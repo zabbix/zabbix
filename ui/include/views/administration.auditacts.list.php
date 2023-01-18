@@ -55,7 +55,9 @@ $auditWidget->addItem(
 );
 
 // create form
-$auditForm = (new CForm('get'))->setName('auditForm');
+$auditForm = (new CForm('get'))
+	->cleanItems()
+	->setName('auditForm');
 
 // create table
 $auditTable = (new CTableInfo())

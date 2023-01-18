@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 if ($data['readonly'] && !$data['macros']) {
@@ -39,18 +40,28 @@ else {
 		]);
 
 	foreach ($data['macros'] as $i => $macro) {
-		$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
-			->setReadonly($data['readonly'])
-			->addClass('macro')
-			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-			->setAttribute('placeholder', '{$MACRO}');
-		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))
-			->setReadonly($data['readonly']);
-		$macro_cell = [$macro_input];
+		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))->setReadonly($data['readonly']);
+
+		$macro_cell = [
+			(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
+				->setReadonly($data['readonly'])
+				->addClass('macro')
+				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+				->setAttribute('placeholder', '{$MACRO}')
+		];
 
 		if (!$data['readonly']) {
 			if (array_key_exists('hostmacroid', $macro)) {
 				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
+			}
+
+			if (array_key_exists('allow_revert', $macro)) {
+				$macro_value->addRevertButton();
+				$macro_value->setRevertButtonVisibility($macro['type'] != ZBX_MACRO_TYPE_SECRET
+					|| array_key_exists('value', $macro)
+				);
+
+				$macro_cell[] = new CVar('macros['.$i.'][allow_revert]', '1');
 			}
 
 			$action_btn = (new CButton('macros['.$i.'][remove]', _('Remove')))
@@ -59,13 +70,6 @@ else {
 		}
 		else {
 			$action_btn = null;
-		}
-
-		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
-			$macro_value->addRevertButton();
-			$macro_value->setRevertButtonVisibility(array_key_exists('value', $macro)
-				&& array_key_exists('hostmacroid', $macro)
-			);
 		}
 
 		if (array_key_exists('value', $macro)) {

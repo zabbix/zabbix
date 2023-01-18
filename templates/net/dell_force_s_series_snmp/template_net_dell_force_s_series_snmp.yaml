@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-15T17:56:24Z'
+  date: '2022-10-27T12:58:33Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: e5ec7acc7efc4ac491b6fa552ab077ae
-      template: 'Dell Force S-Series SNMP'
-      name: 'Dell Force S-Series SNMP'
+      template: 'Dell Force S-Series by SNMP'
+      name: 'Dell Force S-Series by SNMP'
       description: |
         Template Dell Force S-Series
         
@@ -43,7 +43,7 @@ zabbix_export:
           triggers:
             -
               uuid: f186488b337f4b1b8971992e8118d9cc
-              expression: 'max(/Dell Force S-Series SNMP/icmpping,#3)=0'
+              expression: 'max(/Dell Force S-Series by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -69,14 +69,14 @@ zabbix_export:
           triggers:
             -
               uuid: 46798adec54c47a38cb599773767a2a7
-              expression: 'min(/Dell Force S-Series SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell Force S-Series SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Dell Force S-Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell Force S-Series by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Dell Force S-Series SNMP/icmpping,#3)=0'
+                  expression: 'max(/Dell Force S-Series by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -102,17 +102,17 @@ zabbix_export:
           triggers:
             -
               uuid: 04828676081147b4bfad0ad03385986e
-              expression: 'avg(/Dell Force S-Series SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Dell Force S-Series by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Dell Force S-Series SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell Force S-Series SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Dell Force S-Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell Force S-Series by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Dell Force S-Series SNMP/icmpping,#3)=0'
+                  expression: 'max(/Dell Force S-Series by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -258,7 +258,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2dc35c5813b042fd96f2ebc53f565799
-              expression: 'last(/Dell Force S-Series SNMP/system.name,#1)<>last(/Dell Force S-Series SNMP/system.name,#2) and length(last(/Dell Force S-Series SNMP/system.name))>0'
+              expression: 'last(/Dell Force S-Series by SNMP/system.name,#1)<>last(/Dell Force S-Series by SNMP/system.name,#2) and length(last(/Dell Force S-Series by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -339,7 +339,7 @@ zabbix_export:
           triggers:
             -
               uuid: da99689aa1394d17af5008e5678915bc
-              expression: 'max(/Dell Force S-Series SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Dell Force S-Series by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -347,7 +347,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Dell Force S-Series SNMP/icmpping,#3)=0'
+                  expression: 'max(/Dell Force S-Series by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -382,7 +382,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: aecc6fdd58404347b3074b0c1db63f09
-                  expression: 'count(/Dell Force S-Series SNMP/sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  expression: 'count(/Dell Force S-Series by SNMP/sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: 'Fan {#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -396,7 +396,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: a53271304dcf418aa5afdaa145436b70
-                  expression: 'count(/Dell Force S-Series SNMP/sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
+                  expression: 'count(/Dell Force S-Series by SNMP/sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
                   name: 'Fan {#SNMPVALUE}: Fan is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -404,7 +404,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Fan {#SNMPVALUE}: Fan is in critical state'
-                      expression: 'count(/Dell Force S-Series SNMP/sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                      expression: 'count(/Dell Force S-Series by SNMP/sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   tags:
                     -
                       tag: scope
@@ -436,7 +436,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 002c0f19cfe54fe08da2183654752470
-                  expression: 'min(/Dell Force S-Series SNMP/system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/Dell Force S-Series by SNMP/system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPINDEX}: High CPU utilization'
                   event_name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -465,7 +465,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 41baaaa2eb6246b7982ac76928fbd0f8
-                  expression: 'min(/Dell Force S-Series SNMP/vm.memory.util[chStackUnitMemUsageUtil.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Dell Force S-Series by SNMP/vm.memory.util[chStackUnitMemUsageUtil.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '#{#SNMPINDEX}: High memory utilization'
                   event_name: '#{#SNMPINDEX}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -488,7 +488,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Dell Force S-Series SNMP'
+                    host: 'Dell Force S-Series by SNMP'
                     key: 'system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}]'
             -
               uuid: 69c63b7fb65347cc9301b02e1f9cd45e
@@ -500,7 +500,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Dell Force S-Series SNMP'
+                    host: 'Dell Force S-Series by SNMP'
                     key: 'vm.memory.util[chStackUnitMemUsageUtil.{#SNMPINDEX}]'
         -
           uuid: 620805730ede4c7281a1c736fcfeb130
@@ -806,9 +806,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b7b55335f42b4ace8434588bc70f7e60
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -859,21 +859,21 @@ zabbix_export:
             -
               uuid: f4903edf173f470482174ee9937cbb32
               expression: |
-                change(/Dell Force S-Series SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Dell Force S-Series SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Dell Force S-Series SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Dell Force S-Series SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Dell Force S-Series SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Dell Force S-Series SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Dell Force S-Series SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Dell Force S-Series SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Dell Force S-Series by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Dell Force S-Series by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Dell Force S-Series by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Dell Force S-Series by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Dell Force S-Series by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Dell Force S-Series by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Dell Force S-Series SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Dell Force S-Series SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -882,8 +882,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -891,13 +891,13 @@ zabbix_export:
             -
               uuid: e85a287c2e0e48e19cb43bf74d3f3535
               expression: |
-                (avg(/Dell Force S-Series SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Dell Force S-Series SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/Dell Force S-Series SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Dell Force S-Series SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/Dell Force S-Series SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/Dell Force S-Series by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Dell Force S-Series by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Dell Force S-Series SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Dell Force S-Series SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/Dell Force S-Series SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Dell Force S-Series SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/Dell Force S-Series by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Dell Force S-Series by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -907,8 +907,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -916,12 +916,12 @@ zabbix_export:
             -
               uuid: 00d2988bdd084719ba781562920d20fa
               expression: |
-                min(/Dell Force S-Series SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Dell Force S-Series SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Dell Force S-Series by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Dell Force S-Series by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Dell Force S-Series SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Dell Force S-Series SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Dell Force S-Series by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Dell Force S-Series by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -931,8 +931,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -949,42 +949,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Dell Force S-Series SNMP'
+                    host: 'Dell Force S-Series by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Dell Force S-Series SNMP'
+                    host: 'Dell Force S-Series by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Dell Force S-Series SNMP'
+                    host: 'Dell Force S-Series by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Dell Force S-Series SNMP'
+                    host: 'Dell Force S-Series by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Dell Force S-Series SNMP'
+                    host: 'Dell Force S-Series by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Dell Force S-Series SNMP'
+                    host: 'Dell Force S-Series by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 6782ece35ded46b08a4f45a9743b1ff5
@@ -1054,7 +1054,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: edc143c44b2d465cac94c4cf0fb588a6
-                  expression: 'last(/Dell Force S-Series SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
+                  expression: 'last(/Dell Force S-Series by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
@@ -1111,7 +1111,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 764f08ab7a29481fa73a63ae256ff154
-                  expression: 'count(/Dell Force S-Series SNMP/sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                  expression: 'count(/Dell Force S-Series by SNMP/sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: 'PSU {#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1125,7 +1125,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: a7d4ac882ec24cce9839c6012c7fa562
-                  expression: 'count(/Dell Force S-Series SNMP/sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
+                  expression: 'count(/Dell Force S-Series by SNMP/sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
                   name: 'PSU {#SNMPVALUE}: Power supply is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -1133,7 +1133,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'PSU {#SNMPVALUE}: Power supply is in critical state'
-                      expression: 'count(/Dell Force S-Series SNMP/sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                      expression: 'count(/Dell Force S-Series by SNMP/sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   tags:
                     -
                       tag: scope
@@ -1165,9 +1165,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: dc1064de6a6b4533be812e590b96927b
-                  expression: 'avg(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Dell Force S-Series by SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'max(/Dell Force S-Series by SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   name: 'Device {#SNMPVALUE}: Temperature is above critical threshold'
                   event_name: 'Device {#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1182,9 +1182,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: f4d0a2c0b1a9468990e1f6dbfef1ab75
-                  expression: 'avg(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Dell Force S-Series by SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'max(/Dell Force S-Series by SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
                   name: 'Device {#SNMPVALUE}: Temperature is above warning threshold'
                   event_name: 'Device {#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1193,8 +1193,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Device {#SNMPVALUE}: Temperature is above critical threshold'
-                      expression: 'avg(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
-                      recovery_expression: 'max(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                      expression: 'avg(/Dell Force S-Series by SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                      recovery_expression: 'max(/Dell Force S-Series by SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   tags:
                     -
                       tag: scope
@@ -1204,9 +1204,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: f1bbf02af05041ef95ff80ff18fc02a7
-                  expression: 'avg(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Dell Force S-Series by SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
+                  recovery_expression: 'min(/Dell Force S-Series by SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
                   name: 'Device {#SNMPVALUE}: Temperature is too low'
                   event_name: 'Device {#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1265,7 +1265,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6f02e903dab24bf294015f43e0b52504
-                  expression: 'last(/Dell Force S-Series SNMP/system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series SNMP/system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}],#2) and length(last(/Dell Force S-Series SNMP/system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Dell Force S-Series by SNMP/system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series by SNMP/system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}],#2) and length(last(/Dell Force S-Series by SNMP/system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}]))>0'
                   name: '#{#SNMPVALUE}: Device has been replaced'
                   event_name: '#{#SNMPVALUE}: Device has been replaced (new serial number received)'
                   priority: INFO
@@ -1322,7 +1322,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 66049aa1d7cb45ebac1fe5292c309ba2
-                  expression: 'last(/Dell Force S-Series SNMP/system.sw.os[chStackUnitCodeVersion.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series SNMP/system.sw.os[chStackUnitCodeVersion.{#SNMPINDEX}],#2) and length(last(/Dell Force S-Series SNMP/system.sw.os[chStackUnitCodeVersion.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Dell Force S-Series by SNMP/system.sw.os[chStackUnitCodeVersion.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series by SNMP/system.sw.os[chStackUnitCodeVersion.{#SNMPINDEX}],#2) and length(last(/Dell Force S-Series by SNMP/system.sw.os[chStackUnitCodeVersion.{#SNMPINDEX}]))>0'
                   name: '#{#SNMPVALUE}: Operating system description has changed'
                   priority: INFO
                   description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -1330,7 +1330,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'System name has changed'
-                      expression: 'last(/Dell Force S-Series SNMP/system.name,#1)<>last(/Dell Force S-Series SNMP/system.name,#2) and length(last(/Dell Force S-Series SNMP/system.name))>0'
+                      expression: 'last(/Dell Force S-Series by SNMP/system.name,#1)<>last(/Dell Force S-Series by SNMP/system.name,#2) and length(last(/Dell Force S-Series by SNMP/system.name))>0'
                   tags:
                     -
                       tag: scope
@@ -1459,7 +1459,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Dell Force S-Series SNMP'
+                        host: 'Dell Force S-Series by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2411,7 +2411,7 @@ zabbix_export:
   triggers:
     -
       uuid: 4246a064d33f428c8441491402ae8090
-      expression: '(last(/Dell Force S-Series SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Dell Force S-Series SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Dell Force S-Series SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Dell Force S-Series SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Dell Force S-Series by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Dell Force S-Series by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Dell Force S-Series by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Dell Force S-Series by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2420,7 +2420,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Dell Force S-Series SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Dell Force S-Series by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope

@@ -24,6 +24,7 @@
 #include "module.h"
 #include "version.h"
 #include "md5.h"
+#include "zbxprof.h"
 
 #if defined(__MINGW32__)
 #	define __try
@@ -453,6 +454,8 @@ zbx_graph_yaxis_types_t;
 #define ZBX_HA_REMOVE_NODE		"ha_remove_node"
 #define ZBX_HA_SET_FAILOVER_DELAY	"ha_set_failover_delay"
 #define ZBX_USER_PARAMETERS_RELOAD	"userparameter_reload"
+#define ZBX_PROF_ENABLE			"prof_enable"
+#define ZBX_PROF_DISABLE		"prof_disable"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -999,6 +1002,8 @@ zbx_task_t;
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
 #define ZBX_RTC_USER_PARAMETERS_RELOAD		17
+#define ZBX_RTC_PROF_ENABLE			18
+#define ZBX_RTC_PROF_DISABLE			19
 
 /* internal rtc messages */
 #define ZBX_RTC_SUBSCRIBE			100
@@ -1363,12 +1368,10 @@ double	str2double(const char *str);
 #define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
 zbx_uint64_t	suffix2factor(char c);
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 typedef struct __stat64	zbx_stat_t;
 int	__zbx_stat(const char *path, zbx_stat_t *buf);
 int	__zbx_open(const char *pathname, int flags);
-#elif defined(__MINGW32__)
-typedef struct _stat64	zbx_stat_t;
 #else
 typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */
@@ -1687,7 +1690,28 @@ zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
 
 int	zbx_validate_value_dbl(double value, int dbl_precision);
 
-void	zbx_update_env(double time_now);
+void	__zbx_update_env(double time_now);
+
+#ifdef _WINDOWS
+#define zbx_update_env(info, time_now)			\
+							\
+do							\
+{							\
+	__zbx_update_env(time_now);			\
+	ZBX_UNUSED(info);				\
+}							\
+while (0)
+#else
+#define zbx_update_env(info, time_now)			\
+							\
+do							\
+{							\
+	__zbx_update_env(time_now);			\
+	zbx_prof_update(info, time_now);		\
+}							\
+while (0)
+#endif
+
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
 		int *nextcheck, int *scheduling, char **error);
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
@@ -1801,5 +1825,4 @@ typedef enum
 zbx_err_codes_t;
 
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
-int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
 #endif

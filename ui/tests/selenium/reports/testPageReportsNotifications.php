@@ -18,10 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
+/**
+ * @dataSource LoginUsers
+ */
 class testPageReportsNotifications extends CLegacyWebTest {
 
 	public function testPageReportsNotifications_CheckLayout() {
@@ -37,7 +41,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		$dropdowns = [
 			'media_type' => array_merge(['all'], $all_media),
 			'period' => ['Daily', 'Weekly', 'Monthly', 'Yearly'],
-			'year' => ['2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022']
+			'year' => array_reverse(range(date("Y"), date("Y",strtotime("-11 year"))))
 		];
 		$default_selected = [
 			'media_type' => 'all',

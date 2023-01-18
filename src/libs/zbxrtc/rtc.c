@@ -20,25 +20,45 @@
 #include "rtc.h"
 
 #include "common.h"
+#include "zbxprof.h"
+
+
+static int	rtc_parse_scope(const char *str, int *scope)
+{
+	if (NULL == scope)
+		return FAIL;
+
+	if (0 == strcmp(str, "rwlock"))
+		*scope = ZBX_PROF_RWLOCK;
+	else if (0 == strcmp(str, "mutex"))
+		*scope = ZBX_PROF_MUTEX;
+	else if (0 == strcmp(str, "processing"))
+		*scope = ZBX_PROF_PROCESSING;
+	else
+		return FAIL;
+
+	return SUCCEED;
+}
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse loglevel runtime control option                             *
+ * Purpose: parse runtime control option                                      *
  *                                                                            *
- * Parameters: opt       - [IN] the runtime control option                    *
- *             len       - [IN] the runtime control option length without     *
+ * Parameters: opt       - [IN] runtime control option                        *
+ *             len       - [IN] runtime control option length without         *
  *                              parameter                                     *
- *             pid       - [OUT] the target pid (if specified)                *
- *             proc_type - [OUT] the target process type (if specified)       *
- *             proc_num  - [OUT] the target process num (if specified)        *
- *             error     - [OUT] the error message                            *
+ *             pid       - [OUT] target pid (if specified)                    *
+ *             proc_type - [OUT] target process type (if specified)           *
+ *             proc_num  - [OUT] target process num (if specified)            *
+ *             scope     - [OUT] scope (if specified)                         *
+ *             error     - [OUT] error message                                *
  *                                                                            *
- * Return value: SUCCEED - the runtime control option was processed           *
+ * Return value: SUCCEED - runtime control option was processed               *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_parse_loglevel_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,
-		char **error)
+int	zbx_rtc_parse_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,
+		int *scope, char **error)
 {
 	const char	*rtc_options;
 
@@ -54,22 +74,35 @@ int	zbx_rtc_parse_loglevel_option(const char *opt, size_t len, pid_t *pid, int *
 	}
 	else if (0 != isdigit(*(++rtc_options)))
 	{
+		char	*scope_ptr;
+
+		if (NULL != (scope_ptr = strchr(rtc_options, ',')))
+			*scope_ptr++ = '\0';
 		/* convert PID */
 		if (FAIL == is_uint32(rtc_options, pid) || 0 == *pid)
 		{
-			*error = zbx_dsprintf(NULL, "invalid log level control target -"
-					" invalid or unsupported process identifier");
+			*error = zbx_dsprintf(NULL, "invalid control target - invalid or unsupported process"
+					" identifier");
 			return FAIL;
 		}
+
+		if (NULL != scope_ptr)
+		{
+			if (FAIL == rtc_parse_scope(scope_ptr, scope))
+			{
+				*error = zbx_dsprintf(NULL, "invalid control target -"
+						" invalid or unsupported scope \"%s\"", scope_ptr);
+				return FAIL;
+			}
+		}
 	}
-	else
+	else if (FAIL == rtc_parse_scope(rtc_options, scope))
 	{
 		char	proc_name[MAX_STRING_LEN], *proc_num_ptr;
 
 		if ('\0' == *rtc_options)
 		{
-			*error = zbx_dsprintf(NULL, "invalid log level control target -"
-					" unspecified process identifier or type");
+			*error = zbx_dsprintf(NULL, "invalid control target - unspecified process identifier or type");
 			return FAIL;
 		}
 
@@ -80,13 +113,13 @@ int	zbx_rtc_parse_loglevel_option(const char *opt, size_t len, pid_t *pid, int *
 
 		if ('\0' == *proc_name)
 		{
-			*error = zbx_dsprintf(NULL, "invalid log level control target - unspecified process type");
+			*error = zbx_dsprintf(NULL, "invalid control target - unspecified process type");
 			return FAIL;
 		}
 
 		if (ZBX_PROCESS_TYPE_UNKNOWN == (*proc_type = get_process_type_by_name(proc_name)))
 		{
-			*error = zbx_dsprintf(NULL, "invalid log level control target - unknown process type \"%s\"",
+			*error = zbx_dsprintf(NULL, "invalid control target - unknown process type \"%s\"",
 					proc_name);
 			return FAIL;
 		}
@@ -95,17 +128,34 @@ int	zbx_rtc_parse_loglevel_option(const char *opt, size_t len, pid_t *pid, int *
 		{
 			if ('\0' == *proc_num_ptr)
 			{
-				*error = zbx_dsprintf(NULL, "invalid log level control target -"
-						" unspecified process number");
+				*error = zbx_dsprintf(NULL, "invalid control target - unspecified process number");
 				return FAIL;
 			}
 
-			/* convert Zabbix process number (e.g. "2" in "poller,2") */
-			if (FAIL == is_uint32(proc_num_ptr, proc_num) || 0 == *proc_num)
+			if (FAIL == rtc_parse_scope(proc_num_ptr, scope))
 			{
-				*error = zbx_dsprintf(NULL, "invalid log level control target -"
-						" invalid or unsupported process number \"%s\"", proc_num_ptr);
-				return FAIL;
+				char	*scope_ptr;
+
+				if (NULL != (scope_ptr = strchr(proc_num_ptr, ',')))
+					*scope_ptr++ = '\0';
+
+				if (FAIL == is_uint32(proc_num_ptr, proc_num) || 0 == *proc_num)
+				{
+					/* convert Zabbix process number (e.g. "2" in "poller,2") */
+					*error = zbx_dsprintf(NULL, "invalid control target -"
+							" invalid or unsupported process number \"%s\"", proc_num_ptr);
+					return FAIL;
+				}
+
+				if (NULL != scope_ptr)
+				{
+					if (FAIL == rtc_parse_scope(scope_ptr, scope))
+					{
+						*error = zbx_dsprintf(NULL, "invalid control target"
+								" invalid or unsupported scope \"%s\"", scope_ptr);
+						return FAIL;
+					}
+				}
 			}
 		}
 	}

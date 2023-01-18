@@ -819,7 +819,8 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
  *                                                                            *
  * Purpose: execute jsonpath query                                            *
  *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
+ * Parameters: cache  - [IN] the preprocessing cache                          *
+ *             value  - [IN/OUT] the value to process                         *
  *             params - [IN] the operation parameters                         *
  *             errmsg - [OUT] error message                                   *
  *                                                                            *
@@ -827,18 +828,59 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_jsonpath_op(zbx_variant_t *value, const char *params, char **errmsg)
+static int	item_preproc_jsonpath_op(zbx_preproc_cache_t *cache, zbx_variant_t *value, const char *params,
+		char **errmsg)
 {
-	struct zbx_json_parse	jp;
-	char			*data = NULL;
+	char	*data = NULL;
 
-	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
-		return FAIL;
-
-	if (FAIL == zbx_json_open(value->data.str, &jp) || FAIL == zbx_jsonpath_query(&jp, params, &data))
+	if (NULL == cache)
 	{
-		*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
-		return FAIL;
+		zbx_jsonobj_t	obj;
+
+		if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+			return FAIL;
+
+		if (FAIL == zbx_jsonobj_open(value->data.str, &obj))
+		{
+			*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
+			return FAIL;
+		}
+
+		if (FAIL == zbx_jsonobj_query(&obj, params, &data))
+		{
+			zbx_jsonobj_clear(&obj);
+			*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
+			return FAIL;
+		}
+
+		zbx_jsonobj_clear(&obj);
+	}
+	else
+	{
+		zbx_jsonobj_t	*obj;
+
+		if (NULL == (obj = (zbx_jsonobj_t *)zbx_preproc_cache_get(cache, ZBX_PREPROC_JSONPATH)))
+		{
+			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+				return FAIL;
+
+			obj = (zbx_jsonobj_t *)zbx_malloc(NULL, sizeof(zbx_jsonobj_t));
+
+			if (SUCCEED != zbx_jsonobj_open(value->data.str, obj))
+			{
+				*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
+				zbx_free(obj);
+				return FAIL;
+			}
+
+			zbx_preproc_cache_put(cache, ZBX_PREPROC_JSONPATH, obj);
+		}
+
+		if (FAIL == zbx_jsonobj_query(obj, params, &data))
+		{
+			*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
+			return FAIL;
+		}
 	}
 
 	if (NULL == data)
@@ -857,7 +899,8 @@ static int	item_preproc_jsonpath_op(zbx_variant_t *value, const char *params, ch
  *                                                                            *
  * Purpose: execute jsonpath query                                            *
  *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
+ * Parameters: cache  - [IN] the preprocessing cache                          *
+ *             value  - [IN/OUT] the value to process                         *
  *             params - [IN] the operation parameters                         *
  *             errmsg - [OUT] error message                                   *
  *                                                                            *
@@ -865,11 +908,12 @@ static int	item_preproc_jsonpath_op(zbx_variant_t *value, const char *params, ch
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char **errmsg)
+static int	item_preproc_jsonpath(zbx_preproc_cache_t *cache, zbx_variant_t *value, const char *params,
+		char **errmsg)
 {
 	char	*err = NULL;
 
-	if (SUCCEED == item_preproc_jsonpath_op(value, params, &err))
+	if (SUCCEED == item_preproc_jsonpath_op(cache, value, params, &err))
 		return SUCCEED;
 
 	*errmsg = zbx_dsprintf(*errmsg, "cannot extract value from json by path \"%s\": %s", params, err);
@@ -1456,7 +1500,8 @@ fail:
  *                                                                            *
  * Purpose: parse Prometheus format metrics                                   *
  *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
+ * Parameters: cache  - [IN] the preprocessing cache                          *
+ *             value  - [IN/OUT] the value to process                         *
  *             params - [IN] the operation parameters                         *
  *             errmsg - [OUT] error message                                   *
  *                                                                            *
@@ -2033,7 +2078,7 @@ int	zbx_item_preproc(zbx_preproc_cache_t *cache, unsigned char value_type, zbx_v
 			ret = item_preproc_xpath(value, op->params, error);
 			break;
 		case ZBX_PREPROC_JSONPATH:
-			ret = item_preproc_jsonpath(value, op->params, error);
+			ret = item_preproc_jsonpath(cache, value, op->params, error);
 			break;
 		case ZBX_PREPROC_VALIDATE_RANGE:
 			ret = item_preproc_validate_range(value_type, value, op->params, error);

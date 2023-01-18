@@ -52,6 +52,47 @@ void	DBclose(void)
 	zbx_db_close();
 }
 
+#if defined(HAVE_POSTGRESQL)
+int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
+{
+	DB_RESULT	result;
+	int		ret;
+
+	if (1 == ZBX_DB_TSDB_V1) {
+		result = DBselect("select null from timescaledb_information.compressed_chunk_stats where hypertable_name in (%s) and "
+			"compression_status='Compressed'", table_names);
+	}
+	else
+	{
+		result = DBselect("select null from timescaledb_information.chunks where hypertable_name in (%s) and "
+			"is_compressed='t'", table_names);
+	}
+
+	if (NULL != DBfetch(result))
+		ret = SUCCEED;
+	else
+		ret = FAIL;
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+void	zbx_tsdb_update_dbversion_info(struct zbx_db_version_info_t *db_version_info)
+{
+	const char	*history_tables, *trends_tables;
+
+	history_tables = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_HISTORY_TABLES : ZBX_TSDB2_HISTORY_TABLES);
+	trends_tables = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_TRENDS_TABLES : ZBX_TSDB2_TRENDS_TABLES);
+
+	db_version_info->history_compressed_chunks = (SUCCEED ==
+			zbx_tsdb_table_has_compressed_chunks(history_tables)) ? 1 : 0;
+
+	db_version_info->trends_compressed_chunks = (SUCCEED ==
+			zbx_tsdb_table_has_compressed_chunks(trends_tables)) ? 1 : 0;
+}
+#endif
+
 int	zbx_db_validate_config_features(void)
 {
 	int	err = 0;
@@ -810,7 +851,7 @@ void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	if (NULL == (result = DBselect("select db_extension from config")))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = DBfetch(result)) || '\0' == *row[0])
 		goto clean;
 
 	version_info->extension = zbx_strdup(NULL, row[0]);
@@ -2288,6 +2329,46 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 }
 
 #ifndef HAVE_SQLITE3
+int	DBtrigger_exists(const char *table_name, const char *trigger_name)
+{
+	char		*table_name_esc, *trigger_name_esc;
+	DB_RESULT	result;
+	int		ret;
+
+	table_name_esc = DBdyn_escape_string(table_name);
+	trigger_name_esc = DBdyn_escape_string(trigger_name);
+
+#if defined(HAVE_MYSQL)
+	result = DBselect(
+			"show triggers where `table`='%s'"
+			" and `trigger`='%s'",
+			table_name_esc, trigger_name_esc);
+#elif defined(HAVE_ORACLE)
+	result = DBselect(
+			"select 1"
+			" from all_triggers"
+			" where lower(table_name)='%s'"
+				" and lower(trigger_name)='%s'",
+			table_name_esc, trigger_name_esc);
+#elif defined(HAVE_POSTGRESQL)
+	result = DBselect(
+			"select 1"
+			" from information_schema.triggers"
+			" where event_object_table='%s'"
+			" and trigger_name='%s'"
+			" and trigger_schema='%s'",
+			table_name_esc, trigger_name_esc, zbx_db_get_schema_esc());
+#endif
+	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
+
+	DBfree_result(result);
+
+	zbx_free(table_name_esc);
+	zbx_free(trigger_name_esc);
+
+	return ret;
+}
+
 int	DBindex_exists(const char *table_name, const char *index_name)
 {
 	char		*table_name_esc, *index_name_esc;

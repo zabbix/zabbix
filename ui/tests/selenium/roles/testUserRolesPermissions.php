@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -114,6 +115,10 @@ class testUserRolesPermissions extends CWebTest {
 	}
 
 	public function prepareServiceData() {
+		// Remove all unnecessary services before proceeding with execution.
+		DBExecute('DELETE FROM services');
+
+		// Create services for Service permission checks.
 		CDataHelper::call('service.create', [
 			[
 				'name' => 'Parent 1',
@@ -472,9 +477,6 @@ class testUserRolesPermissions extends CWebTest {
 			'Configuration',
 			'Detect operating system',
 			'Ping',
-			'Script for Clone',
-			'Script for Delete',
-			'Script for Update',
 			'Traceroute'
 		];
 		$context_after = [

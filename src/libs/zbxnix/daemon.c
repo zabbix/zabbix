@@ -28,6 +28,7 @@
 #include "fatal.h"
 #include "sighandler.h"
 #include "sigcommon.h"
+#include "zbxprof.h"
 
 #if defined(__linux__)
 #define ZBX_PID_FILE_TIMEOUT 20
@@ -70,6 +71,12 @@ static void	common_sigusr_handler(int flags)
 				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
 						zabbix_get_log_level_string());
 			}
+			break;
+		case ZBX_RTC_PROF_ENABLE:
+			zbx_prof_enable(ZBX_RTC_GET_SCOPE(flags));
+			break;
+		case ZBX_RTC_PROF_DISABLE:
+			zbx_prof_disable();
 			break;
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			if (SUCCEED != zabbix_decrease_log_level())
@@ -171,7 +178,7 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 
 		if (-1 != sigqueue(threads[i], SIGUSR1, s))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d",	threads[i]);
+			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d", threads[i]);
 		}
 		else
 		{

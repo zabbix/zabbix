@@ -262,6 +262,14 @@ zbx_graph_item_type;
 
 #define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 
+#ifdef HAVE_MYSQL
+#	define ZBX_SQL_SORT_ASC(field)	field " asc"
+#	define ZBX_SQL_SORT_DESC(field)	field " desc"
+#else
+#	define ZBX_SQL_SORT_ASC(field)	field " asc nulls first"
+#	define ZBX_SQL_SORT_DESC(field)	field " desc nulls last"
+#endif
+
 typedef struct
 {
 	zbx_uint64_t	druleid;
@@ -687,6 +695,7 @@ int	DBtxn_ongoing(void);
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 #ifndef HAVE_SQLITE3
+int	DBtrigger_exists(const char *table_name, const char *trigger_name);
 int	DBindex_exists(const char *table_name, const char *index_name);
 int	DBpk_exists(const char *table_name);
 #endif

@@ -1,14 +1,17 @@
 
-# OPNsense SNMP
+# OPNsense by SNMP
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
 Template for monitoring OPNsense by SNMP
 
-This template was tested on:
+This template has been tested on:
 
 - OPNsense, version 22.1.9
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
@@ -25,7 +28,7 @@ begemotSnmpdModulePath."pf"     = "/usr/lib/snmp_pf.so"
 5. Link the template to a host.
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -42,8 +45,7 @@ No specific Zabbix configuration is required.
 |{$NET.IF.IFALIAS.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$NET.IF.IFDESCR.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`.*` |
 |{$NET.IF.IFDESCR.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$NET.IF.IFNAME.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`^em[0-9]+$` |
-|{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`^$` |
+|{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`(^pflog[0-9.]*$|^pfsync[0-9.]*$)` |
 |{$NET.IF.IFOPERSTATUS.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`^.*$` |
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES} |<p>Ignore notPresent(6).</p> |`^6$` |
 |{$NET.IF.IFTYPE.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`.*` |
@@ -52,17 +54,17 @@ No specific Zabbix configuration is required.
 |{$SOURCE.TRACKING.TABLE.UTIL.MAX} |<p>Threshold of source tracking table utilization trigger in %.</p> |`90` |
 |{$STATE.TABLE.UTIL.MAX} |<p>Threshold of state table utilization trigger in %.</p> |`90` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Network interfaces discovery |<p>Discovering interfaces from IF-MIB.</p> |SNMP |opnsense.net.if.discovery<p>**Filter**:</p>AND <p>- {#IFADMINSTATUS} MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.MATCHES}`</p><p>- {#IFADMINSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.NOT_MATCHES}`</p><p>- {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p><p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p><p>- {#IFTYPE} MATCHES_REGEX `{$NET.IF.IFTYPE.MATCHES}`</p><p>- {#IFTYPE} NOT_MATCHES_REGEX `{$NET.IF.IFTYPE.NOT_MATCHES}`</p> |
+|Network interfaces discovery |<p>Discovering interfaces from IF-MIB.</p> |SNMP |opnsense.net.if.discovery<p>**Filter**:</p>AND <p>- {#IFADMINSTATUS} MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.MATCHES}`</p><p>- {#IFADMINSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.NOT_MATCHES}`</p><p>- {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p><p>- {#IFNAME} MATCHES_REGEX `@Network interfaces for discovery`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p><p>- {#IFTYPE} MATCHES_REGEX `{$NET.IF.IFTYPE.MATCHES}`</p><p>- {#IFTYPE} NOT_MATCHES_REGEX `{$NET.IF.IFTYPE.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -111,25 +113,25 @@ There are no template links in this template.
 |OPNsense |OPNsense: Firewall rules count |<p>MIB: BEGEMOT-PF-MIB</p><p>The number of labeled filter rules on this system.</p> |SNMP |opnsense.rules.count |
 |Status |OPNsense: SNMP agent availability |<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p> |INTERNAL |zabbix[host,snmp,available] |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p> |`min(/OPNsense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/OPNsense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>**Depends on**:</p><p>- OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/OPNsense SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])) and last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])>0 `<p>Recovery expression:</p>`avg(/OPNsense SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])` |WARNING |<p>**Depends on**:</p><p>- OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p> |`min(/OPNsense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/OPNsense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>**Depends on**:</p><p>- OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/OPNsense SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])) and last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])>0 `<p>Recovery expression:</p>`avg(/OPNsense SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])` |WARNING |<p>**Depends on**:</p><p>- OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`change(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])>0 and ( last(/OPNsense SNMP/net.if.type[{#SNMPINDEX}])=6 or last(/OPNsense SNMP/net.if.type[{#SNMPINDEX}])=7 or last(/OPNsense SNMP/net.if.type[{#SNMPINDEX}])=11 or last(/OPNsense SNMP/net.if.type[{#SNMPINDEX}])=62 or last(/OPNsense SNMP/net.if.type[{#SNMPINDEX}])=69 or last(/OPNsense SNMP/net.if.type[{#SNMPINDEX}])=117 ) and (last(/OPNsense SNMP/net.if.status[{#SNMPINDEX}])<>2) `<p>Recovery expression:</p>`(change(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or (last(/OPNsense SNMP/net.if.status[{#SNMPINDEX}])=2) ` |INFO |<p>**Depends on**:</p><p>- OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p> |`{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense SNMP/net.if.status[{#SNMPINDEX}])=2)` |AVERAGE | |
-|OPNsense: Packet filter is not running |<p>Please check PF status.</p> |`last(/OPNsense SNMP/opnsense.pf.status)<>1` |HIGH | |
-|OPNsense: State table usage is high |<p>Please check the number of connections.</p> |`min(/OPNsense SNMP/opnsense.state.table.pused,#3)>{$STATE.TABLE.UTIL.MAX}` |WARNING | |
-|OPNsense: Source tracking table usage is high |<p>Please check the number of sticky connections.</p> |`min(/OPNsense SNMP/opnsense.source.tracking.table.pused,#3)>{$SOURCE.TRACKING.TABLE.UTIL.MAX}` |WARNING | |
-|OPNsense: DHCP server is not running |<p>Please check DHCP server settings.</p> |`last(/OPNsense SNMP/opnsense.dhcpd.status)=0` |AVERAGE | |
-|OPNsense: DNS server is not running |<p>Please check DNS server settings.</p> |`last(/OPNsense SNMP/opnsense.dns.status)=0` |AVERAGE | |
-|OPNsense: Web server is not running |<p>Please check lighttpd service status.</p> |`last(/OPNsense SNMP/opnsense.lighttpd.status)=0` |AVERAGE | |
-|OPNsense: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/OPNsense SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
+|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p> |`min(/OPNsense by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/OPNsense by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>**Depends on**:</p><p>- OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/OPNsense by SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0 `<p>Recovery expression:</p>`avg(/OPNsense by SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])` |WARNING |<p>**Depends on**:</p><p>- OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p> |`min(/OPNsense by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/OPNsense by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>**Depends on**:</p><p>- OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/OPNsense by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0 `<p>Recovery expression:</p>`avg(/OPNsense by SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])` |WARNING |<p>**Depends on**:</p><p>- OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`change(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0 and ( last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=6 or last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=7 or last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=11 or last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=62 or last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=69 or last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=117 ) and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])<>2) `<p>Recovery expression:</p>`(change(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2) ` |INFO |<p>**Depends on**:</p><p>- OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p> |`{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)` |AVERAGE | |
+|OPNsense: Packet filter is not running |<p>Please check PF status.</p> |`last(/OPNsense by SNMP/opnsense.pf.status)<>1` |HIGH | |
+|OPNsense: State table usage is high |<p>Please check the number of connections.</p> |`min(/OPNsense by SNMP/opnsense.state.table.pused,#3)>{$STATE.TABLE.UTIL.MAX}` |WARNING | |
+|OPNsense: Source tracking table usage is high |<p>Please check the number of sticky connections.</p> |`min(/OPNsense by SNMP/opnsense.source.tracking.table.pused,#3)>{$SOURCE.TRACKING.TABLE.UTIL.MAX}` |WARNING | |
+|OPNsense: DHCP server is not running |<p>Please check DHCP server settings.</p> |`last(/OPNsense by SNMP/opnsense.dhcpd.status)=0` |AVERAGE | |
+|OPNsense: DNS server is not running |<p>Please check DNS server settings.</p> |`last(/OPNsense by SNMP/opnsense.dns.status)=0` |AVERAGE | |
+|OPNsense: Web server is not running |<p>Please check lighttpd service status.</p> |`last(/OPNsense by SNMP/opnsense.lighttpd.status)=0` |AVERAGE | |
+|OPNsense: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/OPNsense by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 

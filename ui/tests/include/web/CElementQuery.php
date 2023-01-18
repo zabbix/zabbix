@@ -521,6 +521,17 @@ class CElementQuery implements IWaitable {
 	/**
 	 * @inheritdoc
 	 */
+	public function getClassesPresentCondition($classes) {
+		$target = $this;
+
+		return function () use ($target, $classes) {
+			return $target->one(false)->hasClass($classes);
+		};
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getVisibleCondition() {
 		$target = $this;
 
@@ -578,7 +589,6 @@ class CElementQuery implements IWaitable {
 				'/div/ul[contains(@class, "radio-list-control")]' // TODO: remove after fix DEV-1071.
 			],
 			'CCheckboxListElement'		=> [
-				'/div/div[@class="columns-wrapper columns-3"]', // TODO: fix after DEV-1859.
 				'/ul[contains(@class, "checkbox-list")]',
 				'/ul[contains(@class, "list-check-radio")]'
 			],
@@ -594,7 +604,10 @@ class CElementQuery implements IWaitable {
 				'/div[contains(@class, "range-control")]',
 				'/div[contains(@class, "calendar-control")]'
 			],
-			'CColorPickerElement'		=> '/div[contains(@class, "color-picker")]',
+			'CColorPickerElement'        => [
+				'/div[contains(@class, "color-picker")]',
+				'/div[contains(@class, "form-field")]/div[contains(@class, "color-picker")]'
+			],
 			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]',
 			'CInputGroupElement'		=> '/div[contains(@class, "macro-input-group")]'
 		];
