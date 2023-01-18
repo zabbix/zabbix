@@ -84,17 +84,16 @@ class CControllerProblemView extends CControllerProblem {
 		$filter_tabs = [];
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
 
-		if ($this->hasInput('filter_set') && $this->getInput('filter_name', '') === '') {
-			$profile->setTabFilter(0, $this->cleanInput($this->getInputAll()));
-			$profile->update();
-		}
-		elseif ($this->hasInput('filter_reset')) {
+		if ($this->hasInput('filter_reset')) {
 			$profile->reset();
+		}
+		elseif ($this->hasInput('filter_set')) {
+			$profile->setTabFilter(0, ['filter_name' => ''] + $this->cleanInput($this->getInputAll()));
+			$profile->update();
 		}
 		else {
 			$profile->setInput($this->cleanInput($this->getInputAll()));
 		}
-
 
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
 			if ($filter_tab['filter_custom_time']) {
