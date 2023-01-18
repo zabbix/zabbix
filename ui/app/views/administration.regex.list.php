@@ -79,7 +79,8 @@ $form->addItem([
 	$table,
 	new CActionButtonList('action', 'regexids', [
 		'regex.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?'),
-			'csrf_token' => CCsrfTokenHelper::get('regex.delete')]
+			'csrf_token' => CCsrfTokenHelper::get('regex')
+		]
 	], 'regex')
 ]);
 

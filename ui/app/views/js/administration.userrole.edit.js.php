@@ -28,9 +28,8 @@
 	const view = {
 		readonly: false,
 
-		init({readonly, csrf_tokens}) {
+		init({readonly}) {
 			this.readonly = readonly;
-			this.csrf_tokens = csrf_tokens;
 
 			const usertype_select = document.getElementById('user-type');
 			if (usertype_select !== null) {
@@ -280,10 +279,6 @@
 
 					redirect(url.getUrl(), 'post', 'action', undefined, true);
 				}
-
-				document
-					.querySelector('input[name="<?= CController::CSRF_TOKEN_NAME ?>"]')
-					.value = view.csrf_tokens['userrole.create'];
 
 				document
 					.querySelectorAll('#roleid, #delete, #clone')

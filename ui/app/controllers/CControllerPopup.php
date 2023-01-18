@@ -40,9 +40,7 @@ class CControllerPopup extends CController {
 
 	protected function init() {
 		$this->disableCsrfValidation();
-	}
 
-	protected function init() {
 		$this->supported_popups = [
 			'acknowledge.edit' => _('Update problem')
 		];

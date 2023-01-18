@@ -98,15 +98,16 @@ foreach ($data['reports'] as $report) {
 		}
 	}
 
-	$action = ($report['status'] == ZBX_REPORT_STATUS_DISABLED) ? 'scheduledreport.enable' : 'scheduledreport.disable';
-
 	$status = ($data['source'] === 'scheduledreport-form' && $data['allowed_edit'])
 		? (new CLink($status_name, (new CUrl('zabbix.php'))
-			->setArgument('action', $action)
+			->setArgument('action', ($report['status'] == ZBX_REPORT_STATUS_DISABLED)
+				? 'scheduledreport.enable'
+				: 'scheduledreport.disable'
+			)
 			->setArgument('reportids', [$report['reportid']])
 			->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::get($action))
+			->addCsrfToken(CCsrfTokenHelper::get('scheduledreport'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 		: new CSpan($status_name);
 	$status->addClass($status_class);

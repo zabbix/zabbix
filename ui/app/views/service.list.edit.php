@@ -161,8 +161,7 @@ $filter->addFilterTab(_('Filter'), [
 		'parent_url' => $data['parent_url'],
 		'refresh_url' => $data['refresh_url'],
 		'refresh_interval' => $data['refresh_interval'],
-		'back_url' => $data['back_url'],
-		'csrf_tokens' => $data['csrf_tokens']
+		'back_url' => $data['back_url']
 	]).');
 '))
 	->setOnDocumentReady()

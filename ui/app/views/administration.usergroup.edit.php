@@ -30,12 +30,11 @@ $html_page = (new CHtmlPage())
 	->setTitle(_('User groups'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERGROUP_EDIT));
 
+$csrf_token = CCsrfTokenHelper::get('usergroup');
+
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(
-		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::get($data['usrgrpid'] == 0 ? 'usergroup.create' : 'usergroup.update')
-	))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('user-group-form')
 	->setName('user_group_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
@@ -335,7 +334,7 @@ if ($data['usrgrpid'] != 0) {
 			(new CRedirectButton(_('Delete'),
 				(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.delete')
 					->setArgument('usrgrpids', [$data['usrgrpid']])
-					->addCsrfToken('usergroup.delete'),
+					->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 				_('Delete selected group?')
 			))->setId('delete'),
 			$cancel_button

@@ -305,8 +305,6 @@ class CControllerScheduledReportEdit extends CController {
 			}
 		}
 
-		$data['csrf_tokens'] = self::generateCsrfTokens(['scheduledreport.create', 'popup.scheduledreport.test']);
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Scheduled reports'));
 		$this->setResponse($response);

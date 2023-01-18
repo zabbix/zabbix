@@ -25,10 +25,7 @@
  */
 
 $form = (new CForm())
-	->addItem((new CVar(
-		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::get($data['groupid'] == 0 ? 'templategroup.create' : 'templategroup.update')
-	))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('templategroup')))->removeId())
 	->setId('templategroupForm')
 	->setName('templategroupForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)

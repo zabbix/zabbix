@@ -55,7 +55,7 @@
 				[value_fields[profile_type]]: value,
 				idx2: idx2,
 				action: 'profile.update',
-				_csrf_token: <?= json_encode(CController::generateCsrfToken('profile.update')) ?>
+				_csrf_token: <?= json_encode(CController::generateCsrfToken('profile')) ?>
 			}
 		});
 	}

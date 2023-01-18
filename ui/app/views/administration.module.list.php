@@ -28,6 +28,8 @@ if ($data['uncheck']) {
 	uncheckTableRows('modules');
 }
 
+$csrf_token = CCsrfTokenHelper::get('module');
+
 $html_page = (new CHtmlPage())
 	->setTitle(_('Modules'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
@@ -35,9 +37,7 @@ $html_page = (new CHtmlPage())
 	->setControls(
 		(new CTag('nav', true,
 			(new CForm())
-				->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('module.scan')))
-					->removeId()
-				)
+				->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 				->addVar('action', 'module.scan')
 				->addItem((new CList())
 					->addItem(new CSubmit('form', _('Scan directory')))
@@ -102,13 +102,13 @@ foreach ($data['modules'] as $moduleid => $module) {
 
 	if ($module['status'] == MODULE_STATUS_ENABLED) {
 		$status = (new CLink(_('Enabled'), (new CUrl($status_url))->getUrl()))
-			->addCsrfToken(CCsrfTokenHelper::get('module.disable'))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN);
 	}
 	else {
 		$status = (new CLink(_('Disabled'), (new CUrl($status_url))->getUrl()))
-			->addCsrfToken(CCsrfTokenHelper::get('module.enable'))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED);
 	}
@@ -130,10 +130,10 @@ $form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'moduleids', [
 		'module.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected modules?'),
-			'csrf_token' => CCsrfTokenHelper::get('module.enable')
+			'csrf_token' => $csrf_token
 		],
 		'module.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected modules?'),
-			'csrf_token' => CCsrfTokenHelper::get('module.disable')
+			'csrf_token' => $csrf_token
 		]
 	], 'modules')
 ]);

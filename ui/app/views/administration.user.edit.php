@@ -34,7 +34,7 @@ $html_page = new CHtmlPage();
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
 	$doc_url = CDocHelper::USERS_USER_EDIT;
-	$csrf_token_action = $data['userid'] != 0 ? 'user.update' : 'user.create';
+	$csrf_token = CCsrfTokenHelper::get('user');
 }
 else {
 	$widget_name = _('User profile').NAME_DELIMITER;
@@ -43,7 +43,7 @@ else {
 		: $data['username'];
 	$html_page->setTitleSubmenu(getUserSettingsSubmenu());
 	$doc_url = CDocHelper::USERS_USERPROFILE_EDIT;
-	$csrf_token_action = 'userprofile.update';
+	$csrf_token = CCsrfTokenHelper::get('userprofile');
 }
 
 $html_page
@@ -66,9 +66,7 @@ if ($data['readonly'] == true) {
 // Create form.
 $user_form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get($csrf_token_action)))
-		->removeId()
-	)
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('user-form')
 	->setName('user_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -843,7 +841,7 @@ if ($data['action'] === 'user.edit') {
 				(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'user.delete')
 					->setArgument('userids', [$data['userid']])
-					->addCsrfToken('user.delete'),
+					->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 					_('Delete selected user?')
 				))
 					->setEnabled(bccomp(CWebUser::$data['userid'], $data['userid']) != 0)

@@ -80,6 +80,8 @@ $table = (new CTableInfo())
 		_('Status')
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('usergroup');
+
 foreach ($this->data['usergroups'] as $usergroup) {
 	$debug_mode = ($usergroup['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 		? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
@@ -88,7 +90,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 			->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 			->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::get('usergroup.massupdate'))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_ORANGE)
 		: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
@@ -97,7 +99,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 			->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 			->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::get('usergroup.massupdate'))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN);
 
@@ -116,7 +118,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 				->getUrl()
 			))
-			->addCsrfToken(CCsrfTokenHelper::get('usergroup.massupdate'))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION);
 
 		$user_status = ($usergroup['users_status'] == GROUP_STATUS_ENABLED)
@@ -126,7 +128,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 				->getUrl()
 			))
-				->addCsrfToken(CCsrfTokenHelper::get('usergroup.massupdate'))
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
 			: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
@@ -135,7 +137,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 				->getUrl()
 			))
-				->addCsrfToken(CCsrfTokenHelper::get('usergroup.massupdate'))
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED);
 	}
@@ -216,32 +218,33 @@ $form->addItem([
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_ENABLED)
-				->addCsrfToken('usergroup.massupdate')
+				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
 		['name' => _('Disable'), 'confirm' => _('Disable selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_DISABLED)
-				->addCsrfToken('usergroup.massupdate')
+				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
 		['name' => _('Enable debug mode'), 'confirm' => _('Enable debug mode in selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('debug_mode', GROUP_DEBUG_MODE_ENABLED)
-				->addCsrfToken('usergroup.massupdate')
+				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
 		['name' => _('Disable debug mode'), 'confirm' => _('Disable debug mode in selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('debug_mode', GROUP_DEBUG_MODE_DISABLED)
-				->addCsrfToken('usergroup.massupdate')
+				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
 		'usergroup.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected groups?'),
-			'csrf_token' => CCsrfTokenHelper::get('usergroup.delete')]
+			'csrf_token' => $csrf_token
+		]
 	], 'usergroup')
 ]);
 

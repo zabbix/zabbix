@@ -30,7 +30,6 @@
 	const old_dashboardid = <?= $data['old_dashboardid'] ?>;
 	let dashboard_inaccessible = <?= json_encode($data['dashboard_inaccessible']) ?>;
 	let subscriptions_sanitized = true;
-	let csrf_tokens = <?= json_encode($data['csrf_tokens']) ?>;
 
 	function sanitizeSubscriptions() {
 		document.querySelectorAll('#subscriptions-table tbody tr').forEach((row) => {
@@ -121,10 +120,6 @@
 						}]);
 				}
 
-				document
-					.querySelector('input[name="<?= CController::CSRF_TOKEN_NAME ?>"]')
-					.value = csrf_tokens['scheduledreport.create'];
-
 				document.querySelector('#name').focus();
 
 				if (dashboard_inaccessible) {
@@ -150,7 +145,7 @@
 				const parameters = {
 					period: form.elements['period'].value,
 					now: Math.floor(Date.now() / 1000),
-					_csrf_token: csrf_tokens['popup.scheduledreport.test']
+					<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>: '<?= CCsrfTokenHelper::get('scheduledreport') ?>'
 				};
 
 				if (typeof form.elements['dashboardid'] !== 'undefined') {

@@ -27,9 +27,7 @@
 <script>
 	const view = {
 
-		init({csrf_tokens}) {
-			this.csrf_tokens = csrf_tokens;
-
+		init() {
 			this.initActionButtons();
 			this.expiresDaysHandler();
 		},
@@ -87,7 +85,8 @@
 			target.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('token.delete', this.csrf_tokens['token.delete']);
+			curl.setArgument('action', 'token.delete');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('token') ?>');
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

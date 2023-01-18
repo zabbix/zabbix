@@ -23,9 +23,7 @@
 <script>
 	const view = new class {
 
-		init({csrf_tokens}) {
-			this.csrf_tokens = csrf_tokens;
-
+		init() {
 			this._initActions();
 		}
 
@@ -113,9 +111,9 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('proxy.config.refresh', this.csrf_tokens['proxy.config.refresh']);
+			curl.setArgument('action', 'proxy.config.refresh');
 
-			this._post(target, proxyids, curl.getUrl());
+			this._post(target, proxyids, curl);
 		}
 
 		_enableHosts(target, proxyids) {
@@ -128,9 +126,9 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('proxy.host.enable', this.csrf_tokens['proxy.host.enable']);
+			curl.setArgument('action', 'proxy.host.enable');
 
-			this._post(target, proxyids, curl.getUrl());
+			this._post(target, proxyids, curl);
 		}
 
 		_disableHosts(target, proxyids) {
@@ -143,9 +141,9 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('proxy.host.disable', this.csrf_tokens['proxy.host.disable']);
+			curl.setArgument('action', 'proxy.host.disable');
 
-			this._post(target, proxyids, curl.getUrl());
+			this._post(target, proxyids, curl);
 		}
 
 		_delete(target, proxyids) {
@@ -158,15 +156,17 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('proxy.delete', this.csrf_tokens['proxy.delete']);
+			curl.setArgument('action', 'proxy.delete');
 
-			this._post(target, proxyids, curl.getUrl());
+			this._post(target, proxyids, curl);
 		}
 
 		_post(target, proxyids, url) {
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('proxy') ?>');
+
 			target.classList.add('is-loading');
 
-			return fetch(url, {
+			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({proxyids})

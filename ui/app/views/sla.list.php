@@ -199,9 +199,7 @@ if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 	->show();
 
 (new CScriptTag('
-	view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');
+	view.init();
 '))
 	->setOnDocumentReady()
 	->show();

@@ -31,9 +31,7 @@
 <script>
 	const view = new class {
 
-		init({csrf_tokens}) {
-			this.csrf_tokens = csrf_tokens;
-
+		init() {
 			this._initTagFilter();
 			this._initActions();
 		}
@@ -119,9 +117,9 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('sla.enable', this.csrf_tokens['sla.enable']);
+			curl.setArgument('action', 'sla.enable');
 
-			this._post(target, slaids, curl.getUrl());
+			this._post(target, slaids, curl);
 		}
 
 		_disable(target, slaids) {
@@ -134,9 +132,9 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('sla.disable', this.csrf_tokens['sla.disable']);
+			curl.setArgument('action', 'sla.disable');
 
-			this._post(target, slaids, curl.getUrl());
+			this._post(target, slaids, curl);
 		}
 
 		_delete(target, slaids) {
@@ -149,15 +147,17 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('sla.delete', this.csrf_tokens['sla.delete']);
+			curl.setArgument('action', 'sla.delete');
 
-			this._post(target, slaids, curl.getUrl());
+			this._post(target, slaids, curl);
 		}
 
 		_post(target, slaids, url) {
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('sla') ?>');
+
 			target.classList.add('is-loading');
 
-			return fetch(url, {
+			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({slaids})

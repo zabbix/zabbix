@@ -22,11 +22,10 @@
 <script>
 	const view = new class {
 
-		init({groupid, name, csrf_tokens}) {
+		init({groupid, name}) {
 			this.form = document.getElementById('templategroupForm');
 			this.groupid = groupid;
 			this.name = name;
-			this.csrf_tokens = csrf_tokens;
 
 			this.form.addEventListener('submit', (e) => this._onSubmit(e));
 			this._initActionButtons();
@@ -82,7 +81,10 @@
 
 		_delete() {
 			const curl = new Curl('zabbix.php', false);
-			curl.setAction('templategroup.delete', this.csrf_tokens['templategroup.delete']);
+			curl.setArgument('action', 'templategroup.delete');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				'<?= CCsrfTokenHelper::get('templategroup') ?>'
+			);
 
 			this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {
 				postMessageOk(response.success.title);

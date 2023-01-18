@@ -26,8 +26,7 @@
 $this->addJsFile('class.calendar.js');
 $this->includeJsFile('reports.scheduledreport.edit.js.php', [
 	'old_dashboardid' => $data['old_dashboardid'],
-	'dashboard_inaccessible' => $data['dashboard_inaccessible'],
-	'csrf_tokens' => $data['csrf_tokens']
+	'dashboard_inaccessible' => $data['dashboard_inaccessible']
 ]);
 
 $html_page = (new CHtmlPage())
@@ -36,10 +35,7 @@ $html_page = (new CHtmlPage())
 
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(
-		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::get(($data['reportid'] == 0) ? 'scheduledreport.create' : 'scheduledreport.update')
-	))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('scheduledreport')))->removeId())
 	->setId('scheduledreport-form')
 	->setName('scheduledreport-form')
 	->setAction(

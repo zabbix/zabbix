@@ -72,6 +72,8 @@ $form = (new CForm())
 	->setId('scheduledreport-form')
 	->setName('scheduledreport-form');
 
+$csrf_token = CCsrfTokenHelper::get('scheduledreport');
+
 $form->addItem([
 		new CPartial('scheduledreport.table.html', [
 			'source' => $form->getName(),
@@ -86,19 +88,19 @@ $form->addItem([
 				'name' => _('Enable'),
 				'confirm' => _('Enable selected scheduled reports?'),
 				'disabled' => !$data['allowed_edit'],
-				'csrf_token' => CCsrfTokenHelper::get('scheduledreport.enable')
+				'csrf_token' => $csrf_token
 			],
 			'scheduledreport.disable' => [
 				'name' => _('Disable'),
 				'confirm' => _('Disable selected scheduled reports?'),
 				'disabled' => !$data['allowed_edit'],
-				'csrf_token' => CCsrfTokenHelper::get('scheduledreport.disable')
+				'csrf_token' => $csrf_token
 			],
 			'scheduledreport.delete' => [
 				'name' => _('Delete'),
 				'confirm' => _('Delete selected scheduled reports?'),
 				'disabled' => !$data['allowed_edit'],
-				'csrf_token' => CCsrfTokenHelper::get('scheduledreport.delete')
+				'csrf_token' => $csrf_token
 			]
 		], 'scheduledreport')
 	]);
