@@ -55,12 +55,12 @@ $menu-main-icons-opacity: .75 !default;
 				top: 1px;
 				display: inline-block;
 				float: right;
-				font-size: 7px;
+				font-size: 7px; // TODO - AS: need to use extend chevron icon
 				font-family: 'zabbix-icons' !important;
-				font-style:normal;
+				font-style: normal;
 				content: "\ea22";
-
 				transform: rotate(0deg);
+
 				@if $menu-main-icons-opacity < 1 {
 					opacity: $menu-main-icons-opacity;
 				}

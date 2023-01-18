@@ -1882,13 +1882,15 @@ define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
-define('ZBX_STYLE_FONT_COLOR', '#1f2c33;');
-define('ZBX_STYLE_EVENT_ACTION_ICON_RED', '#e33734');
-define('ZBX_STYLE_EVENT_ACTION_ICON_YELLOW', '#af6b00');
-define('ZBX_STYLE_EVENT_ACTION_ICON_GRAY', '#768d99');
-define('ZBX_STYLE_ACTION_SEVERETY_CHANGED', '#768d99');
-define('ZBX_STYLE_ACTION_SEVERETY_DOWN', '#009900');
-define('ZBX_STYLE_ACTION_SEVERETY_UP', '#e33734');
+
+define('ZBX_STYLE_FONT_COLOR', '#1f2c33;'); // TODO - AS: not good idea. Will be problem with themes
+define('ZBX_STYLE_EVENT_ACTION_ICON_RED', '#e33734'); // TODO - AS: not good idea. Will be problem with themes
+define('ZBX_STYLE_EVENT_ACTION_ICON_YELLOW', '#af6b00'); // TODO - AS: not good idea. Will be problem with themes
+define('ZBX_STYLE_EVENT_ACTION_ICON_GRAY', '#768d99'); // TODO - AS: not good idea. Will be problem with themes
+define('ZBX_STYLE_ACTION_SEVERETY_CHANGED', '#768d99'); // TODO - AS: not good idea. Will be problem with themes
+define('ZBX_STYLE_ACTION_SEVERETY_DOWN', '#009900'); // TODO - AS: not good idea. Will be problem with themes
+define('ZBX_STYLE_ACTION_SEVERETY_UP', '#e33734'); // TODO - AS: not good idea. Will be problem with themes
+
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
 define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
 define('ZBX_STYLE_OK_UNACK_FG', 'ok-unack-fg');
@@ -1940,7 +1942,7 @@ define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
 define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
 define('ZBX_STYLE_ICON_DESCRIPTION', 'icon-description');
 define('ZBX_STYLE_ICON_INFO', 'icon-info');
-define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
+define('ZBX_STYLE_ICON_INVISIBLE', 'zi-eye-off');
 define('ZBX_STYLE_ICON_USER', 'icon-user');
 define('ZBX_STYLE_ICON_USER_GROUP', 'icon-user-group');
 define('ZBX_STYLE_ICON_MAINTENANCE', 'icon-maintenance');
@@ -2002,6 +2004,7 @@ define('ZBX_STYLE_MONOSPACE_FONT', 'monospace-font');
 define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
 define('ZBX_STYLE_MSG_WARNING', 'msg-warning');
+define('ZBX_STYLE_MSG_GLOBAL', 'msg-global');
 define('ZBX_STYLE_MSG_GLOBAL_FOOTER', 'msg-global-footer');
 define('ZBX_STYLE_MSG_DETAILS', 'msg-details');
 define('ZBX_STYLE_MSG_DETAILS_BORDER', 'msg-details-border');
@@ -2159,16 +2162,16 @@ define('ZBX_STYLE_HOST_AVAIL_FALSE', 'host-avail-false');
 define('ZBX_STYLE_HOST_AVAIL_UNKNOWN', 'host-avail-unknown');
 define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 
-// Widget "Problems by severity" styles.
+// Widget "Problems by severity" styles.s
 define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
 
 define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
 
 // Icons.
-define('ZBX_STYLE_ICON_TEXT', 'icon-text');
-define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
-define('ZBX_STYLE_ICON_HELP_HINT', 'icon-help-hint');
-define('ZBX_STYLE_ICON_DOC_LINK', 'icon-doc-link');
+define('ZBX_STYLE_ICON_TEXT', 'zi-text'); // TODO - AS: rename constant to ZBX_ICON_TEXT
+define('ZBX_STYLE_ICON_SECRET_TEXT', 'zi-lock'); // TODO - AS: rename constant to ZBX_ICON_LOCK
+define('ZBX_STYLE_ICON_HELP_HINT', 'icon-help-hint'); // TODO - AS: ??? rename constant to ZBX_ICON_HELP_HINT
+define('ZBX_STYLE_ICON_DOC_LINK', 'icon-doc-link'); // TODO - AS: ??? rename constant to ZBX_ICON_DOC_LINK
 
 // Host interface styles.
 define('ZBX_STYLE_HOST_INTERFACES', 'interfaces');

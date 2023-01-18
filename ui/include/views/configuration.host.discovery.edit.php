@@ -197,9 +197,7 @@ $item_tab
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
 						(new CCol(
-							(new CDiv(
-								new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
-							))
+							(new CDiv(new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')))
 								->addClass(ZBX_STYLE_DRAG_ICON)
 								->addClass('zi-drag-handle')
 						))->addClass(ZBX_STYLE_TD_DRAG_ICON),

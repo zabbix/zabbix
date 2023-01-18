@@ -79,7 +79,7 @@ $menu-user-icons-opacity: .75 !default;
 				top: 1px;
 				display: inline-block;
 				float: right;
-				font-size: 7px;
+				font-size: 7px; // TODO - AS: need to use extend chevron icon
 				font-family: 'zabbix-icons' !important;
 				font-style:normal;
 				content: "\ea22";

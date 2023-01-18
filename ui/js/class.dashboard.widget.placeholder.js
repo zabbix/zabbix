@@ -53,8 +53,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 		this._placeholder_box.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_BOX);
 
 		this._placeholder_box_label = document.createElement('div');
-		this._placeholder_box_label.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL);
-		this._placeholder_box_label.classList.add('zi-widget-add');
+		this._placeholder_box_label.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL, 'zi-widget-add');
 
 		this._placeholder_box_label_wrap = document.createElement('span');
 

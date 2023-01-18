@@ -211,7 +211,7 @@
 
 			this.clearLoading();
 
-			const messages = $(jqXHR.responseText).find('.msg-global');
+			const messages = $(jqXHR.responseText).find('.<?= ZBX_STYLE_MSG_GLOBAL ?>');
 
 			if (messages.length) {
 				this.host_view_form.html(messages);

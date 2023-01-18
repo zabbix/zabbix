@@ -131,8 +131,7 @@ $html_page = (new CHtmlPage())
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
 						->addItem(
-							(new CButton('dashboard-add-widget', _('Add')
-							))
+							(new CButton('dashboard-add-widget', _('Add')))
 								->addClass(ZBX_STYLE_BTN_ALT)
 								->addClass('zi-plus')
 						)
@@ -150,7 +149,7 @@ $html_page = (new CHtmlPage())
 			))->addStyle('display: none'))
 	)
 	->setKioskModeControls(
-		(count($data['dashboard']['pages']) > 1)
+		count($data['dashboard']['pages']) > 1
 			? (new CList())
 				->addClass(ZBX_STYLE_DASHBOARD_KIOSKMODE_CONTROLS)
 				->addItem(

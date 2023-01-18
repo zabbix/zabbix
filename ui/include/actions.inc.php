@@ -1747,20 +1747,21 @@ function makeEventActionsIcons($eventid, $actions, $users) {
 
 /**
  * Create icon with hintbox for event suppressions.
- * Records must be passed in the order starting from latest by field 'clock'.
+ * Records must be passed in the order starting from the latest by field 'clock'.
  *
- * @param array  $data
+ * @param array $data
  * @param array  $data['suppress_until'][]['suppress_until']  Time until problem is suppressed by user.
- * @param string $data['suppress_until'][]['clock']                 Suppression creation time.
- * @param array  $users                                       User name, surname and username.
- *
- * @return CButton|null
+ * @param string $data['suppress_until'][]['clock']           Suppression creation time.
+ * @param array $users  User name, surname and username.
  */
-function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
-	$total = $data['count'];
+function makeEventSuppressionsProblemIcon(array $data, array $users): ?CTag {
+	if (!$data['count']) {
+		return null;
+	}
+
 	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Action'), _('Suppress until')]);
 
-	for ($i = 0; $i < $total && $i < ZBX_WIDGET_ROWS; $i++) {
+	for ($i = 0; $i < $data['count'] && $i < ZBX_WIDGET_ROWS; $i++) {
 		$suppression = $data['suppress_until'][$i];
 
 		// Added in order to reuse makeActionTableUser().
@@ -1794,25 +1795,23 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 		]);
 	}
 
-	return $total
-		? makeActionIcon([
-			'icon' => array_key_exists('suppress_until', $data['suppress_until'][0])
-				? 'zi-eye-off'
-				: 'zi-eye',
-			'button' => true,
-			'hint' => [
-				$table,
-				($total > ZBX_WIDGET_ROWS)
-					? (new CDiv(
-						(new CDiv(
-							(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $total)))
-								->addClass(ZBX_STYLE_TABLE_STATS)
-						))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-					))->addClass(ZBX_STYLE_TABLE_PAGING)
-					: null
-			]
-		])
-		: null;
+	return makeActionIcon([
+		'icon' => array_key_exists('suppress_until', $data['suppress_until'][0])
+			? 'zi-eye-off'
+			: 'zi-eye',
+		'button' => true,
+		'hint' => [
+			$table,
+			($data['count'] > ZBX_WIDGET_ROWS)
+				? (new CDiv(
+					(new CDiv(
+						(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $data['count'])))
+							->addClass(ZBX_STYLE_TABLE_STATS)
+					))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				))->addClass(ZBX_STYLE_TABLE_PAGING)
+				: null
+		]
+	]);
 }
 
 /**
@@ -1823,15 +1822,15 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
  * @param string $data['messages'][]['message']  Message text.
  * @param string $data['messages'][]['clock']    Message creation time.
  * @param array  $users                          User name, surname and username.
- *
- * @return CButton|null
  */
-function makeEventMessagesIcon(array $data, array $users): ?CButton {
-	$total = $data['count'];
+function makeEventMessagesIcon(array $data, array $users): ?CTag {
+	if (!$data['count']) {
+		return null;
+	}
 
 	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Message')]);
 
-	for ($i = 0; $i < $total && $i < ZBX_WIDGET_ROWS; $i++) {
+	for ($i = 0; $i < $data['count'] && $i < ZBX_WIDGET_ROWS; $i++) {
 		$message = $data['messages'][$i];
 
 		// Added in order to reuse makeActionTableUser().
@@ -1843,25 +1842,24 @@ function makeEventMessagesIcon(array $data, array $users): ?CButton {
 			zbx_nl2br($message['message'])
 		]);
 	}
-	return $total
-		? makeActionIcon([
-			'icon' => 'zi-alert',
-			'button' => true,
-			'hint' => [
-				$table,
-				($total > ZBX_WIDGET_ROWS)
-					? (new CDiv(
-						(new CDiv(
-							(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $total)))
-								->addClass(ZBX_STYLE_TABLE_STATS)
-						))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-					))->addClass(ZBX_STYLE_TABLE_PAGING)
-					: null
-			],
-			'num' => $total,
-			'aria-label' => _xn('%1$s message', '%1$s messages', $total, 'screen reader', $total)
-		])
-		: null;
+
+	return makeActionIcon([
+		'icon' => 'zi-alert',
+		'button' => true,
+		'hint' => [
+			$table,
+			($data['count'] > ZBX_WIDGET_ROWS)
+				? (new CDiv(
+					(new CDiv(
+						(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $data['count'])))
+							->addClass(ZBX_STYLE_TABLE_STATS)
+					))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				))->addClass(ZBX_STYLE_TABLE_PAGING)
+				: null
+		],
+		'num' => $data['count'],
+		'aria-label' => _xn('%1$s message', '%1$s messages', $data['count'], 'screen reader', $data['count'])
+	]);
 }
 
 /**
@@ -1876,15 +1874,15 @@ function makeEventMessagesIcon(array $data, array $users): ?CButton {
  * @param string $data['current_severity']              Current severity.
  * @param int    $data['count']                         Total number of severity changes.
  * @param array  $users                                 User name, surname and username.
- *
- * @return CButton|null
  */
-function makeEventSeverityChangesIcon(array $data, array $users): ?CButton {
-	$total = $data['count'];
+function makeEventSeverityChangesIcon(array $data, array $users): ?CTag {
+	if (!$data['count']) {
+		return null;
+	}
 
 	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Severity changes')]);
 
-	for ($i = 0; $i < $total && $i < ZBX_WIDGET_ROWS; $i++) {
+	for ($i = 0; $i < $data['count'] && $i < ZBX_WIDGET_ROWS; $i++) {
 		$severity = $data['severities'][$i];
 
 		// Added in order to reuse makeActionTableUser().
@@ -1918,25 +1916,23 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButton {
 		$aria_label = _x('Severity changed', 'screen reader');
 	}
 
-	return $total
-		? makeActionIcon([
-			'button' => true,
-			'color' => $color,
-			'icon' => $icon_style,
-			'hint' => [
-				$table,
-				($total > ZBX_WIDGET_ROWS)
-					? (new CDiv(
-						(new CDiv(
-							(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $total)))
-								->addClass(ZBX_STYLE_TABLE_STATS)
-						))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-					))->addClass(ZBX_STYLE_TABLE_PAGING)
-					: null
-			],
-			'aria-label' => $aria_label
-		])
-		: null;
+	return makeActionIcon([
+		'button' => true,
+		'color' => $color,
+		'icon' => $icon_style,
+		'hint' => [
+			$table,
+			($data['count'] > ZBX_WIDGET_ROWS)
+				? (new CDiv(
+					(new CDiv(
+						(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $data['count'])))
+							->addClass(ZBX_STYLE_TABLE_STATS)
+					))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				))->addClass(ZBX_STYLE_TABLE_PAGING)
+				: null
+		],
+		'aria-label' => $aria_label
+	]);
 }
 
 /**
@@ -2002,13 +1998,12 @@ function makeEventActionsTable(array $actions, array $users, array $mediatypes):
  * @param bool   $data['has_uncomplete_action']     Does the event have at least one uncompleted alert action.
  * @param bool   $data['has_failed_action']         Does the event have at least one failed alert action.
  * @param string $eventid
- *
- * @return CButton|null
  */
-function makeEventActionsIcon(array $data, $eventid): ?CButton {
-	// Number of meaningful actions.
-	$total = $data['count'];
-	// select icon
+function makeEventActionsIcon(array $data, $eventid): ?CTag {
+	if (!$data['count']) {
+		return null;
+	}
+
 	if ($data['has_failed_action']) {
 		$color = ZBX_STYLE_EVENT_ACTION_ICON_RED;
 	}
@@ -2019,18 +2014,16 @@ function makeEventActionsIcon(array $data, $eventid): ?CButton {
 		$color = ZBX_STYLE_EVENT_ACTION_ICON_GRAY;
 	}
 
-	return $total
-		? makeActionIcon([
-			'icon' => 'zi-bullet-right',
-			'color' => $color,
-			'button' => true,
-			'num' => $total,
-			'aria-label' => _xn('%1$s action', '%1$s actions', $total, 'screen reader', $total)
-		])->setAjaxHint([
-			'type' => 'eventactions',
-			'data' => ['eventid' => $eventid]
-		])
-		: null;
+	return makeActionIcon([
+		'icon' => 'zi-bullet-right',
+		'color' => $color,
+		'button' => true,
+		'num' => $data['count'],
+		'aria-label' => _xn('%1$s action', '%1$s actions', $data['count'], 'screen reader', $data['count'])
+	])->setAjaxHint([
+		'type' => 'eventactions',
+		'data' => ['eventid' => $eventid]
+	]);
 }
 
 /**
@@ -2185,10 +2178,8 @@ function makeEventDetailsTableUser(array $action, array $users) {
  * @param int    $action['old_severity']  Severity before problem update. (only for ZBX_EVENT_HISTORY_MANUAL_UPDATE)
  * @param int    $action['new_severity']  Severity after problem update. (only for ZBX_EVENT_HISTORY_MANUAL_UPDATE)
  * @param int    $action['alerttype']     Type of alert. (only for ZBX_EVENT_HISTORY_ALERT)
- *
- * @return CSpan
  */
-function makeActionTableIcon(array $action) {
+function makeActionTableIcon(array $action): ?CTag {
 	switch ($action['action_type']) {
 		case ZBX_EVENT_HISTORY_PROBLEM_EVENT:
 			return makeActionIcon(['icon' => 'zi-calendar-warning', 'title' => _('Problem created')]);
@@ -2200,10 +2191,7 @@ function makeActionTableIcon(array $action) {
 			$action_icons = [];
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-				$action_icons[] = makeActionIcon([
-					'icon' => 'zi-checkbox',
-					'title' => _('Manually closed')
-				]);
+				$action_icons[] = makeActionIcon([ 'icon' => 'zi-checkbox', 'title' => _('Manually closed')]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
@@ -2266,6 +2254,9 @@ function makeActionTableIcon(array $action) {
 				: _('Alert message');
 
 			return makeActionIcon(['icon' => $action_icon, 'title' => $title]);
+
+		default:
+			return null;
 	}
 }
 

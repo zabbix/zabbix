@@ -1862,8 +1862,7 @@ jQuery(function($) {
 		}
 
 		if (options.selected) {
-			link.addClass('selected');
-			link.addClass('zi-check');
+			link.addClass('selected zi-check');
 		}
 
 		if (options.class) {

@@ -196,19 +196,19 @@ $browser-sprite-path: '../img/browser-sprite.png?20220722';
 .zabbix-logo {
 	width: 114px;
 	height: 30px;
-	background: url($sprite-path) no-repeat 0 -864px;
+	background: url($sprite-path) no-repeat 0 -864px; // TODO - AS: should be removed
 }
 
 .zabbix-sidebar-logo {
 	width: 91px;
 	height: 24px;
-	background: url($sprite-path) no-repeat -570px -400px;
+	background: url($sprite-path) no-repeat -570px -400px; // TODO - AS: should be removed
 }
 
 .zabbix-sidebar-logo-compact {
 	width: 24px;
 	height: 24px;
-	background: url($sprite-path) no-repeat -540px -400px;
+	background: url($sprite-path) no-repeat -540px -400px; // TODO - AS: should be removed
 }
 
 .hor-list {
@@ -2134,7 +2134,7 @@ $trigger-expression-tree-icons: (
 	margin: 0 12px 0 0;
 	// todo no icon present
 	&::before {
-		background: url($sprite-path) no-repeat;
+		background: url($sprite-path) no-repeat; // TODO - AS: should be removed
 		display: inline-block;
 		width: 12px;
 		height: 12px;
@@ -2149,7 +2149,7 @@ $trigger-expression-tree-icons: (
 //  .icon-tree-top-right
 //  .icon-tree-empty
 @each $class, $bg-position in $trigger-expression-tree-icons {
-	.icon-tree-#{$class} {
+	.icon-tree-#{$class} { // TODO - AS: should be checked and fixed
 		@extend %trigger-expression-tree-icons-common;
 
 		&::before {

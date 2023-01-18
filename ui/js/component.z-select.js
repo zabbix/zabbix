@@ -110,8 +110,7 @@ class ZSelect extends HTMLElement {
 
 	init() {
 		this._button.type = 'button';
-		this._button.classList.add('focusable');
-		this._button.classList.add('zi-chevron-down');
+		this._button.classList.add('focusable', 'zi-chevron-down');
 		this.appendChild(this._button);
 
 		this._input.type = 'hidden';

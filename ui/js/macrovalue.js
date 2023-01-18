@@ -75,8 +75,8 @@
 			.trigger('change');
 
 		$('.btn-dropdown-container button', $container)
-			.removeClass('icon-text zi-text icon-secret')
-			.addClass('btn-alt btn-dropdown-toggle icon-invisible zi-chevron-down');
+			.removeClass('zi-text zi-lock')
+			.addClass('btn-alt btn-dropdown-toggle zi-eye-off');
 		$this.hide();
 	}
 

@@ -125,7 +125,7 @@ ZBX_Notification.prototype.makeNode = function() {
 	node.indicator = indicator;
 	node.title_node = title_node;
 	node.snooze_icon = document.createElement('div');
-	node.snooze_icon.className = 'notif-indic-snooze zi-bell-off';
+	node.snooze_icon.classList.add('notif-indic-snooze', 'zi-bell-off');
 	node.snooze_icon.style.opacity = 0;
 
 	node.indicator.appendChild(node.snooze_icon);

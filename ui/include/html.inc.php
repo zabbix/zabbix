@@ -1009,17 +1009,12 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false) {
  * @return CTag  Returns CSpan or CButton depending on boolean $icon_data['button'] parameter
  */
 function makeActionIcon(array $icon_data): CTag {
-	if (!array_key_exists('color', $icon_data)) {
-		$icon_data['color'] = ZBX_STYLE_FONT_COLOR;
-	}
+	$icon = array_key_exists('button', $icon_data) && $icon_data['button'] ? new CButton(null) : new CSpan();
 
-	if (array_key_exists('button', $icon_data) && $icon_data['button']) {
-		$icon = (new CButton(null))
-				->addClass($icon_data['icon'])
-				->addStyle('color: '.$icon_data['color'].';');
-	}
-	else {
-		$icon = (new CSpan())->addClass($icon_data['icon']);
+	$icon->addClass($icon_data['icon']);
+
+	if (array_key_exists('color', $icon_data)) {
+		$icon->addStyle('color: '.$icon_data['color'].';');
 	}
 
 	if (array_key_exists('num', $icon_data)) {

@@ -126,7 +126,7 @@ class CMacroValue extends CInput {
 
 		if ($value_type == ZBX_MACRO_TYPE_TEXT) {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_TEXT;
-			$dropdown_btn_class = ZBX_STYLE_ICON_TEXT.' zi-text';
+			$dropdown_btn_class = ZBX_STYLE_ICON_TEXT;
 
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
@@ -135,7 +135,7 @@ class CMacroValue extends CInput {
 		}
 		elseif ($value_type == ZBX_MACRO_TYPE_VAULT) {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
-			$dropdown_btn_class = ZBX_STYLE_ICON_SECRET_TEXT.' zi-lock';
+			$dropdown_btn_class = ZBX_STYLE_ICON_SECRET_TEXT;
 
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
@@ -144,7 +144,7 @@ class CMacroValue extends CInput {
 		}
 		else {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_SECRET;
-			$dropdown_btn_class = ZBX_STYLE_ICON_INVISIBLE.' zi-eye-off';
+			$dropdown_btn_class = ZBX_STYLE_ICON_INVISIBLE;
 
 			$elements[] = (new CInputSecret($name.'[value]', $value, $this->add_post_js))
 				->setAttribute('maxlength', $this->maxlength)
@@ -157,9 +157,9 @@ class CMacroValue extends CInput {
 		}
 
 		$elements[] = (new CButtonDropdown($name.'[type]',  $value_type, [
-				['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_STYLE_ICON_TEXT.' zi-text'],
-				['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_STYLE_ICON_INVISIBLE.' zi-eye-off'],
-				['label' => _('Vault secret'), 'value' => ZBX_MACRO_TYPE_VAULT, 'class' => ZBX_STYLE_ICON_SECRET_TEXT.' zi-lock']
+				['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_STYLE_ICON_TEXT],
+				['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_STYLE_ICON_INVISIBLE],
+				['label' => _('Vault secret'), 'value' => ZBX_MACRO_TYPE_VAULT, 'class' => ZBX_STYLE_ICON_SECRET_TEXT]
 			]))
 				->addClass($dropdown_btn_class)
 				->addClass('zi-chevron-down')

@@ -23,10 +23,13 @@ class CWarning extends Ctag {
 
 	public function __construct($header, $messages = [], $buttons = []) {
 		parent::__construct('output', true);
-		$this->addItem($header);
-		$this->addClass(ZBX_STYLE_MSG_BAD);
-		$this->addClass('zi-circle-info-filled');
-		$this->addClass('msg-global');
+
+		$this
+			->addItem($header)
+			->addClass(ZBX_STYLE_MSG_GLOBAL)
+			->addClass(ZBX_STYLE_MSG_BAD)
+			->addClass('zi-circle-info-filled');
+
 		if ($messages) {
 			parent::addItem(
 				(new CDiv(
@@ -36,6 +39,7 @@ class CWarning extends Ctag {
 				))->addClass(ZBX_STYLE_MSG_DETAILS)
 			);
 		}
+
 		parent::addItem((new CDiv($buttons))->addClass('msg-buttons'));
 	}
 }

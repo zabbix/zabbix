@@ -1777,21 +1777,28 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 	}
 
 	$aria_labels = [
-		ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled' => _('Success message'),
-		ZBX_STYLE_MSG_BAD.' zi-circle-info-filled' => _('Error message'),
-		ZBX_STYLE_MSG_WARNING.' zi-circle-info-filled' => _('Warning message')
+		ZBX_STYLE_MSG_GOOD => _('Success message'),
+		ZBX_STYLE_MSG_BAD => _('Error message'),
+		ZBX_STYLE_MSG_WARNING => _('Warning message')
+	];
+
+	$icons = [
+		ZBX_STYLE_MSG_GOOD => 'zi-circle-check-filled',
+		ZBX_STYLE_MSG_BAD => 'zi-circle-info-filled',
+		ZBX_STYLE_MSG_WARNING => 'zi-circle-info-filled'
 	];
 
 	// Details link should be in front of title.
 	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))
 		->addClass($class)
+		->addClass($icons[$class])
 		->setAttribute('role', 'contentinfo')
 		->setAttribute('aria-label', $aria_labels[$class]);
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
-			->onClick('jQuery(this).parent().remove();')
+			->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
 			->setTitle(_('Close')));
 	}
 
@@ -1851,7 +1858,7 @@ function getMessages(bool $good = false, string $title = null, bool $show_close_
 	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)
-		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled' : ZBX_STYLE_MSG_BAD.' zi-circle-info-filled', $messages, $title, $show_close_box, !$good)
+		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD, $messages, $title, $show_close_box, !$good)
 		: null;
 
 	return $message_box;
@@ -1876,7 +1883,7 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 		}
 
 		if ($has_errors) {
-			$class = ZBX_STYLE_MSG_BAD.' zi-circle-info-filled';
+			$class = ZBX_STYLE_MSG_BAD;
 			$good = false;
 		}
 		elseif ($has_warnings) {
@@ -1884,12 +1891,12 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 			$good = true;
 		}
 		else {
-			$class = ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled';
+			$class = ZBX_STYLE_MSG_GOOD;
 			$good = true;
 		}
 	}
 	else {
-		$class = $good ? ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled' : ZBX_STYLE_MSG_BAD.' zi-circle-info-filled';
+		$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
 	}
 
 	$title = $good ? $okmsg : $errmsg;

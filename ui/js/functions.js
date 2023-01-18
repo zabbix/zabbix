@@ -717,8 +717,16 @@ function parseUrlString(url_string) {
  * @return {jQuery}
  */
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
-	var classes = {good: 'msg-good zi-circle-check-filled', bad: 'msg-bad zi-circle-info-filled', warning: 'msg-warning zi-triangle-warning'},
-		msg_class = classes[type];
+	const classes = {
+			good: 'msg-good',
+			bad: 'msg-bad',
+			warning: 'msg-warning'
+		},
+		icons = {
+			good: 'zi-circle-check-filled',
+			bad: 'zi-circle-info-filled',
+			warning: 'zi-triangle-warning'
+		};
 
 	if (show_details === null) {
 		show_details = type === 'bad' || type === 'warning';
@@ -731,7 +739,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			.append($list),
 		aria_labels = {good: t('Success message'), bad: t('Error message'), warning: t('Warning message')},
 		$msg_box = jQuery('<output>')
-			.addClass(msg_class).attr('role', 'contentinfo')
+			.addClass([classes[type], icons[type]]).attr('role', 'contentinfo')
 			.attr('aria-label', aria_labels[type]),
 		$details_arrow = jQuery('<span>')
 			.attr('id', 'details-arrow')
@@ -789,7 +797,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 				.attr('title', t('Close'))
 				.click(function() {
 					jQuery(this)
-						.closest('.' + msg_class)
+						.closest('.' + classes[type])
 						.remove();
 				});
 		$msg_box.append($button);

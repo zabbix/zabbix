@@ -352,7 +352,7 @@ $arrow-fill-up-down: #000000;
 
 	.dashboard-widget-placeholder-label {
 		&::before {
-			background: url($sprite-path) no-repeat -213px -888px;
+			background: url($sprite-path) no-repeat -213px -888px; // TODO - AS: should be removed
 		}
 	}
 
@@ -374,7 +374,7 @@ $arrow-fill-up-down: #000000;
 }
 
 .btn-dashboard-conf {
-	background: url($sprite-path) no-repeat -201px -619px !important;
+	background: url($sprite-path) no-repeat -201px -619px !important; // TODO - AS: should be removed
 }
 
 .subfilter-enabled {
@@ -416,14 +416,14 @@ $arrow-fill-up-down: #000000;
 
 			&.selected {
 				&::before {
-					background: url($sprite-path) no-repeat -317px -835px;
+					background: url($sprite-path) no-repeat -317px -835px; // TODO - AS: should be removed
 				}
 			}
 		}
 
 		&.selected {
 			&::before {
-				background: url($sprite-path) no-repeat -164px -835px;
+				background: url($sprite-path) no-repeat -164px -835px; // TODO - AS: should be removed
 			}
 		}
 
@@ -435,19 +435,19 @@ $arrow-fill-up-down: #000000;
 }
 
 .btn-add {
-	background: url($sprite-path) no-repeat -204px -550px !important;
+	background: url($sprite-path) no-repeat -204px -550px !important; // TODO - AS: should be removed
 }
 
 .btn-edit {
-	background: url($sprite-path) no-repeat -204px -477px !important;
+	background: url($sprite-path) no-repeat -204px -477px !important; // TODO - AS: should be removed
 }
 
 .btn-import {
-	background: url($sprite-path) no-repeat -204px -514px !important;
+	background: url($sprite-path) no-repeat -204px -514px !important; // TODO - AS: should be removed
 }
 
 .drag-icon {
-	background: url($sprite-path) no-repeat -165px -762px !important;
+	background: url($sprite-path) no-repeat -165px -762px !important; // TODO - AS: should be removed
 }
 
 // Colors and general.
@@ -752,11 +752,11 @@ a.link-action {
 			}
 
 			.icon-wizard-action {
-				background: transparent url($sprite-path) no-repeat -318px -624px;
+				background: transparent url($sprite-path) no-repeat -318px -624px; // TODO - AS: should be removed
 			}
 
 			.icon-wizard-action {
-				background: transparent url($sprite-path) no-repeat -165px -624px;
+				background: transparent url($sprite-path) no-repeat -165px -624px; // TODO - AS: should be removed
 			}
 		}
 	}
@@ -819,7 +819,7 @@ a.link-action {
 	}
 
 	&::after {
-		background: url($sprite-path) no-repeat;
+		background: url($sprite-path) no-repeat; // TODO - AS: should be removed
 		content: '';
 		position: absolute;
 		left: 6px;
@@ -965,7 +965,7 @@ td.inactive-bg {
 
 .inactive-bg::after {
 	content: '';
-	background: url($sprite-path) no-repeat -256px -411px;
+	background: url($sprite-path) no-repeat -256px -411px; // TODO - AS: should be removed
 	width: 22px;
 	height: 18px;
 	top: 5px;
@@ -1209,7 +1209,7 @@ td.inactive-bg {
 
 		&::before {
 			content: '';
-			background-image: url($sprite-path);
+			background-image: url($sprite-path); // TODO - AS: should be removed
 			background-repeat: no-repeat;
 			border-radius: 3px;
 			position: absolute;

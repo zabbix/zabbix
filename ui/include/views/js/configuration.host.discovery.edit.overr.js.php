@@ -39,9 +39,10 @@
 </script>
 <script type="text/x-jquery-tmpl" id="lldoverride-row">
 	<?= (new CRow([
-			(new CCol((new CDiv())
-				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addClass('zi-drag-handle')
+			(new CCol(
+				(new CDiv())
+					->addClass(ZBX_STYLE_DRAG_ICON)
+					->addClass('zi-drag-handle')
 			))
 				->addClass(ZBX_STYLE_TD_DRAG_ICON)
 				->setWidth('15'),

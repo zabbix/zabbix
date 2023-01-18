@@ -27,7 +27,7 @@
 $token_form = (new CForm())
 	->setId('token_form')
 	->setName('token')
-	->addItem(makeMessageBox(ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled', [], $data['message']));
+	->addItem(makeMessageBox(ZBX_STYLE_MSG_GOOD, [], $data['message']));
 
 $token_from_grid = (new CFormGrid())
 	->addItem([

@@ -13,6 +13,7 @@
 		.zi-chevron-left,
 		.zi-pause {
 			padding: 0 2px;
+
 			&::before {
 				top: -1px;
 			}
@@ -53,11 +54,10 @@
 				padding: 0;
 			}
 
-			.zi-plus {
+			.zi-plus { // TODO - AS: need to check
 				width: unset;
 				height: unset;
 				padding: 0 11px 0 8px;
-
 				color: $btn-alt-font-color;
 				background-color: $btn-alt-bg-color;
 				font-size: 100%;
@@ -71,7 +71,6 @@
 				&::before {
 					padding-right: 5px;
 					vertical-align: unset;
-
 					font-size: 8px;
 				}
 			}
@@ -79,18 +78,19 @@
 	}
 
 	.zi-cog-filled {
-		padding: 0;
 		width: 24px;
 		height: 24px;
-
+		padding: 0;
 		color: $icon-color;
 		opacity: .5;
 		transition: opacity .2s ease-out;
+
 		&:hover,
 		&:focus {
 			box-shadow: 0 0 0 2px $btn-border-focus-color;
 			opacity: 1;
 		}
+
 		@extend %btn-reset;
 	}
 }
@@ -202,16 +202,19 @@
 
 	.zi-more {
 		padding: 0;
+		opacity: .5;
+		transition: opacity .2s ease-out;
+
 		&::before {
 			top: -1px;
 			padding: 0 3px;
 		}
-		opacity: .5;
-		transition: opacity .2s ease-out;
+
 		&:hover,
 		&:focus {
 			opacity: 1;
 		}
+
 		@extend %btn-reset;
 	}
 }
@@ -302,12 +305,12 @@
 	user-select: none;
 
 	.dashboard-widget-placeholder-box {
+		position: relative;
+		overflow: hidden;
 		background-color: rgba($ui-bg-color, .7);
 		border: 1px dashed $form-border-color;
 		box-shadow: 2px 2px 6px $action-shadow-color;
 		flex: 1;
-		position: relative;
-		overflow: hidden;
 
 		.zi-widget-add,
 		.zi-widget-resize {
@@ -315,10 +318,12 @@
 			flex-direction: column;
 			align-items: center;
 			justify-content: center;
+
 			span {
 				padding: 0 0 20px 0;
 				text-align: center;
 			}
+
 			&::before {
 				padding: 26px;
 				font-size: 48px;
@@ -327,15 +332,12 @@
 	}
 
 	.dashboard-widget-placeholder-label {
-		$icon-height: 28px;
-
 		position: absolute;
 		left: 0;
 		top: 50%;
 		transform: translate(0, -50%);
 		right: 0;
 		bottom: 0;
-
 		text-align: center;
 	}
 
@@ -419,23 +421,25 @@
 
 	.zi-more,
 	.zi-cog-filled {
-		padding: 0;
-		width: 24px;
-		height: 24px;
 		position: relative;
 		top: 2px;
-
+		width: 24px;
+		height: 24px;
+		padding: 0;
 		opacity: .5;
 		transition: opacity .2s ease-out;
+
 		&:hover,
 		&:focus,
 		&:active {
 			box-shadow: 0 0 0 2px $btn-border-focus-color;
 			opacity: 1;
 		}
+
 		&::before {
 			color: $icon-color;
 		}
+
 		@extend %btn-reset;
 	}
 }
@@ -518,7 +522,8 @@
 	&.dashboard-grid-widget-hidden-header {
 		.dashboard-grid-widget-head {
 			height: 0;
-			transition: height $ui-transition-duration, margin-top $ui-transition-duration, box-shadow $ui-transition-duration;
+			transition: height $ui-transition-duration, margin-top $ui-transition-duration,
+				box-shadow $ui-transition-duration;
 		}
 
 		.dashboard-grid-widget-content {
@@ -594,7 +599,8 @@
 	opacity: 0;
 
 	// Transition for opacity is set for best border disappearance on different themes.
-	transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out, opacity .15s .15s ease-out, box-shadow $ui-transition-duration ease-out;
+	transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out,
+		opacity .15s .15s ease-out, box-shadow $ui-transition-duration ease-out;
 
 	// Not to loose hovered header while widget underneath is updating.
 	z-index: 3;
@@ -716,7 +722,8 @@
 			opacity: 1;
 
 			// Not inheriting opacity transition here.
-			transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out, box-shadow $ui-transition-duration ease-out;
+			transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out,
+				box-shadow $ui-transition-duration ease-out;
 		}
 
 		&.dashboard-grid-iterator-hidden-header.iterator-double-header {

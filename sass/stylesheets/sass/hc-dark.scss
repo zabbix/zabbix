@@ -378,7 +378,7 @@ $arrow-fill-up-down: #FFFFFF;
 
 	.dashboard-widget-placeholder-label {
 		&::before {
-			background: url($sprite-path) no-repeat -269px -888px;
+			background: url($sprite-path) no-repeat -269px -888px; // TODO - AS: should be removed
 		}
 	}
 
@@ -450,10 +450,10 @@ $arrow-fill-up-down: #FFFFFF;
 }
 
 $icon-widget-btn: (
-	alarm-off: url($sprite-path) no-repeat -318px -582px,
-	sound-on: url($sprite-path) no-repeat -318px -474px,
-	sound-off: url($sprite-path) no-repeat -318px -510px,
-	info-clock: url($sprite-path) no-repeat -399px -762px
+	alarm-off: url($sprite-path) no-repeat -318px -582px, // TODO - AS: should be removed
+	sound-on: url($sprite-path) no-repeat -318px -474px, // TODO - AS: should be removed
+	sound-off: url($sprite-path) no-repeat -318px -510px, // TODO - AS: should be removed
+	info-clock: url($sprite-path) no-repeat -399px -762px // TODO - AS: should be removed
 );
 
 // Dynamically generated classes:
@@ -469,7 +469,7 @@ $icon-widget-btn: (
 }
 
 .btn-dashboard-conf {
-	background: url($sprite-path) no-repeat -354px -619px !important;
+	background: url($sprite-path) no-repeat -354px -619px !important; // TODO - AS: should be removed
 }
 
 .subfilter-enabled {
@@ -515,7 +515,7 @@ $icon-widget-btn: (
 
 		&.selected {
 			&::before {
-				background: url($sprite-path) no-repeat -317px -835px;
+				background: url($sprite-path) no-repeat -317px -835px; // TODO - AS: should be removed
 			}
 		}
 
@@ -548,19 +548,19 @@ $icon-widget-btn: (
 }
 
 .btn-add {
-	background: url($sprite-path) no-repeat -357px -550px !important;
+	background: url($sprite-path) no-repeat -357px -550px !important; // TODO - AS: should be removed
 }
 
 .btn-edit {
-	background: url($sprite-path) no-repeat -357px -477px !important;
+	background: url($sprite-path) no-repeat -357px -477px !important; // TODO - AS: should be removed
 }
 
 .btn-import {
-	background: url($sprite-path) no-repeat -357px -514px !important;
+	background: url($sprite-path) no-repeat -357px -514px !important; // TODO - AS: should be removed
 }
 
 .drag-icon {
-	background: url($sprite-path) no-repeat -318px -762px !important;
+	background: url($sprite-path) no-repeat -318px -762px !important; // TODO - AS: should be removed
 }
 
 // Colors and general.
@@ -861,7 +861,7 @@ a.icon-count {
 			}
 
 			.icon-wizard-action {
-				background: transparent url($sprite-path) no-repeat -318px -624px;
+				background: transparent url($sprite-path) no-repeat -318px -624px; // TODO - AS: should be removed
 			}
 		}
 	}
@@ -924,7 +924,7 @@ a.icon-count {
 	}
 
 	&::after {
-		background: url($sprite-path) no-repeat;
+		background: url($sprite-path) no-repeat; // TODO - AS: should be removed
 		content: '';
 		position: absolute;
 		left: 6px;
@@ -1070,7 +1070,7 @@ td.inactive-bg {
 
 	&::after {
 		content: '';
-		background: url($sprite-path) no-repeat -256px -443px;
+		background: url($sprite-path) no-repeat -256px -443px; // TODO - AS: should be removed
 		width: 22px;
 		height: 18px;
 		top: 5px;
@@ -1366,7 +1366,7 @@ td.inactive-bg {
 
 		&::before {
 			content: '';
-			background-image: url($sprite-path);
+			background-image: url($sprite-path); // TODO - AS: should be removed
 			background-repeat: no-repeat;
 			border-radius: 3px;
 			position: absolute;
@@ -1455,7 +1455,7 @@ td.inactive-bg {
 
 .filter-container.tabfilter-container {
 	.icon-filter::before {
-		background: url($sprite-path) no-repeat -87px -547px;
+		background: url($sprite-path) no-repeat -87px -547px; // TODO - AS: should be removed
 	}
 
 	.tabfilter-item-label {

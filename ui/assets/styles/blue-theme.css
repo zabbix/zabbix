@@ -1337,9 +1337,9 @@ footer {
         vertical-align: unset;
         font-size: 8px; }
   .dashboard-edit .zi-cog-filled {
-    padding: 0;
     width: 24px;
     height: 24px;
+    padding: 0;
     color: #768d99;
     opacity: .5;
     transition: opacity .2s ease-out; }
@@ -1462,12 +1462,12 @@ footer {
   cursor: pointer;
   user-select: none; }
   .dashboard-widget-placeholder .dashboard-widget-placeholder-box {
+    position: relative;
+    overflow: hidden;
     background-color: rgba(255, 255, 255, 0.7);
     border: 1px dashed #acbbc2;
     box-shadow: 2px 2px 6px rgba(118, 141, 153, 0.5);
-    flex: 1;
-    position: relative;
-    overflow: hidden; }
+    flex: 1; }
     .dashboard-widget-placeholder .dashboard-widget-placeholder-box .zi-widget-add,
     .dashboard-widget-placeholder .dashboard-widget-placeholder-box .zi-widget-resize {
       display: flex;
@@ -1549,11 +1549,11 @@ footer {
   .dashboard-grid-widget-actions .zi-cog-filled,
   .dashboard-grid-iterator-actions .zi-more,
   .dashboard-grid-iterator-actions .zi-cog-filled {
-    padding: 0;
-    width: 24px;
-    height: 24px;
     position: relative;
     top: 2px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
     opacity: .5;
     transition: opacity .2s ease-out; }
     .dashboard-grid-widget-actions .zi-more:hover, .dashboard-grid-widget-actions .zi-more:focus, .dashboard-grid-widget-actions .zi-more:active,
