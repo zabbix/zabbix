@@ -1001,7 +1001,7 @@ typedef struct
 	zbx_uint64_t			r_eventid;		/* [-] recovery eventid */
 	zbx_uint64_t			triggerid;		/* [-] triggerid */
 	zbx_vector_uint64_t		functionids;		/* [IN] associated functionids */
-	zbx_vector_ptr_t		tags;			/* [IN] event tags */
+	zbx_vector_tags_t		tags;			/* [IN] event tags */
 	zbx_vector_uint64_pair_t	maintenances;		/* [OUT] actual maintenance data for the event in */
 								/* (maintenanceid, suppress_until) pairs */
 }

@@ -81,7 +81,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source ||
 				EVENT_SOURCE_SERVICE == event->source)
 		{
-			zbx_vector_ptr_create(&event->tags);
+			zbx_vector_tags_create(&event->tags);
 			zbx_vector_uint64_append(&tagged_eventids, event->eventid);
 		}
 
@@ -152,7 +152,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, row[1]);
 			tag->value = zbx_strdup(NULL, row[2]);
-			zbx_vector_ptr_append(&event->tags, tag);
+			zbx_vector_tags_append(&event->tags, tag);
 		}
 		DBfree_result(result);
 	}
@@ -226,8 +226,8 @@ void	zbx_db_free_event(ZBX_DB_EVENT *event)
 	if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source ||
 			EVENT_SOURCE_SERVICE == event->source)
 	{
-		zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
-		zbx_vector_ptr_destroy(&event->tags);
+		zbx_vector_tags_clear_ext(&event->tags, zbx_free_tag);
+		zbx_vector_tags_destroy(&event->tags);
 	}
 
 	if (0 != event->trigger.triggerid)
@@ -296,7 +296,7 @@ void	zbx_db_prepare_empty_event(zbx_uint64_t eventid, ZBX_DB_EVENT **event)
 	evt = (ZBX_DB_EVENT*)zbx_malloc(evt, sizeof(ZBX_DB_EVENT));
 	evt->eventid = eventid;
 	evt->name = NULL;
-	zbx_vector_ptr_create(&evt->tags);
+	zbx_vector_tags_create(&evt->tags);
 
 	evt->source = EVENT_SOURCE_TRIGGERS;
 	memset(&evt->trigger, 0, sizeof(ZBX_DB_TRIGGER));
@@ -371,7 +371,7 @@ void	zbx_db_get_event_data_tags(ZBX_DB_EVENT *event)
 		tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 		tag->tag = zbx_strdup(NULL, row[0]);
 		tag->value = zbx_strdup(NULL, row[1]);
-		zbx_vector_ptr_append(&event->tags, tag);
+		zbx_vector_tags_append(&event->tags, tag);
 	}
 	DBfree_result(result);
 

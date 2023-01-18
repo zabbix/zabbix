@@ -40,12 +40,12 @@
 
 typedef struct
 {
-	char		*host;
-	char		*severity;
-	char		*tags;
-	char		*name;
-	int		clock;
-	unsigned char	nseverity;
+	char	*host;
+	char	*severity;
+	char	*tags;
+	char	*name;
+	int	clock;
+	int	nseverity;
 }
 zbx_eventdata_t;
 
@@ -93,7 +93,7 @@ static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
+static int	get_trigger_severity_name(int priority, char **replace_to)
 {
 	zbx_config_t	cfg;
 
@@ -720,7 +720,7 @@ static int	DBget_trigger_error(const ZBX_DB_TRIGGER *trigger, char **replace_to)
 		goto out;
 	}
 
-	*replace_to = zbx_strdup(*replace_to, (NULL == (row = DBfetch(result))) ?  "" : row[0]);
+	*replace_to = zbx_strdup(*replace_to, (NULL == (row = DBfetch(result))) ? "" : row[0]);
 
 	DBfree_result(result);
 out:
@@ -1756,8 +1756,8 @@ static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY
 
 typedef struct
 {
-	char	*macro;
-	char	*functions;
+	const char	*macro;
+	const char	*functions;
 }
 zbx_macro_functions_t;
 
@@ -1977,8 +1977,8 @@ static int	compare_tags(const void *d1, const void *d2)
 {
 	int	ret;
 
-	const zbx_tag_t	*tag1 = *(const zbx_tag_t **)d1;
-	const zbx_tag_t	*tag2 = *(const zbx_tag_t **)d2;
+	const zbx_tag_t	*tag1 = *(const zbx_tag_t * const *)d1;
+	const zbx_tag_t	*tag2 = *(const zbx_tag_t * const *)d2;
 
 	if (0 == (ret = zbx_strcmp_natural(tag1->tag, tag2->tag)))
 		ret = zbx_strcmp_natural(tag1->value, tag2->value);
@@ -1998,7 +1998,7 @@ static void	get_event_tags(const ZBX_DB_EVENT *event, char **replace_to)
 {
 	size_t			replace_to_offset = 0, replace_to_alloc = 0;
 	int			i;
-	zbx_vector_ptr_t	tags;
+	zbx_vector_tags_t	tags;
 
 	if (0 == event->tags.values_num)
 	{
@@ -2010,17 +2010,13 @@ static void	get_event_tags(const ZBX_DB_EVENT *event, char **replace_to)
 
 	/* copy tags to temporary vector for sorting */
 
-	zbx_vector_ptr_create(&tags);
-	zbx_vector_ptr_reserve(&tags, event->tags.values_num);
-
-	for (i = 0; i < event->tags.values_num; i++)
-		zbx_vector_ptr_append(&tags, event->tags.values[i]);
-
-	zbx_vector_ptr_sort(&tags, compare_tags);
+	zbx_vector_tags_create(&tags);
+	zbx_vector_tags_append_array(&tags, event->tags.values, event->tags.values_num);
+	zbx_vector_tags_sort(&tags, compare_tags);
 
 	for (i = 0; i < tags.values_num; i++)
 	{
-		const zbx_tag_t	*tag = (const zbx_tag_t *)tags.values[i];
+		const zbx_tag_t	*tag = tags.values[i];
 
 		if (0 != i)
 			zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, ", ");
@@ -2034,7 +2030,7 @@ static void	get_event_tags(const ZBX_DB_EVENT *event, char **replace_to)
 		}
 	}
 
-	zbx_vector_ptr_destroy(&tags);
+	zbx_vector_tags_destroy(&tags);
 }
 
 /******************************************************************************
@@ -2054,7 +2050,7 @@ static void	get_event_tags_json(const ZBX_DB_EVENT *event, char **replace_to)
 
 	for (i = 0; i < event->tags.values_num; i++)
 	{
-		const zbx_tag_t	*tag = (const zbx_tag_t *)event->tags.values[i];
+		const zbx_tag_t	*tag = event->tags.values[i];
 
 		zbx_json_addobject(&json, NULL);
 		zbx_json_addstring(&json, "tag", tag->tag, ZBX_JSON_TYPE_STRING);
@@ -2086,16 +2082,15 @@ static void	get_event_tag_by_name(const char *text, const ZBX_DB_EVENT *event, c
 		{
 			int			i;
 			zbx_tag_t		*tag;
-			zbx_vector_ptr_t	ptr_tags;
+			zbx_vector_tags_t	tags;
 
-			zbx_vector_ptr_create(&ptr_tags);
-			zbx_vector_ptr_append_array(&ptr_tags, event->tags.values,
-					event->tags.values_num);
-			zbx_vector_ptr_sort(&ptr_tags, compare_tags);
+			zbx_vector_tags_create(&tags);
+			zbx_vector_tags_append_array(&tags, event->tags.values, event->tags.values_num);
+			zbx_vector_tags_sort(&tags, compare_tags);
 
-			for (i = 0; i < ptr_tags.values_num; i++)
+			for (i = 0; i < tags.values_num; i++)
 			{
-				tag = (zbx_tag_t *)ptr_tags.values[i];
+				tag = tags.values[i];
 
 				if (0 == strcmp(name, tag->tag))
 				{
@@ -2104,14 +2099,14 @@ static void	get_event_tag_by_name(const char *text, const ZBX_DB_EVENT *event, c
 				}
 			}
 
-			zbx_vector_ptr_destroy(&ptr_tags);
+			zbx_vector_tags_destroy(&tags);
 		}
 
 		zbx_free(name);
 	}
 }
 
-static const char      *trigger_state_string(unsigned char state)
+static const char	*trigger_state_string(int state)
 {
 	switch (state)
 	{
@@ -2124,7 +2119,7 @@ static const char      *trigger_state_string(unsigned char state)
 	}
 }
 
-static const char	*item_state_string(unsigned char state)
+static const char	*item_state_string(int state)
 {
 	switch (state)
 	{
@@ -2137,7 +2132,7 @@ static const char	*item_state_string(unsigned char state)
 	}
 }
 
-static const char	*event_value_string(unsigned char source, unsigned char object, unsigned char value)
+static const char	*event_value_string(int source, int object, int value)
 {
 	if (EVENT_SOURCE_TRIGGERS == source || EVENT_SOURCE_SERVICE == source)
 	{
@@ -2390,8 +2385,8 @@ fail:
  ******************************************************************************/
 static void	eventdata_to_str(const zbx_vector_eventdata_t *eventdata, char **replace_to)
 {
-	int	i;
-	char	*d = "";
+	int		i;
+	const char	*d = "";
 
 	for (i = 0; i < eventdata->values_num; i++)
 	{
@@ -3048,7 +3043,7 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_SEVERITY))
 	{
-		if (FAIL == get_trigger_severity_name((unsigned char)c_event->severity, replace_to))
+		if (FAIL == get_trigger_severity_name(c_event->severity, replace_to))
 			*replace_to = zbx_strdup(*replace_to, "unknown");
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_NSEVERITY))
@@ -5810,7 +5805,7 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
  *                                                                            *
  * Purpose: substitute expression functions with their values                 *
  *                                                                            *
- * Parameters: triggers - [IN] vector of DC_TRIGGER pointers, sorted by      *
+ * Parameters: triggers - [IN] vector of DC_TRIGGER pointers, sorted by       *
  *                             triggerids                                     *
  *             unknown_msgs - vector for storing messages for NOTSUPPORTED    *
  *                            items and failed functions                      *
