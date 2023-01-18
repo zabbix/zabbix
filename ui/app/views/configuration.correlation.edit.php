@@ -29,6 +29,7 @@ $this->includeJsFile('configuration.correlation.edit.js.php');
 $widget = (new CWidget())->setTitle(_('Event correlation rules'));
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('correlation.edit')
 	->setName('correlation.edit')
 	->setAction((new CUrl('zabbix.php'))

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-24T17:02:19Z'
+  date: '2022-12-19T09:46:27Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -719,6 +719,22 @@ zabbix_export:
                   item:
                     host: Solaris
                     key: 'vfs.fs.size[{#FSNAME},free]'
+          overrides:
+            -
+              name: 'Skip metadata collection for dynamic FS'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: inode
+                  discover: NO_DISCOVER
       tags:
         -
           tag: class
@@ -751,8 +767,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: Solaris
                         name: 'CPU load'
-                        host: Solaris
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -767,8 +783,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: Solaris
                         name: 'CPU utilization'
-                        host: Solaris
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -783,8 +799,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: Solaris
                         name: 'Memory usage'
-                        host: Solaris
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -800,8 +816,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Swap usage'
                         host: Solaris
+                        name: 'Swap usage'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -816,8 +832,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: 'proc.num[]'
                         host: Solaris
+                        key: 'proc.num[]'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -833,8 +849,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: 'proc.num[,,run]'
                         host: Solaris
+                        key: 'proc.num[,,run]'
       valuemaps:
         -
           uuid: 2a704279b6e946a99b88bdebd4f99653
