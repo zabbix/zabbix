@@ -37,8 +37,6 @@ extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 #define ZBX_CONNECTOR_RESCHEDULE_FALSE	0
 #define ZBX_CONNECTOR_RESCHEDULE_TRUE	1
 
-static sigset_t				orig_mask;
-
 /* preprocessing worker data */
 typedef struct
 {
