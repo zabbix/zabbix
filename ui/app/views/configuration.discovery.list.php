@@ -108,19 +108,21 @@ foreach ($data['drules'] as $drule) {
 	]);
 }
 
+$csrf_token = CCsrfTokenHelper::get('discovery');
+
 // append table to form
 $discoveryForm->addItem([
 	$discoveryTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'druleids', [
 		'discovery.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?'),
-			'csrf_token' => CCsrfTokenHelper::get('discovery.enable')
+			'csrf_token' => $csrf_token
 		],
 		'discovery.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?'),
-			'csrf_token' => CCsrfTokenHelper::get('discovery.disable')
+			'csrf_token' => $csrf_token
 		],
 		'discovery.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?'),
-			'csrf_token' => CCsrfTokenHelper::get('discovery.delete')
+			'csrf_token' => $csrf_token
 		]
 	], 'discovery')
 ]);

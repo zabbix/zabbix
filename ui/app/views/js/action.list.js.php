@@ -27,9 +27,8 @@
 <script>
 	const view = new class {
 
-		init({eventsource, csrf_tokens}) {
+		init({eventsource}) {
 			this.eventsource = eventsource;
-			this.csrf_tokens = csrf_tokens;
 			this._initActions();
 		}
 
@@ -99,9 +98,9 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('action.enable', this.csrf_tokens['action.enable']);
+			curl.setArgument('action', 'action.enable');
 
-			this._post(target, actionids, curl.getUrl());
+			this._post(target, actionids, curl);
 		}
 
 		_disable(target, actionids) {
@@ -114,9 +113,9 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('action.disable', this.csrf_tokens['action.disable']);
+			curl.setArgument('action', 'action.disable');
 
-			this._post(target, actionids, curl.getUrl());
+			this._post(target, actionids, curl);
 		}
 
 		_delete(target, actionids) {
@@ -129,15 +128,17 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('action.delete', this.csrf_tokens['action.delete']);
+			curl.setArgument('action', 'action.delete');
 
-			this._post(target, actionids, curl.getUrl());
+			this._post(target, actionids, curl);
 		}
 
 		_post(target, actionids, url) {
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('action') ?>');
+
 			target.classList.add('is-loading');
 
-			return fetch(url, {
+			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({actionids: actionids})

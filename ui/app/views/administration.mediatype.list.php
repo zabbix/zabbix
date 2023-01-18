@@ -146,13 +146,15 @@ foreach ($data['mediatypes'] as $mediaType) {
 		).
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
+	$csrf_token = CCsrfTokenHelper::get('mediatype');
+
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
 		? (new CLink(_('Enabled'), (new CUrl($statusLink))->getUrl()))
-			->addCsrfToken(CCsrfTokenHelper::get('mediatype.disable'))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
 		: (new CLink(_('Disabled'), (new CUrl($statusLink))->getUrl()))
-			->addCsrfToken(CCsrfTokenHelper::get('mediatype.enable'))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED);
 
@@ -188,10 +190,10 @@ $mediaTypeForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'mediatypeids', [
 		'mediatype.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected media types?'),
-			'csrf_token' => CCsrfTokenHelper::get('mediatype.enable')
+			'csrf_token' => $csrf_token
 		],
 		'mediatype.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected media types?'),
-			'csrf_token' => CCsrfTokenHelper::get('mediatype.disable')
+			'csrf_token' => $csrf_token
 		],
 		'mediatype.export' => [
 			'content' => new CButtonExport('export.mediatypes',
@@ -202,7 +204,7 @@ $mediaTypeForm->addItem([
 			)
 		],
 		'mediatype.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected media types?'),
-			'csrf_token' => CCsrfTokenHelper::get('mediatype.delete')
+			'csrf_token' => $csrf_token
 		]
 	], 'mediatype')
 ]);

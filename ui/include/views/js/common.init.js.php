@@ -69,7 +69,7 @@
 				object: object,
 				objectid: objectid,
 				action: 'favorite.create',
-				csrf_token: <?= json_encode(CController::generateCsrfToken('favorite.create')) ?>
+				csrf_token: <?= json_encode(CCsrfTokenHelper::get('favorite')) ?>
 			}
 		});
 	}
@@ -83,7 +83,7 @@
 				object: object,
 				objectid: objectid,
 				action: 'favorite.delete',
-				csrf_token: <?= json_encode(CController::generateCsrfToken('favorite.delete')) ?>
+				csrf_token: <?= json_encode(CCsrfTokenHelper::get('favorite')) ?>
 			}
 		});
 	}

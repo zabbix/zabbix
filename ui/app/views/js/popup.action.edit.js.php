@@ -362,9 +362,7 @@ window.action_edit_popup = new class {
 		}
 
 		const curl = new Curl('zabbix.php');
-		this.actionid !== 0
-			? curl.setAction('action.update', this.csrf_tokens['action.update'])
-			: curl.setAction('action.create', this.csrf_tokens['action.create']);
+		curl.setArgument('action', this.actionid !== 0 ? 'action.update' : 'action.create');
 
 		this._post(curl.getUrl(), fields);
 	}
@@ -436,7 +434,8 @@ window.action_edit_popup = new class {
 
 	delete() {
 		const curl = new Curl('zabbix.php');
-		curl.setAction('action.delete', this.csrf_tokens['action.delete']);
+		curl.setArgument('action', 'action.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('action') ?>');
 
 		this._post(curl.getUrl(), {actionids: [this.actionid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

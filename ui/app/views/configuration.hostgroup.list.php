@@ -205,18 +205,20 @@ $html_page
 	->addItem($form)
 	->show();
 
+$csrf_token = CCsrfTokenHelper::get('hostgroup');
+
 (new CScriptTag('view.init('.json_encode([
 	'enable_url' => (new CUrl('zabbix.php'))
 		->setArgument('action', 'hostgroup.enable')
-		->addCsrfToken('hostgroup.enable')
+		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 		->getUrl(),
 	'disable_url' => (new CUrl('zabbix.php'))
 		->setArgument('action', 'hostgroup.disable')
-		->addCsrfToken('hostgroup.disable')
+		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 		->getUrl(),
 	'delete_url' => (new CUrl('zabbix.php'))
 		->setArgument('action', 'hostgroup.delete')
-		->addCsrfToken('hostgroup.delete')
+		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 		->getUrl()
 ]).');'))
 	->setOnDocumentReady()

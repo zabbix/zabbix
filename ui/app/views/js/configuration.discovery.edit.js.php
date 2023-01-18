@@ -230,10 +230,7 @@
 		jQuery('input:radio[name="host_source"][value='+jQuery.escapeSelector(<?= json_encode($data['drule']['host_source']) ?>)+']').attr('checked', 'checked');
 		jQuery('input:radio[name="name_source"][value='+jQuery.escapeSelector(<?= json_encode($data['drule']['name_source']) ?>)+']').attr('checked', 'checked');
 
-		let csrf_tokens = <?= json_encode($data['csrf_tokens']) ?>;
-
 		jQuery('#clone').click(function() {
-			jQuery('input[name="<?= CController::CSRF_TOKEN_NAME ?>"]').val(csrf_tokens['discovery.create']);
 			jQuery('#update')
 				.text(t('Add'))
 				.val('discovery.create')

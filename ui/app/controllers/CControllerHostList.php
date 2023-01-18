@@ -386,8 +386,7 @@ class CControllerHostList extends CController {
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
-			'uncheck' => ($this->getInput('uncheck', 0) == 1),
-			'csrf_tokens' => self::generateCsrfTokens(['host.massdelete', 'popup.import', 'popup.massupdate.host'])
+			'uncheck' => ($this->getInput('uncheck', 0) == 1)
 		];
 
 		$response = new CControllerResponseData($data);

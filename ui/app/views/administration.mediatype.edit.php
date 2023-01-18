@@ -38,13 +38,12 @@ if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
+$csrf_token = CCsrfTokenHelper::get('mediatype');
+
 // create form
 $mediaTypeForm = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(
-		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::get($data['mediatypeid'] == 0 ? 'mediatype.create' : 'mediatype.update')
-	))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('media-type-form')
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])
@@ -377,7 +376,7 @@ else {
 	$deleteButton = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'mediatype.delete')
 			->setArgument('mediatypeids', [$data['mediatypeid']])
-			->addCsrfToken('mediatype.delete'),
+			->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 		_('Delete media type?')
 	))
 		->setId('delete');

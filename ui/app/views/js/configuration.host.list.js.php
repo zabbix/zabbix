@@ -31,14 +31,11 @@
 <script>
 	const view = {
 		applied_filter_groupids: [],
-		csrf_tokens: [],
 
-		init({applied_filter_groupids, csrf_tokens}) {
+		init({applied_filter_groupids}) {
 			this.applied_filter_groupids = applied_filter_groupids;
-			this.csrf_tokens = csrf_tokens;
 
 			this.initFilter();
-			this._initActionButtons();
 		},
 
 		initFilter() {
@@ -63,40 +60,6 @@
 				else {
 					$('#filter_proxyids_').multiSelect('disable');
 				}
-			});
-		},
-
-		_initActionButtons() {
-			document.addEventListener('click', e => {
-				const class_list = e.target.classList;
-
-				if (class_list.contains('js-import-host')) {
-					this.openHostImportPopup();
-				}
-				else if (class_list.contains('js-massupdate-host')) {
-					this.openHostMassUpdatePopup(e.target);
-				}
-			})
-		},
-
-		openHostImportPopup() {
-			return PopUp('popup.import', {
-				rules_preset: 'host',
-				'<?= CController::CSRF_TOKEN_NAME ?>': this.csrf_tokens['popup.import']
-			},
-				{
-					dialogueid: "popup_import",
-					dialogue_class: "modal-popup-generic"
-				}
-			);
-		},
-
-		openHostMassUpdatePopup(button) {
-			openMassupdatePopup('popup.massupdate.host', {
-				'<?= CController::CSRF_TOKEN_NAME ?>': this.csrf_tokens['popup.massupdate.host']
-			}, {
-				dialogue_class: 'modal-popup-static',
-				trigger_element: button
 			});
 		},
 
@@ -140,7 +103,8 @@
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('host.massdelete', this.csrf_tokens['host.massdelete']);
+			curl.setArgument('action', 'host.massdelete');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('host') ?>');
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

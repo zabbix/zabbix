@@ -27,12 +27,10 @@
 <script>
 	const view = {
 		form: null,
-		csrf_tokens: null,
 
-		init({form_name, host_interfaces, host_is_discovered, csrf_tokens}) {
+		init({form_name, host_interfaces, host_is_discovered}) {
 			this.form = document.getElementById(form_name);
 			this.form.addEventListener('submit', this.events.submit);
-			this.csrf_tokens = csrf_tokens;
 
 			host_edit.init({form_name, host_interfaces, host_is_discovered});
 		},
@@ -100,7 +98,8 @@
 			this.setLoading(button);
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('host.massdelete', this.csrf_tokens['host.massdelete']);
+			curl.setArgument('action', 'host.massdelete');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('host') ?>');
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

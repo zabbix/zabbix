@@ -30,9 +30,7 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_HOUSEKEEPING_EDIT));
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('housekeeping.update')))
-		->removeId()
-	)
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('housekeeping')))->removeId())
 	->setId('housekeeping')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'housekeeping.update')

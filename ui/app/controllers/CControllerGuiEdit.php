@@ -28,9 +28,7 @@ class CControllerGuiEdit extends CController {
 
 	protected function init() {
 		$this->disableCsrfValidation();
-	}
 
-	protected function init() {
 		$this->timezones = [
 			ZBX_DEFAULT_TIMEZONE => CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(), _('System'))
 		] + CTimezoneHelper::getList();

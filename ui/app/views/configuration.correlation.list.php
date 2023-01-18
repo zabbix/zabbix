@@ -79,6 +79,8 @@ $table = (new CTableInfo())
 		)
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('correlation');
+
 if ($data['correlations']) {
 	foreach ($data['correlations'] as $correlation) {
 		$conditions = [];
@@ -108,7 +110,7 @@ if ($data['correlations']) {
 				->setArgument('action', 'correlation.enable')
 				->getUrl()
 			))
-				->addCsrfToken(CCsrfTokenHelper::get('correlation.enable'))
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED);
 		}
@@ -118,7 +120,7 @@ if ($data['correlations']) {
 				->setArgument('action', 'correlation.disable')
 				->getUrl()
 			))
-				->addCsrfToken(CCsrfTokenHelper::get('correlation.disable'))
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN);
 		}
@@ -127,7 +129,7 @@ if ($data['correlations']) {
 			new CCheckBox('correlationids['.$correlation['correlationid'].']', $correlation['correlationid']),
 			new CLink($correlation['name'], (new CUrl('zabbix.php'))
 				->setArgument('correlationid', $correlation['correlationid'])
-				->setArgument('action', 'correlation.edit')
+				->setArgument('action', 'correlation')
 			),
 			$conditions,
 			$operations,
@@ -141,13 +143,13 @@ $form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'correlationids', [
 		'correlation.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected correlations?'),
-			'csrf_token' => CCsrfTokenHelper::get('correlation.enable')
+			'csrf_token' => $csrf_token
 		],
 		'correlation.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected correlations?'),
-			'csrf_token' => CCsrfTokenHelper::get('correlation.disable')
+			'csrf_token' => $csrf_token
 		],
 		'correlation.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected correlations?'),
-			'csrf_token' => CCsrfTokenHelper::get('correlation.delete')
+			'csrf_token' => $csrf_token
 		]
 	], 'correlation')
 ]);

@@ -41,7 +41,15 @@ $html_page = (new CHtmlPage())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->addClass('js-import-host')
+					->onClick(
+						'return PopUp("popup.import", {
+							rules_preset: "host", '.
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.': "'. CCsrfTokenHelper::get('import').
+						'"}, {
+							dialogueid: "popup_import",
+							dialogue_class: "modal-popup-generic"
+						});'
+					)
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
@@ -251,15 +259,17 @@ foreach ($data['hosts'] as $host) {
 		->setAttribute('data-hostid', $host['hostid'])
 		->onClick('view.editHost(event, this.dataset.hostid);');
 
+	$csrf_token_massupdate = CCsrfTokenHelper::get('massupdate');
+
 	$maintenance_icon = false;
 	$status_toggle_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'popup.massupdate.host')
 		->setArgument('hostids', [$host['hostid']])
 		->setArgument('visible[status]', 1)
 		->setArgument('update', 1)
-		->addCsrfToken('popup.massupdate.host')
+		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token_massupdate)
 		->setArgument('backurl',
-			(new CUrl('zabbix.php', false))
+			(new CUrl('zabbix.php'))
 				->setArgument('action', 'host.list')
 				->setArgument('page', CPagerHelper::loadPage('host.list', null))
 				->getUrl()
@@ -487,7 +497,7 @@ foreach ($data['hosts'] as $host) {
 
 $status_toggle_url =  (new CUrl('zabbix.php'))
 	->setArgument('action', 'popup.massupdate.host')
-	->addCsrfToken('popup.massupdate.host')
+	->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token_massupdate)
 	->setArgument('visible[status]', 1)
 	->setArgument('update', 1)
 	->setArgument('backurl',
@@ -523,9 +533,16 @@ $form->addItem([
 		],
 		'popup.massupdate.host' => [
 			'content' => (new CButton('', _('Mass update')))
+				->onClick(
+					"openMassupdatePopup('popup.massupdate.host', {".
+						CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".$csrf_token_massupdate.
+					"'}, {
+						dialogue_class: 'modal-popup-static',
+						trigger_element: this
+					});"
+				)
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
-				->addClass('js-massupdate-host')
 		],
 		'host.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
@@ -544,8 +561,7 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'applied_filter_groupids' => array_keys($data['filter']['groups']),
-		'csrf_tokens' => $data['csrf_tokens']
+		'applied_filter_groupids' => array_keys($data['filter']['groups'])
 	]).');
 '))
 	->setOnDocumentReady()
