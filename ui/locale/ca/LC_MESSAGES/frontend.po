@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-12-24 08:36+0000\n"
+"PO-Revision-Date: 2023-01-08 15:52+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1562,7 +1562,7 @@ msgstr "Accions d'autoregistre"
 
 #: app/views/administration.housekeeping.edit.php:86
 msgid "Autoregistration data storage period"
-msgstr "Període d'emmagatzematge de lesdades d'autoregistre"
+msgstr "Període d'emmagatzematge de les dades d'autoregistre"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:195
@@ -6992,7 +6992,7 @@ msgstr "El camp \"%1$s\" no és correcte: %2$s"
 #: include/validate.inc.php:185 include/validate.inc.php:190
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s."
-msgstr ""
+msgstr "El camp \"%1$s\" no és correcte: %2$s."
 
 #: include/validate.inc.php:167
 #, c-format
@@ -21411,7 +21411,7 @@ msgstr "seqüència d'octets no vàlida en UTF-8"
 
 #: include/validate.inc.php:190
 msgid "invalid data type"
-msgstr ""
+msgstr "tipus de dades no vàlid"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
 msgid "invalid delay"

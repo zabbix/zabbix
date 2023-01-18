@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-12-20 21:32+0000\n"
-"Last-Translator: Marco <marcodefreitas@gmail.com>\n"
+"PO-Revision-Date: 2023-01-18 14:05+0000\n"
+"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -116,7 +116,7 @@ msgstr "%1$s (ano %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - lançado pelo módulo localizado em %2$s."
 
 #: include/classes/api/services/CItemGeneral.php:2654
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -244,8 +244,8 @@ msgstr[1] "%1$s segundos"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problema não reconhecido"
+msgstr[1] "%1$s problemas não reconhecidos"
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
@@ -1161,7 +1161,7 @@ msgstr "Alternativamente, você pode instalar manualmente:"
 
 #: include/classes/data/CItemData.php:1449
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Quantidade de memória física do convidado que é trocada para o espaço de troca, <url> - URL do serviço VMware, <uuid> - VMware VM hostname"
 
 #: include/classes/data/CItemData.php:1469
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -2058,7 +2058,7 @@ msgstr "Não é possível construir a árvore de expressão: %1$s."
 
 #: include/classes/api/services/CRole.php:792
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "Um usuário não pode alterar suas próprias permissões."
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
@@ -2197,7 +2197,7 @@ msgstr "Ação não foi excluída"
 #: include/classes/api/services/CRole.php:375
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "Não é possível excluir a função de usuário: \"%1$s\"."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 #, fuzzy
@@ -2259,15 +2259,15 @@ msgstr "Host não foi removido"
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível excluir o host %1$s pois a manutenção \"%2$s\" deve contar um único host ou grupo de hosts."
+msgstr[1] "Não é possível excluir o hosts %1$s pois a manutenção \"%2$s\" deve contar um único host ou grupo de hosts."
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível excluir o grupo de hosts %1$s pois a manutenção \"%2$s\" deve contar um único host ou grupo de hosts."
+msgstr[1] "Não é possível excluir o grupos de hosts %1$s pois a manutenção \"%2$s\" deve contar um único host ou grupo de hosts."
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2284,7 +2284,7 @@ msgstr "A imagem não foi excluída"
 #: include/classes/api/services/CHostInterface.php:636
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Não é possível excluir a interface de descoberta do host \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1142
 msgid "Cannot delete inventory."
@@ -2336,7 +2336,7 @@ msgstr[1] "Não foi possível excluir proxy"
 #: include/classes/api/services/CRole.php:369
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
-msgstr ""
+msgstr "Não é possível excluir a função de usuário somente leitura \"%1$s\"."
 
 #: app/controllers/CControllerRegExDelete.php:55
 msgid "Cannot delete regular expression"
@@ -2375,7 +2375,7 @@ msgstr[1] "Serviço não foi removido"
 #: include/classes/api/services/CService.php:470
 #, c-format
 msgid "Cannot delete service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Não é possível deletar o serviço \"%1$s\": %2$s."
 
 #: templates.php:462 templates.php:476 templates.php:542
 msgid "Cannot delete template"
@@ -2383,11 +2383,11 @@ msgstr "Não foi possível excluir template"
 
 #: include/classes/api/services/CGraphPrototype.php:374
 msgid "Cannot delete templated graph prototype."
-msgstr ""
+msgstr "Não é possível deletar um gráfico de um protótipo de template"
 
 #: include/classes/api/services/CGraph.php:374
 msgid "Cannot delete templated graph."
-msgstr ""
+msgstr "Não é possível excluir gráfico do template."
 
 #: include/classes/api/services/CItemPrototype.php:663
 msgid "Cannot delete templated item prototype."
@@ -2409,7 +2409,7 @@ msgstr "A trigger \"%1$s:%2$s\" é oriunda de um template, por isso não é poss
 #: include/classes/api/services/CTriggerPrototype.php:523
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr ""
+msgstr "Não é possível deletar um template de um protótipo de trigger \"%1$s:%2$s\"."
 
 #: include/classes/api/services/CHttpTest.php:610
 #, c-format
@@ -2441,13 +2441,13 @@ msgstr[1] ""
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
-msgstr[0] ""
+msgstr[0] "Não foi possível excluir o grupo de usuário"
 msgstr[1] ""
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
 msgid_plural "Cannot delete user roles"
-msgstr[0] ""
+msgstr[0] "Não foi possível excluir a permissão do usuário"
 msgstr[1] ""
 
 #: httpconf.php:177 httpconf.php:442
@@ -2457,13 +2457,13 @@ msgstr "Não foi possível excluir o cenário web"
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
 msgid_plural "Cannot disable API tokens"
-msgstr[0] ""
+msgstr[0] "Não foi possível desabilitar o token da API"
 msgstr[1] ""
 
 #: app/controllers/CControllerSlaDisable.php:88
 msgid "Cannot disable SLA"
 msgid_plural "Cannot disable SLAs"
-msgstr[0] ""
+msgstr[0] "Não foi possível desabilitar o SLA"
 msgstr[1] ""
 
 #: actionconf.php:499
@@ -2507,8 +2507,8 @@ msgstr[1] "Não foi possível desabilitar os tipos de midia"
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível desabilitar o módulo: %1$s."
+msgstr[1] "Não foi possível desabilitar os módulos: %1$s."
 
 #: app/controllers/CControllerScheduledReportDisable.php:78
 msgid "Cannot disable scheduled report"
