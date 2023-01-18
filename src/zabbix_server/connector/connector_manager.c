@@ -199,14 +199,17 @@ static zbx_connector_worker_t	*connector_get_free_worker(zbx_connector_manager_t
 }
 
 static void	connector_get_next_task(zbx_connector_t *connector, zbx_connector_worker_t *worker,
-		unsigned char **data, size_t *data_alloc, size_t *data_offset)
+		unsigned char **data, size_t *data_alloc, size_t *data_offset, int *reschedule)
 {
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
 #define ZBX_DATA_JSON_RECORD_LIMIT	(ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED)
 	zbx_object_link_t	*object_link;
-	int			i, records = 0, ret = SUCCEED;
+	int			i, records = 0;
 
-	while (SUCCEED == ret && SUCCEED == zbx_list_pop(&connector->object_link_queue, (void **)&object_link))
+	*reschedule = ZBX_CONNECTOR_RESCHEDULE_FALSE;
+
+	while (ZBX_CONNECTOR_RESCHEDULE_FALSE == *reschedule &&
+			SUCCEED == zbx_list_pop(&connector->object_link_queue, (void **)&object_link))
 	{
 		if (0 == *data_offset)
 			zbx_connector_serialize_connector(data, data_alloc, data_offset, connector);
@@ -216,12 +219,19 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_connector_wo
 			if ((records == connector->max_records && 0 != connector->max_records) ||
 					*data_offset > ZBX_DATA_JSON_RECORD_LIMIT)
 			{
-				ret = FAIL;
+				*reschedule = ZBX_CONNECTOR_RESCHEDULE_TRUE;
 				break;
 			}
 
 			zbx_connector_serialize_data_point(data, data_alloc, data_offset,
 					&object_link->connector_data_points.values[i]);
+		}
+
+		/* return back to list if over the limit */
+		if (0 == i)
+		{
+			zbx_list_prepend(&connector->object_link_queue, object_link, NULL);
+			break;
 		}
 
 		if (i != object_link->connector_data_points.values_num)
@@ -251,7 +261,7 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_connector_wo
 
 	if (0 != worker->ids.values_num)
 	{
-		worker->reschedule = FAIL == ret ? ZBX_CONNECTOR_RESCHEDULE_TRUE : ZBX_CONNECTOR_RESCHEDULE_FALSE;
+		worker->reschedule = *reschedule;
 		worker->taskid = connector->connectorid;
 	}
 
@@ -294,7 +304,9 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now)
 		while (connector->senders < connector->max_senders)
 		{
 			data_offset = 0;
-			connector_get_next_task(connector, worker, &data, &data_alloc, &data_offset);
+			int	reschedule;
+
+			connector_get_next_task(connector, worker, &data, &data_alloc, &data_offset, &reschedule);
 
 			if (0 == data_offset)
 				break;
@@ -308,7 +320,12 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now)
 			connector->senders++;
 
 			if (NULL == (worker = connector_get_free_worker(manager)))
+			{
+				if (ZBX_CONNECTOR_RESCHEDULE_TRUE == reschedule)
+					connector->time_flush = now;
+
 				break;
+			}
 		}
 	}
 	while (NULL != worker && NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&manager->iter)));
