@@ -1841,7 +1841,7 @@ static int	DBpatch_6030159(void)
 
 	do
 	{
-		int			last_collision_idx;
+		int			last_collision_idx = -1;
 		zbx_db_valuemap_t	*valuemap, *valuemap2;
 
 		changed = 0;
@@ -1886,7 +1886,7 @@ static int	DBpatch_6030159(void)
 			}
 		}
 
-		if (MAX_LONG_NAME_COLLISIONS < iterations)
+		if (MAX_LONG_NAME_COLLISIONS < iterations && 0 <= last_collision_idx)
 		{
 			valuemap_free(valuemaps.values[last_collision_idx]);
 			zbx_vector_valuemap_ptr_remove(&valuemaps, last_collision_idx);
@@ -3108,7 +3108,7 @@ static int	DBpatch_6030162(void)
 
 	do
 	{
-		int			last_collision_idx;
+		int			last_collision_idx = -1;
 		zbx_db_dashboard_t	*dashboard, *dashboard2;
 
 		changed = 0;
@@ -3153,7 +3153,7 @@ static int	DBpatch_6030162(void)
 			}
 		}
 
-		if (MAX_LONG_NAME_COLLISIONS < iterations)
+		if (MAX_LONG_NAME_COLLISIONS < iterations && 0 <= last_collision_idx )
 		{
 			dashboard_free(dashboards.values[last_collision_idx]);
 			zbx_vector_dashboard_ptr_remove(&dashboards, last_collision_idx);
