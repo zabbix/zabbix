@@ -75,13 +75,9 @@ abstract class CGraphGeneral extends CApiService {
 			// Allow for template inherited graphs to update discover parameter.
 			if ($dbGraphs[$graph['graphid']]['templateid'] != 0) {
 				if ($dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
-					&& array_key_exists('discover', $graph)) {
-					$graph = [
-						'graphid' => $graph['graphid'],
-						'discover' => $graph['discover'],
-						'name' => $dbGraphs[$graph['graphid']]['name'],
-						'gitems' => $dbGraphs[$graph['graphid']]['gitems']
-					];
+						&& array_key_exists('discover', $graph)) {
+					$graph = ['discover' => $graph['discover']] + $dbGraphs[$graph['graphid']];
+					unset($graph['templateid'], $graph['flags'], $graph['uuid']);
 				}
 				else {
 					unset($graphs[$key]);
