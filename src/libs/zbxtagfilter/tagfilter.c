@@ -90,7 +90,7 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
 
 	for (i = et_start; i < etags->values_num; i++)
 	{
-		etag = (const zbx_tag_t *)&etags->values[i];
+		etag = etags->values[i];
 		if (0 < (ret = strcmp(etag->tag, name)))
 		{
 			*et_pos = i;
@@ -122,7 +122,7 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
 
 	for (; i < etags->values_num; i++)
 	{
-		etag = (const zbx_tag_t *)&etags->values[i];
+		etag = etags->values[i];
 		if (0 != strcmp(etag->tag, name))
 			break;
 	}
@@ -138,7 +138,7 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
 
 		for (j = et_start; j <= et_end; j++)
 		{
-			etag = (const zbx_tag_t *)&etags->values[j];
+			etag = etags->values[j];
 			if (SUCCEED == match_tag_value(mtag, etag))
 				return SUCCEED;
 		}
