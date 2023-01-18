@@ -27,7 +27,7 @@
 $form = (new CForm())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken($data['groupid'] == 0 ? 'templategroup.create' : 'templategroup.update')
+		CCsrfTokenHelper::get($data['groupid'] == 0 ? 'templategroup.create' : 'templategroup.update')
 	))->removeId())
 	->setId('templategroupForm')
 	->setName('templategroupForm')

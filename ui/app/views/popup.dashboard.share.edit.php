@@ -24,7 +24,7 @@
  */
 
 $form = (new CForm('post'))
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('dashboard.share.update')))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('dashboard.share.update')))
 		->removeId()
 	)
 	->setId('dashboard-share-form')

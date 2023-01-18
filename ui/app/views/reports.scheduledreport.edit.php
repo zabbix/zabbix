@@ -38,7 +38,7 @@ $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken(($data['reportid'] == 0) ? 'scheduledreport.create' : 'scheduledreport.update')
+		CCsrfTokenHelper::get(($data['reportid'] == 0) ? 'scheduledreport.create' : 'scheduledreport.update')
 	))->removeId())
 	->setId('scheduledreport-form')
 	->setName('scheduledreport-form')

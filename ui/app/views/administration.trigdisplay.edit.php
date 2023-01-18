@@ -156,7 +156,7 @@ $form_list = (new CFormList())
 	->addInfo(_('Custom severity names affect all locales and require manual translation!'));
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('trigdisplay.update')))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigdisplay.update')))
 		->removeId()
 	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)

@@ -43,7 +43,7 @@ $form_list->addRow((new CLabel(_('Name'), 'iconmap[name]'))->setAsteriskMark(), 
 $form = (new CForm())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken($data['iconmapid'] == 0 ? 'iconmap.create' : 'iconmap.update')
+		CCsrfTokenHelper::get($data['iconmapid'] == 0 ? 'iconmap.create' : 'iconmap.update')
 	))->removeId())
 	->setId('iconmap')
 	->setAction((new CUrl('zabbix.php'))

@@ -49,7 +49,7 @@ $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken(($host_prototype['hostid'] != 0)
+		CCsrfTokenHelper::get(($host_prototype['hostid'] != 0)
 			? 'host_prototypes.php update'
 			: 'host_prototypes.php add'
 		)

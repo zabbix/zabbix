@@ -34,7 +34,7 @@ $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken($data['usrgrpid'] == 0 ? 'usergroup.create' : 'usergroup.update')
+		CCsrfTokenHelper::get($data['usrgrpid'] == 0 ? 'usergroup.create' : 'usergroup.update')
 	))->removeId())
 	->setId('user-group-form')
 	->setName('user_group_form')

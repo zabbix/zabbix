@@ -50,7 +50,7 @@ if ($data['success']) {
 }
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('popup.scriptexec')))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('popup.scriptexec')))
 		->removeId()
 	)
 	->cleanItems()

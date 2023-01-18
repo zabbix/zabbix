@@ -54,7 +54,7 @@ if ($data['support_custom_time']) {
 }
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('popup.tabfilter.update')))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('popup.tabfilter.update')))
 		->removeId()
 	)
 	->cleanItems()

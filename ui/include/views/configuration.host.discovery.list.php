@@ -258,7 +258,7 @@ foreach ($data['discoveries'] as $discovery) {
 			->setArgument('context', $data['context'])
 			->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::getCsrfToken($status_action))
+			->addCsrfToken(CCsrfTokenHelper::get($status_action))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 
@@ -337,10 +337,10 @@ foreach ($data['discoveries'] as $discovery) {
 
 $button_list = [
 	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?'),
-		'csrf_token' => CCsrfTokenHelper::getCsrfToken('discoveryrule.massenable')
+		'csrf_token' => CCsrfTokenHelper::get('discoveryrule.massenable')
 	],
 	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?'),
-		'csrf_token' => CCsrfTokenHelper::getCsrfToken('discoveryrule.massdisable')
+		'csrf_token' => CCsrfTokenHelper::get('discoveryrule.massdisable')
 	]
 ];
 
@@ -358,7 +358,7 @@ if ($data['context'] === 'host') {
 
 $button_list += [
 	'discoveryrule.massdelete' => ['name' => _('Delete'), 'confirm' =>_('Delete selected discovery rules?'),
-		'csrf_token' => CCsrfTokenHelper::getCsrfToken('discoveryrule.massdelete')
+		'csrf_token' => CCsrfTokenHelper::get('discoveryrule.massdelete')
 	]
 ];
 

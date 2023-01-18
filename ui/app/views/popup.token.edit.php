@@ -31,7 +31,7 @@ $url = (new CUrl('zabbix.php'))
 $token_form = (new CForm('post', $url))
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken(($data['tokenid'] == 0) ? 'token.create' : 'token.update')
+		CCsrfTokenHelper::get(($data['tokenid'] == 0) ? 'token.create' : 'token.update')
 	))->removeId())
 	->setId('token_form')
 	->setName('token')

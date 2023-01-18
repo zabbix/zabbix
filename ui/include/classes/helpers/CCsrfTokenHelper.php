@@ -35,7 +35,7 @@ class CCsrfTokenHelper {
 	 *
 	 * @return string  Returns CSRF token in string format or null if session id is not set.
 	 */
-	public static function getCsrfToken(string $action): ?string {
+	public static function get(string $action): ?string {
 		if (!CWebUser::$data['secret']) {
 			throw new CAccessDeniedException();
 		}
@@ -77,13 +77,13 @@ class CCsrfTokenHelper {
 	 *
 	 * @return bool true if the token is correct.
 	 */
-	public static function checkCsrfToken($data, $action): bool {
+	public static function check($data, $action): bool {
 		if (!is_array($data) || !array_key_exists(self::CSRF_TOKEN_NAME, $data)) {
 			return false;
 		}
 
 		$csrf_token_form = $data[self::CSRF_TOKEN_NAME];
-		$csrf_token_correct = self::getCsrfToken($action);
+		$csrf_token_correct = self::get($action);
 
 		return CEncryptHelper::checkSign($csrf_token_correct, $csrf_token_form);
 	}

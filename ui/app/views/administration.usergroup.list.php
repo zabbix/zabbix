@@ -88,7 +88,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 			->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 			->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::getCsrfToken('usergroup.massupdate'))
+			->addCsrfToken(CCsrfTokenHelper::get('usergroup.massupdate'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_ORANGE)
 		: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
@@ -97,7 +97,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 			->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 			->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::getCsrfToken('usergroup.massupdate'))
+			->addCsrfToken(CCsrfTokenHelper::get('usergroup.massupdate'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN);
 
@@ -116,7 +116,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 				->getUrl()
 			))
-			->addCsrfToken(CCsrfTokenHelper::getCsrfToken('usergroup.massupdate'))
+			->addCsrfToken(CCsrfTokenHelper::get('usergroup.massupdate'))
 			->addClass(ZBX_STYLE_LINK_ACTION);
 
 		$user_status = ($usergroup['users_status'] == GROUP_STATUS_ENABLED)
@@ -126,7 +126,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 				->getUrl()
 			))
-				->addCsrfToken(CCsrfTokenHelper::getCsrfToken('usergroup.massupdate'))
+				->addCsrfToken(CCsrfTokenHelper::get('usergroup.massupdate'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
 			: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
@@ -135,7 +135,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 				->getUrl()
 			))
-				->addCsrfToken(CCsrfTokenHelper::getCsrfToken('usergroup.massupdate'))
+				->addCsrfToken(CCsrfTokenHelper::get('usergroup.massupdate'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED);
 	}
@@ -241,7 +241,7 @@ $form->addItem([
 				->getUrl()
 		],
 		'usergroup.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected groups?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('usergroup.delete')]
+			'csrf_token' => CCsrfTokenHelper::get('usergroup.delete')]
 	], 'usergroup')
 ]);
 

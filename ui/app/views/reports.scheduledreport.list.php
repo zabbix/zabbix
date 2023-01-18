@@ -86,19 +86,19 @@ $form->addItem([
 				'name' => _('Enable'),
 				'confirm' => _('Enable selected scheduled reports?'),
 				'disabled' => !$data['allowed_edit'],
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('scheduledreport.enable')
+				'csrf_token' => CCsrfTokenHelper::get('scheduledreport.enable')
 			],
 			'scheduledreport.disable' => [
 				'name' => _('Disable'),
 				'confirm' => _('Disable selected scheduled reports?'),
 				'disabled' => !$data['allowed_edit'],
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('scheduledreport.disable')
+				'csrf_token' => CCsrfTokenHelper::get('scheduledreport.disable')
 			],
 			'scheduledreport.delete' => [
 				'name' => _('Delete'),
 				'confirm' => _('Delete selected scheduled reports?'),
 				'disabled' => !$data['allowed_edit'],
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('scheduledreport.delete')
+				'csrf_token' => CCsrfTokenHelper::get('scheduledreport.delete')
 			]
 		], 'scheduledreport')
 	]);

@@ -108,7 +108,7 @@ if ($data['correlations']) {
 				->setArgument('action', 'correlation.enable')
 				->getUrl()
 			))
-				->addCsrfToken(CCsrfTokenHelper::getCsrfToken('correlation.enable'))
+				->addCsrfToken(CCsrfTokenHelper::get('correlation.enable'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED);
 		}
@@ -118,7 +118,7 @@ if ($data['correlations']) {
 				->setArgument('action', 'correlation.disable')
 				->getUrl()
 			))
-				->addCsrfToken(CCsrfTokenHelper::getCsrfToken('correlation.disable'))
+				->addCsrfToken(CCsrfTokenHelper::get('correlation.disable'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN);
 		}
@@ -141,13 +141,13 @@ $form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'correlationids', [
 		'correlation.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected correlations?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('correlation.enable')
+			'csrf_token' => CCsrfTokenHelper::get('correlation.enable')
 		],
 		'correlation.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected correlations?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('correlation.disable')
+			'csrf_token' => CCsrfTokenHelper::get('correlation.disable')
 		],
 		'correlation.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected correlations?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('correlation.delete')
+			'csrf_token' => CCsrfTokenHelper::get('correlation.delete')
 		]
 	], 'correlation')
 ]);

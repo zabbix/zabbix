@@ -34,7 +34,7 @@ $discoveryForm = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken($this->data['druleid'] != '' ? 'discovery.update' : 'discovery.create')
+		CCsrfTokenHelper::get($this->data['druleid'] != '' ? 'discovery.update' : 'discovery.create')
 	))->removeId())
 	->setId('discoveryForm')
 	->setName('discoveryForm')

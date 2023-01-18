@@ -39,7 +39,7 @@ $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken($data['itemid'] != '' ? 'host_discovery.php update' : 'host_discovery.php add')
+		CCsrfTokenHelper::get($data['itemid'] != '' ? 'host_discovery.php update' : 'host_discovery.php add')
 	))->removeId())
 	->setId('host-discovery-form')
 	->setName('itemForm')

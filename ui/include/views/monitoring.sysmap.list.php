@@ -42,7 +42,7 @@ $html_page = (new CHtmlPage())
 							'return PopUp("popup.import", {
 								rules_preset: "map", '.
 								CCsrfTokenHelper::CSRF_TOKEN_NAME.': "' .
-								CCsrfTokenHelper::getCsrfToken('popup.import').
+								CCsrfTokenHelper::get('popup.import').
 						'"}, {
 								dialogueid: "popup_import",
 								dialogue_class: "modal-popup-generic"
@@ -124,7 +124,7 @@ $sysmapForm->addItem([
 		],
 		'map.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maps?'),
 			'disabled' => $data['allowed_edit'] ? null : 'disabled',
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('map.massdelete')
+			'csrf_token' => CCsrfTokenHelper::get('map.massdelete')
 		]
 	])
 ]);

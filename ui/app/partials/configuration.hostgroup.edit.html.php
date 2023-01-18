@@ -27,7 +27,7 @@
 $form = (new CForm())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken($data['groupid'] == null ? 'hostgroup.create' : 'hostgroup.update')
+		CCsrfTokenHelper::get($data['groupid'] == null ? 'hostgroup.create' : 'hostgroup.update')
 	))->removeId())
 	->setId('hostgroupForm')
 	->setName('hostgroupForm')

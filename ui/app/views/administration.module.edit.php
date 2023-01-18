@@ -32,7 +32,7 @@ $html_page = (new CHtmlPage())
 // create form
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('module.update')))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('module.update')))
 		->removeId())
 	->setName('module-form')
 	->setAction((new CUrl('zabbix.php'))

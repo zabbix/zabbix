@@ -41,7 +41,7 @@ $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken((!empty($data['itemid']))
+		CCsrfTokenHelper::get((!empty($data['itemid']))
 			? 'disc_prototypes.php update'
 			: 'disc_prototypes.php add'
 		)

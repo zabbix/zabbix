@@ -169,7 +169,7 @@ foreach ($data['users'] as $user) {
 		? (new CLink(_('Blocked'), 'zabbix.php?action=user.unblock&userids[]='.$userid))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
-			->addCsrfToken(CCsrfTokenHelper::getCsrfToken('user.unblock'))
+			->addCsrfToken(CCsrfTokenHelper::get('user.unblock'))
 		: (new CSpan(_('Ok')))->addClass(ZBX_STYLE_GREEN);
 
 	order_result($user['usrgrps'], 'name');
@@ -301,13 +301,13 @@ $form->addItem([
 			'name' => _('Provision now'),
 			'attributes' => ['data-required' => 'ldap'],
 			'confirm' => _('Provision selected LDAP users?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('user.provision')
+			'csrf_token' => CCsrfTokenHelper::get('user.provision')
 		],
 		'user.unblock' => ['name' => _('Unblock'), 'confirm' => _('Unblock selected users?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('user.unblock')
+			'csrf_token' => CCsrfTokenHelper::get('user.unblock')
 		],
 		'user.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected users?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('user.delete')
+			'csrf_token' => CCsrfTokenHelper::get('user.delete')
 		]
 	], 'user')
 ]);

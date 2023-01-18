@@ -31,7 +31,7 @@ $host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 $host_form = (new CForm())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken($data['hostid'] == 0 ? 'host.create' : 'host.update')
+		CCsrfTokenHelper::get($data['hostid'] == 0 ? 'host.create' : 'host.update')
 	))->removeId())
 	->setId($data['form_name'])
 	->setName($data['form_name'])

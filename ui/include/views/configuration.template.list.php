@@ -98,7 +98,7 @@ $html_page = (new CHtmlPage())
 				(new CButton('form', _('Import')))
 					->onClick('return PopUp("popup.import", {
 						rules_preset: "template", "'.
-						CCsrfTokenHelper::CSRF_TOKEN_NAME.'": "'.CCsrfTokenHelper::getCsrfToken('popup.import').'"
+						CCsrfTokenHelper::CSRF_TOKEN_NAME.'": "'.CCsrfTokenHelper::get('popup.import').'"
 					}, {
 						dialogueid: "popup_import",
 						dialogue_class: "modal-popup-generic"
@@ -286,7 +286,7 @@ $form->addItem([
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.template', {".
 							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".
-							CCsrfTokenHelper::getCsrfToken('popup.massupdate.template').
+							CCsrfTokenHelper::get('popup.massupdate.template').
 						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
@@ -296,11 +296,11 @@ $form->addItem([
 					->removeAttribute('id')
 			],
 			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?'),
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('template.massdelete')
+				'csrf_token' => CCsrfTokenHelper::get('template.massdelete')
 			],
 			'template.massdeleteclear' => ['name' => _('Delete and clear'),
 				'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'),
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('template.massdeleteclear')
+				'csrf_token' => CCsrfTokenHelper::get('template.massdeleteclear')
 			]
 		]
 	)

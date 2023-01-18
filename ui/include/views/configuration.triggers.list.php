@@ -302,7 +302,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			->setArgument('context', $data['context'])
 			->getUrl()
 		))
-		->addCsrfToken(CCsrfTokenHelper::getCsrfToken($status_action))
+		->addCsrfToken(CCsrfTokenHelper::get($status_action))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']));
 
@@ -355,20 +355,20 @@ $triggers_form->addItem([
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?'),
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('trigger.massenable')
+				'csrf_token' => CCsrfTokenHelper::get('trigger.massenable')
 			],
 			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?'),
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('trigger.massdisable')
+				'csrf_token' => CCsrfTokenHelper::get('trigger.massdisable')
 			],
 			'trigger.masscopyto' => ['name' => _('Copy'),
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('trigger.masscopyto')
+				'csrf_token' => CCsrfTokenHelper::get('trigger.masscopyto')
 			],
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.trigger', {".
 							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '" .
-							CCsrfTokenHelper::getCsrfToken('popup.massupdate.trigger').
+							CCsrfTokenHelper::get('popup.massupdate.trigger').
 						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
@@ -378,7 +378,7 @@ $triggers_form->addItem([
 					->removeAttribute('id')
 			],
 			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?'),
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('trigger.massdelete')
+				'csrf_token' => CCsrfTokenHelper::get('trigger.massdelete')
 			]
 		],
 		$data['checkbox_hash']

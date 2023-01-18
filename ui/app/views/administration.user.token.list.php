@@ -132,7 +132,7 @@ foreach ($data['tokens'] as $token) {
 					->setArgument('tokenids', (array) $token['tokenid'])
 					->getUrl()
 			))
-				->addCsrfToken(CCsrfTokenHelper::getCsrfToken('token.disable'))
+				->addCsrfToken(CCsrfTokenHelper::get('token.disable'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
 			: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
@@ -141,7 +141,7 @@ foreach ($data['tokens'] as $token) {
 					->setArgument('tokenids', (array) $token['tokenid'])
 					->getUrl()
 			))
-				->addCsrfToken(CCsrfTokenHelper::getCsrfToken('token.enable'))
+				->addCsrfToken(CCsrfTokenHelper::get('token.enable'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
 	]);
@@ -152,10 +152,10 @@ $token_form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'tokenids', [
 		'token.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected API tokens?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('token.enable')
+			'csrf_token' => CCsrfTokenHelper::get('token.enable')
 		],
 		'token.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected API tokens?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('token.disable')
+			'csrf_token' => CCsrfTokenHelper::get('token.disable')
 		],
 		'token.delete' => [
 			'content' => (new CSimpleButton(_('Delete')))

@@ -67,7 +67,7 @@ if ($data['ldap_config']['provision_status'] == JIT_PROVISIONING_ENABLED) {
 $form = (new CForm('post', $form_action))
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken('popup.ldap.test.send')
+		CCsrfTokenHelper::get('popup.ldap.test.send')
 	))->removeId())
 	->addItem((new CInput('submit'))->addStyle('display: none;'))
 	->addItem($formgrid)

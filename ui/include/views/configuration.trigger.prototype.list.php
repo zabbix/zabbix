@@ -148,7 +148,7 @@ foreach ($data['triggers'] as $trigger) {
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))
-		->addCsrfToken(CCsrfTokenHelper::getCsrfToken($status_action))
+		->addCsrfToken(CCsrfTokenHelper::get($status_action))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(triggerIndicatorStyle($trigger['status']));
 
@@ -163,7 +163,7 @@ foreach ($data['triggers'] as $trigger) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::getCsrfToken($discover_action))
+			->addCsrfToken(CCsrfTokenHelper::get($discover_action))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -200,18 +200,18 @@ $triggersForm->addItem([
 		[
 			'triggerprototype.massenable' => ['name' => _('Create enabled'),
 				'confirm' => _('Create triggers from selected prototypes as enabled?'),
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('triggerprototype.massenable')
+				'csrf_token' => CCsrfTokenHelper::get('triggerprototype.massenable')
 			],
 			'triggerprototype.massdisable' => ['name' => _('Create disabled'),
 				'confirm' => _('Create triggers from selected prototypes as disabled?'),
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('triggerprototype.massdisable')
+				'csrf_token' => CCsrfTokenHelper::get('triggerprototype.massdisable')
 			],
 			'popup.massupdate.triggerprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.triggerprototype', {".
 							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".
-							CCsrfTokenHelper::getCsrfToken('popup.massupdate.triggerprototype').
+							CCsrfTokenHelper::get('popup.massupdate.triggerprototype').
 						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
@@ -222,7 +222,7 @@ $triggersForm->addItem([
 			],
 			'triggerprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected trigger prototypes?'),
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('triggerprototype.massdelete')
+				'csrf_token' => CCsrfTokenHelper::get('triggerprototype.massdelete')
 			]
 		],
 		$this->data['parent_discoveryid']

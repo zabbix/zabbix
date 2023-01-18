@@ -206,7 +206,7 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::getCsrfToken(($httpTest['status'] == HTTPTEST_STATUS_DISABLED)
+			->addCsrfToken(CCsrfTokenHelper::get(($httpTest['status'] == HTTPTEST_STATUS_DISABLED)
 				? 'httptest.massenable'
 				: 'httptest.massdisable'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
@@ -218,10 +218,10 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 
 $button_list = [
 	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?'),
-		'csrf_token' => CCsrfTokenHelper::getCsrfToken('httptest.massenable')
+		'csrf_token' => CCsrfTokenHelper::get('httptest.massenable')
 	],
 	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?'),
-		'csrf_token' => CCsrfTokenHelper::getCsrfToken('httptest.massdisable')
+		'csrf_token' => CCsrfTokenHelper::get('httptest.massdisable')
 	]
 ];
 
@@ -230,14 +230,14 @@ if ($data['context'] === 'host') {
 		'httptest.massclearhistory' => [
 			'name' => _('Clear history'),
 			'confirm' => _('Delete history of selected web scenarios?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('httptest.massclearhistory')
+			'csrf_token' => CCsrfTokenHelper::get('httptest.massclearhistory')
 		]
 	];
 }
 
 $button_list += [
 	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('httptest.massdelete')
+			'csrf_token' => CCsrfTokenHelper::get('httptest.massdelete')
 	]
 ];
 

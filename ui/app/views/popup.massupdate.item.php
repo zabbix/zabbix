@@ -25,7 +25,7 @@
 
 // Create form.
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken($data['action'])))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get($data['action'])))
 		->removeId()
 	)
 	->setId('massupdate-form')

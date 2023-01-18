@@ -489,7 +489,7 @@ abstract class CController {
 	 * @return CControllerResponse|null
 	 */
 	final public function run(): ?CControllerResponse {
-		if ($this->validate_csrf_token && !CCsrfTokenHelper::checkCsrfToken($this->raw_input, $this->action)) {
+		if ($this->validate_csrf_token && !CCsrfTokenHelper::check($this->raw_input, $this->action)) {
 			throw new CAccessDeniedException();
 		}
 

@@ -40,7 +40,7 @@ $triggersForm = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken(($data['triggerid'] !== null)
+		CCsrfTokenHelper::get(($data['triggerid'] !== null)
 			? 'trigger_prototypes.php update'
 			: 'trigger_prototypes.php add'
 		)

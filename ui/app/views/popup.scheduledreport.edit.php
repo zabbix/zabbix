@@ -25,7 +25,7 @@
 
 $form = (new CForm())
 	->addItem(
-		(new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('popup.scheduledreport.create')))
+		(new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('popup.scheduledreport.create')))
 			->removeId()
 	)
 	->setId('scheduledreport-form')

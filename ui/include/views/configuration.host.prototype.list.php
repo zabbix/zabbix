@@ -158,7 +158,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))
-		->addCsrfToken(CCsrfTokenHelper::getCsrfToken(($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
+		->addCsrfToken(CCsrfTokenHelper::get(($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
 			? 'hostprototype.massenable'
 			: 'hostprototype.massdisable'))
 		->addClass(ZBX_STYLE_LINK_ACTION)
@@ -174,7 +174,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::getCsrfToken('hostprototype.updatediscover'))
+			->addCsrfToken(CCsrfTokenHelper::get('hostprototype.updatediscover'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -196,15 +196,15 @@ $itemForm->addItem([
 		[
 			'hostprototype.massenable' => ['name' => _('Create enabled'),
 				'confirm' => _('Create hosts from selected prototypes as enabled?'),
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('hostprototype.massenable')
+				'csrf_token' => CCsrfTokenHelper::get('hostprototype.massenable')
 			],
 			'hostprototype.massdisable' => ['name' => _('Create disabled'),
 				'confirm' => _('Create hosts from selected prototypes as disabled?'),
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('hostprototype.massdisable')
+				'csrf_token' => CCsrfTokenHelper::get('hostprototype.massdisable')
 			],
 			'hostprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected host prototypes?'),
-				'csrf_token' => CCsrfTokenHelper::getCsrfToken('hostprototype.massdelete')
+				'csrf_token' => CCsrfTokenHelper::get('hostprototype.massdelete')
 			]
 		],
 		$data['discovery_rule']['itemid']

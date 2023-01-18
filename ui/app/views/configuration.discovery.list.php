@@ -89,7 +89,7 @@ foreach ($data['drules'] as $drule) {
 				->setArgument('action', $action)
 				->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::getCsrfToken($action))
+			->addCsrfToken(CCsrfTokenHelper::get($action))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(discovery_status2style($drule['status']))
 	);
@@ -114,13 +114,13 @@ $discoveryForm->addItem([
 	$this->data['paging'],
 	new CActionButtonList('action', 'druleids', [
 		'discovery.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('discovery.enable')
+			'csrf_token' => CCsrfTokenHelper::get('discovery.enable')
 		],
 		'discovery.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('discovery.disable')
+			'csrf_token' => CCsrfTokenHelper::get('discovery.disable')
 		],
 		'discovery.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?'),
-			'csrf_token' => CCsrfTokenHelper::getCsrfToken('discovery.delete')
+			'csrf_token' => CCsrfTokenHelper::get('discovery.delete')
 		]
 	], 'discovery')
 ]);

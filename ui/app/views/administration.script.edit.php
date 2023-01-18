@@ -56,7 +56,7 @@ $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken($data['scriptid'] == 0 ? 'script.create' : 'script.update')
+		CCsrfTokenHelper::get($data['scriptid'] == 0 ? 'script.create' : 'script.update')
 	))->removeId())
 	->setId('script-form')
 	->setName('scripts')

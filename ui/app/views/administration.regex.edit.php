@@ -40,7 +40,7 @@ $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken($data['regexid'] == 0 ? 'regex.create' : 'regex.update')
+		CCsrfTokenHelper::get($data['regexid'] == 0 ? 'regex.create' : 'regex.update')
 	))->removeId())
 	->setId('regex')
 	->setAction($action->getUrl())

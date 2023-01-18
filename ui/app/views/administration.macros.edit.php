@@ -100,7 +100,7 @@ $save_button = (new CSubmit('update', _('Update')))->setAttribute('data-removed-
 $tab_view->setFooter(makeFormFooter($save_button));
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('macros.update')))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('macros.update')))
 		->removeId()
 	)
 	->setName('macrosForm')

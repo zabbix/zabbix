@@ -107,7 +107,7 @@ $form_grid = (new CFormGrid())
 	]);
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('geomaps.update')))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('geomaps.update')))
 		->removeId()
 	)
 	->setId('geomaps-form')

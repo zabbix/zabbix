@@ -23,7 +23,7 @@
  * @var CView $this
  */
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('popup.valuemap.update')))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('popup.valuemap.update')))
 		->removeId()
 	)
 	->setId('valuemap-edit-form')

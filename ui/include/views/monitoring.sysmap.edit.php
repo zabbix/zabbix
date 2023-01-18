@@ -40,7 +40,7 @@ $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken(
+		CCsrfTokenHelper::get(
 			(array_key_exists('sysmapid', $data['sysmap']) && $data['sysmap']['sysmapid'] != '')
 				? 'sysmaps.php update'
 				: 'sysmaps.php add'

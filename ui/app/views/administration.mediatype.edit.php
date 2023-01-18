@@ -43,7 +43,7 @@ $mediaTypeForm = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken($data['mediatypeid'] == 0 ? 'mediatype.create' : 'mediatype.update')
+		CCsrfTokenHelper::get($data['mediatypeid'] == 0 ? 'mediatype.create' : 'mediatype.update')
 	))->removeId())
 	->setId('media-type-form')
 	->addVar('form', 1)

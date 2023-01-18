@@ -47,7 +47,7 @@ $url = (new CUrl('graphs.php'))
 $graphForm = (new CForm('post', $url))
 	->addItem((new CVar(
 		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::getCsrfToken(($data['graphid'] != 0) ? 'graphs.php update' : 'graphs.php add')
+		CCsrfTokenHelper::get(($data['graphid'] != 0) ? 'graphs.php update' : 'graphs.php add')
 	))->removeId())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setName('graphForm')

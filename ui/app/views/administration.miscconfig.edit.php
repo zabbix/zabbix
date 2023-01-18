@@ -184,7 +184,7 @@ $from_list = (new CFormList())
 	);
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('miscconfig.update')))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('miscconfig.update')))
 		->removeId()
 	)
 	->setName('otherForm')
