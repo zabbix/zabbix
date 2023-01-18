@@ -68,23 +68,16 @@ class CCsrfTokenHelper {
 	}
 
 	/**
-	 * Checks if input data contains correct CSRF token.
+	 * Checks if input form CSRF token is correct.
 	 *
-	 * @param array $data     controller input data.
-	 * @param string $action  controller action.
+	 * @param string $csrf_token_form  CSRF token from submitted form.
+	 * @param string $action           controller action.
 	 *
 	 * @throws CAccessDeniedException
 	 *
 	 * @return bool true if the token is correct.
 	 */
-	public static function check($data, $action): bool {
-		if (!is_array($data) || !array_key_exists(self::CSRF_TOKEN_NAME, $data)) {
-			return false;
-		}
-
-		$csrf_token_form = $data[self::CSRF_TOKEN_NAME];
-		$csrf_token_correct = self::get($action);
-
-		return CEncryptHelper::checkSign($csrf_token_correct, $csrf_token_form);
+	public static function check(string $csrf_token_form, string $action): bool {
+		return CEncryptHelper::checkSign(self::get($action), $csrf_token_form);
 	}
 }

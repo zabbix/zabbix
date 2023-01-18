@@ -453,10 +453,7 @@ abstract class CController {
 			return false;
 		}
 
-		$csrf_token_form = $this->raw_input[self::CSRF_TOKEN_NAME];
-		$csrf_token_correct = self::generateCsrfToken($this->action);
-
-		return CEncryptHelper::checkSign($csrf_token_correct, $csrf_token_form);
+		return CCsrfTokenHelper::check($this->raw_input[CCsrfTokenHelper::CSRF_TOKEN_NAME], $this->action);
 	}
 
 	/**
@@ -489,7 +486,7 @@ abstract class CController {
 	 * @return CControllerResponse|null
 	 */
 	final public function run(): ?CControllerResponse {
-		if ($this->validate_csrf_token && !CCsrfTokenHelper::check($this->raw_input, $this->action)) {
+		if ($this->validate_csrf_token && !$this->checkCsrfToken()) {
 			throw new CAccessDeniedException();
 		}
 
