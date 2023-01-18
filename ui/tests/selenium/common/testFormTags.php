@@ -1149,7 +1149,7 @@ class testFormTags extends CWebTest {
 
 		// Check empty column "Parent templates" except for inherited unique template tags.
 		foreach ($tags_table->getRows() as $row) {
-			$parent_template = $row->getColumn('Parent template')->getText();
+			$parent_template = $row->getColumn('Parent templates')->getText();
 			$current_tag = [];
 			$current_tag['tag'] = $row->getColumn('Name')->getText();
 			$current_tag['value'] = $row->getColumn('Value')->getText();
