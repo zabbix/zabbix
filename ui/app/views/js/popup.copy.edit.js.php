@@ -42,7 +42,7 @@ window.copy_popup = new class {
 		this.changeTargetType();
 	}
 
-	changeTargetType(copy_type = <?= COPY_TYPE_TO_HOST_GROUP ?>) {
+	changeTargetType(copy_type = <?= COPY_TYPE_TO_TEMPLATE_GROUP ?>) {
 		const copy_targets = document.getElementById('copy_targets');
 		copy_targets.innerHTML = '';
 

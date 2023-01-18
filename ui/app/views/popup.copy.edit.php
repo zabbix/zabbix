@@ -55,11 +55,11 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Target type'), 'copy_type'),
 		new CFormField(
-			(new CRadioButtonList('copy_type', COPY_TYPE_TO_HOST_GROUP))
+			(new CRadioButtonList('copy_type', COPY_TYPE_TO_TEMPLATE_GROUP))
+				->addValue(_('Template groups'), COPY_TYPE_TO_TEMPLATE_GROUP)
 				->addValue(_('Host groups'), COPY_TYPE_TO_HOST_GROUP)
 				->addValue(_('Hosts'), COPY_TYPE_TO_HOST)
 				->addValue(_('Templates'), COPY_TYPE_TO_TEMPLATE)
-				->addValue(_('Template groups'), COPY_TYPE_TO_TEMPLATE_GROUP)
 				->setModern()
 				->setName('copy_type')
 		)
