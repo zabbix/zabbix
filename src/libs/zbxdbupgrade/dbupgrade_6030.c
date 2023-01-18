@@ -1481,7 +1481,8 @@ static int	DBpatch_6030159(void)
 			"web.actionconf.php.sort", "web.action.list.sort",
 			"web.actionconf.php.sortorder", "web.action.list.sortorder",
 			"web.actionconf.filter_name", "web.action.list.filter_name",
-			"web.actionconf.filter_status", "web.action.list.filter_status"
+			"web.actionconf.filter_status", "web.action.list.filter_status",
+			"web.actionconf.filter.active", "web.action.list.filter.active"
 		};
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
