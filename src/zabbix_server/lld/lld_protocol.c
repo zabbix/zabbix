@@ -187,7 +187,7 @@ static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_
  *             error       - [IN] error message (can be NULL)                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
+void	zbx_lld_queue_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
 		unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error)
 {
 	static zbx_ipc_socket_t	socket;
@@ -246,7 +246,7 @@ void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGEN
 	}
 
 	if (NULL != value || NULL != error || 0 != meta)
-		zbx_lld_process_value(itemid, hostid, value, ts, meta, lastlogsize, mtime, error);
+		zbx_lld_queue_value(itemid, hostid, value, ts, meta, lastlogsize, mtime, error);
 }
 
 /******************************************************************************
