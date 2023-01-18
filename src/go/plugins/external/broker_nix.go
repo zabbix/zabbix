@@ -1,5 +1,5 @@
-//go:build (linux && arm) || (linux && ppc64le) || (linux && s390x)
-// +build linux,arm linux,ppc64le linux,s390x
+//go:build !windows
+// +build !windows
 
 /*
 ** Zabbix
@@ -20,16 +20,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package uname
+package external
 
-func arrayToString(unameArray *[65]uint8) string {
-	var byteString [65]byte
-	var indexLength int
-	for ; indexLength < len(unameArray); indexLength++ {
-		if 0 == unameArray[indexLength] {
-			break
-		}
-		byteString[indexLength] = uint8(unameArray[indexLength])
-	}
-	return string(byteString[:indexLength])
+import (
+	"errors"
+	"net"
+)
+
+func isErrConnectionClosed(err error) bool {
+	return errors.Is(err, net.ErrClosed)
 }

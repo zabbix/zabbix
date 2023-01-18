@@ -1,6 +1,10 @@
 Changes for 6.4.0beta6
 
 New features:
+A.F....... [ZBXNEXT-7951] improved import configuration by changing UI, matching logic and unlinking logic (acikuns, rdetlavs)
+.........T [ZBXNEXT-8112] added Line media type (abiba)
+........S. [ZBXNEXT-8197] added TimescaleDB v2.9.x support (dgoloscapov)
+.........T [ZBXNEXT-7962] fixed interfaces discovery rules in OPNsense, PFSense and TrueNAS templates (drasikhov)
 A.F....... [ZBXNEXT-3100] added requirement for users to enter current password when changing their own password (dpetra)
 .........T [ZBXNEXT-8115] updated system.sw.packages key in Linux templates (abakaldin)
 A.F....... [ZBXNEXT-3100] implemented current password which is required for all users when their own password is changed (dpetra)
@@ -8,6 +12,20 @@ A.F.I...S. [ZBXNEXT-7964] introduced two-level event/problem hierarchy: causes a
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (egordymov)
 
 Bug fixes:
+..F....... [ZBX-22077] fixed Sign out link not working consistently in Mozilla Firefox (jfreibergs)
+...G...... [ZBX-21862] updated tablespaces query for oracle plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBX-21665] fixed SMART plugin infinite loop for Zabbix agent 2 (esneiders)
+...G...... [ZBX-19138] fixed Redis plugin configuration in Zabbix agent 2 configuration files (esneiders)
+.........T [ZBX-21592] moved some static items under LLD rules to optimize Oracle by ODBC template (knaglis)
+.......PS. [ZBX-21069] fixed snmp max_vars not backing off when generr is received (dgoloscapov)
+..F....... [ZBX-21889] fixed warnings being shown even after overrides are enabled for trends or history tables with compressed chunks (jfreibergs)
+..F.....S. [ZBX-21563] changed the order in which escalation steps and recovery operations are executed (asitals, rlataria)
+..F....... [ZBX-22017] fixed map navigation tree widget inability to save the order when the depth levels get changed (acikuns)
+..F....... [ZBX-21961] removed unnecessary "Command:" label for message actions in Event details page (esekace)
+.......... [ZBX-21783] fixed Zabbix JS timeout validation (asestakovs)
+........S. [ZBX-21720] fixed trends function cache size estimation and overallocation handling (kprutkovs, wiper)
+.......PS. [ZBX-21713] fixed retrieval of numeric column width when Oracle db is used (dgoloscapov)
+........S. [ZBX-22126] fixed trends being deleted from cache and retrieved from database when data older than 1 hour is received (vso)
 .......PS. [ZBX-22075] fixed crash when Elasticsearch is used (dgoloscapov)
 ....I..... [ZBX-21826] fixed dummy module Makefile to use cc and compile on FreeBSD (yurii)
 A......... [ZBX-22015] fixed provisioning of new user when group mapping contains duplicate groups (gcalenko)
@@ -225,6 +243,10 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.7rc1
 
 New features:
+A.F....... [ZBXNEXT-7951] improved import configuration by changing UI, matching logic and unlinking logic (acikuns, rdetlavs)
+.........T [ZBXNEXT-8112] added Line media type (abiba)
+........S. [ZBXNEXT-8197] added TimescaleDB v2.9.x support (dgoloscapov)
+.........T [ZBXNEXT-7962] fixed interfaces discovery rules in OPNsense, PFSense and TrueNAS templates (drasikhov)
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (vkhaliev)
 ..F....... [ZBXNEXT-7963] added hint box for "Enable HTTP authentication"; added confirmation dialog box for enabling HTTP authentication (kkuzmina)
 ...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
@@ -234,6 +256,20 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+..F....... [ZBX-22077] fixed Sign out link not working consistently in Mozilla Firefox (jfreibergs)
+...G...... [ZBX-21862] updated tablespaces query for oracle plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBX-21665] fixed SMART plugin infinite loop for Zabbix agent 2 (esneiders)
+...G...... [ZBX-19138] fixed Redis plugin configuration in Zabbix agent 2 configuration files (esneiders)
+.........T [ZBX-21592] moved some static items under LLD rules to optimize Oracle by ODBC template (knaglis)
+.......PS. [ZBX-21069] fixed snmp max_vars not backing off when generr is received (dgoloscapov)
+..F....... [ZBX-21889] fixed warnings being shown even after overrides are enabled for trends or history tables with compressed chunks (jfreibergs)
+..F.....S. [ZBX-21563] changed the order in which escalation steps and recovery operations are executed (asitals, rlataria)
+..F....... [ZBX-22017] fixed map navigation tree widget inability to save the order when the depth levels get changed (acikuns)
+..F....... [ZBX-21961] removed unnecessary "Command:" label for message actions in Event details page (esekace)
+.......... [ZBX-21783] fixed Zabbix JS timeout validation (asestakovs)
+........S. [ZBX-21720] fixed trends function cache size estimation and overallocation handling (kprutkovs, wiper)
+.......PS. [ZBX-21713] fixed retrieval of numeric column width when Oracle db is used (dgoloscapov)
+........S. [ZBX-22126] fixed trends being deleted from cache and retrieved from database when data older than 1 hour is received (vso)
 .......PS. [ZBX-22075] fixed crash when Elasticsearch is used (dgoloscapov)
 ....I..... [ZBX-21826] fixed dummy module Makefile to use cc and compile on FreeBSD (yurii)
 ........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
@@ -785,6 +821,10 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.13rc1
 
 New features:
+A.F....... [ZBXNEXT-7951] implemented configuration import improvements (rdetlavs)
+.........T [ZBXNEXT-8112] added Line media type (abiba)
+........S. [ZBXNEXT-8197] added TimescaleDB v2.9.x support (dgoloscapov)
+.........T [ZBXNEXT-7962] fixed interfaces discovery rules in OPNsense, PFSense and TrueNAS templates (drasikhov)
 .......PS. [ZBXNEXT-7615] added hmac function for javascript (wiper)
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (egordymov)
 .......PS. [ZBXNEXT-8076] added prof_enable and prof_disable commands for profiling (vso)
@@ -796,6 +836,20 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+..F....... [ZBX-22077] fixed Sign out link not working consistently in Mozilla Firefox (jfreibergs)
+...G...... [ZBX-21862] updated tablespaces query for oracle plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBX-21665] fixed SMART plugin infinite loop for Zabbix agent 2 (esneiders)
+...G...... [ZBX-19138] fixed Redis plugin configuration in Zabbix agent 2 configuration files (esneiders)
+.........T [ZBX-21592] moved some static items under LLD rules to optimize Oracle by ODBC template (knaglis)
+.......PS. [ZBX-21069] fixed snmp max_vars not backing off when generr is received (dgoloscapov)
+..F....... [ZBX-21889] fixed warnings being shown even after overrides are enabled for trends or history tables with compressed chunks (jfreibergs)
+..F.....S. [ZBX-21563] changed the order in which escalation steps and recovery operations are executed (asitals, rlataria)
+..F....... [ZBX-22017] fixed map navigation tree widget inability to save the order when the depth levels get changed (acikuns)
+..F....... [ZBX-21961] removed unnecessary "Command:" label for message actions in Event details page (esekace)
+.......... [ZBX-21783] fixed Zabbix JS timeout validation (asestakovs)
+........S. [ZBX-21720] fixed trends function cache size estimation and overallocation handling (kprutkovs, wiper)
+.......PS. [ZBX-21713] fixed retrieval of numeric column width when Oracle db is used (dgoloscapov)
+........S. [ZBX-22126] fixed trends being deleted from cache and retrieved from database when data older than 1 hour is received (vso)
 .......PS. [ZBX-22075] fixed crash when Elasticsearch is used (dgoloscapov)
 ........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
 A......... [ZBX-22138] fixed inability to delete group from host prototype (vmaksimovs)
@@ -3091,10 +3145,17 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.31rc1
 
 New features:
+.........T [ZBXNEXT-7962] fixed interfaces discovery rules in OPNsense and PFSense templates (drasikhov)
 ...G...... [ZBXNEXT-6119] added option to retrieve all JSON data from container info key in Zabbix agent 2 docker plugin (esneiders)
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+...G...... [ZBX-21862] updated tablespaces query for oracle plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBX-21665] fixed SMART plugin infinite loop for Zabbix agent 2 (esneiders)
+...G...... [ZBX-19138] fixed Redis plugin configuration in Zabbix agent 2 configuration files (esneiders)
+..F.....S. [ZBX-21563] changed the order in which escalation steps and recovery operations are executed (asitals, rlataria)
+.......... [ZBX-21783] fixed Zabbix JS timeout validation (asestakovs)
+........S. [ZBX-22126] fixed trends being deleted from cache and retrieved from database when data older than 1 hour is received (vso)
 A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
 .........T [ZBX-21540] moved some static items under LLD rules to improve performance in Oracle by Zabbix agent 2 template (knaglis)
 .........T [ZBX-22071] extended description for OPSGenie media type (atocko)

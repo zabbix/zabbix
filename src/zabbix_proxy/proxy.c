@@ -204,7 +204,7 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
-int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
+static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
 
 int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
@@ -555,7 +555,7 @@ static void	zbx_set_defaults(void)
 	if (NULL == CONFIG_SSL_KEY_LOCATION)
 		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DEFAULT_SSL_KEY_LOCATION);
 #endif
-	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
+	if (ZBX_PROXYMODE_PASSIVE == config_proxymode)
 	{
 		CONFIG_FORKS[ZBX_PROCESS_TYPE_DATASENDER] = 0;
 		program_type = ZBX_PROGRAM_TYPE_PROXY_PASSIVE;
@@ -625,7 +625,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE)
+	if (ZBX_PROXYMODE_ACTIVE == config_proxymode)
 	{
 		if (NULL != strchr(CONFIG_SERVER, ','))
 		{
@@ -633,7 +633,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 			err = 1;
 		}
 	}
-	else if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE && FAIL == zbx_validate_peer_list(CONFIG_SERVER, &ch_error))
+	else if (ZBX_PROXYMODE_PASSIVE == config_proxymode && FAIL == zbx_validate_peer_list(CONFIG_SERVER, &ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"Server\" configuration parameter: %s", ch_error);
 		zbx_free(ch_error);
@@ -759,7 +759,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */
-		{"ProxyMode",			&CONFIG_PROXYMODE,			TYPE_INT,
+		{"ProxyMode",			&config_proxymode,			TYPE_INT,
 			PARM_OPT,	ZBX_PROXYMODE_ACTIVE,	ZBX_PROXYMODE_PASSIVE},
 		{"Server",			&CONFIG_SERVER,				TYPE_STRING,
 			PARM_MAND,	0,			0},
@@ -979,7 +979,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 	zbx_vector_ptr_create(&zbx_addrs);
 
-	if (ZBX_PROXYMODE_PASSIVE != CONFIG_PROXYMODE)
+	if (ZBX_PROXYMODE_PASSIVE != config_proxymode)
 	{
 		char	*error;
 
@@ -1272,13 +1272,13 @@ static void	proxy_db_init(void)
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	zbx_socket_t			listen_sock;
-	char				*error = NULL;
-	int				i, ret;
-	zbx_rtc_t			rtc;
-	zbx_timespec_t			rtc_timeout = {1, 0};
+	zbx_socket_t				listen_sock;
+	char					*error = NULL;
+	int					i, ret;
+	zbx_rtc_t				rtc;
+	zbx_timespec_t				rtc_timeout = {1, 0};
 
-	zbx_config_comms_args_t			config_comms = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE,
+	zbx_config_comms_args_t			config_comms = {zbx_config_tls, CONFIG_HOSTNAME, config_proxymode,
 								config_timeout};
 	zbx_thread_args_t			thread_args;
 	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
@@ -1294,10 +1294,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {config_timeout};
 	zbx_thread_pinger_args			pinger_args = {config_timeout};
 
+	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
+
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
 		printf("Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
-				ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE ? "passive" : "active",
+				ZBX_PROXYMODE_PASSIVE == config_proxymode ? "passive" : "active",
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
@@ -1364,7 +1366,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).",
-			ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE ? "passive" : "active",
+			ZBX_PROXYMODE_PASSIVE == config_proxymode ? "passive" : "active",
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
@@ -1488,6 +1490,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	thread_args.info.program_type = program_type;
 
+	if (ZBX_PROXYMODE_PASSIVE == config_proxymode)
+		rtc_process_request_func = rtc_process_request_ex_passive;
+
 	for (i = 0; i < threads_num; i++)
 	{
 		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.info.process_type,
@@ -1505,7 +1510,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				thread_args.args = &proxyconfig_args;
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
-				if (FAIL == zbx_rtc_wait_config_sync(&rtc, rtc_process_request_ex))
+				if (FAIL == zbx_rtc_wait_config_sync(&rtc, rtc_process_request_func))
 					goto out;
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
@@ -1600,7 +1605,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (NULL != message)
 		{
-			zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_ex);
+			zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_func);
 			zbx_ipc_message_free(message);
 		}
 

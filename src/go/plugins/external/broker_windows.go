@@ -1,4 +1,6 @@
-<?php
+//go:build windows
+// +build windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -18,19 +20,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+package external
 
-/**
- * Converters for convert XML values to values that API can accept.
- */
-class CTransformImportConverter extends CConverter {
+import (
+	"errors"
+	"github.com/Microsoft/go-winio"
+)
 
-	protected $rules;
-
-	public function __construct(array $schema) {
-		$this->rules = $schema;
-	}
-
-	public function convert($data) {
-		return $data;
-	}
+func isErrConnectionClosed(err error) bool {
+	return errors.Is(err, winio.ErrFileClosed)
 }

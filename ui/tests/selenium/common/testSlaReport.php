@@ -267,8 +267,11 @@ class testSlaReport extends CWebTest {
 
 				case 'Weekly':
 					for ($i = 1; $i <= 20; $i++) {
-						$period_values[$i]['start'] = strtotime('next Sunday '.-$i.' week');
-						$period_values[$i]['end'] = strtotime(date('Y-m-d', $period_values[$i]['start']).' + 6 days');
+						// Next Sunday should be taken as period start date in case if today is Sunday (0 represents Sunday).
+						$start_string = (date('w', time()) == 0) ? 'Sunday next week ' : 'next Sunday ';
+
+						$period_values[$i]['start'] = strtotime($start_string.-$i.' week');
+						$period_values[$i]['end'] = strtotime(date('Y-m-d', $period_values[$i]['start']).' + 7 days - 1 second');
 
 						$period_values[$i]['value'] = date('Y-m-d', $period_values[$i]['start']).' – '.
 								date('m-d', $period_values[$i]['end']);

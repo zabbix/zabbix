@@ -38,9 +38,10 @@ $html_page = (new CHtmlPage())
 			->addItem(
 				(new CButton('', _('Import')))
 					->onClick(
-						'return PopUp("popup.import", {rules_preset: "mediatype"},
-							{dialogue_class: "modal-popup-generic"}
-						);'
+						'return PopUp("popup.import", {rules_preset: "mediatype"},{
+							dialogueid: "popup_import",
+							dialogue_class: "modal-popup-generic"
+						});'
 					)
 					->removeId()
 			)

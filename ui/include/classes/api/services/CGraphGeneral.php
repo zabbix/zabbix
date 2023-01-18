@@ -787,6 +787,7 @@ abstract class CGraphGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
 		}
 
+		$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
 		$read_only_fields = ['templateid', 'flags'];
 
 		foreach ($graphs as $key => $graph) {
@@ -796,12 +797,6 @@ abstract class CGraphGeneral extends CApiService {
 
 			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($key + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-
-			if (array_key_exists('uuid', $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/' . ($key + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
 			}
 
 			$templatedGraph = false;
