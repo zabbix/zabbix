@@ -89,12 +89,8 @@ abstract class CGraphGeneral extends CApiService {
 			if ($db_graphs[$graph['graphid']]['templateid'] != 0) {
 				if ($db_graphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
 						&& array_key_exists('discover', $graph)) {
-					$graph = [
-						'graphid' => $graph['graphid'],
-						'discover' => $graph['discover'],
-						'name' => $db_graphs[$graph['graphid']]['name'],
-						'gitems' => $db_graphs[$graph['graphid']]['gitems']
-					];
+					$graph = ['discover' => $graph['discover']] + $db_graphs[$graph['graphid']];
+					unset($graph['templateid'], $graph['flags'], $graph['uuid']);
 				}
 				else {
 					unset($graphs[$key]);
