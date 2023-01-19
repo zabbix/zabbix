@@ -105,6 +105,38 @@ int	zbx_connector_get_diag_stats(int *queued, char **error)
 	return SUCCEED;
 }
 
+int	zbx_connector_get_queue_size(zbx_uint64_t *size, char **error)
+{
+	zbx_ipc_message_t	message;
+	zbx_ipc_socket_t	connector_socket;
+	int			ret = FAIL;
+
+	if (FAIL == zbx_ipc_socket_open(&connector_socket, ZBX_IPC_SERVICE_CONNECTOR, SEC_PER_MIN, error))
+		return FAIL;
+
+	zbx_ipc_message_init(&message);
+
+	if (FAIL == zbx_ipc_socket_write(&connector_socket, ZBX_IPC_CONNECTOR_QUEUE, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "cannot send queue request to connector service");
+		goto out;
+	}
+
+	if (FAIL == zbx_ipc_socket_read(&connector_socket, &message))
+	{
+		*error = zbx_strdup(NULL, "cannot read queue response from connector service");
+		goto out;
+	}
+
+	memcpy(size, message.data, sizeof(zbx_uint64_t));
+	ret = SUCCEED;
+out:
+	zbx_ipc_socket_close(&connector_socket);
+	zbx_ipc_message_clean(&message);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: pack top request data into a single buffer that can be used in IPC*

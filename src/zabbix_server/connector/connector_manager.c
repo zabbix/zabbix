@@ -444,7 +444,7 @@ static void	connector_add_result(zbx_connector_manager_t *manager, zbx_ipc_clien
 	zbx_vector_uint64_clear(&worker->ids);
 }
 
-static	void	connector_get_items_totals(zbx_connector_manager_t *manager, int *queued)
+static	void	connector_get_items_totals(zbx_connector_manager_t *manager, zbx_uint64_t *queued)
 {
 	zbx_connector_t		*connector;
 	zbx_hashset_iter_t	iter;
@@ -530,6 +530,28 @@ static	void	preprocessor_get_items_view(zbx_connector_manager_t *manager, zbx_ve
 
 		zbx_vector_ptr_append(view, connector_stat);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return diagnostic statistics                                      *
+ *                                                                            *
+ * Parameters: manager - [IN] preprocessing manager                           *
+ *             client  - [IN] IPC client                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	connector_get_queue(zbx_connector_manager_t *manager, zbx_ipc_client_t *client)
+{
+	zbx_uint64_t	queued;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	connector_get_items_totals(manager, &queued);
+
+	zbx_ipc_client_send(client, ZBX_IPC_CONNECTOR_QUEUE_RESULT, (unsigned char *)&queued,
+			sizeof(zbx_uint64_t));
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -660,6 +682,9 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 					break;
 				case ZBX_IPC_CONNECTOR_TOP_CONNECTORS:
 					connector_get_top_items(&manager, client, message);
+					break;
+				case ZBX_IPC_CONNECTOR_QUEUE:
+					connector_get_queue(&manager, client);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;

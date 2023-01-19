@@ -34,6 +34,8 @@
 #define ZBX_IPC_CONNECTOR_DIAG_STATS_RESULT	5
 #define ZBX_IPC_CONNECTOR_TOP_CONNECTORS	6
 #define	ZBX_IPC_CONNECTOR_TOP_CONNECTORS_RESULT	7
+#define ZBX_IPC_CONNECTOR_QUEUE			8
+#define ZBX_IPC_CONNECTOR_QUEUE_RESULT		9
 
 typedef struct
 {
@@ -84,6 +86,7 @@ int	zbx_connector_get_top_connectors(int limit, zbx_vector_ptr_t *items, char **
 void	zbx_connector_unpack_top_request(int *limit, const unsigned char *data);
 zbx_uint32_t	zbx_connector_pack_top_connectors_result(unsigned char **data, zbx_connector_stat_t **connector_stats,
 		int connector_stats_num);
+int	zbx_connector_get_queue_size(zbx_uint64_t *size, char **error);
 
 void	zbx_connector_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size);
 #endif /* ZABBIX_AVAILABILITY_H */

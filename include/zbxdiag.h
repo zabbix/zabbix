@@ -65,9 +65,11 @@ void	zbx_diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_s
 int	zbx_diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 void	zbx_diag_add_locks_info(struct zbx_json *json);
+int	zbx_diag_add_connector_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 
 void	zbx_diag_init(zbx_diag_add_section_info_func_t cb);
 int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info);
 void	zbx_diag_log_info(unsigned int flags, char **result);
+
 
 #endif /* ZABBIX_ZBXDIAG_H */
