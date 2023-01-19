@@ -41,10 +41,7 @@ $url = (new CUrl('items.php'))
 // Create form.
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(
-		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::get($data['itemid'] ? 'items.php update' : 'items.php add')
-	))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('items.php')))->removeId())
 	->setId('item-form')
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -1127,8 +1124,7 @@ $html_page->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'trends_default' => $data['trends_default'],
-		'csrf_tokens' => $data['csrf_tokens']
+		'trends_default' => $data['trends_default']
 	]).');
 '))
 	->setOnDocumentReady()

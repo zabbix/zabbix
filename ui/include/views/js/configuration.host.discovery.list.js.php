@@ -69,6 +69,7 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.masscheck_now');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('item') ?>');
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

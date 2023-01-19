@@ -250,7 +250,7 @@ ZABBIX.apps.map = (function($) {
 					data: {
 						favobj: 'sysmap',
 						action: 'update',
-						_csrf_token: this.csrf_tokens['update'],
+						_csrf_token: this.csrf_tokens['sysmap.php'],
 						sysmapid: this.sysmapid,
 						sysmap: JSON.stringify(this.data)
 					},

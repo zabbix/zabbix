@@ -78,6 +78,8 @@ $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['trig
 	'context' => $data['context']
 ]);
 
+$csrf_token = CCsrfTokenHelper::get('trigger_prototypes.php');
+
 foreach ($data['triggers'] as $trigger) {
 	$triggerid = $trigger['triggerid'];
 	$trigger['discoveryRuleid'] = $data['parent_discoveryid'];
@@ -135,20 +137,20 @@ foreach ($data['triggers'] as $trigger) {
 		$description = array_merge($description, [(new CDiv($triggerDependencies))->addClass('dependencies')]);
 	}
 
-	$status_action = ($trigger['status'] == TRIGGER_STATUS_DISABLED)
-		? 'triggerprototype.massenable'
-		: 'triggerprototype.massdisable';
 	// status
 	$status = (new CLink(
 		($trigger['status'] == TRIGGER_STATUS_DISABLED) ? _('No') : _('Yes'),
 		(new CUrl('trigger_prototypes.php'))
-			->setArgument('action', $status_action)
+			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
+				? 'triggerprototype.massenable'
+				: 'triggerprototype.massdisable'
+			)
 			->setArgument('g_triggerid[]', $triggerid)
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))
-		->addCsrfToken(CCsrfTokenHelper::get($status_action))
+		->addCsrfToken($csrf_token)
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(triggerIndicatorStyle($trigger['status']));
 
@@ -163,7 +165,7 @@ foreach ($data['triggers'] as $trigger) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::get($discover_action))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -200,18 +202,17 @@ $triggersForm->addItem([
 		[
 			'triggerprototype.massenable' => ['name' => _('Create enabled'),
 				'confirm' => _('Create triggers from selected prototypes as enabled?'),
-				'csrf_token' => CCsrfTokenHelper::get('triggerprototype.massenable')
+				'csrf_token' => $csrf_token
 			],
 			'triggerprototype.massdisable' => ['name' => _('Create disabled'),
 				'confirm' => _('Create triggers from selected prototypes as disabled?'),
-				'csrf_token' => CCsrfTokenHelper::get('triggerprototype.massdisable')
+				'csrf_token' => $csrf_token
 			],
 			'popup.massupdate.triggerprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.triggerprototype', {".
-							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".
-							CCsrfTokenHelper::get('popup.massupdate.triggerprototype').
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '". CCsrfTokenHelper::get('massupdate').
 						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
@@ -222,7 +223,7 @@ $triggersForm->addItem([
 			],
 			'triggerprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected trigger prototypes?'),
-				'csrf_token' => CCsrfTokenHelper::get('triggerprototype.massdelete')
+				'csrf_token' => $csrf_token
 			]
 		],
 		$this->data['parent_discoveryid']

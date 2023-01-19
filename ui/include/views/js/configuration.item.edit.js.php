@@ -31,11 +31,9 @@ include __DIR__.'/itemtest.js.php';
 <script>
 	const view = {
 		form_name: null,
-		csrf_tokens: null,
 
-		init({form_name, trends_default, csrf_tokens}) {
+		init({form_name, trends_default}) {
 			this.form_name = form_name;
-			this.csrf_tokens = csrf_tokens;
 
 			// Field switchers.
 			new CViewSwitcher('value_type', 'change', item_form.field_switches.for_value_type);
@@ -94,24 +92,6 @@ include __DIR__.'/itemtest.js.php';
 					}
 				})
 				.trigger('change');
-
-			let csrf_token = document.itemForm.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
-
-			document.addEventListener('click', (e) => {
-				if (e.target.id === 'del_history') {
-					document.addEventListener('submit', (e) => {
-						csrf_token.value = this.csrf_tokens['items.php del_history'];
-					})
-				}
-				else if (e.target.id === 'clone') {
-					csrf_token.value = this.csrf_tokens['items.php clone'];
-				}
-				else if (e.target.id === 'delete') {
-					document.addEventListener('submit', (e) => {
-						csrf_token.value = this.csrf_tokens['items.php delete'];
-					})
-				}
-			})
 		},
 
 		typeChangeHandler() {
@@ -138,7 +118,8 @@ include __DIR__.'/itemtest.js.php';
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('item.masscheck_now', this.csrf_tokens['item.masscheck_now']);
+			curl.setArgument('action', 'item.masscheck_now');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('item') ?>');
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

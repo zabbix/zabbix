@@ -43,7 +43,7 @@
 	 * @param {object} 	idx2				An array of IDs
 	 * @param {int} 	profile_type		Profile type
 	 */
-	function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT, ) {
+	function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT) {
 		const value_fields = {
 			[PROFILE_TYPE_INT]: 'value_int',
 			[PROFILE_TYPE_STR]: 'value_str'

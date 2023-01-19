@@ -32,12 +32,10 @@
 	const view = {
 		checkbox_object: null,
 		checkbox_hash: null,
-		csrf_tokens: null,
 
-		init({checkbox_hash, checkbox_object, csrf_tokens}) {
+		init({checkbox_hash, checkbox_object}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
-			this.csrf_tokens = csrf_tokens;
 
 			// Disable the status filter when using the state filter.
 			$('#filter_state')
@@ -86,7 +84,8 @@
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('item.masscheck_now', this.csrf_tokens['item.masscheck_now']);
+			curl.setArgument('action', 'item.masscheck_now');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('item') ?>');
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -126,7 +125,8 @@
 
 		checkNow(itemid) {
 			const curl = new Curl('zabbix.php');
-			curl.setAction('item.masscheck_now', this.csrf_tokens['item.masscheck_now']);
+			curl.setArgument('action', 'item.masscheck_now');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('item') ?>');
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

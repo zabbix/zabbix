@@ -76,6 +76,7 @@ $itemTable = (new CTableInfo())
 	]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
+$csrf_token = CCsrfTokenHelper::get('disc_prototypes.php');
 
 foreach ($data['items'] as $item) {
 	$description = [];
@@ -134,7 +135,7 @@ foreach ($data['items'] as $item) {
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))
-		->addCsrfToken(CCsrfTokenHelper::get($status_action))
+		->addCsrfToken($csrf_token)
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($item['status']));
 
@@ -175,7 +176,7 @@ foreach ($data['items'] as $item) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::get($discover_action))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -202,18 +203,18 @@ $itemForm->addItem([
 		[
 			'itemprototype.massenable' => ['name' => _('Create enabled'),
 				'confirm' => _('Create items from selected prototypes as enabled?'),
-				'csrf_token' => CCsrfTokenHelper::get('itemprototype.massenable')
+				'csrf_token' => $csrf_token
 			],
 			'itemprototype.massdisable' => ['name' => _('Create disabled'),
 				'confirm' => _('Create items from selected prototypes as disabled?'),
-				'csrf_token' => CCsrfTokenHelper::get('itemprototype.massdisable')
+				'csrf_token' => $csrf_token
 			],
 			'popup.massupdate.itemprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.itemprototype', {".
 							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".
-							CCsrfTokenHelper::get('popup.massupdate.itemprototype').
+							CCsrfTokenHelper::get('massupdate').
 						"'}, {
 							dialogue_class: 'modal-popup-preprocessing',
 							trigger_element: this
@@ -224,7 +225,7 @@ $itemForm->addItem([
 			],
 			'itemprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected item prototypes?'),
-				'csrf_token' => CCsrfTokenHelper::get('itemprototype.massdelete')
+				'csrf_token' => $csrf_token
 			]
 		],
 		$data['parent_discoveryid']

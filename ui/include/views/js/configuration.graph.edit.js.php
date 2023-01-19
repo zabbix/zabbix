@@ -323,13 +323,11 @@
 	const view = {
 		form_name: null,
 		graphs: null,
-		csrf_tokens: null,
 
-		init({form_name, theme_colors, graphs, items, csrf_tokens}) {
+		init({form_name, theme_colors, graphs, items}) {
 			this.form_name = form_name;
 			colorPalette.setThemeColors(theme_colors);
 			this.graphs = graphs;
-			this.csrf_tokens = csrf_tokens;
 
 			items.forEach((item, i) => {
 				item.number = i;
@@ -483,30 +481,6 @@
 			});
 
 			!this.graphs.readonly && this.initSortable();
-
-			let csrf_token = document.graphForm.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
-
-			document.addEventListener('click', (e) => {
-				if (e.target.id === 'clone') {
-					csrf_token.value = this.csrf_tokens['graphs.php clone'];
-				}
-				else if (e.target.id === 'delete') {
-					if (this.graphs.parent_discoveryid === null) {
-						if (!window.confirm('<?= _('Delete graph?') ?>')) {
-							e.preventDefault();
-							return;
-						}
-					}
-					else {
-						if (!window.confirm('<?= _('Delete graph prototype?') ?>')) {
-							e.preventDefault();
-							return;
-						}
-					}
-
-					csrf_token.value = this.csrf_tokens['graphs.php delete'];
-				}
-			})
 		},
 
 		loadItem(item) {

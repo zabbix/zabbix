@@ -113,7 +113,6 @@
 		const $add_url_btn = $('#add-url');
 		const $add_url_row = $add_url_btn.closest('tr');
 		let url_rowid = $('[id^="url-row-"]').length;
-		let csrf_tokens = <?= json_encode($data['csrf_tokens']) ?>;
 
 		$add_url_btn.on('click', (e) => {
 			$add_url_row.before(url_tpl.evaluate({id: url_rowid}));
@@ -147,8 +146,6 @@
 				$('#sysmapid').remove();
 			}
 
-			$('input[name=<?= CController::CSRF_TOKEN_NAME ?>]').val(csrf_tokens['sysmaps.php add']);
-
 			$('#delete, #clone, #full_clone, #inaccessible_user').remove();
 
 			$('#update')
@@ -167,20 +164,6 @@
 		});
 
 		$('#label_format').triggerHandler('click');
-
-		let csrf_token = document
-			.getElementById('sysmap-form')
-			.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
-
-		document.addEventListener('click', (e) => {
-			if (e.target.id === 'delete') {
-				if (!window.confirm('<?= _('Delete selected map?') ?>')) {
-					e.preventDefault();
-					return;
-				}
-				csrf_token.value = csrf_tokens['sysmaps.php delete'];
-			}
-		})
 	});
 
 	/**

@@ -99,9 +99,8 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		form_name: null,
 		csrf_tokens: null,
 
-		init({form_name, counter, csrf_tokens}) {
+		init({form_name, counter}) {
 			this.form_name = form_name;
-			this.csrf_tokens = csrf_tokens;
 
 			$('#conditions')
 				.dynamicRows({
@@ -172,21 +171,6 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				.on('click', 'button.element-table-add', () => {
 					$('#lld_macro_paths .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 				});
-
-			let csrf_token = document.itemForm.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
-
-			document.addEventListener('click', (e) => {
-				if (e.target.id === 'clone') {
-					csrf_token.value = this.csrf_tokens['host_discovery.php clone'];
-				}
-				else if (e.target.id === 'delete') {
-					if (!window.confirm('<?= _('Delete discovery rule?') ?>')) {
-						e.preventDefault();
-						return;
-					}
-					csrf_token.value = this.csrf_tokens['host_discovery.php delete'];
-				}
-			})
 		},
 
 		updateExpression() {
@@ -221,7 +205,10 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('item.masscheck_now', this.csrf_tokens['item.masscheck_now']);
+			curl.setArgument('action', 'item.masscheck_now');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				'<?= CCsrfTokenHelper::get('item') ?>'
+			);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

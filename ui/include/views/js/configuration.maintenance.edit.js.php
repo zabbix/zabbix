@@ -112,21 +112,5 @@
 					break;
 			}
 		});
-
-		let csrf_token = document.maintenanceForm.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
-		let csrf_tokens = <?= json_encode($data['csrf_tokens']) ?>;
-
-		document.addEventListener('click', (e) => {
-			if (e.target.id === 'clone') {
-				csrf_token.value = csrf_tokens['maintenance.php clone'];
-			}
-			else if (e.target.id === 'delete') {
-				if (!confirm('<?= _('Delete maintenance period?') ?>')) {
-					e.preventDefault();
-					return;
-				}
-				csrf_token.value = csrf_tokens['maintenance.php delete'];
-			}
-		});
 	});
 </script>

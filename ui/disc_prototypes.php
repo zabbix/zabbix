@@ -619,8 +619,6 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
 	}
 
-	$data['csrf_tokens'] = CController::generateCsrfTokens(['disc_prototypes.php clone', 'disc_prototypes.php delete']);
-
 	// render view
 	if (!$has_errors) {
 		echo (new CView('configuration.item.prototype.edit', $data))->getOutput();

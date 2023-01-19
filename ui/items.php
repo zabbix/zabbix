@@ -920,10 +920,6 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 		'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
 	];
 
-	$data['csrf_tokens'] = CController::generateCsrfTokens(['items.php clone', 'items.php del_history',
-		'items.php delete', 'item.masscheck_now'
-	]);
-
 	// render view
 	if (!$has_errors) {
 		echo (new CView('configuration.item.edit', $data))->getOutput();

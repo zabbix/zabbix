@@ -39,13 +39,7 @@ $url = (new CUrl('disc_prototypes.php'))
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(
-		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::get((!empty($data['itemid']))
-			? 'disc_prototypes.php update'
-			: 'disc_prototypes.php add'
-		)
-	))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('disc_prototypes.php')))->removeId())
 	->setId('item-prototype-form')
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -968,8 +962,7 @@ $html_page->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'trends_default' => $data['trends_default'],
-		'csrf_tokens' => $data['csrf_tokens']
+		'trends_default' => $data['trends_default']
 	]).');
 '))
 	->setOnDocumentReady()

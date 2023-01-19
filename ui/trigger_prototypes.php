@@ -536,10 +536,7 @@ if (isset($_REQUEST['form'])) {
 		'correlation_tag' => getRequest('correlation_tag', ''),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
 		'context' => getRequest('context'),
-		'backurl' => getRequest('backurl'),
-		'csrf_tokens' => CController::generateCsrfTokens(['trigger_prototypes.php clone',
-			'trigger_prototypes.php delete'
-		])
+		'backurl' => getRequest('backurl')
 	]);
 
 	// render view

@@ -825,10 +825,6 @@ if (hasRequest('form')) {
 		$data['counter'] = key($conditions) + 1;
 	}
 
-	$data['csrf_tokens'] = CController::generateCsrfTokens(['host_discovery.php clone', 'host_discovery.php delete',
-		'item.masscheck_now'
-	]);
-
 	// render view
 	if (!$has_errors) {
 		echo (new CView('configuration.host.discovery.edit', $data))->getOutput();

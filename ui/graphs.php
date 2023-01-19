@@ -683,8 +683,6 @@ elseif (isset($_REQUEST['form'])) {
 	// is template
 	$data['is_template'] = ($data['hostid'] == 0) ? false : isTemplate($data['hostid']);
 
-	$data['csrf_tokens'] = CController::generateCsrfTokens(['graphs.php clone', 'graphs.php delete']);
-
 	// render view
 	echo (new CView('configuration.graph.edit', $data))->getOutput();
 }

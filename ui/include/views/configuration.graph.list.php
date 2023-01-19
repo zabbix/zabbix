@@ -172,6 +172,8 @@ $graphTable = (new CTableInfo())
 		$info_column
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('graphs.php');
+
 foreach ($data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
 
@@ -229,7 +231,7 @@ foreach ($data['graphs'] as $graph) {
 					->setArgument('context', $data['context'])
 					->getUrl()
 			))
-				->addCsrfToken(CCsrfTokenHelper::get('graph.updatediscover'))
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 	}
@@ -253,14 +255,14 @@ foreach ($data['graphs'] as $graph) {
 $buttonsArray = [];
 if (!$this->data['parent_discoveryid']) {
 	$buttonsArray['graph.masscopyto'] = ['name' => _('Copy'),
-		'csrf_token' => CCsrfTokenHelper::get('graph.masscopyto')
+		'csrf_token' => $csrf_token
 	];
 }
 
 $buttonsArray['graph.massdelete'] =  ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
 	? _('Delete selected graph prototypes?')
 	: _('Delete selected graphs?'),
-	'csrf_token' => CCsrfTokenHelper::get('graph.massdelete')
+	'csrf_token' => $csrf_token
 ];
 
 // append table to form

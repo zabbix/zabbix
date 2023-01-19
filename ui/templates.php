@@ -752,10 +752,6 @@ if (hasRequest('form')) {
 	$clear_templates = array_diff($clear_templates, array_keys($templateids));
 
 	$data['clear_templates'] = $clear_templates;
-	$data['csrf_tokens'] = CController::generateCsrfTokens(['templates.php unlink',
-		'templates.php unlink_and_clear', 'templates.php clone', 'templates.php full_clone', 'templates.php delete',
-		'templates.php delete_and_clear'
-	]);
 
 	$view = new CView('configuration.template.edit', $data);
 }

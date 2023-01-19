@@ -221,6 +221,8 @@ $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['trig
 	'context' => $data['context']
 ]);
 
+$csrf_token = CCsrfTokenHelper::get('triggers.php');
+
 foreach ($data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
 
@@ -292,17 +294,19 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		}
 	}
 
-	$status_action = ($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'trigger.massenable' : 'trigger.massdisable';
 	// status
 	$status = (new CLink(
 		triggerIndicator($trigger['status'], $trigger['state']),
 		(new CUrl('triggers.php'))
-			->setArgument('action', $status_action)
+			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
+				? 'trigger.massenable'
+				: 'trigger.massdisable'
+			)
 			->setArgument('g_triggerid[]', $triggerid)
 			->setArgument('context', $data['context'])
 			->getUrl()
 		))
-		->addCsrfToken(CCsrfTokenHelper::get($status_action))
+		->addCsrfToken($csrf_token)
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']));
 
@@ -355,20 +359,20 @@ $triggers_form->addItem([
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?'),
-				'csrf_token' => CCsrfTokenHelper::get('trigger.massenable')
+				'csrf_token' => $csrf_token
 			],
 			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?'),
-				'csrf_token' => CCsrfTokenHelper::get('trigger.massdisable')
+				'csrf_token' => $csrf_token
 			],
 			'trigger.masscopyto' => ['name' => _('Copy'),
-				'csrf_token' => CCsrfTokenHelper::get('trigger.masscopyto')
+				'csrf_token' => $csrf_token
 			],
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.trigger', {".
 							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '" .
-							CCsrfTokenHelper::get('popup.massupdate.trigger').
+							CCsrfTokenHelper::get('massupdate').
 						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
@@ -378,7 +382,7 @@ $triggers_form->addItem([
 					->removeAttribute('id')
 			],
 			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?'),
-				'csrf_token' => CCsrfTokenHelper::get('trigger.massdelete')
+				'csrf_token' => $csrf_token
 			]
 		],
 		$data['checkbox_hash']

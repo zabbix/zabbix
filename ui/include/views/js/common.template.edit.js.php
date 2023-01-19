@@ -227,56 +227,5 @@
 
 				proxy_form.submit();
 			}, {passive: false});
-
-		let csrf_tokens = <?= json_encode($data['csrf_tokens']) ?>;
-
-		document.addEventListener('click', (e) => {
-			let csrf_token = '';
-			let template_action = '';
-			const form = document.templatesForm;
-
-			if (e.target.classList.contains('js-unlink-template')) {
-				template_action = `unlink[${e.target.dataset.templateid}]`;
-				csrf_token = csrf_tokens['templates.php unlink'];
-			}
-			else if (e.target.classList.contains('js-unlinkandclear-template')) {
-				template_action = `unlink_and_clear[${e.target.dataset.templateid}]`;
-				csrf_token = csrf_tokens['templates.php unlink_and_clear'];
-			}
-
-			if (template_action != '') {
-				create_var(form, <?= json_encode(CController::CSRF_TOKEN_NAME) ?>, csrf_token, false);
-				submitFormWithParam(form.name, template_action, 1);
-			}
-		})
-
-		document.addEventListener('click', (e) => {
-			let csrf_token = '';
-
-			if (e.target.id === 'clone') {
-				csrf_token = csrf_tokens['templates.php clone'];
-			}
-			else if (e.target.id === 'full_clone') {
-				csrf_token = csrf_tokens['templates.php full_clone'];
-			}
-			else if (e.target.id === 'delete') {
-				if (!window.confirm('<?= _('Delete template?') ?>')) {
-					e.preventDefault();
-					return;
-				}
-				csrf_token= csrf_tokens['templates.php delete'];
-			}
-			else if (e.target.id === 'delete_and_clear') {
-				if (!confirm('<?= _('Delete and clear template? (Warning: all linked hosts will be cleared!)') ?>')) {
-					e.preventDefault();
-					return;
-				}
-				csrf_token = csrf_tokens['templates.php delete_and_clear'];
-			}
-
-			if (csrf_token != '') {
-				create_var(document.templatesForm, <?= json_encode(CController::CSRF_TOKEN_NAME) ?>, csrf_token, false);
-			}
-		})
 	});
 </script>

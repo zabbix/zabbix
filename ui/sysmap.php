@@ -338,7 +338,6 @@ if ($data['iconList']) {
 }
 
 $data['theme'] = getUserGraphTheme();
-$data['csrf_tokens'] = CController::generateCsrfTokens(['update']);
 
 // render view
 echo (new CView('monitoring.sysmap.constructor', $data))->getOutput();

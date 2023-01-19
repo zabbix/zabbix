@@ -38,13 +38,9 @@ $url = (new CUrl('trigger_prototypes.php'))
 // create form
 $triggersForm = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(
-		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::get(($data['triggerid'] !== null)
-			? 'trigger_prototypes.php update'
-			: 'trigger_prototypes.php add'
-		)
-	))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigger_prototypes.php')))
+		->removeId()
+	)
 	->setId('triggers-prototype-form')
 	->setName('triggersForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)

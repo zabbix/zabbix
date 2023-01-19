@@ -24,13 +24,11 @@
  * @var array $data
  */
 
-$action = $data['prototype'] ? 'popup.massupdate.triggerprototype' : 'popup.massupdate.trigger';
-
 // Create form.
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get($action)))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('massupdate')))->removeId())
 	->setId('massupdate-form')
-	->addVar('action', $action)
+	->addVar('action', $data['prototype'] ? 'popup.massupdate.triggerprototype' : 'popup.massupdate.trigger')
 	->addVar('ids', $data['ids'])
 	->addVar('update', '1')
 	->addVar('location_url', $data['location_url'])

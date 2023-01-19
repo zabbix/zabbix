@@ -245,20 +245,22 @@ foreach ($data['discoveries'] as $discovery) {
 			->setArgument('context', $data['context'])
 	);
 
-	$status_action = ($discovery['status'] == ITEM_STATUS_DISABLED)
-		? 'discoveryrule.massenable'
-		: 'discoveryrule.massdisable';
+	$csrf_token = CCsrfTokenHelper::get('host_discovery.php');
+
 	// status
 	$status = (new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
 		(new CUrl('host_discovery.php'))
 			->setArgument('hostid', $discovery['hostid'])
 			->setArgument('g_hostdruleid[]', $discovery['itemid'])
-			->setArgument('action', $status_action)
+			->setArgument('action', ($discovery['status'] == ITEM_STATUS_DISABLED)
+				? 'discoveryrule.massenable'
+				: 'discoveryrule.massdisable'
+			)
 			->setArgument('context', $data['context'])
 			->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::get($status_action))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 
@@ -337,10 +339,10 @@ foreach ($data['discoveries'] as $discovery) {
 
 $button_list = [
 	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?'),
-		'csrf_token' => CCsrfTokenHelper::get('discoveryrule.massenable')
+		'csrf_token' => $csrf_token
 	],
 	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?'),
-		'csrf_token' => CCsrfTokenHelper::get('discoveryrule.massdisable')
+		'csrf_token' => $csrf_token
 	]
 ];
 
@@ -358,7 +360,7 @@ if ($data['context'] === 'host') {
 
 $button_list += [
 	'discoveryrule.massdelete' => ['name' => _('Delete'), 'confirm' =>_('Delete selected discovery rules?'),
-		'csrf_token' => CCsrfTokenHelper::get('discoveryrule.massdelete')
+		'csrf_token' => $csrf_token
 	]
 ];
 

@@ -37,10 +37,7 @@ $url = (new CUrl('host_discovery.php'))
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(
-		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::get($data['itemid'] != '' ? 'host_discovery.php update' : 'host_discovery.php add')
-	))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host_discovery.php')))->removeId())
 	->setId('host-discovery-form')
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -1042,8 +1039,7 @@ $html_page->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'counter' => $data['counter'],
-		'csrf_tokens' => $data['csrf_tokens']
+		'counter' => $data['counter']
 	]).');
 '))
 	->setOnDocumentReady()

@@ -679,10 +679,6 @@ if (isset($_REQUEST['form'])) {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 
-	$data['csrf_tokens'] = CController::generateCsrfTokens(['httpconf.php clone', 'httpconf.php delete',
-		'httpconf.php del_history'
-	]);
-
 	// render view
 	echo (new CView('configuration.httpconf.edit', $data))->getOutput();
 }
