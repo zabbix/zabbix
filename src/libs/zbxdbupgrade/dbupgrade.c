@@ -1473,7 +1473,7 @@ char	*zbx_dbpatch_make_trigger_function(const char *name, const char *tpl, const
 	return func;
 }
 
-int zbx_compose_trigger_expression(DB_ROW row, zbx_uint64_t rules, char **composed_expr)
+int	zbx_compose_trigger_expression(DB_ROW row, zbx_uint64_t rules, char **composed_expr)
 {
 	char		*trigger_expr;
 	int		i;
