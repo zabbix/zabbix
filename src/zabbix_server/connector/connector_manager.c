@@ -54,7 +54,6 @@ typedef struct
 	zbx_hashset_iter_t		iter;
 	zbx_uint64_t			config_revision;	/* the configuration revision */
 	zbx_uint64_t			connector_revision;
-	zbx_uint64_t			global_revision;
 }
 zbx_connector_manager_t;
 
@@ -672,7 +671,6 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 				case ZBX_IPC_CONNECTOR_REQUEST:
 					zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
 							&manager.config_revision, &manager.connector_revision,
-							&manager.global_revision,
 							(zbx_clean_func_t)data_point_link_clean);
 					zbx_connector_deserialize_object(message->data, message->size,
 							&connector_objects);

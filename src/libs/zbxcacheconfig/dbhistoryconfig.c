@@ -878,21 +878,20 @@ typedef struct
 zbx_substitute_value_t;
 
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,
-		zbx_uint64_t *config_revision, zbx_uint64_t *connector_revision, zbx_uint64_t *global_revision,
-		zbx_clean_func_t data_point_link_clean)
+		zbx_uint64_t *config_revision, zbx_uint64_t *connector_revision, zbx_clean_func_t data_point_link_clean)
 {
 	zbx_dc_connector_t	*dc_connector;
 	zbx_connector_t		*connector;
 	zbx_hashset_iter_t	iter;
-	int			connectors_updated = FAIL;
-	zbx_uint64_t		dc_global_revision = *global_revision;
+	int			connectors_updated = FAIL, global_macro_updated = FAIL;
+	zbx_uint64_t		global_revision;
 
 	if (config->revision.config == *config_revision)
 		return;
 
-	RDLOCK_CACHE_CONFIG_HISTORY;
+	global_revision = *config_revision;
 
-	*config_revision = config->revision.config;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	if (config->revision.connector != *connector_revision)
 	{
@@ -957,8 +956,13 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 		connectors_updated = SUCCEED;
 	}
 
-	if (SUCCEED != um_cache_get_host_revision(config->um_cache, 0, &dc_global_revision))
-		dc_global_revision = 0;
+	if (SUCCEED != um_cache_get_host_revision(config->um_cache, 0, &global_revision))
+		global_revision = 0;
+
+	if (global_revision > *config_revision)
+		global_macro_updated = SUCCEED;
+
+	*config_revision = config->revision.config;
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
@@ -974,7 +978,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 		zbx_hashset_iter_reset(connectors, connector_iter);
 	}
 
-	if (dc_global_revision != *global_revision || SUCCEED == connectors_updated)
+	if (SUCCEED == global_macro_updated || SUCCEED == connectors_updated)
 	{
 		zbx_dc_um_handle_t	*um_handle;
 
@@ -1010,7 +1014,6 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 		}
 
 		zbx_dc_close_user_macros(um_handle);
-		*global_revision = dc_global_revision;
 	}
 }
 #undef ZBX_CONNECTOR_STATUS_ENABLED

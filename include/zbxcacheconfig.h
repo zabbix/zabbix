@@ -711,7 +711,7 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filter_t *connector_filters_history,
 		zbx_vector_connector_filter_t *connector_filters_events);
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,
-		zbx_uint64_t *config_revision, zbx_uint64_t *connector_revision, zbx_uint64_t *global_revision,
+		zbx_uint64_t *config_revision, zbx_uint64_t *connector_revision,
 		zbx_clean_func_t data_point_link_clean);
 void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter);
 
