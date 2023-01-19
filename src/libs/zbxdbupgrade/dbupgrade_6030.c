@@ -3377,7 +3377,7 @@ static int	DBpatch_6030165(void)
 		char		*composed_expr[] = { NULL, NULL };
 		size_t		seed_alloc = 0, seed_offset = 0;
 
-		if (FAIL == zbx_compose_trigger_expression(row, ZBX_EVAL_PARSE_TRIGGER_EXPRESSION, composed_expr))
+		if (FAIL == zbx_compose_trigger_expression(row, ZBX_EVAL_TRIGGER_EXPRESSION_LLD, composed_expr))
 		{
 			ret = FAIL;
 			goto out;
