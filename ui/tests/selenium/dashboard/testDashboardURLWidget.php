@@ -791,7 +791,6 @@ class testDashboardURLWidget extends CWebTest {
 
 		// Check that the widget URL field is empty.
 		$broken_form->checkValue(['URL' => '', 'Name' => self::$default_widget]);
-		$this->assertEquals(self::$default_widget, $broken_form->getField('Name')->getValue());
 		COverlayDialogElement::find()->one()->close();
 		$this->query('button:Save changes')->one()->click();
 
