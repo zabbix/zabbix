@@ -95,10 +95,6 @@ window.maintenance_edit = new class {
 		const fields = getFormFields(this.form);
 		fields.mname = fields.mname.trim();
 
-		//if (fields.esc_period != null ) {
-		//	fields.esc_period = fields.esc_period.trim();
-		//}
-
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', this.maintenanceid !== 0 ? 'maintenance.update' : 'maintenance.create');
 
