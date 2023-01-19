@@ -287,7 +287,7 @@ class testDashboardProblemsWidget extends CWebTest {
 			}
 		}
 
-		$this->assertEquals(['Show lines'], array_values($form->getRequiredLabels()));
+		$this->assertEquals(['Show lines'], $form->getRequiredLabels());
 
 		// Check dropdowns options presence.
 		$dropdowns = [
