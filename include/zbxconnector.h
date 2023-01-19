@@ -30,6 +30,10 @@
 #define ZBX_IPC_CONNECTOR_WORKER		1
 #define ZBX_IPC_CONNECTOR_REQUEST		2
 #define ZBX_IPC_CONNECTOR_RESULT		3
+#define ZBX_IPC_CONNECTOR_DIAG_STATS		4
+#define ZBX_IPC_CONNECTOR_DIAG_STATS_RESULT	5
+#define ZBX_IPC_CONNECTOR_TOP_CONNECTORS	6
+#define	ZBX_IPC_CONNECTOR_TOP_CONNECTORS_RESULT	7
 
 typedef struct
 {
@@ -49,6 +53,15 @@ typedef struct
 }
 zbx_connector_data_point_t;
 
+typedef struct
+{
+	zbx_uint64_t	connectorid;
+	int		values_num;
+	int		links_num;
+	int		queued_links_num;
+}
+zbx_connector_stat_t;
+
 ZBX_PTR_VECTOR_DECL(connector_data_point, zbx_connector_data_point_t)
 
 void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, size_t *data_offset,
@@ -63,6 +76,14 @@ void	zbx_connector_serialize_data_point(unsigned char **data, size_t *data_alloc
 void	zbx_connector_deserialize_connector_and_data_point(const unsigned char *data, zbx_uint32_t size,
 		zbx_connector_t *connector, zbx_vector_connector_data_point_t *connector_data_points);
 void	zbx_connector_data_point_free(zbx_connector_data_point_t connector_data_point);
+
+int		zbx_connector_get_diag_stats(int *queued, char **error);
+zbx_uint32_t	zbx_connector_pack_diag_stats(unsigned char **data, int queued);
+
+int	zbx_connector_get_top_connectors(int limit, zbx_vector_ptr_t *items, char **error);
+void	zbx_connector_unpack_top_request(int *limit, const unsigned char *data);
+zbx_uint32_t	zbx_connector_pack_top_connectors_result(unsigned char **data, zbx_connector_stat_t **connector_stats,
+		int connector_stats_num);
 
 void	zbx_connector_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size);
 #endif /* ZABBIX_AVAILABILITY_H */
