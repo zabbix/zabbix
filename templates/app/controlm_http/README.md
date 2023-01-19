@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Setup
 
-This template is primarily intended for using in conjuction with the `Control-M enterprise manager by HTTP` template in order to create host prototypes. 
+This template is primarily intended for using in conjunction with the `Control-M enterprise manager by HTTP` template in order to create host prototypes. 
 
 It monitors: 
 * server statistics;
