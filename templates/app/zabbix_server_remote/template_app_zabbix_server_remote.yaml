@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:38:01Z'
+  date: '2023-01-25T11:18:42Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: 79b16cbbe593444eae3de66de0cb566b
       template: 'Remote Zabbix server health'
       name: 'Remote Zabbix server health'
-      description: 'Template tooling version used: 0.41'
+      description: 'Template tooling version used: 0.42'
       groups:
         -
           name: Templates/Applications
@@ -1479,7 +1479,7 @@ zabbix_export:
               name: 'Remote Zabbix server: Version has changed'
               event_name: 'Remote Zabbix server: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Remote Zabbix server version has changed. Ack to close.'
+              description: 'The Remote Zabbix server version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1896,13 +1896,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.data.ha[?(@.id=="{#NODE.ID}")].address.first()'
+                    - $.address
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
               tags:
                 -
                   tag: component
@@ -1926,9 +1926,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.data.ha[?(@.id=="{#NODE.ID}")].lastaccess_age.first()'
+                    - $.lastaccess_age
               master_item:
-                key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
               tags:
                 -
                   tag: component
@@ -1952,13 +1952,43 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.data.ha[?(@.id=="{#NODE.ID}")].lastaccess.first()'
+                    - $.lastaccess
+              master_item:
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: node-id
+                  value: '{#NODE.ID}'
+                -
+                  tag: node-name
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 525b8142186b488eacb5db7a6044b3c4
+              name: 'Cluster node [{#NODE.NAME}]: Stats'
+              type: DEPENDENT
+              key: 'zabbix.nodes.stats[{#NODE.ID}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Node stats.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data.ha[?(@.id=="{#NODE.ID}")].first()'
               master_item:
                 key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
               tags:
                 -
                   tag: component
                   value: cluster
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: node-id
                   value: '{#NODE.ID}'
@@ -1979,13 +2009,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.data.ha[?(@.id=="{#NODE.ID}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
               tags:
                 -
                   tag: component
