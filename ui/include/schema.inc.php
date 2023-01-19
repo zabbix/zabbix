@@ -9459,17 +9459,17 @@ return [
 				'length' => 10,
 				'default' => '1'
 			],
-			'timeout' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '5s'
-			],
 			'max_attempts' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1'
+			],
+			'timeout' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '5s'
 			],
 			'token' => [
 				'null' => false,
@@ -9540,7 +9540,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0'
+				'default' => '1'
 			],
 			'tags_evaltype' => [
 				'null' => false,

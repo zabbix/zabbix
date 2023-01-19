@@ -183,7 +183,7 @@ class CConnector extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'name')],
 			'protocol' =>			['type' => API_INT32, 'in' => 0],
-			'data_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS])],
+			'data_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_TRIGGER_EVENTS])],
 			'url' =>				['type' => API_URL, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('connector', 'url')],
 			'max_records' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32],
 			'max_senders' =>		['type' => API_INT32, 'in' => '1:100'],
@@ -216,7 +216,7 @@ class CConnector extends CApiService {
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_cert_file')]
 			]],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'description')],
-			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_STATUS_ENABLED, ZBX_CONNECTOR_STATUS_DISABLED])],
+			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_STATUS_DISABLED, ZBX_CONNECTOR_STATUS_ENABLED])],
 			'tags_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR])],
 			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
 				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('connector_tag', 'tag')],
@@ -321,7 +321,7 @@ class CConnector extends CApiService {
 			'connectorid' =>		['type' => API_ID],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'name')],
 			'protocol' =>			['type' => API_INT32, 'in' => 0],
-			'data_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS])],
+			'data_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_TRIGGER_EVENTS])],
 			'url' =>				['type' => API_URL, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('connector', 'url')],
 			'max_records' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32],
 			'max_senders' =>		['type' => API_INT32, 'in' => '1:100'],
@@ -354,7 +354,7 @@ class CConnector extends CApiService {
 			]],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_password')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'description')],
-			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_STATUS_ENABLED, ZBX_CONNECTOR_STATUS_DISABLED])],
+			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_STATUS_DISABLED, ZBX_CONNECTOR_STATUS_ENABLED])],
 			'tags_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR])],
 			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
 				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('connector_tag', 'tag')],
