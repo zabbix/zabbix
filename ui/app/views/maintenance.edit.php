@@ -109,7 +109,8 @@ $form->addItem(
 					->setEnabled($data['allowed_edit'])
 			)
 		])
-		->addItem([(new CLabel(_('Active since'), 'active_since'))->setAsteriskMark(),
+		->addItem([
+			(new CLabel(_('Active since'), 'active_since'))->setAsteriskMark(),
 			new CFormField(
 				(new CDateSelector('active_since', $data['active_since']))
 					->setDateFormat(ZBX_DATE_TIME)
@@ -118,7 +119,8 @@ $form->addItem(
 					->setReadonly(!$data['allowed_edit'])
 			)
 		])
-		->addItem([(new CLabel(_('Active till'), 'active_till'))->setAsteriskMark(),
+		->addItem([
+			(new CLabel(_('Active till'), 'active_till'))->setAsteriskMark(),
 			new CFormField(
 				(new CDateSelector('active_till', $data['active_till']))
 					->setDateFormat(ZBX_DATE_TIME)
@@ -240,21 +242,23 @@ $form->addItem(
 	);
 
 $form->addItem(
-		(new CScriptTag('
-			maintenance_edit.init('.json_encode([
-				'maintenanceid' => $data['maintenanceid'],
-				'maintenance_tags' => $data['tags']
-			]).');
-		'))->setOnDocumentReady()
-	);
+	(new CScriptTag('
+		maintenance_edit.init('.json_encode([
+			'maintenanceid' => $data['maintenanceid'],
+			'maintenance_tags' => $data['tags']
+		]).');
+	'))->setOnDocumentReady()
+);
 
 if ($data['maintenanceid'] !== 0) {
+	$title = _('Maintenance period');
 	$buttons = [
 		[
 			'title' => _('Update'),
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
+			'enabled' => $data['allowed_edit'],
 			'action' => 'maintenance_edit.submit();'
 		],
 		[
@@ -262,19 +266,39 @@ if ($data['maintenanceid'] !== 0) {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'maintenance_edit.clone();'
+			'enabled' => $data['allowed_edit'],
+			'action' => 'maintenance_edit.clone('.json_encode([
+				'title' => _('New maintenance period'),
+				'buttons' => [
+					[
+						'title' => _('Add'),
+						'class' => 'js-add',
+						'keepOpen' => true,
+						'isSubmit' => true,
+						'action' => 'maintenance_edit.submit();'
+					],
+					[
+						'title' => _('Cancel'),
+						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
+						'cancel' => true,
+						'action' => ''
+					]
+				]
+			]).');'
 		],
 		[
 			'title' => _('Delete'),
 			'confirmation' => _('Delete maintenance period?'),
-			'class' => ZBX_STYLE_BTN_ALT,
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
 			'isSubmit' => false,
+			'enabled' => $data['allowed_edit'],
 			'action' => 'maintenance_edit.delete();'
 		]
 	];
 }
 else {
+	$title = _('New maintenance period');
 	$buttons = [
 		[
 			'title' => _('Add'),
@@ -287,7 +311,7 @@ else {
 }
 
 $output = [
-	'header' => $data['maintenanceid'] !== 0 ? _('Maintenance period') : _('New maintenance period'),
+	'header' => $title,
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_MAINTENANCE_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,

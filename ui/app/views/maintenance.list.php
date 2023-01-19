@@ -24,6 +24,7 @@
  * @var array $data
  */
 
+$this->addJsFile('class.calendar.js');
 $this->includeJsFile('maintenance.list.js.php');
 
 $html_page = (new CHtmlPage())
@@ -94,10 +95,12 @@ $form = (new CForm())
 
 $maintenance_list = (new CTableInfo())
 	->setHeader([
-		(new CColHeader(
-			(new CCheckBox('all_maintenances'))
-				->onClick("checkAll('".$form->getName()."', 'all_maintenances', 'maintenanceids');")
-		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		$data['allowed_edit']
+			? (new CColHeader(
+				(new CCheckBox('all_maintenances'))
+					->onClick("checkAll('".$form->getName()."', 'all_maintenances', 'maintenanceids');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH)
+			: null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $action_url->getUrl()),
 		make_sorting_header(_('Type'), 'maintenance_type', $data['sort'], $data['sortorder'], $action_url->getUrl()),
 		make_sorting_header(_('Active since'), 'active_since', $data['sort'], $data['sortorder'], $action_url->getUrl()),
@@ -112,45 +115,45 @@ if ($data['maintenances']) {
 
 		switch ($maintenance['status']) {
 			case MAINTENANCE_STATUS_EXPIRED:
-				$maintenanceStatus = (new CSpan(_x('Expired', 'maintenance status')))->addClass(ZBX_STYLE_RED);
+				$maintenance_status = (new CSpan(_x('Expired', 'maintenance status')))->addClass(ZBX_STYLE_RED);
 				break;
 			case MAINTENANCE_STATUS_APPROACH:
-				$maintenanceStatus = (new CSpan(_x('Approaching', 'maintenance status')))->addClass(ZBX_STYLE_ORANGE);
+				$maintenance_status = (new CSpan(_x('Approaching', 'maintenance status')))->addClass(ZBX_STYLE_ORANGE);
 				break;
 			case MAINTENANCE_STATUS_ACTIVE:
-				$maintenanceStatus = (new CSpan(_x('Active', 'maintenance status')))->addClass(ZBX_STYLE_GREEN);
+				$maintenance_status = (new CSpan(_x('Active', 'maintenance status')))->addClass(ZBX_STYLE_GREEN);
 				break;
 		}
 
 		$maintenance_list->addRow([
-			new CCheckBox('maintenanceids[' . $maintenanceid . ']', $maintenanceid),
+			$data['allowed_edit'] ? new CCheckBox('maintenanceids[' . $maintenanceid . ']', $maintenanceid) : null,
 			(new CLink($maintenance['name']))
 				->addClass('js-maintenance-edit')
 				->setAttribute('data-maintenanceid', $maintenance['maintenanceid']),
 			$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
 			zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_since']),
 			zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_till']),
-			$maintenanceStatus,
+			$maintenance_status,
 			$maintenance['description']
 		]);
 	}
 }
 
+$form->addItem($maintenance_list);
 
-
-$form->addItem([
-	$maintenance_list,
-	$data['paging'],
-	new CActionButtonList('action', 'maintenanceids', [
-		'maintenance.massdelete' => [
-			'content' => (new CSimpleButton(_('Delete')))
-				->setEnabled($data['allowed_edit'])
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdelete-maintenance')
-				->addClass('no-chkbxrange')
-		]
-	], 'maintenance')
-]);
+if ($data['allowed_edit']) {
+	$form->addItem([
+		$data['paging'],
+		new CActionButtonList('action', 'maintenanceids', [
+			'maintenance.massdelete' => [
+				'content' => (new CSimpleButton(_('Delete')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdelete-maintenance')
+					->addClass('no-chkbxrange')
+			]
+		], 'maintenance')
+	]);
+}
 
 $html_page
 	->addItem($filter)

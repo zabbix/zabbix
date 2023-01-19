@@ -93,18 +93,90 @@ window.maintenance_edit = new class {
 
 	submit() {
 		const fields = getFormFields(this.form);
+
+		if (this.maintenanceid !== null) {
+			fields.maintenanceid = this.maintenanceid;
+		}
+
 		fields.mname = fields.mname.trim();
+		fields.description = fields.description.trim();
+
+		if ('maintenance_tags' in fields) {
+			for (const maintenance_tag of Object.values(fields.maintenance_tags)) {
+				maintenance_tag.tag = maintenance_tag.tag.trim();
+				maintenance_tag.value = maintenance_tag.value.trim();
+			}
+		}
+
+		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', this.maintenanceid !== 0 ? 'maintenance.update' : 'maintenance.create');
 
-		this._post(curl.getUrl(), fields);
+		this._post(curl.getUrl(), fields, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+		});
 	}
 
-	_post(url, data) {}
+	_post(url, data, success_callback) {
+		fetch(url, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
 
-	clone() {}
+				return response;
+			})
+			.then(success_callback)
+			.catch((exception) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
 
-	delete() {}
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	}
+
+	clone({title, buttons}) {
+		this.maintenanceid = null;
+
+		this.overlay.unsetLoading();
+		this.overlay.setProperties({title, buttons});
+	}
+
+	delete() {
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'maintenance.delete');
+
+		this._post(curl.getUrl(), {maintenanceids: [this.maintenanceid]}, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+		});
+	}
 
 }
