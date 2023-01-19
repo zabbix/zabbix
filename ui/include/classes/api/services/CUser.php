@@ -1690,7 +1690,7 @@ class CUser extends CApiService {
 
 		if (array_key_exists('extend', $session)) {
 			if ($token !== null) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Extend not compatible with token.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid parameter "/": unexpected parameter "extend".'));
 			}
 		}
 		else {
