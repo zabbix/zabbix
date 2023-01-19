@@ -1473,6 +1473,29 @@ static int	DBpatch_6030158(void)
 {
 	return DBcreate_index("event_symptom", "event_symptom_1", "cause_eventid", 0);
 }
+
+static int	DBpatch_6030159(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.actionconf.php.sort", "web.action.list.sort",
+			"web.actionconf.php.sortorder", "web.action.list.sortorder",
+			"web.actionconf.filter_name", "web.action.list.filter_name",
+			"web.actionconf.filter_status", "web.action.list.filter_status",
+			"web.actionconf.filter.active", "web.action.list.filter.active"
+		};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6030)
@@ -1638,5 +1661,6 @@ DBPATCH_ADD(6030155, 0, 1)
 DBPATCH_ADD(6030156, 0, 1)
 DBPATCH_ADD(6030157, 0, 1)
 DBPATCH_ADD(6030158, 0, 1)
+DBPATCH_ADD(6030159, 0, 1)
 
 DBPATCH_END()

@@ -135,7 +135,7 @@ $form_list
 			makeHelpIcon(_('Converts a symptom event back to cause event'))
 		])),
 		(new CCheckBox('change_rank', ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE))
-			->setEnabled($data['allowed_change_problem_ranking'])
+			->setEnabled($data['allowed_change_problem_ranking'] && $data['problem_can_change_rank'])
 	)
 	->addRow(_('Close problem'),
 		(new CCheckBox('close_problem', ZBX_PROBLEM_UPDATE_CLOSE))

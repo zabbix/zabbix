@@ -110,7 +110,7 @@ class testPageTriggerUrl extends CWebTest {
 		// Add 'Acknowledge' menu link to data provider.
 		$array = $data['links'];
 		array_shift($array);
-		$data['links'] = ['Problems' => $data['links']['Problems'],	'Acknowledge' => ''] + $array;
+		$data['links'] = ['Problems' => $data['links']['Problems'],	'Update problem' => ''] + $array;
 
 		// Remove 'cause and symptoms' from data provider.
 		unset($data['links']['Mark as cause']);

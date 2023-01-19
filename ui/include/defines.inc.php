@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.4.0beta6');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030158);
+define('ZABBIX_DB_VERSION',		6030159);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1964,6 +1964,7 @@ define('ZBX_STYLE_ACTION_ICON_SEV_CHANGED', 'icon-action-severity-changed');
 define('ZBX_STYLE_ACTION_MESSAGE', 'icon-action-message');
 define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
 define('ZBX_STYLE_ACTION_ICON_UNACK', 'icon-action-unack');
+define('ZBX_STYLE_ACTION_ICON_ACK_GREEN', 'icon-action-ack-green');
 define('ZBX_STYLE_ACTION_ICON_SUPPRESS', 'icon-action-suppress');
 define('ZBX_STYLE_ACTION_ICON_UNSUPPRESS', 'icon-action-unsuppress');
 define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause');

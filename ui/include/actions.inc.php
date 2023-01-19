@@ -1548,25 +1548,34 @@ function getEventUpdates(array $event) {
  * @param array  $actions['severities']    Severity change icon data.
  * @param array  $actions['actions']       Actions icon data.
  * @param array  $users                    User name, surname and username.
+ * @param bool   $is_acknowledged          Is the event currently acknowledged. If true, display icon.
  *
  * @return CCol|string
  */
-function makeEventActionsIcons($eventid, $actions, $users) {
+function makeEventActionsIcons($eventid, $actions, $users, $is_acknowledged) {
 	$suppression_icon = makeEventSuppressionsProblemIcon($actions['suppressions'][$eventid], $users);
 	$messages_icon = makeEventMessagesIcon($actions['messages'][$eventid], $users);
 	$severities_icon = makeEventSeverityChangesIcon($actions['severities'][$eventid], $users);
 	$actions_icon = makeEventActionsIcon($actions['actions'][$eventid], $eventid);
 
 	$action_icons = [];
+
+	if ($is_acknowledged) {
+		$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_ACK_GREEN, 'title' => _('Acknowledged')]);
+	}
+
 	if ($suppression_icon !== null) {
 		$action_icons[] = $suppression_icon;
 	}
+
 	if ($messages_icon !== null) {
 		$action_icons[] = $messages_icon;
 	}
+
 	if ($severities_icon !== null) {
 		$action_icons[] = $severities_icon;
 	}
+
 	if ($actions_icon !== null) {
 		$action_icons[] = $actions_icon;
 	}

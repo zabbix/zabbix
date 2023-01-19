@@ -586,7 +586,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 			_('Problem'),
 			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,
 			_('Duration'),
-			_('Ack'),
+			_('Update'),
 			_('Actions'),
 			_('Tags')
 		]));
@@ -738,14 +738,11 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
 				|| $can_be_closed || $allowed['suppress'])
-			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
-				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			? (new CLink(_('Update')))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->setAttribute('data-eventid', $problem['eventid'])
 				->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
-			: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
-				$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
-			);
+			: new CSpan(_('Update'));
 
 		$table->addRow(array_merge($row, [
 			makeInformationList($info_icons),
@@ -759,7 +756,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 			zbx_date2age($problem['clock']),
 			$problem_update_link,
-			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['users']),
+			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['users'], $is_acknowledged),
 			$tags[$problem['eventid']]
 		]));
 	}

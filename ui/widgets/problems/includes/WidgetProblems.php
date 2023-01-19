@@ -108,7 +108,7 @@ class WidgetProblems extends CTableInfo {
 				? _x('Operational data', 'compact table header')
 				: null,
 			_x('Duration', 'compact table header'),
-			_x('Ack', 'compact table header'),
+			_('Update'),
 			_x('Actions', 'compact table header'),
 			$this->data['fields']['show_tags'] ? _x('Tags', 'compact table header') : null
 		]));
@@ -146,6 +146,7 @@ class WidgetProblems extends CTableInfo {
 	 * @param array      $data['users']                         List of users.
 	 * @param array      $data['correlations']                  List of correlations.
 	 * @param array      $data['fields']                        Problem widget filter fields.
+	 * @param int        $data['fields']['show']                "Show" filter option.
 	 * @param int        $data['fields']['show_tags']           "Show tags" filter option.
 	 * @param int        $data['fields']['show_opdata']         "Show operational data" filter option.
 	 * @param array      $data['fields']['tags']                "Tags" filter.
@@ -243,6 +244,11 @@ class WidgetProblems extends CTableInfo {
 
 			// Info.
 			$info_icons = [];
+
+			if ($data['fields']['show'] == TRIGGERS_OPTION_IN_PROBLEM) {
+				$info_icons[] = getEventStatusUpdateIcon($problem);
+			}
+
 			if ($problem['r_eventid'] != 0) {
 				if ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
@@ -476,14 +482,11 @@ class WidgetProblems extends CTableInfo {
 			$problem_update_link = ($data['allowed']['add_comments'] || $data['allowed']['change_severity']
 					|| $data['allowed']['acknowledge'] || $can_be_closed || $data['allowed']['suppress_problems']
 					|| $data['allowed']['rank_change'])
-				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
-					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				? (new CLink(_('Update')))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->setAttribute('data-eventid', $problem['eventid'])
 					->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
-				: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
-					$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
-				);
+				: new CSpan(_('Update'));
 
 			$row->addItem([
 				$data['show_recovery_data'] ? $cell_r_clock : null,
@@ -505,7 +508,7 @@ class WidgetProblems extends CTableInfo {
 						))
 				))->addClass(ZBX_STYLE_NOWRAP),
 				$problem_update_link,
-				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users']),
+				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
 				$data['fields']['show_tags'] ? $data['tags'][$problem['eventid']] : null
 			]);
 

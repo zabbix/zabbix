@@ -1001,7 +1001,6 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false) {
  * @return CTag  Returns CSpan or CButton depending on boolean $icon_data['button'] parameter
  */
 function makeActionIcon(array $icon_data): CTag {
-
 	if (array_key_exists('button', $icon_data) && $icon_data['button']) {
 		$icon = (new CButton(null))->addClass($icon_data['icon']);
 	}

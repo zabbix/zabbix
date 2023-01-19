@@ -372,11 +372,11 @@ class testInitialConfSync extends CIntegrationTest
 			"hostmacros" =>
 			[
 				"insert" =>
-				"0",
+				"2",
 				"update" =>
 				"2",
 				"delete" =>
-				"0"
+				"2"
 			]
 		],
 		[
@@ -396,7 +396,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"72",
+				"88",
 				"delete" =>
 				"0"
 			]
@@ -418,7 +418,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"1",
+				"5",
 				"delete" =>
 				"0"
 			]
@@ -438,33 +438,33 @@ class testInitialConfSync extends CIntegrationTest
 			"triggers" =>
 			[
 				"insert" =>
-				"6",
+				"9",
 				"update" =>
 				"10",
 				"delete" =>
-				"6"
+				"9"
 			]
 		],
 		[
 			"trigdeps" =>
 			[
 				"insert" =>
-				"1",
+				"4",
 				"update" =>
 				"0",
 				"delete" =>
-				"1"
+				"4"
 			]
 		],
 		[
 			"trigtags" =>
 			[
 				"insert" =>
-				"2",
+				"12",
 				"update" =>
 				"0",
 				"delete" =>
-				"2"
+				"12"
 			]
 		],
 		[
@@ -493,11 +493,11 @@ class testInitialConfSync extends CIntegrationTest
 			"functions" =>
 			[
 				"insert" =>
-				"12",
+				"15",
 				"update" =>
 				"0",
 				"delete" =>
-				"12"
+				"15"
 			]
 		],
 		[
@@ -638,7 +638,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"1",
+				"5",
 				"delete" =>
 				"0"
 			]
@@ -1808,9 +1808,9 @@ class testInitialConfSync extends CIntegrationTest
 					'deleteMissing' => false
 				],
 				'triggers' => [
-					'createMissing' => true,
+					'createMissing' => false,
 					'updateExisting' => true,
-					'deleteMissing' => true
+					'deleteMissing' => false
 				],
 				'templateLinkage' => [
 					'createMissing' => false

@@ -783,7 +783,7 @@ class testFormUpdateProblem extends CWebTest {
 			$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 		}
 		else {
-			$table->findRow('Problem', $data['problems'][0])->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+			$table->findRow('Problem', $data['problems'][0])->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		}
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -849,7 +849,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Trigger for log')->getColumn('Ack')
+		$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Trigger for log')->getColumn('Update')
 				->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('id:acknowledge_form')->asForm()->one()->fill([
@@ -874,7 +874,7 @@ class testFormUpdateProblem extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		$row = $table->findRow('Problem', 'Trigger for icon test');
-		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
@@ -897,7 +897,7 @@ class testFormUpdateProblem extends CWebTest {
 		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[@class="icon-action-suppress"]')->exists());
 
 		// Unsuppress problem.
-		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$form->fill(['id:unsuppress_problem' => true]);
 		$form->submit();
 		$dialog->ensureNotPresent();
@@ -917,7 +917,7 @@ class testFormUpdateProblem extends CWebTest {
 		);
 
 		// Check Suppress/Unsuppress icon in History table.
-		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog->waitUntilReady();
 		$form->invalidate();
 		$this->checkHistoryTable($form->getField('History')->asTable(), 'User', 'User action');

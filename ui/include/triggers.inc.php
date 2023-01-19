@@ -777,14 +777,14 @@ function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
 
 	if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 		$eventid = $trigger['problem']['eventid'];
-		$acknowledge = true;
+		$update_problem = true;
 	}
 	else {
-		$acknowledge = false;
+		$update_problem = false;
 	}
 
 	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid,
-		['acknowledge' => $acknowledge]
+		['update_problem' => $update_problem]
 	));
 
 	return $column;
