@@ -106,7 +106,7 @@
 				source: 'triggers'
 			};
 
-			return PopUp('popup.copy.edit', parameters, {
+			return PopUp('copy.edit', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});

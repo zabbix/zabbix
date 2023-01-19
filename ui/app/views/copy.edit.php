@@ -58,8 +58,8 @@ $form_grid = (new CFormGrid())
 			(new CRadioButtonList('copy_type', COPY_TYPE_TO_TEMPLATE_GROUP))
 				->addValue(_('Template groups'), COPY_TYPE_TO_TEMPLATE_GROUP)
 				->addValue(_('Host groups'), COPY_TYPE_TO_HOST_GROUP)
-				->addValue(_('Hosts'), COPY_TYPE_TO_HOST)
 				->addValue(_('Templates'), COPY_TYPE_TO_TEMPLATE)
+				->addValue(_('Hosts'), COPY_TYPE_TO_HOST)
 				->setModern()
 				->setName('copy_type')
 		)
@@ -71,7 +71,7 @@ $form_grid = (new CFormGrid())
 	->addItem(
 		(new CScriptTag('
 			copy_popup.init('.json_encode([
-				'action' => 'popup.copy.create'
+				'action' => 'copy.create'
 			]).');
 		'))->setOnDocumentReady()
 	);
@@ -92,7 +92,7 @@ $output = [
 	'header' => $header,
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('popup.copy.edit.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('copy.edit.js.php')
 ];
 
 echo json_encode($output);
