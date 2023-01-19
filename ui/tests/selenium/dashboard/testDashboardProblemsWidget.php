@@ -36,6 +36,8 @@ class testDashboardProblemsWidget extends CWebTest {
 	 */
 	protected static $dashboardid;
 
+	private static $update_widget = 'Problem widget for updating';
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -223,8 +225,8 @@ class testDashboardProblemsWidget extends CWebTest {
 	public function testDashboardProblemsWidget_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
-
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form->fill(['Type' => 'Problems']);
 		$dialog->waitUntilReady();
@@ -268,10 +270,11 @@ class testDashboardProblemsWidget extends CWebTest {
 			'Show unacknowledged only' => ['value' => false, 'enabled' => true],
 			'Sort entries by' => ['value' => 'Time (descending)', 'enabled' => true],
 			'Show timeline' => ['value' => true, 'enabled' => true],
-			'Show lines' => ['value' => 25, 'enabled' => true, 'maxlength' => 3],
+			'Show lines' => ['value' => 25, 'enabled' => true, 'maxlength' => 3]
 		];
 
 		foreach ($fields as $field => $attributes) {
+			$this->assertTrue($form->getField($field)->isVisible());
 			$this->assertEquals($attributes['value'], $form->getField($field)->getValue());
 			$this->assertTrue($form->getField($field)->isEnabled($attributes['enabled']));
 
@@ -283,6 +286,8 @@ class testDashboardProblemsWidget extends CWebTest {
 				$this->assertEquals($attributes['placeholder'], $form->getField($field)->getAttribute('placeholder'));
 			}
 		}
+
+		$this->assertEquals(['Show lines'], array_values($form->getRequiredLabels()));
 
 		// Check dropdowns options presence.
 		$dropdowns = [
@@ -328,5 +333,145 @@ class testDashboardProblemsWidget extends CWebTest {
 		}
 
 		$dialog->close();
+	}
+
+	public static function getCreateData() {
+		return [
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Show lines' => ''
+					],
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @backupOnce widget
+	 *
+	 * @dataProvider getCreateData
+	 * @ dataProvider getCommonData
+	 */
+	public function testDashboardProblemsWidget_Create($data) {
+		$this->checkFormProblemsWidget($data);
+	}
+
+	/**
+	 * @ dataProvider getCommonData
+	 * @dataProvider getUpdateData
+	 */
+	public function testDashboardProblemsWidget_Update($data) {
+		$this->checkFormProblemsWidget($data, true);
+	}
+
+	/**
+	 * Function for checking Problems widget form.
+	 *
+	 * @param array      $data      data provider
+	 * @param boolean    $update    true if update scenario, false if create
+	 */
+	public function checkFormProblemsWidget($data, $update = false) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = CDBHelper::getHash($this->sql);
+		}
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$old_widget_count = $dashboard->getWidgets()->count();
+
+		$form = $update
+			? $dashboard->getWidget(self::$update_widget)->edit()
+			: $dashboard->edit()->addWidget()->asForm();
+
+		COverlayDialogElement::find()->one()->waitUntilReady();
+
+		if (!$update) {
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Problems')]);
+		}
+
+		$form->fill($data['fields']);
+
+		if (array_key_exists('show_header', $data)) {
+			$form->getField('id:show_header')->fill($data['show_header']);
+		}
+
+		if (array_key_exists('Tags', $data)) {
+			$tags_table = $form->getField('id:tags_table_tags')->asMultifieldTable();
+
+			if (empty($data['Tags'])) {
+				$tags_table->clear();
+			}
+			else {
+				$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
+				$form->getField('id:tags_table_tags')->asMultifieldTable()->fill(CTestArrayHelper::get($data['Tags'], 'tags'));
+			}
+		}
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD)) {
+			$values = $form->getFields()->asValues();
+		}
+
+		$form->submit();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, null, $data['error']);
+
+			// Check that DB hash is not changed.
+			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		}
+		else {
+			COverlayDialogElement::ensureNotPresent();
+
+			/**
+			 *  When name is absent in create scenario it remains default: "Problems",
+			 *  if name is absent in update scenario then previous name remains.
+			 *  If name is empty string in both scenarios it is replaced by "Problems".
+			 */
+			if (array_key_exists('Name', $data['fields'])) {
+				$header = ($data['fields']['Name'] === '')
+					? 'Problems'
+					: $data['fields']['Name'];
+			}
+			else {
+				$header = $update ? self::$update_widget : 'Problems';
+			}
+
+			$dashboard->getWidget($header)->waitUntilReady();
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
+			$saved_form = $dashboard->getWidget($header)->edit();
+
+			// If tags table has been cleared, after form saving there is one empty tag field.
+			if (CTestArrayHelper::get($data, 'Tags') === []) {
+				$values[''] = [['tag' => '', 'operator' => 'Contains', 'value' => '']];
+			}
+
+			// Check widget form fields and values in frontend.
+			$this->assertEquals($values, $saved_form->getFields()->asValues());
+
+			if (array_key_exists('show_header', $data)) {
+				$saved_form->checkValue(['id:show_header' => $data['show_header']]);
+			}
+
+			// Check that widget is saved in DB.
+			$this->assertEquals(1,
+					CDBHelper::getCount('SELECT * FROM widget w'.
+						' WHERE EXISTS ('.
+							'SELECT NULL'.
+							' FROM dashboard_page dp'.
+							' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+								' AND dp.dashboardid='.self::$dashboardid.
+								' AND w.name ='.zbx_dbstr(CTestArrayHelper::get($data['fields'], 'Name', '')).')'
+			));
+
+			// Write new name to updated widget name.
+			if ($update) {
+				self::$update_widget = $header;
+			}
+		}
 	}
 }
