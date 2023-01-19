@@ -13,6 +13,8 @@ COMMON_SRC_FILES = \
 
 JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
+	$(top_srcdir)/src/libs/zbxtimekeeper/libzbxtimekeeper.a \
+	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
