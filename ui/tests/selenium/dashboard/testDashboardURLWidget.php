@@ -783,7 +783,7 @@ class testDashboardURLWidget extends CWebTest {
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
-		// Check that already created widget became invalid and returns errror regarding invalid parameter.
+		// Check that already created widget became invalid and returns error regarding invalid parameter.
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$widget = $dashboard->getWidget('URL')->getContent();
 		$this->assertEquals('Invalid parameter "URL": unacceptable URL.', $widget->query('class:msg-details')->one()->getText());
@@ -794,7 +794,7 @@ class testDashboardURLWidget extends CWebTest {
 		COverlayDialogElement::find()->one()->close();
 		$this->query('button:Save changes')->one()->click();
 
-		// Check that Dashboard can't be saved and returns errror regarding invalid parameter.
+		// Check that Dashboard can't be saved and returns error regarding invalid parameter.
 		CMessageElement::find()->one()->waitUntilVisible();
 		$this->assertMessage(TEST_BAD, null, 'Cannot save widget "'.self::$default_widget.'". Invalid parameter "URL": unacceptable URL.');
 		CMessageElement::find()->one()->close();
