@@ -91,9 +91,9 @@ class ClockWidgets {
 					[
 						'type' => 'clock',
 						'name' => 'CancelClock',
-						'x' => 20,
+						'x' => 0,
 						'y' => 0,
-						'width' => 4,
+						'width' => 5,
 						'height' => 5
 					],
 					[
