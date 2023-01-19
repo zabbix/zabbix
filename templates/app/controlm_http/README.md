@@ -36,6 +36,7 @@ To access the `{$API.TOKEN}` macro, use one of the following interfaces:
 > [Control-M command line interface tool CTM](https://docs.bmc.com/docs/saas-api/authentication-service-941879068.html).
 
 `{$API.URI.ENDPOINT}` - is the Control-M Automation API endpoint for the API requests, including your server IP, or DNS address, the Automation API port and path.
+
 For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 `{$SERVER.NAME}` - is the name of the Control-M server to be monitored.
@@ -66,10 +67,10 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Control-M: Server is down|-|`last(/Control-M server by HTTP/Control-M: Server state)=0 or last(/Control-M server by HTTP/Control-M: Server state)=10`.|High| - 
-|Control-M: Server disconnected|-|`last(/Control-M server by HTTP/Control-M: Server message,#1)="Disconnected"`.|High| - 
-|Control-M: Server error|-|`last(/Control-M server by HTTP/Control-M: Server message,#1)<>"Connected" and last(/Control-M server by HTTP/Control-M: Server message,#1)`.<>"Disconnected" and last(/Control-M server by HTTP/Control-M: Server message,#1)<>""|High| - 
-|Control-M: Server version has changed|-|`last(/Control-M server by HTTP/Control-M: Server version,#1)<>last(/Control-M server by HTTP/Control-M: Server version,#2)`.|Info| - 
+|Control-M: Server is down|-|`last(/Control-M server by HTTP/Control-M: Server state)=0 or last(/Control-M server by HTTP/Control-M: Server state)=10`|High| - 
+|Control-M: Server disconnected|-|`last(/Control-M server by HTTP/Control-M: Server message,#1)="Disconnected"`|High| - 
+|Control-M: Server error|-|`last(/Control-M server by HTTP/Control-M: Server message,#1)<>"Connected" and last(/Control-M server by HTTP/Control-M: Server message,#1)<>"Disconnected" and last(/Control-M server by HTTP/Control-M: Server message,#1)<>""|High| - 
+|Control-M: Server version has changed|-|`last(/Control-M server by HTTP/Control-M: Server version,#1)<>last(/Control-M server by HTTP/Control-M: Server version,#2)`|Info| - 
 
 ### LLD rule for jobs discovery
 
@@ -119,6 +120,7 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 ## Feedback
 
 Please report any issues with the template at `https://support.zabbix.com`.
+
 You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
  
 # Control-M enterprise manager by HTTP
@@ -180,12 +182,14 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-## LLD rule Server discovery
+
+### LLD rule Server discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Server discovery|Discovers the Control-M servers.|Dependent|controlm.server.discovery<p>**Preprocessing**</p><ul><li>Discard_Unchanged_Heartbeat: `2h`</li></ul>
-## LLD rule SLA services discovery
+
+### LLD rule SLA services discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
@@ -216,4 +220,5 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 ## Feedback
 
 Please report any issues with the template at `https://support.zabbix.com`.
+
 You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
