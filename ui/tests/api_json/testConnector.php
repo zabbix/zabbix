@@ -539,7 +539,7 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": value is too long.'
 			],
-			'Test connector.create: missing "ssl_cert_file"' => [
+			'Test connector.create: missing "ssl_cert_file" if "ssl_key_file" not empty' => [
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
@@ -547,7 +547,7 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "ssl_cert_file" is missing.'
 			],
-			'Test connector.create: invalid "ssl_cert_file" (empty)' => [
+			'Test connector.create: invalid "ssl_cert_file" (empty) if "ssl_key_file" not empty' => [
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
@@ -556,16 +556,16 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": cannot be empty.'
 			],
-
-			// Check "ssl_key_file".
-			'Test connector.create: missing "ssl_key_file"' => [
+			'Test connector.create: missing "ssl_cert_file" if "ssl_key_password" not empty' => [
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
 					'ssl_key_password' => 'ssl_key_password'
 				],
-				'expected_error' => 'Invalid parameter "/1/ssl_key_file": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "ssl_cert_file" is missing.'
 			],
+
+			// Check "ssl_key_file".
 			'Test connector.create: invalid "ssl_key_file" (boolean)' => [
 				'connector' => [
 					'name' => 'API create connector',
@@ -1729,7 +1729,7 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": value is too long.'
 			],
-			'Test connector.update: invalid "ssl_cert_file" (empty)' => [
+			'Test connector.update: invalid "ssl_cert_file" (empty) if "ssl_key_file" not empty' => [
 				'connector' => [
 					'connectorid' => 'update_custom_defaults',
 					'ssl_cert_file' => ''
@@ -1752,7 +1752,7 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_key_file": value is too long.'
 			],
-			'Test connector.update: invalid "ssl_key_file" (empty)' => [
+			'Test connector.update: invalid "ssl_key_file" (empty) if "ssl_key_password" not empty' => [
 				'connector' => [
 					'connectorid' => 'update_custom_defaults',
 					'ssl_key_file' => ''

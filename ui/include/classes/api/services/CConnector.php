@@ -202,19 +202,19 @@ class CConnector extends CApiService {
 			]],
 			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
 			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
-			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_password'), 'default' => DB::getDefault('connector', 'ssl_key_password')],
-			'ssl_key_file' =>		['type' => API_MULTIPLE, 'default' => DB::getDefault('connector', 'ssl_key_file'), 'rules' => [
-										['if' => static function (array $data): bool {
-											return $data['ssl_key_password'] !== '';
-										}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'ssl_key_file')],
-										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_file')]
-			]],
 			'ssl_cert_file' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => static function (array $data): bool {
-											return $data['ssl_key_file'] !== '' || $data['ssl_key_password'] !== '';
+											return (array_key_exists('ssl_key_file', $data) && $data['ssl_key_file'] !== '') || (array_key_exists('ssl_key_password', $data) && $data['ssl_key_password'] !== '');
 										}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'ssl_cert_file')],
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_cert_file')]
 			]],
+			'ssl_key_file' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => static function (array $data): bool {
+											return array_key_exists('ssl_key_password', $data) && $data['ssl_key_password'] !== '';
+										}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'ssl_key_file')],
+										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_file')]
+			]],
+			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_password')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'description')],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_STATUS_DISABLED, ZBX_CONNECTOR_STATUS_ENABLED])],
 			'tags_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR])],
@@ -343,13 +343,13 @@ class CConnector extends CApiService {
 			'ssl_cert_file' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => static function (array $data): bool {
 											return $data['ssl_key_file'] !== '' || $data['ssl_key_password'] !== '';
-										}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'ssl_cert_file')],
+										}, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'ssl_cert_file')],
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_cert_file')]
 			]],
 			'ssl_key_file' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => static function (array $data): bool {
 											return $data['ssl_key_password'] !== '';
-										}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'ssl_key_file')],
+										}, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'ssl_key_file')],
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_file')]
 			]],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_password')],
