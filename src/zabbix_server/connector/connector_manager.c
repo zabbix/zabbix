@@ -703,7 +703,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
-		if (!ZBX_IS_RUNNING() && NULL == message)
+		if (!ZBX_IS_RUNNING() && ret == ZBX_IPC_RECV_TIMEOUT)
 		{
 			zbx_connector_t		*connector;
 			zbx_hashset_iter_t	iter;
