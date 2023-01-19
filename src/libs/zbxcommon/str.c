@@ -2952,7 +2952,13 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 	if ('"' == *ptr)	/* quoted parameter */
 	{
 		for (ptr++; '"' != *ptr || '\\' == *(ptr - 1); ptr++)
-			;
+		{
+			if ('\0' == *ptr)
+			{
+				*length = ptr - expr - *param_pos;
+				goto out;
+			}
+		}
 
 		*length = ++ptr - expr - *param_pos;
 
@@ -2967,7 +2973,7 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 
 		*length = ptr - expr - *param_pos;
 	}
-
+out:
 	*sep_pos = ptr - expr;
 }
 
