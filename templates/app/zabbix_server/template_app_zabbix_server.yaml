@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:38:01Z'
+  date: '2023-01-19T09:52:14Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: e2d2b4e4ac28483996cc11fe42823d57
       template: 'Zabbix server health'
       name: 'Zabbix server health'
-      description: 'Template tooling version used: 0.41'
+      description: 'Template tooling version used: 0.42'
       groups:
         -
           name: Templates/Applications
@@ -1109,7 +1109,7 @@ zabbix_export:
               name: 'Zabbix server: Version has changed'
               event_name: 'Zabbix server: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Zabbix server version has changed. Ack to close.'
+              description: 'The Zabbix server version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1385,13 +1385,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.id=="{#NODE.ID}")].address.first()'
+                    - $.address
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[cluster,discovery,nodes]'
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
               tags:
                 -
                   tag: component
@@ -1415,9 +1415,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.id=="{#NODE.ID}")].lastaccess_age.first()'
+                    - $.lastaccess_age
               master_item:
-                key: 'zabbix[cluster,discovery,nodes]'
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
               tags:
                 -
                   tag: component
@@ -1441,13 +1441,43 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.id=="{#NODE.ID}")].lastaccess.first()'
+                    - $.lastaccess
+              master_item:
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: node-id
+                  value: '{#NODE.ID}'
+                -
+                  tag: node-name
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 4cf654a5bbb74ad69847b4ff15d0b623
+              name: 'Cluster node [{#NODE.NAME}]: Stats'
+              type: DEPENDENT
+              key: 'zabbix.nodes.stats[{#NODE.ID}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Node stats.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.id=="{#NODE.ID}")].first()'
               master_item:
                 key: 'zabbix[cluster,discovery,nodes]'
               tags:
                 -
                   tag: component
                   value: cluster
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: node-id
                   value: '{#NODE.ID}'
@@ -1468,13 +1498,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.id=="{#NODE.ID}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[cluster,discovery,nodes]'
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
               tags:
                 -
                   tag: component
