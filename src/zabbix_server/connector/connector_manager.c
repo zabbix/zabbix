@@ -63,7 +63,7 @@ typedef struct
 	zbx_uint64_t				objectid;
 	zbx_vector_connector_data_point_t	connector_data_points;
 }
-zbx_object_link_t;
+zbx_data_point_link_t;
 
 static void	connector_clear(zbx_connector_t *connector)
 {
@@ -85,14 +85,15 @@ static void	connector_clear(zbx_connector_t *connector)
 	zbx_free(connector->ssl_key_file_orig);
 	zbx_free(connector->ssl_key_password);
 	zbx_free(connector->ssl_key_password_orig);
-	zbx_list_destroy(&connector->object_link_queue);
-	zbx_hashset_destroy(&connector->object_links);
+	zbx_list_destroy(&connector->data_point_link_queue);
+	zbx_hashset_destroy(&connector->data_point_links);
 }
 
-static void	object_link_clean(zbx_object_link_t *object_link)
+static void	data_point_link_clean(zbx_data_point_link_t *data_point_link)
 {
-	zbx_vector_connector_data_point_clear_ext(&object_link->connector_data_points, zbx_connector_data_point_free);
-	zbx_vector_connector_data_point_destroy(&object_link->connector_data_points);
+	zbx_vector_connector_data_point_clear_ext(&data_point_link->connector_data_points,
+			zbx_connector_data_point_free);
+	zbx_vector_connector_data_point_destroy(&data_point_link->connector_data_points);
 }
 
 /******************************************************************************
@@ -204,18 +205,18 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_connector_wo
 {
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
 #define ZBX_DATA_JSON_RECORD_LIMIT	(ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED)
-	zbx_object_link_t	*object_link;
+	zbx_data_point_link_t	*data_point_link;
 	int			i, records = 0;
 
 	*reschedule = ZBX_CONNECTOR_RESCHEDULE_FALSE;
 
 	while (ZBX_CONNECTOR_RESCHEDULE_FALSE == *reschedule &&
-			SUCCEED == zbx_list_pop(&connector->object_link_queue, (void **)&object_link))
+			SUCCEED == zbx_list_pop(&connector->data_point_link_queue, (void **)&data_point_link))
 	{
 		if (0 == *data_offset)
 			zbx_connector_serialize_connector(data, data_alloc, data_offset, connector);
 
-		for (i = 0; i < object_link->connector_data_points.values_num; i++, records++)
+		for (i = 0; i < data_point_link->connector_data_points.values_num; i++, records++)
 		{
 			if ((records == connector->max_records && 0 != connector->max_records) ||
 					*data_offset > ZBX_DATA_JSON_RECORD_LIMIT)
@@ -225,39 +226,39 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_connector_wo
 			}
 
 			zbx_connector_serialize_data_point(data, data_alloc, data_offset,
-					&object_link->connector_data_points.values[i]);
+					&data_point_link->connector_data_points.values[i]);
 		}
 
 		/* return back to list if over the limit */
 		if (0 == i)
 		{
-			zbx_list_prepend(&connector->object_link_queue, object_link, NULL);
+			zbx_list_prepend(&connector->data_point_link_queue, data_point_link, NULL);
 			break;
 		}
 
-		if (i != object_link->connector_data_points.values_num)
+		if (i != data_point_link->connector_data_points.values_num)
 		{
 			zbx_vector_connector_data_point_t	connector_data_points_remaining;
 
 			zbx_vector_connector_data_point_create(&connector_data_points_remaining);
 
 			zbx_vector_connector_data_point_append_array(&connector_data_points_remaining,
-					&object_link->connector_data_points.values[i],
-					object_link->connector_data_points.values_num - i);
+					&data_point_link->connector_data_points.values[i],
+					data_point_link->connector_data_points.values_num - i);
 
-			object_link->connector_data_points.values_num = i;
-			zbx_vector_connector_data_point_clear_ext(&object_link->connector_data_points,
+			data_point_link->connector_data_points.values_num = i;
+			zbx_vector_connector_data_point_clear_ext(&data_point_link->connector_data_points,
 					zbx_connector_data_point_free);
-			zbx_vector_connector_data_point_destroy(&object_link->connector_data_points);
-			object_link->connector_data_points = connector_data_points_remaining;
+			zbx_vector_connector_data_point_destroy(&data_point_link->connector_data_points);
+			data_point_link->connector_data_points = connector_data_points_remaining;
 		}
 		else
 		{
-			zbx_vector_connector_data_point_clear_ext(&object_link->connector_data_points,
+			zbx_vector_connector_data_point_clear_ext(&data_point_link->connector_data_points,
 					zbx_connector_data_point_free);
 		}
 
-		zbx_vector_uint64_append(&worker->ids, object_link->objectid);
+		zbx_vector_uint64_append(&worker->ids, data_point_link->objectid);
 	}
 
 	*processed_num += records;
@@ -346,7 +347,7 @@ static void	connector_enqueue(zbx_connector_manager_t *manager, zbx_vector_conne
 
 	for (i = 0; i < connector_objects->values_num; i++)
 	{
-		zbx_object_link_t	*object_link;
+		zbx_data_point_link_t	*data_point_link;
 
 		for (j = 0; j < connector_objects->values[i].ids.values_num; j++)
 		{
@@ -361,23 +362,25 @@ static void	connector_enqueue(zbx_connector_manager_t *manager, zbx_vector_conne
 				}
 			}
 
-			if (NULL == (object_link = (zbx_object_link_t *)zbx_hashset_search(&connector->object_links,
-					&connector_objects->values[i].objectid)))
+			if (NULL == (data_point_link = (zbx_data_point_link_t *)zbx_hashset_search(
+					&connector->data_point_links, &connector_objects->values[i].objectid)))
 			{
-				zbx_object_link_t	object_link_local = {.objectid =
+				zbx_data_point_link_t	data_point_link_local = {.objectid =
 						connector_objects->values[i].objectid};
 
-				object_link = (zbx_object_link_t *)zbx_hashset_insert(
-						&connector->object_links, &object_link_local, sizeof(object_link_local));
-				zbx_vector_connector_data_point_create(&object_link->connector_data_points);
+				data_point_link = (zbx_data_point_link_t *)zbx_hashset_insert(
+						&connector->data_point_links, &data_point_link_local,
+						sizeof(data_point_link_local));
+				zbx_vector_connector_data_point_create(&data_point_link->connector_data_points);
 
-				zbx_list_insert_after(&connector->object_link_queue, NULL, object_link, NULL);
+				zbx_list_insert_after(&connector->data_point_link_queue, NULL, data_point_link, NULL);
 			}
 
 			connector_data_point.ts = connector_objects->values[i].ts;
 			connector_data_point.str = connector_objects->values[i].str;
 
-			zbx_vector_connector_data_point_append(&object_link->connector_data_points, connector_data_point);
+			zbx_vector_connector_data_point_append(&data_point_link->connector_data_points,
+					connector_data_point);
 
 			if (j == connector_objects->values[i].ids.values_num - 1)
 				connector_objects->values[i].str = NULL;
@@ -425,20 +428,18 @@ static void	connector_add_result(zbx_connector_manager_t *manager, zbx_ipc_clien
 	{
 		for (i = 0; i < worker->ids.values_num; i++)
 		{
-			zbx_object_link_t	*object_link;
+			zbx_data_point_link_t	*data_point_link;
 
-			if (NULL == (object_link = (zbx_object_link_t *)zbx_hashset_search(&connector->object_links,
-					&worker->ids.values[i])))
+			if (NULL == (data_point_link = (zbx_data_point_link_t *)zbx_hashset_search(
+					&connector->data_point_links, &worker->ids.values[i])))
 			{
 				continue;
 			}
 
-			if (0 == object_link->connector_data_points.values_num)
-			{
-				zbx_hashset_remove_direct(&connector->object_links, object_link);
-			}
+			if (0 == data_point_link->connector_data_points.values_num)
+				zbx_hashset_remove_direct(&connector->data_point_links, data_point_link);
 			else
-				zbx_list_insert_after(&connector->object_link_queue, NULL, object_link, NULL);
+				zbx_list_insert_after(&connector->data_point_link_queue, NULL, data_point_link, NULL);
 		}
 
 		connector->senders--;
@@ -461,11 +462,11 @@ static	void	connector_get_items_totals(zbx_connector_manager_t *manager, zbx_uin
 	while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_hashset_iter_t	links_iter;
-		zbx_object_link_t	*object_link;
+		zbx_data_point_link_t	*data_point_link;
 
-		zbx_hashset_iter_reset(&connector->object_links, &links_iter);
-		while (NULL != (object_link = (zbx_object_link_t *)zbx_hashset_iter_next(&links_iter)))
-			*queued += object_link->connector_data_points.values_num;
+		zbx_hashset_iter_reset(&connector->data_point_links, &links_iter);
+		while (NULL != (data_point_link = (zbx_data_point_link_t *)zbx_hashset_iter_next(&links_iter)))
+			*queued += data_point_link->connector_data_points.values_num;
 	}
 }
 
@@ -516,21 +517,21 @@ static	void	preprocessor_get_items_view(zbx_connector_manager_t *manager, zbx_ve
 	while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_hashset_iter_t	links_iter;
-		zbx_object_link_t	*object_link;
+		zbx_data_point_link_t	*data_point_link;
 		zbx_connector_stat_t	*connector_stat;
 		zbx_list_iterator_t	iterator;
 
 		connector_stat = zbx_malloc(NULL, sizeof(zbx_connector_stat_t));
 		connector_stat->connectorid = connector->connectorid;
-		connector_stat->links_num = connector->object_links.num_data;
+		connector_stat->links_num = connector->data_point_links.num_data;
 
 		connector_stat->values_num = 0;
-		zbx_hashset_iter_reset(&connector->object_links, &links_iter);
-		while (NULL != (object_link = (zbx_object_link_t *)zbx_hashset_iter_next(&links_iter)))
-			connector_stat->values_num += object_link->connector_data_points.values_num;
+		zbx_hashset_iter_reset(&connector->data_point_links, &links_iter);
+		while (NULL != (data_point_link = (zbx_data_point_link_t *)zbx_hashset_iter_next(&links_iter)))
+			connector_stat->values_num += data_point_link->connector_data_points.values_num;
 
 		connector_stat->queued_links_num = 0;
-		zbx_list_iterator_init(&connector->object_link_queue, &iterator);
+		zbx_list_iterator_init(&connector->data_point_link_queue, &iterator);
 		while (SUCCEED == zbx_list_iterator_next(&iterator))
 			connector_stat->queued_links_num++;
 
@@ -668,7 +669,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 		{
 			zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
 					&manager.config_revision, &manager.connector_revision, &manager.global_revision,
-					(zbx_clean_func_t)object_link_clean);
+					(zbx_clean_func_t)data_point_link_clean);
 
 			switch (message->code)
 			{
@@ -713,9 +714,9 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 			zbx_hashset_iter_reset(&manager.connectors, &iter);
 			while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
 			{
-				if (0 != connector->object_links.num_data)
+				if (0 != connector->data_point_links.num_data)
 				{
-					num = connector->object_links.num_data;
+					num = connector->data_point_links.num_data;
 					break;
 				}
 			}

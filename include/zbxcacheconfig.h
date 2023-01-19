@@ -612,8 +612,8 @@ typedef struct
 	char			*ssl_key_file_orig, *ssl_key_file;
 	char			*ssl_key_password_orig, *ssl_key_password;
 
-	zbx_hashset_t		object_links;
-	zbx_list_t		object_link_queue;
+	zbx_hashset_t		data_point_links;
+	zbx_list_t		data_point_link_queue;
 	int			time_flush;
 	int			senders;
 }
@@ -712,7 +712,7 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 		zbx_vector_connector_filter_t *connector_filters_events);
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,
 		zbx_uint64_t *config_revision, zbx_uint64_t *connector_revision, zbx_uint64_t *global_revision,
-		zbx_clean_func_t object_link_clean);
+		zbx_clean_func_t data_point_link_clean);
 void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter);
 
 int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid);

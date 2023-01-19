@@ -879,7 +879,7 @@ zbx_substitute_value_t;
 
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,
 		zbx_uint64_t *config_revision, zbx_uint64_t *connector_revision, zbx_uint64_t *global_revision,
-		zbx_clean_func_t object_link_clean)
+		zbx_clean_func_t data_point_link_clean)
 {
 	zbx_dc_connector_t	*dc_connector;
 	zbx_connector_t		*connector;
@@ -909,10 +909,10 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 
 				connector = (zbx_connector_t *)zbx_hashset_insert(connectors, &connector_local,
 						sizeof(connector_local));
-				zbx_list_create(&connector->object_link_queue);
+				zbx_list_create(&connector->data_point_link_queue);
 
-				zbx_hashset_create_ext(&connector->object_links, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC, object_link_clean,
+				zbx_hashset_create_ext(&connector->data_point_links, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC, data_point_link_clean,
 						ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 						ZBX_DEFAULT_MEM_FREE_FUNC);
 
