@@ -254,9 +254,7 @@ foreach ($data['graphs'] as $graph) {
 // buttons
 $buttonsArray = [];
 if (!$this->data['parent_discoveryid']) {
-	$buttonsArray['graph.masscopyto'] = ['name' => _('Copy'),
-		'csrf_token' => $csrf_token
-	];
+	$buttonsArray['graph.masscopyto'] = ['name' => _('Copy'), 'csrf_token' => $csrf_token];
 }
 
 $buttonsArray['graph.massdelete'] =  ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']

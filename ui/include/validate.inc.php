@@ -343,8 +343,8 @@ function check_field(&$fields, &$field, $checks) {
 		elseif ($flags & P_ACT) {
 			$action = APP::Component()->router->getAction();
 
-			$csrf_token_form = array_key_exists(CController::CSRF_TOKEN_NAME, $_REQUEST)
-				? $_REQUEST[CController::CSRF_TOKEN_NAME]
+			$csrf_token_form = array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $_REQUEST)
+				? $_REQUEST[CCsrfTokenHelper::CSRF_TOKEN_NAME]
 				: '';
 
 			if (!CCsrfTokenHelper::check($csrf_token_form, $action)) {

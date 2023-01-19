@@ -97,7 +97,6 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 <script>
 	const view = {
 		form_name: null,
-		csrf_tokens: null,
 
 		init({form_name, counter}) {
 			this.form_name = form_name;

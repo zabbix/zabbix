@@ -156,12 +156,14 @@ foreach ($data['triggers'] as $trigger) {
 
 
 	$nodiscover = ($trigger['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
-	$discover_action = $nodiscover ? 'triggerprototype.discover.enable' : 'triggerprototype.discover.disable';
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
 			(new CUrl('trigger_prototypes.php'))
 				->setArgument('g_triggerid[]', $triggerid)
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('action', $discover_action)
+				->setArgument('action',  $nodiscover
+					? 'triggerprototype.discover.enable'
+					: 'triggerprototype.discover.disable'
+				)
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
@@ -201,12 +203,10 @@ $triggersForm->addItem([
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'triggerprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create triggers from selected prototypes as enabled?'),
-				'csrf_token' => $csrf_token
+				'confirm' => _('Create triggers from selected prototypes as enabled?'), 'csrf_token' => $csrf_token
 			],
 			'triggerprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create triggers from selected prototypes as disabled?'),
-				'csrf_token' => $csrf_token
+				'confirm' => _('Create triggers from selected prototypes as disabled?'), 'csrf_token' => $csrf_token
 			],
 			'popup.massupdate.triggerprototype' => [
 				'content' => (new CButton('', _('Mass update')))
@@ -222,8 +222,7 @@ $triggersForm->addItem([
 					->removeAttribute('id')
 			],
 			'triggerprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected trigger prototypes?'),
-				'csrf_token' => $csrf_token
+				'confirm' => _('Delete selected trigger prototypes?'), 'csrf_token' => $csrf_token
 			]
 		],
 		$this->data['parent_discoveryid']

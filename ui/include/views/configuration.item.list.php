@@ -297,9 +297,7 @@ foreach ($data['items'] as $item) {
 }
 
 $button_list = [
-	'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?'),
-		'csrf_token' => $csrf_token
-	],
+	'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?'), 'csrf_token' => $csrf_token],
 	'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?'),
 		'csrf_token' => $csrf_token
 	]
@@ -343,9 +341,7 @@ $button_list += [
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->removeAttribute('id')
 	],
-	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?'),
-		'csrf_token' => $csrf_token
-	]
+	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?'), 'csrf_token' => $csrf_token]
 ];
 
 // Append table to form.

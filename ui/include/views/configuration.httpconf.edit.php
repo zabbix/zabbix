@@ -261,10 +261,14 @@ if (!empty($this->data['httptestid'])) {
 	if ($this->data['host']['status'] == HOST_STATUS_MONITORED
 			|| $this->data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
 
-		$buttons[] = new CSubmit('del_history', _('Clear history and trends'));
+		$buttons[] = new CButtonQMessage(
+			'del_history',
+			_('Clear history and trends'),
+			_('History clearing can take a long time. Continue?')
+		);
 	}
 
-	$buttons[] = (new CSubmit('delete', _('Delete')))->setEnabled(!$data['templated']);
+	$buttons[] = (new CButtonQMessage('delete', _('Delete'), _('Delete web scenario?')))->setEnabled(!$data['templated']);
 	$buttons[] = new CButtonCancel(url_param('context'));
 
 	$http_tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));

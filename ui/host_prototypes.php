@@ -582,8 +582,6 @@ if (hasRequest('form')) {
 		];
 	}
 
-	$data['csrf_tokens'] = CController::generateCsrfTokens(['host_prototypes.php clone', 'host_prototypes.php delete']);
-
 	// Render view.
 	echo (new CView('configuration.host.prototype.edit', $data))->getOutput();
 }

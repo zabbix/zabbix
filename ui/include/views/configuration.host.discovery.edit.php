@@ -998,7 +998,8 @@ if (!empty($data['itemid'])) {
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
-	$buttons[] = (new CSubmit('delete', _('Delete')))->setEnabled(!$data['limited']);
+	$buttons[] = (new CButtonQMessage('delete', _('Delete'), _('Delete discovery rule?')))
+		->setEnabled(!$data['limited']);
 
 	$buttons[] = new CButtonCancel(url_param('context'));
 

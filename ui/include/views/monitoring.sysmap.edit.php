@@ -424,7 +424,7 @@ if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !
 		[
 			new	CButton('clone', _('Clone')),
 			new CButton('full_clone', _('Full clone')),
-			new CSubmit('delete', _('Delete')),
+			new CButtonQMessage('delete', _('Delete'), _('Delete selected map?')),
 			new CButtonCancel()
 		]
 	));

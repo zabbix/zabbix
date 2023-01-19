@@ -497,7 +497,10 @@ $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 // Append buttons to form.
 if ($data['graphid'] != 0) {
 	$updateButton = new CSubmit('update', _('Update'));
-	$deleteButton = new CSubmit('delete', _('Delete'));
+	$deleteButton = new CButtonQMessage('delete', _('Delete'), ($data['parent_discoveryid'] === null)
+		? _('Delete graph?')
+		: _('Delete graph prototype?')
+	);
 
 	if ($readonly) {
 		$updateButton->setEnabled(false);

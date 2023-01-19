@@ -728,7 +728,7 @@ $cancelButton = $data['backurl'] !== null
 
 // append buttons to form
 if (!empty($data['triggerid'])) {
-	$deleteButton = new CSubmit('delete', _('Delete'));
+	$deleteButton = new CButtonQMessage('delete', _('Delete'), _('Delete trigger prototype?'));
 
 	if ($data['limited']) {
 		$deleteButton->setAttribute('disabled', 'disabled');

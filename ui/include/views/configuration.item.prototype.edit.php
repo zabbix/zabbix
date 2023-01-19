@@ -929,7 +929,7 @@ if ($data['itemid'] != 0) {
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
 			(new CSimpleButton(_('Test')))->setId('test_item'),
-			(new CSubmit('delete', _('Delete')))->setEnabled(!$readonly),
+			(new CButtonQMessage('delete', _('Delete'), _('Delete item prototype?')))->setEnabled(!$readonly),
 			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]
 	));

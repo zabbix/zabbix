@@ -213,8 +213,10 @@ if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
 		[
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
-			new CSubmit('delete', _('Delete')),
-			new CSubmit('delete_and_clear', _('Delete and clear')),
+			new CButtonQMessage('delete', _('Delete'), _('Delete template?')),
+			new CButtonQMessage('delete_and_clear', _('Delete and clear'),
+				_('Delete and clear template? (Warning: all linked hosts will be cleared!)')
+			),
 			new CButtonCancel()
 		]
 	));

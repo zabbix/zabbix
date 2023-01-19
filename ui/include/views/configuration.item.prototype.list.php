@@ -122,16 +122,15 @@ foreach ($data['items'] as $item) {
 			->getUrl()
 	);
 
-	$status_action = ($item['status'] == ITEM_STATUS_DISABLED)
-		? 'itemprototype.massenable'
-		: 'itemprototype.massdisable';
-
 	$status = (new CLink(
 		($item['status'] == ITEM_STATUS_DISABLED) ? _('No') : _('Yes'),
 		(new CUrl('disc_prototypes.php'))
 			->setArgument('group_itemid[]', $item['itemid'])
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('action', $status_action)
+			->setArgument('action', ($item['status'] == ITEM_STATUS_DISABLED)
+				? 'itemprototype.massenable'
+				: 'itemprototype.massdisable'
+			)
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))
@@ -167,12 +166,14 @@ foreach ($data['items'] as $item) {
 		->setMenuPopup($item_menu);
 
 	$nodiscover = ($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
-	$discover_action = $nodiscover ? 'itemprototype.massdiscover.enable' : 'itemprototype.massdiscover.disable';
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
 			(new CUrl('disc_prototypes.php'))
 				->setArgument('group_itemid[]', $item['itemid'])
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('action', $discover_action)
+				->setArgument('action', $nodiscover
+					? 'itemprototype.massdiscover.enable'
+					: 'itemprototype.massdiscover.disable'
+				)
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))

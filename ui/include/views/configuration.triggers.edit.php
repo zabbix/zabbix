@@ -713,7 +713,7 @@ if (!empty($data['triggerid'])) {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
-			(new CSubmit('delete', _('Delete')))->setEnabled(!$data['limited']),
+			(new CButtonQMessage('delete', _('Delete'), _('Delete trigger?')))->setEnabled(!$data['limited']),
 			$cancelButton
 		]
 	));
