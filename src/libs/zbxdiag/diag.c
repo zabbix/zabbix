@@ -1063,7 +1063,7 @@ int	zbx_diag_add_connector_info(const struct zbx_json_parse *jp, struct zbx_json
 
 		if (0 != (fields & ZBX_DIAG_CONNECTOR_SIMPLE))
 		{
-			int	queued;
+			zbx_uint64_t	queued;
 
 			time1 = zbx_time();
 			if (FAIL == (ret = zbx_connector_get_diag_stats(&queued, error)))

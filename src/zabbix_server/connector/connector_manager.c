@@ -475,7 +475,7 @@ static void	connector_get_diag_stats(zbx_connector_manager_t *manager, zbx_ipc_c
 {
 	unsigned char	*data;
 	zbx_uint32_t	data_len;
-	int		queued;
+	zbx_uint64_t	queued;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

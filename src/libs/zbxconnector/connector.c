@@ -46,7 +46,7 @@ void	zbx_connector_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t siz
 	}
 }
 
-zbx_uint32_t	zbx_connector_pack_diag_stats(unsigned char **data, int queued)
+zbx_uint32_t	zbx_connector_pack_diag_stats(unsigned char **data, zbx_uint64_t queued)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0;
@@ -79,7 +79,7 @@ zbx_uint32_t	zbx_connector_pack_diag_stats(unsigned char **data, int queued)
  *             data       - [IN] IPC data buffer                              *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_connector_unpack_diag_stats(int *queued, const unsigned char *data)
+static void	zbx_connector_unpack_diag_stats(zbx_uint64_t *queued, const unsigned char *data)
 {
 	(void)zbx_deserialize_int(data, queued);
 }
@@ -89,7 +89,7 @@ static void	zbx_connector_unpack_diag_stats(int *queued, const unsigned char *da
  * Purpose: get preprocessing manager diagnostic statistics                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_connector_get_diag_stats(int *queued, char **error)
+int	zbx_connector_get_diag_stats(zbx_uint64_t *queued, char **error)
 {
 	unsigned char	*result;
 

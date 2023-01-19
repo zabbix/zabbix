@@ -79,8 +79,8 @@ void	zbx_connector_deserialize_connector_and_data_point(const unsigned char *dat
 		zbx_connector_t *connector, zbx_vector_connector_data_point_t *connector_data_points);
 void	zbx_connector_data_point_free(zbx_connector_data_point_t connector_data_point);
 
-int		zbx_connector_get_diag_stats(int *queued, char **error);
-zbx_uint32_t	zbx_connector_pack_diag_stats(unsigned char **data, int queued);
+int		zbx_connector_get_diag_stats(zbx_uint64_t *queued, char **error);
+zbx_uint32_t	zbx_connector_pack_diag_stats(unsigned char **data, zbx_uint64_t queued);
 
 int	zbx_connector_get_top_connectors(int limit, zbx_vector_ptr_t *items, char **error);
 void	zbx_connector_unpack_top_request(int *limit, const unsigned char *data);

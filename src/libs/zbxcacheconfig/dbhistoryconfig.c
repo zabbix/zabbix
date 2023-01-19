@@ -804,7 +804,7 @@ void	zbx_dc_items_update_nextcheck(zbx_history_recv_item_t *items, zbx_agent_val
 	UNLOCK_CACHE;
 }
 
-#define ZBX_CONNECTOR_STATUS_ENABLED	0
+#define ZBX_CONNECTOR_STATUS_ENABLED	1
 
 void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filter_t *connector_filters_history,
 		zbx_vector_connector_filter_t *connector_filters_events)
