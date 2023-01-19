@@ -752,6 +752,11 @@ class testDashboardURLWidget extends CWebTest {
 		$error_details = $this->query('id:sub-frame-error-details')->one()->getText();
 		$this->assertStringContainsString( 'refused to connect.', $error_details);
 		$this->page->switchTo();
+
+		// Change XFrame option to the default value for avoiding possible issues with URI schemes.
+		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+		$other_form->fill(['X-Frame-Options HTTP header' => 'SAMEORIGIN']);
+		$other_form->submit();
 	}
 
 	/**
