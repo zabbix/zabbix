@@ -2491,7 +2491,7 @@ class testUsers extends CAPITest {
 					'token' => 'string',
 					'extend' => true
 				],
-				'expected_error' => 'Extend not compatible with token.'
+				'expected_error' => 'Invalid parameter "/": unexpected parameter "extend".'
 			],
 			'Test user.checkAuthentication invalid "sessionid" parameter (integer)' => [
 				'params' => [
