@@ -93,6 +93,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'problem_can_be_suppressed' => false,
 			'problem_can_be_unsuppressed' => false,
 			'problem_severity_can_be_changed' => false,
+			'problem_can_change_rank' => false,
 			'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
 			'allowed_close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
 			'allowed_change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
@@ -104,7 +105,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 
 		// Select events.
 		$events = API::Event()->get([
-			'output' => ['eventid', 'name', 'objectid', 'acknowledged', 'value', 'r_eventid'],
+			'output' => ['eventid', 'name', 'objectid', 'acknowledged', 'value', 'r_eventid', 'cause_eventid'],
 			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until'
 			],
@@ -148,6 +149,11 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			$can_be_closed = true;
 			$can_be_suppressed = true;
 			$can_be_unsuppressed = false;
+
+			// If only cause events are selected, rank change is not allowed.
+			if ($event['cause_eventid'] != 0) {
+				$data['problem_can_change_rank'] = true;
+			}
 
 			// Only manually suppressed problems can be unsuppressed.
 			if ($this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)) {

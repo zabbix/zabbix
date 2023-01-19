@@ -1276,6 +1276,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param array      $data['correlations']                  List of correlations.
 	 * @param array      $data['dependencies']                  List of trigger dependencies.
 	 * @param array      $data['filter']                        Problem filter.
+	 * @param int        $data['filter']['show']                "Show" filter option.
 	 * @param int        $data['filter']['show_suppressed']     "Show suppressed problems" filter option.
 	 * @param int        $data['filter']['highlight_row']       "Highlight whole row" filter option.
 	 * @param int        $data['filter']['show_tags']           "Show tags" filter option.
@@ -1360,6 +1361,11 @@ class CScreenProblem extends CScreenBase {
 
 			// Info.
 			$info_icons = [];
+
+			if ($data['filter']['show'] == TRIGGERS_OPTION_IN_PROBLEM) {
+				$info_icons[] = getEventStatusUpdateIcon($problem);
+			}
+
 			if ($problem['r_eventid'] != 0) {
 				if ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
@@ -1625,7 +1631,7 @@ class CScreenProblem extends CScreenBase {
 				$data['filter']['compact_view']
 					? (new CDiv($data['triggers_hosts'][$trigger['triggerid']]))->addClass(ZBX_STYLE_ACTION_CONTAINER)
 					: $data['triggers_hosts'][$trigger['triggerid']],
-					$data['filter']['compact_view']
+				$data['filter']['compact_view']
 					? (new CDiv($description))->addClass(ZBX_STYLE_ACTION_CONTAINER)
 					: $description,
 				($data['show_opdata'] == OPERATIONAL_DATA_SHOW_SEPARATELY)
