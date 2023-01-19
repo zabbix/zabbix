@@ -1,0 +1,16 @@
+{
+	"manifest_version": 2.0,
+	"id": "emptyWidget",
+	"type": "widget",
+	"name": "Empty widget",
+	"namespace": "emptyWidget",
+	"version": "1.0",
+	"author": "Some Zabbix employee",
+	"widget": {
+		"size": {
+			"width": 3,
+			"height": 4
+		},
+		"refresh_rate": "120"
+	}
+}

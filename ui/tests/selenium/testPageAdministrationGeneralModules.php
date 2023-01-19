@@ -23,7 +23,9 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
- * @backup module
+ * @backup module, widget
+ *
+ * @onBefore prepareDashboardData
  */
 
 class testPageAdministrationGeneralModules extends CWebTest {
@@ -41,11 +43,130 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		];
 	}
 
+	private static $dashboardid;
+	private static $template_dashboardid;
+
+	const TEMPLATEID = 50000;
+	const ITEMID = 400410;
+
 	private static $widget_names = ['Action log', 'Clock', 'Data overview', 'Discovery status', 'Favorite graphs',
 		'Favorite maps','Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value',
 		'Map', 'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
 		'System information', 'Top hosts', 'Trigger overview', 'URL', 'Web monitoring'
 	];
+
+	/**
+	 * Creates dashboards with widgets and defines the corresponding dashboard IDs.
+	 */
+	public static function prepareDashboardData() {
+		$response = CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for widget module testing',
+				'private' => 0,
+				'pages' => [
+					[
+						'name' => 'Page 1',
+						'widgets' => [
+							[
+								'name' => 'Awesome tree',
+								'type' => 'navtree',
+								'x' => 0,
+								'y' => 0,
+								'width' => 12,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'GZCSV'
+									],
+									[
+										'type' => 1,
+										'name' => 'navtree.name.1',
+										'value' => 'Awesome map'
+									],
+									[
+										'type' => 8,
+										'name' => 'navtree.sysmapid.1',
+										'value' => 1
+									]
+								]
+							],
+							[
+								'name' => 'Map from navtree',
+								'type' => 'map',
+								'x' => 12,
+								'y' => 0,
+								'width' => 12,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source_type',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'filter_widget_reference',
+										'value' => 'GZCSV'
+									]
+								]
+							],
+							[
+								'type' => 'systeminfo',
+								'name' => 'System stats view',
+								'x' => 0,
+								'y' => 4,
+								'width' => 6,
+								'height' => 4
+							]
+						]
+					]
+				]
+			]
+		]);
+
+		self::$dashboardid = $response['dashboardids'][0];
+
+		$template_responce = CDataHelper::call('templatedashboard.create', [
+			[
+				'templateid' => self::TEMPLATEID,
+				'name' => 'Templated dashboard for module widgets',
+				'pages' => [
+					[
+						'name' => 'Page 1',
+						'widgets' => [
+							[
+								'type' => 'clock',
+								'name' => 'Clock widget',
+								'width' => 6,
+								'height' => 4
+							],
+							[
+								'type' => 'item',
+								'name' => 'Item value widget',
+								'x' => 6,
+								'y' => 0,
+								'width' => 6,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'itemid',
+										'value' => self::ITEMID
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
+
+		self::$template_dashboardid = $template_responce['dashboardids'][0];
+	}
 
 	public function testPageAdministrationGeneralModules_Layout() {
 		$modules = [
@@ -75,6 +196,20 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'Version' => '',
 				'Author' => '',
 				'Description' => 'Adding top-level and sub-level menu',
+				'Status' => 'Disabled'
+			],
+			[
+				'Name' => 'Clock2',
+				'Version' => '1.1',
+				'Author' => 'Zabbix QA department',
+				'Description' => '',
+				'Status' => 'Disabled'
+			],
+			[
+				'Name' => 'Empty widget',
+				'Version' => '1.0',
+				'Author' => 'Some Zabbix employee',
+				'Description' => '',
 				'Status' => 'Disabled'
 			],
 			[
@@ -123,8 +258,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Load modules.
 		$this->loadModules();
-
 		$all_modules = array_merge($widget_modules, $modules);
+		$total_count = count($all_modules);
+
 		// Sort column contents ascending.
 		usort($all_modules, function($a, $b) {
 			return strcmp($a['Name'], $b['Name']);
@@ -134,7 +270,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->assertTableData($all_modules);
 
 		$count = CDBHelper::getCount('SELECT moduleid FROM module');
-		$this->assertEquals('Displaying '.$count.' of '.$count.' found', $this->query('class:table-stats')->one()->getText());
+		$this->assertEquals('Displaying '.$total_count.' of '.$total_count.' found', $this->query('class:table-stats')
+				->one()->getText()
+		);
 
 		// Load modules again and check that no new modules were added.
 		$this->loadModules(false);
@@ -191,6 +329,32 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Description' => 'Adding top-level and sub-level menu',
 					'Directory' => 'modules/module_number_5',
 					'Namespace' => 'Modules\Example_E',
+					'Homepage' => '-',
+					'Enabled' => false
+				]
+			],
+			// Clock2.
+			[
+				[
+					'Name' => 'Clock2',
+					'Version' => '1.1',
+					'Author' => 'Zabbix QA department',
+					'Description' => '-',
+					'Directory' => 'modules/clock32',
+					'Namespace' => 'Modules\Clock2',
+					'Homepage' => '-',
+					'Enabled' => false
+				]
+			],
+			// Clock2.
+			[
+				[
+					'Name' => 'Empty widget',
+					'Version' => '1.0',
+					'Author' => 'Some Zabbix employee',
+					'Description' => '-',
+					'Directory' => 'modules/emptyWidget',
+					'Namespace' => 'Modules\emptyWidget',
 					'Homepage' => '-',
 					'Enabled' => false
 				]
@@ -354,20 +518,29 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	}
 
 	/**
-	 * @backup module
+	 * @backupOnce module
 	 * @dataProvider getModuleData
 	 * @depends testPageAdministrationGeneralModules_Layout
 	 */
 	public function testPageAdministrationGeneralModules_EnableDisable($data) {
 		$this->page->login()->open('zabbix.php?action=module.list');
-		// Enable modules from modules page one by one and check that changes took place.
-		$this->enableAndCheckModules($data);
-		// Disable the module that was enabled from page and confirm that changes made by the module are reverted.
-		$this->disableAndCheckModules($data);
-		// Enable modules from module details form one by one and check that changes took place.
-		$this->enableAndCheckModules($data, true);
-		// Disable the module that was enabled from details form and confirm that changes made by the module are reverted.
-		$this->disableAndCheckModules($data, true);
+
+		foreach (['list', 'form'] as $view) {
+			// This block is separate because one of the cases requires one module to be enabled before the other to succeed.
+			foreach ($data as $module) {
+				// Enable module and check the success or error message.
+				$this->enableModule($module, $view);
+			}
+
+			// In case if module should be enabled, check that changes took place and then disable each enabled module.
+			foreach ($data as $module) {
+				if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_GOOD) {
+					$this->assertModuleEnabled($module);
+					$this->disableModule($module, $view);
+					$this->assertModuleDisabled($module);
+				}
+			}
+		}
 	}
 
 	public function getFilterData() {
@@ -450,6 +623,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 						'1st Module name',
 						'4th Module',
 						'5th Module',
+						'Clock2',
+						'Empty widget',
 						'шестой модуль'
 					]
 				]
@@ -535,6 +710,53 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->assertEquals($initial_hash, CDBHelper::getHash($sql));
 	}
 
+	public function getWidgetModuleData() {
+		return [
+			// Exact name match.
+			[
+				[
+					'module_name' => 'Clock2'
+				]
+			],
+			[
+				[
+					'module_name' => 'System information'
+				]
+			],
+			[
+				[
+					'module_name' => 'System information'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @backupOnce module
+	 * @dataProvider getWidgetModuleData
+	 */
+	public function testPageAdministrationGeneralModules_ChangeWidgetModuleStatus($module) {
+		$this->page->login()->open('zabbix.php?action=module.list');
+
+		// Determine the original status of the modules to be checked. Scenarios with mixed statuses are not considered.
+		$initial_status = $this->query('class:list-table')->asTable()->one()->findRow('Name', $module['module_name'])
+				->getColumn('Status')->getText();
+
+		if ($initial_status === 'Disabled') {
+			$this->enableModule($module, 'list');
+
+			$this->assertWidgetModuleEnabled($module);
+
+			$this->disableModule($module, 'list');
+		}
+		else {
+			$this->disableModule($module, 'list');
+
+			$this->enableModule($module, 'list');
+		}
+	}
+
+
 	/**
 	 * Function loads modules in frontend and checks the message depending on whether new modules were loaded.
 	 *
@@ -548,11 +770,18 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		if ($first_load) {
 			// Each loaded module name is checked separately due to difference in their sorting on Jenkins and locally.
 			$this->assertMessage(TEST_GOOD, 'Modules updated', ['Modules added:', '1st Module name',
-					'2nd Module name !@#$%^&*()_+', '4th Module', '5th Module', 'шестой модуль']);
+					'2nd Module name !@#$%^&*()_+', '4th Module', '5th Module', 'Clock2', 'Empty widget', 'шестой модуль'
+			]);
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'No new modules discovered');
 		}
+	}
+
+	private function assertWidgetModuleEnabled($module) {
+//		$url = (CTestArrayHelper::get($data, 'template_widget')) ?
+
+		return true;
 	}
 
 	/**
@@ -615,56 +844,50 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	}
 
 	/**
-	 * Function enables modules from the list in modules page or from module details form, depending on input parameters.
-	 * @param array		$data			data array with module details
-	 * @param bool		$from_form		flag that determines whether the module is enabled from module details form.
+	 * Function enables module from the list in modules page or from module details form, depending on input parameters.
+	 * @param array		$data	data array with module details
+	 * @param string	$view	view from which the module should be enabled - module list or module details form.
 	 */
-	private function enableAndCheckModules($data, $from_form = false) {
-		foreach ($data as $module) {
-			// Change module status from Disabled to Enabled.
-			if ($from_form) {
-				$this->changeModuleStatusFromForm($module['module_name'], true);
-			}
-			else {
-				$this->changeModuleStatusFromPage($module['module_name'], 'Disabled');
-			}
-			// In case of negative test check error message and confirm that module wasn't applied.
-			if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_BAD) {
-				$title = $from_form ? 'Cannot update module: ' : 'Cannot enable module: ';
-				$this->assertMessage($module['expected'], $title.$module['module_name'].'.', $module['error_details']);
-				$this->assertModuleDisabled($module);
-				continue;
-			}
-			// Check message and confirm that changes, made by the enabled module, took place.
-			$message = $from_form ? 'Module updated: ' : 'Module enabled: ';
-			$this->assertMessage(CTestArrayHelper::get($module, 'expected', TEST_GOOD), $message.$module['module_name'].'.');
-			$this->assertModuleEnabled($module);
+	private function enableModule($module, $view) {
+		// Change module status from Disabled to Enabled.
+		if ($view === 'form') {
+			$this->changeModuleStatusFromForm($module['module_name'], true);
 		}
+		else {
+			$this->changeModuleStatusFromPage($module['module_name'], 'Disabled');
+		}
+		// In case of negative test check error message and confirm that module wasn't applied.
+		if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_BAD) {
+			$title = ($view === 'form') ? 'Cannot update module: ' : 'Cannot enable module: ';
+			$this->assertMessage($module['expected'], $title.$module['module_name'].'.', $module['error_details']);
+			$this->assertModuleDisabled($module);
+			return;
+		}
+		// Check message and confirm that changes, made by the enabled module, took place.
+		$message = ($view === 'form') ? 'Module updated: ' : 'Module enabled: ';
+		$this->assertMessage(CTestArrayHelper::get($module, 'expected', TEST_GOOD), $message.$module['module_name'].'.');
 	}
 
 	/**
-	 * Function disables modules from the list in modules page or from module details form, depending on input parameters.
-	 * @param array		$data			data array with module details
-	 * @param bool		$from_form		flag that determines whether the module is enabled from module details form.
+	 * Function disables module from the list in modules page or from module details form, depending on input parameters.
+	 * @param array		$data	data array with module details
+	 * @param string	$view	view from which the module should be enabled - module list or module details form.
 	 */
-	private function disableAndCheckModules($data, $from_form = false) {
-		foreach ($data as $module) {
-			// In case of negative test do nothing.
-			if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_BAD) {
-				continue;
-			}
-			// Change module status from Enabled to Disabled.
-			if ($from_form) {
-				$this->changeModuleStatusFromForm($module['module_name'], false);
-			}
-			else {
-				$this->changeModuleStatusFromPage($module['module_name'], 'Enabled');
-			}
-			// Check message and confirm that changes, made by the module, were reversed.
-			$message = $from_form ? 'Module updated: ' : 'Module disabled: ';
-			$this->assertMessage(TEST_GOOD, $message.$module['module_name'].'.');
-			$this->assertModuleDisabled($module);
+	private function disableModule($module, $view) {
+		// In case of negative test do nothing.
+		if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_BAD) {
+			return;
 		}
+		// Change module status from Enabled to Disabled.
+		if ($view === 'form') {
+			$this->changeModuleStatusFromForm($module['module_name'], false);
+		}
+		else {
+			$this->changeModuleStatusFromPage($module['module_name'], 'Enabled');
+		}
+		// Check message and confirm that changes, made by the module, were reversed.
+		$message = ($view === 'form') ? 'Module updated: ' : 'Module disabled: ';
+		$this->assertMessage(TEST_GOOD, $message.$module['module_name'].'.');
 	}
 
 	/**
