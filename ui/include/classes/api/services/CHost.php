@@ -489,7 +489,7 @@ class CHost extends CHostGeneral {
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 
 				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
-					'host_tag', 'hostid', 'ht2', 'templateid'
+					'host_tag', 'hostid', 'ht2.templateid'
 				);
 			}
 			else {

@@ -35,15 +35,13 @@ class CApiTagHelper {
 	 * @param string      $parent_alias
 	 * @param string      $table
 	 * @param string      $field
-	 * @param string|null $join_alias
-	 * @param string|null $join_field
+	 * @param string|null $template_field
 	 *
 	 * @return string
 	 */
 	public static function addWhereCondition(array $tags, $evaltype, string $parent_alias, string $table,
-			string $field, string $join_alias = null, string $join_field = null): string {
+			string $field, string $template_field = null): string {
 		$values_by_tag = [];
-		$join_glue = [];
 
 		foreach ($tags as $tag) {
 			$operator = array_key_exists('operator', $tag) ? $tag['operator'] : TAG_OPERATOR_LIKE;
@@ -99,22 +97,6 @@ class CApiTagHelper {
 					$values_by_tag[$tag['tag']][$slot][] = $table.'.value='.zbx_dbstr($value);
 					break;
 			}
-
-			if ($join_alias !== null) {
-				switch ($operator) {
-					case TAG_OPERATOR_LIKE:
-					case TAG_OPERATOR_EXISTS:
-					case TAG_OPERATOR_EQUAL:
-						$join_glue[$tag['tag']] = ' OR ';
-						break;
-
-					case TAG_OPERATOR_NOT_LIKE:
-					case TAG_OPERATOR_NOT_EXISTS:
-					case TAG_OPERATOR_NOT_EQUAL:
-						$join_glue[$tag['tag']] = ' AND ';
-						break;
-				}
-			}
 		}
 
 		$sql_where = [];
@@ -147,11 +129,11 @@ class CApiTagHelper {
 					' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.' AND '.$statement.
 				')';
 
-				if ($join_alias !== null) {
-					$condition .= $join_glue[$tag].$prefix.' ('.
+				if ($template_field !== null) {
+					$condition .= ($prefix === 'EXISTS' ? ' OR ' : ' AND ').$prefix.' ('.
 						'SELECT NULL'.
 						' FROM '.$table.
-						' WHERE '.$join_alias.'.'.$join_field.'='.$table.'.'.$field.' AND '.$statement.
+						' WHERE '.$template_field.'='.$table.'.'.$field.' AND '.$statement.
 					')';
 					$condition = '('.$condition.')';
 				}
