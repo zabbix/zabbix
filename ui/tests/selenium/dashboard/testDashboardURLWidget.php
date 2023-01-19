@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  * @ignoreBrowserErrors
  *
  * @backup dashboard
- * @onBefore prepareDashboardData
+ * @onBefore prepareData
  */
 class testDashboardURLWidget extends CWebTest {
 
@@ -42,7 +42,11 @@ class testDashboardURLWidget extends CWebTest {
 	}
 
 	private static $dashboardid;
+	private static $dashboard_create;
 	private static $default_widget = 'Default URL Widget';
+	private static $update_widget = 'Update URL Widget';
+	private static $delete_widget = 'Widget for delete';
+	private static $frame_widget = 'Widget for iframe and xframe testing';
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -56,14 +60,14 @@ class testDashboardURLWidget extends CWebTest {
 	' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
 	' wf.value_itemid, wf.value_graphid';
 
-	public static function prepareDashboardData() {
+	public static function prepareData() {
 		$response = CDataHelper::call('dashboard.create', [
 			[
-				'name' => 'Dashboard for Single URL Widget test',
+				'name' => 'Dashboard for URL Widget test',
 				'private' => 0,
 				'pages' => [
 					[
-						'name' => 'Page with widgets',
+						'name' => 'Page with default widgets',
 						'widgets' => [
 							[
 								'type' => 'url',
@@ -77,6 +81,67 @@ class testDashboardURLWidget extends CWebTest {
 										'type' => 1,
 										'name' => 'url',
 										'value' => 'http://zabbix.com'
+									],
+									[
+										'type' => 0,
+										'name' => 'dynamic',
+										'value' => '1'
+									]
+								]
+							],
+							[
+								'type' => 'url',
+								'name' => self::$frame_widget,
+								'x' => 12,
+								'y' => 0,
+								'width' => 12,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'url',
+										'value' => 'zabbix.php?action=host.edit&hostid=10084'
+									]
+								]
+							],
+							[
+								'type' => 'url',
+								'name' => self::$delete_widget,
+								'x' => 0,
+								'y' => 5,
+								'width' => 12,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'url',
+										'value' => 'zabbix.php?action=dashboard.view'
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				'name' => 'Dashboard for URL Widget create/update test',
+				'private' => 0,
+				'pages' => [
+					[
+						'name' => 'Page with created/updated widgets',
+						'widgets' => [
+							[
+								'type' => 'url',
+								'name' => self::$update_widget,
+								'x' => 0,
+								'y' => 0,
+								'width' => 12,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'url',
+										'value' => 'https://zabbix.com'
 									]
 								]
 							]
@@ -86,75 +151,96 @@ class testDashboardURLWidget extends CWebTest {
 			]
 		]);
 		self::$dashboardid = $response['dashboardids'][0];
-		$host_id = CDBHelper::getValue("SELECT hostid FROM hosts WHERE host in('Not available host')");
-		$interface_id = CDBHelper::getValue("SELECT interfaceid FROM interface WHERE hostid=$host_id AND type=1");
-		CDataHelper::call('item.create', [
-			'hostid' => $host_id,
-			'name' => 'Test DNS',
-			'key_' => 'dns_macro',
-			'type' => ITEM_TYPE_ZABBIX,
-			'delay' => "30",
-			'interfaceid' => $interface_id,
-			'value_type' => ITEM_VALUE_TYPE_FLOAT
+		self::$dashboard_create = $response['dashboardids'][1];
+
+		// Create host for ResolvedMacro test purposes.
+		CDataHelper::createHosts([
+			[
+				'host' => 'Host for resolved DNS macro',
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_DNS,
+						'ip' => '',
+						'dns' => 'dnsmacro.com',
+						'port' => '10051'
+					]
+				],
+				'groups' => [
+					'groupid' => '4'
+				],
+				'items' => [
+					[
+						'name' => 'Test DNS',
+						'key_' => 'dns_macro',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT,
+						'delay' => '30'
+					]
+				]
+			]
 		]);
 	}
 
 	public function testDashboardURLWidget_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-		$form = $dashboard->edit()->addWidget()->waitUntilReady()->asForm();
+		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
+		$this->assertEquals('Add widget', $dialog->getTitle());
+		$form = $dialog->asForm();
+
 		if ($form->getField('Type') !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 		}
 
 		// Check default state.
 		$default_state = [
+			'Type' => 'URL',
 			'Name' => '',
-			'id:show_header' => true,
+			'Show header' => true,
 			'Refresh interval' => 'Default (No refresh)',
 			'URL' => '',
 			'Dynamic item' => false
 		];
 
-		foreach ($default_state as $field => $value) {
-			$this->assertEquals($value, $form->getField($field)->getValue());
-		}
-
-		// Check 'Add widget' form header.
-		$this->assertEquals('Add widget', $form->query('xpath://h4[contains(@id, "head-title")]')->one()->getText());
-
-		// Check that widget type is selected correctly.
-		$this->assertEquals('URL', $form->query('id:label-type')->one()->getText());
+		$form->checkValue($default_state);
+		$this->assertTrue($form->isRequired('URL'));
 
 		// Check attributes of input elements.
 		$inputs = [
 			'Name' => [
-				'maxlength' => 255,
+				'maxlength' => '255',
 				'placeholder' => 'default'
 			],
 			'URL' => [
-				'maxlength' => 255
+				'maxlength' => '255'
 			]
 		];
-
 		foreach ($inputs as $field => $attributes) {
-			foreach ($attributes as $attribute => $value) {
-				$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
-			}
+			$this->assertTrue($form->getField($field)->isAttributePresent($attributes));
 		}
 
-		// Check "Refresh interval" dropdown options.
 		$refresh_interval = ['Default (No refresh)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
 			'2 minutes', '10 minutes', '15 minutes'];
+		$this->assertEquals($refresh_interval, $form->getField('Refresh interval')->getOptions()->asText());
 
-		$this->assertEquals($refresh_interval, $form->getField('id:rf_rate')->asDropdown()->getOptions()->asText());
+		// Check if buttons present and clickable.
+		$this->assertEquals(2, $dialog->query('button', ['Add', 'Cancel'])->all()
+			->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+		);
+		COverlayDialogElement::find()->one()->close();
+		CDashboardElement::find()->one()->save();
 
-		// Check if buttons are present.
-		$widget_buttons = ['dialogue-widget-save', 'btn-alt js-cancel'];
-
-		foreach ($widget_buttons as $button) {
-			$this->assertTrue($form->query('xpath://button[@class="'.$button.'"]')->one()->isVisible());
-		}
+		// Check parameter 'Dynamic item' true/false state.
+		$dashboard = CDashboardElement::find()->one();
+		$this->assertTrue($dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one()->isVisible());
+		$this->assertEquals('No host selected.', $dashboard->getWidget(self::$default_widget)
+			->query('class:nothing-to-show')->one()->getText());
+		$dashboard->getWidget(self::$default_widget)->edit();
+		$this->assertEquals('Edit widget', $dialog->getTitle());
+		$form->fill(['Dynamic item' => false])->submit();
+		$dashboard->save();
+		$this->assertFalse($dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one(false)->isVisible());
 	}
 
 	public static function getWidgetData() {
@@ -195,11 +281,29 @@ class testDashboardURLWidget extends CWebTest {
 					'error' => ['Invalid parameter "URL": unacceptable URL.']
 				]
 			],
+			// The 'Refresh interval' value depends on the previous test case value = 'No refresh'.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'id:show_header' => false,
+						'URL' => 'http://zabbix.com'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Refresh interval' => 'Default (No refresh)',
+						'URL' => 'http://zabbix.com'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Show header' => false,
 						'Refresh interval' => '10 seconds',
 						'URL' => 'http://zabbix.com'
 					]
@@ -209,7 +313,7 @@ class testDashboardURLWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'id:show_header' => false,
+						'Show header' => false,
 						'Refresh interval' => '30 seconds',
 						'URL' => 'https://zabbix.com'
 					]
@@ -228,7 +332,7 @@ class testDashboardURLWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Refresh interval' => '1 minute',
+						'Refresh interval' => '2 minutes',
 						'URL' => 'file://zabbix.com'
 					]
 				]
@@ -237,7 +341,7 @@ class testDashboardURLWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Refresh interval' => '1 minute',
+						'Refresh interval' => '10 minutes',
 						'URL' => 'mailto://zabbix.com'
 					]
 				]
@@ -246,7 +350,7 @@ class testDashboardURLWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Refresh interval' => '1 minute',
+						'Refresh interval' => '15 minutes',
 						'URL' => 'tel://zabbix.com'
 					]
 				]
@@ -255,7 +359,7 @@ class testDashboardURLWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Refresh interval' => '1 minute',
+						'Refresh interval' => 'No refresh',
 						'URL' => 'ssh://zabbix.com'
 					]
 				]
@@ -264,7 +368,6 @@ class testDashboardURLWidget extends CWebTest {
 	}
 
 	/**
-	 * @backupOnce dashboard
 	 * @dataProvider getWidgetData
 	 */
 	public function testDashboardURLWidget_Create($data) {
@@ -272,7 +375,17 @@ class testDashboardURLWidget extends CWebTest {
 	}
 
 	public function testDashboardURLWidget_SimpleUpdate() {
-		$this->checkNoChanges();
+		$old_hash = CDBHelper::getHash($this->sql);
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->getWidget(self::$update_widget)->edit();
+		$form->submit();
+		$dashboard->save();
+		$this->page->waitUntilReady();
+
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
 	/**
@@ -289,17 +402,17 @@ class testDashboardURLWidget extends CWebTest {
 	 */
 	public function checkWidgetForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM widget ORDER BY widgetid');
+			$old_hash = CDBHelper::getHash($this->sql);
 		}
 
 		$data['fields']['Name'] = 'URL widget create '.microtime();
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
 		$form = ($update)
-			? $dashboard->getWidget(self::$default_widget)->edit()->asForm()
-			: $dashboard->edit()->addWidget()->waitUntilReady()->asForm();
+			? $dashboard->getWidget(self::$update_widget)->edit()->asForm()
+			: $dashboard->edit()->addWidget()->asForm();
 
 		if ($form->getField('Type') !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
@@ -312,7 +425,7 @@ class testDashboardURLWidget extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage($data['expected'], null, $data['error']);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM widget ORDER BY widgetid'));
+			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();
 			$this->page->waitUntilReady();
@@ -320,7 +433,7 @@ class testDashboardURLWidget extends CWebTest {
 		}
 		else {
 			if ($update) {
-				self::$default_widget = $data['fields']['Name'];
+				self::$update_widget = $data['fields']['Name'];
 			}
 
 			COverlayDialogElement::ensureNotPresent();
@@ -340,8 +453,8 @@ class testDashboardURLWidget extends CWebTest {
 			$saved_form = $dashboard->getWidget($header)->edit();
 			$this->assertEquals($values, $saved_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
 
-			if (array_key_exists('show_header', $data['fields'])) {
-				$saved_form->checkValue(['id:show_header' => $data['fields']['show_headedr']]);
+			if (array_key_exists('Show header', $data['fields'])) {
+				$saved_form->checkValue(['Show header' => $data['fields']['Show header']]);
 			}
 
 			$saved_form->submit();
@@ -353,44 +466,40 @@ class testDashboardURLWidget extends CWebTest {
 
 			// Check new widget update interval.
 			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (No refresh)')
-				? '30 seconds'
-				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
+				? 'No refresh'
+				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'No refresh'));
 			$this->assertEquals($refresh, CDashboardElement::find()->one()->getWidget($header)->getRefreshInterval());
 		}
 	}
 
 	public static function getCancelData() {
 		return [
-			// Cancel creating widget with saving the dashboard.
+			// Cancel update widget.
 			[
 				[
-					'cancel_form' => true,
-					'create_widget' => true,
-					'save_dashboard' => true
-				]
-			],
-			// Cancel updating widget with saving the dashboard.
-			[
-				[
-					'cancel_form' => true,
-					'create_widget' => false,
-					'save_dashboard' => true
-				]
-			],
-			// Create widget without saving the dashboard.
-			[
-				[
-					'cancel_form' => false,
-					'create_widget' => true,
+					'update' => true,
+					'save_widget' => true,
 					'save_dashboard' => false
 				]
 			],
-			// Update widget without saving the dashboard.
 			[
 				[
-					'cancel_form' => false,
-					'create_widget' => false,
+					'update' => true,
+					'save_widget' => false,
+					'save_dashboard' => true
+				]
+			],
+			// Cancel create widget.
+			[
+				[
+					'save_widget' => true,
 					'save_dashboard' => false
+				]
+			],
+			[
+				[
+					'save_widget' => false,
+					'save_dashboard' => true
 				]
 			]
 		];
@@ -400,104 +509,79 @@ class testDashboardURLWidget extends CWebTest {
 	 * @dataProvider getCancelData
 	 */
 	public function testDashboardURLWidget_Cancel($data) {
-		$this->checkNoChanges($data['cancel_form'], $data['create_widget'], $data['save_dashboard']);
-	}
-
-	/**
-	 * Function for checking canceling form or submitting without any changes.
-	 *
-	 * @param boolean $cancel            true if cancel scenario, false if form is submitted
-	 * @param boolean $create            true if create scenario, false if update
-	 * @param boolean $save_dashboard    true if dashboard will be saved, false if not
-	 */
-	private function checkNoChanges($cancel = false, $create = false, $save_dashboard = true) {
 		$old_hash = CDBHelper::getHash($this->sql);
+		$new_name = 'Widget to be cancelled';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->edit();;
 		$old_widget_count = $dashboard->getWidgets()->count();
 
-		$form = $create
-			? $dashboard->edit()->addWidget()->asForm()
-			: $dashboard->getWidget(self::$default_widget)->edit();
-
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-
-		if (!$create) {
-			$values = $form->getFields()->asValues();
-		}
-
-		if ($form->getField('Type') !== 'URL') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
-		}
-
-		if ($cancel || !$save_dashboard) {
-			$form->fill([
-				'Name' => 'Widget to cancel',
-				'URL' => 'http://zabbix.com'
-			]);
-		}
-
-		if ($cancel) {
-			$dialog->query('button:Cancel')->one()->click();
+		// Start updating or creating a widget.
+		if (CTestArrayHelper::get($data, 'update', false)) {
+			$form = $dashboard->getWidget(self::$default_widget)->edit();
 		}
 		else {
+			$form = $dashboard->addWidget()->asForm();
+
+			if ($form->getField('Type') !== 'URL') {
+				$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
+			}
+		}
+		$form->fill([
+			'Name' => $new_name,
+			'Refresh interval' => '15 minutes',
+			'URL' => 'zabbix.php?action=dashboard.view'
+		]);
+
+		// Save or cancel widget.
+		if (CTestArrayHelper::get($data, 'save_widget', false)) {
 			$form->submit();
+
+			// Check that changes took place on the unsaved dashboard.
+			$this->assertTrue($dashboard->getWidget($new_name)->isVisible());
+		}
+		else {
+			$dialog = COverlayDialogElement::find()->one();
+			$dialog->query('button:Cancel')->one()->click();
+			$dialog->ensureNotPresent();
+
+			if (CTestArrayHelper::get($data, 'update', false)) {
+				foreach ([self::$default_widget => true, $new_name => false] as $name => $valid) {
+					$this->assertTrue($dashboard->getWidget($name, $valid)->isValid($valid));
+				}
+			}
+
+			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 		}
 
-		COverlayDialogElement::ensureNotPresent();
-
-		if (!$cancel) {
-			$dashboard->getWidget(!$save_dashboard ? 'Widget to cancel' : self::$default_widget)->waitUntilReady();
-		}
-
-		if ($save_dashboard) {
+		// Save or cancel dashboard update.
+		if (CTestArrayHelper::get($data, 'save_dashboard', false)) {
 			$dashboard->save();
-			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		}
 		else {
 			$dashboard->cancelEditing();
 		}
-
-		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
-
-		// Check that updated widget form values did not change in frontend.
-		if (!$create && !$save_dashboard) {
-			$this->assertEquals($values, $dashboard->getWidget(self::$default_widget)->edit()->getFields()->asValues());
-		}
-
-		// Check that DB hash is not changed.
+		// Confirm that no changes were made to the widget.
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
 	public function testDashboardURLWidget_Delete() {
-		$data = [
-			'Name' => 'Widget for delete',
-			'URL' => 'https://www.zabbix.com/'
-		];
-
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->edit()->addWidget()->waitUntilReady()->asForm();
-
-		if ($form->getField('Type') !== 'URL') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
-		}
-
-		$form->fill($data)->submit();
-		$dashboard->save();
-		$old_widget_count = $dashboard->getWidgets()->count();
-
-		$dashboard->edit();
-		$this->assertEquals(true, $dashboard->getWidget($data['Name'])->isEditable());
-		$dashboard->deleteWidget($data['Name']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$widget = $dashboard->getWidget(self::$delete_widget);
+		$dashboard->deleteWidget(self::$delete_widget);
+		$widget->waitUntilNotPresent();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		$this->assertEquals($old_widget_count - 1, $dashboard->getWidgets()->count());
-		$this->assertEquals('', CDBHelper::getRow('SELECT * from widget WHERE name = '.zbx_dbstr('Widget to delete')));
+
+		// Confirm that widget is not present on dashboard.
+		$this->assertFalse($dashboard->getWidget(self::$delete_widget, false)->isValid());
+		$widget_sql = 'SELECT NULL FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
+			' WHERE w.name='.zbx_dbstr(self::$delete_widget);
+		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
 	}
 
-	public static function getWidgetMacroData(){
+	public static function getWidgetMacroData() {
 		return [
 			[
 				[
@@ -506,7 +590,11 @@ class testDashboardURLWidget extends CWebTest {
 						'Dynamic item' => true,
 						'URL' => 'zabbix.php?action=host.edit&hostid={HOST.ID}'
 					],
-					'case' => 'Host ID'
+					'result' => [
+						'element' => 'id:visiblename',
+						'value' => 'ЗАББИКС Сервер',
+						'src' => 'zabbix.php?action=host.edit&hostid=10084'
+					]
 				]
 			],
 			[
@@ -518,7 +606,13 @@ class testDashboardURLWidget extends CWebTest {
 							'tags[0][operator]=0&tags[0][value]=&maintenance_status=1&filter_name=&filter_show_counter=0&'.
 							'filter_custom_time=0&sort=name&sortorder=ASC&show_suppressed=0&action=host.view'
 					],
-					'case' => 'Host Name'
+					'result' => [
+						'element' => 'id:name_#{uniqid}',
+						'value' => 'Dynamic widgets H1',
+						'src' => 'zabbix.php?name=Dynamic widgets H1&ip=&dns=&port=&status=-1&evaltype=0&tags[0][tag]=&'.
+							'tags[0][operator]=0&tags[0][value]=&maintenance_status=1&filter_name=&filter_show_counter=0&'.
+							'filter_custom_time=0&sort=name&sortorder=ASC&show_suppressed=0&action=host.view'
+					]
 				]
 			],
 			[
@@ -530,21 +624,31 @@ class testDashboardURLWidget extends CWebTest {
 							'tags[0][operator]=0&tags[0][value]=&maintenance_status=1&filter_name=&filter_show_counter=0&'.
 							'filter_custom_time=0&sort=name&sortorder=ASC&show_suppressed=0&action=host.view'
 					],
-					'case' => 'Host IP',
-					'IP' => '127.0.7.1'
+					'result' => [
+						'element' => 'id:ip_#{uniqid}',
+						'value' => '127.0.7.1',
+						'src' => 'zabbix.php?name=&ip=127.0.7.1&dns=&port=&status=-1&evaltype=0&tags[0][tag]=&'.
+							'tags[0][operator]=0&tags[0][value]=&maintenance_status=1&filter_name=&filter_show_counter=0&'.
+							'filter_custom_time=0&sort=name&sortorder=ASC&show_suppressed=0&action=host.view'
+					]
 				]
 			],
 			[
 				[
 					'fields' => [
-						'Name' => 'Not available host',
+						'Name' => 'Host for resolved DNS macro',
 						'Dynamic item' => true,
 						'URL' => 'zabbix.php?name=&ip=&dns={HOST.DNS}&port=&status=-1&evaltype=0&tags[0][tag]=&'.
 							'tags[0][operator]=0&tags[0][value]=&maintenance_status=1&filter_name=&filter_show_counter=0&'.
 							'filter_custom_time=0&sort=name&sortorder=ASC&show_suppressed=0&action=host.view'
 					],
-					'case' => 'Host DNS',
-					'DNS' => 'zabbixzabbixzabbix.com'
+					'result' => [
+						'element' => 'id:dns_#{uniqid}',
+						'value' => 'dnsmacro.com',
+						'src' => 'zabbix.php?name=&ip=&dns=dnsmacro.com&port=&status=-1&evaltype=0&'.
+							'tags[0][tag]=&tags[0][operator]=0&tags[0][value]=&maintenance_status=1&filter_name=&'.
+							'filter_show_counter=0&filter_custom_time=0&sort=name&sortorder=ASC&show_suppressed=0&action=host.view'
+					]
 				]
 			]
 		];
@@ -553,8 +657,8 @@ class testDashboardURLWidget extends CWebTest {
 	/**
 	 * @dataProvider getWidgetMacroData
 	 */
-	public function testDashboardURLWidget_CheckMacro($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+	public function testDashboardURLWidget_ResolvedMacro($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget(self::$default_widget)->edit();
 
@@ -566,151 +670,176 @@ class testDashboardURLWidget extends CWebTest {
 		$dashboard->save();
 		self::$default_widget = $data['fields']['Name'];
 
-		// Check widget empty content, because the host doesn't match dynamic option criteria.
-		$content = $dashboard->getWidget($data['fields']['Name'])->query('class:nothing-to-show')->one()->getText();
-		$this->assertEquals('No host selected.', $content);
-
 		// Select host.
-		$host = $this->query('class:multiselect-control')->asMultiselect()->one()->fill($data['fields']['Name']);
+		$host = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one()->fill($data['fields']['Name']);
 
 		// Check widget content when the host match dynamic option criteria.
 		$widget = $dashboard->getWidget($data['fields']['Name'])->getContent();
 		$this->page->switchTo($widget->query('id:iframe')->one());
+		$this->assertEquals($data['result']['value'], $this->query($data['result']['element'])->one()->getValue());
 
-		if (array_key_exists('case', $data)) {
-			switch ($data['case']) {
-				case 'Host ID':
-					$visible_name = $this->query('id:visiblename')->one()->getValue();
-					$this->assertEquals($data['fields']['Name'], $visible_name);
-					break;
+		// Check iframe source link
+		$this->page->switchTo();
+		$this->assertEquals($data['result']['src'], $widget->query('xpath://iframe')->one()->getAttribute('src'));
+		$host->clear();
+	}
 
-				case 'Host Name':
-					$visible_name = $this->query('id:name_#{uniqid}')->one()->getValue();
-					$this->assertEquals($data['fields']['Name'], $visible_name);
-					break;
+	/**
+	 * Modify iframe sandboxing and exception configuration. Parameters determine whether retrieved URL content
+	 * should be put into the sandbox or not.
+	 */
+	public function testDashboardURLWidget_IframeSandboxing() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$widget = $dashboard->getWidget(self::$frame_widget)->getContent();
 
-				case 'Host IP':
-					$visible_ip = $this->query('id:ip_#{uniqid}')->one()->getValue();
-					$this->assertEquals($data['IP'], $visible_ip);
-					break;
+		foreach ([true, false] as $state) {
+			$this->page->switchTo($widget->query('id:iframe')->one());
+			$this->query('button:Update')->one()->click();
 
-				case 'Host DNS':
-					$visible_dns = $this->query('id:dns_#{uniqid}')->one()->getValue();
-					$this->assertEquals($data['DNS'], $visible_dns);
-					break;
+			// Wait for message good when 'Use iframe sandboxing' is unchecked (false).
+			if (!$state) {
+				CMessageElement::find()->one()->waitUntilVisible();
+			}
+
+			// Verifies that widget can or can't be updated regarding 'Use iframe sandboxing' state.
+			$this->assertFalse($this->query('class:msg-good')->one(false)->isVisible($state));
+			$this->assertTrue($this->query('button:Update')->one(false)->isVisible($state));
+			$this->page->switchTo();
+
+			// Change 'Use iframe sandboxing' flag for false state scenario.
+			if ($state) {
+				$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+				$other_form = $this->query('name:otherForm')->waitUntilVisible()->asForm()->one();
+				$other_form->fill(['Use iframe sandboxing' => !$state]);
+				$other_form->submit();
+				$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 			}
 		}
 
-		$this->page->switchTo();
-		$host->clear();
-	}
-
-	public static function getWidgetFrameData(){
-		return [
-			[
-				[
-					'fields' => [
-						'Name' => 'ЗАББИКС Сервер',
-						'Dynamic item' => true,
-						'URL' => 'zabbix.php?action=host.edit&hostid={HOST.ID}'
-					],
-					'X Frame Options' => 'DENY', // SAMEORIGIN is default value
-					'Use iframe sandboxing' => true
-				]
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider getWidgetFrameData
-	 */
-	public function testDashboardURLWidget_CheckIframeSandboxing($data) {
-		$this->page->login()->open('zabbix.php?action=miscconfig.edit');
-
-		// Enable iframe sandboxing.
-		$other_form = $this->query('name:otherForm')->waitUntilReady()->asForm()->one();
-		$other_form->getField('id:iframe_sandboxing_enabled')->fill($data['Use iframe sandboxing']);
-		$other_form->submit();
-
-		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget(self::$default_widget)->edit();
-
-		if ($form->getField('Type') !== 'URL') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
-		}
-
-		$form->fill($data['fields'])->submit();
-		$dashboard->save();
-		self::$default_widget = $data['fields']['Name'];
-
-		$content = $dashboard->getWidget($data['fields']['Name'])->query('class:nothing-to-show')->one()->getText();
-		$this->assertEquals('No host selected.', $content);
-
-		// Select host.
-		$host = $this->query('class:multiselect-control')->asMultiselect()->one()->fill($data['fields']['Name']);
-
-		// Check widget content with enabled iframe sandboxing.
-		$widget = $dashboard->getWidget($data['fields']['Name'])->getContent();
-		$this->page->switchTo($widget->query('id:iframe')->one());
-		$this->query('xpath://button[@name="update"]')->one()->click();
-		$this->assertTrue($this->query('xpath://button[@name="update"]')->one()->isVisible());
-		$this->page->switchTo();
-
-		// Disable iframe sandboxing.
+		// Check that widget can be updated via iframe if necessary sandboxing exceptions are set.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
-		$other_form->getField('Use iframe sandboxing')->click();
+		$other_form->fill([
+			'Use iframe sandboxing' => true,
+			'Iframe sandboxing exceptions' => 'allow-scripts allow-same-origin allow-forms'
+		]);
 		$other_form->submit();
-
-		// Check widget content with disabled iframe sandboxing.
-		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$this->page->switchTo($widget->query('id:iframe')->one());
-		$this->query('xpath://button[@name="update"]')->one()->click()->waitUntilNotVisible();
+		$this->query('button:Update')->one()->click();
+		CMessageElement::find()->one()->waitUntilVisible();
 		$this->assertTrue($this->query('class:msg-good')->one()->isVisible());
+		$this->assertFalse($this->query('button:Update')->one(false)->isVisible());
 		$this->page->switchTo();
-		$host->clear();
 	}
 
 	/**
-	 * @dataProvider getWidgetFrameData
+	 * Modify value of 'HTTP X-Frame-options header' and check widget content with changed Xframe options.
+	 * TODO: new test cases should be added after ZBX-21973 fix.
 	 */
-	public function testDashboardURLWidget_CheckXframeOptions($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget(self::$default_widget)->edit();
-
-		if ($form->getField('Type') !== 'URL') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
-		}
-
-		$form->fill($data['fields'])->submit();
-		$dashboard->save();
-
-		$content = $dashboard->getWidget($data['fields']['Name'])->query('class:nothing-to-show')->one()->getText();
-		$this->assertEquals('No host selected.', $content);
-
-		// Select host.
-		$host = $this->query('class:multiselect-control')->asMultiselect()->one()->fill($data['fields']['Name']);
-
-		// Check widget content when the host match dynamic option criteria.
-		$widget = $dashboard->getWidget($data['fields']['Name'])->getContent();
-		$this->page->switchTo($widget->query('id:iframe')->one());
-		$visible_name = $this->query('id:visiblename')->one()->getValue();
-		$this->assertEquals($data['fields']['Name'], $visible_name);
-		$this->page->switchTo();
-
+	public function testDashboardURLWidget_XframeOptions() {
 		// Change Xframe options.
-		$this->page->open('zabbix.php?action=miscconfig.edit');
-		$other_form = $this->query('name:otherForm')->waitUntilReady()->asForm()->one();
-		$other_form->getField('id:x_frame_options')->fill($data['X Frame Options']);
+		$this->page->login()->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+		$other_form = $this->query('name:otherForm')->waitUntilVisible()->asForm()->one();
+		$other_form->fill(['X-Frame-Options HTTP header' => 'DENY']);
 		$other_form->submit();
 
 		// Check widget content with changed Xframe options.
-		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$widget = $dashboard->getWidget(self::$frame_widget)->getContent();
 		$this->page->switchTo($widget->query('id:iframe')->one());
 		$error_details = $this->query('id:sub-frame-error-details')->one()->getText();
 		$this->assertStringContainsString( 'refused to connect.', $error_details);
 		$this->page->switchTo();
-		$host->clear();
+
+		// Change XFrame option to the default value for avoiding possible issues with URI schemes.
+		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+		$other_form->fill(['X-Frame-Options HTTP header' => 'SAMEORIGIN']);
+		$other_form->submit();
+	}
+
+	/**
+	 * Modify the URI scheme validation rules and check the result for the URL type in Widget form.
+	 */
+	public function testDashboardURLWidget_ValidateUriSchemes() {
+		$invalid_schemes = ['dns://zabbix.com', 'message://zabbix.com'];
+		$default_valid_schemes = ['http://zabbix.com', 'https://zabbix.com', 'ftp://zabbix.com', 'file://zabbix.com',
+			'mailto://zabbix.com', 'tel://zabbix.com', 'ssh://zabbix.com'
+		];
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->getWidget(self::$default_widget)->edit();
+
+		// Check default URI scheme rules: http, https, ftp, file, mailto, tel, ssh.
+		$this->assertUriScheme($form, $default_valid_schemes);
+		$this->assertUriScheme($form, $invalid_schemes, TEST_BAD);
+
+		// Change valid URI schemes on "Other configuration parameters" page.
+		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+		$config_form = $this->query('name:otherForm')->asForm()->waitUntilVisible()->one();
+		$config_form->fill(['Valid URI schemes' => 'dns,message']);
+		$config_form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+
+		// Check that already created widget became invalid and returns errror regarding invalid parameter.
+		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$widget = $dashboard->getWidget('URL')->getContent();
+		$this->assertEquals('Invalid parameter "URL": unacceptable URL.', $widget->query('class:msg-details')->one()->getText());
+		$broken_form = $dashboard->getWidget('URL')->edit();
+
+		// Check that the widget URL field is empty.
+		$broken_form->checkValue(['URL' => '', 'Name' => self::$default_widget]);
+		COverlayDialogElement::find()->one()->close();
+		$this->query('button:Save changes')->one()->click();
+
+		// Check that Dashboard can't be saved and returns errror regarding invalid parameter.
+		CMessageElement::find()->one()->waitUntilVisible();
+		$this->assertMessage(TEST_BAD, null, 'Cannot save widget "'.self::$default_widget.'". Invalid parameter "URL": unacceptable URL.');
+		CMessageElement::find()->one()->close();
+
+		// Check updated valid URI schemes.
+		$dashboard->getWidget('URL')->edit();
+		$broken_form->fill(['URL' => 'any'])->submit();
+		$this->assertUriScheme($form, $default_valid_schemes, TEST_BAD);
+		$this->assertUriScheme($form, $invalid_schemes);
+
+		// Disable URI scheme validation.
+		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+		$config_form = $this->query('name:otherForm')->asForm()->waitUntilVisible()->one();
+		$config_form->fill(['Validate URI schemes' => false]);
+		$config_form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+
+		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$this->assertUriScheme($form, array_merge($default_valid_schemes, $invalid_schemes));
+	}
+
+	/**
+	 * Fill in the URL field to check the uri scheme validation rules.
+	 *
+	 * @param CFormElement $form	form element of widget
+	 * @param array $data			url field data
+	 * @param string $expected		expected result after widget form submit, TEST_GOOD or TEST_BAD
+	 */
+	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
+		$dashboard = CDashboardElement::find()->one();
+		foreach ($data as $scheme) {
+			$dashboard->getWidget(self::$default_widget)->edit();
+			$form->fill(['URL' => $scheme]);
+			$form->submit();
+
+			if ($expected === TEST_GOOD) {
+				$dashboard->save();
+				$this->page->waitUntilReady();
+				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+			}
+			else {
+				$this->assertMessage(TEST_BAD, null, 'Invalid parameter "URL": unacceptable URL.');
+				CMessageElement::find()->one()->close();
+				COverlayDialogElement::find()->one()->close();
+			}
+		}
 	}
 }
