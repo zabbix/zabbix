@@ -419,7 +419,7 @@ class testDashboardURLWidget extends CWebTest {
 		}
 
 		$form->fill($data['fields']);
-		$values = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
+		$values = $form->getValues();
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -451,7 +451,7 @@ class testDashboardURLWidget extends CWebTest {
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $dashboard->getWidget($header)->edit();
-			$this->assertEquals($values, $saved_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
+			$this->assertEquals($values, $saved_form->getValues());
 
 			if (array_key_exists('Show header', $data['fields'])) {
 				$saved_form->checkValue(['Show header' => $data['fields']['Show header']]);
