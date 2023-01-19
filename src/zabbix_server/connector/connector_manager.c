@@ -730,6 +730,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 		}
 	}
 
+	zbx_vector_connector_object_destroy(&connector_objects);
 	connector_destroy_manager(&manager);
 	zbx_ipc_service_close(&service);
 
