@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Setup
 
-This template is primarily intended to be used in conjuction with the `Control-M enterprise manager by HTTP` template for the creation of host prototypes. 
+This template is primarily intended for using in conjuction with the `Control-M enterprise manager by HTTP` template in order to create host prototypes. 
 
 It monitors: 
 * server statistics;
@@ -38,12 +38,7 @@ To access the `{$API.TOKEN}` macro, use one of the following interfaces:
 `{$API.URI.ENDPOINT}` is the Control-M Automation API endpoint for the API requests, including your server IP, or DNS address, the Automation API port and path.
 For example, `https://monitored.controlm.instance:8443/automation-api`.
 
-`{$SERVER.NAME}` is the name of the Control-M server to be monitored.
-
-
-## Links
-
-- Forum - https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+`{$SERVER.NAME}` - is the name of the Control-M server to be monitored.
 
 ## Macros used
 
@@ -56,7 +51,7 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Control-M: Get Control-M server stats|Gets the statistics of the server `{#SERVER.NAME}`.|Http Agent|controlm.server.stats<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Error -> Could Not Get Server Stats.</li></ul>
+|Control-M: Get Control-M server stats|Gets the statistics of the server named `{#SERVER.NAME}`.|Http Agent|controlm.server.stats<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Error -> Could Not Get Server Stats.</li></ul>
 |Control-M: Get jobs|Gets the status of jobs.|Http Agent|controlm.jobs
 |Control-M: Get agents|Gets agents for the server.|Http Agent|controlm.agents
 |Control-M: Jobs statistics|Gets the statistics of jobs.|Dependent|controlm.jobs.statistics<p>**Preprocessing**</p><ul><li>Jsonpath: `$.['returned', 'total']`</li></ul>
@@ -64,7 +59,7 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 |Control-M: Jobs total|Gets the count of total jobs.|Dependent|controlm.jobs.statistics.total<p>**Preprocessing**</p><ul><li>Jsonpath: `$.[1]`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 |Control-M: Server state|Gets the metric of the server state.|Dependent|server.state<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Error -> Could Not Get Server State.</li><li>Javascript: `The text is too long. Please see the template.`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 |Control-M: Server message|Gets the metric of the server message.|Dependent|server.message<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Error -> Could Not Get Server Message.</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
-|Control-M: Server version|Get the metric of server version.|Dependent|server.version<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Error -> Could Not Get Server Version.</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
+|Control-M: Server version|Gets the metric of the server version.|Dependent|server.version<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Error -> Could Not Get Server Version.</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
@@ -101,18 +96,23 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Agent [{#AGENT.NAME}]: stats|Gets the statistics of the agent.|Dependent|agent.stats['{#AGENT.NAME}']<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li></ul>
-|Agent [{#AGENT.NAME}]: status|Gets the status of the agent.|Dependent|agent.status['{#AGENT.NAME}']<p>**Preprocessing**</p><ul><li>Jsonpath: `$.status`</li><li>Javascript: `The text is too long. Please see the template.`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
-|Agent [{#AGENT.NAME}]: version|Gets the version number of the agent.|Dependent|agent.version['{#AGENT.NAME}']<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Value -> Unknown</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
+|Agent [{#AGENT.NAME}]: stats|Gets the statistics of an agent.|Dependent|agent.stats['{#AGENT.NAME}']<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li></ul>
+|Agent [{#AGENT.NAME}]: status|Gets the status of an agent.|Dependent|agent.status['{#AGENT.NAME}']<p>**Preprocessing**</p><ul><li>Jsonpath: `$.status`</li><li>Javascript: `The text is too long. Please see the template.`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
+|Agent [{#AGENT.NAME}]: version|Gets the version number of an agent.|Dependent|agent.version['{#AGENT.NAME}']<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Value -> Unknown</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 ### Triggers for Agent discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Agent [{#AGENT.NAME}]: status [{ITEM.VALUE}]|-|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=1` or `last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=10`.|Average| - 
-|Agent [{#AGENT.NAME}}: status disabled|-|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=2` or `last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=3`.|Info| - 
-|Agent [{#AGENT.NAME}]: version has changed|-|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#1)`<>`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#2)`.|Info| - 
-|Agent [{#AGENT.NAME}]: unknown version|-|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#1)="Unknown"`.|Warning| - 
+|Agent [{#AGENT.NAME}]: status [{ITEM.VALUE}]|-|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=1` or `last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=10`|Average| - 
+|Agent [{#AGENT.NAME}}: status disabled|-|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=2` or `last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=3`|Info| - 
+|Agent [{#AGENT.NAME}]: version has changed|-|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#1)`<>`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#2)`|Info| - 
+|Agent [{#AGENT.NAME}]: unknown version|-|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#1)="Unknown"`|Warning| - 
 
+## Feedback
+
+Please report any issues with the template at `https://support.zabbix.com`.
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+ 
 # Control-M enterprise manager by HTTP
 
 ## Overview
@@ -121,7 +121,7 @@ For Zabbix version: 6.0 and higher.
 
 This template is designed to get metrics from the Control-M Enterprise Manager using the Control-M Automation API with HTTP agent.
 
-This template monitors active SLA services, discovers Control-M servers using Low Level Discovery and also creates host prototypes for them in conjunction with the `Control-M server by HTTP` template.
+This template monitors active Service Level Agreement (SLA) services, discovers Control-M servers using Low Level Discovery and also creates host prototypes for them in conjunction with the `Control-M server by HTTP` template.
 
 To use this template, macros `{$API.TOKEN}` and `{$API.URI.ENDPOINT}` need to be set.  
 
@@ -150,26 +150,25 @@ To access the `{$API.TOKEN}` macro, use one of the following interfaces:
 
 > [Control-M command line interface tool CTM](https://docs.bmc.com/docs/saas-api/authentication-service-941879068.html).
 
-`{$API.URI.ENDPOINT}` is the Control-M Automation API endpoint for the API requests, including your server IP, or DNS address, Automation API port and path.
+`{$API.URI.ENDPOINT}` - is the Control-M Automation API endpoint for the API requests, including your server IP, or DNS address, Automation API port and path.
+
 For example, `https://monitored.controlm.instance:8443/automation-api`.
 
-
-## Links
-
-- Forum - https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
-## Macros used
+### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
 |{$API.URI.ENDPOINT} |<p>The API endpoint is a URL - for example, `https://monitored.controlm.instance:8443/automation-api`.</p>| <set the api uri endpoint here>|
 |{$API.TOKEN} |<p>A token to use for API connections.</p>| <set the token here>|
-## Items
+  
+### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Control-M: Get Control-M servers|Gets servers.|Http Agent|controlm.servers
-|Control-M: Get SLA services|Gets all the Service Level Agreement (SLA) active services.|Http Agent|controlm.services
-## Triggers
+|Control-M: Get SLA services|Gets all the SLA active services.|Http Agent|controlm.services|
+
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
@@ -200,6 +199,11 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|-|`last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status,#1)=0` or `last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status,#1)=10`.|Average| - 
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|-|`last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status,#1)=3`.|Warning| - 
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs in 'error' state|-|`last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'error',#1)>0`.|Average| - 
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|-|`last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status,#1)=0` or `last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status,#1)=10`|Average| - 
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|-|`last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status,#1)=3`|Warning| - 
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs in 'error' state|-|`last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'error',#1)>0`|Average| - 
+
+## Feedback
+
+Please report any issues with the template at `https://support.zabbix.com`.
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
