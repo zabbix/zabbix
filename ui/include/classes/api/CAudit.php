@@ -250,6 +250,7 @@ class CAudit {
 			'paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']
 		],
 		self::RESOURCE_CONNECTOR => [
+			['paths' => ['connector.token']],
 			[
 				'paths' => ['connector.password'],
 				'conditions' => [
