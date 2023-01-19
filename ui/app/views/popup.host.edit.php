@@ -100,8 +100,7 @@ $output = [
 			'form_name' => $data['form_name'],
 			'host_interfaces' => $data['host']['interfaces'],
 			'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
-			'warning' => $data['warning'],
-			'csrf_tokens' => $data['csrf_tokens']
+			'warning' => $data['warning']
 		]).');',
 	'buttons' => $buttons
 ];

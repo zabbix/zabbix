@@ -67,6 +67,7 @@ window.hostgroup_edit_popup = new class {
 	delete() {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'hostgroup.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('hostgroup') ?>');
 
 		this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

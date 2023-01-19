@@ -67,7 +67,8 @@ window.templategroup_edit_popup = new class {
 
 	delete() {
 		const curl = new Curl('zabbix.php');
-		curl.setAction('templategroup.delete', this.csrf_tokens['templategroup.delete']);
+		curl.setArgument('action', 'templategroup.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('templategroup') ?>');
 
 		this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

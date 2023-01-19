@@ -148,9 +148,8 @@ function itemGetValueTest(overlay) {
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
 		url = new Curl('zabbix.php');
 
-	let csrf_tokens = <?= json_encode($data['csrf_tokens']) ?>;
-
-	url.setAction('popup.itemtest.getvalue', csrf_tokens['popup.itemtest.getvalue'])
+	url.setArgument('action', 'popup.itemtest.getvalue');
+	url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('itemtest') ?>');
 
 	post_data = jQuery.extend(post_data, {
 		interface: {
@@ -234,7 +233,8 @@ function itemCompleteTest(overlay) {
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
 		url = new Curl('zabbix.php');
 
-	url.setAction('popup.itemtest.send', <?= json_encode($data['csrf_tokens']['popup.itemtest.send']) ?>);
+	url.setArgument('action', 'popup.itemtest.send');
+	url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('itemtest') ?>');
 
 	post_data = jQuery.extend(post_data, {
 		get_value: form_data['get_value'] || 0,

@@ -22,7 +22,7 @@
 
 window.action_edit_popup = new class {
 
-	init({condition_operators, condition_types, conditions, actionid, eventsource, csrf_tokens}) {
+	init({condition_operators, condition_types, conditions, actionid, eventsource}) {
 		this.overlay = overlays_stack.getById('action-edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -30,7 +30,6 @@ window.action_edit_popup = new class {
 		this.condition_types = condition_types;
 		this.actionid = actionid;
 		this.eventsource = eventsource;
-		this.csrf_tokens = csrf_tokens;
 
 		this._initActionButtons();
 		this._processTypeOfCalculation();
