@@ -1,5 +1,3 @@
-# ENUM_CHECK(ENUM,INCLUDE)
-#
 # Zabbix
 # Copyright (C) 2001-2022 Zabbix SIA
 #
@@ -16,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# ENUM_CHECK(ENUM,INCLUDE)
 #
 #   Checks if the specified enumerator (or macro) constant exists
 #   in a header and defines C macro with prefix HAVE_.
