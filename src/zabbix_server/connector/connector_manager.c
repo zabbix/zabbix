@@ -667,13 +667,13 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 		if (NULL != message)
 		{
-			zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
-					&manager.config_revision, &manager.connector_revision, &manager.global_revision,
-					(zbx_clean_func_t)data_point_link_clean);
-
 			switch (message->code)
 			{
 				case ZBX_IPC_CONNECTOR_REQUEST:
+					zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
+							&manager.config_revision, &manager.connector_revision,
+							&manager.global_revision,
+							(zbx_clean_func_t)data_point_link_clean);
 					zbx_connector_deserialize_object(message->data, message->size,
 							&connector_objects);
 					connector_enqueue(&manager, &connector_objects);
