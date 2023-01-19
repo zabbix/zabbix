@@ -25,13 +25,13 @@
  */
 
 $form = (new CForm())
-	->setName('maintenance.edit')
 	->setId('maintenance-form')
+	->setName('maintenance_form')
 	->addVar('maintenanceid', $data['maintenanceid'] ?: 0)
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $maintenance_period_table = (new CTable())
-	->setId('maintenancePeriodTable')
+	->setId('maintenance-period-table')
 	->addStyle('width: 100%;')
 	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')])
 	->setAriaRequired();
@@ -59,10 +59,12 @@ foreach (array_values($data['timeperiods']) as $index => $timeperiod) {
 				(new CSimpleButton(_('Edit')))
 					->setAttribute('data-action', 'edit')
 					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('js-period-edit')
 					->setEnabled($data['allowed_edit']),
 				(new CSimpleButton(_('Remove')))
 					->setAttribute('data-action', 'remove')
 					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('js-period-remove')
 					->setEnabled($data['allowed_edit'])
 			])
 		]))->addClass(ZBX_STYLE_NOWRAP)
@@ -82,203 +84,175 @@ $maintenance_period_table->addItem(
 		)
 );
 
-$tags = $data['tags'];
+$tags_table_enabled = $data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : $data['allowed_edit'];
 
-if (!$tags) {
-	$tags = [['tag' => '', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => '']];
-}
-
-$tag_table = (new CTable())
-	->setId('tagsTable')
-	->setAttribute('style', 'width: 100%;')
-	->addRow(
-		(new CCol(
-			(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
-				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
-				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
-				->setModern(true)
-				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : $data['allowed_edit'])
-		))->setColSpan(4)
-	);
-
-$i = 0;
-foreach ($tags as $tag) {
-	if ($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA) {
-		$tag_table->addRow([
-			(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
-				->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-				->setEnabled(false),
-			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
-				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
-				->setModern(true)
-				->setEnabled(false),
-			(new CTextBox('tags['.$i.'][value]', $tag['value']))
-				->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
-				->setEnabled(false),
-			(new CCol(
-				(new CButton('tags['.$i.'][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-					->setEnabled(false)
-			))->addClass(ZBX_STYLE_NOWRAP)
-		], 'form_row');
-	}
-	else {
-		$tag_table->addRow([
+$form->addItem(
+	(new CFormGrid())
+		->addItem([
+			(new CLabel(_('Name'), 'mname'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
-					->setAttribute('placeholder', _('tag'))
-					->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-					->setReadonly(!$data['allowed_edit'])
-			),
+				(new CTextBox('mname', $data['mname'] ?: ''))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired()
+					->setEnabled($data['allowed_edit'])
+					->setAttribute('autofocus', 'autofocus')
+					->setAttribute('maxlength', DB::getFieldLength('maintenances', 'name'))
+			)
+		])
+		->addItem([
+			(new CLabel(_('Maintenance type'), 'maintenance_type')),
 			new CFormField(
-				(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
-					->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
-					->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
+				(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))
+					->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
+					->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
 					->setModern(true)
 					->setEnabled($data['allowed_edit'])
-			),
+			)
+		])
+		->addItem([(new CLabel(_('Active since'), 'active_since'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('tags['.$i.'][value]', $tag['value']))
-					->setAttribute('placeholder', _('value'))
-					->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
+				(new CDateSelector('active_since', $data['active_since']))
+					->setDateFormat(ZBX_DATE_TIME)
+					->setPlaceholder(_('YYYY-MM-DD hh:mm'))
+					->setAriaRequired()
 					->setReadonly(!$data['allowed_edit'])
-			),
-			(new CCol(
-				(new CButton('tags['.$i.'][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-					->setEnabled($data['allowed_edit'])
-			))->addClass(ZBX_STYLE_NOWRAP)
-		], 'form_row');
-	}
-
-	$i++;
-}
-
-$tag_table->addRow(
-	(new CCol(
-		(new CButton('tags_add', _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-add')
-			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : $data['allowed_edit'])
-	))->setColSpan(3)
-);
-
-$maintenance_tab = (new CFormGrid())
-	->addItem([
-		(new CLabel(_('Name'), 'mname'))->setAsteriskMark(),
-		new CFormField(
-			(new CTextBox('mname', $data['mname'] ?: ''))
+			)
+		])
+		->addItem([(new CLabel(_('Active till'), 'active_till'))->setAsteriskMark(),
+			new CFormField(
+				(new CDateSelector('active_till', $data['active_till']))
+					->setDateFormat(ZBX_DATE_TIME)
+					->setPlaceholder(_('YYYY-MM-DD hh:mm'))
+					->setAriaRequired()
+					->setReadonly(!$data['allowed_edit'])
+			)
+		])
+		->addItem([
+			(new CLabel(_('Periods')))->setAsteriskMark(),
+			(new CFormField($maintenance_period_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		])
+		->addItem([
+			new CLabel(_('Host groups'), 'groupids__ms'),
+			new CFormField(
+				(new CMultiSelect([
+					'name' => 'groupids[]',
+					'object_name' => 'hostGroup',
+					'data' => $data['groups_ms'],
+					'disabled' => !$data['allowed_edit'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'host_groups',
+							'srcfld1' => 'groupid',
+							'dstfrm' => $form->getName(),
+							'dstfld1' => 'groupids_',
+							'editable' => true
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			)
+		])
+		->addItem([
+			new CLabel(_('Hosts'), 'hostids__ms'),
+			new CFormField(
+				(new CMultiSelect([
+					'name' => 'hostids[]',
+					'object_name' => 'hosts',
+					'data' => $data['hosts_ms'],
+					'disabled' => !$data['allowed_edit'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'hosts',
+							'srcfld1' => 'hostid',
+							'dstfrm' => $form->getName(),
+							'dstfld1' => 'hostids_',
+							'editable' => true
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			)
+		])
+		->addItem(
+			new CFormField((new CLabel(_('At least one host group or host must be selected.')))->setAsteriskMark())
+		)
+		->addItem([
+			new CLabel(_('Tags')),
+			new CFormField(
+				(new CDiv([
+					(new CTable())
+						->setId('maintenance-tags')
+						->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+						->setHeader(
+							(new CCol(
+								(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
+									->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
+									->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
+									->setModern(true)
+									->setEnabled($tags_table_enabled)
+							))->setColSpan(4)
+						)
+						->setFooter(
+							(new CCol(
+								(new CButton('tags_add', _('Add')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass('element-table-add')
+									->setEnabled($tags_table_enabled)
+							))->setColSpan(4)
+						),
+					(new CTemplateTag('maintenance-tag-row-tmpl'))
+						->addItem(
+							(new CRow([
+								(new CTextBox('maintenance_tags[#{rowNum}][tag]', '#{tag}', false,
+									DB::getFieldLength('maintenance_tag', 'tag')
+								))
+									->setAttribute('placeholder', $tags_table_enabled ? _('tag') : '')
+									->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+									->setReadonly(!$tags_table_enabled),
+								(new CRadioButtonList('maintenance_tags[#{rowNum}][operator]',
+										MAINTENANCE_TAG_OPERATOR_LIKE))
+									->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
+									->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
+									->setModern(true)
+									->setEnabled($tags_table_enabled),
+								(new CTextBox('maintenance_tags[#{rowNum}][value]', '#{value}', false,
+									DB::getFieldLength('maintenance_tag', 'value')
+								))
+									->setAttribute('placeholder', $tags_table_enabled ? _('value') : '')
+									->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+									->setReadonly(!$tags_table_enabled),
+								(new CButton('maintenance_tags[#{rowNum}][remove]', _('Remove')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass('element-table-remove')
+									->setEnabled($tags_table_enabled),
+							]))->addClass('form_row')
+						)
+				]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			)
+		])
+		->addItem([
+			new CLabel(_('Description')),
+			new CFormField((new CTextArea('description', $data['description']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired()
-				->setEnabled($data['allowed_edit'])
-				->setAttribute('autofocus', 'autofocus')
-				->setAttribute('maxlength', DB::getFieldLength('maintenances', 'name'))
-		)
-	])
-	->addItem([
-		(new CLabel(_('Maintenance type'), 'maintenance_type')),
-		new CFormField(
-			(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))
-				->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
-				->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
-				->setModern(true)
-				->setEnabled($data['allowed_edit'])
-		)
-	])
-	->addItem([(new CLabel(_('Active since'), 'active_since'))->setAsteriskMark(),
-		new CFormField(
-			(new CDateSelector('active_since', $data['active_since']))
-				->setDateFormat(ZBX_DATE_TIME)
-				->setPlaceholder(_('YYYY-MM-DD hh:mm'))
-				->setAriaRequired()
 				->setReadonly(!$data['allowed_edit'])
-		)
-	])
-	->addItem([(new CLabel(_('Active till'), 'active_till'))->setAsteriskMark(),
-		new CFormField(
-			(new CDateSelector('active_till', $data['active_till']))
-				->setDateFormat(ZBX_DATE_TIME)
-				->setPlaceholder(_('YYYY-MM-DD hh:mm'))
-				->setAriaRequired()
-				->setReadonly(!$data['allowed_edit'])
-		)
-	])
-	->addItem([
-		new CLabel(_('Periods')),
-		(new CFormField($maintenance_period_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	])
-	->addItem([
-		new CLabel(_('Host groups'), 'groupids__ms'),
-		new CFormField(
-			(new CMultiSelect([
-				'name' => 'groupids[]',
-				'object_name' => 'hostGroup',
-				'data' => $data['groups_ms'],
-				'disabled' => !$data['allowed_edit'],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'host_groups',
-						'srcfld1' => 'groupid',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => 'groupids_',
-						'editable' => true
-					]
-				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-	])
-	->addItem([
-		new CLabel(_('Hosts'), 'hostids__ms'),
-		new CFormField(
-			(new CMultiSelect([
-				'name' => 'hostids[]',
-				'object_name' => 'hosts',
-				'data' => $data['hosts_ms'],
-				'disabled' => !$data['allowed_edit'],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'hosts',
-						'srcfld1' => 'hostid',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => 'hostids_',
-						'editable' => true
-					]
-				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-	])
-	->addItem(
-		new CFormField((new CLabel(_('At least one host group or host must be selected.')))->setAsteriskMark())
-	)
-	->addItem([
-		new CLabel(_('Tags')),
-		(new CFormField($tag_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	])
-	->addItem([
-		new CLabel(_('Description')),
-		new CFormField((new CTextArea('description', $data['description']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setReadonly(!$data['allowed_edit'])
-		)
-	]);
+			)
+		])
+	);
 
-$form
-	->addItem($maintenance_tab)
-	->addItem(
-		(new CScriptTag('maintenance_edit.init();'))->setOnDocumentReady()
+$form->addItem(
+		(new CScriptTag('
+			maintenance_edit.init('.json_encode([
+				'maintenanceid' => $data['maintenanceid'],
+				'maintenance_tags' => $data['tags']
+			]).');
+		'))->setOnDocumentReady()
 	);
 
 if ($data['maintenanceid'] !== 0) {
 	$buttons = [
 		[
 			'title' => _('Update'),
+			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'maintenance_edit.submit();'

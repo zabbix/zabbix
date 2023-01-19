@@ -21,6 +21,11 @@
 
 class CControllerMaintenanceEdit extends CController {
 
+	/**
+	 * @var array
+	 */
+	private $maintenance;
+
 	protected function checkInput(): bool {
 		$fields = [
 			'maintenanceid' =>	'db maintenances.maintenanceid'
@@ -29,21 +34,28 @@ class CControllerMaintenanceEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE)) {
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)) {
 			return false;
 		}
 
-		$this->maintenance = null;
-
 		if ($this->hasInput('maintenanceid')) {
-			$db_maintenances = API::Maintenance()->get([
+			$this->maintenance = API::Maintenance()->get([
 				'output' => API_OUTPUT_EXTEND,
 				'selectTimeperiods' => API_OUTPUT_EXTEND,
 				'selectTags' => API_OUTPUT_EXTEND,
@@ -51,33 +63,39 @@ class CControllerMaintenanceEdit extends CController {
 				'maintenanceids' => $this->getInput('maintenanceid')
 			]);
 
-			if (!$db_maintenances) {
+			if (!$this->maintenance) {
 				return false;
 			}
 
-			$db_maintenance = reset($db_maintenances);
-			$this->maintenance = $db_maintenance;
+			$this->maintenance = $this->maintenance[0];
 		}
 
 		return true;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected function doAction(): void {
+		$empty_tags = [['tag' => '', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => '']];
+
 		if ($this->maintenance !== null) {
+			CArrayHelper::sort($this->maintenance['tags'], ['tag', 'value', 'operator']);
+			$this->maintenance['tags'] = array_values($this->maintenance['tags']);
+
 			$data = [
 				'maintenanceid' => $this->maintenance['maintenanceid'],
 				'mname' => $this->maintenance['name'],
 				'maintenance_type' => $this->maintenance['maintenance_type'],
 				'active_since' => date(ZBX_DATE_TIME, $this->maintenance['active_since']),
 				'active_till' => date(ZBX_DATE_TIME, $this->maintenance['active_till']),
-				'description' => $this->maintenance['description'],
 				'timeperiods' => $this->maintenance['timeperiods'],
 				'tags_evaltype' => $this->maintenance['tags_evaltype'],
-				'tags' => $this->maintenance['tags']
+				'tags' => $this->maintenance['tags'] ?: $empty_tags,
+				'description' => $this->maintenance['description']
 			];
 
 			CArrayHelper::sort($data['timeperiods'], ['timeperiod_type', 'start_date']);
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
 			foreach ($data['timeperiods'] as &$timeperiod) {
 				$timeperiod['start_date'] = date(ZBX_DATE_TIME, $timeperiod['start_date']);
@@ -103,10 +121,10 @@ class CControllerMaintenanceEdit extends CController {
 				'maintenance_type' => $this->getInput('maintenance_type', 0),
 				'active_since' => $this->getInput('active_since', date(ZBX_DATE_TIME, strtotime('today'))),
 				'active_till' => $this->getInput('active_till', date(ZBX_DATE_TIME, strtotime('tomorrow'))),
-				'description' => $this->getInput('description', ''),
 				'timeperiods' => $this->getInput('timeperiods', []),
 				'tags_evaltype' => $this->getInput('tags_evaltype', MAINTENANCE_TAG_EVAL_TYPE_AND_OR),
-				'tags' => $this->getInput('tags', [])
+				'tags' => $empty_tags,
+				'description' => $this->getInput('description', '')
 			];
 
 			$hostids = $this->getInput('hostids', []);
@@ -139,7 +157,6 @@ class CControllerMaintenanceEdit extends CController {
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }

@@ -47,7 +47,7 @@ class CControllerMaintenanceList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE);
 	}
 
 	protected function doAction(): void {
