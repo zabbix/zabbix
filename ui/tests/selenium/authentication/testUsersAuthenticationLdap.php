@@ -233,7 +233,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 		}
 
 		$values = ($field === 'Media type mapping')
-			? ['Name' => '', 'id:mediatypeid' => 'Brevis.one', 'Attribute' => '']
+			? ['Name' => '', 'Media type' => 'Brevis.one', 'Attribute' => '']
 			: ['LDAP group pattern' => '', 'User groups' => '', 'User role' => ''];
 
 		$mapping_form->checkValue($values);
@@ -468,7 +468,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					'Media type mapping' => [
 						[
 							'Name' => 'Email',
-							'id:mediatypeid' => 'Email',
+							'Media type' => 'Email',
 							'Attribute' => 'mail'
 						]
 					],
@@ -788,12 +788,12 @@ class testUsersAuthenticationLdap extends CWebTest {
 							'Media type mapping' => [
 								[
 									'Name' => 'Test Discord mapping',
-									'id:mediatypeid' => 'Discord',
+									'Media type' => 'Discord',
 									'Attribute' => 'test discord'
 								],
 								[
 									'Name' => 'Test iLert mapping',
-									'id:mediatypeid' => 'iLert',
+									'Media type' => 'iLert',
 									'Attribute' => 'test iLert'
 								]
 							]
