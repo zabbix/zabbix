@@ -28,7 +28,7 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
-	const char	*port, *encoding, *dns, *options;
+	const char	*port, *dns;
 
 	zbx_init_agent_request(&request);
 
@@ -76,10 +76,9 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 	else
 		item->interface.port = ZBX_DEFAULT_SSH_PORT;
 
-	encoding = get_rparam(&request, 3);
-	options = get_rparam(&request, 4);
+	const char	*encoding = get_rparam(&request, 3), *ssh_options = get_rparam(&request, 4);
 
-	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding), ZBX_NULL2EMPTY_STR(options));
+	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding), ZBX_NULL2EMPTY_STR(ssh_options));
 out:
 	zbx_free_agent_request(&request);
 

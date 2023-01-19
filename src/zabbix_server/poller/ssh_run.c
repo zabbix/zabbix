@@ -36,16 +36,16 @@ extern char	*CONFIG_SSH_KEY_LOCATION;
 static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const char *key_str, const char *value,
 		char **err_msg)
 {
-	int ret = 0;
+	int ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(\"%s\", \"%s\")", __func__, key_str, value);
 
 	if (0 > ssh_options_set(session, type, value))
 	{
-		*err_msg = zbx_dsprintf(NULL, "Error while setting %s SSH option: %s.", key_str,
+		*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option %s: %s.", key_str,
 				ssh_get_error(session));
 
-		ret = -1;
+		ret = FAIL;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, ret);
@@ -55,61 +55,80 @@ static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const c
 
 static int	ssh_parse_options(ssh_session session, const char *options, char **err_msg)
 {
-	int ret = SUCCEED;
-	char opt_copy[1024] = {0};
+	int	ret = SUCCEED;
+	char	opt_copy[1024] = {0};
 	char	*line, *rest = opt_copy;
 
 	zbx_strscpy(opt_copy, options);
 
-	while ((line = strtok_r(rest, ";", &rest)))
+	while (NULL != (line = strtok_r(rest, ";", &rest)))
 	{
-		char *eq_str = strchr(line, '=');
+		char	*eq_str = strchr(line, '=');
 
 		if (NULL != eq_str)
-			*eq_str = '\0', eq_str++;
+		{
+			*eq_str = '\0';
+			eq_str++;
+		}
+
 		eq_str = ZBX_NULL2EMPTY_STR(eq_str);
 
 #ifdef HAVE_SSH_OPTIONS_KEY_EXCHANGE
 		if (0 == strncmp(line, KEY_EXCHANGE_STR, ZBX_CONST_STRLEN(KEY_EXCHANGE_STR)))
 		{
-			if (0 != (ret = ssh_set_options(session, SSH_OPTIONS_KEY_EXCHANGE, KEY_EXCHANGE_STR, eq_str,
-					err_msg)))
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_KEY_EXCHANGE, KEY_EXCHANGE_STR,
+					eq_str, err_msg)))
+			{
 				break;
+			}
 			continue;
 		}
 #endif
 #ifdef HAVE_SSH_OPTIONS_HOSTKEYS
 		if (0 == strncmp(line, KEY_HOSTKEY_STR, ZBX_CONST_STRLEN(KEY_HOSTKEY_STR)))
 		{
-			if (0 != (ret = ssh_set_options(session, SSH_OPTIONS_HOSTKEYS, KEY_HOSTKEY_STR, eq_str,
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_HOSTKEYS, KEY_HOSTKEY_STR, eq_str,
 					err_msg)))
+			{
 				break;
+			}
 			continue;
 		}
 #endif
 #if defined(HAVE_SSH_OPTIONS_CIPHERS_C_S) && defined(HAVE_SSH_OPTIONS_CIPHERS_S_C)
 		if (0 == strncmp(line, KEY_CIPHERS_STR, ZBX_CONST_STRLEN(KEY_CIPHERS_STR)))
 		{
-			if (0 != (ret = ssh_set_options(session, SSH_OPTIONS_CIPHERS_C_S, KEY_CIPHERS_STR, eq_str,
-					err_msg)))
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_CIPHERS_C_S, KEY_CIPHERS_STR,
+					eq_str, err_msg)))
+			{
 				break;
-			if (0 != (ret = ssh_set_options(session, SSH_OPTIONS_CIPHERS_S_C, KEY_CIPHERS_STR, eq_str,
-					err_msg)))
+			}
+
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_CIPHERS_S_C, KEY_CIPHERS_STR,
+					eq_str, err_msg)))
+			{
 				break;
+			}
 			continue;
 		}
 #endif
 #if defined(HAVE_SSH_OPTIONS_HMAC_C_S) && defined(HAVE_SSH_OPTIONS_HMAC_S_C)
 		if (0 == strncmp(line, KEY_MACS_STR, ZBX_CONST_STRLEN(KEY_MACS_STR)))
 		{
-			if (0 != (ret = ssh_set_options(session, SSH_OPTIONS_HMAC_C_S, KEY_MACS_STR, eq_str, err_msg)))
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_HMAC_C_S, KEY_MACS_STR, eq_str,
+					err_msg)))
+			{
 				break;
-			if (0 != (ret = ssh_set_options(session, SSH_OPTIONS_HMAC_S_C, KEY_MACS_STR, eq_str, err_msg)))
+			}
+
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_HMAC_S_C, KEY_MACS_STR, eq_str,
+					err_msg)))
+			{
 				break;
+			}
 			continue;
 		}
 #endif
-
 		*err_msg = zbx_dsprintf(NULL, "SSH option %s is not supported.", line);
 		ret = FAIL;
 		break;

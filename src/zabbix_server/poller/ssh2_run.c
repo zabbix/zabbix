@@ -36,26 +36,22 @@ static const char	*password;
 static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_str, const char *value,
 		char **err_msg)
 {
-	int ret = 0;
+	int	ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(\"%s\", \"%s\")", __func__, key_str, value);
 
 	if (0 > libssh2_session_method_pref(session, type, value))
 	{
-		char	*err;
-		const char **algs;
-		int i, rc;
+		char		*err;
+		const char	**algs;
+		int		i, rc;
 
-		*err_msg = zbx_dsprintf(NULL, "Error while setting %s SSH option", key_str);
+		*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option %s", key_str);
 
 		if (0 > libssh2_session_last_error(session, &err, NULL, 0))
-		{
 			*err_msg = zbx_strdcatf(*err_msg, ": %s.", err);
-		}
 		else
-		{
 			*err_msg = zbx_strdcat(*err_msg, ".");
-		}
 
 		if (0 < (rc = libssh2_session_supported_algs(session, type, &algs)))
 		{
@@ -72,7 +68,7 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 			libssh2_free(session, algs);
 		}
 
-		ret = -1;
+		ret = FAIL;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, ret);
@@ -82,15 +78,15 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 
 static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char **err_msg)
 {
-	int ret = SUCCEED;
-	char opt_copy[1024] = {0};
+	int	ret = SUCCEED;
+	char	opt_copy[1024] = {0};
 	char	*line, *rest = opt_copy;
 
 	zbx_strscpy(opt_copy, options);
 
-	while ((line = strtok_r(rest, ";", &rest)))
+	while (NULL != (line = strtok_r(rest, ";", &rest)))
 	{
-		char *eq_str = strchr(line, '=');
+		char	*eq_str = strchr(line, '=');
 
 		if (NULL != eq_str)
 			*eq_str = '\0', eq_str++;
@@ -99,46 +95,59 @@ static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char
 #ifdef HAVE_LIBSSH2_METHOD_KEX
 		if (0 == strncmp(line, KEY_EXCHANGE_STR, ZBX_CONST_STRLEN(KEY_EXCHANGE_STR)))
 		{
-			if (0 != (ret = ssh_set_options(session, LIBSSH2_METHOD_KEX, KEY_EXCHANGE_STR, eq_str,
+			if (SUCCEED != (ret = ssh_set_options(session, LIBSSH2_METHOD_KEX, KEY_EXCHANGE_STR, eq_str,
 					err_msg)))
+			{
 				break;
+			}
 			continue;
 		}
 #endif
 #ifdef HAVE_LIBSSH2_METHOD_HOSTKEY
 		if (0 == strncmp(line, KEY_HOSTKEY_STR, ZBX_CONST_STRLEN(KEY_HOSTKEY_STR)))
 		{
-			if (0 != (ret = ssh_set_options(session, LIBSSH2_METHOD_HOSTKEY, KEY_HOSTKEY_STR, eq_str,
+			if (SUCCEED != (ret = ssh_set_options(session, LIBSSH2_METHOD_HOSTKEY, KEY_HOSTKEY_STR, eq_str,
 					err_msg)))
+			{
 				break;
+			}
 			continue;
 		}
 #endif
 #if defined(HAVE_LIBSSH2_METHOD_CRYPT_CS) && defined(HAVE_LIBSSH2_METHOD_CRYPT_SC)
 		if (0 == strncmp(line, KEY_CIPHERS_STR, ZBX_CONST_STRLEN(KEY_CIPHERS_STR)))
 		{
-			if (0 != (ret = ssh_set_options(session, LIBSSH2_METHOD_CRYPT_CS, KEY_CIPHERS_STR, eq_str,
-					err_msg)))
+			if (SUCCEED != (ret = ssh_set_options(session, LIBSSH2_METHOD_CRYPT_CS, KEY_CIPHERS_STR,
+					eq_str, err_msg)))
+			{
 				break;
-			if (0 != (ret = ssh_set_options(session, LIBSSH2_METHOD_CRYPT_SC, KEY_CIPHERS_STR, eq_str,
-					err_msg)))
+			}
+
+			if (SUCCEED != (ret = ssh_set_options(session, LIBSSH2_METHOD_CRYPT_SC, KEY_CIPHERS_STR,
+					eq_str, err_msg)))
+			{
 				break;
+			}
 			continue;
 		}
 #endif
 #if defined(HAVE_LIBSSH2_METHOD_MAC_CS) && defined(HAVE_LIBSSH2_METHOD_MAC_SC)
 		if (0 == strncmp(line, KEY_MACS_STR, ZBX_CONST_STRLEN(KEY_MACS_STR)))
 		{
-			if (0 != (ret = ssh_set_options(session, LIBSSH2_METHOD_MAC_CS, KEY_MACS_STR, eq_str,
+			if (SUCCEED != (ret = ssh_set_options(session, LIBSSH2_METHOD_MAC_CS, KEY_MACS_STR, eq_str,
 					err_msg)))
+			{
 				break;
-			if (0 != (ret = ssh_set_options(session, LIBSSH2_METHOD_MAC_SC, KEY_MACS_STR, eq_str,
+			}
+
+			if (SUCCEED != (ret = ssh_set_options(session, LIBSSH2_METHOD_MAC_SC, KEY_MACS_STR, eq_str,
 					err_msg)))
+			{
 				break;
+			}
 			continue;
 		}
 #endif
-
 		*err_msg = zbx_dsprintf(NULL, "SSH option %s is not supported.", line);
 		ret = FAIL;
 		break;

@@ -1,20 +1,28 @@
-##
-# ----------------------------------------------------------
-# SYNOPSIS
+# ENUM_CHECK(ENUM,INCLUDE)
 #
-#   ENUM_CHECK(ENUM,INCLUDE)
-#
-# DESCRIPTION
-#
-#   Checks if certain enumerator (or macro) constant exists
+#   Checks if the specified enumerator (or macro) constant exists
 #   in a header and defines C macro with prefix HAVE_.
 #
-# This macro is distributed in the hope that it will be useful,
+# Zabbix
+# Copyright (C) 2001-2022 Zabbix SIA
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
 
 AC_DEFUN([ENUM_CHECK], [
-  AC_MSG_CHECKING([for enum constant $1])
+  AC_MSG_CHECKING([for defined $1])
 
   AS_VAR_PUSHDEF([enum_var], [enum_var_have_$1])
 
