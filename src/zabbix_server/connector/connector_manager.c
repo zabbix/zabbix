@@ -200,7 +200,7 @@ static zbx_connector_worker_t	*connector_get_free_worker(zbx_connector_manager_t
 }
 
 static void	connector_get_next_task(zbx_connector_t *connector, zbx_connector_worker_t *worker,
-		unsigned char **data, size_t *data_alloc, size_t *data_offset, int *reschedule)
+		unsigned char **data, size_t *data_alloc, size_t *data_offset, int *reschedule, int *processed_num)
 {
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
 #define ZBX_DATA_JSON_RECORD_LIMIT	(ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED)
@@ -260,6 +260,8 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_connector_wo
 		zbx_vector_uint64_append(&worker->ids, object_link->objectid);
 	}
 
+	*processed_num += records;
+
 	if (0 != worker->ids.values_num)
 	{
 		worker->reschedule = *reschedule;
@@ -276,7 +278,7 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_connector_wo
  * Parameters: manager - [IN] preprocessing manager                           *
  *                                                                            *
  ******************************************************************************/
-static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now)
+static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now, int *processed_num)
 {
 	zbx_connector_worker_t	*worker;
 	zbx_connector_t		*connector = NULL;
@@ -307,7 +309,8 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now)
 			data_offset = 0;
 			int	reschedule;
 
-			connector_get_next_task(connector, worker, &data, &data_alloc, &data_offset, &reschedule);
+			connector_get_next_task(connector, worker, &data, &data_alloc, &data_offset, &reschedule,
+					processed_num);
 
 			if (0 == data_offset)
 				break;
@@ -601,7 +604,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	char					*error = NULL;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	int					ret;
+	int					ret, processed_num = 0;
 	double					time_stat, time_idle = 0, time_now, sec;
 	zbx_timespec_t				timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
@@ -640,16 +643,17 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
-			zbx_setproctitle("%s #%d [idle "
+			zbx_setproctitle("%s #%d [processed %d, idle "
 					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
-					get_process_type_string(process_type), process_num,
+					get_process_type_string(process_type), process_num, processed_num,
 					time_idle, time_now - time_stat);
 
 			time_stat = time_now;
 			time_idle = 0;
+			processed_num = 0;
 		}
 
-		connector_assign_tasks(&manager, time_now);
+		connector_assign_tasks(&manager, time_now, &processed_num);
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
