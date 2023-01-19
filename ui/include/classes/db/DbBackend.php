@@ -208,6 +208,16 @@ abstract class DbBackend {
 	abstract public function isDoubleIEEE754();
 
 	/**
+	 * Check that a field is present in a database table.
+	 *
+	 * @param string $table_name
+	 * @param string $field_name
+	 *
+	 * @return bool
+	 */
+	abstract public function dbFieldExists($table_name, $field_name);
+
+	/**
 	 * Set warning message.
 	 *
 	 * @param string $message

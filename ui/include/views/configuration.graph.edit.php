@@ -38,6 +38,7 @@ else {
 
 // Create form.
 $graphForm = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('graphForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])

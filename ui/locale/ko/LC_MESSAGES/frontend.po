@@ -6293,6 +6293,11 @@ msgstr "스크린 \"%2$s\" 을 위한 필드 \"%1$s\" 가 설정되어 있지 �
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "항목 \"%1$s\"의 설정이 올바르지 않습니다: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -19992,6 +19997,10 @@ msgstr "주소 범위 \"%1$s\"가 올바르지 않습니다"
 #: include/classes/validators/CApiInputValidator.php:279
 msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8의 바이트 시퀀스가 올바르지 않습니다"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"

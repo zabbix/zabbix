@@ -31,6 +31,7 @@ if ($data['hostid'] != 0) {
 
 // Create form.
 $form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('group_itemid', $data['itemids'])
@@ -236,7 +237,7 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
 			->setLabel(_('Preprocessing steps'))
 			->setChecked(isset($data['visible']['preprocessing'])),
-		(new CDiv(getItemPreprocessing($form, $data['preprocessing'], false, $data['preprocessing_types'])))
+		(new CDiv(getItemPreprocessing($data['preprocessing'], false, $data['preprocessing_types'])))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setId('preprocessing_div')
 	);

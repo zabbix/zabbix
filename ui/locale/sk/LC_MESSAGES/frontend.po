@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-08-29 06:55+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-12-27 08:57+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
@@ -6448,6 +6448,11 @@ msgstr "Chýbajúca hodnota poľa \"%1$s\" pre obrazovku \"%2$s\"."
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "Pole \"%1$s\" nie je správne: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
 
 #: include/validate.inc.php:167
 #, c-format
@@ -13018,7 +13023,7 @@ msgstr "Len spúšťače priradené k monitorovaným hostom alebo závislé na m
 
 #: app/views/popup.mediatypetest.edit.php:52
 msgid "Open log"
-msgstr ""
+msgstr "Otvoriť log"
 
 #: include/httptest.inc.php:430
 msgid "Opera"
@@ -17055,12 +17060,12 @@ msgstr "Tento riadok obrazovky nie je prázdny. Aj tak zmazať?"
 #: app/views/administration.housekeeping.edit.php:134
 #: include/blocks.inc.php:714
 msgid "This setting should be enabled, because history tables contain compressed chunks."
-msgstr ""
+msgstr "Toto nastavenie by malo byť povolené, pretože tabulky historie obsahujú komprimované časti."
 
 #: app/views/administration.housekeeping.edit.php:164
 #: include/blocks.inc.php:730
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
-msgstr ""
+msgstr "Toto nastavenie by malo byť povolené, pretože tabulky trendov obsahujú komprimované časti."
 
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
@@ -20236,6 +20241,10 @@ msgstr "neplatný rozsah adries \"%1$s\""
 #: include/classes/validators/CApiInputValidator.php:279
 msgid "invalid byte sequence in UTF-8"
 msgstr "neplatná sekvencia bajtov v UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"
