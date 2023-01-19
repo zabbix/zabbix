@@ -535,7 +535,7 @@ static void	diag_add_connector_items(struct zbx_json *json, const char *field,
 		zbx_json_adduint64(json, "connectorid", connector_stat->connectorid);
 		zbx_json_adduint64(json, "values", connector_stat->values_num);
 		zbx_json_adduint64(json, "links", connector_stat->links_num);
-		zbx_json_adduint64(json, "queud_links", connector_stat->queued_links_num);
+		zbx_json_adduint64(json, "queued_links", connector_stat->queued_links_num);
 		zbx_json_close(json);
 	}
 
