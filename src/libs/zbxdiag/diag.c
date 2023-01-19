@@ -1073,7 +1073,7 @@ int	zbx_diag_add_connector_info(const struct zbx_json_parse *jp, struct zbx_json
 			time_total += time2 - time1;
 
 			if (0 != (fields & ZBX_DIAG_CONNECTOR_VALUES))
-				zbx_json_addint64(json, "queued", queued);
+				zbx_json_adduint64(json, "queued", queued);
 		}
 
 		if (0 != tops.values_num)

@@ -81,7 +81,7 @@ zbx_uint32_t	zbx_connector_pack_diag_stats(unsigned char **data, zbx_uint64_t qu
  ******************************************************************************/
 static void	zbx_connector_unpack_diag_stats(zbx_uint64_t *queued, const unsigned char *data)
 {
-	(void)zbx_deserialize_int(data, queued);
+	(void)zbx_deserialize_uint64(data, queued);
 }
 
 /******************************************************************************
