@@ -1964,6 +1964,7 @@ define('ZBX_STYLE_ACTION_ICON_SEV_CHANGED', 'icon-action-severity-changed');
 define('ZBX_STYLE_ACTION_MESSAGE', 'icon-action-message');
 define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
 define('ZBX_STYLE_ACTION_ICON_UNACK', 'icon-action-unack');
+define('ZBX_STYLE_ACTION_ICON_ACK_GREEN', 'icon-action-ack-green');
 define('ZBX_STYLE_ACTION_ICON_SUPPRESS', 'icon-action-suppress');
 define('ZBX_STYLE_ACTION_ICON_UNSUPPRESS', 'icon-action-unsuppress');
 define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause');

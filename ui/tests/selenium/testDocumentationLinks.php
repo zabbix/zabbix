@@ -183,7 +183,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'link:No'
+							'element' => 'link:Update'
 						]
 					],
 					'doc_link' => '/en/manual/acknowledgment#updating-problems'

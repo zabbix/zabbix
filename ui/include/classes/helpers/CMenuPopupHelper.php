@@ -126,9 +126,9 @@ class CMenuPopupHelper {
 	 * Prepare data for Ajax trigger menu popup.
 	 *
 	 * @param string $triggerid
-	 * @param string $eventid      (optional) Mandatory for "Acknowledge", "Convert as cause" and
+	 * @param string $eventid      (optional) Mandatory for "Update problem", "Convert as cause" and
 	 *                             "Mark selected as symptoms" context menus.
-	 * @param array  $options      (optional) Whether to show "Acknowledge" menu, "Convert as cause" or
+	 * @param array  $options      (optional) Whether to show "Update problem" menu, "Convert as cause" or
 	 *                             "Mark selected as symptoms" context menus.
 	 *
 	 * @return array

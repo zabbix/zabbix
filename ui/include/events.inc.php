@@ -138,28 +138,19 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param array  $event                              An array of event data.
  * @param string $event['eventid']                   Event ID.
  * @param string $event['r_eventid']                 OK event ID.
- * @param string $event['objectid']                  Object ID.
+ * @param string $event['cause_eventid']             Cause event ID.
  * @param string $event['correlationid']             OK Event correlation ID.
  * @param string $event['userid']                    User ID who generated the OK event.
  * @param string $event['name']                      Event name.
  * @param string $event['acknowledged']              State of acknowledgement.
- * @param array  $event['acknowledges']              List of problem updates.
- * @param string $event['acknowledges'][]['action']  Action performed in update.
  * @param CCOl   $event['opdata']                    Operational data with expanded macros.
  * @param string $event['comments']                  Trigger description with expanded macros.
  * @param array  $allowed                            An array of user role rules.
  * @param bool   $allowed['ui_correlation']          Whether user is allowed to visit event correlation page.
- * @param bool   $allowed['add_comments']            Whether user is allowed to add problems comments.
- * @param bool   $allowed['change_severity']         Whether user is allowed to change problems severity.
- * @param bool   $allowed['acknowledge']             Whether user is allowed to acknowledge problems.
- * @param bool   $allowed['close']                   Whether user is allowed to close problems.
- * @param bool   $allowed['suppress_problems']       Whether user is allowed to manually suppress/unsuppress problems.
- * @param bool   $allowed['rank_change']             Whether user is allowed to change problem ranking.
  *
  * @return CTableInfo
  */
 function make_event_details(array $event, array $allowed) {
-	$can_be_closed = $allowed['close'] && !isEventClosed($event);
 	$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 	$table = (new CTableInfo())
@@ -181,16 +172,9 @@ function make_event_details(array $event, array $allowed) {
 		])
 		->addRow([
 			_('Acknowledged'),
-			($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge'] || $can_be_closed
-					|| $allowed['suppress_problems'] || $allowed['rank_change'])
-				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
-					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->setAttribute('data-eventid', $event['eventid'])
-					->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
-				: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
-					$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
-				)
+			(new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
+				$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
+			)
 		]);
 
 	if ($event['r_eventid'] != 0) {
@@ -370,7 +354,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 			_('Status'),
 			_('Age'),
 			_('Duration'),
-			_('Ack'),
+			_('Update'),
 			_('Actions')
 		]);
 
@@ -476,14 +460,11 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		// Create acknowledge link.
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
 				|| $can_be_closed || $allowed['suppress_problems'] || $allowed['rank_change'])
-			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
-				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			? (new CLink(_('Update')))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->setAttribute('data-eventid', $event['eventid'])
 				->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
-			: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
-				$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
-			);
+			: new CSpan(_('Update'));
 
 		$table->addRow([
 			(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
@@ -498,7 +479,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 			zbx_date2age($event['clock']),
 			$duration,
 			$problem_update_link,
-			makeEventActionsIcons($event['eventid'], $actions['data'], $users)
+			makeEventActionsIcons($event['eventid'], $actions['data'], $users, $is_acknowledged)
 		]);
 	}
 
