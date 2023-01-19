@@ -105,21 +105,40 @@ const char	*help_message[] = {
 	"      " ZBX_HOUSEKEEPER_EXECUTE "         Execute the housekeeper",
 	"      " ZBX_TRIGGER_HOUSEKEEPER_EXECUTE " Execute the trigger housekeeper",
 	"      " ZBX_LOG_LEVEL_INCREASE "=target   Increase log level, affects all processes if",
-	"                                  target is not specified",
+	"                                    target is not specified",
 	"      " ZBX_LOG_LEVEL_DECREASE "=target   Decrease log level, affects all processes if",
-	"                                  target is not specified",
+	"                                    target is not specified",
 	"      " ZBX_SNMP_CACHE_RELOAD "           Reload SNMP cache",
 	"      " ZBX_SECRETS_RELOAD "              Reload secrets from Vault",
 	"      " ZBX_DIAGINFO "=section            Log internal diagnostic information of the",
 	"                                  section (historycache, preprocessing, alerting,",
 	"                                  lld, valuecache, locks) or everything if section is",
 	"                                  not specified",
+	"      " ZBX_PROF_ENABLE "=target          Enable profiling, affects all processes if",
+	"                                    target is not specified",
+	"      " ZBX_PROF_DISABLE "=target         Disable profiling, affects all processes if",
+	"                                    target is not specified",
 	"      " ZBX_SERVICE_CACHE_RELOAD "        Reload service manager cache",
 	"      " ZBX_HA_STATUS "                   Display HA cluster status",
 	"      " ZBX_HA_REMOVE_NODE "=target       Remove the HA node specified by its name or ID",
 	"      " ZBX_HA_SET_FAILOVER_DELAY "=delay Set HA failover delay",
 	"",
 	"      Log level control targets:",
+	"        process-type              All processes of specified type",
+	"                                  (alerter, alert manager, configuration syncer,",
+	"                                  discoverer, escalator, history syncer,",
+	"                                  housekeeper, http poller, icmp pinger,",
+	"                                  ipmi manager, ipmi poller, java poller,",
+	"                                  poller, preprocessing manager,",
+	"                                  preprocessing worker, proxy poller,",
+	"                                  self-monitoring, snmp trapper, task manager,",
+	"                                  timer, trapper, unreachable poller,",
+	"                                  vmware collector, history poller,",
+	"                                  availability manager, service manager, odbc poller)",
+	"        process-type,N            Process type and number (e.g., poller,3)",
+	"        pid                       Process identifier",
+	"",
+	"      Profiling control targets:",
 	"        process-type              All processes of specified type",
 	"                                  (alerter, alert manager, configuration syncer,",
 	"                                  discoverer, escalator, ha manager, history syncer,",
@@ -131,8 +150,11 @@ const char	*help_message[] = {
 	"                                  timer, trapper, unreachable poller,",
 	"                                  vmware collector, history poller,",
 	"                                  availability manager, service manager, odbc poller)",
-	"        process-type,N            Process type and number (e.g., poller,3)",
+	"        process-type,N            Process type and number (e.g., history syncer,1)",
 	"        pid                       Process identifier",
+	"        scope                     Profiling scope",
+	"                                  (rwlock, mutex, processing) can be used with process-type",
+	"                                  (e.g., history syncer,1,processing)",
 	"",
 	"  -h --help                       Display this help message",
 	"  -V --version                    Display version number",
@@ -353,8 +375,6 @@ extern int	ZBX_TSDB_VERSION;
 #endif
 
 struct zbx_db_version_info_t	db_version_info;
-
-static volatile sig_atomic_t	zbx_rtc_command;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -1513,6 +1533,48 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: restart HA manager when working in standby mode                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	server_restart_ha(zbx_rtc_t *rtc)
+{
+	char	*error = NULL;
+
+	zbx_unset_child_signal_handler();
+
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	/* Disable locks so main process doesn't hang on logging if a process was              */
+	/* killed during logging. The locks will be re-enabled after logger is reinitialized   */
+	zbx_locks_disable();
+#endif
+	zbx_ha_kill();
+
+	zbx_set_child_signal_handler();
+
+	/* restart logger because it could have been stuck in lock */
+	if (SUCCEED != server_restart_logger(&error))
+	{
+		zbx_error("cannot restart logger: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	zbx_locks_enable();
+#endif
+
+	if (SUCCEED != zbx_ha_start(rtc, ZBX_NODE_STATUS_STANDBY, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	ha_status = ZBX_NODE_STATUS_STANDBY;
+}
+
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
@@ -1795,6 +1857,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (ZBX_NODE_STATUS_ERROR == ha_status)
 			break;
+
+		if (ZBX_NODE_STATUS_HATIMEOUT == ha_status)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "HA manager is not responding in standby mode, "
+					"restarting it.");
+			server_restart_ha(&rtc);
+			continue;
+		}
 
 		now = time(NULL);
 
