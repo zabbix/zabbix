@@ -48,6 +48,8 @@ struct zbx_es_env
 	struct zbx_json	*json;
 
 	jmp_buf		loc;
+
+	int		http_req_objects;
 };
 
 zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);

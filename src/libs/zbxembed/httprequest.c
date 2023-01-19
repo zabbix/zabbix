@@ -138,12 +138,25 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 {
+#define MAX_HTTPREQUEST_OBJECT_COUNT	10
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
+	zbx_es_env_t		*env;
 	int			err_index = -1;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	if (MAX_HTTPREQUEST_OBJECT_COUNT == env->http_req_objects)
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,
+				"maximum count of HttpRequest objects was reached");
+
+		return duk_throw(ctx);
+	}
 
 	duk_push_this(ctx);
 
@@ -182,7 +195,10 @@ out:
 		return duk_throw(ctx);
 	}
 
+	env->http_req_objects++;
+
 	return 0;
+#undef MAX_HTTPREQUEST_OBJECT_COUNT
 }
 
 /******************************************************************************
