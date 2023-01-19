@@ -1,5 +1,5 @@
 # Zabbix
-# Copyright (C) 2001-2022 Zabbix SIA
+# Copyright (C) 2001-2023 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ AC_DEFUN([ENUM_CHECK], [
   [AS_VAR_SET([enum_var], [no])])
 
   AS_IF([test yes = AS_VAR_GET([enum_var])],[
-    AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1), 1, [Define to 1 if the library has the $1 enum value])
+    AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1), 1, [Define to 1 if $1 definition is available])
     AC_MSG_RESULT(yes)
   ], [
     AC_MSG_RESULT(no)
