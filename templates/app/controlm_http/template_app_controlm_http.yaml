@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-10T08:29:55Z'
+  date: '2023-01-19T12:12:15Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -492,11 +492,11 @@ zabbix_export:
             key: controlm.services
           lld_macro_paths:
             -
-              lld_macro: '{#SERVICE.NAME}'
-              path: $.serviceName
-            -
               lld_macro: '{#SERVICE.JOB}'
               path: $.serviceJob
+            -
+              lld_macro: '{#SERVICE.NAME}'
+              path: $.serviceName
           preprocessing:
             -
               type: JSONPATH
@@ -1197,10 +1197,10 @@ zabbix_export:
                           'Script',       // 1 — runs a script.
                           'File Transfer',// 2 — performs file transfer.
                           'File Watcher', // 3 — monitors file activity.
-                          'Database',     // 4 — runs an SQL script.
+                          'Database',     // 4 — runs an SQL script.
                           'Hadoop',       // 5 — runs a job based on Hadoop objects.
                           'Dummy',        // 6 — always ends successfully without running any commands.
-                          'Folder',       // 7 — displays a job folder, rather than a job. This type is natively supported in Geneos.
+                          'Folder',       // 7 — displays a job folder, rather than a job.
                           'Job'           // 8
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
