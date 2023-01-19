@@ -3,13 +3,16 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -20,24 +23,25 @@ No specific Zabbix configuration is required.
 |{$ADDRESS} |<p>-</p> |`` |
 |{$PORT} |<p>-</p> |`` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |High availability cluster node discovery |<p>LLD rule with item and trigger prototypes for node discovery.</p> |DEPENDENT |zabbix.nodes.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.ha`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Cluster |Cluster node [{#NODE.NAME}]: Address |<p>Node IPv4 address.</p> |DEPENDENT |zabbix.nodes.address[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.ha[?(@.id=="{#NODE.ID}")].address.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Cluster |Cluster node [{#NODE.NAME}]: Last access time |<p>Last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.time[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.ha[?(@.id=="{#NODE.ID}")].lastaccess.first()`</p> |
-|Cluster |Cluster node [{#NODE.NAME}]: Last access age |<p>Time between database unix_timestamp() and last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.age[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.ha[?(@.id=="{#NODE.ID}")].lastaccess_age.first()`</p> |
-|Cluster |Cluster node [{#NODE.NAME}]: Status |<p>Node status.</p> |DEPENDENT |zabbix.nodes.status[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.ha[?(@.id=="{#NODE.ID}")].status.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Stats |<p>Node stats.</p> |DEPENDENT |zabbix.nodes.stats[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.ha[?(@.id=="{#NODE.ID}")].first()`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Address |<p>Node IPv4 address.</p> |DEPENDENT |zabbix.nodes.address[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.address`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Last access time |<p>Last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.time[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.lastaccess`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Last access age |<p>Time between database unix_timestamp() and last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.age[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.lastaccess_age`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Status |<p>Node status.</p> |DEPENDENT |zabbix.nodes.status[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |Zabbix raw items |Remote Zabbix server: Zabbix stats |<p>Zabbix server statistics master item.</p> |INTERNAL |zabbix[stats,{$ADDRESS},{$PORT}] |
 |Zabbix server |Remote Zabbix server: Zabbix stats queue over 10m |<p>Number of monitored items in the queue which are delayed at least by 10 minutes.</p> |INTERNAL |zabbix[stats,{$ADDRESS},{$PORT},queue,10m]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue`</p> |
 |Zabbix server |Remote Zabbix server: Zabbix stats queue |<p>Number of monitored items in the queue which are delayed at least by 6 seconds.</p> |INTERNAL |zabbix[stats,{$ADDRESS},{$PORT},queue]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue`</p> |
@@ -96,7 +100,7 @@ There are no template links in this template.
 |Zabbix server |Remote Zabbix server: Preprocessing queue |<p>Count of values enqueued in the preprocessing queue.</p> |DEPENDENT |preprocessing_queue<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.preprocessing_queue`</p> |
 |Zabbix server |Remote Zabbix server: Number of processed numeric (unsigned) values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed numeric (unsigned) values.</p> |DEPENDENT |wcache.values.uint<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.wcache.values.uint`</p><p>- CHANGE_PER_SECOND</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -138,7 +142,7 @@ There are no template links in this template.
 |Remote Zabbix server: More than 75% used in the configuration cache |<p>Consider increasing CacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix server health/rcache.buffer.pused,10m)>75` |AVERAGE | |
 |Remote Zabbix server: More than 95% used in the value cache |<p>Consider increasing ValueCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix server health/vcache.buffer.pused,10m)>95` |AVERAGE | |
 |Remote Zabbix server: Zabbix value cache working in low memory mode |<p>Once the low memory mode has been switched on, the value cache will remain in this state for 24 hours, even if the problem that triggered this mode is resolved sooner.</p> |`last(/Remote Zabbix server health/vcache.cache.mode)=1` |HIGH | |
-|Remote Zabbix server: Version has changed |<p>Remote Zabbix server version has changed. Ack to close.</p> |`last(/Remote Zabbix server health/version,#1)<>last(/Remote Zabbix server health/version,#2) and length(last(/Remote Zabbix server health/version))>0` |INFO |<p>Manual close: YES</p> |
+|Remote Zabbix server: Version has changed |<p>The Remote Zabbix server version has changed. Acknowledge to close manually.</p> |`last(/Remote Zabbix server health/version,#1)<>last(/Remote Zabbix server health/version,#2) and length(last(/Remote Zabbix server health/version))>0` |INFO |<p>Manual close: YES</p> |
 |Remote Zabbix server: More than 75% used in the vmware cache |<p>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix server health/vmware.buffer.pused,10m)>75` |AVERAGE | |
 |Remote Zabbix server: More than 75% used in the history cache |<p>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix server health/wcache.history.pused,10m)>75` |AVERAGE | |
 |Remote Zabbix server: More than 75% used in the history index cache |<p>Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix server health/wcache.index.pused,10m)>75` |AVERAGE | |
@@ -146,5 +150,5 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
