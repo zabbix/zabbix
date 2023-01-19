@@ -23,12 +23,12 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/natefinch/npipe"
+	"github.com/Microsoft/go-winio"
 	"zabbix.com/plugins/external"
 )
 
 func getListener(socket string) (listener net.Listener, err error) {
-	listener, err = npipe.Listen(socket)
+	listener, err = winio.ListenPipe(socket, nil)
 	if err != nil {
 		err = fmt.Errorf(
 			"failed to create plugin listener with socket path, %s, %s", socket, err.Error(),

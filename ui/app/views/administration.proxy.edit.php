@@ -36,6 +36,7 @@ if ($data['form_refresh'] == 0) {
 $proxyForm = (new CForm())
 	->setId('proxy-form')
 	->setName('proxy-form')
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addVar('proxyid', $data['proxyid'])
 	->addVar('tls_accept', $data['tls_accept'])
 	->addVar('psk_edit_mode', $data['psk_edit_mode'])

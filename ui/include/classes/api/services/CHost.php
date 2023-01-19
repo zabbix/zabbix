@@ -460,6 +460,10 @@ class CHost extends CHostGeneral {
 		if (is_array($options['filter'])) {
 			$this->dbFilter('hosts h', $options, $sqlParts);
 
+			if (array_key_exists('hostid', $options['filter'])) {
+				unset($options['filter']['hostid']);
+			}
+
 			if ($this->dbFilter('interface hi', $options, $sqlParts)) {
 				$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
@@ -541,14 +545,8 @@ class CHost extends CHostGeneral {
 		}
 
 		if ($result) {
-			if (array_key_exists('name_upper', reset($result))) {
-				foreach ($result as &$row) {
-					unset($row['name_upper']);
-				}
-				unset($row);
-			}
-
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['name_upper'], $options['output']);
 		}
 
 		// removing keys (hash -> array)

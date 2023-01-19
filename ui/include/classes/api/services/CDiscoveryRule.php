@@ -298,15 +298,8 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 
 			$result = $this->addRelatedObjects($options, $result);
-
-			if (array_key_exists('name_upper', reset($result))) {
-				foreach ($result as &$row) {
-					unset($row['name_upper']);
-				}
-				unset($row);
-			}
-
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['name_upper']);
 
 			foreach ($result as &$rule) {
 				// unset the fields that are returned in the filter
@@ -418,7 +411,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @return array
 	 */
-	public function update($items) {
+	public function update(array $items) {
 		$items = zbx_toArray($items);
 
 		$db_items = $this->get([

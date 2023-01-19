@@ -284,14 +284,8 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if ($result) {
-			if (array_key_exists('name_upper', reset($result))) {
-				foreach ($result as &$row) {
-					unset($row['name_upper']);
-				}
-				unset($row);
-			}
-
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['name_upper']);
 		}
 
 		// removing keys (hash -> array)
@@ -471,6 +465,7 @@ class CTemplate extends CHostGeneral {
 	 */
 	protected function validateUpdate(array &$templates, array &$db_templates = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid'], ['host'], ['name']], 'fields' => [
+			'uuid' => 				['type' => API_UUID],
 			'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
@@ -1110,7 +1105,8 @@ class CTemplate extends CHostGeneral {
 			'groupids' =>			['type' => API_IDS, 'flags' => API_NORMALIZE, 'uniq' => true],
 			'macros' =>				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE, 'uniq' => true, 'length' => DB::getFieldLength('hostmacro', 'macro')],
 			'templateids_link' =>	['type' => API_IDS, 'flags' => API_NORMALIZE, 'uniq' => true],
-			'templateids_clear' =>	['type' => API_IDS, 'flags' => API_NORMALIZE, 'uniq' => true]
+			'templateids_clear' =>	['type' => API_IDS, 'flags' => API_NORMALIZE, 'uniq' => true],
+			'templateids_unlink' => ['type' => API_IDS, 'flags' => API_NORMALIZE, 'uniq' => true]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {

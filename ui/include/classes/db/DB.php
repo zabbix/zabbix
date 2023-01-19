@@ -237,7 +237,7 @@ class DB {
 	}
 
 	/**
-	 * Returns true if the table $tableName has the $fieldName field.
+	 * Returns true if the table $tableName has the $fieldName field defined in its schema.
 	 *
 	 * @static
 	 *
@@ -250,6 +250,20 @@ class DB {
 		$schema = self::getSchema($tableName);
 
 		return isset($schema['fields'][$fieldName]);
+	}
+
+	/**
+	 * Check that a field is present in a database table.
+	 *
+	 * @static
+	 *
+	 * @param string $table_name
+	 * @param string $field_name
+	 *
+	 * @return bool
+	 */
+	public static function dbFieldExists(string $table_name, string $field_name) {
+		return self::getDbBackend()->dbFieldExists($table_name, $field_name);
 	}
 
 	/**
@@ -1089,7 +1103,7 @@ class DB {
 			$table_alias = $table_name;
 		}
 
-		if ($field_name === 'name' && self::hasField($table_name, 'name_upper')) {
+		if ($field_name === 'name' && self::dbFieldExists($table_name, 'name_upper')) {
 			return $table_alias.'.name_upper';
 		}
 

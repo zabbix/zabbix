@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-10-06 10:34+0000\n"
-"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
+"PO-Revision-Date: 2023-01-07 12:23+0000\n"
+"Last-Translator: spbima <spbima@mail.ru>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -3791,7 +3791,7 @@ msgstr "Закрыть новое событие"
 
 #: app/views/configuration.correlation.edit.php:154
 msgid "Close new events"
-msgstr ""
+msgstr "Закрыть новые события"
 
 #: app/views/configuration.correlation.edit.php:149
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -4106,6 +4106,10 @@ msgstr "Настройки обновлены"
 #: include/classes/setup/CSetupWizard.php:601
 msgid "Configure DB connection"
 msgstr "Настройка подключения к БД"
+
+#: app/views/js/administration.authentication.edit.js.php:56
+msgid "Confirm changes"
+msgstr "Подтвердить изменения"
 
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
@@ -6354,6 +6358,10 @@ msgstr "Активировать"
 msgid "Enable HTTP authentication"
 msgstr "Активация HTTP аутентификации"
 
+#: app/views/js/administration.authentication.edit.js.php:59
+msgid "Enable HTTP authentication for all users."
+msgstr "Разрешить аутентификацию через HTTP для всех пользователей."
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "Активация LDAP аутентификации"
@@ -7067,6 +7075,11 @@ msgstr "В поле \"%1$s\" пропущено значение у карты �
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "Поле \"%1$s\" не корректно: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr "Поле \"%1$s\" имеет некорректное значение: %2$s"
 
 #: include/validate.inc.php:167
 #, c-format
@@ -8577,6 +8590,10 @@ msgstr "Одинаковые пространства имён (%1$s) испол
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
 msgstr "Идентификация системы. Возвращает строку"
+
+#: app/views/administration.authentication.edit.php:113
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -13404,7 +13421,7 @@ msgstr "Подсчитываются только триггеры у актив
 
 #: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
 msgid "Open log"
-msgstr ""
+msgstr "Открыть лог"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -17820,12 +17837,12 @@ msgstr "Эта настройка применима только к число�
 #: app/partials/administration.system.info.php:199
 #: app/views/administration.housekeeping.edit.php:134
 msgid "This setting should be enabled, because history tables contain compressed chunks."
-msgstr ""
+msgstr "Эта настройка должна быть включена, поскольку таблицы истории содержат сжатые фрагменты."
 
 #: app/partials/administration.system.info.php:213
 #: app/views/administration.housekeeping.edit.php:163
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
-msgstr ""
+msgstr "Эта настройка должна быть включена, поскольку таблицы трендов содержат сжатые фрагменты."
 
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
@@ -21530,6 +21547,10 @@ msgstr "ошибочный метод агрегации"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "ошибочная последовательность байт в UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr "Неверный тип данных"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
 msgid "invalid delay"

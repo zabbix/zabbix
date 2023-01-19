@@ -242,16 +242,17 @@ class CImportReferencer {
 	 *
 	 * @param string $hostid
 	 * @param string $key
+	 * @param bool   $inherited
 	 *
 	 * @return string|null
 	 */
-	public function findItemidByKey(string $hostid, string $key): ?string {
+	public function findItemidByKey(string $hostid, string $key, bool $inherited = false): ?string {
 		if ($this->db_items === null) {
 			$this->selectItems();
 		}
 
 		foreach ($this->db_items as $itemid => $item) {
-			if ($item['hostid'] === $hostid && $item['key_'] === $key) {
+			if ($item['hostid'] === $hostid && $item['key_'] === $key && ($inherited || $item['templateid'] == 0)) {
 				return $itemid;
 			}
 		}
@@ -348,10 +349,12 @@ class CImportReferencer {
 	 * @param string $name
 	 * @param string $expression
 	 * @param string $recovery_expression
+	 * @param bool   $inherited
 	 *
 	 * @return string|null
 	 */
-	public function findTriggeridByName(string $name, string $expression, string $recovery_expression): ?string {
+	public function findTriggeridByName(string $name, string $expression, string $recovery_expression,
+			bool $inherited = false): ?string {
 		if ($this->db_triggers === null) {
 			$this->selectTriggers();
 		}
@@ -359,7 +362,8 @@ class CImportReferencer {
 		foreach ($this->db_triggers as $triggerid => $trigger) {
 			if ($trigger['description'] === $name
 					&& $trigger['expression'] === $expression
-					&& $trigger['recovery_expression'] === $recovery_expression) {
+					&& $trigger['recovery_expression'] === $recovery_expression
+					&& ($inherited || $trigger['templateid'] == 0)) {
 				return $triggerid;
 			}
 		}
@@ -393,16 +397,19 @@ class CImportReferencer {
 	 *
 	 * @param string $hostid
 	 * @param string $name
+	 * @param bool   $inherited
 	 *
 	 * @return string|null
 	 */
-	public function findGraphidByName(string $hostid, string $name): ?string {
+	public function findGraphidByName(string $hostid, string $name, bool $inherited = false): ?string {
 		if ($this->db_graphs === null) {
 			$this->selectGraphs();
 		}
 
 		foreach ($this->db_graphs as $graphid => $graph) {
-			if ($graph['name'] === $name && in_array($hostid, $graph['hosts'])) {
+			if ($graph['name'] === $name
+					&& in_array($hostid, $graph['hosts'])
+					&& ($inherited || $graph['templateid'] == 0)) {
 				return $graphid;
 			}
 		}
@@ -458,8 +465,6 @@ class CImportReferencer {
 	 * @param string $uuid
 	 *
 	 * @return string|null
-	 *
-	 * @throws APIException
 	 */
 	public function findTemplateDashboardidByUuid(string $uuid): ?string {
 		if ($this->db_template_dashboards === null) {
@@ -468,6 +473,28 @@ class CImportReferencer {
 
 		foreach ($this->db_template_dashboards as $dashboardid => $dashboard) {
 			if ($dashboard['uuid'] === $uuid) {
+				return $dashboardid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get template dashboard ID by dashboard name and template ID.
+	 *
+	 * @param string $name
+	 * @param int    $templateid
+	 *
+	 * @return string|null
+	 */
+	public function findTemplateDashboardidByNameAndId(string $name, int $templateid): ?string {
+		if ($this->db_template_dashboards === null) {
+			$this->selectTemplateDashboards();
+		}
+
+		foreach ($this->db_template_dashboards as $dashboardid => $dashboard) {
+			if ($dashboard['name'] === $name && $dashboard['templateid'] == $templateid) {
 				return $dashboardid;
 			}
 		}
@@ -750,7 +777,8 @@ class CImportReferencer {
 		$this->db_items[$itemid] = [
 			'hostid' => $item['hostid'],
 			'uuid' => array_key_exists('uuid', $item) ? $item['uuid'] : '',
-			'key_' => $item['key_']
+			'key_' => $item['key_'],
+			'templateid' => 0
 		];
 	}
 
@@ -792,7 +820,8 @@ class CImportReferencer {
 			'uuid' => array_key_exists('uuid', $trigger) ? $trigger['uuid'] : '',
 			'description' => $trigger['description'],
 			'expression' => $trigger['expression'],
-			'recovery_expression' => $trigger['recovery_expression']
+			'recovery_expression' => $trigger['recovery_expression'],
+			'templateid' => 0
 		];
 	}
 
@@ -1014,14 +1043,15 @@ class CImportReferencer {
 
 		if ($sql_where) {
 			$db_items = DBselect(
-				'SELECT i.itemid,i.hostid,i.key_,i.uuid FROM items i WHERE '.implode(' OR ', $sql_where)
+				'SELECT i.itemid,i.hostid,i.key_,i.uuid,i.templateid FROM items i WHERE '.implode(' OR ', $sql_where)
 			);
 
 			while ($db_item = DBfetch($db_items)) {
 				$this->db_items[$db_item['itemid']] = [
 					'uuid' => $db_item['uuid'],
 					'key_' => $db_item['key_'],
-					'hostid' => $db_item['hostid']
+					'hostid' => $db_item['hostid'],
+					'templateid' => $db_item['templateid']
 				];
 			}
 		}
@@ -1092,7 +1122,7 @@ class CImportReferencer {
 		}
 
 		$db_triggers = API::Trigger()->get([
-			'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
+			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
 			'filter' => [
 				'uuid' => array_keys($uuids),
 				'flags' => [
@@ -1105,7 +1135,7 @@ class CImportReferencer {
 		]);
 
 		$db_triggers += API::Trigger()->get([
-			'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
+			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
 			'filter' => [
 				'description' => array_keys($this->triggers),
 				'flags' => [
@@ -1165,8 +1195,8 @@ class CImportReferencer {
 			$graph_names += array_flip(array_keys($graph));
 		}
 
-		$db_graphs =  API::Graph()->get([
-			'output' => ['uuid', 'name'],
+		$db_graphs = API::Graph()->get([
+			'output' => ['uuid', 'name', 'templateid'],
 			'selectHosts' => ['hostid'],
 			'filter' => [
 				'uuid' => array_keys($graph_uuids),
@@ -1176,7 +1206,7 @@ class CImportReferencer {
 		]);
 
 		$db_graphs += API::Graph()->get([
-			'output' => ['uuid', 'name'],
+			'output' => ['uuid', 'name', 'templateid'],
 			'selectHosts' => ['hostid'],
 			'filter' => [
 				'name' => array_keys($graph_names),
@@ -1269,8 +1299,6 @@ class CImportReferencer {
 
 	/**
 	 * Select template dashboard IDs for previously added dashboard names and template IDs.
-	 *
-	 * @throws APIException
 	 */
 	protected function selectTemplateDashboards(): void {
 		$this->db_template_dashboards = [];
@@ -1279,17 +1307,15 @@ class CImportReferencer {
 			return;
 		}
 
-		$db_template_dashboards = API::TemplateDashboard()->get([
-			'output' => ['uuid'],
-			'filter' => ['uuid' => array_keys($this->template_dashboards)],
+		$this->db_template_dashboards = API::TemplateDashboard()->get([
+			'output' => ['uuid', 'name', 'templateid'],
+			'filter' => [
+				'uuid' => array_keys($this->template_dashboards),
+				'name' => array_unique(array_column($this->template_dashboards, 'name'))
+			],
+			'searchByAny' => true,
 			'preservekeys' => true
 		]);
-
-		foreach ($db_template_dashboards as $dashboardid => $dashboard) {
-			$this->db_template_dashboards[$dashboardid] = [
-				'uuid' => $dashboard['uuid']
-			];
-		}
 
 		$this->template_dashboards = [];
 	}
@@ -1470,6 +1496,7 @@ class CImportReferencer {
 
 			if ($hostid !== false) {
 				$sql_where[] = '(ht.hostid='.zbx_dbstr($hostid)
+					.' AND ht.templateid IS NULL'
 					.' AND ('
 						.dbConditionString('ht.name', array_keys($httptests))
 						.' OR '.dbConditionString('ht.uuid', array_column($httptests, 'uuid'))

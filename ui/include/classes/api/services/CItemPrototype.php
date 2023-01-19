@@ -293,15 +293,9 @@ class CItemPrototype extends CItemGeneral {
 				$result = $this->addNclobFieldValues($options, $result);
 			}
 
-			if (array_key_exists('name_upper', reset($result))) {
-				foreach ($result as &$row) {
-					unset($row['name_upper']);
-				}
-				unset($row);
-			}
-
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['name_upper']);
 		}
 
 		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
@@ -345,8 +339,8 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * Check item prototype data and set flags field.
 	 *
-	 * @param array  $items										an array of items passed by reference
-	 * @param bool	 $update
+	 * @param array $items
+	 * @param bool  $update
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		parent::checkInput($items, $update);
