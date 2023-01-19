@@ -24,12 +24,10 @@ window.proxy_edit_popup = new class {
 
 	constructor() {
 		this.clone_proxyid = null;
-		this.csrf_tokens = null;
 	}
 
-	init({proxyid, csrf_tokens}) {
+	init({proxyid}) {
 		this.proxyid = proxyid;
-		this.csrf_tokens = csrf_tokens;
 
 		this.overlay = overlays_stack.getById('proxy_edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -154,7 +152,8 @@ window.proxy_edit_popup = new class {
 
 	refreshConfig() {
 		const curl = new Curl('zabbix.php');
-		curl.setAction('proxy.config.refresh', this.csrf_tokens['proxy.config.refresh']);
+		curl.setArgument('action', 'proxy.config.refresh');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('proxy') ?>');
 
 		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
 			for (const element of this.form.parentNode.children) {
@@ -179,7 +178,8 @@ window.proxy_edit_popup = new class {
 
 	delete() {
 		const curl = new Curl('zabbix.php');
-		curl.setAction('proxy.delete', this.csrf_tokens['proxy.delete']);
+		curl.setArgument('action', 'proxy.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('proxy') ?>');
 
 		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
@@ -211,9 +211,7 @@ window.proxy_edit_popup = new class {
 		}
 
 		const curl = new Curl('zabbix.php');
-		this.proxyid === null
-			? curl.setAction('proxy.create', this.csrf_tokens['proxy.create'])
-			: curl.setAction('proxy.update', this.csrf_tokens['proxy.update']);
+		curl.setArgument('action', this.proxyid !== null ? 'proxy.update' : 'proxy.create');
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

@@ -25,7 +25,7 @@
 
 // create form
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('popup.massupdate.host')))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('massupdate')))
 		->removeId())
 	->setId('massupdate-form')
 	->addVar('action', 'popup.massupdate.host')

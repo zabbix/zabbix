@@ -35,9 +35,10 @@ function tabFilterDelete(overlay) {
 		url = new Curl($form.attr('action')),
 		form_data = $form.serializeJSON();
 
-	url.setAction('popup.tabfilter.delete', <?= json_encode($data['csrf_tokens']['popup.tabfilter.delete']) ?>);
+	url.setArgument('action', 'popup.tabfilter.delete');
 	url.setArgument('idx', form_data['idx']);
 	url.setArgument('idx2', form_data['idx2']);
+	url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('tabfilter') ?>');
 
 	overlay.setLoading();
 	overlay.xhr = $.post(url.getUrl(), null, 'json')

@@ -81,10 +81,7 @@ else {
 }
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('popup.mediatypetest.send')))
-		->removeId()
-	)
-	->cleanItems()
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('mediatypetest')))->removeId())
 	->setName('mediatypetest_form')
 	->addVar('action', 'popup.mediatypetest.send')
 	->addVar('mediatypeid', $data['mediatypeid'])

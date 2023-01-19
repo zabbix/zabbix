@@ -77,8 +77,7 @@ $output = [
 		'templategroup_edit_popup.init('.json_encode([
 			'popup_url' => $popup_url->getUrl(),
 			'groupid' => $data['groupid'],
-			'name' => $data['name'],
-			'csrf_tokens' => $data['csrf_tokens']
+			'name' => $data['name']
 		]).');'
 ];
 

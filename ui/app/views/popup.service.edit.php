@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm('post'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('service')))->removeId())
 	->setId('service-form')
 	->setName('service_form')
 	->addItem(getMessages());
@@ -339,8 +340,7 @@ $form
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
 				'problem_tags' => $data['form']['problem_tags'],
 				'status_rules' => $data['form']['status_rules'],
-				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT),
-				'csrf_tokens' => $data['csrf_tokens']
+				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 			]).');
 		'))->setOnDocumentReady()
 	);

@@ -143,7 +143,6 @@ class CControllerPopupSlaEdit extends CController {
 		}
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
-		$data['csrf_tokens'] = self::generateCsrfTokens(['sla.create', 'sla.update', 'sla.delete']);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

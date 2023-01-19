@@ -33,9 +33,8 @@ window.token_edit_popup = {
 	expires_at_label: null,
 	expires_at: null,
 	expires_state: null,
-	csrf_tokens: null,
 
-	init({csrf_tokens}) {
+	init() {
 		this.overlay = overlays_stack.getById('token_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -44,7 +43,6 @@ window.token_edit_popup = {
 		this.expires_at_label = this.expires_at_field.previousSibling;
 		this.expires_at = document.getElementById('expires_at');
 		this.expires_state = document.getElementById('expires_state');
-		this.csrf_tokens = csrf_tokens;
 		this.expiresAtHandler();
 
 		this.expires_state.addEventListener('change', () => this.expiresAtHandler());
@@ -117,7 +115,8 @@ window.token_edit_popup = {
 		this.removePopupMessages();
 
 		const curl = new Curl('zabbix.php');
-		curl.setAction('token.delete', this.csrf_tokens['token.delete']);
+		curl.setArgument('action', 'token.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('token') ?>');
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

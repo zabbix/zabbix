@@ -116,8 +116,7 @@ class CControllerPopupTabFilterEdit extends CController {
 			'errors' => hasErrorMessages() ? getMessages() : null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-			'csrf_tokens' => self::generateCsrfTokens(['popup.tabfilter.delete'])
+			]
 		];
 
 		$this->setResponse(new CControllerResponseData($data));

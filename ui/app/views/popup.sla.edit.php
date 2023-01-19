@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm('post'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sla')))->removeId())
 	->setId('sla-form')
 	->setName('sla_form')
 	->addItem(getMessages());
@@ -222,8 +223,7 @@ $form
 			sla_edit_popup.init('.json_encode([
 				'slaid' => $data['slaid'],
 				'service_tags' => $data['form']['service_tags'],
-				'excluded_downtimes' => $data['form']['excluded_downtimes'],
-				'csrf_tokens' => $data['csrf_tokens']
+				'excluded_downtimes' => $data['form']['excluded_downtimes']
 			]).');
 		'))->setOnDocumentReady()
 	);

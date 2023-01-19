@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm('post'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('proxy')))->removeId())
 	->setId('proxy-form')
 	->setName('proxy_form')
 	->addStyle('display: none;')
@@ -197,8 +198,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			proxy_edit_popup.init('.json_encode([
-				'proxyid' => $data['proxyid'],
-				'csrf_tokens' => $data['csrf_tokens']
+				'proxyid' => $data['proxyid']
 			]).');
 		'))->setOnDocumentReady()
 	);

@@ -22,14 +22,12 @@
 
 window.service_edit_popup = new class {
 
-	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, search_limit,
-			csrf_tokens}) {
+	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, search_limit}) {
 		this._initTemplates();
 
 		this.serviceid = serviceid;
 
 		this.search_limit = search_limit;
-		this.csrf_tokens = csrf_tokens;
 
 		this.overlay = overlays_stack.getById('service_edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -438,7 +436,8 @@ window.service_edit_popup = new class {
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
-		curl.setAction('service.delete', this.csrf_tokens['service.delete']);
+		curl.setArgument('action', 'service.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('service') ?>');
 
 		this._post(curl.getUrl(), {serviceids: [this.serviceid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
@@ -474,9 +473,7 @@ window.service_edit_popup = new class {
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php', false);
-		this.serviceid === null
-			? curl.setAction('service.create', this.csrf_tokens['service.create'])
-			: curl.setAction('service.update', this.csrf_tokens['service.update']);
+		curl.setArgument('action', this.serviceid !== null ? 'service.update' : 'service.create');
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

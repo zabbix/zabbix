@@ -128,9 +128,6 @@ class CControllerPopupProxyEdit extends CController {
 		}
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
-		$data['csrf_tokens'] = self::generateCsrfTokens(['proxy.create', 'proxy.update', 'proxy.delete',
-			'proxy.config.refresh'
-		]);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

@@ -110,7 +110,6 @@ class CControllerPopupTokenEdit extends CController {
 
 		$data['admin_mode'] = $this->getInput('admin_mode');
 
-		$data['csrf_tokens'] = self::generateCsrfTokens(['token.delete']);
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$response = new CControllerResponseData($data);

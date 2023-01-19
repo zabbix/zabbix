@@ -21,12 +21,11 @@
 
 window.templategroup_edit_popup = new class {
 
-	init({popup_url, groupid, name, csrf_tokens}) {
+	init({popup_url, groupid, name}) {
 		history.replaceState({}, '', popup_url);
 
 		this.groupid = groupid;
 		this.name = name;
-		this.csrf_tokens = csrf_tokens;
 
 		this.overlay = overlays_stack.getById('templategroup_edit');
 		this.dialogue = this.overlay.$dialogue[0];

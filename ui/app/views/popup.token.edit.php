@@ -29,10 +29,7 @@ $url = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $token_form = (new CForm('post', $url))
-	->addItem((new CVar(
-		CCsrfTokenHelper::CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::get(($data['tokenid'] == 0) ? 'token.create' : 'token.update')
-	))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('token')))->removeId())
 	->setId('token_form')
 	->setName('token')
 	->addVar('admin_mode', $data['admin_mode'])
@@ -167,9 +164,7 @@ $output = [
 	'body' => $token_form->toString(),
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.token.edit.js.php').
-		'token_edit_popup.init('. json_encode([
-			'csrf_tokens' => $data['csrf_tokens']
-		]) .');',
+		'token_edit_popup.init();',
 	'buttons' => $buttons
 ];
 
