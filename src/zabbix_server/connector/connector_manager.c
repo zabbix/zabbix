@@ -75,14 +75,21 @@ static void	connector_clear(zbx_connector_t *connector)
 	zbx_free(connector->url);
 	zbx_free(connector->url_orig);
 	zbx_free(connector->timeout);
+	zbx_free(connector->timeout_orig);
 	zbx_free(connector->token);
 	zbx_free(connector->token_orig);
 	zbx_free(connector->http_proxy);
+	zbx_free(connector->http_proxy_orig);
 	zbx_free(connector->username);
+	zbx_free(connector->username_orig);
 	zbx_free(connector->password);
+	zbx_free(connector->password_orig);
 	zbx_free(connector->ssl_cert_file);
+	zbx_free(connector->ssl_cert_file_orig);
 	zbx_free(connector->ssl_key_file);
+	zbx_free(connector->ssl_key_file_orig);
 	zbx_free(connector->ssl_key_password);
+	zbx_free(connector->ssl_key_password_orig);
 	zbx_list_destroy(&connector->object_link_queue);
 	zbx_hashset_destroy(&connector->object_links);
 }

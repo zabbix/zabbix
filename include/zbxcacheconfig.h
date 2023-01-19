@@ -599,18 +599,18 @@ typedef struct
 	char			*url_orig, *url;
 	int			max_records;
 	int			max_senders;
-	char			*timeout;
+	char			*timeout_orig, *timeout;
 	unsigned char		max_attempts;
 	char			*token_orig, *token;
-	char			*http_proxy;
+	char			*http_proxy_orig, *http_proxy;
 	unsigned char		authtype;
-	char			*username;
-	char			*password;
+	char			*username_orig, *username;
+	char			*password_orig, *password;
 	unsigned char		verify_peer;
 	unsigned char		verify_host;
-	char			*ssl_cert_file;
-	char			*ssl_key_file;
-	char			*ssl_key_password;
+	char			*ssl_cert_file_orig,*ssl_cert_file;
+	char			*ssl_key_file_orig, *ssl_key_file;
+	char			*ssl_key_password_orig, *ssl_key_password;
 
 	zbx_hashset_t		object_links;
 	zbx_list_t		object_link_queue;
