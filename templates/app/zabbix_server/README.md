@@ -3,35 +3,39 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |High availability cluster node discovery |<p>LLD rule with item and trigger prototypes for node discovery.</p> |DEPENDENT |zabbix.nodes.discovery |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Cluster |Cluster node [{#NODE.NAME}]: Address |<p>Node IPv4 address.</p> |DEPENDENT |zabbix.nodes.address[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].address.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Cluster |Cluster node [{#NODE.NAME}]: Last access time |<p>Last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.time[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].lastaccess.first()`</p> |
-|Cluster |Cluster node [{#NODE.NAME}]: Last access age |<p>Time between database unix_timestamp() and last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.age[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].lastaccess_age.first()`</p> |
-|Cluster |Cluster node [{#NODE.NAME}]: Status |<p>Cluster node status.</p> |DEPENDENT |zabbix.nodes.status[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].status.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Stats |<p>Node stats.</p> |DEPENDENT |zabbix.nodes.stats[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].first()`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Address |<p>Node IPv4 address.</p> |DEPENDENT |zabbix.nodes.address[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.address`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Last access time |<p>Last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.time[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.lastaccess`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Last access age |<p>Time between database unix_timestamp() and last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.age[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.lastaccess_age`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Status |<p>Cluster node status.</p> |DEPENDENT |zabbix.nodes.status[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |Zabbix raw items |Zabbix stats cluster |<p>Zabbix cluster statistics master item.</p> |INTERNAL |zabbix[cluster,discovery,nodes] |
 |Zabbix server |Zabbix server: Queue over 10 minutes |<p>Number of monitored items in the queue which are delayed at least by 10 minutes.</p> |INTERNAL |zabbix[queue,10m] |
 |Zabbix server |Zabbix server: Queue |<p>Number of monitored items in the queue which are delayed at least by 6 seconds.</p> |INTERNAL |zabbix[queue] |
@@ -90,7 +94,7 @@ There are no template links in this template.
 |Zabbix server |Zabbix server: Preprocessing queue |<p>Count of values enqueued in the preprocessing queue.</p> |INTERNAL |zabbix[preprocessing_queue] |
 |Zabbix server |Zabbix server: Number of processed numeric (unsigned) values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed numeric (unsigned) values.</p> |INTERNAL |zabbix[wcache,values,uint]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -132,7 +136,7 @@ There are no template links in this template.
 |Zabbix server: More than 75% used in the configuration cache |<p>Consider increasing CacheSize in the zabbix_server.conf configuration file.</p> |`max(/Zabbix server health/zabbix[rcache,buffer,pused],10m)>75` |AVERAGE | |
 |Zabbix server: More than 95% used in the value cache |<p>Consider increasing ValueCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Zabbix server health/zabbix[vcache,buffer,pused],10m)>95` |AVERAGE | |
 |Zabbix server: Zabbix value cache working in low memory mode |<p>Once the low memory mode has been switched on, the value cache will remain in this state for 24 hours, even if the problem that triggered this mode is resolved sooner.</p> |`last(/Zabbix server health/zabbix[vcache,cache,mode])=1` |HIGH | |
-|Zabbix server: Version has changed |<p>Zabbix server version has changed. Ack to close.</p> |`last(/Zabbix server health/zabbix[version],#1)<>last(/Zabbix server health/zabbix[version],#2) and length(last(/Zabbix server health/zabbix[version]))>0` |INFO |<p>Manual close: YES</p> |
+|Zabbix server: Version has changed |<p>The Zabbix server version has changed. Acknowledge to close manually.</p> |`last(/Zabbix server health/zabbix[version],#1)<>last(/Zabbix server health/zabbix[version],#2) and length(last(/Zabbix server health/zabbix[version]))>0` |INFO |<p>Manual close: YES</p> |
 |Zabbix server: More than 75% used in the vmware cache |<p>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Zabbix server health/zabbix[vmware,buffer,pused],10m)>75` |AVERAGE | |
 |Zabbix server: More than 75% used in the history cache |<p>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Zabbix server health/zabbix[wcache,history,pused],10m)>75` |AVERAGE | |
 |Zabbix server: More than 75% used in the history index cache |<p>Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Zabbix server health/zabbix[wcache,index,pused],10m)>75` |AVERAGE | |
@@ -140,5 +144,5 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
