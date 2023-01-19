@@ -59,6 +59,7 @@
 #include "housekeeper/trigger_housekeeper.h"
 #include "lld/lld_manager.h"
 #include "lld/lld_worker.h"
+#include "connector/connector_manager.h"
 #include "reporter/report_manager.h"
 #include "reporter/report_writer.h"
 #include "events.h"
@@ -1429,6 +1430,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_alert_syncer_args	alert_syncer_args = {CONFIG_CONFSYNCER_FREQUENCY};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_alert_scripts_path};
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
+	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1654,6 +1656,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_CONNECTORMANAGER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				thread_args.args = &connector_manager_args;
 				zbx_thread_start(connector_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_CONNECTORWORKER:

@@ -28,9 +28,6 @@
 #include "zbxtime.h"
 #include "zbxcacheconfig.h"
 
-extern unsigned char			program_type;
-extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
-
 #define ZBX_CONNECTOR_MANAGER_DELAY	1
 #define ZBX_CONNECTOR_FLUSH_INTERVAL	1
 
@@ -50,16 +47,14 @@ zbx_connector_worker_t;
 /* preprocessing manager data */
 typedef struct
 {
-	zbx_connector_worker_t		*workers;	/* preprocessing worker array */
-	int				worker_count;	/* preprocessing worker count */
+	zbx_connector_worker_t		*workers;		/* preprocessing worker array */
+	int				worker_count;		/* registered preprocessing worker count */
+	int				worker_fork_count;	/* preprocessing worker fork count */
 	zbx_hashset_t			connectors;
 	zbx_hashset_iter_t		iter;
 	zbx_uint64_t			config_revision;	/* the configuration revision */
 	zbx_uint64_t			connector_revision;
 	zbx_uint64_t			global_revision;
-	zbx_uint64_t			processed_num;	/* processed value counter */
-	zbx_uint64_t			queued_num;	/* queued value counter */
-	zbx_uint64_t			preproc_num;	/* queued values with preprocessing steps */
 }
 zbx_connector_manager_t;
 
@@ -107,14 +102,15 @@ static void	object_link_clean(zbx_object_link_t *object_link)
  * Parameters: manager - [IN] the manager to initialize                       *
  *                                                                            *
  ******************************************************************************/
-static void	connector_init_manager(zbx_connector_manager_t *manager)
+static void	connector_init_manager(zbx_connector_manager_t *manager, int worker_fork_count)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers: %d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER]);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers: %d", __func__, worker_fork_count);
 
 	memset(manager, 0, sizeof(zbx_connector_manager_t));
 
+	manager->worker_fork_count = worker_fork_count;
 	manager->workers = (zbx_connector_worker_t *)zbx_calloc(NULL,
-			(size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER], sizeof(zbx_connector_worker_t));
+			(size_t)manager->worker_fork_count, sizeof(zbx_connector_worker_t));
 
 	zbx_hashset_create_ext(&manager->connectors, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)connector_clear,
@@ -128,7 +124,7 @@ static void	connector_destroy_manager(zbx_connector_manager_t *manager)
 {
 	int	i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers: %d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER]);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers: %d", __func__, manager->worker_count);
 
 	for (i = 0; i < manager->worker_count; i++)
 		zbx_vector_uint64_destroy(&manager->workers[i].ids);
@@ -167,7 +163,7 @@ static void	connector_register_worker(zbx_connector_manager_t *manager, zbx_ipc_
 	}
 	else
 	{
-		if (CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER] == manager->worker_count)
+		if (manager->worker_fork_count == manager->worker_count)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -601,24 +597,26 @@ static void	connector_get_top_items(zbx_connector_manager_t *manager, zbx_ipc_cl
 
 ZBX_THREAD_ENTRY(connector_manager_thread, args)
 {
-	zbx_ipc_service_t		service;
-	char				*error = NULL;
-	zbx_ipc_client_t		*client;
-	zbx_ipc_message_t		*message;
-	int				ret, processed_num = 0;
-	double				time_stat, time_idle = 0, time_now, sec;
-	zbx_timespec_t			timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
-	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_vector_connector_object_t	connector_objects;
-	zbx_connector_manager_t		manager;
+	zbx_ipc_service_t			service;
+	char					*error = NULL;
+	zbx_ipc_client_t			*client;
+	zbx_ipc_message_t			*message;
+	int					ret;
+	double					time_stat, time_idle = 0, time_now, sec;
+	zbx_timespec_t				timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
+	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
+	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int					process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_vector_connector_object_t		connector_objects;
+	zbx_connector_manager_t			manager;
+	zbx_thread_connector_manager_args	*args_in;
 
+	args_in = (zbx_thread_connector_manager_args *)(((zbx_thread_args_t *)args)->args);
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 				server_num, get_process_type_string(process_type), process_num);
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_CONNECTOR, &error))
@@ -628,7 +626,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	connector_init_manager(&manager);
+	connector_init_manager(&manager, args_in->get_process_forks_cb_arg(ZBX_PROCESS_TYPE_CONNECTORWORKER));
 
 	/* initialize statistics */
 	time_stat = zbx_time();
@@ -642,14 +640,13 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
-			zbx_setproctitle("%s #%d [queued %d, processed %d values, idle "
+			zbx_setproctitle("%s #%d [idle "
 					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
 					get_process_type_string(process_type), process_num,
-					0, processed_num, time_idle, time_now - time_stat);
+					time_idle, time_now - time_stat);
 
 			time_stat = time_now;
 			time_idle = 0;
-			processed_num = 0;
 		}
 
 		connector_assign_tasks(&manager, time_now);
