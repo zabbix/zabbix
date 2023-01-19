@@ -435,7 +435,8 @@ if ($host_prototype['hostid'] != 0) {
 		new CSubmit('update', _('Update')),
 		[
 			new CSubmit('clone', _('Clone')),
-			(new CSubmit('delete', _('Delete')))->setEnabled($host_prototype['templateid'] == 0),
+			(new CButtonQMessage('delete', _('Delete'), _('Delete selected host prototype?')))
+				->setEnabled($host_prototype['templateid'] == 0),
 			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]
 	));
