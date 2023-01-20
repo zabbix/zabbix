@@ -1625,6 +1625,106 @@ class CHost extends CHostGeneral {
 
 		$hostids = array_keys($result);
 
+		if ($options['selectParentTemplates'] !== null) {
+			if ($options['selectParentTemplates'] != API_OUTPUT_COUNT) {
+				$templates = [];
+				$add_link_type = $this->outputIsRequested('link_type', $options['selectParentTemplates']);
+
+				$hosts_templates = DBfetchArray(DBselect(
+					'SELECT ht.hostid,ht.templateid'.($add_link_type ? ',ht.link_type' : '').
+					' FROM hosts_templates ht'.
+					' WHERE '.dbConditionId('ht.hostid', $hostids)
+				));
+
+				if ($hosts_templates) {
+					$template_output = $options['selectParentTemplates'];
+
+					if (is_array($template_output)) {
+						if (!in_array('templateid', $template_output)) {
+							$template_output[] = 'templateid';
+						}
+
+						if ($add_link_type) {
+							unset($template_output[array_search('link_type', $template_output)]);
+						}
+					}
+
+					$templates = API::Template()->get([
+						'output' => $template_output,
+						'templateids' => array_column($hosts_templates, 'templateid', 'templateid'),
+						'nopermissions' => $options['nopermissions'],
+						'preservekeys' => true
+					]);
+
+					if ($options['limitSelects'] !== null) {
+						order_result($templates, 'host');
+					}
+				}
+
+				$relation_map = [];
+
+				foreach ($hosts_templates as $host_template) {
+					$related_fields = ['templateid' => $host_template['templateid']];
+
+					if ($add_link_type) {
+						$related_fields['link_type'] = $host_template['link_type'];
+					}
+
+					$relation_map[$host_template['hostid']][] = $related_fields;
+				}
+
+				foreach ($result as $hostid => &$host) {
+					$host['parentTemplates'] = [];
+
+					if (!array_key_exists($hostid, $relation_map)) {
+						continue;
+					}
+
+					$templateids = array_column($relation_map[$hostid], 'templateid', 'templateid');
+
+					$host['parentTemplates'] = array_values(array_intersect_key($templates, $templateids));
+
+					if ($options['limitSelects'] !== null && $options['limitSelects'] != 0) {
+						$host['parentTemplates'] = array_slice($host['parentTemplates'], 0,
+							$options['limitSelects']
+						);
+					}
+
+					if ($add_link_type) {
+						foreach ($host['parentTemplates'] as &$template) {
+							foreach ($relation_map[$hostid] as $relation) {
+								if (bccomp($template['templateid'], $relation['templateid']) == 0) {
+									$template['link_type'] = $relation['link_type'];
+									break;
+								}
+							}
+						}
+						unset($template);
+					}
+
+					$host['parentTemplates'] = $this->unsetExtraFields($host['parentTemplates'], ['templateid'],
+						$options['selectParentTemplates']
+					);
+				}
+				unset($host);
+			}
+			else {
+				$templates = API::Template()->get([
+					'hostids' => $hostids,
+					'countOutput' => true,
+					'groupCount' => true,
+				]);
+
+				$templates = array_column($templates, null, 'hostid');
+
+				foreach ($result as $hostid => $host) {
+					$result[$hostid]['parentTemplates'] = array_key_exists($hostid, $templates)
+						? $templates[$hostid]['rowscount']
+						: '0';
+				}
+			}
+		}
+
 		if ($options['selectInventory'] !== null) {
 			$inventory = API::getApiService()->select('host_inventory', [
 				'output' => $options['selectInventory'],

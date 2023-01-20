@@ -316,8 +316,6 @@ class CTemplate extends CHostGeneral {
 		$ins_templates = [];
 
 		foreach ($templates as $template) {
-			unset($template['groups'], $template['tags'], $template['macros']);
-
 			$ins_templates[] = $template + ['status' => HOST_STATUS_TEMPLATE];
 		}
 
@@ -1085,7 +1083,7 @@ class CTemplate extends CHostGeneral {
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
-		$result = parent::addRelatedObjects(['selectParentTemplates' => null] + $options, $result);
+		$result = parent::addRelatedObjects($options, $result);
 
 		// adding template groups
 		$this->addRelatedGroups($options, $result, 'selectGroups');
