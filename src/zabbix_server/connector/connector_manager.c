@@ -659,6 +659,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 		connector_assign_tasks(&manager, (int)time_now, &processed_num);
 
+		time_now = zbx_time();
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
