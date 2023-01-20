@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-12-16T12:03:34Z'
+  date: '2023-01-20T13:53:35Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -20,7 +20,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, and `{$AZURE.SUBSCRIPTION_ID}`.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, and {$AZURE.SUBSCRIPTION_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -230,6 +230,126 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
+          description: 'The result of API requests is expressed in the JSON.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: app_id
+              value: '{$AZURE.APP_ID}'
+            -
+              name: password
+              value: '{$AZURE.PASSWORD}'
+            -
+              name: tenant_id
+              value: '{$AZURE.TENANT_ID}'
+            -
+              name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION_ID}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 91b2290d65b949ad9ea801763c35cf40
+          name: 'Azure: Get storages'
+          type: SCRIPT
+          key: azure.get.storages
+          delay: 10m
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Azure = {
+                params: {},
+                token: '',
+            
+                setParams: function (params) {
+                    ['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    Azure.params = params;
+                },
+                
+                login: function () {
+            
+                    var resp, login = new HttpRequest();
+                    login.addHeader('Content-Type: application/x-www-form-urlencoded');
+                    resp = login.post(
+                        'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) +'/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
+                    );
+                    if (login.getStatus() !== 200 || resp === null) {
+                        throw 'Login failed with status code ' + login.getStatus() + ': ' + resp;
+                    }
+                    try {
+                        resp =  JSON.parse(resp);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse authentication token for the logon session.'; 
+                    }
+                    if (!resp.hasOwnProperty('access_token')) {
+                        throw 'Auth response does not contain access token.';
+                    }
+                    Azure.token = resp['access_token']
+                },
+            
+                request: function (url) {
+              
+                    var response, request = new HttpRequest();
+                    if (typeof Azure.params.http_proxy !== 'undefined' && Azure.params.http_proxy !== '') {
+                        request.setProxy(Azure.params.http_proxy);
+                    }
+                    if (Azure.token) {
+                        request.addHeader('Accept: application/json');
+                        request.addHeader('Authorization: Bearer ' + Azure.token);
+                        response = request.get(url);
+                    }
+                    if (request.getStatus() !== 200 || response === null) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+                    try {
+                        return JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
+                    } 
+                },
+            
+                getMetricsData: function() {
+                    var data = {};
+                    data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + 'Microsoft.Storage/storageAccounts?api-version=2021-05-01');
+                    return data;
+                },
+            
+                lldFormat: function() {
+                    var input = Azure.getMetricsData()
+                    output = [];
+                    input.value.forEach(function (field) {
+                        output.push({
+                          'name': field['name'],
+                          'id': field['id'],
+                          'resourceGroup': field['id'].split("/")[4],
+                          'location': field['location'],
+                          'token': Azure.token
+                        });
+                    });
+                    return output;
+                }
+            };
+            
+            try {
+                Azure.setParams(JSON.parse(value));
+                Azure.login();
+                return JSON.stringify(Azure.lldFormat());
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ Azure ] ERROR: ' + error);
+                return JSON.stringify({'errors': error});
+            }
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
@@ -655,6 +775,489 @@ zabbix_export:
                     -
                       name: 'Azure PostgreSQL single server by HTTP'
         -
+          uuid: 3b9bde32dd6b4e3aa2dd8d7949f655e9
+          name: 'Storage accounts discovery'
+          type: DEPENDENT
+          key: azure.starage.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.STORAGE.NAME.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.STORAGE.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.STORAGE.LOCATION.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.STORAGE.LOCATION.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'The lists all the storage accounts available under the subscription.'
+          item_prototypes:
+            -
+              uuid: 3361508a601748f5aca339f952430889
+              name: 'Azure: Storage: [{#NAME}]: Get data'
+              type: SCRIPT
+              key: 'azure.get.storage[{#NAME}]'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              params: |
+                var AzureStorage = {
+                    params: {},
+                    token: '',
+                
+                    setParams: function (params) {
+                        [ 'token' , 'id'].forEach(function (field) {
+                            if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                                throw 'Required param is not set: ' + field + '.';
+                            }
+                        });
+                
+                        AzureStorage.params = params;
+                    },
+                    
+                    request: function (url) {
+                  
+                        var response, request = new HttpRequest();
+                        if (typeof AzureStorage.params.http_proxy !== 'undefined' && AzureStorage.params.http_proxy !== '') {
+                            request.setProxy(Azure.params.http_proxy);
+                        }
+                            request.addHeader('Accept: application/json');
+                            request.addHeader('Authorization: Bearer ' + AzureStorage.params.token);
+                            
+                            response = request.get(url);
+                        if (request.getStatus() !== 200 || response === null) {
+                            throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                        }
+                        try {
+                            return JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from API.';
+                        } 
+                    },
+                
+                    getMetricsData: function() {
+                        var 
+                        data = {};
+                        metrics = [
+                            'BlobCapacity',
+                            'BlobCount',
+                            'ContainerCount',
+                            'IndexCapacity',
+                            'Transactions',
+                            'Ingress',
+                            'Egress',
+                            'SuccessServerLatency',
+                            'SuccessE2ELatency',
+                            'Availability'
+                        ],
+                        prepared_metrics = [],
+                        data['metrics'] = {};
+                        start_date = new Date((new Date().getTime()) - 7200000).toISOString().replace(/\.\d+/, '');
+                        end_date = new Date((new Date().getTime()) - 3600000).toISOString().replace(/\.\d+/, '');
+                
+                        for (var i = 0; i < metrics.length; i += 20) {
+                            var chunk = metrics.slice(i, i + 20);
+                            prepared_metrics.push(
+                                chunk.map(function(element) {
+                                    return encodeURIComponent(element);
+                                }).join(',')
+                            );
+                        }
+                        for (var j in prepared_metrics) {
+                            metrics_data = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id + '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&interval=PT1H&api-version=2021-05-01&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date));
+                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+                                for (k in metrics_data.value) {
+                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' 
+                                        && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' 
+                                        && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) 
+                                        && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] 
+                                        && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                                    }
+                                }
+                            }
+                        }
+                        return data;
+                    }
+                };
+                
+                try {
+                    AzureStorage.setParams(JSON.parse(value));
+                    return JSON.stringify(AzureStorage.getMetricsData());
+                
+                }
+                catch (error) {
+                    error += (String(error).endsWith('.')) ? '' : '.';
+                    Zabbix.log(3, '[ Azure ] ERROR: ' + error);
+                    return JSON.stringify({'error': error});
+                }
+              description: 'The HTTP API endpoint that returns [{#NAME}] storage metrics.'
+              parameters:
+                -
+                  name: id
+                  value: '{#ID}'
+                -
+                  name: token
+                  value: '{#TOKEN}'
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 9ae0af76a37047f5ba84de2f43dfb5c4
+              name: 'Azure: Storage [{#NAME}]: Availability'
+              type: DEPENDENT
+              key: 'azure.storage.availability[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                The percentage of availability for the storage service or the specified API operation. 
+                Availability is calculated by taking the TotalBillableRequests value and dividing it by the number of applicable requests, including those that produced unexpected errors. 
+                All unexpected errors result in reduced availability for the storage service or the specified API operation.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.Availability.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: c6437ade4fee44f783ab379fb179508d
+              name: 'Azure: Storage [{#NAME}]: Blob Capacity'
+              type: DEPENDENT
+              key: 'azure.storage.blob.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of storage used by the storage account [{#NAME}] Blob service in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.BlobCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 9bd8b8f1b5844298a245d449548de46e
+              name: 'Azure: Storage [{#NAME}]: Blob Count'
+              type: DEPENDENT
+              key: 'azure.storage.blob.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of blob objects stored in the storage account [{#NAME}].'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.BlobCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 707be15f02a141548ce5f89097c303a0
+              name: 'Azure: Storage [{#NAME}]: Container Count'
+              type: DEPENDENT
+              key: 'azure.storage.container.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of containers in the storage account [{#NAME}].'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.ContainerCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: ae28bbd289644619b20b1907212d8293
+              name: 'Azure: Storage [{#NAME}]: Egress'
+              type: DEPENDENT
+              key: 'azure.storage.engress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: |
+                The amount of egress data. This number includes egress to external client from Azure Storage as well as egress within Azure. 
+                As a result, this number does not reflect billable egress.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.Egress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 8e73a2aba92444dd9c02c6f94227a4e5
+              name: 'Azure: Storage [{#NAME}]: Index Capacity'
+              type: DEPENDENT
+              key: 'azure.storage.index.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of storage [{#NAME}] used by Azure Data Lake Storage Gen2 hierarchical index.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.IndexCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: ff40325efb174839bef7bc775049837e
+              name: 'Azure: Storage [{#NAME}]: Ingress'
+              type: DEPENDENT
+              key: 'azure.storage.ingress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of ingress data, in bytes. This number includes ingress from an external client into Azure Storage as well as ingress within Azure.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.Ingress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: e17d6f2ed79c4b5eaa54730c82d6840f
+              name: 'Azure: Storage [{#NAME}]: Success E2E Latency'
+              type: DEPENDENT
+              key: 'azure.storage.success.e2e.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, in milliseconds. 
+                This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.SuccessE2ELatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 727fb792fe5c4229995f7aa5bbb681ed
+              name: 'Azure: Storage [{#NAME}]: Success Server Latency'
+              type: DEPENDENT
+              key: 'azure.storage.success.server.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average time used to process a successful request by Azure Storage. 
+                This value does not include the network latency specified in SuccessE2ELatency.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.SuccessServerLatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 48ecb880def34474b73a03eb895db3ea
+              name: 'Azure: Storage [{#NAME}]: Transactions'
+              type: DEPENDENT
+              key: 'azure.storage.transactions[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The number of requests made to a storage service or the specified API operation. 
+                This number includes successful and failed requests, as well as requests which produced errors. 
+                Use ResponseType dimension for the number of different type of response.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.metrics.Transactions.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+          master_item:
+            key: azure.get.storages
+          lld_macro_paths:
+            -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#LOCATION}'
+              path: $.location
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#TOKEN}'
+              path: $.token
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
           uuid: f9386233186648ce828f406c52972ce5
           name: 'Virtual machines discovery'
           type: DEPENDENT
@@ -837,6 +1440,22 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in discovery rules.'
         -
+          macro: '{$AZURE.STORAGE.LOCATION.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in storage accounts discovery rule.'
+        -
+          macro: '{$AZURE.STORAGE.LOCATION.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in storage accounts discovery rule.'
+        -
+          macro: '{$AZURE.STORAGE.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in storage accounts discovery rule.'
+        -
+          macro: '{$AZURE.STORAGE.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in storage accounts discovery rule.'
+        -
           macro: '{$AZURE.SUBSCRIPTION_ID}'
           description: 'Microsoft Azure subscription ID.'
         -
@@ -871,7 +1490,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -1878,7 +2497,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -2841,7 +3460,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -3647,7 +4266,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -4452,7 +5071,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -5381,7 +6000,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -6193,7 +6812,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -7838,27 +8457,6 @@ zabbix_export:
             host: 'Azure virtual machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.miss
     -
-      uuid: 3b278de1b81a4be7acc865568962c323
-      name: 'Azure Microsoft SQL: Connections'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure Microsoft SQL database by HTTP'
-            key: azure.db.mssql.connections.successful
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure Microsoft SQL database by HTTP'
-            key: azure.db.mssql.connections.failed.system
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Azure Microsoft SQL database by HTTP'
-            key: azure.db.mssql.firewall.blocked
-    -
       uuid: 62a9a5e1fb044a52a0b534bd4eeea914
       name: 'Azure Microsoft SQL: Connections'
       graph_items:
@@ -7880,20 +8478,26 @@ zabbix_export:
             host: 'Azure Microsoft SQL serverless database by HTTP'
             key: azure.db.mssql.firewall.blocked
     -
-      uuid: fe250a5f509d45babea9fcd12accbcac
-      name: 'Azure Microsoft SQL: CPU usage'
+      uuid: 3b278de1b81a4be7acc865568962c323
+      name: 'Azure Microsoft SQL: Connections'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Azure Microsoft SQL database by HTTP'
-            key: azure.db.mssql.cpu.limit
+            key: azure.db.mssql.connections.successful
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Azure Microsoft SQL database by HTTP'
-            key: azure.db.mssql.cpu.used
+            key: azure.db.mssql.connections.failed.system
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure Microsoft SQL database by HTTP'
+            key: azure.db.mssql.firewall.blocked
     -
       uuid: 083d307db8954fc59e8e5cfccefc16c1
       name: 'Azure Microsoft SQL: CPU usage'
@@ -7910,20 +8514,20 @@ zabbix_export:
             host: 'Azure Microsoft SQL serverless database by HTTP'
             key: azure.db.mssql.cpu.used
     -
-      uuid: ec5714017c744484be8c264d24a0e694
-      name: 'Azure Microsoft SQL: Storage utilization'
+      uuid: fe250a5f509d45babea9fcd12accbcac
+      name: 'Azure Microsoft SQL: CPU usage'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Azure Microsoft SQL database by HTTP'
-            key: azure.db.mssql.storage.used
+            key: azure.db.mssql.cpu.limit
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Azure Microsoft SQL database by HTTP'
-            key: azure.db.mssql.storage.allocated
+            key: azure.db.mssql.cpu.used
     -
       uuid: f541b6591683433aba4b3e58a8ad1e5c
       name: 'Azure Microsoft SQL: Storage utilization'
@@ -7938,6 +8542,21 @@ zabbix_export:
           color: 2774A4
           item:
             host: 'Azure Microsoft SQL serverless database by HTTP'
+            key: azure.db.mssql.storage.allocated
+    -
+      uuid: ec5714017c744484be8c264d24a0e694
+      name: 'Azure Microsoft SQL: Storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Microsoft SQL database by HTTP'
+            key: azure.db.mssql.storage.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Microsoft SQL database by HTTP'
             key: azure.db.mssql.storage.allocated
     -
       uuid: 750ae48e6ef749c19a06f4bbe716f92f
