@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxserialize.h"
 #include "zbxconnector.h"
+#include "zbxserialize.h"
 #include "log.h"
 #include "zbxjson.h"
 
