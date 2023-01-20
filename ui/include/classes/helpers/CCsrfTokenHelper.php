@@ -44,30 +44,6 @@ class CCsrfTokenHelper {
 	}
 
 	/**
-	 * Generates an associative array of CSRF tokens that can be used in forms.
-	 *
-	 * @param array $actions  array of actions for which tokens should be generated.
-	 *
-	 * @throws CAccessDeniedException
-	 *
-	 * @return array  Returns associative array of CSRF tokens for the specified actions, where the key is the name
-	 *                of the action.
-	 */
-	public static function getCsrfTokens(array $actions): ?array {
-		if (!CWebUser::$data['secret']) {
-			throw new CAccessDeniedException();
-		}
-
-		$csrf_tokens = [];
-
-		foreach ($actions as $action) {
-			$csrf_tokens[$action] =  CEncryptHelper::sign(CWebUser::$data['secret'] . $action);
-		}
-
-		return $csrf_tokens;
-	}
-
-	/**
 	 * Checks if input form CSRF token is correct.
 	 *
 	 * @param string $csrf_token_form  CSRF token from submitted form.
