@@ -1797,17 +1797,24 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 
 		if (0 != connector_filters->values_num)
 		{
-			int	k;
+			int			k;
+			zbx_vector_tags_t	event_tags;
+
+			zbx_vector_tags_create(&event_tags);
+			zbx_vector_tags_append_array(&event_tags, event->tags.values, event->tags.values_num);
+			zbx_vector_tags_sort(&event_tags, zbx_compare_tags);
 
 			for (k = 0; k < connector_filters->values_num; k++)
 			{
 				if (SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
-						&connector_filters->values[k].connector_tags, &event->tags))
+						&connector_filters->values[k].connector_tags, &event_tags))
 				{
 					zbx_vector_uint64_append(&connector_object.ids,
 							connector_filters->values[k].connectorid);
 				}
 			}
+
+			zbx_vector_tags_destroy(&event_tags);
 
 			if (0 == connector_object.ids.values_num && FAIL == events_export_enabled)
 				continue;
@@ -1897,17 +1904,25 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 
 		if (0 != connector_filters->values_num)
 		{
-			int	k;
+			int			k;
+			zbx_vector_tags_t	event_tags;
+
+			zbx_vector_tags_create(&event_tags);
+			zbx_vector_tags_append_array(&event_tags, recovery->r_event->tags.values,
+					recovery->r_event->tags.values_num);
+			zbx_vector_tags_sort(&event_tags, zbx_compare_tags);
 
 			for (k = 0; k < connector_filters->values_num; k++)
 			{
 				if (SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
-						&connector_filters->values[k].connector_tags, &recovery->r_event->tags))
+						&connector_filters->values[k].connector_tags, &event_tags))
 				{
 					zbx_vector_uint64_append(&connector_object.ids,
 							connector_filters->values[k].connectorid);
 				}
 			}
+
+			zbx_vector_tags_destroy(&event_tags);
 
 			if (0 == connector_object.ids.values_num && FAIL == events_export_enabled)
 				continue;
