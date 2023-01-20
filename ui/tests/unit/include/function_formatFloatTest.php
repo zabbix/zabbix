@@ -25,51 +25,100 @@ class function_formatFloatTest extends TestCase {
 
 	public static function dataProvider() {
 		return [
-			[0,						15,	null,	false,	'0'],
-			[1,						15,	null,	false,	'1'],
-			[9.4,					15,	null,	false,	'9'],
-			[9.5,					15,	null,	false,	'10'],
-			[9.99999999999999E+14,	15,	null,	false,	'999999999999999'],
-			[9.99999999999999E+15,	15,	null,	false,	'1E+16'],
-			[1.1,					15,	4,		false,	'1.1'],
-			[1.0001,				15,	4,		false,	'1.0001'],
-			[1.00004,				15,	4,		false,	'1'],
-			[1.00005,				15,	4,		false,	'1.0001'],
-			[0.000012344,			15,	4,		false,	'0.00001234'],
-			[0.000012345,			15,	4,		false,	'0.00001235'],
-			[100.00004,				15,	4,		false,	'100'],
-			[100.00005,				15,	4,		false,	'100.0001'],
-			[1E-14,					15,	4,		false,	'0.00000000000001'],
-			[1E-15,					15,	4,		false,	'1E-15'],
-			[1.0004E-14,			15,	4,		false,	'0.00000000000001'],
-			[1.0005E-14,			15,	4,		false,	'1.0005E-14'],
-			[1E+6,					4,	null,	false,	'1000000'],
-			[1E+7,					4,	null,	false,	'1E+7'],
-			[1.4E+100,				4,	null,	false,	'1E+100'],
-			[1.5E+100,				4,	null,	false,	'2E+100'],
-			[1.004E+100,			4,	2,		false,	'1E+100'],
-			[1.005E+100,			4,	2,		false,	'1.01E+100'],
-			[0.0004,				15,	4,		true,	'0.0004'],
-			[0.0005,				15,	4,		true,	'0.0005'],
-			[0.00004,				15,	4,		true,	'4.0000E-5'],
-			[0.00005,				15,	4,		true,	'5.0000E-5'],
-			[100.0004,				15,	4,		true,	'100.0004'],
-			[100.0005,				15,	4,		true,	'100.0005'],
-			[100.00004,				15,	4,		true,	'100.0000'],
-			[100.00005,				15,	4,		true,	'100.0001']
+			[0,						15,	null,	false,	true,	'0'],
+			[1,						15,	null,	false,	true,	'1'],
+			[9.4,					15,	null,	false,	true,	'9'],
+			[9.5,					15,	null,	false,	true,	'10'],
+			[9.99999999999999E+14,	15,	null,	false,	true,	'999999999999999'],
+			[9.99999999999999E+15,	15,	null,	false,	true,	'1E+16'],
+			[1.1,					15,	4,		false,	true,	'1.1'],
+			[1.0001,				15,	4,		false,	true,	'1.0001'],
+			[1.00004,				15,	4,		false,	true,	'1'],
+			[1.00005,				15,	4,		false,	true,	'1.0001'],
+			[0.000012344,			15,	4,		false,	true,	'0.00001234'],
+			[0.000012345,			15,	4,		false,	true,	'0.00001235'],
+			[100.00004,				15,	4,		false,	true,	'100'],
+			[100.00005,				15,	4,		false,	true,	'100.0001'],
+			[1E-14,					15,	4,		false,	true,	'0.00000000000001'],
+			[1E-15,					15,	4,		false,	true,	'1E-15'],
+			[1.0004E-14,			15,	4,		false,	true,	'1.0004E-14'],
+			[1.0005E-14,			15,	4,		false,	true,	'1.0005E-14'],
+			[1E+6,					4,	null,	false,	true,	'1000000'],
+			[1E+7,					4,	null,	false,	true,	'1E+7'],
+			[1.4E+100,				4,	null,	false,	true,	'1E+100'],
+			[1.5E+100,				4,	null,	false,	true,	'2E+100'],
+			[1.004E+100,			4,	2,		false,	true,	'1E+100'],
+			[1.005E+100,			4,	2,		false,	true,	'1.01E+100'],
+			[0.129,					4,	2,		false,	true,	'0.13'],
+			[0.0129,				4,	2,		false,	true,	'1.29E-2'],
+			[0.00129,				4,	2,		false,	true,	'1.29E-3'],
+			[0.000129,				4,	2,		false,	true,	'1.29E-4'],
+			[0.129,					4,	2,		true,	true,	'0.13'],
+			[0.0129,				4,	2,		true,	true,	'1.29E-2'],
+			[0.00129,				4,	2,		true,	true,	'1.29E-3'],
+			[0.000129,				4,	2,		true,	true,	'1.29E-4'],
+			[0.0004,				15,	4,		true,	true,	'0.0004'],
+			[0.0005,				15,	4,		true,	true,	'0.0005'],
+			[0.00004,				15,	4,		true,	true,	'4.0000E-5'],
+			[0.00005,				15,	4,		true,	true,	'5.0000E-5'],
+			[100.0004,				15,	4,		true,	true,	'100.0004'],
+			[100.0005,				15,	4,		true,	true,	'100.0005'],
+			[100.00004,				15,	4,		true,	true,	'100.0000'],
+			[100.00005,				15,	4,		true,	true,	'100.0001'],
+			[0,						15,	null,	false,	false,	'0'],
+			[1,						15,	null,	false,	false,	'1'],
+			[9.4,					15,	null,	false,	false,	'9'],
+			[9.5,					15,	null,	false,	false,	'10'],
+			[9.99999999999999E+14,	15,	null,	false,	false,	'999999999999999'],
+			[9.99999999999999E+15,	15,	null,	false,	false,	'1E+16'],
+			[1.1,					15,	4,		false,	false,	'1.1'],
+			[1.0001,				15,	4,		false,	false,	'1.0001'],
+			[1.00004,				15,	4,		false,	false,	'1'],
+			[1.00005,				15,	4,		false,	false,	'1.0001'],
+			[0.000012344,			15,	4,		false,	false,	'0.00001234'],
+			[0.000012345,			15,	4,		false,	false,	'0.00001235'],
+			[100.00004,				15,	4,		false,	false,	'100'],
+			[100.00005,				15,	4,		false,	false,	'100.0001'],
+			[1E-14,					15,	4,		false,	false,	'0.00000000000001'],
+			[1E-15,					15,	4,		false,	false,	'0.000000000000001'],
+			[1.0004E-14,			15,	4,		false,	false,	'0.00000000000001'],
+			[1.0005E-14,			15,	4,		false,	false,	'0.00000000000001001'],
+			[1E+6,					4,	null,	false,	false,	'1000000'],
+			[1E+7,					4,	null,	false,	false,	'1E+7'],
+			[1.4E+100,				4,	null,	false,	false,	'1E+100'],
+			[1.5E+100,				4,	null,	false,	false,	'2E+100'],
+			[1.004E+100,			4,	2,		false,	false,	'1E+100'],
+			[1.005E+100,			4,	2,		false,	false,	'1.01E+100'],
+			[0.129,					4,	2,		false,	false,	'0.13'],
+			[0.0129,				4,	2,		false,	false,	'0.013'],
+			[0.00129,				4,	2,		false,	false,	'0.0013'],
+			[0.000129,				4,	2,		false,	false,	'0.00013'],
+			[0.129,					4,	2,		true,	false,	'0.13'],
+			[0.0129,				4,	2,		true,	false,	'0.01'],
+			[0.00129,				4,	2,		true,	false,	'0.00'],
+			[0.000129,				4,	2,		true,	false,	'0.00'],
+			[0.0004,				15,	4,		true,	false,	'0.0004'],
+			[0.0005,				15,	4,		true,	false,	'0.0005'],
+			[0.00004,				15,	4,		true,	false,	'0.0000'],
+			[0.00005,				15,	4,		true,	false,	'0.0001'],
+			[100.0004,				15,	4,		true,	false,	'100.0004'],
+			[100.0005,				15,	4,		true,	false,	'100.0005'],
+			[100.00004,				15,	4,		true,	false,	'100.0000'],
+			[100.00005,				15,	4,		true,	false,	'100.0001']
 		];
 	}
 
 	/**
 	 * @dataProvider dataProvider
 	 *
-	 * @param string $source
-	 * @param int $precision
-	 * @param int $decimals
-	 * @param bool $exact
-	 * @param string $expected
+	 * @param float    $source
+	 * @param int|null $precision
+	 * @param int|null $decimals
+	 * @param bool     $exact
+	 * @param bool     $small_scientific
+	 * @param string   $expected
 	*/
-	public function test($source, $precision, $decimals, $exact, $expected) {
-		$this->assertSame($expected, formatFloat($source, $precision, $decimals, $exact));
+	public function test($source, $precision, $decimals, $exact, $small_scientific, $expected) {
+		$this->assertSame($expected, formatFloat($source, $precision, $decimals, $exact, $small_scientific));
 	}
 }

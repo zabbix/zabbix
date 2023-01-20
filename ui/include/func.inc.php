@@ -1499,11 +1499,11 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 			}
 
 			$test_number = sprintf('%.'.($precision - 1).'E', $test);
-			$test_digits = ($precision == 1)
+			$test_digits = $precision == 1
 				? 1
 				: strlen(rtrim(explode('E', $test_number)[0], '0')) - ($test_number[0] === '-' ? 2 : 1);
 
-			if ($test_digits - $exponent <= $precision) {
+			if (!$small_scientific || $test_digits - $exponent < $precision) {
 				break;
 			}
 		}
