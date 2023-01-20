@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'screens' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'screens' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,			null],
 	'screenid' =>		[T_ZBX_INT, O_NO,  P_SYS,	DB_ID,
 		'isset({form}) && ({form} === "update" || {form} === "full_clone")'
 	],
@@ -48,8 +48,8 @@ $fields = [
 	],
 	'userid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'private' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	null],
-	'users' =>			[T_ZBX_INT, O_OPT, null,	null,			null],
-	'userGroups' =>		[T_ZBX_INT, O_OPT, null,	null,			null],
+	'users' =>			[T_ZBX_INT, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
+	'userGroups' =>		[T_ZBX_INT, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	// actions
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"screen.export","screen.massdelete"'),		null],
 	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
@@ -57,7 +57,7 @@ $fields = [
 	'delete' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
 	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
-	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,	null,			null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, P_SYS,	null,			null],
 	// filter
 	'filter_set' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
@@ -355,7 +355,7 @@ if (hasRequest('form')) {
 
 	$data['form'] = getRequest('form');
 	$data['current_user_userid'] = $current_userid;
-	$data['form_refresh'] = getRequest('form_refresh');
+	$data['form_refresh'] = getRequest('form_refresh', 0);
 
 	// render view
 	echo (new CView('monitoring.screen.edit', $data))->getOutput();

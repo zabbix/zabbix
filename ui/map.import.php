@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $fields = [
-	'rules' => [T_ZBX_STR, O_OPT, null, null, null],
+	'rules' => [T_ZBX_INT, O_OPT, P_ONLY_TD_ARRAY, null, null],
 	'import' => [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null],
 	'rules_preset' => [T_ZBX_STR, O_OPT, null, null, null]
 ];

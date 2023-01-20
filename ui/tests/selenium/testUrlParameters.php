@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,6 +66,22 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
+						'url' => 'hostgroups.php?form=update&groupid[]=1',
+						'text_not_present' => 'Host groups',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "groupid" is not correct: invalid data type.'
+						]
+					],
+					[
+						'url' => 'hostgroups.php?form[]=update&groupid=1',
+						'text_not_present' => 'Host groups',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "form" is not correct: invalid data type.'
+						]
+					],
+					[
 						'url' => 'hostgroups.php?form=update',
 						'text_not_present' => 'Host groups',
 						'text_present' => [
@@ -113,6 +129,14 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
 							'Incorrect value "-1" for "templateid" field.'
+						]
+					],
+					[
+						'url' => 'templates.php?form=update&templateid%5B%5D=1',
+						'text_not_present' => 'Templates',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "templateid" is not correct: invalid data type.'
 						]
 					],
 					[
@@ -166,6 +190,14 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
+						'url' => 'hosts.php?form=update&hostid[]=1',
+						'text_not_present' => 'Hosts',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "hostid" is not correct: invalid data type.'
+						]
+					],
+					[
 						'url' => 'hosts.php?form=update',
 						'text_not_present' => 'Hosts',
 						'text_present' => [
@@ -213,6 +245,14 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
 							'Incorrect value "-1" for "maintenanceid" field.'
+						]
+					],
+					[
+						'url' => 'maintenance.php?form=update&maintenanceid[]=1',
+						'text_not_present' => 'Maintenance periods',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "maintenanceid" is not correct: invalid data type.'
 						]
 					],
 					[
@@ -266,11 +306,31 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
+						'url' => 'actionconf.php?form=update&actionid[]=1',
+						'text_not_present' => 'Actions',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "actionid" is not correct: invalid data type.'
+						]
+					],
+					[
 						'url' => 'actionconf.php?form=update',
 						'text_not_present' => 'Actions',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
 							'Field "actionid" is mandatory.'
+						]
+					],
+					[
+						'url' => 'actionconf.php?eventsource=1',
+						'text_present' => 'Discovery actions'
+					],
+					[
+						'url' => 'actionconf.php?eventsource[]=1',
+						'text_not_present' => 'Discovery actions',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "eventsource" is not correct: invalid data type.'
 						]
 					]
 				]
@@ -316,11 +376,31 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
+						'url' => 'screenedit.php?screenid[]=3',
+						'text_not_present' => 'Screens: Zabbix server',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "screenid" is not correct: invalid data type.'
+						]
+					],
+					[
 						'url' => 'screenedit.php',
 						'text_not_present' => 'Screens: Zabbix server',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
 							'Field "screenid" is mandatory.'
+						]
+					],
+					[
+						'url' => 'screenconf.php?templateid=1',
+						'text_present' => 'Screens'
+					],
+					[
+						'url' => 'screenconf.php?templateid[]=1',
+						'text_not_present' => 'Screens',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "templateid" is not correct: invalid data type.'
 						]
 					]
 				]
@@ -358,11 +438,41 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
+						'url' => 'slideconf.php?form=update&slideshowid[]=1',
+						'text_not_present' => 'Slide shows',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "slideshowid" is not correct: invalid data type.'
+						]
+					],
+					[
 						'url' => 'slideconf.php?form=update',
 						'text_not_present' => 'Slide shows',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
 							'Field "slideshowid" is mandatory.'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'Custom slides [refreshed every 30 sec.]',
+				'check_server_name' => true,
+				'server_name_on_page' => true,
+				'test_cases' => [
+					[
+						'url' => 'slides.php?elementid=1',
+						'text_not_present' => 'Slide shows',
+						'text_present' => [
+							'No permissions to referred object or it does not exist!'
+						]
+					],
+					[
+						'url' => 'slides.php?elementid[]=1',
+						'text_not_present' => 'Slide shows',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "elementid" is not correct: invalid data type.'
 						]
 					]
 				]
@@ -405,6 +515,14 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
 							'Incorrect value "-1" for "sysmapid" field.'
+						]
+					],
+					[
+						'url' => 'sysmap.php?sysmapid[]=1',
+						'text_not_present' => 'Network maps',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "sysmapid" is not correct: invalid data type.'
 						]
 					],
 					[
@@ -458,6 +576,14 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
+						'url' => 'discoveryconf.php?form=update&druleid[]=1',
+						'text_not_present' => 'Discovery rules',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "druleid" is not correct: invalid data type.'
+						]
+					],
+					[
 						'url' => 'discoveryconf.php?form=update',
 						'text_not_present' => 'Discovery rules',
 						'text_present' => [
@@ -498,6 +624,23 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
 							'Incorrect value "-1" for "type" field.'
+						]
+					],
+					[
+						'url' => 'overview.php?type[]=0',
+						'text_not_present' => 'Overview',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "type" is not correct: invalid data type.'
+						]
+					],
+					[
+						'url' => 'overview.php?application[]=1+application&filter_set[]=1',
+						'text_not_present' => 'Overview',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "filter_set" is not correct: invalid data type.',
+							'Field "application" is not correct: invalid data type.'
 						]
 					]
 				]
@@ -540,6 +683,14 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
 							'Incorrect value "-1" for "httptestid" field.'
+						]
+					],
+					[
+						'url' => 'httpdetails.php?httptestid[]=1',
+						'text_not_present' => 'Details of web scenario',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "httptestid" is not correct: invalid data type.'
 						]
 					],
 					[
@@ -600,8 +751,27 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
+						'url' => 'zabbix.php?action=latest.view&filter_groupids=1&filter_hostids=1',
+						'text_not_present' => 'Latest data',
+						'fatal_error' => true,
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value "1" for "filter_groupids" field.',
+							'Incorrect value "1" for "filter_hostids" field.'
+						]
+					],
+					[
 						'url' => 'zabbix.php?action=latest.view',
 						'text_present' => 'Latest data'
+					],
+					[
+						'url' => 'zabbix.php?action[]=latest.view',
+						'text_not_present' => 'Latest data',
+						'fatal_error' => true,
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for field "action": a character string is expected.'
+						]
 					]
 				]
 			],
@@ -622,6 +792,32 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_not_present' => 'Events',
 						'text_present' => [
 							'Not Found'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'Event details',
+				'check_server_name' => true,
+				'server_name_on_page' => true,
+				'test_cases' => [
+					[
+						'url' => 'tr_events.php?triggerid=99251&eventid=93',
+						'text_present' => 'Event details'
+					],
+					[
+						'url' => 'tr_events.php?triggerid=1&eventid=1',
+						'text_present' => [
+							'No permissions to referred object or it does not exist!'
+						]
+					],
+					[
+						'url' => 'tr_events.php?triggerid[]=1&eventid[]=1',
+						'text_not_present' => 'Event details',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "triggerid" is not correct: invalid data type.',
+							'Field "eventid" is not correct: invalid data type.'
 						]
 					]
 				]
@@ -667,6 +863,15 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_not_present' => 'Problems',
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
+							'Controller: problem.view'
+						]
+					],
+					[
+						'url' => 'zabbix.php?action=problem.view&filter_triggerids=1',
+						'text_not_present' => 'Problems',
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value "1" for "filter_triggerids" field.',
 							'Controller: problem.view'
 						]
 					]
@@ -733,6 +938,16 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
+						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids=1&filter_set[]=1',
+						'text_not_present' => 'Graphs',
+						'fatal_error' => true,
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for "filter_set" field.',
+							'Incorrect value "1" for "filter_graphids" field.'
+						]
+					],
+					[
 						'url' => 'zabbix.php?action=charts.view&filter_set=1',
 						'text_present' => [
 							'Graphs',
@@ -780,6 +995,14 @@ class testUrlParameters extends CLegacyWebTest {
 							'Zabbix has received an incorrect request.',
 							'Incorrect value "-1" for "elementid" field.'
 						]
+					],
+					[
+						'url' => 'screens.php?elementid[]=1',
+						'text_not_present' => 'Screens',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "elementid" is not correct: invalid data type.'
+						]
 					]
 				]
 			],
@@ -797,7 +1020,7 @@ class testUrlParameters extends CLegacyWebTest {
 			[
 				'title' => 'Configuration of network maps',
 				'check_serer_name' => true,
-				'server_name_on_page' => true,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
 						'url' => 'sysmaps.php?sysmapid=1&severity_min=0',
@@ -850,8 +1073,28 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'sysmaps.php?sysmapid=1&severity_min=0',
-						'text_present' => 'Maps'
+						'url' => 'sysmaps.php?sysmapid[]=1&severity_min=0',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "sysmapid" is not correct: invalid data type.'
+						]
+					],
+					[
+						'url' => 'sysmaps.php?sysmapid=1&severity_min[]=0',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "severity_min" is not correct: invalid data type.'
+						]
+					],
+					[
+						'url' => 'zabbix.php?action=map.view&sysmapid[]=1',
+						'text_not_present' => 'Maps',
+						'fatal_error' => true,
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for "sysmapid" field.',
+							'Controller: map.view'
+						]
 					]
 				]
 			],
@@ -875,6 +1118,29 @@ class testUrlParameters extends CLegacyWebTest {
 					[
 						'url' => 'zabbix.php?action=discovery.view&filter_rst=1',
 						'text_present' => 'Status of discovery'
+					]
+				]
+			],
+			[
+				'title' => 'Fatal error, please report to the Zabbix team',
+				'check_server_name' => false,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => 'zabbix.php?action[]=dashboard.list',
+						'text_not_present' => 'Dashboards',
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for field "action": a character string is expected.'
+						]
+					],
+					[
+						'url' => 'zabbix.php?action[]=dashboard.view',
+						'text_not_present' => 'Dashboards',
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for field "action": a character string is expected.'
+						]
 					]
 				]
 			],
@@ -912,6 +1178,15 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_not_present' => 'Status of discovery',
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
+							'Controller: discovery.view'
+						]
+					],
+					[
+						'url' => 'zabbix.php?action=discovery.view&filter_rst[]=1',
+						'text_not_present' => 'Status of discovery',
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for "filter_rst" field.',
 							'Controller: discovery.view'
 						]
 					]
@@ -987,6 +1262,14 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
+						'url' => 'srv_status.php?period[]=1',
+						'text_not_present' => 'Services',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "period" is not correct: invalid data type.'
+						]
+					],
+					[
 						'url' => 'srv_status.php',
 						'text_present' => 'Services'
 					]
@@ -1024,6 +1307,15 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => [
 							'Page received incorrect data',
 							'Incorrect value for "filter_groups" field.'
+						]
+					],
+					[
+						'url' => 'hostinventoriesoverview.php?filter_groups=1&filter_groupby[]=&filter_set[]=1',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "filter_set" is not correct: invalid data type.',
+							'Field "filter_groups" is not correct: an array is expected.',
+							'Field "filter_groupby" is not correct: invalid data type.'
 						]
 					],
 					[
@@ -1070,6 +1362,14 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => [
 							'Page received incorrect data',
 							'Incorrect value for "filter_groups" field.'
+						]
+					],
+					[
+						'url' => 'hostinventories.php?filter_groups=1&filter_set[]=1',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "filter_set" is not correct: invalid data type.',
+							'Field "filter_groups" is not correct: an array is expected.'
 						]
 					],
 					[

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,6 +254,7 @@ $selected_tab = $data['form_refresh'] ? get_cookie('tab', 0) : 0;
 (new CWidget())
 	->setTitle(_('Authentication'))
 	->addItem((new CForm())
+		->addVar('form_refresh', $data['form_refresh'] + 1)
 		->addVar('action', $data['action_submit'])
 		->addVar('db_authentication_type', $data['db_authentication_type'])
 		->setName('form_auth')

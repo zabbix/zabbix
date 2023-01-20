@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,8 +43,8 @@ $fields = [
 	// filter
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_groupids' =>	[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_hostids' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_groupids' =>	[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'filter_hostids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'ack_status' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'show_severity' =>		[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
@@ -53,7 +53,7 @@ $fields = [
 	'status_change' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'txt_select' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'inventory' =>			[T_ZBX_STR, O_OPT, null,	null,		null]
+	'inventory' =>			[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null]
 ];
 check_fields($fields);
 

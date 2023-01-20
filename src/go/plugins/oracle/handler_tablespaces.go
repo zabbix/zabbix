@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 				NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES,
 				NVL(SUM(f.FREE), 0) AS FREE_BYTES,
 				SUM(df.BYTES)-SUM(f.FREE) AS USED_BYTES,
-				ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
+				ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, ((SUM(df.BYTES)-SUM(f.FREE)) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
 				ROUND(DECODE(SUM(df.BYTES), 0, 0, (SUM(df.BYTES)-SUM(f.FREE)) / SUM(df.BYTES)* 100), 2) AS USED_FILE_PCT,
 				DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
 			FROM

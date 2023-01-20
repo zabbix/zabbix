@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class CControllerValuemapEdit extends CController {
 			'valuemapid'   => 'db valuemaps.valuemapid',
 			'name'         => 'string | db valuemaps.name',
 			'mappings'     => 'array',
-			'form_refresh' => '',
+			'form_refresh' => 'int32',
 			'page'         => 'ge 1'
 		];
 
@@ -85,6 +85,7 @@ class CControllerValuemapEdit extends CController {
 
 	protected function doAction() {
 		$data = [
+			'form_refresh'   => $this->getInput('form_refresh', 0),
 			'mappings'       => $this->getInput('mappings', $this->valuemap['mappings']),
 			'name'           => $this->getInput('name', $this->valuemap['name']),
 			'valuemapid'     => $this->getInput('valuemapid', $this->valuemap['valuemapid']),

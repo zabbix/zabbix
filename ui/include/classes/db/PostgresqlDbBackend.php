@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -298,5 +298,22 @@ class PostgresqlDbBackend extends DbBackend {
 		$result = DBfetch(DBselect($query));
 
 		return $result ? (bool) $result['chunks'] : $result;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function dbFieldExists($table_name, $field_name) {
+		global $DB;
+
+		$schema = $DB['SCHEMA'] ? $DB['SCHEMA'] : 'public';
+
+		return (bool) DBFetch(DBselect(
+			'SELECT 1'.
+			' FROM information_schema.columns'.
+			' WHERE table_name='.zbx_dbstr($table_name).
+				' AND column_name='.zbx_dbstr($field_name).
+				' AND table_schema='.zbx_dbstr($schema)
+		));
 	}
 }

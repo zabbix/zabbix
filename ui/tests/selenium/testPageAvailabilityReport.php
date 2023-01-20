@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 		$args = [
 			'from' => date('Y-m-d H:i:s', strtotime($start_time)),
 			'to' => date('Y-m-d H:i:s', strtotime($end_time)),
-			'filter_hostids' => 50014
+			'filter_hostids' => [50014]
 		];
 
 		$this->zbxTestLogin('report2.php?'.http_build_query($args));

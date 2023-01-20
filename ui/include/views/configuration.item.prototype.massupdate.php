@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ $widget = (new CWidget())
 	->addItem(get_header_host_table('items', $data['hostid'], $data['parent_discoveryid']));
 
 $form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('item_prototype_form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('group_itemid', $data['item_prototypeids'])
@@ -232,7 +233,7 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
 			->setLabel(_('Preprocessing steps'))
 			->setChecked(array_key_exists('preprocessing', $data['visible'])),
-		(new CDiv(getItemPreprocessing($form, $data['preprocessing'], false, $data['preprocessing_types'])))
+		(new CDiv(getItemPreprocessing($data['preprocessing'], false, $data['preprocessing_types'])))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->setId('preprocessing_div')

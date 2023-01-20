@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'new_httpstep'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM,	null,				null],
-	'group_httptestid'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,				null],
+	'group_httptestid'	=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,				null],
 	// form
 	'hostid'          => [T_ZBX_INT, O_OPT, P_SYS, DB_ID.NOT_ZERO,          'isset({form}) || isset({add}) || isset({update})'],
 	'applicationid'   => [T_ZBX_INT, O_OPT, null,  DB_ID,                   null, _('Application')],
@@ -46,10 +46,10 @@ $fields = [
 	'status'          => [T_ZBX_STR, O_OPT, null,  null,                    null],
 	'agent'           => [T_ZBX_STR, O_OPT, null, null,                     'isset({add}) || isset({update})'],
 	'agent_other'     => [T_ZBX_STR, O_OPT, null, null,
-		'(isset({add}) || isset({update})) && {agent} == '.ZBX_AGENT_OTHER
+		'(isset({add}) || isset({update})) && isset({agent}) && {agent} == '.ZBX_AGENT_OTHER
 	],
-	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    null],
-	'steps'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    'isset({add}) || isset({update})', _('Steps')],
+	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,  null,                    null],
+	'steps'           => [null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,  null,                    'isset({add}) || isset({update})', _('Steps')],
 	'authentication'  => [T_ZBX_INT, O_OPT, null,  IN('0,1,2,3'),             'isset({add}) || isset({update})'],
 	'http_user'       => [T_ZBX_STR, O_OPT, null,  null,
 		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
@@ -78,8 +78,8 @@ $fields = [
 	'filter_status' =>		[T_ZBX_INT, O_OPT, null,
 		IN([-1, HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED]), null
 	],
-	'filter_groups'		=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'filter_hostids'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
+	'filter_groups'		=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
+	'filter_hostids'	=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"httptest.massclearhistory","httptest.massdelete","httptest.massdisable",'.
@@ -94,7 +94,7 @@ $fields = [
 	'delete'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'cancel'			=> [T_ZBX_STR, O_OPT, P_SYS,	null,				null],
 	'form'				=> [T_ZBX_STR, O_OPT, P_SYS,	null,				null],
-	'form_refresh'		=> [T_ZBX_INT, O_OPT, null,	null,				null],
+	'form_refresh'		=> [T_ZBX_INT, O_OPT, P_SYS,	null,				null],
 	// sort and sortorder
 	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"hostname","name","status"'),				null],
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -532,7 +532,7 @@ if (isset($_REQUEST['form'])) {
 		'hostid' => getRequest('hostid', 0),
 		'httptestid' => getRequest('httptestid'),
 		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'templates' => []
 	];
 
