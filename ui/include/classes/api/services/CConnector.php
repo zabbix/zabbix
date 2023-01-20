@@ -249,6 +249,8 @@ class CConnector extends CApiService {
 
 		$this->validateUpdate($connectors, $db_connectors);
 
+		$connectorids = array_column($connectors, 'connectorid');
+
 		$upd_connectors = [];
 		$upd_connectorids = [];
 
@@ -285,7 +287,7 @@ class CConnector extends CApiService {
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_CONNECTOR, $connectors, $db_connectors);
 
-		return ['connectorids' => array_column($connectors, 'connectorid')];
+		return ['connectorids' => $connectorids];
 	}
 
 	/**
