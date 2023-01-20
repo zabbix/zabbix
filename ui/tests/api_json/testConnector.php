@@ -539,31 +539,6 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": value is too long.'
 			],
-			'Test connector.create: missing "ssl_cert_file" if "ssl_key_file" not empty' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'ssl_key_file' => 'ssl_key_file'
-				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "ssl_cert_file" is missing.'
-			],
-			'Test connector.create: invalid "ssl_cert_file" (empty) if "ssl_key_file" not empty' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'ssl_cert_file' => '',
-					'ssl_key_file' => 'ssl_key_file'
-				],
-				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": cannot be empty.'
-			],
-			'Test connector.create: missing "ssl_cert_file" if "ssl_key_password" not empty' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'ssl_key_password' => 'ssl_key_password'
-				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "ssl_cert_file" is missing.'
-			],
 
 			// Check "ssl_key_file".
 			'Test connector.create: invalid "ssl_key_file" (boolean)' => [
@@ -583,6 +558,14 @@ class testConnector extends CAPITest {
 					'ssl_key_file' => str_repeat('a', DB::getFieldLength('connector', 'ssl_key_file') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_key_file": value is too long.'
+			],
+			'Test connector.create: "ssl_key_file" must be empty, if "ssl_cert_file" is empty' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'ssl_key_file' => 'ssl_key_file'
+				],
+				'expected_error' => 'Invalid parameter "/1/ssl_key_file": value must be empty.'
 			],
 
 			// Check "ssl_key_password".
@@ -605,6 +588,14 @@ class testConnector extends CAPITest {
 					'ssl_key_password' => str_repeat('a', DB::getFieldLength('connector', 'ssl_key_password') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_key_password": value is too long.'
+			],
+			'Test connector.create: "ssl_key_password" must be empty, if "ssl_key_file" is empty' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'ssl_key_password' => 'ssl_key_password'
+				],
+				'expected_error' => 'Invalid parameter "/1/ssl_key_password": value must be empty.'
 			],
 
 			// Check "description".
@@ -1729,13 +1720,6 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": value is too long.'
 			],
-			'Test connector.update: invalid "ssl_cert_file" (empty) if "ssl_key_file" not empty' => [
-				'connector' => [
-					'connectorid' => 'update_custom_defaults',
-					'ssl_cert_file' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": cannot be empty.'
-			],
 
 			// Check "ssl_key_file".
 			'Test connector.update: invalid "ssl_key_file" (boolean)' => [
@@ -1752,12 +1736,13 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_key_file": value is too long.'
 			],
-			'Test connector.update: invalid "ssl_key_file" (empty) if "ssl_key_password" not empty' => [
+			'Test connector.update: "ssl_key_file" must be empty, if "ssl_cert_file" is empty' => [
 				'connector' => [
 					'connectorid' => 'update_custom_defaults',
-					'ssl_key_file' => ''
+					'ssl_cert_file' => '',
+					'ssl_key_file' => 'ssl_key_file'
 				],
-				'expected_error' => 'Invalid parameter "/1/ssl_key_file": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/ssl_key_file": value must be empty.'
 			],
 
 			// Check "ssl_key_password".
@@ -1774,6 +1759,14 @@ class testConnector extends CAPITest {
 					'ssl_key_password' => str_repeat('a', DB::getFieldLength('connector', 'ssl_key_password') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_key_password": value is too long.'
+			],
+			'Test connector.update: "ssl_key_password" must be empty, if "ssl_key_file" is empty' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'ssl_key_file' => '',
+					'ssl_key_password' => 'ssl_key_password'
+				],
+				'expected_error' => 'Invalid parameter "/1/ssl_key_password": value must be empty.'
 			],
 
 			// Check "description".
