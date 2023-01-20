@@ -635,7 +635,7 @@ class testFormUpdateProblem extends CWebTest {
 						'id:severity' => 'High',
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
-						'id:suppress_until_problem' => 'now+15y'
+						'id:suppress_until_problem' => 'now+14y'
 					],
 					'db_check' => [
 						[
