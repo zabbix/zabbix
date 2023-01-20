@@ -182,7 +182,7 @@ static void	proxyconfig_remove_unused_templates(void)
 		else
 			zbx_vector_uint64_append(&hostids, hostid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_dc_get_unused_macro_templates(&templates, &hostids, &templateids);
 

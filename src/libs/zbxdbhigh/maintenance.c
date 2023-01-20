@@ -77,7 +77,7 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 		while (maintenanceid != maintenanceids->values[i])
 			zbx_vector_uint64_remove(maintenanceids, i);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	while (i != maintenanceids->values_num)
 		zbx_vector_uint64_remove_noorder(maintenanceids, i);

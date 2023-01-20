@@ -6449,7 +6449,7 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 			timer->eval_ts = timer_local.eval_ts;
 
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)

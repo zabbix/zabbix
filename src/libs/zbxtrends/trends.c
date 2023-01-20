@@ -463,7 +463,7 @@ static zbx_trend_state_t	trends_eval(const char *table, zbx_uint64_t itemid, int
 	else
 		state = ZBX_TREND_STATE_NODATA;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return state;
 }
@@ -522,7 +522,7 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
 	else
 		state = ZBX_TREND_STATE_NODATA;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return state;
 }
@@ -564,7 +564,7 @@ static zbx_trend_state_t	trends_eval_sum(const char *table, zbx_uint64_t itemid,
 	while (NULL != (row = DBfetch(result)))
 		sum += atof(row[0]) * atof(row[1]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_INFINITY == sum)
 		return ZBX_TREND_STATE_OVERFLOW;

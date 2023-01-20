@@ -53,7 +53,7 @@ static int	DBpatch_4000001(void)
 	ret = db_rename_macro(result, "actions", "actionid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
 			"{EVENT.NAME}");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -77,7 +77,7 @@ static int	DBpatch_4000002(void)
 	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
 			"{EVENT.NAME}");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -98,7 +98,7 @@ static int	DBpatch_4000003(void)
 	ret = db_rename_macro(result, "opcommand", "operationid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
 			"{EVENT.NAME}");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }

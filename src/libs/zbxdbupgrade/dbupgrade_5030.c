@@ -140,13 +140,13 @@ static int	DBpatch_5030001(void)
 
 		if (NULL == (row = DBfetch(result)))
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			continue;
 		}
 
 		DBpatch_get_key_fields(row, &profile, &subsect, &field, &key);
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		if (NULL == subsect || NULL == field || NULL == key)
 		{
@@ -242,7 +242,7 @@ static int	DBpatch_5030003(void)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(profile.idx);
 	zbx_free(profile.value_str);
@@ -596,7 +596,7 @@ static void	get_discovered_itemids(const zbx_vector_uint64_t *itemids, zbx_vecto
 
 		zbx_vector_uint64_append(discovered_itemids, itemid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids, zbx_vector_uint64_t *itemids,
@@ -635,7 +635,7 @@ static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids
 
 		zbx_vector_uint64_append(templateids, itemid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select i2.itemid"
@@ -656,7 +656,7 @@ static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids
 
 		zbx_vector_uint64_append(discovered_itemids, itemid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_destroy(&templateids_tmp);
 
@@ -729,7 +729,7 @@ static int	DBpatch_5030046(void)
 
 		zbx_vector_ptr_pair_append(&valuemap->mappings, pair);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect("select h.flags,i.hostid,i.valuemapid,i.itemid"
 			" from items i,hosts h"
@@ -768,7 +768,7 @@ static int	DBpatch_5030046(void)
 
 		zbx_vector_uint64_append(&host->itemids, itemid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", NULL);
 	zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
@@ -1002,7 +1002,7 @@ static int	validate_types_in_opcommand(void)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1163,7 +1163,7 @@ static int	DBpatch_5030067(void)
 			break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1249,11 +1249,11 @@ static int	zbx_make_script_name_unique(const char *name, int *suffix, char **uni
 		if (NULL == DBfetch(result))
 		{
 			*unique_name = try_name;
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return SUCCEED;
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 }
 
@@ -1320,7 +1320,7 @@ static int	DBpatch_5030068(void)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1557,7 +1557,7 @@ static int	DBpatch_5030069(void)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < opcommands.values_num; i++)
 		zbx_free(opcommands.values[i].record);
@@ -1917,7 +1917,7 @@ static int DBpatch_dashboard_name(char *name, char **new_name)
 	{
 		char	*name_esc;
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		name_esc = DBdyn_escape_string(*new_name);
 
@@ -1948,7 +1948,7 @@ static int DBpatch_dashboard_name(char *name, char **new_name)
 		*new_name = zbx_dsprintf(*new_name, "%s%s", name, affix_string);
 	} while (COLLISIONS_MAX_NUMBER > affix++);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(affix_string);
 
 	return ret;
@@ -1969,7 +1969,7 @@ static int DBpatch_reference_name(char **ref_name)
 		for (j = 0; j < REFERENCE_MAX_LEN; j++)
 			name[j] = pattern[rand() % (int)strlen(pattern)];
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		result = DBselect("select count(*)"
 			" from widget_field"
@@ -1988,7 +1988,7 @@ static int DBpatch_reference_name(char **ref_name)
 
 	} while (COLLISIONS_MAX_NUMBER > i++);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -2962,7 +2962,7 @@ static int DBpatch_set_permissions_screen(uint64_t dashboardid, uint64_t screeni
 			goto out;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect("select usrgrpid,permission from screen_usrgrp where screenid=" ZBX_FS_UI64, screenid);
 
@@ -2978,7 +2978,7 @@ static int DBpatch_set_permissions_screen(uint64_t dashboardid, uint64_t screeni
 		}
 	}
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -3001,7 +3001,7 @@ static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slid
 			goto out;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect("select usrgrpid,permission from slideshow_usrgrp where slideshowid=" ZBX_FS_UI64,
 			slideshowid);
@@ -3018,7 +3018,7 @@ static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slid
 		}
 	}
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -3245,7 +3245,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t userid
 
 	zbx_free(dashboard.name);
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -3336,7 +3336,7 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 		if (NULL == result2 || NULL == (row2 = DBfetch(result2)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot convert screen " ZBX_FS_UI64, screenid);
-			DBfree_result(result2);
+			zbx_db_free_result(result2);
 			continue;
 		}
 
@@ -3344,7 +3344,7 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 				row2[0], page_delay, step)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot convert screen " ZBX_FS_UI64, screenid);
-			DBfree_result(result2);
+			zbx_db_free_result(result2);
 			continue;
 		}
 
@@ -3356,8 +3356,8 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 		if (NULL != result3)
 			DBpatch_convert_screen_items(result3, dashboard_page.dashboard_pageid);
 
-		DBfree_result(result2);
-		DBfree_result(result3);
+		zbx_db_free_result(result2);
+		zbx_db_free_result(result3);
 	}
 
 out:
@@ -3365,7 +3365,7 @@ out:
 
 	zbx_free(dashboard.name);
 exit:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -3398,7 +3398,7 @@ static int	DBpatch_5030094(void)
 		ret = DBpatch_convert_slideshow(slideshowid, row[1], delay, userid, private);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -3427,7 +3427,7 @@ static int	DBpatch_5030095(void)
 			ret = DBpatch_delete_screen(screenid);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -3748,7 +3748,7 @@ static int	DBpatch_5030120(void)
 		zbx_db_insert_add_values(&db_insert, itemtagid++, itemid, "Application", value);
 		zbx_free(value);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ret = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
@@ -3782,7 +3782,7 @@ static int	DBpatch_5030121(void)
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), itemid, "Application", value);
 		zbx_free(value);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, "itemtagid");
 	ret = zbx_db_insert_execute(&db_insert);
@@ -3815,7 +3815,7 @@ static int	DBpatch_5030122(void)
 		zbx_db_insert_add_values(&db_insert, httptesttagid++, httptestid, "Application", value);
 		zbx_free(value);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ret = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
@@ -3847,7 +3847,7 @@ static int	DBpatch_5030123(void)
 		zbx_db_insert_add_values(&db_insert, selementtagid++, selementid, "Application", value);
 		zbx_free(value);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ret = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
@@ -4122,7 +4122,7 @@ static int	DBpatch_5030130(void)
 		zbx_free(app);
 		zbx_json_free(&json);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -4172,7 +4172,7 @@ static int	DBpatch_5030131(void)
 
 		zbx_free(val);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
 
@@ -4280,7 +4280,7 @@ static int	DBpatch_5030143(void)
 	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{EVENT.NAME}",
 			"{EVENT.RECOVERY.NAME}");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -4299,7 +4299,7 @@ static int	DBpatch_5030144(void)
 	ret = db_rename_macro(result, "media_type_message", "mediatype_messageid", fields, ARRSIZE(fields),
 			"{EVENT.NAME}", "{EVENT.RECOVERY.NAME}");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -4725,7 +4725,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 			zbx_free(replace);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = index; i < functions->values_num; i++)
 	{
@@ -4935,7 +4935,7 @@ static int	DBpatch_5030165(void)
 			break;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -5112,7 +5112,7 @@ static int	DBpatch_5030167(void)
 
 		zbx_free(out);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -5332,7 +5332,7 @@ static int	DBpatch_5030168(void)
 		zbx_free(out);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_vector_ptr_destroy(&functions);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -5501,7 +5501,7 @@ static int	DBpatch_5030169(void)
 		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -5584,7 +5584,7 @@ static int	DBpatch_5030173(void)
 
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), objectid, type, clock, ns);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, "trigger_queueid");
 	ret = zbx_db_insert_execute(&db_insert);
@@ -5682,14 +5682,14 @@ static int	DBpatch_5030181(void)
 		if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 			ret = FAIL;
 out:
-		DBfree_result(in_result);
+		zbx_db_free_result(in_result);
 		zbx_free(sql);
 
 		if (FAIL == ret)
 			break;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -5843,7 +5843,7 @@ static int	DBpatch_5030190(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -5890,7 +5890,7 @@ static int	DBpatch_5030191(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -5951,7 +5951,7 @@ static int	DBpatch_5030192(void)
 				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
 						__func__, row[0], error);
 				zbx_free(error);
-				DBfree_result(result);
+				zbx_db_free_result(result);
 				return FAIL;
 			}
 
@@ -5968,7 +5968,7 @@ static int	DBpatch_5030192(void)
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
 							" zbx_is_uint64_n error", __func__, row[0]);
-					DBfree_result(result);
+					zbx_db_free_result(result);
 					return FAIL;
 				}
 
@@ -5989,7 +5989,7 @@ static int	DBpatch_5030192(void)
 					zbx_variant_set_str(&token->value, func);
 				}
 
-				DBfree_result(result2);
+				zbx_db_free_result(result2);
 			}
 
 			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
@@ -6019,7 +6019,7 @@ static int	DBpatch_5030192(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -6077,7 +6077,7 @@ static int	DBpatch_5030193(void)
 		zbx_free(uuid);
 		zbx_free(seed);
 
-		DBfree_result(result2);
+		zbx_db_free_result(result2);
 
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
@@ -6088,7 +6088,7 @@ static int	DBpatch_5030193(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -6135,7 +6135,7 @@ static int	DBpatch_5030194(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -6182,7 +6182,7 @@ static int	DBpatch_5030195(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -6229,7 +6229,7 @@ static int	DBpatch_5030196(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -6266,7 +6266,7 @@ static int	DBpatch_5030197(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -6315,7 +6315,7 @@ static int	DBpatch_5030198(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -6363,13 +6363,13 @@ static int	DBpatch_5030199(void)
 
 		if (NULL == (row2 = DBfetch(result2)))
 		{
-			DBfree_result(result2);
+			zbx_db_free_result(result2);
 			continue;
 		}
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", row2[0]);
 
-		DBfree_result(result2);
+		zbx_db_free_result(result2);
 
 		for (i = 0; i < 2; i++)
 		{
@@ -6395,7 +6395,7 @@ static int	DBpatch_5030199(void)
 				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
 						__func__, row[0], error);
 				zbx_free(error);
-				DBfree_result(result);
+				zbx_db_free_result(result);
 				return FAIL;
 			}
 
@@ -6412,7 +6412,7 @@ static int	DBpatch_5030199(void)
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
 							" zbx_is_uint64_n error", __func__, row[0]);
-					DBfree_result(result);
+					zbx_db_free_result(result);
 					return FAIL;
 				}
 
@@ -6433,7 +6433,7 @@ static int	DBpatch_5030199(void)
 					zbx_variant_set_str(&token->value, func);
 				}
 
-				DBfree_result(result2);
+				zbx_db_free_result(result2);
 			}
 
 			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
@@ -6463,7 +6463,7 @@ static int	DBpatch_5030199(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -6514,7 +6514,7 @@ static int	DBpatch_5030200(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -6563,7 +6563,7 @@ static int	DBpatch_5030201(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;

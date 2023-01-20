@@ -55,7 +55,7 @@ static void	DBget_lastsize(void)
 	else
 		ZBX_STR2UINT64(trap_lastsize, row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	DBcommit();
 }
