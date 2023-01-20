@@ -364,6 +364,8 @@ void	zabbix_close_log(void)
 	{
 		zbx_mutex_destroy(&log_access);
 	}
+
+	log_type = LOG_TYPE_UNDEFINED;
 }
 
 void	__zbx_zabbix_log(int level, const char *fmt, ...)
