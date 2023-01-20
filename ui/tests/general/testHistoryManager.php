@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,10 +26,12 @@ require_once __DIR__.'/../../include/classes/api/API.php';
 require_once __DIR__.'/../../include/classes/api/CApiServiceFactory.php';
 require_once __DIR__.'/../../include/classes/api/managers/CHistoryManager.php';
 require_once __DIR__.'/../../include/classes/api/services/CSettings.php';
+require_once __DIR__.'/../../include/classes/api/services/CHousekeeping.php';
 require_once __DIR__.'/../../include/classes/helpers/CArrayHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CConfigGeneralHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CSettingsHelper.php';
 require_once __DIR__.'/../../include/classes/validators/CApiInputValidator.php';
+require_once __DIR__.'/../../include/classes/helpers/CHousekeepingHelper.php';
 
 /**
  * @backup history_uint
