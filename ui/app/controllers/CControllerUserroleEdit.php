@@ -26,7 +26,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 	private $role;
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 

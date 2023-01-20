@@ -26,7 +26,7 @@ class CControllerHintboxEventlist extends CController {
 	 */
 	protected $trigger;
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 

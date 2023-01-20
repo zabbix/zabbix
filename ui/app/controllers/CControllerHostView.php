@@ -22,7 +22,7 @@
 
 class CControllerHostView extends CControllerHost {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 

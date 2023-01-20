@@ -24,6 +24,10 @@
  */
 class CControllerProblemViewRefresh extends CControllerProblemView {
 
+	protected function init(): void {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'action' =>				'string',

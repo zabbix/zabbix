@@ -23,7 +23,7 @@ class CControllerHostGroupUpdate extends CController {
 
 	private $group;
 
-	protected function init() {
+	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 

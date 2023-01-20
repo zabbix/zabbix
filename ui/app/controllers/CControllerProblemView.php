@@ -24,7 +24,7 @@
  */
 class CControllerProblemView extends CControllerProblem {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 

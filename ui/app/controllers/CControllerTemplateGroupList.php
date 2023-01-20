@@ -21,7 +21,7 @@
 
 class CControllerTemplateGroupList extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 

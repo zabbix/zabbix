@@ -23,7 +23,7 @@ class CControllerTemplateDashboardEdit extends CController {
 
 	private array $dashboard;
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 

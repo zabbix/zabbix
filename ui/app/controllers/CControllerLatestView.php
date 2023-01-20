@@ -24,7 +24,7 @@
  */
 class CControllerLatestView extends CControllerLatest {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
