@@ -71,5 +71,4 @@ void	zbx_diag_init(zbx_diag_add_section_info_func_t cb);
 int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info);
 void	zbx_diag_log_info(unsigned int flags, char **result);
 
-
 #endif /* ZABBIX_ZBXDIAG_H */

@@ -6553,6 +6553,7 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		zbx_hashset_remove_direct(&config->connectors, connector);
 	}
+
 	if (0 != sync->add_num || 0 != sync->update_num || 0 != sync->remove_num)
 		config->revision.connector = revision;
 
@@ -7224,12 +7225,13 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec +  tisec + pisec + tsec +
 				dsec + fsec + expr_sec + action_sec + action_op_sec + action_condition_sec +
 				trigger_tag_sec + correlation_sec + corr_condition_sec + corr_operation_sec +
-				hgroups_sec + itempp_sec + maintenance_sec + item_tag_sec + drules_sec + httptest_sec;
+				hgroups_sec + itempp_sec + maintenance_sec + item_tag_sec + drules_sec + httptest_sec +
+				connector_sec;
 		total2 = csec2 + hsec2 + hisec2 + ifsec2 + idsec2 + isec2 + tisec2 + pisec2 + tsec2 + dsec2 + fsec2 +
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec +
-				drules_sec2 + httptest_sec2;
+				drules_sec2 + httptest_sec2 + connector_sec2;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
 				__func__, changelog_sec, changelog_num);
@@ -7383,6 +7385,10 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, connector_sec, connector_sec2, connector_sync.add_num,
 				connector_sync.update_num, connector_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() connector_tag: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, connector_sec, connector_sec2, connector_tag_sync.add_num,
+				connector_tag_sync.update_num, connector_tag_sync.remove_num);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() macro cache: " ZBX_FS_DBL " sec.", __func__, um_cache_sec);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec.", __func__, update_sec);
