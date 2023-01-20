@@ -57,7 +57,7 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 		{
 			*err_msg = zbx_strdcat(*err_msg, " Supported values are: ");
 
-			for (int	i = 0; i < rc; i++)
+			for (int i = 0; i < rc; i++)
 			{
 				*err_msg = zbx_strdcat(*err_msg, algs[i]);
 
