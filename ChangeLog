@@ -821,6 +821,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.13rc1
 
 New features:
+.......PS. [ZBXNEXT-8054] updated MariaDB maximum supported version to 10.10 (MVekslers)
 A.F....... [ZBXNEXT-7951] implemented configuration import improvements (rdetlavs)
 .........T [ZBXNEXT-8112] added Line media type (abiba)
 ........S. [ZBXNEXT-8197] added TimescaleDB v2.9.x support (dgoloscapov)
@@ -836,6 +837,21 @@ A.F....... [ZBXNEXT-7951] implemented configuration import improvements (rdetlav
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+...G...... [ZBX-22061] fixed custom query parameter read on empty parameter for oracle plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBX-21227] improved error logging during agent start as Windows service (asestakovs)
+........S. [ZBX-22178] fixed action operations being executed on current host if only host group is selected (vso)
+........S. [ZBX-22189] fixed LLD Zabbix server crash (arimdjonoks)
+A......... [ZBX-21538] fixed history.get API method blocking drop_chunks requests during housekeeping (agriscenko, Sasha)
+..F....... [ZBX-21956] fixed severity sign overlapping trigger name in map element configuration (agriscenko)
+........S. [ZBX-22215] fixed incorrectly quoted function parameter parsing (wiper)
+.......PS. [ZBX-22043] fixed crash when array index in jsonpath is negative or large (vso)
+...G...... [ZBX-22118] fixed remote command execution sequence in Zabbix agent 2 (esneiders)
+.........T [ZBX-21556] updated Etcd by HTTP template to comply with Etcd v3.5 (knaglis)
+...G...... [ZBX-22133] fixed closed pipe detection for communication with plugins in Windows (MVekslers)
+..F....... [ZBX-21936] fixed actions not being displayed in Action log widget (esekace)
+..F....... [ZBX-22164] fixed quote and unquote methods for trigger functions (rdetlavs)
+.........T [ZBX-21254] removed kernel.maxproc from processes graph in Linux by Zabbix agent templates (drasikhov)
+........S. [ZBX-21754] improved value cache warmup when retrieving two last values with 1 day update interval (vso)
 ..F....... [ZBX-22077] fixed Sign out link not working consistently in Mozilla Firefox (jfreibergs)
 ...G...... [ZBX-21862] updated tablespaces query for oracle plugin in Zabbix agent 2 (esneiders)
 ...G...... [ZBX-21665] fixed SMART plugin infinite loop for Zabbix agent 2 (esneiders)
