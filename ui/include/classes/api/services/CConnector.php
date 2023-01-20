@@ -36,7 +36,7 @@ class CConnector extends CApiService {
 	protected $sortColumns = ['connectorid', 'name', 'data_type', 'status'];
 
 	private array $output_fields = ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_records', 'max_senders',
-		'timeout', 'max_attempts', 'token', 'http_proxy', 'authtype', 'username', 'password', 'verify_peer',
+		'max_attempts', 'timeout', 'token', 'http_proxy', 'authtype', 'username', 'password', 'verify_peer',
 		'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'status', 'tags_evaltype'
 	];
 
@@ -187,8 +187,8 @@ class CConnector extends CApiService {
 			'url' =>				['type' => API_URL, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('connector', 'url')],
 			'max_records' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32],
 			'max_senders' =>		['type' => API_INT32, 'in' => '1:100'],
-			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:'.SEC_PER_MIN],
 			'max_attempts' =>		['type' => API_INT32, 'in' => '0:5'],
+			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
 			'token' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'token')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
 			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]), 'default' => DB::getDefault('connector', 'authtype')],
@@ -325,8 +325,8 @@ class CConnector extends CApiService {
 			'url' =>				['type' => API_URL, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('connector', 'url')],
 			'max_records' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32],
 			'max_senders' =>		['type' => API_INT32, 'in' => '1:100'],
-			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:'.SEC_PER_MIN],
 			'max_attempts' =>		['type' => API_INT32, 'in' => '0:5'],
+			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
 			'token' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'token')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
 			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])],

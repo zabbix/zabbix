@@ -319,6 +319,24 @@ class testConnector extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/max_senders": value must be one of 1-100.'
 			],
 
+			// Check "max_attempts".
+			'Test connector.create: invalid "max_attempts" (string)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'max_attempts' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/max_attempts": an integer is expected.'
+			],
+			'Test connector.create: invalid "max_attempts" (not in range)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'max_attempts' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/max_attempts": value must be one of 0-5.'
+			],
+
 			// Check "timeout".
 			'Test connector.create: invalid "timeout" (boolean)' => [
 				'connector' => [
@@ -351,24 +369,6 @@ class testConnector extends CAPITest {
 					'timeout' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/timeout": value must be one of 1-'.SEC_PER_MIN.'.'
-			],
-
-			// Check "max_attempts".
-			'Test connector.create: invalid "max_attempts" (string)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'max_attempts' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/max_attempts": an integer is expected.'
-			],
-			'Test connector.create: invalid "max_attempts" (not in range)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'max_attempts' => self::INVALID_NUMBER
-				],
-				'expected_error' => 'Invalid parameter "/1/max_attempts": value must be one of 0-5.'
 			],
 
 			// Check "token".
@@ -1023,7 +1023,7 @@ class testConnector extends CAPITest {
 					'output' => ['abc']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "connectorid", "name", "protocol", "data_type", "url", "max_records", "max_senders", "timeout", "max_attempts", "token", "http_proxy", "authtype", "username", "password", "verify_peer", "verify_host", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "description", "status", "tags_evaltype".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "connectorid", "name", "protocol", "data_type", "url", "max_records", "max_senders", "max_attempts", "timeout", "token", "http_proxy", "authtype", "username", "password", "verify_peer", "verify_host", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "description", "status", "tags_evaltype".'
 			],
 
 			// Check "selectTags" option.
@@ -1537,6 +1537,22 @@ class testConnector extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/max_senders": value must be one of 1-100.'
 			],
 
+			// Check "max_attempts".
+			'Test connector.update: invalid "max_attempts" (string)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'max_attempts' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/max_attempts": an integer is expected.'
+			],
+			'Test connector.update: invalid "max_attempts" (not in range)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'max_attempts' => self::INVALID_NUMBER
+				],
+				'expected_error' => 'Invalid parameter "/1/max_attempts": value must be one of 0-5.'
+			],
+
 			// Check "timeout".
 			'Test connector.update: invalid "timeout" (boolean)' => [
 				'connector' => [
@@ -1565,22 +1581,6 @@ class testConnector extends CAPITest {
 					'timeout' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/timeout": value must be one of 1-'.SEC_PER_MIN.'.'
-			],
-
-			// Check "max_attempts".
-			'Test connector.update: invalid "max_attempts" (string)' => [
-				'connector' => [
-					'connectorid' => 'update_custom_defaults',
-					'max_attempts' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/max_attempts": an integer is expected.'
-			],
-			'Test connector.update: invalid "max_attempts" (not in range)' => [
-				'connector' => [
-					'connectorid' => 'update_custom_defaults',
-					'max_attempts' => self::INVALID_NUMBER
-				],
-				'expected_error' => 'Invalid parameter "/1/max_attempts": value must be one of 0-5.'
 			],
 
 			// Check "token".
@@ -2185,9 +2185,10 @@ class testConnector extends CAPITest {
 	 */
 	private function getConnectors(array $connectorids): array {
 		$response = $this->call('connector.get', [
-			'output' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_records', 'max_senders', 'timeout',
-				'max_attempts', 'token', 'http_proxy', 'authtype', 'username', 'password', 'verify_peer', 'verify_host',
-				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'status', 'tags_evaltype'
+			'output' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_records', 'max_senders',
+				'max_attempts', 'timeout', 'token', 'http_proxy', 'authtype', 'username', 'password', 'verify_peer',
+				'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'status',
+				'tags_evaltype'
 			],
 			'selectTags' => ['tag', 'operator', 'value'],
 			'connectorids' => $connectorids,
