@@ -1324,15 +1324,24 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				",null,null,null,null");
 #endif
-	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o"
-			" join scripts s"
-				" on o.scriptid=s.scriptid"
-			" left join opcommand_hst oh"
-				" on o.operationid=oh.operationid"
-			" where  o.operationid=" ZBX_FS_UI64
-				" and oh.hostid is null",
-			operationid);
+	if (EVENT_SOURCE_SERVICE == event->source)
+	{
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
+				" from opcommand o,scripts s"
+				" where o.scriptid=s.scriptid"
+					" and o.operationid=" ZBX_FS_UI64,
+				operationid);
+	}
+	else
+	{
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
+				" from opcommand o,opcommand_hst oh,scripts s"
+				" where o.operationid=oh.operationid"
+					" and o.scriptid=s.scriptid"
+					" and o.operationid=" ZBX_FS_UI64
+					" and oh.hostid is null",
+				operationid);
+	}
 
 	result = DBselect("%s", buffer);
 
