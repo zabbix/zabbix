@@ -76,12 +76,12 @@ void	zbx_connector_deserialize_object(const unsigned char *data, zbx_uint32_t si
 void	zbx_connector_serialize_data_point(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_connector_data_point_t *connector_data_point)
 {
-	zbx_uint32_t	data_len = 0, error_len;
+	zbx_uint32_t	data_len = 0, str_len;
 	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, connector_data_point->ts.sec);
 	zbx_serialize_prepare_value(data_len, connector_data_point->ts.ns);
-	zbx_serialize_prepare_str_len(data_len, connector_data_point->str, error_len);
+	zbx_serialize_prepare_str_len(data_len, connector_data_point->str, str_len);
 
 	if (NULL == *data)
 		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
@@ -96,7 +96,7 @@ void	zbx_connector_serialize_data_point(unsigned char **data, size_t *data_alloc
 
 	ptr += zbx_serialize_value(ptr, connector_data_point->ts.sec);
 	ptr += zbx_serialize_value(ptr, connector_data_point->ts.ns);
-	ptr += zbx_serialize_str(ptr, connector_data_point->str, error_len);
+	ptr += zbx_serialize_str(ptr, connector_data_point->str, str_len);
 }
 
 static void	zbx_connector_deserialize_data_point(const unsigned char *data, zbx_uint32_t size,
