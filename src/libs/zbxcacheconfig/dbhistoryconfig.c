@@ -872,12 +872,26 @@ void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter)
 	zbx_vector_match_tags_clear_ext(&connector_filter.connector_tags, zbx_match_tag_free);
 	zbx_vector_match_tags_destroy(&connector_filter.connector_tags);
 }
-typedef struct
+
+static void	substitute_orig_unmasked(const char *orig, char **data)
 {
-	const char	*orig;
-	char		**data;
+	if (NULL == strstr(orig, "{$"))
+		return;
+
+	*data = zbx_strdup(*data, orig);
+	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			data, MACRO_TYPE_COMMON, NULL, 0);
 }
-zbx_substitute_value_t;
+
+static void	substitute_orig(const char *orig, char **data)
+{
+	if (NULL == strstr(orig, "{$"))
+		return;
+
+	*data = zbx_strdup(*data, orig);
+	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, data,
+			MACRO_TYPE_COMMON, NULL, 0);
+}
 
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,
 		zbx_uint64_t *config_revision, zbx_uint64_t *connector_revision, zbx_clean_func_t data_point_link_clean)
@@ -989,30 +1003,16 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 		zbx_hashset_iter_reset(connectors, &iter);
 		while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
 		{
-			size_t			i;
-			zbx_substitute_value_t	substitute_values[] = {
-					{connector->url_orig, &connector->url},
-					{connector->timeout_orig, &connector->timeout},
-					{connector->token_orig, &connector->token},
-					{connector->http_proxy_orig, &connector->http_proxy},
-					{connector->username_orig, &connector->username},
-					{connector->password_orig, &connector->password},
-					{connector->ssl_cert_file_orig, &connector->ssl_cert_file},
-					{connector->ssl_key_file_orig, &connector->ssl_key_file},
-					{connector->ssl_key_password_orig, &connector->ssl_key_password}
-			};
+			substitute_orig_unmasked(connector->url_orig, &connector->url);
+			substitute_orig_unmasked(connector->token_orig, &connector->token);
+			substitute_orig_unmasked(connector->http_proxy_orig, &connector->http_proxy);
+			substitute_orig_unmasked(connector->username_orig, &connector->username);
+			substitute_orig_unmasked(connector->password_orig, &connector->password);
+			substitute_orig_unmasked(connector->ssl_cert_file_orig, &connector->ssl_cert_file);
+			substitute_orig_unmasked(connector->ssl_key_file_orig, &connector->ssl_key_file);
+			substitute_orig_unmasked(connector->ssl_key_password_orig, &connector->ssl_key_password);
 
-			for (i = 0; i < ARRSIZE(substitute_values); i++)
-			{
-				if (NULL == strstr(substitute_values[i].orig, "{$"))
-					continue;
-
-				*substitute_values[i].data = zbx_strdup(*substitute_values[i].data,
-						substitute_values[i].orig);
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-						NULL, NULL, NULL, NULL, substitute_values[i].data, MACRO_TYPE_COMMON,
-						NULL, 0);
-			}
+			substitute_orig(connector->timeout_orig, &connector->timeout);
 		}
 
 		zbx_dc_close_user_macros(um_handle);
