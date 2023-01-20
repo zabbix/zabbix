@@ -1194,4 +1194,60 @@ abstract class CHostBase extends CApiService {
 
 		return $result;
 	}
+
+	/**
+	 * Extracts and combines properties from database data for input array of templates, hosts or host prototypes.
+	 *
+	 * @param array $data
+	 * @param array $db_objects
+	 *
+	 * @return array
+	 */
+	protected function getObjectsByData(array $data, array $db_objects): array {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		$objects = [];
+
+		foreach ($db_objects as $db_object) {
+			$object = [$id_field_name => $db_object[$id_field_name]];
+
+			if (array_key_exists('groups', $db_object)) {
+				$object['groups'] = [];
+
+				if (array_key_exists('groups', $data)) {
+					foreach ($data['groups'] as $group) {
+						$object['groups'][] = ['groupid' => $group['groupid']];
+					}
+				}
+			}
+
+			if (array_key_exists('macros', $db_object)) {
+				$object['macros'] = [];
+
+				if (array_key_exists('macros', $data) && is_array(reset($data['macros']))) {
+					$db_macros = [];
+
+					foreach ($db_object['macros'] as $db_macro) {
+						$db_macros[CApiInputValidator::trimMacro($db_macro['macro'])] = $db_macro;
+					}
+
+					foreach ($data['macros'] as $macro) {
+						$trimmed_macro = CApiInputValidator::trimMacro($macro['macro']);
+
+						if (array_key_exists($trimmed_macro, $db_macros)) {
+							$object['macros'][] = ['hostmacroid' => $db_macros[$trimmed_macro]['hostmacroid']] + $macro
+								+ ['description' => DB::getDefault('hostmacro', 'description')];
+						}
+						else {
+							$object['macros'][] = $macro;
+						}
+					}
+				}
+			}
+
+			$objects[] = $object;
+		}
+
+		return $objects;
+	}
 }

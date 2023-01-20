@@ -735,60 +735,6 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Get templates input array based on requested data and database data.
-	 *
-	 * @param array $data
-	 * @param array $db_templates
-	 *
-	 * @return array
-	 */
-	protected function getTemplatesByData(array $data, array $db_templates): array {
-		$templates = [];
-
-		foreach ($db_templates as $db_template) {
-			$template = ['templateid' => $db_template['templateid']];
-
-			if (array_key_exists('groups', $db_template)) {
-				$template['groups'] = [];
-
-				if (array_key_exists('groups', $data)) {
-					foreach ($data['groups'] as $group) {
-						$template['groups'][] = ['groupid' => $group['groupid']];
-					}
-				}
-			}
-
-			if (array_key_exists('macros', $db_template)) {
-				$template['macros'] = [];
-
-				if (array_key_exists('macros', $data) && is_array(reset($data['macros']))) {
-					$db_macros = [];
-
-					foreach ($db_template['macros'] as $db_macro) {
-						$db_macros[CApiInputValidator::trimMacro($db_macro['macro'])] = $db_macro;
-					}
-
-					foreach ($data['macros'] as $macro) {
-						$trimmed_macro = CApiInputValidator::trimMacro($macro['macro']);
-
-						if (array_key_exists($trimmed_macro, $db_macros)) {
-							$template['macros'][] = ['hostmacroid' => $db_macros[$trimmed_macro]['hostmacroid']] + $macro
-								+ ['description' => DB::getDefault('hostmacro', 'description')];
-						}
-						else {
-							$template['macros'][] = $macro;
-						}
-					}
-				}
-			}
-
-			$templates[] = $template;
-		}
-
-		return $templates;
-	}
-
-	/**
 	 * Add given template groups, macros and templates to given templates.
 	 *
 	 * @param array $data
@@ -798,7 +744,7 @@ class CTemplate extends CHostGeneral {
 	public function massAdd(array $data) {
 		$this->validateMassAdd($data, $db_templates);
 
-		$templates = $this->getTemplatesByData($data, $db_templates);
+		$templates = parent::getObjectsByData($data, $db_templates);
 
 		$this->updateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
@@ -818,7 +764,7 @@ class CTemplate extends CHostGeneral {
 	public function massUpdate(array $data) {
 		$this->validateMassUpdate($data, $db_templates);
 
-		$templates = $this->getTemplatesByData($data, $db_templates);
+		$templates = parent::getObjectsByData($data, $db_templates);
 
 		$this->updateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
@@ -838,7 +784,7 @@ class CTemplate extends CHostGeneral {
 	public function massRemove(array $data) {
 		$this->validateMassRemove($data, $db_templates);
 
-		$templates = $this->getTemplatesByData($data, $db_templates);
+		$templates = parent::getObjectsByData($data, $db_templates);
 
 		$this->updateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
