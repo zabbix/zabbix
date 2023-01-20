@@ -147,6 +147,11 @@ class CHistory extends CApiService {
 				return $this->getFromElasticsearch($options);
 
 			default:
+				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
+					$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+					$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
+				}
+
 				return $this->getFromSql($options);
 		}
 	}
