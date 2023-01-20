@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1477,6 +1477,29 @@ static int	DBpatch_6030158(void)
 	return DBcreate_index("event_symptom", "event_symptom_1", "cause_eventid", 0);
 }
 
+static int	DBpatch_6030159(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.actionconf.php.sort", "web.action.list.sort",
+			"web.actionconf.php.sortorder", "web.action.list.sortorder",
+			"web.actionconf.filter_name", "web.action.list.filter_name",
+			"web.actionconf.filter_status", "web.action.list.filter_status",
+			"web.actionconf.filter.active", "web.action.list.filter.active"
+		};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #undef HOST_STATUS_TEMPLATE
 #define HOST_STATUS_TEMPLATE		3
 #define MAX_LONG_NAME_COLLISIONS	999999
@@ -1777,7 +1800,7 @@ static void	correct_entity_name(char **name, int uniq, int max_len, int *long_na
 		*name = zbx_dsprintf(*name, "%s %d", *name, uniq);
 }
 
-static int	DBpatch_6030159(void)
+static int	DBpatch_6030160(void)
 {
 	zbx_vector_valuemap_ptr_t		valuemaps;
 	zbx_vector_child_valuemap_ptr_t		child_valuemaps;
@@ -2161,7 +2184,7 @@ static void	collect_hostmacros(zbx_vector_uint64_t *parent_ids, zbx_vector_uint6
 }
 
 
-static int	DBpatch_6030160(void)
+static int	DBpatch_6030161(void)
 {
 	zbx_vector_hostmacro_ptr_t		hostmacros;
 	zbx_vector_child_hostmacro_ptr_t	child_hostmacros;
@@ -2402,7 +2425,7 @@ static void	DBpatch_propogate_tag(zbx_vector_tag_ptr_t *tags, zbx_db_patch_tag_t
 	DBfree_result(result);
 }
 
-static int	DBpatch_6030161(void)
+static int	DBpatch_6030162(void)
 {
 	zbx_vector_tag_ptr_t		tags;
 	zbx_vector_child_tag_ptr_t	child_tags;
@@ -2584,7 +2607,7 @@ static void	DBpatch_propogate_tag_web(zbx_vector_tag_ptr_t *tags, zbx_db_patch_t
 	DBfree_result(result);
 }
 
-static int	DBpatch_6030162(void)
+static int	DBpatch_6030163(void)
 {
 	zbx_vector_tag_ptr_t		tags;
 	zbx_vector_child_tag_ptr_t	child_tags;
@@ -3328,7 +3351,7 @@ static void	collect_dashboards(zbx_vector_uint64_t *parent_ids, zbx_vector_uint6
 	zbx_vector_uint64_destroy(&loc_child_templateids);
 }
 
-static int	DBpatch_6030163(void)
+static int	DBpatch_6030164(void)
 {
 	zbx_vector_dashboard_ptr_t		dashboards;
 	zbx_vector_child_dashboard_ptr_t	child_dashboards;
@@ -3557,7 +3580,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6030164(void)
+static int	DBpatch_6030165(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -3568,7 +3591,7 @@ static int	DBpatch_6030164(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6030165(void)
+static int	DBpatch_6030166(void)
 {
 	zbx_vector_uint64_t	itemids;
 	zbx_vector_str_t	uuids;
@@ -3634,7 +3657,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6030166(void)
+static int	DBpatch_6030167(void)
 {
 	int		ret = SUCCEED;
 	char		*sql = NULL;
@@ -3696,7 +3719,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6030167(void)
+static int	DBpatch_6030168(void)
 {
 	int		ret = SUCCEED;
 	char		*host_name, *uuid, *sql = NULL, *seed = NULL;
@@ -3764,7 +3787,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6030168(void)
+static int	DBpatch_6030169(void)
 {
 	int		ret = SUCCEED;
 	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
@@ -3813,7 +3836,7 @@ out:
 #undef ZBX_FLAG_DISCOVERY_PROTOTYPE
 #define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02
 
-static int	DBpatch_6030169(void)
+static int	DBpatch_6030170(void)
 {
 	int		ret = SUCCEED;
 	char		*name_tmpl, *uuid, *seed = NULL, *sql = NULL;
@@ -3863,7 +3886,7 @@ out:
 }
 #undef ZBX_FLAG_DISCOVERY_PROTOTYPE
 
-static int	DBpatch_6030170(void)
+static int	DBpatch_6030171(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -3879,7 +3902,6 @@ static int	DBpatch_6030170(void)
 #undef HOST_STATUS_TEMPLATE
 #undef MAX_LONG_NAME_COLLISIONS
 #undef MAX_LONG_NAME_COLLISIONS_LEN
-
 #endif
 
 DBPATCH_START(6030)
@@ -4057,5 +4079,6 @@ DBPATCH_ADD(6030167, 0, 1)
 DBPATCH_ADD(6030168, 0, 1)
 DBPATCH_ADD(6030169, 0, 1)
 DBPATCH_ADD(6030170, 0, 1)
+DBPATCH_ADD(6030171, 0, 1)
 
 DBPATCH_END()
