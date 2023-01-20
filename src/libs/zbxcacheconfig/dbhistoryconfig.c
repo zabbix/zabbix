@@ -858,6 +858,8 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 			}
 		}
 
+		zbx_vector_match_tags_sort(&connector_filter.connector_tags, zbx_compare_match_tags);
+
 		zbx_vector_connector_filter_append(connector_filter_dest, connector_filter);
 	}
 

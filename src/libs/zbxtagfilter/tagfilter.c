@@ -232,10 +232,10 @@ int	zbx_match_tags(int eval_type, const zbx_vector_match_tags_t *match_tags, con
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare filter tags by tag name for sorting                       *
+ * Purpose: compare match tags by tag name for sorting                        *
  *                                                                            *
  ******************************************************************************/
-static int	compare_match_tags(const void *d1, const void *d2)
+int	zbx_compare_match_tags(const void *d1, const void *d2)
 {
 	const zbx_match_tag_t	*tag1 = *(const zbx_match_tag_t * const *)d1;
 	const zbx_match_tag_t	*tag2 = *(const zbx_match_tag_t * const *)d2;
@@ -245,24 +245,9 @@ static int	compare_match_tags(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sort entity tags by tag name                                      *
+ * Purpose: release memory                                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_sort_tags(zbx_vector_tags_t *tags)
-{
-	zbx_vector_tags_sort(tags, zbx_compare_tags);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sort filter tags by tag name                                      *
- *                                                                            *
- ******************************************************************************/
-void	zbx_sort_match_tags(zbx_vector_match_tags_t *tags)
-{
-	zbx_vector_match_tags_sort(tags, compare_match_tags);
-}
-
 void	zbx_match_tag_free(zbx_match_tag_t *tag)
 {
 	zbx_free(tag->tag);
