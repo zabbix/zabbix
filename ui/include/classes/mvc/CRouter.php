@@ -64,6 +64,8 @@ class CRouter {
 		'autoreg.update'							=> ['CControllerAutoregUpdate',							null,					null],
 		'charts.view'								=> ['CControllerChartsView',							'layout.htmlpage',		'monitoring.charts.view'],
 		'charts.view.json'							=> ['CControllerChartsViewJson',						'layout.json',			'monitoring.charts.view.json'],
+		'copy.create'								=> ['CControllerCopyCreate',							'layout.json',			null],
+		'copy.edit'									=> ['CControllerCopyEdit',								'layout.json',			'copy.edit'],
 		'correlation.condition.add'					=> ['CControllerCorrelationConditionAdd',				null,					null],
 		'correlation.create'						=> ['CControllerCorrelationCreate',						null,					null],
 		'correlation.delete'						=> ['CControllerCorrelationDelete',						null,					null],

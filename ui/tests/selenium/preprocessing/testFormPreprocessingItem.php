@@ -129,7 +129,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$table = $this->query('xpath://form[@name="items"]/table')->asTable()->one();
 		$table->findRow('Key', $item_key)->select();
 		$this->query('button:Copy')->one()->click();
-		$mass_update_form = $this->query('name:elements_form')->waitUntilPresent()->asForm()->one();
+		$mass_update_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$mass_update_form->fill([
 			'Target type'	=> 'Hosts',
 			'Target' => $target_hostname

@@ -28,6 +28,17 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testPageHostGraph extends CLegacyWebTest {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			'class' => CMessageBehavior::class
+		];
+	}
+
 	public function testPageHostGraph_CheckLayout() {
 		$host_name = 'Host to check graph 1';
 
@@ -142,7 +153,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					],
 					'target_type' => 'Hosts',
 					'group' => 'Group for host graph check',
-					'error' => 'No target selected.'
+					'error' => 'Field "copy_targetids" is mandatory.'
 				]
 			],
 			// Copy graph to the same host.
@@ -243,7 +254,7 @@ class testPageHostGraph extends CLegacyWebTest {
 						'Delete graph 4'
 					],
 					'target_type' => 'Host groups',
-					'error' => 'No target selected.'
+					'error' => 'Field "copy_targetids" is mandatory.'
 				]
 			],
 			// Copy graph to host group without item.
@@ -325,7 +336,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					],
 					'target_type' => 'Templates',
 					'group' => 'Templates',
-					'error' => 'No target selected.'
+					'error' => 'Field "copy_targetids" is mandatory.'
 				]
 			],
 			// Copy graph to the same template.
@@ -428,22 +439,23 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->selectGraph($data);
 		$this->zbxTestClickButtonText('Copy');
 
-		$copy_type = 'copy_type_'.array_search($data['target_type'], ['Template groups', 'Host groups', 'Hosts', 'Templates']);
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+		$copy_type = 'copy_type_'.array_search($data['target_type'], ['Template groups', 'Host groups', 'Templates', 'Hosts']);
 		$this->zbxTestClickXpathWait('//label[@for="'.$copy_type.'"][text()="'.$data['target_type'].'"]');
 
 		// Select check boxes of defined targets.
 		if (array_key_exists('targets', $data)) {
 			$this->zbxTestClickButtonMultiselect('copy_targetids');
 			$this->zbxTestLaunchOverlayDialog($data['target_type']);
-			COverlayDialogElement::find()->one()->waitUntilReady();
+			$hosts_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
 			// Select hosts or templates.
 			if ($data['target_type'] === 'Hosts' || $data['target_type'] === 'Templates') {
 				// Select host group.
-				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$hosts_dialog->query('button:Select')->one()->click();
 				$this->zbxTestLaunchOverlayDialog(rtrim($data['target_type'], "s").' groups');
-				COverlayDialogElement::find()->all()->last()->query('link', $data['group'])->waitUntilVisible()->one()->click();
-				COverlayDialogElement::find()->one()->waitUntilReady();
+				COverlayDialogElement::find()->all()->last()->waitUntilReady()->query('link', $data['group'])->waitUntilVisible()->one()->click();
+				COverlayDialogElement::find()->all()->waitUntilReady();
 				foreach ($data['targets'] as $target) {
 					$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($target));
 					$this->zbxTestCheckboxSelect('item_'.$hostid);
@@ -460,10 +472,10 @@ class testPageHostGraph extends CLegacyWebTest {
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 		}
 
-		$this->zbxTestClick('copy');
+		$dialog->submit();
 
 		if (array_key_exists('error', $data)) {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
+			$this->assertMessage(TEST_BAD, null, $data['error']);
 		}
 		else {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::className('msg-good'));
