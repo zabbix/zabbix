@@ -1060,7 +1060,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartODBCPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"StartConnectors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER],	TYPE_INT,
-			PARM_OPT,	0,			1000},
+			PARM_OPT,	1,			1000},
 		{NULL}
 	};
 
