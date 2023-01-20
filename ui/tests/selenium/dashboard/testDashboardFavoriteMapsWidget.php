@@ -85,8 +85,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		foreach ($favorite_maps as $map) {
 			// Added variable due to External Hook.
 			$xpath = './/button[@data-sysmapid='.CXPathHelper::escapeQuotes($map['value_id']);
-			$remove_item = $widget->query('xpath', $xpath.' and contains(@onclick, "removeFromFavorites")]')
-				->waituntilClickable()->one();
+			$remove_item = $widget->query('xpath', $xpath.' and contains(@onclick, "rm4favorites")]')->waituntilClickable()->one();
 			$remove_item->click();
 			$remove_item->waitUntilNotVisible();
 		}

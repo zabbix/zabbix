@@ -63,7 +63,7 @@
 	/**
 	 * Add object to the list of favorites.
 	 */
-	function addToFavorites(object, objectid) {
+	function add2favorites(object, objectid) {
 		sendAjaxData('zabbix.php', {
 			data: {
 				object: object,
@@ -77,7 +77,7 @@
 	/**
 	 * Remove object from the list of favorites. Remove all favorites if objectid==0.
 	 */
-	function removeFromFavorites(object, objectid) {
+	function rm4favorites(object, objectid) {
 		sendAjaxData('zabbix.php', {
 			data: {
 				object: object,
