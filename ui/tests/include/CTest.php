@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -374,6 +374,14 @@ class CTest extends TestCase {
 		if ($this->case_backup_config) {
 			CConfigHelper::restoreConfig();
 			$this->case_backup_config = false;
+		}
+
+		if (CDataHelper::getSessionId() !== null) {
+			foreach (CDBHelper::$backups as $backup) {
+				if (in_array('sessions', $backup)) {
+					CDataHelper::reset();
+				}
+			}
 		}
 
 		if ($this->case_backup !== null) {

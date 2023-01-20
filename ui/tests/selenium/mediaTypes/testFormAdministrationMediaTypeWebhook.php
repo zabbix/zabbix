@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
+
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
  * @backup media_type
@@ -26,7 +27,8 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
 	// SQL query to get media_type and media_type_param tables to compare hash values.
-	private $sql = 'SELECT * FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid';
+	private $sql = 'SELECT * FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid'.
+			' ORDER BY mt.mediatypeid, mtp.mediatype_paramid, mtp.name';
 
 	public function getValidationWebhookData() {
 		return [

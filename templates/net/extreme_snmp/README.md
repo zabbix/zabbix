@@ -46,7 +46,7 @@ No specific Zabbix configuration is required.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|CPU |CPU utilization |<p>MIB: EXTREME-SOFTWARE-MONITOR-MIB</p><p>Total CPU utlization (percentage) as of last sampling.</p> |SNMP |system.cpu.util[extremeCpuMonitorTotalUtilization.0] |
+|CPU |CPU utilization |<p>MIB: EXTREME-SOFTWARE-MONITOR-MIB</p><p>Total CPU utilization (percentage) as of last sampling.</p> |SNMP |system.cpu.util[extremeCpuMonitorTotalUtilization.0] |
 |Fans |Fan {#SNMPVALUE}: Fan status |<p>MIB: EXTREME-SYSTEM-MIB</p><p>Operational status of a cooling fan.</p> |SNMP |sensor.fan.status[extremeFanOperational.{#SNMPINDEX}] |
 |Fans |Fan {#SNMPVALUE}: Fan speed |<p>MIB: EXTREME-SYSTEM-MIB</p><p>The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}</p> |SNMP |sensor.fan.speed[extremeFanSpeed.{#SNMPINDEX}] |
 |Inventory |Hardware model name |<p>MIB: ENTITY-MIB</p> |SNMP |system.hw.model<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
@@ -56,7 +56,7 @@ No specific Zabbix configuration is required.
 |Inventory |Operating system |<p>MIB: EXTREME-SYSTEM-MIB</p><p>The software revision of the primary image stored in this device.</p><p>This string will have a zero length if the revision is unknown, invalid or not present.</p><p>This will also be reported in RMON2 probeSoftwareRev if this is the software image currently running in the device.</p> |SNMP |system.sw.os[extremePrimarySoftwareRev.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Memory |#{#SNMPVALUE}: Available memory |<p>MIB: EXTREME-SOFTWARE-MONITOR-MIB</p><p>Total amount of free memory in Kbytes in the system.</p> |SNMP |vm.memory.available[extremeMemoryMonitorSystemFree.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
 |Memory |#{#SNMPVALUE}: Total memory |<p>MIB: EXTREME-SOFTWARE-MONITOR-MIB</p><p>Total amount of DRAM in Kbytes in the system.</p> |SNMP |vm.memory.total[extremeMemoryMonitorSystemTotal.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Memory |#{#SNMPVALUE}: Memory utilization |<p>Memory utilization in %</p> |CALCULATED |vm.memory.util[{#SNMPVALUE}]<p>**Expression**:</p>`(last("vm.memory.total[extremeMemoryMonitorSystemTotal.{#SNMPINDEX}]") - last("vm.memory.available[extremeMemoryMonitorSystemFree.{#SNMPINDEX}]")) / last("vm.memory.total[extremeMemoryMonitorSystemTotal.{#SNMPINDEX}]") * 100` |
+|Memory |#{#SNMPVALUE}: Memory utilization |<p>Memory utilization in %.</p> |CALCULATED |vm.memory.util[{#SNMPVALUE}]<p>**Expression**:</p>`(last("vm.memory.total[extremeMemoryMonitorSystemTotal.{#SNMPINDEX}]") - last("vm.memory.available[extremeMemoryMonitorSystemFree.{#SNMPINDEX}]")) / last("vm.memory.total[extremeMemoryMonitorSystemTotal.{#SNMPINDEX}]") * 100` |
 |Power_supply |PSU {#SNMPVALUE}: Power supply status |<p>MIB: EXTREME-SYSTEM-MIB</p><p>Status of the power supply {#SNMPVALUE}</p> |SNMP |sensor.psu.status[extremePowerSupplyStatus.{#SNMPINDEX}] |
 |Temperature |Device: Temperature |<p>MIB: EXTREME-SYSTEM-MIB</p><p>Temperature readings of testpoint: Device</p><p>Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-support-temperature-polling-via-SNMP-on-all-nodes-in-a-stack</p> |SNMP |sensor.temp.value[extremeCurrentTemperature.0] |
 |Temperature |Device: Temperature status |<p>MIB: EXTREME-SYSTEM-MIB</p><p>Temperature status of testpoint: Device</p> |SNMP |sensor.temp.status[extremeOverTemperatureAlarm.0] |

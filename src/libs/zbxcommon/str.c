@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@
 #endif
 
 static const char	copyright_message[] =
-	"Copyright (C) 2022 Zabbix SIA\n"
-	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
+	"Copyright (C) 2023 Zabbix SIA\n"
+	"License GPLv2+: GNU GPL version 2 or later <https://www.gnu.org/licenses/>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
 
@@ -653,17 +653,21 @@ char	*zbx_str_printable_dyn(const char *text)
  ******************************************************************************/
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
 {
-	const char	*s = src;
+	size_t	len = strlen(src);
 
-	if (0 != siz)
+	if (len + 1 <= siz)
 	{
-		while (0 != --siz && '\0' != *s)
-			*dst++ = *s++;
-
-		*dst = '\0';
+		memcpy(dst, src, len + 1);
+		return len;
 	}
 
-	return s - src;	/* count does not include null */
+	if (0 == siz)
+		return 0;
+
+	memcpy(dst, src, siz - 1);
+	dst[siz - 1] = '\0';
+
+	return siz - 1;
 }
 
 /******************************************************************************
@@ -3129,7 +3133,13 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 	if ('"' == *ptr)	/* quoted parameter */
 	{
 		for (ptr++; '"' != *ptr || '\\' == *(ptr - 1); ptr++)
-			;
+		{
+			if ('\0' == *ptr)
+			{
+				*length = ptr - expr - *param_pos;
+				goto out;
+			}
+		}
 
 		*length = ++ptr - expr - *param_pos;
 
@@ -3144,7 +3154,7 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 
 		*length = ptr - expr - *param_pos;
 	}
-
+out:
 	*sep_pos = ptr - expr;
 }
 

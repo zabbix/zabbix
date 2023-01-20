@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-23T13:08:47Z</date>
+   <date>2022-07-28T08:53:56Z</date>
    <groups>
       <group>
          <name>Templates/SAN</name>
@@ -1409,7 +1409,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
             <macro>
                <macro>{$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME}</macro>
                <value>5m</value>
-               <description>The time during which verage I/O latency of node may exceed the threshold.</description>
+               <description>The time during which average I/O latency of node may exceed the threshold.</description>
             </macro>
             <macro>
                <macro>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}</macro>

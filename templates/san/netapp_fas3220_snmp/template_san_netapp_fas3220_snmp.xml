@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-23T13:32:39Z</date>
+   <date>2022-06-17T09:29:01Z</date>
    <groups>
       <group>
          <name>Templates/SAN</name>
@@ -398,7 +398,7 @@ fullyCharged(9).</description>
                            <expression>{last()}&lt;10m</expression>
                            <name>Node {#NODE.NAME}: has been restarted (uptime &lt; 10m)</name>
                            <priority>INFO</priority>
-                           <description>Uptime is less than 10 minutes</description>
+                           <description>Uptime is less than 10 minutes.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -1264,7 +1264,7 @@ return JSON.stringify(out);</params>
             </macro>
             <macro>
                <macro>{$FAS3220.FS.TIME}</macro>
-               <value>10G</value>
+               <value>10m</value>
                <description>The time during which disk usage may exceed the threshold. Can be used with {#FSNAME} as context.</description>
             </macro>
             <macro>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -109,6 +109,10 @@ class CMultiselectElement extends CElement {
 	public function select($label, $context = null) {
 		if (is_array($label)) {
 			throw new Exception('Select of multiple labels is not supported in single select mode.');
+		}
+
+		if ($label === '') {
+			return $this->clear();
 		}
 
 		$this->edit($context)->query('link:'.$label)->one()->click()->waitUntilNotPresent();
@@ -338,7 +342,12 @@ class CMultiselectElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function getValue() {
-		return $this->getSelected();
+		$selected = $this->getSelected();
+		if (is_array($selected) && count($selected) === 0) {
+			$selected = '';
+		}
+
+		return $selected;
 	}
 
 	/**

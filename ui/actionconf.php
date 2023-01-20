@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,19 +52,19 @@ $fields = [
 	'status' =>							[T_ZBX_INT, O_OPT, null,	IN([ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
 											null
 										],
-	'g_actionid' =>						[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'conditions' =>						[null,		O_OPT,	null,	null,		null],
-	'new_condition' =>					[null,		O_OPT,	null,	null,		'isset({add_condition})'],
-	'operations' =>						[null,		O_OPT,	null,	null,		null],
+	'g_actionid' =>						[T_ZBX_INT, O_OPT,	P_ONLY_ARRAY,	DB_ID,		null],
+	'conditions' =>						[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
+	'new_condition' =>					[null,		O_OPT,	P_ONLY_ARRAY,	null,		'isset({add_condition})'],
+	'operations' =>						[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
 	'edit_operationid' =>				[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
-	'new_operation' =>					[null,		O_OPT,	null,	null,		null],
-	'recovery_operations' =>			[null,		O_OPT,	null,	null,		null],
+	'new_operation' =>					[null,		O_OPT,	P_ONLY_ARRAY,	null,		null],
+	'recovery_operations' =>			[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
 	'edit_recovery_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
-	'new_recovery_operation' =>			[null,		O_OPT,	null,	null,		null],
-	'ack_operations' =>					[null,		O_OPT,	null,	null,		null],
+	'new_recovery_operation' =>			[null,		O_OPT,	P_ONLY_ARRAY,	null,		null],
+	'ack_operations' =>					[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
 	'edit_ack_operationid' =>			[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
-	'new_ack_operation' =>				[null,		O_OPT,	null,	null,		null],
-	'opconditions' =>					[null,		O_OPT,	null,	null,		null],
+	'new_ack_operation' =>				[null,		O_OPT,	P_ONLY_ARRAY,	null,		null],
+	'opconditions' =>					[null,		O_OPT,	P_ONLY_ARRAY,	null,		null],
 	// actions
 	'action' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 											IN('"action.massdelete","action.massdisable","action.massenable"'),
@@ -85,7 +85,7 @@ $fields = [
 	'delete' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>							[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form' =>							[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'form_refresh' =>					[T_ZBX_INT, O_OPT, null,		null,	null],
+	'form_refresh' =>					[T_ZBX_INT, O_OPT, P_SYS,		null,	null],
 	// filter
 	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -365,7 +365,7 @@ elseif (hasRequest('edit_ack_operationid')) {
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['action.massenable', 'action.massdisable']) && hasRequest('g_actionid')) {
 	$status = (getRequest('action') == 'action.massenable') ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED;
-	$actionids = (array) getRequest('g_actionid', []);
+	$actionids = getRequest('g_actionid');
 	$actions_count = count($actionids);
 	$actions = [];
 
@@ -418,6 +418,7 @@ $config = select_config();
 
 if (hasRequest('form')) {
 	$data = [
+		'form_refresh' => getRequest('form_refresh', 0),
 		'form' => getRequest('form'),
 		'actionid' => getRequest('actionid', '0'),
 		'new_condition' => getRequest('new_condition', []),

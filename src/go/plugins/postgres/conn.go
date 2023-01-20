@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ func (conn *PGConn) updateAccessTime() {
 type ConnManager struct {
 	sync.Mutex
 	connMutex      sync.Mutex
-	connections    map[string]*PGConn
+	connections    map[uri.URI]*PGConn
 	keepAlive      time.Duration
 	connectTimeout time.Duration
 	callTimeout    time.Duration
@@ -142,7 +142,7 @@ func NewConnManager(keepAlive, connectTimeout, callTimeout,
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections:    make(map[string]*PGConn),
+		connections:    make(map[uri.URI]*PGConn),
 		keepAlive:      keepAlive,
 		connectTimeout: connectTimeout,
 		callTimeout:    callTimeout,
@@ -164,7 +164,7 @@ func (c *ConnManager) closeUnused() {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
 			conn.client.Close()
 			delete(c.connections, uri)
-			log.Debugf("[%s] Closed unused connection: %s", pluginName, conn.address)
+			log.Debugf("[%s] Closed unused connection: %s", pluginName, uri.Addr())
 		}
 	}
 }
@@ -201,7 +201,7 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*PGConn, e
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	if _, ok := c.connections[uri.NoQueryString()]; ok {
+	if _, ok := c.connections[uri]; ok {
 		// Should never happen.
 		panic("connection already exists")
 	}
@@ -249,7 +249,7 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*PGConn, e
 		return nil, fmt.Errorf("postgres version %d is not supported", serverVersion)
 	}
 
-	c.connections[uri.NoQueryString()] = &PGConn{
+	c.connections[uri] = &PGConn{
 		client:         client,
 		callTimeout:    c.callTimeout,
 		version:        serverVersion,
@@ -261,7 +261,7 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*PGConn, e
 
 	log.Debugf("[%s] Created new connection: %s", pluginName, uri.Addr())
 
-	return c.connections[uri.NoQueryString()], nil
+	return c.connections[uri], nil
 }
 
 func createTLSClient(dsn string, timeout time.Duration, details tlsconfig.Details) (*sql.DB, error) {
@@ -306,7 +306,7 @@ func (c *ConnManager) get(uri uri.URI) *PGConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	if conn, ok := c.connections[uri.NoQueryString()]; ok {
+	if conn, ok := c.connections[uri]; ok {
 		conn.updateAccessTime()
 		return conn
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,7 +236,7 @@ class DB {
 	}
 
 	/**
-	 * Returns true if the table $tableName has the $fieldName field.
+	 * Returns true if the table $tableName has the $fieldName field defined in its schema.
 	 *
 	 * @static
 	 *
@@ -249,6 +249,28 @@ class DB {
 		$schema = self::getSchema($tableName);
 
 		return isset($schema['fields'][$fieldName]);
+	}
+
+	/**
+	 * Check that a field is present in a database table.
+	 *
+	 * @static
+	 *
+	 * @param string $table_name
+	 * @param string $field_name
+	 *
+	 * @return bool
+	 */
+	public static function dbFieldExists($table_name, $field_name) {
+		static $checked = [];
+
+		$cache_key = $table_name.'.'.$field_name;
+
+		if (!array_key_exists($cache_key, $checked)) {
+			$checked[$cache_key] = self::getDbBackend()->dbFieldExists($table_name, $field_name);
+		}
+
+		return $checked[$cache_key];
 	}
 
 	/**
@@ -959,6 +981,27 @@ class DB {
 	 */
 	private static function fieldId($field_name, $table_alias = null) {
 		return ($table_alias !== null) ? $table_alias.'.'.$field_name : $field_name;
+	}
+
+	/**
+	 * Convert field to uppercase or substitute it with its pre-upcased variant.
+	 *
+	 * @param string      $field_name
+	 * @param string      $table_name
+	 * @param string|null $table_alias
+	 *
+	 * @return string
+	 */
+	public static function uppercaseField($field_name, $table_name, $table_alias = null) {
+		if ($table_alias === null) {
+			$table_alias = $table_name;
+		}
+
+		if ($field_name === 'name' && self::dbFieldExists($table_name, 'name_upper')) {
+			return $table_alias.'.name_upper';
+		}
+
+		return 'UPPER('.$table_alias.'.'.$field_name.')';
 	}
 
 	/**

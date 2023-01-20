@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,7 +97,8 @@ static ub4	OCI_DBserver_status(void);
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
-static int			ZBX_PG_SVERSION = 0, ZBX_TSDB_VERSION = -1;
+static int			ZBX_PG_SVERSION = 0;
+int					ZBX_TSDB_VERSION = -1;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
@@ -105,6 +106,7 @@ static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
 #if defined(HAVE_ORACLE)
+static void	OCI_DBclean_result_handle(DB_RESULT result);
 static void	OCI_DBclean_result(DB_RESULT result);
 #endif
 
@@ -292,9 +294,12 @@ static DB_RESULT	zbx_db_select(const char *fmt, ...)
 }
 
 #if defined(HAVE_MYSQL)
-static int	is_recoverable_mysql_error(void)
+static int	is_recoverable_mysql_error(int err_no)
 {
-	switch (mysql_errno(conn))
+	if (0 == err_no)
+		err_no = (int)mysql_errno(conn);
+
+	switch (err_no)
 	{
 		case CR_CONN_HOST_ERROR:
 		case CR_SERVER_GONE_ERROR:
@@ -367,6 +372,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #else
 	my_bool		mysql_reconnect = 1;
 #endif
+	int		err_no = 0;
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
 	sword		err = OCI_SUCCESS;
@@ -540,7 +546,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket,
 				CLIENT_MULTI_STATEMENTS))
 	{
-		zbx_db_errlog(ERR_Z3001, mysql_errno(conn), mysql_error(conn), dbname);
+		err_no = (int)mysql_errno(conn);
+		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
@@ -553,23 +560,32 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
 
-	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
-	if (ZBX_DB_OK == ret && 0 != mysql_set_character_set(conn, "utf8"))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"utf8\"");
+	if (ZBX_DB_OK == ret)
+	{
+		/* in contrast to "set names utf8" results of this call will survive auto-reconnects     */
+		/* utf8mb3 and utf8 are currently aliases but one of them might be missing, attempt both */
+		if (0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB3) &&
+				0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set");
+		}
+	}
 
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
 	{
-		zbx_db_errlog(ERR_Z3001, mysql_errno(conn), mysql_error(conn), dbname);
+		err_no = (int)mysql_errno(conn);
+		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
 	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
 	{
-		zbx_db_errlog(ERR_Z3001, mysql_errno(conn), mysql_error(conn), dbname);
+		err_no = (int)mysql_errno(conn);
+		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error())
+	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error(err_no))
 		ret = ZBX_DB_DOWN;
 
 #elif defined(HAVE_ORACLE)
@@ -938,7 +954,7 @@ void	zbx_db_close(void)
 		for (i = 0; i < oracle.db_results.values_num; i++)
 		{
 			/* deallocate all handles before environment is deallocated */
-			OCI_DBclean_result(oracle.db_results.values[i]);
+			OCI_DBclean_result_handle(oracle.db_results.values[i]);
 		}
 	}
 
@@ -1409,9 +1425,9 @@ out:
  ******************************************************************************/
 int	zbx_db_vexecute(const char *fmt, va_list args)
 {
-	char	*sql = NULL;
-	int	ret = ZBX_DB_OK;
-	double	sec = 0;
+	char		*sql = NULL;
+	int		ret = ZBX_DB_OK;
+	double		sec = 0;
 #if defined(HAVE_MYSQL)
 #elif defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
@@ -1449,11 +1465,14 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 	else
 	{
+		int	err_no;
+
 		if (0 != mysql_query(conn, sql))
 		{
-			zbx_db_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+			err_no = (int)mysql_errno(conn);
+			zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
-			ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
+			ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 		}
 		else
 		{
@@ -1472,8 +1491,9 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				/* more results? 0 = yes (keep looping), -1 = no, >0 = error */
 				if (0 < (status = mysql_next_result(conn)))
 				{
-					zbx_db_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
-					ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
+					err_no = (int)mysql_errno(conn);
+					zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
+					ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 				}
 			}
 			while (0 == status);
@@ -1620,10 +1640,13 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	{
 		if (0 != mysql_query(conn, sql) || NULL == (result->result = mysql_store_result(conn)))
 		{
-			zbx_db_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+			int err_no;
+
+			err_no = (int)mysql_errno(conn);
+			zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
 			DBfree_result(result);
-			result = (SUCCEED == is_recoverable_mysql_error() ? (DB_RESULT)ZBX_DB_DOWN : NULL);
+			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (DB_RESULT)ZBX_DB_DOWN : NULL);
 		}
 	}
 #elif defined(HAVE_ORACLE)
@@ -2089,19 +2112,14 @@ int	zbx_db_is_null(const char *field)
 }
 
 #ifdef HAVE_ORACLE
-static void	OCI_DBclean_result(DB_RESULT result)
+static void	OCI_DBclean_result_handle(DB_RESULT result)
 {
-	if (NULL == result)
-		return;
-
 	if (NULL != result->values)
 	{
 		int	i;
 
 		for (i = 0; i < result->ncolumn; i++)
 		{
-			zbx_free(result->values[i]);
-
 			/* deallocate the lob locator variable */
 			if (NULL != result->clobs[i])
 			{
@@ -2109,16 +2127,31 @@ static void	OCI_DBclean_result(DB_RESULT result)
 				result->clobs[i] = NULL;
 			}
 		}
-
-		zbx_free(result->values);
-		zbx_free(result->clobs);
-		zbx_free(result->values_alloc);
 	}
 
 	if (result->stmthp)
 	{
 		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
 		result->stmthp = NULL;
+	}
+}
+static void	OCI_DBclean_result(DB_RESULT result)
+{
+	if (NULL == result)
+		return;
+
+	OCI_DBclean_result_handle(result);
+
+	if (NULL != result->values)
+	{
+		int	i;
+
+		for (i = 0; i < result->ncolumn; i++)
+			zbx_free(result->values[i]);
+
+		zbx_free(result->values);
+		zbx_free(result->clobs);
+		zbx_free(result->values_alloc);
 	}
 }
 #endif

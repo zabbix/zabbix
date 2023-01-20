@@ -41,7 +41,7 @@ No specific Zabbix configuration is required.
 |{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN} |<p>Maximum average I/O response time of LUN in milliseconds.</p> |`100` |
 |{$HUAWEI.5300.MEM.MAX.TIME} |<p>The time during which memory usage may exceed the threshold.</p> |`5m` |
 |{$HUAWEI.5300.MEM.MAX.WARN} |<p>Maximum percentage of memory used</p> |`90` |
-|{$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME} |<p>The time during which verage I/O latency of node may exceed the threshold.</p> |`5m` |
+|{$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME} |<p>The time during which average I/O latency of node may exceed the threshold.</p> |`5m` |
 |{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN} |<p>Maximum average I/O latency of node in milliseconds.</p> |`20` |
 |{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME} |<p>The time during which free capacity may exceed the {#THRESHOLD} from hwInfoStoragePoolFullThreshold.</p> |`5m` |
 |{$HUAWEI.5300.TEMP.MAX.TIME} |<p>The time during which temperature of enclosure may exceed the threshold.</p> |`3m` |

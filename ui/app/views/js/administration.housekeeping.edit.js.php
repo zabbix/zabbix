@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,6 +66,22 @@ $schema = DB::getSchema('config');
 		jQuery('#compression_status').change(function() {
 			jQuery('#compress_older').prop('disabled', !this.checked);
 		});
+
+		jQuery('#hk_history_mode, #hk_history_global')
+			.change(function() {
+				jQuery('.js-hk-history-warning').toggle(
+					jQuery('#hk_history_mode:checked').length && !jQuery('#hk_history_global:checked').length
+				);
+			})
+			.trigger('change');
+
+		jQuery('#hk_trends_mode, #hk_trends_global')
+			.change(function() {
+				jQuery('.js-hk-trends-warning').toggle(
+					jQuery('#hk_trends_mode:checked').length && !jQuery('#hk_trends_global:checked').length
+				);
+			})
+			.trigger('change');
 
 		jQuery("#resetDefaults").click(function() {
 			overlayDialogue({

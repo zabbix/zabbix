@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -210,7 +210,6 @@ class CPage {
 			self::$cookie = [
 				'name' => 'zbx_sessionid',
 				'value' => $sessionid,
-				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
 				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
 			];
 
@@ -579,10 +578,11 @@ class CPage {
 	 *
 	 * @param string $alias     Username on login screen
 	 * @param string $password  Password on login screen
+	 * @param string $url		Dirrect link to certain Zabbix page
 	 */
-	public function userLogin($alias, $password) {
+	public function userLogin($alias, $password, $url = 'index.php') {
 		$this->logout();
-		$this->open('index.php');
+		$this->open($url);
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
 		$this->query('id:password')->one()->fill($password);
 		$this->query('id:enter')->one()->click();

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -155,6 +155,7 @@ class CRouter {
 		'popup.triggerwizard'			=> ['CControllerPopupTriggerWizard',				'layout.json',			'popup.triggerwizard'],
 		'problem.view'					=> ['CControllerProblemView',						'layout.htmlpage',		'monitoring.problem.view'],
 		'problem.view.csv'				=> ['CControllerProblemView',						'layout.csv',			'monitoring.problem.view'],
+		'problem.view.refresh'			=> ['CControllerProblemViewRefresh',				'layout.json',			'monitoring.problem.view.refresh'],
 		'profile.update'				=> ['CControllerProfileUpdate',						'layout.json',			null],
 		'proxy.create'					=> ['CControllerProxyCreate',						null,					null],
 		'proxy.delete'					=> ['CControllerProxyDelete',						null,					null],

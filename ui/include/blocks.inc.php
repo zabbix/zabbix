@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -697,6 +697,46 @@ function make_status_of_zbx() {
 			(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
 			''
 		]);
+	}
+
+	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+		$config = select_config();
+
+		if ($config['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB && $config['compression_availability'] == 1) {
+			if ($config['hk_history_mode'] == 1 && $config['hk_history_global'] == 0) {
+				if (PostgresqlDbBackend::isCompressed([
+					'history', 'history_log', 'history_str', 'history_text', 'history_uint'
+				])) {
+					$table->addRow((new CRow([
+						_('Housekeeping'),
+						_('Override item history period'),
+						(new CCol([
+							_('This setting should be enabled, because history tables contain compressed chunks.'),
+							' ',
+							new CLink(_('Configuration').'&hellip;',
+								(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
+							)
+						]))->addClass(ZBX_STYLE_RED)
+					])));
+				}
+			}
+
+			if ($config['hk_trends_mode'] == 1 && $config['hk_trends_global'] == 0) {
+				if (PostgresqlDbBackend::isCompressed(['trends', 'trends_uint'])) {
+					$table->addRow((new CRow([
+						_('Housekeeping'),
+						_('Override item trend period'),
+						(new CCol([
+							_('This setting should be enabled, because trend tables contain compressed chunks.'),
+							' ',
+							new CLink(_('Configuration').'&hellip;',
+								(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
+							)
+						]))->addClass(ZBX_STYLE_RED)
+					])));
+				}
+			}
+		}
 	}
 
 	return $table;

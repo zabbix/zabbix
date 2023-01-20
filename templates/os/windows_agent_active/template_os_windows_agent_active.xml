@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-06-01T13:46:30Z</date>
+   <date>2022-09-12T10:57:38Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -2069,7 +2069,7 @@ Template tooling version used: 0.39</description>
          </dependencies>
       </trigger>
       <trigger>
-         <expression>{Template Module Windows memory by Zabbix agent active:system.swap.pfree.min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Windows memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
+         <expression>{Template Module Windows memory by Zabbix agent active:system.swap.pfree.max(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Windows memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
          <name>High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>

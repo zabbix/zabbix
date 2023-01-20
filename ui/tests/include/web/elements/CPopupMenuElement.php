@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,9 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
+
+use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * Global popup menu element.
@@ -31,7 +34,7 @@ class CPopupMenuElement extends CElement {
 	 * @inheritdoc
 	 */
 	public static function find() {
-		return (new CElementQuery('xpath://ul[contains(@class, "menu-popup-top")]'))->asPopupMenu();
+		return (new CElementQuery('xpath://ul[@role="menu"]'))->asPopupMenu();
 	}
 
 	/**
@@ -132,5 +135,13 @@ class CPopupMenuElement extends CElement {
 	 */
 	public function fill($items) {
 		return $this->select($items);
+	}
+
+	/**
+	 * Press Escape key to close context menu.
+	 */
+	public function close() {
+		CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
+		(new CElementQuery('xpath://ul['.CXPathHelper::fromClass('menu-popup-top').']'))->waitUntilNotVisible();
 	}
 }

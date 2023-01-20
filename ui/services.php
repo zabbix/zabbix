@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,13 +40,13 @@ $fields = [
 									_('Calculate SLA, acceptable SLA (in %)')
 								],
 	'sortorder' => 				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')],
-	'times' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'times' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'triggerid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'trigger' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'new_service_time' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'new_service_time' =>		[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,		null],
 	'new_service_time_from' =>	[T_ZBX_ABS_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('From')],
 	'new_service_time_till' =>	[T_ZBX_ABS_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('Till')],
-	'children' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'children' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,		null],
 	'parentid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'parentname' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
@@ -56,7 +56,7 @@ $fields = [
 	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
 	// others
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null]
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null]
 ];
 check_fields($fields);
 
