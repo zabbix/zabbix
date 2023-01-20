@@ -1049,13 +1049,13 @@ zbx_item_info_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get items name and item tags                                      *
+ * Purpose: get item names                                                    *
  *                                                                            *
- * Parameters: items_info - [IN/OUT] output item name and item tags           *
+ * Parameters: items_info - [IN/OUT] output item names                        *
  *             itemids    - [IN] the item identifiers                         *
  *                                                                            *
  ******************************************************************************/
-static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vector_uint64_t *itemids)
+static void	db_get_item_names_by_itemid(zbx_hashset_t *items_info, const zbx_vector_uint64_t *itemids)
 {
 	size_t		sql_offset = 0;
 	DB_RESULT	result;
@@ -1081,27 +1081,49 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 
 		item_info->name = zbx_strdup(item_info->name, row[1]);
 	}
+
 	DBfree_result(result);
+}
 
-	sql_offset = 0;
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get item tags                                                     *
+ *                                                                            *
+ * Parameters: items_info - [IN/OUT] output item tags                         *
+ *             itemids    - [IN] the item identifiers                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_get_item_tags_by_itemid(zbx_hashset_t *items_info, const zbx_vector_uint64_t *itemids)
+{
+	size_t		sql_offset = 0;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_item_info_t	*item_info = NULL;
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,tag,value from item_tag where");
-
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by itemid");
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	itemid;
-		zbx_item_info_t	*item_info;
 		zbx_tag_t	*item_tag;
 
 		ZBX_DBROW2UINT64(itemid, row[0]);
 
-		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &itemid)))
+		if (NULL == item_info || item_info->itemid != itemid)
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
+			if (NULL != item_info)
+			{
+				zbx_vector_tags_sort(&item_info->item_tags, zbx_compare_tags);
+			}
+			if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &itemid)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
 		}
 
 		item_tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(*item_tag));
@@ -1109,7 +1131,27 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 		item_tag->value = zbx_strdup(NULL, row[2]);
 		zbx_vector_tags_append(&item_info->item_tags, item_tag);
 	}
+
+	if (NULL != item_info)
+	{
+		zbx_vector_tags_sort(&item_info->item_tags, zbx_compare_tags);
+	}
+
 	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get item names and item tags                                      *
+ *                                                                            *
+ * Parameters: items_info - [IN/OUT] output item name and item tags           *
+ *             itemids    - [IN] the item identifiers                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vector_uint64_t *itemids)
+{
+	db_get_item_names_by_itemid(items_info, itemids);
+	db_get_item_tags_by_itemid(items_info, itemids);
 }
 
 /******************************************************************************
