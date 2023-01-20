@@ -259,21 +259,5 @@
 				$('#name').attr('placeholder', $(this).val());
 			})
 			.trigger('input');
-
-		let csrf_token = document.hostPrototypeForm.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
-		let csrf_tokens_host = <?= json_encode($data['csrf_tokens']) ?>;
-
-		document.addEventListener('click', (e) => {
-			if (e.target.id === 'clone') {
-				csrf_token.value = csrf_tokens_host['host_prototypes.php clone'];
-			}
-			else if (e.target.id === 'delete') {
-				if (!window.confirm('<?= _('Delete selected host prototype?') ?>')) {
-					e.preventDefault();
-					return;
-				}
-				csrf_token.value = csrf_tokens_host['host_prototypes.php delete'];
-			}
-		})
 	});
 </script>

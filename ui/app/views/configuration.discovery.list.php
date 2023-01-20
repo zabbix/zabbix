@@ -80,16 +80,18 @@ $discoveryTable = (new CTableInfo())
 	]);
 
 foreach ($data['drules'] as $drule) {
-	$action = $drule['status'] == DRULE_STATUS_ACTIVE ? 'discovery.disable' : 'discovery.enable';
 	$status = new CCol(
 		(new CLink(
 			discovery_status2str($drule['status']),
 			(new CUrl('zabbix.php'))
 				->setArgument('druleids', (array) $drule['druleid'])
-				->setArgument('action', $action)
+				->setArgument('action', $drule['status'] == DRULE_STATUS_ACTIVE
+					? 'discovery.disable'
+					: 'discovery.enable'
+				)
 				->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::get($action))
+			->addCsrfToken(CCsrfTokenHelper::get('discovery'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(discovery_status2style($drule['status']))
 	);

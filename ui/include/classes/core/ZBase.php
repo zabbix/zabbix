@@ -734,7 +734,7 @@ class ZBase {
 
 	private static function denyPageAccess(CRouter $router): void {
 		$request_url = (new CUrl(array_key_exists('request', $_REQUEST) ? $_REQUEST['request'] : ''))
-			->removeArgument(CController::CSRF_TOKEN_NAME)
+			->removeArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME)
 			->toString();
 
 		if (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP

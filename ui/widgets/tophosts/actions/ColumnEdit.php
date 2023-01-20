@@ -47,7 +47,7 @@ class ColumnEdit extends CController {
 		'thresholds' => []
 	];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 

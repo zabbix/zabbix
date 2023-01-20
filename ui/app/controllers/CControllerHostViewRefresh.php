@@ -25,7 +25,7 @@
  */
 class CControllerHostViewRefresh extends CControllerHostView {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 

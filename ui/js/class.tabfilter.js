@@ -246,8 +246,7 @@ class CTabFilter extends CBaseComponent {
 		let url = new Curl('zabbix.php'),
 			signal = null;
 
-		url.setArgument('action', 'tabfilter.profile.update')
-		url.setArgument('_csrf_token', this._csrf_token);
+		url.setArgument('action', 'tabfilter.profile.update');
 		this.fire(TABFILTER_EVENT_UPDATE, {filter_property: property});
 
 		if (this._fetch[property] && ('abort' in this._fetch[property]) && !this._fetch[property].aborted) {
@@ -255,6 +254,7 @@ class CTabFilter extends CBaseComponent {
 		}
 
 		body.idx = this._idx_namespace + '.' + property;
+		body._csrf_token = this._csrf_token;
 
 		if (property !== 'properties') {
 			this._fetch[property] = new AbortController();

@@ -79,7 +79,7 @@ function getMenuPopupHistory(options) {
  *
  * @param {string} options['hostid']                  Host ID.
  * @param {array}  options['scripts']                 Host scripts (optional).
- * @param {string} options['csrf_token']             CSRF token.
+ * @param {string} options['csrf_token']              CSRF token.
  * @param {string} options[]['name']                  Script name.
  * @param {string} options[]['scriptid']              Script ID.
  * @param {string} options[]['confirmation']          Confirmation text.
@@ -655,7 +655,7 @@ function getMenuPopupDashboard(options, trigger_element) {
 							return false;
 						}
 
-						redirect(url_delete.getUrl(), 'post', 'sid', true);
+						redirect(url_delete.getUrl(), 'post', '_csrf_token', true);
 					},
 					disabled: !options.editable
 				}

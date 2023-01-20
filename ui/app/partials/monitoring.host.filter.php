@@ -167,7 +167,8 @@ $template = (new CForm('get'))
 		(new CVar('filter_show_counter', '#{filter_show_counter}'))->removeId(),
 		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId(),
 		(new CVar('sort', '#{sort}'))->removeId(),
-		(new CVar('sortorder', '#{sortorder}'))->removeId()
+		(new CVar('sortorder', '#{sortorder}'))->removeId(),
+		(new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('tabfilter')))->removeId()
 	]);
 
 if (array_key_exists('render_html', $data)) {

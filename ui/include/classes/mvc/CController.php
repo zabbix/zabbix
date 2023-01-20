@@ -28,8 +28,6 @@ abstract class CController {
 	protected const VALIDATION_ERROR = 1;
 	protected const VALIDATION_FATAL_ERROR = 2;
 
-	public const CSRF_TOKEN_NAME = '_csrf_token';
-
 	/**
 	 * Content type of the POST request.
 	 *
@@ -408,7 +406,7 @@ abstract class CController {
 	 * @return bool
 	 */
 	private function checkCsrfToken(): bool {
-		if (!is_array($this->raw_input) || !array_key_exists(self::CSRF_TOKEN_NAME, $this->raw_input)) {
+		if (!is_array($this->raw_input) || !array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $this->raw_input)) {
 			return false;
 		}
 
@@ -427,7 +425,7 @@ abstract class CController {
 	abstract protected function doAction();
 
 	private function populateRawInput(): void {
-		switch ($this->post_content_type) {
+		switch ($this->getPostContentType()) {
 			case self::POST_CONTENT_TYPE_FORM:
 				$this->raw_input = self::getFormInput();
 				break;
