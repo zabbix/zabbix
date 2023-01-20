@@ -322,7 +322,15 @@ class function_convertUnitsTest extends TestCase {
 			[ 'in' => ['value' => '0.000002', 'units' => '!U', 'convert' => ITEM_CONVERT_WITH_UNITS],		'out'  => '0.000002 U' ],
 			[ 'in' => ['value' => '0.000002', 'units' => '!U', 'convert' => ITEM_CONVERT_NO_UNITS],			'out'  => '0.000002 U' ],
 			[ 'in' => ['value' => '10000000', 'units' => '!uptime', 'convert' => ITEM_CONVERT_WITH_UNITS],	'out'  => '10000000 uptime' ],
-			[ 'in' => ['value' => '10000000', 'units' => '!uptime', 'convert' => ITEM_CONVERT_NO_UNITS],	'out'  => '10000000 uptime' ]
+			[ 'in' => ['value' => '10000000', 'units' => '!uptime', 'convert' => ITEM_CONVERT_NO_UNITS],	'out'  => '10000000 uptime' ],
+
+			// Disabled scientific notation of small numbers.
+
+			[ 'in' => ['value' => '0', 'units' => 'B', 'small_scientific' => false],			'out'  => '0 B' ],
+			[ 'in' => ['value' => '1.5E+100', 'units' => 'B', 'decimals_exact' => false, 'small_scientific' => false],	'out'  => '1.24E+76 YB' ],
+			[ 'in' => ['value' => '1.5E+100', 'units' => 'B', 'decimals_exact' => true, 'small_scientific' => false],	'out'  => '1.24E+76 YB' ],
+			[ 'in' => ['value' => '1.5E-20', 'units' => 'B', 'decimals_exact' => false, 'small_scientific' => false],	'out'  => '0.000000000000000000015 B' ],
+			[ 'in' => ['value' => '1.5E-20', 'units' => 'B', 'decimals_exact' => true, 'small_scientific' => false],	'out'  => '0.0000 B' ]
 		];
 	}
 
