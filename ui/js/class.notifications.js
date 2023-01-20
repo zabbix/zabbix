@@ -54,7 +54,7 @@ function ZBX_Notifications(store, tab) {
 	}
 
 	this.active = false;
-	this.csrf_tokens = {};
+	this.csrf_token = '';
 
 	this.poll_interval = ZBX_Notifications.POLL_INTERVAL;
 
@@ -421,7 +421,7 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
 ZBX_Notifications.prototype.handleCloseClicked = function(e) {
 	const data = {
 		ids: this.getEventIds(),
-		_csrf_token: this.csrf_tokens['notifications.read']
+		_csrf_token: this.csrf_token
 	}
 
 	this
@@ -477,7 +477,7 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
 ZBX_Notifications.prototype.handleMuteClicked = function(e) {
 	const data = {
 		muted: this.alarm.muted ? 0 : 1,
-		_csrf_token: this.csrf_tokens['notifications.mute']
+		_csrf_token: this.csrf_token
 	}
 
 	this
@@ -527,7 +527,7 @@ ZBX_Notifications.prototype.handleMainLoopResp = function(resp) {
 
 	this.consumeUserSettings(resp.settings);
 	this.consumeList(resp.notifications);
-	this.csrf_tokens = resp.csrf_tokens;
+	this.csrf_token = resp.csrf_token;
 	this.render();
 
 	this.pushUpdates();

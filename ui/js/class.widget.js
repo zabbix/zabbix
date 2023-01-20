@@ -66,7 +66,7 @@ class CWidget extends CBaseComponent {
 		can_edit_dashboards,
 		time_period,
 		dynamic_hostid,
-		csrf_token_widget_rfrate = null,
+		csrf_token = null,
 		unique_id
 	}) {
 		super(document.createElement('div'));
@@ -98,7 +98,7 @@ class CWidget extends CBaseComponent {
 		this._can_edit_dashboards = can_edit_dashboards;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
-		this._csrf_token_widget_rfrate = csrf_token_widget_rfrate;
+		this._csrf_token = csrf_token;
 		this._unique_id = unique_id;
 
 		this._init();
@@ -394,7 +394,8 @@ class CWidget extends CBaseComponent {
 		if (this._widgetid !== null) {
 			const curl = new Curl('zabbix.php');
 
-			curl.setAction('dashboard.widget.rfrate', this._csrf_token_widget_rfrate);
+			curl.setArgument('action', 'dashboard.widget.rfrate');
+			curl.setArgument('_csrf_token', this._csrf_token);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

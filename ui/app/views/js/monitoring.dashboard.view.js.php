@@ -38,8 +38,7 @@
 			time_period,
 			dynamic,
 			web_layout_mode,
-			clone,
-			csrf_tokens,
+			clone
 		}) {
 			this.dashboard = dashboard;
 			this.has_time_selector = has_time_selector;
@@ -91,7 +90,7 @@
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period,
 				dynamic_hostid: dynamic.host ? dynamic.host.id : null,
-				csrf_tokens
+				csrf_token: '<?= CCsrfTokenHelper::get('dashboard') ?>'
 			});
 
 			for (const page of dashboard.pages) {

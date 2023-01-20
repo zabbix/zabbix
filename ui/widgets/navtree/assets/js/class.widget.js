@@ -116,8 +116,6 @@ class CWidgetNavTree extends CWidget {
 
 		super._processUpdateResponse(response);
 
-		this.csrf_tokens = response.csrf_tokens;
-
 		if (response.navtree_data !== undefined) {
 			this._has_contents = true;
 

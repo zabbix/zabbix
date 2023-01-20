@@ -44,7 +44,7 @@ class CMenuPopupHelper {
 				'can_edit_dashboards' => $can_edit_dashboards,
 				'can_view_reports' => $can_view_reports,
 				'can_create_reports' => $can_create_reports,
-				'csrf_tokens' => CController::generateCsrfTokens(['dashboard.delete'])
+				'csrf_token' => CCsrfTokenHelper::get('dashboard')
 			]
 		];
 	}

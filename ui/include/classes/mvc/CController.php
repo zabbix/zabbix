@@ -183,47 +183,6 @@ abstract class CController {
 	}
 
 	/**
-	 * Generates CSRF token that is used in forms.
-	 *
-	 * @param string $action  action that controller should perform.
-	 *
-	 * @throws CAccessDeniedException
-	 *
-	 * @return string  Returns CSRF token in string format or null if session id is not set.
-	 */
-	public static function generateCsrfToken(string $action): ?string {
-		if (!CWebUser::$data['secret']) {
-			throw new CAccessDeniedException();
-		}
-
-		return CEncryptHelper::sign(CWebUser::$data['secret'] . $action);
-	}
-
-	/**
-	 * Generates an associative array of CSRF tokens that can be used in forms.
-	 *
-	 * @param array $actions  array of actions for which tokens should be generated.
-	 *
-	 * @throws CAccessDeniedException
-	 *
-	 * @return array  Returns associative array of CSRF tokens for the specified actions, where the key is the name
-	 *                of the action.
-	 */
-	public static function generateCsrfTokens(array $actions): ?array {
-		if (!CWebUser::$data['secret']) {
-			throw new CAccessDeniedException();
-		}
-
-		$csrf_tokens = [];
-
-		foreach ($actions as $action) {
-			$csrf_tokens[$action] =  CEncryptHelper::sign(CWebUser::$data['secret'] . $action);
-		}
-
-		return $csrf_tokens;
-	}
-
-	/**
 	 * @return array
 	 */
 	private static function getFormInput(): array {

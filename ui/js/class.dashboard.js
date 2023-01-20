@@ -57,7 +57,7 @@ class CDashboard extends CBaseComponent {
 		is_kiosk_mode,
 		time_period,
 		dynamic_hostid,
-		csrf_tokens = null
+		csrf_token = null
 	}) {
 		super(target);
 
@@ -98,7 +98,7 @@ class CDashboard extends CBaseComponent {
 		this._is_kiosk_mode = is_kiosk_mode;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
-		this._csrf_tokens = csrf_tokens;
+		this._csrf_token = csrf_token;
 
 		this._init();
 		this._registerEvents();
@@ -528,7 +528,7 @@ class CDashboard extends CBaseComponent {
 			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid,
-			csrf_token_widget_rfrate: this._csrf_tokens == null ? null : this._csrf_tokens['dashboard.widget.rfrate'],
+			csrf_token: this._csrf_token == null ? null : this._csrf_token,
 			unique_id: this._createUniqueId()
 		});
 
