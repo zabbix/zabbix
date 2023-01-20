@@ -337,7 +337,7 @@ function check_field(&$fields, &$field, $checks) {
 		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
 	}
 	elseif ($opt == O_OPT) {
-		if (!isset($_REQUEST[$field]) || $_REQUEST[$field] == '') {
+		if (!isset($_REQUEST[$field])) {
 			return ZBX_VALID_OK;
 		}
 		elseif ($flags & P_ACT) {
@@ -351,7 +351,6 @@ function check_field(&$fields, &$field, $checks) {
 				info(_('Operation cannot be performed due to unauthorized request.'));
 				return ZBX_VALID_ERROR;
 			}
-
 		}
 	}
 
