@@ -299,7 +299,7 @@ static void	DCdump_host_inventories(void)
 
 		for (j = 0; j < HOST_INVENTORY_FIELD_COUNT; j++)
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "  %s: '%s'", DBget_inventory_field(j + 1),
+			zabbix_log(LOG_LEVEL_TRACE, "  %s: '%s'", DBget_inventory_field((unsigned char)(j + 1)),
 					host_inventory->values[j]);
 		}
 	}
@@ -1196,8 +1196,8 @@ static void	DCdump_maintenance_hosts(zbx_dc_maintenance_t *maintenance)
 
 static int	maintenance_tag_compare(const void *v1, const void *v2)
 {
-	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t **)v1;
-	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t **)v2;
+	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t * const *)v1;
+	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t * const *)v2;
 	int				ret;
 
 	if (0 != (ret = (strcmp(tag1->tag, tag2->tag))))
@@ -1442,8 +1442,8 @@ static void	DCdump_httpstep_fields(void)
 
 static int	connector_tag_compare(const void *v1, const void *v2)
 {
-	const zbx_dc_connector_tag_t	*tag1 = *(const zbx_dc_connector_tag_t **)v1;
-	const zbx_dc_connector_tag_t	*tag2 = *(const zbx_dc_connector_tag_t **)v2;
+	const zbx_dc_connector_tag_t	*tag1 = *(const zbx_dc_connector_tag_t * const *)v1;
+	const zbx_dc_connector_tag_t	*tag2 = *(const zbx_dc_connector_tag_t * const *)v2;
 	int				ret;
 
 	if (0 != (ret = (strcmp(tag1->tag, tag2->tag))))

@@ -617,7 +617,7 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 		goto clean;
 	}
 
-	if (FAIL == zbx_is_time_suffix(timeout, &timeout_seconds, strlen(timeout)))
+	if (FAIL == zbx_is_time_suffix(timeout, &timeout_seconds, (int)strlen(timeout)))
 	{
 		*error = zbx_dsprintf(NULL, "Invalid timeout: %s", timeout);
 		goto clean;
@@ -814,7 +814,7 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 			break;
 	}
 
-	if ('\0' != *status_codes && FAIL == zbx_int_in_list(status_codes, response_code))
+	if ('\0' != *status_codes && FAIL == zbx_int_in_list(status_codes, (int)response_code))
 	{
 		*error = zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
 				" required status codes \"%s\"", response_code, status_codes);

@@ -33,7 +33,8 @@ extern unsigned char			program_type;
 
 static int	connector_object_compare_func(const void *d1, const void *d2)
 {
-	return zbx_timespec_compare(&((zbx_connector_data_point_t *)d1)->ts, &((zbx_connector_data_point_t *)d2)->ts);
+	return zbx_timespec_compare(&((const zbx_connector_data_point_t *)d1)->ts,
+			&((const zbx_connector_data_point_t *)d2)->ts);
 }
 
 static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message,

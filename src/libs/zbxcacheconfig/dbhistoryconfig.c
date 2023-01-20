@@ -842,7 +842,8 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 
 		if (0 != dc_connector->tags.values_num)
 		{
-			zbx_vector_match_tags_reserve(&connector_filter.connector_tags, dc_connector->tags.values_num);
+			zbx_vector_match_tags_reserve(&connector_filter.connector_tags,
+					(size_t)dc_connector->tags.values_num);
 
 			for (i = 0; i < dc_connector->tags.values_num; i++)
 			{

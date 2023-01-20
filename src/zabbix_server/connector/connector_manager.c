@@ -40,7 +40,7 @@ typedef struct
 	zbx_ipc_client_t	*client;	/* the connected preprocessing worker client */
 	zbx_uint64_t		taskid;		/* the current task data */
 	zbx_vector_uint64_t	ids;
-	unsigned char		reschedule;
+	int			reschedule;
 }
 zbx_connector_worker_t;
 
@@ -315,7 +315,8 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now, in
 			if (0 == data_offset)
 				break;
 
-			if (FAIL == zbx_ipc_client_send(worker->client, ZBX_IPC_CONNECTOR_REQUEST, data, data_offset))
+			if (FAIL == zbx_ipc_client_send(worker->client, ZBX_IPC_CONNECTOR_REQUEST, data,
+					(zbx_uint32_t)data_offset))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot send data to connector worker");
 				exit(EXIT_FAILURE);
@@ -465,7 +466,7 @@ static	void	connector_get_items_totals(zbx_connector_manager_t *manager, zbx_uin
 
 		zbx_hashset_iter_reset(&connector->data_point_links, &links_iter);
 		while (NULL != (data_point_link = (zbx_data_point_link_t *)zbx_hashset_iter_next(&links_iter)))
-			*queued += data_point_link->connector_data_points.values_num;
+			*queued += (zbx_uint64_t)data_point_link->connector_data_points.values_num;
 	}
 }
 
@@ -653,7 +654,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 			processed_num = 0;
 		}
 
-		connector_assign_tasks(&manager, time_now, &processed_num);
+		connector_assign_tasks(&manager, (int)time_now, &processed_num);
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
@@ -682,7 +683,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 					connector_register_worker(&manager, client, message);
 					break;
 				case ZBX_IPC_CONNECTOR_RESULT:
-					connector_add_result(&manager, client, time_now);
+					connector_add_result(&manager, client, (int)time_now);
 					break;
 				case ZBX_IPC_CONNECTOR_DIAG_STATS:
 					connector_get_diag_stats(&manager, client);

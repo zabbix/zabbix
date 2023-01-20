@@ -216,8 +216,8 @@ void	zbx_diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_s
  ******************************************************************************/
 static int	diag_compare_pair_second_desc(const void *d1, const void *d2)
 {
-	zbx_uint64_pair_t	*p1 = (zbx_uint64_pair_t *)d1;
-	zbx_uint64_pair_t	*p2 = (zbx_uint64_pair_t *)d2;
+	const zbx_uint64_pair_t	*p1 = (const zbx_uint64_pair_t *)d1;
+	const zbx_uint64_pair_t	*p2 = (const zbx_uint64_pair_t *)d2;
 
 	if (p1->second < p2->second)
 		return 1;
@@ -241,8 +241,8 @@ static void	diag_historycache_add_items(struct zbx_json *json, const char *field
 	for (i = 0; i < pairs_num; i++)
 	{
 		zbx_json_addobject(json, NULL);
-		zbx_json_addint64(json, "itemid", pairs[i].first);
-		zbx_json_addint64(json, "values", pairs[i].second);
+		zbx_json_adduint64(json, "itemid", pairs[i].first);
+		zbx_json_adduint64(json, "values", pairs[i].second);
 		zbx_json_close(json);
 	}
 
@@ -295,9 +295,9 @@ int	zbx_diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_j
 			time_total += time2 - time1;
 
 			if (0 != (fields & ZBX_DIAG_HISTORYCACHE_ITEMS))
-				zbx_json_addint64(json, "items", items_num);
+				zbx_json_adduint64(json, "items", items_num);
 			if (0 != (fields & ZBX_DIAG_HISTORYCACHE_VALUES))
-				zbx_json_addint64(json, "values", values_num);
+				zbx_json_adduint64(json, "values", values_num);
 		}
 
 		if (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEMORY))
@@ -388,8 +388,8 @@ static void	diag_add_preproc_items(struct zbx_json *json, const char *field, con
 
 		zbx_json_addobject(json, NULL);
 		zbx_json_adduint64(json, "itemid", item->itemid);
-		zbx_json_adduint64(json, "values", item->values_num);
-		zbx_json_adduint64(json, "steps", item->steps_num);
+		zbx_json_addint64(json, "values", item->values_num);
+		zbx_json_addint64(json, "steps", item->steps_num);
 		zbx_json_close(json);
 	}
 
@@ -471,10 +471,10 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 					zbx_vector_ptr_create(&items);
 					time1 = zbx_time();
 					if (0 == strcmp(map->name, "values"))
-						ret = zbx_preprocessor_get_top_items(map->value, &items, error);
+						ret = zbx_preprocessor_get_top_items((int)map->value, &items, error);
 					else
-						ret = zbx_preprocessor_get_top_oldest_preproc_items(map->value, &items,
-								error);
+						ret = zbx_preprocessor_get_top_oldest_preproc_items((int)map->value,
+								&items, error);
 
 					if (FAIL == ret)
 					{
@@ -533,9 +533,9 @@ static void	diag_add_connector_items(struct zbx_json *json, const char *field,
 
 		zbx_json_addobject(json, NULL);
 		zbx_json_adduint64(json, "connectorid", connector_stat->connectorid);
-		zbx_json_adduint64(json, "values", connector_stat->values_num);
-		zbx_json_adduint64(json, "links", connector_stat->links_num);
-		zbx_json_adduint64(json, "queued_links", connector_stat->queued_links_num);
+		zbx_json_addint64(json, "values", connector_stat->values_num);
+		zbx_json_addint64(json, "links", connector_stat->links_num);
+		zbx_json_addint64(json, "queued_links", connector_stat->queued_links_num);
 		zbx_json_close(json);
 	}
 
@@ -1094,8 +1094,8 @@ int	zbx_diag_add_connector_info(const struct zbx_json_parse *jp, struct zbx_json
 					time1 = zbx_time();
 					if (0 == strcmp(map->name, "values"))
 					{
-						ret = zbx_connector_get_top_connectors(map->value, &connector_stats,
-								error);
+						ret = zbx_connector_get_top_connectors((int)map->value,
+								&connector_stats, error);
 					}
 
 					if (FAIL == ret)

@@ -191,5 +191,5 @@ void	zbx_connector_deserialize_connector_and_data_point(const unsigned char *dat
 	data += zbx_deserialize_str(data, &connector->ssl_key_file, ssl_key_file_len);
 	data += zbx_deserialize_str(data, &connector->ssl_key_password, ssl_key_password_len);
 
-	zbx_connector_deserialize_data_point(data, size - (data - start), connector_data_points);
+	zbx_connector_deserialize_data_point(data, (zbx_uint32_t)(size - (data - start)), connector_data_points);
 }

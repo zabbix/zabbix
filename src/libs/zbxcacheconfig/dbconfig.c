@@ -6568,8 +6568,8 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
  ******************************************************************************/
 static int	dc_compare_connector_tags(const void *d1, const void *d2)
 {
-	const zbx_dc_connector_tag_t	*tag1 = *(const zbx_dc_connector_tag_t **)d1;
-	const zbx_dc_connector_tag_t	*tag2 = *(const zbx_dc_connector_tag_t **)d2;
+	const zbx_dc_connector_tag_t	*tag1 = *(const zbx_dc_connector_tag_t * const *)d1;
+	const zbx_dc_connector_tag_t	*tag2 = *(const zbx_dc_connector_tag_t * const *)d2;
 
 	return strcmp(tag1->tag, tag2->tag);
 }
