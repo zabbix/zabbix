@@ -111,7 +111,7 @@ window.maintenance_edit = new class {
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php', false);
-		curl.setArgument('action', this.maintenanceid !== 0 ? 'maintenance.update' : 'maintenance.create');
+		curl.setArgument('action', this.maintenanceid === null ? 'maintenance.create' : 'maintenance.update');
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

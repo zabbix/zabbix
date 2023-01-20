@@ -38,8 +38,8 @@ class CControllerMaintenanceUpdate extends CController {
 			'active_since' =>		'required|abs_time',
 			'active_till' =>		'required|abs_time',
 			'timeperiods' =>		'required|array',
-			'groupids' =>			'array',
-			'hostids' => 			'array',
+			'groupids' =>			'array_db hosts.hostid',
+			'hostids' => 			'array_db hstgrp.groupid',
 			'tags_evaltype' =>		'in '.implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR]),
 			'maintenance_tags' =>	'array',
 			'description' =>		'required|string'
@@ -47,7 +47,7 @@ class CControllerMaintenanceUpdate extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret && $this->getInput('groupids') === null && $this->getInput('hostids') === null ) {
+		if ($ret && !$this->hasInput('groupids') && !$this->hasInput('hostids')) {
 			error(_('At least one host group or host must be selected.'));
 
 			$ret = false;
@@ -143,7 +143,7 @@ class CControllerMaintenanceUpdate extends CController {
 		$output = [];
 
 		if ($result) {
-			$output['success']['title'] = _('Maintenance updated');
+			$output['success']['title'] = _('Maintenance period updated');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -151,7 +151,7 @@ class CControllerMaintenanceUpdate extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot update maintenance'),
+				'title' => _('Cannot update maintenance period'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
