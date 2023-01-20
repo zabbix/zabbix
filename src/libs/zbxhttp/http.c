@@ -565,8 +565,10 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 	char			application_ndjson[] = {"Content-Type: application/x-ndjson"};
 	char			application_xml[] = {"Content-Type: application/xml"};
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request method '%s' URL '%s%s' headers '%s' message body '%s'",
-			__func__, zbx_request_string(request_method), url, query_fields, headers, posts);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request method '%s' URL '%s%s' headers '%s'",
+			__func__, zbx_request_string(request_method), url, query_fields, headers);
+
+	zabbix_log(LOG_LEVEL_TRACE, "message body '%s'", posts);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
