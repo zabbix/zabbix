@@ -173,6 +173,11 @@ class CHistory extends CApiService {
 				return $this->getFromElasticsearch($options);
 
 			default:
+				$config = select_config();
+				$options['time_from'] = $config['hk_history_global'] == 1
+					? max($options['time_from'], time() - timeUnitToSeconds($config['hk_history']) + 1)
+					: $options['time_from'];
+
 				return $this->getFromSql($options);
 		}
 	}
