@@ -170,14 +170,15 @@ class CControllerWidgetItemView extends CControllerWidget {
 							}
 						}
 
-						if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $last_value != $prev_value) {
+						if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null) {
 							if (array_key_exists('mappings', $item['valuemap'])) {
 								$change_indicator = self::CHANGE_INDICATOR_UP_DOWN;
 							}
-							else {
-								$change_indicator = $last_value > $prev_value
-									? self::CHANGE_INDICATOR_UP
-									: self::CHANGE_INDICATOR_DOWN;
+							elseif ($last_value > $prev_value) {
+								$change_indicator = self::CHANGE_INDICATOR_UP;
+							}
+							elseif ($last_value < $prev_value) {
+								$change_indicator = self::CHANGE_INDICATOR_DOWN;
 							}
 						}
 						break;
