@@ -45,6 +45,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 	public function testUsersAuthenticationLdap_Layout() {
 		$form = $this->openLdapForm();
 		$this->page->assertHeader('Authentication');
+		$this->page->assertTitle('Configuration of authentication');
 		$this->assertTrue($form->getField('Enable LDAP authentication')->isEnabled());
 
 		// Check that Update button is clickable and no other buttons present.
@@ -68,6 +69,8 @@ class testUsersAuthenticationLdap extends CWebTest {
 			}
 		}
 
+		$this->assertEquals(['Servers'], $form->getRequiredLabels());
+
 		// Check 'Provisioning period' field's editability.
 		foreach ([false, true] as $jit_status) {
 			$form->fill(['Enable JIT provisioning' => $jit_status]);
@@ -81,11 +84,11 @@ class testUsersAuthenticationLdap extends CWebTest {
 		$server_form = $server_dialog->asForm();
 
 		$server_fields = [
-			'Name' => ['visible' => true, 'maxlength' => 128, 'value' => '', 'mandatory' => true],
-			'Host' => ['visible' => true, 'maxlength' => 255, 'value' => '', 'mandatory' => true],
-			'Port' => ['visible' => true, 'maxlength' => 5, 'value' => 389, 'mandatory' => true],
-			'Base DN' => ['visible' => true, 'maxlength' => 255, 'value' => '', 'mandatory' => true],
-			'Search attribute' => ['visible' => true, 'maxlength' => 128, 'value' => '', 'mandatory' => true],
+			'Name' => ['visible' => true, 'maxlength' => 128, 'value' => ''],
+			'Host' => ['visible' => true, 'maxlength' => 255, 'value' => ''],
+			'Port' => ['visible' => true, 'maxlength' => 5, 'value' => 389],
+			'Base DN' => ['visible' => true, 'maxlength' => 255, 'value' => ''],
+			'Search attribute' => ['visible' => true, 'maxlength' => 128, 'value' => ''],
 			'Bind DN' => ['visible' => true, 'maxlength' => 255, 'value' => ''],
 			'Bind password' => ['visible' => true, 'maxlength' => 128, 'value' => ''],
 			'Description' => ['visible' => true, 'maxlength' => 65535, 'value' => ''],
@@ -100,7 +103,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 			'User group membership attribute' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => 'memberOf'],
 			'User name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'User last name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
-			'User group mapping' => ['visible' => false, 'mandatory' => true],
+			'User group mapping' => ['visible' => false],
 			'Media type mapping' => ['visible' => false ],
 			'StartTLS' => ['visible'  => false, 'value' => false],
 			'Search filter' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{attr}=%{user})']
@@ -121,15 +124,19 @@ class testUsersAuthenticationLdap extends CWebTest {
 			if (array_key_exists('placeholder', $attributes)) {
 				$this->assertEquals($attributes['placeholder'], $server_form->getField($field)->getAttribute('placeholder'));
 			}
-
-			if (array_key_exists('mandatory', $attributes)) {
-				$this->assertStringContainsString('form-label-asterisk', $server_form->getLabel($field)->getAttribute('class'));
-			}
 		}
+
+		// Check mandatory fields.
+		$this->assertEquals(['Name', 'Host', 'Port', 'Base DN', 'Search attribute'],
+				$server_form->getRequiredLabels()
+		);
+
+		// Check invisible mandatory field.
+		$server_form->isRequired('User group mapping');
 
 		// Check JIT fields (memberOf).
 		$server_form->fill(['Configure JIT provisioning' => true]);
-		$server_form->query('xpath:.//label[text()="Group configuration"]')->waitUntilVisible()->one();
+		$server_form->query('xpath:.//label[text()="Group configuration"]')->waitUntilVisible();
 
 		$jit_fields_memberOf = [
 			'Group base DN' => false,
@@ -151,7 +158,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 
 		// Check JIT fields (groupOfNames).
 		$server_form->fill(['Group configuration' => 'groupOfNames']);
-		$server_form->query('xpath:.//label[text()="Group base DN"]')->waitUntilVisible()->one();
+		$server_form->query('xpath:.//label[text()="Group base DN"]')->waitUntilVisible();
 
 		$jit_fields_groupOfNames = [
 			'Group base DN' => true,
@@ -197,6 +204,9 @@ class testUsersAuthenticationLdap extends CWebTest {
 				"\nwildcard patterns with '*' may be used"], $group_mapping_dialog->asForm()
 		);
 
+		// Check Groups mapping footer buttons.
+		$this->checkFooterButtons($group_mapping_dialog, ['Add', 'Cancel']);
+
 		// Close Group mapping dialog.
 		$group_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
 
@@ -205,10 +215,34 @@ class testUsersAuthenticationLdap extends CWebTest {
 				$server_form, ['Name', 'Media type', 'Attribute']
 		);
 
+		// Check Media mapping footer buttons.
+		$this->checkFooterButtons($media_mapping_dialog, ['Add', 'Cancel']);
+
 		// Close Media mapping dialog.
 		$media_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
 
+		// Check footer buttons.
+		$this->checkFooterButtons($server_dialog, ['Add', 'Test', 'Cancel']);
+
 		$server_dialog->close();
+	}
+
+	/**
+	 * Check buttons in dialog footer.
+	 *
+	 * @param COverlayDialogElement    $dialog     given dialog
+	 * @param array                    $buttons    checked buttons array
+	 */
+	private function checkFooterButtons($dialog, $buttons) {
+		$footer = $dialog->getFooter();
+
+		// Check that there are correct buttons count in the footer.
+		$this->assertEquals(count($buttons), $footer->query('xpath:.//button')->all()->count());
+
+		// Check that all footer buttons are clickable.
+		$this->assertEquals(count($buttons), $footer->query('button', $buttons)->all()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+		);
 	}
 
 	/**
