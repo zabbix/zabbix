@@ -66,7 +66,7 @@ There are no template links in this template.
 |Veeam |Veeam Manager: Failed Job Runs |<p>Informs about the failed job runs.</p> |DEPENDENT |veeam.manager.failed.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.FailedJobRuns`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Veeam |Veeam Manager: Backup Size [{#NAME}] |<p>Gets the backup size with the name [{#NAME}].</p> |DEPENDENT |veeam.backup.file.size[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.BackupSize`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Veeam |Veeam Manager: Data Size [{#NAME}] |<p>Gets the data size with the name [{#NAME}].</p> |DEPENDENT |veeam.backup.data.size[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.DataSize`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Veeam |Veeam Manager: Compression ratio [{#NAME}] |<p>Gets the data compression ratio with the name[{#NAME}].</p> |DEPENDENT |veeam.backup.compress.ratio[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.CompressRatio`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam Manager: Compression ratio [{#NAME}] |<p>Gets the data compression ratio with the name [{#NAME}].</p> |DEPENDENT |veeam.backup.compress.ratio[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.CompressRatio`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Veeam |Veeam Manager: Deduplication Ratio [{#NAME}] |<p>Gets the data deduplication ratio with the name [{#NAME}].</p> |DEPENDENT |veeam.backup.deduplication.ratio[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.DeduplicationRatio`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
 ### Triggers
