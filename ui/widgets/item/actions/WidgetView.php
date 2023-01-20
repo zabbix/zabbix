@@ -182,7 +182,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null) {
 							if (array_key_exists('mappings', $item['valuemap'])) {
-								$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
+								if ($last_value != $prev_value) {
+									$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
+								}
 							}
 							elseif ($last_value > $prev_value) {
 								$change_indicator = Widget::CHANGE_INDICATOR_UP;
