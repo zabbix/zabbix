@@ -29,7 +29,7 @@ class ClockWidgets {
 	public static function load() {
 		CDataHelper::call('hostgroup.create', [
 			[
-				'name' => 'Host group for clock widget',
+				'name' => 'Host group for clock widget'
 			]
 		]);
 		$hostgrpid = CDataHelper::getIds('name');
@@ -62,7 +62,7 @@ class ClockWidgets {
 				'type' => 0,
 				'value_type' => 1,
 				'interfaceid' => $interfaceid,
-				'delay' => '5s',
+				'delay' => '5s'
 			],
 			[
 				'hostid' => $hostid['Host for clock widget'],
@@ -71,7 +71,7 @@ class ClockWidgets {
 				'type' => 0,
 				'value_type' => 1,
 				'interfaceid' => $interfaceid,
-				'delay' => '5s',
+				'delay' => '5s'
 			]
 		]);
 		$itemid = CDataHelper::getIds('name');
