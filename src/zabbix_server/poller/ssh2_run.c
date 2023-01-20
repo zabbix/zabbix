@@ -36,11 +36,11 @@ static const char	*password;
 static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_str, const char *value,
 		char **err_msg)
 {
-	int	ret = SUCCEED;
+	int	res, ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s key_str:'%s' value:'%s'", __func__, key_str, value);
 
-	if (0 > libssh2_session_method_pref(session, type, value))
+	if (0 > (res = libssh2_session_method_pref(session, type, value)) && res != LIBSSH2_ERROR_EAGAIN)
 	{
 		char		*err;
 		const char	**algs;
