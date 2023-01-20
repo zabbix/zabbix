@@ -25,11 +25,8 @@
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxconnector.h"
-#include "zbxembed.h"
 #include "zbxtime.h"
 #include "zbxhttp.h"
-
-extern unsigned char			program_type;
 
 static int	connector_object_compare_func(const void *d1, const void *d2)
 {
@@ -134,13 +131,13 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_vector_connector_data_point_t	connector_data_points;
 
-	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s #%d starting", get_process_type_string(info->program_type), process_num);
 
 	zbx_ipc_message_init(&message);
 
 	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CONNECTOR, SEC_PER_MIN, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to preprocessing service: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to connector service: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -148,7 +145,7 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 	ppid = getppid();
 	zbx_ipc_socket_write(&socket, ZBX_IPC_CONNECTOR_WORKER, (unsigned char *)&ppid, sizeof(ppid));
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);

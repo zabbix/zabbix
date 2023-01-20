@@ -27,21 +27,21 @@ void	zbx_connector_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t siz
 {
 	static zbx_ipc_socket_t	socket;
 
-	/* each process has a permanent connection to availability manager */
+	/* each process has a permanent connection to connector manager */
 	if (0 == socket.fd)
 	{
 		char	*error = NULL;
 
 		if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CONNECTOR, SEC_PER_MIN, &error))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot connect to availability manager service: %s", error);
+			zabbix_log(LOG_LEVEL_CRIT, "cannot connect to connector manager service: %s", error);
 			exit(EXIT_FAILURE);
 		}
 	}
 
 	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to availability manager service");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to connector manager service");
 		exit(EXIT_FAILURE);
 	}
 }
@@ -63,20 +63,11 @@ zbx_uint32_t	zbx_connector_pack_diag_stats(unsigned char **data, zbx_uint64_t qu
 
 /******************************************************************************
  *                                                                            *
- * Purpose: unpack preprocessing test data from IPC data buffer               *
+ * Purpose: unpack connector queue length                                     *
  *                                                                            *
- * Parameters: total      - [OUT] the number of values                        *
- *             queued     - [OUT] the number of values waiting to be          *
- *                                preprocessed                                *
- *             processing - [OUT] the number of values being preprocessed     *
- *             done       - [OUT] the number of values waiting to be flushed  *
- *                                that are either preprocessed or did not     *
- *                                require preprocessing                       *
- *             pending    - [OUT] the number of values pending to be          *
- *                                preprocessed after previous value for       *
- *                                example delta, throttling depends on        *
- *                                previous value                              *
- *             data       - [IN] IPC data buffer                              *
+ * Parameters: queued - [OUT] the number of values waiting to be              *
+ *                            preprocessed                                    *
+ *             data   - [IN] IPC data buffer                                  *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_connector_unpack_diag_stats(zbx_uint64_t *queued, const unsigned char *data)
@@ -86,7 +77,7 @@ static void	zbx_connector_unpack_diag_stats(zbx_uint64_t *queued, const unsigned
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get preprocessing manager diagnostic statistics                   *
+ * Purpose: get connector manager diagnostic statistics                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_connector_get_diag_stats(zbx_uint64_t *queued, char **error)
@@ -142,7 +133,6 @@ out:
  * Purpose: pack top request data into a single buffer that can be used in IPC*
  *                                                                            *
  * Parameters: data  - [OUT] memory buffer for packed data                    *
- *             field - [IN] the sort field                                    *
  *             limit - [IN] the number of top values to return                *
  *                                                                            *
  ******************************************************************************/
@@ -159,7 +149,7 @@ static zbx_uint32_t	connector_pack_top_items_request(unsigned char **data, int l
 
 /******************************************************************************
  *                                                                            *
- * Purpose: unpack preprocessing test data from IPC data buffer               *
+ * Purpose: unpack top request from IPC data buffer                           *
  *                                                                            *
  * Parameters: data  - [OUT] memory buffer for packed data                    *
  *             limit - [IN] the number of top values to return                *
@@ -172,10 +162,10 @@ void	zbx_connector_unpack_top_request(int *limit, const unsigned char *data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: unpack preprocessing test data from IPC data buffer               *
+ * Purpose: unpack connector top result from IPC data buffer                  *
  *                                                                            *
- * Parameters: items - [OUT] the item diag data                               *
- *             data  - [IN] memory buffer for packed data                     *
+ * Parameters: connector_stats - [OUT] the connector diag data                *
+ *             data            - [IN] memory buffer for packed data           *
  *                                                                            *
  ******************************************************************************/
 static void	connector_unpack_top_result(zbx_vector_ptr_t *connector_stats, const unsigned char *data)
@@ -204,7 +194,7 @@ static void	connector_unpack_top_result(zbx_vector_ptr_t *connector_stats, const
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the top N items by the number of queued values                *
+ * Purpose: get the top N connectors by the number of queued values           *
  *                                                                            *
  ******************************************************************************/
 static int	connector_get_top_items(int limit, zbx_vector_ptr_t *items, char **error, zbx_uint32_t code)
@@ -231,7 +221,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the top N items by the number of queued values                *
+ * Purpose: get the top N connectors by the number of queued values           *
  *                                                                            *
  ******************************************************************************/
 int	zbx_connector_get_top_connectors(int limit, zbx_vector_ptr_t *items, char **error)
@@ -274,9 +264,9 @@ zbx_uint32_t	zbx_connector_pack_top_connectors_result(unsigned char **data, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees interface availability data                                 *
+ * Purpose: frees connector object data                                       *
  *                                                                            *
- * Parameters: availability - [IN] interface availability data                *
+ * Parameters: connector_object - [IN] connector object data                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_connector_object_free(zbx_connector_object_t connector_object)
@@ -287,9 +277,9 @@ void	zbx_connector_object_free(zbx_connector_object_t connector_object)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees interface availability data                                 *
+ * Purpose: frees connecto data point                                         *
  *                                                                            *
- * Parameters: availability - [IN] interface availability data                *
+ * Parameters: connector_data_point - [IN] connector data point               *
  *                                                                            *
  ******************************************************************************/
 void	zbx_connector_data_point_free(zbx_connector_data_point_t connector_data_point)

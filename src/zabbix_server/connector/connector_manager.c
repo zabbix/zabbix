@@ -34,26 +34,26 @@
 #define ZBX_CONNECTOR_RESCHEDULE_FALSE	0
 #define ZBX_CONNECTOR_RESCHEDULE_TRUE	1
 
-/* preprocessing worker data */
+/* connector worker data */
 typedef struct
 {
-	zbx_ipc_client_t	*client;	/* the connected preprocessing worker client */
-	zbx_uint64_t		taskid;		/* the current task data */
+	zbx_ipc_client_t	*client;	/* the connected worker client */
+	zbx_uint64_t		taskid;		/* the current task id (connectorid) */
 	zbx_vector_uint64_t	ids;
 	int			reschedule;
 }
 zbx_connector_worker_t;
 
-/* preprocessing manager data */
+/* connector manager data */
 typedef struct
 {
-	zbx_connector_worker_t		*workers;		/* preprocessing worker array */
-	int				worker_count;		/* registered preprocessing worker count */
-	int				worker_fork_count;	/* preprocessing worker fork count */
-	zbx_hashset_t			connectors;
-	zbx_hashset_iter_t		iter;
-	zbx_uint64_t			config_revision;	/* the configuration revision */
-	zbx_uint64_t			connector_revision;
+	zbx_connector_worker_t		*workers;		/*c onnector worker array */
+	int				worker_count;		/* registered connector worker count */
+	int				worker_fork_count;	/* connector worker fork count */
+	zbx_hashset_t			connectors;		/* connectors */
+	zbx_hashset_iter_t		iter;			/* connector iterator */
+	zbx_uint64_t			config_revision;	/* configuration revision */
+	zbx_uint64_t			connector_revision;	/* connector configuration revision */
 }
 zbx_connector_manager_t;
 
@@ -97,9 +97,10 @@ static void	data_point_link_clean(zbx_data_point_link_t *data_point_link)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initializes preprocessing manager                                 *
+ * Purpose: initializes connector manager                                     *
  *                                                                            *
- * Parameters: manager - [IN] the manager to initialize                       *
+ * Parameters: manager           - [IN] the manager to initialize             *
+ *             worker_fork_count - [IN] number of worker forks                *
  *                                                                            *
  ******************************************************************************/
 static void	connector_init_manager(zbx_connector_manager_t *manager, int worker_fork_count)
@@ -139,11 +140,11 @@ static void	connector_destroy_manager(zbx_connector_manager_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: registers preprocessing worker                                    *
+ * Purpose: registers connector worker                                        *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
- *             client  - [IN] the connected preprocessing worker              *
- *             message - [IN] message received by preprocessing manager       *
+ *             client  - [IN] the connected connector worker                   *
+ *             message - [IN] message received by connector manager           *
  *                                                                            *
  ******************************************************************************/
 static void	connector_register_worker(zbx_connector_manager_t *manager, zbx_ipc_client_t *client,
@@ -179,9 +180,9 @@ static void	connector_register_worker(zbx_connector_manager_t *manager, zbx_ipc_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get worker without active preprocessing task                      *
+ * Purpose: get worker without active task                                    *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
+ * Parameters: manager - [IN] connector manager                               *
  *                                                                            *
  * Return value: pointer to the worker data or NULL if none                   *
  *                                                                            *
@@ -273,9 +274,11 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_connector_wo
 }
 /******************************************************************************
  *                                                                            *
- * Purpose: assign available queued preprocessing tasks to free workers       *
+ * Purpose: assign available queued connector tasks to free workers           *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
+ * Parameters: manager       - [IN] connector manager                         *
+ *             now           - [IN] current time                              *
+ *             processed_num - [OUT] number of records sent to workers        *
  *                                                                            *
  ******************************************************************************/
 static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now, int *processed_num)
@@ -474,7 +477,7 @@ static	void	connector_get_items_totals(zbx_connector_manager_t *manager, zbx_uin
  *                                                                            *
  * Purpose: return diagnostic statistics                                      *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
+ * Parameters: manager - [IN] connector manager                               *
  *             client  - [IN] IPC client                                      *
  *                                                                            *
  ******************************************************************************/
@@ -497,7 +500,7 @@ static void	connector_get_diag_stats(zbx_connector_manager_t *manager, zbx_ipc_c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare item statistics by value                                  *
+ * Purpose: compare connector statistics by value                             *
  *                                                                            *
  ******************************************************************************/
 static int	connector_sort_item_by_values_desc(const void *d1, const void *d2)
@@ -543,7 +546,7 @@ static	void	preprocessor_get_items_view(zbx_connector_manager_t *manager, zbx_ve
  *                                                                            *
  * Purpose: return diagnostic statistics                                      *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
+ * Parameters: manager - [IN] connector manager                               *
  *             client  - [IN] IPC client                                      *
  *                                                                            *
  ******************************************************************************/
@@ -565,7 +568,7 @@ static void	connector_get_queue(zbx_connector_manager_t *manager, zbx_ipc_client
  *                                                                            *
  * Purpose: return diagnostic top view                                        *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
+ * Parameters: manager - [IN] connector manager                               *
  *             client  - [IN] IPC client                                      *
  *             message - [IN] the message with request                        *
  *                                                                            *
@@ -625,7 +628,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_CONNECTOR, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot start availability manager service: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start connector manager service: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}

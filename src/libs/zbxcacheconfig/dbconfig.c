@@ -6472,16 +6472,10 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Updates maintenances in configuration cache                       *
+ * Purpose: Updates connectors in configuration cache                         *
  *                                                                            *
- * Parameters: sync - [IN] the db synchronization data                        *
- *                                                                            *
- * Comments: The result contains the following fields:                        *
- *           0 - maintenanceid                                                *
- *           1 - maintenance_type                                             *
- *           2 - active_since                                                 *
- *           3 - active_till                                                  *
- *           4 - tags_evaltype                                                *
+ * Parameters: sync     - [IN] the db synchronization data                    *
+ *             revision - [IN] updated configuration revision                 *
  *                                                                            *
  ******************************************************************************/
 static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
@@ -6579,13 +6573,6 @@ static int	dc_compare_connector_tags(const void *d1, const void *d2)
  * Purpose: Updates connector tags in configuration cache                     *
  *                                                                            *
  * Parameters: sync - [IN] the db synchronization data                        *
- *                                                                            *
- * Comments: The result contains the following fields:                        *
- *           0 - maintenancetagid                                             *
- *           1 - maintenanceid                                                *
- *           2 - operator                                                     *
- *           3 - tag                                                          *
- *           4 - value                                                        *
  *                                                                            *
  ******************************************************************************/
 static void	DCsync_connector_tags(zbx_dbsync_t *sync)

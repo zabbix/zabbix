@@ -511,11 +511,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add item top list to output json                                  *
+ * Purpose: add top list to output json                                       *
  *                                                                            *
- * Parameters: json  - [OUT] the output json                                  *
- *             field - [IN] the field name                                    *
- *             items - [IN] a top item list                                   *
+ * Parameters: json            - [OUT] the output json                        *
+ *             field           - [IN] the field name                          *
+ *             connector_stats - [IN] a top connector list                    *
  *                                                                            *
  ******************************************************************************/
 static void	diag_add_connector_items(struct zbx_json *json, const char *field,
@@ -937,7 +937,7 @@ static void	diag_log_alerting(struct zbx_json_parse *jp, char **out, size_t *out
 
 /******************************************************************************
  *                                                                            *
- * Purpose: log preprocessing diagnostic information                          *
+ * Purpose: log connector diagnostic information                              *
  *                                                                            *
  ******************************************************************************/
 static void	diag_log_connector(struct zbx_json_parse *jp, char **out, size_t *out_alloc, size_t *out_offset)
@@ -1033,7 +1033,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add requested preprocessing diagnostic information to json data   *
+ * Purpose: add requested connector diagnostic information to json data       *
  *                                                                            *
  * Parameters: jp    - [IN] the request                                       *
  *             json  - [IN/OUT] the json to update                            *
