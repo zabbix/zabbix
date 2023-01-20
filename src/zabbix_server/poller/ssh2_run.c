@@ -38,13 +38,13 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 {
 	int	ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(\"%s\", \"%s\")", __func__, key_str, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s key_str:'%s' value:'%s'", __func__, key_str, value);
 
 	if (0 > libssh2_session_method_pref(session, type, value))
 	{
 		char		*err;
 		const char	**algs;
-		int		i, rc;
+		int		rc;
 
 		*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option %s", key_str);
 
@@ -57,9 +57,10 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 		{
 			*err_msg = zbx_strdcat(*err_msg, " Supported values are: ");
 
-			for (i = 0; i < rc; i++)
+			for (int	i = 0; i < rc; i++)
 			{
 				*err_msg = zbx_strdcat(*err_msg, algs[i]);
+
 				if (i < rc - 1)
 					*err_msg = zbx_strdcat(*err_msg, ", ");
 			}
@@ -79,7 +80,7 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 		ret = FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, ret);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
