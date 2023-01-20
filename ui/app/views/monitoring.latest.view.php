@@ -84,8 +84,7 @@ $html_page
 		'refresh_url' => $data['refresh_url'],
 		'refresh_data' => $data['refresh_data'],
 		'refresh_interval' => $data['refresh_interval'],
-		'checkbox_object' => 'itemids',
-		'csrf_tokens' =>  $data['csrf_tokens']
+		'checkbox_object' => 'itemids'
 	]).');
 '))
 	->setOnDocumentReady()

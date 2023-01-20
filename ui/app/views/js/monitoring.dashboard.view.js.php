@@ -46,7 +46,6 @@
 			this.time_period = time_period;
 			this.dynamic = dynamic;
 			this.clone = clone;
-			this.csrf_tokens = csrf_tokens;
 
 			timeControl.refreshPage = false;
 
@@ -202,7 +201,8 @@
 
 			const curl = new Curl('zabbix.php');
 
-			curl.setAction('dashboard.update', this.csrf_tokens['dashboard.update']);
+			curl.setArgument('action', 'dashboard.update');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('dashboard') ?>');
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

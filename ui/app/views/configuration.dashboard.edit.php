@@ -106,8 +106,7 @@ $html_page
 		'widget_defaults' => $data['widget_defaults'],
 		'widget_last_type' => $data['widget_last_type'],
 		'time_period' => $data['time_period'],
-		'page' => $data['page'],
-		'csrf_tokens' => $data['csrf_tokens']
+		'page' => $data['page']
 	]).');
 '))
 	->setOnDocumentReady()

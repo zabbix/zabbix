@@ -211,8 +211,7 @@ class CControllerLatestView extends CControllerLatest {
 			'tags' => makeTags($prepared_data['items'], true, 'itemid', (int) $filter['show_tags'], $filter['tags'],
 				array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : [],
 				(int) $filter['tag_name_format'], $filter['tag_priority']
-			),
-			'csrf_tokens' => self::generateCsrfTokens(['item.masscheck_now'])
+			)
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

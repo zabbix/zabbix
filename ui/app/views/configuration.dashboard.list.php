@@ -66,7 +66,7 @@ $form->addItem([
 		'template.dashboard.delete' => [
 			'name' => _('Delete'),
 			'confirm' => _('Delete selected dashboards?'),
-			'csrf_token' => CCsrfTokenHelper::get('template.dashboard.delete')
+			'csrf_token' => CCsrfTokenHelper::get('template')
 		]
 	], $checkbox_hash)
 ]);

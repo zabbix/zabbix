@@ -132,8 +132,6 @@ class CControllerDiscoveryEdit extends CController {
 		]);
 		CArrayHelper::sort($data['proxies'], ['host']);
 
-		$data['csrf_tokens'] = self::generateCsrfTokens(['discovery.create']);
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));
 		$this->setResponse($response);

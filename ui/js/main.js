@@ -709,7 +709,8 @@ function sendAjaxData(url, options) {
 	let curl = new Curl(url);
 
 	if (options.data.csrf_token) {
-		curl.setAction(options.data.action, options.data.csrf_token);
+		curl.setArgument('action', options.data.action);
+		curl.setArgument('_csrf_token', options.data.csrf_token);
 	}
 	else {
 		curl.setArgument('action', options.data.action);
