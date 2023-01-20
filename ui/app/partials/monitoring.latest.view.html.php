@@ -25,7 +25,6 @@
  */
 
 $form = (new CForm('GET', 'history.php'))
-	->cleanItems()
 	->setName('items')
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
 

@@ -31,7 +31,6 @@ $html_page = (new CHtmlPage())->setWebLayoutMode($web_layout_mode);
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($data['items'])),
 	'right' => (new CForm('get'))
-		->cleanItems()
 		->setName('filter_view_as')
 		->addVar('itemids', $data['itemids'])
 ];

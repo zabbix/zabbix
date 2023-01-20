@@ -27,7 +27,6 @@ $discovery_check_types = discovery_check_type2str();
 order_result($discovery_check_types);
 
 $form = (new CForm())
-	->cleanItems()
 	->setName('dcheck_form')
 	->addVar('action', 'popup.discovery.check')
 	->addVar('validate', 1);

@@ -31,7 +31,6 @@ $html_page = (new CHtmlPage())
 			(new CList())
 				->addItem(
 					(new CForm('get'))
-						->cleanItems()
 						->addItem(
 							(new CSubmit('form', _('Create map')))->setEnabled($data['allowed_edit'])
 						)

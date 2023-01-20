@@ -24,7 +24,6 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setId('preprocessing-test-form');
 
 if ($data['show_prev']) {

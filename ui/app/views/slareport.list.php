@@ -96,7 +96,6 @@ $html_page = (new CHtmlPage())
 $report = new CTableInfo();
 
 $form = (new CForm())
-	->cleanItems()
 	->setId('slareport-list')
 	->setName('slareport_list');
 

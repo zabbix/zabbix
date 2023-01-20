@@ -197,7 +197,6 @@ $filter_template = (new CDiv())
 	]);
 
 $template = (new CForm('get'))
-	->cleanItems()
 	->setName('zbx_filter')
 	->addItem([
 		$filter_template,

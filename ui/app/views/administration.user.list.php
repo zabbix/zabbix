@@ -34,7 +34,6 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USER_LIST))
 	->setControls((new CList([
 		(new CForm('get'))
-			->cleanItems()
 			->setName('main_filter')
 			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CVar('action', 'user.list'))->removeId()),
