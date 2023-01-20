@@ -1619,111 +1619,11 @@ class CHost extends CHostGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		// adding groups
 		$this->addRelatedGroups($options, $result, 'selectGroups');
 		$this->addRelatedGroups($options, $result, 'selectHostGroups');
+		$this->addRelatedTemplates($options, $result);
 
 		$hostids = array_keys($result);
-
-		if ($options['selectParentTemplates'] !== null) {
-			if ($options['selectParentTemplates'] != API_OUTPUT_COUNT) {
-				$templates = [];
-				$add_link_type = $this->outputIsRequested('link_type', $options['selectParentTemplates']);
-
-				$hosts_templates = DBfetchArray(DBselect(
-					'SELECT ht.hostid,ht.templateid'.($add_link_type ? ',ht.link_type' : '').
-					' FROM hosts_templates ht'.
-					' WHERE '.dbConditionId('ht.hostid', $hostids)
-				));
-
-				if ($hosts_templates) {
-					$template_output = $options['selectParentTemplates'];
-
-					if (is_array($template_output)) {
-						if (!in_array('templateid', $template_output)) {
-							$template_output[] = 'templateid';
-						}
-
-						if ($add_link_type) {
-							unset($template_output[array_search('link_type', $template_output)]);
-						}
-					}
-
-					$templates = API::Template()->get([
-						'output' => $template_output,
-						'templateids' => array_column($hosts_templates, 'templateid', 'templateid'),
-						'nopermissions' => $options['nopermissions'],
-						'preservekeys' => true
-					]);
-
-					if ($options['limitSelects'] !== null) {
-						order_result($templates, 'host');
-					}
-				}
-
-				$relation_map = [];
-
-				foreach ($hosts_templates as $host_template) {
-					$related_fields = ['templateid' => $host_template['templateid']];
-
-					if ($add_link_type) {
-						$related_fields['link_type'] = $host_template['link_type'];
-					}
-
-					$relation_map[$host_template['hostid']][] = $related_fields;
-				}
-
-				foreach ($result as $hostid => &$host) {
-					$host['parentTemplates'] = [];
-
-					if (!array_key_exists($hostid, $relation_map)) {
-						continue;
-					}
-
-					$templateids = array_column($relation_map[$hostid], 'templateid', 'templateid');
-
-					$host['parentTemplates'] = array_values(array_intersect_key($templates, $templateids));
-
-					if ($options['limitSelects'] !== null && $options['limitSelects'] != 0) {
-						$host['parentTemplates'] = array_slice($host['parentTemplates'], 0,
-							$options['limitSelects']
-						);
-					}
-
-					if ($add_link_type) {
-						foreach ($host['parentTemplates'] as &$template) {
-							foreach ($relation_map[$hostid] as $relation) {
-								if (bccomp($template['templateid'], $relation['templateid']) == 0) {
-									$template['link_type'] = $relation['link_type'];
-									break;
-								}
-							}
-						}
-						unset($template);
-					}
-
-					$host['parentTemplates'] = $this->unsetExtraFields($host['parentTemplates'], ['templateid'],
-						$options['selectParentTemplates']
-					);
-				}
-				unset($host);
-			}
-			else {
-				$templates = API::Template()->get([
-					'hostids' => $hostids,
-					'countOutput' => true,
-					'groupCount' => true,
-				]);
-
-				$templates = array_column($templates, null, 'hostid');
-
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['parentTemplates'] = array_key_exists($hostid, $templates)
-						? $templates[$hostid]['rowscount']
-						: '0';
-				}
-			}
-		}
 
 		if ($options['selectInventory'] !== null) {
 			$inventory = API::getApiService()->select('host_inventory', [
@@ -1941,6 +1841,94 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private function addRelatedTemplates(array $options, array &$result): void {
+		if ($options['selectParentTemplates'] === null) {
+			return;
+		}
+
+		foreach ($result as &$host) {
+			$host['parentTemplates'] = [];
+		}
+		unset($host);
+
+		if ($options['selectParentTemplates'] === API_OUTPUT_COUNT) {
+			$templates = API::Template()->get([
+				'hostids' => array_keys($result),
+				'countOutput' => true,
+				'groupCount' => true
+			]);
+
+			$host_templates = array_column($templates, 'rowscount', 'hostid');
+
+			foreach ($result as $hostid => &$host) {
+				$host['parentTemplates'] = array_key_exists($hostid, $host_templates)
+					? $host_templates[$hostid]
+					: '0';
+			}
+			unset($host);
+		}
+		else {
+			$template_options = [
+				'output' => ['hostid', 'templateid'],
+				'filter' => ['hostid' => array_keys($result)]
+			];
+
+			if ($this->outputIsRequested('link_type', $options['selectParentTemplates'])) {
+				$template_options['output'][] = 'link_type';
+			}
+
+			$hosts_templates = DBselect(DB::makeSql('hosts_templates', $template_options));
+
+			$template_links = [];
+
+			while ($row = DBfetch($hosts_templates)) {
+				$template_links[$row['templateid']][] = $row;
+			}
+
+			if ($options['selectParentTemplates'] === API_OUTPUT_EXTEND) {
+				$output = $options['selectParentTemplates'];
+			}
+			else {
+				$output = array_diff($options['selectParentTemplates'], ['link_type']);
+			}
+
+			$templates = API::Template()->get([
+				'output' => $output,
+				'templateids' => array_keys($template_links),
+				'nopermissions' => $options['nopermissions'],
+				'preservekeys' => true
+			]);
+
+			if ($options['limitSelects'] !== null) {
+				order_result($templates, 'host');
+			}
+
+			$templateid_requested = $this->outputIsRequested('templateid', $options['selectParentTemplates']);
+
+			foreach ($templates as $templateid => $template) {
+				if (!$templateid_requested) {
+					unset($template['templateid']);
+				}
+
+				foreach ($template_links[$templateid] as $link) {
+					$result[$link['hostid']]['parentTemplates'][] = $template
+						+ array_intersect_key($link, array_flip(['link_type']));
+				}
+			}
+
+			if ($options['limitSelects'] !== null) {
+				foreach ($result as &$host) {
+					$host['parentTemplates'] = array_slice($host['parentTemplates'], 0, $options['limitSelects']);
+				}
+				unset($host);
+			}
+		}
+	}
+
+	/**
 	 * Validates the input parameters for the get() method.
 	 *
 	 * @param array $options
@@ -1957,7 +1945,8 @@ class CHost extends CHostGeneral {
 			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value', 'automatic'])],
 			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
 			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
-			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])]
+			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])],
+			'limitSelects' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32]
 		]];
 
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
