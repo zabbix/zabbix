@@ -2693,4 +2693,54 @@ class CHost extends CHostGeneral {
 
 		return $hosts;
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function getObjectsByData(array $data, array $db_objects): array {
+		$objects = parent::getObjectsByData($data, $db_objects);
+
+		foreach ($db_objects as $db_object) {
+			$object = ['hostid' => $db_object['hostid']];
+
+			if (array_key_exists('templates', $db_object)) {
+				$templates = $this instanceof CTemplate ? 'templates_link' : 'templates';
+				$templateids = $this instanceof CTemplate ? 'templateids_link' : 'templateids';
+
+				if (array_key_exists($templates, $data) || array_key_exists($templateids, $data)) {
+					$object['templates'] = [];
+
+					if (array_key_exists($templates, $data)) {
+						foreach ($data[$templates] as $template) {
+							$object['templates'][] = ['templateid' => $template['templateid']];
+						}
+					}
+				}
+
+				if (array_key_exists('templates_clear', $data) || array_key_exists('templateids_clear', $data)) {
+					$object['templates_clear'] = [];
+					$db_templateids = array_column($db_object['templates'], 'templateid');
+
+					if (array_key_exists('templates_clear', $data)) {
+						foreach ($data['templates_clear'] as $template) {
+							if (in_array($template['templateid'], $db_templateids)) {
+								$object['templates_clear'][] = ['templateid' => $template['templateid']];
+							}
+						}
+					}
+					else {
+						foreach ($data['templateids_clear'] as $templateid) {
+							if (in_array($templateid, $db_templateids)) {
+								$object['templates_clear'][] = ['templateid' => $templateid];
+							}
+						}
+					}
+				}
+			}
+
+			$objects[] = $object;
+		}
+
+		return $objects;
+	}
 }
