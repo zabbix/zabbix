@@ -1773,9 +1773,10 @@ static void	collect_valuemaps(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64
 	zbx_vector_uint64_destroy(&loc_child_templateids);
 }
 
-static void	correct_entity_name(char **name, int uniq, int max_len, int *long_name_collisions)
+static void	correct_entity_name(char **name, int uniq, size_t max_len, int *long_name_collisions)
 {
-	int	tmp, len, uniq_len = 0;
+	int	tmp;
+	size_t	len, uniq_len = 0;
 
 	tmp = uniq;
 	len = zbx_strlen_utf8(*name);
