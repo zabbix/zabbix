@@ -1286,8 +1286,10 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 	zbx_host_info_t			*host_info;
 	zbx_item_info_t			*item_info;
 	struct zbx_json			json;
+	zbx_connector_object_t		connector_object;
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_vector_uint64_create(&connector_object.ids);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1308,6 +1310,25 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
+		}
+
+		if (0 != connector_filters->values_num)
+		{
+			int	k;
+
+			for (k = 0; k < connector_filters->values_num; k++)
+			{
+				if (SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
+						&connector_filters->values[k].connector_tags, &item_info->item_tags))
+				{
+					zbx_vector_uint64_append(&connector_object.ids,
+							connector_filters->values[k].connectorid);
+				}
+			}
+
+
+			if (0 == connector_object.ids.values_num && FAIL == history_export_enabled)
+				continue;
 		}
 
 		zbx_json_clean(&json);
@@ -1374,30 +1395,15 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_TYPE, h->value_type);
 
-		if (0 != connector_filters->values_num)
+		if (0 != connector_object.ids.values_num)
 		{
-			int			k;
-			zbx_connector_object_t	connector_object;
-
-			zbx_vector_uint64_create(&connector_object.ids);
 			connector_object.objectid = item->itemid;
 			connector_object.ts = h->ts;
 			connector_object.str = json.buffer;
 
-			for (k = 0; k < connector_filters->values_num; k++)
-			{
-				if (SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
-						&connector_filters->values[k].connector_tags, &item_info->item_tags))
-				{
-					zbx_vector_uint64_append(&connector_object.ids,
-							connector_filters->values[k].connectorid);
-				}
-			}
+			zbx_connector_serialize_object(data, data_alloc, data_offset, &connector_object);
 
-			if (0 != connector_object.ids.values_num)
-				zbx_connector_serialize_object(data, data_alloc, data_offset, &connector_object);
-
-			zbx_vector_uint64_destroy(&connector_object.ids);
+			zbx_vector_uint64_clear(&connector_object.ids);
 		}
 
 		if (SUCCEED == history_export_enabled)
@@ -1407,6 +1413,7 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 	if (SUCCEED == history_export_enabled)
 		zbx_history_export_flush();
 
+	zbx_vector_uint64_destroy(&connector_object.ids);
 	zbx_json_free(&json);
 }
 
