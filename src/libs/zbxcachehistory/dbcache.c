@@ -1326,7 +1326,6 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 				}
 			}
 
-
 			if (0 == connector_object.ids.values_num && FAIL == history_export_enabled)
 				continue;
 		}
