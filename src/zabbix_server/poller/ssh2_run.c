@@ -67,6 +67,14 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 
 			libssh2_free(session, algs);
 		}
+		else
+		{
+			*err_msg = zbx_strdcat(*err_msg, " Cannot get suported values");
+			if (0 > libssh2_session_last_error(session, &err, NULL, 0))
+				*err_msg = zbx_strdcatf(*err_msg, ": %s.", err);
+			else
+				*err_msg = zbx_strdcat(*err_msg, ".");
+		}
 
 		ret = FAIL;
 	}
