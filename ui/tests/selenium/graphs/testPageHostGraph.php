@@ -454,7 +454,7 @@ class testPageHostGraph extends CLegacyWebTest {
 				// Select host group.
 				$hosts_dialog->query('button:Select')->one()->click();
 				$this->zbxTestLaunchOverlayDialog(rtrim($data['target_type'], "s").' groups');
-				COverlayDialogElement::find()->all()->last()->waitUntilRedy()->query('link', $data['group'])->waitUntilVisible()->one()->click();
+				COverlayDialogElement::find()->all()->last()->waitUntilReady()->query('link', $data['group'])->waitUntilVisible()->one()->click();
 				COverlayDialogElement::find()->all()->waitUntilReady();
 				foreach ($data['targets'] as $target) {
 					$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($target));
