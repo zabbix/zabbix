@@ -259,8 +259,8 @@ class testUsersAuthenticationLdap extends CWebTest {
 	 */
 	private function checkTablesHeaders($tables, $form) {
 		foreach ($tables as $name => $attributes) {
-			$this->assertEquals($attributes['headers'],
-					$form->getFieldContainer($name)->query('id', $attributes['id'])->asTable()->one()->getHeadersText()
+			$this->assertEquals($attributes['headers'], $form->getFieldContainer($name)
+					->query('id', $attributes['id'])->asTable()->waitUntilVisible()->one()->getHeadersText()
 			);
 		}
 	}
