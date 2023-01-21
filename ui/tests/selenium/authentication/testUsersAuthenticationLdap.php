@@ -75,7 +75,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 		$server_table = [
 			'Servers' => [
 				'id' => 'ldap-servers',
-				'headers' => ['Name', 'Host', 'User groups', 'Default']
+				'headers' => ['Name', 'Host', 'User groups', 'Default', '']
 			]
 		];
 
@@ -1231,7 +1231,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 							'host' => 'кириллица',
 							'port' => '389',
 							'base_dn' => 'кириллица',
-							'bind_dn' => '',
+							'bind_dn' => 'кириллица',
 							'bind_password' => '',
 							'search_attribute' => 'кириллица',
 							'group_basedn' => 'кириллица',
@@ -1282,7 +1282,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 								'Bind DN' => '~`!@#$%^7*()_+=/',
 								'Description' => '~`!@#$%^7*()_+=/',
 								'Configure JIT provisioning' => true,
-								'Group configuration' => '~`!@#$%^7*()_+=/',
+								'Group configuration' => 'groupOfNames',
 								'Group base DN' => '~`!@#$%^7*()_+=/',
 								'Group name attribute' => '~`!@#$%^7*()_+=/',
 								'Group member attribute' => '~`!@#$%^7*()_+=/',
@@ -1406,14 +1406,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 							],
 							'Media type mapping' => [
 								[
-									'Name' => '1ong_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
+									// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
+									'Name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
 									'Media type' => 'Discord',
 									'Attribute' => 'test discord'
 								],
 								[
-									'Name' => '2ong_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
+									// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
+									'Name' => '2ong_value_long_value_long_value_long_value_long_value_lon',
 									'Media type' => 'iLert',
 									'Attribute' => 'test iLert'
 								]
@@ -1462,14 +1462,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 						],
 						'userdirectory_media' => [
 							[
-								'name' => '1ong_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
+								// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
+								'name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
 								'mediatypeid' => 10,
 								'attribute' => 'test discord'
 							],
 							[
-								'name' => '2ong_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
+								// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
+								'name' => '2ong_value_long_value_long_value_long_value_long_value_lon',
 								'mediatypeid' => 22,
 								'attribute' => 'test iLert'
 							]
