@@ -838,7 +838,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 								'Port' => '',
 								'Base DN' => 'base dn',
 								'Search attribute' => 'search attribute',
-								'Bind DN' => 'bin dn test',
+								'Bind DN' => 'bind dn test',
 								'Description' => 'test description with jit',
 								'Configure JIT provisioning' => true,
 								'Group configuration' => 'groupOfNames',
@@ -881,7 +881,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 								'host' => '111.222.333',
 								'port' => '0',
 								'base_dn' => 'base dn',
-								'bind_dn' => 'bin dn test',
+								'bind_dn' => 'bind dn test',
 								'search_attribute' => 'search attribute',
 								'group_basedn' => 'test group base dn',
 								'group_name' => 'test group name attribute',
@@ -1280,6 +1280,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 								'Base DN' => '~`!@#$%^7*()_+=/',
 								'Search attribute' => '~`!@#$%^7*()_+=/',
 								'Bind DN' => '~`!@#$%^7*()_+=/',
+								'Bind password' => '~`!@#$%^7*()_+=/',
 								'Description' => '~`!@#$%^7*()_+=/',
 								'Configure JIT provisioning' => true,
 								'Group configuration' => 'groupOfNames',
@@ -1318,8 +1319,8 @@ class testUsersAuthenticationLdap extends CWebTest {
 							'host' => '~`!@#$%^7*()_+=/',
 							'port' => '389',
 							'base_dn' => '~`!@#$%^7*()_+=/',
-							'bind_dn' => '',
-							'bind_password' => '',
+							'bind_dn' => '~`!@#$%^7*()_+=/',
+							'bind_password' => '~`!@#$%^7*()_+=/',
 							'search_attribute' => '~`!@#$%^7*()_+=/',
 							'group_basedn' => '~`!@#$%^7*()_+=/',
 							'group_name' => '~`!@#$%^7*()_+=/',
@@ -1421,14 +1422,20 @@ class testUsersAuthenticationLdap extends CWebTest {
 						]
 					],
 					'db_check' => [
-						'userdirectory' => ['name' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va'],
+						'userdirectory' => [
+							'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
+									'_long_value_long_value_long_value_long_value_long_va',
+							'description' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
+									'_long_value_long_value_long_value_long_value_long_va'
+						],
 						'userdirectory_ldap' => [
-							'host' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
+							'host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
+										'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long',
 							'port' => 65535,
-							'base_dn' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
+							'base_dn' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
+										'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_'.
+										'value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
+										'value_long_value_long_v',
 							'bind_dn' => '',
 							'bind_password' => '',
 							'search_attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
@@ -1499,7 +1506,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 						]
 					],
 					'db_check' => [
-						'userdirectory' => ['name' => 'LDAP'],
+						'userdirectory' => ['name' => 'LDAP', 'description' => 'description'],
 						'userdirectory_ldap' => [
 							'host' => 'ipa.demo1.freeipa.org',
 							'port' => '389',
