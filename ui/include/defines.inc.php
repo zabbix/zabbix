@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ define('DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR',		6);
 define('DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING',	7);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2022');
+define('ZABBIX_COPYRIGHT_TO',	'2023');
 
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);
@@ -216,6 +216,8 @@ define('P_NZERO',				0x0020);
 define('P_NO_TRIM',				0x0040);
 define('P_ALLOW_USER_MACRO',	0x0080);
 define('P_ALLOW_LLD_MACRO',		0x0100);
+define('P_ONLY_ARRAY',			0x0200);
+define('P_ONLY_TD_ARRAY',		0x0400);
 
 //	misc parameters
 define('IMAGE_FORMAT_PNG',	'PNG');

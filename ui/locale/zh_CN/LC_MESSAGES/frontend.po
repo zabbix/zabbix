@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-12-20 21:20+0000\n"
-"Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
+"PO-Revision-Date: 2023-01-06 08:42+0000\n"
+"Last-Translator: tongsonghua <yolylight@hotmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "日期\"%1$s\" 必须小于日期\"%2$s\"."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -47,7 +47,7 @@ msgstr "\"%1$s\" 替换 \"%2$s\""
 #: include/classes/import/validators/C60XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr "\"%1$s\" 预计"
+msgstr "预期为\"%1$s\" "
 
 #: include/classes/api/services/CReport.php:229
 #: include/classes/api/services/CReport.php:636
@@ -58,7 +58,7 @@ msgstr "\"%1$s\" 必须是空字符串或大于 \"%2$s\"。"
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "\"%1$s\" 的值必须小于或等于 \"%2$s\" 的值"
 
 #: include/classes/import/validators/C10XmlValidator.php:356
 #: include/classes/import/validators/C10XmlValidator.php:378
@@ -68,11 +68,11 @@ msgstr "“主机：key值” 关键的预计"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr ""
+msgstr "依赖项和主项的 \"hostid\" 必须匹配"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr ""
+msgstr "依赖项和主项的 \"ruleid\" 必须匹配"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:900
@@ -107,7 +107,7 @@ msgstr[0] "%1$d of %3$d%2$s 问题显示"
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d 个问题被选择。"
 
 #: chart4.php:94
 #, c-format
@@ -117,7 +117,7 @@ msgstr "%1$s (年 %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - 模块异常位于 %2$s。"
 
 #: include/classes/api/services/CItemGeneral.php:2654
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -135,12 +135,12 @@ msgstr[0] "%1$s 动作"
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s 字符"
 
 #: jsLoader.php:329
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s 个字符剩余"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -153,13 +153,13 @@ msgstr[0] "%1$s 事件"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
+msgstr[0] "%1$s 个主机维护中"
 
 #: include/func.inc.php:2549
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
+msgstr[0] "%1$s 小时"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:126
 #: app/controllers/CControllerWidgetPlainTextView.php:127
@@ -233,7 +233,7 @@ msgstr[0] "%1$s 秒"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
+msgstr[0] "%1$s 个未确认问题"
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
@@ -317,7 +317,7 @@ msgstr "触发器TOP100"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
-msgstr ""
+msgstr "7x24"
 
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
@@ -376,48 +376,48 @@ msgstr "添加覆盖"
 
 #: app/views/administration.user.list.php:114
 msgid "API access"
-msgstr ""
+msgstr "API 访问"
 
 #: app/controllers/CControllerPopupGeneric.php:333
 #: app/views/administration.userrole.edit.php:285
 msgid "API methods"
-msgstr ""
+msgstr "API 方法"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "API token"
-msgstr ""
+msgstr "API token"
 
 #: include/classes/api/services/CToken.php:299
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "API token \"%1$s\"已分配给用户\"%2$s\"。"
 
 #: app/controllers/CControllerTokenCreate.php:98
 msgid "API token added"
-msgstr ""
+msgstr "API token已添加"
 
 #: app/controllers/CControllerTokenDelete.php:61
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] ""
+msgstr[0] "API token已删除"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] ""
+msgstr[0] "API token已禁用"
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] ""
+msgstr[0] "API token已启用"
 
 #: include/classes/api/clients/CLocalApiClient.php:198
 msgid "API token expired."
-msgstr ""
+msgstr "API token已过期。"
 
 #: app/controllers/CControllerTokenUpdate.php:114
 msgid "API token updated"
-msgstr ""
+msgstr "API token已更新"
 
 #: app/controllers/CControllerTokenEdit.php:107
 #: app/controllers/CControllerTokenList.php:193
@@ -435,15 +435,15 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:397 include/html.inc.php:820
 #: include/html.inc.php:900
 msgid "API tokens"
-msgstr ""
+msgstr "API token"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
-msgstr ""
+msgstr "高于数值"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
-msgstr ""
+msgstr "横坐标"
 
 #: include/func.inc.php:1578
 msgid "Access denied"
@@ -456,27 +456,27 @@ msgstr "访问拒绝!"
 #: app/views/administration.user.edit.php:599
 #: app/views/administration.userrole.edit.php:271
 msgid "Access to API"
-msgstr ""
+msgstr "访问API"
 
 #: app/views/administration.user.edit.php:452
 #: app/views/administration.userrole.edit.php:81
 msgid "Access to UI elements"
-msgstr ""
+msgstr "访问 UI 页面"
 
 #: app/views/administration.user.edit.php:628
 #: app/views/administration.userrole.edit.php:320
 msgid "Access to actions"
-msgstr ""
+msgstr "访问动作"
 
 #: app/views/administration.user.edit.php:570
 #: app/views/administration.userrole.edit.php:222
 msgid "Access to modules"
-msgstr ""
+msgstr "访问模块"
 
 #: app/views/administration.user.edit.php:474
 #: app/views/administration.userrole.edit.php:134
 msgid "Access to services"
-msgstr ""
+msgstr "访问服务"
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66 include/actions.inc.php:161
@@ -492,7 +492,7 @@ msgstr "确认"
 
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "确认问题"
 
 #: app/views/popup.condition.common.php:684 include/actions.inc.php:2075
 #: include/events.inc.php:196
@@ -587,7 +587,7 @@ msgstr "动作 \"%1$s\" 已经存在。"
 #: include/classes/api/services/CRole.php:761
 #, c-format
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "动作\"%2$s\" 对于用户角色\"%1$s\"不可用。"
 
 #: actionconf.php:301
 msgid "Action added"
@@ -596,7 +596,7 @@ msgstr "动作已添加"
 #: include/classes/core/ZBase.php:500
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "动作分组 %1$s 必须扩展 %2$s 分组。"
 
 #: actionconf.php:323
 msgid "Action deleted"
@@ -623,7 +623,7 @@ msgstr "动作日志"
 #: app/views/administration.script.list.php:51
 #: app/views/administration.script.list.php:90
 msgid "Action operation"
-msgstr ""
+msgstr "动作操作"
 
 #: actionconf.php:293
 msgid "Action updated"
@@ -823,7 +823,7 @@ msgstr "添加"
 
 #: app/views/js/administration.mediatype.edit.js.php:133
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "添加 (消息类型达到限制)"
 
 #: jsLoader.php:149
 msgid "Add a new widget"
@@ -835,15 +835,15 @@ msgstr "添加子节点元素"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
-msgstr ""
+msgstr "添加子服务"
 
 #: app/views/js/popup.service.edit.js.php:401
 msgid "Add child services"
-msgstr ""
+msgstr "添加多个子服务"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
-msgstr ""
+msgstr "添加自"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -851,12 +851,12 @@ msgstr "添加主机"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "添加列"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
 msgid "Add missing"
-msgstr ""
+msgstr "添加缺失项"
 
 #: jsLoader.php:205
 msgid "Add multiple maps"
@@ -869,7 +869,7 @@ msgstr "添加新数据集"
 #: app/partials/configuration.host.edit.html.php:256
 #: include/views/configuration.host.prototype.edit.php:266
 msgid "Add new interface"
-msgstr ""
+msgstr "添加新接口"
 
 #: include/classes/widgets/CWidgetHelper.php:906
 msgid "Add new override"
@@ -878,15 +878,15 @@ msgstr "添加新的覆盖"
 #: app/views/js/configuration.dashboard.edit.js.php:202
 #: app/views/js/monitoring.dashboard.view.js.php:290
 msgid "Add page"
-msgstr ""
+msgstr "添加页面"
 
 #: app/views/js/popup.service.edit.js.php:431
 msgid "Add parent services"
-msgstr ""
+msgstr "添加父服务"
 
 #: include/classes/helpers/CRoleHelper.php:461
 msgid "Add problem comments"
-msgstr ""
+msgstr "添加问题备注"
 
 #: app/views/popup.massupdate.trigger.php:101
 #: include/views/configuration.graph.edit.php:408
@@ -896,11 +896,11 @@ msgstr "添加原型"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:127
 msgid "Add scheduled report"
-msgstr ""
+msgstr "添加定时报表"
 
 #: app/views/js/administration.userrole.edit.js.php:210
 msgid "Add services"
-msgstr ""
+msgstr "添加服务"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:68
 msgid "Add submaps"
@@ -908,7 +908,7 @@ msgstr "添加子图"
 
 #: app/controllers/CControllerFavouriteDelete.php:69 include/html.inc.php:153
 msgid "Add to favorites"
-msgstr ""
+msgstr "添加到收藏"
 
 #: include/actions.inc.php:1033
 msgid "Add to host group"
@@ -920,11 +920,11 @@ msgstr "添加到主机群组"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "添加用户"
 
 #: app/partials/scheduledreport.subscription.php:46
 msgid "Add user group"
-msgstr ""
+msgstr "添加用户组"
 
 #: app/views/js/configuration.dashboard.edit.js.php:198
 #: app/views/js/monitoring.dashboard.view.js.php:286
@@ -935,7 +935,7 @@ msgstr "添加构件"
 #: app/controllers/CControllerAuditLogList.php:356
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
-msgstr ""
+msgstr "已添加"
 
 #: jsLoader.php:340
 #, c-format
@@ -945,15 +945,15 @@ msgstr "%1$s，已添加"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "额外规则"
 
 #: app/views/popup.service.edit.php:182
 msgid "Additional rules"
-msgstr ""
+msgstr "额外规则"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"
-msgstr ""
+msgstr "地址"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -967,7 +967,7 @@ msgstr "管理"
 #: app/views/popup.service.edit.php:158
 #: include/classes/widgets/forms/CWidgetFormItem.php:69
 msgid "Advanced configuration"
-msgstr ""
+msgstr "高级配置"
 
 #: include/views/monitoring.sysmap.edit.php:158
 msgid "Advanced labels"
@@ -975,7 +975,7 @@ msgstr "高级标签"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
-msgstr ""
+msgstr "值之后"
 
 #: include/events.inc.php:288
 msgid "Age"
@@ -1017,21 +1017,21 @@ msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:1317
 msgid "Aggregate"
-msgstr ""
+msgstr "聚合"
 
 #: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
-msgstr ""
+msgstr "聚合函数"
 
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
 msgid "Aggregation function"
-msgstr ""
+msgstr "聚合函数"
 
 #: app/views/popup.tophosts.column.edit.php:139
 #: include/classes/widgets/CWidgetHelper.php:1308
 msgid "Aggregation interval"
-msgstr ""
+msgstr "聚合间隔"
 
 #: include/actions.inc.php:2106
 msgid "Alert message"
@@ -1039,7 +1039,7 @@ msgstr "告警消息"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
-msgstr ""
+msgstr "算法"
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -1074,7 +1074,7 @@ msgstr "添加仪表盘"
 
 #: app/views/monitoring.charts.view.php:82
 msgid "All graphs"
-msgstr ""
+msgstr "所有图形"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:425
@@ -1106,7 +1106,7 @@ msgstr "所有问题如果标签值匹配"
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
-msgstr ""
+msgstr "所有服务"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
@@ -1118,7 +1118,7 @@ msgstr "所有模板"
 
 #: app/views/administration.userrole.edit.php:289
 msgid "Allow list"
-msgstr ""
+msgstr "允许清单"
 
 #: app/views/popup.massupdate.trigger.php:60 include/triggers.inc.php:991
 #: include/views/configuration.trigger.prototype.edit.php:526
@@ -1135,7 +1135,7 @@ msgstr "允许的主机"
 
 #: app/views/administration.user.edit.php:619
 msgid "Allowed methods"
-msgstr ""
+msgstr "允许的方法"
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -1186,7 +1186,7 @@ msgstr "与/或（默认）"
 
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
-msgstr ""
+msgstr "每年"
 
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:59
@@ -1253,15 +1253,15 @@ msgstr "四月"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
-msgstr ""
+msgstr "您确定要删除此过滤器吗？"
 
 #: app/views/js/administration.macros.edit.js.php:86
 msgid "Are you sure you want to delete?"
-msgstr ""
+msgstr "您确定要删除吗?"
 
 #: include/classes/html/CButtonQMessage.php:52
 msgid "Are you sure you want to perform this action?"
-msgstr ""
+msgstr "您确定要执行此动作吗?"
 
 #: include/views/js/monitoring.sysmaps.js.php:116
 msgid "Area size"
@@ -1321,12 +1321,12 @@ msgstr "于(时:分)"
 
 #: app/views/administration.userrole.edit.php:115
 msgid "At least one UI element must be checked."
-msgstr ""
+msgstr "至少选中一个 UI 元素。"
 
 #: include/classes/api/services/CRole.php:487
 #, c-format
 msgid "At least one UI element must be enabled for user role \"%1$s\"."
-msgstr ""
+msgstr "用户角色\"%1$s\"至少需要启用一个UI页面。"
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
@@ -1355,11 +1355,11 @@ msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "至少需要支持MySQL、PostgreSQL或Oracle中的一种。"
 
 #: app/views/configuration.correlation.edit.php:159
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "至少需要选择一项操作。"
 
 #: include/views/configuration.action.edit.php:520
 msgid "At least one operation must exist."
@@ -1379,7 +1379,7 @@ msgstr "您必须至少选择一个用户或用户组。"
 
 #: include/classes/api/services/CReport.php:343
 msgid "At least one user or user group must be specified."
-msgstr ""
+msgstr "至少需要指定一个用户或用户组。"
 
 #: app/views/administration.mediatype.edit.php:340
 msgid "Attempt interval"
@@ -1411,7 +1411,7 @@ msgstr "审计日志"
 
 #: app/views/administration.housekeeping.edit.php:179
 msgid "Audit settings"
-msgstr ""
+msgstr "审计设置"
 
 #: include/func.inc.php:243
 msgid "Aug"
@@ -1424,11 +1424,11 @@ msgstr "八月"
 #: app/views/administration.token.view.php:38
 #: app/views/administration.user.token.view.php:37
 msgid "Auth token"
-msgstr ""
+msgstr "认证令牌"
 
 #: app/views/administration.authentication.edit.php:281
 msgid "AuthN requests"
-msgstr ""
+msgstr "AuthN 请求"
 
 #: app/controllers/CControllerAuditLogList.php:211
 #: app/views/administration.authentication.edit.php:323
@@ -1480,15 +1480,15 @@ msgstr "验证设置已更新"
 #: app/views/administration.module.edit.php:40
 #: app/views/administration.module.list.php:76
 msgid "Author"
-msgstr ""
+msgstr "作者"
 
 #: app/views/administration.miscconfig.edit.php:86
 msgid "Authorization"
-msgstr ""
+msgstr "授权"
 
 #: app/views/popup.tophosts.column.edit.php:162
 msgid "Auto"
-msgstr ""
+msgstr "自动"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
@@ -1535,16 +1535,16 @@ msgstr "自动的图标选择"
 #: include/classes/helpers/CMediatypeHelper.php:189
 #: include/classes/helpers/CMenuHelper.php:249 include/html.inc.php:890
 msgid "Autoregistration"
-msgstr ""
+msgstr "自动注册"
 
 #: include/classes/helpers/CMenuHelper.php:209
 #: include/views/configuration.action.list.php:35
 msgid "Autoregistration actions"
-msgstr ""
+msgstr "自动注册动作"
 
 #: app/views/administration.housekeeping.edit.php:86
 msgid "Autoregistration data storage period"
-msgstr ""
+msgstr "自动注册数据存储周期"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:195
@@ -1597,7 +1597,7 @@ msgstr "背景"
 #: include/classes/widgets/forms/CWidgetFormItem.php:384
 #: include/views/js/monitoring.sysmaps.js.php:564
 msgid "Background color"
-msgstr ""
+msgstr "背景颜色"
 
 #: include/views/monitoring.sysmap.edit.php:121
 msgid "Background image"
@@ -4171,7 +4171,7 @@ msgstr "复制"
 #: app/views/administration.token.view.php:45
 #: app/views/administration.user.token.view.php:44
 msgid "Copy to clipboard"
-msgstr ""
+msgstr "复制到剪贴板"
 
 #: app/views/configuration.correlation.edit.php:167
 msgid "Correlation"
@@ -4247,7 +4247,7 @@ msgstr ""
 
 #: app/views/sla.list.php:188
 msgid "Create SLA"
-msgstr ""
+msgstr "创建SLA"
 
 #: include/views/configuration.action.list.php:61
 msgid "Create action"
@@ -4255,15 +4255,15 @@ msgstr "创建动作"
 
 #: include/classes/helpers/CRoleHelper.php:452
 msgid "Create and edit dashboards"
-msgstr ""
+msgstr "创建并编辑仪表盘"
 
 #: include/classes/helpers/CRoleHelper.php:457
 msgid "Create and edit maintenance"
-msgstr ""
+msgstr "创建并编辑维护期"
 
 #: include/classes/helpers/CRoleHelper.php:453
 msgid "Create and edit maps"
-msgstr ""
+msgstr "创建并编辑拓扑图"
 
 #: app/views/administration.image.list.php:61
 msgid "Create background"
@@ -4280,7 +4280,7 @@ msgstr "创建仪表盘"
 
 #: jsLoader.php:359
 msgid "Create dependent discovery rule"
-msgstr ""
+msgstr "创建依赖项发现规则"
 
 #: jsLoader.php:358
 msgid "Create dependent item"
@@ -4299,11 +4299,11 @@ msgstr "创建发现规则"
 
 #: include/views/configuration.host.discovery.list.php:43
 msgid "Create discovery rule (select host first)"
-msgstr ""
+msgstr "创建发现规则(先选择主机)"
 
 #: include/views/configuration.host.discovery.list.php:44
 msgid "Create discovery rule (select template first)"
-msgstr ""
+msgstr "创建发现规则(先选择模板)"
 
 #: app/views/popup.lldoperation.php:80 app/views/popup.massupdate.item.php:324
 #: include/views/configuration.host.prototype.edit.php:288
@@ -4328,7 +4328,7 @@ msgstr "创建图形(先选择主机)"
 
 #: include/views/configuration.graph.list.php:52
 msgid "Create graph (select template first)"
-msgstr ""
+msgstr "创建图表(先选择模板)"
 
 #: include/views/configuration.graph.list.php:33
 msgid "Create graph prototype"
@@ -4374,7 +4374,7 @@ msgstr "创建监控项(先选择主机)"
 
 #: include/views/configuration.item.list.php:43
 msgid "Create item (select template first)"
-msgstr ""
+msgstr "创建监控项(先选择模板)"
 
 #: include/views/configuration.item.prototype.list.php:32
 msgid "Create item prototype"
@@ -4410,7 +4410,7 @@ msgstr "创建代理"
 
 #: app/views/reports.scheduledreport.list.php:35
 msgid "Create report"
-msgstr ""
+msgstr "创建报表"
 
 #: app/views/administration.script.list.php:34
 msgid "Create script"
@@ -4418,7 +4418,7 @@ msgstr "创建脚本"
 
 #: app/views/service.list.edit.php:128
 msgid "Create service"
-msgstr ""
+msgstr "创建服务"
 
 #: include/views/configuration.template.list.php:90
 msgid "Create template"
@@ -4434,7 +4434,7 @@ msgstr "创建触发器(先选择主机)"
 
 #: include/views/configuration.triggers.list.php:158
 msgid "Create trigger (select template first)"
-msgstr ""
+msgstr "创建触发器(先选择模板)"
 
 #: include/views/configuration.trigger.prototype.list.php:32
 msgid "Create trigger prototype"
@@ -4458,7 +4458,7 @@ msgstr "创建用户群组"
 
 #: app/views/administration.userrole.list.php:34
 msgid "Create user role"
-msgstr ""
+msgstr "创建用户角色"
 
 #: include/views/configuration.httpconf.list.php:95
 msgid "Create web scenario"
@@ -4470,27 +4470,27 @@ msgstr "创建 Web 场景（首先选择主机）"
 
 #: include/views/configuration.httpconf.list.php:104
 msgid "Create web scenario (select template first)"
-msgstr ""
+msgstr "创建 Web 场景(首先选择模板)"
 
 #: app/partials/service.list.edit.php:57 app/partials/service.list.php:54
 #: app/views/administration.token.list.php:137
 #: app/views/administration.user.token.list.php:98
 #: app/views/popup.service.edit.php:146
 msgid "Created at"
-msgstr ""
+msgstr "创建于"
 
 #: app/views/monitoring.dashboard.list.php:66
 #: app/views/reports.scheduledreport.list.php:55
 msgid "Created by me"
-msgstr ""
+msgstr "由我创建"
 
 #: app/views/administration.token.list.php:138
 msgid "Created by user"
-msgstr ""
+msgstr "由用户创建"
 
 #: app/views/administration.token.list.php:74
 msgid "Created by users"
-msgstr ""
+msgstr "由多个用户创建"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: include/items.inc.php:41
@@ -4503,7 +4503,7 @@ msgstr "当前主机"
 
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
-msgstr ""
+msgstr "当前用户"
 
 #: include/classes/setup/CSetupWizard.php:423
 msgid "Current value"
@@ -4547,7 +4547,7 @@ msgstr "自定义标签地图 \"%2$s\" 类型元素 \"%1$s\" 不能为空."
 #: app/controllers/CControllerActionOperationValidate.php:121
 #: app/partials/popup.operations.php:145
 msgid "Custom message"
-msgstr ""
+msgstr "自定义消息内容"
 
 #: include/items.inc.php:1837
 msgid "Custom multiplier"
@@ -4556,15 +4556,15 @@ msgstr "自定义倍数"
 #: app/views/js/popup.itemtestedit.view.js.php:381 include/forms.inc.php:1262
 #: include/forms.inc.php:1502 include/views/js/item.preprocessing.js.php:64
 msgid "Custom on fail"
-msgstr ""
+msgstr "失败时自定义"
 
 #: include/classes/helpers/CSlaHelper.php:247
 msgid "Custom schedule"
-msgstr ""
+msgstr "自定义计划"
 
 #: include/items.inc.php:1860
 msgid "Custom scripts"
-msgstr ""
+msgstr "自定义脚本"
 
 #: app/views/administration.trigdisplay.edit.php:155
 msgid "Custom severity names affect all locales and require manual translation!"
@@ -4576,7 +4576,7 @@ msgstr "自定义大小"
 
 #: app/partials/scheduledreport.formgrid.html.php:95
 msgid "Cycle"
-msgstr ""
+msgstr "循环"
 
 #: include/locales.inc.php:38
 msgid "Czech (cs_CZ)"
@@ -4640,7 +4640,7 @@ msgstr "仪表盘 \"%1$s\" 已经存在。"
 #: include/classes/api/services/CDashboardGeneral.php:91
 #, c-format
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
-msgstr ""
+msgstr "仪表盘\"%1$s\"已在报表\"%2$s\"中使用."
 
 #: app/controllers/CControllerDashboardUpdate.php:145
 #: app/controllers/CControllerTemplateDashboardUpdate.php:139
@@ -4655,7 +4655,7 @@ msgstr[0] "仪表板已删除"
 
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
-msgstr ""
+msgstr "仪表盘页面属性"
 
 #: app/views/dashboard.properties.edit.php:88
 msgid "Dashboard properties"
@@ -4674,7 +4674,7 @@ msgstr "更新仪表盘"
 #: include/classes/api/services/CReport.php:277
 #, c-format
 msgid "Dashboard with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID为 \"%1$s\" 的仪表盘不可用。"
 
 #: app/controllers/CControllerDashboardList.php:120
 #: app/controllers/CControllerHostDashboardView.php:122
@@ -4704,7 +4704,7 @@ msgstr "虚线"
 #: app/views/popup.tophosts.column.edit.php:58
 #: include/classes/widgets/CWidgetHelper.php:587
 msgid "Data"
-msgstr ""
+msgstr "数据"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
@@ -4738,42 +4738,42 @@ msgstr "数据存储期"
 #: include/classes/setup/CSetupWizard.php:717
 #: include/classes/setup/CSetupWizard.php:976
 msgid "Database TLS CA file"
-msgstr ""
+msgstr "数据库 TLS CA 文件"
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:575
 #: include/classes/setup/CSetupWizard.php:725
 #: include/classes/setup/CSetupWizard.php:984
 msgid "Database TLS certificate file"
-msgstr ""
+msgstr "数据库 TLS 证书文件"
 
 #: include/classes/setup/CFrontendSetup.php:672
 msgid "Database TLS certificate files must be read-only"
-msgstr ""
+msgstr "数据库 TLS 证书文件权限必须为只读"
 
 #: include/classes/setup/CSetupWizard.php:585
 #: include/classes/setup/CSetupWizard.php:735
 msgid "Database TLS cipher list"
-msgstr ""
+msgstr "数据库 TLS 密码列表"
 
 #: include/classes/setup/CSetupWizard.php:548
 #: include/classes/setup/CSetupWizard.php:710
 msgid "Database TLS encryption"
-msgstr ""
+msgstr "数据库 TLS 加密"
 
 #: include/classes/setup/CSetupWizard.php:570
 #: include/classes/setup/CSetupWizard.php:721
 #: include/classes/setup/CSetupWizard.php:980
 msgid "Database TLS key file"
-msgstr ""
+msgstr "数据库 TLS 密钥文件"
 
 #: app/partials/administration.system.info.php:121
 msgid "Database history tables upgraded"
-msgstr ""
+msgstr "数据库中历史数据表已升级"
 
 #: app/partials/administration.system.info.php:129
 msgid "Database history tables use primary key"
-msgstr ""
+msgstr "数据库历史数据表使用主键"
 
 #: include/classes/setup/CSetupWizard.php:486
 msgid "Database host"
@@ -4782,7 +4782,7 @@ msgstr "数据库主机"
 #: include/classes/setup/CSetupWizard.php:580
 #: include/classes/setup/CSetupWizard.php:729
 msgid "Database host verification"
-msgstr ""
+msgstr "数据库主机验证"
 
 #: include/items.inc.php:94
 msgid "Database monitor"
@@ -4843,7 +4843,7 @@ msgstr "硬件购买日期"
 
 #: app/views/popup.triggerexpr.php:111
 msgid "Date and time functions"
-msgstr ""
+msgstr "日期和时间函数"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:119
 #: include/classes/helpers/CSlaHelper.php:58 report4.php:175
@@ -4861,7 +4861,7 @@ msgstr "月中第几日"
 
 #: include/classes/api/services/CMaintenance.php:689
 msgid "Day of the week and day of the month cannot be specified simultaneously."
-msgstr ""
+msgstr "不能同时指定星期几和月份中具体日。"
 
 #: app/views/popup.maintenance.period.php:96
 #: app/views/popup.maintenance.period.php:115
@@ -4900,7 +4900,7 @@ msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:150
 msgid "Decrease by"
-msgstr ""
+msgstr "减少"
 
 #: app/views/administration.iconmap.edit.php:108
 #: include/classes/widgets/forms/CWidgetForm.php:54 include/hosts.inc.php:31
@@ -4915,19 +4915,19 @@ msgstr "默认"
 #: app/views/dashboard.page.properties.edit.php:48
 #, c-format
 msgid "Default (%1$s)"
-msgstr ""
+msgstr "默认 (%1$s)"
 
 #: app/views/administration.userrole.edit.php:121
 msgid "Default access to new UI elements"
-msgstr ""
+msgstr "默认访问新的UI元素"
 
 #: app/views/administration.userrole.edit.php:341
 msgid "Default access to new actions"
-msgstr ""
+msgstr "默认访问新的动作"
 
 #: app/views/administration.userrole.edit.php:260
 msgid "Default access to new modules"
-msgstr ""
+msgstr "默认访问新的模块"
 
 #: app/views/administration.authentication.edit.php:30
 msgid "Default authentication"
@@ -4940,7 +4940,7 @@ msgstr "默认主机资产记录模式"
 #: app/views/administration.gui.edit.php:72
 #: include/classes/setup/CSetupWizard.php:413
 msgid "Default language"
-msgstr ""
+msgstr "默认语言"
 
 #: app/views/administration.authentication.edit.php:115
 msgid "Default login form"
@@ -4956,7 +4956,7 @@ msgstr "默认操作步骤持续时间"
 
 #: app/views/dashboard.properties.edit.php:79
 msgid "Default page display period"
-msgstr ""
+msgstr "默认页面显示周期"
 
 #: app/views/administration.gui.edit.php:84
 #: include/classes/setup/CSetupWizard.php:628
@@ -4966,7 +4966,7 @@ msgstr "默认主题"
 #: app/views/administration.gui.edit.php:77
 #: include/classes/setup/CSetupWizard.php:621
 msgid "Default time zone"
-msgstr ""
+msgstr "默认时区"
 
 #: app/views/popup.lldoperation.php:105 app/views/popup.massupdate.item.php:217
 msgid "Delay"
@@ -5033,7 +5033,7 @@ msgstr "删除"
 
 #: app/views/js/popup.import.js.php:48
 msgid "Delete all elements that are not present in the import file?"
-msgstr ""
+msgstr "删除导入文件中不存在的所有元素？"
 
 #: include/views/configuration.template.edit.php:224
 #: include/views/configuration.template.list.php:292
@@ -5131,20 +5131,20 @@ msgstr "删除脚本?"
 #: app/views/administration.token.edit.php:115
 #: app/views/administration.user.token.edit.php:97
 msgid "Delete selected API token?"
-msgstr ""
+msgstr "删除选定的 API 令牌？"
 
 #: app/views/administration.token.list.php:201
 #: app/views/administration.user.token.list.php:153
 msgid "Delete selected API tokens?"
-msgstr ""
+msgstr "删除选定的多个 API 令牌？"
 
 #: app/views/js/sla.list.js.php:130 app/views/popup.sla.edit.php:274
 msgid "Delete selected SLA?"
-msgstr ""
+msgstr "删除选定的 SLA？"
 
 #: app/views/js/sla.list.js.php:129
 msgid "Delete selected SLAs?"
-msgstr ""
+msgstr "删除所选的SLAs?"
 
 #: include/views/configuration.action.list.php:169
 msgid "Delete selected actions?"
@@ -5243,19 +5243,19 @@ msgstr "删除所选的正则表达式?"
 
 #: app/views/administration.userrole.edit.php:366
 msgid "Delete selected role?"
-msgstr ""
+msgstr "删除所选的角色?"
 
 #: app/views/administration.userrole.list.php:127
 msgid "Delete selected roles?"
-msgstr ""
+msgstr "删除所选的多个角色?"
 
 #: app/partials/scheduledreport.formgrid.html.php:234
 msgid "Delete selected scheduled report?"
-msgstr ""
+msgstr "删除所选的计划报表?"
 
 #: app/views/reports.scheduledreport.list.php:95
 msgid "Delete selected scheduled reports?"
-msgstr ""
+msgstr "删除所选的多个计划报表?"
 
 #: app/views/administration.script.list.php:202
 msgid "Delete selected scripts?"
@@ -5263,11 +5263,11 @@ msgstr "删除所选的脚本?"
 
 #: app/views/js/service.list.js.php:152 app/views/popup.service.edit.php:391
 msgid "Delete selected service?"
-msgstr ""
+msgstr "删除所选的服务?"
 
 #: app/views/js/service.list.js.php:151
 msgid "Delete selected services?"
-msgstr ""
+msgstr "删除所选的多个服务?"
 
 #: jsLoader.php:274
 msgid "Delete selected shapes?"
@@ -5315,7 +5315,7 @@ msgstr "删除 web 场景？"
 
 #: app/controllers/CControllerAuditLogList.php:359
 msgid "Deleted"
-msgstr ""
+msgstr "已删除"
 
 #: app/views/administration.regex.edit.php:49
 msgid "Delimiter"
@@ -5323,7 +5323,7 @@ msgstr "分隔符"
 
 #: app/views/administration.user.edit.php:619
 msgid "Denied methods"
-msgstr ""
+msgstr "方法已阻止"
 
 #: app/partials/administration.usergroup.grouprights.html.php:71
 #: app/views/administration.usergroup.edit.php:133 include/perm.inc.php:33
@@ -5333,7 +5333,7 @@ msgstr "拒绝"
 
 #: app/views/administration.userrole.edit.php:290
 msgid "Deny list"
-msgstr ""
+msgstr "阻止列表"
 
 #: app/views/popup.massupdate.trigger.php:150
 #: include/views/configuration.trigger.prototype.edit.php:618
@@ -5363,7 +5363,7 @@ msgstr "部署状态"
 
 #: include/classes/widgets/CWidgetHelper.php:62
 msgid "Deprecated"
-msgstr ""
+msgstr "已弃用"
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -5419,11 +5419,11 @@ msgstr "网络方案详细信息"
 
 #: app/views/administration.housekeeping.edit.php:194
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "检测到的 TimescaleDB 许可证不支持压缩。 TimescaleDB 社区版支持压缩。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
-msgstr ""
+msgstr "检测周期"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1111
 msgid "Deviations"
@@ -5502,15 +5502,15 @@ msgstr "停用所选的agent代理程序所监测的主机?"
 #: app/views/administration.token.list.php:200
 #: app/views/administration.user.token.list.php:152
 msgid "Disable selected API tokens?"
-msgstr ""
+msgstr "停用所选的API令牌?"
 
 #: app/views/js/sla.list.js.php:118
 msgid "Disable selected SLA?"
-msgstr ""
+msgstr "停用所选的SLA?"
 
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
-msgstr ""
+msgstr "禁用所选的SLAs?"
 
 #: include/views/configuration.action.list.php:168
 msgid "Disable selected actions?"
@@ -5543,11 +5543,11 @@ msgstr "停用所选的报警媒介类型?"
 
 #: app/views/administration.module.list.php:124
 msgid "Disable selected modules?"
-msgstr ""
+msgstr "禁用所选的模块?"
 
 #: app/views/reports.scheduledreport.list.php:90
 msgid "Disable selected scheduled reports?"
-msgstr ""
+msgstr "禁用所选的计划报表?"
 
 #: include/views/configuration.triggers.list.php:342
 msgid "Disable selected triggers?"
@@ -5608,16 +5608,16 @@ msgstr "灾难"
 
 #: include/items.inc.php:1893
 msgid "Discard unchanged"
-msgstr ""
+msgstr "丢弃未变化的值"
 
 #: include/items.inc.php:1897
 msgid "Discard unchanged with heartbeat"
-msgstr ""
+msgstr "丢弃检测周期内未变化的值"
 
 #: app/views/js/popup.itemtestedit.view.js.php:359 include/forms.inc.php:1481
 #: include/views/js/item.preprocessing.js.php:66
 msgid "Discard value"
-msgstr ""
+msgstr "丢弃值"
 
 #: app/views/popup.lldoperation.php:92 app/views/popup.massupdate.item.php:333
 #: include/views/configuration.graph.edit.php:427
@@ -5629,7 +5629,7 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.edit.php:548
 #: include/views/configuration.trigger.prototype.list.php:64
 msgid "Discover"
-msgstr ""
+msgstr "发现"
 
 #: app/partials/configuration.filter.items.php:207
 #: include/discovery.inc.php:138 include/forms.inc.php:374
@@ -5667,7 +5667,7 @@ msgstr "自动发现"
 #: include/classes/helpers/CMenuHelper.php:204
 #: include/views/configuration.action.list.php:34
 msgid "Discovery actions"
-msgstr ""
+msgstr "发现动作"
 
 #: app/views/configuration.discovery.edit.php:61
 msgid "Discovery by proxy"
@@ -5692,35 +5692,35 @@ msgstr "自动发现物件"
 
 #: include/classes/data/CItemData.php:1229
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "发现 VMware 集群，<url> - VMware 服务 URL。返回 JSON"
 
 #: include/classes/data/CItemData.php:1237
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "发现 VMware数据存储，<url> - VMware 服务 URL。返回 JSON"
 
 #: include/classes/data/CItemData.php:1289
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "发现 VMware hypervisor数据存储，<url> - VMware 服务 URL，<uuid> - VMware hypervisor主机名。返回 JSON"
 
 #: include/classes/data/CItemData.php:1313
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "发现 VMware hypervisor，<url> - VMware 服务 URL。返回 JSON"
 
 #: include/classes/data/CItemData.php:1557
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "发现 VMware 虚拟机磁盘设备，<url> - VMware 服务 URL，<uuid> - VMware 虚拟机主机名。返回 JSON"
 
 #: include/classes/data/CItemData.php:1569
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "发现 VMware 虚拟机文件系统，<url> - VMware 服务 URL，<uuid> - VMware 虚拟机主机名。返回 JSON"
 
 #: include/classes/data/CItemData.php:1501
 msgid "Discovery of VMware virtual machine network interfaces, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "发现 VMware 虚拟机网络接口，<url> - VMware 服务 URL，<uuid> - VMware 虚拟机主机名。返回 JSON"
 
 #: include/classes/data/CItemData.php:1445
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "发现 VMware 虚拟机，<url> - VMware 服务 URL。返回 JSON"
 
 #: app/controllers/CControllerAuditLogList.php:215
 #: app/views/configuration.discovery.edit.php:136
@@ -5751,7 +5751,7 @@ msgstr "发现规则\"%1$s\"已存在"
 #: include/classes/api/services/CDiscoveryRule.php:2165
 #, c-format
 msgid "Discovery rule \"%1$s\" cannot be copied without its master item."
-msgstr ""
+msgstr "如果没有主监控项，则无法复制发现规则“%1$s”。"
 
 #: include/classes/api/services/CDRule.php:847
 #: include/classes/api/services/CDRule.php:864
@@ -5816,7 +5816,7 @@ msgstr "磁盘写入数据。类型是sectors, operations, bytes;返回整数，
 
 #: app/views/popup.tophosts.column.edit.php:147
 msgid "Display"
-msgstr ""
+msgstr "显示"
 
 #: app/views/administration.trigdisplay.edit.php:89
 msgid "Display OK triggers for"
@@ -5862,13 +5862,13 @@ msgstr ""
 #: include/views/configuration.item.edit.php:848
 #: include/views/configuration.item.prototype.edit.php:785
 msgid "Do not keep history"
-msgstr ""
+msgstr "不保留历史数据"
 
 #: app/views/popup.lldoperation.php:211 app/views/popup.massupdate.item.php:309
 #: include/views/configuration.item.edit.php:888
 #: include/views/configuration.item.prototype.edit.php:800
 msgid "Do not keep trends"
-msgstr ""
+msgstr "不保留趋势数据"
 
 #: jsLoader.php:226 jsLoader.php:363
 msgid "Do you wish to replace the conditional expression?"
@@ -5885,7 +5885,7 @@ msgstr "您想要替换条件式表达式吗?"
 #: include/classes/widgets/CWidgetHelper.php:664
 #: include/classes/widgets/CWidgetHelper.php:730
 msgid "Does not contain"
-msgstr ""
+msgstr "不包含"
 
 #: app/partials/monitoring.host.filter.php:50
 #: app/partials/monitoring.host.filter.php:199
@@ -5898,7 +5898,7 @@ msgstr ""
 #: include/classes/widgets/CWidgetHelper.php:663
 #: include/classes/widgets/CWidgetHelper.php:729
 msgid "Does not equal"
-msgstr ""
+msgstr "不等于"
 
 #: app/partials/monitoring.host.filter.php:49
 #: app/partials/monitoring.host.filter.php:198
@@ -5911,11 +5911,11 @@ msgstr ""
 #: include/classes/widgets/CWidgetHelper.php:662
 #: include/classes/widgets/CWidgetHelper.php:728
 msgid "Does not exist"
-msgstr ""
+msgstr "不存在"
 
 #: include/items.inc.php:1873
 msgid "Does not match regular expression"
-msgstr ""
+msgstr "不匹配正则表达式"
 
 #: include/graphs.inc.php:61 include/views/js/monitoring.sysmaps.js.php:781
 #: include/views/js/monitoring.sysmaps.js.php:871
@@ -5934,7 +5934,7 @@ msgstr "下"
 
 #: jsLoader.php:200 jsLoader.php:214
 msgid "Download image"
-msgstr ""
+msgstr "下载图片"
 
 #: include/classes/setup/CSetupWizard.php:884
 msgid "Download the configuration file"
@@ -5970,7 +5970,7 @@ msgstr "拓扑图 %1$s 名字重复。"
 #: include/classes/api/services/CMap.php:1285
 #, c-format
 msgid "Duplicate \"usrgrpid\" \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "图表\"%2$s\"中用户组\"usrgrpid\" \"%1$s\"冲突."
 
 #: include/classes/api/services/CTrigger.php:1155
 #, c-format
@@ -5986,13 +5986,13 @@ msgstr "触发器的原形依赖复制\"%1$s\"。"
 #: include/classes/api/services/CHost.php:2247
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%1$s\" already exists in data."
-msgstr ""
+msgstr "重复主机。数据中已存在具有相同主机名“%1$s”的主机。"
 
 #: include/classes/api/services/CHost.php:1957
 #: include/classes/api/services/CHost.php:2267
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
-msgstr ""
+msgstr "重复主机。数据中已存在具有相同可见名称“%1$s”的主机。"
 
 #: include/classes/api/services/CMap.php:743
 #: include/classes/api/services/CMap.php:1211
@@ -6032,7 +6032,7 @@ msgstr "每个URL必须是唯一的. 请确保只有一个被命名的 URL."
 
 #: include/classes/widgets/CWidgetHelper.php:1322
 msgid "Each item"
-msgstr ""
+msgstr "每个监控项"
 
 #: app/partials/service.list.edit.php:126
 #: app/views/administration.user.edit.php:355
@@ -6067,7 +6067,7 @@ msgstr "编辑拓扑图"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "Edit operation"
-msgstr ""
+msgstr "编辑操作"
 
 #: jsLoader.php:209
 msgid "Edit tree element"
@@ -6079,7 +6079,7 @@ msgstr "编辑构件"
 
 #: app/views/popup.sla.edit.php:113 app/views/sla.list.php:89
 msgid "Effective date"
-msgstr ""
+msgstr "生效日期"
 
 #: app/partials/hostmacros.inherited.list.html.php:49
 msgid "Effective value"
@@ -6089,7 +6089,7 @@ msgstr "可用值"
 #: include/classes/api/managers/CHistoryManager.php:1385
 #, c-format
 msgid "Elasticsearch URL is not set for type: %1$s."
-msgstr ""
+msgstr "类型：%1$s的Elasticsearch URL未设置。"
 
 #: include/classes/helpers/CElasticsearchHelper.php:86
 #: include/classes/helpers/CElasticsearchHelper.php:185
@@ -6131,7 +6131,7 @@ msgstr "场景\"%1$s\"配置了空的SSL证书文件"
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
-msgstr ""
+msgstr "空颜色。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1840
 #, c-format
@@ -6184,7 +6184,7 @@ msgstr "开启 HTTP 验证"
 
 #: app/views/js/administration.authentication.edit.js.php:59
 msgid "Enable HTTP authentication for all users."
-msgstr ""
+msgstr "为所有用户启用HTTP认证方式"
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
@@ -6192,15 +6192,15 @@ msgstr "开启 LDAP 验证"
 
 #: app/views/administration.authentication.edit.php:215
 msgid "Enable SAML authentication"
-msgstr ""
+msgstr "启用SAML身份验证"
 
 #: app/views/administration.audit.settings.edit.php:43
 msgid "Enable audit logging"
-msgstr ""
+msgstr "启用审计日志"
 
 #: app/views/administration.housekeeping.edit.php:160
 msgid "Enable compression"
-msgstr ""
+msgstr "启用压缩"
 
 #: app/views/administration.script.edit.php:249
 msgid "Enable confirmation"
@@ -6243,15 +6243,15 @@ msgstr "开启内部管家"
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
 msgid "Enable selected API tokens?"
-msgstr ""
+msgstr "启用选定的 API 令牌？"
 
 #: app/views/js/sla.list.js.php:106
 msgid "Enable selected SLA?"
-msgstr ""
+msgstr "启用所选的SLA?"
 
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
-msgstr ""
+msgstr "启用所选的SLAs?"
 
 #: include/views/configuration.action.list.php:167
 msgid "Enable selected actions?"
@@ -6285,11 +6285,11 @@ msgstr "启用所选的报警媒介类型?"
 
 #: app/views/administration.module.list.php:123
 msgid "Enable selected modules?"
-msgstr ""
+msgstr "启用所选的模块?"
 
 #: app/views/reports.scheduledreport.list.php:85
 msgid "Enable selected scheduled reports?"
-msgstr ""
+msgstr "启用所选的计划报表?"
 
 #: include/views/configuration.triggers.list.php:341
 msgid "Enable selected triggers?"
@@ -6367,7 +6367,7 @@ msgstr "已启用"
 
 #: app/views/administration.authentication.edit.php:299
 msgid "Encrypt"
-msgstr ""
+msgstr "加密"
 
 #: app/partials/configuration.host.edit.html.php:527
 #: app/views/administration.proxy.edit.php:143
@@ -6379,11 +6379,11 @@ msgstr "加密"
 
 #: app/views/administration.autoreg.edit.php:43
 msgid "Encryption level"
-msgstr ""
+msgstr "加密级别"
 
 #: app/partials/scheduledreport.formgrid.html.php:160
 msgid "End date"
-msgstr ""
+msgstr "结束日期"
 
 #: app/views/popup.itemtestedit.view.php:296
 msgid "End of line sequence"
@@ -6391,7 +6391,7 @@ msgstr ""
 
 #: include/locales.inc.php:33
 msgid "English (en_GB)"
-msgstr ""
+msgstr "英语 (en_GB)"
 
 #: include/locales.inc.php:33
 msgid "English (en_US)"
@@ -6409,7 +6409,7 @@ msgstr "英语(en_US)"
 #: include/classes/api/services/CValueMap.php:451
 #, c-format
 msgid "Entry with UUID \"%1$s\" already exists."
-msgstr ""
+msgstr "UUID \"%1$s\" 已存在。"
 
 #: app/partials/monitoring.host.filter.php:47
 #: app/partials/monitoring.host.filter.php:196
@@ -6440,7 +6440,7 @@ msgstr "错误"
 #: app/views/monitoring.widget.slareport.view.php:101
 #: app/views/slareport.list.php:166
 msgid "Error budget"
-msgstr ""
+msgstr "误差范围"
 
 #: include/db.inc.php:518
 #, c-format
@@ -6454,14 +6454,14 @@ msgstr "错误信息"
 #: app/partials/administration.system.info.php:161
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
-msgstr ""
+msgstr "错误！由于 %1$s 数据库服务器版本不受支持，无法启动 Zabbix 服务器。必须至少为 (%2$s)"
 
 #: app/partials/administration.system.info.php:140
 #: app/partials/administration.system.info.php:147
 #: app/partials/administration.system.info.php:159
 #: app/partials/administration.system.info.php:172
 msgid "Error! Unable to start Zabbix server."
-msgstr ""
+msgstr "错误！无法启动 Zabbix 服务器。"
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -6471,7 +6471,7 @@ msgstr "错误: %1$s"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1091
 msgid "Evaluation period"
-msgstr ""
+msgstr "评估周期"
 
 #: include/events.inc.php:180
 msgid "Event"
@@ -6508,11 +6508,11 @@ msgstr "事件生成"
 
 #: include/actions.inc.php:363
 msgid "Event is acknowledged"
-msgstr ""
+msgstr "事件已确认"
 
 #: include/actions.inc.php:363
 msgid "Event is not acknowledged"
-msgstr ""
+msgstr "事件未确认"
 
 #: tr_events.php:187
 msgid "Event list [previous 20]"
@@ -6525,7 +6525,7 @@ msgstr "事件日志监控。返回日志"
 #: include/views/configuration.trigger.prototype.edit.php:79
 #: include/views/configuration.triggers.edit.php:100
 msgid "Event name"
-msgstr ""
+msgstr "事件名称"
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
@@ -6554,16 +6554,16 @@ msgstr "每周"
 
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
-msgstr ""
+msgstr "示例"
 
 #: app/views/administration.miscconfig.edit.php:36
 msgid "Example: https://localhost/zabbix/ui/"
-msgstr ""
+msgstr "示例: https://localhost/zabbix/ui/"
 
 #: app/partials/massupdate.macros.tab.php:103
 #: app/partials/massupdate.valuemaps.tab.php:77
 msgid "Except selected"
-msgstr ""
+msgstr "已选除外"
 
 #: app/partials/js/scheduledreport.subscription.js.php:170
 #: app/partials/js/scheduledreport.subscription.js.php:185
@@ -6580,13 +6580,13 @@ msgstr "排除主机组"
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:94
 msgid "Excluded downtime"
-msgstr ""
+msgstr "排除停机时间"
 
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:167
 msgid "Excluded downtimes"
-msgstr ""
+msgstr "排除停机时间"
 
 #: app/controllers/CControllerAuditLogList.php:197 jsLoader.php:219
 msgid "Execute"
@@ -6594,7 +6594,7 @@ msgstr "执行"
 
 #: include/classes/data/CItemData.php:1593
 msgid "Execute WMI query and return the JSON document with all selected objects"
-msgstr ""
+msgstr "执行 WMI 查询并返回包含所有选定对象的 JSON 文档"
 
 #: include/classes/data/CItemData.php:1589
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
@@ -6605,7 +6605,7 @@ msgstr "执行 WMI 查询返回第一个对象。返回整形、浮点、字符�
 #: include/views/configuration.item.edit.php:1057
 #: include/views/configuration.item.list.php:307
 msgid "Execute now"
-msgstr ""
+msgstr "立即执行"
 
 #: app/views/administration.script.edit.php:121
 #: app/views/administration.script.list.php:78
@@ -6614,7 +6614,7 @@ msgstr "执行在"
 
 #: include/classes/helpers/CRoleHelper.php:465
 msgid "Execute scripts"
-msgstr ""
+msgstr "执行脚本"
 
 #: include/actions.inc.php:2127
 #: include/views/administration.auditacts.list.php:78
@@ -6643,7 +6643,7 @@ msgstr "执行确认"
 #: include/classes/widgets/CWidgetHelper.php:659
 #: include/classes/widgets/CWidgetHelper.php:725
 msgid "Exists"
-msgstr ""
+msgstr "存在"
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
 #: include/classes/widgets/CWidgetHelper.php:1152 jsLoader.php:309
@@ -6658,7 +6658,7 @@ msgstr "展开宏"
 #: app/partials/layout.htmlpage.aside.php:42
 #: app/partials/layout.htmlpage.aside.php:44
 msgid "Expand sidebar"
-msgstr ""
+msgstr "展开侧边栏"
 
 #: include/views/monitoring.sysmap.edit.php:152
 msgid "Expand single problem"
@@ -6667,7 +6667,7 @@ msgstr "展开单一问题"
 #: app/partials/scheduledreport.table.html.php:92
 #: app/views/reports.scheduledreport.list.php:63
 msgid "Expired"
-msgstr ""
+msgstr "已过期"
 
 #: include/views/configuration.maintenance.list.php:68
 #: include/views/configuration.maintenance.list.php:98
@@ -6678,7 +6678,7 @@ msgstr "过期的"
 #: app/partials/scheduledreport.table.html.php:95
 #, c-format
 msgid "Expired on %1$s."
-msgstr ""
+msgstr "已于 %1$s 过期。"
 
 #: app/views/administration.token.edit.php:81
 #: app/views/administration.token.list.php:132
@@ -6687,12 +6687,12 @@ msgstr ""
 #: app/views/administration.user.token.list.php:93
 #: app/views/administration.user.token.view.php:48
 msgid "Expires at"
-msgstr ""
+msgstr "过期于"
 
 #: app/views/administration.token.list.php:61
 #: app/views/administration.user.token.list.php:44
 msgid "Expires in less than"
-msgstr ""
+msgstr "过期时间小于"
 
 #: app/views/popup.generic.php:503 include/graphs.inc.php:27
 msgid "Exploded"
@@ -6704,7 +6704,7 @@ msgstr "导出"
 
 #: app/controllers/CControllerExport.php:113
 msgid "Export failed"
-msgstr ""
+msgstr "导出失败"
 
 #: app/views/monitoring.problem.view.php:99
 msgid "Export to CSV"
@@ -6754,7 +6754,7 @@ msgstr "表达式类型"
 
 #: app/views/popup.testtriggerexpr.php:29
 msgid "Expression variable elements"
-msgstr ""
+msgstr "表达式变量元素"
 
 #: app/views/administration.regex.edit.php:112
 #: app/views/administration.regex.edit.php:139
@@ -6788,7 +6788,7 @@ msgstr "失败"
 #: app/partials/administration.system.info.php:182
 #, c-format
 msgid "Fail-over delay: %1$s"
-msgstr ""
+msgstr "故障转移延迟：%1$s"
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:88
@@ -6797,7 +6797,7 @@ msgstr "已失败"
 
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
-msgstr ""
+msgstr "登录失败"
 
 #: app/controllers/CControllerDashboardUpdate.php:146
 #: app/controllers/CControllerTemplateDashboardUpdate.php:140
@@ -6813,11 +6813,11 @@ msgstr "无法解析URL。"
 
 #: jsLoader.php:137
 msgid "Failed to paste dashboard page."
-msgstr ""
+msgstr "无法粘贴仪表盘页面。"
 
 #: jsLoader.php:138
 msgid "Failed to paste widget."
-msgstr ""
+msgstr "无法粘贴小组件。"
 
 #: app/controllers/CControllerDashboardUpdate.php:141
 #: app/controllers/CControllerTemplateDashboardUpdate.php:135
@@ -6828,15 +6828,15 @@ msgstr "更新仪表盘失败"
 
 #: jsLoader.php:139
 msgid "Failed to update dashboard page properties."
-msgstr ""
+msgstr "仪表盘页面属性更新失败。"
 
 #: jsLoader.php:140
 msgid "Failed to update dashboard properties."
-msgstr ""
+msgstr "仪表盘属性更新失败。"
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
-msgstr ""
+msgstr "小组件属性更新失败。"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
@@ -6848,11 +6848,11 @@ msgstr "呦吼~中奖了。你发现了一个致命的zabbix错误。来我们�
 
 #: include/classes/widgets/CWidgetConfig.php:56
 msgid "Favorite graphs"
-msgstr ""
+msgstr "收藏的图表"
 
 #: include/classes/widgets/CWidgetConfig.php:57
 msgid "Favorite maps"
-msgstr ""
+msgstr "收藏的拓扑图"
 
 #: include/func.inc.php:237
 msgid "Feb"
@@ -6898,6 +6898,11 @@ msgstr "字段 \"%1$s\" 缺少拓扑图 \"%2$s\" 的值。"
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "字段 \"%1$s\" 设置错误: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -6915,11 +6920,11 @@ msgstr "字段\"%1$s\"不可以填写"
 
 #: include/classes/data/CItemData.php:1157
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
-msgstr ""
+msgstr "文件校验，通过UNIX cksum算法进行检测，返回crc32数值(默认)，md5字符串，sha256字符串"
 
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
-msgstr ""
+msgstr "文件为空"
 
 #: include/classes/helpers/CUploadFile.php:156
 #, c-format
@@ -6928,11 +6933,11 @@ msgstr "文件太大, 最大的上传大小是 %1$s 个字节."
 
 #: include/classes/data/CItemData.php:1177
 msgid "File owner information. Returns string"
-msgstr ""
+msgstr "文件所有者信息。返回字符串"
 
 #: include/classes/data/CItemData.php:1193
 msgid "File size in bytes (default) or in newlines. Returns integer"
-msgstr ""
+msgstr "文件大小以字节（默认）或换行符为单位。返回整数"
 
 #: include/classes/data/CItemData.php:1197
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -6999,15 +7004,15 @@ msgstr "过滤器"
 
 #: app/views/js/popup.tabfilter.edit.js.php:57
 msgid "Filter deleted"
-msgstr ""
+msgstr "过滤器已删除"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:117
 msgid "Filter properties"
-msgstr ""
+msgstr "过滤器属性"
 
 #: app/controllers/CControllerServiceListGeneral.php:186
 msgid "Filter results"
-msgstr ""
+msgstr "过滤结果"
 
 #: app/views/popup.lldoverride.php:183
 #: include/views/configuration.host.discovery.edit.php:849
@@ -7056,7 +7061,7 @@ msgstr "固定的"
 
 #: include/classes/helpers/CServiceHelper.php:152
 msgid "Fixed status"
-msgstr ""
+msgstr "固定状态"
 
 #: app/views/js/popup.massupdate.tmpl.js.php:81
 #: app/views/popup.lldoperation.php:124 app/views/popup.massupdate.item.php:233
@@ -7083,7 +7088,7 @@ msgstr "字体"
 
 #: include/views/js/monitoring.sysmaps.js.php:540
 msgid "Font color"
-msgstr ""
+msgstr "字体颜色"
 
 #: include/views/js/monitoring.sysmaps.js.php:376
 #: include/views/js/monitoring.sysmaps.js.php:534
@@ -7102,12 +7107,12 @@ msgstr "公式"
 #: include/classes/api/services/CDiscoveryRule.php:1810
 #, c-format
 msgid "Formula missing for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "发现规则“%1$s”缺少公式。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1601
 #, c-format
 msgid "Formula missing for override \"%1$s\"."
-msgstr ""
+msgstr "覆盖“%1$s”的公式缺失。"
 
 #: include/locales.inc.php:41
 msgid "French (fr_FR)"
@@ -7137,7 +7142,7 @@ msgstr "自从"
 
 #: app/views/administration.miscconfig.edit.php:33
 msgid "Frontend URL"
-msgstr ""
+msgstr "前端网址"
 
 #: app/views/administration.usergroup.edit.php:78
 #: app/views/administration.usergroup.edit.php:86
@@ -7190,23 +7195,23 @@ msgstr "一般"
 #: app/partials/scheduledreport.subscription.php:34
 #: app/views/popup.scheduledreport.subscription.php:100
 msgid "Generate report by"
-msgstr ""
+msgstr "报表生成于"
 
 #: chart4.php:172
 #, c-format
 msgid "Generated in %1$s sec"
-msgstr ""
+msgstr "在 %1$s 秒内生成"
 
 #: app/controllers/CControllerGeomapsEdit.php:75
 #: app/views/administration.geomaps.edit.php:120
 #: app/views/administration.geomaps.edit.php:127
 #: include/classes/helpers/CMenuHelper.php:268 include/html.inc.php:898
 msgid "Geographical maps"
-msgstr ""
+msgstr "地理地图"
 
 #: include/classes/widgets/CWidgetConfig.php:58
 msgid "Geomap"
-msgstr ""
+msgstr "地理地图"
 
 #: include/locales.inc.php:42
 msgid "Georgian (ka_GE)"
@@ -7222,16 +7227,16 @@ msgstr "获取网页。返回信息为网页源码或者TXT"
 
 #: app/views/popup.itemtestedit.view.php:251
 msgid "Get value"
-msgstr ""
+msgstr "获取值"
 
 #: app/views/js/popup.itemtestedit.view.js.php:503
 #: app/views/popup.itemtestedit.view.php:432
 msgid "Get value and test"
-msgstr ""
+msgstr "获取值并进行测试"
 
 #: app/views/popup.itemtestedit.view.php:94
 msgid "Get value from host"
-msgstr ""
+msgstr "从主机获取值"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: include/triggers.inc.php:1144
@@ -7259,36 +7264,36 @@ msgstr "到"
 #: app/views/system.warning.php:31 include/func.inc.php:1594
 #, c-format
 msgid "Go to \"%1$s\""
-msgstr ""
+msgstr "转到 \"%1$s\""
 
 #: include/classes/helpers/CPagerHelper.php:188
 msgid "Go to first page"
-msgstr ""
+msgstr "返回首页"
 
 #: include/classes/helpers/CPagerHelper.php:233
 #, c-format
 msgid "Go to last page, %1$s"
-msgstr ""
+msgstr "跳转到尾页，%1$s"
 
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
 msgid "Go to next page, %1$s"
-msgstr ""
+msgstr "跳转到下一页，%1$s"
 
 #: include/classes/helpers/CPagerHelper.php:218
 #, c-format
 msgid "Go to page %1$s"
-msgstr ""
+msgstr "跳转到第 %1$s 页"
 
 #: include/classes/helpers/CPagerHelper.php:214
 #, c-format
 msgid "Go to page %1$s, current page"
-msgstr ""
+msgstr "跳转到第 %1$s 页，当前页"
 
 #: include/classes/helpers/CPagerHelper.php:199
 #, c-format
 msgid "Go to previous page, %1$s"
-msgstr ""
+msgstr "跳转到上一页，%1$s"
 
 #: include/httptest.inc.php:414
 msgid "Google Chrome"
@@ -7325,7 +7330,7 @@ msgstr "图形\"%1$s\"已存在于\"%2$s\"中 (项目不一致)."
 #: include/classes/api/services/CGraphGeneral.php:1135
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" as a graph created from graph prototype."
-msgstr ""
+msgstr "图形“%1$s”已作为从图形原型创建的图形存在于“%2$s”上。"
 
 #: include/classes/api/services/CGraphGeneral.php:1038
 #: include/classes/api/services/CGraphGeneral.php:1246
@@ -7546,7 +7551,7 @@ msgstr "群组"
 
 #: include/classes/helpers/CMenuHelper.php:384
 msgid "Guest user"
-msgstr ""
+msgstr "访客用户"
 
 #: jsLoader.php:184
 msgctxt "abbreviation of severity level"
@@ -7681,7 +7686,7 @@ msgstr "隐藏所选的"
 #: app/partials/layout.htmlpage.aside.php:45
 #: app/partials/layout.htmlpage.aside.php:47
 msgid "Hide sidebar"
-msgstr ""
+msgstr "隐藏侧边栏"
 
 #: include/classes/html/CBreadcrumbs.php:40
 msgctxt "screen reader"
@@ -7695,15 +7700,15 @@ msgstr "严重"
 #: app/partials/administration.system.info.php:180
 #: app/partials/administration.system.info.php:187
 msgid "High availability cluster"
-msgstr ""
+msgstr "高可用集群"
 
 #: app/controllers/CControllerAuditLogList.php:218
 msgid "High availability node"
-msgstr ""
+msgstr "高可用节点"
 
 #: include/classes/widgets/forms/CWidgetFormSystemInfo.php:32
 msgid "High availability nodes"
-msgstr ""
+msgstr "高可用节点"
 
 #: include/classes/core/ZBase.php:361
 msgid "High-contrast dark"
@@ -7737,15 +7742,15 @@ msgstr "历史记录"
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
-msgstr ""
+msgstr "压缩历史和趋势数据"
 
 #: include/classes/api/services/CHistory.php:353
 msgid "History cleanup is not supported if compression is enabled"
-msgstr ""
+msgstr "如果启用压缩功能，则不支持历史数据清理"
 
 #: app/controllers/CControllerAuditLogList.php:198
 msgid "History clear"
-msgstr ""
+msgstr "清除历史数据"
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "History cleared"
@@ -7758,7 +7763,7 @@ msgstr "历史清除可能会很久。继续吗?"
 
 #: app/views/popup.tophosts.column.edit.php:159
 msgid "History data"
-msgstr ""
+msgstr "历史数据"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:47
 msgid "History data selection"
@@ -7766,7 +7771,7 @@ msgstr "选择历史数据"
 
 #: app/views/popup.triggerexpr.php:112
 msgid "History functions"
-msgstr ""
+msgstr "历史数据功能"
 
 #: app/controllers/CControllerPopupLldOperation.php:219
 #: app/views/popup.lldoperation.php:185 app/views/popup.massupdate.item.php:290
@@ -7777,11 +7782,11 @@ msgstr "历史数据保留时长"
 
 #: include/classes/html/CTabFilter.php:166
 msgid "Home"
-msgstr ""
+msgstr "主页"
 
 #: app/views/administration.module.edit.php:44
 msgid "Homepage"
-msgstr ""
+msgstr "主页"
 
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:49
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:122
@@ -7797,7 +7802,7 @@ msgstr "横向对齐"
 #: include/classes/widgets/forms/CWidgetFormItem.php:171
 #: include/classes/widgets/forms/CWidgetFormItem.php:294
 msgid "Horizontal position"
-msgstr ""
+msgstr "水平位置"
 
 #: app/controllers/CControllerAuditLogList.php:219
 #: app/partials/configuration.host.edit.html.php:522
@@ -7851,7 +7856,7 @@ msgstr "主机 \"%1$s\" 没有设置主机组"
 #: include/classes/api/services/CProxy.php:448
 #, c-format
 msgid "Host \"%1$s\" is monitored by proxy \"%2$s\"."
-msgstr ""
+msgstr "主机 \"%1$s\" 是由agent代理程序  \"%2$s\" 监控的。"
 
 #: include/actions.inc.php:55
 msgid "Host IP"
@@ -7868,11 +7873,11 @@ msgstr "已添加主机"
 #: app/controllers/CControllerPopupItemTest.php:1303
 #: app/views/popup.itemtestedit.view.php:99
 msgid "Host address"
-msgstr ""
+msgstr "主机地址"
 
 #: include/classes/widgets/CWidgetConfig.php:62
 msgid "Host availability"
-msgstr ""
+msgstr "主机可用性"
 
 #: include/classes/api/services/CHostInterface.php:1027
 msgid "Host cannot have more than one default interface of the same type."
@@ -7901,7 +7906,7 @@ msgstr[0] "主机已启用"
 
 #: app/views/monitoring.charts.view.php:83
 msgid "Host graphs"
-msgstr ""
+msgstr "主机图形"
 
 #: app/controllers/CControllerAuditLogList.php:220
 #: app/partials/administration.usergroup.grouprights.html.php:29
@@ -7935,7 +7940,7 @@ msgstr "主机群组“%1$s”不能被删除，因为它被用于全局脚本"
 #: include/classes/api/services/CHostGroup.php:642
 #, c-format
 msgid "Host group \"%1$s\" is internal and cannot be deleted."
-msgstr ""
+msgstr "主机群组 \"%1$s\" 为内建的且不能被删除"
 
 #: include/views/js/monitoring.sysmaps.js.php:103
 msgid "Host group elements"
@@ -8055,7 +8060,7 @@ msgstr "主机模板已删除"
 
 #: include/views/configuration.host.prototype.edit.php:336
 msgid "Host prototype macros"
-msgstr ""
+msgstr "主机模板宏"
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:340
 msgid "Host prototype updated"
@@ -8065,12 +8070,12 @@ msgstr[0] "主机模板已更新"
 #: include/classes/api/services/CHostPrototype.php:999
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
-msgstr ""
+msgstr "主机名为“%1$s”的主机模板已存在于主机“%3$s”的发现规则“%2$s”中。"
 
 #: include/classes/api/services/CHostPrototype.php:996
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
-msgstr ""
+msgstr "主机名为“%1$s”的主机模板已存在于模板“%3$s”的发现规则“%2$s”中。"
 
 #: include/classes/api/services/CHostPrototype.php:978
 #, c-format
@@ -8104,7 +8109,7 @@ msgstr "主机子网掩码"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:91
 msgid "Host tags"
-msgstr ""
+msgstr "主机标签"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:34
 msgid "Host time"
@@ -8126,7 +8131,7 @@ msgstr "ID为 \"%1$s\" 的主机不可用"
 #: include/classes/api/services/CHostGeneral.php:127
 #, c-format
 msgid "Host with host name \"%1$s\" already exists."
-msgstr ""
+msgstr "已存在主机名称 \"%1$s\" 的主机。"
 
 #: include/classes/api/services/CHost.php:2046
 #: include/classes/api/services/CHost.php:2328
@@ -8143,7 +8148,7 @@ msgstr "显示名称为\"%1$s\" 的主机已经存在"
 #: include/classes/api/services/CHostGeneral.php:147
 #, c-format
 msgid "Host with visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "已存在主机可见名称 \"%1$s\" 的主机。"
 
 #: app/controllers/CControllerHostView.php:125
 #: app/controllers/CControllerPopupGeneric.php:109
@@ -8202,7 +8207,7 @@ msgstr "主机已更新"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:118
 msgid "Hour"
-msgstr ""
+msgstr "时"
 
 #: app/views/popup.maintenance.period.php:170
 #: app/views/popup.sla.excludeddowntime.edit.php:68
@@ -8227,11 +8232,11 @@ msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:111
 msgid "I confirm to remove all macros"
-msgstr ""
+msgstr "我确认删除所有宏"
 
 #: app/partials/massupdate.valuemaps.tab.php:84
 msgid "I confirm to remove all value mappings"
-msgstr ""
+msgstr "我确认删除所有值映射"
 
 #: include/discovery.inc.php:60
 msgid "ICMP ping"
@@ -8303,7 +8308,7 @@ msgstr "IPMI传感器"
 
 #: include/classes/data/CItemData.php:865
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
-msgstr ""
+msgstr "IPMI 传感器IDs和其他传感器相关参数。返回 JSON。"
 
 #: app/views/administration.iconmap.edit.php:58
 #: app/views/administration.image.edit.php:73
@@ -8339,7 +8344,7 @@ msgstr "图标映射"
 #: include/classes/api/services/CIconMap.php:323
 #, c-format
 msgid "Icon map \"%1$s\" already exists."
-msgstr ""
+msgstr "图标映射\"%1$s\"已存在。"
 
 #: include/classes/api/services/CIconMap.php:563
 #, c-format
@@ -8376,22 +8381,22 @@ msgstr "图标"
 
 #: app/views/administration.authentication.edit.php:222
 msgid "IdP entity ID"
-msgstr ""
+msgstr "IdP 实体 ID"
 
 #: include/classes/core/CModuleManager.php:155
 #, c-format
 msgid "Identical ID (%1$s) is used by modules located at %2$s."
-msgstr ""
+msgstr "位于 %2$s 的模块使用了相同的 ID (%1$s)。"
 
 #: include/classes/core/CModuleManager.php:173
 #, c-format
 msgid "Identical actions are used by modules located at %1$s."
-msgstr ""
+msgstr "位于 %1$s 的模块使用了相同的动作。"
 
 #: include/classes/core/CModuleManager.php:162
 #, c-format
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
-msgstr ""
+msgstr "位于 %2$s 的模块使用了相同的命名空间 (%1$s)。"
 
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
@@ -8399,49 +8404,49 @@ msgstr "识别系统。返回 字符串"
 
 #: app/views/administration.authentication.edit.php:113
 msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
-msgstr ""
+msgstr "如HTTP认证启用，所有用户(即使前端访问使用LDAP/内置认证)将通过web服务器认证，而不通过zabbix"
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
 msgid_plural "If at least %2$s child services have %1$s status or above"
-msgstr[0] ""
+msgstr[0] "如果至少 %2$s 子服务的状态为 %1$s 或更严重"
 
 #: include/classes/helpers/CServiceHelper.php:35
 #, c-format
 msgid "If at least %2$s child services have %1$s status or above"
-msgstr ""
+msgstr "如果至少 %2$s 子服务的状态为 %1$s 或更严重"
 
 #: include/classes/helpers/CServiceHelper.php:40
 #: include/classes/helpers/CServiceHelper.php:89
 #, c-format
 msgid "If at least %2$s of child services have %1$s status or above"
-msgstr ""
+msgstr "如果至少 %2$s 的子服务具有 %1$s 或更严重的状态"
 
 #: app/views/popup.lldoverride.php:54
 msgid "If filter matches"
-msgstr ""
+msgstr "如果过滤器匹配"
 
 #: include/classes/helpers/CServiceHelper.php:95
 #, c-format
 msgid "If less than %2$s child service has %1$s status or below"
 msgid_plural "If less than %2$s child services have %1$s status or below"
-msgstr[0] ""
+msgstr[0] "如果少于 %2$s 个子服务的状态为 %1$s 或更低"
 
 #: include/classes/helpers/CServiceHelper.php:45
 #, c-format
 msgid "If less than %2$s child services have %1$s status or below"
-msgstr ""
+msgstr "如果少于 %2$s 个子服务的状态为 %1$s 或更低"
 
 #: include/classes/helpers/CServiceHelper.php:50
 #: include/classes/helpers/CServiceHelper.php:101
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
-msgstr ""
+msgstr "如果少于 %2$s 的子服务的状态为 %1$s 或更低"
 
 #: include/classes/api/services/CReport.php:348
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
-msgstr ""
+msgstr "如果未指定用户组，则邮件列表中必须包含至少一个用户。"
 
 #: include/classes/helpers/CServiceHelper.php:55
 #: include/classes/helpers/CServiceHelper.php:60
@@ -8449,7 +8454,7 @@ msgstr ""
 #: include/classes/helpers/CServiceHelper.php:110
 #, c-format
 msgid "If weight of child services with %1$s status or above is at least %2$s"
-msgstr ""
+msgstr "如果状态为 %1$s 或以上的子服务的权重至少为 %2$s"
 
 #: include/classes/helpers/CServiceHelper.php:65
 #: include/classes/helpers/CServiceHelper.php:70
@@ -8457,7 +8462,7 @@ msgstr ""
 #: include/classes/helpers/CServiceHelper.php:118
 #, c-format
 msgid "If weight of child services with %1$s status or below is less than %2$s"
-msgstr ""
+msgstr "如果状态为 %1$s 或以下的子服务的权重小于 %2$s"
 
 #: include/func.inc.php:1583 include/func.inc.php:1603
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -8465,11 +8470,11 @@ msgstr "假如您认为这个信息是错的, 请咨询您的管理员关于如�
 
 #: app/views/administration.miscconfig.edit.php:124
 msgid "Iframe sandboxing exceptions"
-msgstr ""
+msgstr "iframe 沙盒异常"
 
 #: include/classes/helpers/CServiceHelper.php:151
 msgid "Ignore this service"
-msgstr ""
+msgstr "忽略此服务"
 
 #: app/controllers/CControllerAuditLogList.php:224
 #: app/views/administration.image.edit.php:60
@@ -8500,7 +8505,7 @@ msgstr "图片标签类型"
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %1$s."
-msgstr ""
+msgstr "图片大小必须小于 %1$s。"
 
 #: app/controllers/CControllerImageUpdate.php:147
 msgid "Image updated"
@@ -8532,7 +8537,7 @@ msgstr "导入"
 #: app/controllers/CControllerPopupImportCompare.php:141
 #: app/controllers/CControllerPopupImport.php:154
 msgid "Import failed"
-msgstr ""
+msgstr "导入失败"
 
 #: app/views/popup.import.php:135
 msgid "Import file"
@@ -8545,7 +8550,7 @@ msgstr "已成功导入"
 #: hostinventories.php:192
 #, c-format
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
-msgstr ""
+msgstr "无法按资产字段“%1$s”过滤，该字段不存在。"
 
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
@@ -8558,21 +8563,21 @@ msgstr "启用中"
 
 #: include/items.inc.php:1865
 msgid "In range"
-msgstr ""
+msgstr "区间"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:363
 msgid "Inaccessible SLA"
-msgstr ""
+msgstr "无法访问SLA"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
 msgid "Inaccessible dashboard"
-msgstr ""
+msgstr "无法访问仪表盘"
 
 #: app/partials/configuration.host.edit.html.php:60
 #: app/views/configuration.host.list.php:236
 msgid "Inaccessible discovery rule"
-msgstr ""
+msgstr "无法访问发现规则"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:359
 msgid "Inaccessible graph"
@@ -8580,7 +8585,7 @@ msgstr "不能访问的图表"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:361
 msgid "Inaccessible graph prototype"
-msgstr ""
+msgstr "无法访问图形模板"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:356
 #: host_prototypes.php:475
@@ -8597,7 +8602,7 @@ msgstr "无法访问的项"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:360
 msgid "Inaccessible item prototype"
-msgstr ""
+msgstr "无法访问监控项模板"
 
 #: app/partials/monitoring.host.view.html.php:105
 #: app/partials/monitoring.latest.view.html.php:210
@@ -8615,7 +8620,7 @@ msgstr "无法访问的拓扑图"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
-msgstr ""
+msgstr "无法访问服务"
 
 #: httpconf.php:661 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
@@ -8643,7 +8648,7 @@ msgstr "用户无法访问"
 
 #: app/controllers/CControllerScheduledReportEdit.php:231
 msgid "Inaccessible user group"
-msgstr ""
+msgstr "无法访问用户组"
 
 #: app/partials/js/scheduledreport.subscription.js.php:165
 #: app/partials/js/scheduledreport.subscription.js.php:181
@@ -8653,7 +8658,7 @@ msgstr "包含"
 
 #: app/views/administration.mediatype.edit.php:240
 msgid "Include event menu entry"
-msgstr ""
+msgstr "包括事件菜单条目"
 
 #: app/views/administration.usergroup.edit.php:140
 #: app/views/administration.usergroup.edit.php:191
@@ -8667,7 +8672,7 @@ msgstr "网络接口上传流量统计。返回 整数"
 #: include/classes/api/services/CService.php:1441
 #, c-format
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
-msgstr ""
+msgstr "服务“%1$s”的“propagation_rule”和“propagation_value”参数不兼容。"
 
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
@@ -8726,11 +8731,11 @@ msgstr "错误的SNMP community."
 
 #: include/classes/helpers/CVaultHelper.php:137
 msgid "Incorrect Vault API endpoint."
-msgstr ""
+msgstr "Vault API 终端不正确。"
 
 #: include/classes/helpers/CVaultHelper.php:61
 msgid "Incorrect Vault token."
-msgstr ""
+msgstr "Vault 令牌不正确。"
 
 #: include/classes/validators/CActionCondValidator.php:122
 msgid "Incorrect action condition discovery check."
@@ -8758,15 +8763,15 @@ msgstr "错误的动作条件时间类型."
 
 #: include/classes/api/services/CAction.php:2999
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
-msgstr ""
+msgstr "动作条件或主机组操作不正确。主机组不存在或您无权访问它。"
 
 #: include/classes/api/services/CAction.php:3059
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
-msgstr ""
+msgstr "动作条件或主机操作不正确。主机不存在或您无权访问它。"
 
 #: include/classes/api/services/CAction.php:3197
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
-msgstr ""
+msgstr "动作条件或模板操作不正确。模板不存在或您无权访问它。"
 
 #: include/classes/validators/CActionCondValidator.php:131
 #, c-format
@@ -8779,7 +8784,7 @@ msgstr "不正确的动作条件agent代理程序. agent代理程序不存在或
 
 #: include/classes/api/services/CAction.php:3401
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
-msgstr ""
+msgstr "动作条件服务不正确。服务不存在或您无权访问它。"
 
 #: include/classes/validators/CActionCondValidator.php:155
 msgid "Incorrect action condition trigger severity."
@@ -8801,7 +8806,7 @@ msgstr "错误的动作操作升级步骤值."
 
 #: include/classes/api/services/CAction.php:2899
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
-msgstr ""
+msgstr "动作操作媒介类型不正确。媒介类型不存在或您无权访问它。"
 
 #: app/controllers/CControllerActionOperationValidate.php:63
 #, c-format
@@ -8810,11 +8815,11 @@ msgstr "在事件源 \"%2$s\" 中有错误的动作类型 \"%1$s\" "
 
 #: include/classes/api/services/CAction.php:3145
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
-msgstr ""
+msgstr "动作操作用户组不正确。用户组不存在或您无权访问它。"
 
 #: include/classes/api/services/CAction.php:3102
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
-msgstr ""
+msgstr "动作操作用户不正确。用户不存在或您无权访问它。"
 
 #: include/classes/api/services/CDRule.php:206
 #: include/classes/api/services/CDRule.php:348
@@ -8880,7 +8885,7 @@ msgstr "接口的值不正确"
 #: include/classes/api/services/CHost.php:2241
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
-msgstr ""
+msgstr "主机名称 \"%1$s\" 中有不支持的字符。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1805
 #, c-format
@@ -8895,13 +8900,13 @@ msgstr "自动发现规则\"%1$s\": %3$s自定义的表达式 \"%2$s\"不正确.
 #: include/classes/api/services/CDiscoveryRule.php:1602
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for override \"%1$s\": %3$s."
-msgstr ""
+msgstr "覆盖“%1$s”的自定义表达式“%2$s”不正确：%3$s。"
 
 #: include/classes/db/MysqlDbBackend.php:69
 #: include/classes/db/PostgresqlDbBackend.php:95
 #, c-format
 msgid "Incorrect default charset for Zabbix database: %1$s."
-msgstr ""
+msgstr "Zabbix 数据库的默认字符集不正确：%1$s。"
 
 #: include/classes/api/services/CEvent.php:510
 #: include/classes/api/services/CProblem.php:375
@@ -8935,7 +8940,7 @@ msgstr "错误的sysmap字段."
 #: include/classes/setup/CSetupWizard.php:984
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
-msgstr ""
+msgstr "\"%1$s\" 的文件路径不正确：%2$s。"
 
 #: include/classes/helpers/CUploadFile.php:162
 msgid "Incorrect file upload."
@@ -8954,7 +8959,7 @@ msgstr "自动发现规则\"%1$s\"的过滤器条件宏变量不正确"
 #: include/classes/api/services/CDiscoveryRule.php:1637
 #, c-format
 msgid "Incorrect filter condition macro for override \"%1$s\"."
-msgstr ""
+msgstr "覆盖 \"%1$s\" 的宏过滤条件不正确。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1847
 #, c-format
@@ -8981,18 +8986,18 @@ msgstr "不正确的输入参数"
 #: include/classes/api/services/CHostInterface.php:801
 #, c-format
 msgid "Incorrect interface DNS parameter \"%1$s\" provided."
-msgstr ""
+msgstr "提供的接口 DNS 参数“%1$s”不正确。"
 
 #: include/classes/api/services/CHostInterface.php:846
 #, c-format
 msgid "Incorrect interface port \"%1$s\" provided."
-msgstr ""
+msgstr "提供的接口端口“%1$s”不正确。"
 
 #: include/classes/api/services/CHost.php:2021
 #: include/classes/api/services/CHost.php:2224
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
-msgstr ""
+msgstr "资产字段“%1$s”不正确。"
 
 #: app/controllers/CControllerActionOperationValidate.php:176
 msgid "Incorrect inventory mode in action operation."
@@ -9048,7 +9053,7 @@ msgstr "错误的对象值."
 #: include/classes/db/OracleDbBackend.php:141
 #, c-format
 msgid "Incorrect parameter \"%1$s\" value: %2$s."
-msgstr ""
+msgstr "参数“%1$s”值不正确：%2$s。"
 
 #: app/controllers/CControllerPopupDiscoveryCheck.php:58
 #: include/classes/api/services/CDRule.php:496
@@ -9071,7 +9076,7 @@ msgstr "收到了来自于zabbix服务器\"%1$s\"的错误应答."
 #: app/controllers/CControllerSlaCreateUpdate.php:111
 #, c-format
 msgid "Incorrect schedule: %1$s."
-msgstr ""
+msgstr "计划不正确：%1$s。"
 
 #: include/classes/api/services/CEvent.php:491
 #: include/classes/api/services/CProblem.php:356
@@ -9136,7 +9141,7 @@ msgstr "拓扑图 \"%1$s\" 用户组ID错误。"
 #: include/classes/api/services/CUser.php:2043
 #: include/classes/validators/CLdapAuthValidator.php:88 index_http.php:79
 msgid "Incorrect user name or password or account is temporarily blocked."
-msgstr ""
+msgstr "用户名或密码不正确，或帐户被临时禁用。"
 
 #: app/controllers/CControllerActionOperationValidate.php:121
 #: app/controllers/CControllerPopupGeneric.php:478
@@ -21258,6 +21263,10 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8中无效的字节排序"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
 msgid "invalid delay"

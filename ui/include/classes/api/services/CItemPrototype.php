@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -339,8 +339,8 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * Check item prototype data and set flags field.
 	 *
-	 * @param array  $items										an array of items passed by reference
-	 * @param bool	 $update
+	 * @param array $items
+	 * @param bool  $update
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		parent::checkInput($items, $update);

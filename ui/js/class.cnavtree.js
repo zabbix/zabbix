@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -345,6 +345,11 @@ if (typeof addPopupValues === 'undefined') {
 				this._clear(event, noPropagation);
 			}
 			else {
+				const parent_id = this.placeholder.parent().closest('.tree-item').data('id');
+				const item_id = $(this.currentItem[0]).data('id');
+
+				$('[name="navtree.parent.' + item_id + '"]').val(parent_id);
+
 				if (this.options.revert) {
 					var self = this,
 						cur = self.placeholder.offset();

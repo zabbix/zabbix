@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ if ($data['regexid'] != 0) {
 }
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('regex')
 	->setAction($action->getUrl())
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
@@ -132,7 +133,7 @@ $test_tab = (new CFormList())
 	);
 
 $reg_exp_view = new CTabView();
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$reg_exp_view->setSelected(0);
 }
 

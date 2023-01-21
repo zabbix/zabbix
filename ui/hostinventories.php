@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ $fields = [
 	'filter_field' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_field_value' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_exact' =>		[T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null],
-	'filter_groups' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_groups' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	// actions
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	// sort and sortorder

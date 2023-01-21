@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -173,6 +173,13 @@ class CValueMap extends CApiService {
 			if (array_key_exists('name', $valuemap) && $valuemap['name'] !== $db_valuemap['name']) {
 				$upd_valuemaps[] = [
 					'values' => ['name' => $valuemap['name']],
+					'where' => ['valuemapid' => $valuemap['valuemapid']]
+				];
+			}
+
+			if (array_key_exists('uuid', $valuemap) && $valuemap['uuid'] !== $db_valuemap['uuid']) {
+				$upd_valuemaps[] = [
+					'values' => ['uuid' => $valuemap['uuid'], 'name' => $valuemap['name']],
 					'where' => ['valuemapid' => $valuemap['valuemapid']]
 				];
 			}
@@ -455,6 +462,7 @@ class CValueMap extends CApiService {
 	 */
 	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['valuemapid']], 'fields' => [
+			'uuid' => 		['type' => API_UUID],
 			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
@@ -490,13 +498,14 @@ class CValueMap extends CApiService {
 				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$this->validateValuemapMappings($valuemaps);
 		$db_valuemaps = $this->get([
-			'output' => ['valuemapid', 'hostid', 'name'],
+			'output' => ['valuemapid', 'hostid', 'name', 'uuid'],
 			'valuemapids' => array_column($valuemaps, 'valuemapid'),
 			'editable' => true,
 			'preservekeys' => true

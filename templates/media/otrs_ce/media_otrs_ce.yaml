@@ -1,9 +1,9 @@
 zabbix_export:
-  version: '5.4'
+  version: '6.0'
   date: '2020-10-16T09:33:49Z'
   media_types:
     -
-      name: OTRS
+      name: OTRS CE
       type: WEBHOOK
       parameters:
         -
@@ -56,7 +56,7 @@ zabbix_export:
           value: '0'
         -
           name: otrs_url
-          value: '<PUT YOUR OTRS URL>'
+          value: '<PUT YOUR ((OTRS)) CE URL>'
         -
           name: trigger_id
           value: '{TRIGGER.ID}'
@@ -145,7 +145,7 @@ zabbix_export:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.log(4, '[ OTRS Webhook ] Received response with status code ' + request.getStatus() + ': ' + response);
+                Zabbix.log(4, '[ ((OTRS)) CE Webhook ] Received response with status code ' + request.getStatus() + ': ' + response);
         
                 if (request.getStatus() < 200 || request.getStatus() >= 300) {
                     var message = 'Request failed with status code ' + request.getStatus();
@@ -159,7 +159,7 @@ zabbix_export:
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        Zabbix.log(4, '[ OTRS Webhook ] Failed to parse response received from OTRS');
+                        Zabbix.log(4, '[ ((OTRS)) CE Webhook ] Failed to parse response received from ((OTRS)) CE');
                         response = null;
                     }
                 }
@@ -199,7 +199,7 @@ zabbix_export:
                 if (typeof result.response !== 'object'
                     || typeof result.response.TicketID === 'undefined'
                     || result.status != 200) {
-                    throw 'Cannot create OTRS ticket. Check debug log for more information.';
+                    throw 'Cannot create ((OTRS)) CE ticket. Check debug log for more information.';
                 }
         
                 return result.response.TicketID;
@@ -221,7 +221,7 @@ zabbix_export:
                 if (typeof result.response !== 'object'
                     || typeof result.response.TicketID === 'undefined'
                     || result.status != 200) {
-                    throw 'Cannot update OTRS ticket. Check debug log for more information.';
+                    throw 'Cannot update ((OTRS)) CE ticket. Check debug log for more information.';
                 }
             }
         };
@@ -332,13 +332,13 @@ zabbix_export:
             return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.log(3, '[ OTRS Webhook ] ERROR: ' + error);
+            Zabbix.log(3, '[ ((OTRS)) CE Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'
       show_event_menu: 'YES'
       event_menu_url: '{EVENT.TAGS.__zbx_otrs_ticketlink}'
-      event_menu_name: 'OTRS: ticket #{EVENT.TAGS.__zbx_otrs_ticket_id}'
+      event_menu_name: '((OTRS)) CE: ticket #{EVENT.TAGS.__zbx_otrs_ticket_id}'
       message_templates:
         -
           event_source: TRIGGERS

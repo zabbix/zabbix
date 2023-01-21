@@ -3,13 +3,16 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher.  
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -20,14 +23,14 @@ No specific Zabbix configuration is required.
 |{$CPU.UTIL.CRIT} |<p>-</p> |`90` |
 |{$LOAD_AVG_PER_CPU.MAX.WARN} |<p>Load per CPU considered sustainable. Tune if needed.</p> |`1.5` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -49,7 +52,7 @@ There are no template links in this template.
 |CPU |Context switches per second |<p>-</p> |ZABBIX_ACTIVE |system.cpu.switches<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |CPU |Interrupts per second |<p>-</p> |ZABBIX_ACTIVE |system.cpu.intr<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -64,13 +67,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
-For Zabbix version: 6.0 and higher.  
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -89,17 +95,17 @@ No specific Zabbix configuration is required.
 |{$VFS.FS.PUSED.MAX.CRIT} |<p>-</p> |`90` |
 |{$VFS.FS.PUSED.MAX.WARN} |<p>-</p> |`80` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |ZABBIX_ACTIVE |vfs.fs.discovery<p>**Filter**:</p>AND <p>- {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Skip metadata collection for dynamic FS<br> - {#FSTYPE} MATCHES_REGEX `^(btrfs|zfs)$`<br>  - ITEM_PROTOTYPE LIKE `inode`<br>  - NO_DISCOVER</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -108,7 +114,7 @@ There are no template links in this template.
 |Filesystems |{#FSNAME}: Space utilization |<p>Space utilization in % for {#FSNAME}</p> |ZABBIX_ACTIVE |vfs.fs.size[{#FSNAME},pused] |
 |Filesystems |{#FSNAME}: Free inodes in % |<p>-</p> |ZABBIX_ACTIVE |vfs.fs.inode[{#FSNAME},pfree] |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -125,13 +131,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
-For Zabbix version: 6.0 and higher.  
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -143,14 +152,14 @@ No specific Zabbix configuration is required.
 |{$MEMORY.UTIL.MAX} |<p>This macro is used as a threshold in memory utilization trigger.</p> |`90` |
 |{$SWAP.PFREE.MIN.WARN} |<p>-</p> |`50` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -162,7 +171,7 @@ There are no template links in this template.
 |Memory |Free swap space |<p>The free space of swap volume/file in bytes.</p> |ZABBIX_ACTIVE |system.swap.size[,free] |
 |Memory |Free swap space in % |<p>The free space of swap volume/file in percent.</p> |ZABBIX_ACTIVE |system.swap.size[,pfree] |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -178,13 +187,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
-For Zabbix version: 6.0 and higher.  
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -197,17 +209,17 @@ No specific Zabbix configuration is required.
 |{$VFS.DEV.READ.AWAIT.WARN} |<p>Disk read average response time (in ms) before the trigger would fire</p> |`20` |
 |{$VFS.DEV.WRITE.AWAIT.WARN} |<p>Disk write average response time (in ms) before the trigger would fire</p> |`20` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Block devices discovery |<p>-</p> |ZABBIX_ACTIVE |vfs.dev.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#DEVTYPE} MATCHES_REGEX `disk`</p><p>- {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -221,7 +233,7 @@ There are no template links in this template.
 |Zabbix raw items |{#DEVNAME}: Disk read time (rate) |<p>Rate of total read time counter. Used in r_await calculation</p> |DEPENDENT |vfs.dev.read.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[3]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
 |Zabbix raw items |{#DEVNAME}: Disk write time (rate) |<p>Rate of total write time counter. Used in w_await calculation</p> |DEPENDENT |vfs.dev.write.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[7]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -235,13 +247,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
-For Zabbix version: 6.0 and higher.  
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -255,17 +270,17 @@ No specific Zabbix configuration is required.
 |{$NET.IF.IFNAME.MATCHES} |<p>-</p> |`^.*$` |
 |{$NET.IF.IFNAME.NOT_MATCHES} |<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</p> |`(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Network interface discovery |<p>Discovery of network interfaces.</p> |ZABBIX_ACTIVE |net.if.discovery<p>**Filter**:</p>AND <p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -279,7 +294,7 @@ There are no template links in this template.
 |Network interfaces |Interface {#IFNAME}: Interface type |<p>Indicates the interface protocol type as a decimal value.</p><p>See include/uapi/linux/if_arp.h for all possible values.</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_ACTIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/type"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Network interfaces |Interface {#IFNAME}: Speed |<p>Indicates the interface latest or current speed value. Value is an integer representing the link speed in bits/sec.</p><p>This attribute is only valid for interfaces that implement the ethtool get_link_ksettings method (mostly Ethernet).</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_ACTIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1000000`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -296,13 +311,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
-For Zabbix version: 6.0 and higher.  
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -314,14 +332,14 @@ No specific Zabbix configuration is required.
 |{$KERNEL.MAXPROC.MIN} |<p>-</p> |`1024` |
 |{$SYSTEM.FUZZYTIME.MAX} |<p>-</p> |`60` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -340,7 +358,7 @@ There are no template links in this template.
 |Security |Checksum of /etc/passwd |<p>-</p> |ZABBIX_ACTIVE |vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |System uptime |<p>System uptime in 'N days, hh:mm:ss' format.</p> |ZABBIX_ACTIVE |system.uptime |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
