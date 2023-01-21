@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -158,7 +158,7 @@ static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interf
 		ZBX_STR2UCHAR(type, row[0]);
 		ZBX_STR2UINT64(interfaceids[type - 1], row[1]);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -490,7 +490,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		zbx_vector_lld_macro_ptr_create(&item->template_lld_macros);
 		zbx_vector_ptr_append(items, item);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 
@@ -634,7 +634,7 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_free(sql);
 	}
@@ -1279,7 +1279,7 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 
 		zbx_vector_ptr_append(&prototypes, proto);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == prototypes.values_num)
 		goto out;
@@ -2176,7 +2176,7 @@ static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_
 
 		zbx_vector_ptr_append(&override->override_conditions, override_condition);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_vector_uint64_t *overrideids,
@@ -2516,7 +2516,7 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 		}
 
 		sql_offset = 0;
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from lld_override where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", lld_itemids->values,
@@ -2551,7 +2551,7 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 		zbx_vector_uint64_append(&overrideids, override->overrideid);
 		zbx_vector_ptr_append(&overrides, override);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != overrides.values_num)
 	{
@@ -2716,7 +2716,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 
 			zbx_vector_item_preproc_ptr_append(&((zbx_template_item_t *)item)->item_preprocs, ppdst);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		zbx_free(sql);
 		sql_offset = 0;
 		sql_alloc = 0;
@@ -2747,7 +2747,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 
 		zbx_vector_item_preproc_ptr_append(&(*pitem)->template_preprocs, ppdst);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < items->values_num; i++)
@@ -2892,7 +2892,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 			zbx_vector_db_tag_ptr_append(&item->item_tags, db_tag);
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		zbx_free(sql);
 		sql_offset = 0;
 		sql_alloc = 0;
@@ -2922,7 +2922,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 		db_tag = zbx_db_tag_create(row[1], row[2]);
 		zbx_vector_db_tag_ptr_append(&(*pitem)->template_tags, db_tag);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < items->values_num; i++)
@@ -2999,7 +2999,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 			ZBX_STR2UINT64(db_item_param->item_parameterid, row[0]);
 			zbx_vector_item_param_ptr_append(&item->item_params, db_item_param);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		zbx_free(sql);
 		sql_offset = 0;
 		sql_alloc = 0;
@@ -3029,7 +3029,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 		zbx_vector_item_param_ptr_append(&(*pitem)->template_params, db_item_param);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < items->values_num; i++)
@@ -3100,7 +3100,7 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 
 			zbx_vector_lld_macro_ptr_append(&item->item_lld_macros, plmpdst);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		zbx_free(sql);
 		sql_offset = 0;
 		sql_alloc = 0;
@@ -3134,7 +3134,7 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 
 		zbx_vector_lld_macro_ptr_append(&(*pitem)->template_lld_macros, plmpdst);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < items->values_num; i++)

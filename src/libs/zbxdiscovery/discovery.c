@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ static void	discovery_separate_host(const ZBX_DB_DRULE *drule, ZBX_DB_DHOST *dho
 		dhost->lastup = 0;
 		dhost->lastdown = 0;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 	zbx_free(ip_esc);
@@ -152,7 +152,7 @@ static void	discovery_register_host(const ZBX_DB_DRULE *drule, zbx_uint64_t dche
 
 		if (NULL == (row = DBfetch(result)))
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 
 			result = discovery_get_dhost_by_ip_port(drule->druleid, ip, port);
 			row = DBfetch(result);
@@ -195,7 +195,7 @@ static void	discovery_register_host(const ZBX_DB_DRULE *drule, zbx_uint64_t dche
 		if (0 == match_value)
 			discovery_separate_host(drule, dhost, ip);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -283,7 +283,7 @@ static void	discovery_register_service(zbx_uint64_t dcheckid, ZBX_DB_DHOST *dhos
 			zbx_free(dns_esc);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(ip_esc);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		zbx_vector_uint64_append(&all_templ_ids, dep_list_id.second);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == dep_list_ids.values_num)	/* not all trigger templates have a dependency trigger */
 		goto clean;
@@ -223,7 +223,7 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		zbx_vector_uint64_pair_append(&map_ids, map_id);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < dep_list_ids.values_num; i++)
 	{
@@ -352,7 +352,7 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < links->values_num; i++)
 	{
