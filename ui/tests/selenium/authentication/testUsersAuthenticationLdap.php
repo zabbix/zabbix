@@ -71,6 +71,16 @@ class testUsersAuthenticationLdap extends CWebTest {
 
 		$this->assertEquals(['Servers'], $form->getRequiredLabels());
 
+		// Check server table's headers.
+		$server_table = [
+			'Servers' => [
+				'id' => 'ldap-servers',
+				'headers' => ['Name', 'Host', 'User groups', 'Default']
+			]
+		];
+
+		$this->checkTablesHeaders($server_table, $form);
+
 		// Check 'Provisioning period' field's editability.
 		foreach ([false, true] as $jit_status) {
 			$form->fill(['Enable JIT provisioning' => $jit_status]);
@@ -206,14 +216,10 @@ class testUsersAuthenticationLdap extends CWebTest {
 			]
 		];
 
-		foreach ($mapping_tables as $name => $attributes) {
-			$this->assertEquals($attributes['headers'],
-					$server_form->getFieldContainer($name)->query('id', $attributes['id'])->asTable()->one()->getHeadersText()
-			);
-		}
+		$this->checkTablesHeaders($mapping_tables, $server_form);
 
 		// Check group mapping popup.
-		$group_mapping_dialog = $this->checkMapping('User group mapping', 'New user group mapping', $server_form,
+		$group_mapping_dialog = $this->checkMappingDialog('User group mapping', 'New user group mapping', $server_form,
 				['LDAP group pattern', 'User groups', 'User role']
 		);
 
@@ -229,7 +235,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 		$group_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
 
 		// Check media type mapping popup.
-		$media_mapping_dialog = $this->checkMapping('Media type mapping', 'New media type mapping',
+		$media_mapping_dialog = $this->checkMappingDialog('Media type mapping', 'New media type mapping',
 				$server_form, ['Name', 'Media type', 'Attribute']
 		);
 
@@ -243,6 +249,20 @@ class testUsersAuthenticationLdap extends CWebTest {
 		$this->checkFooterButtons($server_dialog, ['Add', 'Test', 'Cancel']);
 
 		$server_dialog->close();
+	}
+
+	/**
+	 * Check buttons in dialog footer.
+	 *
+	 * @param array           $tables    given tables
+	 * @param CFormElement    $form      given form
+	 */
+	private function checkTablesHeaders($tables, $form) {
+		foreach ($tables as $name => $attributes) {
+			$this->assertEquals($attributes['headers'],
+					$form->getFieldContainer($name)->query('id', $attributes['id'])->asTable()->one()->getHeadersText()
+			);
+		}
 	}
 
 	/**
@@ -264,14 +284,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 	}
 
 	/**
-	 * Check mapping form in dialog.
+	 * Check mapping dialog contents.
 	 *
 	 * @param string          $field	 field which mapping is checked
 	 * @param string          $title     title in dialog
 	 * @param CFormElement    $form      LDAP form
 	 * @param array           $labels    labels in mapping form
 	 */
-	private function checkMapping($field, $title, $form, $labels) {
+	private function checkMappingDialog($field, $title, $form, $labels) {
 		$form->getFieldContainer($field)->query('button:Add')->waitUntilClickable()->one()->click();
 		$mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 		$this->assertEquals($title, $mapping_dialog->getTitle());
@@ -281,7 +301,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 			$mapping_field = $mapping_form->getField($label);
 			$this->assertTrue($mapping_field->isVisible());
 			$this->assertTrue($mapping_field->isEnabled());
-			$this->assertStringContainsString('form-label-asterisk', $mapping_form->getLabel($label)->getAttribute('class'));
+			$this->assertEquals($labels, $form->getRequiredLabels());
 		}
 
 		$values = ($field === 'Media type mapping')
@@ -528,7 +548,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 						'Login' => 'user1',
 						'User password' => 'zabbix#33'
 					],
-					'check_provisioning' =>[
+					'check_provisioning' => [
 						'role' => 'Super admin role',
 						'groups' => 'Zabbix administratorsGuests',
 						'medias' => 'Email'
@@ -687,7 +707,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 				[
 					'servers_settings' => [
 						[
-							'fields' =>  [
+							'fields' => [
 								'Name' => '',
 								'Host' => '',
 								'Base DN' => '',
@@ -710,7 +730,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 				[
 					'servers_settings' => [
 						[
-							'fields' =>  [
+							'fields' => [
 								'Name' => '',
 								'Host' => 'updated_host',
 								'Base DN' => '',
@@ -731,7 +751,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 				[
 					'servers_settings' => [
 						[
-							'fields' =>  [
+							'fields' => [
 								'Name' => '',
 								'Host' => 'updated_host',
 								'Base DN' => 'updated_dn',
@@ -751,7 +771,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 				[
 					'servers_settings' => [
 						[
-							'fields' =>  [
+							'fields' => [
 								'Name' => '',
 								'Host' => 'updated_host',
 								'Base DN' => 'updated_dn',
@@ -771,7 +791,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					'expected' => TEST_GOOD,
 					'servers_settings' => [
 						[
-							'fields' =>  [
+							'fields' => [
 								'Name' => 'updated_name',
 								'Host' => 'updated_host',
 								'Port' => '777',
@@ -812,7 +832,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					'expected' => TEST_GOOD,
 					'servers_settings' => [
 						[
-							'fields' =>  [
+							'fields' => [
 								'Name' => 'ldap_with_jit',
 								'Host' => '111.222.333',
 								'Port' => '',
@@ -904,7 +924,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					'expected' => TEST_GOOD,
 					'servers_settings' => [
 						[
-							'fields' =>  [
+							'fields' => [
 								'Name' => 'ldap1',
 								'Host' => '111.222.444',
 								'Port' => '123',
@@ -914,7 +934,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 							]
 						],
 						[
-							'fields' =>  [
+							'fields' => [
 								'Name' => 'ldap2',
 								'Host' => '111.222.555',
 								'Port' => '999',
@@ -1074,7 +1094,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					'error' => 'At least one LDAP server must exist.'
 				]
 			],
-			//#4 LDAP server without name.
+			// #4 LDAP server without name.
 			[
 				[
 					'servers_settings' => [
@@ -1093,7 +1113,28 @@ class testUsersAuthenticationLdap extends CWebTest {
 					'error' => 'At least one LDAP server must exist.'
 				]
 			],
-			// #5 Two LDAP servers with same names.
+			// #5 LDAP server with to big integer in Port.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'TEST',
+								'Host' => 'ipa.demo1.freeipa.org',
+								'Posrt' => 99999,
+								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+								'Search attribute' => 'uid'
+							]
+						]
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "port": value must be no greater than "65535".'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #6 Two LDAP servers with same names.
 			[
 				[
 					'servers_settings' => [
@@ -1118,7 +1159,29 @@ class testUsersAuthenticationLdap extends CWebTest {
 					'error' => 'Invalid parameter "/2": value (name)=(TEST) already exists.'
 				]
 			],
-			// #6 Using cyrillic in settings.
+			// #7 LDAP server with JIT, but without Group mapping.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test',
+								'Port' => '001',
+								'Base DN' => 'test',
+								'Search attribute' => 'tets',
+								'Configure JIT provisioning' => true
+							],
+							'ldap_error' => 'Invalid LDAP configuration',
+							'ldap_error_details' => [
+								'Invalid user group mapping configuration.'
+							],
+							'error' => 'At least one LDAP server must exist.'
+						]
+					]
+				]
+			],
+			// #8 Using cyrillic in settings.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1128,7 +1191,37 @@ class testUsersAuthenticationLdap extends CWebTest {
 								'Name' => 'кириллица',
 								'Host' => 'кириллица',
 								'Base DN' => 'кириллица',
-								'Search attribute' => 'кириллица'
+								'Search attribute' => 'кириллица',
+								'Bind DN' => 'кириллица',
+								'Description' => 'кириллица',
+								'Configure JIT provisioning' => true,
+								'Group configuration' => 'groupOfNames',
+								'Group base DN' => 'кириллица',
+								'Group name attribute' => 'кириллица',
+								'Group member attribute' => 'кириллица',
+								'Reference attribute' => 'кириллица',
+								'Group filter' => 'кириллица',
+								'User name attribute' => 'кириллица',
+								'User last name attribute' => 'кириллица'
+							],
+							'User group mapping' => [
+								[
+									'LDAP group pattern' => 'кириллица',
+									'User groups' => 'Test timezone',
+									'User role' => 'User role'
+								]
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'кириллица1',
+									'Media type' => 'Discord',
+									'Attribute' => 'test discord'
+								],
+								[
+									'Name' => 'кириллица2',
+									'Media type' => 'iLert',
+									'Attribute' => 'test iLert'
+								]
 							]
 						]
 					],
@@ -1140,39 +1233,129 @@ class testUsersAuthenticationLdap extends CWebTest {
 							'base_dn' => 'кириллица',
 							'bind_dn' => '',
 							'bind_password' => '',
-							'search_attribute' => 'кириллица'
+							'search_attribute' => 'кириллица',
+							'group_basedn' => 'кириллица',
+							'group_name' => 'кириллица',
+							'group_member' => 'кириллица',
+							'user_ref_attr' => 'кириллица',
+							'group_filter' => 'кириллица',
+							'user_username' => 'кириллица',
+							'user_lastname' => 'кириллица'
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => 'кириллица',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						],
+						'userdirectory_media' => [
+							[
+								'name' => 'кириллица1',
+								'mediatypeid' => 10,
+								'attribute' => 'test discord'
+							],
+							[
+								'name' => 'кириллица2',
+								'mediatypeid' => 22,
+								'attribute' => 'test iLert'
+							]
 						]
 					]
 				]
 			],
-			// #7 Using symbols in settings.
+			// #9 Using symbols in settings.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'servers_settings' => [
 						[
 							'fields' => [
-								'Name' => '@#$%^&*.',
-								'Host' => '@#$%^&*.',
-								'Base DN' => '@#$%^&*.',
-								'Search attribute' => '@#$%^&*.'
+								'Name' => '~`!@#$%^7*()_+=/',
+								'Host' => '~`!@#$%^7*()_+=/',
+								'Base DN' => '~`!@#$%^7*()_+=/',
+								'Search attribute' => '~`!@#$%^7*()_+=/',
+								'Bind DN' => '~`!@#$%^7*()_+=/',
+								'Description' => '~`!@#$%^7*()_+=/',
+								'Configure JIT provisioning' => true,
+								'Group configuration' => '~`!@#$%^7*()_+=/',
+								'Group base DN' => '~`!@#$%^7*()_+=/',
+								'Group name attribute' => '~`!@#$%^7*()_+=/',
+								'Group member attribute' => '~`!@#$%^7*()_+=/',
+								'Reference attribute' => '~`!@#$%^7*()_+=/',
+								'Group filter' => '~`!@#$%^7*()_+=/',
+								'User name attribute' => '~`!@#$%^7*()_+=/',
+								'User last name attribute' => '~`!@#$%^7*()_+=/'
+							],
+							'User group mapping' => [
+								[
+									'LDAP group pattern' => '~`!@#$%^7*()_+=/',
+									'User groups' => 'Test timezone',
+									'User role' => 'User role'
+								]
+							],
+							'Media type mapping' => [
+								[
+									'Name' => '~`!@#$%^7*()_+=/1',
+									'Media type' => 'Discord',
+									'Attribute' => 'test discord'
+								],
+								[
+									'Name' => '~`!@#$%^7*()_+=/2',
+									'Media type' => 'iLert',
+									'Attribute' => 'test iLert'
+								]
 							]
 						]
 					],
 					'db_check' => [
-						'userdirectory' => ['name' => '@#$%^&*.'],
+						'userdirectory' => ['name' => '~`!@#$%^7*()_+=/'],
 						'userdirectory_ldap' => [
-							'host' => '@#$%^&*.',
+							'host' => '~`!@#$%^7*()_+=/',
 							'port' => '389',
-							'base_dn' => '@#$%^&*.',
+							'base_dn' => '~`!@#$%^7*()_+=/',
 							'bind_dn' => '',
 							'bind_password' => '',
-							'search_attribute' => '@#$%^&*.'
+							'search_attribute' => '~`!@#$%^7*()_+=/',
+							'group_basedn' => '~`!@#$%^7*()_+=/',
+							'group_name' => '~`!@#$%^7*()_+=/',
+							'group_member' => '~`!@#$%^7*()_+=/',
+							'user_ref_attr' => '~`!@#$%^7*()_+=/',
+							'group_filter' => '~`!@#$%^7*()_+=/',
+							'user_username' => '~`!@#$%^7*()_+=/',
+							'user_lastname' => '~`!@#$%^7*()_+=/'
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => '~`!@#$%^7*()_+=/',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						],
+						'userdirectory_media' => [
+							[
+								'name' => '~`!@#$%^7*()_+=/1',
+								'mediatypeid' => 10,
+								'attribute' => 'test discord'
+							],
+							[
+								'name' => '~`!@#$%^7*()_+=/2',
+								'mediatypeid' => 22,
+								'attribute' => 'test iLert'
+							]
 						]
 					]
 				]
 			],
-			// #8 Long values.
+			// #10 Long values.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1185,37 +1368,116 @@ class testUsersAuthenticationLdap extends CWebTest {
 										'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long'.
 										'_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
 										'value_long_value_long_v',
+								'Port' => 65535,
 								'Base DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
 										'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_'.
 										'value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
 										'value_long_value_long_v',
 								'Search attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'Bind DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'Description' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'Configure JIT provisioning' => true,
+								'Group configuration' => 'groupOfNames',
+								'Group base DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'Group name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'Group member attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'Reference attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'Group filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'User name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'User last name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
 										'long_value_long_value_long_value_long_value_long_value_long_va'
+							],
+							'User group mapping' => [
+								[
+									'LDAP group pattern' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+									'User groups' => 'Test timezone',
+									'User role' => 'User role'
+								]
+							],
+							'Media type mapping' => [
+								[
+									'Name' => '1ong_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+									'Media type' => 'Discord',
+									'Attribute' => 'test discord'
+								],
+								[
+									'Name' => '2ong_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+									'Media type' => 'iLert',
+									'Attribute' => 'test iLert'
+								]
 							]
 						]
 					],
 					'db_check' => [
-						'userdirectory' => [
-							'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
-									'value_long_value_long_value_long_value_long_va'
-						],
+						'userdirectory' => ['name' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va'],
 						'userdirectory_ldap' => [
-							'host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
-									'value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_'.
-									'value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-							'port' => '389',
-							'base_dn' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_'.
-									'long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_'.
-									'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+							'host' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+							'port' => 65535,
+							'base_dn' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
 							'bind_dn' => '',
 							'bind_password' => '',
 							'search_attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-								'long_value_long_value_long_value_long_value_long_value_long_va'
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+							'group_basedn' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+							'group_name' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+							'group_member' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+							'user_ref_attr' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+							'group_filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+							'user_username' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+							'user_lastname' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va'
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						],
+						'userdirectory_media' => [
+							[
+								'name' => '1ong_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'mediatypeid' => 10,
+								'attribute' => 'test discord'
+							],
+							[
+								'name' => '2ong_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'mediatypeid' => 22,
+								'attribute' => 'test iLert'
+							]
 						]
 					]
 				]
 			],
-			// #9 LDAP server with every field filled.
+			// #11 LDAP server with every field filled (no JIT).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1248,14 +1510,106 @@ class testUsersAuthenticationLdap extends CWebTest {
 						]
 					]
 				]
+			],
+			// #12 LDAP server with every field filled with JIT.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'create_ldap_with_jit',
+								'Host' => '111.222.444',
+								'Port' => '',
+								'Base DN' => 'create base dn',
+								'Search attribute' => 'create search attribute',
+								'Bind DN' => 'create bin dn test',
+								'Description' => 'create test description with jit',
+								'Configure JIT provisioning' => true,
+								'Group configuration' => 'groupOfNames',
+								'Group base DN' => 'create test group base dn',
+								'Group name attribute' => 'create test group name attribute',
+								'Group member attribute' => 'create test group member',
+								'Reference attribute' => 'create test reference attribute',
+								'Group filter' => 'create est group filter',
+								'User name attribute' => 'create user name attribute',
+								'User last name attribute' => 'create user last name'
+							],
+							'User group mapping' => [
+								[
+									'LDAP group pattern' => 'create group pattern',
+									'User groups' => 'Test timezone',
+									'User role' => 'User role'
+								]
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Create Test Discord mapping',
+									'Media type' => 'Discord',
+									'Attribute' => 'test discord'
+								],
+								[
+									'Name' => 'Create Test iLert mapping',
+									'Media type' => 'iLert',
+									'Attribute' => 'test iLert'
+								]
+							]
+						]
+					],
+					'db_check' => [
+						'userdirectory' => [
+							['name' => '', 'description' => '', 'provision_status' => 0],
+							['name' => 'create_ldap_with_jit', 'description' => 'create test description with jit', 'provision_status' => 1]
+						],
+						'userdirectory_ldap' => [
+							[
+								'host' => '111.222.444',
+								'port' => '0',
+								'base_dn' => 'create base dn',
+								'bind_dn' => 'create bin dn test',
+								'search_attribute' => 'create search attribute',
+								'group_basedn' => 'create test group base dn',
+								'group_name' => 'create test group name attribute',
+								'group_member' => 'create test group member',
+								'user_ref_attr' => 'create test reference attribute',
+								'group_filter' => 'create test group filter',
+								'user_username' => 'create user name attribute',
+								'user_lastname' => 'create user last name'
+							]
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => 'create group pattern',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						],
+						'userdirectory_media' => [
+							[
+								'name' => 'Create Test Discord mapping',
+								'mediatypeid' => 10,
+								'attribute' => 'test discord'
+							],
+							[
+								'name' => 'Create Test iLert mapping',
+								'mediatypeid' => 22,
+								'attribute' => 'test iLert'
+							]
+						]
+					]
+				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider getCreateData
-	 *
 	 * Check authentication with LDAP settings.
+	 *
+	 * @dataProvider getCreateData
 	 */
 	public function testUsersAuthenticationLdap_Create($data) {
 		$this->checkLdap($data, 'button:Add');
@@ -1366,9 +1720,8 @@ class testUsersAuthenticationLdap extends CWebTest {
 
 			if (array_key_exists('Bind password', $ldap)) {
 				$ldap_form->getFieldContainer('Bind password')->query('button:Change password')->waitUntilClickable()
-								->one()->click();
-				$ldap_form->query('id:bind_password')->one()->waitUntilVisible();
-				$ldap_form->fill(['Bind password' => $ldap['Bind password']]);
+						->one()->click();
+				$ldap_form->query('id:bind_password')->one()->waitUntilVisible()->fill($ldap['Bind password']);
 			}
 
 			if (CTestArrayHelper::get($ldap['fields'], 'Configure JIT provisioning')) {
@@ -1392,8 +1745,8 @@ class testUsersAuthenticationLdap extends CWebTest {
 	/**
 	 * Create or update LDAP server values.
 	 *
-	 * @param array $data	  data provider
-	 * @param string $query  object to click for LDAP creating or updating
+	 * @param array     $data	  data provider
+	 * @param string    $query    object to click for LDAP creating or updating
 	 */
 	private function checkLdap($data, $query) {
 		$form = $this->openLdapForm('LDAP');
