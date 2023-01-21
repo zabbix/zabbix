@@ -182,6 +182,7 @@ static const char	*mock_token_type2str(zbx_uint32_t type)
 		ZBX_MOCK_TOKEN_CASE(PROP_TAG)
 		ZBX_MOCK_TOKEN_CASE(PROP_GROUP)
 		ZBX_MOCK_TOKEN_CASE(NOP)
+		ZBX_MOCK_TOKEN_CASE(VAR_HIST_STR)
 	}
 
 	fail_msg("unknown token type: %d", type);
@@ -225,6 +226,7 @@ static zbx_uint32_t	mock_token_str2type(const char *str)
 	ZBX_MOCK_TOKEN_IF(PROP_TAG)
 	ZBX_MOCK_TOKEN_IF(PROP_GROUP)
 	ZBX_MOCK_TOKEN_IF(NOP)
+	ZBX_MOCK_TOKEN_IF(VAR_HIST_STR)
 
 	fail_msg("unknown token type %s", str);
 	return 0;
