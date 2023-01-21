@@ -126,7 +126,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 			}
 		}
 
-		// Check mandatory fields.
+		// Check visible mandatory fields.
 		$this->assertEquals(['Name', 'Host', 'Port', 'Base DN', 'Search attribute'],
 				$server_form->getRequiredLabels()
 		);
@@ -193,6 +193,24 @@ class testUsersAuthenticationLdap extends CWebTest {
 		];
 
 		$this->checkHints($hintboxes, $server_form);
+
+		// Check mapping tables headers.
+		$mapping_tables = [
+			'User group mapping' => [
+				'id' => 'ldap-user-groups-table',
+				'headers' => ['LDAP group pattern', 'User groups', 'User role', 'Action']
+			],
+			'Media type mapping' => [
+				'id' => 'media-type-mapping-table',
+				'headers' => ['Name', 'Media type', 'Attribute', 'Action']
+			]
+		];
+
+		foreach ($mapping_tables as $name => $attributes) {
+			$this->assertEquals($attributes['headers'],
+					$server_form->getFieldContainer($name)->query('id', $attributes['id'])->asTable()->one()->getHeadersText()
+			);
+		}
 
 		// Check group mapping popup.
 		$group_mapping_dialog = $this->checkMapping('User group mapping', 'New user group mapping', $server_form,
