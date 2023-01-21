@@ -1113,7 +1113,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					'error' => 'At least one LDAP server must exist.'
 				]
 			],
-			// #5 LDAP server with to big integer in Port.
+			// #5 LDAP server with too big integer in Port.
 			[
 				[
 					'servers_settings' => [
@@ -1121,7 +1121,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 							'fields' => [
 								'Name' => 'TEST',
 								'Host' => 'ipa.demo1.freeipa.org',
-								'Posrt' => 99999,
+								'Port' => 99999,
 								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 								'Search attribute' => 'uid'
 							]
