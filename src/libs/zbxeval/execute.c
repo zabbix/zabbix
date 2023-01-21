@@ -471,12 +471,13 @@ static int	eval_execute_push_value(const zbx_eval_context_t *ctx, const zbx_eval
 			dst = zbx_malloc(NULL, token->loc.r - token->loc.l + 2);
 			zbx_variant_set_str(&value, dst);
 
-			if (ZBX_EVAL_TOKEN_VAR_STR == token->type)
+			if (ZBX_EVAL_TOKEN_VAR_STR == token->type || ZBX_EVAL_TOKEN_VAR_HIST_STR == token->type)
 			{
 				for (src = ctx->expression + token->loc.l + 1; src < ctx->expression + token->loc.r;
 						src++)
 				{
-					if ('\\' == *src)
+					/* workaround for calculated items is required to due present bug */
+					if (ZBX_EVAL_TOKEN_VAR_HIST_STR != token->type && '\\' == *src)
 						src++;
 					*dst++ = *src;
 				}
@@ -2911,6 +2912,7 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 				case ZBX_EVAL_TOKEN_VAR_STR:
 				case ZBX_EVAL_TOKEN_VAR_MACRO:
 				case ZBX_EVAL_TOKEN_VAR_USERMACRO:
+				case ZBX_EVAL_TOKEN_VAR_HIST_STR:
 					if (SUCCEED != eval_execute_push_value(ctx, token, &output, &errmsg))
 						goto out;
 					break;

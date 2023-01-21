@@ -386,6 +386,16 @@ static void	eval_parse_greater_character_token(zbx_eval_context_t *ctx, size_t p
 		eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_GT, token);
 }
 
+static zbx_eval_token_t	*eval_get_last_function_token(zbx_eval_context_t *ctx)
+{
+	int func_token_index = ctx->ops.values_num - 1;
+	for(; func_token_index >= 0; func_token_index --)
+		if (0 != (ctx->ops.values[func_token_index].type & ZBX_EVAL_CLASS_FUNCTION))
+			return &ctx->ops.values[func_token_index];
+
+	return NULL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: parse string variable token                                       *
@@ -403,32 +413,40 @@ static void	eval_parse_greater_character_token(zbx_eval_context_t *ctx, size_t p
  ******************************************************************************/
 static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
 {
-	const char	*ptr = ctx->expression + pos + 1;
+	const char		*ptr = ctx->expression + pos + 1;
+	int			is_history_function;
+	zbx_eval_token_t	*func_token;
+
+	/* workaround for calculated items is required to due present bug */
+	func_token = eval_get_last_function_token(ctx);
+	is_history_function = NULL != func_token && ZBX_EVAL_TOKEN_HIST_FUNCTION == func_token->type;
 
 	for (; '\0' != *ptr; ptr++)
 	{
 		if (*ptr == '"')
 		{
-			token->type = ZBX_EVAL_TOKEN_VAR_STR;
+			token->type = is_history_function ? ZBX_EVAL_TOKEN_VAR_HIST_STR : ZBX_EVAL_TOKEN_VAR_STR;
 			token->loc.l = pos;
 			token->loc.r = ptr - ctx->expression;
 			eval_update_const_variable(ctx, token);
+
 			return SUCCEED;
 		}
 
 		if ('\\' == *ptr)
 		{
-			if ('"' != ptr[1] && '\\' != ptr[1] )
+			if (!is_history_function && '"' != ptr[1] && '\\' != ptr[1])
 			{
-				*error = zbx_dsprintf(*error, "invalid escape sequence in string starting with \"%s\"",
-						ptr);
+				*error = zbx_dsprintf(*error,
+						"invalid escape sequence in string starting with \"%s\"", ptr);
+
 				return FAIL;
 			}
 			ptr++;
 		}
 	}
-
 	*error = zbx_dsprintf(*error, "unterminated string at \"%s\"", ctx->expression + pos);
+
 	return FAIL;
 }
 
