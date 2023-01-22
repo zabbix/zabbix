@@ -326,7 +326,7 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c)
 	zbx_strncpy_alloc(str, alloc_len, offset, &c, 1);
 }
 
-void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str)
+void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str, int escape_backslash)
 {
 	size_t		size;
 	const char	*src;
@@ -365,6 +365,8 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 		switch (*src)
 		{
 			case '\\':
+				if (!escape_backslash)
+					break;
 			case '"':
 				*dst++ = '\\';
 				break;
@@ -5720,7 +5722,7 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
  * Return value: The unquoted and copied substring.                           *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
+char	*zbx_substr_unquote(const char *src, size_t left, size_t right, int unescape_backslash)
 {
 	char	*str, *ptr;
 
@@ -5738,6 +5740,8 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 				{
 					case '\\':
 						*ptr++ = '\\';
+						if (!unescape_backslash)
+							*ptr++ = '\\';
 						break;
 					case '"':
 						*ptr++ = '"';
@@ -5746,6 +5750,12 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 						THIS_SHOULD_NEVER_HAPPEN;
 						*ptr = '\0';
 						return str;
+					default:
+						if (!unescape_backslash)
+						{
+							*ptr++ = '\\';
+							*ptr++ = *src;
+						}
 				}
 			}
 			else

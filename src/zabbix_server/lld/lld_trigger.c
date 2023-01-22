@@ -1293,12 +1293,14 @@ static char	*lld_eval_get_expanded_expression(const zbx_eval_context_t *src, con
 			case ZBX_EVAL_TOKEN_VAR_LLDMACRO:
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
 			case ZBX_EVAL_TOKEN_VAR_STR:
+			case ZBX_EVAL_TOKEN_VAR_HIST_STR:
 				break;
 			default:
 				continue;
 		}
 
-		value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
+		value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r,
+				ZBX_EVAL_TOKEN_VAR_HIST_STR == token->type ? 0 : 1);
 
 		if (FAIL == substitute_lld_macros(&value, jp_row, lld_macros, ZBX_MACRO_ANY, err, err_len))
 		{
