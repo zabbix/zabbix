@@ -22,7 +22,7 @@
 
 window.maintenance_edit = new class {
 
-	init({maintenanceid, maintenance_tags}) {
+	init({maintenanceid, maintenance_tags, allowed_edit}) {
 		this.maintenanceid = maintenanceid;
 
 		this.overlay = overlays_stack.getById('maintenance-edit');
@@ -30,7 +30,32 @@ window.maintenance_edit = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		// Update form field state according to the form data.
+		// Setup tags.
+
+		const $maintenance_tags = jQuery(document.getElementById('maintenance-tags'));
+
+		$maintenance_tags.dynamicRows({
+			template: '#maintenance-tag-row-tmpl',
+			rows: maintenance_tags
+		});
+
+		if (!allowed_edit) {
+			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"]').forEach((element) => {
+				element.disabled = true;
+				element.setAttribute('readonly', 'readonly')
+			});
+		}
+
+		if (document.querySelector('input[name=maintenance_type]:checked').value  == <?= MAINTENANCE_TYPE_NODATA ?>) {
+			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"]').forEach((element) => {
+				element.disabled = true;
+			});
+			document.querySelectorAll('input[name$="[tag]"], input[name$="[value]').forEach((element) => {
+				element.removeAttribute('placeholder');
+			});
+		}
+
+		// Update form field state according to the form data and allowed_edit.
 
 		document.getElementById('maintenance_type').addEventListener('change', () => {
 			var maintenance_type = document.querySelector('input[name=maintenance_type]:checked').value;
@@ -55,18 +80,7 @@ window.maintenance_edit = new class {
 			}
 		});
 
-		// Setup tags.
-
-		const $maintenance_tags = jQuery(document.getElementById('maintenance-tags'));
-
-		$maintenance_tags.dynamicRows({
-			template: '#maintenance-tag-row-tmpl',
-			rows: maintenance_tags
-		});
-
 		this._initActionButtons();
-
-
 	}
 
 	_initActionButtons() {

@@ -119,7 +119,7 @@ class CControllerMaintenanceCreate extends CController {
 		if ($maintenance['maintenance_type'] != MAINTENANCE_TYPE_NODATA) {
 			$maintenance += [
 				'tags_evaltype' => $this->getInput('tags_evaltype', MAINTENANCE_TAG_EVAL_TYPE_AND_OR),
-				'tags' => $this->getInput('tags', [])
+				'tags' => $this->getInput('maintenance_tags', [])
 			];
 
 			foreach ($maintenance['tags'] as $tnum => $tag) {
