@@ -337,6 +337,8 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 		switch (*src)
 		{
 			case '\\':
+				if (!escape_backslash)
+					break;
 			case '"':
 				size++;
 		}
