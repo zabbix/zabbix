@@ -279,7 +279,7 @@ zabbix_export:
                   tags:
                     -
                       tag: scope
-                      value: jobs
+                      value: availability
             -
               uuid: cd2bc50b71184c5ebf39b75a2dafa483
               name: 'Veeam: Job states [{#NAME}] [{#TYPE}]: Get data'
@@ -824,7 +824,7 @@ zabbix_export:
                   tags:
                     -
                       tag: scope
-                      value: sessions
+                      value: availability
             -
               uuid: 8c7092e721eb4f8f8b53a07f0fb710a0
               name: 'Veeam: Session [{#NAME}] [{#TYPE}]: State'
