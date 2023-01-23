@@ -254,8 +254,8 @@ class CAudit {
 			[
 				'paths' => ['connector.password'],
 				'conditions' => [
-					'authtype' => [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-						HTTPTEST_AUTH_DIGEST
+					'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+						ZBX_HTTP_AUTH_DIGEST
 					]
 				]
 			],
@@ -276,8 +276,8 @@ class CAudit {
 					],
 					[
 						'type' => ITEM_TYPE_HTTPAGENT,
-						'authtype' => [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-							HTTPTEST_AUTH_DIGEST
+						'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+							ZBX_HTTP_AUTH_DIGEST
 						]
 					]
 				]
@@ -295,8 +295,8 @@ class CAudit {
 					],
 					[
 						'type' => ITEM_TYPE_HTTPAGENT,
-						'authtype' => [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-							HTTPTEST_AUTH_DIGEST
+						'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+							ZBX_HTTP_AUTH_DIGEST
 						]
 					]
 				]

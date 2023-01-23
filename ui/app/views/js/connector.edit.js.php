@@ -69,7 +69,7 @@ window.connector_edit_popup = new class {
 			field.style.display = advanced_configuration ? '' : 'none';
 		}
 
-		const authtype_none = document.getElementById('authtype').value == <?= HTTPTEST_AUTH_NONE ?>;
+		const authtype_none = document.getElementById('authtype').value == <?= ZBX_HTTP_AUTH_NONE ?>;
 
 		for (const field of this.form.querySelectorAll('.js-field-username, .js-field-password')) {
 			field.style.display = advanced_configuration && !authtype_none ? '' : 'none';

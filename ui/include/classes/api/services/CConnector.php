@@ -191,17 +191,17 @@ class CConnector extends CApiService {
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
 			'token' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'token')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
-			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]), 'default' => DB::getDefault('connector', 'authtype')],
+			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST]), 'default' => DB::getDefault('connector', 'authtype')],
 			'username' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'username')],
+										['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'username')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'username')]
 			]],
 			'password' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'password')],
+										['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'password')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'password')]
 			]],
-			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
-			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
+			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
+			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_cert_file'), 'default' => DB::getDefault('connector', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_MULTIPLE, 'default' => DB::getDefault('connector', 'ssl_key_file'), 'rules' => [
 										['if' => ['field' => 'ssl_cert_file', 'in' => DB::getDefault('connector', 'ssl_cert_file')], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'ssl_key_file')],
@@ -318,7 +318,7 @@ class CConnector extends CApiService {
 		$db_defaults = DB::getDefaults('connector');
 
 		foreach ($connectors as &$connector) {
-			if ($connector['authtype'] == HTTPTEST_AUTH_NONE) {
+			if ($connector['authtype'] == ZBX_HTTP_AUTH_NONE) {
 				$connector += [
 					'username' => $db_defaults['username'],
 					'password' => $db_defaults['password']
@@ -349,17 +349,17 @@ class CConnector extends CApiService {
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
 			'token' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'token')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
-			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])],
+			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])],
 			'username' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'username')],
+										['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'username')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'username')]
 			]],
 			'password' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'password')],
+										['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'password')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'password')]
 			]],
-			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
-			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
+			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
+			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'ssl_cert_file', 'in' => ''], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'ssl_key_file')],

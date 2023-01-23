@@ -171,7 +171,7 @@
 			ZBX_STYLE_DRAG_ICON:                 <?= zbx_jsvalue(ZBX_STYLE_DRAG_ICON) ?>,
 			ZBX_STYLE_TD_DRAG_ICON:              <?= zbx_jsvalue(ZBX_STYLE_TD_DRAG_ICON) ?>,
 			ZBX_STYLE_DISABLED:                  <?= zbx_jsvalue(ZBX_STYLE_DISABLED) ?>,
-			HTTPTEST_AUTH_NONE:                  <?= HTTPTEST_AUTH_NONE ?>,
+			ZBX_HTTP_AUTH_NONE:                  <?= ZBX_HTTP_AUTH_NONE ?>,
 			ZBX_POSTTYPE_FORM:                   <?= ZBX_POSTTYPE_FORM ?>,
 			HTTPTEST_STEP_RETRIEVE_MODE_HEADERS: <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>,
 			ZBX_POSTTYPE_RAW:                    <?= ZBX_POSTTYPE_RAW ?>,
@@ -563,7 +563,7 @@
 		this.$password = jQuery('#http_password', $tab);
 
 		this.$type_select.on('change', function(e) {
-			var http_fields_disabled = (e.target.value == httpconf.HTTPTEST_AUTH_NONE);
+			var http_fields_disabled = e.target.value == httpconf.ZBX_HTTP_AUTH_NONE;
 			this.$user.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
 			this.$password.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
 		}.bind(this));

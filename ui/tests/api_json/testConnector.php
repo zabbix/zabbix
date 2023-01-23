@@ -80,7 +80,7 @@ class testConnector extends CAPITest {
 			'get_authtype_basic' => [
 				'name' => 'API test connector.get with authtype (basic), username and password',
 				'url' => 'http://localhost/',
-				'authtype' => HTTPTEST_AUTH_BASIC,
+				'authtype' => ZBX_HTTP_AUTH_BASIC,
 				'username' => 'test',
 				'password' => '12345678'
 			],
@@ -114,7 +114,7 @@ class testConnector extends CAPITest {
 			'update_authtype_basic' => [
 				'name' => 'API test connector.update with authtype (basic), username and password',
 				'url' => 'http://localhost/',
-				'authtype' => HTTPTEST_AUTH_BASIC,
+				'authtype' => ZBX_HTTP_AUTH_BASIC,
 				'username' => 'test',
 				'password' => '12345678'
 			],
@@ -423,8 +423,8 @@ class testConnector extends CAPITest {
 					'authtype' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
-					implode(', ', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-						HTTPTEST_AUTH_DIGEST
+					implode(', ', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+						ZBX_HTTP_AUTH_DIGEST
 					]).'.'
 			],
 
@@ -441,7 +441,7 @@ class testConnector extends CAPITest {
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
-					'authtype' => HTTPTEST_AUTH_BASIC,
+					'authtype' => ZBX_HTTP_AUTH_BASIC,
 					'username' => false
 				],
 				'expected_error' => 'Invalid parameter "/1/username": a character string is expected.'
@@ -450,7 +450,7 @@ class testConnector extends CAPITest {
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
-					'authtype' => HTTPTEST_AUTH_NTLM,
+					'authtype' => ZBX_HTTP_AUTH_NTLM,
 					'username' => str_repeat('a', DB::getFieldLength('connector', 'username') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/username": value is too long.'
@@ -469,7 +469,7 @@ class testConnector extends CAPITest {
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
-					'authtype' => HTTPTEST_AUTH_BASIC,
+					'authtype' => ZBX_HTTP_AUTH_BASIC,
 					'password' => false
 				],
 				'expected_error' => 'Invalid parameter "/1/password": a character string is expected.'
@@ -478,7 +478,7 @@ class testConnector extends CAPITest {
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
-					'authtype' => HTTPTEST_AUTH_NTLM,
+					'authtype' => ZBX_HTTP_AUTH_NTLM,
 					'password' => str_repeat('a', DB::getFieldLength('connector', 'password') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/password": value is too long.'
@@ -500,7 +500,7 @@ class testConnector extends CAPITest {
 					'verify_peer' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/verify_peer": value must be one of '.
-					implode(', ', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]).'.'
+					implode(', ', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]).'.'
 			],
 
 			// Check "verify_host".
@@ -519,7 +519,7 @@ class testConnector extends CAPITest {
 					'verify_host' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/verify_host": value must be one of '.
-					implode(', ', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]).'.'
+					implode(', ', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]).'.'
 			],
 
 			// Check "ssl_cert_file".
@@ -899,8 +899,8 @@ class testConnector extends CAPITest {
 					}
 				}
 
-				if (in_array($db_connector['authtype'], [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
-						HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])) {
+				if (in_array($db_connector['authtype'], [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM,
+						ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])) {
 					foreach (['username', 'password'] as $field) {
 						if (array_key_exists($field, $connector)) {
 							$this->assertSame($connector[$field], $db_connector[$field]);
@@ -1163,13 +1163,13 @@ class testConnector extends CAPITest {
 					'output' => ['name', 'authtype', 'username', 'password'],
 					'connectorids' => ['get_custom_defaults', 'get_authtype_basic'],
 					'filter' => [
-						'authtype' => HTTPTEST_AUTH_BASIC
+						'authtype' => ZBX_HTTP_AUTH_BASIC
 					]
 				],
 				'expected_result' => [
 					[
 						'name' => 'API test connector.get with authtype (basic), username and password',
-						'authtype' => (string) HTTPTEST_AUTH_BASIC,
+						'authtype' => (string) ZBX_HTTP_AUTH_BASIC,
 						'username' => 'test',
 						'password' => '12345678'
 					]
@@ -1274,7 +1274,7 @@ class testConnector extends CAPITest {
 				'expected_result' => [
 					[
 						'name' => 'API test connector.get with authtype (basic), username and password',
-						'authtype' => (string) HTTPTEST_AUTH_BASIC,
+						'authtype' => (string) ZBX_HTTP_AUTH_BASIC,
 						'username' => 'test',
 						'password' => '12345678'
 					]
@@ -1620,8 +1620,8 @@ class testConnector extends CAPITest {
 					'authtype' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
-					implode(', ', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-						HTTPTEST_AUTH_DIGEST
+					implode(', ', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+						ZBX_HTTP_AUTH_DIGEST
 					]).'.'
 			],
 
@@ -1685,7 +1685,7 @@ class testConnector extends CAPITest {
 					'verify_peer' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/verify_peer": value must be one of '.
-					implode(', ', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]).'.'
+					implode(', ', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]).'.'
 			],
 
 			// Check "verify_host".
@@ -1702,7 +1702,7 @@ class testConnector extends CAPITest {
 					'verify_host' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/verify_host": value must be one of '.
-					implode(', ', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]).'.'
+					implode(', ', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]).'.'
 			],
 
 			// Check "ssl_cert_file".
@@ -2042,8 +2042,8 @@ class testConnector extends CAPITest {
 					}
 				}
 
-				if (in_array($connector_upd['authtype'], [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
-						HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])) {
+				if (in_array($connector_upd['authtype'], [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM,
+						ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])) {
 					foreach (['username', 'password'] as $field) {
 						if (array_key_exists($field, $connector)) {
 							$this->assertSame($connector[$field], $connector_upd[$field]);

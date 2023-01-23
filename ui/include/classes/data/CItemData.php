@@ -777,25 +777,25 @@ final class CItemData {
 				]
 			],
 			'for_http_auth_type' => [
-				HTTPTEST_AUTH_BASIC => [
+				ZBX_HTTP_AUTH_BASIC => [
 					'js-item-http-username-label',
 					'js-item-http-username-field',
 					'js-item-http-password-label',
 					'js-item-http-password-field'
 				],
-				HTTPTEST_AUTH_NTLM => [
+				ZBX_HTTP_AUTH_NTLM => [
 					'js-item-http-username-label',
 					'js-item-http-username-field',
 					'js-item-http-password-label',
 					'js-item-http-password-field'
 				],
-				HTTPTEST_AUTH_KERBEROS => [
+				ZBX_HTTP_AUTH_KERBEROS => [
 					'js-item-http-username-label',
 					'js-item-http-username-field',
 					'js-item-http-password-label',
 					'js-item-http-password-field'
 				],
-				HTTPTEST_AUTH_DIGEST => [
+				ZBX_HTTP_AUTH_DIGEST => [
 					'js-item-http-username-label',
 					'js-item-http-username-field',
 					'js-item-http-password-label',

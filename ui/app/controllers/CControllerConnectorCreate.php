@@ -39,11 +39,11 @@ class CControllerConnectorCreate extends CController {
 			'token' =>					'db connector.token',
 			'advanced_configuration' =>	'in 1',
 			'http_proxy' =>				'db connector.http_proxy',
-			'authtype' =>				'db connector.authtype|in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]),
+			'authtype' =>				'db connector.authtype|in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST]),
 			'username' =>				'db connector.username',
 			'password' =>				'db connector.password',
-			'verify_peer' =>			'db connector.verify_peer|in '.implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]),
-			'verify_host' =>			'db connector.verify_host|in '.implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]),
+			'verify_peer' =>			'db connector.verify_peer|in '.implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]),
+			'verify_host' =>			'db connector.verify_host|in '.implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]),
 			'ssl_cert_file' =>			'db connector.ssl_cert_file',
 			'ssl_key_file' =>			'db connector.ssl_key_file',
 			'ssl_key_password' =>		'db connector.ssl_key_password',
@@ -103,8 +103,8 @@ class CControllerConnectorCreate extends CController {
 				'ssl_key_file', 'ssl_key_password'
 			]);
 
-			if (in_array($connector['authtype'], [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-					HTTPTEST_AUTH_DIGEST])) {
+			if (in_array($connector['authtype'], [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+					ZBX_HTTP_AUTH_DIGEST])) {
 				$this->getInputs($connector, ['username', 'password']);
 			}
 		}

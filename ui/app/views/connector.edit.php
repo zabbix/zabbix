@@ -210,15 +210,15 @@ $connector_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('SSL verify peer'), 'verify_peer'))->addClass('js-field-verify-peer'),
 		(new CFormField(
-			(new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_ON))
-				->setChecked($data['form']['verify_peer'] == HTTPTEST_VERIFY_PEER_ON)
+			(new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
+				->setChecked($data['form']['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
 		))->addClass('js-field-verify-peer')
 	])
 	->addItem([
 		(new CLabel(_('SSL verify host'), 'verify_host'))->addClass('js-field-verify-host'),
 		(new CFormField(
-			(new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_ON))
-				->setChecked($data['form']['verify_host'] == HTTPTEST_VERIFY_HOST_ON)
+			(new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
+				->setChecked($data['form']['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
 		))->addClass('js-field-verify-host')
 	])
 	->addItem([
