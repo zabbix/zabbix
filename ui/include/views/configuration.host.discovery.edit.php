@@ -1002,7 +1002,6 @@ if (!empty($data['itemid'])) {
 		'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('host_discovery.php'),
 		'context'
 	))->setEnabled(!$data['limited']);
-
 	$buttons[] = new CButtonCancel(url_param('context'));
 
 	$form_actions = new CFormActions(new CSubmit('update', _('Update')), $buttons);

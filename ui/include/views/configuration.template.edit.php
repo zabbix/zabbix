@@ -226,7 +226,7 @@ if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
 				'delete_and_clear',
 				_('Delete and clear'),
 				_('Delete and clear template? (Warning: all linked hosts will be cleared!)'),
-				url_param('form').url_param('templateid').'&'. CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.
+				url_param('form').url_param('templateid').'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.
 				CCsrfTokenHelper::get('templates.php')
 			),
 			new CButtonCancel()

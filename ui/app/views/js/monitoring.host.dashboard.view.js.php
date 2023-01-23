@@ -26,14 +26,7 @@
 
 <script>
 	const view = {
-		init({
-			host,
-			dashboard,
-			widget_defaults,
-			configuration_hash,
-			time_period,
-			web_layout_mode
-		}) {
+		init({host, dashboard, widget_defaults, configuration_hash, time_period, web_layout_mode}) {
 			timeControl.refreshPage = false;
 
 			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
