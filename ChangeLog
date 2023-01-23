@@ -9,9 +9,8 @@ A.F....... [ZBXNEXT-7951] improved import configuration by changing UI, matching
 .........T [ZBXNEXT-8112] added Line media type (abiba)
 ........S. [ZBXNEXT-8197] added TimescaleDB v2.9.x support (dgoloscapov)
 .........T [ZBXNEXT-7962] fixed interfaces discovery rules in OPNsense, PFSense and TrueNAS templates (drasikhov)
-A.F....... [ZBXNEXT-3100] added requirement for users to enter current password when changing their own password (dpetra)
 .........T [ZBXNEXT-8115] updated system.sw.packages key in Linux templates (abakaldin)
-A.F....... [ZBXNEXT-3100] implemented current password which is required for all users when their own password is changed (dpetra)
+A.F....... [ZBXNEXT-3100] added requirement for users to enter current password when changing their own password (dpetra)
 A.F.I...S. [ZBXNEXT-7964] introduced two-level event/problem hierarchy: causes and symptoms (Ivo, mprihodko)
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (egordymov)
 
