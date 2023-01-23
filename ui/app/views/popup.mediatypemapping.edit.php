@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,14 +46,14 @@ $media_type_select = (new CSelect('mediatypeid'))
 $form
 	->addItem((new CFormGrid())
 		->addItem([
-			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+			(new CLabel(_('Name'), 'media-type-mapping-name'))->setAsteriskMark(),
 			new CFormField((new CTextBox('name', $data['name']))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setId('media-type-mapping-name'))
 		])
 		->addItem([
 			(new CLabel(_('Media type'), $media_type_select->getFocusableElementId()))->setAsteriskMark(),
-			$media_type_select
+			new CFormField($media_type_select)
 		])
 		->addItem([
 			(new CLabel(_('Attribute'), 'attribute'))->setAsteriskMark(),

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-06 19:14+0000\n"
+"PO-Revision-Date: 2023-01-14 19:13+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -1073,7 +1073,7 @@ msgstr "Étiquettes avancées"
 
 #: app/views/popup.import.php:175
 msgid "Advanced options"
-msgstr ""
+msgstr "Options avancées"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -4869,6 +4869,27 @@ msgstr "Coordonnées"
 #: jsLoader.php:164 jsLoader.php:281
 msgid "Copy"
 msgstr "Copier"
+
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
@@ -12360,11 +12381,11 @@ msgstr "La mise à jour de la carte a échoué."
 
 #: app/views/popup.ldap.edit.php:257
 msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr ""
+msgstr "Mappez les attributs médias LDAP de l'utilisateur (par exemple, e-mail) sur les médias utilisateur Zabbix pour l'envoi de notifications."
 
 #: app/views/administration.authentication.edit.php:513
 msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr ""
+msgstr "Mappez les attributs médias SAML de l'utilisateur (par exemple, e-mail) sur les médias utilisateur Zabbix pour l'envoi de notifications."
 
 #: app/views/popup.ldap.edit.php:257
 msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
@@ -12518,7 +12539,7 @@ msgstr "Le nombre maximal de répétitions s'applique uniquement à la découver
 
 #: app/partials/configuration.host.interface.row.php:106
 msgid "Max repetition count is applicable to discovery and walk only."
-msgstr ""
+msgstr "Le nombre maximal de répétitions s'applique uniquement à la découverte et à walk."
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -20534,6 +20555,10 @@ msgstr "Mis à jour"
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "État de l'hôte \"%1$s\" mis à jour."
+
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr ""
 
 #: app/views/administration.image.edit.php:53
 msgid "Upload"

@@ -146,7 +146,7 @@ WRAP_DB_FUNCS = \
 	-Wl,--wrap=DBbegin \
 	-Wl,--wrap=DBcommit \
 	-Wl,--wrap=DBexecute_multiple_query \
-	-Wl,--wrap=DBfree_result
+	-Wl,--wrap=zbx_db_free_result
 
 WRAP_IO_FUNCS = \
 	-Wl,--wrap=fopen \

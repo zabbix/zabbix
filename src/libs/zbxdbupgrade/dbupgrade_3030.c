@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,7 +100,7 @@ static int	DBpatch_3030007(void)
 
 		zbx_vector_uint64_append(&dserviceids, dserviceid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(&dserviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -255,7 +255,7 @@ static int	DBpatch_3030018(void)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, "item_preprocid");
 	ret = zbx_db_insert_execute(&db_insert);
@@ -405,7 +405,7 @@ static int	DBpatch_3030030(void)
 				ret = FAIL;
 		}
 out:
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 	while (0 < upd_num && SUCCEED == ret);
 
@@ -591,7 +591,7 @@ static int	DBpatch_3030046(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -688,7 +688,7 @@ static int	DBpatch_3030053(void)
 	zbx_db_insert_autoincrement(&db_insert, "selement_triggerid");
 	ret = zbx_db_insert_execute(&db_insert);
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_db_insert_clean(&db_insert);
 
 	return ret;
@@ -884,7 +884,7 @@ static int	DBpatch_3030060_migrate_pairs(const char *table, const char *field, i
 					allow_empty);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, target_id);
 	ret = zbx_db_insert_execute(&db_insert);
@@ -1102,7 +1102,7 @@ static int	DBpatch_table_convert(const char *table, const char *recid, const DBp
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -1302,7 +1302,7 @@ static int	DBpatch_3030093(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -1410,7 +1410,7 @@ static int	DBpatch_3030102(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -1739,7 +1739,7 @@ static int	DBpatch_trailing_semicolon_remove(const char *table, const char *reci
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -2305,7 +2305,7 @@ static int	DBpatch_3030197(void)
 
 		ret = SUCCEED;
 out:
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		return ret;
 	}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,13 +71,13 @@ static zbx_uint64_t	select_discovered_host(const ZBX_DB_EVENT *event, char **hos
 
 			if (NULL == (row = DBfetch(result)))
 			{
-				DBfree_result(result);
+				zbx_db_free_result(result);
 				goto exit;
 			}
 
 			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
 			ip_esc = DBdyn_escape_string(row[1]);
-			DBfree_result(result);
+			zbx_db_free_result(result);
 
 			sql = zbx_dsprintf(sql,
 					"select h.hostid,h.name"
@@ -119,7 +119,7 @@ static zbx_uint64_t	select_discovered_host(const ZBX_DB_EVENT *event, char **hos
 		ZBX_STR2UINT64(hostid, row[0]);
 		zbx_strcpy_alloc(hostname, &out_alloc, &out_offset, row[1]);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __func__, hostid);
 
@@ -171,7 +171,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 
 		zbx_vector_uint64_remove_noorder(groupids, i);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != groupids->values_num)
 	{
@@ -317,7 +317,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 					*status = atoi(row2[2]);
 				}
 
-				DBfree_result(result2);
+				zbx_db_free_result(result2);
 			}
 
 			if (0 == hostid)
@@ -369,7 +369,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 				else
 					host = zbx_strdup(NULL, row[3]);
 
-				DBfree_result(result3);
+				zbx_db_free_result(result3);
 
 				/* for host uniqueness purposes */
 				zbx_make_hostname(host);	/* replace not-allowed symbols */
@@ -423,7 +423,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 				else
 					host_visible = zbx_strdup(NULL, host_unique);
 
-				DBfree_result(result3);
+				zbx_db_free_result(result3);
 				zbx_free(sql);
 
 				zbx_make_hostname(host_visible);	/* replace not-allowed symbols */
@@ -490,7 +490,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 						hostid);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 	else if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
 	{
@@ -542,10 +542,10 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot add discovered host \"%s\":"
 						" template with the same name already exists", row[1]);
-				DBfree_result(result2);
+				zbx_db_free_result(result2);
 				goto out;
 			}
-			DBfree_result(result2);
+			zbx_db_free_result(result2);
 
 			sql = zbx_dsprintf(sql,
 					"select hostid,proxy_hostid,name,status"
@@ -636,11 +636,11 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 			}
-			DBfree_result(result2);
+			zbx_db_free_result(result2);
 out:
 			zbx_free(host_esc);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 clean:
 	zbx_config_clean(cfg);
@@ -901,7 +901,7 @@ void	op_groups_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	if (NULL == DBfetch(result))
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove host \"%s\" from all host groups:"
 				" it must belong to at least one", zbx_host_string(hostid));
@@ -912,7 +912,7 @@ void	op_groups_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *groupids)
 		DB_RESULT		result2;
 		DB_ROW			row;
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_vector_uint64_create(&hostgroupids);
 		zbx_vector_uint64_create(&found_groupids);
@@ -939,7 +939,7 @@ void	op_groups_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *groupids)
 			zbx_vector_uint64_append(&found_groupids, groupid);
 		}
 
-		DBfree_result(result2);
+		zbx_db_free_result(result2);
 
 		if (0 != hostgroupids.values_num)
 		{

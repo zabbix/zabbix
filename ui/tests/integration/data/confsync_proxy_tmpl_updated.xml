@@ -91,12 +91,12 @@
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <uuid>c64594a285b64df79b137eeaec10e52b</uuid>
-                                    <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=10</expression>
+                                    <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=210</expression>
                                     <name>proto_dep {#LLDMACRO}</name>
                                     <dependencies>
                                         <dependency>
                                             <name>proto {#LLDMACRO}</name>
-                                            <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=110</expression>
+                                            <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=10</expression>
                                         </dependency>
                                     </dependencies>
                                     <tags>

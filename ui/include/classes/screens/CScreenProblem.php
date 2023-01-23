@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1050,7 +1050,7 @@ class CScreenProblem extends CScreenBase {
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
 							->addStyle('width: 58%;'),
 						(new CColHeader(_('Duration')))->addStyle('width: 73px;'),
-						(new CColHeader(_('Ack')))->addStyle('width: 36px;'),
+						(new CColHeader(_('Update')))->addStyle('width: 40px;'),
 						(new CColHeader(_('Actions')))->addStyle('width: 64px;'),
 						$tags_header
 					]))
@@ -1074,7 +1074,7 @@ class CScreenProblem extends CScreenBase {
 							? _('Operational data')
 							: null,
 						_('Duration'),
-						_('Ack'),
+						_('Update'),
 						_('Actions'),
 						$this->data['filter']['show_tags'] ? _('Tags') : null
 					]));
@@ -1275,6 +1275,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param array      $data['correlations']                  List of correlations.
 	 * @param array      $data['dependencies']                  List of trigger dependencies.
 	 * @param array      $data['filter']                        Problem filter.
+	 * @param int        $data['filter']['show']                "Show" filter option.
 	 * @param int        $data['filter']['show_suppressed']     "Show suppressed problems" filter option.
 	 * @param int        $data['filter']['highlight_row']       "Highlight whole row" filter option.
 	 * @param int        $data['filter']['show_tags']           "Show tags" filter option.
@@ -1359,6 +1360,11 @@ class CScreenProblem extends CScreenBase {
 
 			// Info.
 			$info_icons = [];
+
+			if ($data['filter']['show'] == TRIGGERS_OPTION_IN_PROBLEM) {
+				$info_icons[] = getEventStatusUpdateIcon($problem);
+			}
+
 			if ($problem['r_eventid'] != 0) {
 				if ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
@@ -1610,14 +1616,11 @@ class CScreenProblem extends CScreenBase {
 			$problem_update_link = ($data['allowed']['add_comments'] || $data['allowed']['change_severity']
 					|| $data['allowed']['acknowledge'] || $can_be_closed || $data['allowed']['suppress_problems']
 					|| $data['allowed']['rank_change'])
-				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
-					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				? (new CLink(_('Update')))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->setAttribute('data-eventid', $problem['eventid'])
 					->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
-				: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
-					$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
-				);
+				: new CSpan(_('Update'));
 
 			$row->addItem([
 				CSeverityHelper::makeSeverityCell((int) $problem['severity'], null, $value == TRIGGER_VALUE_FALSE),
@@ -1627,7 +1630,7 @@ class CScreenProblem extends CScreenBase {
 				$data['filter']['compact_view']
 					? (new CDiv($data['triggers_hosts'][$trigger['triggerid']]))->addClass(ZBX_STYLE_ACTION_CONTAINER)
 					: $data['triggers_hosts'][$trigger['triggerid']],
-					$data['filter']['compact_view']
+				$data['filter']['compact_view']
 					? (new CDiv($description))->addClass(ZBX_STYLE_ACTION_CONTAINER)
 					: $description,
 				($data['show_opdata'] == OPERATIONAL_DATA_SHOW_SEPARATELY)
@@ -1637,7 +1640,7 @@ class CScreenProblem extends CScreenBase {
 					? zbx_date2age($problem['clock'], $problem['r_clock'])
 					: zbx_date2age($problem['clock']),
 				$problem_update_link,
-				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users']),
+				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
 				$data['filter']['show_tags'] ? $data['tags'][$problem['eventid']] : null
 			]);
 

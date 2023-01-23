@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -701,11 +701,12 @@ function getMenuPopupDashboard(options, trigger_element) {
  * Get menu popup trigger section data.
  *
  * @param {string} options['triggerid']               Trigger ID.
- * @param {string} options['eventid']                 (optional) Required for Acknowledge section and event rank change.
+ * @param {string} options['eventid']                 (optional) Required for "Update problem" section and event
+ *                                                    rank change.
  * @param {object} options['items']                   Link to trigger item history page (optional).
  * @param {string} options['items'][]['name']         Item name.
  * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
- * @param {bool}   options['acknowledge']             (optional) Whether to show Acknowledge section.
+ * @param {bool}   options['update_problem']          (optional) Whether to show "Update problem" section.
  * @param {object} options['configuration']           Link to trigger configuration page (optional).
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
  * @param {string} options['url']                     Trigger URL link (optional).
@@ -733,10 +734,9 @@ function getMenuPopupTrigger(options, trigger_element) {
 		});
 	}
 
-	// acknowledge
-	if ('acknowledge' in options) {
+	if ('update_problem' in options) {
 		items.push({
-			label: t('Acknowledge'),
+			label: t('Update problem'),
 			clickCallback: function() {
 				jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
 
