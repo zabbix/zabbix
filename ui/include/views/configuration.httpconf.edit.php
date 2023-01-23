@@ -268,7 +268,10 @@ if (!empty($this->data['httptestid'])) {
 		);
 	}
 
-	$buttons[] = (new CButtonQMessage('delete', _('Delete'), _('Delete web scenario?')))->setEnabled(!$data['templated']);
+	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid', 'context']).
+		'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('httpconf.php'),
+		'context'
+	))->setEnabled(!$data['templated']);
 	$buttons[] = new CButtonCancel(url_param('context'));
 
 	$http_tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));

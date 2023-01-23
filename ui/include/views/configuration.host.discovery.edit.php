@@ -998,8 +998,10 @@ if (!empty($data['itemid'])) {
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
-	$buttons[] = (new CButtonQMessage('delete', _('Delete'), _('Delete discovery rule?')))
-		->setEnabled(!$data['limited']);
+	$buttons[] = (new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid', 'context']).
+		'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('host_discovery.php'),
+		'context'
+	))->setEnabled(!$data['limited']);
 
 	$buttons[] = new CButtonCancel(url_param('context'));
 

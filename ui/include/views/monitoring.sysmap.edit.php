@@ -424,7 +424,9 @@ if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !
 		[
 			new	CButton('clone', _('Clone')),
 			new CButton('full_clone', _('Full clone')),
-			new CButtonQMessage('delete', _('Delete'), _('Delete selected map?')),
+			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid']).'&'.
+				CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('sysmaps.php')
+			),
 			new CButtonCancel()
 		]
 	));

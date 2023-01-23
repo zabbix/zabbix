@@ -108,7 +108,7 @@ if ($data['linked_templates']) {
 					(array_key_exists($template['templateid'], $data['original_templates']) && !$clone_mode)
 						? (new CSimpleButton(_('Unlink and clear')))
 							->setAttribute('data-templateid', $template['templateid'])
-						->onClick('
+							->onClick('
 								submitFormWithParam("'.$form->getName().'",
 									`unlink_and_clear[${this.dataset.templateid}]`, 1
 								);
@@ -219,9 +219,15 @@ if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
 		[
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
-			new CButtonQMessage('delete', _('Delete'), _('Delete template?')),
-			new CButtonQMessage('delete_and_clear', _('Delete and clear'),
-				_('Delete and clear template? (Warning: all linked hosts will be cleared!)')
+			new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid').'&'.
+				CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('templates.php')
+			),
+			new CButtonQMessage(
+				'delete_and_clear',
+				_('Delete and clear'),
+				_('Delete and clear template? (Warning: all linked hosts will be cleared!)'),
+				url_param('form').url_param('templateid').'&'. CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.
+				CCsrfTokenHelper::get('templates.php')
 			),
 			new CButtonCancel()
 		]

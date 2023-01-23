@@ -1091,7 +1091,9 @@ if ($data['itemid'] != 0) {
 			);
 	}
 
-	$buttons[] = (new CButtonQMessage('delete', _('Delete'), _('Delete item?')))->setEnabled(!$data['limited']);
+	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'itemid', 'hostid', 'context']).'&'.
+		CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('items.php'), 'context'
+	))->setEnabled(!$data['limited']);
 	$buttons[] = $cancel_button;
 
 	$item_tabs->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));

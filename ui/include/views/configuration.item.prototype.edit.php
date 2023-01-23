@@ -929,7 +929,10 @@ if ($data['itemid'] != 0) {
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
 			(new CSimpleButton(_('Test')))->setId('test_item'),
-			(new CButtonQMessage('delete', _('Delete'), _('Delete item prototype?')))->setEnabled(!$readonly),
+			(new CButtonDelete(_('Delete item prototype?'),
+				url_params(['form', 'itemid', 'parent_discoveryid', 'context']).'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.
+				'='.CCsrfTokenHelper::get('disc_prototypes.php'), 'context'
+			))->setEnabled(!$readonly),
 			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]
 	));

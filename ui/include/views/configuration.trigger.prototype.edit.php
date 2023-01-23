@@ -728,7 +728,10 @@ $cancelButton = $data['backurl'] !== null
 
 // append buttons to form
 if (!empty($data['triggerid'])) {
-	$deleteButton = new CButtonQMessage('delete', _('Delete'), _('Delete trigger prototype?'));
+	$deleteButton = new CButtonDelete(_('Delete trigger prototype?'),
+		url_params(['form', 'triggerid', 'parent_discoveryid', 'context', 'backurl']).'&'.
+		CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('trigger_prototypes.php'), 'context'
+	);
 
 	if ($data['limited']) {
 		$deleteButton->setAttribute('disabled', 'disabled');

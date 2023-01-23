@@ -713,7 +713,11 @@ if (!empty($data['triggerid'])) {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
-			(new CButtonQMessage('delete', _('Delete'), _('Delete trigger?')))->setEnabled(!$data['limited']),
+			(new CButtonDelete(
+				_('Delete trigger?'),
+				url_params(['form', 'hostid', 'triggerid', 'context', 'backurl']).'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.
+				'='.CCsrfTokenHelper::get('triggers.php'), 'context'
+			))->setEnabled(!$data['limited']),
 			$cancelButton
 		]
 	));

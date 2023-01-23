@@ -268,8 +268,9 @@ if (array_key_exists('maintenanceid', $data) && $data['maintenanceid']) {
 		(new CSubmit('update', _('Update')))->setEnabled($data['allowed_edit']),
 		[
 			(new CSubmit('clone', _('Clone')))->setEnabled($data['allowed_edit']),
-			(new CButtonQMessage('delete', _('Delete'), _('Delete maintenance period?')))
-				->setEnabled($data['allowed_edit']),
+			(new CButtonDelete(_('Delete maintenance period?'), url_param('form').url_param('maintenanceid').'&'.
+				CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('maintenance.php')
+			))->setEnabled($data['allowed_edit']),
 			new CButtonCancel()
 		]
 	));
