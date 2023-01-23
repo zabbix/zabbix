@@ -45,7 +45,6 @@ class CTemplateImporter extends CImporter {
 			$templates_to_create = [];
 			$templates_to_update = [];
 			$valuemaps = [];
-			$templates_to_clear = [];
 
 			foreach ($independent_templates as $name) {
 				$template = $templates[$name];
@@ -83,15 +82,6 @@ class CTemplateImporter extends CImporter {
 				foreach ($templates_to_update as $template) {
 					$this->referencer->setDbTemplate($template['templateid'], $template);
 					$this->processed_templateids[$template['templateid']] = $template['templateid'];
-
-					// Drop existing template linkages if 'delete missing' is selected.
-					if (array_key_exists($template['templateid'], $templates_to_clear)
-							&& $templates_to_clear[$template['templateid']]) {
-						API::Template()->massRemove([
-							'templateids' => [$template['templateid']],
-							'templateids_clear' => $templates_to_clear[$template['templateid']]
-						]);
-					}
 
 					$db_valuemaps = API::ValueMap()->get([
 						'output' => ['valuemapid', 'uuid'],
