@@ -1931,8 +1931,6 @@ static int	DBpatch_6030160(void)
 		iterations++;
 	}while (0 != changed);
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	valuemapid = DBget_maxid_num("valuemap", valuemaps.values_num);
 	valuemap_mappingid = DBget_maxid_num("valuemap_mapping", mappings_num);
 
@@ -1947,18 +1945,6 @@ static int	DBpatch_6030160(void)
 		valuemap = valuemaps.values[i];
 		zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, valuemap->child_templateid,
 				valuemap->name, valuemap->uuid);
-
-		for (j = 0; j < valuemap->itemids.values_num; j++)
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set ");
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "valuemapid=%s",
-					DBsql_id_ins(valuemapid));
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64 ";\n",
-					valuemap->itemids.values[j]);
-
-			if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
-				goto clean_sql;
-		}
 
 		for (j = 0; j < valuemap->mappings.values_num; j++)
 		{
@@ -1983,6 +1969,30 @@ static int	DBpatch_6030160(void)
 		goto clean_sql;
 
 	zbx_db_insert_clean(&db_insert_valuemap_mapping);
+
+	valuemapid -= (zbx_uint64_t)valuemaps.values_num;
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < valuemaps.values_num; i++)
+	{
+		zbx_db_valuemap_t	*valuemap;
+
+		valuemap = valuemaps.values[i];
+
+		for (j = 0; j < valuemap->itemids.values_num; j++)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set ");
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "valuemapid=%s",
+					DBsql_id_ins(valuemapid));
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64 ";\n",
+					valuemap->itemids.values[j]);
+
+			if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+				goto clean_sql;
+		}
+
+		valuemapid++;
+	}
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
