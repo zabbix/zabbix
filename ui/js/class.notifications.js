@@ -48,13 +48,13 @@ ZBX_Notifications.ALARM_ONCE_SERVER = 1;
  * @param {ZBX_LocalStorage} store
  * @param {ZBX_BrowserTab} tab
  */
-function ZBX_Notifications(store, tab) {
+function ZBX_Notifications(store, tab, csrf_token) {
 	if (!(store instanceof ZBX_LocalStorage) || !(tab instanceof ZBX_BrowserTab)) {
 		throw 'Unmatched signature!';
 	}
 
 	this.active = false;
-	this.csrf_token = '';
+	this.csrf_token = csrf_token;
 
 	this.poll_interval = ZBX_Notifications.POLL_INTERVAL;
 
@@ -527,7 +527,6 @@ ZBX_Notifications.prototype.handleMainLoopResp = function(resp) {
 
 	this.consumeUserSettings(resp.settings);
 	this.consumeList(resp.notifications);
-	this.csrf_token = resp.csrf_token;
 	this.render();
 
 	this.pushUpdates();
@@ -986,14 +985,6 @@ ZBX_NotificationsAlarm.prototype.acceptNotification = function(notif) {
 		this.start = notif.getId();
 	}
 };
-
-/**
- * Registering instance.
- */
-ZABBIX.namespace('instances.notifications', new ZBX_Notifications(
-	ZABBIX.namespace('instances.localStorage'),
-	ZABBIX.namespace('instances.browserTab')
-));
 
 /**
  * Appends list node to DOM when document is ready, then make it draggable.

@@ -87,4 +87,13 @@
 			}
 		});
 	}
+
+	/**
+	 * Registering notifications instance.
+	 */
+	ZABBIX.namespace('instances.notifications', new ZBX_Notifications(
+		ZABBIX.namespace('instances.localStorage'),
+		ZABBIX.namespace('instances.browserTab'),
+		<?= json_encode(CCsrfTokenHelper::get('notifications')) ?>
+	));
 </script>
