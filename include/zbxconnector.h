@@ -89,4 +89,5 @@ zbx_uint32_t	zbx_connector_pack_top_connectors_result(unsigned char **data, zbx_
 int	zbx_connector_get_queue_size(zbx_uint64_t *size, char **error);
 
 void	zbx_connector_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size);
+void	zbx_connector_init(void);
 #endif /* ZABBIX_AVAILABILITY_H */

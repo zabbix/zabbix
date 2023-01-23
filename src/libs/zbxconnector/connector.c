@@ -23,9 +23,25 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 
+static int	connector_initialized;
+
+#define CONNECTOR_INITIALIZED_YES	1
+
+void	zbx_connector_init(void)
+{
+	connector_initialized = CONNECTOR_INITIALIZED_YES;
+}
+
 void	zbx_connector_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size)
 {
 	static zbx_ipc_socket_t	socket;
+
+	if (CONNECTOR_INITIALIZED_YES != connector_initialized)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "connector is not initialized: please check \"StartConnectors\""
+				" configuration parameter");
+		return;
+	}
 
 	/* each process has a permanent connection to connector manager */
 	if (0 == socket.fd)
@@ -84,6 +100,15 @@ int	zbx_connector_get_diag_stats(zbx_uint64_t *queued, char **error)
 {
 	unsigned char	*result;
 
+	if (CONNECTOR_INITIALIZED_YES != connector_initialized)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "connector is not initialized: please check \"StartConnectors\""
+				" configuration parameter");
+
+		queued = 0;
+		return SUCCEED;
+	}
+
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_CONNECTOR, ZBX_IPC_CONNECTOR_DIAG_STATS,
 			SEC_PER_MIN, NULL, 0, &result, error))
 	{
@@ -101,6 +126,13 @@ int	zbx_connector_get_queue_size(zbx_uint64_t *size, char **error)
 	zbx_ipc_message_t	message;
 	zbx_ipc_socket_t	connector_socket;
 	int			ret = FAIL;
+
+	if (CONNECTOR_INITIALIZED_YES != connector_initialized)
+	{
+		*error = zbx_strdup(NULL, "connector is not initialized: please check \"StartConnectors\" configuration"
+				" parameter");
+		return FAIL;
+	}
 
 	if (FAIL == zbx_ipc_socket_open(&connector_socket, ZBX_IPC_SERVICE_CONNECTOR, SEC_PER_MIN, error))
 		return FAIL;
@@ -202,6 +234,14 @@ static int	connector_get_top_items(int limit, zbx_vector_ptr_t *items, char **er
 	int		ret;
 	unsigned char	*data, *result;
 	zbx_uint32_t	data_len;
+
+	if (CONNECTOR_INITIALIZED_YES != connector_initialized)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "connector is not initialized: please check \"StartConnectors\""
+				" configuration parameter");
+
+		return SUCCEED;
+	}
 
 	data_len = connector_pack_top_items_request(&data, limit);
 

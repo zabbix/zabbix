@@ -65,7 +65,7 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get connector queue size: %s", error);
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get connector queue size: %s", error);
 		zbx_free(error);
 	}
 

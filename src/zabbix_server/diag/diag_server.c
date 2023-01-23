@@ -542,10 +542,7 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 		ret = SUCCEED;
 	}
 	else if (0 == strcmp(section, ZBX_DIAG_CONNECTOR))
-	{
-		zbx_diag_add_connector_info(jp, json, error);
-		ret = SUCCEED;
-	}
+		ret = zbx_diag_add_connector_info(jp, json, error);
 	else
 		*error = zbx_dsprintf(*error, "Unsupported diagnostics section: %s", section);
 

@@ -55,6 +55,7 @@
 #include "availability/avail_manager.h"
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"
+#include "zbxconnector.h"
 #include "service/service_manager.h"
 #include "housekeeper/trigger_housekeeper.h"
 #include "lld/lld_manager.h"
@@ -275,8 +276,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_SERVICEMAN */
 	1, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
 	1, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
-	1, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
-	3, /* ZBX_PROCESS_TYPE_CONNECTORWORKER */
+	0, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
+	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -687,6 +688,9 @@ static void	zbx_set_defaults(void)
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER])
 		CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTMANAGER] = 1;
 
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER])
+		CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORMANAGER] = 1;
+
 	if (NULL == CONFIG_NODE_ADDRESS)
 		CONFIG_NODE_ADDRESS = zbx_strdup(CONFIG_NODE_ADDRESS, "localhost");
 }
@@ -1062,7 +1066,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartODBCPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"StartConnectors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER],	TYPE_INT,
-			PARM_OPT,	1,			1000},
+			PARM_OPT,	0,			1000},
 		{NULL}
 	};
 
@@ -1475,6 +1479,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		zbx_free(error);
 		return FAIL;
 	}
+
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORMANAGER])
+		zbx_connector_init();
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER])
 	{
