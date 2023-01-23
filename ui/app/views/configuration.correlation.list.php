@@ -129,7 +129,7 @@ if ($data['correlations']) {
 			new CCheckBox('correlationids['.$correlation['correlationid'].']', $correlation['correlationid']),
 			new CLink($correlation['name'], (new CUrl('zabbix.php'))
 				->setArgument('correlationid', $correlation['correlationid'])
-				->setArgument('action', 'correlation')
+				->setArgument('action', 'correlation.edit')
 			),
 			$conditions,
 			$operations,
