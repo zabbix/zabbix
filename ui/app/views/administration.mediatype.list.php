@@ -38,7 +38,10 @@ $html_page = (new CHtmlPage())
 			->addItem(
 				(new CButton('', _('Import')))
 					->onClick(
-						'return PopUp("popup.import", {rules_preset: "mediatype"},{
+						'return PopUp("popup.import", {
+							rules_preset: "mediatype", '.
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.': "'. CCsrfTokenHelper::get('import').
+						'"},{
 							dialogueid: "popup_import",
 							dialogue_class: "modal-popup-generic"
 						});'
@@ -90,6 +93,8 @@ $mediaTypeTable = (new CTableInfo())
 		_('Details'),
 		_('Action')
 	]);
+
+$csrf_token = CCsrfTokenHelper::get('mediatype');
 
 foreach ($data['mediatypes'] as $mediaType) {
 	switch ($mediaType['typeid']) {
@@ -145,8 +150,6 @@ foreach ($data['mediatypes'] as $mediaType) {
 			: 'mediatype.disable'
 		).
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
-
-	$csrf_token = CCsrfTokenHelper::get('mediatype');
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
 		? (new CLink(_('Enabled'), (new CUrl($statusLink))->getUrl()))

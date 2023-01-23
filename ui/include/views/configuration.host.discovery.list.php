@@ -210,6 +210,7 @@ $discoveryTable = (new CTableInfo())
 	]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+$csrf_token = CCsrfTokenHelper::get('host_discovery.php');
 
 foreach ($data['discoveries'] as $discovery) {
 	// description
@@ -244,8 +245,6 @@ foreach ($data['discoveries'] as $discovery) {
 			->setArgument('itemid', $discovery['itemid'])
 			->setArgument('context', $data['context'])
 	);
-
-	$csrf_token = CCsrfTokenHelper::get('host_discovery.php');
 
 	// status
 	$status = (new CLink(

@@ -141,6 +141,8 @@ $table = (new CTableInfo())
 		_('Info')
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('user');
+
 foreach ($data['users'] as $user) {
 	$userid = $user['userid'];
 	$session = $data['sessions'][$userid];
@@ -163,8 +165,6 @@ foreach ($data['users'] as $user) {
 	else {
 		$online = (new CCol(_('No')))->addClass(ZBX_STYLE_RED);
 	}
-
-	$csrf_token = CCsrfTokenHelper::get('user');
 
 	$blocked = ($user['attempt_failed'] >= $data['config']['login_attempts'])
 		? (new CLink(_('Blocked'), 'zabbix.php?action=user.unblock&userids[]='.$userid))

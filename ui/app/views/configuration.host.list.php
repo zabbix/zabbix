@@ -216,6 +216,7 @@ $table = (new CTableInfo())
 	]);
 
 $current_time = time();
+$csrf_token_massupdate = CCsrfTokenHelper::get('host');
 
 foreach ($data['hosts'] as $host) {
 	// Select an interface from the list with highest priority.
@@ -268,8 +269,6 @@ foreach ($data['hosts'] as $host) {
 	))
 		->setAttribute('data-hostid', $host['hostid'])
 		->onClick('view.editHost(event, this.dataset.hostid);');
-
-	$csrf_token_massupdate = CCsrfTokenHelper::get('host');
 
 	$maintenance_icon = false;
 	$status_toggle_url = (new CUrl('zabbix.php'))

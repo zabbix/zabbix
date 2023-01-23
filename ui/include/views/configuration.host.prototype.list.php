@@ -71,6 +71,8 @@ $hostTable = (new CTableInfo())
 		_('Tags')
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('host_prototypes.php');
+
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	// name
 	$name = [];
@@ -158,9 +160,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))
-		->addCsrfToken(CCsrfTokenHelper::get(($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
-			? 'hostprototype.massenable'
-			: 'hostprototype.massdisable'))
+		->addCsrfToken($csrf_token)
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($hostPrototype['status']));
 
@@ -174,7 +174,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addCsrfToken(CCsrfTokenHelper::get('hostprototype.updatediscover'))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -195,16 +195,13 @@ $itemForm->addItem([
 	new CActionButtonList('action', 'group_hostid',
 		[
 			'hostprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create hosts from selected prototypes as enabled?'),
-				'csrf_token' => CCsrfTokenHelper::get('hostprototype.massenable')
+				'confirm' => _('Create hosts from selected prototypes as enabled?'), 'csrf_token' => $csrf_token
 			],
 			'hostprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create hosts from selected prototypes as disabled?'),
-				'csrf_token' => CCsrfTokenHelper::get('hostprototype.massdisable')
+				'confirm' => _('Create hosts from selected prototypes as disabled?'), 'csrf_token' => $csrf_token
 			],
 			'hostprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected host prototypes?'),
-				'csrf_token' => CCsrfTokenHelper::get('hostprototype.massdelete')
+				'confirm' => _('Delete selected host prototypes?'), 'csrf_token' => $csrf_token
 			]
 		],
 		$data['discovery_rule']['itemid']
