@@ -69,12 +69,12 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	];
 
 	private static $trigger_icons = [
-		'2_trigger_Information' => 'icon-ackn',
-		'3_trigger_Average' => 'icon-ackn',
-		'4_trigger_Average' => 'icon-ackn',
-		'Dependent trigger ONE' => 'icon-depend-down',
-		'Inheritance trigger with tags' => 'icon-depend-down',
-		'Trigger disabled with tags' => 'icon-depend-up'
+		'2_trigger_Information' => 'zi-check',
+		'3_trigger_Average' => 'zi-check',
+		'4_trigger_Average' => 'zi-check',
+		'Dependent trigger ONE' => 'zi-bullet-alt-down',
+		'Inheritance trigger with tags' => 'zi-bullet-alt-down',
+		'Trigger disabled with tags' => 'zi-bullet-alt-up'
 	];
 
 	/**
@@ -890,7 +890,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 
 		// Check trigger icon if such should exist.
 		if (in_array($trigger, self::$trigger_icons)) {
-			$element = (self::$trigger_icons[$trigger] === 'icon-ackn') ? 'span' : 'a';
+			$element = (self::$trigger_icons[$trigger] === 'zi-check') ? 'span' : 'a';
 			$icon = $cell->query('xpath:.//'.$element)->one();
 			$this->assertTrue($icon->isValid());
 			$this->assertStringStartsWith(self::$trigger_icons[$trigger], $cell->getAttribute('class'));

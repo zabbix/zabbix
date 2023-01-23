@@ -265,8 +265,7 @@ final class CSlaHelper {
 		return (new CSpan(_('Custom')))
 			->addItem(
 				(new CSpan())
-					->addClass(ZBX_STYLE_ICON_DESCRIPTION)
-					->addClass('zi-alert')
+					->addClass(ZBX_ICON_ALERT)
 					->setHint($hint)
 			);
 	}

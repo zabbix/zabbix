@@ -144,14 +144,14 @@ function get_icon($type, $params = []) {
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = (new CRedirectButton(SPACE, null))
 					->addClass(ZBX_STYLE_BTN_REMOVE_FAV)
-					->addClass('zi-star-filled')
+					->addClass(ZBX_ICON_STAR_FILLED)
 					->setTitle(_('Remove from favorites'))
 					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
 				$icon = (new CRedirectButton(SPACE, null))
 					->addClass(ZBX_STYLE_BTN_ADD_FAV)
-					->addClass('zi-star')
+					->addClass(ZBX_ICON_STAR)
 					->setTitle(_('Add to favorites'))
 					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
@@ -166,8 +166,8 @@ function get_icon($type, $params = []) {
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_STYLE_BTN_DASHBOARD_NORMAL)
-					->addClass('zi-minimize')
-					->addClass(ZBX_STYLE_BTN_MIN);
+					->addClass(ZBX_STYLE_BTN_MIN)
+					->addClass(ZBX_ICON_MINIMIZE);
 			}
 			else {
 				$icon = (new CButton(null, '&nbsp;'))
@@ -175,7 +175,7 @@ function get_icon($type, $params = []) {
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_STYLE_BTN_KIOSK)
-					->addClass('zi-fullscreen');
+					->addClass(ZBX_ICON_FULLSCREEN);
 			}
 
 			return $icon;
@@ -769,7 +769,7 @@ function makeServerStatusOutput() {
 		->setId('msg-global-footer')
 		->addClass(ZBX_STYLE_MSG_GLOBAL_FOOTER)
 		->addClass(ZBX_STYLE_MSG_WARNING)
-		->addClass('zi-circle-info-filled');
+		->addClass(ZBX_ICON_CIRCLE_INFO_FILLED);
 }
 
 /**
@@ -915,8 +915,7 @@ function makeInformationList($info_icons) {
  */
 function makeInformationIcon($message) {
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_INFO)
-		->addClass('zi-i')
+		->addClass(ZBX_ICON_I)
 		->addClass(ZBX_STYLE_STATUS_GREEN)
 		->setHint($message, ZBX_STYLE_HINTBOX_WRAP);
 }
@@ -940,8 +939,7 @@ function makeMaintenanceIcon($type, $name, $description) {
 	}
 
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_MAINTENANCE)
-		->addClass('zi-wrench-alt')
+		->addClass(ZBX_ICON_WRENCH_ALT)
 		->setHint($hint);
 }
 
@@ -986,8 +984,7 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false) {
 	$maintenances = implode(',', $maintenance_names);
 
 	return (new CSimpleButton())
-		->addClass(ZBX_STYLE_ACTION_ICON_SUPPRESS)
-		->addClass('zi-eye-off')
+		->addClass(ZBX_ICON_EYE_OFF)
 		->addClass($blink ? 'blink' : null)
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
@@ -1051,8 +1048,7 @@ function makeActionIcon(array $icon_data): CTag {
  */
 function makeDescriptionIcon($description) {
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_DESCRIPTION)
-		->addClass('zi-alert')
+		->addClass(ZBX_ICON_ALERT)
 		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
 }
 
@@ -1065,8 +1061,7 @@ function makeDescriptionIcon($description) {
  */
 function makeErrorIcon($error) {
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_INFO)
-		->addClass('zi-i')
+		->addClass(ZBX_ICON_I)
 		->addClass(ZBX_STYLE_STATUS_RED)
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
 }
@@ -1080,8 +1075,7 @@ function makeErrorIcon($error) {
  */
 function makeHelpIcon($help_text): CLink {
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_HELP_HINT)
-		->addClass('zi-circle-question-filled')
+		->addClass(ZBX_ICON_CIRCLE_QUESTION_FILLED)
 		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
 }
 
@@ -1094,8 +1088,7 @@ function makeHelpIcon($help_text): CLink {
  */
 function makeWarningIcon($error) {
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_INFO)
-		->addClass('zi-i')
+		->addClass(ZBX_ICON_I)
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP);
 }

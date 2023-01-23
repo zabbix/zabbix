@@ -40,7 +40,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 		$list->addItem(
 			(new CDiv(
 				(new CButton('override_add', _('Add new override')))
-					->addClass('zi-plus')
+					->addClass(ZBX_ICON_PLUS)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->setId('override-add')
 			)),
@@ -291,7 +291,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 		return (new CListItem([
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addClass('zi-drag-handle'),
+				->addClass(ZBX_ICON_DRAG_HANDLE),
 			$host_pattern_field,
 			(new CPatternSelect([
 				'name' => $this->field->getName().'['.$row_num.'][items][]',
@@ -343,7 +343,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 				->addClass(ZBX_STYLE_OVERRIDES_OPTIONS_LIST)
 				->addItem(
 					(new CButton())
-						->addClass('zi-plus')
+						->addClass(ZBX_ICON_PLUS)
 						->setAttribute('data-row', $row_num)
 						->addClass(ZBX_STYLE_BTN_ALT)
 				)

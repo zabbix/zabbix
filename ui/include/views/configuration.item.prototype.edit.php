@@ -242,7 +242,7 @@ $item_tab
 					(new CCol(
 						(new CDiv(new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')))
 							->addClass(ZBX_STYLE_DRAG_ICON)
-							->addClass('zi-drag-handle')
+							->addClass(ZBX_ICON_DRAG_HANDLE)
 					))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 						->setAttribute('placeholder', _('name'))
@@ -394,7 +394,7 @@ $item_tab
 								new CVar('headers[sortorder][#{index}]', '#{sortorder}')
 							))
 								->addClass(ZBX_STYLE_DRAG_ICON)
-								->addClass('zi-drag-handle')
+								->addClass(ZBX_ICON_DRAG_HANDLE)
 						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))

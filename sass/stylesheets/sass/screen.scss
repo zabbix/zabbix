@@ -1797,7 +1797,7 @@ button {
 
 		.btn-info {
 			&::after {
-				background-position: -279px -621px;
+				background-position: -279px -621px; // TODO - AS: need to check
 				top: 1px;
 			}
 		}
@@ -5546,7 +5546,7 @@ z-select,
 		margin: 0 5px 0 5px;
 	}
 }
-
+// TODO - AS: code style should be fixed
 .geomap-filter {
 	border: 1px solid $overlay-border-color;
 	background-color: $ui-bg-color;

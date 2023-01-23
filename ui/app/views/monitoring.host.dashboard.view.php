@@ -85,13 +85,13 @@ $html_page = (new CHtmlPage())
 				->addItem(
 					(new CSimpleButton(null))
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE)
-						->addClass('zi-chevron-left')
+						->addClass(ZBX_ICON_CHEVRON_LEFT)
 						->setTitle(_('Previous page'))
 				)
 				->addItem(
 					(new CSimpleButton(null))
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
-						->addClass('zi-pause')
+						->addClass(ZBX_ICON_PAUSE)
 						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 							? _s('Stop slideshow')
 							: _s('Start slideshow')
@@ -105,7 +105,7 @@ $html_page = (new CHtmlPage())
 				->addItem(
 					(new CSimpleButton(null))
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE)
-						->addClass('zi-chevron-right')
+						->addClass(ZBX_ICON_CHEVRON_RIGHT)
 						->setTitle(_('Next page'))
 				)
 			: null
@@ -153,12 +153,12 @@ if (count($data['dashboard']['pages']) > 1
 							(new CSimpleButton())
 								->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
 								->addClass('btn-iterator-page-previous')
-								->addClass('zi-chevron-left')
+								->addClass(ZBX_ICON_CHEVRON_LEFT)
 								->setEnabled(false),
 							(new CSimpleButton())
 								->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
 								->addClass('btn-iterator-page-next')
-								->addClass('zi-chevron-right')
+								->addClass(ZBX_ICON_CHEVRON_RIGHT)
 								->setEnabled(false),
 							(new CSimpleButton([
 								(new CSpan(_s('Start slideshow')))->addClass('slideshow-state-stopped'),

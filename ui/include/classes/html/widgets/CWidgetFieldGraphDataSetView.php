@@ -63,13 +63,13 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 			->addClass(ZBX_STYLE_BTN_SPLIT)
 			->addItem([
 				(new CButton(null, _('Add new data set')))
-					->addClass('zi-plus')
+					->addClass(ZBX_ICON_PLUS)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->setId('dataset-add'),
 				(new CButton(null, '&#8203;'))
 					->setId('dataset-menu')
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('zi-chevron-down')
+					->addClass(ZBX_ICON_CHEVRON_DOWN)
 			]);
 	}
 
@@ -94,7 +94,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		$dataset_head = [
 			new CDiv((new CSimpleButton('&nbsp;'))
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)
-				->addClass('zi-chevron-up')
+				->addClass(ZBX_ICON_CHEVRON_UP)
 			),
 			new CVar($field_name.'['.$row_num.'][dataset_type]', $dataset_type, '')
 		];
@@ -214,7 +214,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		return (new CListItem([
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addClass('zi-drag-handle')
+				->addClass(ZBX_ICON_DRAG_HANDLE)
 				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
 				->addClass('js-main-drag-icon'),
 			(new CDiv())
@@ -412,7 +412,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 			(new CCol(
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addClass('zi-drag-handle')
+					->addClass(ZBX_ICON_DRAG_HANDLE)
 			))
 				->addClass('table-col-handle')
 				->addClass(ZBX_STYLE_TD_DRAG_ICON),

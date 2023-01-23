@@ -756,9 +756,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
  */
 function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
 	$ack = $trigger['problem']['acknowledged'] == 1
-		? (new CSpan())
-			->addClass(ZBX_STYLE_ICON_ACKN)
-			->addClass('zi-check')
+		? (new CSpan())->addClass(ZBX_ICON_CHECK)
 		: null;
 	$desc = array_key_exists($trigger['triggerid'], $dependencies)
 		? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
@@ -2420,19 +2418,16 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 
 	foreach (['down', 'up'] as $type) {
 		if (array_key_exists($type, $dependencies)) {
-			$header = ($type === 'down') ? _('Depends on') : _('Dependent');
-			$class = ($type === 'down') ? 'zi-bullet-alt-down' : 'zi-bullet-alt-up';
-
 			$table = (new CTableInfo())
 				->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-				->setHeader([$header]);
+				->setHeader([$type === 'down' ? _('Depends on') : _('Dependent')]);
 
 			foreach ($dependencies[$type] as $description) {
 				$table->addRow($description);
 			}
 
 			$result[] = (new CButton())
-				->addClass($class)
+				->addClass($type === 'down' ? ZBX_ICON_BULLET_ALT_DOWN : ZBX_ICON_BULLET_ALT_UP)
 				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->setHint($table, '', $freeze_on_click);
 		}

@@ -1331,10 +1331,7 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 		$css = CSeverityHelper::getStyle((int) $trigger['priority']);
 
 		if ($trigger['problem']['acknowledged'] == 1) {
-			$ack = [' ', (new CSpan())
-				->addClass(ZBX_STYLE_ICON_ACKN)
-				->addClass('zi-check')
-			];
+			$ack = [' ', (new CSpan())->addClass(ZBX_ICON_CHECK)];
 		}
 	}
 

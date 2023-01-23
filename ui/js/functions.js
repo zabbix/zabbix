@@ -723,9 +723,9 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			warning: 'msg-warning'
 		},
 		icons = {
-			good: 'zi-circle-check-filled',
-			bad: 'zi-circle-info-filled',
-			warning: 'zi-triangle-warning'
+			good: ZBX_ICON_CIRCLE_CHECK_FILLED,
+			bad: ZBX_ICON_CIRCLE_INFO_FILLED,
+			warning: ZBX_ICON_TRIANGLE_WARNING
 		};
 
 	if (show_details === null) {

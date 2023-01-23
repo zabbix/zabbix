@@ -304,7 +304,7 @@ class testPageServicesSla extends CWebTest {
 		foreach ($reference_schedules as $schedule) {
 			if (array_key_exists('rows', $schedule)) {
 				// Find the corresponding row and open the Custom schedule dialog.
-				$table->findRow('Name', $schedule['name'])->query('class:icon-description')->one()->click();
+				$table->findRow('Name', $schedule['name'])->query('class:zi-alert')->one()->click();
 				$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilReady()->one();
 				$schedule_table = $overlay->query('class:list-table')->asTable()->one();
 				$displayed_days = $schedule_table->getRows()->asText();
@@ -320,7 +320,7 @@ class testPageServicesSla extends CWebTest {
 				$overlay->close();
 			}
 			else {
-				$this->assertFalse($table->findRow('Name', $schedule['name'])->query('class:icon-description')
+				$this->assertFalse($table->findRow('Name', $schedule['name'])->query('class:zi-alert')
 						->one(false)->isValid()
 				);
 			}

@@ -296,7 +296,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			// Check advanced fields when Advanced configuration is true.
 			if ($advanced_config){
 				// Check hintbox.
-				$form->query('class:icon-help-hint')->one()->click();
+				$form->query('class:zi-circle-question-filled')->one()->click();
 				$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 
 				// Assert text.
@@ -1278,7 +1278,7 @@ class testDashboardItemValueWidget extends CWebTest {
 	 */
 	public function testDashboardItemValueWidget_ThresholdWarningMessage($data) {
 		$warning = 'id:item-value-thresholds-warning';
-		$info = 'class:icon-info';
+		$info = 'class:zi-i';
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();

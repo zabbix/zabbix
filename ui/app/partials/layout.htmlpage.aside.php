@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array $data
  */
 
 $header = (new CDiv())
@@ -37,16 +38,24 @@ $header = (new CDiv())
 	->addItem(
 		(new CDiv([
 			(new CButton(null, _('Collapse sidebar')))
-				->addClass('button-compact js-sidebar-mode zi-chevron-double-left')
+				->addClass('button-compact')
+				->addClass('js-sidebar-mode')
+				->addClass(ZBX_ICON_CHEVRON_DOUBLE_LEFT)
 				->setAttribute('title', _('Collapse sidebar')),
 			(new CButton(null, _('Expand sidebar')))
-				->addClass('button-expand js-sidebar-mode zi-chevron-double-right')
+				->addClass('button-expand')
+				->addClass('js-sidebar-mode')
+				->addClass(ZBX_ICON_CHEVRON_DOUBLE_RIGHT)
 				->setAttribute('title', _('Expand sidebar')),
 			(new CButton(null, _('Hide sidebar')))
-				->addClass('button-hide js-sidebar-mode zi-collapse')
+				->addClass('button-hide')
+				->addClass('js-sidebar-mode')
+				->addClass(ZBX_ICON_COLLAPSE)
 				->setAttribute('title', _('Hide sidebar')),
 			(new CButton(null, _('Show sidebar')))
-				->addClass('button-show js-sidebar-mode zi-expand')
+				->addClass('button-show')
+				->addClass('js-sidebar-mode')
+				->addClass(ZBX_ICON_EXPAND)
 				->setAttribute('title', _('Show sidebar'))
 		]))->addClass('sidebar-header-buttons')
 	);
@@ -56,7 +65,8 @@ $server_name = ($data['server_name'] !== '')
 	: null;
 
 $search_icon = (new CSubmitButton(null))
-	->addClass('zi-search js-search')
+	->addClass(ZBX_ICON_SEARCH)
+	->addClass('js-search')
 	->setTitle(_('Search'));
 
 if (getRequest('search', '') === '') {

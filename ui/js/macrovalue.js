@@ -75,8 +75,8 @@
 			.trigger('change');
 
 		$('.btn-dropdown-container button', $container)
-			.removeClass('zi-text zi-lock')
-			.addClass('btn-alt btn-dropdown-toggle zi-eye-off');
+			.removeClass([ZBX_ICON_TEXT, ZBX_ICON_LOCK])
+			.addClass('btn-alt btn-dropdown-toggle ' + ZBX_ICON_EYE_OFF);
 		$this.hide();
 	}
 
@@ -98,7 +98,7 @@
 			$container = $this.closest('.macro-input-group'),
 			curr_value_type = getCurrentValueType($container);
 
-		$('.btn-dropdown-container button', $container).addClass('zi-chevron-down');
+		$('.btn-dropdown-container button', $container).addClass(ZBX_ICON_CHEVRON_DOWN);
 
 		if (value_type == curr_value_type) {
 			return false;

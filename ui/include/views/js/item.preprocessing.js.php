@@ -45,7 +45,7 @@
 		(new CDiv([
 			(new CDiv(new CVar('preprocessing[#{rowNum}][sortorder]', '#{sortorder}')))
 				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addClass('zi-drag-handle'),
+				->addClass(ZBX_ICON_DRAG_HANDLE),
 			(new CDiv($preproc_types_select))
 				->addClass('list-numbered-item')
 				->addClass('step-name'),

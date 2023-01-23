@@ -26,9 +26,6 @@ class HostMacrosManager {
 	static ZBX_MACRO_TYPE_TEXT = 0;
 	static ZBX_MACRO_TYPE_SECRET = 1;
 	static ZBX_MACRO_TYPE_VAULT = 2;
-	static ZBX_STYLE_ICON_TEXT = 'zi-text';
-	static ZBX_STYLE_ICON_INVISIBLE = 'zi-eye-off';
-	static ZBX_STYLE_ICON_SECRET_TEXT = 'zi-lock';
 	static ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
 	static DISCOVERY_STATE_AUTOMATIC = 0x1;
 	static DISCOVERY_STATE_CONVERTING = 0x2;
@@ -123,9 +120,9 @@ class HostMacrosManager {
 	initMacroTable(show_inherited_macros) {
 		const $parent = this.getMacroTable();
 		const dropdown_btn_classes = {
-			[HostMacrosManager.ZBX_MACRO_TYPE_TEXT]: HostMacrosManager.ZBX_STYLE_ICON_TEXT,
-			[HostMacrosManager.ZBX_MACRO_TYPE_SECRET]: HostMacrosManager.ZBX_STYLE_ICON_INVISIBLE,
-			[HostMacrosManager.ZBX_MACRO_TYPE_VAULT]: HostMacrosManager.ZBX_STYLE_ICON_SECRET_TEXT
+			[HostMacrosManager.ZBX_MACRO_TYPE_TEXT]: ZBX_ICON_TEXT,
+			[HostMacrosManager.ZBX_MACRO_TYPE_SECRET]: ZBX_ICON_EYE_OFF,
+			[HostMacrosManager.ZBX_MACRO_TYPE_VAULT]: ZBX_ICON_LOCK
 		};
 
 		$parent

@@ -1935,30 +1935,9 @@ define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
 define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
-define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
-define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_ICON_COUNT', 'icon-count');
-define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
-define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
-define('ZBX_STYLE_ICON_DESCRIPTION', 'icon-description');
-define('ZBX_STYLE_ICON_INFO', 'icon-info');
-define('ZBX_STYLE_ICON_INVISIBLE', 'zi-eye-off');
-define('ZBX_STYLE_ICON_USER', 'icon-user');
-define('ZBX_STYLE_ICON_USER_GROUP', 'icon-user-group');
-define('ZBX_STYLE_ICON_MAINTENANCE', 'icon-maintenance');
-define('ZBX_STYLE_ICON_WIZARD_ACTION', 'icon-wizard-action');
-define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
-define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
-define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');
-define('ZBX_STYLE_ACTION_ICON_MSGS', 'icon-action-msgs');
 define('ZBX_STYLE_ACTION_ICON_SEV_UP', 'icon-action-severity-up');
 define('ZBX_STYLE_ACTION_ICON_SEV_DOWN', 'icon-action-severity-down');
-define('ZBX_STYLE_ACTION_ICON_SEV_CHANGED', 'icon-action-severity-changed');
-define('ZBX_STYLE_ACTION_MESSAGE', 'icon-action-message');
-define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
-define('ZBX_STYLE_ACTION_ICON_UNACK', 'icon-action-unack');
-define('ZBX_STYLE_ACTION_ICON_SUPPRESS', 'icon-action-suppress');
-define('ZBX_STYLE_ACTION_ICON_UNSUPPRESS', 'icon-action-unsuppress');
 define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');
 define('ZBX_STYLE_PROBLEM_RECOVERY', 'icon-problem-recovery');
 define('ZBX_STYLE_ACTIONS_NUM_GRAY', 'icon-actions-number-gray');
@@ -2168,10 +2147,7 @@ define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
 define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
 
 // Icons.
-define('ZBX_STYLE_ICON_TEXT', 'zi-text'); // TODO - AS: rename constant to ZBX_ICON_TEXT
-define('ZBX_STYLE_ICON_SECRET_TEXT', 'zi-lock'); // TODO - AS: rename constant to ZBX_ICON_LOCK
-define('ZBX_STYLE_ICON_HELP_HINT', 'icon-help-hint'); // TODO - AS: ??? rename constant to ZBX_ICON_HELP_HINT
-define('ZBX_STYLE_ICON_DOC_LINK', 'icon-doc-link'); // TODO - AS: ??? rename constant to ZBX_ICON_DOC_LINK
+define('ZBX_STYLE_ICON_DOC_LINK', 'icon-doc-link'); // TODO - AS: ??? rename constant to ZBX_ICON_HELP
 
 // Host interface styles.
 define('ZBX_STYLE_HOST_INTERFACES', 'interfaces');
@@ -2199,6 +2175,83 @@ define('ZBX_STYLE_ZSELECT_HOST_INTERFACE', 'z-select-host-interface');
 // Dashboard list table classes.
 define('ZBX_STYLE_DASHBOARD_LIST', 'dashboard-list');
 define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
+
+// Icons.
+define('ZBX_ICON_ALERT', 'zi-alert');
+define('ZBX_ICON_ALERT_MORE', 'zi-alert-more');
+define('ZBX_ICON_ARROW_BACK', 'zi-arrow-back');
+define('ZBX_ICON_ARROW_DOWN', 'zi-arrow-down');
+define('ZBX_ICON_ARROW_UP', 'zi-arrow-up');
+define('ZBX_ICON_ARROWS_TOP_BOTTOM', 'zi-arrows-top-bottom');
+define('ZBX_ICON_BELL', 'zi-bell');
+define('ZBX_ICON_BELL_OFF', 'zi-bell-off');
+define('ZBX_ICON_BULLET_ALT_DOWN', 'zi-bullet-alt-down');
+define('ZBX_ICON_BULLET_ALT_UP', 'zi-bullet-alt-up');
+define('ZBX_ICON_BULLET_RIGHT', 'zi-bullet-right');
+define('ZBX_ICON_CALENDAR', 'zi-calendar');
+define('ZBX_ICON_CALENDAR_CHECK', 'zi-calendar-check');
+define('ZBX_ICON_CALENDAR_WARNING', 'zi-calendar-warning');
+define('ZBX_ICON_CHEVRON_DOUBLE_LEFT', 'zi-chevron-double-left');
+define('ZBX_ICON_CHECK', 'zi-check');
+define('ZBX_ICON_CHECKBOX', 'zi-checkbox');
+define('ZBX_ICON_CHEVRON_DOUBLE_RIGHT', 'zi-chevron-double-right');
+define('ZBX_ICON_CHEVRON_DOWN', 'zi-chevron-down');
+define('ZBX_ICON_CHEVRON_LEFT', 'zi-chevron-left');
+define('ZBX_ICON_CHEVRON_RIGHT', 'zi-chevron-right');
+define('ZBX_ICON_CHEVRON_UP', 'zi-chevron-up');
+define('ZBX_ICON_CIRCLE_CHECK_FILLED', 'zi-circle-check-filled');
+define('ZBX_ICON_CIRCLE_INFO', 'zi-circle-info');
+define('ZBX_ICON_CIRCLE_INFO_FILLED', 'zi-circle-info-filled');
+define('ZBX_ICON_CIRCLE_QUESTION_FILLED', 'zi-circle-question-filled');
+define('ZBX_ICON_CLOCK', 'zi-clock');
+define('ZBX_ICON_COG', 'zi-cog');
+define('ZBX_ICON_COG_FILLED', 'zi-cog-filled');
+define('ZBX_ICON_COLLAPSE', 'zi-collapse');
+define('ZBX_ICON_COMMAND', 'zi-command');
+define('ZBX_ICON_COPY', 'zi-copy');
+define('ZBX_ICON_DASHBOARD', 'zi-dashboard');
+define('ZBX_ICON_DOWNLOAD', 'zi-download');
+define('ZBX_ICON_DRAG_HANDLE', 'zi-drag-handle');
+define('ZBX_ICON_ENVELOPE', 'zi-envelope');
+define('ZBX_ICON_ENVELOPE_FILLED', 'zi-envelope-filled');
+define('ZBX_ICON_EXPAND', 'zi-expand');
+define('ZBX_ICON_EYE', 'zi-eye');
+define('ZBX_ICON_EYE_ALT', 'zi-eye-alt');
+define('ZBX_ICON_EYE_OFF', 'zi-eye-off');
+define('ZBX_ICON_FILTER', 'zi-filter');
+define('ZBX_ICON_FULLSCREEN', 'zi-fullscreen');
+define('ZBX_ICON_HELP', 'zi-help');
+define('ZBX_ICON_HIERARCHY', 'zi-hierarchy');
+define('ZBX_ICON_HOME', 'zi-home');
+define('ZBX_ICON_I', 'zi-i');
+define('ZBX_ICON_LIST', 'zi-list');
+define('ZBX_ICON_LOCK', 'zi-lock');
+define('ZBX_ICON_MENU', 'zi-menu');
+define('ZBX_ICON_MINIMIZE', 'zi-minimize');
+define('ZBX_ICON_MORE', 'zi-more');
+define('ZBX_ICON_PAUSE', 'zi-pause');
+define('ZBX_ICON_PENCIL', 'zi-pencil');
+define('ZBX_ICON_PLUS', 'zi-plus');
+define('ZBX_ICON_REPORT', 'zi-report');
+define('ZBX_ICON_SEARCH', 'zi-search');
+define('ZBX_ICON_SIGNOUT', 'zi-signout');
+define('ZBX_ICON_SPEAKER', 'zi-speaker');
+define('ZBX_ICON_SPEAKER_OFF', 'zi-speaker-off');
+define('ZBX_ICON_STAR', 'zi-star');
+define('ZBX_ICON_STAR_FILLED', 'zi-star-filled');
+define('ZBX_ICON_SUPPORT', 'zi-support');
+define('ZBX_ICON_TEXT', 'zi-text');
+define('ZBX_ICON_TIME_PERIOD', 'zi-time-period');
+define('ZBX_ICON_TRIANGLE_WARNING', 'zi-triangle-warning');
+define('ZBX_ICON_UNCHECK', 'zi-uncheck');
+define('ZBX_ICON_USER', 'zi-user');
+define('ZBX_ICON_USER_FILLED', 'zi-user-filled');
+define('ZBX_ICON_USERS', 'zi-users');
+define('ZBX_ICON_USERS_FILLED', 'zi-users-filled');
+define('ZBX_ICON_WIDGET_ADD', 'zi-widget-add');
+define('ZBX_ICON_WIDGET_RESIZE', 'zi-widget-resize');
+define('ZBX_ICON_WRENCH_ALT', 'zi-wrench-alt');
+define('ZBX_ICON_Z', 'zi-z');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

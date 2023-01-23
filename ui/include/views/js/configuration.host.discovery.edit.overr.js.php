@@ -42,7 +42,7 @@
 			(new CCol(
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addClass('zi-drag-handle')
+					->addClass(ZBX_ICON_DRAG_HANDLE)
 			))
 				->addClass(ZBX_STYLE_TD_DRAG_ICON)
 				->setWidth('15'),

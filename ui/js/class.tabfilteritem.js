@@ -183,7 +183,7 @@ class CTabFilterItem extends CBaseComponent {
 
 		let edit = document.createElement('a');
 
-		edit.classList.add(TABFILTERITEM_STYLE_EDIT_BTN, 'zi-cog-filled');
+		edit.classList.add(TABFILTERITEM_STYLE_EDIT_BTN, ZBX_ICON_COG_FILLED);
 		edit.addEventListener('click', () => this.openPropertiesDialog({}, this._target));
 
 		this._target.parentNode.appendChild(edit);

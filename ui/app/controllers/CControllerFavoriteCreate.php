@@ -62,10 +62,8 @@ class CControllerFavoriteCreate extends CController {
 				if (addrm_fav !== null) {
 					addrm_fav.title = "'._('Remove from favorites').'";
 					addrm_fav.onclick = () => rm4favorites("'.$object.'", "'.$objectid.'");
-					addrm_fav.classList.add("btn-remove-fav");
-					addrm_fav.classList.add("zi-star-filled");
-					addrm_fav.classList.remove("btn-add-fav");
-					addrm_fav.classList.remove("zi-star");
+					addrm_fav.classList.add("'.ZBX_STYLE_BTN_REMOVE_FAV.'", "'.ZBX_ICON_STAR_FILLED.'");
+					addrm_fav.classList.remove("'.ZBX_STYLE_BTN_ADD_FAV.'", "'.ZBX_ICON_STAR.'");
 				}
 			';
 		}

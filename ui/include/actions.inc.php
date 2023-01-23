@@ -1768,7 +1768,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CTag {
 		$suppression['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
 		if (array_key_exists('suppress_until', $suppression)) {
-			$icon = 'zi-eye-off';
+			$icon = ZBX_ICON_EYE_OFF;
 			$title = _('Suppressed');
 
 			if ($suppression['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
@@ -1782,7 +1782,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CTag {
 			}
 		}
 		else {
-			$icon = 'zi-eye';
+			$icon = ZBX_ICON_EYE;
 			$title = _('Unsuppressed');
 			$suppress_until = '';
 		}
@@ -1796,9 +1796,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CTag {
 	}
 
 	return makeActionIcon([
-		'icon' => array_key_exists('suppress_until', $data['suppress_until'][0])
-			? 'zi-eye-off'
-			: 'zi-eye',
+		'icon' => array_key_exists('suppress_until', $data['suppress_until'][0]) ? ZBX_ICON_EYE_OFF : ZBX_ICON_EYE,
 		'button' => true,
 		'hint' => [
 			$table,
@@ -1844,7 +1842,7 @@ function makeEventMessagesIcon(array $data, array $users): ?CTag {
 	}
 
 	return makeActionIcon([
-		'icon' => 'zi-alert',
+		'icon' => ZBX_ICON_ALERT,
 		'button' => true,
 		'hint' => [
 			$table,
@@ -1901,17 +1899,17 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CTag {
 
 	// select icon
 	if ($data['original_severity'] > $data['current_severity']) {
-		$icon_style = 'zi-arrow-down';
+		$icon_style = ZBX_ICON_ARROW_DOWN;
 		$color = ZBX_STYLE_ACTION_SEVERETY_DOWN;
 		$aria_label = _x('Severity decreased', 'screen reader');
 	}
 	elseif ($data['original_severity'] < $data['current_severity']) {
-		$icon_style = 'zi-arrow-up';
+		$icon_style = ZBX_ICON_ARROW_UP;
 		$color = ZBX_STYLE_ACTION_SEVERETY_UP;
 		$aria_label = _x('Severity increased', 'screen reader');
 	}
 	else {
-		$icon_style = 'zi-arrows-top-bottom';
+		$icon_style = ZBX_ICON_ARROWS_TOP_BOTTOM;
 		$color = ZBX_STYLE_ACTION_SEVERETY_CHANGED;
 		$aria_label = _x('Severity changed', 'screen reader');
 	}
@@ -2015,7 +2013,7 @@ function makeEventActionsIcon(array $data, $eventid): ?CTag {
 	}
 
 	return makeActionIcon([
-		'icon' => 'zi-bullet-right',
+		'icon' => ZBX_ICON_BULLET_RIGHT,
 		'color' => $color,
 		'button' => true,
 		'num' => $data['count'],
@@ -2182,24 +2180,24 @@ function makeEventDetailsTableUser(array $action, array $users) {
 function makeActionTableIcon(array $action): ?CTag {
 	switch ($action['action_type']) {
 		case ZBX_EVENT_HISTORY_PROBLEM_EVENT:
-			return makeActionIcon(['icon' => 'zi-calendar-warning', 'title' => _('Problem created')]);
+			return makeActionIcon(['icon' => ZBX_ICON_CALENDAR_WARNING, 'title' => _('Problem created')]);
 
 		case ZBX_EVENT_HISTORY_RECOVERY_EVENT:
-			return makeActionIcon(['icon' => 'zi-calendar-check', 'title' => _('Problem resolved')]);
+			return makeActionIcon(['icon' => ZBX_ICON_CALENDAR_CHECK, 'title' => _('Problem resolved')]);
 
 		case ZBX_EVENT_HISTORY_MANUAL_UPDATE:
 			$action_icons = [];
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-				$action_icons[] = makeActionIcon([ 'icon' => 'zi-checkbox', 'title' => _('Manually closed')]);
+				$action_icons[] = makeActionIcon([ 'icon' => ZBX_ICON_CHECKBOX, 'title' => _('Manually closed')]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
-				$action_icons[] = makeActionIcon(['icon' => 'zi-check', 'title' => _('Acknowledged')]);
+				$action_icons[] = makeActionIcon(['icon' => ZBX_ICON_CHECK, 'title' => _('Acknowledged')]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) {
-				$action_icons[] = makeActionIcon(['icon' => 'zi-uncheck', 'title' => _('Unacknowledged')]);
+				$action_icons[] = makeActionIcon(['icon' => ZBX_ICON_UNCHECK, 'title' => _('Unacknowledged')]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
@@ -2214,7 +2212,7 @@ function makeActionTableIcon(array $action): ?CTag {
 				}
 
 				$action_icons[] = makeActionIcon([
-					'icon' => 'zi-eye-off',
+					'icon' => ZBX_ICON_EYE_OFF,
 					'button' => true,
 					'hint' => _s('Suppressed till: %1$s', $suppress_until)
 				]);
@@ -2222,19 +2220,19 @@ function makeActionTableIcon(array $action): ?CTag {
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
 				$action_icons[] = makeActionIcon([
-					'icon' => 'zi-eye',
+					'icon' => ZBX_ICON_EYE,
 					'title' => _('Unsuppressed')
 				]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {
-				$action_icons[] = makeActionIcon(['icon' => 'zi-alert-more', 'title' => _('Message')]);
+				$action_icons[] = makeActionIcon(['icon' => ZBX_ICON_ALERT_MORE, 'title' => _('Message')]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY) {
 				$action_type = ($action['new_severity'] > $action['old_severity'])
-					? ZBX_STYLE_ACTION_ICON_SEV_UP
-					: ZBX_STYLE_ACTION_ICON_SEV_DOWN;
+					? ZBX_STYLE_ACTION_ICON_SEV_UP    // TODO - AS: need to update to icon class
+					: ZBX_STYLE_ACTION_ICON_SEV_DOWN; // TODO - AS: need to update to icon class
 
 				$old_severity_name = CSeverityHelper::getName((int) $action['old_severity']);
 				$new_severity_name = CSeverityHelper::getName((int) $action['new_severity']);
@@ -2246,14 +2244,10 @@ function makeActionTableIcon(array $action): ?CTag {
 			return (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP);
 
 		case ZBX_EVENT_HISTORY_ALERT:
-			$action_icon = ($action['alerttype'] == ALERT_TYPE_COMMAND)
-					? 'zi-command'
-					: 'zi-envelope-filled';
-			$title = ($action['alerttype'] == ALERT_TYPE_COMMAND)
-				? _('Remote command')
-				: _('Alert message');
-
-			return makeActionIcon(['icon' => $action_icon, 'title' => $title]);
+			return makeActionIcon([
+				'icon' => $action['alerttype'] == ALERT_TYPE_COMMAND ? ZBX_ICON_COMMAND : ZBX_ICON_ENVELOPE_FILLED,
+				'title' => $action['alerttype'] == ALERT_TYPE_COMMAND ? _('Remote command') : _('Alert message')
+			]);
 
 		default:
 			return null;

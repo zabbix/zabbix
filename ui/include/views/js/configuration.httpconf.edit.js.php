@@ -44,7 +44,7 @@
 	<?= (new CRow([
 			(new CCol((new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addClass('zi-drag-handle')
+				->addClass(ZBX_ICON_DRAG_HANDLE)
 				->addStyle('top: 0px;')
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
@@ -69,7 +69,7 @@
 			(new CCol([
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addClass('zi-drag-handle')
+					->addClass(ZBX_ICON_DRAG_HANDLE)
 			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CTextBox(null, '#{name}'))
 				->setAttribute('placeholder', _('name'))

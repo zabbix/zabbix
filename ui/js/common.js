@@ -18,6 +18,31 @@
 **/
 
 
+const ZBX_ICON_BELL = 'zi-bell';
+const ZBX_ICON_BELL_OFF = 'zi-bell-off';
+const ZBX_ICON_CHECK = 'zi-check';
+const ZBX_ICON_CHEVRON_DOWN = 'zi-chevron-down';
+const ZBX_ICON_CHEVRON_LEFT = 'zi-chevron-left';
+const ZBX_ICON_CHEVRON_RIGHT = 'zi-chevron-right';
+const ZBX_ICON_CIRCLE_CHECK_FILLED = 'zi-circle-check-filled';
+const ZBX_ICON_CIRCLE_INFO_FILLED = 'zi-circle-info-filled';
+const ZBX_ICON_COG_FILLED = 'zi-cog-filled';
+const ZBX_ICON_COPY = 'zi-copy';
+const ZBX_ICON_DRAG_HANDLE = 'zi-drag-handle';
+const ZBX_ICON_EYE_OFF = 'zi-eye-off';
+const ZBX_ICON_FILTER = 'zi-filter';
+const ZBX_ICON_HOME = 'zi-home';
+const ZBX_ICON_LOCK = 'zi-lock';
+const ZBX_ICON_MORE = 'zi-more';
+const ZBX_ICON_PENCIL = 'zi-pencil';
+const ZBX_ICON_PLUS = 'zi-plus';
+const ZBX_ICON_SPEAKER = 'zi-speaker';
+const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
+const ZBX_ICON_TEXT = 'zi-text';
+const ZBX_ICON_TRIANGLE_WARNING = 'zi-triangle-warning';
+const ZBX_ICON_WIDGET_ADD = 'zi-widget-add';
+const ZBX_ICON_WIDGET_RESIZE = 'zi-widget-resize';
+
 const KEY_ARROW_DOWN = 40;
 const KEY_ARROW_LEFT = 37;
 const KEY_ARROW_RIGHT = 39;

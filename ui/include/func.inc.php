@@ -1783,9 +1783,9 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 	];
 
 	$icons = [
-		ZBX_STYLE_MSG_GOOD => 'zi-circle-check-filled',
-		ZBX_STYLE_MSG_BAD => 'zi-circle-info-filled',
-		ZBX_STYLE_MSG_WARNING => 'zi-circle-info-filled'
+		ZBX_STYLE_MSG_GOOD => ZBX_ICON_CIRCLE_CHECK_FILLED,
+		ZBX_STYLE_MSG_BAD => ZBX_ICON_CIRCLE_INFO_FILLED,
+		ZBX_STYLE_MSG_WARNING => ZBX_ICON_CIRCLE_INFO_FILLED // TODO - AS: maybe wrong icon (ZBX_ICON_TRIANGLE_WARNING)
 	];
 
 	// Details link should be in front of title.

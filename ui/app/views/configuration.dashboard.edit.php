@@ -47,16 +47,16 @@ $html_page = (new CHtmlPage())
 				(new CTag('nav', true, new CList([
 					(new CButton('dashboard-config'))
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF)
-						->addClass('zi-cog-filled'),
+						->addClass(ZBX_ICON_COG_FILLED),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
 						->addItem((new CButton('dashboard-add-widget', _('Add')))
-							->addClass('zi-plus')
+							->addClass(ZBX_ICON_PLUS)
 							->addClass(ZBX_STYLE_BTN_ALT))
 						->addItem(
 							(new CButton('dashboard-add', '&#8203;'))
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass('zi-chevron-down')
+								->addClass(ZBX_ICON_CHEVRON_DOWN)
 						),
 					(new CButton('dashboard-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
@@ -87,12 +87,12 @@ $dashboard->addItem(
 					(new CSimpleButton())
 						->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
 						->addClass('btn-iterator-page-previous')
-						->addClass('zi-chevron-left')
+						->addClass(ZBX_ICON_CHEVRON_LEFT)
 						->setEnabled(false),
 					(new CSimpleButton())
 						->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
 						->addClass('btn-iterator-page-next')
-						->addClass('zi-chevron-right')
+						->addClass(ZBX_ICON_CHEVRON_RIGHT)
 						->setEnabled(false)
 				])
 		)

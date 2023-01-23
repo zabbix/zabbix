@@ -1512,7 +1512,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				(new CDiv([
 					(new CDiv(new CVar('preprocessing['.$i.'][sortorder]', $step['sortorder'])))
 						->addClass(ZBX_STYLE_DRAG_ICON)
-						->addClass('zi-drag-handle')
+						->addClass(ZBX_ICON_DRAG_HANDLE)
 						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
 					(new CDiv($preproc_types_select))
 						->addClass('list-numbered-item')

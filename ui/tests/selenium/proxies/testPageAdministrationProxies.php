@@ -102,7 +102,7 @@ class testPageAdministrationProxies extends CWebTest {
 
 				// Check info-icon color.
 				$this->assertTrue($column->query("xpath:.//a[@class=".
-						CXPathHelper::escapeQuotes("icon-info status-".$parameters['icon_color'])."]")->exists()
+						CXPathHelper::escapeQuotes("zi-i status-".$parameters['icon_color'])."]")->exists()
 				);
 
 				// Check version hint.

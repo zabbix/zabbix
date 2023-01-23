@@ -1710,7 +1710,7 @@ class CDashboard extends CBaseComponent {
 			properties_button.title = t('Actions');
 			properties_button.setAttribute('aria-expanded', 'false');
 			properties_button.setAttribute('aria-haspopup', 'true');
-			properties_button.classList.add('btn-dashboard-page-properties', 'zi-more');
+			properties_button.classList.add('btn-dashboard-page-properties', ZBX_ICON_MORE);
 
 			tab_contents.append(properties_button);
 		}

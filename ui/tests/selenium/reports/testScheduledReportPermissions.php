@@ -328,7 +328,7 @@ class testScheduledReportPermissions extends CWebTest {
 					// User with admin type should see "Inaccessible user" in columns 'Generate report by' and 'Recipient'
 					$this->assertEquals($owner, $row->getColumn('Generate report by')->getText());
 
-					if ($row->getColumn('Recipient')->query('class:icon-user')->one(false)->isValid()) {
+					if ($row->getColumn('Recipient')->query('class:zi-user-filled')->one(false)->isValid()) {
 						$this->assertEquals($owner, $row->getColumn('Recipient')->getText());
 					}
 					else {

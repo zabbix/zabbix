@@ -78,8 +78,7 @@ if (array_key_exists('slas', $data)) {
 			$sla_html[] = ': ';
 			$sla_html[] = CSlaHelper::getSliTag($current_period_sli, (float) $sla['slo']);
 			$sla_html[] = (new CLink())
-				->addClass(ZBX_STYLE_ICON_DESCRIPTION)
-				->addClass('zi-alert')
+				->addClass(ZBX_ICON_ALERT)
 				->setHint($hint);
 		}
 
@@ -100,7 +99,7 @@ if (array_key_exists('slas', $data)) {
 				$data['is_editable']
 					? (new CButton(null))
 						->addClass(ZBX_STYLE_BTN_EDIT)
-						->addClass('zi-pencil')
+						->addClass(ZBX_ICON_PENCIL)
 						->addClass('js-edit-service')
 						->setAttribute('data-serviceid', $data['service']['serviceid'])
 						->setEnabled(!$data['service']['readonly'])

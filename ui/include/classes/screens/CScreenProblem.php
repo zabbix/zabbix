@@ -1021,8 +1021,7 @@ class CScreenProblem extends CScreenBase {
 							: _('Inaccessible user');
 
 						$info_icons[] = (new CSimpleButton())
-							->addClass(ZBX_STYLE_ACTION_ICON_UNSUPPRESS)
-							->addClass('zi-eye')
+							->addClass(ZBX_ICON_EYE)
 							->addClass('blink')
 							->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 					}
@@ -1043,8 +1042,7 @@ class CScreenProblem extends CScreenBase {
 				if ($this->data['filter']['compact_view'] && $this->data['filter']['show_suppressed']
 						&& count($info_icons) > 1) {
 					$cell_info = (new CButton(null))
-						->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
-						->addClass('zi-more')
+						->addClass(ZBX_ICON_MORE)
 						->addStyle('margin-left: -3px;')
 						->setHint(makeInformationList($info_icons));
 				}

@@ -642,7 +642,7 @@ function createFontSelect(string $name): CSelect {
 			(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_MASSUPDATE_ELEMENTS)))
 				->setTitle(_('Help'))
 				->addClass(ZBX_STYLE_ICON_DOC_LINK)
-				->addClass('zi-help')
+				->addClass(ZBX_ICON_HELP)
 				->setTarget('_blank')
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
@@ -932,7 +932,7 @@ function createFontSelect(string $name): CSelect {
 			(new CCol([
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addClass('zi-drag-handle')
+					->addClass(ZBX_ICON_DRAG_HANDLE)
 					->addStyle('top: 0px;'),
 				(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
 			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),

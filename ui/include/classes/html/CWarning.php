@@ -28,7 +28,7 @@ class CWarning extends Ctag {
 			->addItem($header)
 			->addClass(ZBX_STYLE_MSG_GLOBAL)
 			->addClass(ZBX_STYLE_MSG_BAD)
-			->addClass('zi-circle-info-filled');
+			->addClass(ZBX_ICON_CIRCLE_INFO_FILLED);
 
 		if ($messages) {
 			parent::addItem(

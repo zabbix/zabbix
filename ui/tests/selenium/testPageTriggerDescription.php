@@ -93,7 +93,7 @@ class testPageTriggerDescription extends CWebTest {
 		$row = $table->findRow('Problem', $data['Trigger name'], true);
 
 		if (CTestArrayHelper::get($data, 'description', false)) {
-			$row->query('xpath:.//a[contains(@class, "icon-description")]')->one()->click();
+			$row->query('xpath:.//a[contains(@class, "zi-alert")]')->one()->click();
 			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->one()->waitUntilReady();
 			$this->assertEquals($data['description'], $overlay->getText());
 
@@ -105,7 +105,7 @@ class testPageTriggerDescription extends CWebTest {
 		}
 		// Check that there is no description icon if such is not specified if trigger config.
 		else {
-			$this->assertTrue($row->query('class:icon-description')->count() === 0);
+			$this->assertTrue($row->query('class:zi-alert')->count() === 0);
 		}
 
 		// Check trigger description in event details of the corresponding problem.

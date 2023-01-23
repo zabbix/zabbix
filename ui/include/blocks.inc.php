@@ -663,8 +663,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 					: _('Inaccessible user');
 
 				$info_icons[] = (new CSimpleButton())
-					->addClass(ZBX_STYLE_ACTION_ICON_UNSUPPRESS)
-					->addClass('zi-eye')
+					->addClass(ZBX_ICON_EYE)
 					->addClass('blink')
 					->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 			}

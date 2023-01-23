@@ -44,7 +44,7 @@ class CSectionCollapsible extends CSection {
 
 		$toggle = (new CSimpleButton())
 			->addClass(self::ZBX_STYLE_TOGGLE)
-			->addClass('zi-chevron-up')
+			->addClass(ZBX_ICON_CHEVRON_UP)
 			->setTitle($this->is_expanded ? _('Collapse') : _('Expand'))
 			->onClick('toggleSection("'.$this->getId().'", "'.$this->profile_key.'");');
 
