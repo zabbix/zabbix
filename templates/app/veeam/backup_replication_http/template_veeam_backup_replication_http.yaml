@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-17T14:49:17Z'
+  date: '2023-01-23T08:52:46Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -55,7 +55,7 @@ zabbix_export:
               value: status
           triggers:
             -
-              uuid: 502cb582546046a29267715763c46bff
+              uuid: 3487d31a2aa540009f006c6a4eff8c79
               expression: 'length(last(/Veeam Backup and Replication by HTTP/veeam.get.errors))>0'
               name: 'Veeam: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
@@ -243,14 +243,14 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 120a6bf888e74e0c9b054c3bdd50473f
-              name: 'Veeam: Job last result [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Job states [{#NAME}] [{#TYPE}]: Last result'
               type: DEPENDENT
               key: 'veeam.jobs.last.result[{#ID}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'The result of the session. The enums used: `"None"`, `"Success"`, `"Warning"`, `"Failed"`.'
+              description: 'The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -282,14 +282,14 @@ zabbix_export:
                       value: jobs
             -
               uuid: cd2bc50b71184c5ebf39b75a2dafa483
-              name: 'Veeam: Get jobs states data [{#NAME}]'
+              name: 'Veeam: Job states [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'veeam.jobs.states.raw[{#ID}]'
               delay: '0'
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Gets raw data of the jobs states `[{#NAME}]`.'
+              description: 'Gets raw data from the job states with the name `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -306,14 +306,14 @@ zabbix_export:
                   value: raw
             -
               uuid: 6f3837f27334466b814728036dd65c1d
-              name: 'Veeam: Job status [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Job states [{#NAME}] [{#TYPE}]: Status'
               type: DEPENDENT
               key: 'veeam.jobs.status[{#ID}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'The current status of the job. The enums used: `"running"`, `"inactive"`, `"disabled"`.'
+              description: 'The current status of the job. The enums used: `running`, `inactive`, `disabled`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -338,20 +338,20 @@ zabbix_export:
               lld_macro: '{#ID}'
               path: $.id
             -
+              lld_macro: '{#JOB.STATUS}'
+              path: $.status
+            -
               lld_macro: '{#NAME}'
               path: $.name
+            -
+              lld_macro: '{#REPOSITORY.NAME}'
+              path: $.repositoryName
             -
               lld_macro: '{#TYPE}'
               path: $.type
             -
               lld_macro: '{#WORKLOAD}'
               path: $.workload
-            -
-              lld_macro: '{#JOB.STATUS}'
-              path: $.status
-            -
-              lld_macro: '{#REPOSITORY.NAME}'
-              path: $.repositoryName
           preprocessing:
             -
               type: JSONPATH
@@ -392,7 +392,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 1daea1ba8ac144fc9e22296720af0b22
-              name: 'Veeam: Max task count by [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Proxy [{#NAME}] [{#TYPE}]: Max Task Count'
               type: DEPENDENT
               key: 'veeam.proxy.maxtask[{#NAME}]'
               delay: '0'
@@ -414,14 +414,14 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 40d85eb402274838b00765ab91de3896
-              name: 'Veeam: Get data [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Proxy [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'veeam.proxy.raw[{#NAME}]'
               delay: '0'
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Gets raw data of the proxy `[{#NAME}]`, `[{#TYPE}]`.'
+              description: 'Gets raw data collected by the proxy with the name `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -441,7 +441,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 4c304283f1ad480b8251a72ade27620f
-              name: 'Veeam: Host name by [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Proxy [{#NAME}] [{#TYPE}]: Host name'
               type: DEPENDENT
               key: 'veeam.proxy.server.name[{#NAME}]'
               delay: '0'
@@ -465,14 +465,14 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 83e2e092ae1f4e1a9b4a426076f76467
-              name: 'Veeam: Get server data by [{#NAME}]'
+              name: 'Veeam: Server [{#NAME}]: Get data'
               type: DEPENDENT
               key: 'veeam.proxy.server.raw[{#NAME}]'
               delay: '0'
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Gets raw data of the proxy server.'
+              description: 'Gets raw data collected by the proxy server.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -492,7 +492,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 7dca605f25854e89a7e18702e8a48fc7
-              name: 'Veeam: Host type by [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Proxy [{#NAME}] [{#TYPE}]: Host type'
               type: DEPENDENT
               key: 'veeam.proxy.server.type[{#NAME}]'
               delay: '0'
@@ -518,20 +518,20 @@ zabbix_export:
             key: veeam.get.metrics
           lld_macro_paths:
             -
+              lld_macro: '{#DESCRIPTION}'
+              path: $.description
+            -
+              lld_macro: '{#HOSTID}'
+              path: $.server.hostId
+            -
               lld_macro: '{#ID}'
               path: $.id
             -
               lld_macro: '{#NAME}'
               path: $.name
             -
-              lld_macro: '{#HOSTID}'
-              path: $.server.hostId
-            -
               lld_macro: '{#TYPE}'
               path: $.type
-            -
-              lld_macro: '{#DESCRIPTION}'
-              path: $.description
           preprocessing:
             -
               type: JSONPATH
@@ -572,14 +572,14 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 1c925cfa0a2b46838588471aa58a1591
-              name: 'Veeam: Get data [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Repository [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'veeam.repositories.raw[{#NAME}]'
               delay: '0'
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Gets raw data of repositories `[{#NAME}]`, `[{#TYPE}]`.'
+              description: 'Gets raw data from repository with the name: `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -599,7 +599,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 80a13587e8cc40ba886f987fcde23c13
-              name: 'Veeam: Used space [{#NAME}] [{#HOSTNAME}] [{#PATH}]'
+              name: 'Veeam: Repository [{#NAME}] [{#TYPE}]: Used space [{#PATH}]'
               type: DEPENDENT
               key: 'veeam.repository.capacity[{#NAME}]'
               delay: '0'
@@ -623,7 +623,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 882451efee0a4ce8aabc2d2f3955d0be
-              name: 'Veeam: Free space [{#NAME}] [{#HOSTNAME}] [{#PATH}]'
+              name: 'Veeam: Repository [{#NAME}] [{#TYPE}]: Free space [{#PATH}]'
               type: DEPENDENT
               key: 'veeam.repository.free.space[{#NAME}]'
               delay: '0'
@@ -649,26 +649,26 @@ zabbix_export:
             key: veeam.get.metrics
           lld_macro_paths:
             -
+              lld_macro: '{#DESCRIPTION}'
+              path: $.description
+            -
+              lld_macro: '{#HOSTID}'
+              path: $.server.hostId
+            -
+              lld_macro: '{#HOSTNAME}'
+              path: $.hostName
+            -
               lld_macro: '{#ID}'
               path: $.id
             -
               lld_macro: '{#NAME}'
               path: $.name
             -
-              lld_macro: '{#HOSTID}'
-              path: $.server.hostId
+              lld_macro: '{#PATH}'
+              path: $.path
             -
               lld_macro: '{#TYPE}'
               path: $.type
-            -
-              lld_macro: '{#DESCRIPTION}'
-              path: $.description
-            -
-              lld_macro: '{#HOSTNAME}'
-              path: $.hostName
-            -
-              lld_macro: '{#PATH}'
-              path: $.path
           preprocessing:
             -
               type: JSONPATH
@@ -709,7 +709,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 7224f41e5c614268bf6997ad8a49710b
-              name: 'Veeam: Session message [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Session [{#NAME}] [{#TYPE}]: Message'
               type: DEPENDENT
               key: 'veeam.sessions.message[{#ID}]'
               delay: '0'
@@ -763,14 +763,14 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: f82984e1180946c6b4bff1f46987555d
-              name: 'Veeam: Get sessions data [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Session [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'veeam.sessions.raw[{#ID}]'
               delay: '0'
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Gets raw data of sessions `[{#NAME}]`, `[{#TYPE}]`.'
+              description: 'Gets raw data from session with the name: `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -788,14 +788,14 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 5fb9dcb62bfe4d1dae94beefa329691d
-              name: 'Veeam: Session result [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Session [{#NAME}] [{#TYPE}]: Result'
               type: DEPENDENT
               key: 'veeam.sessions.result[{#ID}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'The result of the session. The enums used: `"None"`, `"Success"`, `"Warning"`, `"Failed"`.'
+              description: 'The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -827,14 +827,14 @@ zabbix_export:
                       value: sessions
             -
               uuid: 8c7092e721eb4f8f8b53a07f0fb710a0
-              name: 'Veeam: Session state [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Session [{#NAME}] [{#TYPE}]: State'
               type: DEPENDENT
               key: 'veeam.sessions.state[{#ID}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'The state of the session. The enums used: `"Stopped"`, `"Starting"`, `"Stopping"`, `"Working"`, `"Pausing"`, `"Resuming"`, `"WaitingTape"`, `"Idle"`, `"Postprocessing"`, `"WaitingRepository"`, `"WaitingSlot"`.'
+              description: 'The state of the session. The enums used: `Stopped`, `Starting`, `Stopping`, `Working`, `Pausing`, `Resuming`, `WaitingTape`, `Idle`, `Postprocessing`, `WaitingRepository`, `WaitingSlot`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -856,23 +856,23 @@ zabbix_export:
             key: veeam.get.metrics
           lld_macro_paths:
             -
+              lld_macro: '{#CREATION.TIME}'
+              path: $.creationTime
+            -
+              lld_macro: '{#END.TIME}'
+              path: $.endTime
+            -
               lld_macro: '{#ID}'
               path: $.id
             -
               lld_macro: '{#NAME}'
               path: $.name
             -
-              lld_macro: '{#TYPE}'
-              path: $.sessionType
-            -
               lld_macro: '{#STATE}'
               path: $.state
             -
-              lld_macro: '{#CREATION.TIME}'
-              path: $.creationTime
-            -
-              lld_macro: '{#END.TIME}'
-              path: $.endTime
+              lld_macro: '{#TYPE}'
+              path: $.sessionType
           preprocessing:
             -
               type: JSONPATH
@@ -888,6 +888,10 @@ zabbix_export:
                         return value;
                       });
                   return JSON.stringify(obj);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
       tags:
         -
           tag: class
@@ -986,8 +990,8 @@ zabbix_export:
         -
           macro: '{$VEEAM.PASSWORD}'
           type: SECRET_TEXT
-          description: 'Veeam Backup and Replication account `password`. Used to obtain an access token.'
+          description: 'The `password` of the Veeam Backup and Replication account. It is used to obtain an access token.'
         -
           macro: '{$VEEAM.USER}'
           type: SECRET_TEXT
-          description: 'Veeam Backup and Replication account `username`. Used to obtain an access token.'
+          description: 'The `username` of the Veeam Backup and Replication account. It is used to obtain an access token.'

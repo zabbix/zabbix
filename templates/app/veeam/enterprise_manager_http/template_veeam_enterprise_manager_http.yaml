@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-17T14:49:46Z'
+  date: '2023-01-23T09:32:28Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -11,16 +11,16 @@ zabbix_export:
       template: 'Veeam Backup Enterprise Manager by HTTP'
       name: 'Veeam Backup Enterprise Manager by HTTP'
       description: |
-        This template is designed to monitor Veeam Backup and Replication used Veeam Backup Enterprise Manager REST API.
-        Veeam Backup Enterprise Manager REST API lets communicate with Zabbix to query information about Veeam Backup Enterprise Manager objects.      
+        This template is designed to monitor Veeam Backup Enterprise Manager.
+        The Veeam Backup Enterprise Manager REST API enables the communication with Zabbix to query the information about Veeam Backup Enterprise Manager objects.
         It works without any external scripts and uses the script item. 
         
         Setup:
-          1. Create a user to monitor the service or use an existing read-only account.
-          You can obtain a collection of jobs if you are logged in under an account with the `Portal Administrator` role only.
+          1. Create a user to monitor the service, or use an existing read-only account.
+             You can also obtain the collected jobs if you are logged in under an account having only `Portal Administrator` role.
           See [Veeam Help Center](https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110) for more details.
           2. Link the template to a host.
-          3. Configure macros `{$VEEAM.MANAGER.API.URL}`, `{$VEEAM.MANAGER.USER}`, `{$VEEAM.MANAGER.PASSWORD}`.
+          3. Configure the following macros: `{$VEEAM.MANAGER.API.URL}`, `{$VEEAM.MANAGER.USER}`, `{$VEEAM.MANAGER.PASSWORD}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -36,13 +36,17 @@ zabbix_export:
           key: veeam.manager.failed.jobs
           delay: '0'
           history: 7d
-          description: 'The informing about of the failed job runs.'
+          description: 'Informs about the failed job runs.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.JobStatistics.FailedJobRuns
               error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
@@ -70,7 +74,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'The errors from the API requests.'
+          description: 'The errors from API requests.'
           preprocessing:
             -
               type: JSONPATH
@@ -204,13 +208,17 @@ zabbix_export:
           key: veeam.manager.running.jobs
           delay: '0'
           history: 7d
-          description: 'The informing about of the running jobs.'
+          description: 'Informs about the running jobs.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.JobStatistics.RunningJobs
               error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
@@ -224,13 +232,17 @@ zabbix_export:
           key: veeam.manager.scheduled.backup.jobs
           delay: '0'
           history: 7d
-          description: 'The informing about of the scheduled backup jobs.'
+          description: 'Informs about the scheduled backup jobs.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.JobStatistics.ScheduledBackupJobs
               error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
@@ -244,13 +256,17 @@ zabbix_export:
           key: veeam.manager.scheduled.jobs
           delay: '0'
           history: 7d
-          description: 'The informing about of the scheduled jobs.'
+          description: 'Informs about the scheduled jobs.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.JobStatistics.ScheduledJobs
               error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
@@ -264,13 +280,17 @@ zabbix_export:
           key: veeam.manager.scheduled.replica.jobs
           delay: '0'
           history: 7d
-          description: 'The informing about of the scheduled replica jobs.'
+          description: 'Informs about the scheduled replica jobs.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.JobStatistics.ScheduledReplicaJobs
               error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
@@ -284,13 +304,17 @@ zabbix_export:
           key: veeam.manager.scheduled.total.jobs
           delay: '0'
           history: 7d
-          description: 'The informing about of the total job runs.'
+          description: 'Informs about the total job runs.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.JobStatistics.TotalJobRuns
               error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
@@ -304,13 +328,17 @@ zabbix_export:
           key: veeam.manager.warning.jobs
           delay: '0'
           history: 7d
-          description: 'The informing about of the warning job runs.'
+          description: 'Informs about the warning job runs.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.JobStatistics.WarningsJobRuns
               error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
@@ -357,7 +385,7 @@ zabbix_export:
                 value: '{$BACKUP.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery of all backup files created on or imported to backup servers connected to Veeam Backup Enterprise Manager.'
+          description: 'Discovery of all backup files created on, or imported to the backup servers that are connected to Veeam Backup Enterprise Manager.'
           item_prototypes:
             -
               uuid: d3f87401602c48d3a837504ed08902db
@@ -366,7 +394,7 @@ zabbix_export:
               key: 'veeam.backup.compress.ratio[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'Get data compression ratio [{#NAME}].'
+              description: 'Gets the data compression ratio with the name `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -391,7 +419,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Get data size [{#NAME}].'
+              description: 'Gets the data size with the name `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -414,7 +442,7 @@ zabbix_export:
               key: 'veeam.backup.deduplication.ratio[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'Get data deduplication ratio [{#NAME}].'
+              description: 'Gets the data deduplication ratio with the name `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -439,7 +467,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Get backup size [{#NAME}].'
+              description: 'Gets the backup size with the name `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -506,7 +534,7 @@ zabbix_export:
         -
           macro: '{$VEEAM.MANAGER.API.URL}'
           value: 'https://localhost:9398/api'
-          description: 'Veeam Backup Enterprise Manager API endpoint is a URL in the format `<scheme>://<host>:<port>`.'
+          description: 'Veeam Backup Enterprise Manager API endpoint is a URL in the format: `<scheme>://<host>:<port>`.'
         -
           macro: '{$VEEAM.MANAGER.DATA.TIMEOUT}'
           value: '10'
@@ -517,16 +545,16 @@ zabbix_export:
         -
           macro: '{$VEEAM.MANAGER.JOB.MAX.FAIL}'
           value: '5'
-          description: 'Maximum failed job''s score (for trigger expression).'
+          description: 'The maximum score of failed jobs (for a trigger expression).'
         -
           macro: '{$VEEAM.MANAGER.JOB.MAX.WARN}'
           value: '10'
-          description: 'Maximum warning job''s score (for trigger expression).'
+          description: 'The maximum score of warning jobs (for a trigger expression).'
         -
           macro: '{$VEEAM.MANAGER.PASSWORD}'
           type: SECRET_TEXT
-          description: 'Veeam Backup Enterprise Manager account `password`.'
+          description: 'The `password` of the Veeam Backup Enterprise Manager account.'
         -
           macro: '{$VEEAM.MANAGER.USER}'
           type: SECRET_TEXT
-          description: 'Veeam Backup Enterprise Manager account `user name`.'
+          description: 'The `user name` of the Veeam Backup Enterprise Manager account .'
