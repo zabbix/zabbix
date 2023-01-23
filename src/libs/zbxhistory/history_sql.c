@@ -79,13 +79,22 @@ static void	row2value_log(zbx_history_value_t *value, DB_ROW row)
 	value->log->value = zbx_strdup(NULL, row[4]);
 }
 
+static void	row2value_binary(zbx_history_value_t *value, DB_ROW row)
+{
+	value->bin = (zbx_bin_value_t *)zbx_malloc(NULL, sizeof(zbx_bin_value_t));
+
+	value->bin->value = zbx_strdup(NULL, row[0]);
+	value->bin->hash = zbx_strdup(NULL, row[1]);
+}
+
 /* value_type - history table data mapping */
 static zbx_vc_history_table_t	vc_history_tables[] = {
 	{"history", "value", row2value_dbl},
 	{"history_str", "value", row2value_str},
 	{"history_log", "timestamp,logeventid,severity,source,value", row2value_log},
 	{"history_uint", "value", row2value_ui64},
-	{"history_text", "value", row2value_str}
+	{"history_text", "value", row2value_str},
+	{"history_binary", "value,hash", row2value_binary}
 };
 
 /******************************************************************************************************************
@@ -297,6 +306,27 @@ static void	add_history_log(const zbx_vector_ptr_t *history)
 
 		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, log->timestamp,
 				ZBX_NULL2EMPTY_STR(log->source), log->severity, log->value, log->logeventid);
+	}
+
+	sql_writer_add_dbinsert(db_insert);
+}
+
+static void	add_history_bin(const zbx_vector_ptr_t *history)
+{
+	int		i;
+	zbx_db_insert_t	*db_insert;
+
+	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
+	zbx_db_insert_prepare(db_insert, "history_binary", "itemid", "clock", "ns", "value", NULL);
+
+	for (i = 0; i < history->values_num; i++)
+	{
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+
+		if (ITEM_VALUE_TYPE_TEXT != h->value_type)
+			continue;
+
+		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.str);
 	}
 
 	sql_writer_add_dbinsert(db_insert);
@@ -702,6 +732,9 @@ int	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, ch
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			hist->data.sql_history_func = add_history_log;
+			break;
+		case ITEM_VALUE_TYPE_BIN:
+			hist->data.sql_history_func = add_history_bin;
 			break;
 	}
 

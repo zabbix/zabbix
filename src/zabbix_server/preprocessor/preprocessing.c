@@ -1264,6 +1264,10 @@ static void	agent_result_set_value(zbx_variant_t *value, zbx_item_value_type_t v
 			SET_TEXT_RESULT(result, value->data.str);
 			zbx_variant_set_none(value);
 			break;
+		case ITEM_VALUE_TYPE_BIN:
+			SET_BIN_RESULT(result, value->data.str);
+			zbx_variant_set_none(value);
+			break;
 		case ITEM_VALUE_TYPE_LOG:
 			log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
 			memset(log, 0, sizeof(zbx_log_t));
@@ -1275,7 +1279,7 @@ static void	agent_result_set_value(zbx_variant_t *value, zbx_item_value_type_t v
 			SET_UI64_RESULT(result, value->data.ui64);
 			break;
 		default:
-			*error = zbx_dsprintf(*error, "Unsupported value \"%s\" of type \"%s\"",
+			*error = zbx_dsprintf(*error, "x2 Unsupported value \"%s\" of type \"%s\"",
 					zbx_variant_value_desc(value), zbx_variant_type_desc(value));
 			return;
 	}

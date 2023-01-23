@@ -94,6 +94,7 @@ typedef union
 	char		*str;
 	char		*err;
 	zbx_log_value_t	*log;
+	zbx_bin_value_t *bin;
 }
 zbx_history_value_t;
 
