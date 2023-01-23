@@ -32,8 +32,7 @@
 			widget_defaults,
 			configuration_hash,
 			time_period,
-			web_layout_mode,
-			csrf_tokens
+			web_layout_mode
 		}) {
 			timeControl.refreshPage = false;
 
@@ -77,7 +76,7 @@
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period: time_period,
 				dynamic_hostid: host.hostid,
-				csrf_tokens
+				csrf_token: '<?= CCsrfTokenHelper::get('dashboard') ?>'
 			});
 
 			for (const page of dashboard.pages) {

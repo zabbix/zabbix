@@ -183,8 +183,7 @@ if (count($data['dashboard']['pages']) > 1
 			'widget_defaults' => $data['widget_defaults'],
 			'configuration_hash' => $data['configuration_hash'],
 			'time_period' => $data['time_period'],
-			'web_layout_mode' => $web_layout_mode,
-			'csrf_tokens' => $data['csrf_tokens']
+			'web_layout_mode' => $web_layout_mode
 		]).');
 	'))
 		->setOnDocumentReady()
