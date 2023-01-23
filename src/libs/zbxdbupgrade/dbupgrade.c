@@ -58,6 +58,7 @@ zbx_db_version_t;
 #	define ZBX_TYPE_FLOAT_STR		"double precision"
 #	define ZBX_TYPE_UINT_STR		"bigint unsigned"
 #	define ZBX_TYPE_LONGTEXT_STR		"longtext"
+#	define ZBX_TYPE_BLOB_STR		"longblob"
 #	define ZBX_TYPE_SERIAL_STR		"bigint unsigned"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	"auto_increment"
 #elif defined(HAVE_ORACLE)
@@ -65,6 +66,7 @@ zbx_db_version_t;
 #	define ZBX_TYPE_FLOAT_STR		"binary_double"
 #	define ZBX_TYPE_UINT_STR		"number(20)"
 #	define ZBX_TYPE_LONGTEXT_STR		"nclob"
+#	define ZBX_TYPE_BLOB_STR		"blob"
 #	define ZBX_TYPE_SERIAL_STR		"number(20)"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	""
 #elif defined(HAVE_POSTGRESQL)
@@ -72,6 +74,7 @@ zbx_db_version_t;
 #	define ZBX_TYPE_FLOAT_STR		"double precision"
 #	define ZBX_TYPE_UINT_STR		"numeric(20)"
 #	define ZBX_TYPE_LONGTEXT_STR		"text"
+#	define ZBX_TYPE_BLOB_STR		"bytea"
 #	define ZBX_TYPE_SERIAL_STR		"bigserial"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	""
 #endif
@@ -118,6 +121,9 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 			break;
 		case ZBX_TYPE_TEXT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_TEXT_STR);
+			break;
+		case ZBX_TYPE_BLOB:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_BLOB_STR);
 			break;
 		case ZBX_TYPE_CUID:
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%d)", ZBX_TYPE_CHAR_STR, CUID_LEN - 1);

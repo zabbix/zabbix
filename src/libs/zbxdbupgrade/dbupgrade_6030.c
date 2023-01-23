@@ -1496,6 +1496,25 @@ static int	DBpatch_6030159(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_6030160(void)
+{
+	const ZBX_TABLE	table =
+		{"history_binary", "itemid,clock,ns", 0,
+			{
+				{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 0, ZBX_TYPE_BLOB, ZBX_NOTNULL, 0},
+				{"hash", "", NULL, NULL, 8, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{NULL}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -1662,5 +1681,6 @@ DBPATCH_ADD(6030156, 0, 1)
 DBPATCH_ADD(6030157, 0, 1)
 DBPATCH_ADD(6030158, 0, 1)
 DBPATCH_ADD(6030159, 0, 1)
+DBPATCH_ADD(6030160, 0, 1)
 
 DBPATCH_END()

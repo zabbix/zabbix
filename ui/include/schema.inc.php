@@ -4689,6 +4689,42 @@ return [
 			]
 		]
 	],
+	'history_binary' => [
+		'key' => 'itemid,clock,ns',
+		'fields' => [
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
+			],
+			'clock' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'value' => [
+				'null' => false,
+				'type' => t_binary,
+				'length' => 10,
+				'default' => ''
+			],
+			'hash' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 8,
+				'default' => ''
+			],
+			'ns' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			]
+		]
+	],
 	'proxy_history' => [
 		'key' => 'id',
 		'fields' => [
