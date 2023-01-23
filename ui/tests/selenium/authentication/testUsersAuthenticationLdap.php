@@ -702,7 +702,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 
 	public function getUpdateData() {
 		return [
-			// 0.
+			// #0 Update LDAP with empty strings.
 			[
 				[
 					'servers_settings' => [
@@ -725,7 +725,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// 1.
+			// #1 Update LDAP with empty strings except host.
 			[
 				[
 					'servers_settings' => [
@@ -746,7 +746,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// 2.
+			// #2 Update LDAP with empty strings except host and Base DN.
 			[
 				[
 					'servers_settings' => [
@@ -766,7 +766,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// 3.
+			// #3 Update LDAP with empty strings in name only.
 			[
 				[
 					'servers_settings' => [
@@ -785,7 +785,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// 4.
+			// #4 Update LDAP with changing Bind password.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -794,7 +794,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 							'fields' => [
 								'Name' => 'updated_name',
 								'Host' => 'updated_host',
-								'Port' => '777',
+								'Port' => 777,
 								'Base DN' => 'updated_dn',
 								'Search attribute' => 'updated_search',
 								'Bind DN' => 'updated_bin_dn',
@@ -814,7 +814,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 						'userdirectory_ldap' => [
 							[
 								'host' => 'updated_host',
-								'port' => '777',
+								'port' => 777,
 								'base_dn' => 'updated_dn',
 								'bind_password' => 'test_password',
 								'search_attribute' => 'updated_search',
@@ -826,14 +826,76 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// 5.
+			// #5 Update LDAP with adding JIT (memberOf).
 			[
 				[
 					'expected' => TEST_GOOD,
 					'servers_settings' => [
 						[
 							'fields' => [
-								'Name' => 'ldap_with_jit',
+								'Name' => 'ldap_with_jit_memberOf',
+								'Host' => '111.222.666',
+								'Port' => 1234,
+								'Base DN' => 'new base dn',
+								'Search attribute' => 'new search attribute',
+								'Bind DN' => 'new bind dn test',
+								'Description' => 'new test description with jit',
+								'Configure JIT provisioning' => true,
+								'Group configuration' => 'memberOf',
+								'Group name attribute' => 'new test group name attribute',
+								'User group membership attribute' => 'new test group membership',
+								'User name attribute' => 'new user name attribute',
+								'User last name attribute' => 'new user last name'
+							],
+							'User group mapping' => [
+								[
+									'LDAP group pattern' => 'NEW updated group pattern',
+									'User groups' => 'Test timezone',
+									'User role' => 'User role'
+								]
+							]
+						]
+					],
+					'db_check' => [
+						'userdirectory' => [
+							['name' => '', 'description' => '', 'provision_status' => 0],
+							['name' => 'ldap_with_jit_memberOf', 'description' => 'new test description with jit', 'provision_status' => 1]
+						],
+						'userdirectory_ldap' => [
+							[
+								'host' => '111.222.666',
+								'port' => 1234,
+								'base_dn' => 'new base dn',
+								'bind_dn' => 'new bind dn test',
+								'search_attribute' => 'new search attribute',
+								'group_name' => 'new test group name attribute',
+								'group_membership' => 'new test group membership',
+								'user_username' => 'new user name attribute',
+								'user_lastname' => 'new user last name'
+							]
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => 'NEW updated group pattern',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						]
+					]
+				]
+			],
+			// #6 Update LDAP with adding JIT (groupOfNames).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'ldap_with_jit_groupOfNames',
 								'Host' => '111.222.333',
 								'Port' => '',
 								'Base DN' => 'base dn',
@@ -874,12 +936,12 @@ class testUsersAuthenticationLdap extends CWebTest {
 					'db_check' => [
 						'userdirectory' => [
 							['name' => '', 'description' => '', 'provision_status' => 0],
-							['name' => 'ldap_with_jit', 'description' => 'test description with jit', 'provision_status' => 1]
+							['name' => 'ldap_with_jit_groupOfNames', 'description' => 'test description with jit', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
 							[
 								'host' => '111.222.333',
-								'port' => '0',
+								'port' => 0,
 								'base_dn' => 'base dn',
 								'bind_dn' => 'bind dn test',
 								'search_attribute' => 'search attribute',
@@ -918,58 +980,82 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// 6 Two LDAP servers.
+			// #7 Update LDAP with JIT from memberOf to groupOfNames.
 			[
 				[
 					'expected' => TEST_GOOD,
+					'start_ldap' => [
+						'Name' => 'test_update_memberOf',
+						'Host' => '111.020.050',
+						'Port' => 888,
+						'Base DN' => 'test_update_memberOf',
+						'Search attribute' => 'test_update_memberOf',
+						'Bind DN' => 'test_update_memberOf',
+						'Description' => 'test_update_memberOf',
+						'Configure JIT provisioning' => true,
+						'Group configuration' => 'memberOf',
+						'Group name attribute' => 'test_update_memberOf',
+						'User group membership attribute' => 'test_update_memberOf',
+						'User name attribute' => 'test_update_memberOf',
+						'User last name attribute' => 'test_update_memberOf'
+					],
+					'start_group_mapping' => [
+						[
+							'LDAP group pattern' => 'NEW group pattern',
+							'User groups' => 'Test timezone',
+							'User role' => 'User role'
+						]
+					],
 					'servers_settings' => [
 						[
 							'fields' => [
-								'Name' => 'ldap1',
-								'Host' => '111.222.444',
-								'Port' => '123',
-								'Base DN' => 'base dn 1',
-								'Search attribute' => 'search attribute 1',
-								'Bind DN' => 'bin dn test 1'
-							]
-						],
-						[
-							'fields' => [
-								'Name' => 'ldap2',
-								'Host' => '111.222.555',
-								'Port' => '999',
-								'Base DN' => 'base dn 2',
-								'Search attribute' => 'search attribute 2',
-								'Bind DN' => 'bin dn test 2'
+								'Name' => 'test_update_to_groupOfNames',
+								'Host' => '111.030.060',
+								'Base DN' => 'test_update_to_groupOfNames',
+								'Search attribute' => 'test_update_to_groupOfNames',
+								'Bind DN' => 'test_update_to_groupOfNames',
+								'Description' => 'test_update_to_groupOfNames',
+								'Group configuration' => 'groupOfNames',
+								'Group base DN' => 'test_update_to_groupOfNames',
+								'Group name attribute' => 'test_update_to_groupOfNames',
+								'Group member attribute' => 'test_update_to_groupOfNames',
+								'Reference attribute' => 'test_update_to_groupOfNames',
+								'Group filter' => 'test_update_to_groupOfNames',
+								'User name attribute' => 'test_update_to_groupOfNames',
+								'User last name attribute' => 'test_update_to_groupOfNames'
 							]
 						]
 					],
 					'db_check' => [
 						'userdirectory' => [
-							[
-								'name' => ''
-							],
-							[
-								'name' => 'ldap1'
-							],
-							[
-								'name' => 'ldap2'
-							]
+							['name' => '', 'description' => '', 'provision_status' => 0],
+							['name' => 'test_update_to_groupOfNames', 'description' => 'test_update_to_groupOfNames', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
 							[
-								'host' => '111.222.444',
-								'port' => '123',
-								'base_dn' => 'base dn 1',
-								'search_attribute' => 'search attribute 1',
-								'bind_dn' => 'bin dn test 1'
-							],
+								'host' => '111.030.060',
+								'port' => 888,
+								'base_dn' => 'test_update_to_groupOfNames',
+								'bind_dn' => 'test_update_to_groupOfNames',
+								'search_attribute' => 'test_update_to_groupOfNames',
+								'group_basedn' => 'test_update_to_groupOfNames',
+								'group_name' => 'test_update_to_groupOfNames',
+								'group_member' => 'test_update_to_groupOfNames',
+								'user_ref_attr' => 'test_update_to_groupOfNames',
+								'group_filter' => 'test_update_to_groupOfNames',
+								'user_username' => 'test_update_to_groupOfNames',
+								'user_lastname' => 'test_update_to_groupOfNames'
+							]
+						],
+						'userdirectory_idpgroup' => [
 							[
-								'host' => '111.222.555',
-								'port' => '999',
-								'base_dn' => 'base dn 2',
-								'search_attribute' => 'search attribute 2',
-								'bind_dn' => 'bin dn test 2'
+								'name' => 'NEW group pattern',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
 							]
 						]
 					]
@@ -985,12 +1071,19 @@ class testUsersAuthenticationLdap extends CWebTest {
 	 */
 	public function testUsersAuthenticationLdap_Update($data) {
 		if (CDBHelper::getCount('SELECT * FROM userdirectory_ldap') === 0) {
-			$server_settings['servers_settings'][0]['fields'] = [
-				'Name' => 'test_update',
-				'Host' => 'test_update',
-				'Base DN' => 'test_update',
-				'Search attribute' => 'test_update'
-			];
+			$server_settings['servers_settings'][0]['fields'] = (array_key_exists('start_ldap', $data))
+				? $data['start_ldap']
+				: [
+					'Name' => 'test_update',
+					'Host' => 'test_update',
+					'Base DN' => 'test_update',
+					'Bind password' => 'test_password',
+					'Search attribute' => 'test_update'
+				];
+
+			if (array_key_exists('start_group_mapping', $data)) {
+				$server_settings['servers_settings'][0]['User group mapping'] =	$data['start_group_mapping'];
+			}
 
 			$this->checkLdap($server_settings, 'button:Add');
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
@@ -1180,13 +1273,68 @@ class testUsersAuthenticationLdap extends CWebTest {
 					],
 					'error' => 'At least one LDAP server must exist.'
 				]
+			],
+			// #8 Group mapping dialog form validation.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test',
+								'Base DN' => 'test',
+								'Search attribute' => 'tets',
+								'Configure JIT provisioning' => true
+							],
+							'User group mapping' => [[]],
+						]
+					],
+					'mapping_error' => 'Invalid user group mapping configuration.',
+					'mapping_error_details' => [
+						'Field "roleid" is mandatory.',
+						'Incorrect value for field "name": cannot be empty.',
+						'Field "user_groups" is mandatory.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #9 Media mapping dialog form validation.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'tets no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [[]],
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "attribute": cannot be empty.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
 			]
 		];
 	}
 
 	public function getCreateData() {
 		return [
-			// #1 Using cyrillic in settings.
+			// #0 Using cyrillic in settings.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1278,7 +1426,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// #2 Using symbols in settings.
+			// #1 Using symbols in settings.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1371,7 +1519,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// #3 Long values.
+			// #2 Long values.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1473,7 +1621,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// #4 LDAP server with every field filled (no JIT).
+			// #3 LDAP server with every field filled (no JIT).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1512,7 +1660,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// #5 LDAP server with every field filled with JIT.
+			// #4 LDAP server with every field filled with JIT (groupOfNames).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1599,6 +1747,63 @@ class testUsersAuthenticationLdap extends CWebTest {
 								'name' => 'Create Test iLert mapping',
 								'mediatypeid' => 22,
 								'attribute' => 'test iLert'
+							]
+						]
+					]
+				]
+			],
+			// #5 Two LDAP servers with different names.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'ldap1',
+								'Host' => '111.222.444',
+								'Port' => '123',
+								'Base DN' => 'base dn 1',
+								'Search attribute' => 'search attribute 1',
+								'Bind DN' => 'bin dn test 1'
+							]
+						],
+						[
+							'fields' => [
+								'Name' => 'ldap2',
+								'Host' => '111.222.555',
+								'Port' => '999',
+								'Base DN' => 'base dn 2',
+								'Search attribute' => 'search attribute 2',
+								'Bind DN' => 'bin dn test 2'
+							]
+						]
+					],
+					'db_check' => [
+						'userdirectory' => [
+							[
+								'name' => ''
+							],
+							[
+								'name' => 'ldap1'
+							],
+							[
+								'name' => 'ldap2'
+							]
+						],
+						'userdirectory_ldap' => [
+							[
+								'host' => '111.222.444',
+								'port' => '123',
+								'base_dn' => 'base dn 1',
+								'search_attribute' => 'search attribute 1',
+								'bind_dn' => 'bin dn test 1'
+							],
+							[
+								'host' => '111.222.555',
+								'port' => '999',
+								'base_dn' => 'base dn 2',
+								'search_attribute' => 'search attribute 2',
+								'bind_dn' => 'bin dn test 2'
 							]
 						]
 					]
@@ -1734,16 +1939,25 @@ class testUsersAuthenticationLdap extends CWebTest {
 			}
 
 			if (CTestArrayHelper::get($ldap['fields'], 'Configure JIT provisioning')) {
+				$success = (array_key_exists('mapping_error', $data)) ? false : true;
+
 				if (array_key_exists('User group mapping', $ldap)) {
-					$this->setMapping($ldap['User group mapping'], $ldap_form, 'User group mapping');
+					$this->setMapping($ldap['User group mapping'], $ldap_form, 'User group mapping', $success);
 				}
 
 				if (array_key_exists('Media type mapping', $ldap)) {
-					$this->setMapping($ldap['Media type mapping'], $ldap_form, 'Media type mapping');
+					$this->setMapping($ldap['Media type mapping'], $ldap_form, 'Media type mapping', $success);
 				}
 			}
 
+			// Check error message in ldap creation form.
+			if (array_key_exists('mapping_error', $data)) {
+				$this->assertMessage(TEST_BAD, $data['mapping_error'], $data['mapping_error_details']);
+				COverlayDialogElement::find()->all()->last()->query('button:Cancel')->one()->click();
+			}
+
 			$ldap_form->submit();
+
 
 			if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD || CTestArrayHelper::get($data, 'dialog_submit')) {
 				$dialog->ensureNotPresent();
@@ -1767,7 +1981,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// Check error message in ldap creation form.
 			if (array_key_exists('ldap_error', $data)) {
 				$this->assertMessage(TEST_BAD, $data['ldap_error'], $data['ldap_error_details']);
-				COverlayDialogElement::find()->one()->close();
+				COverlayDialogElement::find()->all()->last()->close();
 			}
 		}
 
@@ -1785,14 +1999,17 @@ class testUsersAuthenticationLdap extends CWebTest {
 	 * @param CFormElement     $form     LDAP form
 	 * @param string           $field    mapping field which is being filled
 	 */
-	private function setMapping($data, $form, $field) {
+	private function setMapping($data, $form, $field, $success = true) {
 		foreach ($data as $mapping) {
 			$form->getFieldContainer($field)->query('button:Add')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 			$param_form = $dialog->asForm();
 			$param_form->fill($mapping);
 			$param_form->submit();
-			$dialog->waitUntilNotVisible();
+
+			if ($success) {
+				$dialog->waitUntilNotVisible();
+			}
 		}
 	}
 }
