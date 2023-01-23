@@ -34,8 +34,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'from' => 'required|range_time',
-			'to' => 'required|range_time'
+			'from' => 'string',
+			'to' => 'string'
 		]);
 	}
 

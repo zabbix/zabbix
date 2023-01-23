@@ -45,8 +45,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'content_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
 			'content_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'preview' => 'in 1',
-			'from' => 'required|range_time',
-			'to' => 'required|range_time'
+			'from' => 'string',
+			'to' => 'string'
 		]);
 	}
 
