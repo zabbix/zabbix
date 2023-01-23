@@ -25,10 +25,10 @@
 class CConnector extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' =>	['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'create' =>	['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'update' =>	['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'delete' =>	['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+		'get' =>	['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'create' =>	['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' =>	['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'delete' =>	['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
 	protected $tableName = 'connector';
@@ -48,6 +48,12 @@ class CConnector extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options = []) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'connector', __FUNCTION__)
+			);
+		}
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'connectorids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
