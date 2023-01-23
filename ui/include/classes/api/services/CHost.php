@@ -2687,49 +2687,46 @@ class CHost extends CHostGeneral {
 	 * @inheritdoc
 	 */
 	protected function getObjectsByData(array $data, array $db_objects): array {
-		$objects = parent::getObjectsByData($data, $db_objects);
+		$hosts = parent::getObjectsByData($data, $db_objects);
+		$hosts = array_column($hosts, null, 'hostid');
 
-		foreach ($db_objects as $db_object) {
-			$object = ['hostid' => $db_object['hostid']];
+		foreach ($db_objects as $db_host) {
+			if (!array_key_exists('templates', $db_host)) {
+				continue;
+			}
 
-			if (array_key_exists('templates', $db_object)) {
-				$templates = $this instanceof CTemplate ? 'templates_link' : 'templates';
-				$templateids = $this instanceof CTemplate ? 'templateids_link' : 'templateids';
+			$host = array_key_exists($db_host['hostid'], $hosts)
+				? $hosts[$db_host['hostid']]
+				: ['hostid' => $db_host['hostid']];
 
-				if (array_key_exists($templates, $data) || array_key_exists($templateids, $data)) {
-					$object['templates'] = [];
+			if (array_key_exists('templates', $data) || array_key_exists('templateids', $data)) {
+				$host['templates'] = [];
 
-					if (array_key_exists($templates, $data)) {
-						foreach ($data[$templates] as $template) {
-							$object['templates'][] = ['templateid' => $template['templateid']];
-						}
-					}
-				}
-
-				if (array_key_exists('templates_clear', $data) || array_key_exists('templateids_clear', $data)) {
-					$object['templates_clear'] = [];
-					$db_templateids = array_column($db_object['templates'], 'templateid');
-
-					if (array_key_exists('templates_clear', $data)) {
-						foreach ($data['templates_clear'] as $template) {
-							if (in_array($template['templateid'], $db_templateids)) {
-								$object['templates_clear'][] = ['templateid' => $template['templateid']];
-							}
-						}
-					}
-					else {
-						foreach ($data['templateids_clear'] as $templateid) {
-							if (in_array($templateid, $db_templateids)) {
-								$object['templates_clear'][] = ['templateid' => $templateid];
-							}
-						}
+				if (array_key_exists('templates', $data)) {
+					foreach ($data['templates'] as $template) {
+						$host['templates'][] = ['templateid' => $template['templateid']];
 					}
 				}
 			}
 
-			$objects[] = $object;
+			if (array_key_exists('templates_clear', $data) || array_key_exists('templateids_clear', $data)) {
+				$db_templateids = array_flip(array_column($db_host['templates'], 'templateid'));
+				$templateids_clear = array_key_exists('templates_clear', $data)
+					? array_column($data['templates_clear'], 'templateid')
+					: $data['templateids_clear'];
+
+				$host['templates_clear'] = [];
+
+				foreach ($templateids_clear as $templateid) {
+					if (array_key_exists($templateid, $db_templateids)) {
+						$host['templates_clear'][] = ['templateid' => $templateid];
+					}
+				}
+			}
+
+			$hosts[$db_host['hostid']] = $host;
 		}
 
-		return $objects;
+		return array_values($hosts);
 	}
 }
