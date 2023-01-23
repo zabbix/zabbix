@@ -28,7 +28,7 @@ class CControllerConnectorList extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'filter_name' =>	'string',
-			'filter_status' =>	'in '.implode(',', [-1, ZBX_CONNECTOR_STATUS_ENABLED, ZBX_CONNECTOR_STATUS_DISABLED]),
+			'filter_status' =>	'in '.implode(',', [-1, ZBX_CONNECTOR_STATUS_DISABLED, ZBX_CONNECTOR_STATUS_ENABLED]),
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
 			'sort' =>			'in '.implode(',', ['name', 'data_type']),

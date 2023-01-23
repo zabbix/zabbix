@@ -90,7 +90,7 @@ class CControllerConnectorEdit extends CController {
 					'protocol' => $this->connector['protocol'],
 					'data_type' => (int) $this->connector['data_type'],
 					'url' => $this->connector['url'],
-					'max_records_mode' => (int) $this->connector['max_records'] == 0 ? 0 : 1,
+					'max_records_mode' => $this->connector['max_records'] == 0 ? 0 : 1,
 					'max_records' => (int) $this->connector['max_records'],
 					'max_senders' => (int) $this->connector['max_senders'],
 					'max_attempts' => (int) $this->connector['max_attempts'],

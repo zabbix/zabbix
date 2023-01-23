@@ -43,7 +43,7 @@ $connector_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Protocol'), 'protocol'),
+		new CLabel(_('Protocol')),
 		new CFormField([
 			_('Zabbix Streaming Protocol v1.0'),
 			new CInput('hidden', 'protocol', $data['form']['protocol'])
@@ -82,11 +82,11 @@ $connector_tab = (new CFormGrid())
 				->addClass('table-tags')
 				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
 				->setFooter(
-					(new CCol(
+					new CCol(
 						(new CSimpleButton(_('Add')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->addClass('element-table-add')
-					))
+					)
 				),
 			(new CTemplateTag('tag-row-tmpl'))
 				->addItem(
@@ -130,12 +130,12 @@ $connector_tab = (new CFormGrid())
 					->setModern()
 			))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CNumericBox('max_records', $data['form']['max_records'], 10, false, false, false))
-				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
 		])
 	])
 	->addItem([
-		(new CLabel(_('Processes')))->setAsteriskMark(),
+		(new CLabel(_('Processes'), 'max_senders'))->setAsteriskMark(),
 		new CFormField(
 			(new CNumericBox('max_senders', $data['form']['max_senders'], 3, false, false, false))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -143,7 +143,7 @@ $connector_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		(new CLabel(_('Attempts')))->setAsteriskMark(),
+		(new CLabel(_('Attempts'), 'max_attempts'))->setAsteriskMark(),
 		new CFormField(
 			(new CNumericBox('max_attempts', $data['form']['max_attempts'], 1, false, false, false))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
