@@ -190,7 +190,8 @@ class CControllerWidgetItemView extends CControllerWidget {
 					case ITEM_VALUE_TYPE_LOG:
 						$value = formatHistoryValue($last_value, $items[$itemid], false);
 
-						if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $last_value !== $prev_value) {
+						if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
+								&& $last_value !== $prev_value) {
 							$change_indicator = self::CHANGE_INDICATOR_UP_DOWN;
 						}
 						break;
