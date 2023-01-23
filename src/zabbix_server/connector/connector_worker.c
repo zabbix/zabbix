@@ -35,7 +35,8 @@ static int	connector_object_compare_func(const void *d1, const void *d2)
 }
 
 static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message,
-		zbx_vector_connector_data_point_t *connector_data_points)
+		zbx_vector_connector_data_point_t *connector_data_points, zbx_uint64_t *processed_num,
+		zbx_uint64_t *connections_num)
 {
 	zbx_connector_t	connector;
 	int		i;
@@ -54,6 +55,8 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 		delim = '\n';
 	}
 
+	*processed_num += connector_data_points->values_num;
+	*connections_num += 1;
 	zbx_vector_connector_data_point_clear_ext(connector_data_points, zbx_connector_data_point_free);
 #ifdef HAVE_LIBCURL
 	if (SUCCEED != zbx_http_request(HTTP_REQUEST_POST, connector.url, "", "",
@@ -123,15 +126,19 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 
 ZBX_THREAD_ENTRY(connector_worker_thread, args)
 {
+#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
 	pid_t					ppid;
 	char					*error = NULL;
 	zbx_ipc_socket_t			socket;
 	zbx_ipc_message_t			message;
+	double					time_stat, time_idle = 0, time_now, time_read;
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
 	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_vector_connector_data_point_t	connector_data_points;
+	zbx_uint64_t				processed_num = 0, connections_num = 0;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(info->program_type), process_num);
 
@@ -156,8 +163,26 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 
 	zbx_vector_connector_data_point_create(&connector_data_points);
 
+	time_stat = zbx_time();
+
 	for (;;)
 	{
+
+		time_now = zbx_time();
+
+		if (STAT_INTERVAL < time_now - time_stat)
+		{
+			zbx_setproctitle("%s #%d [processed values " ZBX_FS_UI64 ", connections " ZBX_FS_UI64 ", idle "
+					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
+					get_process_type_string(process_type), process_num, processed_num,
+					connections_num, time_idle, time_now - time_stat);
+
+			time_stat = time_now;
+			time_idle = 0;
+			processed_num = 0;
+			connections_num = 0;
+		}
+
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&socket, &message))
@@ -172,12 +197,17 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-		zbx_update_env(get_process_type_string(process_type), zbx_time());
+
+		time_read = zbx_time();
+		time_idle += time_read - time_now;
+
+		zbx_update_env(get_process_type_string(process_type), time_read);
 
 		switch (message.code)
 		{
 			case ZBX_IPC_CONNECTOR_REQUEST:
-				worker_process_request(&socket, &message, &connector_data_points);
+				worker_process_request(&socket, &message, &connector_data_points, &processed_num,
+						&connections_num);
 				break;
 		}
 
