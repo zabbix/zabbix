@@ -85,7 +85,7 @@ zbx_add_post_js('ZABBIX.apps.map.run("'.ZBX_STYLE_MAP_AREA.'", '.json_encode([
 	'defaultAutoIconId' => $data['defaultAutoIconId'],
 	'defaultIconId' => $data['defaultIconId'],
 	'defaultIconName' => $data['defaultIconName'],
-	'csrf_tokens' => CCsrfTokenHelper::get('sysmap.php')
+	'csrf_token' => CCsrfTokenHelper::get('sysmap.php')
 ], JSON_FORCE_OBJECT).');');
 
 (new CHtmlPage())

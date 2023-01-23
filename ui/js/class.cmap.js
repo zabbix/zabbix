@@ -121,7 +121,7 @@ ZABBIX.apps.map = (function($) {
 			this.defaultAutoIconId = mapData.defaultAutoIconId;
 			this.defaultIconId = mapData.defaultIconId;
 			this.defaultIconName = mapData.defaultIconName;
-			this.csrf_tokens = mapData.csrf_tokens;
+			this.csrf_token = mapData.csrf_token;
 			this.container = $('#' + containerId);
 
 			if (this.container.length === 0) {
@@ -250,7 +250,7 @@ ZABBIX.apps.map = (function($) {
 					data: {
 						favobj: 'sysmap',
 						action: 'update',
-						_csrf_token: this.csrf_tokens['sysmap.php'],
+						_csrf_token: this.csrf_token,
 						sysmapid: this.sysmapid,
 						sysmap: JSON.stringify(this.data)
 					},
