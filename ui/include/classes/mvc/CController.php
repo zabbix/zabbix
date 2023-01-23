@@ -410,16 +410,15 @@ abstract class CController {
 			return false;
 		}
 
-		$action_parts = explode('.', $this->action);
+		$skip = ['popup', 'massupdate'];
 
-		if ($action_parts[0] === 'popup') {
-			$action_main = ($action_parts[1] === 'massupdate') ? $action_parts[2] : $action_parts[1];
-		}
-		else {
-			$action_main = $action_parts[0];
+		foreach (explode('.', $this->action) as $segment) {
+			if (!in_array($segment, $skip, true)) {
+				return CCsrfTokenHelper::check($this->raw_input[CCsrfTokenHelper::CSRF_TOKEN_NAME], $segment);
+			}
 		}
 
-		return CCsrfTokenHelper::check($this->raw_input[CCsrfTokenHelper::CSRF_TOKEN_NAME], $action_main);
+		return false;
 	}
 
 	/**
