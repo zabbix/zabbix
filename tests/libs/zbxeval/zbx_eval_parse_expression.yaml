@@ -1592,8 +1592,8 @@ out:
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/Trapper/trap[1]', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '5m', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_HIST_STR, token: '"1h"', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_HIST_STR, token: '"1"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"1h"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"1"', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
   result: SUCCEED

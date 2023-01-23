@@ -1236,7 +1236,7 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
-void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str, int escape_backslash);
+void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str);
 
 void	zbx_strsplit(const char *src, char delimiter, char **left, char **right);
 
@@ -1796,7 +1796,7 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 
 /* */
 char	*zbx_substr(const char *src, size_t left, size_t right);
-char	*zbx_substr_unquote(const char *src, size_t left, size_t right, int unescape_backslash);
+char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 
 /* UTF-8 trimming */
 void	zbx_ltrim_utf8(char *str, const char *charlist);

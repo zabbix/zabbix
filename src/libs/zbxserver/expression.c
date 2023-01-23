@@ -4792,8 +4792,7 @@ static int	expand_trigger_macros(zbx_eval_context_t *ctx, const DB_EVENT *event,
 	{
 		zbx_eval_token_t	*token = &ctx->stack.values[i];
 
-		if (ZBX_EVAL_TOKEN_VAR_MACRO != token->type && ZBX_EVAL_TOKEN_VAR_STR != token->type &&
-				ZBX_EVAL_TOKEN_VAR_HIST_STR != token->type)
+		if (ZBX_EVAL_TOKEN_VAR_MACRO != token->type && ZBX_EVAL_TOKEN_VAR_STR != token->type)
 			continue;
 
 		/* all trigger macros are already extracted into strings */
@@ -5744,9 +5743,7 @@ static int	substitute_query_filter_lld_macros(char **filter, const struct zbx_js
 			case ZBX_EVAL_TOKEN_VAR_LLDMACRO:
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
 			case ZBX_EVAL_TOKEN_VAR_STR:
-			case ZBX_EVAL_TOKEN_VAR_HIST_STR:
-				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r,
-						ZBX_EVAL_TOKEN_VAR_HIST_STR == token->type ? 0 : 1);
+				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
 
 				if (FAIL == substitute_lld_macros(&value, jp_row, lld_macro_paths, ZBX_MACRO_ANY, err,
 						sizeof(err)))
@@ -5873,9 +5870,7 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 			case ZBX_EVAL_TOKEN_VAR_STR:
 			case ZBX_EVAL_TOKEN_VAR_NUM:
 			case ZBX_EVAL_TOKEN_ARG_PERIOD:
-			case ZBX_EVAL_TOKEN_VAR_HIST_STR:
-				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r,
-						ZBX_EVAL_TOKEN_VAR_HIST_STR == token->type ? 0 : 1);
+				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
 
 				if (FAIL == substitute_lld_macros(&value, jp_row, lld_macro_paths, ZBX_MACRO_ANY, err,
 						sizeof(err)))

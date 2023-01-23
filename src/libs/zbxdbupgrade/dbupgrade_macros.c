@@ -322,7 +322,7 @@ static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, const z
 
 	if (2 <= params->values_num && '\0' != function->parameter[params->values[1].l])
 	{
-		mask = zbx_substr_unquote(function->parameter, params->values[1].l, params->values[1].r, 1);
+		mask = zbx_substr_unquote(function->parameter, params->values[1].l, params->values[1].r);
 		*replace = zbx_dsprintf(NULL, "bitand({" ZBX_FS_UI64 "},%s)", function->functionid, mask);
 		zbx_free(mask);
 	}
@@ -333,7 +333,7 @@ static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, const z
 	{
 		char	*param;
 
-		param = zbx_substr_unquote(function->parameter, params->values[0].l, params->values[0].r, 1);
+		param = zbx_substr_unquote(function->parameter, params->values[0].l, params->values[0].r);
 
 		if ('#' != *param && '{' != *param)
 			secnum = -1;
@@ -726,7 +726,7 @@ void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **replace, 
 		{
 			if (3 <= params.values_num && '\0' != function->parameter[params.values[2].l])
 			{
-				op = zbx_substr_unquote(function->parameter, params.values[2].l, params.values[2].r, 1);
+				op = zbx_substr_unquote(function->parameter, params.values[2].l, params.values[2].r);
 
 				if (0 == strcmp(op, "band"))
 					op = zbx_strdup(op, "bitand");
@@ -770,7 +770,7 @@ void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **replace, 
 		{
 			char	*param;
 
-			param = zbx_substr_unquote(function->parameter, params.values[0].l, params.values[0].r, 1);
+			param = zbx_substr_unquote(function->parameter, params.values[0].l, params.values[0].r);
 
 			if ('#' != *param && '{' != *param)
 				secnum = -1;
@@ -795,7 +795,7 @@ void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **replace, 
 		{
 			char	*param;
 
-			param = zbx_substr_unquote(function->parameter, params.values[0].l, params.values[0].r, 1);
+			param = zbx_substr_unquote(function->parameter, params.values[0].l, params.values[0].r);
 
 			if ('#' != *param && '{' != *param)
 				secnum = -1;

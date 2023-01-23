@@ -300,7 +300,6 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 			}
 			break;
 		case ZBX_EVAL_TOKEN_VAR_STR:
-		case ZBX_EVAL_TOKEN_VAR_HIST_STR:
 			quoted = 1;
 			break;
 		case ZBX_EVAL_TOKEN_VAR_MACRO:
@@ -335,8 +334,7 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 	if (0 == quoted)
 		zbx_strcpy_alloc(str, str_alloc, str_offset, value_str);
 	else
-		zbx_strquote_alloc(str, str_alloc, str_offset, value_str,
-				ZBX_EVAL_TOKEN_VAR_HIST_STR == token->type ? 0 : 1);
+		zbx_strquote_alloc(str, str_alloc, str_offset, value_str);
 }
 
 /******************************************************************************
@@ -491,14 +489,12 @@ static int	eval_query_expand_user_macros(const char *itemquery, size_t len, zbx_
 						hostids, hostids_num, &value, error);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
-			case ZBX_EVAL_TOKEN_VAR_HIST_STR:
 				if (SUCCEED != eval_has_usermacro(ctx.expression + token->loc.l,
 						token->loc.r - token->loc.l + 1))
 				{
 					continue;
 				}
-				tmp = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r,
-						ZBX_EVAL_TOKEN_VAR_HIST_STR == token->type ? 0 : 1);
+				tmp = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
 				ret = resolver_cb(tmp, strlen(tmp), hostids, hostids_num, &value, error);
 				zbx_free(tmp);
 				break;
@@ -563,14 +559,12 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, zbx_uint64_t *hos
 			case ZBX_EVAL_TOKEN_VAR_STR:
 			case ZBX_EVAL_TOKEN_VAR_NUM:
 			case ZBX_EVAL_TOKEN_ARG_PERIOD:
-			case ZBX_EVAL_TOKEN_VAR_HIST_STR:
 				if (SUCCEED != eval_has_usermacro(ctx->expression + token->loc.l,
 						token->loc.r - token->loc.l + 1))
 				{
 					continue;
 				}
-				tmp = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r,
-						ZBX_EVAL_TOKEN_VAR_HIST_STR == token->type ? 0 : 1);
+				tmp = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
 				ret = resolver_cb(tmp, strlen(tmp), hostids, hostids_num, &value, error);
 				zbx_free(tmp);
 				break;
@@ -697,12 +691,10 @@ zbx_eval_context_t	*zbx_eval_deserialize_dyn(const unsigned char *data, const ch
 				expression_extract_functionid(expression, token, &functionid);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
-			case ZBX_EVAL_TOKEN_VAR_HIST_STR:
 				if (0 != (mask & ZBX_EVAL_EXTRACT_VAR_STR) && ZBX_VARIANT_NONE == token->value.type)
 				{
 					/* extract string variable value for macro resolving */
-					value = zbx_substr_unquote(expression, token->loc.l, token->loc.r,
-							ZBX_EVAL_TOKEN_VAR_HIST_STR == token->type ? 0 : 1);
+					value = zbx_substr_unquote(expression, token->loc.l, token->loc.r);
 					zbx_variant_set_str(&token->value, value);
 				}
 				break;
@@ -710,7 +702,7 @@ zbx_eval_context_t	*zbx_eval_deserialize_dyn(const unsigned char *data, const ch
 				if (0 != (mask & ZBX_EVAL_EXTRACT_VAR_MACRO) && ZBX_VARIANT_NONE == token->value.type)
 				{
 					/* extract macro for resolving */
-					value = zbx_substr_unquote(expression, token->loc.l, token->loc.r, 1);
+					value = zbx_substr_unquote(expression, token->loc.l, token->loc.r);
 					zbx_variant_set_str(&token->value, value);
 				}
 				break;
@@ -897,15 +889,13 @@ void	zbx_eval_get_constant(const zbx_eval_context_t *ctx, int index, char **valu
 			case ZBX_EVAL_TOKEN_VAR_STR:
 			case ZBX_EVAL_TOKEN_VAR_NUM:
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
-			case ZBX_EVAL_TOKEN_VAR_HIST_STR:
 				if (index == (int)token->opt + 1)
 				{
 					zbx_free(*value);
 					if (ZBX_VARIANT_NONE != token->value.type)
 						*value = zbx_strdup(NULL, zbx_variant_value_desc(&token->value));
 					else
-						*value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r,
-								ZBX_EVAL_TOKEN_VAR_HIST_STR == token->type ? 0 : 1);
+						*value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
 					return;
 				}
 				break;
