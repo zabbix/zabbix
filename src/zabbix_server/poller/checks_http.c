@@ -32,7 +32,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	if (SUCCEED == (ret = zbx_http_request(item->request_method, item->url, item->query_fields, item->headers,
 			item->posts, item->retrieve_mode, item->http_proxy, item->follow_redirects, item->timeout, 1,
 			item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password, item->verify_peer,
-			item->verify_host, item->authtype, item->username, item->password, "", item->post_type,
+			item->verify_host, item->authtype, item->username, item->password, NULL, item->post_type,
 			item->status_codes, item->output_format, &out, &error)))
 	{
 		SET_TEXT_RESULT(result, out);

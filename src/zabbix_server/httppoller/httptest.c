@@ -842,7 +842,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest, int *delay
 		}
 
 		if (SUCCEED != zbx_http_prepare_auth(easyhandle, httptest->httptest.authentication,
-				httptest->httptest.http_user, httptest->httptest.http_password, "", &err_str))
+				httptest->httptest.http_user, httptest->httptest.http_password, NULL, &err_str))
 		{
 			goto httpstep_error;
 		}

@@ -200,7 +200,7 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 {
 	CURLcode	err;
 
-	if ('\0' != *token)
+	if (NULL != token && '\0' != *token)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "setting CURLOPT_XOAUTH2_BEARER");
 
