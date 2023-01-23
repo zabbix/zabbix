@@ -161,7 +161,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 						$units = $formatted_value['units'];
 
 						if (!$formatted_value['is_mapped']) {
-							$numeric_formatting = localeconv();
+							$numeric_formatting = getNumericFormatting();
 							$decimal_pos = strrpos($value, $numeric_formatting['decimal_point']);
 
 							if ($decimal_pos !== false) {

@@ -1462,6 +1462,21 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 }
 
 /**
+ * Get decimal point and thousands separator for number formatting in the current locale.
+ *
+ * @return array  'decimal_point' and 'thousands_sep' values.
+ */
+function getNumericFormatting(): array {
+	static $numeric_formatting = null;
+
+	if ($numeric_formatting === null) {
+		$numeric_formatting = array_intersect_key(localeconv(), array_flip(['decimal_point', 'thousands_sep']));
+	}
+
+	return $numeric_formatting;
+}
+
+/**
  * Format floating-point number in the best possible way for displaying.
  *
  * @param float $number   Valid number in decimal or scientific notation.
@@ -1556,7 +1571,7 @@ function formatFloat(float $number, array $options = []): string {
 	[
 		'decimal_point' => $decimal_point,
 		'thousands_sep' => $thousands_sep
-	] = localeconv();
+	] = getNumericFormatting();
 
 	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
 
@@ -1568,12 +1583,16 @@ function formatFloat(float $number, array $options = []): string {
 			);
 		}
 		else {
-			return sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
+			return str_replace('.', $decimal_point,
+				sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number)
+			);
 		}
 	}
 	elseif ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
 			|| ($exponent >= $precision && $number != $number_original)) {
-		return sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
+		return str_replace('.', $decimal_point,
+			sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number)
+		);
 	}
 	else {
 		return number_format($number, $decimals_exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals)),
