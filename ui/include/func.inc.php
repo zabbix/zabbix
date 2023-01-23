@@ -580,7 +580,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 					$v = fmod($value_abs, 1) * 1000;
 
 					if ($v > 0) {
-						$parts['milliseconds'] = formatFloat($v, null, ZBX_UNITS_ROUNDOFF_SUFFIXED);
+						$parts['milliseconds'] = formatFloat($v, ['decimals' => ZBX_UNITS_ROUNDOFF_SUFFIXED]);
 					}
 				}
 			}
@@ -600,7 +600,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 	$result = [];
 
 	foreach (array_filter($parts) as $part_unit => $part_value) {
-		$result[] = formatFloat($part_value, null, ZBX_UNITS_ROUNDOFF_SUFFIXED).$units[$part_unit];
+		$result[] = formatFloat($part_value, ['decimals' => ZBX_UNITS_ROUNDOFF_SUFFIXED]).$units[$part_unit];
 	}
 
 	return $result ? ($value < 0 ? '-' : '').implode(' ', $result) : '0';
@@ -704,19 +704,22 @@ function convertUnits(array $options): string {
  * @param array $options
  *
  * $options = [
- *     'value' =>               (string)  Value to convert.
- *     'units' =>               (string)  Default: ''. Units to base the conversion on.
- *     'convert' =>             (int)     Default: ITEM_CONVERT_WITH_UNITS. Set to ITEM_CONVERT_NO_UNITS to
- *                                        force-convert a value with empty units.
- *     'power' =>               (int)     Convert to the specified power of "unit_base" (0 => '', 1 => K, 2 => M, ...).
- *                                        By default, the power will be calculated automatically.
- *     'unit_base' =>           (string)  1000 or 1024. By default, will only use 1024 for "B" and "Bps" units.
- *     'ignore_milliseconds' => (bool)    Ignore milliseconds in time conversion ("s" units).
- *     'precision' =>           (int)     Max number of significant digits to take into account. Default: ZBX_FLOAT_DIG.
- *     'decimals' =>            (int)     Max number of first non-zero decimals to display. Default: 0.
- *     'decimals_exact' =>      (bool)    Display exactly this number of decimals instead of first non-zeros.
- *                                        Default: false.
- *     'small_scientific' =>    (bool)    Allow scientific notation for small numbers. Default: true.
+ *     'value' =>               (string)    Value to convert.
+ *     'units' =>               (string)    Units to base the conversion on. Default: ''.
+ *     'convert' =>             (int)       Default: ITEM_CONVERT_WITH_UNITS. Set to ITEM_CONVERT_NO_UNITS to
+ *                                          force-convert a value with empty units.
+ *     'power' =>               (int)       Convert to the specified power of "unit_base" (0 => '', 1 => K, 2 => M, ..).
+ *                                          By default, the power will be calculated automatically.
+ *     'unit_base' =>           (string)    1000 or 1024. By default, will only use 1024 for "B" and "Bps" units.
+ *     'ignore_milliseconds' => (bool)      Ignore milliseconds in time conversion ("s" units).
+ *     'precision' =>           (int)       Max number of significant digits to take into account.
+ *                                          Default: ZBX_FLOAT_DIG.
+ *     'decimals' =>            (int|null)  Max number of first non-zero decimals to display. If null is specified,
+ *                                          ZBX_UNITS_ROUNDOFF_SUFFIXED or ZBX_UNITS_ROUNDOFF_UNSUFFIXED will be used,
+ *                                          depending on whether the units have been prefixed.
+ *     'decimals_exact' =>      (bool)      Display exactly this number of decimals instead of first non-zeros.
+ *                                          Default: false.
+ *     'small_scientific' =>    (bool)      Allow scientific notation for small numbers. Default: true.
  * ]
  *
  * @return array
@@ -731,7 +734,7 @@ function convertUnitsRaw(array $options): array {
 		'power' => null,
 		'unit_base' => null,
 		'ignore_milliseconds' => false,
-		'precision' => null,
+		'precision' => ZBX_FLOAT_DIG,
 		'decimals' => null,
 		'decimals_exact' => false,
 		'small_scientific' => true
@@ -787,9 +790,12 @@ function convertUnitsRaw(array $options): array {
 
 	if (in_array($units, $blacklist) || !$do_convert || $value_abs < 1) {
 		return [
-			'value' => formatFloat($value, $options['precision'], $options['decimals'] ?? ZBX_UNITS_ROUNDOFF_UNSUFFIXED,
-				$options['decimals_exact'], $options['small_scientific']
-			),
+			'value' => formatFloat($value, [
+				'precision' => $options['precision'],
+				'decimals' => $options['decimals'] !== null ? $options['decimals'] : ZBX_UNITS_ROUNDOFF_UNSUFFIXED,
+				'decimals_exact' => $options['decimals_exact'],
+				'small_scientific' => $options['small_scientific']
+			]),
 			'units' => $units,
 			'is_numeric' => true
 		];
@@ -806,10 +812,15 @@ function convertUnitsRaw(array $options): array {
 		$unit_prefix = null;
 
 		foreach ($power_table as $power => $prefix) {
-			$result = formatFloat($value / pow($unit_base, $power), $options['precision'],
-				$options['decimals'] ?? ($prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED),
-				$options['decimals_exact'], $options['small_scientific']
-			);
+			$result = formatFloat($value / pow($unit_base, $power), [
+				'precision' => $options['precision'],
+				'decimals' => $options['decimals'] !== null
+					? $options['decimals']
+					: ($prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED),
+				'decimals_exact' => $options['decimals_exact'],
+				'small_scientific' => $options['small_scientific']
+			]);
+
 			$unit_prefix = $prefix;
 
 			if (abs($result) < $unit_base) {
@@ -821,10 +832,14 @@ function convertUnitsRaw(array $options): array {
 		$unit_power = array_key_exists($options['power'], $power_table) ? $options['power'] : count($power_table) - 1;
 		$unit_prefix = $power_table[$unit_power];
 
-		$result = formatFloat($value / pow($unit_base, $unit_power), $options['precision'],
-			$options['decimals'] ?? ($unit_prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED),
-			$options['decimals_exact'], $options['small_scientific']
-		);
+		$result = formatFloat($value / pow($unit_base, $unit_power), [
+			'precision' => $options['precision'],
+			'decimals' => $options['decimals'] !== null
+				? $options['decimals']
+				: ($unit_prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED),
+			'decimals_exact' => $options['decimals_exact'],
+			'small_scientific' => $options['small_scientific']
+		]);
 	}
 
 	$result_units = ($result == 0 ? '' : $unit_prefix).$units;
@@ -1449,18 +1464,21 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 /**
  * Format floating-point number in the best possible way for displaying.
  *
- * @param float    $number            Valid number in decimal or scientific notation.
- * @param int|null $precision         Max number of significant digits to take into account. Default: ZBX_FLOAT_DIG.
- * @param int|null $decimals          Max number of first non-zero decimals to display. Default: 0.
- * @param bool     $exact             Display exactly this number of decimals instead of first non-zeros.
- * @param bool     $small_scientific  Allow scientific notation for small numbers.
+ * @param float $number   Valid number in decimal or scientific notation.
+ * @param array $options  Formatting options.
+ *
+ * $options = [
+ *     'precision' =>        (int)   Max number of significant digits to take into account. Default: ZBX_FLOAT_DIG.
+ *     'decimals' =>         (int)   Max number of first non-zero decimals to display. Default: 0.
+ *     'decimals_exact' =>   (bool)  Display exactly this number of decimals instead of first non-zeros. Default: false.
+ *     'small_scientific' => (bool)  Allow scientific notation for small numbers. Default: true.
+ * ]
  *
  * Note: $decimals must be less than $precision.
  *
  * @return string
  */
-function formatFloat(float $number, int $precision = null, int $decimals = null, bool $exact = false,
-		bool $small_scientific = true): string {
+function formatFloat(float $number, array $options = []): string {
 	if ($number == 0) {
 		return '0';
 	}
@@ -1473,13 +1491,19 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 		return '-'._('Infinity');
 	}
 
-	if ($precision === null) {
-		$precision = ZBX_FLOAT_DIG;
-	}
+	$defaults = [
+		'precision' => ZBX_FLOAT_DIG,
+		'decimals' => 0,
+		'decimals_exact' => false,
+		'small_scientific' => true
+	];
 
-	if ($decimals === null) {
-		$decimals = 0;
-	}
+	[
+		'precision' => $precision,
+		'decimals' => $decimals,
+		'decimals_exact' => $decimals_exact,
+		'small_scientific' => $small_scientific
+	] = $options + $defaults;
 
 	$number_original = $number;
 
@@ -1537,19 +1561,22 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
 
 	if ($exponent < 0) {
-		if (!$small_scientific || $digits - $exponent <= ($exact ? min($decimals + 1, $precision) : $precision)) {
-			return number_format($number, $exact ? $decimals : $digits - $exponent - 1, $decimal_point, $thousands_sep);
+		if (!$small_scientific
+				|| $digits - $exponent <= ($decimals_exact ? min($decimals + 1, $precision) : $precision)) {
+			return number_format($number, $decimals_exact ? $decimals : $digits - $exponent - 1, $decimal_point,
+				$thousands_sep
+			);
 		}
 		else {
-			return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
+			return sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 		}
 	}
 	elseif ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
 			|| ($exponent >= $precision && $number != $number_original)) {
-		return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
+		return sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
 	}
 	else {
-		return number_format($number, $exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals)),
+		return number_format($number, $decimals_exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals)),
 			$decimal_point, $thousands_sep
 		);
 	}
