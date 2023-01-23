@@ -64,7 +64,7 @@ zabbix_export:
               tags:
                 -
                   tag: scope
-                  value: jobs
+                  value: availability
         -
           uuid: e698c05dae9f4d2f8323ce718e9ed83b
           name: 'Veeam Manager: Get errors'
@@ -356,7 +356,7 @@ zabbix_export:
               tags:
                 -
                   tag: scope
-                  value: jobs
+                  value: availability
       discovery_rules:
         -
           uuid: d07b06fbd84d493bb38d61ac0824e794
