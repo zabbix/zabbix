@@ -25,7 +25,6 @@
 #include "embed.h"
 #include "duktape.h"
 #include "zbxalgo.h"
-#include "log.h"
 
 #ifdef HAVE_LIBCURL
 
