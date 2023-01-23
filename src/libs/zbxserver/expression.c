@@ -5870,7 +5870,11 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 			case ZBX_EVAL_TOKEN_VAR_STR:
 			case ZBX_EVAL_TOKEN_VAR_NUM:
 			case ZBX_EVAL_TOKEN_ARG_PERIOD:
-				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
+				if (ZBX_VARIANT_STR == token->value.type)
+					value = zbx_substr_unquote_backslash_optional(ctx.expression,
+							token->loc.l, token->loc.r, 0);
+				else
+					value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
 
 				if (FAIL == substitute_lld_macros(&value, jp_row, lld_macro_paths, ZBX_MACRO_ANY, err,
 						sizeof(err)))

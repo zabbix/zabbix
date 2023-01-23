@@ -326,7 +326,7 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c)
 	zbx_strncpy_alloc(str, alloc_len, offset, &c, 1);
 }
 
-void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str)
+void	zbx_strquote_alloc_backslash_optional(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str, int quote_backslash)
 {
 	size_t		size;
 	const char	*src;
@@ -337,6 +337,8 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 		switch (*src)
 		{
 			case '\\':
+				if (!quote_backslash)
+					break;
 			case '"':
 				size++;
 		}
@@ -365,6 +367,8 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 		switch (*src)
 		{
 			case '\\':
+				if (!quote_backslash)
+					break;
 			case '"':
 				*dst++ = '\\';
 				break;
@@ -376,6 +380,11 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 	*dst++ = '"';
 	*dst = '\0';
 	*str_offset += size;
+}
+
+void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str)
+{
+	zbx_strquote_alloc_backslash_optional(str, str_alloc, str_offset, value_str, 1);
 }
 
 /* Has to be rewritten to avoid malloc */
@@ -5713,14 +5722,15 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
  *                                                                            *
  * Purpose: unquotes valid substring at the specified location                *
  *                                                                            *
- * Parameters: src   - [IN] the source string                                 *
- *             left  - [IN] the left substring position 9start)               *
- *             right - [IN] the right substirng position (end)                *
+ * Parameters: src               - [IN] the source string                     *
+ *             left              - [IN] the left substring position 9start)   *
+ *             right             - [IN] the right substirng position (end)    *
+ *             unquote_backslash - [INT] whether to unquote baskslash or not  *
  *                                                                            *
  * Return value: The unquoted and copied substring.                           *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
+char	*zbx_substr_unquote_backslash_optional(const char *src, size_t left, size_t right, int unquote_backslash)
 {
 	char	*str, *ptr;
 
@@ -5738,6 +5748,8 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 				{
 					case '\\':
 						*ptr++ = '\\';
+						if (!unquote_backslash)
+							*ptr++ = '\\';
 						break;
 					case '"':
 						*ptr++ = '"';
@@ -5746,6 +5758,12 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 						THIS_SHOULD_NEVER_HAPPEN;
 						*ptr = '\0';
 						return str;
+					default:
+						if (!unquote_backslash)
+						{
+							*ptr++ = '\\';
+							*ptr++ = *src;
+						}
 				}
 			}
 			else
@@ -5762,6 +5780,22 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 	}
 
 	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unquotes valid substring at the specified location                *
+ *                                                                            *
+ * Parameters: src   - [IN] the source string                                 *
+ *             left  - [IN] the left substring position 9start)               *
+ *             right - [IN] the right substirng position (end)                *
+ *                                                                            *
+ * Return value: The unquoted and copied substring.                           *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
+{
+	return zbx_substr_unquote_backslash_optional(src, left, right, 1);
 }
 
 /******************************************************************************
