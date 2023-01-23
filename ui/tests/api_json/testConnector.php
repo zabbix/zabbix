@@ -60,7 +60,7 @@ class testConnector extends CAPITest {
 			],
 			'get_data_type_events' => [
 				'name' => 'API test connector.get with data type (events)',
-				'data_type' => ZBX_CONNECTOR_DATA_TYPE_TRIGGER_EVENTS,
+				'data_type' => ZBX_CONNECTOR_DATA_TYPE_EVENTS,
 				'url' => 'http://localhost/'
 			],
 			'get_url' => [
@@ -244,7 +244,7 @@ class testConnector extends CAPITest {
 					'data_type' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/data_type": value must be one of '.
-					implode(', ', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_TRIGGER_EVENTS]).'.'
+					implode(', ', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]).'.'
 			],
 
 			// Check "url".
@@ -1145,13 +1145,13 @@ class testConnector extends CAPITest {
 					'output' => ['name', 'data_type'],
 					'connectorids' => ['get_custom_defaults', 'get_data_type_events'],
 					'filter' => [
-						'data_type' => ZBX_CONNECTOR_DATA_TYPE_TRIGGER_EVENTS
+						'data_type' => ZBX_CONNECTOR_DATA_TYPE_EVENTS
 					]
 				],
 				'expected_result' => [
 					[
 						'name' => 'API test connector.get with data type (events)',
-						'data_type' => (string) ZBX_CONNECTOR_DATA_TYPE_TRIGGER_EVENTS
+						'data_type' => (string) ZBX_CONNECTOR_DATA_TYPE_EVENTS
 					]
 				],
 				'expected_error' => null
@@ -1463,7 +1463,7 @@ class testConnector extends CAPITest {
 					'data_type' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/data_type": value must be one of '.
-					implode(', ', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_TRIGGER_EVENTS]).'.'
+					implode(', ', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]).'.'
 			],
 
 			// Check "url".

@@ -95,7 +95,7 @@ foreach ($data['connectors'] as $connectorid => $connector) {
 				->addClass('js-edit-connector')
 				->setAttribute('data-connectorid', $connectorid)
 		))->addClass(ZBX_STYLE_WORDBREAK),
-		$connector['data_type'] == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES ? _('Item values') : _('Trigger events'),
+		$connector['data_type'] == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES ? _('Item values') : _('Events'),
 		$status_tag
 	];
 

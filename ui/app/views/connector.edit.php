@@ -54,7 +54,7 @@ $connector_tab = (new CFormGrid())
 		new CFormField(
 			(new CRadioButtonList('data_type', $data['form']['data_type']))
 				->addValue(_('Item values'), ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES)
-				->addValue(_('Trigger events'), ZBX_CONNECTOR_DATA_TYPE_TRIGGER_EVENTS)
+				->addValue(_('Events'), ZBX_CONNECTOR_DATA_TYPE_EVENTS)
 				->setModern()
 		)
 	])
