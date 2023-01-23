@@ -1898,9 +1898,9 @@ class testUsersAuthenticationLdap extends CWebTest {
 	/**
 	 * Fill and submit LDAP server settings.
 	 *
-	 * @param string $data			   data provider
-	 * @param string $query			   object to click for LDAP creating or updating
-	 * @param string $values		   simple LDAP server values
+	 * @param string $data	    data provider
+	 * @param string $query     object to click for LDAP creating or updating
+	 * @param string $values    simple LDAP server values
 	 */
 	private function setLdap($data, $query, $values = null) {
 		$form = $this->query('id:authentication-form')->asForm()->one();
@@ -1995,9 +1995,10 @@ class testUsersAuthenticationLdap extends CWebTest {
 	/**
 	 * Set mapping for LDAP server.
 	 *
-	 * @param array            $data	 given mapping
-	 * @param CFormElement     $form     LDAP form
-	 * @param string           $field    mapping field which is being filled
+	 * @param array            $data	   given mapping
+	 * @param CFormElement     $form       LDAP form
+	 * @param string           $field      mapping field which is being filled
+	 * @param boolean		   $success    true if mapping submits successfully, false if not
 	 */
 	private function setMapping($data, $form, $field, $success = true) {
 		foreach ($data as $mapping) {
