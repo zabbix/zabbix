@@ -211,7 +211,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 				'headers' => ['LDAP group pattern', 'User groups', 'User role', 'Action']
 			],
 			'Media type mapping' => [
-				'id' => 'media-type-mapping-table',
+				'id' => 'ldap-media-type-mapping-table',
 				'headers' => ['Name', 'Media type', 'Attribute', 'Action']
 			]
 		];
@@ -301,7 +301,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 			$mapping_field = $mapping_form->getField($label);
 			$this->assertTrue($mapping_field->isVisible());
 			$this->assertTrue($mapping_field->isEnabled());
-			$this->assertEquals($labels, $form->getRequiredLabels());
+			$this->assertEquals($labels, $mapping_form->getRequiredLabels());
 		}
 
 		$values = ($field === 'Media type mapping')
