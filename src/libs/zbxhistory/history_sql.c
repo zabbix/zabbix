@@ -317,16 +317,17 @@ static void	add_history_bin(const zbx_vector_ptr_t *history)
 	zbx_db_insert_t	*db_insert;
 
 	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
-	zbx_db_insert_prepare(db_insert, "history_binary", "itemid", "clock", "ns", "value", NULL);
+	zbx_db_insert_prepare(db_insert, "history_binary", "itemid", "clock", "ns", "value", "hash", NULL);
 
 	for (i = 0; i < history->values_num; i++)
 	{
 		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
-		if (ITEM_VALUE_TYPE_TEXT != h->value_type)
+		if (ITEM_VALUE_TYPE_BIN != h->value_type)
 			continue;
 
-		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.str);
+		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.bin->value,
+				h->value.bin->hash);
 	}
 
 	sql_writer_add_dbinsert(db_insert);
