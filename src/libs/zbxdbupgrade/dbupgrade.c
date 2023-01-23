@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -894,7 +894,7 @@ static void	DBget_version(int *mandatory, int *optional)
 		*mandatory = atoi(row[0]);
 		*optional = atoi(row[1]);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (-1 == *mandatory)
 	{
@@ -1130,7 +1130,7 @@ int	DBcheck_double_type(void)
 	if (NULL != (row = DBfetch(result)) && total_dbl_cols == atoi(row[0]))
 		ret = SUCCEED;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	DBclose();
 	zbx_free(sql);

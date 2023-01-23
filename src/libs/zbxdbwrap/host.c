@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,7 +107,7 @@ static int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vec
 		local_id_name_pair.name = zbx_strdup(NULL, row[1]);
 		zbx_hashset_insert(&ids_names, &local_id_name_pair, sizeof(local_id_name_pair));
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -173,7 +173,7 @@ static char	*get_template_names(const zbx_vector_uint64_t *templateids)
 
 	template_names[tmp_offset - 2] = '\0';
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return template_names;
@@ -295,7 +295,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 			ret = FAIL;
 			zbx_snprintf(error, max_error_len, "conflicting item key \"%s\" found", row[0]);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	/* trigger expressions */
@@ -328,7 +328,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 					"trigger \"%s\" has items from template \"%s\"",
 					row[0], row[1]);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	/* trigger dependencies */
@@ -366,7 +366,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 					" has dependency from trigger \"%s\" in template \"%s\"",
 					row[0], row[1], row[2], row[3]);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	/* graphs */
@@ -410,7 +410,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 				zbx_snprintf(error, max_error_len,
 						"template with graph \"%s\" already linked to the host", row[0]);
 			}
-			DBfree_result(result);
+			zbx_db_free_result(result);
 		}
 
 		zbx_vector_uint64_destroy(&graphids);
@@ -438,7 +438,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 			zbx_snprintf(error, max_error_len,
 					"template with web scenario \"%s\" already linked to the host", row[0]);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_free(sql);
@@ -491,7 +491,7 @@ static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64
 		ret = FAIL;
 		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (FAIL == ret)
 		goto out;
@@ -526,7 +526,7 @@ static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64
 		ret = FAIL;
 		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zbx_free(sql);
 
@@ -610,12 +610,12 @@ static int	validate_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *te
 					"web scenario \"%s\" already exists on the host (steps are not identical)",
 					trow[1]);
 		}
-		DBfree_result(sresult);
+		zbx_db_free_result(sresult);
 
 		if (SUCCEED != ret)
 			break;
 	}
-	DBfree_result(tresult);
+	zbx_db_free_result(tresult);
 
 	zbx_free(sql);
 
@@ -715,7 +715,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		zbx_vector_graph_valid_ptr_append(&graphs, graph);
 	}
 
-	DBfree_result(tresult);
+	zbx_db_free_result(tresult);
 
 	if (0 != graphids.values_num)
 	{
@@ -752,7 +752,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 				}
 			}
 		}
-		DBfree_result(tresult);
+		zbx_db_free_result(tresult);
 	}
 
 	for (i = 0; i < graphs.values_num; i++)
@@ -811,7 +811,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 			zbx_snprintf(error, max_error_len,
 					"item prototype and real item \"%s\" have the same key", trow[0]);
 		}
-		DBfree_result(tresult);
+		zbx_db_free_result(tresult);
 	}
 
 	/* interfaces */
@@ -833,14 +833,16 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 			type = (unsigned char)atoi(trow[0]);
 			ZBX_STR2UINT64(interfaceids[type - 1], trow[1]);
 		}
-		DBfree_result(tresult);
+		zbx_db_free_result(tresult);
 
 		sql_offset = 0;
+
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
 				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d,%d)"
 					" and",
+				/* item types with interface types INTERFACE_TYPE_OPT or INTERFACE_TYPE_UNKNOWN */
 				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
 				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT);
@@ -875,7 +877,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 				ret = FAIL;
 			}
 		}
-		DBfree_result(tresult);
+		zbx_db_free_result(tresult);
 	}
 
 	zbx_free(sql);
@@ -919,7 +921,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 		zbx_vector_uint64_append(&conditionids, id);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1279,7 +1281,7 @@ static void	DBdelete_graphs_by_itemids(const zbx_vector_uint64_t *itemids)
 		if (FAIL != (index = zbx_vector_uint64_bsearch(&graphids, graphid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			zbx_vector_uint64_remove(&graphids, index);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	DBdelete_graph_hierarchy(&graphids);
 clean:
@@ -1905,7 +1907,7 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
 		ZBX_STR2UINT64(templateid, row[0]);
 		zbx_vector_uint64_append(templateids, templateid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
@@ -1992,7 +1994,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 		zbx_audit_host_update_json_delete_parent_template(hostid, hosttemplateid);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	sql_offset = 0;
 
@@ -2211,7 +2213,7 @@ static int	DBis_regular_host(zbx_uint64_t hostid)
 		if (0 == atoi(row[0]))
 			ret = SUCCEED;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -2287,7 +2289,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		zbx_vector_ptr_append(host_prototypes, host_prototype);
 		zbx_vector_uint64_append(&itemids, host_prototype->itemid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != host_prototypes->values_num)
 	{
@@ -2370,7 +2372,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 				}
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_free(sql);
@@ -2442,7 +2444,7 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 
 		zbx_vector_uint64_append(&host_prototype->lnk_templateids, templateid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* select list of templates which are already linked to host prototypes */
 
@@ -2505,7 +2507,7 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 			if (i == host_prototypes->values_num)
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
@@ -2580,7 +2582,7 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 
 		zbx_vector_ptr_append(&host_prototype->group_prototypes, group_prototype);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* select list of group prototypes which already linked to host prototypes */
 
@@ -2653,7 +2655,7 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 			if (i == host_prototypes->values_num)
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_sort(del_group_prototypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -2791,7 +2793,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 
 		zbx_vector_macros_append(&host_prototype->hostmacros, hostmacro);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* select list of macros prototypes which already linked to host prototypes */
 
@@ -2853,7 +2855,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 			if (i == host_prototypes->values_num)
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_sort(del_macroids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -2921,7 +2923,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes)
 		tag = zbx_db_tag_create(row[1], row[2]);
 		zbx_vector_db_tag_ptr_append(&host_prototype->new_tags, tag);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* get tags of existing host prototypes */
 
@@ -2975,7 +2977,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes)
 			ZBX_DBROW2UINT64(tag->tagid, row[0]);
 			zbx_vector_db_tag_ptr_append(&host_prototype->tags, tag);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	for (i = 0; i < host_prototypes->values_num; i++)
@@ -3197,7 +3199,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 
 		zbx_vector_interfaces_append(&host_prototype->interfaces, interface);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* select list of interfaces which are already linked to host prototypes */
 
@@ -3281,7 +3283,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 
 			zbx_vector_interfaces_append(&old_interfaces, interface);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		if (0 != old_interfaces.values_num)
 			host_prototype_interfaces_make(last_hostid, host_prototypes, &old_interfaces, del_interfaceids);
@@ -4285,7 +4287,7 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
 		zbx_vector_uint64_append(&httptestids, httptest->templateid);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != httptestids.values_num)
 	{
@@ -4327,7 +4329,7 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
 
 			zbx_vector_ptr_append(&httptest->fields, httpfield);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		/* web scenario steps */
 		httptest = NULL;
@@ -4411,7 +4413,7 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
 			zbx_vector_ptr_append(&httptest->httpsteps, httpstep);
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		for (i = 0; i < httptests->values_num; i++)
 		{
@@ -4474,7 +4476,7 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
 
 			zbx_vector_ptr_append(&httpstep->fields, httpfield);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		/* web scenario tags */
 		httptest = NULL;
@@ -4516,7 +4518,7 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
 
 			zbx_vector_ptr_append(&httptest->httptesttags, httptesttag);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		for (i = 0; i < httptests->values_num; i++)
 		{
@@ -4565,7 +4567,7 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
 
 			zbx_vector_uint64_append(&items, httptestitem->t_itemid);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	/* web scenario step items */
@@ -4627,7 +4629,7 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
 
 			zbx_vector_uint64_append(&items, httpstepitem->t_itemid);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	/* items */
@@ -4680,7 +4682,7 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
 				}
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_free(sql);
@@ -4779,7 +4781,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 			zbx_audit_httptest_update_json_delete_httptest_field(testid, httpfieldid, type);
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
@@ -4801,7 +4803,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 			zbx_audit_httptest_update_json_delete_tags(testid, httptagid);
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	if (0 != httpupdstepids.values_num)
@@ -4830,7 +4832,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 			zbx_audit_httptest_update_json_delete_httpstep_field(testid, stepid, stepfieldid, type);
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	if (0 != deletefieldsids.values_num)
@@ -5714,7 +5716,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 			break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(tmp);
 
@@ -5880,7 +5882,7 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 	zbx_free(privpassphrase_esc);
 	zbx_free(contextname_esc);
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -5968,7 +5970,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 					" because some hosts or templates depend on it", row[1]);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* check if groups is used in the groups prototypes */
 
@@ -6003,7 +6005,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" cannot be deleted,"
 					" because it is used by a host prototype", row[1]);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
@@ -6118,7 +6120,7 @@ void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 		zbx_audit_host_update_json_update_inventory_mode(hostid, atoi(row[0]), inventory_mode);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

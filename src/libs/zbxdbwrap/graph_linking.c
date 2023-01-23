@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -418,7 +418,7 @@ static int	get_templates_graphs_data(const zbx_vector_uint64_t *templateids,
 		zbx_vector_str_append(templates_graphs_names, zbx_strdup(NULL,graph_copy->name));
 	}
 clean:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
@@ -505,7 +505,7 @@ static int	update_same_itemids(zbx_uint64_t hostid, zbx_vector_graphs_copies_t *
 clean:
 	zbx_free(sql);
 	zbx_hashset_destroy(&y_data_map);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zbx_vector_uint64_destroy(&y_data_ids);
 
@@ -602,7 +602,7 @@ static int	get_graphs_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *grap
 	}
 clean:
 	zbx_free(sql);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
@@ -684,7 +684,7 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 	}
 clean:
 	zbx_free(sql);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;

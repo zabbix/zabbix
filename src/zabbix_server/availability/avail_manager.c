@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -284,7 +284,7 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache, unsigne
 
 			zbx_hashset_insert(&cache->queue, &avail_local, sizeof(zbx_host_active_avail_t));
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 }
 static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)

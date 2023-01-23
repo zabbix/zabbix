@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -466,7 +466,7 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
 			ZBX_STR2UINT64(itemid, row[0]);
 			uint64_array_remove(itemids, itemids_num, &itemid, 1);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	/* update trends disable_until for the leftover itemids */
@@ -627,7 +627,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1035,7 +1035,7 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 
 		zbx_vector_ptr_append(&host_info->groups, zbx_strdup(NULL, row[1]));
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 typedef struct
@@ -1082,7 +1082,7 @@ static void	db_get_item_names_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 		item_info->name = zbx_strdup(item_info->name, row[1]);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -1137,7 +1137,7 @@ static void	db_get_item_tags_by_itemid(zbx_hashset_t *items_info, const zbx_vect
 		zbx_vector_tags_sort(&item_info->item_tags, zbx_compare_tags);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -2448,7 +2448,7 @@ static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char 
 
 		zbx_vector_ptr_append(duplicates, d);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(query->sql);
 }
@@ -5117,7 +5117,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 	UNLOCK_CACHE_IDS;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
 			__func__, table_name, nextid, lastid);

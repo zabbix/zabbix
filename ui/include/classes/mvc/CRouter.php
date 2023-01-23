@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,6 +71,8 @@ class CRouter {
 		'connector.enable'							=> ['CControllerConnectorEnable',						'layout.json',			null],
 		'connector.list'							=> ['CControllerConnectorList',							'layout.htmlpage',		'connector.list'],
 		'connector.update'							=> ['CControllerConnectorUpdate',						'layout.json',			null],
+		'copy.create'								=> ['CControllerCopyCreate',							'layout.json',			null],
+		'copy.edit'									=> ['CControllerCopyEdit',								'layout.json',			'copy.edit'],
 		'correlation.condition.add'					=> ['CControllerCorrelationConditionAdd',				null,					null],
 		'correlation.create'						=> ['CControllerCorrelationCreate',						null,					null],
 		'correlation.delete'						=> ['CControllerCorrelationDelete',						null,					null],

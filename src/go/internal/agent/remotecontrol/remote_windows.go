@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,7 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/log"
-
-	"github.com/natefinch/npipe"
+	"github.com/Microsoft/go-winio"
 )
 
 func New(path string, timeout time.Duration) (conn *Conn, err error) {
@@ -42,7 +41,7 @@ func New(path string, timeout time.Duration) (conn *Conn, err error) {
 				return
 			}
 		}
-		if c.listener, err = npipe.Listen(path); err != nil {
+		if c.listener, err = winio.ListenPipe(path, nil); err != nil {
 			return
 		}
 		c.sink = make(chan *Client)
@@ -53,7 +52,7 @@ func New(path string, timeout time.Duration) (conn *Conn, err error) {
 
 func SendCommand(path string, command string, timeout time.Duration) (reply string, err error) {
 	var conn net.Conn
-	if conn, err = npipe.DialTimeout(path, timeout); err != nil {
+	if conn, err = winio.DialPipe(path, &timeout); err != nil {
 		return
 	}
 	defer conn.Close()

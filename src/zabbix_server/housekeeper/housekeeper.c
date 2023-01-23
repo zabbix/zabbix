@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -289,7 +289,7 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule)
 		zbx_hashset_insert(&rule->item_cache, &item_record, sizeof(zbx_hk_item_cache_t));
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -449,7 +449,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 					HK_UPDATE_CACHE_TREND_COUNT, now, itemid, trends);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_dc_close_user_macros(um_handle);
 
@@ -561,7 +561,7 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 	if (NULL == result)
 		zabbix_log(LOG_LEVEL_ERR, "cannot drop chunks for %s", rule->table);
 	else
-		DBfree_result(result);
+		zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -743,7 +743,7 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 		else
 			rule->min_clock = now;
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	/* Delete the old records from database. Don't remove more than 4 x housekeeping */
@@ -795,7 +795,7 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 					zbx_vector_str_append(&ids_str, zbx_strdup(NULL, row[0]));
 			}
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 
 			if (0 == id_field_str_type)
 			{
@@ -1050,7 +1050,7 @@ static int	housekeeping_cleanup(void)
 		if (0 == more)
 			zbx_vector_uint64_append(&housekeeperids, housekeeperid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != housekeeperids.values_num)
 	{
@@ -1205,7 +1205,7 @@ static int	housekeeping_problems(int now)
 			zbx_vector_uint64_append(&ids_uint64, id);
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		if (0 == ids_uint64.values_num)
 			break;
