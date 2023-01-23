@@ -5,7 +5,7 @@
 
 This template is designed to monitor Microsoft Azure by HTTP.
 It works without any external scripts and uses the script item.
-Currently the template supports discovery of virtual machines (VMs), MySQL and PostgreSQL servers.
+Currently the template supports the discovery of virtual machines (VMs), MySQL, and PostgreSQL servers.
 
 ## Requirements
 
@@ -22,7 +22,7 @@ For Zabbix version: 6.0 and higher.
 > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, and `{$AZURE.SUBSCRIPTION_ID}`.
+3. Configure the macros: `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, and `{$AZURE.SUBSCRIPTION_ID}`.
 
 ## Configuration
 
@@ -32,7 +32,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>The AppID of Microsoft Azure.</p> |`` |
+|{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`15s` |
 |{$AZURE.MSSQL.DB.LOCATION.MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`.*` |
 |{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`CHANGE_IF_NEEDED` |
@@ -72,7 +72,7 @@ There are no template links in this template.
 |Microsoft SQL databases discovery |<p>The list of the Microsoft SQL databases is provided by the subscription.</p> |DEPENDENT |azure.mssql.databases.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Sql/servers/databases`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.MSSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.MSSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.MSSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p><p>- {#SIZE} NOT_MATCHES_REGEX `{$AZURE.MSSQL.DB.SIZE.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Serverless<br> - {#VERSION} MATCHES_REGEX `^.*serverless$`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Server<br> - {#VERSION} MATCHES_REGEX `^((?!serverless).)*$`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
 |MySQL servers discovery |<p>The list of the MySQL servers is provided by the subscription.</p> |DEPENDENT |azure.mysql.servers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DBforMySQL`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Flexible server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforMySQL/flexibleServers`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Single server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforMySQL/servers`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
 |PostgreSQL servers discovery |<p>The list of the PostgreSQL servers is provided by the subscription.</p> |DEPENDENT |azure.pgsql.servers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DBforPostgreSQL`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.PGSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.PGSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.PGSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.PGSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Flexible server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforPostgreSQL/flexibleServers`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Single server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforPostgreSQL/servers`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
-|Storage accounts discovery |<p>The lists all the storage accounts available under the subscription.</p> |DEPENDENT |azure.starage.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$AZURE.STORAGE.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.STORAGE.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.STORAGE.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.STORAGE.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p> |
+|Storage accounts discovery |<p>The list of all storage accounts available under the subscription.</p> |DEPENDENT |azure.starage.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$AZURE.STORAGE.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.STORAGE.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.STORAGE.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.STORAGE.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p> |
 |Virtual machines discovery |<p>The list of the virtual machines is provided by the subscription.</p> |DEPENDENT |azure.vm.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Compute/virtualMachines$`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.VM.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.VM.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.VM.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.VM.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p> |
 
 ### Items collected
@@ -82,17 +82,17 @@ There are no template links in this template.
 |Azure |Azure: Get resources |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.get.resources<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Azure |Azure: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure: Get storages |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.get.storages<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Azure |Azure: Storage: [{#NAME}]: Get data |<p>The HTTP API endpoint that returns [{#NAME}] storage metrics.</p> |SCRIPT |azure.get.storage[{#NAME}]<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Azure |Azure: Storage [{#NAME}]: Blob Capacity |<p>The amount of storage used by the storage account [{#NAME}] Blob service in bytes.</p> |DEPENDENT |azure.storage.blob.capacity[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.BlobCapacity.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Blob Count |<p>The number of blob objects stored in the storage account [{#NAME}].</p> |DEPENDENT |azure.storage.blob.count[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.BlobCount.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Container Count |<p>The number of containers in the storage account [{#NAME}].</p> |DEPENDENT |azure.storage.container.count[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.ContainerCount.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Index Capacity |<p>The amount of storage [{#NAME}] used by Azure Data Lake Storage Gen2 hierarchical index.</p> |DEPENDENT |azure.storage.index.capacity[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.IndexCapacity.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Transactions |<p>The number of requests made to a storage service or the specified API operation. </p><p>This number includes successful and failed requests, as well as requests which produced errors. </p><p>Use ResponseType dimension for the number of different type of response.</p> |DEPENDENT |azure.storage.transactions[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Transactions.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Ingress |<p>The amount of ingress data, in bytes. This number includes ingress from an external client into Azure Storage as well as ingress within Azure.</p> |DEPENDENT |azure.storage.ingress[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Ingress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Egress |<p>The amount of egress data. This number includes egress to external client from Azure Storage as well as egress within Azure. </p><p>As a result, this number does not reflect billable egress.</p> |DEPENDENT |azure.storage.engress[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Egress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Success Server Latency |<p>The average time used to process a successful request by Azure Storage. </p><p>This value does not include the network latency specified in SuccessE2ELatency.</p> |DEPENDENT |azure.storage.success.server.latency[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.SuccessServerLatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Success E2E Latency |<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation, in milliseconds. </p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p> |DEPENDENT |azure.storage.success.e2e.latency[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.SuccessE2ELatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Availability |<p>The percentage of availability for the storage service or the specified API operation. </p><p>Availability is calculated by taking the TotalBillableRequests value and dividing it by the number of applicable requests, including those that produced unexpected errors. </p><p>All unexpected errors result in reduced availability for the storage service or the specified API operation.</p> |DEPENDENT |azure.storage.availability[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Availability.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage: [{#NAME}]: Get data |<p>The HTTP API endpoint that returns `[{#NAME}]` storage metrics.</p> |SCRIPT |azure.get.storage[{#NAME}]<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure: Storage [{#NAME}]: Blob Capacity |<p>The amount of storage used by the storage account `[{#NAME}]` Blob service in bytes.</p> |DEPENDENT |azure.storage.blob.capacity[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.BlobCapacity.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Blob Count |<p>The number of blob objects stored in the storage account with the name `[{#NAME}]`.</p> |DEPENDENT |azure.storage.blob.count[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.BlobCount.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Container Count |<p>The number of containers in the storage account with the name `[{#NAME}]`.</p> |DEPENDENT |azure.storage.container.count[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.ContainerCount.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Index Capacity |<p>The amount of storage with the name `[{#NAME}]` used by the Azure Data Lake Storage Gen2 hierarchical index.</p> |DEPENDENT |azure.storage.index.capacity[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.IndexCapacity.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Transactions |<p>The number of requests made to a storage service or a specified API operation. </p><p>This number includes successful and failed requests and also requests, which produced errors. </p><p>Use `ResponseType` dimension for the number of different type of responses.</p> |DEPENDENT |azure.storage.transactions[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Transactions.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Ingress |<p>The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.</p> |DEPENDENT |azure.storage.ingress[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Ingress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Egress |<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure. </p><p>As a result, this number does not reflect billable egress.</p> |DEPENDENT |azure.storage.engress[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Egress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Success Server Latency |<p>The average time used to process a successful request by Azure Storage. </p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p> |DEPENDENT |azure.storage.success.server.latency[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.SuccessServerLatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Success E2E Latency |<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds. </p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p> |DEPENDENT |azure.storage.success.e2e.latency[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.SuccessE2ELatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Availability |<p>The percentage of availability for the storage service or the specified API operation. </p><p>Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.</p><p>All unexpected errors result in reduced availability for the storage service or the specified API operation.</p> |DEPENDENT |azure.storage.availability[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Availability.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 
 ### Triggers
 
@@ -106,11 +106,11 @@ Please report any issues with the template at https://support.zabbix.com.
 
 You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 
-# Azure virtual machine by HTTP
+# Azure Virtual Machine by HTTP
 
 ## Overview
 
-This template is designed to monitor Microsoft Azure virtual machines by HTTP.
+This template is designed to monitor Microsoft Azure Virtual Machines (VMs) by HTTP.
 It works without any external scripts and uses the script item.
 
 ## Requirements
@@ -128,7 +128,7 @@ For Zabbix version: 6.0 and higher.
 > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+3. Configure the macros: `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
 
 ## Configuration
 
@@ -138,10 +138,10 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>The AppID of Microsoft Azure.</p> |`` |
+|{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
-|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
+|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure Virtual Machine ID.</p> |`` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 |{$AZURE.VM.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
@@ -161,7 +161,7 @@ There are no template links in this template.
 |Azure |Azure: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.vm.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure: Availability state |<p>The availability status of the resource.</p> |DEPENDENT |azure.vm.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure: Availability status detailed |<p>The summary description of the availability status.</p> |DEPENDENT |azure.vm.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Azure |Azure: Percentage CPU |<p>The percentage of allocated compute units that are currently in use by the Virtual Machine(s).</p> |DEPENDENT |azure.vm.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.PercentageCPU.average`</p> |
+|Azure |Azure: Percentage CPU |<p>The percentage of allocated computing units that are currently in use by the virtual machine(s).</p> |DEPENDENT |azure.vm.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.PercentageCPU.average`</p> |
 |Azure |Azure: Disk read rate |<p>Bytes read from the disk during the monitoring period (1 minute).</p> |DEPENDENT |azure.vm.disk.read.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DiskReadBytes.total`</p><p>- MULTIPLIER: `0.0167`</p> |
 |Azure |Azure: Disk write rate |<p>Bytes written to the disk during the monitoring period (1 minute).</p> |DEPENDENT |azure.vm.disk.write.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DiskWriteBytes.total`</p><p>- MULTIPLIER: `0.0167`</p> |
 |Azure |Azure: Disk read Operations/Sec |<p>The count of read operations from the disk per second.</p> |DEPENDENT |azure.vm.disk.read.ops<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DiskReadOperationsSec.average`</p> |
@@ -226,7 +226,7 @@ Please report any issues with the template at https://support.zabbix.com.
 
 You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 
-# Azure MySQL flexible server by HTTP
+# Azure MySQL Flexible Server by HTTP
 
 ## Overview
 
@@ -274,7 +274,6 @@ No specific Zabbix configuration is required.
 There are no template links in this template.
 
 ### Discovery rules
-
 
 ### Items collected
 
