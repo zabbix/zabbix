@@ -1030,7 +1030,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 		}
 	}
 
-	public function getCreateData() {
+	public function getCreateValidationData() {
 		return [
 			// #0 Only default authentication added.
 			[
@@ -1171,17 +1171,22 @@ class testUsersAuthenticationLdap extends CWebTest {
 								'Base DN' => 'test',
 								'Search attribute' => 'tets',
 								'Configure JIT provisioning' => true
-							],
-							'ldap_error' => 'Invalid LDAP configuration',
-							'ldap_error_details' => [
-								'Invalid user group mapping configuration.'
-							],
-							'error' => 'At least one LDAP server must exist.'
+							]
 						]
-					]
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
 				]
-			],
-			// #8 Using cyrillic in settings.
+			]
+		];
+	}
+
+	public function getCreateData() {
+		return [
+			// #1 Using cyrillic in settings.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1226,21 +1231,26 @@ class testUsersAuthenticationLdap extends CWebTest {
 						]
 					],
 					'db_check' => [
-						'userdirectory' => ['name' => 'кириллица'],
+						'userdirectory' => [
+							['name' => '', 'description' => '', 'provision_status' => 0],
+							['name' => 'кириллица', 'description' => 'кириллица', 'provision_status' => 1]
+						],
 						'userdirectory_ldap' => [
-							'host' => 'кириллица',
-							'port' => '389',
-							'base_dn' => 'кириллица',
-							'bind_dn' => 'кириллица',
-							'bind_password' => '',
-							'search_attribute' => 'кириллица',
-							'group_basedn' => 'кириллица',
-							'group_name' => 'кириллица',
-							'group_member' => 'кириллица',
-							'user_ref_attr' => 'кириллица',
-							'group_filter' => 'кириллица',
-							'user_username' => 'кириллица',
-							'user_lastname' => 'кириллица'
+							[
+								'host' => 'кириллица',
+								'port' => '389',
+								'base_dn' => 'кириллица',
+								'bind_dn' => 'кириллица',
+								'bind_password' => '',
+								'search_attribute' => 'кириллица',
+								'group_basedn' => 'кириллица',
+								'group_name' => 'кириллица',
+								'group_member' => 'кириллица',
+								'user_ref_attr' => 'кириллица',
+								'group_filter' => 'кириллица',
+								'user_username' => 'кириллица',
+								'user_lastname' => 'кириллица'
+							]
 						],
 						'userdirectory_idpgroup' => [
 							[
@@ -1268,7 +1278,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// #9 Using symbols in settings.
+			// #2 Using symbols in settings.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1314,21 +1324,26 @@ class testUsersAuthenticationLdap extends CWebTest {
 						]
 					],
 					'db_check' => [
-						'userdirectory' => ['name' => '~`!@#$%^7*()_+=/'],
+						'userdirectory' => [
+							['name' => '', 'description' => '', 'provision_status' => 0],
+							['name' => '~`!@#$%^7*()_+=/', 'description' => '~`!@#$%^7*()_+=/', 'provision_status' => 1]
+						],
 						'userdirectory_ldap' => [
-							'host' => '~`!@#$%^7*()_+=/',
-							'port' => '389',
-							'base_dn' => '~`!@#$%^7*()_+=/',
-							'bind_dn' => '~`!@#$%^7*()_+=/',
-							'bind_password' => '~`!@#$%^7*()_+=/',
-							'search_attribute' => '~`!@#$%^7*()_+=/',
-							'group_basedn' => '~`!@#$%^7*()_+=/',
-							'group_name' => '~`!@#$%^7*()_+=/',
-							'group_member' => '~`!@#$%^7*()_+=/',
-							'user_ref_attr' => '~`!@#$%^7*()_+=/',
-							'group_filter' => '~`!@#$%^7*()_+=/',
-							'user_username' => '~`!@#$%^7*()_+=/',
-							'user_lastname' => '~`!@#$%^7*()_+=/'
+							[
+								'host' => '~`!@#$%^7*()_+=/',
+								'port' => '389',
+								'base_dn' => '~`!@#$%^7*()_+=/',
+								'bind_dn' => '~`!@#$%^7*()_+=/',
+								'bind_password' => '~`!@#$%^7*()_+=/',
+								'search_attribute' => '~`!@#$%^7*()_+=/',
+								'group_basedn' => '~`!@#$%^7*()_+=/',
+								'group_name' => '~`!@#$%^7*()_+=/',
+								'group_member' => '~`!@#$%^7*()_+=/',
+								'user_ref_attr' => '~`!@#$%^7*()_+=/',
+								'group_filter' => '~`!@#$%^7*()_+=/',
+								'user_username' => '~`!@#$%^7*()_+=/',
+								'user_lastname' => '~`!@#$%^7*()_+=/'
+							]
 						],
 						'userdirectory_idpgroup' => [
 							[
@@ -1356,51 +1371,34 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// #10 Long values.
+			// #3 Long values.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'servers_settings' => [
 						[
 							'fields' => [
-								'Name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
-										'_long_value_long_value_long_value_long_value_long_va',
-								'Host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
-										'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long'.
-										'_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
-										'value_long_value_long_v',
+								'Name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'Host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 								'Port' => 65535,
-								'Base DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
-										'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_'.
-										'value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
-										'value_long_value_long_v',
-								'Search attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-								'Bind DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-								'Description' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'Base DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'Search attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'Bind password' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'Bind DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'Description' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_vlong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_vlong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 								'Configure JIT provisioning' => true,
 								'Group configuration' => 'groupOfNames',
-								'Group base DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-								'Group name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-								'Group member attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-								'Reference attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-								'Group filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-								'User name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-								'User last name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va'
+								'Group base DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'Group name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'Group member attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'Reference attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'Group filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'User name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'User last name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
 							],
 							'User group mapping' => [
 								[
-									'LDAP group pattern' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
+									'LDAP group pattern' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 									'User groups' => 'Test timezone',
 									'User role' => 'User role'
 								]
@@ -1423,42 +1421,33 @@ class testUsersAuthenticationLdap extends CWebTest {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
-									'_long_value_long_value_long_value_long_value_long_va',
-							'description' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
-									'_long_value_long_value_long_value_long_value_long_va'
+							['name' => '', 'description' => '', 'provision_status' => 0],
+							[
+								'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'description' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_vlong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_vlong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'provision_status' => 1
+							]
 						],
 						'userdirectory_ldap' => [
-							'host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
-										'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long',
-							'port' => 65535,
-							'base_dn' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
-										'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_'.
-										'value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
-										'value_long_value_long_v',
-							'bind_dn' => '',
-							'bind_password' => '',
-							'search_attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-							'group_basedn' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-							'group_name' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-							'group_member' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-							'user_ref_attr' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-							'group_filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-							'user_username' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
-							'user_lastname' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va'
+							[
+								'host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'port' => 65535,
+								'base_dn' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'bind_dn' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'bind_password' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'search_attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'group_basedn' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'group_name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'group_member' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'user_ref_attr' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'group_filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'user_username' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'user_lastname' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
+							]
 						],
 						'userdirectory_idpgroup' => [
 							[
-								'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-										'long_value_long_value_long_value_long_value_long_value_long_va',
+								'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 								'roleid' => 1
 							]
 						],
@@ -1484,7 +1473,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// #11 LDAP server with every field filled (no JIT).
+			// #4 LDAP server with every field filled (no JIT).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1493,7 +1482,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 							'fields' => [
 								'Name' => 'LDAP',
 								'Host' => 'ipa.demo1.freeipa.org',
-								'Port' => '389',
+								'Port' => 389,
 								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 								'Search attribute' => 'uid',
 								'Bind DN' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
@@ -1506,19 +1495,24 @@ class testUsersAuthenticationLdap extends CWebTest {
 						]
 					],
 					'db_check' => [
-						'userdirectory' => ['name' => 'LDAP', 'description' => 'description'],
+						'userdirectory' => [
+							['name' => '', 'description' => '', 'provision_status' => 0],
+							['name' => 'LDAP', 'description' => 'description',  'provision_status' => 0]
+						],
 						'userdirectory_ldap' => [
-							'host' => 'ipa.demo1.freeipa.org',
-							'port' => '389',
-							'base_dn' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-							'bind_dn' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-							'bind_password' => 'Secret123',
-							'search_attribute' => 'uid'
+							[
+								'host' => 'ipa.demo1.freeipa.org',
+								'port' => 389,
+								'base_dn' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+								'bind_dn' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+								'bind_password' => 'Secret123',
+								'search_attribute' => 'uid'
+							]
 						]
 					]
 				]
 			],
-			// #12 LDAP server with every field filled with JIT.
+			// #5 LDAP server with every field filled with JIT.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1538,7 +1532,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 								'Group name attribute' => 'create test group name attribute',
 								'Group member attribute' => 'create test group member',
 								'Reference attribute' => 'create test reference attribute',
-								'Group filter' => 'create est group filter',
+								'Group filter' => 'create test group filter',
 								'User name attribute' => 'create user name attribute',
 								'User last name attribute' => 'create user last name'
 							],
@@ -1614,11 +1608,22 @@ class testUsersAuthenticationLdap extends CWebTest {
 	}
 
 	/**
-	 * Check authentication with LDAP settings.
+	 * @dataProvider getCreateValidationData
+	 */
+	public function testUsersAuthenticationLdap_CreateValidation($data) {
+		$this->testLdapCreate($data);
+	}
+
+	/**
+	 * @backup config
 	 *
 	 * @dataProvider getCreateData
 	 */
 	public function testUsersAuthenticationLdap_Create($data) {
+		$this->testLdapCreate($data);
+	}
+
+	private function testLdapCreate($data) {
 		$this->checkLdap($data, 'button:Add');
 
 		// Check error messages.
@@ -1626,15 +1631,12 @@ class testUsersAuthenticationLdap extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 			// Check DB configuration.
-			$sql = 'SELECT host, port, base_dn, bind_dn, bind_password, search_attribute '.
-					'FROM userdirectory_ldap '.
-					'WHERE userdirectoryid IN ('.
-						'SELECT userdirectoryid'.
-						' FROM userdirectory '.
-						' WHERE name ='.zbx_dbstr($data['db_check']['userdirectory']['name']).
-					')';
-
-			$this->assertEquals($data['db_check']['userdirectory_ldap'], CDBHelper::getRow($sql));
+			foreach ($data['db_check'] as $table => $rows) {
+				foreach ($rows as $i => $row) {
+					$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table.' LIMIT 1 OFFSET '.$i;
+					$this->assertEquals([$row], CDBHelper::getAll($sql));
+				}
+			}
 		}
 		else {
 			$this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error']);
