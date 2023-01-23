@@ -332,7 +332,7 @@ $button_list += [
 		'content' => (new CButton('', _('Mass update')))
 			->onClick(
 				"openMassupdatePopup('popup.massupdate.item', {".
-					CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('massupdate').
+					CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('item').
 				"'}, {
 					dialogue_class: 'modal-popup-preprocessing',
 					trigger_element: this

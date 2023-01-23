@@ -214,8 +214,7 @@ $itemForm->addItem([
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.itemprototype', {".
-							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".
-							CCsrfTokenHelper::get('massupdate').
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('itemprototype').
 						"'}, {
 							dialogue_class: 'modal-popup-preprocessing',
 							trigger_element: this

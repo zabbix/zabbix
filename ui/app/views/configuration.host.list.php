@@ -259,7 +259,7 @@ foreach ($data['hosts'] as $host) {
 		->setAttribute('data-hostid', $host['hostid'])
 		->onClick('view.editHost(event, this.dataset.hostid);');
 
-	$csrf_token_massupdate = CCsrfTokenHelper::get('massupdate');
+	$csrf_token_massupdate = CCsrfTokenHelper::get('host');
 
 	$maintenance_icon = false;
 	$status_toggle_url = (new CUrl('zabbix.php'))

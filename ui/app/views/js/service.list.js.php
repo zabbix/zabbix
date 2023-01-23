@@ -95,7 +95,7 @@
 				else if (e.target.classList.contains('js-massupdate-service')) {
 					openMassupdatePopup('popup.massupdate.service', {
 							location_url: this.back_url,
-							<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?> : '<?= CCsrfTokenHelper::get('massupdate') ?>'
+							<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?> : '<?= CCsrfTokenHelper::get('service') ?>'
 						}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: e.target
