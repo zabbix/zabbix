@@ -87,6 +87,12 @@ class CWidgetMap extends CWidget {
 		}
 	}
 
+	updateProperties({name, view_mode, fields}) {
+		this._has_contents = null;
+
+		super.updateProperties({name, view_mode, fields});
+	}
+
 	_promiseUpdate() {
 		if (!this._has_contents || this._map_svg === null) {
 			if (this._sysmapid !== null
