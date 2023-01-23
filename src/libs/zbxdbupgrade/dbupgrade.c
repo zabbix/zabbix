@@ -148,6 +148,7 @@ static void	DBfield_type_suffix_string(char **sql, size_t *sql_alloc, size_t *sq
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_SHORTTEXT:
 		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_CUID:
 			return;
 		case ZBX_TYPE_SERIAL:
