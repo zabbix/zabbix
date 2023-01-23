@@ -123,7 +123,7 @@ const char	*help_message[] = {
 	"      " ZBX_SECRETS_RELOAD "                  Reload secrets from Vault",
 	"      " ZBX_DIAGINFO "=section                Log internal diagnostic information of the",
 	"                                        section (historycache, preprocessing, alerting,",
-	"                                        lld, valuecache, locks) or everything if section is",
+	"                                        lld, valuecache, locks, connector) or everything if section is",
 	"                                        not specified",
 	"      " ZBX_PROF_ENABLE "=target              Enable profiling, affects all processes if",
 	"                                        target is not specified",

@@ -169,7 +169,7 @@ static void	rtc_process_diaginfo(const char *data, char **result)
 	if (0 == strcmp(buf, "all"))
 	{
 		scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_PREPROCESSING) |
-				(1 << ZBX_DIAGINFO_LOCKS) | (1 << ZBX_DIAGINFO_CONNECTOR);
+				(1 << ZBX_DIAGINFO_LOCKS);
 	}
 	else if (0 == strcmp(buf, ZBX_DIAG_HISTORYCACHE))
 	{
