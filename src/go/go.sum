@@ -2,6 +2,8 @@ git.zabbix.com/ap/plugin-support v1.2.2-0.20221229105226-e7e46bf69288 h1:o53qGcO
 git.zabbix.com/ap/plugin-support v1.2.2-0.20221229105226-e7e46bf69288/go.mod h1:hBZQJDWXEBg2DpEIGzQD8R9xrvfdwveqLlJgDRVagHk=
 git.zabbix.com/ap/plugin-support v1.2.2-0.20230119152032-dcd85a2c1b4b h1:xILmVUgStXXpKuq9qD7pdx521D7eIIF6FUFIV18Ewu8=
 git.zabbix.com/ap/plugin-support v1.2.2-0.20230119152032-dcd85a2c1b4b/go.mod h1:hBZQJDWXEBg2DpEIGzQD8R9xrvfdwveqLlJgDRVagHk=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20230123113531-5ae9ac97afce h1:bHHGGtbue/Fr7wgPicVCfR9U4A0vJslaagaHpCtR/B0=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20230123113531-5ae9ac97afce/go.mod h1:hBZQJDWXEBg2DpEIGzQD8R9xrvfdwveqLlJgDRVagHk=
 git.zabbix.com/ap/plugin-support v1.2.2-0.20230123113819-fed2d1600b4d h1:GD10vTEM6N0kVuRycYN8IadXDG2Ogbf7bsv0OH39gRU=
 git.zabbix.com/ap/plugin-support v1.2.2-0.20230123113819-fed2d1600b4d/go.mod h1:hBZQJDWXEBg2DpEIGzQD8R9xrvfdwveqLlJgDRVagHk=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69 h1:+tu3HOoMXB7RXEINRVIpxJCT+KdYiI7LAEAUrOw3dIU=
