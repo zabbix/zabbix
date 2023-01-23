@@ -29,7 +29,7 @@ $this->includeJsFile('connector.list.js.php');
 $filter = (new CFilter())
 	->addVar('action', 'connector.list')
 	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'connector.list'))
-	->setProfile('web.connector.list.filter')
+	->setProfile('web.connector.filter')
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
 		(new CFormGrid())
