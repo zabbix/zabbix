@@ -70,7 +70,7 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 |Control-M: Server is down|The server is down.|`last(/Control-M server by HTTP/Control-M: Server state)=0 or last(/Control-M server by HTTP/Control-M: Server state)=10`|High| - 
 |Control-M: Server disconnected|The server is disconnected.|`last(/Control-M server by HTTP/Control-M: Server message,#1)="Disconnected"`|High| - 
 |Control-M: Server error|The server has encountered an error.|`last(/Control-M server by HTTP/Control-M: Server message,#1)<>"Connected" and last(/Control-M server by HTTP/Control-M: Server message,#1)<>"Disconnected" and last(/Control-M server by HTTP/Control-M: Server message,#1)<>""`|High| - 
-|Control-M: Server version has changed|The server version has changed. Acknowledge to close.|`last(/Control-M server by HTTP/Control-M: Server version,#1)<>last(/Control-M server by HTTP/Control-M: Server version,#2) and length(last(/Control-M server by HTTP/Control-M: Server version))>0`|Info| - 
+|Control-M: Server version has changed|The server version has changed. Acknowledge (Ack) to close.|`last(/Control-M server by HTTP/Control-M: Server version,#1)<>last(/Control-M server by HTTP/Control-M: Server version,#2) and length(last(/Control-M server by HTTP/Control-M: Server version))>0`|Info| - 
 
 ### LLD rule for jobs discovery
 
@@ -114,12 +114,12 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 |----|-----------|----|-----------------------|
 |Agent [{#AGENT.NAME}]: status [{ITEM.VALUE}]|The agent has encountered an issue.|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=1 or last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=10`|Average| - 
 |Agent [{#AGENT.NAME}}: status disabled|The agent is disabled.|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=2 or last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=3`|Info| - 
-|Agent [{#AGENT.NAME}]: version has changed|The agent version has changed. Acknowledge to close.|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#1)<>last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#2)`|Info| - 
+|Agent [{#AGENT.NAME}]: version has changed|The agent version has changed. Acknowledge (Ack) to close.|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#1)<>last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#2)`|Info| - 
 |Agent [{#AGENT.NAME}]: unknown version|The agent version is unknown.|`last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#1)="Unknown"`|Warning| - 
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at https://support.zabbix.com.
 
 You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 
@@ -214,11 +214,11 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|The service has encountered an issue.|`last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status,#1)=0 or last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status,#1)=10`|Average| - 
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|The service has finished late.|`last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status,#1)=3`|Warning| - 
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|The service has finished its job late.|`last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status,#1)=3`|Warning| - 
 |Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs in 'error' state|There are services present which are in the state - `error`.|`last(/Control-M enterprise manager by HTTP/Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'error',#1)>0`|Average| - 
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at https://support.zabbix.com.
 
 You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
