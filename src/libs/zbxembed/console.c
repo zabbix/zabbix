@@ -84,13 +84,23 @@ static duk_ret_t	es_log_message(duk_context *ctx, int level)
 	else
 		msg_output = zbx_strdup(msg_output, "undefined");
 
-	zabbix_log(level, "%s", msg_output);
-
 	duk_get_memory_functions(ctx, &out_funcs);
 	env = (zbx_es_env_t *)out_funcs.udata;
 
 	if (NULL == env->json)
+	{
+		if (ZBX_ES_LOG_MEMORY_LIMIT < env->log_size)
+		{
+			err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "log exceeds the maximum size of "
+					ZBX_FS_UI64 " bytes.", ZBX_ES_LOG_MEMORY_LIMIT);
+		}
+		else
+			zabbix_log(level, "%s", msg_output);
+
 		goto out;
+	}
+
+	zabbix_log(level, "%s", msg_output);
 
 	if (ZBX_ES_LOG_MEMORY_LIMIT < env->json->buffer_size)	/* approximate limit */
 	{
@@ -105,6 +115,7 @@ static duk_ret_t	es_log_message(duk_context *ctx, int level)
 	zbx_json_addstring(env->json, "message", msg_output, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(env->json);
 out:
+	env->log_size += strlen(msg_output);
 	zbx_free(msg_output);
 
 	if (-1 != err_index)

@@ -25,6 +25,7 @@
 #include "embed.h"
 #include "duktape.h"
 #include "zbxalgo.h"
+#include "log.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -51,6 +52,7 @@ typedef struct
 	size_t			headers_in_alloc;
 	size_t			headers_in_offset;
 	unsigned char		custom_header;
+	size_t			headers_sz;
 }
 zbx_es_httprequest_t;
 
@@ -208,10 +210,12 @@ out:
  ******************************************************************************/
 static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 {
+#define ZBX_ES_MAX_HEADERS_SIZE	ZBX_KIBIBYTE * 128
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
 	char			*utf8 = NULL;
 	int			err_index = -1;
+	size_t			header_sz;
 
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
@@ -222,9 +226,20 @@ static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 		goto out;
 	}
 
+	header_sz = strlen(utf8);
+
+	if (ZBX_ES_MAX_HEADERS_SIZE + header_sz <= request->headers_sz)
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "headers exceeded maximum size of "
+				ZBX_FS_UI64 " bytes.", ZBX_ES_MAX_HEADERS_SIZE);
+
+		goto out;
+	}
+
 	request->headers = curl_slist_append(request->headers, utf8);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	request->custom_header = 1;
+	request->headers_sz += header_sz + 1;
 out:
 	zbx_free(utf8);
 
@@ -232,6 +247,7 @@ out:
 		return duk_throw(ctx);
 
 	return 0;
+#undef ZBX_ES_MAX_HEADERS_SIZE
 }
 
 /******************************************************************************
@@ -249,6 +265,7 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
 	curl_slist_free_all(request->headers);
 	request->headers = NULL;
 	request->custom_header = 0;
+	request->headers_sz = 0;
 
 	return 0;
 }
@@ -314,6 +331,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 		{
 			curl_slist_free_all(request->headers);
 			request->headers = NULL;
+			request->headers_sz = 0;
 		}
 
 		if (NULL != contents)
