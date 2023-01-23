@@ -1462,7 +1462,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 }
 
 /**
- * Get decimal point and thousands separator for number formatting in the current locale.
+ * Get decimal point and thousands separator for number formatting according to the current locale.
  *
  * @return array  'decimal_point' and 'thousands_sep' values.
  */
