@@ -157,7 +157,7 @@ DBclose();
 /*
  * Setup wizard
  */
-$setup_wizard = (new CSetupWizard())->cleanItems();
+$setup_wizard = new CSetupWizard();
 
 // page title
 $page_header = (new CHtmlPageHeader(_('Installation'), substr($default_lang, 0, strpos($default_lang, '_'))));
