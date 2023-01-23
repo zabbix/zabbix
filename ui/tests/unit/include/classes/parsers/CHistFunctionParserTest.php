@@ -1140,7 +1140,7 @@ class CHistFunctionParserTest extends TestCase {
 						]
 					]
 				],
-				['/host/key', '\\1h\\']
+				['/host/key', '\\\\1h\\\\']
 			],
 			[
 				'nodata(/host/key, "\\"")', 0, [],
