@@ -144,7 +144,7 @@ class CRouter {
 		'maintenance.delete'						=> ['CControllerMaintenanceDelete',						'layout.json',			null],
 		'maintenance.edit'							=> ['CControllerMaintenanceEdit',						'layout.json',			'maintenance.edit'],
 		'maintenance.list'							=> ['CControllerMaintenanceList',						'layout.htmlpage',		'maintenance.list'],
-		'maintenance.period'						=> ['CControllerMaintenancePeriod',						'layout.json',			'maintenance.period'],
+		'maintenance.period.edit'					=> ['CControllerMaintenancePeriodEdit',					'layout.json',			'maintenance.period.edit'],
 		'maintenance.period.check'					=> ['CControllerMaintenancePeriodCheck',				'layout.json',			null],
 		'maintenance.update'						=> ['CControllerMaintenanceUpdate',						'layout.json',			null],
 		'map.view'									=> ['CControllerMapView',								'layout.htmlpage',		'monitoring.map.view'],

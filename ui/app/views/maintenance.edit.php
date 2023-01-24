@@ -30,56 +30,19 @@ $form = (new CForm())
 	->addVar('maintenanceid', $data['maintenanceid'] ?: 0)
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-$maintenance_period_table = (new CTable())
-	->setId('maintenance-period-table')
-	->addStyle('width: 100%;')
-	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')])
-	->setAriaRequired();
+$periods = (new CTable())
+	->setId('periods')
+	->setHeader(
+		(new CRowHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')]))->addClass(ZBX_STYLE_GREY)
+	);
 
-foreach (array_values($data['timeperiods']) as $index => $timeperiod) {
-	$period_data = [];
-
-	if ($timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
-		unset($timeperiod['start_date']);
-	}
-
-	foreach ($timeperiod as $field => $value) {
-		$period_data[] = (new CVar(sprintf('timeperiods[%s][%s]', $index, $field), $value))->removeId();
-	}
-
-	$maintenance_period_table->addRow([
-		(new CCol(timeperiod_type2str($timeperiod['timeperiod_type'])))->addClass(ZBX_STYLE_NOWRAP),
-		($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME)
-			? $timeperiod['start_date']
-			: schedule2str($timeperiod),
-		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
-		(new CCol([
-			$period_data,
-			new CHorList([
-				(new CSimpleButton(_('Edit')))
-					->setAttribute('data-action', 'edit')
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('js-period-edit')
-					->setEnabled($data['allowed_edit']),
-				(new CSimpleButton(_('Remove')))
-					->setAttribute('data-action', 'remove')
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('js-period-remove')
-					->setEnabled($data['allowed_edit'])
-			])
-		]))->addClass(ZBX_STYLE_NOWRAP)
-	]);
-}
-
-$maintenance_period_table->addItem(
+$periods->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
 			(new CCol(
 				(new CSimpleButton(_('Add')))
-					->setAttribute('data-action', 'add')
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('js-period-create')
-					->setEnabled($data['allowed_edit'])
+					->addClass('js-add')
 			))->setColSpan(4)
 		)
 );
@@ -129,9 +92,12 @@ $form->addItem(
 		])
 		->addItem([
 			(new CLabel(_('Periods')))->setAsteriskMark(),
-			(new CFormField($maintenance_period_table))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			new CFormField(
+				(new CDiv($periods))
+					->setId('periods')
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			)
 		])
 		->addItem([
 			new CLabel(_('Host groups'), 'groupids__ms'),
@@ -237,6 +203,7 @@ $form->addItem(
 	(new CScriptTag('
 		maintenance_edit.init('.json_encode([
 			'maintenanceid' => $data['maintenanceid'],
+			'timeperiods' => $data['timeperiods'],
 			'maintenance_tags' => $data['tags'],
 			'allowed_edit' => $data['allowed_edit']
 		]).');

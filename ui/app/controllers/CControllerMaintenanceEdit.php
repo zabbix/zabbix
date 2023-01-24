@@ -83,6 +83,22 @@ class CControllerMaintenanceEdit extends CController {
 			CArrayHelper::sort($this->maintenance['tags'], ['tag', 'value', 'operator']);
 			$this->maintenance['tags'] = array_values($this->maintenance['tags']);
 
+			CArrayHelper::sort($this->maintenance['timeperiods'], ['timeperiod_type', 'start_date']);
+			$this->maintenance['timeperiods'] = array_values($this->maintenance['timeperiods']);
+
+			foreach ($this->maintenance['timeperiods'] as $row_index => &$timeperiod) {
+				$timeperiod['start_date'] = date(ZBX_DATE_TIME, $timeperiod['start_date']);
+				$timeperiod += [
+					'row_index' => $row_index,
+					'period_type' => timeperiod_type2str($timeperiod['timeperiod_type']),
+					'schedule' => $timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME
+						? $timeperiod['start_date']
+						: schedule2str($timeperiod),
+					'period_table_entry' =>zbx_date2age(0, $timeperiod['period'])
+				];
+			}
+			unset($timeperiod);
+
 			$data = [
 				'maintenanceid' => $this->maintenance['maintenanceid'],
 				'mname' => $this->maintenance['name'],
@@ -94,13 +110,6 @@ class CControllerMaintenanceEdit extends CController {
 				'tags' => $this->maintenance['tags'] ?: $empty_tags,
 				'description' => $this->maintenance['description']
 			];
-
-			CArrayHelper::sort($data['timeperiods'], ['timeperiod_type', 'start_date']);
-
-			foreach ($data['timeperiods'] as &$timeperiod) {
-				$timeperiod['start_date'] = date(ZBX_DATE_TIME, $timeperiod['start_date']);
-			}
-			unset($timeperiod);
 
 			$db_hosts = API::Host()->get([
 				'output' => ['hostid', 'name'],

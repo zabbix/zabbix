@@ -22,7 +22,9 @@
 
 window.maintenance_edit = new class {
 
-	init({maintenanceid, maintenance_tags, allowed_edit}) {
+	init({maintenanceid, timeperiods, maintenance_tags, allowed_edit}) {
+		this._initTemplates();
+
 		this.maintenanceid = maintenanceid;
 
 		this.overlay = overlays_stack.getById('maintenance-edit');
@@ -30,8 +32,16 @@ window.maintenance_edit = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		// Setup tags.
+		// Add existing periods in maintenance edit form.
+		if (typeof(timeperiods) === 'object') {
+			timeperiods = Object.values(timeperiods);
+		}
 
+		for (const timeperiod of timeperiods) {
+			this._addPeriod(timeperiod);
+		}
+
+		// Setup tags.
 		const $maintenance_tags = jQuery(document.getElementById('maintenance-tags'));
 
 		$maintenance_tags.dynamicRows({
@@ -80,28 +90,103 @@ window.maintenance_edit = new class {
 			}
 		});
 
-		this._initActionButtons();
+		this._initPeriodActionButtons();
 	}
 
-	_initActionButtons() {
-		this.dialogue.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-period-create')) {
-				this._openPeriodPopup(this.maintenanceid);
+	_initTemplates() {
+		this.periods_template = new Template(`
+			<tr data-row_index="#{row_index}">
+				<td>#{period_type}</td>
+				<td>#{schedule}</td>
+				<td>#{period_table_entry}</td>
+				<td>
+					<input type="hidden" name="timeperiods[#{row_index}][timeperiod_type]" value="#{timeperiod_type}">
+					<input type="hidden" name="timeperiods[#{row_index}][every]" value="#{every}">
+					<input type="hidden" name="timeperiods[#{row_index}][month]" value="#{month}">
+					<input type="hidden" name="timeperiods[#{row_index}][dayofweek]" value="#{dayofweek}">
+					<input type="hidden" name="timeperiods[#{row_index}][day]" value="#{day}">
+					<input type="hidden" name="timeperiods[#{row_index}][start_time]" value="#{start_time}">
+					<input type="hidden" name="timeperiods[#{row_index}][period]" value="#{period}">
+					<input type="hidden" name="timeperiods[#{row_index}][start_date]" value="#{start_date}">
+					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit"><?= _('Edit') ?></button>
+						</li>
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+						</li>
+					</ul>
+				</td>
+			</tr>
+		`);
+	}
+
+	_addPeriod(period) {
+		document
+			.querySelector('#periods tbody')
+			.insertAdjacentHTML('beforeend', this.periods_template.evaluate(period));
+	}
+
+	_initPeriodActionButtons() {
+		document
+			.getElementById('periods')
+			.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-add')) {
+					this._editPeriod();
+				}
+				else if (e.target.classList.contains('js-edit')) {
+					this._editPeriod(e.target.closest('tr'));
+				}
+				else if (e.target.classList.contains('js-remove')) {
+					e.target.closest('tr').remove();
+				}
+			});
+	}
+
+	_editPeriod(row = null) {
+		let popup_params;
+
+		if (row !== null) {
+			const row_index = row.dataset.row_index;
+
+			popup_params = {
+				edit: '1',
+				row_index,
+				timeperiod_type: row.querySelector(`[name="timeperiods[${row_index}][timeperiod_type]"`).value,
+				every: row.querySelector(`[name="timeperiods[${row_index}][every]"`).value,
+				month: row.querySelector(`[name="timeperiods[${row_index}][month]"`).value,
+				dayofweek: row.querySelector(`[name="timeperiods[${row_index}][dayofweek]"`).value,
+				day: row.querySelector(`[name="timeperiods[${row_index}][day]"`).value,
+				start_time: row.querySelector(`[name="timeperiods[${row_index}][start_time]"`).value,
+				period: row.querySelector(`[name="timeperiods[${row_index}][period]"`).value,
+				start_date: row.querySelector(`[name="timeperiods[${row_index}][start_date]"`).value
+			};
+		}
+		else {
+			let row_index = 0;
+
+			while (document.querySelector(`#periods [data-row_index="${row_index}"]`) !== null) {
+				row_index++;
 			}
-			else if (e.target.classList.contains('js-period-edit')) {
-				this._openPeriodEditPopup(e, JSON.parse(e.target.dataset.period));
+
+			popup_params = {row_index};
+		}
+
+		const overlay = PopUp('maintenance.period.edit', popup_params, {
+			dialogueid: 'maintenance_period_edit'
+		});
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+			if (row !== null) {
+				this._updatePeriod(row, e.detail)
 			}
-			else if (e.target.classList.contains('js-period-remove')) {
-				e.target.closest('tr').remove();
+			else {
+				this._addPeriod(e.detail);
 			}
 		});
 	}
 
-	_openPeriodPopup() {
-
-	}
-
-	_openPeriodEditPopup() {
+	_updatePeriod(row, period) {
 
 	}
 
