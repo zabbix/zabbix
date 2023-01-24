@@ -36,9 +36,22 @@ class CLdap {
 	 */
 	public $error;
 
-	public function __construct($arg = []) {
-		$this->ds = false;
-		$this->info = [];
+	/**
+	 * @var mixed
+	 */
+	private $ds = false;
+
+	/**
+	 * @var mixed
+	 */
+	private $info = [];
+
+	/**
+	 * @var array
+	 */
+	private $cnf = [];
+
+	public function __construct(array $arg = []) {
 		$this->cnf = [
 			'host' => 'ldap://localhost',
 			'port' => '389',
