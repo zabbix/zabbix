@@ -130,7 +130,7 @@ $connector_tab = (new CFormGrid())
 					->setModern()
 			))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CNumericBox('max_records', $data['form']['max_records'], 10, false, false, false))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired()
 		])
 	])
@@ -138,7 +138,7 @@ $connector_tab = (new CFormGrid())
 		(new CLabel(_('Processes'), 'max_senders'))->setAsteriskMark(),
 		new CFormField(
 			(new CNumericBox('max_senders', $data['form']['max_senders'], 3, false, false, false))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired()
 		)
 	])
@@ -146,7 +146,7 @@ $connector_tab = (new CFormGrid())
 		(new CLabel(_('Attempts'), 'max_attempts'))->setAsteriskMark(),
 		new CFormField(
 			(new CNumericBox('max_attempts', $data['form']['max_attempts'], 1, false, false, false))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAriaRequired()
 		)
 	])
