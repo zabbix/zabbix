@@ -1,0 +1,997 @@
+zabbix_export:
+  version: '6.2'
+  date: '2023-01-24T06:39:09Z'
+  template_groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 738085dde4e749d49199e5e6fd4d56ab
+      template: 'Veeam Backup and Replication by HTTP'
+      name: 'Veeam Backup and Replication by HTTP'
+      description: |
+        This template is designed to monitor Veeam Backup and Replication version 11.0.
+        It works without any external scripts and uses the script item.
+        
+        Setup:
+          1. Create a user to monitor the service or use an existing read-only account.
+          See [Veeam Help Center](https://helpcenter.veeam.com/docs/backup/vbr_rest/reference/vbr-rest-v1-rev2.html?ver=110#tag/Login/operation/CreateToken!path=grant_type&t=request) for more details. 
+          2. Link the template to a host.
+          3. Configure macros `{$VEEAM.API.URL}`, `{$VEEAM.USER}`, and `{$VEEAM.PASSWORD}`.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.42
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 87224dc0114446689f0fcfc4f0f83c17
+          name: 'Veeam: Get errors'
+          type: DEPENDENT
+          key: veeam.get.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'The errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: veeam.get.metrics
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: 3487d31a2aa540009f006c6a4eff8c79
+              expression: 'length(last(/Veeam Backup and Replication by HTTP/veeam.get.errors))>0'
+              name: 'Veeam: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in response to API requests.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: f8ef587e6d204e7da6e27e56b1131ca4
+          name: 'Veeam: Get metrics'
+          type: SCRIPT
+          key: veeam.get.metrics
+          delay: 5m
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Veeam = {
+                params: {},
+                token: '',
+            
+                setParams: function (params) {
+                    ['api_endpoint', 'user', 'password', 'created_after'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    Veeam.params = params;
+                    if (typeof Veeam.params.api_endpoint === 'string' && !Veeam.params.api_endpoint.endsWith('/')) {
+                        Veeam.params.api_endpoint += '/';
+                    }
+                    if (Veeam.params.created_after >= 365 || Veeam.params.created_after <= 1) {
+                        throw 'Incorrect "created_after" parameter given: ' + Veeam.params.created_after + '\nMust be between 1 and 365 days.';
+                    }
+                },
+            
+                login: function () {
+            
+                    var resp, login = new HttpRequest();
+                    if (typeof Veeam.params.http_proxy !== 'undefined' && Veeam.params.http_proxy !== '') {
+                        login.setProxy(Veeam.params.http_proxy);
+                    }
+                    login.addHeader('Content-Type: application/x-www-form-urlencoded');
+                    login.addHeader('x-api-version: 1.0-rev2');
+                    resp = login.post(Veeam.params.api_endpoint+ 'api/oauth2/token', 
+                    'grant_type=password&username=' + encodeURIComponent(Veeam.params.user) + '&password='+ encodeURIComponent(Veeam.params.password));
+            
+                    if (login.getStatus() !== 200 || resp === null) {
+                        throw 'Login failed with status code ' + login.getStatus() + ': ' + resp;
+                    }
+            
+                    try {
+                        resp =  JSON.parse(resp);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse authentication token for the logon session.'; 
+                    }
+                    if (!resp.hasOwnProperty('access_token')) {
+                        throw 'Auth response does not contain access token.';
+                    }
+                    Veeam.token = resp['access_token']
+            
+                },
+            
+                request: function (url) {
+              
+                    var response, request = new HttpRequest();
+                    if (typeof Veeam.params.http_proxy !== 'undefined' && Veeam.params.http_proxy !== '') {
+                        request.setProxy(Veeam.params.http_proxy);
+                    }
+                    if (Veeam.token) {
+                        request.addHeader('Authorization: Bearer ' + Veeam.token);
+                        request.addHeader('x-api-version: 1.0-rev2');
+                        response = request.get(url);
+                    }
+                    if (request.getStatus() !== 200 || response === null) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+                    try {
+                        return JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
+                    } 
+                },
+            
+                getMetricsData: function() {
+                    var data = {};
+                    ms = 86400000;
+                    start_date = new Date((new Date().getTime()) - ms * Veeam.params.created_after).toISOString().replace(/\.\d+/, '');
+                    endpoints = {
+                        'proxies': 'api/v1/backupInfrastructure/proxies',
+                        'repositories': 'api/v1/backupInfrastructure/repositories',
+                        'managedServers': 'api/v1/backupInfrastructure/managedServers',
+                        'repositories_states': 'api/v1/backupInfrastructure/repositories/states',
+                        'services': 'api/v1/services',
+                        'jobs_states': 'api/v1/jobs/states',
+                        'backups': 'api/v1/backups',
+                        'backupObjects': 'api/v1/backupObjects',
+                        'objectRestorePoints': 'api/v1/objectRestorePoints',
+                        'sessions': 'api/v1/sessions?createdAfterFilter=' + encodeURIComponent(start_date)
+                    };
+            
+                    Object.keys(endpoints).forEach(function (key) {
+                        data[key] = Veeam.request(Veeam.params.api_endpoint + endpoints[key]);
+                    });
+            
+                    return data;
+                }
+            };
+            
+            try {
+                Veeam.setParams(JSON.parse(value));
+                Veeam.login();
+                return JSON.stringify(Veeam.getMetricsData());
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ VEEAM ] ERROR: ' + error);
+                return JSON.stringify({'error': error});
+            }
+          description: 'The result of API requests is expressed in the JSON.'
+          timeout: '{$VEEAM.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: api_endpoint
+              value: '{$VEEAM.API.URL}'
+            -
+              name: password
+              value: '{$VEEAM.PASSWORD}'
+            -
+              name: user
+              value: '{$VEEAM.USER}'
+            -
+              name: created_after
+              value: '{$CREATED.AFTER}'
+            -
+              name: http_proxy
+              value: '{$VEEAM.HTTP.PROXY}'
+          tags:
+            -
+              tag: component
+              value: raw
+      discovery_rules:
+        -
+          uuid: 02bac44761384a579575c16ef1740f32
+          name: 'Jobs states discovery'
+          type: DEPENDENT
+          key: veeam.job.state.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: '{$JOB.TYPE.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#TYPE}'
+                value: '{$JOB.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#NAME}'
+                value: '{$JOB.NAME.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#NAME}'
+                value: '{$JOB.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#JOB.STATUS}'
+                value: '{$JOB.STATUS.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#JOB.STATUS}'
+                value: '{$JOB.STATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovery of the jobs states.'
+          item_prototypes:
+            -
+              uuid: 120a6bf888e74e0c9b054c3bdd50473f
+              name: 'Veeam: Job states [{#NAME}] [{#TYPE}]: Last result'
+              type: DEPENDENT
+              key: 'veeam.jobs.last.result[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.lastResult
+              master_item:
+                key: 'veeam.jobs.states.raw[{#ID}]'
+              tags:
+                -
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
+                -
+                  tag: workload
+                  value: '{#WORKLOAD}'
+              trigger_prototypes:
+                -
+                  uuid: 337b1cafc2674b4fb44e5baf1076183b
+                  expression: 'find(/Veeam Backup and Replication by HTTP/veeam.jobs.last.result[{#ID}],,"like","Failed")=1'
+                  name: 'Veeam: Last result job failed'
+                  event_name: 'Veeam: Failed job [{#NAME}]'
+                  priority: AVERAGE
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: cd2bc50b71184c5ebf39b75a2dafa483
+              name: 'Veeam: Job states [{#NAME}] [{#TYPE}]: Get data'
+              type: DEPENDENT
+              key: 'veeam.jobs.states.raw[{#ID}]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Gets raw data from the job states with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs_states.data.[?(@.id==''{#ID}'')].first()'
+              master_item:
+                key: veeam.get.metrics
+              tags:
+                -
+                  tag: component
+                  value: jobs
+                -
+                  tag: component
+                  value: raw
+            -
+              uuid: 6f3837f27334466b814728036dd65c1d
+              name: 'Veeam: Job states [{#NAME}] [{#TYPE}]: Status'
+              type: DEPENDENT
+              key: 'veeam.jobs.status[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'The current status of the job. The enums used: `running`, `inactive`, `disabled`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.status
+              master_item:
+                key: 'veeam.jobs.states.raw[{#ID}]'
+              tags:
+                -
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
+                -
+                  tag: workload
+                  value: '{#WORKLOAD}'
+          master_item:
+            key: veeam.get.metrics
+          lld_macro_paths:
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#TYPE}'
+              path: $.type
+            -
+              lld_macro: '{#WORKLOAD}'
+              path: $.workload
+            -
+              lld_macro: '{#JOB.STATUS}'
+              path: $.status
+            -
+              lld_macro: '{#REPOSITORY.NAME}'
+              path: $.repositoryName
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.jobs_states.data
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 4b1925bd0295403b8eb0d99b2f947296
+          name: 'Proxies discovery'
+          type: DEPENDENT
+          key: veeam.proxies.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: '{$PROXIES.TYPE.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#TYPE}'
+                value: '{$PROXIES.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#NAME}'
+                value: '{$PROXIES.NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$PROXIES.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovery of proxies.'
+          item_prototypes:
+            -
+              uuid: 1daea1ba8ac144fc9e22296720af0b22
+              name: 'Veeam: Proxy [{#NAME}] [{#TYPE}]: Max Task Count'
+              type: DEPENDENT
+              key: 'veeam.proxy.maxtask[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The maximum number of concurrent tasks.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.server.maxTaskCount
+              master_item:
+                key: 'veeam.proxy.raw[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxies
+                -
+                  tag: proxy
+                  value: '{#NAME}'
+            -
+              uuid: 40d85eb402274838b00765ab91de3896
+              name: 'Veeam: Proxy [{#NAME}] [{#TYPE}]: Get data'
+              type: DEPENDENT
+              key: 'veeam.proxy.raw[{#NAME}]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Gets raw data collected by the proxy with the name `[{#NAME}]`, `[{#TYPE}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.proxies.data.[?(@.id==''{#ID}'')].first()'
+              master_item:
+                key: veeam.get.metrics
+              tags:
+                -
+                  tag: component
+                  value: proxies
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: proxy
+                  value: '{#NAME}'
+            -
+              uuid: 4c304283f1ad480b8251a72ade27620f
+              name: 'Veeam: Proxy [{#NAME}] [{#TYPE}]: Host name'
+              type: DEPENDENT
+              key: 'veeam.proxy.server.name[{#NAME}]'
+              delay: '0'
+              history: 1d
+              trends: '0'
+              value_type: TEXT
+              description: 'The name of the proxy server.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.name
+              master_item:
+                key: 'veeam.proxy.server.raw[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxies
+                -
+                  tag: proxy
+                  value: '{#NAME}'
+            -
+              uuid: 83e2e092ae1f4e1a9b4a426076f76467
+              name: 'Veeam: Server [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'veeam.proxy.server.raw[{#NAME}]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Gets raw data collected by the proxy server.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.managedServers.data.[?(@.id==''{#HOSTID}'')].first()'
+              master_item:
+                key: veeam.get.metrics
+              tags:
+                -
+                  tag: component
+                  value: proxies
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: proxy
+                  value: '{#NAME}'
+            -
+              uuid: 7dca605f25854e89a7e18702e8a48fc7
+              name: 'Veeam: Proxy [{#NAME}] [{#TYPE}]: Host type'
+              type: DEPENDENT
+              key: 'veeam.proxy.server.type[{#NAME}]'
+              delay: '0'
+              history: 1d
+              trends: '0'
+              value_type: TEXT
+              description: 'The type of the proxy server.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.type
+              master_item:
+                key: 'veeam.proxy.server.raw[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxies
+                -
+                  tag: proxy
+                  value: '{#NAME}'
+          master_item:
+            key: veeam.get.metrics
+          lld_macro_paths:
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#HOSTID}'
+              path: $.server.hostId
+            -
+              lld_macro: '{#TYPE}'
+              path: $.type
+            -
+              lld_macro: '{#DESCRIPTION}'
+              path: $.description
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.proxies.data
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 27db09e55a3c4d638f7c10109d9b76be
+          name: 'Repositories discovery'
+          type: DEPENDENT
+          key: veeam.repositories.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: '{$REPOSITORIES.TYPE.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#TYPE}'
+                value: '{$REPOSITORIES.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#NAME}'
+                value: '{$REPOSITORIES.NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$REPOSITORIES.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovery of repositories.'
+          item_prototypes:
+            -
+              uuid: 1c925cfa0a2b46838588471aa58a1591
+              name: 'Veeam: Repository [{#NAME}] [{#TYPE}]: Get data'
+              type: DEPENDENT
+              key: 'veeam.repositories.raw[{#NAME}]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Gets raw data from repository with the name: `[{#NAME}]`, `[{#TYPE}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.repositories_states.data.[?(@.id==''{#ID}'')].first()'
+              master_item:
+                key: veeam.get.metrics
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: repositories
+                -
+                  tag: repository
+                  value: '{#NAME}'
+            -
+              uuid: 80a13587e8cc40ba886f987fcde23c13
+              name: 'Veeam: Repository [{#NAME}] [{#TYPE}]: Used space [{#PATH}]'
+              type: DEPENDENT
+              key: 'veeam.repository.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!GB'
+              description: 'Used space by repositories expressed in gigabytes (GB).'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.usedSpaceGB
+              master_item:
+                key: 'veeam.repositories.raw[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: repositories
+                -
+                  tag: repository
+                  value: '{#NAME}'
+            -
+              uuid: 882451efee0a4ce8aabc2d2f3955d0be
+              name: 'Veeam: Repository [{#NAME}] [{#TYPE}]: Free space [{#PATH}]'
+              type: DEPENDENT
+              key: 'veeam.repository.free.space[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!GB'
+              description: 'Free space of repositories expressed in gigabytes (GB).'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.freeGB
+              master_item:
+                key: 'veeam.repositories.raw[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: repositories
+                -
+                  tag: repository
+                  value: '{#NAME}'
+          master_item:
+            key: veeam.get.metrics
+          lld_macro_paths:
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#HOSTID}'
+              path: $.server.hostId
+            -
+              lld_macro: '{#TYPE}'
+              path: $.type
+            -
+              lld_macro: '{#DESCRIPTION}'
+              path: $.description
+            -
+              lld_macro: '{#HOSTNAME}'
+              path: $.hostName
+            -
+              lld_macro: '{#PATH}'
+              path: $.path
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.repositories_states.data
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 06b4e666bede4d4b9f29ab7e94dcb442
+          name: 'Sessions discovery'
+          type: DEPENDENT
+          key: veeam.sessions.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: '{$SESSION.TYPE.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#TYPE}'
+                value: '{$SESSION.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#NAME}'
+                value: '{$SESSION.NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$SESSION.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovery of sessions.'
+          item_prototypes:
+            -
+              uuid: 7224f41e5c614268bf6997ad8a49710b
+              name: 'Veeam: Session [{#NAME}] [{#TYPE}]: Message'
+              type: DEPENDENT
+              key: 'veeam.sessions.message[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'A message that explains the session result.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.result.message
+              master_item:
+                key: 'veeam.sessions.raw[{#ID}]'
+              tags:
+                -
+                  tag: component
+                  value: sessions
+                -
+                  tag: creation-date
+                  value: '{#CREATION.TIME}'
+                -
+                  tag: session
+                  value: '{#NAME}'
+            -
+              uuid: 3f449f47943b4877a32e89774712510f
+              name: 'Veeam: Session progress percent [{#NAME}] [{#TYPE}]'
+              type: DEPENDENT
+              key: 'veeam.sessions.progress.percent[{#ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'The progress of the session expressed as percentage.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.progressPercent
+              master_item:
+                key: 'veeam.sessions.raw[{#ID}]'
+              tags:
+                -
+                  tag: component
+                  value: sessions
+                -
+                  tag: creation-date
+                  value: '{#CREATION.TIME}'
+                -
+                  tag: session
+                  value: '{#NAME}'
+            -
+              uuid: f82984e1180946c6b4bff1f46987555d
+              name: 'Veeam: Session [{#NAME}] [{#TYPE}]: Get data'
+              type: DEPENDENT
+              key: 'veeam.sessions.raw[{#ID}]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Gets raw data from session with the name: `[{#NAME}]`, `[{#TYPE}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.sessions.data.[?(@.id==''{#ID}'')].first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: veeam.get.metrics
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: session
+                  value: '{#NAME}'
+            -
+              uuid: 5fb9dcb62bfe4d1dae94beefa329691d
+              name: 'Veeam: Session [{#NAME}] [{#TYPE}]: Result'
+              type: DEPENDENT
+              key: 'veeam.sessions.result[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.result.result
+              master_item:
+                key: 'veeam.sessions.raw[{#ID}]'
+              tags:
+                -
+                  tag: component
+                  value: sessions
+                -
+                  tag: creation-date
+                  value: '{#CREATION.TIME}'
+                -
+                  tag: session
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: eeb93a10f3d04eee819587c6fa4ce8f8
+                  expression: 'find(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#ID}],,"like","Failed")=1'
+                  name: 'Veeam: Last result session failed'
+                  event_name: 'Veeam: Failed session [{#NAME}]'
+                  priority: AVERAGE
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 8c7092e721eb4f8f8b53a07f0fb710a0
+              name: 'Veeam: Session [{#NAME}] [{#TYPE}]: State'
+              type: DEPENDENT
+              key: 'veeam.sessions.state[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'The state of the session. The enums used: `Stopped`, `Starting`, `Stopping`, `Working`, `Pausing`, `Resuming`, `WaitingTape`, `Idle`, `Postprocessing`, `WaitingRepository`, `WaitingSlot`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.state
+              master_item:
+                key: 'veeam.sessions.raw[{#ID}]'
+              tags:
+                -
+                  tag: component
+                  value: sessions
+                -
+                  tag: creation-date
+                  value: '{#CREATION.TIME}'
+                -
+                  tag: session
+                  value: '{#NAME}'
+          master_item:
+            key: veeam.get.metrics
+          lld_macro_paths:
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#TYPE}'
+              path: $.sessionType
+            -
+              lld_macro: '{#STATE}'
+              path: $.state
+            -
+              lld_macro: '{#CREATION.TIME}'
+              path: $.creationTime
+            -
+              lld_macro: '{#END.TIME}'
+              path: $.endTime
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sessions.data
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  obj = JSON.parse(value, function(key, value) 
+                      {
+                        if (key == 'creationTime') return new Date(value).toDateString(); 
+                        return value;
+                      });
+                  return JSON.stringify(obj);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: veeam
+      macros:
+        -
+          macro: '{$CREATED.AFTER}'
+          value: '7'
+          description: 'Returns sessions that are created after chosen days.'
+        -
+          macro: '{$JOB.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+        -
+          macro: '{$JOB.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+        -
+          macro: '{$JOB.STATUS.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+        -
+          macro: '{$JOB.STATUS.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+        -
+          macro: '{$JOB.TYPE.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+        -
+          macro: '{$JOB.TYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
+        -
+          macro: '{$PROXIES.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in proxies discovery rule.'
+        -
+          macro: '{$PROXIES.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in proxies discovery rule.'
+        -
+          macro: '{$PROXIES.TYPE.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in proxies discovery rule.'
+        -
+          macro: '{$PROXIES.TYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in proxies discovery rule.'
+        -
+          macro: '{$REPOSITORIES.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in repositories discovery rule.'
+        -
+          macro: '{$REPOSITORIES.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in repositories discovery rule.'
+        -
+          macro: '{$REPOSITORIES.TYPE.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in repositories discovery rule.'
+        -
+          macro: '{$REPOSITORIES.TYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in repositories discovery rule.'
+        -
+          macro: '{$SESSION.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in discovery rule to evaluate sessions.'
+        -
+          macro: '{$SESSION.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in discovery rule to evaluate sessions.'
+        -
+          macro: '{$SESSION.TYPE.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in discovery rule to evaluate sessions.'
+        -
+          macro: '{$SESSION.TYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in discovery rule to evaluate sessions.'
+        -
+          macro: '{$VEEAM.API.URL}'
+          value: 'https://localhost:9419'
+          description: 'The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.'
+        -
+          macro: '{$VEEAM.DATA.TIMEOUT}'
+          value: '10'
+          description: 'A response timeout for the API.'
+        -
+          macro: '{$VEEAM.HTTP.PROXY}'
+          description: 'Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.'
+        -
+          macro: '{$VEEAM.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'The `password` of the Veeam Backup and Replication account. It is used to obtain an access token.'
+        -
+          macro: '{$VEEAM.USER}'
+          type: SECRET_TEXT
+          description: 'The `username` of the Veeam Backup and Replication account. It is used to obtain an access token.'
