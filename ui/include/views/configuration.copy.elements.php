@@ -47,9 +47,6 @@ if ($data['hostid'] != 0) {
 
 // create form
 $form = (new CForm('post', (new CUrl())->getUrl()))
-	->addItem((new CVar(
-		CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get(strtok($data['action'], '.') . 's.php')
-	))->removeId())
 	->setName('elements_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])

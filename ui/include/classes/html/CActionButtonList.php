@@ -98,17 +98,11 @@ class CActionButtonList extends CObject {
 						}
 						form.action = this.dataset.redirect;';
 
-					if (array_key_exists('csrf_token', $button_data)) {
-						$on_click_action .= 'create_var(form,"'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'", "'.
-							$button_data['csrf_token'].'", false);';
-					}
-
 					$button
 						// Removing parameters not to conflict with the redirecting URL.
 						->removeAttribute('name')
 						->removeAttribute('value')
-						->setAttribute('data-redirect', $button_data['redirect'])
-						->onClick($on_click_action);
+						->setAttribute('data-redirect', $button_data['redirect']);
 				}
 				else {
 					$on_click_action = 'const form = this.closest("form");'.
@@ -117,15 +111,16 @@ class CActionButtonList extends CObject {
 							form.action = form.dataset.action;
 						}';
 
-					if (array_key_exists('csrf_token', $button_data)) {
-						$on_click_action .= 'create_var(form,"'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'", "'.
-							$button_data['csrf_token'].'", false);';
-					}
-
 					$button
-						->setAttribute('value', $action)
-						->onClick($on_click_action);
+						->setAttribute('value', $action);
 				}
+
+				if (array_key_exists('csrf_token', $button_data)) {
+					$on_click_action .= 'create_var(form,"'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'", "'.
+						$button_data['csrf_token'].'", false);';
+				}
+
+				$button->onClick($on_click_action);
 
 				if (array_key_exists('disabled', $button_data)) {
 					$button
