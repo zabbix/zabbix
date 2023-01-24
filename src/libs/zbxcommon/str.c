@@ -337,7 +337,7 @@ void	zbx_strquote_alloc_opt(char **str, size_t *str_alloc, size_t *str_offset, c
 		switch (*src)
 		{
 			case '\\':
-				if (0 == option)
+				if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
 					break;
 				ZBX_FALLTHROUGH;
 			case '"':
@@ -368,7 +368,7 @@ void	zbx_strquote_alloc_opt(char **str, size_t *str_alloc, size_t *str_offset, c
 		switch (*src)
 		{
 			case '\\':
-				if (0 == option)
+				if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
 					break;
 				ZBX_FALLTHROUGH;
 			case '"':
@@ -5747,7 +5747,7 @@ char	*zbx_substr_unquote_opt(const char *src, size_t left, size_t right, int opt
 				{
 					case '\\':
 						*ptr++ = '\\';
-						if (0 == option)
+						if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
 							*ptr++ = '\\';
 						break;
 					case '"':
@@ -5758,7 +5758,7 @@ char	*zbx_substr_unquote_opt(const char *src, size_t left, size_t right, int opt
 						*ptr = '\0';
 						return str;
 					default:
-						if (0 == option)
+						if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
 						{
 							*ptr++ = '\\';
 							*ptr++ = *src;
