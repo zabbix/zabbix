@@ -559,7 +559,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 		zbx_vector_ptr_append(items, item);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -629,7 +629,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 				atoi(row[3]), row[4], atoi(row[5]), row[6]);
 		zbx_vector_ptr_append(&item->preproc_ops, preproc_op);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
@@ -661,7 +661,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		ZBX_STR2UINT64(item_param->item_parameterid, row[0]);
 		zbx_vector_item_param_ptr_append(&item->item_params, item_param);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
@@ -694,7 +694,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		ZBX_STR2UINT64(db_tag->tagid, row[0]);
 		zbx_vector_db_tag_ptr_append(&item->item_tags, db_tag);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&parent_itemids);
@@ -979,7 +979,7 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 				zbx_vector_uint64_append(&next_check_itemids, dependence->master_itemid);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 	zbx_free(sql);
 
@@ -1569,7 +1569,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 				}
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_free(sql);
 	}
@@ -4140,7 +4140,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 
 		zbx_vector_ptr_append(item_prototypes, item_prototype);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(item_prototypes, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -4172,7 +4172,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 				row[3], atoi(row[4]), row[5]);
 		zbx_vector_ptr_append(&item_prototype->preproc_ops, preproc_op);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < item_prototypes->values_num; i++)
 	{
@@ -4204,7 +4204,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		item_param = zbx_item_param_create(row[1], row[2]);
 		zbx_vector_item_param_ptr_append(&item_prototype->item_params, item_param);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* get item prototype tags */
 
@@ -4233,7 +4233,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		db_tag = zbx_db_tag_create(row[1], row[2]);
 		zbx_vector_db_tag_ptr_append(&item_prototype->item_tags, db_tag);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d prototypes", __func__, item_prototypes->values_num);
 }

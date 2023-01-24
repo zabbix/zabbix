@@ -1128,7 +1128,7 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 		if (SUCCEED != proxyconfig_compare_row(row, dbrow, &buf, &buf_alloc))
 			zbx_vector_table_row_ptr_append(&td->updates, row);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 	zbx_free(buf);
@@ -1608,7 +1608,7 @@ static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, zbx_tab
 			ZBX_STR2UINT64(templateid, dbrow[0]);
 			zbx_hashset_insert(&templates, &templateid, sizeof(templateid));
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "status", NULL);
 

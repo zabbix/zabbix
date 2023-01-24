@@ -555,7 +555,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 		zbx_vector_valuemaps_ptr_append(&valuemaps, valuemap);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ret = evaluate_value_by_map(value, max_len, &valuemaps, value_type);
 

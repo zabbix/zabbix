@@ -71,11 +71,11 @@ static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host
 			else
 				zbx_strlcpy(error, row[1], max_error_len);
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return ret;
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_snprintf(error, max_error_len, "Timeout while waiting for remote command result.");
@@ -150,7 +150,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 
 	ret = SUCCEED;
 fail:
-	DBfree_result(db_result);
+	zbx_db_free_result(db_result);
 
 	return ret;
 }
@@ -177,7 +177,7 @@ static int	is_user_in_allowed_group(zbx_uint64_t userid, zbx_uint64_t usrgrpid, 
 	else
 		ret = SUCCEED;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 fail:
 	return ret;
 }
@@ -213,7 +213,7 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 	else
 		ZBX_DBROW2UINT64(*r_eventid, row[0]);
 
-	DBfree_result(db_result);
+	zbx_db_free_result(db_result);
 
 	return SUCCEED;
 }

@@ -461,7 +461,7 @@ static void	process_checks(const ZBX_DB_DRULE *drule, int *host_status, char *ip
 
 		process_check(&dcheck, host_status, ip, now, services, config_timeout);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static int	process_services(const ZBX_DB_DRULE *drule, ZBX_DB_DHOST *dhost, const char *ip, const char *dns,
@@ -661,7 +661,7 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 	if (NULL != (row = DBfetch(result)))
 		iprange = zbx_strdup(iprange, row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (NULL == iprange)
 		goto out;
@@ -696,7 +696,7 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 		else
 			zbx_vector_uint64_append(&keep_dhostids, dhostid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(iprange);
 
@@ -816,7 +816,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout)
 				discovery_clean_services(druleid);
 
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		now = time(NULL);
 	}

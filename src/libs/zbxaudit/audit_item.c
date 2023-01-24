@@ -428,7 +428,7 @@ int	zbx_audit_DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids
 		zbx_audit_item_create_entry_for_delete(id, row[1], atoi(row[2]));
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	ret = SUCCEED;

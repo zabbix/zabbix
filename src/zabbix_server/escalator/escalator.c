@@ -142,7 +142,7 @@ static int	get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_
 		*user_timezone = zbx_strdup(NULL, row[2]);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return user_type;
 }
@@ -197,7 +197,7 @@ static int	get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *h
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		perm = atoi(row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
@@ -249,7 +249,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		zbx_vector_ptr_append(&tag_filters, tag_filter);
 	}
 	zbx_free(sql);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < tag_filters.values_num)
 		condition.op = ZBX_CONDITION_OPERATOR_EQUAL;
@@ -335,7 +335,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, const ZBX_DB_EVENT *event
 		ZBX_STR2UINT64(hostgroupid, row[0]);
 		zbx_vector_uint64_append(&hostgroupids, hostgroupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -390,7 +390,7 @@ static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **
 		ZBX_STR2UINT64(hostgroupid, row[0]);
 		zbx_vector_uint64_append(&hostgroupids, hostgroupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	perm = get_hostgroups_permission(userid, &hostgroupids);
 out:
@@ -460,7 +460,7 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_v
 		perm = PERM_READ;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return perm;
@@ -572,7 +572,7 @@ static void	zbx_db_cache_service_role(zbx_service_role_t *role)
 		zbx_vector_uint64_uniq(&role->serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -764,7 +764,7 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 			goto out;
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 	else
 		goto out;
@@ -818,7 +818,7 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 	}
 
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -882,7 +882,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 clean:
 		zbx_free(user_timezone);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -982,7 +982,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 clean:
 		zbx_free(user_timezone);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 
@@ -1081,7 +1081,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 clean:
 		zbx_free(user_timezone);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 
@@ -1139,7 +1139,7 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 clean:
 		zbx_free(user_timezone);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1324,15 +1324,24 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				",null,null,null,null");
 #endif
-	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o"
-			" join scripts s"
-				" on o.scriptid=s.scriptid"
-			" left join opcommand_hst oh"
-				" on o.operationid=oh.operationid"
-			" where  o.operationid=" ZBX_FS_UI64
-				" and oh.hostid is null",
-			operationid);
+	if (EVENT_SOURCE_SERVICE == event->source)
+	{
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
+				" from opcommand o,scripts s"
+				" where o.scriptid=s.scriptid"
+					" and o.operationid=" ZBX_FS_UI64,
+				operationid);
+	}
+	else
+	{
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
+				" from opcommand o,opcommand_hst oh,scripts s"
+				" where o.operationid=oh.operationid"
+					" and o.scriptid=s.scriptid"
+					" and o.operationid=" ZBX_FS_UI64
+					" and oh.hostid is null",
+				operationid);
+	}
 
 	result = DBselect("%s", buffer);
 
@@ -1550,7 +1559,7 @@ skip:
 		zbx_vector_ptr_pair_destroy(&webhook_params);
 		zbx_script_clean(&script);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_vector_uint64_destroy(&executed_on_hosts);
 
 	zbx_dc_close_user_macros(um_handle);
@@ -1608,7 +1617,7 @@ static void	get_mediatype_params(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *
 		zbx_free(value);
 
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_dc_close_user_macros(um_handle);
 
@@ -1752,7 +1761,7 @@ static void	add_message_alert(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_e
 
 	zbx_free(period);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == mediatypeid)
 	{
@@ -1878,7 +1887,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 
 		zbx_vector_uint64_destroy(&condition.eventids);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 succeed:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1958,7 +1967,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_D
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operation.");
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	flush_user_msg(&user_msg, escalation->esc_step, event, NULL, action->actionid, NULL, NULL, service);
 
@@ -1989,7 +1998,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_D
 		else
 			escalation->status = ESCALATION_STATUS_COMPLETED;
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		zbx_free(sql);
 	}
 	else
@@ -2060,7 +2069,7 @@ static void	escalation_execute_recovery_operations(const ZBX_DB_EVENT *event, co
 				break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	flush_user_msg(&user_msg, 1, event, r_event, action->actionid, NULL, NULL, service);
 
@@ -2137,7 +2146,7 @@ static void	escalation_execute_update_operations(const ZBX_DB_EVENT *event, cons
 				break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	flush_user_msg(&user_msg, 1, event, r_event, action->actionid, ack, service_alarm, service);
 
@@ -2304,7 +2313,7 @@ static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 	else
 		ret = SUCCEED;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -2609,7 +2618,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 				config_timeout);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -2848,7 +2857,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 
 		last_serviceid = (zbx_int64_t)service->serviceid;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	get_services_rootcause_eventids(&serviceids, services);
@@ -2916,7 +2925,7 @@ static void	db_get_service_alarms(zbx_vector_service_alarm_t *service_alarms,
 
 		zbx_vector_service_alarm_append(service_alarms, service_alarm);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(filter);
 }
@@ -3482,7 +3491,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			zbx_vector_uint64_clear(&problem_eventids);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < escalations.values_num)
 	{

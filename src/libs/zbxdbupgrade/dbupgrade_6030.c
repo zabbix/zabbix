@@ -91,7 +91,7 @@ static int	DBpatch_6030000(void)
 					"ui.configuration.service_actions", value_int);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
 
@@ -514,7 +514,7 @@ static int	DBpatch_6030062(void)
 
 		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1172,7 +1172,7 @@ static int	migrate_ldap_data(void)
 
 		if (ZBX_DB_OK > rc)
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return FAIL;
 		}
 
@@ -1180,13 +1180,13 @@ static int	migrate_ldap_data(void)
 		if (ZBX_DB_OK > DBexecute("update userdirectory set idp_type=%d where userdirectoryid=%s",
 				IDP_TYPE_LDAP, row[0]))
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return FAIL;
 		}
 #undef IDP_TYPE_LDAP
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1213,7 +1213,7 @@ static int	migrate_saml_data(void)
 
 	if (NULL == row)
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		return FAIL;
 	}
 
@@ -1221,7 +1221,7 @@ static int	migrate_saml_data(void)
 			'\0' == *row[5] && 0 == atoi(row[6]) && 0 == atoi(row[7]) && 0 == atoi(row[8]) &&
 			0 == atoi(row[9]) && 0 == atoi(row[10]) && 0 == atoi(row[11]) && 0 == atoi(row[12]))
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		return SUCCEED;
 	}
 
@@ -1233,7 +1233,7 @@ static int	migrate_saml_data(void)
 #undef IDP_TYPE_SAML
 	if (ZBX_DB_OK > rc)
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		return FAIL;
 	}
 
@@ -1258,7 +1258,7 @@ static int	migrate_saml_data(void)
 	zbx_free(sso_url);
 	zbx_free(idp_entityid);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_DB_OK > rc2)
 	return FAIL;
@@ -1563,7 +1563,7 @@ static int	DBpatch_propogate_valuemap(zbx_db_valuemap_t *valuemap, uint64_t valu
 		zbx_vector_uint64_append(&valuemap->itemids, itemid);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect("select value,newvalue,type,sortorder from valuemap_mapping where valuemapid=" ZBX_FS_UI64,
 			valuemapid);
@@ -1582,7 +1582,7 @@ static int	DBpatch_propogate_valuemap(zbx_db_valuemap_t *valuemap, uint64_t valu
 		zbx_vector_valuemap_mapping_ptr_append(&valuemap->mappings, mapping);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return valuemap->mappings.values_num;
 }
@@ -1637,7 +1637,7 @@ static void	select_pure_parents(zbx_vector_uint64_t *ids)
 		zbx_vector_uint64_append(ids, id);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == ids->values_num)
 		return;
@@ -1763,7 +1763,7 @@ static void	collect_valuemaps(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64
 		zbx_free(template_name);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	collect_valuemaps(&loc_child_templateids, child_templateids, valuemaps, mappings_num);
@@ -1854,7 +1854,7 @@ static int	DBpatch_6030160(void)
 		zbx_vector_child_valuemap_ptr_append(&child_valuemaps, valuemap);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 	sql_alloc = 0;
 	sql_offset = 0;
@@ -2181,7 +2181,7 @@ static void	collect_hostmacros(zbx_vector_uint64_t *parent_ids, zbx_vector_uint6
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	zbx_vector_uint64_sort(&loc_child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -2247,7 +2247,7 @@ static int	DBpatch_6030161(void)
 		zbx_vector_child_hostmacro_ptr_append(&child_hostmacros, hostmacro);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	zbx_vector_hostmacro_ptr_sort(&hostmacros, (zbx_compare_func_t)hostmacro_sort);
@@ -2430,10 +2430,10 @@ static void	DBpatch_propogate_tag(zbx_vector_tag_ptr_t *tags, zbx_db_patch_tag_t
 			zbx_vector_tag_ptr_append(tags, tag2);
 		}
 
-		DBfree_result(result2);
+		zbx_db_free_result(result2);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static int	DBpatch_6030162(void)
@@ -2479,7 +2479,7 @@ static int	DBpatch_6030162(void)
 		zbx_vector_tag_ptr_append(&tags, tag);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == tags.values_num)
 		goto out;
@@ -2507,7 +2507,7 @@ static int	DBpatch_6030162(void)
 		zbx_vector_child_tag_ptr_append(&child_tags, child_tag);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < child_tags.values_num; i++)
@@ -2612,10 +2612,10 @@ static void	DBpatch_propogate_tag_web(zbx_vector_tag_ptr_t *tags, zbx_db_patch_t
 			zbx_vector_tag_ptr_append(tags, tag2);
 		}
 
-		DBfree_result(result2);
+		zbx_db_free_result(result2);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static int	DBpatch_6030163(void)
@@ -2661,7 +2661,7 @@ static int	DBpatch_6030163(void)
 		zbx_vector_tag_ptr_append(&tags, tag);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == tags.values_num)
 		goto out;
@@ -2690,7 +2690,7 @@ static int	DBpatch_6030163(void)
 		zbx_vector_child_tag_ptr_append(&child_tags, child_tag);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < child_tags.values_num; i++)
@@ -2873,7 +2873,7 @@ static int	DBpatch_propogate_widget(zbx_db_widget_t *widget, uint64_t widgetid,
 		zbx_vector_widget_field_ptr_append(&widget->fields, field);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return widget->fields.values_num;
 }
@@ -2944,7 +2944,7 @@ static int	DBpatch_propogate_page(zbx_db_dashboard_page_t *page, uint64_t pageid
 		zbx_vector_widget_ptr_append(&page->widgets, widget);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return page->widgets.values_num;
 }
@@ -2999,7 +2999,7 @@ static int	DBpatch_propogate_dashboard(zbx_db_dashboard_t *dashboard, uint64_t d
 		zbx_vector_dashboard_page_ptr_append(&dashboard->pages, page);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return dashboard->pages.values_num;
 }
@@ -3102,7 +3102,7 @@ static void	change_item_ids(zbx_db_dashboard_t *dashboard, zbx_vector_uint64_t *
 		zbx_vector_uint64_pair_append(&itemid_pairs, pair);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < dashboard->pages.values_num; i++)
@@ -3175,7 +3175,7 @@ static void	change_graph_ids(zbx_db_dashboard_t *dashboard, zbx_vector_uint64_t 
 		zbx_vector_uint64_pair_append(&graphid_pairs, pair);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < dashboard->pages.values_num; i++)
@@ -3352,7 +3352,7 @@ static void	collect_dashboards(zbx_vector_uint64_t *parent_ids, zbx_vector_uint6
 		zbx_free(template_name);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	collect_dashboards(&loc_child_templateids, child_templateids, dashboards, pages_num, widgets_num, fields_num);
@@ -3417,7 +3417,7 @@ static int	DBpatch_6030164(void)
 		zbx_vector_child_dashboard_ptr_append(&child_dashboards, dashboard);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	zbx_vector_dashboard_ptr_uniq2(&dashboards, (zbx_compare_func_t)dashboard_compare);
@@ -3637,7 +3637,7 @@ static int	DBpatch_6030166(void)
 		zbx_free(seed);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != itemids.values_num)
 	{
@@ -3724,7 +3724,7 @@ static int	DBpatch_6030167(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -3781,7 +3781,7 @@ static int	DBpatch_6030168(void)
 		zbx_free(uuid);
 		zbx_free(seed);
 
-		DBfree_result(result2);
+		zbx_db_free_result(result2);
 
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
@@ -3792,7 +3792,7 @@ static int	DBpatch_6030168(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -3838,7 +3838,7 @@ static int	DBpatch_6030169(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -3890,7 +3890,7 @@ static int	DBpatch_6030170(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;

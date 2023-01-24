@@ -167,7 +167,7 @@ int	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t 
 		zbx_audit_httptest_create_entry(ZBX_AUDIT_ACTION_DELETE, id, row[1]);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 

@@ -64,7 +64,7 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 		goto rollback;
 
 	ZBX_STR2UINT64(lastid, row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect("select min(clock) from %s",
 			table);
@@ -73,7 +73,7 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 		goto rollback;
 
 	minclock = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect("select max(id) from %s",
 			table);
@@ -82,7 +82,7 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 		goto rollback;
 
 	ZBX_STR2UINT64(maxid, row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	records = DBexecute(
 			"delete from %s"
@@ -99,7 +99,7 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 
 	return records;
 rollback:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	DBrollback();
 

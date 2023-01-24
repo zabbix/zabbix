@@ -463,7 +463,7 @@ static int	DBget_template_count(zbx_uint64_t *count)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -481,7 +481,7 @@ static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offl
 	if (NULL == (row = DBfetch(result)) || SUCCEED != zbx_is_uint64(row[0], &users_offline))
 		goto out;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	now = time(NULL);
 
 	if (NULL == (result = DBselect("select max(lastaccess) from sessions where status=%d group by userid,status",
@@ -508,7 +508,7 @@ static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offl
 	*count_offline = users_offline;
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }

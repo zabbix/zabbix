@@ -90,7 +90,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 		zbx_vector_ptr_append(events, event);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(events, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -117,7 +117,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		event = (ZBX_DB_EVENT *)events->values[index];
 		event->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* EVENT_SOURCE_TRIGGERS || EVENT_SOURCE_INTERNAL || EVENT_SOURCE_SERVICE */
 	if (0 != tagged_eventids.values_num)
@@ -154,7 +154,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 			tag->value = zbx_strdup(NULL, row[2]);
 			zbx_vector_ptr_append(&event->tags, tag);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	if (0 != triggerids.values_num)	/* EVENT_OBJECT_TRIGGER */
@@ -205,7 +205,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 				}
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_free(sql);
@@ -274,7 +274,7 @@ void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vecto
 		zbx_vector_uint64_pair_append(event_pairs, r_event);
 		zbx_vector_uint64_append(r_eventids, r_event.second);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(filter);
 }
@@ -340,7 +340,7 @@ void	zbx_db_get_event_data_core(ZBX_DB_EVENT *event)
 
 		event->flags |= ZBX_FLAGS_DB_EVENT_RETRIEVED_CORE;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -373,7 +373,7 @@ void	zbx_db_get_event_data_tags(ZBX_DB_EVENT *event)
 		tag->value = zbx_strdup(NULL, row[1]);
 		zbx_vector_ptr_append(&event->tags, tag);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != event->tags.values_num)
 		event->flags |= ZBX_FLAGS_DB_EVENT_RETRIEVED_TAGS;
@@ -418,7 +418,7 @@ void	zbx_db_get_event_data_triggers(ZBX_DB_EVENT *event)
 
 		event->flags |= ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -450,7 +450,7 @@ void	zbx_db_select_symptom_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ui
 		ZBX_STR2UINT64(s_eventid, row[0]);
 		zbx_vector_uint64_append(symptom_eventids, s_eventid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 }
@@ -477,7 +477,7 @@ zbx_uint64_t	zbx_db_get_cause_eventid(zbx_uint64_t eventid)
 	else
 		cause_eventid = 0;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return cause_eventid;
 }
@@ -504,7 +504,7 @@ zbx_uint64_t	zbx_get_objectid_by_eventid(zbx_uint64_t eventid)
 	else
 		objectid = 0;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return objectid;
 }

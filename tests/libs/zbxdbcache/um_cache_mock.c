@@ -736,7 +736,7 @@ void	mock_dbsync_clear(zbx_dbsync_t *sync)
 	}
 	else
 	{
-		DBfree_result(sync->dbresult);
+		zbx_db_free_result(sync->dbresult);
 		sync->dbresult = NULL;
 	}
 }

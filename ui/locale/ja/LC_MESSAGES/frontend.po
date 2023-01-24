@@ -4789,6 +4789,24 @@ msgstr "座標"
 msgid "Copy"
 msgstr "コピー"
 
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] ""
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] ""
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] ""
+
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
 msgstr "クリップボードにコピー"
@@ -20398,6 +20416,10 @@ msgstr "更新しました"
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "ホスト\"%1$s\"のステータスを更新しました。"
+
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr ""
 
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
