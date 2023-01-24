@@ -252,14 +252,14 @@ static int	compare_tokens_by_loc(const void *d1, const void *d2)
 	return 0;
 }
 
-static const zbx_eval_token_t	*eval_get_last_function_token(const zbx_eval_context_t *ctx, const int token_index)
+static const zbx_eval_token_t	*eval_get_next_function_token(const zbx_eval_context_t *ctx, const int token_index)
 {
 	if (0 != (ctx->stack.values[token_index].type & ZBX_EVAL_CLASS_FUNCTION))
 		return NULL;
 
 	for(int i = token_index + 1; i < ctx->stack.values_num; i++)
 	{
-		const zbx_eval_token_t *token = &ctx->stack.values[i];
+		const zbx_eval_token_t	*token = &ctx->stack.values[i];
 		if (0 != (token->type & ZBX_EVAL_CLASS_FUNCTION))
 		{
 			if (token->opt < i - token_index)
@@ -283,10 +283,10 @@ static const zbx_eval_token_t	*eval_get_last_function_token(const zbx_eval_conte
  *             token      - [IN] the token to print                           *
  *                                                                            *
  ******************************************************************************/
-static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, size_t *str_alloc, size_t *str_offset,
-		const zbx_eval_token_t *token, const int token_index)
+static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, size_t *str_alloc,
+	size_t *str_offset, const zbx_eval_token_t *token)
 {
-	int			quoted = 0, check_value = 0, is_history_function;
+	int			quoted = 0, check_value = 0;
 	const char		*value_str;
 	const zbx_eval_token_t	*func_token;
 
@@ -301,9 +301,6 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 			zbx_strcpy_alloc(str, str_alloc, str_offset, "*ERROR*");
 		return;
 	}
-
-	func_token = eval_get_last_function_token(ctx, token_index);
-	is_history_function = NULL != func_token && ZBX_EVAL_TOKEN_HIST_FUNCTION == func_token->type;
 
 	switch (token->type)
 	{
@@ -358,7 +355,12 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 	if (0 == quoted)
 		zbx_strcpy_alloc(str, str_alloc, str_offset, value_str);
 	else
-		zbx_strquote_alloc_backslash_optional(str, str_alloc, str_offset, value_str, is_history_function ? 0 : 1);
+	{
+		func_token = eval_get_next_function_token(ctx, token - ctx->stack.values);
+		zbx_strquote_alloc_opt(str, str_alloc, str_offset, value_str,
+				NULL != func_token && ZBX_EVAL_TOKEN_HIST_FUNCTION == func_token->type ?
+				ZBX_STRQUOTE_SKIP_BACKSLASH : ZBX_STRQUOTE_DEFAULT);
+	}
 }
 
 /******************************************************************************
@@ -382,7 +384,7 @@ void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expressio
 	if (2 == ctx->stack.values_num && ZBX_EVAL_TOKEN_EXCEPTION == ctx->stack.values[1].type)
 	{
 		zbx_strcpy_alloc(expression, &expression_alloc, &expression_offset, "throw(");
-		eval_token_print_alloc(ctx, expression, &expression_alloc, &expression_offset, &ctx->stack.values[0], 0);
+		eval_token_print_alloc(ctx, expression, &expression_alloc, &expression_offset, &ctx->stack.values[0]);
 		zbx_chrcpy_alloc(expression, &expression_alloc, &expression_offset, ')');
 		return;
 	}
@@ -407,7 +409,7 @@ void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expressio
 					token->loc.l - pos);
 		}
 		pos = token->loc.r + 1;
-		eval_token_print_alloc(ctx, expression, &expression_alloc, &expression_offset, token, i);
+		eval_token_print_alloc(ctx, expression, &expression_alloc, &expression_offset, token);
 	}
 
 	if ('\0' != ctx->expression[pos])

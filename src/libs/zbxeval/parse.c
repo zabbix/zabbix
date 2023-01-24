@@ -417,7 +417,7 @@ static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 	zbx_eval_token_t	*func_token;
 	char			*value = NULL;
 
-	/* workaround for calculated items is required to due present bug */
+	/* workaround for calculated items is required due to present bug */
 	func_token = eval_get_last_function_token(ctx);
 	is_history_function = NULL != func_token && ZBX_EVAL_TOKEN_HIST_FUNCTION == func_token->type;
 
@@ -432,8 +432,8 @@ static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 
 			if (is_history_function)
 			{
-				value = zbx_substr_unquote_backslash_optional(ctx->expression,
-						token->loc.l, token->loc.r, 0);
+				value = zbx_substr_unquote_opt(ctx->expression,
+						token->loc.l, token->loc.r, ZBX_STRQUOTE_SKIP_BACKSLASH);
 
 				if (NULL != value)
 					zbx_variant_set_str(&token->value, value);

@@ -1002,7 +1002,8 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 						args[i].data.dbl);
 				break;
 			case ZBX_VARIANT_STR:
-				zbx_strquote_alloc_backslash_optional(&params, &params_alloc, &params_offset, args[i].data.str, 0);
+				zbx_strquote_alloc_opt(&params, &params_alloc, &params_offset, args[i].data.str,
+						ZBX_STRQUOTE_SKIP_BACKSLASH);
 				break;
 			case ZBX_VARIANT_UI64:
 				zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_UI64,

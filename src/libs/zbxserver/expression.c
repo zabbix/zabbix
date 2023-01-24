@@ -5855,6 +5855,7 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 	{
 		zbx_eval_token_t	*token = &ctx.stack.values[i];
 		char			*value = NULL, err[128];
+		size_t			value_alloc = 0, value_offset = 0;
 
 		switch(token->type)
 		{
@@ -5871,8 +5872,7 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 			case ZBX_EVAL_TOKEN_VAR_NUM:
 			case ZBX_EVAL_TOKEN_ARG_PERIOD:
 				if (ZBX_VARIANT_STR == token->value.type)
-					value = zbx_substr_unquote_backslash_optional(ctx.expression,
-							token->loc.l, token->loc.r, 0);
+					zbx_strcpy_alloc(&value, &value_alloc, &value_offset, token->value.data.str);
 				else
 					value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
 
