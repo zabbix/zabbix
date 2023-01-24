@@ -248,14 +248,6 @@ typedef struct
 }
 zbx_log_value_t;
 
-typedef struct
-{
-	void	*value;
-	size_t	len;
-	char	*hash;
-}
-zbx_bin_value_t;
-
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
 /* the error message for not supported items when reason is unknown */

@@ -21,7 +21,6 @@
 #define ZABBIX_MODULE_H
 
 #include "zbxtypes.h"
-
 #define ZBX_MODULE_OK	0
 #define ZBX_MODULE_FAIL	-1
 
@@ -210,6 +209,23 @@ ZBX_HISTORY_TEXT;
 
 typedef struct
 {
+	void	*value;
+	size_t	len;
+	char	*hash;
+}
+zbx_bin_value_t;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	int			clock;
+	int			ns;
+	const zbx_bin_value_t	*value;
+}
+ZBX_HISTORY_BIN;
+
+typedef struct
+{
 	zbx_uint64_t	itemid;
 	int		clock;
 	int		ns;
@@ -228,6 +244,7 @@ typedef struct
 	void	(*history_string_cb)(const ZBX_HISTORY_STRING *history, int history_num);
 	void	(*history_text_cb)(const ZBX_HISTORY_TEXT *history, int history_num);
 	void	(*history_log_cb)(const ZBX_HISTORY_LOG *history, int history_num);
+	void	(*history_bin_cb)(const ZBX_HISTORY_BIN *history, int history_num);
 }
 ZBX_HISTORY_WRITE_CBS;
 

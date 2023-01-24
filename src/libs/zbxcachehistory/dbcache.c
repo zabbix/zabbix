@@ -2964,7 +2964,8 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, zbx_history_sync_ite
 static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, ZBX_HISTORY_FLOAT *history_float,
 		int *history_float_num, ZBX_HISTORY_INTEGER *history_integer, int *history_integer_num,
 		ZBX_HISTORY_STRING *history_string, int *history_string_num, ZBX_HISTORY_TEXT *history_text,
-		int *history_text_num, ZBX_HISTORY_LOG *history_log, int *history_log_num)
+		int *history_text_num, ZBX_HISTORY_LOG *history_log, int *history_log_num,
+		ZBX_HISTORY_BIN *history_bin, int *history_bin_num)
 {
 	ZBX_DC_HISTORY		*h;
 	ZBX_HISTORY_FLOAT	*h_float;
@@ -2972,6 +2973,7 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 	ZBX_HISTORY_STRING	*h_string;
 	ZBX_HISTORY_TEXT	*h_text;
 	ZBX_HISTORY_LOG		*h_log;
+	ZBX_HISTORY_BIN		*h_bin;
 	int			i;
 	const zbx_log_value_t	*log;
 
@@ -2980,6 +2982,7 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 	*history_string_num = 0;
 	*history_text_num = 0;
 	*history_log_num = 0;
+	*history_bin_num = 0;
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -3045,6 +3048,15 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 				h_log->logeventid = log->logeventid;
 				h_log->severity = log->severity;
 				break;
+			case ITEM_VALUE_TYPE_BIN:
+				if (NULL == history_bin_cbs)
+					continue;
+
+				h_bin = &history_bin[(*history_bin_num)++];
+				h_bin->itemid = h->itemid;
+				h_bin->clock = h->ts.sec;
+				h_bin->ns = h->ts.ns;
+				h_bin->value = h->value.bin;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
@@ -3052,9 +3064,9 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 }
 
 static void	DCmodule_sync_history(int history_float_num, int history_integer_num, int history_string_num,
-		int history_text_num, int history_log_num, ZBX_HISTORY_FLOAT *history_float,
+		int history_text_num, int history_log_num, int history_bin_num, ZBX_HISTORY_FLOAT *history_float,
 		ZBX_HISTORY_INTEGER *history_integer, ZBX_HISTORY_STRING *history_string,
-		ZBX_HISTORY_TEXT *history_text, ZBX_HISTORY_LOG *history_log)
+		ZBX_HISTORY_TEXT *history_text, ZBX_HISTORY_LOG *history_log, ZBX_HISTORY_BIN *history_bin)
 {
 	if (0 != history_float_num)
 	{
@@ -3129,6 +3141,21 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "synced %d log values with modules", history_log_num);
+	}
+
+	if (0 != history_bin_num)
+	{
+		int	i;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "syncing bin history data with modules...");
+
+		for (i = 0; NULL != history_bin_cbs[i].module; i++)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "... module \"%s\"", history_bin_cbs[i].module->name);
+			history_bin_cbs[i].history_bin_cb(history_bin, history_bin_num);
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "synced %d bin values with modules", history_bin_num);
 	}
 }
 
@@ -3305,9 +3332,10 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	static ZBX_HISTORY_STRING	*history_string;
 	static ZBX_HISTORY_TEXT		*history_text;
 	static ZBX_HISTORY_LOG		*history_log;
+	static ZBX_HISTORY_BIN		*history_bin;
 	static int			module_enabled = FAIL;
 	int				i, history_num, history_float_num, history_integer_num, history_string_num,
-					history_text_num, history_log_num, txn_error, compression_age;
+					history_text_num, history_log_num, history_bin_num, txn_error, compression_age;
 	unsigned int			item_retrieve_mode;
 	time_t				sync_start;
 	zbx_vector_uint64_t		triggerids ;
@@ -3357,6 +3385,13 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		module_enabled = SUCCEED;
 		history_log = (ZBX_HISTORY_LOG *)zbx_malloc(history_log,
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
+	}
+
+	if (NULL == history_bin && NULL != history_bin_cbs)
+	{
+		module_enabled = SUCCEED;
+		history_bin = (ZBX_HISTORY_BIN *)zbx_malloc(history_bin,
+				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_BIN));
 	}
 
 	compression_age = hc_get_history_compression_age();
@@ -3578,11 +3613,12 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 					DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
 							history_integer, &history_integer_num, history_string,
 							&history_string_num, history_text, &history_text_num, history_log,
-							&history_log_num);
+							&history_log_num, history_bin, &history_bin_num);
 
 					DCmodule_sync_history(history_float_num, history_integer_num, history_string_num,
-							history_text_num, history_log_num, history_float, history_integer,
-							history_string, history_text, history_log);
+							history_text_num, history_log_num, history_bin_num,
+							history_float, history_integer, history_string, history_text,
+							history_log, history_bin);
 				}
 
 				if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
@@ -4174,7 +4210,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		}
 		else if (ZBX_ISSET_BIN(result))
 		{
-			dc_local_add_history_bin(itemid, item_value_type, ts, result->text, result->lastlogsize,
+			dc_local_add_history_bin(itemid, item_value_type, ts, result->bin, result->lastlogsize,
 					result->mtime, value_flags);
 		}
 		else
