@@ -90,10 +90,13 @@
 
 	/**
 	 * Registering notifications instance.
+	 * Notifications code is included by jsLoader for all user types except guest.
 	 */
-	ZABBIX.namespace('instances.notifications', new ZBX_Notifications(
-		ZABBIX.namespace('instances.localStorage'),
-		ZABBIX.namespace('instances.browserTab'),
-		<?= json_encode(CCsrfTokenHelper::get('notifications')) ?>
-	));
+	if (typeof window['ZBX_Notifications'] === 'function') {
+		ZABBIX.namespace('instances.notifications', new ZBX_Notifications(
+			ZABBIX.namespace('instances.localStorage'),
+			ZABBIX.namespace('instances.browserTab'),
+			<?= json_encode(CCsrfTokenHelper::get('notifications')) ?>
+		));
+	}
 </script>
