@@ -242,7 +242,7 @@ $menu-main-icons-opacity: .75 !default;
 		}
 	}
 
-	.zi-dashboard,
+	.zi-dashboard, // TODO - AS: need to fix to css class mask
 	.zi-hierarchy,
 	.zi-list,
 	.zi-report,
@@ -254,7 +254,7 @@ $menu-main-icons-opacity: .75 !default;
 		&::before {
 			top: -1px;
 			padding-right: 11px;
-			font-size: 23px;
+			font-size: 24px;
 			color: $menu-icon-color;
 			opacity: $menu-main-icons-opacity;
 		}

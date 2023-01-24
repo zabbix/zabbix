@@ -40,20 +40,14 @@ svg *:focus {
 
 @font-face {
   font-family: "zabbix-icons";
-  src: url("../fonts/zabbix-icons.woff2?t=1666878672374") format("woff2"), url("../fonts/zabbix-icons.woff?t=1666878672374") format("woff"), url("../fonts/zabbix-icons.ttf") format("truetype"), url("../fonts/zabbix-icons.svg?t=1666878672374#zabbix-icons") format("svg");
-  /* iOS 4.1- */ }
+  src: url("../fonts/zabbix-icons.woff2?t=1674569919821") format("woff2"), url("../fonts/zabbix-icons.woff?t=1674569919821") format("woff"), url("../fonts/zabbix-icons.ttf?t=1674569919821") format("truetype"), url("../fonts/zabbix-icons.svg?t=1674569919821#zabbix-icons") format("svg"); }
 [class^="zi-"]::before, [class*=" zi-"]::before {
-  position: relative;
-  font-family: 'zabbix-icons';
-  font-size: 18px;
+  font-family: 'zabbix-icons' !important;
+  font-size: 16px;
   font-style: normal;
   line-height: 0;
-  vertical-align: middle;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
-[class^="zi-"]::after, [class*=" zi-"]::after {
-  position: relative;
-  font-family: 'zabbix-icons'; }
 
 .zi-alert-check:before {
   content: "\ea01"; }
@@ -157,9 +151,6 @@ svg *:focus {
 .zi-chevron-down:before {
   content: "\ea22"; }
 
-.zi-chevron-down:after {
-  content: "\ea22"; }
-
 .zi-chevron-left:before {
   content: "\ea23"; }
 
@@ -169,19 +160,16 @@ svg *:focus {
 .zi-chevron-up:before {
   content: "\ea25"; }
 
-.zi-circle-check-filled:after {
+.zi-circle-check-filled:before {
   content: "\ea26"; }
 
 .zi-circle-check:before {
   content: "\ea27"; }
 
-.zi-circle-check:after {
-  content: "\ea27"; }
-
-.zi-circle-info-filled:after {
+.zi-circle-info-filled:before {
   content: "\ea28"; }
 
-.zi-circle-info:after {
+.zi-circle-info:before {
   content: "\ea29"; }
 
 .zi-circle-question-filled:before {
@@ -197,9 +185,6 @@ svg *:focus {
   content: "\ea2d"; }
 
 .zi-clock:before {
-  content: "\ea2e"; }
-
-.zi-clock:after {
   content: "\ea2e"; }
 
 .zi-cog-filled:before {
@@ -251,9 +236,6 @@ svg *:focus {
   content: "\ea3e"; }
 
 .zi-filter:before {
-  content: "\ea3f"; }
-
-.zi-filter:after {
   content: "\ea3f"; }
 
 .zi-fullscreen:before {
@@ -346,7 +328,7 @@ svg *:focus {
 .zi-triangle-flipped-warning:before {
   content: "\ea5d"; }
 
-.zi-triangle-warning:after {
+.zi-triangle-warning:before {
   content: "\ea5e"; }
 
 .zi-uncheck:before {
@@ -2876,7 +2858,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
 .menu-main .zi-eye-alt::before {
   top: -1px;
   padding-right: 11px;
-  font-size: 23px;
+  font-size: 24px;
   color: #b7d6ea;
   opacity: 1; }
 .menu-main .zi-dashboard:hover::before, .menu-main .zi-dashboard:focus::before,
@@ -3024,8 +3006,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
     width: 15px;
     height: 15px;
     padding-right: 17px;
-    font-size: 15px;
-    color: #b7d6ea;
+    font-size: 16px;
+    color: #ffffff;
     opacity: 1; }
   .menu-user .zi-support:hover::before, .menu-user .zi-support:focus::before,
   .menu-user .zi-help:hover::before,

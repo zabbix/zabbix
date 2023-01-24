@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%=_title%></title>
+  <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <%if (meta && Object.keys(meta).length > 0) { Object.keys(meta).forEach((metaName) => { %> 
+  <meta name="<%=metaName%>" content="<%=meta[metaName]%>">
+  <%})}%>
+  <%if(favicon) {%>
+  <link rel="icon" type="image/x-icon" href="<%-favicon%>">
+  <%}%>
+  <%if(_type === 'font-class' && _link) {%>
+  <link rel="stylesheet" href="<%=_link%>" />
+  <%}%>
+  <style>
+    *{margin: 0;padding: 0;list-style: none;}
+    body { color: #696969; font: 12px/1.5 tahoma, arial, \5b8b\4f53, sans-serif; }
+    a { color: #333; text-decoration: underline; }
+    a:hover { color: rgb(9, 73, 209); }
+    .header { color: #333; text-align: center; padding: 80px 0 60px 0; min-height: 153px; font-size: 14px; }
+    .header .logo { color: #fff; background-color: #d40000; display: block; }
+    .header h1 { font-size: 42px; padding: 26px 0 10px 0; }
+    .info {
+      color: #999;
+      font-weight: normal;
+      max-width: 346px;
+      margin: 0 auto;
+      padding: 20px 0;
+      font-size: 14px;
+    }
+
+    .icons { max-width: 1190px; margin: 0 auto; }
+    .icons ul { text-align: center; }
+    .icons ul li {
+      vertical-align: top;
+      width: 145px;
+      display: inline-block;
+      text-align: center;
+      background-color: rgba(0,0,0,.02);
+      border-radius: 3px;
+      padding: 29px 0 10px 0;
+      margin-right: 10px;
+      margin-top: 10px;
+      transition: all 0.6s ease;
+    }
+    .icons ul li:hover { background-color: rgba(0,0,0,.06); }
+    .icons ul li:hover span { color: #3c75e4; opacity: 1; }
+    .icons ul li .unicode { color: #8c8c8c; opacity: 0.3; }
+    .icons ul li h4 {
+      font-weight: normal;
+      padding: 10px 0 5px 0;
+      display: block;
+      color: #8c8c8c;
+      font-size: 14px;
+      line-height: 12px;
+      opacity: 0.8;
+    }
+    .icons ul li:hover h4 { opacity: 1; }
+    .icons ul li svg { width: 24px; height: 24px; }
+    .icons ul li:hover { background-color: #d40000; color: #fff; }
+    .footer { text-align: center; padding: 10px 0 90px 0; }
+    .footer a { text-align: center; padding: 10px 0 90px 0; color: #696969;}
+    .footer a:hover { color: #0949d1; }
+    .links { text-align: center; padding: 50px 0 0 0; font-size: 14px; }
+    <%if(_type === 'font-class') {%>
+    .icons ul li.class-icon { font-size: 21px; line-height: 21px; padding-bottom: 20px; }
+    .icons ul li.class-icon p{ font-size: 11px; }
+    .icons ul li.class-icon [class^="<%=classNamePrefix%>-"]{ font-size: 32px; }
+    .icons ul li.class-icon p:before { content: "<%=classNamePrefix%>-"; }
+    <%}%>
+    <%if(_type === 'unicode') {%>
+    .icons ul .unicode-icon span { display: block; }
+    .icons ul .unicode-icon h4 { font-size: 12px; }
+    @font-face {
+      font-family: "<%-fontname%>";
+      src: url("<%-fontname%>.eot");
+      /* IE9*/
+      src: url("<%-fontname%>.eot#iefix") format("embedded-opentype"),
+      /* IE6-IE8 */
+      url("<%-fontname%>.woff2?<%-(new Date()).getTime()%>") format("woff2"),
+      url("<%-fontname%>.woff?<%-(new Date()).getTime()%>") format("woff"),
+      /* chrome, firefox */
+      url("<%-fontname%>.ttf?<%-(new Date()).getTime()%>") format("truetype"),
+      /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+      url("<%-fontname%>.svg#<%-fontname%>?<%-(new Date()).getTime()%>") format("svg");
+      /* iOS 4.1- */
+    }
+    .iconfont {
+      font-family: "<%-fontname%>" !important;
+      font-size: 26px;
+      font-style: normal;
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-stroke-width: 0.2px;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    <%}%>
+    <%if(_type === 'symbol') {%>
+    .icons ul li.symbol {padding: 28px 10px 16px 10px; width: 100px;}
+    .icons ul li.symbol svg {width: 34px; height: 34px;}
+    .icons ul li.symbol h4 {font-size: 12px;}
+    <%}%>
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1><span class="logo">ZABBIX</span> icons</h1>
+    <div class="info">
+      <%-description || (meta && meta.description)%>
+    </div>
+    <p>
+      <%if(links && links.length > 0) { links.forEach((linkItem, index) => {%>
+      <a href="<%-linkItem.url%>"><%-linkItem.title%></a><%if(links.length-1 !== index){%> · <%}%>
+      <%})}%>
+    </p>
+  </div>
+  <div class="icons">
+    <ul>
+      <%-_IconHtml%>
+    </ul>
+  </div>
+  <p class="links">
+    <%if(links && links.length > 0) { links.forEach((linkItem, index) => {%>
+    <a href="<%-linkItem.url%>"><%-linkItem.title%></a><%if(links.length-1 !== index){%> · <%}%>
+    <%})}%>
+  </p>
+  <div class="footer">
+    <%-footerInfo%>
+  </div>
+</body>
+
+</html>
