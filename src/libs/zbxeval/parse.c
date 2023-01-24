@@ -430,7 +430,7 @@ static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 			token->loc.r = ptr - ctx->expression;
 			eval_update_const_variable(ctx, token);
 
-			if (is_history_function)
+			if (0 != is_history_function)
 			{
 				value = zbx_substr_unquote_opt(ctx->expression,
 						token->loc.l, token->loc.r, ZBX_STRQUOTE_SKIP_BACKSLASH);
@@ -444,7 +444,14 @@ static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 
 		if ('\\' == *ptr)
 		{
-			if (0 == is_history_function && '"' != ptr[1] && '\\' != ptr[1])
+			if (0 != is_history_function)
+			{
+				if ('"' == ptr[1])
+					ptr++;
+				continue;
+			}
+
+			if ('"' != ptr[1] && '\\' != ptr[1])
 			{
 				*error = zbx_dsprintf(*error,
 						"invalid escape sequence in string starting with \"%s\"", ptr);

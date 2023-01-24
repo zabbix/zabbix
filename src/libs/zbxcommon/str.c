@@ -5751,7 +5751,7 @@ char	*zbx_substr_unquote_opt(const char *src, size_t left, size_t right, int opt
 					case '\\':
 						*ptr++ = '\\';
 						if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
-							*ptr++ = '\\';
+							continue;
 						break;
 					case '"':
 						*ptr++ = '"';
