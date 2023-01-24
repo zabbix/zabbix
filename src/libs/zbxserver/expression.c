@@ -5872,7 +5872,10 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 			case ZBX_EVAL_TOKEN_VAR_NUM:
 			case ZBX_EVAL_TOKEN_ARG_PERIOD:
 				if (ZBX_VARIANT_STR == token->value.type)
-					zbx_strcpy_alloc(&value, &value_alloc, &value_offset, token->value.data.str);
+				{
+					value = token->value.data.str;
+					zbx_variant_set_none(&token->value);
+				}
 				else
 					value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
 

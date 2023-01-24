@@ -5724,7 +5724,10 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
  *                                                                            *
  * Purpose: unquotes valid substring at the specified location                *
  *                                                                            *
- * Parameters: option - [IN] whether to unquote baskslash or not              *
+ * Parameters: src    - [IN] source string                                    *
+ *             left   - [IN] left substring position start)                   *
+ *             right  - [IN] right substring position (end)                   *
+ *             option - [IN] whether to unquote baskslash or not              *
  *                                                                            *
  * Return value: The unquoted and copied substring.                           *
  *                                                                            *
