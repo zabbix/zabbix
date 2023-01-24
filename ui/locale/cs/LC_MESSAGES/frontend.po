@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-01-01 18:25+0000\n"
-"Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
+"PO-Revision-Date: 2023-01-13 10:40+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -7079,7 +7079,7 @@ msgstr "Pole \"%1$s\" není správné: %2$s"
 #: include/validate.inc.php:185 include/validate.inc.php:190
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s."
-msgstr ""
+msgstr "Pole \"%1$s\" není správné: %2$s."
 
 #: include/validate.inc.php:167
 #, c-format
@@ -20143,11 +20143,11 @@ msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:68
 msgid "Widget is deprecated."
-msgstr ""
+msgstr "Widget je zastaralý."
 
 #: jsLoader.php:196
 msgid "Widget is too small for the specified number of columns and rows."
-msgstr ""
+msgstr "Widget je pro zadaný počet sloupců a řádků příliš malý."
 
 #: graphs.php:44 include/classes/widgets/CWidgetHelper.php:923
 #: include/classes/widgets/CWidgetHelper.php:956
@@ -20231,7 +20231,7 @@ msgstr "Zápis"
 #: include/classes/core/CModuleManager.php:203
 #, c-format
 msgid "Wrong Module.php class name for module located at %1$s."
-msgstr ""
+msgstr "Chybný název třídy v Module.php pro modul umístěný v %1$s."
 
 #: include/classes/api/services/CHost.php:1891
 #: include/classes/api/services/CHost.php:2128
@@ -20247,7 +20247,7 @@ msgstr "Nesprávné pole pro link mapy."
 #: include/classes/api/services/CMap.php:977
 #: include/classes/api/services/CMap.php:1452
 msgid "Wrong value for \"url\" field."
-msgstr ""
+msgstr "Špatná hodnota pro pole \"url\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:302
 #: include/views/js/monitoring.sysmaps.js.php:435
@@ -20260,7 +20260,7 @@ msgstr "Osa X"
 
 #: app/views/administration.miscconfig.edit.php:112
 msgid "X-Frame-Options HTTP header"
-msgstr ""
+msgstr "HTTP hlavička X-Frame-Options"
 
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
@@ -20272,7 +20272,7 @@ msgstr "X2"
 
 #: include/classes/html/CButtonExport.php:67
 msgid "XML"
-msgstr ""
+msgstr "XML"
 
 #: include/items.inc.php:1821
 msgid "XML XPath"
@@ -20291,11 +20291,11 @@ msgstr "XML je prázdný"
 
 #: include/classes/api/services/CItemGeneral.php:2648
 msgid "XML is expected"
-msgstr ""
+msgstr "Je očekáváno XML"
 
 #: include/items.inc.php:1833
 msgid "XML to JSON"
-msgstr ""
+msgstr "XML na JSON"
 
 #: include/forms.inc.php:1329 include/views/js/item.preprocessing.js.php:164
 msgid "XPath"
@@ -20576,12 +20576,12 @@ msgstr "Oddálit"
 #: include/func.inc.php:129
 #, c-format
 msgid "[Wrong value for day: \"%1$s\" ]"
-msgstr ""
+msgstr "[Nesprávná hodnota pro den: \"%1$s\" ]"
 
 #: include/func.inc.php:114
 #, c-format
 msgid "[Wrong value for month: \"%1$s\" ]"
-msgstr ""
+msgstr "[Nesprávná hodnota pro měsíc: \"%1$s\" ]"
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"
@@ -20606,7 +20606,7 @@ msgstr "řetězec znaků se očekává"
 
 #: include/classes/validators/CApiInputValidator.php:854
 msgid "a character string, integer or floating point value is expected"
-msgstr ""
+msgstr "očekává se znakový řetězec, celé číslo nebo hodnota s plovoucí desetinnou čárkou"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -20617,7 +20617,7 @@ msgstr ""
 #: app/controllers/CControllerSlaReportList.php:162
 #: include/classes/widgets/fields/CWidgetFieldDatePicker.php:146
 msgid "a date is expected"
-msgstr ""
+msgstr "očekáváno datum"
 
 #: app/controllers/CControllerSlaCreateUpdate.php:44
 #: app/controllers/CControllerSlaReportList.php:149
@@ -20628,17 +20628,17 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:79
 msgid "a digit"
-msgstr ""
+msgstr "číslice"
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:125
 #: include/classes/validators/CApiInputValidator.php:822
 msgid "a floating point value is expected"
-msgstr ""
+msgstr "očekává se hodnota s desetinou čárkou"
 
 #: include/classes/validators/CApiInputValidator.php:448
 #: include/classes/validators/CNewValidator.php:279
 msgid "a hexadecimal color code (6 symbols) is expected"
-msgstr ""
+msgstr "očekává se hexadecimální kód barvy (6 znaků)"
 
 #: include/classes/validators/CApiInputValidator.php:1812
 msgid "a low-level discovery macro is expected"
@@ -20647,7 +20647,7 @@ msgstr "je očekáván nález makra na nízké úrovni"
 #: include/classes/validators/CApiInputValidator.php:1648
 #: include/validate.inc.php:194
 msgid "a number has too many fractional digits"
-msgstr ""
+msgstr "číslo má příliš mnoho desetinných míst"
 
 #: include/classes/validators/CApiInputValidator.php:1076
 #: include/classes/validators/CApiInputValidator.php:1627
@@ -20680,11 +20680,11 @@ msgstr "je očekáván relativní čas"
 
 #: app/views/administration.authentication.edit.php:86
 msgid "a special character"
-msgstr ""
+msgstr "speciální znak"
 
 #: include/classes/validators/CApiInputValidator.php:2530
 msgid "a string, number or null value is expected"
-msgstr ""
+msgstr "očekává se řetězec, číslo nebo prázdná hodnota"
 
 #: app/controllers/CControllerSlaExcludedDowntimeValidate.php:58
 #: include/classes/validators/CNewValidator.php:238
@@ -20719,11 +20719,11 @@ msgstr "je očekávána časová jednotka"
 
 #: include/classes/validators/CApiInputValidator.php:2888
 msgid "a timestamp is too large"
-msgstr ""
+msgstr "časové razítko je příliš velké"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:333
 msgid "abs() - Absolute value"
-msgstr ""
+msgstr "abs() - Absolutní hodnota"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
@@ -20767,7 +20767,7 @@ msgstr "všechny média"
 
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
-msgstr ""
+msgstr "očekává se IP adresa"
 
 #: include/classes/api/services/CDRule.php:474
 #: include/classes/api/services/CDRule.php:481
@@ -20806,7 +20806,7 @@ msgstr "řada či znakový řetězec je očekáván"
 
 #: include/classes/validators/CApiInputValidator.php:2510
 msgid "an array or object is expected"
-msgstr ""
+msgstr "očekává se pole nebo objekt"
 
 #: include/classes/import/validators/C10XmlValidator.php:360
 #: include/classes/import/validators/C10XmlValidator.php:382
@@ -20829,12 +20829,12 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:677
 msgid "an integer is expected"
-msgstr ""
+msgstr "očekává se celé číslo"
 
 #: include/classes/validators/CApiInputValidator.php:716
 #: include/classes/validators/CApiInputValidator.php:2882
 msgid "an unsigned integer is expected"
-msgstr ""
+msgstr "očekává se celé číslo"
 
 #: app/views/administration.authentication.edit.php:72
 msgid "an uppercase and a lowercase Latin letter"
@@ -20842,7 +20842,7 @@ msgstr ""
 
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
-msgstr ""
+msgstr "a"
 
 #: include/views/monitoring.history.php:186
 msgid "as Blue"
@@ -20899,7 +20899,7 @@ msgstr "automaticky registrovaný host"
 
 #: include/events.inc.php:36
 msgid "autoregistration"
-msgstr ""
+msgstr "automatická registrace"
 
 #: app/views/popup.tophosts.column.edit.php:128
 #: include/classes/graphdraw/CLineGraphDraw.php:1369
