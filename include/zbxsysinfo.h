@@ -29,11 +29,12 @@
 #define ZBX_ISSET_DBL(res)	((res)->type & AR_DOUBLE)
 #define ZBX_ISSET_STR(res)	((res)->type & AR_STRING)
 #define ZBX_ISSET_TEXT(res)	((res)->type & AR_TEXT)
+#define ZBX_ISSET_BIN(res)	((res)->type & AR_BIN)
 #define ZBX_ISSET_LOG(res)	((res)->type & AR_LOG)
 #define ZBX_ISSET_MSG(res)	((res)->type & AR_MESSAGE)
 #define ZBX_ISSET_META(res)	((res)->type & AR_META)
 
-#define ZBX_ISSET_VALUE(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_LOG))
+#define ZBX_ISSET_VALUE(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_BIN | AR_LOG))
 
 /* UNSET RESULT */
 
@@ -75,6 +76,18 @@ do									\
 	{								\
 		zbx_free((res)->text);					\
 		(res)->type &= ~AR_TEXT;				\
+	}								\
+}									\
+while (0)
+
+#define ZBX_UNSET_BIN_RESULT(res)					\
+									\
+do									\
+{									\
+	if ((res)->type & AR_BIN)					\
+	{								\
+		zbx_free((res)->bin);					\
+		(res)->type &= ~AR_BIN;					\
 	}								\
 }									\
 while (0)

@@ -38,6 +38,7 @@ typedef struct
 	zbx_uint64_t	history_str_counter;	/* the number of processed str values */
 	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
 	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
+	zbx_uint64_t	history_bin_counter;	/* the number of processed bin values */
 	zbx_uint64_t	notsupported_counter;	/* the number of processed not supported items */
 }
 ZBX_DC_STATS;
@@ -74,22 +75,23 @@ int	get_proxy_history_count(void);
 #define ZBX_STATS_HISTORY_STR_COUNTER	3
 #define ZBX_STATS_HISTORY_LOG_COUNTER	4
 #define ZBX_STATS_HISTORY_TEXT_COUNTER	5
-#define ZBX_STATS_NOTSUPPORTED_COUNTER	6
-#define ZBX_STATS_HISTORY_TOTAL		7
-#define ZBX_STATS_HISTORY_USED		8
-#define ZBX_STATS_HISTORY_FREE		9
-#define ZBX_STATS_HISTORY_PUSED		10
-#define ZBX_STATS_HISTORY_PFREE		11
-#define ZBX_STATS_TREND_TOTAL		12
-#define ZBX_STATS_TREND_USED		13
-#define ZBX_STATS_TREND_FREE		14
-#define ZBX_STATS_TREND_PUSED		15
-#define ZBX_STATS_TREND_PFREE		16
-#define ZBX_STATS_HISTORY_INDEX_TOTAL	17
-#define ZBX_STATS_HISTORY_INDEX_USED	18
-#define ZBX_STATS_HISTORY_INDEX_FREE	19
-#define ZBX_STATS_HISTORY_INDEX_PUSED	20
-#define ZBX_STATS_HISTORY_INDEX_PFREE	21
+#define ZBX_STATS_HISTORY_BIN_COUNTER	6
+#define ZBX_STATS_NOTSUPPORTED_COUNTER	7
+#define ZBX_STATS_HISTORY_TOTAL		8
+#define ZBX_STATS_HISTORY_USED		9
+#define ZBX_STATS_HISTORY_FREE		10
+#define ZBX_STATS_HISTORY_PUSED		11
+#define ZBX_STATS_HISTORY_PFREE		12
+#define ZBX_STATS_TREND_TOTAL		13
+#define ZBX_STATS_TREND_USED		14
+#define ZBX_STATS_TREND_FREE		15
+#define ZBX_STATS_TREND_PUSED		16
+#define ZBX_STATS_TREND_PFREE		17
+#define ZBX_STATS_HISTORY_INDEX_TOTAL	18
+#define ZBX_STATS_HISTORY_INDEX_USED	19
+#define ZBX_STATS_HISTORY_INDEX_FREE	20
+#define ZBX_STATS_HISTORY_INDEX_PUSED	21
+#define ZBX_STATS_HISTORY_INDEX_PFREE	22
 void	*DCget_stats(int request);
 void	DCget_stats_all(zbx_wcache_info_t *wcache_info);
 

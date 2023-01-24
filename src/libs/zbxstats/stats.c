@@ -141,6 +141,7 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time)
 	zbx_json_adduint64(json, "str", wcache_info.stats.history_str_counter);
 	zbx_json_adduint64(json, "log", wcache_info.stats.history_log_counter);
 	zbx_json_adduint64(json, "text", wcache_info.stats.history_text_counter);
+	zbx_json_adduint64(json, "bin", wcache_info.stats.history_bin_counter);
 	zbx_json_adduint64(json, "not supported", wcache_info.stats.notsupported_counter);
 	zbx_json_close(json);
 

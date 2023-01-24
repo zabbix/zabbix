@@ -136,6 +136,9 @@ static ZBX_DC_CACHE	*cache = NULL;
 #define ZBX_STRUCT_REALLOC_STEP	8
 #define ZBX_STRING_REALLOC_STEP	ZBX_KIBIBYTE
 
+
+#define ZBX_BIN_REALLOC_STEP	ZBX_KIBIBYTE
+
 typedef struct
 {
 	size_t	pvalue;
@@ -166,11 +169,17 @@ typedef struct
 	unsigned char	value_type;
 	unsigned char	state;
 	unsigned char	flags;		/* see ZBX_DC_FLAG_* above */
+
+	size_t		len;
+	char		*hash;
 }
 dc_item_value_t;
 
 static char		*string_values = NULL;
+static void		*bin_values = NULL;
 static size_t		string_values_alloc = 0, string_values_offset = 0;
+static size_t		bin_values_alloc = 0, bin_values_offset = 0;
+
 static dc_item_value_t	*item_values = NULL;
 static size_t		item_values_alloc = 0, item_values_num = 0;
 
@@ -252,6 +261,10 @@ void	*DCget_stats(int request)
 			break;
 		case ZBX_STATS_HISTORY_TEXT_COUNTER:
 			value_uint = cache->stats.history_text_counter;
+			ret = (void *)&value_uint;
+			break;
+		case ZBX_STATS_HISTORY_BIN_COUNTER:
+			value_uint = cache->stats.history_bin_counter;
 			ret = (void *)&value_uint;
 			break;
 		case ZBX_STATS_NOTSUPPORTED_COUNTER:
@@ -2021,6 +2034,16 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 			}
 			hdata->value.log->value = value->data.str;
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
+			break;
+		case ITEM_VALUE_TYPE_BIN:
+			if (ITEM_VALUE_TYPE_BIN != hdata->value_type)
+			{
+				dc_history_clean_value(hdata);
+				hdata->value.bin = (zbx_bin_value_t *)zbx_malloc(NULL, sizeof(zbx_bin_value_t));
+				memset(hdata->value.bin, 0, sizeof(zbx_bin_value_t));
+			}
+			hdata->value.bin->value = value->data.str;
+			hdata->value.bin->len = strlen(value->data.str);
 	}
 
 	hdata->value_type = value_type;
@@ -3789,6 +3812,21 @@ static void	dc_string_buffer_realloc(size_t len)
 	string_values = (char *)zbx_realloc(string_values, string_values_alloc);
 }
 
+static void	dc_bin_buffer_realloc(size_t len)
+{
+	if (bin_values_alloc >= bin_values_offset + len)
+		return;
+
+	do
+	{
+		bin_values_alloc += ZBX_BIN_REALLOC_STEP;
+	}
+	while (bin_values_alloc < bin_values_offset + len);
+
+	bin_values = (char *)zbx_realloc(bin_values, bin_values_alloc);
+}
+
+
 static dc_item_value_t	*dc_local_get_history_slot(void)
 {
 	if (ZBX_MAX_VALUES_LOCAL == item_values_num)
@@ -3877,6 +3915,39 @@ static void	dc_local_add_history_text(zbx_uint64_t itemid, unsigned char item_va
 		dc_string_buffer_realloc(item_value->value.value_str.len);
 
 		item_value->value.value_str.pvalue = string_values_offset;
+		memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
+		string_values_offset += item_value->value.value_str.len;
+	}
+	else
+		item_value->value.value_str.len = 0;
+}
+
+static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
+		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
+{
+	dc_item_value_t	*item_value;
+
+	item_value = dc_local_get_history_slot();
+
+	item_value->itemid = itemid;
+	item_value->ts = *ts;
+	item_value->item_value_type = item_value_type;
+	item_value->value_type = ITEM_VALUE_TYPE_BIN;
+	item_value->state = ITEM_STATE_NORMAL;
+	item_value->flags = flags;
+
+	if (0 != (item_value->flags & ZBX_DC_FLAG_META))
+	{
+		item_value->lastlogsize = lastlogsize;
+		item_value->mtime = mtime;
+	}
+
+	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
+	{
+		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, ZBX_HISTORY_VALUE_LEN) + 1;
+		dc_bin_buffer_realloc(item_value->value.value_str.len);
+
+		item_value->value.value_str.pvalue = bin_values_offset;
 		memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
 		string_values_offset += item_value->value.value_str.len;
 	}
@@ -4101,6 +4172,11 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 			dc_local_add_history_text(itemid, item_value_type, ts, result->text, result->lastlogsize,
 					result->mtime, value_flags);
 		}
+		else if (ZBX_ISSET_BIN(result))
+		{
+			dc_local_add_history_bin(itemid, item_value_type, ts, result->text, result->lastlogsize,
+					result->mtime, value_flags);
+		}
 		else
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -4265,6 +4341,20 @@ static char	*hc_mem_value_str_dup(const dc_value_str_t *str)
 
 	return ptr;
 }
+//
+//static void	*hc_mem_value_bin_dup(const dc_value_str_t *bin)
+//{
+//	void	*ptr;
+//
+//	if (NULL == (ptr = (char *)__hc_shmem_malloc_func(NULL, bin->len)))
+//		return NULL;
+//
+//	memcpy(ptr, &bin_values[bin->pvalue], bin->len);
+//
+//	return ptr;
+//}
+//
+
 
 /******************************************************************************
  *                                                                            *
@@ -4295,6 +4385,21 @@ static int	hc_clone_history_str_data(char **dst, const dc_value_str_t *str)
 
 	return FAIL;
 }
+
+//static int	hc_clone_history_bin2_data(void **dst, const dc_value_str_t *bin)
+//{
+//	if (0 == bin->len)
+//		return SUCCEED;
+//
+//	if (NULL != *dst)
+//		return SUCCEED;
+//
+//	if (NULL != (*dst = hc_mem_value_bin_dup(bin)))
+//		return SUCCEED;
+//
+//	return FAIL;
+//}
+//
 
 /******************************************************************************
  *                                                                            *
@@ -4333,6 +4438,31 @@ static int	hc_clone_history_log_data(zbx_log_value_t **dst, const dc_item_value_
 
 	return SUCCEED;
 }
+
+static int	hc_clone_history_bin_data(zbx_bin_value_t **dst, const dc_item_value_t *item_value)
+{
+	if (NULL == *dst)
+	{
+		/* using realloc instead of malloc just to suppress 'not used' warning for realloc */
+		if (NULL == (*dst = (zbx_bin_value_t *)__hc_shmem_realloc_func(NULL, sizeof(zbx_bin_value_t))))
+			return FAIL;
+
+		memset(*dst, 0, sizeof(zbx_bin_value_t));
+	}
+
+//	if (SUCCEED != hc_clone_history_bin2_data(&(*dst)->value, &item_value->value.value_str))
+//		return FAIL;
+
+	if (SUCCEED != hc_clone_history_str_data((char**)(&(*dst)->value), &item_value->value.value_str))
+		return FAIL;
+
+	(*dst)->len = item_value->len;
+	(*dst)->hash = item_value->hash;
+
+	return SUCCEED;
+}
+
+
 
 /******************************************************************************
  *                                                                            *
@@ -4420,6 +4550,10 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 				if (SUCCEED != hc_clone_history_log_data(&(*data)->value.log, item_value))
 					return FAIL;
 				break;
+			case ITEM_VALUE_TYPE_BIN:
+				if (SUCCEED != hc_clone_history_bin_data(&(*data)->value.bin, item_value))
+					return FAIL;
+				break;
 		}
 
 		switch (item_value->item_value_type)
@@ -4438,6 +4572,9 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				cache->stats.history_log_counter++;
+				break;
+			case ITEM_VALUE_TYPE_BIN:
+				cache->stats.history_bin_counter++;
 				break;
 		}
 

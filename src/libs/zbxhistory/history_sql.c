@@ -81,6 +81,8 @@ static void	row2value_log(zbx_history_value_t *value, DB_ROW row)
 
 static void	row2value_binary(zbx_history_value_t *value, DB_ROW row)
 {
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA ROW2VALUE");
+
 	value->bin = (zbx_bin_value_t *)zbx_malloc(NULL, sizeof(zbx_bin_value_t));
 
 	value->bin->value = zbx_strdup(NULL, row[0]);
@@ -315,6 +317,8 @@ static void	add_history_bin(const zbx_vector_ptr_t *history)
 {
 	int		i;
 	zbx_db_insert_t	*db_insert;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin");
 
 	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 	zbx_db_insert_prepare(db_insert, "history_binary", "itemid", "clock", "ns", "value", "hash", NULL);
@@ -716,6 +720,8 @@ int	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, ch
 	hist->add_values = sql_add_values;
 	hist->flush = sql_flush;
 	hist->get_values = sql_get_values;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA sql_init, value_type: %d", value_type);
 
 	switch (value_type)
 	{
