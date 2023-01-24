@@ -559,9 +559,9 @@ class testUsersAuthenticationLdap extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getTestData
-	 *
 	 * Test LDAP settings.
+	 *
+	 * @dataProvider getTestData
 	 */
 	public function testUsersAuthenticationLdap_Test($data) {
 		$form = $this->openLdapForm();
@@ -1065,9 +1065,9 @@ class testUsersAuthenticationLdap extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getUpdateData
-	 *
 	 * Update LDAP server settings.
+	 *
+	 * @dataProvider getUpdateData
 	 */
 	public function testUsersAuthenticationLdap_Update($data) {
 		if (CDBHelper::getCount('SELECT * FROM userdirectory_ldap') === 0) {
@@ -1884,7 +1884,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 	/**
 	 * Function for opening LDAP configuration form.
 	 *
-	 * @param string $auth		default authentication field value
+	 * @param string $auth    default authentication field value
 	 */
 	private function openLdapForm($auth = 'Internal') {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');

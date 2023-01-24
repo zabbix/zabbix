@@ -27,11 +27,11 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testUsersAuthenticationSaml extends CWebTest {
 
-	protected function onBeforeTestSuite() {
-		if (!defined('PHPUNIT_SAML_TESTS_ENABLED') || !PHPUNIT_SAML_TESTS_ENABLED) {
-			self::markTestSuiteSkipped();
-		}
-	}
+//	protected function onBeforeTestSuite() {
+//		if (!defined('PHPUNIT_SAML_TESTS_ENABLED') || !PHPUNIT_SAML_TESTS_ENABLED) {
+//			self::markTestSuiteSkipped();
+//		}
+//	}
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -60,11 +60,11 @@ class testUsersAuthenticationSaml extends CWebTest {
 		// Check SAML form default values.
 		$saml_fields = [
 			'Enable JIT provisioning' => ['value' => false, 'visible' => true],
-			'IdP entity ID' => ['value' => '', 'visible' => true, 'maxlength' => 1024, 'mandatory' => true],
-			'SSO service URL' => ['value' => '', 'visible' => true, 'maxlength' => 2048, 'mandatory' => true],
+			'IdP entity ID' => ['value' => '', 'visible' => true, 'maxlength' => 1024],
+			'SSO service URL' => ['value' => '', 'visible' => true, 'maxlength' => 2048],
 			'SLO service URL' => ['value' => '', 'visible' => true, 'maxlength' => 2048],
-			'Username attribute' => ['value' => '', 'visible' => true, 'maxlength' => 128, 'mandatory' => true],
-			'SP entity ID' => ['value' => '', 'visible' => true, 'maxlength' => 1024, 'mandatory' => true],
+			'Username attribute' => ['value' => '', 'visible' => true, 'maxlength' => 128],
+			'SP entity ID' => ['value' => '', 'visible' => true, 'maxlength' => 1024],
 			'SP name ID format' => ['value' => '', 'visible' => true, 'maxlength' => 2048,
 					'placeholder' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
 			],
@@ -77,10 +77,10 @@ class testUsersAuthenticationSaml extends CWebTest {
 			'id:encrypt_assertions' => ['value' => false, 'visible' => true],
 			'Case-sensitive login' => ['value' => false, 'visible' => true],
 			'Configure JIT provisioning' => ['value' => false, 'visible' => true],
-			'Group name attribute' => ['value' => '',  'visible' => false, 'maxlength' => 255, 'mandatory' => true],
-			'User name attribute' => ['value' => '','visible' => false, 'maxlength' => 255],
-			'User last name attribute' => ['value' => '','visible' => false, 'maxlength' => 255],
-			'User group mapping' => ['visible' => false, 'mandatory' => true],
+			'Group name attribute' => ['value' => '', 'visible' => false, 'maxlength' => 255],
+			'User name attribute' => ['value' => '', 'visible' => false, 'maxlength' => 255],
+			'User last name attribute' => ['value' => '', 'visible' => false, 'maxlength' => 255],
+			'User group mapping' => ['visible' => false],
 			'Media type mapping' => ['visible' => false],
 			'Enable SCIM provisioning' => ['value' => false, 'visible' => false]
 		];
@@ -100,10 +100,16 @@ class testUsersAuthenticationSaml extends CWebTest {
 			if (array_key_exists('placeholder', $attributes)) {
 				$this->assertEquals($attributes['placeholder'], $form->getField($field)->getAttribute('placeholder'));
 			}
+		}
 
-			if (array_key_exists('mandatory', $attributes)) {
-				$this->assertStringContainsString('form-label-asterisk', $form->getLabel($field)->getAttribute('class'));
-			}
+		// Check visible mandatory fields.
+		$this->assertEquals(['IdP entity ID', 'SSO service URL', 'Username attribute', 'SP entity ID'],
+				$form->getRequiredLabels()
+		);
+
+		// Check invisible mandatory field.
+		foreach (['Group name attribute', 'User group mapping'] as $manadatory_field) {
+			$form->isRequired($manadatory_field);
 		}
 
 		// Enable SAML and check that fields become enabled.
@@ -130,7 +136,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 		);
 
 		// Check Group mapping dialog.
-		$group_mapping_dialog = $this->checkMapping('User group mapping', 'New user group mapping', $form,
+		$group_mapping_dialog = $this->checkMappingDialog('User group mapping', 'New user group mapping', $form,
 				['SAML group pattern', 'User groups', 'User role']
 		);
 
@@ -143,7 +149,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 		$group_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
 
 		// Check Media mapping dialog.
-		$media_mapping_dialog = $this->checkMapping('Media type mapping', 'New media type mapping',
+		$media_mapping_dialog = $this->checkMappingDialog('Media type mapping', 'New media type mapping',
 				$form, ['Name', 'Media type', 'Attribute']
 		);
 
@@ -159,7 +165,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 	 * @param CFormElement    $form      SAML form
 	 * @param array           $labels    labels in mapping form
 	 */
-	private function checkMapping($field, $title, $form, $labels) {
+	private function checkMappingDialog($field, $title, $form, $labels) {
 		$form->getFieldContainer($field)->query('button:Add')->waitUntilClickable()->one()->click();
 		$mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 		$this->assertEquals($title, $mapping_dialog->getTitle());
@@ -169,7 +175,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 			$mapping_field = $mapping_form->getField($label);
 			$this->assertTrue($mapping_field->isVisible());
 			$this->assertTrue($mapping_field->isEnabled());
-			$this->assertStringContainsString('form-label-asterisk', $mapping_form->getLabel($label)->getAttribute('class'));
+			$this->assertEquals($labels, $mapping_form->getRequiredLabels());
 		}
 
 		$values = ($field === 'Media type mapping')
@@ -200,7 +206,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 
 	public function getSamlData() {
 		return [
-			// Missing IdP entity ID
+			// #0 Missing IdP entity ID.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -212,7 +218,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 					'error' => 'Incorrect value for field "idp_entityid": cannot be empty.'
 				]
 			],
-			// Missing SSO service URL
+			// #1 Missing SSO service URL.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -224,7 +230,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 					'error' => 'Incorrect value for field "sso_url": cannot be empty.'
 				]
 			],
-			// Missing Username attribute
+			// #2 Missing Username attribute.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -236,7 +242,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 					'error' => 'Incorrect value for field "username_attribute": cannot be empty.'
 				]
 			],
-			// Missing SP entity ID
+			// #3 Missing SP entity ID.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -248,7 +254,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 					'error' => 'Incorrect value for field "sp_entityid": cannot be empty.'
 				]
 			],
-			// Configure SAML with only
+			// #4 Configure SAML with only.
 			[
 				[
 					'fields' => [
@@ -259,7 +265,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 					]
 				]
 			],
-			// Various UTF-8 characters in SAML settings fields
+			// #5 Various UTF-8 characters in SAML settings fields.
 			[
 				[
 					'fields' => [
@@ -272,7 +278,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 					]
 				]
 			],
-			// SAML settings with leading and trailing spaces
+			// #6 SAML settings with leading and trailing spaces.
 			[
 				[
 					'fields' => [
@@ -286,7 +292,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 					'trim' => true
 				]
 			],
-			// Configure SAML with all possible parameters
+			// #7 Configure SAML with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -407,13 +413,13 @@ class testUsersAuthenticationSaml extends CWebTest {
 
 	public function getAuthenticationDetails() {
 		return [
-			// Login as zabbix super admin - case insensitive login
+			// #0 Login as zabbix super admin - case insensitive login.
 			[
 				[
 					'username' => 'admin'
 				]
 			],
-			// Login as zabbix super admin - case sensitive login
+			// #1 Login as zabbix super admin - case sensitive login.
 			[
 				[
 					'username' => 'Admin',
@@ -422,13 +428,13 @@ class testUsersAuthenticationSaml extends CWebTest {
 					]
 				]
 			],
-			// Login as zabbix user
+			// #2 Login as zabbix user.
 			[
 				[
 					'username' => 'user-zabbix'
 				]
 			],
-			// Login as zabbix admin with custom url after login
+			// #3 Login as zabbix admin with custom url after login.
 			[
 				[
 					'username' => 'admin-zabbix',
@@ -437,7 +443,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 					'header' => '100 busiest triggers'
 				]
 			],
-			// Login as zabbix admin with pre-defined login url (has higher priority then the configured url after login).
+			// #4 Login as zabbix admin with pre-defined login url (has higher priority then the configured url after login).
 			[
 				[
 					'username' => 'admin-zabbix',
@@ -447,14 +453,14 @@ class testUsersAuthenticationSaml extends CWebTest {
 					'header' => 'Services'
 				]
 			],
-			// Regular login
+			// #5 Regular login.
 			[
 				[
 					'username' => 'Admin',
 					'regular_login' => true
 				]
 			],
-			// Incorrect IDP
+			// #6 Incorrect IDP.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -466,7 +472,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 					'error_details' => 'Invalid issuer in the Assertion/Response'
 				]
 			],
-			// UID exists only on IDP side.
+			// #7 UID exists only on IDP side.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -475,7 +481,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 					'error_details' => 'Incorrect user name or password or account is temporarily blocked.'
 				]
 			],
-			// Login as Admin - case sensitive login - negative test.
+			// #8 Login as Admin - case sensitive login - negative test.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -577,7 +583,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 
 		// Check that SAML settings are disabled by default.
 		if ($check_enabled === true) {
-			foreach(array_keys($fields) as $name){
+			foreach(array_keys($fields) as $name) {
 				$this->assertFalse($form->getField($name)->isEnabled());
 			}
 		}
