@@ -54,7 +54,7 @@ class CLdap {
 	/**
 	 * @var int
 	 */
-	private $bound = 0
+	private $bound = 0;
 
 	public function __construct(array $arg = []) {
 		$this->cnf = [
