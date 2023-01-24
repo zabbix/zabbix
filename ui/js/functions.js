@@ -554,10 +554,9 @@ function overlayDialogue(params, trigger_elmnt) {
  * @param string eventid			Event ID.
  * @param string csrf_token			CSRF token.
  */
-function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null,
-		csrf_token) {
+function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null, csrf_token) {
 	var execute = function() {
-		var popup_options = {scriptid: scriptid, _csrf_token: csrf_token};
+		var popup_options = {scriptid: scriptid};
 
 		if (hostid !== null) {
 			popup_options.hostid = hostid;
@@ -567,7 +566,9 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 			popup_options.eventid = eventid;
 		}
 
-		if (Object.keys(popup_options).length === 3) {
+		if (Object.keys(popup_options).length === 2) {
+			popup_options._csrf_token = csrf_token;
+
 			PopUp('popup.scriptexec', popup_options, {dialogue_class: 'modal-popup-medium', trigger_element});
 		}
 	};
