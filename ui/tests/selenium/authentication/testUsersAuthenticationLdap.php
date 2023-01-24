@@ -23,13 +23,14 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
 
 /**
  * @backup config, userdirectory, usrgrp
  *
  * @dataSource LoginUsers
  */
-class testUsersAuthenticationLdap extends CWebTest {
+class testUsersAuthenticationLdap extends testFormAuthentication {
 
 	use TableTrait;
 
@@ -43,14 +44,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 	}
 
 	public function testUsersAuthenticationLdap_Layout() {
-		$form = $this->openLdapForm();
-		$this->page->assertHeader('Authentication');
-		$this->page->assertTitle('Configuration of authentication');
-		$this->assertTrue($form->getField('Enable LDAP authentication')->isEnabled());
-
-		// Check that Update button is clickable and no other buttons present.
-		$this->assertTrue($form->query('button:Update')->one()->isClickable());
-		$this->assertEquals(1, $form->query('xpath:.//ul[@class="table-forms"]//button')->all()->count());
+		$this->openFormAndCheckBasics('LDAP');
 
 		// Check LDAP form default values.
 		$form->checkValue([
@@ -80,6 +74,12 @@ class testUsersAuthenticationLdap extends CWebTest {
 		];
 
 		$this->checkTablesHeaders($server_table, $form);
+
+		foreach ($server_table as $name => $attributes) {
+			$this->assertEquals($attributes['headers'], $form->getFieldContainer($name)
+					->query('id', $attributes['id'])->asTable()->waitUntilVisible()->one()->getHeadersText()
+			);
+		}
 
 		// Check 'Provisioning period' field's editability.
 		foreach ([false, true] as $jit_status) {
@@ -193,7 +193,6 @@ class testUsersAuthenticationLdap extends CWebTest {
 		$server_form->query('xpath:.//label[text()="StartTLS"]')->waitUntilVisible()->one();
 		$this->assertTrue($server_form->getField('Search filter')->isVisible());
 
-		// Open hintboxes and compare text.
 		$hintboxes = [
 			'Group configuration' => 'memberOf is a preferable way to configure groups because it is faster. '.
 					'Use groupOfNames if your LDAP server does not support memberOf or group filtering is required.',
@@ -202,9 +201,6 @@ class testUsersAuthenticationLdap extends CWebTest {
 					" notifications."
 		];
 
-		$this->checkHints($hintboxes, $server_form);
-
-		// Check mapping tables headers.
 		$mapping_tables = [
 			'User group mapping' => [
 				'id' => 'ldap-user-groups-table',
@@ -216,119 +212,11 @@ class testUsersAuthenticationLdap extends CWebTest {
 			]
 		];
 
-		$this->checkTablesHeaders($mapping_tables, $server_form);
+		$this->checkFormHintsAndMapping($server_form, $hintboxes, $mapping_tables, 'LDAP');
 
-		// Check group mapping popup.
-		$group_mapping_dialog = $this->checkMappingDialog('User group mapping', 'New user group mapping', $server_form,
-				['LDAP group pattern', 'User groups', 'User role']
-		);
-
-		// Check hint in group mapping popup.
-		$this->checkHints(['LDAP group pattern' => "Naming requirements:\ngroup name must match LDAP group name".
-				"\nwildcard patterns with '*' may be used"], $group_mapping_dialog->asForm()
-		);
-
-		// Check Groups mapping footer buttons.
-		$this->checkFooterButtons($group_mapping_dialog, ['Add', 'Cancel']);
-
-		// Close Group mapping dialog.
-		$group_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
-
-		// Check media type mapping popup.
-		$media_mapping_dialog = $this->checkMappingDialog('Media type mapping', 'New media type mapping',
-				$server_form, ['Name', 'Media type', 'Attribute']
-		);
-
-		// Check Media mapping footer buttons.
-		$this->checkFooterButtons($media_mapping_dialog, ['Add', 'Cancel']);
-
-		// Close Media mapping dialog.
-		$media_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
-
-		// Check footer buttons.
+		// Check footer buttons in Server form and close it.
 		$this->checkFooterButtons($server_dialog, ['Add', 'Test', 'Cancel']);
-
 		$server_dialog->close();
-	}
-
-	/**
-	 * Check buttons in dialog footer.
-	 *
-	 * @param array           $tables    given tables
-	 * @param CFormElement    $form      given form
-	 */
-	private function checkTablesHeaders($tables, $form) {
-		foreach ($tables as $name => $attributes) {
-			$this->assertEquals($attributes['headers'], $form->getFieldContainer($name)
-					->query('id', $attributes['id'])->asTable()->waitUntilVisible()->one()->getHeadersText()
-			);
-		}
-	}
-
-	/**
-	 * Check buttons in dialog footer.
-	 *
-	 * @param COverlayDialogElement    $dialog     given dialog
-	 * @param array                    $buttons    checked buttons array
-	 */
-	private function checkFooterButtons($dialog, $buttons) {
-		$footer = $dialog->getFooter();
-
-		// Check that there are correct buttons count in the footer.
-		$this->assertEquals(count($buttons), $footer->query('xpath:.//button')->all()->count());
-
-		// Check that all footer buttons are clickable.
-		$this->assertEquals(count($buttons), $footer->query('button', $buttons)->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
-		);
-	}
-
-	/**
-	 * Check mapping dialog contents.
-	 *
-	 * @param string          $field	 field which mapping is checked
-	 * @param string          $title     title in dialog
-	 * @param CFormElement    $form      LDAP form
-	 * @param array           $labels    labels in mapping form
-	 */
-	private function checkMappingDialog($field, $title, $form, $labels) {
-		$form->getFieldContainer($field)->query('button:Add')->waitUntilClickable()->one()->click();
-		$mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-		$this->assertEquals($title, $mapping_dialog->getTitle());
-		$mapping_form = $mapping_dialog->asForm();
-
-		foreach ($labels as $label) {
-			$mapping_field = $mapping_form->getField($label);
-			$this->assertTrue($mapping_field->isVisible());
-			$this->assertTrue($mapping_field->isEnabled());
-			$this->assertEquals($labels, $mapping_form->getRequiredLabels());
-		}
-
-		$values = ($field === 'Media type mapping')
-			? ['Name' => '', 'Media type' => 'Brevis.one', 'Attribute' => '']
-			: ['LDAP group pattern' => '', 'User groups' => '', 'User role' => ''];
-
-		$mapping_form->checkValue($values);
-
-		// Check group mapping popup footer buttons.
-		$this->assertTrue($mapping_dialog->getFooter()->query('button:Add')->one()->isClickable());
-
-		return $mapping_dialog;
-	}
-
-	/**
-	 * Check hints for labels in form.
-	 *
-	 * @param array			   $hintboxes	label which hint is checked
-	 * @param CFormElement     $form        given form
-	 */
-	private function checkHints($hintboxes, $form) {
-		foreach ($hintboxes as $field => $text) {
-			$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']/a')->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->all()->last();
-			$this->assertEquals($text, $hint->getText());
-			$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
-		}
 	}
 
 	public function getTestData() {

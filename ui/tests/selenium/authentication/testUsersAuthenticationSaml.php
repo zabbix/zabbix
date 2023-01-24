@@ -21,11 +21,12 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
 
 /**
  * @backup config
  */
-class testUsersAuthenticationSaml extends CWebTest {
+class testUsersAuthenticationSaml extends testFormAuthentication {
 
 //	protected function onBeforeTestSuite() {
 //		if (!defined('PHPUNIT_SAML_TESTS_ENABLED') || !PHPUNIT_SAML_TESTS_ENABLED) {
@@ -39,23 +40,11 @@ class testUsersAuthenticationSaml extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
+		return [CMessageBehavior::class];
 	}
 
 	public function testUsersAuthenticationSaml_Layout() {
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form = $this->query('id:authentication-form')->asForm()->one();
-		$form->selectTab('SAML settings');
-		$this->page->assertHeader('Authentication');
-
-		$enable_saml = $form->getField('Enable SAML authentication');
-		$this->assertTrue($enable_saml->isEnabled());
-		$this->assertTrue($enable_saml->isVisible());
-		$form->checkValue(['Enable SAML authentication' => false]);
-
-		// Check that Update button is clickable and no other buttons present.
-		$this->assertTrue($form->query('button:Update')->one()->isClickable());
-		$this->assertEquals(1, $form->query('xpath:.//ul[@class="table-forms"]//button')->all()->count());
+		$this->openFormAndCheckBasics('SAML');
 
 		// Check SAML form default values.
 		$saml_fields = [
@@ -86,122 +75,68 @@ class testUsersAuthenticationSaml extends CWebTest {
 		];
 
 		foreach ($saml_fields as $field => $attributes) {
-			$this->assertEquals($attributes['visible'], $form->getField($field)->isVisible());
-			$this->assertFalse($form->getField($field)->isEnabled());
+			$this->assertEquals($attributes['visible'], $saml_form->getField($field)->isVisible());
+			$this->assertFalse($saml_form->getField($field)->isEnabled());
 
 			if (array_key_exists('value', $attributes)) {
-				$this->assertEquals($attributes['value'], $form->getField($field)->getValue());
+				$this->assertEquals($attributes['value'], $saml_form->getField($field)->getValue());
 			}
 
 			if (array_key_exists('maxlength', $attributes)) {
-				$this->assertEquals($attributes['maxlength'], $form->getField($field)->getAttribute('maxlength'));
+				$this->assertEquals($attributes['maxlength'], $saml_form->getField($field)->getAttribute('maxlength'));
 			}
 
 			if (array_key_exists('placeholder', $attributes)) {
-				$this->assertEquals($attributes['placeholder'], $form->getField($field)->getAttribute('placeholder'));
+				$this->assertEquals($attributes['placeholder'], $saml_form->getField($field)->getAttribute('placeholder'));
 			}
 		}
 
 		// Check visible mandatory fields.
 		$this->assertEquals(['IdP entity ID', 'SSO service URL', 'Username attribute', 'SP entity ID'],
-				$form->getRequiredLabels()
+				$saml_form->getRequiredLabels()
 		);
 
 		// Check invisible mandatory field.
 		foreach (['Group name attribute', 'User group mapping'] as $manadatory_field) {
-			$form->isRequired($manadatory_field);
+			$saml_form->isRequired($manadatory_field);
 		}
 
 		// Enable SAML and check that fields become enabled.
-		$form->fill(['Enable SAML authentication' => true]);
+		$saml_form->fill(['Enable SAML authentication' => true]);
 
 		foreach (array_keys($saml_fields) as $label) {
-			$this->assertTrue($form->getField($label)->isEnabled());
+			$this->assertTrue($saml_form->getField($label)->isEnabled());
 		}
 
 		// Check that JIT fields remain invisible and depend on "Configure JIT" checkbox.
 		$jit_fields = array_slice($saml_fields, 16);
 
-
 		foreach ([false, true] as $jit_status) {
-			$form->fill(['Configure JIT provisioning' => $jit_status]);
+			$saml_form->fill(['Configure JIT provisioning' => $jit_status]);
 
 			foreach (array_keys($jit_fields) as $label) {
-				$this->assertTrue($form->getField($label)->isVisible($jit_status));
+				$this->assertTrue($saml_form->getField($label)->isVisible($jit_status));
 			}
 		}
 
-		$this->checkHint('Media type mapping', "Map user's SAML media attributes (e.g. email) to Zabbix user media for".
-				" sending notifications.", $form
-		);
+		$hintboxes = [
+			'Media type mapping' => "Map user's SAML media attributes (e.g. email) to Zabbix user media for".
+				" sending notifications."
+		];
 
-		// Check Group mapping dialog.
-		$group_mapping_dialog = $this->checkMappingDialog('User group mapping', 'New user group mapping', $form,
-				['SAML group pattern', 'User groups', 'User role']
-		);
+		// Maping tables headers.
+		$mapping_tables = [
+			'User group mapping' => [
+				'id' => 'saml-group-table',
+				'headers' => ['SAML group pattern', 'User groups', 'User role', 'Action']
+			],
+			'Media type mapping' => [
+				'id' => 'saml-media-type-mapping-table',
+				'headers' => ['Name', 'Media type', 'Attribute', '']
+			]
+		];
 
-		// Check hint in group mapping popup.
-		$this->checkHint('SAML group pattern', "Naming requirements:\ngroup name must match SAML group name".
-				"\nwildcard patterns with '*' may be used", $group_mapping_dialog->asForm()
-		);
-
-		// Close Group mapping dialog.
-		$group_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
-
-		// Check Media mapping dialog.
-		$media_mapping_dialog = $this->checkMappingDialog('Media type mapping', 'New media type mapping',
-				$form, ['Name', 'Media type', 'Attribute']
-		);
-
-		// Close Media mapping dialog.
-		$media_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
-	}
-
-	/**
-	 * Check mapping form in dialog.
-	 *
-	 * @param string          $field	 field which mapping is checked
-	 * @param string          $title     title in dialog
-	 * @param CFormElement    $form      SAML form
-	 * @param array           $labels    labels in mapping form
-	 */
-	private function checkMappingDialog($field, $title, $form, $labels) {
-		$form->getFieldContainer($field)->query('button:Add')->waitUntilClickable()->one()->click();
-		$mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-		$this->assertEquals($title, $mapping_dialog->getTitle());
-		$mapping_form = $mapping_dialog->asForm();
-
-		foreach ($labels as $label) {
-			$mapping_field = $mapping_form->getField($label);
-			$this->assertTrue($mapping_field->isVisible());
-			$this->assertTrue($mapping_field->isEnabled());
-			$this->assertEquals($labels, $mapping_form->getRequiredLabels());
-		}
-
-		$values = ($field === 'Media type mapping')
-			? ['Name' => '', 'id:mediatypeid' => 'Brevis.one', 'Attribute' => '']
-			: ['SAML group pattern' => '', 'User groups' => '', 'User role' => ''];
-
-		$mapping_form->checkValue($values);
-
-		// Check group mapping popup footer buttons.
-		$this->assertTrue($mapping_dialog->getFooter()->query('button:Add')->one()->isClickable());
-
-		return $mapping_dialog;
-	}
-
-	/**
-	 * Check hints for labels in form.
-	 *
-	 * @param string           $label	label which hint is checked
-	 * @param string           $text    hint's text
-	 * @param CFormElement     $form    given form
-	 */
-	private function checkHint($label, $text, $form) {
-		$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']/a')->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->all()->last();
-		$this->assertEquals($text, $hint->getText());
-		$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
+		$this->checkFormHintsAndMapping($saml_form, $hintboxes, $mapping_tables, 'SAML');
 	}
 
 	public function getSamlData() {
@@ -252,6 +187,21 @@ class testUsersAuthenticationSaml extends CWebTest {
 						'Username attribute' => 'UA'
 					],
 					'error' => 'Incorrect value for field "sp_entityid": cannot be empty.'
+				]
+			],
+			// #4 Missing Group name attribute.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'IdP entity ID' => 'IdP entity',
+						'SSO service URL' => 'SSO',
+						'IdP entity ID' => 'IdP',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP entity',
+						'Configure JIT provisioning' => true
+					],
+					'error' => 'Incorrect value for field "saml_group_name": cannot be empty.'
 				]
 			],
 			// #4 Configure SAML with only.
@@ -574,20 +524,11 @@ class testUsersAuthenticationSaml extends CWebTest {
 	 * fills SAML settings, and submits the form.
 	 *
 	 * @param array      $fields	       given SAML settings
-	 * @param boolean    $check_enabled    check SAML fields dependency from
 	 * @param array      $data             data provider
 	 */
-	private function configureSamlAuthentication($fields, $check_enabled = false, $data = null) {
+	private function configureSamlAuthentication($fields, $data = null) {
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('SAML settings');
-
-		// Check that SAML settings are disabled by default.
-		if ($check_enabled === true) {
-			foreach(array_keys($fields) as $name) {
-				$this->assertFalse($form->getField($name)->isEnabled());
-			}
-		}
-
 		$form->getField('Enable SAML authentication')->check();
 		$form->fill($fields);
 
