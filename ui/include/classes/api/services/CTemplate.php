@@ -726,11 +726,11 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if ($del_templates) {
-			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
+			CHost::checkTriggerExpressionsOfDelTemplates($del_templates);
 		}
 
 		if ($del_links_clear) {
-			$this->checkTriggerDependenciesOfHostTriggers($del_links_clear);
+			CHost::checkTriggerDependenciesOfHostTriggers($del_links_clear);
 		}
 	}
 
@@ -849,7 +849,7 @@ class CTemplate extends CHostGeneral {
 				);
 			}
 
-			$this->massAddAffectedObjects('groups', $groupids, $db_templates);
+			self::massAddAffectedObjects('groups', $groupids, $db_templates);
 		}
 
 		if (array_key_exists('macros', $data) && $data['macros']) {
@@ -938,7 +938,7 @@ class CTemplate extends CHostGeneral {
 				);
 			}
 
-			$this->massAddAffectedObjects('groups', [], $db_templates);
+			self::massAddAffectedObjects('groups', [], $db_templates);
 
 			$groupids = array_flip($groupids);
 			$edit_groupids = [];
@@ -973,7 +973,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (array_key_exists('macros', $data)) {
-			$this->massAddAffectedObjects('macros', [], $db_templates);
+			self::massAddAffectedObjects('macros', [], $db_templates);
 		}
 	}
 
@@ -1020,11 +1020,11 @@ class CTemplate extends CHostGeneral {
 
 			CTemplateGroup::checkTemplatesWithoutGroups($db_templates, $data['groupids']);
 
-			$this->massAddAffectedObjects('groups', $data['groupids'], $db_templates);
+			self::massAddAffectedObjects('groups', $data['groupids'], $db_templates);
 		}
 
 		if (array_key_exists('macros', $data) && $data['macros']) {
-			$this->massAddAffectedObjects('macros', $data['macros'], $db_templates);
+			self::massAddAffectedObjects('macros', $data['macros'], $db_templates);
 		}
 	}
 

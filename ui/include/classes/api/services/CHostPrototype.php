@@ -537,43 +537,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Check templates links.
-	 *
-	 * @param array      $hosts
-	 * @param array|null $db_hosts
-	 */
-	private static function checkTemplatesLinks(array $hosts, array $db_hosts = null): void {
-		$ins_templates = [];
-
-		foreach ($hosts as $host) {
-			if (array_key_exists('templates', $host)) {
-				$db_templates = $db_hosts !== null
-					? array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid')
-					: [];
-				$templateids = array_column($host['templates'], 'templateid');
-
-				if ($db_hosts !== null
-						&& array_key_exists('nopermissions_templates', $db_hosts[$host['hostid']])) {
-					foreach ($db_hosts[$host['hostid']]['nopermissions_templates'] as $db_template) {
-						$templateids[] = $db_template['templateid'];
-					}
-				}
-
-				foreach ($host['templates'] as $template) {
-					if (!array_key_exists($template['templateid'], $db_templates)) {
-						$ins_templates[$template['templateid']][$host['hostid']] = $templateids;
-					}
-				}
-			}
-		}
-
-		if ($ins_templates) {
-			self::checkTriggerDependenciesOfInsTemplates($ins_templates);
-			self::checkTriggerExpressionsOfInsTemplates($ins_templates);
-		}
-	}
-
-	/**
 	 * @param array $host_prototypes
 	 *
 	 * @return array
@@ -850,6 +813,61 @@ class CHostPrototype extends CHostBase {
 		self::addAffectedGroupLinks($host_prototypes, $db_host_prototypes);
 		self::addAffectedGroupPrototypes($host_prototypes, $db_host_prototypes);
 		self::addAffectedTemplates($host_prototypes, $db_host_prototypes);
+	}
+
+	/**
+	 * @param array $hosts
+	 * @param array $db_hosts
+	 */
+	private static function addAffectedInterfaces(array $hosts, array &$db_hosts): void {
+		$hostids = [];
+
+		foreach ($hosts as $hosts) {
+			$db_custom_interfaces = $db_hosts[$hosts['hostid']]['custom_interfaces'];
+
+			if (array_key_exists('interfaces', $hosts)
+					|| ($hosts['custom_interfaces'] != $db_custom_interfaces
+						&& $db_custom_interfaces == HOST_PROT_INTERFACES_CUSTOM)) {
+				$hostids[] = $hosts['hostid'];
+				$db_hosts[$hosts['hostid']]['interfaces'] = [];
+			}
+		}
+
+		if (!$hostids) {
+			return;
+		}
+
+		$details_interfaces = [];
+		$options = [
+			'output' => ['interfaceid', 'hostid', 'main', 'type', 'useip', 'ip', 'dns', 'port'],
+			'filter' => ['hostid' => $hostids]
+		];
+		$db_interfaces = DBselect(DB::makeSql('interface', $options));
+
+		while ($db_interface = DBfetch($db_interfaces)) {
+			$db_hosts[$db_interface['hostid']]['interfaces'][$db_interface['interfaceid']] =
+				array_diff_key($db_interface, array_flip(['hostid']));
+
+			if ($db_interface['type'] == INTERFACE_TYPE_SNMP) {
+				$details_interfaces[$db_interface['interfaceid']] = $db_interface['hostid'];
+			}
+		}
+
+		if ($details_interfaces) {
+			$options = [
+				'output' => ['interfaceid', 'version', 'bulk', 'community', 'securityname', 'securitylevel',
+					'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname'
+				],
+				'filter' => ['interfaceid' => array_keys($details_interfaces)]
+			];
+			$result = DBselect(DB::makeSql('interface_snmp', $options));
+
+			while ($db_details = DBfetch($result)) {
+				$hostid = $details_interfaces[$db_details['interfaceid']];
+				$db_hosts[$hostid]['interfaces'][$db_details['interfaceid']]['details'] =
+					array_diff_key($db_details, array_flip(['interfaceid']));
+			}
+		}
 	}
 
 	/**
