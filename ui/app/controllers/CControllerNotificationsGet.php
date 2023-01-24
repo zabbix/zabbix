@@ -24,6 +24,26 @@
  */
 class CControllerNotificationsGet extends CController {
 
+	/**
+	 * @var array
+	 */
+	private $notifications = [];
+
+	/**
+	 * @var array
+	 */
+	private $settings = [];
+
+	/**
+	 * @var int
+	 */
+	private $timeout_time = 0;
+
+	/**
+	 * @var int
+	 */
+	private $time_from = 0;
+
 	protected function init() {
 		parent::init();
 
