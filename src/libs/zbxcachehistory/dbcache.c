@@ -170,8 +170,8 @@ typedef struct
 	unsigned char	state;
 	unsigned char	flags;		/* see ZBX_DC_FLAG_* above */
 
-	size_t		len;
-	char		*hash;
+	size_t		bin_len;
+	char		*bin_hash;
 }
 dc_item_value_t;
 
@@ -3057,6 +3057,7 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 				h_bin->clock = h->ts.sec;
 				h_bin->ns = h->ts.ns;
 				h_bin->value = h->value.bin;
+				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
@@ -3959,7 +3960,7 @@ static void	dc_local_add_history_text(zbx_uint64_t itemid, unsigned char item_va
 }
 
 static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
-		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
+		const zbx_bin_t *bin, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
 	dc_item_value_t	*item_value;
 
@@ -3980,11 +3981,11 @@ static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_val
 
 	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 	{
-		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, ZBX_HISTORY_VALUE_LEN) + 1;
-		dc_bin_buffer_realloc(item_value->value.value_str.len);
+		item_value->value.value_str.len = bin->len;
+		dc_string_buffer_realloc(item_value->value.value_str.len);
 
-		item_value->value.value_str.pvalue = bin_values_offset;
-		memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
+		item_value->value.value_str.pvalue = string_values_offset;
+		memcpy(&string_values[string_values_offset], bin->value, item_value->value.value_str.len);
 		string_values_offset += item_value->value.value_str.len;
 	}
 	else
@@ -4050,6 +4051,8 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, unsigned char item_val
 		}
 	}
 }
+
+
 
 static void	dc_local_add_history_notsupported(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *error,
 		zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
@@ -4210,7 +4213,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		}
 		else if (ZBX_ISSET_BIN(result))
 		{
-			dc_local_add_history_bin(itemid, item_value_type, ts, result->bin, result->lastlogsize,
+			dc_local_add_history_bin(itemid, item_value_type, ts, result->bin->value, result->lastlogsize,
 					result->mtime, value_flags);
 		}
 		else
@@ -4492,8 +4495,8 @@ static int	hc_clone_history_bin_data(zbx_bin_value_t **dst, const dc_item_value_
 	if (SUCCEED != hc_clone_history_str_data((char**)(&(*dst)->value), &item_value->value.value_str))
 		return FAIL;
 
-	(*dst)->len = item_value->len;
-	(*dst)->hash = item_value->hash;
+	(*dst)->len = item_value->bin_len;
+	(*dst)->hash = item_value->bin_hash;
 
 	return SUCCEED;
 }

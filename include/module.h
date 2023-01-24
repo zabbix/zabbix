@@ -78,7 +78,8 @@ zbx_log_t;
 
 typedef struct
 {
-	char		*value;
+	void		*value;
+	size_t		len;
 	char		*hash;
 }
 zbx_bin_t;
