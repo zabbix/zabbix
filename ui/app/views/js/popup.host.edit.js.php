@@ -116,7 +116,7 @@ window.host_edit_popup = {
 
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'host.massdelete');
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('host')?>');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', <?= json_encode(CCsrfTokenHelper::get('host')) ?>);
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

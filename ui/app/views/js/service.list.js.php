@@ -95,7 +95,8 @@
 				else if (e.target.classList.contains('js-massupdate-service')) {
 					openMassupdatePopup('popup.massupdate.service', {
 							location_url: this.back_url,
-							<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?> : '<?= CCsrfTokenHelper::get('service') ?>'
+							<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?> :
+								<?= json_encode(CCsrfTokenHelper::get('service')) ?>
 						}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: e.target
@@ -162,7 +163,9 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'service.delete');
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('service') ?>');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('service')) ?>
+			);
 
 			return fetch(curl.getUrl(), {
 				method: 'POST',

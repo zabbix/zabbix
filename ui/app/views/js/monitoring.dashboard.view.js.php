@@ -90,7 +90,7 @@
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period,
 				dynamic_hostid: dynamic.host ? dynamic.host.id : null,
-				csrf_token: '<?= CCsrfTokenHelper::get('dashboard') ?>'
+				csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 			});
 
 			for (const page of dashboard.pages) {
@@ -201,7 +201,9 @@
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.update');
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('dashboard') ?>');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
+			);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

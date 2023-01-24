@@ -38,11 +38,11 @@ $html_page = (new CHtmlPage())
 				->addItem(
 					(new CButton('form', _('Import')))
 						->onClick(
-							'return PopUp("popup.import", {
-								rules_preset: "map", '.
-								CCsrfTokenHelper::CSRF_TOKEN_NAME.': "' .
-								CCsrfTokenHelper::get('import').
-						'"}, {
+							'return PopUp("popup.import", '.
+								json_encode([ 'rules_preset' => 'map',
+									CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('import')
+								]).
+						', {
 								dialogueid: "popup_import",
 								dialogue_class: "modal-popup-generic"
 							});'

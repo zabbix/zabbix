@@ -162,7 +162,9 @@
 		}
 
 		_post(target, proxyids, url) {
-			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('proxy') ?>');
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('proxy')) ?>
+			);
 
 			target.classList.add('is-loading');
 

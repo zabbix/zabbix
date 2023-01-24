@@ -86,7 +86,9 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'token.delete');
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('token') ?>');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('token')) ?>
+			);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

@@ -83,7 +83,7 @@
 			const curl = new Curl('zabbix.php', false);
 			curl.setArgument('action', 'templategroup.delete');
 			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				'<?= CCsrfTokenHelper::get('templategroup') ?>'
+				<?= json_encode(CCsrfTokenHelper::get('templategroup')) ?>
 			);
 
 			this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {

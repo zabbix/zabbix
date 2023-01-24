@@ -134,7 +134,9 @@
 		}
 
 		_post(target, actionids, url) {
-			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', '<?= CCsrfTokenHelper::get('action') ?>');
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('action')) ?>
+			);
 
 			target.classList.add('is-loading');
 

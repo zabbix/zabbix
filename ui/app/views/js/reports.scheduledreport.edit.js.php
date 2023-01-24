@@ -145,7 +145,8 @@
 				const parameters = {
 					period: form.elements['period'].value,
 					now: Math.floor(Date.now() / 1000),
-					<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>: '<?= CCsrfTokenHelper::get('scheduledreport') ?>'
+					<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>:
+						<?= json_encode(CCsrfTokenHelper::get('scheduledreport')) ?>
 				};
 
 				if (typeof form.elements['dashboardid'] !== 'undefined') {
