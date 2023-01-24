@@ -2570,25 +2570,11 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $db_items
 	 */
 	public static function addInheritedItems(array &$db_items): void {
-		$templateids = array_keys($db_items);
-
-		do {
-			$options = [
-				'output' => ['itemid', 'name'],
-				'filter' => ['templateid' => $templateids]
-			];
-			$result = DBselect(DB::makeSql('items', $options));
-
-			$templateids = [];
-
-			while ($row = DBfetch($result)) {
-				if (!array_key_exists($row['itemid'], $db_items)) {
-					$templateids[] = $row['itemid'];
-
-					$db_items[$row['itemid']] = $row;
-				}
-			}
-		} while ($templateids);
+		$options = [
+			'output' => ['itemid', 'name'],
+			'filter' => ['templateid' => array_keys($db_items)]
+		];
+		$db_items += DBfetchArrayAssoc(DBselect(DB::makeSql('items', $options)), 'itemid');
 	}
 
 	/**

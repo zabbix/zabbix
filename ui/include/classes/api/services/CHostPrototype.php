@@ -499,7 +499,7 @@ class CHostPrototype extends CHostBase {
 		self::checkDuplicates($host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
 		self::checkGroupLinks($host_prototypes);
-		$this->checkTemplates($host_prototypes);
+		self::checkTemplates($host_prototypes);
 	}
 
 	/**
@@ -629,9 +629,9 @@ class CHostPrototype extends CHostBase {
 		self::checkDuplicates($host_prototypes, $db_host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
 		self::checkGroupLinks($host_prototypes, $db_host_prototypes);
-		$this->checkTemplates($host_prototypes, $db_host_prototypes);
+		self::checkTemplates($host_prototypes, $db_host_prototypes);
 		$this->checkTemplatesLinks($host_prototypes, $db_host_prototypes);
-		$host_prototypes = parent::validateHostMacros($host_prototypes, $db_host_prototypes);
+		$host_prototypes = $this->validateHostMacros($host_prototypes, $db_host_prototypes);
 	}
 
 	/**
@@ -1652,30 +1652,19 @@ class CHostPrototype extends CHostBase {
 	 * @param array $ruleids
 	 */
 	public static function unlinkTemplateObjects(array $ruleids): void {
-		$result = DBselect(
-			'SELECT hd.hostid,h.status AS host_status'.
-			' FROM host_discovery hd,items i,hosts h'.
-			' WHERE hd.parent_itemid=i.itemid'.
-				' AND i.hostid=h.hostid'.
-				' AND '.dbConditionId('hd.parent_itemid', $ruleids)
-		);
+		$options = [
+			'output' => ['hostid'],
+			'filter' => ['parent_itemid' => $ruleids]
+		];
+		$hostids = DBfetchColumn(DBselect(DB::makeSql('host_discovery', $options)), 'hostid');
 
 		$upd_host_prototypes = [];
-		$hostids = [];
 
-		while ($row = DBfetch($result)) {
-			$upd_host_prototype = ['templateid' => 0];
-
-			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
-				$upd_host_prototype += ['uuid' => generateUuidV4()];
-			}
-
-			$upd_host_prototypes[$row['hostid']] = [
-				'values' => $upd_host_prototype,
-				'where' => ['hostid' => $row['hostid']]
+		foreach ($hostids as $hostid) {
+			$upd_host_prototypes[] = [
+				'values' => ['templateid' => 0],
+				'where' => ['hostid' => $hostid]
 			];
-
-			$hostids[] = $row['hostid'];
 		}
 
 		if ($upd_host_prototypes) {
@@ -1689,12 +1678,9 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Updates the children of the host prototypes on the given hosts and propagates the inheritance to the child hosts.
-	 *
 	 * @param array      $host_prototypes
 	 * @param array      $db_host_prototypes
-	 * @param array|null $hostids            Array of hosts to inherit to; if set to null, the children will be updated
-	 *                                       on all child hosts.
+	 * @param array|null $hostids
 	 */
 	protected function inherit(array $host_prototypes, array $db_host_prototypes = [], array $hostids = null): void {
 		$ins_host_prototypes = [];
@@ -1737,14 +1723,6 @@ class CHostPrototype extends CHostBase {
 
 		if ($ins_host_prototypes) {
 			$this->createForce($ins_host_prototypes, true);
-		}
-
-		[$tpl_host_prototypes, $tpl_db_host_prototypes] = self::getTemplatedObjects(
-			array_merge($upd_host_prototypes, $ins_host_prototypes), $upd_db_host_prototypes
-		);
-
-		if ($tpl_host_prototypes) {
-			$this->inherit($tpl_host_prototypes, $tpl_db_host_prototypes);
 		}
 	}
 
@@ -2228,20 +2206,13 @@ class CHostPrototype extends CHostBase {
 			' FOR UPDATE'
 		);
 
-		$_db_host_prototypes = $db_host_prototypes;
-
-		do {
-			// Lock also inherited host prototypes before the deletion to prevent server from adding new LLD hosts.
-			$_db_host_prototypes = DBfetchArrayAssoc(DBselect(
-				'SELECT hostid,host'.
-				' FROM hosts h'.
-				' WHERE '.dbConditionId('h.templateid', array_keys($_db_host_prototypes)).
-				' FOR UPDATE'
-			), 'hostid');
-
-			$db_host_prototypes += $_db_host_prototypes;
-		}
-		while ($_db_host_prototypes);
+		// Lock also inherited host prototypes before the deletion to prevent server from adding new LLD hosts.
+		$db_host_prototypes += DBfetchArrayAssoc(DBselect(
+			'SELECT hostid,host'.
+			' FROM hosts h'.
+			' WHERE '.dbConditionId('h.templateid', array_keys($db_host_prototypes)).
+			' FOR UPDATE'
+		), 'hostid');
 
 		$hostids = array_keys($db_host_prototypes);
 

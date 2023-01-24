@@ -510,7 +510,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Updates children of triggers on the given hosts and propagates the inheritance to all child hosts.
+	 * Updates children of triggers on the given hosts.
 	 * All of the child triggers that became obsolete will be deleted if the given triggers were assigned to a different
 	 * template or host.
 	 *
@@ -531,10 +531,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 		if ($upd_triggers) {
 			$this->updateReal($upd_triggers, $db_triggers, true);
-		}
-
-		if ($ins_triggers || $upd_triggers) {
-			$this->inherit(array_merge($ins_triggers + $upd_triggers));
 		}
 	}
 

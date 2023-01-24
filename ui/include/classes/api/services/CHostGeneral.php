@@ -370,24 +370,6 @@ abstract class CHostGeneral extends CHostBase {
 					];
 				}
 			}
-
-			if (!$clear && ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL] || $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
-				$db_triggers = DBselect(
-					'SELECT DISTINCT t.triggerid,t.flags'.
-					' FROM triggers t,functions f,items i,hosts h'.
-					' WHERE t.triggerid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND i.hostid=h.hostid'.
-						' AND h.status='.HOST_STATUS_TEMPLATE.
-						' AND '.dbConditionInt('t.triggerid', array_keys(
-							$upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]
-						))
-				);
-
-				while ($db_trigger = DBfetch($db_triggers)) {
-					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']]['values']['uuid'] = generateUuidV4();
-				}
-			}
 		}
 
 		if ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]) {
@@ -452,24 +434,6 @@ abstract class CHostGeneral extends CHostBase {
 						'values' => ['templateid' => 0],
 						'where' => ['graphid' => $db_graph['graphid']]
 					];
-				}
-			}
-
-			if (!$clear && ($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL] || $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
-				$db_graphs = DBselect(
-					'SELECT DISTINCT g.graphid,g.flags'.
-					' FROM graphs g,graphs_items gi,items i,hosts h'.
-					' WHERE g.graphid=gi.graphid'.
-						' AND gi.itemid=i.itemid'.
-						' AND i.hostid=h.hostid'.
-						' AND h.status='.HOST_STATUS_TEMPLATE.
-						' AND '.dbConditionInt('g.graphid', array_keys(
-							$upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]
-						))
-				);
-
-				while ($db_graph = DBfetch($db_graphs)) {
-					$upd_graphs[$db_graph['flags']][$db_graph['graphid']]['values']['uuid'] = generateUuidV4();
 				}
 			}
 
@@ -860,24 +824,6 @@ abstract class CHostGeneral extends CHostBase {
 					];
 				}
 			}
-
-			if (!$clear && ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL] || $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
-				$db_triggers = DBselect(
-					'SELECT DISTINCT t.triggerid,t.flags'.
-					' FROM triggers t,functions f,items i,hosts h'.
-					' WHERE t.triggerid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND i.hostid=h.hostid'.
-						' AND h.status='.HOST_STATUS_TEMPLATE.
-						' AND '.dbConditionInt('t.triggerid', array_keys(
-							$upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]
-						))
-				);
-
-				while ($db_trigger = DBfetch($db_triggers)) {
-					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']]['values']['uuid'] = generateUuidV4();
-				}
-			}
 		}
 
 		if ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]) {
@@ -942,24 +888,6 @@ abstract class CHostGeneral extends CHostBase {
 						'values' => ['templateid' => 0],
 						'where' => ['graphid' => $db_graph['graphid']]
 					];
-				}
-			}
-
-			if (!$clear && ($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL] || $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
-				$db_graphs = DBselect(
-					'SELECT DISTINCT g.graphid,g.flags'.
-					' FROM graphs g,graphs_items gi,items i,hosts h'.
-					' WHERE g.graphid=gi.graphid'.
-						' AND gi.itemid=i.itemid'.
-						' AND i.hostid=h.hostid'.
-						' AND h.status='.HOST_STATUS_TEMPLATE.
-						' AND '.dbConditionInt('g.graphid', array_keys(
-							$upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]
-						))
-				);
-
-				while ($db_graph = DBfetch($db_graphs)) {
-					$upd_graphs[$db_graph['flags']][$db_graph['graphid']]['values']['uuid'] = generateUuidV4();
 				}
 			}
 

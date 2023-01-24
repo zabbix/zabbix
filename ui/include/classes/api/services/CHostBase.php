@@ -39,7 +39,7 @@ abstract class CHostBase extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function checkTemplates(array $hosts, array $db_hosts = null): void {
+	protected static function checkTemplates(array $hosts, array $db_hosts = null): void {
 		$edit_templates = [];
 
 		foreach ($hosts as $i1 => $host) {

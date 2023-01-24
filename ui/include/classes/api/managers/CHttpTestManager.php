@@ -1359,8 +1359,7 @@ class CHttpTestManager {
 
 		self::$parent_itemids = self::getItemIds($httptests);
 		$preparedHttpTests = $this->prepareInheritedHttpTests($httptests, $template_hosts);
-		$inheritedHttpTests = $this->save($preparedHttpTests);
-		$this->inherit($inheritedHttpTests);
+		$this->save($preparedHttpTests);
 
 		return true;
 	}

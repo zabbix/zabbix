@@ -721,10 +721,9 @@ class CDiscoveryRule extends CItemGeneralOld {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$result = DBselect(
-			'SELECT ii.itemid,h.status AS host_status'.
-			' FROM items i,items ii,hosts h'.
+			'SELECT ii.itemid'.
+			' FROM items i,items ii'.
 			' WHERE i.itemid=ii.templateid'.
-				' AND ii.hostid=h.hostid'.
 				' AND '.dbConditionId('i.hostid', $templateids).
 				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE]).
 				$hostids_condition
@@ -734,17 +733,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 		$ruleids = [];
 
 		while ($row = DBfetch($result)) {
-			$upd_item = [
-				'templateid' => 0,
-				'valuemapid' => 0
-			];
-
-			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
-				$upd_item += ['uuid' => generateUuidV4()];
-			}
-
 			$upd_items[] = [
-				'values' => $upd_item,
+				'values' => ['templateid' => 0],
 				'where' => ['itemid' => $row['itemid']]
 			];
 
