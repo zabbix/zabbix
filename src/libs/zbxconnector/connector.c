@@ -32,13 +32,21 @@ void	zbx_connector_init(void)
 	connector_initialized = CONNECTOR_INITIALIZED_YES;
 }
 
+int	zbx_connector_initialized(void)
+{
+	if (CONNECTOR_INITIALIZED_YES != connector_initialized)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 void	zbx_connector_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size)
 {
 	static zbx_ipc_socket_t	socket;
 
 	if (CONNECTOR_INITIALIZED_YES != connector_initialized)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "connector is not initialized: please check \"StartConnectors\""
+		zabbix_log(LOG_LEVEL_DEBUG, "connector is not initialized: please check \"StartConnectors\""
 				" configuration parameter");
 		return;
 	}

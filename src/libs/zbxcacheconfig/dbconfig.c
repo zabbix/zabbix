@@ -43,6 +43,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxconnector.h"
 
 int	sync_in_progress = 0;
 
@@ -7191,6 +7192,12 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	if (0 != htmpl_sync.add_num + htmpl_sync.update_num + htmpl_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_MACROS;
 
+	if (0 != connector_sync.add_num + connector_sync.update_num + connector_sync.remove_num +
+			connector_tag_sync.add_num + connector_tag_sync.update_num + connector_tag_sync.remove_num)
+	{
+		update_flags |= ZBX_DBSYNC_UPDATE_CONNECTORS;
+	}
+
 	/* update trigger topology if trigger dependency was changed */
 	if (0 != (update_flags & ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY))
 		dc_trigger_update_topology();
@@ -7574,6 +7581,12 @@ out:
 
 		queues_sec = zbx_time() - sec;
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reschedule : " ZBX_FS_DBL " sec.", __func__, queues_sec);
+	}
+
+	if (0 != (update_flags & ZBX_DBSYNC_UPDATE_CONNECTORS) && FAIL == zbx_connector_initialized())
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "connectors cannot be used without connector workers:"
+				" please check \"StartConnectors\" configuration parameter");
 	}
 clean:
 	zbx_dbsync_clear(&config_sync);
