@@ -43,10 +43,12 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 	private static $dashboardid;
 	private static $template_dashboardid;
+	private static $hostid;
 
 	const TEMPLATEID = 50000;
 	const ITEMID = 400410;
 	const INACCESSIBLE_TEXT = 'No permissions to referred object or it does not exist!';
+	const HOSTNAME = 'Host for widget module test';
 
 	private static $widget_names = ['Action log', 'Clock', 'Data overview', 'Discovery status', 'Favorite graphs',
 		'Favorite maps','Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value',
@@ -64,10 +66,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'private' => 0,
 				'pages' => [
 					[
-						'name' => 'Page 1',
+						'name' => 'Map page',
 						'widgets' => [
 							[
-								'name' => 'Awesome tree',
 								'type' => 'navtree',
 								'x' => 0,
 								'y' => 0,
@@ -93,7 +94,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								]
 							],
 							[
-								'name' => 'Map from navtree',
 								'type' => 'map',
 								'x' => 12,
 								'y' => 0,
@@ -114,19 +114,74 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								]
 							],
 							[
+								'type' => 'favgraphs',
+								'view_mode' => 0,
+								'x' => 6,
+								'y' => 4,
+								'width' => 6,
+								'height' => 4
+							]
+						]
+					],
+					[
+						'name' => 'Alarm clock page',
+						'widgets' => [
+							[
 								'type' => 'clock345',
 								'view_mode' => 0,
 								'x' => 0,
-								'y' => 4,
+								'y' => 0,
+								'width' => 6,
+								'height' => 4
+							],
+							[
+								'type' => 'favgraphs',
+								'view_mode' => 0,
+								'x' => 6,
+								'y' => 0,
+								'width' => 6,
+								'height' => 4
+							]
+						]
+					],
+					[
+						'name' => 'System info page',
+						'widgets' => [
+							[
+
+								'type' => 'favgraphs',
+								'view_mode' => 0,
+								'x' => 0,
+								'y' => 0,
 								'width' => 6,
 								'height' => 4
 							],
 							[
 								'type' => 'systeminfo',
-								'name' => 'System stats view',
 								'view_mode' => 0,
 								'x' => 6,
-								'y' => 4,
+								'y' => 0,
+								'width' => 6,
+								'height' => 4
+							]
+						]
+					],
+					[
+						'name' => 'Empty widget page',
+						'widgets' => [
+							[
+								'type' => 'favgraphs',
+								'view_mode' => 0,
+								'x' => 0,
+								'y' => 0,
+								'width' => 6,
+								'height' => 4
+							],
+							[
+								'type' => 'emptyWidget',
+								'view_mode' => 0,
+								'x' => 6,
+								'y' => 0,
 								'width' => 6,
 								'height' => 4
 							]
@@ -144,17 +199,15 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'name' => 'Templated dashboard for module widgets',
 				'pages' => [
 					[
-						'name' => 'Page 1',
+						'name' => 'Default clock page',
 						'widgets' => [
 							[
 								'type' => 'clock',
-								'name' => 'Clock widget',
 								'width' => 6,
 								'height' => 4
 							],
 							[
 								'type' => 'item',
-								'name' => 'Item value widget',
 								'x' => 6,
 								'y' => 0,
 								'width' => 6,
@@ -168,12 +221,54 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								]
 							]
 						]
+					],
+					[
+						'name' => 'Alarm clock page',
+						'widgets' => [
+							[
+								'type' => 'clock',
+								'name' => 'Clock widget',
+								'width' => 6,
+								'height' => 4
+							],
+							[
+								'type' => 'clock345',
+								'view_mode' => 0,
+								'x' => 6,
+								'y' => 0,
+								'width' => 6,
+								'height' => 4
+							]
+						]
 					]
 				]
 			]
 		]);
 
 		self::$template_dashboardid = $template_responce['dashboardids'][0];
+
+		$host_responce = CDataHelper::createHosts([
+			[
+				'host' => self::HOSTNAME,
+				'interfaces' => [
+					'type' => INTERFACE_TYPE_AGENT,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => '10050'
+				],
+				'groups' => [
+					'groupid' => 7
+				],
+				'status' => HOST_STATUS_MONITORED,
+				'templates' => [
+					'templateid' => self::TEMPLATEID
+				]
+			]
+		]);
+
+		self::$hostid = $host_responce['hostids'][self::HOSTNAME];
 	}
 
 	public function testPageAdministrationGeneralModules_Layout() {
@@ -720,25 +815,58 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 	public function getWidgetModuleData() {
 		return [
-			// Exact name match.
+			// Custom widget with JS, css and pre-defined widget type name
 			[
 				[
 					'module_name' => 'Clock2',
 					'widget_name' => 'Local',
 					'widget_type' => 'ALARM CLOCK',
-					'template_widget' => true
+					'page' => 'Alarm clock page'
 				]
 			],
+			// Existing default widget.
 			[
 				[
 					'module_name' => 'System information',
-					'widget_name' => 'System stats view'
+					'widget_name' => 'System information',
+					'page' => 'System info page'
 				]
 			],
+			// Existing default widget on which another widget is dependent.
 			[
 				[
 					'module_name' => 'Map navigation tree',
-					'widget_name' => ['Awesome tree', 'Map from navtree']
+					'widget_name' => 'Map navigation tree',
+					'dependent_widget' => 'Map',
+					'page' => 'Map page'
+				]
+			],
+			// Custom widget with minimal contents.
+			[
+				[
+					'module_name' => 'Empty widget',
+					'widget_name' => 'Empty widget',
+					'page' => 'Empty widget page'
+				]
+			],
+			// Existing default widget on template dashboard.
+			[
+				[
+					'module_name' => 'Clock',
+					'widget_name' => 'Local',
+					'template' => true,
+					'page' => 'Default clock page'
+				]
+			],
+			// Custom widget with minimal contents.
+			[
+				[
+					'module_name' => 'Clock2',
+					'widget_name' => 'Local',
+					'widget_type' => 'ALARM CLOCK',
+					'template' => true,
+					'not_available' => 'Empty widget',
+					'page' => 'Alarm clock page'
 				]
 			]
 		];
@@ -779,19 +907,28 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	}
 
 	private function checkWidgetModuleStatus($module, $status = 'enabled') {
-		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$url = CTestArrayHelper::get($module, 'template')
+			? 'zabbix.php?action=host.dashboard.view&hostid='.self::$hostid.'&dashboardid='.self::$template_dashboardid
+			: 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
+		$this->page->open($url);
 		$this->checkWidgetStatusOnDashboard($module, $status);
 
 		// Open Kiosk mode and check widget display again.
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
-		$this->page->waitUntilReady();
 		$this->checkWidgetStatusOnDashboard($module, $status, 'kiosk');
-
-		// Open dashboard in edit mode and check widget display again.
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
 		$this->page->waitUntilReady();
+
+		// Open dashboard in edit mode and check widget display again.
+		if (CTestArrayHelper::get($module, 'template')) {
+			$this->page->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$template_dashboardid);
+		}
+
 		$dashboard = CDashboardElement::find()->one();
-		$dashboard->edit();
+
+		if (!array_key_exists('template', $module)) {
+			$dashboard->edit();
+		}
+
 		$this->checkWidgetStatusOnDashboard($module, $status);
 
 		// Check that widget is present among widget types dropdown.
@@ -806,70 +943,85 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			$this->assertFalse(in_array($widget_type, $options));
 		}
 
+		// Check that module that should be present only on regular dashboards is not present (key used only on template).
+		if (array_key_exists('not_available', $module)) {
+			$this->assertFalse(in_array($module['not_available'], $options));
+		}
+
 		// go back to the list of modules after the check is complete.
 		$widget_form->close();
 		$this->page->open('zabbix.php?action=module.list');
 	}
 
 	private function checkWidgetStatusOnDashboard($module, $status, $mode = null) {
+		$kiosk_button_xpath = 'xpath://button[@title="Kiosk mode"]';
 		$dashboard = CDashboardElement::find()->one();
+		$dashboard->selectPage($module['page']);
+
+		if ($mode === 'kiosk') {
+			$this->query($kiosk_button_xpath)->one()->click();
+			$this->page->waitUntilReady();
+		}
 
 		if ($status === 'enabled') {
-			// Putting into array is required as there are cases when module status change affects multiple widgets.
-			if (!is_array($module['widget_name'])) {
-				$module['widget_name'] = [$module['widget_name']];
-			}
+			// Check that widget with required name is shown and that is doesn't have the inaccessilbe widget string in it.
+			$widget = $dashboard->getWidget($module['widget_name']);
+			$this->assertFalse($widget->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes(self::INACCESSIBLE_TEXT).
+					"]")->one(false)->isValid()
+			);
 
-			foreach ($module['widget_name'] as $widget_name) {
-				// Check that widget with required name is shown and that is doesn't have the inaccessilbe widget string in it.
-				$widget = $dashboard->getWidget($widget_name);
-				$this->assertFalse($widget->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes(self::INACCESSIBLE_TEXT).
-						"]")->one(false)->isValid()
-				);
+			// Check that dependent widget is there and that it's content is not hidden.
+			if (array_key_exists('dependent_widget', $module)) {
+				$dependent_widget = $dashboard->getWidget($module['dependent_widget']);
+				$this->assertTrue($dependent_widget->isValid());
+				$this->assertFalse($dependent_widget->getContent()->getText() === self::INACCESSIBLE_TEXT);
 			}
 		}
 		else {
-			$inaccessible_widgets = $dashboard->query('xpath:.//div[contains(@class, "dashboard-widget-inaccessible")]/../..')
-					->asWidget()->all();
+			// Check that there is only 1 inaccessible widget present on the dashboard.
+			$inaccessible_count = $dashboard->query('xpath:.//div[contains(@class, "dashboard-widget-inaccessible")]')
+					->waitUntilVisible()->all()->count();
+			$this->assertEquals(1, $inaccessible_count);
 
-			$expected_count = (is_array($module['widget_name'])) ? count($module['widget_name']) : 1;
+			// Get the inaccessible widget and check its contents.
+			$inaccessible_widget = $dashboard->getWidget('Inaccessible widget');
+			$this->assertEquals(self::INACCESSIBLE_TEXT, $inaccessible_widget->getContent()->getText());
 
-			if (!is_array($module['widget_name'])) {
-				$module['widget_name'] = [$module['widget_name']];
+			// Check that withget of the disabled module is not present on the dashboard.
+			$this->assertFalse($dashboard->getWidget($module['widget_name'], false)->isValid());
+
+			// Check that the dependent widget is still there, but its contents is not displayed.
+			if (array_key_exists('dependent_widget', $module)) {
+				$dependent_widget = $dashboard->getWidget($module['dependent_widget']);
+				$this->assertTrue($dependent_widget->isValid());
+				$this->assertEquals(self::INACCESSIBLE_TEXT, $dependent_widget->getContent()->getText());
 			}
 
-			$this->assertEquals($expected_count, $inaccessible_widgets->count());
+			// Check that edit widget button  on disabled module widget is hidden and that it doesn't exist in kiosk mode.
+			$edit_button_xpath = 'xpath:.//button[contains(@class, "btn-widget-edit")]';
 
-			foreach ($module['widget_name'] as $widget) {
-				$this->assertFalse($dashboard->getWidget($widget, false)->isValid());
+			if ($mode === 'kiosk' || $this->query('link:All hosts')->one(false)->isValid()) {
+				$this->assertFalse($inaccessible_widget->query($edit_button_xpath)->one(false)->isValid());
+			}
+			else {
+				$this->assertFalse($inaccessible_widget->query($edit_button_xpath)->one()->isDisplayed());
 			}
 
-			foreach ($inaccessible_widgets as $inaccessible_widget) {
-				$this->assertEquals('Inaccessible widget', $inaccessible_widget->getHeaderText());
-				$this->assertEquals(self::INACCESSIBLE_TEXT, $inaccessible_widget->getContent()->getText());
+			// Check if it is possible to perform actions with the widget depending on dashboard mode.
+			$button_xpath = 'xpath:.//button[contains(@class, "btn-widget-action")]';
 
-				$edit_button_xpath = 'xpath:.//button[contains(@class, "btn-widget-edit")]';
+			if ($this->query($kiosk_button_xpath)->one(false)->isVisible() || $mode === 'kiosk') {
+				$this->assertFalse($inaccessible_widget->query($button_xpath)->one()->isVisible());
+			}
+			else {
+				$popup_menu = $inaccessible_widget->query($button_xpath)->waitUntilPresent()->asPopupButton()
+						->one()->getMenu();
+				$menu_items = $popup_menu->getItems();
+				$this->assertEquals(['Copy', 'Paste', 'Delete'], $menu_items->asText());
 
-				if ($mode === 'kiosk') {
-					$this->assertFalse($inaccessible_widget->query($edit_button_xpath)->one(false)->isValid());
-				}
-				else {
-					$this->assertFalse($inaccessible_widget->query($edit_button_xpath)->one()->isDisplayed());
-				}
-
-				// Check if it is possible to perform actions with the widget depending on dashboard state.
-				$button_xpath = 'xpath:.//button[contains(@class, "btn-widget-action")]';
-				if ($this->query('button:Edit dashboard')->one(false)->isVisible() || $mode === 'kiosk') {
-					$this->assertFalse($inaccessible_widget->query($button_xpath)->one()->isVisible());
-				}
-				else {
-					$popup_menu = $inaccessible_widget->query($button_xpath)->waitUntilPresent()->asPopupButton()
-							->one()->getMenu();
-					$menu_items = $popup_menu->getItems();
-					$this->assertEquals(['Copy', 'Paste', 'Delete'], $menu_items->asText());
-					$this->assertEquals(['Delete'], array_values($menu_items->filter(CElementFilter::CLICKABLE)->asText()));
-					$popup_menu->close();
-				}
+				// Check that inaccessible widgets can only be deleted.
+				$this->assertEquals(['Delete'], array_values($menu_items->filter(CElementFilter::CLICKABLE)->asText()));
+				$popup_menu->close();
 			}
 		}
 	}
