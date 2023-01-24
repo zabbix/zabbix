@@ -33,7 +33,7 @@ No specific Zabbix configuration is required.
 |{$BACKUP.NAME.NOT_MATCHES} |<p>This macro is used in backup discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$BACKUP.TYPE.MATCHES} |<p>This macro is used in backup discovery rule.</p> |`.*` |
 |{$BACKUP.TYPE.NOT_MATCHES} |<p>This macro is used in backup discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$VEEAM.MANAGER.API.URL} |<p>Veeam Backup Enterprise Manager API endpoint is a URL in the format: `<scheme>://<host>:<port>`.</p> |`https://localhost:9398/api` |
+|{$VEEAM.MANAGER.API.URL} |<p>Veeam Backup Enterprise Manager API endpoint is a URL in the format: `<scheme>://<host>:<port>`.</p> |`https://localhost:9398` |
 |{$VEEAM.MANAGER.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`10` |
 |{$VEEAM.MANAGER.HTTP.PROXY} |<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p> |`` |
 |{$VEEAM.MANAGER.JOB.MAX.FAIL} |<p>The maximum score of failed jobs (for a trigger expression).</p> |`5` |

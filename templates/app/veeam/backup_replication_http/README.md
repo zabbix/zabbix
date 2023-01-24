@@ -46,7 +46,7 @@ No specific Zabbix configuration is required.
 |{$SESSION.NAME.NOT_MATCHES} |<p>This macro is used in discovery rule to evaluate sessions.</p> |`CHANGE_IF_NEEDED` |
 |{$SESSION.TYPE.MATCHES} |<p>This macro is used in discovery rule to evaluate sessions.</p> |`.*` |
 |{$SESSION.TYPE.NOT_MATCHES} |<p>This macro is used in discovery rule to evaluate sessions.</p> |`CHANGE_IF_NEEDED` |
-|{$VEEAM.API.URL} |<p>The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.</p> |`https://localhost:9419/api` |
+|{$VEEAM.API.URL} |<p>The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.</p> |`https://localhost:9419` |
 |{$VEEAM.DATA.TIMEOUT} |<p>A response timeout for the API.</p> |`10` |
 |{$VEEAM.HTTP.PROXY} |<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p> |`` |
 |{$VEEAM.PASSWORD} |<p>The `password` of the Veeam Backup and Replication account. It is used to obtain an access token.</p> |`` |

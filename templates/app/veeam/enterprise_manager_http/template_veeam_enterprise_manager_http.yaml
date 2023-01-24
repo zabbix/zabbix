@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2023-01-23T10:04:59Z'
+  date: '2023-01-24T06:43:48Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -136,7 +136,7 @@ zabbix_export:
                     }
                     request.addHeader('Accept: application/json');
                     request.addHeader('Authorization: Basic ' + btoa(Veeam.params.user + ':' + Veeam.params.password));
-                    request.post(Veeam.params.api_endpoint + '/sessionMngr');
+                    request.post(Veeam.params.api_endpoint + 'api/sessionMngr');
                     response = request.get(url);
                     if (request.getStatus() !== 200 || response === null) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -152,9 +152,9 @@ zabbix_export:
                 getMetricsData: function() {
                     var data = {};
                     endpoints = {
-                        'backupFiles': 'backupFiles',
+                        'backupFiles': 'api/backupFiles',
                     };
-                    reports_summary = Veeam.request(Veeam.params.api_endpoint + 'reports/summary')
+                    reports_summary = Veeam.request(Veeam.params.api_endpoint + 'api/reports/summary')
                     if (typeof reports_summary !== 'object' || reports_summary.hasOwnProperty('Links') === false)
                         throw 'Failed response parse. Check debug log for more information.';
                     reports_summary.Links.forEach(function (field)  {
@@ -533,7 +533,7 @@ zabbix_export:
           description: 'This macro is used in backup discovery rule.'
         -
           macro: '{$VEEAM.MANAGER.API.URL}'
-          value: 'https://localhost:9398/api'
+          value: 'https://localhost:9398'
           description: 'Veeam Backup Enterprise Manager API endpoint is a URL in the format: `<scheme>://<host>:<port>`.'
         -
           macro: '{$VEEAM.MANAGER.DATA.TIMEOUT}'
