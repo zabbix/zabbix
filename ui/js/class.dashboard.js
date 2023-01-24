@@ -528,7 +528,7 @@ class CDashboard extends CBaseComponent {
 			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid,
-			csrf_token: this._csrf_token == null ? null : this._csrf_token,
+			csrf_token: this._csrf_token,
 			unique_id: this._createUniqueId()
 		});
 

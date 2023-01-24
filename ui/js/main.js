@@ -706,20 +706,11 @@ function toggleSection(id, profile_idx) {
  * @param object options
  */
 function sendAjaxData(url, options) {
-	let curl = new Curl(url);
-
-	if (options.data.csrf_token) {
-		curl.setArgument('action', options.data.action);
-		curl.setArgument('_csrf_token', options.data.csrf_token);
-	}
-	else {
-		curl.setArgument('action', options.data.action);
-	}
-
-	curl.setArgument('output', 'ajax');
+	var url = new Curl(url);
+	url.setArgument('output', 'ajax');
 
 	options.type = 'post';
-	options.url = curl.getUrl();
+	options.url = url.getUrl();
 
 	return jQuery.ajax(options);
 }

@@ -49,12 +49,11 @@
 			[PROFILE_TYPE_STR]: 'value_str'
 		};
 
-		return sendAjaxData('zabbix.php', {
+		return sendAjaxData('zabbix.php?action=profile.update', {
 			data: {
 				idx: idx,
 				[value_fields[profile_type]]: value,
 				idx2: idx2,
-				action: 'profile.update',
 				_csrf_token: <?= json_encode(CCsrfTokenHelper::get('profile')) ?>
 			}
 		});
@@ -64,12 +63,11 @@
 	 * Add object to the list of favorites.
 	 */
 	function add2favorites(object, objectid) {
-		sendAjaxData('zabbix.php', {
+		sendAjaxData('zabbix.php?action=favorite.create', {
 			data: {
 				object: object,
 				objectid: objectid,
-				action: 'favorite.create',
-				csrf_token: <?= json_encode(CCsrfTokenHelper::get('favorite')) ?>
+				_csrf_token: <?= json_encode(CCsrfTokenHelper::get('favorite')) ?>
 			}
 		});
 	}
@@ -78,12 +76,11 @@
 	 * Remove object from the list of favorites. Remove all favorites if objectid==0.
 	 */
 	function rm4favorites(object, objectid) {
-		sendAjaxData('zabbix.php', {
+		sendAjaxData('zabbix.php?action=favorite.delete', {
 			data: {
 				object: object,
 				objectid: objectid,
-				action: 'favorite.delete',
-				csrf_token: <?= json_encode(CCsrfTokenHelper::get('favorite')) ?>
+				_csrf_token: <?= json_encode(CCsrfTokenHelper::get('favorite')) ?>
 			}
 		});
 	}
