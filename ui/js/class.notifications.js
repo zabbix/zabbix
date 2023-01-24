@@ -560,19 +560,18 @@ ZBX_Notifications.prototype.renderAudio = function() {
 
 /**
  * @param {string} resource  A value for 'action' parameter.
- * @param {object} params    Form data to be sent.
+ * @param {object} params    Data to be sent as request body.
  *
  * @return {Promise}
  */
 ZBX_Notifications.prototype.fetch = function(resource, params) {
-	params._csrf_token = this.csrf_token;
+	if (resource !== 'notifications.get') {
+		params._csrf_token = this.csrf_token;
+	}
 
 	return new Promise(function(resolve, reject) {
-		let data = params || {};
-		data.action = resource;
-
 		sendAjaxData('zabbix.php?action=' + resource, {
-			data: params || {},
+			data: params,
 			success: resolve,
 			error: reject
 		});
