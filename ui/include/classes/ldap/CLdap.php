@@ -51,6 +51,11 @@ class CLdap {
 	 */
 	private $cnf = [];
 
+	/**
+	 * @var int
+	 */
+	private $bound = 0
+
 	public function __construct(array $arg = []) {
 		$this->cnf = [
 			'host' => 'ldap://localhost',
