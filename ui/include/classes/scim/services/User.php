@@ -337,15 +337,22 @@ class User extends ScimApiService {
 
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 		$user_data = [
-			'userid' => $db_user[0]['userid']
+			'userid' => $db_user['userid']
 		];
 		$user_data += $provisioning->getUserAttributes($options);
 		$user_data['medias'] = $provisioning->getUserMedias($options);
 		$user_data['usrgrps'] = [];
 
-		DB::delete('user_scim_group', [
-			'userid' => $user_data['userid']
+		$user_groups = DB::select('user_scim_group', [
+			'output' => ['scim_groupid'],
+			'filter' => ['userid' => $user_data['userid']]
 		]);
+
+		if ($user_groups) {
+			DB::delete('user_scim_group', [
+				'userid' => $user_data['userid']
+			]);
+		}
 
 		APIRPC::User()->updateProvisionedUser($user_data);
 
