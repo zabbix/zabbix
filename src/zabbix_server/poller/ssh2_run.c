@@ -38,7 +38,7 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 {
 	int	res, ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s key_str:'%s' value:'%s'", __func__, key_str, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_str:'%s' value:'%s'", __func__, key_str, value);
 
 	if (0 > (res = libssh2_session_method_pref(session, type, value)) && res != LIBSSH2_ERROR_EAGAIN)
 	{
@@ -46,12 +46,10 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 		const char	**algs;
 		int		rc;
 
-		*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option %s", key_str);
-
 		if (0 > libssh2_session_last_error(session, &err, NULL, 0))
-			*err_msg = zbx_strdcatf(*err_msg, ": %s.", err);
+			*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option %s: %s.", key_str, err);
 		else
-			*err_msg = zbx_strdcat(*err_msg, ".");
+			*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option %s.", key_str);
 
 		if (0 < (rc = libssh2_session_supported_algs(session, type, &algs)))
 		{
@@ -70,11 +68,10 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 		}
 		else
 		{
-			*err_msg = zbx_strdcat(*err_msg, " Cannot get suported values");
 			if (0 > libssh2_session_last_error(session, &err, NULL, 0))
-				*err_msg = zbx_strdcatf(*err_msg, ": %s.", err);
+				*err_msg = zbx_strdcatf(*err_msg, " Cannot get supported values: %s.", err);
 			else
-				*err_msg = zbx_strdcat(*err_msg, ".");
+				*err_msg = zbx_strdcat(*err_msg, " Cannot get supported values.");
 		}
 
 		ret = FAIL;
@@ -98,7 +95,8 @@ static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char
 		char	*eq_str = strchr(line, '=');
 
 		if (NULL != eq_str)
-			*eq_str = '\0', eq_str++;
+			*eq_str++ = '\0';
+
 		eq_str = ZBX_NULL2EMPTY_STR(eq_str);
 
 #ifdef HAVE_LIBSSH2_METHOD_KEX
@@ -228,10 +226,10 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 	if (NULL == (session = libssh2_session_init()))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize SSH session"));
-		goto ret;
+		goto ret_label;
 	}
 
-	if (0 != ssh_parse_options(session, options, &err_msg))
+	if (SUCCEED != ssh_parse_options(session, options, &err_msg))
 	{
 		SET_MSG_RESULT(result, err_msg);
 		goto session_free;
@@ -457,7 +455,7 @@ tcp_close:
 session_free:
 	libssh2_session_free(session);
 
-ret:
+ret_label:
 	zbx_free(publickey);
 	zbx_free(privatekey);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

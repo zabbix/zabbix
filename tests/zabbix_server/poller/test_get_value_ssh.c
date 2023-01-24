@@ -24,9 +24,7 @@
 
 #if defined(HAVE_SSH)
 #include "../../../src/zabbix_server/poller/ssh_run.c"
-#endif
-
-#if defined(HAVE_SSH2)
+#elif defined(HAVE_SSH2)
 #include "../../../src/zabbix_server/poller/ssh2_run.c"
 #endif
 
@@ -51,7 +49,7 @@ int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error)
 
 	return ret;
 }
-#endif /*POLLER_GET_VALUE_SSH_TEST_H*/
+#endif
 
 int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const char *options)
 {
@@ -59,8 +57,7 @@ int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, co
 	char		*err_msg = NULL;
 #ifdef HAVE_SSH
 	ssh_session	session;
-#endif
-#ifdef HAVE_SSH2
+#elif defined(HAVE_SSH2)
 	LIBSSH2_SESSION	*session;
 #endif
 
@@ -90,7 +87,7 @@ int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, co
 #endif
 
 #if defined(HAVE_SSH) || defined(HAVE_SSH2)
-	if (0 != ssh_parse_options(session, options, &err_msg))
+	if (SUCCEED != ssh_parse_options(session, options, &err_msg))
 	{
 		SET_MSG_RESULT(result, err_msg);
 		goto session_free;

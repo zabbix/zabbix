@@ -38,17 +38,16 @@ static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const c
 {
 	int ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(\"%s\", \"%s\")", __func__, key_str, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_str:'%s' value:'%s'", __func__, key_str, value);
 
 	if (0 > ssh_options_set(session, type, value))
 	{
-		*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option %s: %s.", key_str,
-				ssh_get_error(session));
+		*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option %s: %s.", key_str, ssh_get_error(session));
 
 		ret = FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, ret);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -66,10 +65,7 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 		char	*eq_str = strchr(line, '=');
 
 		if (NULL != eq_str)
-		{
-			*eq_str = '\0';
-			eq_str++;
-		}
+			*eq_str++ = '\0';
 
 		eq_str = ZBX_NULL2EMPTY_STR(eq_str);
 
@@ -172,7 +168,7 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 		goto session_free;
 	}
 
-	if (0 != ssh_parse_options(session, options, &err_msg))
+	if (SUCCEED != ssh_parse_options(session, options, &err_msg))
 	{
 		SET_MSG_RESULT(result, err_msg);
 		goto session_free;
