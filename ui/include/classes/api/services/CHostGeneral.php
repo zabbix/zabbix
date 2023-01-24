@@ -215,298 +215,6 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Update table "hosts_templates" and change objects of linked or unliked templates on target hosts.
-	 *
-	 * @param array      $hosts
-	 * @param array|null $db_hosts
-	 */
-	protected function updateTemplates(array &$hosts, array $db_hosts = null): void {
-		parent::updateTemplates($hosts, $db_hosts);
-
-		$ins_links = [];
-		$del_links = [];
-		$del_links_clear = [];
-
-		foreach ($hosts as $host) {
-			if (!array_key_exists('templates', $host) && !array_key_exists('templates_clear', $host)) {
-				continue;
-			}
-
-			$db_templates = ($db_hosts !== null)
-				? array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid')
-				: [];
-
-			if (array_key_exists('templates', $host)) {
-				foreach ($host['templates'] as $template) {
-					if (array_key_exists($template['templateid'], $db_templates)) {
-						unset($db_templates[$template['templateid']]);
-					}
-					else {
-						$ins_links[$template['templateid']][] = $host['hostid'];
-					}
-				}
-
-				$templates_clear = array_key_exists('templates_clear', $host)
-					? array_column($host['templates_clear'], null, 'templateid')
-					: [];
-
-				foreach ($db_templates as $del_template) {
-					if (array_key_exists($del_template['templateid'], $templates_clear)) {
-						$del_links_clear[$del_template['templateid']][] = $host['hostid'];
-					}
-					else {
-						$del_links[$del_template['templateid']][] = $host['hostid'];
-					}
-				}
-			}
-			elseif (array_key_exists('templates_clear', $host)) {
-				foreach ($host['templates_clear'] as $template) {
-					$del_links_clear[$template['templateid']][] = $host['hostid'];
-				}
-			}
-		}
-
-		while ($del_links_clear) {
-			$templateid = key($del_links_clear);
-			$hostids = reset($del_links_clear);
-			$templateids = [$templateid];
-			unset($del_links_clear[$templateid]);
-
-			foreach ($del_links_clear as $templateid => $_hostids) {
-				if ($_hostids === $hostids) {
-					$templateids[] = $templateid;
-					unset($del_links_clear[$templateid]);
-				}
-			}
-
-			self::unlinkTemplatesObjects($templateids, $hostids, true);
-		}
-
-		while ($del_links) {
-			$templateid = key($del_links);
-			$hostids = reset($del_links);
-			$templateids = [$templateid];
-			unset($del_links[$templateid]);
-
-			foreach ($del_links as $templateid => $_hostids) {
-				if ($_hostids === $hostids) {
-					$templateids[] = $templateid;
-					unset($del_links[$templateid]);
-				}
-			}
-
-			self::unlinkTemplatesObjects($templateids, $hostids);
-		}
-
-		while ($ins_links) {
-			$templateid = key($ins_links);
-			$hostids = reset($ins_links);
-			$templateids = [$templateid];
-			unset($ins_links[$templateid]);
-
-			foreach ($ins_links as $templateid => $_hostids) {
-				if ($_hostids === $hostids) {
-					$templateids[] = $templateid;
-					unset($ins_links[$templateid]);
-				}
-			}
-
-			self::linkTemplatesObjects($templateids, $hostids);
-		}
-	}
-
-	/**
-	 * Unlink or clear objects of given templates from given hosts.
-	 *
-	 * @param array      $templateids
-	 * @param array|null $hostids
-	 * @param bool       $clear
-	 */
-	protected static function unlinkTemplatesObjects(array $templateids, array $hostids = null,
-			bool $clear = false): void {
-		$flags = ($clear)
-			? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE]
-			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE];
-
-		// triggers
-		$db_triggers = DBselect(
-			'SELECT DISTINCT f.triggerid'.
-			' FROM functions f,items i'.
-			' WHERE f.itemid=i.itemid'.
-				' AND '.dbConditionInt('i.hostid', $templateids)
-		);
-
-		$tpl_triggerids = DBfetchColumn($db_triggers, 'triggerid');
-		$upd_triggers = [
-			ZBX_FLAG_DISCOVERY_NORMAL => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
-		];
-
-		if ($tpl_triggerids) {
-			$sql_distinct = ($hostids !== null) ? ' DISTINCT' : '';
-			$sql_from = ($hostids !== null) ? ',functions f,items i' : '';
-			$sql_where = ($hostids !== null)
-				? ' AND t.triggerid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND '.dbConditionInt('i.hostid', $hostids)
-				: '';
-
-			$db_triggers = DBSelect(
-				'SELECT'.$sql_distinct.' t.triggerid,t.flags'.
-				' FROM triggers t'.$sql_from.
-				' WHERE '.dbConditionInt('t.templateid', $tpl_triggerids).
-					' AND '.dbConditionInt('t.flags', $flags).
-					$sql_where
-			);
-
-			while ($db_trigger = DBfetch($db_triggers)) {
-				if ($clear) {
-					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = true;
-				}
-				else {
-					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = [
-						'values' => ['templateid' => 0],
-						'where' => ['triggerid' => $db_trigger['triggerid']]
-					];
-				}
-			}
-		}
-
-		if ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]) {
-			if ($clear) {
-				CTriggerManager::delete(array_keys($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]));
-			}
-			else {
-				DB::update('triggers', $upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]);
-			}
-		}
-
-		if ($upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
-			if ($clear) {
-				CTriggerPrototypeManager::delete(array_keys($upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
-			}
-			else {
-				DB::update('triggers', $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
-			}
-		}
-
-		// graphs
-		$db_tpl_graphs = DBselect(
-			'SELECT DISTINCT g.graphid'.
-			' FROM graphs g,graphs_items gi,items i'.
-			' WHERE g.graphid=gi.graphid'.
-				' AND gi.itemid=i.itemid'.
-				' AND '.dbConditionInt('i.hostid', $templateids).
-				' AND '.dbConditionInt('g.flags', $flags)
-		);
-
-		$tpl_graphids = [];
-
-		while ($db_tpl_graph = DBfetch($db_tpl_graphs)) {
-			$tpl_graphids[] = $db_tpl_graph['graphid'];
-		}
-
-		if ($tpl_graphids) {
-			$upd_graphs = [
-				ZBX_FLAG_DISCOVERY_NORMAL => [],
-				ZBX_FLAG_DISCOVERY_PROTOTYPE => []
-			];
-
-			$sql = ($hostids !== null)
-				? 'SELECT DISTINCT g.graphid,g.flags'.
-					' FROM graphs g,graphs_items gi,items i'.
-					' WHERE g.graphid=gi.graphid'.
-						' AND gi.itemid=i.itemid'.
-						' AND '.dbConditionInt('g.templateid', $tpl_graphids).
-						' AND '.dbConditionInt('i.hostid', $hostids)
-				: 'SELECT g.graphid,g.flags'.
-					' FROM graphs g'.
-					' WHERE '.dbConditionInt('g.templateid', $tpl_graphids);
-
-			$db_graphs = DBSelect($sql);
-
-			while ($db_graph = DBfetch($db_graphs)) {
-				if ($clear) {
-					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = true;
-				}
-				else {
-					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = [
-						'values' => ['templateid' => 0],
-						'where' => ['graphid' => $db_graph['graphid']]
-					];
-				}
-			}
-
-			if ($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
-				if ($clear) {
-					CGraphPrototypeManager::delete(array_keys($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
-				}
-				else {
-					DB::update('graphs', $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
-				}
-			}
-
-			if ($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]) {
-				if ($clear) {
-					CGraphManager::delete(array_keys($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]));
-				}
-				else {
-					DB::update('graphs', $upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]);
-				}
-			}
-		}
-
-		if ($clear) {
-			CDiscoveryRule::clearTemplateObjects($templateids, $hostids);
-			CItem::clearTemplateObjects($templateids, $hostids);
-			CHttpTest::clearTemplateObjects($templateids, $hostids);
-		}
-		else {
-			CDiscoveryRule::unlinkTemplateObjects($templateids, $hostids);
-			CItem::unlinkTemplateObjects($templateids, $hostids);
-			CHttpTest::unlinkTemplateObjects($templateids, $hostids);
-		}
-	}
-
-	/**
-	 * Add objects of given templates to given hosts or templates.
-	 *
-	 * @param array $templateids
-	 * @param array $hostids
-	 */
-	private static function linkTemplatesObjects(array $templateids, array $hostids): void {
-		// TODO: Modify parameters of syncTemplates methods when complete audit log will be implementing for hosts.
-		$link_request = [
-			'templateids' => $templateids,
-			'hostids' => $hostids
-		];
-
-		foreach ($templateids as $templateid) {
-			// Fist link web items, so that later regular items can use web item as their master item.
-			Manager::HttpTest()->link($templateid, $hostids);
-		}
-
-		CItem::linkTemplateObjects($templateids, $hostids);
-		$ruleids = API::DiscoveryRule()->syncTemplates($templateids, $hostids);
-
-		if ($ruleids) {
-			CItemPrototype::linkTemplateObjects($templateids, $hostids);
-			API::HostPrototype()->syncTemplates($ruleids, $hostids);
-		}
-
-		API::Trigger()->syncTemplates($link_request);
-
-		if ($ruleids) {
-			API::TriggerPrototype()->syncTemplates($link_request);
-			API::GraphPrototype()->syncTemplates($link_request);
-		}
-
-		API::Graph()->syncTemplates($link_request);
-
-		CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
-	}
-
-	/**
 	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
 	 *
 	 * @param array $hostids    an array of host or template IDs
@@ -1167,21 +875,21 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Add the existing host or template groups, templates, tags, macros.
+	 * Add the existing host or template groups, tags and macros.
 	 *
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 */
 	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {
-		$this->addAffectedGroups($hosts, $db_hosts);
 		parent::addAffectedObjects($hosts, $db_hosts);
+		$this->addAffectedGroups($hosts, $db_hosts);
 	}
 
 	/**
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 */
-	protected function addAffectedGroups(array $hosts, array &$db_hosts): void {
+	private function addAffectedGroups(array $hosts, array &$db_hosts): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$hostids = [];
@@ -1231,7 +939,7 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Add the existing groups, macros or templates whether these are affected by the mass methods.
+	 * Add the existing groups and macros if affected by the mass methods.
 	 *
 	 * @param string     $objects
 	 * @param array      $objectids
@@ -1313,50 +1021,6 @@ abstract class CHostGeneral extends CHostBase {
 				if (!$objectids || in_array(CApiInputValidator::trimMacro($db_macro['macro']), $trimmed_macros)) {
 					$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] =
 						array_diff_key($db_macro, array_flip(['hostid']));
-				}
-			}
-		}
-
-		if ($objects === 'templates') {
-			$permitted_templates = [];
-
-			if (!$objectids && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-				$permitted_templates = API::Template()->get([
-					'output' => [],
-					'hostids' => array_keys($db_hosts),
-					'preservekeys' => true
-				]);
-			}
-
-			$options = [
-				'output' => ['hosttemplateid', 'hostid', 'templateid'],
-				'filter' => [
-					'hostid' => array_keys($db_hosts)
-				]
-			];
-			$db_hosts_templates = DBselect(DB::makeSql('hosts_templates', $options));
-
-			while ($link = DBfetch($db_hosts_templates)) {
-				if ($objectids) {
-					if (in_array($link['templateid'], $objectids)) {
-						$db_hosts[$link['hostid']]['templates'][$link['hosttemplateid']] =
-							array_diff_key($link, array_flip(['hostid']));
-					}
-					else {
-						$db_hosts[$link['hostid']]['nopermissions_templates'][$link['hosttemplateid']] =
-							array_diff_key($link, array_flip(['hostid']));
-					}
-				}
-				else {
-					if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN
-							|| array_key_exists($link['templateid'], $permitted_templates)) {
-						$db_hosts[$link['hostid']]['templates'][$link['hosttemplateid']] =
-							array_diff_key($link, array_flip(['hostid']));
-					}
-					else {
-						$db_hosts[$link['hostid']]['nopermissions_templates'][$link['hosttemplateid']] =
-							array_diff_key($link, array_flip(['hostid']));
-					}
 				}
 			}
 		}

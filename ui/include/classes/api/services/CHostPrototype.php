@@ -520,7 +520,7 @@ class CHostPrototype extends CHostBase {
 		unset($host_prototype);
 
 		if (!$inherited) {
-			$this->checkTemplatesLinks($host_prototypes);
+			self::checkTemplatesLinks($host_prototypes);
 		}
 
 		self::createHostDiscoveries($host_prototypes);
@@ -528,12 +528,49 @@ class CHostPrototype extends CHostBase {
 		self::updateInterfaces($host_prototypes);
 		self::updateGroupLinks($host_prototypes);
 		self::updateGroupPrototypes($host_prototypes);
-		$this->updateTemplates($host_prototypes);
+		self::updateTemplates($host_prototypes);
 		$this->updateTags($host_prototypes);
 		$this->updateMacros($host_prototypes);
 		self::updateHostInventories($host_prototypes);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST_PROTOTYPE, $host_prototypes);
+	}
+
+	/**
+	 * Check templates links.
+	 *
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
+	 */
+	private static function checkTemplatesLinks(array $hosts, array $db_hosts = null): void {
+		$ins_templates = [];
+
+		foreach ($hosts as $host) {
+			if (array_key_exists('templates', $host)) {
+				$db_templates = $db_hosts !== null
+					? array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid')
+					: [];
+				$templateids = array_column($host['templates'], 'templateid');
+
+				if ($db_hosts !== null
+						&& array_key_exists('nopermissions_templates', $db_hosts[$host['hostid']])) {
+					foreach ($db_hosts[$host['hostid']]['nopermissions_templates'] as $db_template) {
+						$templateids[] = $db_template['templateid'];
+					}
+				}
+
+				foreach ($host['templates'] as $template) {
+					if (!array_key_exists($template['templateid'], $db_templates)) {
+						$ins_templates[$template['templateid']][$host['hostid']] = $templateids;
+					}
+				}
+			}
+		}
+
+		if ($ins_templates) {
+			self::checkTriggerDependenciesOfInsTemplates($ins_templates);
+			self::checkTriggerExpressionsOfInsTemplates($ins_templates);
+		}
 	}
 
 	/**
@@ -624,13 +661,13 @@ class CHostPrototype extends CHostBase {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->addAffectedObjects($host_prototypes, $db_host_prototypes);
+		self::addAffectedObjects($host_prototypes, $db_host_prototypes);
 
 		self::checkDuplicates($host_prototypes, $db_host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
 		self::checkGroupLinks($host_prototypes, $db_host_prototypes);
 		self::checkTemplates($host_prototypes, $db_host_prototypes);
-		$this->checkTemplatesLinks($host_prototypes, $db_host_prototypes);
+		self::checkTemplatesLinks($host_prototypes, $db_host_prototypes);
 		$host_prototypes = $this->validateHostMacros($host_prototypes, $db_host_prototypes);
 	}
 
@@ -793,7 +830,7 @@ class CHostPrototype extends CHostBase {
 		self::updateInterfaces($host_prototypes, $db_host_prototypes);
 		self::updateGroupLinks($host_prototypes, $db_host_prototypes);
 		self::updateGroupPrototypes($host_prototypes, $db_host_prototypes);
-		$this->updateTemplates($host_prototypes, $db_host_prototypes);
+		self::updateTemplates($host_prototypes, $db_host_prototypes);
 		$this->updateTags($host_prototypes, $db_host_prototypes);
 		$this->updateMacros($host_prototypes, $db_host_prototypes);
 		self::updateHostInventories($host_prototypes, $db_host_prototypes);
@@ -808,65 +845,11 @@ class CHostPrototype extends CHostBase {
 	 * @param array $db_host_prototypes
 	 */
 	protected function addAffectedObjects(array $host_prototypes, array &$db_host_prototypes): void {
+		parent::addAffectedObjects($host_prototypes, $db_host_prototypes);
 		self::addAffectedInterfaces($host_prototypes, $db_host_prototypes);
 		self::addAffectedGroupLinks($host_prototypes, $db_host_prototypes);
 		self::addAffectedGroupPrototypes($host_prototypes, $db_host_prototypes);
-		parent::addAffectedObjects($host_prototypes, $db_host_prototypes);
-	}
-
-	/**
-	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
-	 */
-	private static function addAffectedInterfaces(array $host_prototypes, array &$db_host_prototypes): void {
-		$hostids = [];
-
-		foreach ($host_prototypes as $host_prototype) {
-			$db_custom_interfaces = $db_host_prototypes[$host_prototype['hostid']]['custom_interfaces'];
-
-			if (array_key_exists('interfaces', $host_prototype)
-					|| ($host_prototype['custom_interfaces'] != $db_custom_interfaces
-						&& $db_custom_interfaces == HOST_PROT_INTERFACES_CUSTOM)) {
-				$hostids[] = $host_prototype['hostid'];
-				$db_host_prototypes[$host_prototype['hostid']]['interfaces'] = [];
-			}
-		}
-
-		if (!$hostids) {
-			return;
-		}
-
-		$details_interfaces = [];
-		$options = [
-			'output' => ['interfaceid', 'hostid', 'main', 'type', 'useip', 'ip', 'dns', 'port'],
-			'filter' => ['hostid' => $hostids]
-		];
-		$db_interfaces = DBselect(DB::makeSql('interface', $options));
-
-		while ($db_interface = DBfetch($db_interfaces)) {
-			$db_host_prototypes[$db_interface['hostid']]['interfaces'][$db_interface['interfaceid']] =
-				array_diff_key($db_interface, array_flip(['hostid']));
-
-			if ($db_interface['type'] == INTERFACE_TYPE_SNMP) {
-				$details_interfaces[$db_interface['interfaceid']] = $db_interface['hostid'];
-			}
-		}
-
-		if ($details_interfaces) {
-			$options = [
-				'output' => ['interfaceid', 'version', 'bulk', 'community', 'securityname', 'securitylevel',
-					'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname'
-				],
-				'filter' => ['interfaceid' => array_keys($details_interfaces)]
-			];
-			$result = DBselect(DB::makeSql('interface_snmp', $options));
-
-			while ($db_details = DBfetch($result)) {
-				$hostid = $details_interfaces[$db_details['interfaceid']];
-				$db_host_prototypes[$hostid]['interfaces'][$db_details['interfaceid']]['details'] =
-					array_diff_key($db_details, array_flip(['interfaceid']));
-			}
-		}
+		self::addAffectedTemplates($host_prototypes, $db_host_prototypes);
 	}
 
 	/**
@@ -1628,7 +1611,7 @@ class CHostPrototype extends CHostBase {
 			];
 		}
 
-		$this->addAffectedObjects($host_prototypes, $db_host_prototypes);
+		self::addAffectedObjects($host_prototypes, $db_host_prototypes);
 
 		$host_prototypes = array_values($db_host_prototypes);
 
@@ -1771,7 +1754,7 @@ class CHostPrototype extends CHostBase {
 				$upd_host_prototypes[] = $upd_host_prototype;
 			}
 
-			$this->addAffectedObjects($upd_host_prototypes, $upd_db_host_prototypes);
+			self::addAffectedObjects($upd_host_prototypes, $upd_db_host_prototypes);
 		}
 
 		return $upd_db_host_prototypes;
@@ -1960,7 +1943,7 @@ class CHostPrototype extends CHostBase {
 				$upd_host_prototypes[] = $upd_host_prototype;
 			}
 
-			$this->addAffectedObjects($upd_host_prototypes, $upd_db_host_prototypes);
+			self::addAffectedObjects($upd_host_prototypes, $upd_db_host_prototypes);
 		}
 
 		return $upd_db_host_prototypes;

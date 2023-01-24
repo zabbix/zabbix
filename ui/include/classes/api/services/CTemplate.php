@@ -496,7 +496,7 @@ class CTemplate extends CHostGeneral {
 	public function delete(array $templateids) {
 		$this->validateDelete($templateids, $db_templates);
 
-		self::unlinkTemplatesObjects($templateids, null, true);
+		CHost::unlinkTemplatesObjects($templateids, null, true);
 
 		// delete the discovery rules first
 		$del_rules = API::DiscoveryRule()->get([
@@ -735,7 +735,7 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Add given template groups, macros and templates to given templates.
+	 * Add given template groups and macros to given templates.
 	 *
 	 * @param array $data
 	 *
@@ -744,7 +744,7 @@ class CTemplate extends CHostGeneral {
 	public function massAdd(array $data) {
 		$this->validateMassAdd($data, $db_templates);
 
-		$templates = parent::getObjectsByData($data, $db_templates);
+		$templates = $this->getObjectsByData($data, $db_templates);
 
 		$this->updateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
@@ -755,7 +755,7 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Replace template groups, macros and templates on the given templates.
+	 * Replace template groups and macros on the given templates.
 	 *
 	 * @param array $data
 	 *
@@ -764,7 +764,7 @@ class CTemplate extends CHostGeneral {
 	public function massUpdate(array $data) {
 		$this->validateMassUpdate($data, $db_templates);
 
-		$templates = parent::getObjectsByData($data, $db_templates);
+		$templates = $this->getObjectsByData($data, $db_templates);
 
 		$this->updateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
@@ -775,7 +775,7 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Remove given template groups, macros and templates from given templates.
+	 * Remove given template groups and macros from given templates.
 	 *
 	 * @param array $data
 	 *
@@ -784,7 +784,7 @@ class CTemplate extends CHostGeneral {
 	public function massRemove(array $data) {
 		$this->validateMassRemove($data, $db_templates);
 
-		$templates = parent::getObjectsByData($data, $db_templates);
+		$templates = $this->getObjectsByData($data, $db_templates);
 
 		$this->updateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
