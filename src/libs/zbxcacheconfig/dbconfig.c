@@ -7192,8 +7192,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	if (0 != htmpl_sync.add_num + htmpl_sync.update_num + htmpl_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_MACROS;
 
-	if (0 != connector_sync.add_num + connector_sync.update_num + connector_sync.remove_num +
-			connector_tag_sync.add_num + connector_tag_sync.update_num + connector_tag_sync.remove_num)
+	if (0 != connector_sync.add_num + connector_sync.update_num + connector_tag_sync.add_num +
+			connector_tag_sync.update_num + connector_tag_sync.remove_num)
 	{
 		update_flags |= ZBX_DBSYNC_UPDATE_CONNECTORS;
 	}
