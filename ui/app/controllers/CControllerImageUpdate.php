@@ -21,6 +21,11 @@
 
 class CControllerImageUpdate extends CController {
 
+	/**
+	 * @var array
+	 */
+	private $image = [];
+
 	protected function checkInput() {
 		$fields = [
 			'name'      => 'required|not_empty|db images.name',
@@ -62,8 +67,6 @@ class CControllerImageUpdate extends CController {
 		if (!$images) {
 			return false;
 		}
-
-		$this->image = $images[0];
 
 		return true;
 	}
