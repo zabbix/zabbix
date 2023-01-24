@@ -123,7 +123,7 @@ css_hc_dark:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-dark.scss ui/assets/styles/hc-dark.css
 	cp ui/assets/styles/hc-dark.css sass/stylesheets/hc-dark.css
 
-css_icons:
+css_images:
 	cp sass/img/icon-sprite.svg ui/assets/img/
 	cp sass/img/browser-sprite.png ui/assets/img/
 	cp sass/apple-touch-icon-120x120-precomposed.png ui/assets/img/
@@ -133,13 +133,23 @@ css_icons:
 	cp sass/ms-tile-144x144.png ui/assets/img/
 	cp sass/touch-icon-192x192.png ui/assets/img/
 	cp sass/favicon.ico ui/
-	cp sass/fonts/zabbix-icons.eot ui/assets/fonts/
-	cp sass/fonts/zabbix-icons.svg ui/assets/fonts/
-	cp sass/fonts/zabbix-icons.ttf ui/assets/fonts/
-	cp sass/fonts/zabbix-icons.woff ui/assets/fonts/
-	cp sass/fonts/zabbix-icons.woff2 ui/assets/fonts/
 
-css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
+icons_build:
+	cd sass/icons && \
+	npm run generate
+	cp sass/icons/dist/_icons.scss sass/stylesheets/sass/base/
+	cp sass/icons/dist/zabbix-icons.svg ui/assets/fonts/
+	cp sass/icons/dist/zabbix-icons.ttf ui/assets/fonts/
+	cp sass/icons/dist/zabbix-icons.woff ui/assets/fonts/
+	cp sass/icons/dist/zabbix-icons.woff2 ui/assets/fonts/
+
+icons_cleanup:
+	cd sass/icons && \
+	npm run cleanup
+
+css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_images
+
+icons: icons_build css icons_cleanup
 
 ## cmocka test support
 if ZBXCMOCKA

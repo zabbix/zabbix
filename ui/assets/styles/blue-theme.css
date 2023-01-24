@@ -40,7 +40,7 @@ svg *:focus {
 
 @font-face {
   font-family: "zabbix-icons";
-  src: url("../fonts/zabbix-icons.woff2?t=1674569919821") format("woff2"), url("../fonts/zabbix-icons.woff?t=1674569919821") format("woff"), url("../fonts/zabbix-icons.ttf?t=1674569919821") format("truetype"), url("../fonts/zabbix-icons.svg?t=1674569919821#zabbix-icons") format("svg"); }
+  src: url("../fonts/zabbix-icons.woff2?t=1674572603616") format("woff2"), url("../fonts/zabbix-icons.woff?t=1674572603616") format("woff"), url("../fonts/zabbix-icons.ttf?t=1674572603616") format("truetype"), url("../fonts/zabbix-icons.svg?t=1674572603616#zabbix-icons") format("svg"); }
 [class^="zi-"]::before, [class*=" zi-"]::before {
   font-family: 'zabbix-icons' !important;
   font-size: 16px;
