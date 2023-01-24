@@ -362,6 +362,8 @@ static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, const z
  * Return value: SUCCEED - the text is a composite constant                   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
+ * Comments: This function uses old escaping rules where '\' was not escaped. *
+ *                                                                            *
  ******************************************************************************/
 void	dbpatch_strcpy_alloc_quoted(char **str, size_t *str_alloc, size_t *str_offset, const char *source)
 {
