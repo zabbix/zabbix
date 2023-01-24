@@ -419,13 +419,8 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleCloseClicked = function(e) {
-	const data = {
-		ids: this.getEventIds(),
-		_csrf_token: this.csrf_token
-	}
-
 	this
-		.fetch('notifications.read', data)
+		.fetch('notifications.read', {ids: this.getEventIds()})
 		.then((resp) => {
 			if ('error' in resp) {
 				throw {error: resp.error};
@@ -475,13 +470,8 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleMuteClicked = function(e) {
-	const data = {
-		muted: this.alarm.muted ? 0 : 1,
-		_csrf_token: this.csrf_token
-	}
-
 	this
-		.fetch('notifications.mute', data)
+		.fetch('notifications.mute', {muted: this.alarm.muted ? 0 : 1})
 		.then((resp) => {
 			if ('error' in resp) {
 				throw {error: resp.error};
@@ -575,6 +565,8 @@ ZBX_Notifications.prototype.renderAudio = function() {
  * @return {Promise}
  */
 ZBX_Notifications.prototype.fetch = function(resource, params) {
+	params._csrf_token = this.csrf_token;
+
 	return new Promise(function(resolve, reject) {
 		let data = params || {};
 		data.action = resource;
