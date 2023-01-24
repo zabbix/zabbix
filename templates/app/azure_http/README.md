@@ -150,9 +150,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -273,8 +270,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -367,9 +362,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -460,9 +452,6 @@ No specific Zabbix configuration is required.
 ### Template links
 
 There are no template links in this template.
-
-### Discovery rules
-
 
 ### Items collected
 
@@ -560,9 +549,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -653,9 +639,6 @@ No specific Zabbix configuration is required.
 ### Template links
 
 There are no template links in this template.
-
-### Discovery rules
-
 
 ### Items collected
 
