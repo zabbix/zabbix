@@ -5855,7 +5855,6 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 	{
 		zbx_eval_token_t	*token = &ctx.stack.values[i];
 		char			*value = NULL, err[128];
-		size_t			value_alloc = 0, value_offset = 0;
 
 		switch(token->type)
 		{

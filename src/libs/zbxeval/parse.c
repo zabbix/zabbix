@@ -444,7 +444,7 @@ static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 
 		if ('\\' == *ptr)
 		{
-			if (!is_history_function && '"' != ptr[1] && '\\' != ptr[1])
+			if (0 == is_history_function && '"' != ptr[1] && '\\' != ptr[1])
 			{
 				*error = zbx_dsprintf(*error,
 						"invalid escape sequence in string starting with \"%s\"", ptr);
