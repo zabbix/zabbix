@@ -35,8 +35,7 @@ static int	connector_object_compare_func(const void *d1, const void *d2)
 }
 
 static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message,
-		zbx_vector_connector_data_point_t *connector_data_points, zbx_uint64_t *processed_num,
-		zbx_uint64_t *connections_num)
+		zbx_vector_connector_data_point_t *connector_data_points, zbx_uint64_t *processed_num)
 {
 	zbx_connector_t	connector;
 	int		i;
@@ -56,7 +55,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 	}
 
 	*processed_num += connector_data_points->values_num;
-	*connections_num += 1;
+
 	zbx_vector_connector_data_point_clear_ext(connector_data_points, zbx_connector_data_point_free);
 #ifdef HAVE_LIBCURL
 	if (SUCCEED != zbx_http_request(HTTP_REQUEST_POST, connector.url, "", "",
@@ -206,8 +205,8 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 		switch (message.code)
 		{
 			case ZBX_IPC_CONNECTOR_REQUEST:
-				worker_process_request(&socket, &message, &connector_data_points, &processed_num,
-						&connections_num);
+				worker_process_request(&socket, &message, &connector_data_points, &processed_num);
+				connections_num++;
 				break;
 		}
 
