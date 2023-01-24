@@ -235,6 +235,8 @@ void	*DCget_stats(int request)
 	static double		value_double;
 	void			*ret;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, DCget_stats");
+
 	LOCK_CACHE;
 
 	switch (request)
@@ -1998,6 +2000,9 @@ static void	dc_history_set_error(ZBX_DC_HISTORY *hdata, char *errmsg)
 static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type, zbx_variant_t *value)
 {
 	char	*errmsg = NULL;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_history_set_value");
+
 
 	if (FAIL == zbx_variant_to_value_type(value, value_type, CONFIG_DOUBLE_PRECISION, &errmsg))
 	{
@@ -3964,6 +3969,8 @@ static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_val
 {
 	dc_item_value_t	*item_value;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_add_history_bin");
+
 	item_value = dc_local_get_history_slot();
 
 	item_value->itemid = itemid;
@@ -3975,12 +3982,15 @@ static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_val
 
 	if (0 != (item_value->flags & ZBX_DC_FLAG_META))
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_add_history_bin 1");
 		item_value->lastlogsize = lastlogsize;
 		item_value->mtime = mtime;
 	}
 
 	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 	{
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_add_history_bin 2");
 		item_value->value.value_str.len = bin->len;
 		dc_string_buffer_realloc(item_value->value.value_str.len);
 
@@ -3989,7 +3999,10 @@ static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_val
 		string_values_offset += item_value->value.value_str.len;
 	}
 	else
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_add_history_bin 3");
 		item_value->value.value_str.len = 0;
+	}
 }
 
 static void	dc_local_add_history_log(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
@@ -4131,6 +4144,8 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error)
 {
 	unsigned char	value_flags;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_add_history");
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
