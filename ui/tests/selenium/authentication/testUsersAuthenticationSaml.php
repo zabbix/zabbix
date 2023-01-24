@@ -302,7 +302,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 
 		// Check that SAML settings are disabled by default and configure SAML authentication.
-		$this->configureSamlAuthentication($data['fields'], true, $data);
+		$this->configureSamlAuthentication($data['fields'], $data);
 
 		// Check SAML settings update messages and, in case of successful update, check that field values were saved.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
