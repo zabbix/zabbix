@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-23T09:43:17Z'
+  date: '2023-01-24T06:39:09Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -103,7 +103,7 @@ zabbix_export:
                     }
                     login.addHeader('Content-Type: application/x-www-form-urlencoded');
                     login.addHeader('x-api-version: 1.0-rev2');
-                    resp = login.post(Veeam.params.api_endpoint+ '/oauth2/token', 
+                    resp = login.post(Veeam.params.api_endpoint+ 'api/oauth2/token', 
                     'grant_type=password&username=' + encodeURIComponent(Veeam.params.user) + '&password='+ encodeURIComponent(Veeam.params.password));
             
                     if (login.getStatus() !== 200 || resp === null) {
@@ -150,16 +150,16 @@ zabbix_export:
                     ms = 86400000;
                     start_date = new Date((new Date().getTime()) - ms * Veeam.params.created_after).toISOString().replace(/\.\d+/, '');
                     endpoints = {
-                        'proxies': 'v1/backupInfrastructure/proxies',
-                        'repositories': 'v1/backupInfrastructure/repositories',
-                        'managedServers': 'v1/backupInfrastructure/managedServers',
-                        'repositories_states': 'v1/backupInfrastructure/repositories/states',
-                        'services': 'v1/services',
-                        'jobs_states': 'v1/jobs/states',
-                        'backups': 'v1/backups',
-                        'backupObjects': 'v1/backupObjects',
-                        'objectRestorePoints': 'v1/objectRestorePoints',
-                        'sessions': 'v1/sessions?createdAfterFilter=' + encodeURIComponent(start_date)
+                        'proxies': 'api/v1/backupInfrastructure/proxies',
+                        'repositories': 'api/v1/backupInfrastructure/repositories',
+                        'managedServers': 'api/v1/backupInfrastructure/managedServers',
+                        'repositories_states': 'api/v1/backupInfrastructure/repositories/states',
+                        'services': 'api/v1/services',
+                        'jobs_states': 'api/v1/jobs/states',
+                        'backups': 'api/v1/backups',
+                        'backupObjects': 'api/v1/backupObjects',
+                        'objectRestorePoints': 'api/v1/objectRestorePoints',
+                        'sessions': 'api/v1/sessions?createdAfterFilter=' + encodeURIComponent(start_date)
                     };
             
                     Object.keys(endpoints).forEach(function (key) {
@@ -978,7 +978,7 @@ zabbix_export:
           description: 'This macro is used in discovery rule to evaluate sessions.'
         -
           macro: '{$VEEAM.API.URL}'
-          value: 'https://localhost:9419/api'
+          value: 'https://localhost:9419'
           description: 'The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.'
         -
           macro: '{$VEEAM.DATA.TIMEOUT}'
