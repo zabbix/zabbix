@@ -29,19 +29,21 @@ class testFormAuthentication extends CWebTest {
 
 	protected function openFormAndCheckBasics($auth_type) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$saml_form = $this->query('id:authentication-form')->asForm()->one();
-		$saml_form->selectTab($auth_type.' settings');
+		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form->selectTab($auth_type.' settings');
 		$this->page->assertHeader('Authentication');
 		$this->page->assertTitle('Configuration of authentication');
 
-		$enable_saml = $saml_form->getField('Enable '.$auth_type.' authentication');
+		$enable_saml = $form->getField('Enable '.$auth_type.' authentication');
 		$this->assertTrue($enable_saml->isEnabled());
 		$this->assertTrue($enable_saml->isVisible());
-		$saml_form->checkValue(['Enable '.$auth_type.' authentication' => false]);
+		$form->checkValue(['Enable '.$auth_type.' authentication' => false]);
 
 		// Check that Update button is clickable and no other buttons present.
-		$this->assertTrue($saml_form->query('button:Update')->one()->isClickable());
-		$this->assertEquals(1, $saml_form->query('xpath:.//ul[@class="table-forms"]//button')->all()->count());
+		$this->assertTrue($form->query('button:Update')->one()->isClickable());
+		$this->assertEquals(1, $form->query('xpath:.//ul[@class="table-forms"]//button')->all()->count());
+
+		return $form;
 	}
 
 	protected function checkFormHintsAndMapping($form, $hintboxes, $mapping_tables, $auth_type) {
@@ -52,20 +54,14 @@ class testFormAuthentication extends CWebTest {
 		$this->checkTablesHeaders($mapping_tables, $form);
 
 		// Check group mapping popup.
-		$group_mapping_dialog = $this->checkMappingDialog('User group mapping', 'New user group mapping', $form,
+		$this->checkMappingDialog('User group mapping', 'New user group mapping', $form,
 				[$auth_type.' group pattern', 'User groups', 'User role'], $auth_type
 		);
 
-		// Close Group mapping dialog.
-		$group_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
-
 		// Check media type mapping popup.
-		$media_mapping_dialog = $this->checkMappingDialog('Media type mapping', 'New media type mapping',
+		$this->checkMappingDialog('Media type mapping', 'New media type mapping',
 				$form, ['Name', 'Media type', 'Attribute'], $auth_type
 		);
-
-		// Close Media mapping dialog.
-		$media_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
 	}
 
 	/**
@@ -107,7 +103,7 @@ class testFormAuthentication extends CWebTest {
 
 		$values = ($field === 'Media type mapping')
 			? ['Name' => '', 'Media type' => 'Brevis.one', 'Attribute' => '']
-			: ['SAML group pattern' => '', 'User groups' => '', 'User role' => ''];
+			: [$auth_type.' group pattern' => '', 'User groups' => '', 'User role' => ''];
 
 		$mapping_form->checkValue($values);
 
@@ -119,8 +115,8 @@ class testFormAuthentication extends CWebTest {
 
 		// Check hint in group mapping popup.
 		if ($field === 'User group mapping') {
-			$this->checkHints([$auth_type.' group pattern' => "Naming requirements:\ngroup name must match '.$auth_type.".
-					"' group name\nwildcard patterns with '*' may be used"], $mapping_dialog->asForm()
+			$this->checkHints([$auth_type.' group pattern' => "Naming requirements:\ngroup name must match ".$auth_type.
+					" group name\nwildcard patterns with '*' may be used"], $mapping_dialog->asForm()
 			);
 		}
 
@@ -151,15 +147,16 @@ class testFormAuthentication extends CWebTest {
 	/**
 	 * Check hints for labels in form.
 	 *
-	 * @param string           $label	label which hint is checked
-	 * @param string           $text    hint's text
-	 * @param CFormElement     $form    given form
+	 * @param array            $hintboxes	given hintboxes to check
+	 * @param CFormElement     $form        given form
 	 */
-	protected function checkHints($label, $text, $form) {
-		$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']/a')->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->all()->last();
-		$this->assertEquals($text, $hint->getText());
-		$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
+	protected function checkHints($hintboxes, $form) {
+		foreach ($hintboxes as $label => $text) {
+			$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']/a')->one()->click();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->all()->last();
+			$this->assertEquals($text, $hint->getText());
+			$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
+		}
 	}
 }
 

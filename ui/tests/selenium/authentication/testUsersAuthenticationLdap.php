@@ -44,10 +44,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	}
 
 	public function testUsersAuthenticationLdap_Layout() {
-		$this->openFormAndCheckBasics('LDAP');
+		$ldap_form = $this->openFormAndCheckBasics('LDAP');
 
 		// Check LDAP form default values.
-		$form->checkValue([
+		$ldap_form->checkValue([
 			'Enable LDAP authentication' => false,
 			'Enable JIT provisioning' => false,
 			'Case-sensitive login' => true,
@@ -56,14 +56,14 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 		// Check LDAP form fields editability.
 		foreach ([false, true] as $status) {
-			$form->fill(['Enable LDAP authentication' => $status]);
+			$ldap_form->fill(['Enable LDAP authentication' => $status]);
 
 			foreach (['Enable JIT provisioning', 'Servers', 'Case-sensitive login'] as $label) {
-				$this->assertTrue($form->getField($label)->isEnabled($status));
+				$this->assertTrue($ldap_form->getField($label)->isEnabled($status));
 			}
 		}
 
-		$this->assertEquals(['Servers'], $form->getRequiredLabels());
+		$this->assertEquals(['Servers'], $ldap_form->getRequiredLabels());
 
 		// Check server table's headers.
 		$server_table = [
@@ -73,22 +73,22 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			]
 		];
 
-		$this->checkTablesHeaders($server_table, $form);
+		$this->checkTablesHeaders($server_table, $ldap_form);
 
 		foreach ($server_table as $name => $attributes) {
-			$this->assertEquals($attributes['headers'], $form->getFieldContainer($name)
+			$this->assertEquals($attributes['headers'], $ldap_form->getFieldContainer($name)
 					->query('id', $attributes['id'])->asTable()->waitUntilVisible()->one()->getHeadersText()
 			);
 		}
 
 		// Check 'Provisioning period' field's editability.
 		foreach ([false, true] as $jit_status) {
-			$form->fill(['Enable JIT provisioning' => $jit_status]);
-			$this->assertTrue($form->getField('Provisioning period')->isEnabled($jit_status));
+			$ldap_form->fill(['Enable JIT provisioning' => $jit_status]);
+			$this->assertTrue($ldap_form->getField('Provisioning period')->isEnabled($jit_status));
 		}
 
 		// Check default server popup fields.
-		$form->getFieldContainer('Servers')->query('button:Add')->waitUntilClickable()->one()->click();
+		$ldap_form->getFieldContainer('Servers')->query('button:Add')->waitUntilClickable()->one()->click();
 		$server_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('New LDAP server', $server_dialog->getTitle());
 		$server_form = $server_dialog->asForm();

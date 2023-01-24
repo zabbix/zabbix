@@ -44,7 +44,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 	}
 
 	public function testUsersAuthenticationSaml_Layout() {
-		$this->openFormAndCheckBasics('SAML');
+		$saml_form = $this->openFormAndCheckBasics('SAML');
 
 		// Check SAML form default values.
 		$saml_fields = [
