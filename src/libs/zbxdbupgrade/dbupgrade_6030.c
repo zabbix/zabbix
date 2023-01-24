@@ -3618,7 +3618,11 @@ static int	DBpatch_6030166(void)
 	zbx_vector_uint64_create(&itemids);
 	zbx_vector_str_create(&uuids);
 
-	result = DBselect("select i.itemid,i.key_,h.host from items i left join hosts h on h.hostid=i.hostid"
+	result = DBselect(
+			"select i.itemid,i.key_,h.host,hi.httptestitemid,hs.httpstepitemid"
+			" from items i left join hosts h on h.hostid=i.hostid"
+			" left join httptestitem hi on hi.itemid=i.itemid"
+			" left join httpstepitem hs on hs.itemid=i.itemid"
 			" where h.status=%d and i.templateid is not null", HOST_STATUS_TEMPLATE);
 
 	while (NULL != (row = DBfetch(result)))
@@ -3629,12 +3633,17 @@ static int	DBpatch_6030166(void)
 		ZBX_DBROW2UINT64(itemid, row[0]);
 		zbx_vector_uint64_append(&itemids, itemid);
 
-		name = zbx_strdup(NULL, row[2]);
-		name = zbx_update_template_name(name);
-		seed = zbx_dsprintf(seed, "%s/%s", name, row[1]);
-		zbx_vector_str_append(&uuids, zbx_gen_uuid4(seed));
-		zbx_free(name);
-		zbx_free(seed);
+		if (SUCCEED == DBis_null(row[3]) && SUCCEED == DBis_null(row[4]))
+		{
+			name = zbx_strdup(NULL, row[2]);
+			name = zbx_update_template_name(name);
+			seed = zbx_dsprintf(seed, "%s/%s", name, row[1]);
+			zbx_vector_str_append(&uuids, zbx_gen_uuid4(seed));
+			zbx_free(name);
+			zbx_free(seed);
+		}
+		else
+			zbx_vector_str_append(&uuids, zbx_strdup(NULL, ""));
 	}
 
 	zbx_db_free_result(result);
