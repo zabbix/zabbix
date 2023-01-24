@@ -280,6 +280,12 @@ class CDashboardPage extends CBaseComponent {
 			}
 		}
 
+		for (const widget of this._widgets.keys()) {
+			if (widget.isUnsaved()) {
+				return true;
+			}
+		}
+
 		return false;
 	}
 
@@ -399,8 +405,6 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	replaceWidget(widget, widget_data) {
-		this._is_unsaved = true;
-
 		this.deleteWidget(widget, {is_batch_mode: true});
 
 		return this.addWidget(widget_data);
