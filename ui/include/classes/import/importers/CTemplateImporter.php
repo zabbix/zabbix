@@ -34,142 +34,138 @@ class CTemplateImporter extends CImporter {
 	 * @param array $templates
 	 */
 	public function import(array $templates) {
-		$templates = zbx_toHash($templates, 'host');
+		$template_fields = array_flip(['uuid', 'groups', 'macros', 'host', 'status', 'name', 'description', 'tags']);
 
-		do {
-			$independent_templates = $this->getIndependentTemplates($templates);
-			$templates_api_params = array_flip(['uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name',
-				'description', 'tags'
+		$upd_templates = [];
+		$ins_templates = [];
+
+		$valuemaps = [];
+		$create_valuemaps = [];
+
+		foreach ($templates as $i => $template) {
+			unset($templates[$i]);
+			$template = $this->resolveTemplateReferences($template);
+
+			if (array_key_exists('templateid', $template)
+					&& ($this->options['templates']['updateExisting'] || $this->options['process_templates'])) {
+				$upd_templates[] = array_intersect_key($template, array_flip(['templateid']) + $template_fields);
+			}
+			elseif ($this->options['templates']['createMissing']) {
+				if (array_key_exists('templateid', $template)) {
+					throw new Exception(_s('Template "%1$s" already exists.', $template['host']));
+				}
+
+				$ins_templates[] = array_intersect_key($template, $template_fields);
+			}
+
+			if (array_key_exists('valuemaps', $template)) {
+				if (array_key_exists('templateid', $template)) {
+					$valuemaps[$template['templateid']] = $template['valuemaps'];
+				}
+				else {
+					$create_valuemaps[$template['host']] = $template['valuemaps'];
+				}
+			}
+		}
+
+		$db_valuemaps = [];
+
+		if ($upd_templates && array_filter($this->options['valueMaps'])) {
+			$result = API::ValueMap()->get([
+				'output' => ['valuemapid', 'hostid', 'uuid', 'name'],
+				'hostids' => array_keys($valuemaps)
 			]);
 
-			$templates_to_create = [];
-			$templates_to_update = [];
-			$valuemaps = [];
-
-			foreach ($independent_templates as $name) {
-				$template = $templates[$name];
-				unset($templates[$name]);
-
-				$template = $this->resolveTemplateReferences($template);
-
-				if (array_key_exists('templateid', $template)
-						&& ($this->options['templates']['updateExisting'] || $this->options['process_templates'])) {
-					$templates_to_update[] = array_intersect_key($template,
-						$templates_api_params + array_flip(['templateid'])
-					);
-				}
-				elseif ($this->options['templates']['createMissing']) {
-					if (array_key_exists('templateid', $template)) {
-						throw new Exception(_s('Template "%1$s" already exists.', $template['host']));
-					}
-
-					$templates_to_create[] = array_intersect_key($template, $templates_api_params);
-				}
-
-				if (array_key_exists('valuemaps', $template)) {
-					$valuemaps[$template['host']] = $template['valuemaps'];
-				}
+			foreach ($result as $row) {
+				$db_valuemaps[$row['hostid']][] = array_diff_key($row, array_flip(['hostid']));
 			}
+		}
 
-			if ($templates_to_update) {
-				if ($this->options['templates']['updateExisting']) {
-					API::Template()->update(array_map(function($template) {
-						unset($template['uuid']);
-						return $template;
-					}, $templates_to_update));
+		$del_valuemaps = [];
+		$upd_valuemaps = [];
+		$ins_valuemaps = [];
+
+		foreach ($upd_templates as &$template) {
+			$templateid = $template['templateid'];
+
+			$this->referencer->setDbTemplate($templateid, $template);
+			unset($template['uuid']);
+			$this->processed_templateids[$templateid] = $templateid;
+
+			$tpl_db_valuemaps = array_key_exists($templateid, $db_valuemaps) ? $db_valuemaps[$templateid] : [];
+
+			if (array_key_exists($templateid, $valuemaps)) {
+				if ($this->options['valueMaps']['createMissing']) {
+					$valuemap_uuids = array_flip(array_column($tpl_db_valuemaps, 'uuid'));
+					$valuemap_names = array_flip(array_column($tpl_db_valuemaps, 'name'));
+
+					foreach ($valuemaps[$templateid] as $i => $valuemap) {
+						if (!array_key_exists($valuemap['uuid'], $valuemap_uuids)
+								&& !array_key_exists($valuemap['name'], $valuemap_names)) {
+							$ins_valuemaps[] = ['hostid' => $templateid] + $valuemap;
+
+							unset($valuemaps[$templateid][$i]);
+						}
+					}
 				}
 
-				foreach ($templates_to_update as $template) {
-					$this->referencer->setDbTemplate($template['templateid'], $template);
-					$this->processed_templateids[$template['templateid']] = $template['templateid'];
+				if ($this->options['valueMaps']['updateExisting']) {
+					foreach ($tpl_db_valuemaps as $i => $db_valuemap) {
+						foreach ($valuemaps[$templateid] as $valuemap) {
+							if ($db_valuemap['uuid'] === $valuemap['uuid']
+									|| $db_valuemap['name'] === $valuemap['name']) {
+								unset($valuemap['uuid']);
+								$upd_valuemaps[] = ['valuemapid' => $db_valuemap['valuemapid']] + $valuemap;
 
-					$db_valuemaps = API::ValueMap()->get([
-						'output' => ['valuemapid', 'uuid'],
-						'hostids' => [$template['templateid']]
-					]);
-
-					if ($this->options['valueMaps']['createMissing']
-							&& array_key_exists($template['host'], $valuemaps)) {
-						$valuemaps_to_create = [];
-						$valuemap_uuids = array_column($db_valuemaps, 'uuid');
-
-						foreach ($valuemaps[$template['host']] as $valuemap) {
-							if (!in_array($valuemap['uuid'], $valuemap_uuids)) {
-								$valuemaps_to_create[] = $valuemap  + ['hostid' => $template['templateid']];
+								unset($tpl_db_valuemaps[$i]);
+								break;
 							}
-						}
-
-						if ($valuemaps_to_create) {
-							API::ValueMap()->create($valuemaps_to_create);
-						}
-					}
-
-					if ($this->options['valueMaps']['updateExisting']
-							&& array_key_exists($template['host'], $valuemaps)) {
-						$valuemaps_to_update = [];
-
-						foreach ($db_valuemaps as $db_valuemap) {
-							foreach ($valuemaps[$template['host']] as $valuemap) {
-								if ($db_valuemap['uuid'] === $valuemap['uuid']) {
-									unset($valuemap['uuid']);
-									$valuemaps_to_update[] = $valuemap + ['valuemapid' => $db_valuemap['valuemapid']];
-								}
-							}
-						}
-
-						if ($valuemaps_to_update) {
-							API::ValueMap()->update($valuemaps_to_update);
-						}
-					}
-
-					if ($this->options['valueMaps']['deleteMissing'] && $db_valuemaps) {
-						$valuemapids_to_delete = [];
-
-						if (array_key_exists($template['host'], $valuemaps)) {
-							$valuemap_uuids = array_column($valuemaps[$template['host']], 'uuid');
-
-							foreach ($db_valuemaps as $db_valuemap) {
-								if (!in_array($db_valuemap['uuid'], $valuemap_uuids)) {
-									$valuemapids_to_delete[] = $db_valuemap['valuemapid'];
-								}
-							}
-						}
-						else {
-							$valuemapids_to_delete = array_column($db_valuemaps, 'valuemapid');
-						}
-
-						if ($valuemapids_to_delete) {
-							API::ValueMap()->delete($valuemapids_to_delete);
 						}
 					}
 				}
 			}
 
-			if ($this->options['templates']['createMissing'] && $templates_to_create) {
-				$created_templates = API::Template()->create($templates_to_create);
+			if ($this->options['valueMaps']['deleteMissing'] && $tpl_db_valuemaps) {
+				foreach ($tpl_db_valuemaps as $valuemap) {
+					$del_valuemaps[] = $valuemap['valuemapid'];
+				}
+			}
+		}
+		unset($template);
 
-				foreach ($templates_to_create as $index => $template) {
-					$templateid = $created_templates['templateids'][$index];
+		if ($this->options['templates']['updateExisting'] && $upd_templates) {
+			API::Template()->update($upd_templates);
+		}
 
-					$this->referencer->setDbTemplate($templateid, $template);
-					$this->processed_templateids[$templateid] = $templateid;
+		if ($this->options['templates']['createMissing'] && $ins_templates) {
+			$created_templates = API::Template()->create($ins_templates);
 
-					if ($this->options['valueMaps']['createMissing']
-						&& array_key_exists($template['host'], $valuemaps)) {
-						$valuemaps_to_create = [];
+			foreach ($ins_templates as $i => $template) {
+				$templateid = $created_templates['templateids'][$i];
 
-						foreach ($valuemaps[$template['host']] as $valuemap) {
-							$valuemap['hostid'] = $templateid;
-							$valuemaps_to_create[] = $valuemap;
-						}
+				$this->referencer->setDbTemplate($templateid, $template);
+				$this->processed_templateids[$templateid] = $templateid;
 
-						if ($valuemaps_to_create) {
-							API::ValueMap()->create($valuemaps_to_create);
-						}
+				if ($this->options['valueMaps']['createMissing']
+						&& array_key_exists($template['host'], $create_valuemaps)) {
+					foreach ($create_valuemaps[$template['host']] as $valuemap) {
+						$ins_valuemaps[] = ['hostid' => $templateid] + $valuemap;
 					}
 				}
 			}
-		} while ($independent_templates);
+		}
+
+		if ($del_valuemaps) {
+			API::ValueMap()->delete($del_valuemaps);
+		}
+
+		if ($upd_valuemaps) {
+			API::ValueMap()->update($upd_valuemaps);
+		}
+
+		if ($ins_valuemaps) {
+			API::ValueMap()->create($ins_valuemaps);
+		}
 	}
 
 	/**
@@ -179,31 +175,6 @@ class CTemplateImporter extends CImporter {
 	 */
 	public function getProcessedTemplateids(): array {
 		return $this->processed_templateids;
-	}
-
-	/**
-	 * Get templates that don't have not existing linked templates i.e. all templates that must be linked to these
-	 * templates exist. Returns array with template names (host).
-	 *
-	 * @param array $templates
-	 *
-	 * @return array
-	 */
-	protected function getIndependentTemplates(array $templates): array {
-		foreach ($templates as $index => $template) {
-			if (!array_key_exists('templates', $template)) {
-				continue;
-			}
-
-			foreach ($template['templates'] as $linked_template) {
-				if ($this->referencer->findTemplateidByHost($linked_template['name']) === null) {
-					unset($templates[$index]);
-					continue 2;
-				}
-			}
-		}
-
-		return array_column($templates, 'host');
 	}
 
 	/**
@@ -217,6 +188,10 @@ class CTemplateImporter extends CImporter {
 	 */
 	protected function resolveTemplateReferences(array $template): array {
 		$templateid = $this->referencer->findTemplateidByUuid($template['uuid']);
+
+		if ($templateid === null) {
+			$templateid = $this->referencer->findTemplateidByHost($template['host']);
+		}
 
 		if ($templateid !== null) {
 			$template['templateid'] = $templateid;
