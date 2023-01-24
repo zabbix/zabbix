@@ -6702,6 +6702,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	zbx_vector_uint64_t	active_avail_diff;
 	zbx_hashset_t		activated_hosts;
 	zbx_uint64_t		new_revision = config->revision.config + 1;
+	int			connectors_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -7192,10 +7193,10 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	if (0 != htmpl_sync.add_num + htmpl_sync.update_num + htmpl_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_MACROS;
 
-	if (0 != connector_sync.add_num + connector_sync.update_num + connector_tag_sync.add_num +
-			connector_tag_sync.update_num + connector_tag_sync.remove_num)
+	if (0 != connector_sync.add_num + connector_sync.update_num + connector_sync.remove_num +
+			connector_tag_sync.add_num + connector_tag_sync.update_num + connector_tag_sync.remove_num)
 	{
-		update_flags |= ZBX_DBSYNC_UPDATE_CONNECTORS;
+		connectors_num = config->connectors.num_data;
 	}
 
 	/* update trigger topology if trigger dependency was changed */
@@ -7583,7 +7584,7 @@ out:
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reschedule : " ZBX_FS_DBL " sec.", __func__, queues_sec);
 	}
 
-	if (0 != (update_flags & ZBX_DBSYNC_UPDATE_CONNECTORS) && FAIL == zbx_connector_initialized())
+	if (0 != connectors_num && FAIL == zbx_connector_initialized())
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "connectors cannot be used without connector workers:"
 				" please check \"StartConnectors\" configuration parameter");
