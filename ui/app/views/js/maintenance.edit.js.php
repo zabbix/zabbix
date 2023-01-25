@@ -50,10 +50,11 @@ window.maintenance_edit = new class {
 		});
 
 		if (!allowed_edit) {
-			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"]').forEach((element) => {
-				element.disabled = true;
-				element.setAttribute('readonly', 'readonly')
-			});
+			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"], .js-edit, .js-remove')
+				.forEach((element) => {
+					element.disabled = true;
+					element.setAttribute('readonly', 'readonly')
+				});
 		}
 
 		if (document.querySelector('input[name=maintenance_type]:checked').value  == <?= MAINTENANCE_TYPE_NODATA ?>) {

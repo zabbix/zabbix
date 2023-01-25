@@ -43,6 +43,7 @@ $periods->addItem(
 				(new CSimpleButton(_('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('js-add')
+					->setEnabled($data['allowed_edit'])
 			))->setColSpan(4)
 		)
 );
