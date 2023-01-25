@@ -775,21 +775,19 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Creates user macros for hosts, templates and host prototypes.
+	 * Creates user macros for hosts.
 	 *
 	 * @param array  $hosts
-	 * @param array  $hosts[]['templateid|hostid']
+	 * @param array  $hosts[]['hostid']
 	 * @param array  $hosts[]['macros']             (optional)
 	 */
 	private function createHostMacros(array $hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
 		$ins_hostmacros = [];
 
 		foreach ($hosts as $host) {
 			if (array_key_exists('macros', $host)) {
 				foreach ($host['macros'] as $macro) {
-					$ins_hostmacros[] = ['hostid' => $host[$id_field_name]] + $macro;
+					$ins_hostmacros[] = ['hostid' => $host['hostid']] + $macro;
 				}
 			}
 		}
@@ -900,17 +898,15 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Updates user macros for hosts, templates and host prototypes.
+	 * Updates user macros for hosts.
 	 *
 	 * @param array  $hosts
-	 * @param array  $hosts[]['templateid|hostid']
+	 * @param array  $hosts[]['hostid']
 	 * @param array  $hosts[]['macros']             (optional)
 	 * @param array  $db_hosts
 	 * @param array  $db_hosts[<hostid>]['macros']  An array of host macros indexed by hostmacroid.
 	 */
 	private function updateHostMacros(array $hosts, array $db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
 		$ins_hostmacros = [];
 		$upd_hostmacros = [];
 		$del_hostmacroids = [];
@@ -920,7 +916,7 @@ class CHost extends CHostGeneral {
 				continue;
 			}
 
-			$db_host = $db_hosts[$host[$id_field_name]];
+			$db_host = $db_hosts[$host['hostid']];
 
 			foreach ($host['macros'] as $hostmacro) {
 				if (array_key_exists('hostmacroid', $hostmacro)) {
@@ -937,7 +933,7 @@ class CHost extends CHostGeneral {
 					}
 				}
 				else {
-					$ins_hostmacros[] = $hostmacro + ['hostid' => $host[$id_field_name]];
+					$ins_hostmacros[] = $hostmacro + ['hostid' => $host['hostid']];
 				}
 			}
 
@@ -1268,7 +1264,11 @@ class CHost extends CHostGeneral {
 	 *
 	 * @return array
 	 */
-	public static function massAdd(array $data): array {
+	public function massAdd(array $data): array {
+		if (!array_key_exists('hosts', $data) || !$data['hosts']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Incorrect arguments passed to function.'));
+		}
+
 		$hosts = zbx_toArray($data['hosts']);
 		$hostids = array_column($hosts, 'hostid');
 
@@ -1515,7 +1515,7 @@ class CHost extends CHostGeneral {
 			$templateIdsClear = array_column($updateTemplatesClear, 'templateid');
 
 			if ($updateTemplatesClear) {
-				self::massRemove(['hostids' => $hostids, 'templateids_clear' => $templateIdsClear]);
+				$this->massRemove(['hostids' => $hostids, 'templateids_clear' => $templateIdsClear]);
 			}
 		}
 		else {
@@ -1537,7 +1537,7 @@ class CHost extends CHostGeneral {
 			$templatesToDel = array_diff($templatesToDel, $templateIdsClear);
 
 			if ($templatesToDel) {
-				$result = self::massRemove([
+				$result = $this->massRemove([
 					'hostids' => $hostids,
 					'templateids' => $templatesToDel
 				]);
@@ -1561,7 +1561,7 @@ class CHost extends CHostGeneral {
 
 		// link new templates
 		if (isset($updateTemplates)) {
-			$result = self::massAdd([
+			$result = $this->massAdd([
 				'hosts' => $hosts,
 				'templates' => $updateTemplates
 			]);
@@ -1575,7 +1575,7 @@ class CHost extends CHostGeneral {
 		if (isset($updateMacros)) {
 			DB::delete('hostmacro', ['hostid' => $hostids]);
 
-			self::massAdd([
+			$this->massAdd([
 				'hosts' => $hosts,
 				'macros' => $updateMacros
 			]);
@@ -1684,7 +1684,7 @@ class CHost extends CHostGeneral {
 
 			$groupsToAdd = array_diff($newGroupIds, $hostGroupIds);
 			if ($groupsToAdd) {
-				self::massAdd([
+				$this->massAdd([
 					'hosts' => $hosts,
 					'groups' => zbx_toObject($groupsToAdd, 'groupid')
 				]);
@@ -1692,7 +1692,7 @@ class CHost extends CHostGeneral {
 
 			$groupIdsToDelete = array_diff($hostGroupIds, $newGroupIds);
 			if ($groupIdsToDelete) {
-				self::massRemove([
+				$this->massRemove([
 					'hostids' => $hostids,
 					'groupids' => $groupIdsToDelete
 				]);
@@ -1727,13 +1727,9 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException
 	 */
-	public static function massRemove(array $data): array {
+	public function massRemove(array $data): array {
 		if (!array_key_exists('hostids', $data) || $data['hostids'] === null) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-		}
-
-		if (array_key_exists('macros', $data) && !$data['macros']) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		self::checkPermissions($data['hostids'], _('No permissions to referred object or it does not exist!'));
@@ -3809,14 +3805,6 @@ class CHost extends CHostGeneral {
 			CHttpTest::unlinkTemplateObjects($templateids, $targetids);
 		}
 
-		$options = ['templateid' => $templateids];
-
-		if ($targetids !== null) {
-			$options['hostid'] = $targetids;
-		}
-
-		DB::delete('hosts_templates', $options);
-
 		if ($targetids !== null) {
 			$hosts = API::Host()->get([
 				'hostids' => $targetids,
@@ -3832,6 +3820,14 @@ class CHost extends CHostGeneral {
 			]);
 		}
 
+		$options = ['templateid' => $templateids];
+
+		if ($targetids !== null) {
+			$options['hostid'] = $targetids;
+		}
+
+		DB::delete('hosts_templates', $options);
+
 		if ($hosts) {
 			$templates = API::Template()->get([
 				'output' => ['host'],
@@ -3839,10 +3835,9 @@ class CHost extends CHostGeneral {
 				'nopermissions' => true
 			]);
 
-			$hosts = implode(', ', array_column($hosts, 'host'));
-			$templates = implode(', ', array_column($templates, 'host'));
-
-			info(_s('Templates "%1$s" unlinked from hosts "%2$s".', $templates, $hosts));
+			info(_s('Templates "%1$s" unlinked from hosts "%2$s".',	implode(', ', array_column($templates, 'host')),
+				implode(', ', array_column($hosts, 'host'))
+			));
 		}
 	}
 

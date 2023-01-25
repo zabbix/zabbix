@@ -119,7 +119,7 @@ class CHostImporter extends CImporter {
 
 				// Drop existing template linkages if 'delete missing' selected.
 				if (array_key_exists($host['hostid'], $templates_to_clear) && $templates_to_clear[$host['hostid']]) {
-					CHost::massRemove([
+					API::Host()->massRemove([
 						'hostids' => [$host['hostid']],
 						'templateids_clear' => $templates_to_clear[$host['hostid']]
 					]);
@@ -128,7 +128,7 @@ class CHostImporter extends CImporter {
 				// Make new template linkages.
 				if ($this->options['templateLinkage']['createMissing']
 						&& array_key_exists($host['host'], $template_linkage)) {
-					CHost::massAdd([
+					API::Host()->massAdd([
 						'hosts' => $host,
 						'templates' => $template_linkage[$host['host']]
 					]);
@@ -206,7 +206,7 @@ class CHostImporter extends CImporter {
 
 				if ($this->options['templateLinkage']['createMissing']
 						&& array_key_exists($host['host'], $template_linkage)) {
-					CHost::massAdd([
+					API::Host()->massAdd([
 						'hosts' => ['hostid' => $hostid],
 						'templates' => $template_linkage[$host['host']]
 					]);
