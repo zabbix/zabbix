@@ -252,7 +252,7 @@ static int	compare_tokens_by_loc(const void *d1, const void *d2)
 	return 0;
 }
 
-static const zbx_eval_token_t	*eval_get_next_function_token(const zbx_eval_context_t *ctx, const int token_index)
+static const zbx_eval_token_t	*eval_get_next_function_token(const zbx_eval_context_t *ctx, int token_index)
 {
 	if (0 != (ctx->stack.values[token_index].type & ZBX_EVAL_CLASS_FUNCTION))
 		return NULL;
@@ -262,7 +262,7 @@ static const zbx_eval_token_t	*eval_get_next_function_token(const zbx_eval_conte
 		const zbx_eval_token_t	*token = &ctx->stack.values[i];
 		if (0 != (token->type & ZBX_EVAL_CLASS_FUNCTION))
 		{
-			if (token->opt < i - token_index)
+			if (token->opt < (zbx_uint32_t)(i - token_index))
 				return NULL;
 
 			return &ctx->stack.values[i];
@@ -356,7 +356,7 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 		zbx_strcpy_alloc(str, str_alloc, str_offset, value_str);
 	else
 	{
-		func_token = eval_get_next_function_token(ctx, token - ctx->stack.values);
+		func_token = eval_get_next_function_token(ctx, (int)(token - ctx->stack.values));
 		zbx_strquote_alloc_opt(str, str_alloc, str_offset, value_str,
 				NULL != func_token && ZBX_EVAL_TOKEN_HIST_FUNCTION == func_token->type ?
 				ZBX_STRQUOTE_SKIP_BACKSLASH : ZBX_STRQUOTE_DEFAULT);
