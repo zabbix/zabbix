@@ -42,7 +42,7 @@ static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const c
 
 	if (0 > ssh_options_set(session, type, value))
 	{
-		*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option %s: %s.", key_str, ssh_get_error(session));
+		*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option \"%s\": %s.", key_str, ssh_get_error(session));
 
 		ret = FAIL;
 	}
@@ -125,7 +125,7 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 			continue;
 		}
 #endif
-		*err_msg = zbx_dsprintf(NULL, "SSH option %s is not supported.", line);
+		*err_msg = zbx_dsprintf(NULL, "SSH option \"%s\" is not supported.", line);
 		ret = FAIL;
 		break;
 	}
@@ -378,14 +378,14 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 			goto channel_close;
 		}
 
-		if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
+		if (MAX_EXECUTE_OUTPUT_LEN <= offset + (size_t)rc)
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE));
 			goto channel_close;
 		}
 
-		zbx_str_memcpy_alloc(&buffer, &buf_size, &offset, tmp_buf, rc);
+		zbx_str_memcpy_alloc(&buffer, &buf_size, &offset, tmp_buf, (size_t)rc);
 	}
 
 	output = zbx_convert_to_utf8(buffer, offset, encoding);

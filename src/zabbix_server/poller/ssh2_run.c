@@ -46,10 +46,10 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 		const char	**algs;
 		int		rc;
 
-		if (0 > libssh2_session_last_error(session, &err, NULL, 0))
-			*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option %s: %s.", key_str, err);
+		if (LIBSSH2_ERROR_NONE != libssh2_session_last_error(session, &err, NULL, 0))
+			*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option \"%s\": %s.", key_str, err);
 		else
-			*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option %s.", key_str);
+			*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option \"%s\".", key_str);
 
 		if (0 < (rc = libssh2_session_supported_algs(session, type, &algs)))
 		{
@@ -68,7 +68,7 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 		}
 		else
 		{
-			if (0 > libssh2_session_last_error(session, &err, NULL, 0))
+			if (LIBSSH2_ERROR_NONE != libssh2_session_last_error(session, &err, NULL, 0))
 				*err_msg = zbx_strdcatf(*err_msg, " Cannot get supported values: %s.", err);
 			else
 				*err_msg = zbx_strdcat(*err_msg, " Cannot get supported values.");
@@ -155,7 +155,7 @@ static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char
 			continue;
 		}
 #endif
-		*err_msg = zbx_dsprintf(NULL, "SSH option %s is not supported.", line);
+		*err_msg = zbx_dsprintf(NULL, "SSH option \"%s\" is not supported.", line);
 		ret = FAIL;
 		break;
 	}
@@ -406,14 +406,14 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 			goto channel_close;
 		}
 
-		if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
+		if (MAX_EXECUTE_OUTPUT_LEN <= offset + (size_t)rc)
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE));
 			goto channel_close;
 		}
 
-		zbx_str_memcpy_alloc(&buffer, &buf_size, &offset, tmp_buf, rc);
+		zbx_str_memcpy_alloc(&buffer, &buf_size, &offset, tmp_buf, (size_t)rc);
 	}
 
 	output = zbx_convert_to_utf8(buffer, offset, encoding);
