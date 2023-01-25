@@ -262,6 +262,9 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.7rc1
 
 New features:
+.......... [ZBX-20110] added single field search option to oracle archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys for Zabbix agent 2 (esneiders)
+.........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
+.........T [ZBXNEXT-7775] added veeam backup and replication templates (egordymov)
 .......PS. [ZBXNEXT-8054] updated MariaDB maximum supported version to 10.10 (MVekslers)
 A.F....... [ZBXNEXT-7951] improved import configuration by changing UI, matching logic and unlinking logic (acikuns, rdetlavs)
 .........T [ZBXNEXT-8112] added Line media type (abiba)
