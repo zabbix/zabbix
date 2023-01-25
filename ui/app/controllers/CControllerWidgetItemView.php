@@ -110,7 +110,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
 			}
 
-			if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $fields['units_show'] == 1) {
+			if ($fields['units_show'] == 1 && $fields['units'] === '') {
 				$options['output'][] = 'units';
 			}
 		}
@@ -151,8 +151,13 @@ class CControllerWidgetItemView extends CControllerWidget {
 				switch ($value_type) {
 					case ITEM_VALUE_TYPE_FLOAT:
 					case ITEM_VALUE_TYPE_UINT64:
-						if ($fields['units_show'] == 1 && $fields['units'] !== '') {
-							$item['units'] = $fields['units'];
+						if ($fields['units_show'] == 1) {
+							if ($fields['units'] !== '') {
+								$item['units'] = $fields['units'];
+							}
+						}
+						else {
+							$item['units'] = '';
 						}
 
 						$formatted_value = formatHistoryValueRaw($last_value, $item, false, $fields['decimal_places']);
