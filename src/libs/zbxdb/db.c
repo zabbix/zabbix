@@ -1597,8 +1597,8 @@ lbl_exec:
 
 		switch (err)
 		{
-			case SQLITE_ERROR:	/* SQL error or missing database; assuming SQL error, because if we
-						   are this far into execution, zbx_db_connect_basic() was successful */
+			case SQLITE_ERROR:	/* SQL error or missing database; assuming SQL error, because if we are
+						this far into execution, zbx_db_connect_basic() was successful */
 			case SQLITE_NOMEM:	/* A malloc() failed */
 			case SQLITE_TOOBIG:	/* String or BLOB exceeds size limit */
 			case SQLITE_CONSTRAINT:	/* Abort due to constraint violation */
@@ -1904,8 +1904,8 @@ lbl_get_table:
 
 		switch (ret)
 		{
-			case SQLITE_ERROR:	/* SQL error or missing database; assuming SQL error, because if we
-						   are this far into execution, zbx_db_connect_basic() was successful */
+			case SQLITE_ERROR:	/* SQL error or missing database; assuming SQL error, because if we are
+						this far into execution, zbx_db_connect_basic() was successful */
 			case SQLITE_NOMEM:	/* a malloc() failed */
 			case SQLITE_MISMATCH:	/* data type mismatch */
 				result = NULL;
