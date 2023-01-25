@@ -44,6 +44,11 @@ class CControllerNotificationsGet extends CController {
 	 */
 	private $time_from = 0;
 
+	/**
+	 * @var array
+	 */
+	private $known_eventids = [];
+
 	protected function init() {
 		parent::init();
 
