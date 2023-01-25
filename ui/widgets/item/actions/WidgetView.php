@@ -118,7 +118,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
 			}
 
-			if (array_key_exists(Widget::SHOW_VALUE, $show) && $this->fields_values['units_show'] == 1) {
+			if ($this->fields_values['units_show'] == 1 && $this->fields_values['units'] === '') {
 				$options['output'][] = 'units';
 			}
 		}
@@ -159,8 +159,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 				switch ($value_type) {
 					case ITEM_VALUE_TYPE_FLOAT:
 					case ITEM_VALUE_TYPE_UINT64:
-						if ($this->fields_values['units_show'] == 1 && $this->fields_values['units'] !== '') {
-							$item['units'] = $this->fields_values['units'];
+						if ($this->fields_values['units_show'] == 1) {
+							if ($this->fields_values['units'] !== '') {
+								$item['units'] = $this->fields_values['units'];
+							}
+						}
+						else {
+							$item['units'] = '';
 						}
 
 						$formatted_value = formatHistoryValueRaw($last_value, $item, false,
