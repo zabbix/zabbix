@@ -93,7 +93,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 		$options['groupCount'] = ($options['groupCount'] && $options['countOutput']);
 
 		// permissions
-		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
+		if (in_array(self::$userData['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN])) {
 			if ($options['templateids'] !== null) {
 				$options['templateids'] = array_keys(API::Template()->get([
 					'output' => [],
