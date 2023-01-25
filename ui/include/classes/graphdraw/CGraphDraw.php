@@ -27,6 +27,7 @@ abstract class CGraphDraw {
 	protected $m_minY;
 	protected $m_maxY;
 	protected $data;
+	protected $items;
 	private $header;
 	protected $from_time;
 	protected $to_time;

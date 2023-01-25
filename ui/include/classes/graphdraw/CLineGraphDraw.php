@@ -24,6 +24,30 @@ class CLineGraphDraw extends CGraphDraw {
 	const GRAPH_HEIGHT_MIN = 20;
 	const LEGEND_OFFSET_Y = 90;
 
+	private $cell_height_min;
+	private $cell_width;
+	private $drawExLegend;
+	private $drawItemsLegend;
+	private $intervals;
+	private $is_binary;
+	private $itemsHost;
+	private $outer;
+	private $oxy;
+	private $percentile;
+	private $power;
+	private $show_triggers;
+	private $show_work_period;
+	private $triggers;
+	private $unit2px;
+	private $yaxis;
+	private $yaxismin;
+	private $yaxismax;
+	private $ymin_itemid;
+	private $ymax_itemid;
+	private $ymin_type;
+	private $ymax_type;
+	private $zero;
+
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		parent::__construct($type);
 
