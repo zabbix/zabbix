@@ -95,34 +95,34 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 
 /* event support */
 void		zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
-void		zbx_db_free_event(ZBX_DB_EVENT *event);
+void		zbx_db_free_event(zbx_db_event *event);
 void		zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
-void		zbx_db_prepare_empty_event(zbx_uint64_t eventid, ZBX_DB_EVENT **event);
-void		zbx_db_get_event_data_core(ZBX_DB_EVENT *event);
-void		zbx_db_get_event_data_tags(ZBX_DB_EVENT *event);
-void		zbx_db_get_event_data_triggers(ZBX_DB_EVENT *event);
+void		zbx_db_prepare_empty_event(zbx_uint64_t eventid, zbx_db_event **event);
+void		zbx_db_get_event_data_core(zbx_db_event *event);
+void		zbx_db_get_event_data_tags(zbx_db_event *event);
+void		zbx_db_get_event_data_triggers(zbx_db_event *event);
 void		zbx_db_select_symptom_eventids(zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *symptom_eventids);
 zbx_uint64_t	zbx_db_get_cause_eventid(zbx_uint64_t eventid);
 zbx_uint64_t	zbx_get_objectid_by_eventid(zbx_uint64_t eventid);
 
-void	zbx_db_trigger_get_all_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
-void	zbx_db_trigger_get_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
-int	zbx_db_trigger_get_constant(const ZBX_DB_TRIGGER *trigger, int index, char **out);
-int	zbx_db_trigger_get_all_hostids(const ZBX_DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids);
-int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
-void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
+void	zbx_db_trigger_get_all_functionids(const zbx_db_trigger *trigger, zbx_vector_uint64_t *functionids);
+void	zbx_db_trigger_get_functionids(const zbx_db_trigger *trigger, zbx_vector_uint64_t *functionids);
+int	zbx_db_trigger_get_constant(const zbx_db_trigger *trigger, int index, char **out);
+int	zbx_db_trigger_get_all_hostids(const zbx_db_trigger *trigger, const zbx_vector_uint64_t **hostids);
+int	zbx_db_trigger_get_itemid(const zbx_db_trigger *trigger, int index, zbx_uint64_t *itemid);
+void	zbx_db_trigger_get_itemids(const zbx_db_trigger *trigger, zbx_vector_uint64_t *itemids);
 
-void	zbx_db_trigger_get_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
-void	zbx_db_trigger_get_recovery_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
-void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
+void	zbx_db_trigger_get_expression(const zbx_db_trigger *trigger, char **expression);
+void	zbx_db_trigger_get_recovery_expression(const zbx_db_trigger *trigger, char **expression);
+void	zbx_db_trigger_clean(zbx_db_trigger *trigger);
 
 typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_EVALUATE_ITEM *, const char *, const char *,
 		const zbx_timespec_t *, char **);
 
-void	zbx_db_trigger_explain_expression(const ZBX_DB_TRIGGER *trigger, char **expression,
+void	zbx_db_trigger_explain_expression(const zbx_db_trigger *trigger, char **expression,
 		zbx_trigger_func_t eval_func_cb, int recovery);
-void	zbx_db_trigger_get_function_value(const ZBX_DB_TRIGGER *trigger, int index, char **value,
+void	zbx_db_trigger_get_function_value(const zbx_db_trigger *trigger, int index, char **value,
 		zbx_trigger_func_t eval_func_cb, int recovery);
 
 #endif /* ZABBIX_DBWRAP_H */

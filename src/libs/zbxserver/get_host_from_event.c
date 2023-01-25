@@ -30,7 +30,7 @@
 #	define ZBX_IPMI_FIELDS_NUM	0
 #endif
 
-int	get_host_from_event(const ZBX_DB_EVENT *event, DC_HOST *host, char *error, size_t max_error_len)
+int	get_host_from_event(const zbx_db_event *event, DC_HOST *host, char *error, size_t max_error_len)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -100,9 +100,9 @@ int	get_host_from_event(const ZBX_DB_EVENT *event, DC_HOST *host, char *error, s
 
 	host->hostid = 0;
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (0 != host->hostid)
 		{

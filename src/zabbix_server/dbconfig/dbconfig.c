@@ -59,7 +59,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	sec = zbx_time();
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));

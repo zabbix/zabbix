@@ -784,10 +784,10 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
 
-		config_table = DBget_table("config");
+		config_table = zbx_db_get_table("config");
 
 		for (i = 0; i < ARRSIZE(selected_fields); i++)
-			row[i] = DBget_field(config_table, selected_fields[i])->default_value;
+			row[i] = zbx_db_get_field(config_table, selected_fields[i])->default_value;
 	}
 	else
 	{
@@ -2242,7 +2242,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
 			}
 
-			if (FAIL == DBis_null(row[12]))
+			if (FAIL == zbx_db_is_null(row[12]))
 			{
 				snmp = dc_interface_snmp_set(interfaceid, (const char **)row, &bulk_changed);
 
@@ -2764,7 +2764,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 		/* dependent items */
 
-		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[29]))
+		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != zbx_db_is_null(row[29]))
 		{
 			depitem = (ZBX_DC_DEPENDENTITEM *)DCfind_id(&config->dependentitems, itemid,
 					sizeof(ZBX_DC_DEPENDENTITEM), &found);
@@ -6426,9 +6426,9 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect("select objectid,type,clock,ns from trigger_queue");
+	result = zbx_db_select("select objectid,type,clock,ns from trigger_queue");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_trigger_timer_t	timer_local, *timer;
 
