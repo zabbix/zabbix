@@ -176,7 +176,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 						}
 
 						if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null) {
-							if (array_key_exists('mappings', $item['valuemap'])) {
+							if ($formatted_value['is_mapped']) {
 								if ($last_value != $prev_value) {
 									$change_indicator = self::CHANGE_INDICATOR_UP_DOWN;
 								}
