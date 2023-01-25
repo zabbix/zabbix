@@ -233,6 +233,8 @@
 		},
 
 		cancelEditing() {
+			this.disableNavigationWarning();
+
 			const curl = new Curl('zabbix.php', false);
 
 			curl.setArgument('action', 'dashboard.view');
