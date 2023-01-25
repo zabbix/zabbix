@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ static int	DBpatch_6030000(void)
 					"ui.configuration.service_actions", value_int);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
 
@@ -511,7 +511,7 @@ static int	DBpatch_6030062(void)
 
 		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1169,7 +1169,7 @@ static int	migrate_ldap_data(void)
 
 		if (ZBX_DB_OK > rc)
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return FAIL;
 		}
 
@@ -1177,13 +1177,13 @@ static int	migrate_ldap_data(void)
 		if (ZBX_DB_OK > DBexecute("update userdirectory set idp_type=%d where userdirectoryid=%s",
 				IDP_TYPE_LDAP, row[0]))
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return FAIL;
 		}
 #undef IDP_TYPE_LDAP
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1210,7 +1210,7 @@ static int	migrate_saml_data(void)
 
 	if (NULL == row)
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		return FAIL;
 	}
 
@@ -1218,7 +1218,7 @@ static int	migrate_saml_data(void)
 			'\0' == *row[5] && 0 == atoi(row[6]) && 0 == atoi(row[7]) && 0 == atoi(row[8]) &&
 			0 == atoi(row[9]) && 0 == atoi(row[10]) && 0 == atoi(row[11]) && 0 == atoi(row[12]))
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		return SUCCEED;
 	}
 
@@ -1230,7 +1230,7 @@ static int	migrate_saml_data(void)
 #undef IDP_TYPE_SAML
 	if (ZBX_DB_OK > rc)
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		return FAIL;
 	}
 
@@ -1255,7 +1255,7 @@ static int	migrate_saml_data(void)
 	zbx_free(sso_url);
 	zbx_free(idp_entityid);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_DB_OK > rc2)
 	return FAIL;
@@ -1478,6 +1478,29 @@ static int	DBpatch_6030159(void)
 {
 	int		i;
 	const char	*values[] = {
+			"web.actionconf.php.sort", "web.action.list.sort",
+			"web.actionconf.php.sortorder", "web.action.list.sortorder",
+			"web.actionconf.filter_name", "web.action.list.filter_name",
+			"web.actionconf.filter_status", "web.action.list.filter_status",
+			"web.actionconf.filter.active", "web.action.list.filter.active"
+		};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030160(void)
+{
+	int		i;
+	const char	*values[] = {
 			"web.maintenance.php.sortorder", "web.maintenance.sortorder",
 			"web.maintenance.php.sort", "web.maintenance.sort"
 		};
@@ -1659,5 +1682,6 @@ DBPATCH_ADD(6030156, 0, 1)
 DBPATCH_ADD(6030157, 0, 1)
 DBPATCH_ADD(6030158, 0, 1)
 DBPATCH_ADD(6030159, 0, 1)
+DBPATCH_ADD(6030160, 0, 1)
 
 DBPATCH_END()

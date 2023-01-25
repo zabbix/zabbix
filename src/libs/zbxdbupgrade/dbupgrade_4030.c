@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -320,7 +320,7 @@ static int	DBpatch_4030020(void)
 
 	zbx_free(token);
 	zbx_free(value);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 #undef FIELD_LEN
 	return ret;
@@ -425,7 +425,7 @@ static int	DBpatch_4030027(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(exec_params);
 
 	return ret;

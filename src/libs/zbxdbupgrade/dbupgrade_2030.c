@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -276,7 +276,7 @@ static int	DBpatch_2030024(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -502,7 +502,7 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 
 	if (NULL != (row = DBfetch(result)))
 		local_nodeid = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == local_nodeid)
 		return SUCCEED;
@@ -546,7 +546,7 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 
 		zbx_free(name_esc);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(name);
 
@@ -571,7 +571,7 @@ static int	check_data_uniqueness(const char *table_name, const char *field_name)
 				" Remove it manually and restart the process.", row[0], field_name, table_name);
 		ret = FAIL;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -684,7 +684,7 @@ static int	DBpatch_2030065(void)
 
 	if (NULL != (row = DBfetch(result)))
 		local_nodeid = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == local_nodeid)
 		return SUCCEED;
@@ -962,7 +962,7 @@ static int	DBpatch_2030094(void)
 			zbx_free(expr_esc);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(expr);
 
@@ -1196,7 +1196,7 @@ static int	DBpatch_2030095(void)
 			zbx_free(params_esc);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(params);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ extern int		CONFIG_DOUBLE_PRECISION;
 
 #define ZBX_HC_ITEMS_INIT_SIZE	1000
 
-#define ZBX_TRENDS_CLEANUP_TIME	((SEC_PER_HOUR * 55) / 60)
+#define ZBX_TRENDS_CLEANUP_TIME	(SEC_PER_MIN * 55)
 
 /* the maximum time spent synchronizing history */
 #define ZBX_HC_SYNC_TIME_MAX	10
@@ -470,7 +470,7 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
 			ZBX_STR2UINT64(itemid, row[0]);
 			uint64_array_remove(itemids, itemids_num, &itemid, 1);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	/* update trends disable_until for the leftover itemids */
@@ -631,7 +631,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -840,11 +840,14 @@ static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, in
 static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num, ZBX_DC_TREND **trends,
 		int *trends_num, int compression_age)
 {
-	static int	last_trend_discard = 0;
-	zbx_timespec_t	ts;
-	int		trends_alloc = 0, i, hour, seconds;
+	static int		last_trend_discard = 0;
+	zbx_timespec_t		ts;
+	int			trends_alloc = 0, i, hour, seconds;
+	zbx_vector_uint64_t	del_itemids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&del_itemids);
 
 	zbx_timespec(&ts);
 	seconds = ts.sec % SEC_PER_HOUR;
@@ -883,17 +886,49 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 							" compressed history period");
 					last_trend_discard = ts.sec;
 				}
-			}
-			else if (SUCCEED == zbx_history_requires_trends(trend->value_type))
-				DCflush_trend(trend, trends, &trends_alloc, trends_num);
 
-			zbx_hashset_iter_remove(&iter);
+				zbx_hashset_iter_remove(&iter);
+			}
+			else
+			{
+				if (SUCCEED == zbx_history_requires_trends(trend->value_type) && 0 != trend->num)
+					DCflush_trend(trend, trends, &trends_alloc, trends_num);
+
+				zbx_vector_uint64_append(&del_itemids, trend->itemid);
+			}
 		}
 
 		cache->trends_last_cleanup_hour = hour;
 	}
 
 	UNLOCK_TRENDS;
+
+	if (0 != del_itemids.values_num)
+	{
+		zbx_dc_config_history_sync_unset_existing_itemids(&del_itemids);
+
+		if (0 != del_itemids.values_num)
+		{
+			LOCK_TRENDS;
+
+			for (i = 0; i < del_itemids.values_num; i++)
+			{
+				ZBX_DC_TREND	*trend;
+
+				if (NULL == (trend = (ZBX_DC_TREND *)zbx_hashset_search(&cache->trends,
+						&del_itemids.values[i])))
+				{
+					continue;
+				}
+
+				zbx_hashset_remove_direct(&cache->trends, trend);
+			}
+
+			UNLOCK_TRENDS;
+		}
+	}
+
+	zbx_vector_uint64_destroy(&del_itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1004,7 +1039,7 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 
 		zbx_vector_ptr_append(&host_info->groups, zbx_strdup(NULL, row[1]));
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 typedef struct
@@ -1050,7 +1085,7 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 
 		item_info->name = zbx_strdup(item_info->name, row[1]);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -1078,7 +1113,7 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 		item_tag.value = zbx_strdup(NULL, row[2]);
 		zbx_vector_item_tag_append(&item_info->item_tags, item_tag);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -1510,8 +1545,11 @@ static void	DCsync_trends(void)
 
 	while (NULL != (trend = (ZBX_DC_TREND *)zbx_hashset_iter_next(&iter)))
 	{
-		if (SUCCEED == zbx_history_requires_trends(trend->value_type) && trend->clock >= compression_age)
+		if (SUCCEED == zbx_history_requires_trends(trend->value_type) && trend->clock >= compression_age &&
+				0 != trend->num)
+		{
 			DCflush_trend(trend, &trends, &trends_alloc, &trends_num);
+		}
 	}
 
 	UNLOCK_TRENDS;
@@ -2342,7 +2380,7 @@ static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char 
 
 		zbx_vector_ptr_append(duplicates, d);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(query->sql);
 }
@@ -4953,7 +4991,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 	UNLOCK_CACHE_IDS;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
 			__func__, table_name, nextid, lastid);

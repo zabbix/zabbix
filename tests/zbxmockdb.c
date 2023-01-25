@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@
 
 #define zbx_db_vselect	__wrap_zbx_db_vselect
 #define zbx_db_fetch	__wrap_zbx_db_fetch
-#define DBfree_result	__wrap_DBfree_result
+#define zbx_db_free_result	__wrap_zbx_db_free_result
 #include "zbxdb.h"
 #undef zbx_db_vselect
 #undef zbx_db_fetch
-#undef DBfree_result
+#undef zbx_db_free_result
 
 #define __zbx_DBexecute			__wrap___zbx_DBexecute
 #define DBexecute_multiple_query	__wrap_DBexecute_multiple_query
@@ -256,7 +256,7 @@ DB_ROW	__wrap_zbx_db_fetch(DB_RESULT result)
 }
 
 
-void	__wrap_DBfree_result(DB_RESULT result)
+void	__wrap_zbx_db_free_result(DB_RESULT result)
 {
 	if (NULL != result)
 	{

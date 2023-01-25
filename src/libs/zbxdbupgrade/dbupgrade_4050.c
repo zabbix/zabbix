@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ static int	DBpatch_4050014(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 	zbx_free(name);
 
@@ -194,7 +194,7 @@ static int	DBpatch_4050015(void)
 		invalidate = 1;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != invalidate &&
 			ZBX_DB_OK > DBexecute("update timeperiods set every=1 where timeperiodid!=0 and every=0"))
@@ -278,7 +278,7 @@ static int	DBpatch_4050020(void)
 			break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -466,7 +466,7 @@ static int	DBpatch_4050021(void)
 		}
 	}
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -930,7 +930,7 @@ static void	DBpatch_load_data(zbx_vector_dbu_snmp_if_t *snmp_ifs, zbx_vector_dbu
 
 		zbx_vector_dbu_interface_append(new_ifs, interface);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 #undef ITEM_TYPE_SNMPv1
 #undef ITEM_TYPE_SNMPv2c
@@ -970,7 +970,7 @@ static void	DBpatch_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs)
 
 		zbx_vector_dbu_snmp_if_append(snmp_def_ifs, snmp);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static int	DBpatch_snmp_if_save(zbx_vector_dbu_snmp_if_t *snmp_ifs)
@@ -1359,7 +1359,7 @@ static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *new_ifs, zbx_vector
 		zbx_vector_dbu_interface_append(new_ifs, interface);
 		zbx_vector_dbu_snmp_if_append(snmp_new_ifs, snmp);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static int	DBpatch_interface_discovery_save(zbx_vector_uint64_pair_t *if_links)
@@ -1565,7 +1565,7 @@ static int	DBpatch_4050063(void)
 			}
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }

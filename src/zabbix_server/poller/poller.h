@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ typedef struct
 	zbx_config_comms_args_t	*config_comms;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	unsigned char		poller_type;
+	int			config_startup_time;
 }
 zbx_thread_poller_args;
 
@@ -44,7 +45,7 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, DC_ITEM *item,  unsigned 
 		size_t *data_offset, const char *error);
 void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, unsigned char expand_macros);
 void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, zbx_vector_ptr_t *add_results,
-		unsigned char poller_type, const zbx_config_comms_args_t *zbx_config_comms);
+		unsigned char poller_type, const zbx_config_comms_args_t *config_comms, int config_startup_time);
 void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results);
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result);
 

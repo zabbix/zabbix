@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,13 +36,6 @@ $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 $fields = [
 	'hostid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
 	'interfaceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
-	'copy_type' =>					[T_ZBX_INT, O_OPT, P_SYS,
-										IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
-											COPY_TYPE_TO_TEMPLATE
-										]),
-										'isset({copy})'
-									],
-	'copy_mode' =>					[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
 	'itemid' =>						[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'name' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})',
 										_('Name')
@@ -62,7 +55,7 @@ $fields = [
 												' && isset({key}) && strncmp({key}, "mqtt.get", 8) === 0))',
 										_('Update interval')
 									],
-	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'delay_flex' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'history_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
 	'history' =>					[T_ZBX_STR, O_OPT, null,	null, '(isset({add}) || isset({update}))'.
 										' && isset({history_mode}) && {history_mode}=='.ITEM_STORAGE_CUSTOM,
@@ -115,7 +108,8 @@ $fields = [
 										getParamFieldLabelByType(getRequest('type', 0))
 									],
 	'inventory_link' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),
-										'(isset({add}) || isset({update})) && {value_type} != '.ITEM_VALUE_TYPE_LOG
+										'(isset({add}) || isset({update})) && isset({value_type})'.
+											' && {value_type} != '.ITEM_VALUE_TYPE_LOG
 									],
 	'snmp_oid' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
@@ -139,10 +133,9 @@ $fields = [
 										'(isset({add}) || isset({update})) && isset({value_type})'.
 											' && {value_type} == '.ITEM_VALUE_TYPE_LOG
 									],
-	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
-	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_targetids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'preprocessing' =>				[null,		O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'group_itemid' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,				DB_ID,	null],
+	'visible' =>					[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,				null,	null],
 	'del_history' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
@@ -157,10 +150,10 @@ $fields = [
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
 										_('URL')
 									],
-	'query_fields' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'parameters' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'posts' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'status_codes' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'query_fields' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'parameters' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'posts' =>						[T_ZBX_STR, O_OPT, null,			null,	null],
+	'status_codes' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
 	'follow_redirects' =>			[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
 										null
@@ -169,8 +162,8 @@ $fields = [
 										IN([ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 										null
 									],
-	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'headers' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
+	'headers' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'retrieve_mode' =>				[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
 											HTTPTEST_STEP_RETRIEVE_MODE_BOTH
@@ -223,7 +216,7 @@ $fields = [
 	'context' =>					[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-										IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
+										IN('"item.massclearhistory","item.massdelete",'.
 											'"item.massdisable","item.massenable"'
 										),
 										null
@@ -231,19 +224,18 @@ $fields = [
 	'add' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'clone' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'copy' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
-	'tags' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'form_refresh' =>				[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
+	'tags' =>						[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'show_inherited_tags' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
 	// filter
-	'filter_set' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_groupids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_hostids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_name' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_set' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
+	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
+	'filter_groupids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_hostids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_name' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
 	'filter_type' =>				[T_ZBX_INT, O_OPT, null,
 										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
@@ -272,23 +264,23 @@ $fields = [
 										null
 									],
 	'filter_evaltype' =>			[T_ZBX_INT, O_OPT, null,	IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), null],
-	'filter_tags' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_valuemapids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_tags' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'filter_valuemapids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	// subfilters
-	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_types' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_value_types' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_status' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_state' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_inherited' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_with_triggers' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_discovered' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_hosts' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_interval' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_history' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_trends' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_tags' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'checkbox_hash' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
+	'subfilter_types' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_value_types' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_status' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_state' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_inherited' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_with_triggers' =>	[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_discovered' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_hosts' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_interval' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_history' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_trends' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_tags' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'checkbox_hash' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
 	'backurl' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>						[T_ZBX_STR, O_OPT, P_SYS,
@@ -704,63 +696,8 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
-		&& hasRequest('group_itemid')) {
-	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-		if (in_array(getRequest('copy_type'), [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])) {
-			$options = getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE
-				? ['templateids' => getRequest('copy_targetids')]
-				: ['groupids' => getRequest('copy_targetids')];
-
-			$hostids = array_keys(API::Template()->get([
-				'output' => [],
-				'editable' => true,
-				'preservekeys' => true
-			] + $options));
-
-			$dst_is_template = true;
-		}
-
-		if (in_array(getRequest('copy_type'), [COPY_TYPE_TO_HOST, COPY_TYPE_TO_HOST_GROUP])) {
-			$options = getRequest('copy_type') == COPY_TYPE_TO_HOST
-				? ['hostids' => getRequest('copy_targetids')]
-				: ['groupids' => getRequest('copy_targetids')];
-
-			$hostids = array_keys(API::Host()->get([
-				'output' => [],
-				'editable' => true,
-				'preservekeys' => true
-			] + $options));
-
-			$dst_is_template = false;
-		}
-
-		$result = true;
-
-		if ($hostids) {
-			DBstart();
-			$result = copyItemsToHosts('itemids', getRequest('group_itemid'), $dst_is_template, $hostids);
-			DBend($result);
-		}
-
-		$items_count = count(getRequest('group_itemid'));
-
-		show_messages($result, _n('Item copied', 'Items copied', $items_count),
-			_n('Cannot copy item', 'Cannot copy items', $items_count)
-		);
-
-		if ($result) {
-			uncheckTableRows(getRequest('checkbox_hash'));
-			unset($_REQUEST['group_itemid']);
-		}
-	}
-	else {
-		show_error_message(_('No target selected.'));
-	}
-}
 // clean history for selected items
-elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
-		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
+elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory' && hasRequest('group_itemid')) {
 	$result = (bool) API::History()->clear(getRequest('group_itemid'));
 
 	if ($result) {
@@ -924,13 +861,6 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 	if (!$has_errors) {
 		echo (new CView('configuration.item.edit', $data))->getOutput();
 	}
-}
-elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('group_itemid')) {
-	$data = getCopyElementsFormData('group_itemid', _('Items'));
-	$data['action'] = 'item.masscopyto';
-
-	// render view
-	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 // list of items
 else {

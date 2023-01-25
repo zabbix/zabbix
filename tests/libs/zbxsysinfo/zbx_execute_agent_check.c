@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,6 +69,7 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != zbx_is_uint32(flags_string, &flags_uint32))
 		fail_msg("Cannot convert flags to unsigned 32 bit integer.");
 
+	zbx_init_library_sysinfo(get_config_timeout);
 	zbx_init_metrics();
 
 	zbx_execute_agent_check(in_command_string, flags_uint32, &result);

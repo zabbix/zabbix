@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2022 Zabbix SIA
+ ** Copyright (C) 2001-2023 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -523,7 +523,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 			zbx_vector_uint64_pair_append(itemhosts, pair);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_KEY_SOME))
 		zbx_free_agent_request(&pattern);

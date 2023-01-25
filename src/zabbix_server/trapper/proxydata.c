@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -338,7 +338,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 			else
 				ZBX_STR2UINT64(history_maxid, row[0]);
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 
 			reset_proxy_history_count(history_maxid - history_lastid);
 			proxy_set_hist_lastid(history_lastid);
@@ -387,10 +387,10 @@ out:
  *                                                                            *
  * Purpose: sends 'proxy data' request to server                              *
  *                                                                            *
- * Parameters: sock         - [IN] connection socket                          *
- *             ts           - [IN] connection timestamp                       *
- *             config_comms - [IN] proxy configuration for communication      *
- *                                 with server                                *
+ * Parameters: sock             - [IN] connection socket                      *
+ *             ts               - [IN] connection timestamp                   *
+ *             config_comms     - [IN] proxy configuration for communication  *
+ *                                     with server                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms)
