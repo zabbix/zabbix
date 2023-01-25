@@ -121,12 +121,6 @@ window.maintenance_edit = new class {
 		`);
 	}
 
-	_addPeriod(period) {
-		document
-			.querySelector('#periods tbody')
-			.insertAdjacentHTML('beforeend', this.periods_template.evaluate(period));
-	}
-
 	_initPeriodActionButtons() {
 		document
 			.getElementById('periods')
@@ -186,8 +180,16 @@ window.maintenance_edit = new class {
 		});
 	}
 
-	_updatePeriod(row, period) {
+	_addPeriod(period) {
+		document
+			.querySelector('#periods tbody')
+			.insertAdjacentHTML('beforeend', this.periods_template.evaluate(period));
+	}
 
+
+	_updatePeriod(row, period) {
+		row.insertAdjacentHTML('afterend', this.periods_template.evaluate(period));
+		row.remove();
 	}
 
 	submit() {
@@ -195,6 +197,9 @@ window.maintenance_edit = new class {
 
 		if (this.maintenanceid !== null) {
 			fields.maintenanceid = this.maintenanceid;
+		}
+		else {
+			fields.maintenanceid = 0;
 		}
 
 		fields.mname = fields.mname.trim();
@@ -214,7 +219,7 @@ window.maintenance_edit = new class {
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php', false);
-		curl.setArgument('action', this.maintenanceid === null ? 'maintenance.create' : 'maintenance.update');
+		curl.setArgument('action', fields.maintenanceid === 0 ? 'maintenance.create' : 'maintenance.update');
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
