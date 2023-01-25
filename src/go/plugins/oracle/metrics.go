@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,19 +127,22 @@ var (
 
 var metrics = metric.MetricSet{
 	keyASMDiskGroups: metric.New("Returns ASM disk groups statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
+			metric.NewParam("Diskgroup", "Diskgroup name.")}, false),
 
 	keyASMDiskGroupsDiscovery: metric.New("Returns list of ASM disk groups in LLD format.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
 
 	keyArchive: metric.New("Returns archive logs statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
+			metric.NewParam("Destination", "Destination name.")}, false),
 
 	keyArchiveDiscovery: metric.New("Returns list of archive logs in LLD format.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
 
 	keyCDB: metric.New("Returns CDBs info.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
+			metric.NewParam("Database", "Database name.")}, false),
 
 	keyCustomQuery: metric.New("Returns result of a custom query.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
@@ -160,7 +163,8 @@ var metrics = metric.MetricSet{
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
 
 	keyPDB: metric.New("Returns PDBs info.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService,
+			metric.NewParam("Database", "Database name.")}, false),
 
 	keyPDBDiscovery: metric.New("Returns list of PDBs in LLD format.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
@@ -196,8 +200,11 @@ var metrics = metric.MetricSet{
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
 
 	keyTablespaces: metric.New("Returns tablespaces statistics.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
-
+		[]*metric.Param{
+			paramURI, paramUsername, paramPassword, paramService,
+			metric.NewParam("Tablespace", "Table-space name."),
+			metric.NewParam("Type", "table-space type."),
+		}, false),
 	keyTablespacesDiscovery: metric.New("Returns list of tablespaces in LLD format.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),
 

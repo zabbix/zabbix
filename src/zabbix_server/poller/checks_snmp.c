@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,6 +103,17 @@ typedef struct
 }
 zbx_snmpidx_mapping_t;
 
+typedef struct
+{
+	oid	root_oid[MAX_OID_LEN];
+	size_t	root_oid_len;
+	char	*str_oid;
+}
+zbx_snmp_oid_t;
+
+ZBX_PTR_VECTOR_DECL(snmp_oid, zbx_snmp_oid_t *)
+ZBX_PTR_VECTOR_IMPL(snmp_oid, zbx_snmp_oid_t *)
+
 static zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
 static char		zbx_snmp_init_done;
 
@@ -175,6 +186,17 @@ static void	__snmpidx_mapping_clean(void *data)
 
 	zbx_free(mapping->value);
 	zbx_free(mapping->index);
+}
+
+static int	zbx_snmp_oid_compare(const zbx_snmp_oid_t **s1, const zbx_snmp_oid_t **s2)
+{
+	return strcmp((*s1)->str_oid, (*s2)->str_oid);
+}
+
+static void	vector_snmp_oid_free(zbx_snmp_oid_t *ptr)
+{
+	zbx_free(ptr->str_oid);
+	zbx_free(ptr);
 }
 
 static char	*get_item_community_context(const DC_ITEM *item)
@@ -437,16 +459,7 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_I
 		zbx_snprintf(error, max_error_len, "Cannot connect to \"%s:%hu\": %s.",
 				interface->addr, interface->port, snmp_api_errstring(ss->s_snmp_errno));
 
-		switch (ss->s_snmp_errno)
-		{
-			case SNMPERR_UNKNOWN_USER_NAME:
-			case SNMPERR_UNSUPPORTED_SEC_LEVEL:
-			case SNMPERR_AUTHENTICATION_FAILURE:
-				ret = NOTSUPPORTED;
-				break;
-			default:
-				ret = NETWORK_ERROR;
-		}
+		ret = NETWORK_ERROR;
 	}
 	else if (STAT_TIMEOUT == status)
 	{
@@ -1167,7 +1180,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		{
 			/* The logic of iteratively reducing request size here is the same as in function */
 			/* zbx_snmp_get_values(). Please refer to the description there for explanation.  */
-
+reduce_max_vars:
 			if (*min_fail > max_vars)
 				*min_fail = max_vars;
 
@@ -1186,6 +1199,9 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		}
 		else if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
+			if (1 >= level)
+				goto reduce_max_vars;
+
 			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
 			running = 0;
 			goto next;
@@ -1575,7 +1591,12 @@ halve:
 		}
 	}
 	else
+	{
+		if (1 <= level)
+			goto halve;
+
 		ret = zbx_get_snmp_response_error(ss, &items[0].interface, status, response, error, max_error_len);
+	}
 exit:
 	if (NULL != response)
 		snmp_free_pdu(response);
@@ -1880,6 +1901,288 @@ static void	zbx_snmp_walk_cache_cb(void *arg, const char *snmp_oid, const char *
 	cache_put_snmp_index((const DC_ITEM *)arg, snmp_oid, index, value);
 }
 
+typedef struct
+{
+	int	numeric_oids;
+	int	numeric_enum;
+	int	numeric_ts;
+	int	oid_format;
+}
+zbx_snmp_format_opts_t;
+
+static void	snmp_bulkwalk_get_options(zbx_snmp_format_opts_t *opts)
+{
+	opts->numeric_oids = netsnmp_ds_get_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS);
+	opts->numeric_enum = netsnmp_ds_get_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_ENUM);
+	opts->numeric_ts = netsnmp_ds_get_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_NUMERIC_TIMETICKS);
+	opts->oid_format = netsnmp_ds_get_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT);
+}
+
+static void	snmp_bulkwalk_set_options(zbx_snmp_format_opts_t *opts)
+{
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, opts->numeric_oids);
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_ENUM, opts->numeric_enum);
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_NUMERIC_TIMETICKS, opts->numeric_ts);
+	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, opts->oid_format);
+}
+
+static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
+{
+	size_t	len;
+	int	i;
+
+	zbx_vector_snmp_oid_sort(oids, (zbx_compare_func_t)zbx_snmp_oid_compare);
+	len = strlen(oids->values[0]->str_oid);
+
+	for (i = 1; i < oids->values_num; i++)
+	{
+		while (0 == memcmp(oids->values[i - 1]->str_oid, oids->values[i]->str_oid, len))
+		{
+			vector_snmp_oid_free(oids->values[i]);
+			zbx_vector_snmp_oid_remove(oids, i);
+
+			if (i == oids->values_num)
+				return;
+		}
+
+		len = strlen(oids->values[i]->str_oid);
+	}
+}
+
+static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oid_t *oids_out,
+		char *error, size_t max_error_len)
+{
+	int	i;
+
+	for (i = 0; i < request->nparam; i++)
+	{
+		char		oid_translated[ZBX_ITEM_SNMP_OID_LEN_MAX];
+		char		buffer[MAX_OID_LEN];
+		zbx_snmp_oid_t	*root_oid;
+
+		zbx_snmp_translate(oid_translated, request->params[i], sizeof(oid_translated));
+
+		root_oid = (zbx_snmp_oid_t *)zbx_malloc(NULL, sizeof(zbx_snmp_oid_t));
+		root_oid->root_oid_len = MAX_OID_LEN;
+
+		if (NULL == snmp_parse_oid(oid_translated, root_oid->root_oid, &root_oid->root_oid_len))
+		{
+			zbx_free(root_oid);
+			zbx_snprintf(error, max_error_len, "snmp_parse_oid(): cannot parse OID \"%s\".",
+					oid_translated);
+			return FAIL;
+		}
+
+		snprint_objid(buffer, sizeof(buffer), root_oid->root_oid, root_oid->root_oid_len);
+		root_oid->str_oid = zbx_strdup(NULL, buffer);
+		zbx_vector_snmp_oid_append(oids_out, root_oid);
+	}
+
+	if (1 < oids_out->values_num)
+	{
+		zbx_vector_snmp_oid_sort(oids_out, (zbx_compare_func_t)zbx_snmp_oid_compare);
+		snmp_bulkwalk_remove_matching_oids(oids_out);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() oids_num:%d", __func__, oids_out->values_num);
+
+	return SUCCEED;
+}
+
+static int	snmp_bulkwalk(struct snmp_session *ss, int pdu_type, const DC_ITEM *item, zbx_snmp_oid_t *p_oid,
+		char **results, size_t *results_alloc, size_t *results_offset, char *error, size_t max_error_len)
+{
+	struct snmp_pdu		*pdu, *response = NULL;
+	int			ret, running = 1, vars_num = 0, status;
+	oid			name[MAX_OID_LEN];
+	size_t			name_length = MAX_OID_LEN;
+	struct variable_list	*var;
+
+	memcpy(name, p_oid->root_oid, p_oid->root_oid_len * sizeof(oid));
+	name_length = p_oid->root_oid_len;
+
+	while (running)
+	{
+		/* create PDU */
+		if (NULL == (pdu = snmp_pdu_create(pdu_type)))
+		{
+			zbx_strlcpy(error, "snmp_pdu_create(): cannot create PDU object.", max_error_len);
+			ret = CONFIG_ERROR;
+			goto out;
+		}
+
+		if (SNMP_MSG_GETBULK == pdu_type)
+		{
+			pdu->non_repeaters = 0;
+			pdu->max_repetitions = item->snmp_max_repetitions;
+		}
+
+		if (NULL == snmp_add_null_var(pdu, name, name_length))
+		{
+			zbx_strlcpy(error, "snmp_add_null_var(): cannot add null variable.", max_error_len);
+			ret = CONFIG_ERROR;
+			snmp_free_pdu(pdu);
+			goto out;
+		}
+
+		status = snmp_synch_response(ss, pdu, &response);
+		if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
+		{
+			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
+			goto out;
+		}
+
+		if (SNMP_ERR_NOSUCHNAME == response->errstat)
+			break;
+
+		for (var = response->variables; NULL != var; var = var->next_variable)
+		{
+			if (var->name_length < p_oid->root_oid_len ||
+					0 != memcmp(p_oid->root_oid, var->name, p_oid->root_oid_len * sizeof(oid)))
+			{
+				running = 0;
+				break;
+			}
+
+			if (SNMP_ENDOFMIBVIEW != var->type && SNMP_NOSUCHOBJECT != var->type &&
+					SNMP_NOSUCHINSTANCE != var->type)
+			{
+				char	buffer[MAX_STRING_LEN];
+				vars_num++;
+
+				if (SNMP_MSG_GET != pdu_type)
+				{
+					if (0 <= snmp_oid_compare(name, name_length, var->name, var->name_length))
+					{
+						running = 0;
+						break;
+					}
+				}
+				else
+					running = 0;
+
+				snprint_variable(buffer, sizeof(buffer), var->name, var->name_length, var);
+
+				if (NULL != *results)
+					zbx_chrcpy_alloc(results, results_alloc, results_offset, '\n');
+
+				zbx_strcpy_alloc(results, results_alloc, results_offset, buffer);
+
+				if (NULL == var->next_variable)
+				{
+					memcpy(name, var->name, var->name_length * sizeof(oid));
+					name_length = var->name_length;
+				}
+			}
+			else
+			{
+				running = 0;
+				break;
+			}
+		}
+
+		if (NULL != response)
+		{
+			snmp_free_pdu(response);
+			response = NULL;
+		}
+	}
+
+	ret = vars_num;
+out:
+	if (NULL != response)
+		snmp_free_pdu(response);
+
+	return ret;
+}
+
+static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM *item, AGENT_RESULT *result,
+		int *errcode, char *error, size_t max_error_len)
+{
+	int			i, ret = SUCCEED, pdu_type;
+	AGENT_REQUEST		request;
+	char			*results = NULL;
+	size_t			results_alloc = 0, results_offset = 0;
+	zbx_snmp_format_opts_t	default_opts, bulk_opts;
+	zbx_vector_snmp_oid_t	param_oids;
+
+	zbx_init_agent_request(&request);
+
+	snmp_bulkwalk_get_options(&default_opts);
+
+	bulk_opts.numeric_oids = 1;
+	bulk_opts.numeric_enum = 1;
+	bulk_opts.numeric_ts = 1;
+	bulk_opts.oid_format = NETSNMP_OID_OUTPUT_NUMERIC;
+	snmp_bulkwalk_set_options(&bulk_opts);
+
+	zbx_vector_snmp_oid_create(&param_oids);
+
+	if (SUCCEED != zbx_parse_item_key(item->snmp_oid, &request))
+	{
+		zbx_strlcpy(error, "Invalid SNMP OID: cannot parse parameter.", max_error_len);
+		ret = CONFIG_ERROR;
+		goto out;
+	}
+
+	if (0 == request.nparam || (1 == request.nparam && '\0' == *(request.params[0])))
+	{
+		zbx_strlcpy(error, "Invalid parameters: at least one OID is expected.", max_error_len);
+		ret = CONFIG_ERROR;
+		goto out;
+	}
+
+	pdu_type = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
+
+	if (SNMP_MSG_GETBULK == pdu_type && 1 > item->snmp_max_repetitions)
+	{
+		zbx_strlcpy(error, "Invalid max repetition count: it should be at least 1.", max_error_len);
+		ret = CONFIG_ERROR;
+		goto out;
+	}
+
+	if (SUCCEED != snmp_bulkwalk_parse_params(&request, &param_oids, error, max_error_len))
+	{
+		ret = CONFIG_ERROR;
+		goto out;
+	}
+
+	for (i = 0; i < param_oids.values_num; i++)
+	{
+		if (SUCCEED > (ret = snmp_bulkwalk(ss, pdu_type, item, param_oids.values[i], &results, &results_alloc,
+				&results_offset, error, max_error_len)))
+		{
+			goto out;
+		}
+
+		if (0 == ret && SNMP_MSG_GETBULK == pdu_type)
+		{
+			if (SUCCEED > (ret = snmp_bulkwalk(ss, SNMP_MSG_GET, item, param_oids.values[i], &results,
+					&results_alloc, &results_offset, error, max_error_len)))
+			{
+				goto out;
+			}
+		}
+	}
+
+	SET_TEXT_RESULT(result, NULL != results ? results : zbx_strdup(NULL, ""));
+	ret = SUCCEED;
+out:
+	zbx_free_agent_request(&request);
+
+	if (SUCCEED != (*errcode = ret))
+	{
+		zbx_free(results);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+	}
+
+	snmp_bulkwalk_set_options(&default_opts);
+	zbx_vector_snmp_oid_clear_ext(&param_oids, vector_snmp_oid_free);
+	zbx_vector_snmp_oid_destroy(&param_oids);
+
+	return ret;
+}
+
 static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
 		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int bulk,
 		unsigned char poller_type)
@@ -2180,6 +2483,10 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 
 		err = zbx_snmp_process_discovery(ss, &items[j], &results[j], &errcodes[j], error, sizeof(error),
 				&max_succeed, &min_fail, max_vars, bulk);
+	}
+	else if (0 == strncmp(items[j].snmp_oid, "walk[", 5))
+	{
+		err = zbx_snmp_process_snmp_bulkwalk(ss, &items[j], &results[j], &errcodes[j], error, sizeof(error));
 	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
 	{

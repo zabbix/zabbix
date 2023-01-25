@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxprof.h"
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 
@@ -96,6 +97,8 @@ int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush)
 
 	*ret_flush = FLUSH_SUCCEED;
 
+	zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
@@ -118,6 +121,8 @@ int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	zbx_prof_end();
 
 	return (FLUSH_SUCCEED == *ret_flush ? SUCCEED : FAIL);
 }

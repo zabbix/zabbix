@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'maps' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'maps' =>					[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
 	'sysmapid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,
 		'isset({form}) && ({form} === "update" || {form} === "full_clone")'
 	],
@@ -59,13 +59,13 @@ $fields = [
 	'label_string_image' =>		[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'label_type' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM), 'isset({add}) || isset({update})'],
 	'label_location' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 3),	'isset({add}) || isset({update})'],
-	'urls' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
+	'urls' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'severity_min' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), null],
 	'show_suppressed' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	null],
 	'userid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'private' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	null],
-	'users' =>					[T_ZBX_INT, O_OPT, null,	null,			null],
-	'userGroups' =>				[T_ZBX_INT, O_OPT, null,	null,			null],
+	'users' =>					[T_ZBX_INT, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'userGroups' =>				[T_ZBX_INT, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"map.export","map.massdelete"'),		null],
 	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
@@ -74,7 +74,7 @@ $fields = [
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	// form
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
-	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,			null],
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,			null],
 	// filter
 	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
@@ -350,7 +350,7 @@ if (hasRequest('form')) {
 	}
 
 	$data['current_user_userid'] = $current_userid;
-	$data['form_refresh'] = getRequest('form_refresh');
+	$data['form_refresh'] = getRequest('form_refresh', 0);
 
 	// advanced labels
 	$data['labelTypes'] = sysmapElementLabel();

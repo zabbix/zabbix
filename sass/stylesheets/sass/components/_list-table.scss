@@ -16,6 +16,11 @@
 			@extend %overflow-ellipsis;
 		}
 
+		// TODO - AS: check
+		//[class*='icon-'] {
+		//	flex-shrink: 0;
+		//}
+
 		.rel-container {
 			display: flex;
 		}
@@ -23,6 +28,104 @@
 		.separator {
 			flex-shrink: 0;
 			margin-right: 4px;
+		}
+	}
+
+	td {
+		// TODO - AS: check
+		//.icon-maintenance {
+		//	margin: 0 0 -3px 4px;
+		//}
+
+		// TODO - AS: check
+		//.icon-depend-up,
+		//.icon-depend-down,
+		//.icon-ackn {
+		//	margin: 0 4px -3px 0;
+		//}
+
+		// Align tags and checkboxes. Tags are too low.
+		.tag {
+			margin-top: -1px;
+		}
+
+		// Checkboxes are too high up.
+		.checkbox-radio {
+			& + label {
+				span {
+					margin-top: 1px;
+				}
+			}
+		}
+
+		// TODO - AS: check
+		//.btn-widget-expand,
+		//.btn-widget-collapse {
+		//	background-color: $ui-bg-color;
+		//	width: 18px;
+		//	height: 18px;
+		//	background-position-x: -9px;
+		//	margin: 7px 0 0 0;
+		//	opacity: 1;
+		//}
+
+		// TODO - AS: check
+		//.btn-widget-expand {
+		//	background-position-y: -693px;
+		//}
+
+		// TODO - AS: check
+		//.btn-widget-collapse {
+		//	background-position-y: -657px;
+		//}
+	}
+
+	.second-col {
+		padding-left: 0;
+		padding-right: 0;
+
+		// Default icon marging makes the cell too wide.
+		.icon-action-symptom {
+			margin-right: 0;
+		}
+	}
+
+	.third-col {
+		// Padding top removed because it pushes the collapse and expand icon too far down.
+		padding-top: 0;
+		// Padding bottom removed because Chrome and Safari expands the row.
+		padding-bottom: 0;
+		padding-left: 2px;
+
+		.icon-action-symptom {
+			// Align the symptom icon in the third column, since padding is removed.
+			margin-top: 6px;
+			// Default icon marging makes the cell too wide.
+			margin-right: 0;
+		}
+	}
+
+	// Make the row more narrow.
+	.symptom-limit-td {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+
+	.problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) {
+		background-color: darken($ui-bg-color, 5%);
+
+		td,
+		.timeline-axis,
+		.timeline-td {
+			border-bottom-color: darken($ui-bg-color, 5%) !important;
+		}
+	}
+
+	.problem-nested-small {
+		font-size: calc(#{$font-mono-size} - 1px);
+
+		.tag {
+			font-size: 12px;
 		}
 	}
 
@@ -48,6 +151,11 @@
 								background-color: rgba($font-color, .5);
 							}
 
+							// TODO - AS: check
+							//.icon-wizard-action {
+							//	background-position: -165px -624px;
+							//}
+
 							button:focus {
 								box-shadow: 0 0 0 2px rgba($font-color, .5);
 							}
@@ -70,9 +178,33 @@
 								border-bottom-color: rgba(0, 0, 0, .5);
 							}
 
+							// TODO - AS: check
+							//.icon-wizard-action {
+							//	background-position: -165px -624px;
+							//}
+
 							button:focus {
 								box-shadow: 0 0 0 2px rgba(0, 0, 0, .5);
 							}
+						}
+					}
+				}
+
+				@if $theme-name == 'blue' or $theme-name == 'dark' {
+					&:not(.row-selected):not(:hover) {
+						td {
+							// TODO - AS: check
+							//[class*='icon-'] {
+							//	background-color: $ui-bg-color;
+							//	border-radius: 2px;
+							//}
+
+							// TODO - AS: check
+							//[class*='icon-depend-'],
+							//.icon-description,
+							//.icon-wizard-action {
+							//	background-color: transparent;
+							//}
 						}
 					}
 				}
@@ -104,6 +236,12 @@
 			}
 		}
 
+		.problem-nested:not([class*='flh-']):not(.row-selected) {
+			td, .timeline-axis, .timeline-td {
+				border-bottom: 0 !important;
+			}
+		}
+
 		td {
 			padding-top: 0;
 			padding-bottom: 0;
@@ -113,6 +251,19 @@
 			height: 22px;
 			vertical-align: middle;
 			white-space: nowrap;
+
+			// TODO - AS: check
+			//[class*='icon-'] {
+			//	&::after {
+			//		margin: 0;
+			//		line-height: 14px;
+			//		top: 0;
+			//	}
+
+				//&:last-of-type {
+				//	margin-right: 0;
+				//}
+			//}
 
 			.rel-container {
 				span {
@@ -138,6 +289,59 @@
 				@media screen and (min-width: 1600px) {
 					max-width: 133px;
 				}
+			}
+
+			// TODO - AS: check
+			//.icon-maintenance {
+			//	height: 12px;
+			//	width: 12px;
+			//	margin: 3px 1px 2px 4px;
+
+			//	&::before {
+			//		height: 12px;
+			//		width: 12px;
+			//		background-position: -49px -805px;
+			//	}
+			//}
+
+			// TODO - AS: check
+			/*
+			.icon-depend-up,
+			.icon-depend-down {
+				width: 12px;
+			}
+
+			.icon-depend-up::before {
+				background-position: -49px -731px;
+			}
+
+			.icon-depend-down::before {
+				background-position: -49px -767px;
+			}
+
+			.icon-wizard-action {
+				background: url($sprite-path) no-repeat -6px -624px;
+				height: 12px;
+				min-height: 12px;
+				margin: 0;
+				position: relative;
+			}
+
+			.icon-description {
+				margin-left: 2px;
+			}
+
+			// Align action icons according to tags and problem description icons in compact view.
+			[class*='icon-action'] {
+				margin-top: -2px;
+			}
+			*/
+
+			// Align the expand and collapse icons in compact view.
+			.btn-widget-expand,
+			.btn-widget-collapse {
+				vertical-align: top;
+				margin: 0;
 			}
 		}
 	}
@@ -253,6 +457,13 @@
 		&:hover {
 			background-color: $ui-hover-color;
 
+			.timeline-axis,
+			.timeline-td {
+				border-bottom-color: $ui-hover-color !important;
+			}
+
+			// TODO - AS: check
+			/*
 			.timeline-axis {
 				background-color: $ui-bg-color;
 			}
@@ -264,11 +475,24 @@
 			.timeline-td {
 				background-color: $ui-bg-color !important;
 			}
+			*/
+
+			.btn-widget-expand,
+			.btn-widget-collapse {
+				background-color: $ui-hover-color;
+			}
 		}
 
 		&.row-selected {
 			@extend %found-bg;
 
+			.timeline-axis,
+			.timeline-td {
+				border-bottom-color: $lighter-yellow !important;
+			}
+
+			// TODO - AS: check
+			/*
 			.timeline-axis {
 				background-color: $ui-bg-color;
 			}
@@ -279,6 +503,12 @@
 
 			.timeline-td {
 				background-color: $ui-bg-color;
+			}
+			*/
+
+			.btn-widget-expand,
+			.btn-widget-collapse {
+				background-color: $lighter-yellow;
 			}
 		}
 
@@ -293,6 +523,24 @@
 
 		&.hover-nobg {
 			background-color: $ui-bg-color;
+
+			.timeline-axis,
+			.timeline-td {
+				border-bottom-color: $ui-bg-color !important;
+			}
+		}
+
+		&.hover-nobg-problem-nested {
+			background-color: darken($ui-bg-color, 5%);
+
+			.timeline-axis,
+			.timeline-td {
+				border-bottom-color: darken($ui-bg-color, 5%) !important;
+			}
+		}
+
+		&.hidden {
+			display: none;
 		}
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,12 +73,18 @@ if (array_key_exists('problems', $data)) {
 			_('Recovery time'),
 			_('Status'),
 			_('Duration'),
-			_('Ack'),
+			_('Update'),
 			($data['show_tags'] != SHOW_TAGS_NONE) ? _('Tags') : null
 		]));
 
+	$data += [
+		'last_clock' => 0,
+		'sortorder' => ZBX_SORT_DOWN,
+		'show_three_columns' => false,
+		'show_two_columns' => false
+	];
+
 	$today = strtotime('today');
-	$last_clock = 0;
 
 	if ($data['problems'] && $data['show_tags'] != SHOW_TAGS_NONE) {
 		$tags = makeTags($data['problems'], true, 'eventid', $data['show_tags'], $data['filter_tags'], null,
@@ -94,28 +100,24 @@ if (array_key_exists('problems', $data)) {
 
 	foreach ($data['problems'] as $problem) {
 		$can_be_closed = $data['allowed_close'];
+		$in_closing = false;
 
 		if ($problem['r_eventid'] != 0) {
 			$value = TRIGGER_VALUE_FALSE;
-			$value_str = _('RESOLVED');
 			$value_clock = $problem['r_clock'];
 			$can_be_closed = false;
 		}
 		else {
-			$in_closing = false;
-
-			foreach ($problem['acknowledges'] as $acknowledge) {
-				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-					$in_closing = true;
-					$can_be_closed = false;
-					break;
-				}
+			if (hasEventCloseAction($problem['acknowledges'])) {
+				$in_closing = true;
+				$can_be_closed = false;
 			}
 
 			$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
-			$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 			$value_clock = $in_closing ? time() : $problem['clock'];
 		}
+
+		$value_str = getEventStatusString($in_closing, $problem);
 
 		$cell_clock = ($problem['clock'] >= $today)
 			? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
@@ -147,14 +149,18 @@ if (array_key_exists('problems', $data)) {
 		$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$cell_status = new CSpan($value_str);
 
+		if (isEventUpdating($in_closing, $problem)) {
+			$cell_status->addClass('blink');
+		}
+
 		// Add colors and blinking to span depending on configuration and trigger parameters.
 		addTriggerValueStyle($cell_status, $value, $value_clock, $is_acknowledged);
 
 		if ($data['show_timeline']) {
-			if ($last_clock != 0) {
-				CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], ZBX_SORT_DOWN);
+			if ($data['last_clock'] != 0) {
+				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false);
 			}
-			$last_clock = $problem['clock'];
+			$data['last_clock'] = $problem['clock'];
 
 			$row = [
 				$cell_clock->addClass(ZBX_STYLE_TIMELINE_DATE),
@@ -175,13 +181,11 @@ if (array_key_exists('problems', $data)) {
 		// Create acknowledge link.
 		$problem_update_link = ($data['allowed_add_comments'] || $data['allowed_change_severity']
 				|| $data['allowed_acknowledge'] || $can_be_closed || $data['allowed_suppress'])
-			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
-				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			? (new CLink(_('Update')))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->setAttribute('data-eventid', $problem['eventid'])
 				->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
-			: (new CSpan($is_acknowledged ? _('Yes') : _('No')))
-				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
+			: new CSpan(_('Update'));
 
 		$table->addRow(array_merge($row, [
 			$cell_r_clock,

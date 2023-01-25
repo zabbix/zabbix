@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -350,7 +350,7 @@ int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *pro
  *                          Value: ZBX_SEND_RESPONSE or                       *
  *                          ZBX_DO_NOT_SEND_RESPONSE                          *
  *     req            - [IN] request, included into error message             *
- *     zbx_config_tls - [IN] configured requirements to allow access          *
+ *     config_tls     - [IN] configured requirements to allow access          *
  *     config_timeout - [IN]                                                  *
  *                                                                            *
  * Return value:                                                              *
@@ -359,7 +359,7 @@ int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *pro
  *                                                                            *
  ******************************************************************************/
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout)
+		const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	char	*msg = NULL;
 
@@ -374,7 +374,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 		return FAIL;
 	}
 
-	if (0 == (zbx_config_tls->accept_modes & sock->connection_type))
+	if (0 == (config_tls->accept_modes & sock->connection_type))
 	{
 		msg = zbx_dsprintf(NULL, "%s over connection of type \"%s\" is not allowed", req,
 				zbx_tcp_connection_type_name(sock->connection_type));
@@ -392,8 +392,8 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
-		if (SUCCEED == zbx_check_server_issuer_subject(sock, zbx_config_tls->server_cert_issuer,
-				zbx_config_tls->server_cert_subject, &msg))
+		if (SUCCEED == zbx_check_server_issuer_subject(sock, config_tls->server_cert_issuer,
+				config_tls->server_cert_subject, &msg))
 		{
 			return SUCCEED;
 		}
@@ -566,7 +566,7 @@ static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zb
 		*lastid = 0;
 	else
 		ZBX_STR2UINT64(*lastid, row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64,	__func__, *lastid);
 }
@@ -590,7 +590,7 @@ static void	proxy_set_lastid(const char *table_name, const char *lastidfield, co
 		DBexecute("update ids set nextid=" ZBX_FS_UI64 " where table_name='%s' and field_name='%s'",
 				lastid, table_name, lastidfield);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -628,7 +628,7 @@ int	proxy_get_delay(const zbx_uint64_t lastid)
 	if (NULL != (row = DBfetch(result)))
 		ts = (int)time(NULL) - atoi(row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -674,7 +674,7 @@ try_again:
 			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
 			if (0 < retries--)
 			{
-				DBfree_result(result);
+				zbx_db_free_result(result);
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
 						" Waiting " ZBX_FS_DBL " sec, retrying.",
 						__func__, *lastid - *id - 1,
@@ -715,7 +715,7 @@ try_again:
 
 		*id = *lastid;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_MAX_HRECORDS == *records_num - records_num_last)
 		*more = ZBX_PROXY_DATA_MORE;
@@ -803,7 +803,7 @@ try_again:
 				if (0 >= total_retries--)
 					break;
 
-				DBfree_result(result);
+				zbx_db_free_result(result);
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
 						" Waiting " ZBX_FS_DBL " sec, retrying.",
 						__func__, id - lastid - 1,
@@ -874,7 +874,7 @@ try_again:
 
 		lastid = id;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_MAX_HRECORDS != data_num && 1 == retries)
 		*more = ZBX_PROXY_DATA_DONE;
@@ -2324,7 +2324,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 				dchecks++;
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		if (0 != i)
 		{
@@ -2549,7 +2549,7 @@ json_parse_error:
 			ZBX_STR2UINT64(unique_dcheckid, row[0]);
 		else
 			unique_dcheckid = 0;
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		for (j = 0; j < drule->ips.values_num && SUCCEED == ret2; j++)
 		{
 			int	processed_num = 0;
@@ -2766,7 +2766,7 @@ int	proxy_get_history_count(void)
 	if (NULL != (row = DBfetch(result)))
 		count = atoi(row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	DBclose();
 

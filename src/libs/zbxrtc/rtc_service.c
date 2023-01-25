@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ static void	rtc_change_service_loglevel(int code)
 					zabbix_get_log_level_string());
 		}
 	}
-	else
+	else if (ZBX_RTC_LOG_LEVEL_DECREASE == code)
 	{
 		if (SUCCEED != zabbix_decrease_log_level())
 		{
@@ -70,18 +70,18 @@ static void	rtc_change_service_loglevel(int code)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process loglevel runtime control option                           *
+ * Purpose: process runtime control option                                    *
  *                                                                            *
  * Parameters: code   - [IN] the runtime control request code                 *
  *             data   - [IN] the runtime control parameter (optional)         *
  *             result - [OUT] the runtime control result                      *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_process_loglevel(int code, const char *data, char **result)
+static void	rtc_process_option(int code, const char *data, char **result)
 {
 	struct zbx_json_parse	jp;
 	char			buf[MAX_STRING_LEN];
-	int			process_num = 0, process_type;
+	int			process_num = 0, process_type, scope = 0;
 
 	if (NULL == data)
 	{
@@ -96,6 +96,9 @@ static void	rtc_process_loglevel(int code, const char *data, char **result)
 		return;
 	}
 
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SCOPE, buf, sizeof(buf), NULL))
+		scope = atoi(buf);
+
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PID, buf, sizeof(buf), NULL))
 	{
 		zbx_uint64_t	pid;
@@ -108,12 +111,17 @@ static void	rtc_process_loglevel(int code, const char *data, char **result)
 
 		if ((pid_t)pid == getpid())
 		{
-			rtc_change_service_loglevel(code);
-			/* temporary message, the signal forwarding command output will be changed later */
-			*result = zbx_strdup(NULL, "Changed log level for the main process\n");
+			if (ZBX_RTC_LOG_LEVEL_INCREASE == code || ZBX_RTC_LOG_LEVEL_DECREASE == code)
+			{
+				rtc_change_service_loglevel(code);
+				/* temporary message, the signal forwarding command output will be changed later */
+				*result = zbx_strdup(NULL, "Changed log level for the main process\n");
+			}
+			else
+				*result = zbx_dsprintf(NULL, "Cannot use pid value for runtime command \"%s\"\n", buf);
 		}
 		else
-			zbx_signal_process_by_pid((int)pid, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+			zbx_signal_process_by_pid((int)pid, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
 
 		return;
 	}
@@ -123,7 +131,7 @@ static void	rtc_process_loglevel(int code, const char *data, char **result)
 
 	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NAME, buf, sizeof(buf), NULL))
 	{
-		*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
+		zbx_signal_process_by_pid(0, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
 		return;
 	}
 
@@ -133,7 +141,7 @@ static void	rtc_process_loglevel(int code, const char *data, char **result)
 		return;
 	}
 
-	zbx_signal_process_by_type(process_type, process_num, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+	zbx_signal_process_by_type(process_type, process_num, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
 }
 #endif
 
@@ -237,7 +245,9 @@ static void	rtc_process_request(zbx_rtc_t *rtc, int code, const unsigned char *d
 #if defined(HAVE_SIGQUEUE)
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
-			rtc_process_loglevel(code, (const char *)data, result);
+		case ZBX_RTC_PROF_ENABLE:
+		case ZBX_RTC_PROF_DISABLE:
+			rtc_process_option(code, (const char *)data, result);
 			return;
 #endif
 		case ZBX_RTC_HOUSEKEEPER_EXECUTE:
@@ -313,7 +323,7 @@ static void	rtc_process(zbx_rtc_t *rtc, zbx_ipc_client_t *client, int code, cons
 	char		*result = NULL, *result_ex = NULL;
 	zbx_uint32_t	size = 0;
 
-	if (FAIL == cb_proc_req(rtc, code, data, &result_ex))
+	if (NULL == cb_proc_req || FAIL == cb_proc_req(rtc, code, data, &result_ex))
 		rtc_process_request(rtc, code, data, &result);
 
 	if (NULL != result_ex)

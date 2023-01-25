@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,14 +111,14 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	int				ret;
 	zbx_socket_t			s;
 	zbx_thread_listener_args	*init_child_args_in;
+	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	init_child_args_in = (zbx_thread_listener_args *)((((zbx_thread_args_t *)args))->args);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(init_child_args_in->zbx_get_program_type_cb_arg()),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	memcpy(&s, init_child_args_in->listen_sock, sizeof(zbx_socket_t));
@@ -147,7 +147,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
 		ret = zbx_tcp_accept(&s, init_child_args_in->zbx_config_tls->accept_modes,
 				init_child_args_in->config_timeout);
-		zbx_update_env(zbx_time());
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		if (SUCCEED == ret)
 		{

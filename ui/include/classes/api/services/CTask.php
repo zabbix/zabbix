@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -156,11 +156,11 @@ class CTask extends CApiService {
 		$tasks_by_types = [
 			ZBX_TM_DATA_TYPE_DIAGINFO => [],
 			ZBX_TM_DATA_TYPE_PROXY_HOSTIDS => [],
-			ZBX_TM_DATA_TYPE_CHECK_NOW => []
+			ZBX_TM_TASK_CHECK_NOW => []
 		];
 
 		foreach ($tasks as $index => $task) {
-			if ($task['type'] == ZBX_TM_DATA_TYPE_CHECK_NOW) {
+			if ($task['type'] == ZBX_TM_TASK_CHECK_NOW) {
 				$tasks_by_types[$task['type']][$index] = [
 					'type' => $task['type'],
 					'request' => [
@@ -175,7 +175,7 @@ class CTask extends CApiService {
 
 		$return = $this->createTasksDiagInfo($tasks_by_types[ZBX_TM_DATA_TYPE_DIAGINFO])
 			+ $this->createTasksProxyHostids($tasks_by_types[ZBX_TM_DATA_TYPE_PROXY_HOSTIDS])
-			+ $this->createTasksCheckNow($tasks_by_types[ZBX_TM_DATA_TYPE_CHECK_NOW]);
+			+ $this->createTasksCheckNow($tasks_by_types[ZBX_TM_TASK_CHECK_NOW]);
 
 		ksort($return);
 
@@ -194,7 +194,7 @@ class CTask extends CApiService {
 	 */
 	protected function validateCreate(array &$tasks): array {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXY_HOSTIDS, ZBX_TM_DATA_TYPE_CHECK_NOW])],
+			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXY_HOSTIDS, ZBX_TM_TASK_CHECK_NOW])],
 			'request' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 									['if' => ['field' => 'type', 'in' => ZBX_TM_DATA_TYPE_DIAGINFO], 'type' => API_OBJECT, 'fields' => [
 										'historycache' =>	['type' => API_OBJECT, 'fields' => [
@@ -233,7 +233,7 @@ class CTask extends CApiService {
 									['if' => ['field' => 'type', 'in' => ZBX_TM_DATA_TYPE_PROXY_HOSTIDS], 'type' => API_OBJECT, 'fields' => [
 										'proxy_hostids' =>	['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => true]
 									]],
-									['if' => ['field' => 'type', 'in' => ZBX_TM_DATA_TYPE_CHECK_NOW], 'type' => API_OBJECT, 'fields' => [
+									['if' => ['field' => 'type', 'in' => ZBX_TM_TASK_CHECK_NOW], 'type' => API_OBJECT, 'fields' => [
 										'itemid' => ['type' => API_ID, 'flags' => API_REQUIRED]
 									]]
 								]],
@@ -262,7 +262,7 @@ class CTask extends CApiService {
 					$proxy_hostids = array_fill_keys($task['request']['proxy_hostids'], true);
 					break;
 
-				case ZBX_TM_DATA_TYPE_CHECK_NOW:
+				case ZBX_TM_TASK_CHECK_NOW:
 					$itemids_editable[$task['request']['itemid']] = true;
 					break;
 			}

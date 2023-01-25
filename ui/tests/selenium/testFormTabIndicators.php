@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -694,6 +694,11 @@ class testFormTabIndicators extends CWebTest {
 			$tab_selector = $form->query('xpath:.//a[text()="'.$tab['name'].'"]')->one();
 			$this->assertTabIndicator($tab_selector, $old_value);
 
+			if (CTestArrayHelper::get($tab, 'name') === 'HTTP settings') {
+				$form->fill(['Enable HTTP authentication' => true]);
+				$this->query('button:Ok')->one()->click();
+			}
+
 			// Populate fields in tab and check indicator value.
 			$this->updateTabFields($tab, $form);
 			// Input elements change their attribute values only after focus is removed from the element.
@@ -712,27 +717,30 @@ class testFormTabIndicators extends CWebTest {
 	}
 
 	public function testFormTabIndicators_CheckActionOperationsCounter() {
-		$this->page->login()->open('actionconf.php?eventsource=0&form=Create+action')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=action.list&eventsource=0')->waitUntilReady();
+		$this->query('button:Create action')->one()->click()->waitUntilReady();
 
 		// Open Operations tab and check indicator value.
-		$form = $this->query('id:action-form')->asForm()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady();
+		$form = $dialog->asForm()->one();
 		$form->selectTab('Operations');
-		$tab_selector = $form->query('xpath:.//a[text()="Operations"]')->one();
+		$tab_selector = $form->query('xpath:.//a[text()="Operations"]')->one()->waitUntilVisible();
 		$this->assertTabIndicator($tab_selector, 0);
 
 		// Specify an operation of each type and check indicator value.
-		foreach (['Operations', 'Recovery operations', 'Update operations'] as $operation) {
+		foreach (['Operations' => 'operations_0', 'Recovery operations' => 'recovery_operations_0',
+						'Update operations' => 'update_operations_0'] as $operation => $row) {
 			$form->getField($operation)->query('button:Add')->one()->waitUntilClickable()->click();
-			$operations_overlay = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
-			$operations_overlay->getField('Send to users')->query('button:Add')->one()->click();
-
+			$operations_overlay = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$operations_overlay->query('xpath://div[@id="operation-message-users"]'.
+					'//button[text()="Select"]')->one()->click();
 			$users_overlay = COverlayDialogElement::find()->all()->asForm()->last();
 			$users_overlay->query('id:item_1')->asCheckbox()->one()->check();
 			$users_overlay->submit();
 			$operations_overlay->submit();
-
-			COverlayDialogElement::ensureNotPresent();
+			$this->query('xpath://tr[@id="'.$row.'"]')->waitUntilVisible();
 		}
+
 		$this->assertTabIndicator($tab_selector, 3);
 
 		// Remove the previously created operations and check indicator value.

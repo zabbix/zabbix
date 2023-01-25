@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20220722';
-$browser-sprite-path: '../img/browser-sprite.png?20220722';
+$sprite-path: '../img/icon-sprite.svg?20230110';
+$browser-sprite-path: '../img/browser-sprite.png?20221026';
 
 @import "utils/mixins";
 
@@ -536,6 +536,10 @@ form {
 	overflow-x: auto;
 	position: relative;
 	@extend %webkit-hor-scrollbar;
+}
+
+.problem-expand-td {
+	border-bottom-color: $transparent !important;
 }
 
 // Timeline in table view.
@@ -4317,6 +4321,10 @@ svg {
 		padding: 5px 5px 5px 0;
 	}
 
+	.preprocessing-step {
+		align-items: baseline;
+	}
+
 	.step-name {
 		flex: 0 0 $name-width;
 		max-width: $name-width;
@@ -4334,6 +4342,10 @@ svg {
 			&:not(:last-child) {
 				margin-right: 5px;
 			}
+		}
+
+		.table-forms-separator {
+			width: 100%;
 		}
 	}
 
@@ -4690,6 +4702,16 @@ a.icon-count {
 		}
 	}
 }
+
+// TODO - AS: check. ZBXNEXT-7964
+//.icon-action-cause::before {
+//	background-position: -123px -693px;
+//}
+
+// TODO - AS: check. ZBXNEXT-7964
+//.icon-action-symptom::before {
+//	background-position: -122px -656px;
+//}
 
 :-ms-input-placeholder {
 	color: $input-placeholder-color !important;

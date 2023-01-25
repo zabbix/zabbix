@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
 
-extern unsigned char	program_type;
-
 /*
  * 6.4 development database patches
  */
@@ -37,7 +35,7 @@ static int	DBpatch_6030000(void)
 	zbx_db_insert_t		db_insert;
 	int			ret = SUCCEED;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	result = DBselect("select roleid,type,name,value_int from role_rule where name in ("
@@ -90,7 +88,7 @@ static int	DBpatch_6030000(void)
 					"ui.configuration.service_actions", value_int);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
 
@@ -484,7 +482,7 @@ static int	DBpatch_6030062(void)
 	size_t			sql_alloc = 4096, sql_offset = 0;
 	int			ret = SUCCEED;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	sql = zbx_malloc(NULL, sql_alloc);
@@ -513,7 +511,7 @@ static int	DBpatch_6030062(void)
 
 		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -540,7 +538,7 @@ static int	DBpatch_6030063(void)
 			"url", "web"
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "module", "moduleid", "id", "relative_path", "status", "config", NULL);
@@ -704,7 +702,7 @@ static int	DBpatch_6030074(void)
 			"web.auditacts.filter.userids", "web.actionlog.filter.userids"
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
@@ -1171,7 +1169,7 @@ static int	migrate_ldap_data(void)
 
 		if (ZBX_DB_OK > rc)
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return FAIL;
 		}
 
@@ -1179,20 +1177,20 @@ static int	migrate_ldap_data(void)
 		if (ZBX_DB_OK > DBexecute("update userdirectory set idp_type=%d where userdirectoryid=%s",
 				IDP_TYPE_LDAP, row[0]))
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return FAIL;
 		}
 #undef IDP_TYPE_LDAP
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
 
 static int	DBpatch_6030124(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return migrate_ldap_data();
@@ -1212,7 +1210,7 @@ static int	migrate_saml_data(void)
 
 	if (NULL == row)
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		return FAIL;
 	}
 
@@ -1220,7 +1218,7 @@ static int	migrate_saml_data(void)
 			'\0' == *row[5] && 0 == atoi(row[6]) && 0 == atoi(row[7]) && 0 == atoi(row[8]) &&
 			0 == atoi(row[9]) && 0 == atoi(row[10]) && 0 == atoi(row[11]) && 0 == atoi(row[12]))
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		return SUCCEED;
 	}
 
@@ -1232,7 +1230,7 @@ static int	migrate_saml_data(void)
 #undef IDP_TYPE_SAML
 	if (ZBX_DB_OK > rc)
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		return FAIL;
 	}
 
@@ -1257,7 +1255,7 @@ static int	migrate_saml_data(void)
 	zbx_free(sso_url);
 	zbx_free(idp_entityid);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_DB_OK > rc2)
 	return FAIL;
@@ -1267,7 +1265,7 @@ static int	migrate_saml_data(void)
 
 static int	DBpatch_6030125(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return migrate_saml_data();
@@ -1398,6 +1396,106 @@ static int	DBpatch_6030148(void)
 	return DBdrop_field("userdirectory", "search_filter");
 }
 /* end of ZBXNEXT-276 patches */
+
+static int	DBpatch_6030149(void)
+{
+	const ZBX_FIELD	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_result", &field, &old_field);
+}
+
+static int	DBpatch_6030150(void)
+{
+	const ZBX_FIELD	field = {"max_repetitions", "10", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface_snmp", &field);
+}
+
+static int	DBpatch_6030151(void)
+{
+	const ZBX_TABLE table =
+		{"event_symptom", "eventid", 0,
+			{
+				{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"cause_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030152(void)
+{
+	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_symptom", 1, &field);
+}
+
+static int	DBpatch_6030153(void)
+{
+	const ZBX_FIELD	field = {"cause_eventid", NULL, "events", "eventid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("event_symptom", 2, &field);
+}
+
+static int	DBpatch_6030154(void)
+{
+	const ZBX_FIELD field = {"cause_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_6030155(void)
+{
+	const ZBX_FIELD	field = {"cause_eventid", NULL, "events", "eventid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("problem", 3, &field);
+}
+
+static int	DBpatch_6030156(void)
+{
+	const ZBX_FIELD field = {"pause_symptoms", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
+static int	DBpatch_6030157(void)
+{
+	const ZBX_FIELD field = {"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_6030158(void)
+{
+	return DBcreate_index("event_symptom", "event_symptom_1", "cause_eventid", 0);
+}
+
+static int	DBpatch_6030159(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.actionconf.php.sort", "web.action.list.sort",
+			"web.actionconf.php.sortorder", "web.action.list.sortorder",
+			"web.actionconf.filter_name", "web.action.list.filter_name",
+			"web.actionconf.filter_status", "web.action.list.filter_status",
+			"web.actionconf.filter.active", "web.action.list.filter.active"
+		};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6030)
@@ -1553,5 +1651,16 @@ DBPATCH_ADD(6030145, 0, 1)
 DBPATCH_ADD(6030146, 0, 1)
 DBPATCH_ADD(6030147, 0, 1)
 DBPATCH_ADD(6030148, 0, 1)
+DBPATCH_ADD(6030149, 0, 1)
+DBPATCH_ADD(6030150, 0, 1)
+DBPATCH_ADD(6030151, 0, 1)
+DBPATCH_ADD(6030152, 0, 1)
+DBPATCH_ADD(6030153, 0, 1)
+DBPATCH_ADD(6030154, 0, 1)
+DBPATCH_ADD(6030155, 0, 1)
+DBPATCH_ADD(6030156, 0, 1)
+DBPATCH_ADD(6030157, 0, 1)
+DBPATCH_ADD(6030158, 0, 1)
+DBPATCH_ADD(6030159, 0, 1)
 
 DBPATCH_END()

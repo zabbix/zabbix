@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@
  */
 
 #ifndef HAVE_SQLITE3
-
-extern unsigned char	program_type;
 
 static int	DBpatch_4050001(void)
 {
@@ -118,7 +116,7 @@ static int	DBpatch_4050014(void)
 	char		*sql = NULL, *name = NULL, *name_esc;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -158,7 +156,7 @@ static int	DBpatch_4050014(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 	zbx_free(name);
 
@@ -196,7 +194,7 @@ static int	DBpatch_4050015(void)
 		invalidate = 1;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != invalidate &&
 			ZBX_DB_OK > DBexecute("update timeperiods set every=1 where timeperiodid!=0 and every=0"))
@@ -251,7 +249,7 @@ static int	DBpatch_4050020(void)
 	int		ret = SUCCEED, res, col;
 	char		*subject, *message;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	result = DBselect(
@@ -280,7 +278,7 @@ static int	DBpatch_4050020(void)
 			break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -417,7 +415,7 @@ static int	DBpatch_4050021(void)
 	int		content_type, i, k;
 	char		*msg_esc = NULL, *subj_esc = NULL;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	result = DBselect("select mediatypeid,type,content_type from media_type");
@@ -468,7 +466,7 @@ static int	DBpatch_4050021(void)
 		}
 	}
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -619,7 +617,7 @@ static int	DBpatch_4050039(void)
 			"web.auditlogs.filter.to", "web.auditlog.filter.to"
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
@@ -647,7 +645,7 @@ static int	DBpatch_4050041(void)
 
 static int	DBpatch_4050042(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update auditlog set resourceid=null where resourceid=0"))
@@ -658,7 +656,7 @@ static int	DBpatch_4050042(void)
 
 static int	DBpatch_4050043(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.screens.graphid'"))
@@ -932,7 +930,7 @@ static void	DBpatch_load_data(zbx_vector_dbu_snmp_if_t *snmp_ifs, zbx_vector_dbu
 
 		zbx_vector_dbu_interface_append(new_ifs, interface);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 #undef ITEM_TYPE_SNMPv1
 #undef ITEM_TYPE_SNMPv2c
@@ -972,7 +970,7 @@ static void	DBpatch_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs)
 
 		zbx_vector_dbu_snmp_if_append(snmp_def_ifs, snmp);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static int	DBpatch_snmp_if_save(zbx_vector_dbu_snmp_if_t *snmp_ifs)
@@ -1361,7 +1359,7 @@ static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *new_ifs, zbx_vector
 		zbx_vector_dbu_interface_append(new_ifs, interface);
 		zbx_vector_dbu_snmp_if_append(snmp_new_ifs, snmp);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static int	DBpatch_interface_discovery_save(zbx_vector_uint64_pair_t *if_links)
@@ -1523,7 +1521,7 @@ static int	DBpatch_4050063(void)
 	int		ret = SUCCEED, value_int, i;
 	const char	*profile = "web.problem.filter.severities";
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	result = DBselect(
@@ -1567,7 +1565,7 @@ static int	DBpatch_4050063(void)
 			}
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1584,7 +1582,7 @@ static int	DBpatch_4050065(void)
 {
 	const ZBX_FIELD	field = {"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return DBmodify_field_type("history", &field, &field);
@@ -1594,7 +1592,7 @@ static int	DBpatch_4050066(void)
 {
 	const ZBX_FIELD	field = {"value_min", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return DBmodify_field_type("trends", &field, &field);
@@ -1604,7 +1602,7 @@ static int	DBpatch_4050067(void)
 {
 	const ZBX_FIELD	field = {"value_avg", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return DBmodify_field_type("trends", &field, &field);
@@ -1614,7 +1612,7 @@ static int	DBpatch_4050068(void)
 {
 	const ZBX_FIELD	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return DBmodify_field_type("trends", &field, &field);
@@ -1666,7 +1664,7 @@ static int	DBpatch_4050074(void)
 			"web.avail_report.0.groupid", "web.graphs.filter.to", "web.graphs.filter.from", "web.graphs.filter.active"
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i++)

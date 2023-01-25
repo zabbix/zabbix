@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@
 
 #ifndef HAVE_SQLITE3
 
-extern unsigned char program_type;
-
 static int	DBpatch_4000000(void)
 {
 	return SUCCEED;
@@ -55,7 +53,7 @@ static int	DBpatch_4000001(void)
 	ret = db_rename_macro(result, "actions", "actionid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
 			"{EVENT.NAME}");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -79,7 +77,7 @@ static int	DBpatch_4000002(void)
 	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
 			"{EVENT.NAME}");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -100,7 +98,7 @@ static int	DBpatch_4000003(void)
 	ret = db_rename_macro(result, "opcommand", "operationid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
 			"{EVENT.NAME}");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }

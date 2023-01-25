@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ extern int				CONFIG_HEARTBEAT_FREQUENCY;
 
 static ZBX_THREAD_LOCAL ZBX_ACTIVE_BUFFER	buffer;
 static ZBX_THREAD_LOCAL zbx_vector_ptr_t	active_metrics;
-static ZBX_THREAD_LOCAL zbx_vector_ptr_t	regexps;
+static ZBX_THREAD_LOCAL zbx_vector_expression_t	regexps;
 static ZBX_THREAD_LOCAL char			*session_token;
 static ZBX_THREAD_LOCAL zbx_uint64_t		last_valueid = 0;
 static ZBX_THREAD_LOCAL zbx_vector_pre_persistent_t	pre_persistent_vec;	/* used for staging of data going */
@@ -76,7 +76,7 @@ static void	init_active_metrics(void)
 	}
 
 	zbx_vector_ptr_create(&active_metrics);
-	zbx_vector_ptr_create(&regexps);
+	zbx_vector_expression_create(&regexps);
 	zbx_vector_pre_persistent_create(&pre_persistent_vec);
 	zbx_vector_persistent_inactive_create(&persistent_inactive_vec);
 
@@ -106,7 +106,7 @@ static void	free_active_metrics(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_ptr_destroy(&regexps);
+	zbx_vector_expression_destroy(&regexps);
 
 	zbx_vector_ptr_clear_ext(&active_metrics, (zbx_clean_func_t)free_active_metric);
 	zbx_vector_ptr_destroy(&active_metrics);
@@ -517,7 +517,7 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 
 			case_sensitive = atoi(tmp);
 
-			add_regexp_ex(&regexps, name, expression, expression_type, exp_delimiter, case_sensitive);
+			zbx_add_regexp_ex(&regexps, name, expression, expression_type, exp_delimiter, case_sensitive);
 		}
 	}
 success:
@@ -601,7 +601,7 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
  *               FAIL on other cases                                          *
  *                                                                            *
  ******************************************************************************/
-static int	refresh_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *zbx_config_tls,
+static int	refresh_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *config_tls,
 		zbx_uint32_t *config_revision_local, int config_timeout)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
@@ -657,7 +657,7 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
 	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, config_timeout, config_timeout,
-			0, level, zbx_config_tls)))
+			0, level, config_tls)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
 
@@ -755,7 +755,7 @@ static int	check_response(char *response)
  *                             Hostname and port number                       *
  *   prep_vec       - [IN/OUT] vector with data for writing into              *
  *                                 persistent files                           *
- *   zbx_config_tls - [IN]                                                    *
+ *   config_tls     - [IN]                                                    *
  *   config_timeout - [IN]                                                    *
  *                                                                            *
  * Return value: SUCCEED if:                                                  *
@@ -766,7 +766,7 @@ static int	check_response(char *response)
  *                                                                            *
  ******************************************************************************/
 static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout)
+		const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
 	int				ret = SUCCEED, i, now, level;
@@ -844,7 +844,7 @@ static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *pre
 	level = 0 == buffer.first_error ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
 
 	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, MIN(buffer.count * config_timeout, 60),
-			config_timeout, 0, level, zbx_config_tls)))
+			config_timeout, 0, level, config_tls)))
 	{
 		zbx_timespec(&ts);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
@@ -954,7 +954,7 @@ ret:
  *                           the event; used for monitoring of Windows        *
  *                           event logs                                       *
  *   flags          - metric flags                                            *
- *   zbx_config_tls - [IN]                                                    *
+ *   config_tls     - [IN]                                                    *
  *   config_timeout - [IN]                                                    *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
@@ -973,7 +973,7 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
 		const int *mtime, const unsigned long *timestamp, const char *source,
 		const unsigned short *severity, const unsigned long *logeventid, unsigned char flags,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout)
+		const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
 	int				i, ret = FAIL;
@@ -1005,7 +1005,7 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 				CONFIG_BUFFER_SIZE <= buffer.count ||
 				0 != strcmp(el->key, key) || 0 != strcmp(el->host, host))
 		{
-			send_buffer(addrs, &pre_persistent_vec, zbx_config_tls, config_timeout);
+			send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout);
 		}
 	}
 
@@ -1093,7 +1093,7 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 	if ((0 != (flags & ZBX_METRIC_FLAG_PERSISTENT) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount) ||
 			CONFIG_BUFFER_SIZE <= buffer.count)
 	{
-		send_buffer(addrs, &pre_persistent_vec, zbx_config_tls, config_timeout);
+		send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout);
 	}
 
 	ret = SUCCEED;
@@ -1133,9 +1133,9 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
-		zbx_vector_ptr_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
+		zbx_vector_expression_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **error)
+		const zbx_config_tls_t *config_tls, int config_timeout, char **error)
 {
 	ZBX_UNUSED(addrs);
 	ZBX_UNUSED(agent2_result);
@@ -1144,19 +1144,20 @@ static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *age
 	ZBX_UNUSED(process_value_cb);
 	ZBX_UNUSED(lastlogsize_sent);
 	ZBX_UNUSED(error);
-	ZBX_UNUSED(zbx_config_tls);
+	ZBX_UNUSED(config_tls);
 	ZBX_UNUSED(config_timeout);
 
 	return FAIL;
 }
 #else
-int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
-		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **error);
+int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
+		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
+		char **error);
 #endif
 
 static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **error)
+		const zbx_config_tls_t *config_tls, int config_timeout, char **error)
 {
 	int		ret;
 	AGENT_RESULT	result;
@@ -1176,7 +1177,7 @@ static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metr
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 
 		process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
-				NULL, NULL, NULL, NULL, metric->flags, zbx_config_tls, config_timeout);
+				NULL, NULL, NULL, NULL, metric->flags, config_tls, config_timeout);
 	}
 out:
 	zbx_free_agent_result(&result);
@@ -1226,7 +1227,7 @@ static void	zbx_fill_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, con
 }
 #endif	/* not WINDOWS, not __MINGW32__ */
 
-static void	process_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *zbx_config_tls,
+static void	process_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *config_tls,
 		int config_timeout)
 {
 	char	*error = NULL;
@@ -1263,15 +1264,15 @@ static void	process_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_
 		else if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags))
 		{
 			ret = process_log_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
-					&mtime_sent, &error, &pre_persistent_vec, zbx_config_tls, config_timeout);
+					&mtime_sent, &error, &pre_persistent_vec, config_tls, config_timeout);
 		}
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
 		{
 			ret = process_eventlog_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
-					zbx_config_tls, config_timeout, &error);
+					config_tls, config_timeout, &error);
 		}
 		else
-			ret = process_common_check(addrs, metric, zbx_config_tls, config_timeout, &error);
+			ret = process_common_check(addrs, metric, config_tls, config_timeout, &error);
 
 		if (SUCCEED != ret)
 		{
@@ -1302,7 +1303,7 @@ static void	process_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_
 #endif
 			process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
 					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, metric->flags,
-					zbx_config_tls, config_timeout);
+					config_tls, config_timeout);
 
 			zbx_free(error);
 		}
@@ -1340,7 +1341,7 @@ static void	process_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_
 					/* meta information update */
 					process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, NULL,
 							metric->state, &metric->lastlogsize, &metric->mtime, NULL, NULL,
-							NULL, NULL, metric->flags, zbx_config_tls, config_timeout);
+							NULL, NULL, metric->flags, config_tls, config_timeout);
 				}
 
 				/* remove "new metric" flag */
@@ -1348,7 +1349,7 @@ static void	process_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_
 			}
 		}
 
-		send_buffer(addrs, &pre_persistent_vec, zbx_config_tls, config_timeout);
+		send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout);
 		metric->nextcheck = (int)time(NULL) + metric->refresh;
 	}
 
@@ -1387,7 +1388,7 @@ static void	zbx_active_checks_sigusr_handler(int flags)
 }
 #endif
 
-static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *zbx_config_tls, int config_timeout)
+static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
@@ -1405,7 +1406,7 @@ static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
 	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, config_timeout, config_timeout,
-			0, level, zbx_config_tls)))
+			0, level, config_tls)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
 
@@ -1441,14 +1442,14 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	time_t				nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0,
 					heartbeat_nextcheck = 0;
 	zbx_uint32_t			config_revision_local = 0;
+	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	activechks_args_in = (zbx_thread_activechk_args *)((((zbx_thread_args_t *)args))->args);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(activechks_args_in->zbx_get_program_type_cb_arg()),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_vector_ptr_create(&activechk_args.addrs);
@@ -1483,7 +1484,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 #endif
 
-		zbx_update_env(zbx_time());
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		if ((now = time(NULL)) >= nextsend)
 		{

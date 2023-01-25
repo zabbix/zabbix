@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ static void	get_hist_upload_state(const char *buffer, int *state)
  *          data and sends 'proxy data' request                               *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const zbx_config_tls_t *zbx_config_tls,
+static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const zbx_config_tls_t *config_tls,
 		const zbx_thread_info_t *info, int config_timeout)
 {
 	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
@@ -186,7 +186,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 
 		/* retry till have a connection */
 		if (FAIL == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, config_timeout,
-				CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING, zbx_config_tls))
+				CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING, config_tls))
 		{
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -248,7 +248,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 					else
 						ZBX_STR2UINT64(history_maxid, row[0]);
 
-					DBfree_result(result);
+					zbx_db_free_result(result);
 
 					reset_proxy_history_count(history_maxid - history_lastid);
 					proxy_set_hist_lastid(history_lastid);
@@ -295,8 +295,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	int				server_num = info->server_num;
 	int				process_num = info->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(datasender_args_in->zbx_get_program_type_cb_arg()),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -311,7 +310,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
-		zbx_update_env(time_now);
+		zbx_update_env(get_process_type_string(process_type), time_now);
 
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, sending data]",
 				get_process_type_string(process_type), records, time_diff);

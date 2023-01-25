@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -327,8 +327,8 @@ class testUserRolesPermissions extends CWebTest {
 				[
 					'activityid' => 'acknowledge_problem',
 					'action' => 'Acknowledge problems',
-					'column' => 'Ack',
-					'value' => 'Yes'
+					'column' => 'Update',
+					'value' => 'Update'
 				]
 			]
 		];
@@ -347,7 +347,7 @@ class testUserRolesPermissions extends CWebTest {
 		foreach ([true, false] as $action_status) {
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 			$row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Test trigger with tag');
-			$row->getColumn('Ack')->query('link:No')->waitUntilClickable()->one()->click();
+			$row->getColumn('Update')->query('link:Update')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
 			$this->changeRoleRule([$data['action'] => !$action_status]);
@@ -355,7 +355,7 @@ class testUserRolesPermissions extends CWebTest {
 			// Check that problem actions works after they were turned on.
 			if ($action_status === false) {
 				$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-				$row->getColumn('Ack')->query('link:No')->waitUntilCLickable()->one()->click();
+				$row->getColumn('Update')->query('link:Update')->waitUntilCLickable()->one()->click();
 				COverlayDialogElement::find()->waitUntilReady()->one();
 
 				if ($data['activityid'] === 'message') {
@@ -394,7 +394,8 @@ class testUserRolesPermissions extends CWebTest {
 			'Change severity' => false,
 			'Acknowledge problems' => false,
 			'Suppress problems' => false,
-			'Close problems' => false
+			'Close problems' => false,
+			'Change problem ranking' => false
 		];
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 
@@ -402,23 +403,22 @@ class testUserRolesPermissions extends CWebTest {
 			// Problem page.
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 			$problem_row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', $problem);
-			$this->assertEquals($action_status, $problem_row->getColumn('Ack')->query('xpath:.//*[text()="No"]')
+			$this->assertEquals($action_status, $problem_row->getColumn('Update')->query('xpath:.//*[text()="Update"]')
 					->one()->isAttributePresent('onclick'));
 
 			// Problem widget in dashboard.
 			$this->page->open('zabbix.php?action=dashboard.view&dashboardid=1')->waitUntilReady();
 			$table = CDashboardElement::find()->one()->getWidget('Current problems')->query('class:list-table')->asTable()->one();
-			$this->assertEquals($action_status, $table->findRow('Problem • Severity', $problem)->getColumn('Ack')
-					->query('xpath:.//*[text()="No"]')->one()->isAttributePresent('onclick'));
+			$this->assertEquals($action_status, $table->findRow('Problem • Severity', $problem)->getColumn('Update')
+					->query('xpath:.//*[text()="Update"]')->one()->isAttributePresent('onclick'));
 
 			// Event details page.
 			$this->page->open('tr_events.php?triggerid=99251&eventid=93')->waitUntilReady();
 
-			foreach (['Event details', 'Event list [previous 20]'] as $table_name) {
-				$table = $this->query('xpath://h4[text()='.CXPathHelper::escapeQuotes($table_name).']/../..//table')->asTable()->one();
-				$this->assertEquals($action_status, $table->query('xpath:.//*[text()="No"]')
-						->one()->isAttributePresent('onclick'));
-			}
+			$table = $this->query('xpath://h4[text()='.CXPathHelper::escapeQuotes('Event list [previous 20]').
+					']/../..//table')->asTable()->one();
+			$this->assertEquals($action_status, $table->query('xpath:(.//*[text()="Update"])[2]')
+					->one()->isAttributePresent('onclick'));
 
 			if ($action_status) {
 				$this->changeRoleRule($actions);
@@ -486,9 +486,6 @@ class testUserRolesPermissions extends CWebTest {
 			'Web',
 			'Detect operating system',
 			'Ping',
-			'Script for Clone',
-			'Script for Delete',
-			'Script for Update',
 			'Traceroute'
 		];
 		$context_after = [
@@ -812,7 +809,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Media types',
 						'Scripts'
 					],
-					'link' => ['actionconf.php?eventsource=0']
+					'link' => ['zabbix.php?action=action.list&eventsource=0']
 				]
 			],
 			[
@@ -828,7 +825,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Media types',
 						'Scripts'
 					],
-					'link' => ['actionconf.php?eventsource=4']
+					'link' => ['zabbix.php?action=action.list&eventsource=4']
 				]
 			],
 			[
@@ -844,7 +841,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Media types',
 						'Scripts'
 					],
-					'link' => ['actionconf.php?eventsource=1']
+					'link' => ['zabbix.php?action=action.list&eventsource=1']
 				]
 			],
 			[
@@ -860,7 +857,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Media types',
 						'Scripts'
 					],
-					'link' => ['actionconf.php?eventsource=2']
+					'link' => ['zabbix.php?action=action.list&eventsource=2']
 				]
 			],
 			[
@@ -876,7 +873,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Media types',
 						'Scripts'
 					],
-					'link' => ['actionconf.php?eventsource=3']
+					'link' => ['zabbix.php?action=action.list&eventsource=3']
 				]
 			],
 			[
@@ -888,11 +885,11 @@ class testUserRolesPermissions extends CWebTest {
 						'Scripts'
 					],
 					'link' => [
-						'actionconf.php?eventsource=0',
-						'actionconf.php?eventsource=1',
-						'actionconf.php?eventsource=2',
-						'actionconf.php?eventsource=3',
-						'actionconf.php?eventsource=4'
+						'zabbix.php?action=action.list&eventsource=0',
+						'zabbix.php?action=action.list&eventsource=1',
+						'zabbix.php?action=action.list&eventsource=2',
+						'zabbix.php?action=action.list&eventsource=3',
+						'zabbix.php?action=action.list&eventsource=4'
 					]
 				]
 			],
@@ -1243,7 +1240,8 @@ class testUserRolesPermissions extends CWebTest {
 
 				if (array_key_exists('actions', $data)) {
 					$this->changeRoleRule([$data['section'] => $data['displayed_ui']]);
-					$this->page->open('actionconf.php'.(($data['page'] === 'Trigger actions') ? '?eventsource=1' : ''))->waitUntilReady();
+					$this->page->open('zabbix.php?action=action.list'.(($data['page'] === 'Trigger actions') ?
+							'&eventsource=1' : '&eventsource=0'))->waitUntilReady();
 					$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
 					$this->assertNotContains($data['page'], $popup_menu->getItems()->asText());
 					$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "../metrics.h"
 #include "persistent_state.h"
 #include "zbxcomms.h"
+#include "zbxregexp.h"
 
 #define ZBX_MD5_PRINT_BUF_LEN	((ZBX_MD5_DIGEST_SIZE) * 2 + 1)	/* for MD5 sum representation with hex-digits */
 
@@ -60,15 +61,15 @@ struct	st_logfile
 typedef int 	(*zbx_process_value_func_t)(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
 		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
 		const unsigned long *timestamp, const char *source, const unsigned short *severity,
-		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *zbx_config_tls,
+		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *config_tls,
 		int config_timeout);
 
 void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num);
 
-int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
+int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_expression_t *regexps,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
 		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout);
+		const zbx_config_tls_t *config_tls, int config_timeout);
 
 struct st_logfile	*find_last_processed_file_in_logfiles_list(struct st_logfile *logfiles, int logfiles_num);
 #endif

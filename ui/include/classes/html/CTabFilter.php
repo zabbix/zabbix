@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -364,7 +364,7 @@ class CTabFilter extends CDiv {
 		$nav_list = new CList([
 			(new CSimpleButton())
 				->setAttribute('data-action', 'toggleTabsList')
-				->addClass('btn-widget-expand')
+				->addClass(ZBX_ICON_CHEVRON_DOWN)
 				->addClass(ZBX_ICON_CHEVRON_DOWN),
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectNextTab')

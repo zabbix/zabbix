@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -142,7 +142,7 @@ static int	get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_
 		*user_timezone = zbx_strdup(NULL, row[2]);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return user_type;
 }
@@ -197,7 +197,7 @@ static int	get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *h
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		perm = atoi(row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
@@ -249,7 +249,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		zbx_vector_ptr_append(&tag_filters, tag_filter);
 	}
 	zbx_free(sql);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < tag_filters.values_num)
 		condition.op = ZBX_CONDITION_OPERATOR_EQUAL;
@@ -335,7 +335,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, const ZBX_DB_EVENT *event
 		ZBX_STR2UINT64(hostgroupid, row[0]);
 		zbx_vector_uint64_append(&hostgroupids, hostgroupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -390,7 +390,7 @@ static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **
 		ZBX_STR2UINT64(hostgroupid, row[0]);
 		zbx_vector_uint64_append(&hostgroupids, hostgroupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	perm = get_hostgroups_permission(userid, &hostgroupids);
 out:
@@ -460,7 +460,7 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_v
 		perm = PERM_READ;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return perm;
@@ -572,7 +572,7 @@ static void	zbx_db_cache_service_role(zbx_service_role_t *role)
 		zbx_vector_uint64_uniq(&role->serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -764,7 +764,7 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 			goto out;
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 	else
 		goto out;
@@ -818,7 +818,7 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 	}
 
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -882,7 +882,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 clean:
 		zbx_free(user_timezone);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -982,7 +982,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 clean:
 		zbx_free(user_timezone);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 
@@ -1081,7 +1081,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 clean:
 		zbx_free(user_timezone);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 
@@ -1139,7 +1139,7 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 clean:
 		zbx_free(user_timezone);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1324,15 +1324,24 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				",null,null,null,null");
 #endif
-	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o"
-			" join scripts s"
-				" on o.scriptid=s.scriptid"
-			" left join opcommand_hst oh"
-				" on o.operationid=oh.operationid"
-			" where  o.operationid=" ZBX_FS_UI64
-				" and oh.hostid is null",
-			operationid);
+	if (EVENT_SOURCE_SERVICE == event->source)
+	{
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
+				" from opcommand o,scripts s"
+				" where o.scriptid=s.scriptid"
+					" and o.operationid=" ZBX_FS_UI64,
+				operationid);
+	}
+	else
+	{
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
+				" from opcommand o,opcommand_hst oh,scripts s"
+				" where o.operationid=oh.operationid"
+					" and o.scriptid=s.scriptid"
+					" and o.operationid=" ZBX_FS_UI64
+					" and oh.hostid is null",
+				operationid);
+	}
 
 	result = DBselect("%s", buffer);
 
@@ -1550,7 +1559,7 @@ skip:
 		zbx_vector_ptr_pair_destroy(&webhook_params);
 		zbx_script_clean(&script);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_vector_uint64_destroy(&executed_on_hosts);
 
 	zbx_dc_close_user_macros(um_handle);
@@ -1608,7 +1617,7 @@ static void	get_mediatype_params(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *
 		zbx_free(value);
 
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_dc_close_user_macros(um_handle);
 
@@ -1752,7 +1761,7 @@ static void	add_message_alert(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_e
 
 	zbx_free(period);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == mediatypeid)
 	{
@@ -1878,7 +1887,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 
 		zbx_vector_uint64_destroy(&condition.eventids);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 succeed:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1958,7 +1967,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_D
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operation.");
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	flush_user_msg(&user_msg, escalation->esc_step, event, NULL, action->actionid, NULL, NULL, service);
 
@@ -1989,7 +1998,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_D
 		else
 			escalation->status = ESCALATION_STATUS_COMPLETED;
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		zbx_free(sql);
 	}
 	else
@@ -2060,7 +2069,7 @@ static void	escalation_execute_recovery_operations(const ZBX_DB_EVENT *event, co
 				break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	flush_user_msg(&user_msg, 1, event, r_event, action->actionid, NULL, NULL, service);
 
@@ -2137,7 +2146,7 @@ static void	escalation_execute_update_operations(const ZBX_DB_EVENT *event, cons
 				break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	flush_user_msg(&user_msg, 1, event, r_event, action->actionid, ack, service_alarm, service);
 
@@ -2304,7 +2313,7 @@ static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 	else
 		ret = SUCCEED;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -2331,6 +2340,7 @@ static const char	*escalation_status_string(unsigned char status)
  *                                                                            *
  * Parameters: escalation - [IN]  escalation to check                         *
  *             action     - [IN]  action responsible for the escalation       *
+ *             s_eventids - [IN]  symptom event ids                           *
  *             error      - [OUT] message in case escalation is cancelled     *
  *                                                                            *
  * Return value: ZBX_ESCALATION_CANCEL   - the relevant event, item, trigger  *
@@ -2346,7 +2356,7 @@ static const char	*escalation_status_string(unsigned char status)
  *                                                                            *
  ******************************************************************************/
 static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *action, const ZBX_DB_EVENT *event,
-		char **error)
+		zbx_vector_uint64_t *s_eventids, char **error)
 {
 	DC_ITEM		item;
 	int		errcode, ret = ZBX_ESCALATION_CANCEL;
@@ -2403,7 +2413,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 	}
 
 /* action escalation processing mode */
-/*#define ACTION_PAUSE_SUPPRESSED_FALSE	0	 process escalation for suppressed events */
+#define ACTION_PAUSE_SUPPRESSED_FALSE	0	/* process escalation for suppressed events */
 #define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource &&
 			ACTION_PAUSE_SUPPRESSED_TRUE == action->pause_suppressed &&
@@ -2426,6 +2436,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 			goto out;
 		}
 	}
+#undef ACTION_PAUSE_SUPPRESSED_FALSE
 #undef ACTION_PAUSE_SUPPRESSED_TRUE
 
 	if (0 != skip)
@@ -2434,6 +2445,20 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		ret = ZBX_ESCALATION_SKIP;
 		goto out;
 	}
+
+/* action escalation symptom event processing mode */
+#define ACTION_PAUSE_SYMPTOMS_FALSE	0	/* process escalation for symptom events */
+#define ACTION_PAUSE_SYMPTOMS_TRUE	1	/* pause escalation for symptom events */
+	if (EVENT_SOURCE_TRIGGERS == action->eventsource && ACTION_PAUSE_SYMPTOMS_TRUE == action->pause_symptoms &&
+			0 == escalation->acknowledgeid && 0 == escalation->r_eventid &&
+			FAIL != zbx_vector_uint64_bsearch(s_eventids, event->eventid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+	{
+		/* suppress escalations for trigger-based symptom events */
+		ret = ZBX_ESCALATION_SUPPRESS;
+		goto out;
+	}
+#undef ACTION_PAUSE_SYMPTOMS_FALSE
+#undef ACTION_PAUSE_SYMPTOMS_TRUE
 
 	ret = ZBX_ESCALATION_PROCESS;
 out:
@@ -2593,7 +2618,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 				config_timeout);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -2832,7 +2857,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 
 		last_serviceid = (zbx_int64_t)service->serviceid;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	get_services_rootcause_eventids(&serviceids, services);
@@ -2900,7 +2925,7 @@ static void	db_get_service_alarms(zbx_vector_service_alarm_t *service_alarms,
 
 		zbx_vector_service_alarm_append(service_alarms, service_alarm);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(filter);
 }
@@ -2951,11 +2976,11 @@ static void	service_role_clean(zbx_service_role_t *role)
 }
 
 static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *escalations,
-		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *actionids, const char *default_timezone,
-		int config_timeout)
+		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *problem_eventids, zbx_vector_uint64_t *actionids,
+		const char *default_timezone, int config_timeout)
 {
 	int				i, ret;
-	zbx_vector_uint64_t		escalationids;
+	zbx_vector_uint64_t		escalationids, symptom_eventids;
 	zbx_vector_ptr_t		diffs, actions, events;
 	zbx_escalation_diff_t		*diff;
 	zbx_vector_uint64_pair_t	event_pairs;
@@ -2967,6 +2992,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 	zbx_dc_um_handle_t		*um_handle;
 
 	zbx_vector_uint64_create(&escalationids);
+	zbx_vector_uint64_create(&symptom_eventids);
 	zbx_vector_ptr_create(&diffs);
 	zbx_vector_ptr_create(&actions);
 	zbx_vector_ptr_create(&events);
@@ -2984,6 +3010,9 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 	get_db_actions_info(actionids, &actions);
 	zbx_db_get_events_by_eventids(eventids, &events);
+
+	zbx_db_select_symptom_eventids(problem_eventids, &symptom_eventids);
+	zbx_vector_uint64_sort(&symptom_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (0 != ((DB_ESCALATION *)escalations->values[0])->serviceid)
 	{
@@ -3098,7 +3127,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 		/* Handle escalation taking into account status of items, triggers, hosts, */
 		/* maintenance and trigger dependencies.                                   */
 		if (ZBX_ESCALATION_UNSET == state)
-			state = check_escalation(escalation, action, event, &error);
+			state = check_escalation(escalation, action, event, &symptom_eventids, &error);
 
 		switch (state)
 		{
@@ -3303,6 +3332,7 @@ out:
 	ret = escalationids.values_num; /* performance metric */
 
 	zbx_vector_uint64_destroy(&escalationids);
+	zbx_vector_uint64_destroy(&symptom_eventids);
 
 	return ret;
 }
@@ -3340,7 +3370,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	size_t			filter_alloc = 0, filter_offset = 0;
 
 	zbx_vector_ptr_t		escalations;
-	zbx_vector_uint64_t		actionids, eventids;
+	zbx_vector_uint64_t		actionids, eventids, problem_eventids;
 
 	DB_ESCALATION		*escalation;
 
@@ -3349,6 +3379,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	zbx_vector_ptr_create(&escalations);
 	zbx_vector_uint64_create(&actionids);
 	zbx_vector_uint64_create(&eventids);
+	zbx_vector_uint64_create(&problem_eventids);
 
 	/* Selection of escalations to be processed:                                                          */
 	/*                                                                                                    */
@@ -3409,8 +3440,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 					"acknowledgeid,servicealarmid,serviceid"
 				" from escalations"
 				" where %s and nextcheck<=%d"
-				" order by actionid,triggerid,itemid,escalationid", filter,
-				now + CONFIG_ESCALATOR_FREQUENCY);
+				" order by actionid,triggerid,itemid," ZBX_SQL_SORT_ASC("r_eventid") ",escalationid",
+				filter, now + CONFIG_ESCALATOR_FREQUENCY);
 	zbx_free(filter);
 
 	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())
@@ -3445,31 +3476,34 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		zbx_vector_ptr_append(&escalations, escalation);
 		zbx_vector_uint64_append(&actionids, escalation->actionid);
 		zbx_vector_uint64_append(&eventids, escalation->eventid);
+		zbx_vector_uint64_append(&problem_eventids, escalation->eventid);
 
 		if (0 < escalation->r_eventid)
 			zbx_vector_uint64_append(&eventids, escalation->r_eventid);
 
 		if (escalations.values_num >= ZBX_ESCALATIONS_PER_STEP)
 		{
-			ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &actionids,
-					default_timezone, config_timeout);
+			ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &problem_eventids,
+					&actionids, default_timezone, config_timeout);
 			zbx_vector_ptr_clear_ext(&escalations, zbx_ptr_free);
 			zbx_vector_uint64_clear(&actionids);
 			zbx_vector_uint64_clear(&eventids);
+			zbx_vector_uint64_clear(&problem_eventids);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < escalations.values_num)
 	{
-		ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &actionids, default_timezone,
-				config_timeout);
+		ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &problem_eventids,
+				&actionids, default_timezone, config_timeout);
 		zbx_vector_ptr_clear_ext(&escalations, zbx_ptr_free);
 	}
 
 	zbx_vector_ptr_destroy(&escalations);
 	zbx_vector_uint64_destroy(&actionids);
 	zbx_vector_uint64_destroy(&eventids);
+	zbx_vector_uint64_destroy(&problem_eventids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -3497,9 +3531,8 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(escalator_args_in->zbx_get_program_type_cb_arg()), server_num,
-			get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -3517,7 +3550,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (0 != sleeptime)
 		{

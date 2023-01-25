@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,7 +149,7 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			}
 			else {
 				unset($macro['discovery_state'], $macro['original_value'], $macro['original_description'],
-					$macro['original_macro_type']
+					$macro['original_macro_type'], $macro['allow_revert']
 				);
 			}
 		}

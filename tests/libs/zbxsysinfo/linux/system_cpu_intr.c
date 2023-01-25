@@ -39,6 +39,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_init_agent_result(&result);
 	zbx_init_agent_request(&request);
+	zbx_init_library_sysinfo(get_config_timeout);
 
 	if (SUCCEED != zbx_parse_item_key(itemkey, &request))
 		fail_msg("Invalid item key format '%s'", itemkey);

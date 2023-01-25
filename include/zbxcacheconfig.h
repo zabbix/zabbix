@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@
 #include "zbxeval.h"
 #include "zbxavailability.h"
 #include "zbxversion.h"
+#include "zbxvault.h"
+#include "zbxregexp.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -187,6 +189,7 @@ typedef struct
 	char			*script_params;
 	char			*error;
 	unsigned char		*formula_bin;
+	int			snmp_max_repetitions;
 }
 DC_ITEM;
 
@@ -636,8 +639,9 @@ zbx_synced_new_config_t;
 
 #define ZBX_ITEM_GET_PROCESS		0
 
-void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids);
-void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids,
+		const zbx_config_vault_t *config_vault);
+void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
 
@@ -658,6 +662,7 @@ void	zbx_dc_config_history_sync_get_functions_by_functionids(DC_FUNCTION *functi
 void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
 void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int *errcodes, size_t num);
+void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *itemids);
 
 void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items, const zbx_host_key_t *keys,
 		int *errcodes, size_t num);
@@ -676,6 +681,7 @@ void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zb
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_all_triggers(void);
 int	DCconfig_trigger_exists(zbx_uint64_t triggerid);
+
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);
 int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);
@@ -779,8 +785,8 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
 		zbx_uint64_t *triggers_enabled_problem, zbx_uint64_t *triggers_disabled,
 		zbx_vector_ptr_t *required_performance);
 
-void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
-void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
+void	DCget_expressions_by_names(zbx_vector_expression_t *expressions, const char * const *names, int names_num);
+void	DCget_expressions_by_name(zbx_vector_expression_t *expressions, const char *name);
 
 int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 

@@ -415,6 +415,10 @@ $toc-title-bg-color: #4f4f4f;
 	}
 }
 
+.icon-action-ack-green::before {
+	background-position: -423px -356px;
+}
+
 .icon-description::after {
 	color: $font-selected-color;
 }

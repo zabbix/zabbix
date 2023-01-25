@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,5 +87,8 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname);
-#endif
+#endif /* !HAVE_SQLITE3 */
+
+unsigned char	DBget_program_type(void);
+
 #endif

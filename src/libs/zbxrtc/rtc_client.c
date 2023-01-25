@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse loglevel runtime control option                             *
+ * Purpose: parse runtime control option                                      *
  *                                                                            *
  * Parameters: opt   - [IN] the runtime control option                        *
  *             len   - [IN] the runtime control option length without         *
@@ -42,24 +42,36 @@
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	rtc_parse_log_level_parameter(const char *opt, size_t len, char **data, char **error)
+static int	rtc_parse_runtime_parameter(const char *opt, zbx_uint32_t code, size_t len, char **data, char **error)
 {
 	struct 	zbx_json	j;
 	const char		*proc_name;
-	int			pid = 0, proc_num = 0, proc_type = ZBX_PROCESS_TYPE_UNKNOWN;
+	int			pid = 0, proc_num = 0, proc_type = ZBX_PROCESS_TYPE_UNKNOWN, scope = 0;
 
-	if (SUCCEED != zbx_rtc_parse_loglevel_option(opt, len, &pid, &proc_type, &proc_num, error))
+	if (SUCCEED != zbx_rtc_parse_option(opt, len, &pid, &proc_type, &proc_num,
+			ZBX_RTC_PROF_ENABLE == code ? &scope : NULL, error))
+	{
 		return FAIL;
+	}
 
 	if (0 != pid)
 	{
 		zbx_json_init(&j, 1024);
 		zbx_json_addint64(&j, ZBX_PROTO_TAG_PID, pid);
+		zbx_json_addint64(&j, ZBX_PROTO_TAG_SCOPE, scope);
 		goto finish;
 	}
 
 	if (ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
+	{
+		if (0 != scope)
+		{
+			zbx_json_init(&j, 1024);
+			zbx_json_addint64(&j, ZBX_PROTO_TAG_SCOPE, scope);
+			goto finish;
+		}
 		return SUCCEED;
+	}
 
 	proc_name = get_process_type_string((unsigned char)proc_type);
 
@@ -69,6 +81,8 @@ static int	rtc_parse_log_level_parameter(const char *opt, size_t len, char **dat
 	if (0 != proc_num)
 		zbx_json_addint64(&j, ZBX_PROTO_TAG_PROCESS_NUM, proc_num);
 
+	if (0 != scope)
+		zbx_json_addint64(&j, ZBX_PROTO_TAG_SCOPE, scope);
 finish:
 	*data = zbx_strdup(NULL, j.buffer);
 	zbx_json_clean(&j);
@@ -91,14 +105,28 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char
 	{
 		*code = ZBX_RTC_LOG_LEVEL_INCREASE;
 
-		return rtc_parse_log_level_parameter(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE), data, error);
+		return rtc_parse_runtime_parameter(opt, *code, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE), data, error);
 	}
 
 	if (0 == strncmp(opt, ZBX_LOG_LEVEL_DECREASE, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE)))
 	{
 		*code = ZBX_RTC_LOG_LEVEL_DECREASE;
 
-		return rtc_parse_log_level_parameter(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE), data, error);
+		return rtc_parse_runtime_parameter(opt, *code, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE), data, error);
+	}
+
+	if (0 == strncmp(opt, ZBX_PROF_ENABLE, ZBX_CONST_STRLEN(ZBX_PROF_ENABLE)))
+	{
+		*code = ZBX_RTC_PROF_ENABLE;
+
+		return rtc_parse_runtime_parameter(opt, *code, ZBX_CONST_STRLEN(ZBX_PROF_ENABLE), data, error);
+	}
+
+	if (0 == strncmp(opt, ZBX_PROF_DISABLE, ZBX_CONST_STRLEN(ZBX_PROF_DISABLE)))
+	{
+		*code = ZBX_RTC_PROF_DISABLE;
+
+		return rtc_parse_runtime_parameter(opt, *code, ZBX_CONST_STRLEN(ZBX_PROF_DISABLE), data, error);
 	}
 
 	if (0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
@@ -310,6 +338,8 @@ int	zbx_rtc_async_exchange(char **data, zbx_uint32_t code, int config_timeout, c
 		/* allow only socket based runtime control options */
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
+		case ZBX_RTC_PROF_ENABLE:
+		case ZBX_RTC_PROF_DISABLE:
 			*error = zbx_dsprintf(NULL, "operation is not supported on the given operating system");
 			return FAIL;
 	}

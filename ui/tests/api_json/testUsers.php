@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -389,6 +389,22 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => 'Not allowed to set password for user "guest".'
 			],
+			// Check super admin type user password change for himself/herself.
+			[
+				'user' => [[
+					'userid' => '1',
+					'passwd' => 'Z@bb1x1234'
+				]],
+				'expected_error' => 'Current password is mandatory.'
+			],
+			[
+				'user' => [[
+					'userid' => '1',
+					'current_passwd' => 'test1234',
+					'passwd' => 'test1234'
+				]],
+				'expected_error' => 'Incorrect current password.'
+			],
 			// Check user username.
 			[
 				'user' => [[
@@ -570,6 +586,20 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			// Check super admin type user password change for another super admin type user.
+			[
+				'user' => [
+					[
+						'userid' => '16',
+						'username' => 'api-user-for-password-super-admin',
+						'passwd' => 'GreatNewP',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						]
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -603,6 +633,10 @@ class testUsers extends CAPITest {
 				$this->assertEquals($dbRowUser['theme'], 'default');
 				$this->assertEquals($dbRowUser['url'], '');
 
+				if ($id == '16') {
+					$this->assertEquals(1, password_verify('GreatNewP', $dbRowUser['passwd']));
+				}
+
 				$this->assertEquals(1, CDBHelper::getCount('select * from users_groups where userid='.zbx_dbstr($id).
 						' and usrgrpid='.zbx_dbstr($users[$key]['usrgrps'][0]['usrgrpid']))
 				);
@@ -627,6 +661,52 @@ class testUsers extends CAPITest {
 				$this->assertEquals($oldHashUser, CDBHelper::getHash($sqlUser));
 			}
 		}
+	}
+
+		public static function user_password() {
+		return [
+			[
+				'method' => 'user.update',
+				'login' => ['user' => 'api-user-for-password-user', 'password' => 'test1234u'],
+				'user' => [
+					'userid' => '17',
+					'passwd' => 'trytochangep',
+					'username' => 'api-user-for-password-user'
+				],
+				'expected_error' => 'Current password is mandatory.'
+			],
+			[
+				'method' => 'user.update',
+				'login' => ['user' => 'api-user-for-password-user', 'password' => 'test1234u'],
+				'user' => [
+					'userid' => '17',
+					'passwd' => 'TryToChangeP',
+					'current_passwd' => 'IncorrectCurrentP',
+					'username' => 'api-user-for-password-user'
+				],
+				'expected_error' => 'Incorrect current password.'
+			],
+			// Successfully user update.
+			[
+				'method' => 'user.update',
+				'login' => ['user' => 'api-user-for-password-user', 'password' => 'test1234u'],
+				'user' => [
+					'userid' => '17',
+					'passwd' => 'AcceptableNewP',
+					'current_passwd' => 'test1234u',
+					'username' => 'api-user-for-password-user'
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	* @dataProvider user_password
+	*/
+	public function testUser_UpdatePassword($method, $login, $user, $expected_error) {
+		$this->authorize($login['user'], $login['password']);
+		$this->call($method, $user, $expected_error);
 	}
 
 	public static function user_properties() {

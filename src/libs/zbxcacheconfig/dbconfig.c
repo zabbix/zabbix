@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,8 +113,6 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts);
 static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint64_t revision);
 static int	dc_item_update_revision(ZBX_DC_ITEM *item, zbx_uint64_t revision);
 
-extern char		*CONFIG_VAULTTOKEN;
-extern char		*CONFIG_VAULT;
 /******************************************************************************
  *                                                                            *
  * Purpose: copies string into configuration cache shared memory              *
@@ -343,6 +341,15 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 	if (ITEM_TYPE_SNMP == type)
 	{
 		ZBX_DC_SNMPINTERFACE	*snmp;
+		ZBX_DC_SNMPITEM		*snmpitem;
+
+		if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid)))
+		{
+			if (0 == strncmp(snmpitem->snmp_oid, "walk[", 5))
+			{
+				return itemid;
+			}
+		}
 
 		if (NULL == (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp, &interfaceid))
 				|| SNMP_BULK_ENABLED != snmp->bulk)
@@ -1168,7 +1175,7 @@ static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid,
 
 
 static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_uint64_t *active_avail_diff,
-		zbx_hashset_t *activated_hosts)
+		zbx_hashset_t *activated_hosts, const zbx_config_vault_t *config_vault)
 {
 	char				**row;
 	zbx_uint64_t			rowid;
@@ -1471,7 +1478,7 @@ done:
 				(HOST_STATUS_PROXY_ACTIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED &
 				host->tls_accept)))
 		{
-			if (NULL != CONFIG_VAULTTOKEN || NULL != CONFIG_VAULT)
+			if (NULL != config_vault->token || NULL != config_vault->name)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "connection with Zabbix proxy \"%s\" should not be"
 						" unencrypted when using Vault", host->host);
@@ -1841,7 +1848,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
+void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
@@ -1872,7 +1879,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 			}
 
 		}
-		else if (FAIL == zbx_vault_kvs_get(dc_kvs_path->path, &kvs, &error))
+		else if (FAIL == zbx_vault_kvs_get(dc_kvs_path->path, &kvs, config_vault, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path,
 					error);
@@ -2063,6 +2070,7 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 	ZBX_STR2UCHAR(snmp->authprotocol, row[19]);
 	ZBX_STR2UCHAR(snmp->privprotocol, row[20]);
 	dc_strpool_replace(found, &snmp->contextname, row[21]);
+	ZBX_STR2UCHAR(snmp->max_repetitions, row[22]);
 
 	return snmp;
 }
@@ -6441,7 +6449,7 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 			timer->eval_ts = timer_local.eval_ts;
 
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
@@ -6466,7 +6474,8 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids)
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids,
+		const zbx_config_vault_t *config_vault)
 {
 	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
 
@@ -6632,7 +6641,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 
 	START_SYNC;
 	sec = zbx_time();
-	config->um_cache = um_cache_sync(config->um_cache, new_revision, &gmacro_sync, &hmacro_sync, &htmpl_sync);
+	config->um_cache = um_cache_sync(config->um_cache, new_revision, &gmacro_sync, &hmacro_sync, &htmpl_sync,
+			config_vault);
 	um_cache_sec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6701,7 +6711,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	START_SYNC;
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
-	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts);
+	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts, config_vault);
 	zbx_dbsync_clear_user_macros();
 	hsec2 = zbx_time() - sec;
 
@@ -8551,6 +8561,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->snmpv3_privprotocol = snmp->privprotocol;
 				zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
 				dst_item->snmp_version = snmp->version;
+				dst_item->snmp_max_repetitions = snmp->max_repetitions;
 			}
 			else
 			{
@@ -8564,6 +8575,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->snmpv3_privprotocol = 0;
 				*dst_item->snmpv3_contextname_orig = '\0';
 				dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+				dst_item->snmp_max_repetitions = 0;
 			}
 
 			dst_item->snmp_community = NULL;
@@ -12355,7 +12367,7 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num)
+void	DCget_expressions_by_names(zbx_vector_expression_t *expressions, const char * const *names, int names_num)
 {
 	int			i, iname;
 	const ZBX_DC_EXPRESSION	*expression;
@@ -12388,7 +12400,7 @@ void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * cons
 				rxp->case_sensitive = expression->case_sensitive;
 				rxp->expression_type = expression->type;
 
-				zbx_vector_ptr_append(expressions, rxp);
+				zbx_vector_expression_append(expressions, rxp);
 			}
 		}
 	}
@@ -12407,7 +12419,7 @@ void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * cons
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
+void	DCget_expressions_by_name(zbx_vector_expression_t *expressions, const char *name)
 {
 	DCget_expressions_by_names(expressions, &name, 1);
 }

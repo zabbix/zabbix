@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,9 +96,10 @@ $html_page = (new CHtmlPage())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", {rules_preset: "template"},
-						{dialogue_class: "modal-popup-generic"}
-					);')
+					->onClick('return PopUp("popup.import", {rules_preset: "template"}, {
+						dialogueid: "popup_import",
+						dialogue_class: "modal-popup-generic"
+					});')
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))

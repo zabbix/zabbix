@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'type' =>           [T_ZBX_INT,			O_OPT, null,	IN([GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED]), null],
-	'itemids' =>		[T_ZBX_INT,			O_MAND, P_SYS,	DB_ID,		null],
+	'type' =>			[T_ZBX_INT,			O_OPT, null,	IN([GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED]), null],
+	'itemids' =>		[T_ZBX_INT,			O_MAND, P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
 	'from' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
 	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
 	'profileIdx' =>		[T_ZBX_STR,			O_OPT, null,	null,		null],

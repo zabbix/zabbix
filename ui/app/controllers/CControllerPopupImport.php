@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,33 +68,33 @@ class CControllerPopupImport extends CController {
 			case 'host':
 				$rules['host_groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['hosts'] = ['updateExisting' => true, 'createMissing' => true];
-				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
+				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => true];
+				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
-					'deleteMissing' => false
+					'deleteMissing' => true
 				];
-				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
+				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
+				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				break;
 
 			case 'template':
 				$rules['host_groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['template_groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['templates'] = ['updateExisting' => true, 'createMissing' => true];
-				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				$rules['templateDashboards'] = ['updateExisting' => true, 'createMissing' => true,
-					'deleteMissing' => false
+					'deleteMissing' => true
 				];
-				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => true];
+				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
-					'deleteMissing' => false
+					'deleteMissing' => true
 				];
-				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
+				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
+				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				break;
 
 			case 'mediatype':
@@ -163,6 +163,7 @@ class CControllerPopupImport extends CController {
 				'title' => _('Import'),
 				'rules' => $rules,
 				'rules_preset' => $this->getInput('rules_preset'),
+				'advanced_config' => in_array($this->getInput('rules_preset'), ['host', 'template']),
 				'user' => [
 					'type' => $this->getUserType(),
 					'can_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),

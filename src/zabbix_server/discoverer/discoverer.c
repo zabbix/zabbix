@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -461,7 +461,7 @@ static void	process_checks(const ZBX_DB_DRULE *drule, int *host_status, char *ip
 
 		process_check(&dcheck, host_status, ip, now, services, config_timeout);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static int	process_services(const ZBX_DB_DRULE *drule, ZBX_DB_DHOST *dhost, const char *ip, const char *dns,
@@ -661,7 +661,7 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 	if (NULL != (row = DBfetch(result)))
 		iprange = zbx_strdup(iprange, row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (NULL == iprange)
 		goto out;
@@ -696,7 +696,7 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 		else
 			zbx_vector_uint64_append(&keep_dhostids, dhostid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(iprange);
 
@@ -816,7 +816,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout)
 				discovery_clean_services(druleid);
 
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		now = time(NULL);
 	}
@@ -845,9 +845,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(discoverer_args_in->zbx_get_program_type_cb_arg()), server_num,
-			get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -870,7 +869,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		unsigned char	*rtc_data;
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (0 != sleeptime)
 		{

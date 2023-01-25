@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,9 +22,7 @@
 #include "zbxdbwrap.h"
 #include "zbx_rtc_constants.h"
 
-extern int	CONFIG_PROXYMODE;
-
-int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
+int	rtc_process_request_ex_passive(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
 {
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(result);
@@ -32,13 +30,8 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
 	switch (code)
 	{
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
-			{
-				zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL,
-						0);
-				return SUCCEED;
-			}
-			return FAIL;
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
+			return SUCCEED;
 	}
 
 	return FAIL;

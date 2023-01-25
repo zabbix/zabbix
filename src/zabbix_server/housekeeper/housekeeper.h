@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ extern int	CONFIG_MAX_HOUSEKEEPER_DELETE;
 
 typedef struct
 {
-	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
 	struct zbx_db_version_info_t	*db_version_info;
 	int				config_timeout;
 }

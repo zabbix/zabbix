@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@
 
 #ifndef HAVE_SQLITE3
 
-extern unsigned char	program_type;
-
 static int	DBpatch_5010000(void)
 {
 	const ZBX_FIELD	field = {"default_lang", "en_GB", NULL, NULL, 5, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
@@ -55,7 +53,7 @@ static int	DBpatch_5010002(void)
 
 static int	DBpatch_5010003(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ('web.latest.toggle','web.latest.toggle_other')"))
@@ -70,7 +68,7 @@ static int	DBpatch_5010004(void)
 	DB_RESULT	result;
 	int		ret = SUCCEED;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	result = DBselect("select userid from profiles where idx='web.latest.sort' and value_str='lastclock'");
@@ -86,7 +84,7 @@ static int	DBpatch_5010004(void)
 			break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -310,7 +308,7 @@ static int	DBpatch_5010034(void)
 
 static int	DBpatch_5010035(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.hostsmon.filter.%%' or idx like 'web.problem.filter%%'"))
@@ -1341,7 +1339,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		zbx_vector_ptr_append(&screen_items, (void *)scr_item);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (screen_items.values_num > 0)
 	{
@@ -1450,7 +1448,7 @@ static int	DBpatch_5010044(void)
 	DB_ROW		row;
 	int		ret = SUCCEED;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
 	result = DBselect("select screenid,name,templateid from screens where templateid is not null");
@@ -1466,7 +1464,7 @@ static int	DBpatch_5010044(void)
 			ret = DBpatch_delete_screen(screenid);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1631,7 +1629,7 @@ static int	DBpatch_5010058(void)
 			NULL
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; NULL != values[i]; i++)
@@ -1667,7 +1665,7 @@ static int	DBpatch_5010059(void)
 			NULL
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; NULL != values[i]; i++)
@@ -1690,7 +1688,7 @@ static int	DBpatch_5010061(void)
 {
 	int	i;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 1; i <= 3; i++)
@@ -1749,7 +1747,7 @@ static int	DBpatch_5010067(void)
 			NULL
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; NULL != values[i]; i++)

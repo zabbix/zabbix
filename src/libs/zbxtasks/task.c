@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1209,11 +1209,11 @@ static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
 			if (SUCCEED != (ret = atoi(row[0])))
 				ret = FAIL;
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return ret;
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	*info = zbx_strdup(NULL, "Timeout while waiting for result.");
