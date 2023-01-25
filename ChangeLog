@@ -1,6 +1,9 @@
 Changes for 6.4.0beta6
 
 New features:
+.......... [ZBX-20110] added single field search option to oracle archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys for Zabbix agent 2 (esneiders)
+.........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
+.........T [ZBXNEXT-7775] added veeam backup and replication templates (egordymov)
 ..F....... [ZBXNEXT-7605] replaced column "Ack" with "Update" in problem lists (Ivo)
 ....I..... [ZBXNEXT-8213] added database upgrade patch for renamed Actions filters (dpetra)
 ..F....... [ZBXNEXT-1354] implemented host filtering by status (dpetra)
@@ -9,9 +12,8 @@ A.F....... [ZBXNEXT-7951] improved import configuration by changing UI, matching
 .........T [ZBXNEXT-8112] added Line media type (abiba)
 ........S. [ZBXNEXT-8197] added TimescaleDB v2.9.x support (dgoloscapov)
 .........T [ZBXNEXT-7962] fixed interfaces discovery rules in OPNsense, PFSense and TrueNAS templates (drasikhov)
-A.F....... [ZBXNEXT-3100] added requirement for users to enter current password when changing their own password (dpetra)
 .........T [ZBXNEXT-8115] updated system.sw.packages key in Linux templates (abakaldin)
-A.F....... [ZBXNEXT-3100] implemented current password which is required for all users when their own password is changed (dpetra)
+A.F....... [ZBXNEXT-3100] added requirement for users to enter current password when changing their own password (dpetra)
 A.F.I...S. [ZBXNEXT-7964] introduced two-level event/problem hierarchy: causes and symptoms (Ivo, mprihodko)
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (egordymov)
 
@@ -263,6 +265,9 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.7rc1
 
 New features:
+.......... [ZBX-20110] added single field search option to oracle archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys for Zabbix agent 2 (esneiders)
+.........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
+.........T [ZBXNEXT-7775] added veeam backup and replication templates (egordymov)
 .......PS. [ZBXNEXT-8054] updated MariaDB maximum supported version to 10.10 (MVekslers)
 A.F....... [ZBXNEXT-7951] improved import configuration by changing UI, matching logic and unlinking logic (acikuns, rdetlavs)
 .........T [ZBXNEXT-8112] added Line media type (abiba)
@@ -857,6 +862,9 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.13rc1
 
 New features:
+.......... [ZBX-20110] added single field search option to oracle archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys for Zabbix agent 2 (esneiders)
+.........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
+.........T [ZBXNEXT-7775] added veeam backup and replication templates (egordymov)
 .......PS. [ZBXNEXT-8054] updated MariaDB maximum supported version to 10.10 (MVekslers)
 A.F....... [ZBXNEXT-7951] implemented configuration import improvements (rdetlavs)
 .........T [ZBXNEXT-8112] added Line media type (abiba)
@@ -3192,6 +3200,12 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.31rc2
+
+Bug fixes:
+...G...... [ZBX-20110] added single field search option to oracle archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys for Zabbix agent 2 (esneiders)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.31rc1

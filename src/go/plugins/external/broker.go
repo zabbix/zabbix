@@ -24,7 +24,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"strconv"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
@@ -335,7 +334,7 @@ func (b *pluginBroker) register() (*comms.RegisterResponse, error) {
 			Common: comms.Common{
 				Type: comms.RegisterRequestType,
 			},
-			Version: strconv.Itoa(comms.MajorVersion),
+			ProtocolVersion: comms.ProtocolVersion,
 		},
 		out: make(chan interface{}),
 	}
