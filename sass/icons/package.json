@@ -4,7 +4,7 @@
   },
   "scripts": {
     "generate": "svgtofont --sources ./svg --output ./dist --fontName zabbix-icons",
-    "cleanup": "rm ./dist/symbol.html ./dist/unicode.html ./dist/*.symbol.svg ./dist/*.eot"
+    "cleanup": "rm ./dist/symbol.html ./dist/unicode.html ./dist/*.symbol.svg ./dist/*.eot ./dist/*.scss"
   },
   "svgtofont": {
     "emptyDist": true,
