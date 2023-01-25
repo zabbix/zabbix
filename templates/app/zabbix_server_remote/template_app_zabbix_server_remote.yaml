@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2023-01-25T12:15:56Z'
+  date: '2023-01-25T14:22:53Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1817,14 +1817,14 @@ zabbix_export:
               value: system
         -
           uuid: 1e6a7ebfc0de47fd823ff59458317172
-          name: 'Zabbix stats proxy'
+          name: 'Zabbix proxies stats'
           type: DEPENDENT
-          key: zabbix.proxy.stats
+          key: zabbix.proxies.stats
           delay: '0'
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Zabbix proxy statistics master item.'
+          description: 'Zabbix proxies statistics master item.'
           preprocessing:
             -
               type: JSONPATH
@@ -2096,7 +2096,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].cert.first()'
+                    - $.cert
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -2106,7 +2106,7 @@ zabbix_export:
                   parameters:
                     - 12h
               master_item:
-                key: zabbix.proxy.stats
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -2128,13 +2128,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].compatibility.first()'
+                    - $.compatibility
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: zabbix.proxy.stats
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -2172,7 +2172,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].compression.first()'
+                    - $.compression
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -2182,7 +2182,7 @@ zabbix_export:
                   parameters:
                     - 12h
               master_item:
-                key: zabbix.proxy.stats
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -2202,13 +2202,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].hosts.first()'
+                    - $.hosts
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: zabbix.proxy.stats
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -2228,13 +2228,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].items.first()'
+                    - $.items
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: zabbix.proxy.stats
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -2257,9 +2257,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].last_seen.first()'
+                    - $.last_seen
               master_item:
-                key: zabbix.proxy.stats
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -2309,7 +2309,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].passive.first()'
+                    - $.passive
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -2319,7 +2319,7 @@ zabbix_export:
                   parameters:
                     - 12h
               master_item:
-                key: zabbix.proxy.stats
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -2341,7 +2341,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].psk.first()'
+                    - $.psk
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -2351,7 +2351,7 @@ zabbix_export:
                   parameters:
                     - 12h
               master_item:
-                key: zabbix.proxy.stats
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -2373,17 +2373,44 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].requiredperformance.first()'
+                    - $.requiredperformance
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: zabbix.proxy.stats
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
                   value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 285d4a878d3e43cc930d5a82bb103f13
+              name: 'Proxy [{#PROXY.NAME}]: Stats'
+              type: DEPENDENT
+              key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Discovered proxy statistics.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].first()'
+              master_item:
+                key: zabbix.proxies.stats
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: proxy-name
                   value: '{#PROXY.NAME}'
@@ -2401,7 +2428,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].unencrypted.first()'
+                    - $.unencrypted
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -2411,7 +2438,7 @@ zabbix_export:
                   parameters:
                     - 12h
               master_item:
-                key: zabbix.proxy.stats
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -2433,13 +2460,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].version.first()'
+                    - $.version
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: zabbix.proxy.stats
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -2448,7 +2475,7 @@ zabbix_export:
                   tag: proxy-name
                   value: '{#PROXY.NAME}'
           master_item:
-            key: zabbix.proxy.stats
+            key: zabbix.proxies.stats
           lld_macro_paths:
             -
               lld_macro: '{#PROXY.NAME}'
