@@ -431,7 +431,11 @@ class User extends ScimApiService {
 			'schemas'	=> [self::SCIM_USER_SCHEMA],
 			'id' 		=> $user['userid'],
 			'userName'	=> $user['username'],
-			'active'	=> true
+			'active'	=> true,
+			'name' => [
+				'givenName' => $options['name']['givenName'],
+				'familyName' => $options['name']['familyName']
+			]
 		];
 
 		$provisioning = CProvisioning::forUserDirectoryId($user['userdirectoryid']);
