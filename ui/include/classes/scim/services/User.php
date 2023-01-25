@@ -243,9 +243,27 @@ class User extends ScimApiService {
 
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 
-		$user_group_names = array_key_exists('groups', $options)
-			? array_column($options['groups'], 'display')
-			: [];
+		// Some IdPs have group attribute, but others don't.
+		if (array_key_exists('groups', $options) && array_key_exists('display', $options['groups'][0])) {
+			$user_group_names = array_column($options['groups'], 'display');
+		}
+		else {
+			$user_groupids = DB::select('user_scim_group', [
+				'output' => ['scim_groupid'],
+				'filter' => ['userid' => $options['id']]
+			]);
+
+			if ($user_groupids) {
+				$user_group_names = DB::select('scim_group', [
+					'output' => ['name'],
+					'scim_groupids' => array_column($user_groupids, 'scim_groupid')
+				]);
+				$user_group_names = array_column($user_group_names, 'name');
+			}
+			else {
+				$user_group_names = [];
+			}
+		}
 
 		// In case some IdPs do not send attribute 'active'.
 		$options += [
