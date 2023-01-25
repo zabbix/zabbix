@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-11T12:25:41Z'
+  date: '2023-01-25T15:12:12Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -30,7 +30,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns statistics of client connections.'
+          description: 'Returns the statistics of client connections.'
           url: '{$NGINX.API.ENDPOINT}/6/connections/'
           status_codes: '200,404'
           tags:
@@ -108,7 +108,7 @@ zabbix_export:
               name: 'Nginx: High connections drop rate'
               event_name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.'
+              description: 'The rate of dropped connections is greater than `{$NGINX.DROP_RATE.MAX.WARN}` for the last 5 minutes.'
               tags:
                 -
                   tag: scope
@@ -140,7 +140,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns status information for each HTTP location zone.'
+          description: 'Returns the status information for each HTTP location zone.'
           url: '{$NGINX.API.ENDPOINT}/6/http/location_zones/'
           status_codes: '200,404'
           tags:
@@ -158,7 +158,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns status information for each HTTP server zone.'
+          description: 'Returns the status information for each HTTP server zone.'
           url: '{$NGINX.API.ENDPOINT}/6/http/server_zones/'
           status_codes: '200,404'
           tags:
@@ -176,7 +176,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns status of each HTTP upstream server group and its servers.'
+          description: 'Returns the status of each HTTP upstream server group and its servers.'
           url: '{$NGINX.API.ENDPOINT}/6/http/upstreams/'
           status_codes: '200,404'
           tags:
@@ -194,7 +194,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Return status of nginx running instance.'
+          description: 'Return status of the NGINX running instance.'
           url: '{$NGINX.API.ENDPOINT}/6/nginx/'
           status_codes: '200,404'
           tags:
@@ -238,7 +238,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Nginx error description.'
+          description: 'The description of NGINX errors.'
           preprocessing:
             -
               type: JSONPATH
@@ -300,7 +300,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: uptime
-          description: 'Server uptime.'
+          description: 'The server uptime.'
           preprocessing:
             -
               type: JSONPATH
@@ -324,7 +324,7 @@ zabbix_export:
               name: 'Nginx: Failed to fetch info data'
               event_name: 'Nginx: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for metrics for the last 30 minutes'
+              description: 'Zabbix has not received any data for metrics for the last 30 minutes'
               manual_close: 'YES'
               tags:
                 -
@@ -351,7 +351,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Version of nginx.'
+          description: 'The version number of NGINX.'
           preprocessing:
             -
               type: JSONPATH
@@ -374,7 +374,7 @@ zabbix_export:
               name: 'Nginx: Version has changed'
               event_name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Nginx version has changed. Perform Ack to close.'
+              description: 'The Nginx version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -388,7 +388,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns status of client HTTP requests.'
+          description: 'Returns the status of the client''s HTTP requests.'
           url: '{$NGINX.API.ENDPOINT}/6/http/requests/'
           status_codes: '200,404'
           tags:
@@ -448,7 +448,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns status information for each resolver zone.'
+          description: 'Returns the status information for each Resolver zone.'
           url: '{$NGINX.API.ENDPOINT}/6/resolvers/'
           status_codes: '200,404'
           tags:
@@ -466,7 +466,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns SSL statistics.'
+          description: 'Returns the SSL statistics.'
           url: '{$NGINX.API.ENDPOINT}/6/ssl/'
           status_codes: '200,404'
           tags:
@@ -553,7 +553,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns status information for each stream server zone.'
+          description: 'Returns the status information for each server zone configured in the "stream" directive.'
           url: '{$NGINX.API.ENDPOINT}/6/stream/server_zones/'
           status_codes: '200,404'
           tags:
@@ -636,7 +636,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Location zone {#NAME} raw data.'
+              description: 'The raw data of the location zone with the name `{#NAME}`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -713,7 +713,7 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.1xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “1xx” status codes per second.'
+              description: 'The number of responses with “1xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -739,7 +739,7 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.2xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “2xx” status codes per second.'
+              description: 'The number of responses with “2xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -765,7 +765,7 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.3xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “3xx” status codes per second.'
+              description: 'The number of responses with “3xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -791,7 +791,7 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.4xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “4xx” status codes per second.'
+              description: 'The number of responses with “4xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -817,7 +817,7 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.5xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “5xx” status codes per second.'
+              description: 'The number of responses with “5xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1031,7 +1031,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'HTTP server zone {#NAME} raw data.'
+              description: 'The raw data of the HTTP server zone with the name `{#NAME}` .'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1108,7 +1108,7 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.1xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “1xx” status codes per second.'
+              description: 'The number of responses with “1xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1134,7 +1134,7 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.2xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “2xx” status codes per second.'
+              description: 'The number of responses with “2xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1160,7 +1160,7 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.3xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “3xx” status codes per second.'
+              description: 'The number of responses with “3xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1186,7 +1186,7 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.4xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “4xx” status codes per second.'
+              description: 'The number of responses with “4xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1212,7 +1212,7 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.5xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “5xx” status codes per second.'
+              description: 'The number of responses with “5xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1507,7 +1507,7 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'How many times the server became unhealthy (state “unhealthy”).'
+              description: 'Displays how many times the server has become `unhealthy` (the state - “unhealthy”.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1534,7 +1534,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'HTTP upstream [{#UPSTREAM}] peer [{#PEER}] raw data.'
+              description: 'The raw data of the HTTP upstream with the name `[{#UPSTREAM}]`and peer with the name`[{#PEER}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1620,7 +1620,7 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.1xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “1xx” status codes per second.'
+              description: 'The number of responses with “1xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1649,7 +1649,7 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.2xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “2xx” status codes per second.'
+              description: 'The number of responses with “2xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1678,7 +1678,7 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.3xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “3xx” status codes per second.'
+              description: 'The number of responses with “3xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1707,7 +1707,7 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “4xx” status codes per second.'
+              description: 'The number of responses with “4xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1736,7 +1736,7 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “5xx” status codes per second.'
+              description: 'The number of responses with “5xx” status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1852,7 +1852,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.'
+              description: 'The current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1892,7 +1892,7 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.unavail.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'How many times the server became unavailable for client requests (state “unavail”) due to the number of unsuccessful attempts reaching the max_fails threshold.'
+              description: 'Displays how many times the server has become unavailable for client requests (the state - “unavail”) due to the number of unsuccessful attempts reaching the `max_fails` threshold.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2065,7 +2065,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'HTTP Upstream {#NAME} raw data.'
+              description: 'The raw data of the HTTP upstream with the name `{#NAME}`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2179,7 +2179,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'HTTP Upstream {#NAME} raw data.'
+              description: 'The raw data of the Resolver with the name `{#NAME}`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2282,7 +2282,7 @@ zabbix_export:
               key: 'nginx.resolvers.responses.formerr.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of FORMERR (Format error) responses per second.'
+              description: 'The total number of `FORMERR` (format error) responses per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2334,7 +2334,7 @@ zabbix_export:
               key: 'nginx.resolvers.responses.notimp.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of NOTIMP (Unimplemented) responses per second.'
+              description: 'The total number of `NOTIMP` (Unimplemented) responses per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2360,7 +2360,7 @@ zabbix_export:
               key: 'nginx.resolvers.responses.nxdomain.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of NXDOMAIN (Host not found) responses per second.'
+              description: 'The total number of `NXDOMAIN` (Host not found) responses per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2386,7 +2386,7 @@ zabbix_export:
               key: 'nginx.resolvers.responses.refused.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of REFUSED (Operation refused) responses per second.'
+              description: 'The total number of `REFUSED` (Operation refused) responses per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2412,7 +2412,7 @@ zabbix_export:
               key: 'nginx.resolvers.responses.servfail.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of SERVFAIL (Server failure) responses per second.'
+              description: 'The total number of `SERVFAIL` (Server failure) responses per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2687,7 +2687,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Stream server zone {#NAME} raw data.'
+              description: 'The raw data of server zone with the name `{#NAME}`, configured in the "stream" directive.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2764,7 +2764,7 @@ zabbix_export:
               key: 'nginx.stream.server_zones.sessions.2xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of sessions completed with status codes “2xx” per second.'
+              description: 'The total number of sessions completed with status code “2xx” per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2790,7 +2790,7 @@ zabbix_export:
               key: 'nginx.stream.server_zones.sessions.4xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of sessions completed with status codes “4xx” per second.'
+              description: 'The total number of sessions completed with status code “4xx” per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2816,7 +2816,7 @@ zabbix_export:
               key: 'nginx.stream.server_zones.sessions.5xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of sessions completed with status codes “5xx” per second.'
+              description: 'The total number of sessions completed with status code “5xx” per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3113,7 +3113,7 @@ zabbix_export:
               key: 'nginx.stream.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'How many times the server became unhealthy (state “unhealthy”).'
+              description: 'Displays how many times the server has become `unhealthy` (the state - “unhealthy”).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3140,7 +3140,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Stream upstream [{#UPSTREAM}] peer [{#PEER}] raw data.'
+              description: 'The raw data of the upstream with the name `[{#UPSTREAM}]`and peer with the name`[{#PEER}]`, configured in the "stream" directive.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3255,7 +3255,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.'
+              description: 'The current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3295,7 +3295,7 @@ zabbix_export:
               key: 'nginx.stream.upstream.peer.unavail.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'How many times the server became unavailable for client requests (state “unavail”) due to the number of unsuccessful attempts reaching the max_fails threshold.'
+              description: 'Displays how many times the server has  become unavailable for client requests (the state - “unavail”) due to the number of unsuccessful attempts reaching the `max_fails` threshold.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3387,7 +3387,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Stream upstream {#NAME} raw data.'
+              description: 'The raw data of the upstream with the name `[{#UPSTREAM}], configured in the "stream" directive.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3481,67 +3481,67 @@ zabbix_export:
       macros:
         -
           macro: '{$NGINX.API.ENDPOINT}'
-          description: 'NGINX Plus API URL in the format `<scheme>://<host>:<port>/<location>/`'
+          description: 'NGINX Plus API URL in the format `<scheme>://<host>:<port>/<location>/`.'
         -
           macro: '{$NGINX.DROP_RATE.MAX.WARN}'
           value: '1'
-          description: 'The critical rate of the dropped connections for trigger expression.'
+          description: 'The critical rate of the dropped connections for a  trigger expression.'
         -
           macro: '{$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}'
           value: '5'
-          description: 'Maximum percentage of errors with status code 4xx (for trigger expression).'
+          description: 'The maximum percentage of errors with the status code `4xx` (for a trigger expression).'
         -
           macro: '{$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}'
           value: '5'
-          description: 'Maximum percentage of errors with status code 4xx (for trigger expression).'
+          description: 'The maximum percentage of errors with the status code `5xx` (for a trigger expression).'
         -
           macro: '{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable HTTP location zones'
+          description: 'The filter to include the necessary discovered HTTP location zones.'
         -
           macro: '{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered HTTP location zones'
+          description: 'The filter to exclude discovered HTTP location zones.'
         -
           macro: '{$NGINX.LLD.FILTER.HTTP.UPSTREAM.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable HTTP upstreams'
+          description: 'The filter to include the necessary discovered HTTP upstreams.'
         -
           macro: '{$NGINX.LLD.FILTER.HTTP.UPSTREAM.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered HTTP upstreams'
+          description: 'The filter to exclude discovered HTTP upstreams.'
         -
           macro: '{$NGINX.LLD.FILTER.HTTP.ZONE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable HTTP server zones'
+          description: 'The filter to include the necessary discovered HTTP server zones.'
         -
           macro: '{$NGINX.LLD.FILTER.HTTP.ZONE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered HTTP server zones'
+          description: 'The filter to exclude discovered HTTP server zones.'
         -
           macro: '{$NGINX.LLD.FILTER.RESOLVER.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable Resolvers'
+          description: 'The filter to include the necessary discovered `Resolvers'
         -
           macro: '{$NGINX.LLD.FILTER.RESOLVER.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered Resolvers'
+          description: 'The filter to exclude discovered `Resolvers'
         -
           macro: '{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable Stream upstreams'
+          description: 'The filter to include the necessary discovered upstreams of the "stream" directive.'
         -
           macro: '{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered Stream upstreams'
+          description: 'The filter to exclude discovered upstreams of the "stream" directive'
         -
           macro: '{$NGINX.LLD.FILTER.STREAM.ZONE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable Stream server zones'
+          description: 'The filter to include discovered server zones of the "stream" directive.'
         -
           macro: '{$NGINX.LLD.FILTER.STREAM.ZONE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered Stream server zones'
+          description: 'The filter to exclude discovered server zones of the "stream" directive.'
   graphs:
     -
       uuid: a8b239f2f21a471fa3ac6a10a0419e9c
