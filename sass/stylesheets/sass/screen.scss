@@ -550,7 +550,9 @@ form {
 					line-height: 14px;
 					top: 0;
 				}
+			}
 
+			button[class*='icon-'] {
 				&:last-of-type {
 					margin-right: 0;
 				}
@@ -5399,7 +5401,6 @@ button {
 	&.icon-action-severity-changed,
 	&.icon-action-message,
 	&.icon-action-ack,
-	&.icon-action-ack-green,
 	&.icon-action-suppress,
 	&.icon-action-unsuppress,
 	&.icon-problem-generated,

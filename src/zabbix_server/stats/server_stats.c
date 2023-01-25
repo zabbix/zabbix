@@ -127,6 +127,4 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy data: %s", error);
 		zbx_free(error);
 	}
-
-	zbx_json_close(json);
 }
