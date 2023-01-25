@@ -6583,7 +6583,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	/* In such cache next sync will need to do full scan rather than just      */
 	/* applying changelog diff. To detect this problem configuration is synced */
 	/* in transaction and error is checked at the end.                         */
-	DBbegin();
+	zbx_db_begin();
 #endif
 
 	sec = zbx_time();
@@ -7320,9 +7320,9 @@ out:
 
 #ifdef HAVE_ORACLE
 	if (ZBX_DB_OK == dberr)
-		dberr = DBcommit();
+		dberr = zbx_db_commit();
 	else
-		DBrollback();
+		zbx_db_rollback();
 #endif
 	switch (dberr)
 	{
