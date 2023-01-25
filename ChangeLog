@@ -2341,6 +2341,12 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.31rc2
+
+Bug fixes:
+...G...... [ZBX-20110] added single field search option to oracle archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys for Zabbix agent 2
+
+--------------------------------------------------------------------------------
 Changes for 5.0.31rc1
 
 New features:
