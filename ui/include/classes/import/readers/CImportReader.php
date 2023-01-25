@@ -31,18 +31,4 @@ abstract class CImportReader {
 	 * @return array
 	 */
 	abstract public function read($string);
-
-	protected static function transform(array &$data = null): void {
-		if ($data === null) {
-			return;
-		}
-
-		if (array_key_exists('zabbix_export', $data) && is_array($data['zabbix_export'])
-				&& array_key_exists('templates', $data['zabbix_export'])) {
-			foreach ($data['zabbix_export']['templates'] as &$template) {
-				unset($template['templates']);
-			}
-			unset($template);
-		}
-	}
 }

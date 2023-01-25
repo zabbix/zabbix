@@ -35,8 +35,6 @@ class CJsonImportReader extends CImportReader {
 			throw new Exception(_s('Cannot read JSON: %1$s.', json_last_error_msg()));
 		}
 
-		self::transform($data);
-
 		return $data;
 	}
 }

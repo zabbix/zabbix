@@ -55,8 +55,6 @@ class CYamlImportReader extends CImportReader {
 			throw new ErrorException(_s('Cannot read YAML: %1$s.', _('Invalid YAML file contents')));
 		}
 
-		self::transform($data);
-
 		return self::trimEmptyLine($data);
 	}
 
