@@ -1407,6 +1407,100 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
+			// #1 Using symbols in settings.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'trim' => true,
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => '   leading.trailing   ',
+								'Host' => '   leading.trailing   ',
+								'Base DN' => '   leading.trailing   ',
+								'Search attribute' => '   leading.trailing   ',
+								'Bind DN' => '   leading.trailing   ',
+								'Bind password' => '   leading.trailing   ',
+								'Description' => '   leading.trailing   ',
+								'Configure JIT provisioning' => true,
+								'Group configuration' => 'groupOfNames',
+								'Group base DN' => '   leading.trailing   ',
+								'Group name attribute' => '   leading.trailing   ',
+								'Group member attribute' => '   leading.trailing   ',
+								'Reference attribute' => '   leading.trailing   ',
+								'Group filter' => '   leading.trailing   ',
+								'User name attribute' => '   leading.trailing   ',
+								'User last name attribute' => '   leading.trailing   '
+							],
+							'User group mapping' => [
+								[
+									'LDAP group pattern' => '   leading.trailing   ',
+									'User groups' => 'Test timezone',
+									'User role' => 'User role'
+								]
+							],
+							'Media type mapping' => [
+								[
+									'Name' => '   leading.trailing   ',
+									'Media type' => 'Discord',
+									'Attribute' => 'test discord'
+								],
+								[
+									'Name' => '   leading.trailing   ',
+									'Media type' => 'iLert',
+									'Attribute' => 'test iLert'
+								]
+							]
+						]
+					],
+					'db_check' => [
+						'userdirectory' => [
+							['name' => '', 'description' => '', 'provision_status' => 0],
+							['name' => 'leading.trailing', 'description' => 'leading.trailing', 'provision_status' => 1]
+						],
+						'userdirectory_ldap' => [
+							[
+								'host' => 'leading.trailing',
+								'port' => 389,
+								'base_dn' => 'leading.trailing',
+								'bind_dn' => 'leading.trailing',
+								'bind_password' => 'leading.trailing',
+								'search_attribute' => 'leading.trailing',
+								'group_basedn' => 'leading.trailing',
+								'group_name' => 'leading.trailing',
+								'group_member' => 'leading.trailing',
+								'user_ref_attr' => 'leading.trailing',
+								'group_filter' => 'leading.trailing',
+								'user_username' => 'leading.trailing',
+								'user_lastname' => 'leading.trailing'
+							]
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => 'leading.trailing',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						],
+						'userdirectory_media' => [
+							[
+								'name' => 'leading.trailing',
+								'mediatypeid' => 10,
+								'attribute' => 'test discord'
+							],
+							[
+								'name' => 'leading.trailing',
+								'mediatypeid' => 22,
+								'attribute' => 'test iLert'
+							]
+						]
+					]
+				]
+			],
 			// #2 Long values.
 			[
 				[
