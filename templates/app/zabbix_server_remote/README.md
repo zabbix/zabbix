@@ -3,13 +3,16 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -19,38 +22,28 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$ADDRESS} |<p>-</p> |`` |
 |{$PORT} |<p>-</p> |`` |
-|{$PROXY.LAST_SEEN.MAX} |<p>The maximum number of seconds the Zabbix proxy is not seen</p> |`600` |
+|{$PROXY.LAST_SEEN.MAX} |<p>The maximum number of seconds that the Zabbix proxy is not seen</p> |`600` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |High availability cluster node discovery |<p>LLD rule with item and trigger prototypes for node discovery.</p> |DEPENDENT |zabbix.nodes.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.ha`</p> |
 |Zabbix proxy discovery |<p>LLD rule with item and trigger prototypes for proxy discovery.</p> |DEPENDENT |zabbix.proxy.discovery |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Cluster |Cluster node [{#NODE.NAME}]: Address |<p>Node IPv4 address.</p> |DEPENDENT |zabbix.nodes.address[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.ha[?(@.id=="{#NODE.ID}")].address.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Cluster |Cluster node [{#NODE.NAME}]: Last access time |<p>Last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.time[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.ha[?(@.id=="{#NODE.ID}")].lastaccess.first()`</p> |
-|Cluster |Cluster node [{#NODE.NAME}]: Last access age |<p>Time between database unix_timestamp() and last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.age[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.ha[?(@.id=="{#NODE.ID}")].lastaccess_age.first()`</p> |
-|Cluster |Cluster node [{#NODE.NAME}]: Status |<p>Node status.</p> |DEPENDENT |zabbix.nodes.status[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.ha[?(@.id=="{#NODE.ID}")].status.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Proxy |Proxy [{#PROXY.NAME}]: Mode |<p>Proxy mode</p> |DEPENDENT |zabbix.proxy.mode[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].passive.first()`</p><p>- JAVASCRIPT: `return value === 'false' ? 0 : 1 `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Proxy |Proxy [{#PROXY.NAME}]: Unencrypted |<p>Encryption status for connections from the proxy</p> |DEPENDENT |zabbix.proxy.unencrypted[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].unencrypted.first()`</p><p>- JAVASCRIPT: `return value === 'false' ? 0 : 1 `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Proxy |Proxy [{#PROXY.NAME}]: PSK |<p>Encryption status for connections from the proxy</p> |DEPENDENT |zabbix.proxy.psk[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].psk.first()`</p><p>- JAVASCRIPT: `return value === 'false' ? 0 : 1 `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Proxy |Proxy [{#PROXY.NAME}]: Certificate |<p>Encryption status for connections from the proxy</p> |DEPENDENT |zabbix.proxy.cert[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].cert.first()`</p><p>- JAVASCRIPT: `return value === 'false' ? 0 : 1 `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Proxy |Proxy [{#PROXY.NAME}]: Compression |<p>Compression status</p> |DEPENDENT |zabbix.proxy.compression[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].compression.first()`</p><p>- JAVASCRIPT: `return value === 'false' ? 0 : 1 `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Proxy |Proxy [{#PROXY.NAME}]: Item count |<p>The number of enabled items on enabled hosts assigned to the proxy</p> |DEPENDENT |zabbix.proxy.items[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].items.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Proxy |Proxy [{#PROXY.NAME}]: Host count |<p>The number of enabled hosts assigned to the proxy</p> |DEPENDENT |zabbix.proxy.hosts[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].hosts.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Proxy |Proxy [{#PROXY.NAME}]: Version |<p>Zabbix proxy version</p> |DEPENDENT |zabbix.proxy.version[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].version.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Proxy |Proxy [{#PROXY.NAME}]: Last seen, in seconds |<p>The time when the proxy was last seen by the server</p> |DEPENDENT |zabbix.proxy.last_seen[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].last_seen.first()`</p> |
-|Proxy |Proxy [{#PROXY.NAME}]: Compatibility |<p>Zabbix proxy compatibility</p> |DEPENDENT |zabbix.proxy.compatibility[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].compatibility.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Proxy |Proxy [{#PROXY.NAME}]: Required VPS |<p>Required proxy performance (the number of values that need to be collected per second)</p> |DEPENDENT |zabbix.proxy.requiredperformance[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].requiredperformance.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Stats |<p>Node stats.</p> |DEPENDENT |zabbix.nodes.stats[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.ha[?(@.id=="{#NODE.ID}")].first()`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Address |<p>Node IPv4 address.</p> |DEPENDENT |zabbix.nodes.address[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.address`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Last access time |<p>Last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.time[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.lastaccess`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Last access age |<p>Time between database unix_timestamp() and last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.age[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.lastaccess_age`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Status |<p>Node status.</p> |DEPENDENT |zabbix.nodes.status[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |Zabbix raw items |Remote Zabbix server: Zabbix stats |<p>Zabbix server statistics master item.</p> |INTERNAL |zabbix[stats,{$ADDRESS},{$PORT}] |
 |Zabbix raw items |Zabbix stats proxy |<p>Zabbix proxy statistics master item.</p> |DEPENDENT |zabbix.proxy.stats<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.proxy`</p> |
 |Zabbix server |Remote Zabbix server: Zabbix stats queue over 10m |<p>Number of monitored items in the queue which are delayed at least by 10 minutes.</p> |INTERNAL |zabbix[stats,{$ADDRESS},{$PORT},queue,10m]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue`</p> |
@@ -109,15 +102,23 @@ There are no template links in this template.
 |Zabbix server |Remote Zabbix server: LLD queue |<p>Count of values enqueued in the low-level discovery processing queue.</p> |DEPENDENT |lld_queue<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.lld_queue`</p> |
 |Zabbix server |Remote Zabbix server: Preprocessing queue |<p>Count of values enqueued in the preprocessing queue.</p> |DEPENDENT |preprocessing_queue<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.preprocessing_queue`</p> |
 |Zabbix server |Remote Zabbix server: Number of processed numeric (unsigned) values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed numeric (unsigned) values.</p> |DEPENDENT |wcache.values.uint<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.wcache.values.uint`</p><p>- CHANGE_PER_SECOND</p> |
+|Zabbix proxy |Proxy [{#PROXY.NAME}]: Mode |<p>Proxy mode</p> |DEPENDENT |zabbix.proxy.mode[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].passive.first()`</p><p>- JAVASCRIPT: `return value === 'false' ? 0 : 1 `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Zabbix proxy |Proxy [{#PROXY.NAME}]: Unencrypted |<p>Encryption status for connections from the proxy</p> |DEPENDENT |zabbix.proxy.unencrypted[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].unencrypted.first()`</p><p>- JAVASCRIPT: `return value === 'false' ? 0 : 1 `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Zabbix proxy |Proxy [{#PROXY.NAME}]: PSK |<p>Encryption status for connections from the proxy</p> |DEPENDENT |zabbix.proxy.psk[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].psk.first()`</p><p>- JAVASCRIPT: `return value === 'false' ? 0 : 1 `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Zabbix proxy |Proxy [{#PROXY.NAME}]: Certificate |<p>Encryption status for connections from the proxy</p> |DEPENDENT |zabbix.proxy.cert[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].cert.first()`</p><p>- JAVASCRIPT: `return value === 'false' ? 0 : 1 `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Zabbix proxy |Proxy [{#PROXY.NAME}]: Compression |<p>Compression status</p> |DEPENDENT |zabbix.proxy.compression[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].compression.first()`</p><p>- JAVASCRIPT: `return value === 'false' ? 0 : 1 `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Zabbix proxy |Proxy [{#PROXY.NAME}]: Item count |<p>The number of enabled items on enabled hosts assigned to the proxy</p> |DEPENDENT |zabbix.proxy.items[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].items.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Zabbix proxy |Proxy [{#PROXY.NAME}]: Host count |<p>The number of enabled hosts assigned to the proxy</p> |DEPENDENT |zabbix.proxy.hosts[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].hosts.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Zabbix proxy |Proxy [{#PROXY.NAME}]: Version |<p>Zabbix proxy version</p> |DEPENDENT |zabbix.proxy.version[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].version.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Zabbix proxy |Proxy [{#PROXY.NAME}]: Last seen, in seconds |<p>The time when the proxy was last seen by the server</p> |DEPENDENT |zabbix.proxy.last_seen[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].last_seen.first()`</p> |
+|Zabbix proxy |Proxy [{#PROXY.NAME}]: Compatibility |<p>Zabbix proxy compatibility</p> |DEPENDENT |zabbix.proxy.compatibility[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].compatibility.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Zabbix proxy |Proxy [{#PROXY.NAME}]: Required VPS |<p>Required proxy performance (the number of values that need to be collected per second)</p> |DEPENDENT |zabbix.proxy.requiredperformance[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name=="{#PROXY.NAME}")].requiredperformance.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Cluster node [{#NODE.NAME}]: Status changed |<p>The state of the node has changed. Confirm to close.</p> |`last(/Remote Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#1)<>last(/Remote Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#2)` |INFO |<p>Manual close: YES</p> |
-|Proxy [{#PROXY.NAME}]: Proxy last seen |<p>Zabbix proxy not updating configuration</p> |`last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)>{$PROXY.LAST_SEEN.MAX}` |WARNING |<p>**Depends on**:</p><p>- Proxy [{#PROXY.NAME}]: Zabbix proxy never seen</p> |
-|Proxy [{#PROXY.NAME}]: Zabbix proxy never seen |<p>Zabbix proxy not updating configuration</p> |`last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1` |WARNING | |
-|Proxy [{#PROXY.NAME}]: Zabbix proxy is incompatible |<p>Zabbix proxy not compatibility</p> |`last(/Remote Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)<>1` |WARNING |<p>**Depends on**:</p><p>- Proxy [{#PROXY.NAME}]: Zabbix proxy never seen</p> |
 |Remote Zabbix server: More than 100 items having missing data for more than 10 minutes |<p>zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about</p><p>how many items are missing data for more than 10 minutes.</p> |`min(/Remote Zabbix server health/zabbix[stats,{$ADDRESS},{$PORT},queue,10m],10m)>100` |WARNING | |
 |Remote Zabbix server: Utilization of alert manager processes is high |<p>-</p> |`avg(/Remote Zabbix server health/process.alert_manager.avg.busy,10m)>75`<p>Recovery expression:</p>`avg(/Remote Zabbix server health/process.alert_manager.avg.busy,10m)<65` |AVERAGE | |
 |Remote Zabbix server: Utilization of alert syncer processes is high |<p>-</p> |`avg(/Remote Zabbix server health/process.alert_syncer.avg.busy,10m)>75`<p>Recovery expression:</p>`avg(/Remote Zabbix server health/process.alert_syncer.avg.busy,10m)<65` |AVERAGE | |
@@ -155,13 +156,16 @@ There are no template links in this template.
 |Remote Zabbix server: More than 75% used in the configuration cache |<p>Consider increasing CacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix server health/rcache.buffer.pused,10m)>75` |AVERAGE | |
 |Remote Zabbix server: More than 95% used in the value cache |<p>Consider increasing ValueCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix server health/vcache.buffer.pused,10m)>95` |AVERAGE | |
 |Remote Zabbix server: Zabbix value cache working in low memory mode |<p>Once the low memory mode has been switched on, the value cache will remain in this state for 24 hours, even if the problem that triggered this mode is resolved sooner.</p> |`last(/Remote Zabbix server health/vcache.cache.mode)=1` |HIGH | |
-|Remote Zabbix server: Version has changed |<p>Remote Zabbix server version has changed. Ack to close.</p> |`last(/Remote Zabbix server health/version,#1)<>last(/Remote Zabbix server health/version,#2) and length(last(/Remote Zabbix server health/version))>0` |INFO |<p>Manual close: YES</p> |
+|Remote Zabbix server: Version has changed |<p>The Remote Zabbix server version has changed. Acknowledge to close manually.</p> |`last(/Remote Zabbix server health/version,#1)<>last(/Remote Zabbix server health/version,#2) and length(last(/Remote Zabbix server health/version))>0` |INFO |<p>Manual close: YES</p> |
 |Remote Zabbix server: More than 75% used in the vmware cache |<p>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix server health/vmware.buffer.pused,10m)>75` |AVERAGE | |
 |Remote Zabbix server: More than 75% used in the history cache |<p>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix server health/wcache.history.pused,10m)>75` |AVERAGE | |
 |Remote Zabbix server: More than 75% used in the history index cache |<p>Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix server health/wcache.index.pused,10m)>75` |AVERAGE | |
 |Remote Zabbix server: More than 75% used in the trends cache |<p>Consider increasing TrendCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix server health/wcache.trend.pused,10m)>75` |AVERAGE | |
+|Proxy [{#PROXY.NAME}]: Proxy last seen |<p>Zabbix proxy not updating configuration</p> |`last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)>{$PROXY.LAST_SEEN.MAX}` |WARNING |<p>**Depends on**:</p><p>- Proxy [{#PROXY.NAME}]: Zabbix proxy never seen</p> |
+|Proxy [{#PROXY.NAME}]: Zabbix proxy never seen |<p>Zabbix proxy not updating configuration</p> |`last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1` |WARNING | |
+|Proxy [{#PROXY.NAME}]: Zabbix proxy is incompatible |<p>Zabbix proxy not compatibility</p> |`last(/Remote Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)<>1` |WARNING |<p>**Depends on**:</p><p>- Proxy [{#PROXY.NAME}]: Zabbix proxy never seen</p> |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
