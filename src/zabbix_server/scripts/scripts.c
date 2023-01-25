@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -226,7 +226,7 @@ int	zbx_check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 	if (NULL == DBfetch(result))
 		ret = FAIL;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -259,7 +259,7 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 	if (NULL == DBfetch(result))
 		ret = FAIL;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -417,7 +417,7 @@ int	DBfetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params,
 		zbx_vector_ptr_pair_append(params, pair);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

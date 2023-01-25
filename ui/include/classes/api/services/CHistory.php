@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,6 +147,11 @@ class CHistory extends CApiService {
 				return $this->getFromElasticsearch($options);
 
 			default:
+				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
+					$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+					$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
+				}
+
 				return $this->getFromSql($options);
 		}
 	}

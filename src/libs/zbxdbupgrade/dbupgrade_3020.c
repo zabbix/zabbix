@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ int	DBpatch_3020001(void)
 			ZBX_STR2UINT64(eventid, row[0]);
 			zbx_vector_uint64_append(&eventids, eventid);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	for (i = 0; i < (int)ARRSIZE(objects); i++)
@@ -83,7 +83,7 @@ int	DBpatch_3020001(void)
 			ZBX_STR2UINT64(eventid, row[0]);
 			zbx_vector_uint64_append(&eventids, eventid);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);

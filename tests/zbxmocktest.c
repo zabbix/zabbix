@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,8 +119,6 @@ int	CONFIG_JAVA_GATEWAY_PORT	= 0;
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
-
-int	CONFIG_SERVER_STARTUP_TIME	= 0;	/* zabbix server startup time */
 
 /* how often Zabbix server sends configuration data to proxy, in seconds */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 0;

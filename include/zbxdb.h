@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,23 +26,6 @@
 #define ZBX_DB_OK	0
 #define ZBX_DB_FAIL	-1
 #define ZBX_DB_DOWN	-2
-
-#define ZBX_DB_WAIT_DOWN	10
-
-#define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
-#ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
-#	ifdef HAVE_ORACLE
-		/* Do not use "overflowing" (multi-statement) queries for Oracle. */
-		/* Zabbix benefits from cursor_sharing=force Oracle parameter */
-		/* which doesn't apply to PL/SQL blocks. */
-#		define ZBX_MAX_OVERFLOW_SQL_SIZE	0
-#	else
-#		define ZBX_MAX_OVERFLOW_SQL_SIZE	ZBX_MAX_SQL_SIZE
-#	endif
-#elif 0 != ZBX_MAX_OVERFLOW_SQL_SIZE && \
-		(1024 > ZBX_MAX_OVERFLOW_SQL_SIZE || ZBX_MAX_OVERFLOW_SQL_SIZE > ZBX_MAX_SQL_SIZE)
-#error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
-#endif
 
 #define ZBX_DB_TLS_CONNECT_REQUIRED_TXT		"required"
 #define ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT	"verify_ca"
@@ -72,12 +55,6 @@ zbx_db_value_t;
 #	define ZBX_FOR_UPDATE	""	/* SQLite3 does not support "select ... for update" */
 #else
 #	define ZBX_FOR_UPDATE	" for update"
-#endif
-
-#ifdef HAVE_MULTIROW_INSERT
-#	define ZBX_ROW_DL	","
-#else
-#	define ZBX_ROW_DL	";\n"
 #endif
 
 int	zbx_db_init(const char *dbname, const char *const dbschema, char **error);
@@ -114,7 +91,6 @@ zbx_err_codes_t	zbx_db_last_errcode(void);
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
-char	*zbx_tsdb_get_license(void);
 #define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
 #endif
 
@@ -147,7 +123,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
 DB_RESULT	zbx_db_select_n(const char *query, int n);
 
 DB_ROW		zbx_db_fetch(DB_RESULT result);
-void		DBfree_result(DB_RESULT result);
+void		zbx_db_free_result(DB_RESULT result);
 int		zbx_db_is_null(const char *field);
 
 typedef enum
@@ -163,55 +139,22 @@ char		*zbx_db_dyn_escape_like_pattern(const char *src);
 
 int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
-#define ZBX_MYSQL_MIN_VERSION				50728
-#define ZBX_MYSQL_MIN_VERSION_FRIENDLY			"5.07.28"
-#define ZBX_MYSQL_MIN_SUPPORTED_VERSION			80000
-#define ZBX_MYSQL_MIN_SUPPORTED_VERSION_FRIENDLY	"8.00.0"
-#define ZBX_MYSQL_MAX_VERSION				80099
-#define ZBX_MYSQL_MAX_VERSION_FRIENDLY			"8.00.x"
-
-#define ZBX_MARIA_MIN_VERSION				100200
-#define ZBX_MARIA_MIN_VERSION_FRIENDLY			"10.02.00"
-#define ZBX_MARIA_MIN_SUPPORTED_VERSION			100500
-#define ZBX_MARIA_MIN_SUPPORTED_VERSION_FRIENDLY	"10.05.00"
-#define ZBX_MARIA_MAX_VERSION				100899
-#define ZBX_MARIA_MAX_VERSION_FRIENDLY			"10.08.xx"
-
-#define ZBX_POSTGRESQL_MIN_VERSION			100009
-#define ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY		"10.9"
-#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION		130000
-#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_FRIENDLY	"13.0"
-#define ZBX_POSTGRESQL_MAX_VERSION			159999
-#define ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY		"15.x"
-
-#define ZBX_ORACLE_MIN_VERSION				1201000200
-#define ZBX_ORACLE_MIN_VERSION_FRIENDLY			"Database 12c Release 12.01.00.02.x"
-#define ZBX_ORACLE_MIN_SUPPORTED_VERSION		1900000000
-#define ZBX_ORACLE_MIN_SUPPORTED_VERSION_FRIENDLY	"Database 19c Release 19.x.x"
-#define ZBX_ORACLE_MAX_VERSION				2199000000
-#define ZBX_ORACLE_MAX_VERSION_FRIENDLY			"Database 21c Release 21.x.x"
-
-#define ZBX_ELASTIC_MIN_VERSION				70000
-#define ZBX_ELASTIC_SUPPORTED_VERSION_FRIENDLY		"7.x"
-#define ZBX_ELASTIC_MAX_VERSION				79999
-
 #define ZBX_DBVERSION_UNDEFINED				0
 
 #define ZBX_DB_EXTENSION_TIMESCALEDB				"timescaledb"
 
 #define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
-#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB_FRIENDLY	"10.2"
+#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB_STR		"10.2"
 #define ZBX_TIMESCALE_MIN_VERSION				10500
-#define ZBX_TIMESCALE_MIN_VERSION_FRIENDLY			"1.5.0"
+#define ZBX_TIMESCALE_MIN_VERSION_STR				"1.5.0"
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION 			20001
-#define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY 		"2.0.1"
+#define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR 		"2.0.1"
 #define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
-#define ZBX_TIMESCALE_MAX_VERSION				20899
-#define ZBX_TIMESCALE_MAX_VERSION_FRIENDLY			"2.8"
-#define ZBX_TIMESCALE_LICENSE_APACHE				"apache"
-#define ZBX_TIMESCALE_LICENSE_APACHE_FRIENDLY			"TimescaleDB Apache 2 Edition"
+#define ZBX_TIMESCALE_MAX_VERSION				20999
+#define ZBX_TIMESCALE_MAX_VERSION_STR				"2.9"
+#define ZBX_TIMESCALE_LICENSE_APACHE_STR			"TimescaleDB Apache 2 Edition"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
-#define ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY		"TimescaleDB Community Edition"
+#define ZBX_TIMESCALE_LICENSE_COMMUNITY_STR			"TimescaleDB Community Edition"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
@@ -254,8 +197,6 @@ typedef enum
 	ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY
 }
 zbx_db_ext_err_code_t;
-
-zbx_uint32_t	zbx_dbms_version_get(void);
 
 struct zbx_db_version_info_t
 {
@@ -306,10 +247,6 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_set_compression_availability(int compression_availabile);
 int	zbx_tsdb_get_compression_availability(void);
 void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info);
-#endif
-
-#ifdef HAVE_MYSQL
-int	zbx_dbms_mariadb_used(void);
 #endif
 
 int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,20 +96,28 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 // Start implements the Runner interface and performs initialization when plugin is activated.
 func (p *Plugin) Start() {
-	queryStorage, err := yarn.New(http.Dir(p.options.CustomQueriesPath), "*"+sqlExt)
-	if err != nil {
-		p.Errf(err.Error())
-		// create empty storage if error occurred
-		queryStorage = yarn.NewFromMap(map[string]string{})
-	}
-
 	p.connMgr = NewConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
 		time.Duration(p.options.ConnectTimeout)*time.Second,
 		time.Duration(p.options.CallTimeout)*time.Second,
 		hkInterval*time.Second,
-		queryStorage,
+		p.setCustomQuery(),
 	)
+}
+
+func (p *Plugin) setCustomQuery() yarn.Yarn {
+	if p.options.CustomQueriesPath == "" {
+		return yarn.NewFromMap(map[string]string{})
+	}
+
+	queryStorage, err := yarn.New(http.Dir(p.options.CustomQueriesPath), "*"+sqlExt)
+	if err != nil {
+		p.Errf(err.Error())
+		// create empty storage if error occurred
+		return yarn.NewFromMap(map[string]string{})
+	}
+
+	return queryStorage
 }
 
 // Stop implements the Runner interface and frees resources when plugin is deactivated.

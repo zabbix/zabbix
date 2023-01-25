@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -196,7 +196,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, const 
 	while (NULL != (row = DBfetch(result)) && SUCCEED == (ret = lld_filter_condition_add(&filter->conditions,
 			row[0], row[1], row[2], row[3], item, error)))
 		;
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
 		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
@@ -532,7 +532,7 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 			break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < overrides->values_num; i++)
 	{
@@ -677,7 +677,7 @@ static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rule
 		zbx_vector_ptr_append(overrides, override);
 		zbx_vector_uint64_append(&overrideids, override->overrideid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != overrideids.values_num && SUCCEED == (ret = lld_override_conditions_load(overrides, &overrideids,
 			&sql, &sql_alloc, item, error)))
@@ -1178,7 +1178,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 
 		zbx_free(lifetime_str);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (NULL == row)
 	{

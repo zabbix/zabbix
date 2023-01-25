@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -510,7 +510,7 @@ $saml_tab = (new CFormGrid())
 		(new CLabel([
 			_('Media type mapping'),
 			makeHelpIcon(
-				_('Map user’s SAML media attributes (e.g. email) to Zabbix user media for sending notifications.')
+				_("Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications.")
 			)
 		]))
 			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)

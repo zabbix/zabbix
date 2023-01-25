@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -248,7 +248,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 					else
 						ZBX_STR2UINT64(history_maxid, row[0]);
 
-					DBfree_result(result);
+					zbx_db_free_result(result);
 
 					reset_proxy_history_count(history_maxid - history_lastid);
 					proxy_set_hist_lastid(history_lastid);

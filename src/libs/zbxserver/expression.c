@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -251,7 +251,7 @@ static int	DBget_host_value(zbx_uint64_t hostid, char **replace_to, const char *
 		*replace_to = zbx_strdup(*replace_to, row[0]);
 		ret = SUCCEED;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -281,7 +281,7 @@ static int	DBget_templateid_by_triggerid(zbx_uint64_t triggerid, zbx_uint64_t *t
 		ZBX_DBROW2UINT64(*templateid, row[0]);
 		ret = SUCCEED;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -317,7 +317,7 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_
 
 		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 			user_type = atoi(row[0]);
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		if (-1 == user_type)
 		{
@@ -335,7 +335,7 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_
 
 	if (NULL != (row = DBfetch(result)))
 		ZBX_STR2UINT64(triggerid, row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (SUCCEED != DBget_templateid_by_triggerid(triggerid, &templateid) || 0 == templateid)
 	{
@@ -394,7 +394,7 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_
 			zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, ", ");
 		zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, row[0]);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -429,7 +429,7 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64
 
 		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 			user_type = atoi(row[0]);
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		if (-1 == user_type)
 		{
@@ -478,7 +478,7 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64
 		zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, row[0]);
 		ret = SUCCEED;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -698,7 +698,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -722,7 +722,7 @@ static int	DBget_trigger_error(const ZBX_DB_TRIGGER *trigger, char **replace_to)
 
 	*replace_to = zbx_strdup(*replace_to, (NULL == (row = DBfetch(result))) ?  "" : row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -800,7 +800,7 @@ static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, 
 		*replace_to = zbx_strdup(*replace_to, row[0]);
 		ret = SUCCEED;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -856,7 +856,7 @@ static int	DBget_dhost_value_by_event(const ZBX_DB_EVENT *event, char **replace_
 		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
 		ret = SUCCEED;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -891,7 +891,7 @@ static int	DBget_dchecks_value_by_event(const ZBX_DB_EVENT *event, char **replac
 		*replace_to = zbx_strdup(*replace_to, row[0]);
 		ret = SUCCEED;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -925,7 +925,7 @@ static int	DBget_dservice_value_by_event(const ZBX_DB_EVENT *event, char **repla
 		*replace_to = zbx_strdup(*replace_to, row[0]);
 		ret = SUCCEED;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -968,7 +968,7 @@ static int	DBget_drule_value_by_event(const ZBX_DB_EVENT *event, char **replace_
 		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
 		ret = SUCCEED;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1117,7 +1117,7 @@ static int	DBitem_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_
 			ret = SUCCEED;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1330,7 +1330,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const ZBX_DB_EVENT *ev
 
 		zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (NULL != r_event)
 	{
@@ -1407,7 +1407,7 @@ static void	get_event_update_history(const ZBX_DB_EVENT *event, char **replace_t
 
 		zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != buf_offset)
 	{
@@ -1442,7 +1442,7 @@ static int	get_autoreg_value_by_event(const ZBX_DB_EVENT *event, char **replace_
 		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
 		ret = SUCCEED;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1891,7 +1891,7 @@ static int	get_action_value(const char *macro, zbx_uint64_t actionid, char **rep
 		else
 			ret = FAIL;
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	return ret;
@@ -2444,7 +2444,7 @@ static void	get_event_symptoms(const ZBX_DB_EVENT *event, char **replace_to)
 		ZBX_STR2UINT64(symptom_eventid, row[0]);
 		zbx_vector_uint64_append(&symptom_eventids, symptom_eventid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (symptom_eventids.values_num > 0)
 	{

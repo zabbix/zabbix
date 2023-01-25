@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -184,7 +184,7 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 		if (ALERT_STATUS_NEW == alert->status)
 			zbx_vector_uint64_append(&alertids, alert->alertid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (SUCCEED == ret)
 	{
@@ -363,7 +363,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 		if (NULL != mediatype)
 			zbx_vector_ptr_append(mediatypes, mediatype);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() mediatypes:%d/%d", __func__, mediatypes->values_num, mediatypeids_num);
 }
@@ -577,7 +577,7 @@ static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params, zb
 		}
 	}
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -627,7 +627,7 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 				}
 			}
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 		}
 
 		for (j = 0; j < local_event_tags->tags.values_num; j++)
@@ -886,7 +886,7 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 		zbx_vector_ptr_append(&medias, media);
 		zbx_vector_uint64_append(&mediatypeids, media->mediatypeid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* update media types used for watchdog alerts */
 

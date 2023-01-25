@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ $fields = [
 	'status'          => [T_ZBX_STR, O_OPT, null,	null,	null],
 	'agent'           => [T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'agent_other'     => [T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && {agent} == '.ZBX_AGENT_OTHER
+		'(isset({add}) || isset({update})) && isset({agent}) && {agent} == '.ZBX_AGENT_OTHER
 	],
 	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
 	'steps'           => [null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	'isset({add}) || isset({update})', _('Steps')],

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -452,7 +452,7 @@ static	zbx_rm_session_t	*rm_get_session(zbx_rm_t *manager, zbx_uint64_t userid)
 			zbx_hashset_remove_direct(&manager->sessions, session);
 			session = NULL;
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	if (NULL == session)
@@ -962,7 +962,7 @@ static void	rm_update_cache_settings(zbx_rm_t *manager)
 		manager->session_key = zbx_strdup(manager->session_key, "");
 		manager->zabbix_url = zbx_strdup(manager->zabbix_url, "");
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1150,7 +1150,7 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 			zbx_free(error);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* remove deleted reports from cache */
 	zbx_vector_uint64_sort(&reportids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1223,7 +1223,7 @@ static void	rm_update_cache_reports_params(zbx_rm_t *manager)
 		pair.second = zbx_strdup(NULL, row[2]);
 		zbx_vector_ptr_pair_append(&params, pair);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != params.values_num)
 		rm_report_update_params(report, &params);
@@ -1294,7 +1294,7 @@ static void	rm_update_cache_reports_users(zbx_rm_t *manager)
 		else
 			zbx_vector_uint64_append(&users_excl, userid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != users.values_num || 0 != users_excl.values_num)
 		rm_report_update_users(report, &users, &users_excl);
@@ -1356,7 +1356,7 @@ static void	rm_update_cache_reports_usergroups(zbx_rm_t *manager)
 		ZBX_DBROW2UINT64(usergroup.access_userid, row[2]);
 		zbx_vector_recipient_append(&usergroups, usergroup);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != usergroups.values_num)
 		rm_report_update_usergroups(report, &usergroups);
@@ -1528,7 +1528,7 @@ static void	rm_get_report_dimensions(zbx_uint64_t dashboardid, int *width, int *
 		if (bottom > y_max)
 			y_max = bottom;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != y_max)
 		*height = y_max * ZBX_REPORT_ROW_HEIGHT + ZBX_REPORT_BOTTOM_MARGIN;
@@ -1589,7 +1589,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 		zbx_vector_ptr_append(&dsts, dst);
 		zbx_vector_uint64_append(&mediatypeids, dst->mediatypeid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == dsts.values_num)
 	{
@@ -1684,7 +1684,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 			zbx_vector_str_clear(&recipients);
 			zbx_db_mediatype_clean(&mt);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_vector_str_destroy(&recipients);
 	}
@@ -1825,7 +1825,7 @@ static int	rm_report_create_usergroup_jobs(zbx_rm_t *manager, zbx_rm_report_t *r
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&ids);

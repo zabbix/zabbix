@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
@@ -357,9 +358,8 @@ if ($data['context'] === 'host') {
 	$button_list += [
 		'item.masscheck_now' => [
 			'content' => (new CSimpleButton(_('Execute now')))
-				->onClick('view.massCheckNow(this);')
+				->addClass('js-execute-now')
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('no-chkbxrange')
 				->setAttribute('data-required', 'execute')
 		],
 		'item.massclearhistory' => $massclearhistory
@@ -367,7 +367,12 @@ if ($data['context'] === 'host') {
 }
 
 $button_list += [
-	'item.masscopyto' => ['name' => _('Copy')],
+	'item.masscopyto' => [
+		'content' => (new CSimpleButton(_('Copy')))
+			->addClass('js-copy')
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->removeId()
+	],
 	'popup.massupdate.item' => [
 		'content' => (new CButton('', _('Mass update')))
 			->onClick(
@@ -383,9 +388,10 @@ $button_list += [
 ];
 
 // Append table to form.
-$itemForm->addItem([$itemTable, $data['paging'], new CActionButtonList('action', 'group_itemid', $button_list,
-	$data['checkbox_hash']
-)]);
+$itemForm->addItem([
+	$itemTable, $data['paging'],
+	new CActionButtonList('action', 'group_itemid', $button_list, $data['checkbox_hash'])
+]);
 
 $html_page
 	->addItem($itemForm)

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,19 @@ class CSystemInfoHelper {
 			}
 		}
 
-		$data += CHousekeepingHelper::getWarnings($dbversion_status);
+		$housekeeper_warnings = CHousekeepingHelper::getWarnings($dbversion_status);
+
+		if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $housekeeper_warnings)
+				&& CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) == 1
+				&& CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 0) {
+			$data[CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY] = true;
+		}
+
+		if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS, $housekeeper_warnings)
+				&& CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE) == 1
+				&& CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL) == 0) {
+			$data[CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS] = true;
+		}
 
 		$ha_cluster_enabled = false;
 

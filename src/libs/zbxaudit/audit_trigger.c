@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -248,7 +248,7 @@ void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t 
 		zbx_audit_trigger_create_entry(ZBX_AUDIT_ACTION_DELETE, id, row[1], atoi(row[2]));
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }

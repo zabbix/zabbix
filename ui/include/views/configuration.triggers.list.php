@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -387,7 +387,12 @@ $triggers_form->addItem([
 		[
 			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?')],
 			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?')],
-			'trigger.masscopyto' => ['name' => _('Copy')],
+			'trigger.masscopyto' => [
+				'content' => (new CSimpleButton(_('Copy')))
+					->addClass('js-copy')
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeId()
+			],
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
@@ -409,6 +414,11 @@ $html_page
 	->addItem($triggers_form)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['checkbox_hash'],
+		'checkbox_object' => 'g_triggerid'
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();
