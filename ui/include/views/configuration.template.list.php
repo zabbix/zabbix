@@ -79,6 +79,16 @@ $filter = (new CFilter())
 			)
 			->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(_('Vendor'),
+				(new CTextBox('filter_vendor_name', $data['filter']['vendor_name'], false,
+					DB::getFieldLength('hosts', 'vendor_name')
+				))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(_('Version'),
+				(new CTextBox('filter_vendor_version', $data['filter']['vendor_version'], false,
+					DB::getFieldLength('hosts', 'vendor_version'))
+				)->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			),
 		(new CFormList())->addRow(_('Tags'), $filter_tags_table)
 	]);
@@ -124,6 +134,8 @@ $table = (new CTableInfo())
 		_('Dashboards'),
 		_('Discovery'),
 		_('Web'),
+		_('Vendor'),
+		_('Version'),
 		_('Linked templates'),
 		_('Linked to templates'),
 		_('Tags')
@@ -260,6 +272,8 @@ foreach ($data['templates'] as $template) {
 			),
 			CViewHelper::showNum($template['httpTests'])
 		],
+		$template['vendor_name'],
+		$template['vendor_version'],
 		$linked_templates_output,
 		$linked_to_output,
 		$data['tags'][$template['templateid']]

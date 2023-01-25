@@ -24,7 +24,7 @@
  */
 class CTemplate extends CHostGeneral {
 
-	protected $sortColumns = ['hostid', 'host', 'name'];
+	protected $sortColumns = ['hostid', 'host', 'name', 'vendor_name', 'vendor_version'];
 
 	/**
 	 * Get template data.
@@ -385,13 +385,16 @@ class CTemplate extends CHostGeneral {
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
-			]]
+			]],
+			'vendor_name' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'vendor_name')],
+			'vendor_version' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'vendor_version')]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $templates, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		$this->validateVendorFields($templates, []);
 		$this->checkGroups($templates);
 		$this->checkDuplicates($templates);
 		self::checkAndAddUuid($templates);
@@ -494,7 +497,9 @@ class CTemplate extends CHostGeneral {
 				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
 				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
-			]]
+			]],
+			'vendor_name' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'vendor_name')],
+			'vendor_version' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'vendor_version')]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $templates, '/', $error)) {
@@ -502,7 +507,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$db_templates = $this->get([
-			'output' => ['templateid', 'host', 'name', 'description'],
+			'output' => ['templateid', 'host', 'name', 'description', 'vendor_name', 'vendor_version'],
 			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -514,6 +519,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->addAffectedObjects($templates, $db_templates);
 
+		$this->validateVendorFields($templates, $db_templates);
 		$this->checkDuplicates($templates, $db_templates);
 		$this->checkGroups($templates, $db_templates);
 		$this->checkTemplates($templates, $db_templates);
@@ -1353,5 +1359,41 @@ class CTemplate extends CHostGeneral {
 
 		$output_tag = $option === 'selectGroups' ? 'groups' : 'templategroups';
 		$result = $relationMap->mapMany($result, $groups, $output_tag);
+	}
+
+	/**
+	 * Validates vendor fields for update or create operation.
+	 * Expects updating template data to be set in $db_templates array.
+	 *
+	 * @param array $templates     Array of arrays with template data.
+	 * @param array $db_templates  Associative array of templates, templateid as key.
+	 *
+	 * @throws Exception when vendor fields contain invalid data.
+	 */
+	private function validateVendorFields(array $templates, array $db_templates): void {
+		$vendor_field_keys = array_fill_keys(['vendor_name', 'vendor_version'], '');
+		$is_update = (bool) $db_templates;
+
+		foreach ($templates as $i => $template) {
+			$vendor = array_intersect_key($template, $vendor_field_keys);
+
+			if (!$vendor) {
+				continue;
+			}
+
+			if ($is_update) {
+				$vendor += array_intersect_key($db_templates[$template['templateid']], $vendor_field_keys);
+			}
+
+			$vendor = array_filter($vendor, 'strlen');
+			$empty_fields = array_keys(array_diff_key($vendor_field_keys, $vendor));
+
+			if ($empty_fields) {
+				$path = '/'.($i + 1).'/'.array_shift($empty_fields);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					$path, _('cannot be empty')
+				));
+			}
+		}
 	}
 }

@@ -31,7 +31,6 @@ class CConfigurationExportBuilder {
 	 */
 	public function __construct() {
 		$this->data['version'] = ZABBIX_EXPORT_VERSION;
-		$this->data['date'] = date(DATE_TIME_FORMAT_SECONDS_XML, time() - date('Z'));
 	}
 
 	/**
@@ -284,7 +283,16 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($templates, ['host']);
 
 		foreach ($templates as $template) {
-			$result[] = [
+			$vendor = [];
+
+			if ($template['vendor_name'] !== '' && $template['vendor_version'] !== '') {
+				$vendor = ['vendor' => [
+					'name' => $template['vendor_name'],
+					'version' => $template['vendor_version']
+				]];
+			}
+
+			$result[] = $vendor + [
 				'uuid' => $template['uuid'],
 				'template' => $template['host'],
 				'name' => $template['name'],
