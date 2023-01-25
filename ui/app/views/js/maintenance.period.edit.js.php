@@ -38,15 +38,19 @@ window.maintenance_period_edit = new class {
 	}
 
 	_updateFields(timeperiod_type) {
-		this.form.querySelectorAll('.form-field, label').forEach((element) => {
-			element.setAttribute('style', 'display: none;');
-		});
-		this.form.querySelectorAll('[id="row_timeperiod_type"], [for="label-timeperiod-type"]').forEach((element) => {
-			element.removeAttribute('style', 'display: none;');
-		});
-		this.form.querySelectorAll('[id="row_timeperiod_period_length"], [for="period_days"], [for="label-period-hours"], [for="label-period-minutes"]').forEach((element) => {
-			element.removeAttribute('style', 'display: none;');
-		});
+		this.form
+			.querySelectorAll('.form-field, label')
+			.forEach((element) => {
+				element.setAttribute('style', 'display: none;');
+			});
+		this.form
+			.querySelectorAll('[id="row_timeperiod_type"], [for="label-timeperiod-type"], ' +
+				'[id="row_timeperiod_period_length"], [for="period_days"], [for="label-period-hours"], ' +
+				'[for="label-period-minutes"]'
+			)
+			.forEach((element) => {
+				element.removeAttribute('style', 'display: none;');
+			});
 
 		switch (timeperiod_type) {
 			case '<?= TIMEPERIOD_TYPE_ONETIME ?>':
@@ -56,48 +60,33 @@ window.maintenance_period_edit = new class {
 						element.removeAttribute('style', 'display: none;');
 					});
 				break;
+
 			case '<?= TIMEPERIOD_TYPE_DAILY ?>':
 				this.form
-					.querySelectorAll('[id="row_timeperiod_every_day"], [for="every_day"]')
-					.forEach((element) => {
-						element.removeAttribute('style', 'display: none;');
-					});
-				this.form
-					.querySelectorAll('[id="row_timeperiod_period_at_hours_minutes"], [for="hour"]')
+					.querySelectorAll('[id="row_timeperiod_every_day"], [for="every_day"], ' +
+						'[id="row_timeperiod_period_at_hours_minutes"], [for="hour"]'
+					)
 					.forEach((element) => {
 						element.removeAttribute('style', 'display: none;');
 					});
 				break;
+
 			case '<?= TIMEPERIOD_TYPE_WEEKLY ?>':
 				this.form
-					.querySelectorAll('[id="row_timeperiod_every_week"], [for="every_week"]')
-					.forEach((element) => {
-						element.removeAttribute('style', 'display: none;');
-					});
-				this.form
-					.querySelectorAll('[id="row_timeperiod_dayofweek"], [for^="days"]')
-					.forEach((element) => {
-						element.removeAttribute('style', 'display: none;');
-					});
-				this.form
-					.querySelectorAll('[id="row_timeperiod_period_at_hours_minutes"], [for="hour"]')
+					.querySelectorAll('[id="row_timeperiod_every_week"], [for="every_week"], ' +
+						'[id="row_timeperiod_dayofweek"], [for^="days"], ' +
+						'[id="row_timeperiod_period_at_hours_minutes"], [for="hour"]'
+					)
 					.forEach((element) => {
 						element.removeAttribute('style', 'display: none;');
 					});
 				break;
+
 			case '<?= TIMEPERIOD_TYPE_MONTHLY ?>':
 				this.form
-					.querySelectorAll('[id="row_timeperiod_months"], [for^="months"]')
-					.forEach((element) => {
-						element.removeAttribute('style', 'display: none;');
-					});
-				this.form
-					.querySelectorAll('[id="row_timeperiod_date"], [for^="month_date_type"]')
-					.forEach((element) => {
-						element.removeAttribute('style', 'display: none;');
-					});
-				this.form
-					.querySelectorAll('[id="row_timeperiod_period_at_hours_minutes"], [for="hour"]')
+					.querySelectorAll('[id="row_timeperiod_months"], [for^="months"], [id="row_timeperiod_date"], ' +
+						'[for^="month_date_type"], [id="row_timeperiod_period_at_hours_minutes"], [for="hour"]'
+					)
 					.forEach((element) => {
 						element.removeAttribute('style', 'display: none;');
 					});
@@ -113,12 +102,9 @@ window.maintenance_period_edit = new class {
 				}
 				else {
 					this.form
-						.querySelectorAll('[id="row_timeperiod_week"], [for="label-every-dow"]')
-						.forEach((element) => {
-							element.removeAttribute('style', 'display: none;');
-						});
-					this.form
-						.querySelectorAll('[id="row_timeperiod_week_days"], [for^="monthly_days_"]')
+						.querySelectorAll('[id="row_timeperiod_week"], [for="label-every-dow"], ' +
+							'[id="row_timeperiod_week_days"], [for^="monthly_days_"]'
+						)
 						.forEach((element) => {
 							element.removeAttribute('style', 'display: none;');
 						});
@@ -135,12 +121,15 @@ window.maintenance_period_edit = new class {
 		switch (fields.timeperiod_type) {
 			case '<?= TIMEPERIOD_TYPE_ONETIME ?>':
 				break;
+
 			case '<?= TIMEPERIOD_TYPE_DAILY ?>':
 				fields.every = document.getElementById('every_day').value;
 				break;
+
 			case '<?= TIMEPERIOD_TYPE_WEEKLY ?>':
 				fields.every = document.getElementById('every_week').value;
 				break;
+
 			case '<?= TIMEPERIOD_TYPE_MONTHLY ?>':
 				fields.every = document.getElementById('every_dow').value;
 				break;

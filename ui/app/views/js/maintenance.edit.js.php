@@ -76,7 +76,7 @@ window.maintenance_edit = new class {
 				element.disabled = tags_table_disabled;
 			});
 
-			if(tags_table_disabled) {
+			if (tags_table_disabled) {
 				document.querySelectorAll('input[name$="[tag]"], input[name$="[value]').forEach((element) => {
 					element.removeAttribute('placeholder');
 				});
