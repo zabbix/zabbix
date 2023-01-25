@@ -1,8 +1,6 @@
 Changes for 6.4.0beta6
 
 New features:
-........S. [ZBX-22224] fixed broken json generation by zabbix internal stats (dgoloscapov)
-.......... [ZBX-20110] added single field search option to oracle archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys for Zabbix agent 2 (esneiders)
 .........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
 .........T [ZBXNEXT-7775] added veeam backup and replication templates (egordymov)
 ..F....... [ZBXNEXT-7605] replaced column "Ack" with "Update" in problem lists (Ivo)
@@ -61,6 +59,8 @@ A......... [ZBX-22138] fixed inability to delete group from host prototype (vmak
 .........T [ZBX-21288] renamed LLD macro 'DG_NAME' to 'DGNAME' and fixed preprocessing JSONPATH in Oracle by Zabbix agent 2 template (knaglis)
 .........T [ZBX-22071] extended description for OPSGenie media type (atocko)
 .......PS. [ZBX-20845] fixed SNMP interface availability in case of wrong credentials (akozlovs)
+........S. [ZBX-22224] fixed broken json generation by zabbix internal stats (dgoloscapov)
+.......... [ZBX-20110] added single field search option to oracle archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys for Zabbix agent 2 (esneiders)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta5
