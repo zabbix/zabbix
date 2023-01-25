@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-01-13 10:39+0000\n"
+"PO-Revision-Date: 2023-01-24 22:07+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -20243,7 +20243,7 @@ msgstr "neplatná bytová sekvence v UTF-8"
 
 #: include/validate.inc.php:190
 msgid "invalid data type"
-msgstr ""
+msgstr "Neplatný datový typ"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"
