@@ -139,7 +139,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		$this->checkFormHintsAndMapping($saml_form, $hintboxes, $mapping_tables, 'SAML');
 	}
 
-	public function getSamlData() {
+	public function getConfigureValidationData() {
 		return [
 			// #0 Missing IdP entity ID.
 			[
@@ -199,12 +199,33 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'IdP entity ID' => 'IdP',
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP entity',
-						'Configure JIT provisioning' => true
+						'Configure JIT provisioning' => true,
 					],
 					'error' => 'Incorrect value for field "saml_group_name": cannot be empty.'
 				]
 			],
-			// #5 Configure SAML with minimal fields.
+			// #5 Missing Group name attribute.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'IdP entity ID' => 'IdP entity',
+						'SSO service URL' => 'SSO',
+						'IdP entity ID' => 'IdP',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP entity',
+						'Configure JIT provisioning' => true,
+						'Group name attribute' => 'group name attribute'
+					],
+					'error' => 'Invalid parameter "/1/provision_groups": cannot be empty.'
+				]
+			]
+		];
+	}
+
+	public function getConfigureData() {
+		return [
+			// #0 Configure SAML with minimal fields.
 			[
 				[
 					'fields' => [
@@ -212,19 +233,43 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'SSO service URL' => 'SSO',
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP'
+					],
+					'db_check' => [
+						'config' => [
+							'saml_auth_enabled' => 1,
+							'saml_case_sensitive' => 0,
+							'saml_jit_status' => 0
+						],
+						'userdirectory_saml' => [
+							'idp_entityid' => 'IdP',
+							'sso_url' => 'SSO',
+							'username_attribute' => 'UA',
+							'sp_entityid' => 'SP'
+						]
 					]
 				]
 			],
-			// #6 Various UTF-8 characters in SAML settings fields.
+			// #1 Various UTF-8 characters in SAML settings fields + All possible fields with JIT configuration.
 			[
 				[
 					'fields' => [
+						'Enable JIT provisioning' => true,
 						'IdP entity ID' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 						'SSO service URL' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 						'SLO service URL' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 						'Username attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 						'SP entity ID' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-						'Enable JIT provisioning' => true,
+						// Sign.
+						'id:sign_messages' => true,
+						'id:sign_assertions' => true,
+						'id:sign_authn_requests' => true,
+						'id:sign_logout_requests' => true,
+						'id:sign_logout_responses' => true,
+						// Encrypt.
+						'id:encrypt_nameid' => true,
+						'id:encrypt_assertions' => true,
+						'Case-sensitive login' => true,
+						'Configure JIT provisioning' => true,
 						'SP name ID format' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 						'Group name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 						'User name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
@@ -232,7 +277,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					],
 					'User group mapping' => [
 						[
-							'LDAP group pattern' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+							'SAML group pattern' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 							'User groups' => 'Test timezone',
 							'User role' => 'User role'
 						]
@@ -241,14 +286,15 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						[
 							'Name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 							'Media type' => 'Discord',
-							'Attribute' => 'test discord'
+							'Attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 						]
 					],
 					'db_check' => [
 						'config' => [
 							'saml_auth_enabled' => 1,
 							'saml_case_sensitive' => 1,
-							'saml_jit_status' => 1
+							'saml_jit_status' => 1,
+							'saml_provision_status' => 1
 						],
 						'userdirectory_saml' => [
 							'idp_entityid' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
@@ -256,7 +302,14 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 							'slo_url' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 							'username_attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 							'sp_entityid' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-							'nameid_format' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
+							'nameid_format' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+							'sign_messages' => 1,
+							'sign_assertions' => 1,
+							'sign_authn_requests' => 1,
+							'sign_logout_requests' => 1,
+							'sign_logout_responses' => 1,
+							'encrypt_nameid' => 1,
+							'encrypt_assertions' => 1
 						],
 						'userdirectory_idpgroup' => [
 							[
@@ -284,7 +337,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					]
 				]
 			],
-			// #7 SAML settings with leading and trailing spaces.
+			// #2 SAML settings with leading and trailing spaces.
 			[
 				[
 					'trim' => true,
@@ -295,7 +348,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'Username attribute' => '   leading.trailing   ',
 						'SP entity ID' => '   leading.trailing   ',
 						'SP name ID format' => '   leading.trailing   ',
-						'Enable JIT provisioning' => true,
+						'Configure JIT provisioning' => true,
 						'Group name attribute' => '   leading.trailing   ',
 						'User name attribute' => '   leading.trailing   ',
 						'User last name attribute'=> '   leading.trailing   '
@@ -344,42 +397,37 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 								'name' => 'leading.trailing',
 								'mediatypeid' => 10,
 								'attribute' => 'test discord'
-							],
-							[
-								'name' => 'leading.trailing',
-								'mediatypeid' => 22,
-								'attribute' => 'test iLert'
 							]
 						]
 					]
 				]
 			],
-			// #8 SAML settings with long values in fields.
+			// #3 SAML settings with long values in fields.
 			[
 				[
 					'trim' => true,
 					'fields' => [
 						'IdP entity ID' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 						'SSO service URL' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-						'SLO service URL' => '   leading.trailing   ',
-						'Username attribute' => '   leading.trailing   ',
-						'SP entity ID' => '   leading.trailing   ',
-						'SP name ID format' => '   leading.trailing   ',
-						'Enable JIT provisioning' => true,
-						'Group name attribute' => '   leading.trailing   ',
-						'User name attribute' => '   leading.trailing   ',
-						'User last name attribute'=> '   leading.trailing   '
+						'SLO service URL' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+						'Username attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+						'SP entity ID' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+						'SP name ID format' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+						'Configure JIT provisioning' => true,
+						'Group name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+						'User name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+						'User last name attribute'=> 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
 					],
 					'User group mapping' => [
 						[
-							'LDAP group pattern' => '   leading.trailing   ',
+							'LDAP group pattern' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 							'User groups' => 'Test timezone',
 							'User role' => 'User role'
 						]
 					],
 					'Media type mapping' => [
 						[
-							'Name' => '   leading.trailing   ',
+							'Name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 							'Media type' => 'Discord',
 							'Attribute' => 'test discord'
 						]
@@ -424,11 +472,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					]
 				]
 			],
-			// #8 Configure SAML with all  parameters, but no JIT.
+			// #4 Configure SAML with all parameters, but no JIT configuration.
 			[
 				[
 					'Deprovisioned users group' => 'Disabled',
 					'fields' => [
+						'Enable JIT provisioning' => true,
 						'IdP entity ID' => 'IdP_saml_zabbix.com',
 						'SSO service URL' => 'SSO_saml_zabbix.com',
 						'SLO service URL' => 'SLO_saml_zabbix.com',
@@ -468,23 +517,32 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						]
 					]
 				]
-			],
-			// #9 Configure SAML with all possible parameters and with  JIT.
-
+			]
 		];
+	}
+
+	/**
+	 * @dataProvider getConfigureValidationData
+	 */
+	public function testUsersAuthenticationSaml_ConfigureValidation($data) {
+		$this->testSamlConfiguration($data);
 	}
 
 	/**
 	 * @backup config
 	 *
-	 * @dataProvider getSamlData
+	 * @dataProvider getConfigureData
 	 */
-	public function testUsersAuthenticationSaml_Configure($data) {
+	public function testUsersAuthenticationSaml_Configure1($data) {
+		$this->testSamlConfiguration($data);
+	}
+
+	private function testSamlConfiguration($data) {
 		$old_hash = CDBHelper::getHash('SELECT * FROM config');
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 
 		// Check that SAML settings are disabled by default and configure SAML authentication.
-		$this->configureSamlAuthentication($data['fields'], $data);
+		$this->configureSamlAuthentication($data);
 
 		// Check SAML settings update messages and, in case of successful update, check that field values were saved.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
@@ -705,16 +763,27 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 	 * Function checks that SAML settings are disabled by default, if the corresponding flag is specified, enables and
 	 * fills SAML settings, and submits the form.
 	 *
-	 * @param array      $fields	       given SAML settings
-	 * @param array      $data             data provider
+	 * @param array    $data    data provider
 	 */
-	private function configureSamlAuthentication($fields, $data = null) {
+	private function configureSamlAuthentication($data) {
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('SAML settings');
 		$form->getField('Enable SAML authentication')->check();
-		$form->fill($fields);
+		$form->fill($data['fields']);
 
-		if ($data !== null && array_key_exists('Deprovisioned users group', $data)) {
+		if (CTestArrayHelper::get($data['fields'], 'Configure JIT provisioning')) {
+			$success = (array_key_exists('mapping_error', $data)) ? false : true;
+
+			if (array_key_exists('User group mapping', $data)) {
+				$this->setMapping($data['User group mapping'], $form, 'User group mapping', $success);
+			}
+
+			if (array_key_exists('Media type mapping', $data)) {
+				$this->setMapping($data['Media type mapping'], $form, 'Media type mapping', $success);
+			}
+		}
+
+		if (array_key_exists('Deprovisioned users group', $data)) {
 			$form->selectTab('Authentication');
 			$form->fill(['Deprovisioned users group' => 'Disabled']);
 		}

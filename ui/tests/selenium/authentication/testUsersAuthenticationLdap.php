@@ -1256,12 +1256,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								[
 									'Name' => 'кириллица1',
 									'Media type' => 'Discord',
-									'Attribute' => 'test discord'
+									'Attribute' => 'кириллица'
 								],
 								[
 									'Name' => 'кириллица2',
 									'Media type' => 'iLert',
-									'Attribute' => 'test iLert'
+									'Attribute' => 'кириллица'
 								]
 							]
 						]
@@ -1303,12 +1303,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							[
 								'name' => 'кириллица1',
 								'mediatypeid' => 10,
-								'attribute' => 'test discord'
+								'attribute' => 'кириллица'
 							],
 							[
 								'name' => 'кириллица2',
 								'mediatypeid' => 22,
-								'attribute' => 'test iLert'
+								'attribute' => 'кириллица'
 							]
 						]
 					]
@@ -1349,12 +1349,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								[
 									'Name' => '~`!@#$%^7*()_+=/1',
 									'Media type' => 'Discord',
-									'Attribute' => 'test discord'
+									'Attribute' => '~`!@#$%^7*()_+=/'
 								],
 								[
 									'Name' => '~`!@#$%^7*()_+=/2',
 									'Media type' => 'iLert',
-									'Attribute' => 'test iLert'
+									'Attribute' => '~`!@#$%^7*()_+=/'
 								]
 							]
 						]
@@ -1396,12 +1396,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							[
 								'name' => '~`!@#$%^7*()_+=/1',
 								'mediatypeid' => 10,
-								'attribute' => 'test discord'
+								'attribute' => '~`!@#$%^7*()_+=/'
 							],
 							[
 								'name' => '~`!@#$%^7*()_+=/2',
 								'mediatypeid' => 22,
-								'attribute' => 'test iLert'
+								'attribute' => '~`!@#$%^7*()_+=/'
 							]
 						]
 					]
@@ -1441,7 +1441,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								[
 									'Name' => '   leading.trailing   ',
 									'Media type' => 'Discord',
-									'Attribute' => 'test discord'
+									'Attribute' => '   leading.trailing   '
 								]
 							]
 						]
@@ -1481,7 +1481,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							[
 								'name' => 'leading.trailing',
 								'mediatypeid' => 10,
-								'attribute' => 'test discord'
+								'attribute' => 'leading.trailing'
 							]
 						]
 					]
@@ -1524,13 +1524,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 									// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
 									'Name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
 									'Media type' => 'Discord',
-									'Attribute' => 'test discord'
+									'Attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
 								],
 								[
 									// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
 									'Name' => '2ong_value_long_value_long_value_long_value_long_value_lon',
 									'Media type' => 'iLert',
-									'Attribute' => 'test iLert'
+									'Attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
 								]
 							]
 						]
@@ -1577,13 +1577,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
 								'name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
 								'mediatypeid' => 10,
-								'attribute' => 'test discord'
+								'attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
 							],
 							[
 								// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
 								'name' => '2ong_value_long_value_long_value_long_value_long_value_lon',
 								'mediatypeid' => 22,
-								'attribute' => 'test iLert'
+								'attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
 							]
 						]
 					]
@@ -1960,28 +1960,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
-		}
-	}
-
-	/**
-	 * Set mapping for LDAP server.
-	 *
-	 * @param array            $data	   given mapping
-	 * @param CFormElement     $form       LDAP form
-	 * @param string           $field      mapping field which is being filled
-	 * @param boolean		   $success    true if mapping submits successfully, false if not
-	 */
-	private function setMapping($data, $form, $field, $success = true) {
-		foreach ($data as $mapping) {
-			$form->getFieldContainer($field)->query('button:Add')->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-			$param_form = $dialog->asForm();
-			$param_form->fill($mapping);
-			$param_form->submit();
-
-			if ($success) {
-				$dialog->waitUntilNotVisible();
-			}
 		}
 	}
 }

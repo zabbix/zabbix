@@ -158,5 +158,27 @@ class testFormAuthentication extends CWebTest {
 			$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 		}
 	}
+
+	/**
+	 * Set mapping for LDAP server.
+	 *
+	 * @param array            $mappings    given mappings
+	 * @param CFormElement     $form        LDAP or SAML form
+	 * @param string           $field       mapping field which is being filled
+	 * @param boolean		   $success     true if mapping submits successfully, false if not
+	 */
+	protected function setMapping($mappings, $form, $field, $success = true) {
+		foreach ($mappings as $mapping) {
+			$form->getFieldContainer($field)->query('button:Add')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+			$param_form = $dialog->asForm();
+			$param_form->fill($mapping);
+			$param_form->submit();
+
+			if ($success) {
+				$dialog->waitUntilNotVisible();
+			}
+		}
+	}
 }
 
