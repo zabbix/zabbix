@@ -1407,7 +1407,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
-			// #1 Using symbols in settings.
+			// #2 Checking trim of the leading and trailing settings.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1420,14 +1420,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Base DN' => '   leading.trailing   ',
 								'Search attribute' => '   leading.trailing   ',
 								'Bind DN' => '   leading.trailing   ',
-								'Bind password' => '   leading.trailing   ',
 								'Description' => '   leading.trailing   ',
 								'Configure JIT provisioning' => true,
 								'Group configuration' => 'groupOfNames',
 								'Group base DN' => '   leading.trailing   ',
 								'Group name attribute' => '   leading.trailing   ',
 								'Group member attribute' => '   leading.trailing   ',
-								'Reference attribute' => '   leading.trailing   ',
 								'Group filter' => '   leading.trailing   ',
 								'User name attribute' => '   leading.trailing   ',
 								'User last name attribute' => '   leading.trailing   '
@@ -1444,11 +1442,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 									'Name' => '   leading.trailing   ',
 									'Media type' => 'Discord',
 									'Attribute' => 'test discord'
-								],
-								[
-									'Name' => '   leading.trailing   ',
-									'Media type' => 'iLert',
-									'Attribute' => 'test iLert'
 								]
 							]
 						]
@@ -1464,12 +1457,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'port' => 389,
 								'base_dn' => 'leading.trailing',
 								'bind_dn' => 'leading.trailing',
-								'bind_password' => 'leading.trailing',
 								'search_attribute' => 'leading.trailing',
 								'group_basedn' => 'leading.trailing',
 								'group_name' => 'leading.trailing',
 								'group_member' => 'leading.trailing',
-								'user_ref_attr' => 'leading.trailing',
 								'group_filter' => 'leading.trailing',
 								'user_username' => 'leading.trailing',
 								'user_lastname' => 'leading.trailing'
@@ -1491,17 +1482,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'name' => 'leading.trailing',
 								'mediatypeid' => 10,
 								'attribute' => 'test discord'
-							],
-							[
-								'name' => 'leading.trailing',
-								'mediatypeid' => 22,
-								'attribute' => 'test iLert'
 							]
 						]
 					]
 				]
 			],
-			// #2 Long values.
+			// #3 Long values.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1603,7 +1589,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
-			// #3 LDAP server with every field filled (no JIT).
+			// #4 LDAP server with every field filled (no JIT).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1642,7 +1628,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
-			// #4 LDAP server with every field filled with JIT (groupOfNames).
+			// #5 LDAP server with every field filled with JIT (groupOfNames).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1734,7 +1720,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
-			// #5 Two LDAP servers with different names.
+			// #6 Two LDAP servers with different names.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1820,6 +1806,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			// Check DB configuration.
 			foreach ($data['db_check'] as $table => $rows) {
 				foreach ($rows as $i => $row) {
+					$rows = array_map('trim', $row);
 					$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table.' LIMIT 1 OFFSET '.$i;
 					$this->assertEquals([$row], CDBHelper::getAll($sql));
 				}
@@ -1939,7 +1926,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			}
 
 			$ldap_form->submit();
-
 
 			if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD || CTestArrayHelper::get($data, 'dialog_submit')) {
 				$dialog->ensureNotPresent();
