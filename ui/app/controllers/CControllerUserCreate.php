@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'surname' =>		'db users.surname',
 			'password1' =>		'required|string',
 			'password2' =>		'required|string',
-			'user_groups' =>	'required|array_id|not_empty',
+			'user_groups' =>	'array_id',
 			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
 			'timezone' =>		'db users.timezone|in '.implode(',', $this->timezones),
@@ -43,7 +43,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'url' =>			'db users.url',
 			'refresh' =>		'required|db users.refresh|not_empty',
 			'rows_per_page' =>	'required|db users.rows_per_page',
-			'roleid' =>			'required|db users.roleid',
+			'roleid' =>			'id',
 			'form_refresh' =>	'int32'
 		];
 
@@ -83,7 +83,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		$this->getInputs($user, ['username', 'name', 'surname', 'url', 'autologin', 'autologout', 'theme', 'refresh',
 			'rows_per_page', 'lang', 'timezone', 'roleid'
 		]);
-		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups'), 'usrgrpid');
+		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
 
 		if ($this->getInput('password1', '') !== '' || !$this->allow_empty_password) {
 			$user['passwd'] = $this->getInput('password1');

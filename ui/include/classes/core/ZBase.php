@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -205,6 +205,18 @@ class ZBase {
 				/** @var CRouter $router */
 				$router = $this->component_registry->get('router');
 				$router->addActions($this->module_manager->getActions());
+
+				$validator = new CNewValidator(['action' => $action_name], ['action' => 'fatal|required|string']);
+				$errors = $validator->getAllErrors();
+
+				if ($errors) {
+					CCookieHelper::set('system-message-details', base64_encode(json_encode(
+						['type' => 'error', 'messages' => $errors]
+					)));
+
+					redirect('zabbix.php?action=system.warning');
+				}
+
 				$router->setAction($action_name);
 
 				$this->component_registry->get('menu.main')
@@ -545,7 +557,10 @@ class ZBase {
 		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
 
 		// Set the authentication token for the API.
-		API::getWrapper()->auth = CWebUser::$data['sessionid'];
+		API::getWrapper()->auth = [
+			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
+			'auth' => CWebUser::$data['sessionid']
+		];
 
 		// Enable debug mode in the API.
 		API::getWrapper()->debug = CWebUser::getDebugMode();
@@ -746,6 +761,7 @@ class ZBase {
 		else {
 			$view['header'] = _('You are not logged in');
 			$view['messages'][] = _('You must login to view this page.');
+			$view['messages'][] = _('Possibly the session has expired or the password was changed.');
 		}
 
 		$view['messages'][] = _('If you think this message is wrong, please consult your administrators about getting the necessary permissions.');

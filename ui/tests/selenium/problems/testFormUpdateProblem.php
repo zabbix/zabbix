@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -212,7 +212,7 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for unsigned'],
 					// If problem is Aknowledged - label is changed to Unacknowledge.
 					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress',
-							'Unsuppress', 'Unacknowledge', 'Close problem', ''
+							'Unsuppress', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
 					],
 					'message' => 'Acknowledged event',
 					'Unacknowledge' => true,
@@ -237,7 +237,7 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for float', 'Trigger for char'],
 					// If more than one problems selected - History label is absent.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-							'Acknowledge', 'Close problem', ''
+							'Acknowledge', 'Convert to cause', 'Close problem', ''
 					],
 					'close_enabled' => true,
 					'Acknowledge' => true,
@@ -255,7 +255,7 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for float', 'Trigger for char', 'Trigger for log', 'Trigger for unsigned', 'Trigger for text'],
 					// If more than one problem selected - History label is absent.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-							'Acknowledge', 'Unacknowledge', 'Close problem', ''
+							'Acknowledge', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
 					],
 					'hintboxes' => [
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
@@ -290,7 +290,7 @@ class testFormUpdateProblem extends CWebTest {
 		// Check form labels.
 		$count = count($data['problems']);
 		$default_labels = ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-				'Acknowledge', 'Close problem', ''];
+				'Acknowledge', 'Convert to cause', 'Close problem', ''];
 		$this->assertEquals(CTestArrayHelper::get($data, 'labels', $default_labels), $form->getLabels()->asText());
 
 		// Check "Problem" field value.
@@ -635,7 +635,7 @@ class testFormUpdateProblem extends CWebTest {
 						'id:severity' => 'High',
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
-						'id:suppress_until_problem' => 'now+15y'
+						'id:suppress_until_problem' => 'now+14y'
 					],
 					'db_check' => [
 						[
@@ -783,7 +783,7 @@ class testFormUpdateProblem extends CWebTest {
 			$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 		}
 		else {
-			$table->findRow('Problem', $data['problems'][0])->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+			$table->findRow('Problem', $data['problems'][0])->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		}
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -849,7 +849,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Open filtered Problems list.
 		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
-		$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Trigger for log')->getColumn('Ack')
+		$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Trigger for log')->getColumn('Update')
 				->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('id:acknowledge_form')->asForm()->one()->fill([
@@ -874,7 +874,7 @@ class testFormUpdateProblem extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		$row = $table->findRow('Problem', 'Trigger for icon test');
-		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
@@ -897,7 +897,7 @@ class testFormUpdateProblem extends CWebTest {
 		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[@class="icon-action-suppress"]')->exists());
 
 		// Unsuppress problem.
-		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$form->fill(['id:unsuppress_problem' => true]);
 		$form->submit();
 		$dialog->ensureNotPresent();
@@ -917,7 +917,7 @@ class testFormUpdateProblem extends CWebTest {
 		);
 
 		// Check Suppress/Unsuppress icon in History table.
-		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
+		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog->waitUntilReady();
 		$form->invalidate();
 		$this->checkHistoryTable($form->getField('History')->asTable(), 'User', 'User action');

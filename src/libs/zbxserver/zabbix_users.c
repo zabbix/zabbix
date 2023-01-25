@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,14 @@
 
 #include "zbxdbhigh.h"
 #include "log.h"
+
+/* group statuses */
+typedef enum
+{
+	GROUP_STATUS_ACTIVE = 0,
+	GROUP_STATUS_DISABLED
+}
+zbx_group_status_type_t;
 
 /******************************************************************************
  *                                                                            *
@@ -48,7 +56,7 @@ int	check_perm2system(zbx_uint64_t userid)
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]) && atoi(row[0]) > 0)
 		res = FAIL;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return res;
 }
@@ -66,10 +74,18 @@ char	*get_user_timezone(zbx_uint64_t userid)
 	else
 		user_timezone = NULL;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return user_timezone;
 }
+
+/* user role permissions */
+typedef enum
+{
+	ROLE_PERM_DENY = 0,
+	ROLE_PERM_ALLOW = 1,
+}
+zbx_user_role_permission_t;
 
 /******************************************************************************
  *                                                                            *
@@ -111,7 +127,7 @@ int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, co
 		else
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

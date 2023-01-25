@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,7 +92,9 @@ class CFrontendApiWrapper extends CApiWrapper {
 	 * @return CApiClientResponse
 	 */
 	protected function callClientMethod($method, $params) {
-		$auth = ($this->requiresAuthentication($this->api, $method)) ? $this->auth : null;
+		$auth = ($this->requiresAuthentication($this->api, $method))
+			? $this->auth
+			: ['type' => CJsonRpc::AUTH_TYPE_PARAM, 'auth' => null];
 
 		return $this->client->callMethod($this->api, $method, $params, $auth);
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,8 +36,7 @@ class testJSONRPC extends CAPITest {
 						'data' => 'Invalid JSON. An error occurred on the server while parsing the JSON text.'
 					],
 					'id' => null
-				],
-				'auth' => false
+				]
 			],
 			// rpc call Batch, invalid JSON
 			[
@@ -54,8 +53,7 @@ class testJSONRPC extends CAPITest {
 						'data' => 'Invalid JSON. An error occurred on the server while parsing the JSON text.'
 					],
 					'id' => null
-				],
-				'auth' => false
+				]
 			],
 			// rpc call with an empty Array
 			[
@@ -68,8 +66,7 @@ class testJSONRPC extends CAPITest {
 						'data' => 'The received JSON is not a valid JSON-RPC request.'
 					],
 					'id' => null
-				],
-				'auth' => false
+				]
 			],
 			// rpc call with an invalid scalar data
 			[
@@ -82,8 +79,7 @@ class testJSONRPC extends CAPITest {
 						'data' => 'The received JSON is not a valid JSON-RPC request.'
 					],
 					'id' => null
-				],
-				'auth' => false
+				]
 			],
 			// rpc call with invalid "jsonrpc"
 			[
@@ -96,8 +92,7 @@ class testJSONRPC extends CAPITest {
 						'data' => 'Invalid parameter "/jsonrpc": a character string is expected.'
 					],
 					'id' => null
-				],
-				'auth' => false
+				]
 			],
 			// rpc call with invalid version "jsonrpc"
 			[
@@ -110,8 +105,7 @@ class testJSONRPC extends CAPITest {
 						'data' => 'Invalid parameter "/jsonrpc": value must be "2.0".'
 					],
 					'id' => null
-				],
-				'auth' => false
+				]
 			],
 			// rpc call with invalid "method"
 			[
@@ -124,8 +118,7 @@ class testJSONRPC extends CAPITest {
 						'data' => 'Invalid parameter "/method": a character string is expected.'
 					],
 					'id' => null
-				],
-				'auth' => false
+				]
 			],
 			// rpc call with invalid "params"
 			[
@@ -138,8 +131,7 @@ class testJSONRPC extends CAPITest {
 						'data' => 'Invalid parameter "/params": an array or object is expected.'
 					],
 					'id' => null
-				],
-				'auth' => false
+				]
 			],
 			// rpc call with invalid "auth"
 			[
@@ -153,8 +145,7 @@ class testJSONRPC extends CAPITest {
 					],
 					'id' => 1
 				],
-				'auth' => true,
-				'token' => 12345
+				'token' => '12345'
 			],
 			// rpc call with invalid "id"
 			[
@@ -168,7 +159,6 @@ class testJSONRPC extends CAPITest {
 					],
 					'id' => null
 				],
-				'auth' => true,
 				'token' => null
 			],
 			// rpc call with invalid batch (but not empty)
@@ -184,8 +174,7 @@ class testJSONRPC extends CAPITest {
 						],
 						'id' => null
 					]
-				],
-				'auth' => false
+				]
 			],
 			// rpc call with invalid batch
 			[
@@ -218,8 +207,7 @@ class testJSONRPC extends CAPITest {
 						],
 						'id' => null
 					]
-				],
-				'auth' => false
+				]
 			],
 			// rpc call with empty "method"
 			[
@@ -232,8 +220,7 @@ class testJSONRPC extends CAPITest {
 						'data' => 'Incorrect API "".'
 					],
 					'id' => null
-				],
-				'auth' => false
+				]
 			],
 			// rpc call of non-existent API class
 			[
@@ -246,8 +233,7 @@ class testJSONRPC extends CAPITest {
 						'data' => 'Incorrect API "foo".'
 					],
 					'id' => 5
-				],
-				'auth' => false
+				]
 			],
 			// rpc call of non-existent method
 			[
@@ -260,20 +246,17 @@ class testJSONRPC extends CAPITest {
 						'data' => 'Incorrect method "apiinfo.get".'
 					],
 					'id' => 5
-				],
-				'auth' => false
+				]
 			],
 			// a notification
 			[
 				'request' => '{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}}',
-				'result' => '',
-				'auth' => false
+				'result' => ''
 			],
 			// a notification with non-existent method
 			[
 				'request' => '{"jsonrpc": "2.0", "method": "foobar", "params": {}}',
-				'result' => '',
-				'auth' => false
+				'result' => ''
 			],
 			// rpc call batch (all notifications)
 			[
@@ -281,8 +264,7 @@ class testJSONRPC extends CAPITest {
 					'{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}},'.
 					'{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}}'.
 				']',
-				'result' => '',
-				'auth' => false
+				'result' => ''
 			],
 			// rpc call with unsupported parameter
 			[
@@ -295,8 +277,7 @@ class testJSONRPC extends CAPITest {
 						'data' => 'Invalid parameter "/": unexpected parameter "foo".'
 					],
 					'id' => 1
-				],
-				'auth' => false
+				]
 			],
 			// rpc call batch
 			[
@@ -347,8 +328,7 @@ class testJSONRPC extends CAPITest {
 						'result' => ZABBIX_API_VERSION,
 						'id' => 4
 					]
-				],
-				'auth' => false
+				]
 			],
 			// rpc call with not required auth
 			[
@@ -358,11 +338,10 @@ class testJSONRPC extends CAPITest {
 					'error' => [
 						'code' => -32602,
 						'message' => 'Invalid params.',
-						'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
+						'data' => 'The "apiinfo.version" method must be called without authorization header.'
 					],
 					'id' => 5
 				],
-				'auth' => true,
 				'token' => 'token'
 			],
 			// rpc call without required auth
@@ -377,7 +356,6 @@ class testJSONRPC extends CAPITest {
 					],
 					'id' => 5
 				],
-				'auth' => true,
 				'token' => null
 			]
 		];
@@ -386,12 +364,7 @@ class testJSONRPC extends CAPITest {
 	/**
 	 * @dataProvider json_rpc_data
 	 */
-	public function testJSONRPC_Calls($request, $expected_result, $auth, $token = null) {
-		if ($auth) {
-			CAPIHelper::setAuth($auth);
-			CAPIHelper::setSessionId($token);
-		}
-
-		$this->assertSame($expected_result, $this->callRaw($request));
+	public function testJSONRPC_Calls($request, $expected_result, $token = null) {
+		$this->assertSame($expected_result, $this->callRaw($request, $token));
 	}
 }

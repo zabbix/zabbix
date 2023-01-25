@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,9 +44,14 @@ $buttons = [
 ];
 
 if ($data['form'] === 'massupdate') {
-	$buttons[] = (new CButton(null, _('Add from')))
+	$buttons[] = (new CButton(null, _('Add from template')))
 		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('element-table-addfrom');
+		->addClass('element-table-addfrom')
+		->setAttribute('data-context', 'template');
+	$buttons[] = (new CButton(null, _('Add from host')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-addfrom')
+		->setAttribute('data-context', 'host');
 }
 
 $table->addItem((new CTag('tfoot', true))->addItem([new CCol($buttons)]));

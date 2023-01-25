@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "zbxnum.h"
 #include "log.h"
+#include "zbx_host_constants.h"
 
 #ifdef HAVE_OPENIPMI
 #	define ZBX_IPMI_FIELDS_NUM	4	/* number of selected IPMI-related fields in function */
@@ -136,7 +137,7 @@ int	get_host_from_event(const ZBX_DB_EVENT *event, DC_HOST *host, char *error, s
 		zbx_strscpy(host->tls_psk, row[7 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (FAIL == ret)
 	{

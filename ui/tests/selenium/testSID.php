@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,6 +61,48 @@ class testSID extends CWebTest {
 
 	public static function getLinksData() {
 		return [
+			// Action create
+			[[
+				'link' => 'zabbix.php?action=action.create&form_refresh=1&actionid=0&eventsource=0&name=testsid&evaltype=0'.
+					'&formula=&status=0&esc_period=1h&operations[0][eventsource]=0&operations[0][recovery]=0'.
+					'&operations[0][operationtype]=0&operations[0][esc_step_from]=1&operations[0][esc_step_to]=1'.
+					'&operations[0][esc_period]=0&operations[0][opmessage_grp][0][usrgrpid]=8&operations[0][opmessage][mediatypeid]=0'.
+					'&operations[0][opmessage][default_msg]=1&operations[0][evaltype]=0&pause_suppressed=1&notify_if_canceled=1',
+				'json_output' => true
+			]],
+			// Action update
+			[[
+				'link' => 'zabbix.php?action=action.update&form_refresh=1&actionid=3&eventsource=0'.
+					'&name=Report problems to Zabbix administrators&evaltype=0&formula=&esc_period=1h&operations[0][operationid]=3'.
+					'&operations[0][actionid]=3&operations[0][operationtype]=0&operations[0][esc_period]=0&operations[0][esc_step_from]=1'.
+					'&operations[0][esc_step_to]=1&operations[0][evaltype]=0&operations[0][opmessage][default_msg]=1'.
+					'&operations[0][opmessage][subject]=&operations[0][opmessage][message]=&operations[0][opmessage][mediatypeid]=0'.
+					'&operations[0][opmessage_grp][0][usrgrpid]=7&operations_for_popup[0][0]={"operationid":"3","actionid":"3"'.
+					',"operationtype":"0","esc_period":"0","esc_step_from":"1","esc_step_to":"1","evaltype":"0","opconditions":[]'.
+					',"opmessage":{"default_msg":"1","subject":"","message":"","mediatypeid":"0"},"opmessage_grp":[{"usrgrpid":"7"}]'.
+					',"opmessage_usr":[],"id":0}&operations_for_popup[1][0]={"operationid":"7","actionid":"3","operationtype":"11"'.
+					',"evaltype":"0","opconditions":[],"opmessage":{"default_msg":"1","subject":"","message":"","mediatypeid":"0"}'.
+					',"id":0}&recovery_operations[0][operationid]=7&recovery_operations[0][actionid]=3'.
+					'&recovery_operations[0][operationtype]=11&recovery_operations[0][evaltype]=0&recovery_operations[0][opmessage]'.
+					'[default_msg]=1&recovery_operations[0][opmessage][subject]=&recovery_operations[0][opmessage][message]='.
+					'&recovery_operations[0][opmessage][mediatypeid]=0&pause_suppressed=1&notify_if_canceled=1',
+				'json_output' => true
+			]],
+			// Action delete
+			[[
+				'link' => 'zabbix.php?action=action.delete&eventsource=0&actionids[]=3',
+				'json_output' => true
+			]],
+			// Action disable
+			[[
+				'link' => 'zabbix.php?action=action.disable&eventsource=0&actionids[]=3',
+				'json_output' => true
+			]],
+			// Action enable
+			[[
+				'link' => 'zabbix.php?action=action.enable&eventsource=0&actionids[]=3',
+				'json_output' => true
+			]],
 			// Icon mapping delete.
 			[['link' => 'zabbix.php?action=iconmap.delete&iconmapid=101']],
 
@@ -515,7 +557,7 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?form_refresh=3&action=authentication.update&db_authentication_type=0&'.
 					'authentication_type=0&passwd_min_length=8&passwd_check_rules%5B%5D=1&passwd_check_rules%5B%5D=2&'.
 					'passwd_check_rules%5B%5D=4&passwd_check_rules%5B%5D=8&http_auth_enabled=1&http_login_form=0&'.
-					'http_strip_domains=&http_case_sensitive=1&ldap_configured=0&change_bind_password=1&'.
+					'http_strip_domains=&http_case_sensitive=1&ldap_auth_enabled=0&change_bind_password=1&'.
 					'saml_auth_enabled=0&update=Update']],
 
 			// Media type create.
@@ -1087,7 +1129,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM actions',
-					'link' => 'actionconf.php?eventsource=0&form=Create+action'
+					'access_denied' => true,
+					'link' => 'zabbix.php?action=action.list&eventsource=0',
+					'case' => 'action create'
 				]
 			],
 
@@ -1095,7 +1139,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM actions',
-					'link' => 'actionconf.php?form=update&actionid=3'
+					'access_denied' => true,
+					'link' => 'zabbix.php?action=action.list&eventsource=0',
+					'case' => 'action update'
 				]
 			],
 
@@ -1465,6 +1511,16 @@ class testSID extends CWebTest {
 					$this->query('button:Create proxy')->waitUntilClickable()->one()->click();
 					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 					$dialog->asForm()->fill(['Proxy name' => 'test remove sid']);
+					break;
+
+				case 'action create':
+					$this->query('button:Create action')->one()->click()->waitUntilReady();
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+					break;
+
+				case 'action update':
+					$this->query('xpath://a[text()="Report problems to Zabbix administrators"]')->one()->click()->waitUntilReady();
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 					break;
 			}
 

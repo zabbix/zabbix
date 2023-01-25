@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #define ZABBIX_ZBXEMBED_H
 
 #include "zbxjson.h"
+
+#define ZBX_ES_TIMEOUT	10
 
 typedef struct zbx_es_env zbx_es_env_t;
 

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ class CSvgGraphHelper {
 		// Load Data for each metric.
 		self::getMetricsData($metrics, $width);
 		// Load aggregated Data for each dataset.
-		self::getMetricsAggregatedData($metrics, $width);
+		self::getMetricsAggregatedData($metrics, $width, $options['data_sets']);
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
@@ -529,7 +529,7 @@ class CSvgGraphHelper {
 	/**
 	 * Select aggregated data to show in graph for each metric.
 	 */
-	private static function getMetricsAggregatedData(array &$metrics, int $width): void {
+	private static function getMetricsAggregatedData(array &$metrics, int $width, array $data_sets): void {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
@@ -543,7 +543,9 @@ class CSvgGraphHelper {
 				$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
 			}
 			else {
-				$name = 'Dataset #'.($dataset_num + 1);
+				$name = $data_sets[$dataset_num]['data_set_label'] !== ''
+					? $data_sets[$dataset_num]['data_set_label']
+					: _('Data set').' #'.($dataset_num + 1);
 			}
 
 			$item = [
@@ -761,6 +763,7 @@ class CSvgGraphHelper {
 			'select_acknowledges' => ['action'],
 			'problem_time_from' => $time_period['time_from'],
 			'problem_time_till' => $time_period['time_to'],
+			'symptom' => false,
 			'preservekeys' => true
 		];
 

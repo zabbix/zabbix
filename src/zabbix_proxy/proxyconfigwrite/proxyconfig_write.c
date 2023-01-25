@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "zbxdbhigh.h"
 #include "zbxcommshigh.h"
 #include "zbxrtc.h"
+#include "zbx_host_constants.h"
 
 /*
  * The configuration sync is split into 4 parts for each table:
@@ -1127,7 +1128,7 @@ static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_fiel
 		if (SUCCEED != proxyconfig_compare_row(row, dbrow, &buf, &buf_alloc))
 			zbx_vector_table_row_ptr_append(&td->updates, row);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 	zbx_free(buf);
@@ -1607,7 +1608,7 @@ static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, zbx_tab
 			ZBX_STR2UINT64(templateid, dbrow[0]);
 			zbx_hashset_insert(&templates, &templateid, sizeof(templateid));
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "status", NULL);
 
@@ -2059,7 +2060,8 @@ out:
  * Purpose: receive configuration tables from server (passive proxies)        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls)
+void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
+		const zbx_config_vault_t *config_vault, int config_timeout)
 {
 	struct zbx_json_parse	jp_config, jp_kvs_paths = {0};
 	int			ret;
@@ -2068,8 +2070,11 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update", zbx_config_tls))
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update", config_tls,
+			config_timeout))
+	{
 		goto out;
+	}
 
 	zbx_json_init(&j, 1024);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
@@ -2077,7 +2082,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)zbx_dc_get_received_revision());
 
 	if (SUCCEED != zbx_tcp_send_ext(sock, j.buffer, j.buffer_size, 0, (unsigned char)sock->protocol,
-			CONFIG_TIMEOUT))
+			config_timeout))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy configuration information to sever at \"%s\": %s",
 				sock->peer, zbx_json_strerror());
@@ -2095,7 +2100,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse empty proxy configuration data received from server at"
 				" \"%s\"", sock->peer);
-		zbx_send_proxy_response(sock, FAIL, "cannot parse empty data", CONFIG_TIMEOUT);
+		zbx_send_proxy_response(sock, FAIL, "cannot parse empty data", config_timeout);
 		goto out;
 	}
 
@@ -2103,7 +2108,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data received from server at"
 				" \"%s\": %s", sock->peer, zbx_json_strerror());
-		zbx_send_proxy_response(sock, ret, zbx_json_strerror(), CONFIG_TIMEOUT);
+		zbx_send_proxy_response(sock, ret, zbx_json_strerror(), config_timeout);
 		goto out;
 	}
 
@@ -2112,7 +2117,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
 		{
 			if (SUCCEED == zbx_json_brackets_by_name(&jp_config, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
-				DCsync_kvs_paths(&jp_kvs_paths);
+				DCsync_kvs_paths(&jp_kvs_paths, config_vault);
 		}
 		else
 		{
@@ -2126,7 +2131,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy onfiguration data received from server at"
 				" \"%s\": %s", sock->peer, error);
 	}
-	zbx_send_proxy_response(sock, ret, error, CONFIG_TIMEOUT);
+	zbx_send_proxy_response(sock, ret, error, config_timeout);
 	zbx_free(error);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

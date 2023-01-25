@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -163,7 +163,9 @@ class HostInterfaceManager {
 				],
 				[HostInterfaceManager.SNMP_V2C]: [
 					`snmp_community_label_${iface.interfaceid}`,
-					`snmp_community_field_${iface.interfaceid}`
+					`snmp_community_field_${iface.interfaceid}`,
+					`snmp_repetition_count_label_${iface.interfaceid}`,
+					`snmp_repetition_count_field_${iface.interfaceid}`
 				],
 				[HostInterfaceManager.SNMP_V3]: [
 					`snmpv3_contextname_label_${iface.interfaceid}`,
@@ -179,7 +181,9 @@ class HostInterfaceManager {
 					`snmpv3_privprotocol_label_${iface.interfaceid}`,
 					`snmpv3_privprotocol_field_${iface.interfaceid}`,
 					`snmpv3_privpassphrase_label_${iface.interfaceid}`,
-					`snmpv3_privpassphrase_field_${iface.interfaceid}`
+					`snmpv3_privpassphrase_field_${iface.interfaceid}`,
+					`snmp_repetition_count_label_${iface.interfaceid}`,
+					`snmp_repetition_count_field_${iface.interfaceid}`
 				]
 			}
 		);
@@ -233,6 +237,7 @@ class HostInterfaceManager {
 			details: {
 				version: HostInterfaceManager.SNMP_V2C,
 				community: '{$SNMP_COMMUNITY}',
+				max_repetitions: 10,
 				bulk: HostInterfaceManager.SNMP_BULK_ENABLED,
 				securitylevel: HostInterfaceManager.ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
 				authprotocol: HostInterfaceManager.ITEM_SNMPV3_AUTHPROTOCOL_MD5,

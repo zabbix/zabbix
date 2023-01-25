@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@
  */
 
 #ifndef HAVE_SQLITE3
-
-extern unsigned char program_type;
 
 static int	DBpatch_3030000(void)
 {
@@ -102,7 +100,7 @@ static int	DBpatch_3030007(void)
 
 		zbx_vector_uint64_append(&dserviceids, dserviceid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(&dserviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -180,6 +178,16 @@ static int	DBpatch_3030017(void)
 	return DBadd_foreign_key("item_preproc", 1, &field);
 }
 
+/* item data types */
+typedef enum
+{
+	ITEM_DATA_TYPE_DECIMAL = 0,
+	ITEM_DATA_TYPE_OCTAL,
+	ITEM_DATA_TYPE_HEXADECIMAL,
+	ITEM_DATA_TYPE_BOOLEAN
+}
+zbx_item_data_type_t;
+
 static void	DBpatch_3030018_add_numeric_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid,
 		unsigned char data_type, const char *formula, unsigned char delta)
 {
@@ -247,7 +255,7 @@ static int	DBpatch_3030018(void)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, "item_preprocid");
 	ret = zbx_db_insert_execute(&db_insert);
@@ -397,7 +405,7 @@ static int	DBpatch_3030030(void)
 				ret = FAIL;
 		}
 out:
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 	while (0 < upd_num && SUCCEED == ret);
 
@@ -583,7 +591,7 @@ static int	DBpatch_3030046(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -680,7 +688,7 @@ static int	DBpatch_3030053(void)
 	zbx_db_insert_autoincrement(&db_insert, "selement_triggerid");
 	ret = zbx_db_insert_execute(&db_insert);
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_db_insert_clean(&db_insert);
 
 	return ret;
@@ -876,7 +884,7 @@ static int	DBpatch_3030060_migrate_pairs(const char *table, const char *field, i
 					allow_empty);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, target_id);
 	ret = zbx_db_insert_execute(&db_insert);
@@ -1094,7 +1102,7 @@ static int	DBpatch_table_convert(const char *table, const char *recid, const DBp
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -1294,7 +1302,7 @@ static int	DBpatch_3030093(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -1402,7 +1410,7 @@ static int	DBpatch_3030102(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -1731,7 +1739,7 @@ static int	DBpatch_trailing_semicolon_remove(const char *table, const char *reci
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -2029,7 +2037,7 @@ static int	DBpatch_3030173(void)
 
 static int	DBpatch_3030174(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 	{
 		/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
 		if (ZBX_DB_OK > DBexecute(
@@ -2058,7 +2066,7 @@ static int	DBpatch_3030175(void)
 		NULL
 	};
 
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 	{
 		for (i = 0; NULL != values[i]; i++)
 		{
@@ -2297,7 +2305,7 @@ static int	DBpatch_3030197(void)
 
 		ret = SUCCEED;
 out:
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		return ret;
 	}

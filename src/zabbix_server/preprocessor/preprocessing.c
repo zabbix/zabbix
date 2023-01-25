@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "preproc_history.h"
 #include "item_preproc.h"
 #include "zbxsysinfo.h"
+#include "zbx_item_constants.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1

@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2022 Zabbix SIA
+ ** Copyright (C) 2001-2023 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,9 @@ window.ZABBIX = Object.create({
 	/**
 	 * Logs user out, also, handles side effects before that.
 	 */
-	logout: function() {
+	logout: function(event) {
+		cancelEvent(event);
+
 		var ls = this.namespace('instances.localStorage');
 		ls && ls.destruct();
 
@@ -105,9 +107,9 @@ jQuery(function($) {
 		var $this = $(this);
 
 		uncheckedHandler($this);
-		$this.on('change enable disable', function() {
-			uncheckedHandler($(this));
-		});
+		$this.on('change enable disable', function () {
+			uncheckedHandler($(this))
+		})
 	});
 
 	function showMenuPopup($obj, data, event, options) {
@@ -285,6 +287,11 @@ jQuery(function($) {
 		}, data.options || {});
 
 		if (isServerRequestRequired(data.type)) {
+			if (data.type === 'trigger') {
+				// Add additional IDs from checkboxes and pass them to popup menu.
+				data.data.ids = Object.keys(chkbxRange.getSelectedIds());
+			}
+
 			var url = new Curl('zabbix.php');
 
 			url.setArgument('action', 'menu.popup');

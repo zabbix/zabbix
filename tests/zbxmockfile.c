@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@
 void	*mock_streams[ZBX_MOCK_MAX_FILES];
 
 static zbx_mock_handle_t	fragments;
+
+static FILE	*(*fopen_mock_callback)(const char *, const char *) = NULL;
 
 struct zbx_mock_IO_FILE
 {
@@ -95,6 +97,10 @@ FILE	*__wrap_fopen(const char *path, const char *mode)
 	zbx_mock_handle_t	file_contents;
 	const char		*contents;
 	struct zbx_mock_IO_FILE	*file = NULL;
+
+	/* in case a test needs a custom fopen mock, use callback instead */
+	if (NULL != fopen_mock_callback)
+		return (*fopen_mock_callback)(path, mode);
 
 	if (SUCCEED == is_profiler_path(path))
 		return __real_fopen(path, mode);
@@ -298,3 +304,8 @@ int	__wrap___fxstat(int __ver, int __fildes, struct stat *__stat_buf)
 	return 0;
 }
 #endif
+
+void	zbx_set_fopen_mock_callback(FILE *(*fopen_callback)(const char *, const char *))
+{
+	fopen_mock_callback = fopen_callback;
+}

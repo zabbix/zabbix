@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -953,7 +953,7 @@ class testFormUserRoles extends CWebTest {
 						'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.create',
 						'trigger.delete', 'trigger.get', 'trigger.update', 'triggerprototype.create',
 						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.create',
-						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'userdirectory.create',
+						'user.delete', 'user.get', 'user.logout', 'user.provision', 'user.unblock', 'user.update', 'userdirectory.create',
 						'userdirectory.delete', 'userdirectory.get', 'userdirectory.test', 'userdirectory.update',
 						'usergroup.create', 'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create',
 						'usermacro.createglobal', 'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get',

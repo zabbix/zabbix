@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,13 @@ require_once dirname(__FILE__).'/apiTokens/testPageApiTokensAdministrationGenera
 require_once dirname(__FILE__).'/apiTokens/testPageApiTokensUserSettings.php';
 require_once dirname(__FILE__).'/apiTokens/testFormApiTokensAdministrationGeneral.php';
 require_once dirname(__FILE__).'/apiTokens/testFormApiTokensUserSettings.php';
+
+// Authentication.
+require_once dirname(__FILE__).'/authentication/testUsersAuthentication.php';
+require_once dirname(__FILE__).'/authentication/testUsersAuthenticationHttp.php';
+require_once dirname(__FILE__).'/authentication/testUsersAuthenticationLdap.php';
+require_once dirname(__FILE__).'/authentication/testUsersAuthenticationSaml.php';
+require_once dirname(__FILE__).'/authentication/testUsersPasswordComplexity.php';
 
 // Dashboards.
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
@@ -111,6 +118,12 @@ require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 
+// Media types.
+require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypes.php';
+require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
+require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
+require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php';
+
 // Monitoring.
 require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
 
@@ -187,7 +200,6 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
-require_once dirname(__FILE__).'/testPageAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
 require_once dirname(__FILE__).'/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
@@ -200,7 +212,6 @@ require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
 require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
-require_once dirname(__FILE__).'/testPasswordComplexity.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
@@ -211,9 +222,6 @@ require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
-require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
-require_once dirname(__FILE__).'/testFormAdministrationAuthenticationLdap.php';
-require_once dirname(__FILE__).'/testFormAdministrationAuthenticationSaml.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAuditLog.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
@@ -222,9 +230,6 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
 require_once dirname(__FILE__).'/testFormAdministrationHousekeeper.php';
-require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
-require_once dirname(__FILE__).'/testFormAdministrationMediaTypeMessageTemplates.php';
-require_once dirname(__FILE__).'/testFormAdministrationMediaTypeWebhook.php';
 require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
 require_once dirname(__FILE__).'/testFormEventCorrelation.php';
@@ -282,6 +287,13 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormApiTokensUserSettings');
 		$suite->addTestSuite('testPageApiTokensAdministrationGeneral');
 		$suite->addTestSuite('testPageApiTokensUserSettings');
+
+		// Authentication.
+		$suite->addTestSuite('testUsersAuthentication');
+		$suite->addTestSuite('testUsersAuthenticationHttp');
+		$suite->addTestSuite('testUsersAuthenticationLdap');
+		$suite->addTestSuite('testUsersAuthenticationSaml');
+		$suite->addTestSuite('testUsersPasswordComplexity');
 
 		// Dashboards.
 		$suite->addTestSuite('testDashboardCopyWidgets');
@@ -459,11 +471,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageWeb');
-		$suite->addTestSuite('testPasswordComplexity');
 		$suite->addTestSuite('testExpandExpressionMacros');
-		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
-		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');
-		$suite->addTestSuite('testFormAdministrationAuthenticationLdap');
 		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');

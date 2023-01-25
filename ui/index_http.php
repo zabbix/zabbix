@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,10 @@ if ($http_user) {
 
 		if (!empty(CWebUser::$data)) {
 			CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
-			API::getWrapper()->auth = CWebUser::$data['sessionid'];
+			API::getWrapper()->auth = [
+				'type' => CJsonRpc::AUTH_TYPE_FRONTEND,
+				'auth' => CWebUser::$data['sessionid']
+			];
 
 			$redirect = array_filter([$request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
 			redirect(reset($redirect));

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,6 +40,6 @@
 #define	ZBX_REQUEST_ITEM_ERROR			115
 
 int	DBget_trigger_value(const ZBX_DB_TRIGGER *trigger, char **replace_to, int N_functionid, int request);
-int	zbx_host_macro_index(const char *macro);
+int	zbx_expr_macro_index(const char *macro);
 
 #endif

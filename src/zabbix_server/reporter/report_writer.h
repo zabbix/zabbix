@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ typedef struct
 	char	*config_tls_cert_file;
 	char	*config_tls_key_file;
 	char	*config_source_ip;
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 }
 zbx_thread_report_writer_args;
 

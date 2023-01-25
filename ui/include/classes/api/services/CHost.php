@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -463,6 +463,10 @@ class CHost extends CHostGeneral {
 		// filter
 		if (is_array($options['filter'])) {
 			$this->dbFilter('hosts h', $options, $sqlParts);
+
+			if (array_key_exists('hostid', $options['filter'])) {
+				unset($options['filter']['hostid']);
+			}
 
 			if ($this->dbFilter('interface hi', $options, $sqlParts)) {
 				$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];

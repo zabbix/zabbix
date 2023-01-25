@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,12 +25,12 @@
 #include "zbxself.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbx_host_constants.h"
 
 #define ZBX_TIMER_DELAY		SEC_PER_MIN
 
 #define ZBX_EVENT_BATCH_SIZE	1000
 
-extern unsigned char	program_type;
 extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /* addition data for event maintenance calculations to pair with zbx_event_suppress_query_t */
@@ -264,7 +264,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 			process_num - 1);
 
 	event_queries_fetch(result, event_queries);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* get event suppress data */
 
@@ -295,7 +295,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 		pair.second = atoi(row[2]);
 		zbx_vector_uint64_pair_append(&data->maintenances, pair);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* get missing event data */
 
@@ -332,7 +332,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 			zbx_free(sql);
 
 			event_queries_fetch(result, event_queries);
-			DBfree_result(result);
+			zbx_db_free_result(result);
 		}
 
 		zbx_vector_ptr_sort(event_queries, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -569,8 +569,9 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(thread_info->program_type), server_num,
+			get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 
@@ -582,7 +583,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (1 == process_num)
 		{

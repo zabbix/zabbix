@@ -910,6 +910,21 @@ a.icon-count {
 		border-color: lighten($table-border-color, 3%);
 	}
 
+	.problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) {
+		background-color: $ui-bg-color;
+
+		td {
+			border-bottom-color: $table-border-color !important;
+		}
+
+		.timeline-axis,
+		.timeline-td,
+		.timeline-date,
+		.problem-expand-td {
+			border-bottom-color: transparent !important;
+		}
+	}
+
 	&.compact-view {
 		.flh-na-bg,
 		.flh-info-bg,
@@ -1113,7 +1128,7 @@ td.log-info-bg,
 td.log-warning-bg,
 td.log-high-bg,
 td.log-disaster-bg {
-	padding-left: 42px;
+	padding-left: 42px !important;
 	color: $font-color;
 }
 
@@ -1384,12 +1399,24 @@ td.inactive-bg {
 	background-position: -173px -325px;
 }
 
+.icon-action-ack-green::before {
+	background-position: -398px -356px;
+}
+
 .icon-action-suppress::before {
 	background-position: -401px -803px;
 }
 
 .icon-action-unsuppress::before {
 	background-position: -401px -836px;
+}
+
+.icon-action-cause::before {
+	background-position: -435px -693px;
+}
+
+.icon-action-symptom::before {
+	background-position: -434px -656px;
 }
 
 .icon-invisible::before {

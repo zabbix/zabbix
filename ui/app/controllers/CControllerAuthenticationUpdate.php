@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,10 @@ class CControllerAuthenticationUpdate extends CController {
 	 */
 	private $response;
 
+	private const PROVISION_ENABLED_FIELDS = ['group_basedn', 'group_member', 'group_membership',  'group_name',
+		'user_username', 'user_lastname', 'uer_ref_attr', 'provision_groups', 'provision_media'
+	];
+
 	protected function init() {
 		$this->response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'authentication.edit')
@@ -35,43 +39,57 @@ class CControllerAuthenticationUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'form_refresh' =>					'string',
-			'ldap_test_user' =>					'string',
-			'ldap_test_password' =>				'string',
-			'ldap_test' =>						'in 1',
-			'change_bind_password' =>			'in 0,1',
+			'form_refresh' =>					'int32',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
+			'disabled_usrgrpid' =>				'id',
 			'http_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_configured' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
+			'ldap_auth_enabled' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_servers' =>					'array',
 			'ldap_default_row_index' =>			'int32',
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_removed_userdirectoryids' =>	'array',
+			'ldap_removed_userdirectoryids' =>	'array_id',
+			'ldap_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
+			'jit_provision_interval' =>			'db config.jit_provision_interval|time_unit_year '.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]),
 			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' =>				'db config.http_strip_domains',
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
-			'saml_idp_entityid' =>				'db config.saml_idp_entityid',
-			'saml_sso_url' =>					'db config.saml_sso_url',
-			'saml_slo_url' =>					'db config.saml_slo_url',
-			'saml_username_attribute' =>		'db config.saml_username_attribute',
-			'saml_sp_entityid' =>				'db config.saml_sp_entityid',
-			'saml_nameid_format' =>				'db config.saml_nameid_format',
-			'saml_sign_messages' =>				'in 0,1',
-			'saml_sign_assertions' =>			'in 0,1',
-			'saml_sign_authn_requests' =>		'in 0,1',
-			'saml_sign_logout_requests' =>		'in 0,1',
-			'saml_sign_logout_responses' =>		'in 0,1',
-			'saml_encrypt_nameid' =>			'in 0,1',
-			'saml_encrypt_assertions' =>		'in 0,1',
+			'saml_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
+			'idp_entityid' =>					'db userdirectory_saml.idp_entityid',
+			'sso_url' =>						'db userdirectory_saml.sso_url',
+			'slo_url' =>						'db userdirectory_saml.slo_url',
+			'username_attribute' =>				'db userdirectory_saml.username_attribute',
+			'sp_entityid' =>					'db userdirectory_saml.sp_entityid',
+			'nameid_format' =>					'db userdirectory_saml.nameid_format',
+			'sign_messages' =>					'in 0,1',
+			'sign_assertions' =>				'in 0,1',
+			'sign_authn_requests' =>			'in 0,1',
+			'sign_logout_requests' =>			'in 0,1',
+			'sign_logout_responses' =>			'in 0,1',
+			'encrypt_nameid' =>					'in 0,1',
+			'encrypt_assertions' =>				'in 0,1',
 			'saml_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'saml_provision_status' =>			'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
+			'saml_group_name' =>				'db userdirectory_saml.group_name',
+			'saml_user_username' =>				'db userdirectory_saml.user_username',
+			'saml_user_lastname' =>				'db userdirectory_saml.user_lastname',
+			'saml_provision_groups' =>			'array',
+			'saml_provision_media' =>			'array',
+			'scim_status' =>					'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
 			'passwd_min_length' =>				'int32',
 			'passwd_check_rules' =>				'array'
 		];
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			$ret = $this->validateDefaultAuth() && $this->validateLdap() && $this->validateSamlAuth();
+		}
+
 		if (!$ret) {
+			if (CMessageHelper::getTitle() === null) {
+				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
+			}
 			$this->response->setFormData($this->getInputAll());
 			$this->setResponse($this->response);
 		}
@@ -87,18 +105,16 @@ class CControllerAuthenticationUpdate extends CController {
 	 */
 	private function validateDefaultAuth() {
 		$data = [
-			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
+			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 			'authentication_type' => ZBX_AUTH_INTERNAL
 		];
 		$this->getInputs($data, array_keys($data));
 
 		$is_valid = ($data['authentication_type'] != ZBX_AUTH_LDAP
-				|| $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
+				|| $data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED);
 
 		if (!$is_valid) {
-			CMessageHelper::setErrorTitle(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type',
-				_('LDAP is not configured')
-			));
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type', _('LDAP is not configured')));
 		}
 
 		return $is_valid;
@@ -110,29 +126,52 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function validateLdap(): bool {
-		$ldap_enabled = $this->getInput('ldap_configured', ZBX_AUTH_LDAP_DISABLED) == ZBX_AUTH_LDAP_ENABLED;
+		$ldap_enabled = $this->getInput('ldap_auth_enabled', ZBX_AUTH_LDAP_DISABLED) == ZBX_AUTH_LDAP_ENABLED;
 		$ldap_servers = $this->getInput('ldap_servers', []);
 
 		if ($ldap_enabled) {
 			$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 
 			if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
-				CMessageHelper::setErrorTitle($ldap_status['error']);
+				error($ldap_status['error']);
+
 				return false;
 			}
 
 			if (!$ldap_servers) {
-				CMessageHelper::setErrorTitle(_('At least one LDAP server must exist.'));
+				error(_('At least one LDAP server must exist.'));
+
 				return false;
 			}
 		}
 
 		if ($ldap_servers
 				&& (!$this->hasInput('ldap_default_row_index')
-					|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers)
-				)) {
-			CMessageHelper::setErrorTitle(_('Default LDAP server must be specified.'));
+					|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers))) {
+			error(_('Default LDAP server must be specified.'));
+
 			return false;
+		}
+
+		foreach ($ldap_servers as $ldap_server) {
+			if (!array_key_exists('provision_status', $ldap_server)
+					|| $ldap_server['provision_status'] != JIT_PROVISIONING_ENABLED) {
+				continue;
+			}
+
+			if (!array_key_exists('provision_groups', $ldap_server)
+					|| !$this->validateProvisionGroups($ldap_server['provision_groups'])) {
+				error(_('Invalid LDAP JIT provisioning user group mapping configuration.'));
+
+				return false;
+			}
+
+			if (array_key_exists('provision_media', $ldap_server)
+					&& !$this->validateProvisionMedia($ldap_server['provision_media'])) {
+				error(_('Invalid LDAP JIT provisioning media type mapping configuration.'));
+
+				return false;
+			}
 		}
 
 		return true;
@@ -144,26 +183,43 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function validateSamlAuth() {
-		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
+		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED) == ZBX_AUTH_SAML_DISABLED) {
+			return true;
+		}
 
+		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
 		if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
-			CMessageHelper::setErrorTitle($openssl_status['error']);
+			error($openssl_status['error']);
 
 			return false;
 		}
 
-		$saml_fields = ['saml_idp_entityid', 'saml_sso_url', 'saml_sp_entityid', 'saml_username_attribute'];
-		$saml_auth = [
-			'saml_idp_entityid' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_IDP_ENTITYID),
-			'saml_sso_url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SSO_URL),
-			'saml_sp_entityid' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SP_ENTITYID),
-			'saml_username_attribute' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE)
-		];
-		$this->getInputs($saml_auth, $saml_fields);
+		$this->getInputs($saml_fields, [
+			'idp_entityid',
+			'sso_url',
+			'username_attribute',
+			'sp_entityid'
+		]);
 
-		foreach ($saml_fields as $field) {
-			if (trim($saml_auth[$field]) === '') {
-				CMessageHelper::setErrorTitle(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
+		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
+			$saml_fields['saml_group_name'] = $this->getInput('saml_group_name', '');
+
+			if (!$this->validateProvisionGroups($this->getInput('saml_provision_groups', []))) {
+				error(_('Invalid SAML JIT provisioning user group mapping configuration.'));
+
+				return false;
+			}
+
+			if (!$this->validateProvisionMedia($this->getInput('saml_provision_media', []))) {
+				error(_('Invalid SAML JIT provisioning media type mapping configuration.'));
+
+				return false;
+			}
+		}
+
+		foreach ($saml_fields as $field_name => $field_value) {
+			if ($field_value === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty')));
 
 				return false;
 			}
@@ -202,76 +258,80 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$auth_valid = $this->validateDefaultAuth();
+		$result = false;
 
-		if ($auth_valid && !$this->validateLdap()) {
-			$auth_valid = false;
-		}
+		try {
+			DBstart();
 
-		if ($auth_valid && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
-			if (!$this->validateSamlAuth()) {
-				$auth_valid = false;
+			$result = $this->processSamlConfiguration();
+
+			$ldap_userdirectoryid = 0;
+			if ($result) {
+				$ldap_servers = $this->getInput('ldap_servers', []);
+
+				if ($ldap_servers) {
+					$ldap_userdirectoryids = $this->processLdapServers($ldap_servers);
+					$ldap_default_row_index = $this->getInput('ldap_default_row_index', 0);
+
+					if (!$ldap_userdirectoryids) {
+						$result = false;
+					}
+					elseif (!array_key_exists($ldap_default_row_index, $ldap_userdirectoryids)) {
+						CMessageHelper::setErrorTitle(_('Failed to select default LDAP server.'));
+						$result = false;
+					}
+					else {
+						$ldap_userdirectoryid = $ldap_userdirectoryids[$ldap_default_row_index];
+					}
+				}
 			}
+
+			if ($result) {
+				$result = $this->processGeneralAuthenticationSettings($ldap_userdirectoryid);
+			}
+
+			if ($result && $this->hasInput('ldap_removed_userdirectoryids')) {
+				$result = (bool) API::UserDirectory()->delete($this->getInput('ldap_removed_userdirectoryids'));
+			}
+
+			if (!$result) {
+				throw new Exception();
+			}
+
+			$result = DBend(true);
+		}
+		catch (Exception $e) {
+			DBend(false);
 		}
 
-		if ($auth_valid) {
-			[$auth_valid, $ldap_userdirectoryid] = $this->processLdapServers(
-				$this->getInput('ldap_servers', []),
-				$this->getInput('ldap_default_row_index', 0)
-			);
+		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
 		}
-
-		if (!$auth_valid) {
+		else {
 			if (CMessageHelper::getTitle() === null) {
 				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
 			}
 			$this->response->setFormData($this->getInputAll());
-			$this->setResponse($this->response);
-
-			return;
 		}
 
-		$auth_params = [
-			CAuthenticationHelper::AUTHENTICATION_TYPE,
-			CAuthenticationHelper::HTTP_AUTH_ENABLED,
-			CAuthenticationHelper::HTTP_LOGIN_FORM,
-			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
-			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
-			CAuthenticationHelper::LDAP_CONFIGURED,
-			CAuthenticationHelper::LDAP_USERDIRECTORYID,
-			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
-			CAuthenticationHelper::SAML_AUTH_ENABLED,
-			CAuthenticationHelper::SAML_IDP_ENTITYID,
-			CAuthenticationHelper::SAML_SSO_URL,
-			CAuthenticationHelper::SAML_SLO_URL,
-			CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE,
-			CAuthenticationHelper::SAML_SP_ENTITYID,
-			CAuthenticationHelper::SAML_NAMEID_FORMAT,
-			CAuthenticationHelper::SAML_SIGN_MESSAGES,
-			CAuthenticationHelper::SAML_SIGN_ASSERTIONS,
-			CAuthenticationHelper::SAML_SIGN_AUTHN_REQUESTS,
-			CAuthenticationHelper::SAML_SIGN_LOGOUT_REQUESTS,
-			CAuthenticationHelper::SAML_SIGN_LOGOUT_RESPONSES,
-			CAuthenticationHelper::SAML_ENCRYPT_NAMEID,
-			CAuthenticationHelper::SAML_ENCRYPT_ASSERTIONS,
-			CAuthenticationHelper::SAML_CASE_SENSITIVE,
-			CAuthenticationHelper::PASSWD_MIN_LENGTH,
-			CAuthenticationHelper::PASSWD_CHECK_RULES
-		];
-		$auth = [];
-		foreach ($auth_params as $param) {
-			$auth[$param] = CAuthenticationHelper::get($param);
-		}
+		$this->setResponse($this->response);
+	}
 
+	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid): bool {
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
-			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
+			'disabled_usrgrpid' => 0,
+			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 			'ldap_userdirectoryid' => $ldap_userdirectoryid,
 			'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
+			'ldap_jit_status' => JIT_PROVISIONING_DISABLED,
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
+			'saml_jit_status' => JIT_PROVISIONING_DISABLED,
+			'saml_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
-			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules')
+			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules'),
+			'jit_provision_interval' => '1h'
 		];
 
 		if ($this->getInput('http_auth_enabled', ZBX_AUTH_HTTP_DISABLED) == ZBX_AUTH_HTTP_ENABLED) {
@@ -282,23 +342,28 @@ class CControllerAuthenticationUpdate extends CController {
 			];
 		}
 
-		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
-			$fields += [
-				'saml_idp_entityid' => '',
-				'saml_sso_url' => '',
-				'saml_slo_url' => '',
-				'saml_username_attribute' => '',
-				'saml_sp_entityid' => '',
-				'saml_nameid_format' => '',
-				'saml_sign_messages' => 0,
-				'saml_sign_assertions' => 0,
-				'saml_sign_authn_requests' => 0,
-				'saml_sign_logout_requests' => 0,
-				'saml_sign_logout_responses' => 0,
-				'saml_encrypt_nameid' => 0,
-				'saml_encrypt_assertions' => 0,
-				'saml_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE
-			];
+		$auth_params = [
+			CAuthenticationHelper::AUTHENTICATION_TYPE,
+			CAuthenticationHelper::DISABLED_USER_GROUPID,
+			CAuthenticationHelper::HTTP_AUTH_ENABLED,
+			CAuthenticationHelper::HTTP_LOGIN_FORM,
+			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
+			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
+			CAuthenticationHelper::LDAP_AUTH_ENABLED,
+			CAuthenticationHelper::LDAP_USERDIRECTORYID,
+			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
+			CAuthenticationHelper::LDAP_JIT_STATUS,
+			CAuthenticationHelper::JIT_PROVISION_INTERVAL,
+			CAuthenticationHelper::SAML_AUTH_ENABLED,
+			CAuthenticationHelper::SAML_JIT_STATUS,
+			CAuthenticationHelper::SAML_CASE_SENSITIVE,
+			CAuthenticationHelper::PASSWD_MIN_LENGTH,
+			CAuthenticationHelper::PASSWD_CHECK_RULES
+		];
+
+		$auth = [];
+		foreach ($auth_params as $param) {
+			$auth[$param] = CAuthenticationHelper::get($param);
 		}
 
 		$data = $fields + $auth;
@@ -315,87 +380,121 @@ class CControllerAuthenticationUpdate extends CController {
 		$result = true;
 
 		if ($data) {
-			$result = API::Authentication()->update($data);
+			$result = (bool) API::Authentication()->update($data);
 
 			if ($result && array_key_exists('authentication_type', $data)) {
 				$this->invalidateSessions();
 			}
 		}
 
-		if ($result) {
-			$del_userdirectoryids = $this->getInput('ldap_removed_userdirectoryids', []);
-
-			if ($del_userdirectoryids) {
-				$result = API::UserDirectory()->delete($del_userdirectoryids);
-			}
-		}
-
-		if ($result) {
-			CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
-		}
-		else {
-			$this->response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update authentication'));
-		}
-
-		$this->setResponse($this->response);
+		return $result;
 	}
 
 	/**
 	 * Updates existing LDAP servers, creates new ones, removes deleted ones.
 	 *
 	 * @param array $ldap_servers
-	 * @param int $default_row_index
 	 *
 	 * @return array
 	 */
-	private function processLdapServers(array $ldap_servers, int $default_row_index): array {
+	private function processLdapServers(array $ldap_servers): array {
 		$ins_ldap_servers = [];
 		$upd_ldap_servers = [];
-
-		$ldap_userdirectoryid = 0;
-		$default_ldap_mapping_index = null;
+		$userdirectoryid_map = [];
 
 		foreach ($ldap_servers as $row_index => $ldap_server) {
-			if (array_key_exists('userdirectoryid', $ldap_server)) {
-				$upd_ldap_servers[] = $ldap_server;
+			if (!array_key_exists('provision_status', $ldap_server)
+					|| $ldap_server['provision_status'] != JIT_PROVISIONING_ENABLED) {
+				$ldap_server = array_diff_key($ldap_server, array_flip(self::PROVISION_ENABLED_FIELDS));
+			}
 
-				if ($default_row_index == $row_index) {
-					$ldap_userdirectoryid = $ldap_server['userdirectoryid'];
-				}
+			if (array_key_exists('userdirectoryid', $ldap_server)) {
+				$userdirectoryid_map[$row_index] = $ldap_server['userdirectoryid'];
+				$upd_ldap_servers[] = $ldap_server;
 			}
 			else {
-				$ins_ldap_servers[] = $ldap_server;
+				$userdirectoryid_map[$row_index] = null;
+				$ins_ldap_servers[] = ['idp_type' => IDP_TYPE_LDAP] + $ldap_server;
+			}
+		}
 
-				if ($default_row_index == $row_index) {
-					$default_ldap_mapping_index = count($ins_ldap_servers) - 1;
+		$result = $upd_ldap_servers ? API::UserDirectory()->update($upd_ldap_servers) : [];
+		$result = $result !== false && $ins_ldap_servers ? API::UserDirectory()->create($ins_ldap_servers) : $result;
+
+		if ($result) {
+			foreach ($userdirectoryid_map as $row_index => $userdirectoryid) {
+				if ($userdirectoryid === null) {
+					$userdirectoryid_map[$row_index] = array_shift($result['userdirectoryids']);
 				}
 			}
+
+			return $userdirectoryid_map;
+		}
+		else {
+			return [];
+		}
+	}
+
+	/**
+	 * Retrieves SAML configuration fields and creates or updates SAML configuration.
+	 *
+	 * @return bool
+	 */
+	private function processSamlConfiguration(): bool {
+		$saml_data = [
+			'idp_entityid' => '',
+			'sso_url' => '',
+			'slo_url' => '',
+			'username_attribute' => '',
+			'sp_entityid' => '',
+			'nameid_format' => '',
+			'sign_messages' => 0,
+			'sign_assertions' => 0,
+			'sign_authn_requests' => 0,
+			'sign_logout_requests' => 0,
+			'sign_logout_responses' => 0,
+			'encrypt_nameid' => 0,
+			'encrypt_assertions' => 0,
+			'provision_status' => JIT_PROVISIONING_DISABLED,
+			'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED
+		];
+		$this->getInputs($saml_data, array_keys($saml_data));
+
+		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
+			$provisioning_fields = [
+				'saml_provision_status' => JIT_PROVISIONING_ENABLED,
+				'saml_group_name' => '',
+				'saml_user_username' => '',
+				'saml_user_lastname' => '',
+				'saml_provision_groups' => [],
+				'saml_provision_media' => []
+			];
+			$this->getInputs($provisioning_fields, array_keys($provisioning_fields));
+			$provisioning_fields = CArrayHelper::renameKeys($provisioning_fields, [
+				'saml_group_name' => 'group_name',
+				'saml_user_username' => 'user_username',
+				'saml_user_lastname' => 'user_lastname',
+				'saml_provision_status' => 'provision_status',
+				'saml_provision_groups' => 'provision_groups',
+				'saml_provision_media' => 'provision_media'
+			]);
+			$saml_data = array_merge($saml_data, $provisioning_fields);
 		}
 
-		if ($upd_ldap_servers && !API::UserDirectory()->update($upd_ldap_servers)) {
-			return [false, $ldap_userdirectoryid];
+		$saml_data['idp_type'] = IDP_TYPE_SAML;
+		$db_saml = API::UserDirectory()->get([
+			'output' => ['userdirectoryid'],
+			'filter' => ['idp_type' => IDP_TYPE_SAML]
+		]);
+
+		if ($db_saml) {
+			$result = API::UserDirectory()->update(['userdirectoryid' => $db_saml[0]['userdirectoryid']] + $saml_data);
+		}
+		else {
+			$result = API::UserDirectory()->create($saml_data);
 		}
 
-		if ($ins_ldap_servers) {
-			$inserted_ids = API::UserDirectory()->create($ins_ldap_servers);
-
-			if (!$inserted_ids) {
-				return [false, $ldap_userdirectoryid];
-			}
-
-			if ($default_ldap_mapping_index !== null) {
-				$ldap_userdirectoryid = $inserted_ids['userdirectoryids'][$default_ldap_mapping_index];
-			}
-		}
-
-		if ($ldap_servers && $ldap_userdirectoryid === 0) {
-			CMessageHelper::setErrorTitle(_('Failed to select default LDAP server.'));
-
-			return [false, $ldap_userdirectoryid];
-		}
-
-		return [true, $ldap_userdirectoryid];
+		return $result !== false;
 	}
 
 	/**
@@ -421,14 +520,46 @@ class CControllerAuthenticationUpdate extends CController {
 		unset($internal_auth_users[CWebUser::$data['userid']]);
 
 		if ($internal_auth_users) {
-			DBstart();
 			$result = DB::update('sessions', [
 				'values' => ['status' => ZBX_SESSION_PASSIVE],
 				'where' => ['userid' => array_keys($internal_auth_users)]
 			]);
-			$result = DBend($result);
 		}
 
 		return $result;
+	}
+
+	private function validateProvisionGroups(array $provision_group): bool {
+		foreach ($provision_group as $group) {
+			if (!is_array($group)) {
+				return false;
+			}
+
+			if (!array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
+					|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])
+					|| !array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === '') {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private function validateProvisionMedia(array $provision_media): bool {
+		if (!$provision_media) {
+			return true;
+		}
+
+		foreach ($provision_media as $media) {
+			if (!is_array($media)
+					|| !array_key_exists('name', $media) || !is_string($media['name']) || $media['name'] === ''
+					|| !array_key_exists('attribute', $media) || !is_string($media['attribute'])
+					|| $media['attribute'] === ''
+					|| !array_key_exists('mediatypeid', $media) || !ctype_digit($media['mediatypeid'])) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

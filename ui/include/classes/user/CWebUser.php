@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,10 @@ class CWebUser {
 				throw new Exception();
 			}
 
-			API::getWrapper()->auth = self::$data['sessionid'];
+			API::getWrapper()->auth = [
+				'type' => CJsonRpc::AUTH_TYPE_FRONTEND,
+				'auth' => self::$data['sessionid']
+			];
 
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 				error(_('GUI access disabled.'));

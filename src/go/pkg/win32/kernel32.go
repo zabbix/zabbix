@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ var (
 	getActiveProcessorGroupCount     uintptr
 	getDiskFreeSpaceW                uintptr
 	getVolumePathNameW               uintptr
+	getNativeSystemInfo              uintptr
 )
 
 const (
@@ -51,7 +52,23 @@ const (
 	RelationAll = 0xfff
 )
 
+type SystemInfo struct {
+	WProcessorArchitecture      uint16
+	WReserved                   uint16
+	DWPageSize                  uint32
+	LPMinimumApplicationAddress *uint64
+	LPMaximumApplicationAddress *uint64
+	DWActiveProcessorMask       *uint32
+	DWNumberOfProcessors        uint32
+	DWProcessorType             uint32
+	DWAllocationGranularity     uint32
+	WProcessorLevel             uint16
+	WProcessorRevision          uint16
+}
+
 func init() {
+	var err error
+
 	hKernel32 = mustLoadLibrary("kernel32.dll")
 
 	globalMemoryStatusEx = hKernel32.mustGetProcAddress("GlobalMemoryStatusEx")
@@ -61,6 +78,11 @@ func init() {
 	getDiskFreeSpaceW = hKernel32.mustGetProcAddress("GetDiskFreeSpaceW")
 	getVolumePathNameW = hKernel32.mustGetProcAddress("GetVolumePathNameW")
 	getProcessHandleCount = hKernel32.mustGetProcAddress("GetProcessHandleCount")
+
+	getNativeSystemInfo, err = hKernel32.getProcAddress("GetNativeSystemInfo")
+	if err != nil {
+		getNativeSystemInfo = hKernel32.mustGetProcAddress("GetSystemInfo")
+	}
 }
 
 func GlobalMemoryStatusEx() (m *MEMORYSTATUSEX, err error) {
@@ -177,4 +199,10 @@ func GetDiskFreeSpace(path string) (c CLUSTER, err error) {
 	}
 
 	return c, nil
+}
+
+func GetNativeSystemInfo() (sysInfo SystemInfo) {
+	syscall.Syscall(getNativeSystemInfo, 1, uintptr(unsafe.Pointer(&sysInfo)), 0, 0)
+
+	return sysInfo
 }

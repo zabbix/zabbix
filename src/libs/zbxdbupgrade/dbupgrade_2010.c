@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,9 @@
 #include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxsysinfo.h"
+#include "zbx_host_constants.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_item_constants.h"
 
 /*
  * 2.2 development database patches
@@ -525,7 +528,7 @@ static int	DBpatch_2010050(void)
 						fields[i], (int)ts, row[0]);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	return SUCCEED;
@@ -788,7 +791,7 @@ static int	DBpatch_2010080(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1008,7 +1011,7 @@ static int	DBpatch_2010101(void)
 		zbx_free(dsn);
 		zbx_free(sql);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(key);
 
@@ -1491,7 +1494,7 @@ static int	DBpatch_2010176(void)
 
 		zbx_free(name);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1739,7 +1742,7 @@ static int	DBpatch_2010195(void)
 			zbx_free(key_esc);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(key);
 

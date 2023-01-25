@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include "zbxtime.h"
 #include "history_compress.h"
 #include "zbx_rtc_constants.h"
-
+#include "zbx_host_constants.h"
 
 static struct zbx_db_version_info_t	*db_version_info;
 
@@ -289,7 +289,7 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule)
 		zbx_hashset_insert(&rule->item_cache, &item_record, sizeof(zbx_hk_item_cache_t));
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -449,7 +449,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 					HK_UPDATE_CACHE_TREND_COUNT, now, itemid, trends);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_dc_close_user_macros(um_handle);
 
@@ -561,7 +561,7 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 	if (NULL == result)
 		zabbix_log(LOG_LEVEL_ERR, "cannot drop chunks for %s", rule->table);
 	else
-		DBfree_result(result);
+		zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -743,7 +743,7 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 		else
 			rule->min_clock = now;
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	/* Delete the old records from database. Don't remove more than 4 x housekeeping */
@@ -795,7 +795,7 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 					zbx_vector_str_append(&ids_str, zbx_strdup(NULL, row[0]));
 			}
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 
 			if (0 == id_field_str_type)
 			{
@@ -1050,7 +1050,7 @@ static int	housekeeping_cleanup(void)
 		if (0 == more)
 			zbx_vector_uint64_append(&housekeeperids, housekeeperid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != housekeeperids.values_num)
 	{
@@ -1113,13 +1113,26 @@ static int	housekeeping_audit(int now)
 
 static int	housekeeping_events(int now)
 {
-#define ZBX_HK_EVENT_RULE	" and not exists (select null from problem where events.eventid=problem.eventid)" \
-				" and not exists (select null from problem where events.eventid=problem.r_eventid)"
+#define ZBX_HK_EVENT_RULE		" and not exists(" \
+						"select null" \
+						" from problem" \
+						" where events.eventid=problem.eventid" \
+					")" \
+					" and not exists(" \
+						"select null" \
+						" from problem" \
+						" where events.eventid=problem.r_eventid" \
+					")"
+#define ZBX_HK_TRIGGER_EVENT_RULE	" and not exists(" \
+						"select null" \
+						" from event_symptom" \
+						" where events.eventid=event_symptom.cause_eventid" \
+					")"
 
 	static zbx_hk_rule_t	rules[] = {
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_trigger},
+			ZBX_HK_EVENT_RULE ZBX_HK_TRIGGER_EVENT_RULE, 0, &cfg.hk.events_trigger},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
 			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
@@ -1152,18 +1165,69 @@ static int	housekeeping_events(int now)
 
 	return deleted;
 #undef ZBX_HK_EVENT_RULE
+#undef ZBX_HK_TRIGGER_EVENT_RULE
 }
 
 static int	housekeeping_problems(int now)
 {
-	int	deleted = 0, rc;
+	int			deleted = 0, rc;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	ids_uint64;
+	size_t			sql_alloc = 0, sql_offset;
+	char			*sql = NULL;
+	char			buffer[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
-	rc = DBexecute("delete from problem where r_clock<>0 and r_clock<%d", now - SEC_PER_DAY);
+	zbx_vector_uint64_create(&ids_uint64);
 
-	if (ZBX_DB_OK <= rc)
-		deleted = rc;
+	zbx_snprintf(buffer, sizeof(buffer),
+		"select p1.eventid from problem p1"
+		" where p1.r_clock<>0 and p1.r_clock<%d and p1.eventid not in ("
+			" select cause_eventid"
+			" from problem p2"
+			" where p1.eventid=p2.cause_eventid"
+		")", now - SEC_PER_DAY);
+
+	while (1)
+	{
+		if (0 == CONFIG_MAX_HOUSEKEEPER_DELETE)
+			result = DBselect("%s", buffer);
+		else
+			result = DBselectN(buffer, CONFIG_MAX_HOUSEKEEPER_DELETE);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_uint64_t	id;
+
+			ZBX_STR2UINT64(id, row[0]);
+			zbx_vector_uint64_append(&ids_uint64, id);
+		}
+
+		zbx_db_free_result(result);
+
+		if (0 == ids_uint64.values_num)
+			break;
+
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from problem where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", ids_uint64.values,
+				ids_uint64.values_num);
+
+		rc = DBexecute("%s", sql);
+
+		zbx_vector_uint64_clear(&ids_uint64);
+
+		if (ZBX_DB_OK > rc)
+			break;
+
+		deleted += rc;
+	}
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&ids_uint64);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
 
@@ -1205,7 +1269,6 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	double				sec, time_slept, time_now;
 	char				sleeptext[25];
 	zbx_ipc_async_socket_t		rtc;
-	unsigned char			program_type;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
@@ -1213,9 +1276,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 	db_version_info = housekeeper_args_in->db_version_info;
 
-	program_type = housekeeper_args_in->zbx_get_program_type_cb_arg();
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -1236,7 +1297,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 	hk_history_compression_init();
 
-	zbx_rtc_subscribe(&rtc, process_type, process_num);
+	zbx_rtc_subscribe(process_type, process_num, housekeeper_args_in->config_timeout, &rtc);
 
 #if defined(HAVE_POSTGRESQL)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -1291,7 +1352,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		time_now = zbx_time();
 		time_slept = time_now - sec;
-		zbx_update_env(time_now);
+		zbx_update_env(get_process_type_string(process_type), time_now);
 
 		hk_period = get_housekeeping_period(time_slept);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,34 @@
 #if defined(HAVE_SQLITE3)
 #	include "zbxmutexs.h"
 #endif
+
+#define ZBX_MYSQL_MIN_VERSION				50728
+#define ZBX_MYSQL_MIN_VERSION_STR			"5.07.28"
+#define ZBX_MYSQL_MIN_SUPPORTED_VERSION			80000
+#define ZBX_MYSQL_MIN_SUPPORTED_VERSION_STR		"8.00.0"
+#define ZBX_MYSQL_MAX_VERSION				80099
+#define ZBX_MYSQL_MAX_VERSION_STR			"8.00.x"
+
+#define ZBX_MARIA_MIN_VERSION				100200
+#define ZBX_MARIA_MIN_VERSION_STR			"10.02.00"
+#define ZBX_MARIA_MIN_SUPPORTED_VERSION			100500
+#define ZBX_MARIA_MIN_SUPPORTED_VERSION_STR		"10.05.00"
+#define ZBX_MARIA_MAX_VERSION				101099
+#define ZBX_MARIA_MAX_VERSION_STR			"10.10.xx"
+
+#define ZBX_POSTGRESQL_MIN_VERSION			100009
+#define ZBX_POSTGRESQL_MIN_VERSION_STR			"10.9"
+#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION		130000
+#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_STR	"13.0"
+#define ZBX_POSTGRESQL_MAX_VERSION			159999
+#define ZBX_POSTGRESQL_MAX_VERSION_STR			"15.x"
+
+#define ZBX_ORACLE_MIN_VERSION				1201000200
+#define ZBX_ORACLE_MIN_VERSION_STR			"Database 12c Release 12.01.00.02.x"
+#define ZBX_ORACLE_MIN_SUPPORTED_VERSION		1900000000
+#define ZBX_ORACLE_MIN_SUPPORTED_VERSION_STR		"Database 19c Release 19.x.x"
+#define ZBX_ORACLE_MAX_VERSION				2199000000
+#define ZBX_ORACLE_MAX_VERSION_STR			"Database 21c Release 21.x.x"
 
 struct zbx_db_result
 {
@@ -114,6 +142,7 @@ static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
 #if defined(HAVE_ORACLE)
+static void	OCI_DBclean_result_handle(DB_RESULT result);
 static void	OCI_DBclean_result(DB_RESULT result);
 #endif
 
@@ -818,7 +847,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (NULL != (row = zbx_db_fetch(result)))
 		ZBX_PG_BYTEAOID = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* disable "nonstandard use of \' in a string literal" warning */
 	if (0 < (ret = zbx_db_execute("set escape_string_warning to off")))
@@ -844,7 +873,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (NULL != (row = zbx_db_fetch(result)))
 		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (90000 <= ZBX_PG_SVERSION)
 	{
@@ -973,7 +1002,7 @@ void	zbx_db_close(void)
 		for (i = 0; i < oracle.db_results.values_num; i++)
 		{
 			/* deallocate all handles before environment is deallocated */
-			OCI_DBclean_result(oracle.db_results.values[i]);
+			OCI_DBclean_result_handle(oracle.db_results.values[i]);
 		}
 	}
 
@@ -1652,7 +1681,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	{
 		zbx_db_errlog(ERR_Z3003, 0, NULL, NULL);
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		result = NULL;
 	}
 	else
@@ -1664,7 +1693,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 			err_no = (int)mysql_errno(conn);
 			zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (DB_RESULT)ZBX_DB_DOWN : NULL);
 		}
 	}
@@ -1782,9 +1811,16 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 					}
 					else
 					{
+#define ZBX_MIN_OCI_NUMBER_WIDTH	22
 						/* retrieve the column width in bytes */
 						err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
 								(ub4 *)NULL, (ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
+
+						if (ZBX_MIN_OCI_NUMBER_WIDTH > col_width && SQLT_NUM == data_type)
+						{
+							col_width = ZBX_MIN_OCI_NUMBER_WIDTH;
+						}
+#undef ZBX_MIN_OCI_NUMBER_WIDTH
 					}
 				}
 				col_width++;	/* add 1 byte for terminating '\0' */
@@ -1815,7 +1851,7 @@ error:
 		int	server_status;
 
 		server_status = OCI_handle_sql_error(ERR_Z3005, err, sql);
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		result = (ZBX_DB_DOWN == server_status ? (DB_RESULT)(intptr_t)server_status : NULL);
 	}
@@ -1837,12 +1873,12 @@ error:
 
 		if (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result))
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			result = (DB_RESULT)ZBX_DB_DOWN;
 		}
 		else
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			result = NULL;
 		}
 	}
@@ -1864,7 +1900,7 @@ lbl_get_table:
 		zbx_db_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		switch (ret)
 		{
@@ -2146,19 +2182,14 @@ int	zbx_db_is_null(const char *field)
 }
 
 #ifdef HAVE_ORACLE
-static void	OCI_DBclean_result(DB_RESULT result)
+static void	OCI_DBclean_result_handle(DB_RESULT result)
 {
-	if (NULL == result)
-		return;
-
 	if (NULL != result->values)
 	{
 		int	i;
 
 		for (i = 0; i < result->ncolumn; i++)
 		{
-			zbx_free(result->values[i]);
-
 			/* deallocate the lob locator variable */
 			if (NULL != result->clobs[i])
 			{
@@ -2166,10 +2197,6 @@ static void	OCI_DBclean_result(DB_RESULT result)
 				result->clobs[i] = NULL;
 			}
 		}
-
-		zbx_free(result->values);
-		zbx_free(result->clobs);
-		zbx_free(result->values_alloc);
 	}
 
 	if (result->stmthp)
@@ -2178,9 +2205,28 @@ static void	OCI_DBclean_result(DB_RESULT result)
 		result->stmthp = NULL;
 	}
 }
+static void	OCI_DBclean_result(DB_RESULT result)
+{
+	if (NULL == result)
+		return;
+
+	OCI_DBclean_result_handle(result);
+
+	if (NULL != result->values)
+	{
+		int	i;
+
+		for (i = 0; i < result->ncolumn; i++)
+			zbx_free(result->values[i]);
+
+		zbx_free(result->values);
+		zbx_free(result->clobs);
+		zbx_free(result->values_alloc);
+	}
+}
 #endif
 
-void	DBfree_result(DB_RESULT result)
+void	zbx_db_free_result(DB_RESULT result)
 {
 #if defined(HAVE_MYSQL)
 	if (NULL == result)
@@ -2627,7 +2673,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
  * Return value: DBMS version or DBVERSION_UNDEFINED if unknown               *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	zbx_dbms_version_get(void)
+static zbx_uint32_t	zbx_dbms_version_get(void)
 {
 #if defined(HAVE_MYSQL)
 	return ZBX_MYSQL_SVERSION;
@@ -2639,20 +2685,6 @@ zbx_uint32_t	zbx_dbms_version_get(void)
 	return ZBX_DBVERSION_UNDEFINED;
 #endif
 }
-
-#ifdef HAVE_MYSQL
-/******************************************************************************
- *                                                                            *
- * Purpose: returns flag if the mariadb was detected                          *
- *                                                                            *
- * Return value: ON  - mariadb detected                                       *
- *               OFF - otherwise (it is unforked mysql)                       *
- ******************************************************************************/
-int	zbx_dbms_mariadb_used(void)
-{
-	return ZBX_MARIADB_SFORK;
-}
-#endif
 
 /***************************************************************************************************************
  *                                                                                                             *
@@ -2721,9 +2753,9 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 		version_info->max_version = ZBX_MARIA_MAX_VERSION;
 		version_info->min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION;
 
-		version_info->friendly_min_version = ZBX_MARIA_MIN_VERSION_FRIENDLY;
-		version_info->friendly_max_version = ZBX_MARIA_MAX_VERSION_FRIENDLY;
-		version_info->friendly_min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION_FRIENDLY;
+		version_info->friendly_min_version = ZBX_MARIA_MIN_VERSION_STR;
+		version_info->friendly_max_version = ZBX_MARIA_MAX_VERSION_STR;
+		version_info->friendly_min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION_STR;
 	}
 	else
 	{
@@ -2733,9 +2765,9 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 		version_info->max_version = ZBX_MYSQL_MAX_VERSION;
 		version_info->min_supported_version = ZBX_MYSQL_MIN_SUPPORTED_VERSION;
 
-		version_info->friendly_min_version = ZBX_MYSQL_MIN_VERSION_FRIENDLY;
-		version_info->friendly_max_version = ZBX_MYSQL_MAX_VERSION_FRIENDLY;
-		version_info->friendly_min_supported_version = ZBX_MYSQL_MIN_SUPPORTED_VERSION_FRIENDLY;
+		version_info->friendly_min_version = ZBX_MYSQL_MIN_VERSION_STR;
+		version_info->friendly_max_version = ZBX_MYSQL_MAX_VERSION_STR;
+		version_info->friendly_min_supported_version = ZBX_MYSQL_MIN_SUPPORTED_VERSION_STR;
 	}
 
 	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
@@ -2767,9 +2799,9 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 				RIGHT2(ZBX_PG_SVERSION));
 	}
 
-	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY;
-	version_info->friendly_max_version = ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY;
-	version_info->friendly_min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_FRIENDLY;
+	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_STR;
+	version_info->friendly_max_version = ZBX_POSTGRESQL_MAX_VERSION_STR;
+	version_info->friendly_min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_STR;
 
 	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
 			version_info->min_version, version_info->max_version, version_info->min_supported_version);
@@ -2855,9 +2887,9 @@ out:
 	version_info->min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION;
 
 	version_info->friendly_current_version = zbx_strdup(NULL, version_friendly);
-	version_info->friendly_min_version = ZBX_ORACLE_MIN_VERSION_FRIENDLY;
-	version_info->friendly_max_version = ZBX_ORACLE_MAX_VERSION_FRIENDLY;
-	version_info->friendly_min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION_FRIENDLY;
+	version_info->friendly_min_version = ZBX_ORACLE_MIN_VERSION_STR;
+	version_info->friendly_max_version = ZBX_ORACLE_MAX_VERSION_STR;
+	version_info->friendly_min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION_STR;
 
 	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
 			version_info->min_version, version_info->max_version, version_info->min_supported_version);
@@ -2897,7 +2929,7 @@ static int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
 	else
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -2924,6 +2956,36 @@ void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *versi
 #undef ZBX_TSDB1_TRENDS_TABLES
 #undef ZBX_TSDB2_TRENDS_TABLES
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrievs TimescaleDB (TSDB) license information                   *
+ *                                                                            *
+ * Return value: license information from datase as string                    *
+ *               "apache"    for TimescaleDB Apache 2 Edition                 *
+ *               "timescale" for TimescaleDB Community Edition                *
+ *                                                                            *
+ * Comments: returns a pointer to allocated memory                            *
+ *                                                                            *
+ ******************************************************************************/
+static char	*zbx_tsdb_get_license(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*tsdb_lic = NULL;
+
+	result = zbx_db_select("show timescaledb.license");
+
+	if ((DB_RESULT)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch(result)))
+	{
+		tsdb_lic = zbx_strdup(NULL, row[0]);
+	}
+
+	zbx_db_free_result(result);
+
+	return tsdb_lic;
+}
+
 /***************************************************************************************************************
  *                                                                                                             *
  * Purpose: retrieves TimescaleDB extension info, including license string and numeric version value           *
@@ -2946,9 +3008,9 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 	version_info->ext_friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d", RIGHT2(tsdb_ver/10000),
 			RIGHT2(tsdb_ver/100), RIGHT2(tsdb_ver));
 
-	version_info->ext_friendly_min_version = ZBX_TIMESCALE_MIN_VERSION_FRIENDLY;
-	version_info->ext_friendly_max_version = ZBX_TIMESCALE_MAX_VERSION_FRIENDLY;
-	version_info->ext_friendly_min_supported_version = ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY;
+	version_info->ext_friendly_min_version = ZBX_TIMESCALE_MIN_VERSION_STR;
+	version_info->ext_friendly_max_version = ZBX_TIMESCALE_MAX_VERSION_STR;
+	version_info->ext_friendly_min_supported_version = ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR;
 
 	version_info->ext_flag = zbx_db_version_check(version_info->extension, version_info->ext_current_version,
 			version_info->ext_min_version, version_info->ext_max_version,
@@ -3017,41 +3079,12 @@ int	zbx_tsdb_get_version(void)
 		else
 			ver = ZBX_TSDB_VERSION = 0;
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 	else
 		ver = ZBX_TSDB_VERSION;
 out:
 	return ver;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrievs TimescaleDB (TSDB) license information                   *
- *                                                                            *
- * Return value: license information from datase as string                    *
- *               "apache"    for TimescaleDB Apache 2 Edition                 *
- *               "timescale" for TimescaleDB Community Edition                *
- *                                                                            *
- * Comments: returns a pointer to allocated memory                            *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_tsdb_get_license(void)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*tsdb_lic = NULL;
-
-	result = zbx_db_select("show timescaledb.license");
-
-	if ((DB_RESULT)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch(result)))
-	{
-		tsdb_lic = zbx_strdup(NULL, row[0]);
-	}
-
-	DBfree_result(result);
-
-	return tsdb_lic;
 }
 
 /******************************************************************************

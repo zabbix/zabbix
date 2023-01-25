@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,9 @@
 	const ZBX_STYLE_MACRO_VALUE_TEXT = 'macro-value-text';
 	const ZBX_STYLE_MACRO_VALUE_SECRET = 'macro-value-secret';
 	const ZBX_STYLE_MACRO_VALUE_VAULT = 'macro-value-vault';
+
+	const ZBX_STYLE_ICON_INVISIBLE = 'icon-invisible';
+	const ZBX_STYLE_ICON_SECRET = 'icon-secret';
 
 	function btnUndoFocusEventHandle() {
 		$(this)
@@ -75,8 +78,8 @@
 			.trigger('change');
 
 		$('.btn-dropdown-container button', $container)
-			.removeClass('icon-text icon-secret')
-			.addClass('btn-alt btn-dropdown-toggle icon-invisible');
+			.removeClass('icon-text ' + ZBX_STYLE_ICON_SECRET)
+			.addClass('btn-alt btn-dropdown-toggle ' + ZBX_STYLE_ICON_INVISIBLE);
 
 		$this.hide();
 	}

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-10 03:50+0000\n"
+"PO-Revision-Date: 2023-01-13 11:39+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -149,6 +149,11 @@ msgstr "剩余%1$s 字符"
 msgid "%1$s event"
 msgid_plural "%1$s events"
 msgstr[0] "%1$s 事件"
+
+#: app/views/popup.usergroupmapping.edit.php:90
+#, c-format
+msgid "%1$s group pattern"
+msgstr "%1$s 组模式"
 
 #: include/maps.inc.php:410
 #, c-format
@@ -672,6 +677,11 @@ msgstr "动作操作"
 msgid "Action updated"
 msgstr "动作已更新"
 
+#: include/classes/api/services/CDashboardGeneral.php:672
+#, c-format
+msgid "Action with ID \"%1$s\" is not available."
+msgstr "ID 为“%1$s”的动作不可用。"
+
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
 #: app/views/monitoring.dashboard.view.php:122
@@ -878,7 +888,7 @@ msgstr "添加 (已达消息类型限制)"
 
 #: jsLoader.php:149
 msgid "Add a new widget"
-msgstr "添加新部件"
+msgstr "添加新小组件"
 
 #: jsLoader.php:204
 msgid "Add child element"
@@ -899,6 +909,14 @@ msgstr "添加子服务"
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
 msgstr "添加自"
+
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr "从主机添加"
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr "从模板添加"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -991,7 +1009,7 @@ msgstr "添加用户组"
 #: app/views/js/monitoring.dashboard.view.js.php:286
 #: app/views/monitoring.dashboard.widget.edit.php:35
 msgid "Add widget"
-msgstr "添加部件"
+msgstr "添加小组件"
 
 #: app/controllers/CControllerAuditLogList.php:356
 #: app/controllers/CControllerPopupImportCompare.php:161
@@ -1033,6 +1051,10 @@ msgstr "高级配置"
 #: include/views/monitoring.sysmap.edit.php:160
 msgid "Advanced labels"
 msgstr "高级标签"
+
+#: app/views/popup.import.php:175
+msgid "Advanced options"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -1202,6 +1224,10 @@ msgstr "允许的主机"
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
 msgstr "允许的方法"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr "也用作聚合数据集的图例标签。"
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -1507,6 +1533,12 @@ msgstr "尝试间隔"
 #: include/views/configuration.httpconf.list.php:141
 msgid "Attempts"
 msgstr "尝试次数"
+
+#: app/views/administration.authentication.edit.php:520
+#: app/views/popup.ldap.edit.php:265
+#: app/views/popup.mediatypemapping.edit.php:59
+msgid "Attribute"
+msgstr "属性"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
@@ -2146,26 +2178,26 @@ msgstr "无法添加web场景"
 
 #: jsLoader.php:129
 msgid "Cannot add widget: no widgets available."
-msgstr ""
+msgstr "无法添加小组件：无可用的小组件。"
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr "无法添加部件：仪表盘上的可用空间不足。"
+msgstr "无法添加小组件：仪表盘上的可用空间不足。"
 
 #: include/classes/api/services/CItem.php:1532
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of host \"%3$s\", because it is already populated by the item with key \"%4$s\"."
-msgstr ""
+msgstr "无法将资产字段“%1$s”分配给主机“%3$s”键为“%2$s”的监控项，已被键为“%4$s”的监控项占用。"
 
 #: include/classes/api/services/CItem.php:1531
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\""
-msgstr ""
+msgstr "无法将资产字段“%1$s”分配给模板“%3$s”键为“%2$s”的监控项，已被键为“%4$s”的监控项占用。"
 
 #: include/classes/api/services/CItem.php:1531
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
-msgstr ""
+msgstr "无法将资产字段“%1$s”分配给模板“%3$s”键为“%2$s”的监控项，已被键为“%4$s”的监控项占用。"
 
 #: jsLoader.php:343
 msgctxt "screen reader"
@@ -2239,12 +2271,12 @@ msgstr[0] "无法复制监控项"
 #: include/classes/api/services/CDiscoveryRule.php:2475
 #, c-format
 msgid "Cannot copy item prototype with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "无法在主监控项键“%2$s”缺失的情况下复制键为“%1$s”的监控项原型。"
 
 #: include/items.inc.php:590
 #, c-format
 msgid "Cannot copy item with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "无法在主监控项键“%2$s”缺失的情况下复制键为“%1$s”的监控项。"
 
 #: triggers.php:538
 msgid "Cannot copy trigger"
@@ -2810,12 +2842,12 @@ msgstr "在 \"%1$s\" 找不到用于监控项 key\"%2$s\" 的主机接口."
 #: include/classes/api/services/CDiscoveryRule.php:2517
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item prototype with key \"%2$s\"."
-msgstr ""
+msgstr "无法在“%1$s”的主机接口找到具有键“%2$s”监控项原型。"
 
 #: include/items.inc.php:640
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item with key \"%2$s\"."
-msgstr ""
+msgstr "无法在“%1$s”的主机接口找到具有键“%2$s”的监控项。"
 
 #: include/classes/import/importers/CMapImporter.php:207
 #, c-format
@@ -2936,201 +2968,201 @@ msgstr[0] "无法导入模板 \"%1$s\",被关联的模板\"%2$s\"不存在."
 #: include/classes/api/services/CItemGeneral.php:588
 #, c-format
 msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "无法使用“%2$s”和“%3$s”模板的键“%1$s”继承 LDD 规则，键在主机“%4$s”上必须是唯一的。"
 
 #: include/classes/api/services/CItemGeneral.php:589
 #, c-format
 msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "无法使用“%2$s”和“%3$s”模板的键“%1$s”继承 LDD 规则，键在模板“%4$s”上必须是唯一的。"
 
 #: include/classes/api/services/CItemGeneral.php:704
 #: include/classes/api/services/CItemGeneral.php:716
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到主机“%3$s”，已发现相同密钥的监控项。"
 
 #: include/classes/api/services/CItemGeneral.php:1030
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到主机“%3$s”，需要类型“%4$s”的主机接口。"
 
 #: include/classes/api/services/CItemGeneral.php:710
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到主机“%3$s”，已存在具有相同密钥的监控项原型。"
 
 #: include/classes/api/services/CItemGeneral.php:704
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到主机“%3$s”，已存在具有相同密钥的监控项。"
 
 #: include/classes/api/services/CItemGeneral.php:769
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到主机“%3$s”，具有相同密钥的监控项已从模板“%4$s”继承。"
 
 #: include/classes/api/services/CItemGeneral.php:705
 #: include/classes/api/services/CItemGeneral.php:717
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到模板“%3$s”，已发现相同密钥的监控项。"
 
 #: include/classes/api/services/CItemGeneral.php:711
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到模板“%3$s”，已存在相同密钥的监控项原型。"
 
 #: include/classes/api/services/CItemGeneral.php:705
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到模板“%3$s”，已存在相同密钥的监控项。"
 
 #: include/classes/api/services/CItemGeneral.php:770
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到模板“%3$s”，具有相同密钥的监控项已从模板“%4$s”继承。"
 
 #: include/classes/api/services/CItemPrototype.php:1230
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的密钥“%1$s”和 LLD 规则“%3$s”的监控项原型继承到主机“%4$s”，具有相同密钥的监控项原型已属于 LLD规则“%5$s”。"
 
 #: include/classes/api/services/CItemPrototype.php:1231
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的键“%1$s”和 LLD 规则“%3$s”的监控项原型继承到模板“%4$s”，因为具有相同键的监控项原型已属于 LLD规则“%5$s”。"
 
 #: include/classes/api/services/CItemGeneral.php:725
 #: include/classes/api/services/CItemGeneral.php:737
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到主机“%3$s”，已发现相同键的监控项。"
 
 #: include/classes/api/services/CItemGeneral.php:1034
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到主机“%3$s”，需要类型为“%4$s”的主机接口。"
 
 #: include/classes/api/services/CItemGeneral.php:731
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到主机“%3$s”，已存在相同键的 LLD 规则。"
 
 #: include/classes/api/services/CItemGeneral.php:725
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到主机“%3$s”，已存在具有相同键的监控项。"
 
 #: include/classes/api/services/CItemGeneral.php:775
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的具有键“%1$s”的监控项原型继承到主机“%3$s”，具有相同键的监控项已从模板“%4$s”继承。"
 
 #: include/classes/api/services/CItemGeneral.php:726
 #: include/classes/api/services/CItemGeneral.php:738
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到模板“%3$s”，已存在相同键的监控项。"
 
 #: include/classes/api/services/CItemGeneral.php:732
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到模板“%3$s”，已存在相同键的 LLD 规则。"
 
 #: include/classes/api/services/CItemGeneral.php:726
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到模板“%3$s”，已存在相同键的监控项。"
 
 #: include/classes/api/services/CItemGeneral.php:776
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到模板“%3$s”，具有相同键的监控项已从模板“%4$s”继承。"
 
 #: include/classes/api/services/CItemGeneral.php:582
 #, c-format
 msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "无法继承“%2$s”和“%3$s”模板的键为“%1$s”的监控项原型，键在主机“%4$s”上必须是唯一的。"
 
 #: include/classes/api/services/CItemGeneral.php:583
 #, c-format
 msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "无法继承“%2$s”和“%3$s”模板的键为“%1$s”的监控项原型，键在模板“%4$s”上必须是唯一的。"
 
 #: include/classes/api/services/CItem.php:1455
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to host \"%5$s\", because they would populate the same inventory field \"%6$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项和模板“%4$s”的键为“%3$s”的监控项继承到主机“%5$s”，会占用同一的资产字段“%6$s”。"
 
 #: include/classes/api/services/CItem.php:1454
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to template \"%5$s\", because they would populate the same inventory field \"%6$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项和模板“%4$s”的键为“%3$s”的监控项继承到模板“%5$s”，会占用同一的资产字段“%6$s”。"
 
 #: include/classes/api/services/CItemGeneral.php:695
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项继承到主机“%3$s”，已存在相同键的监控项。"
 
 #: include/classes/api/services/CItemGeneral.php:1026
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项继承到主机“%3$s”，需要类型为“%4$s”的主机接口。"
 
 #: include/classes/api/services/CItemGeneral.php:683
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项继承到主机“%3$s”，已存在相同键的 LLD 规则。"
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项继承到主机“%3$s”，已存在相同键的监控项原型。"
 
 #: include/classes/api/services/CItemGeneral.php:763
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项继承到主机“%3$s”，相同键的监控项已从模板“%4$s”继承。"
 
 #: include/classes/api/services/CItem.php:1509
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项继承到主机“%3$s”，其资产字段“%4$s”已由键为“%5$s”的监控占用”。"
 
 #: include/classes/api/services/CItemGeneral.php:696
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项继承到模板“%3$s”，已发现相同键的监控项。"
 
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项继承到模板“%3$s”，已存在相同键的 LLD 规则。"
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项继承到模板“%3$s”，已存在相同键的监控项原型。"
 
 #: include/classes/api/services/CItemGeneral.php:764
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项继承到模板“%3$s”，相同键的监控项已从模板“%4$s”继承。"
 
 #: include/classes/api/services/CItem.php:1508
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项继承到模板“%3$s”，其资产字段“%4$s”已由键为“%5$s”的监控项占用”。"
 
 #: include/classes/api/services/CItemGeneral.php:576
 #, c-format
 msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "无法继承“%2$s”和“%3$s”模板的键为“%1$s”的监控项，键在主机“%4$s”上必须是唯一的。"
 
 #: include/classes/api/services/CItemGeneral.php:577
 #, c-format
 msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "无法继承“%2$s”和“%3$s”模板中具有键“%1$s”的监控项，键在模板“%4$s”上必须是唯一的。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1581
 msgid "Cannot insert trigger expression"
@@ -3269,7 +3301,7 @@ msgstr "无法为链接传递重复的模板 ID：%1$s。"
 
 #: jsLoader.php:130
 msgid "Cannot paste inaccessible widget."
-msgstr ""
+msgstr "无法粘贴无权访问的小组件。"
 
 #: include/classes/db/DB.php:958
 #, c-format
@@ -3285,6 +3317,11 @@ msgstr "无法对空表 \"%1$s\" 执行update语句。"
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "没有where条件，无法对表 \"%1$s\" 执行update语句。"
+
+#: app/controllers/CControllerUserProvision.php:69
+msgid "Cannot provision user"
+msgid_plural "Cannot provision users"
+msgstr[0] "无法配置用户"
 
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
@@ -3360,42 +3397,42 @@ msgstr "无法设置 \"%1$s\" 为监控项 \"%2$s\"."
 #: include/classes/api/services/CItemGeneral.php:2237
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "无法为主机“%3$s”：%4$s上键为“%2$s”的主监控项设置依赖项键为“%1$s”的 LLD 规则。"
 
 #: include/classes/api/services/CItemGeneral.php:2236
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "无法为模板“%3$s”上键为“%2$s”的主监控项设置依赖监控项键为“%1$s”的 LLD 规则 ：%4$s。"
 
 #: include/classes/api/services/CItemGeneral.php:2231
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "无法为主机“%3$s”上键为“%2$s”的主监控项原型上键为“%1$s”设置依赖监控项原型：%4$s。"
 
 #: include/classes/api/services/CItemGeneral.php:2230
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "无法为模板“%3$s”上键为“%2$s”的主监控项原型上键为“%1$s”设置依赖监控项原型：%4$s。"
 
 #: include/classes/api/services/CItemGeneral.php:2226
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "无法为主机“%3$s”上键为“%2$s”的主监控项上键为“%1$s”设置依赖监控项原型：%4$s。"
 
 #: include/classes/api/services/CItemGeneral.php:2225
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "无法为模板“%3$s”上键为“%2$s”的主监控项上键为“%1$s”设置依赖监控项原型：%4$s。"
 
 #: include/classes/api/services/CItemGeneral.php:2220
 #, c-format
 msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "无法为主机“%3$s”上键为“%2$s”的主监控项上键为“%1$s”设置依赖监控项：%4$s。"
 
 #: include/classes/api/services/CItemGeneral.php:2219
 #, c-format
 msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "无法为模板“%3$s”上键为“%2$s”的主监控项上键为“%1$s”设置依赖监控项：%4$s。"
 
 #: include/classes/api/services/CHost.php:1037
 #: include/classes/api/services/CHost.php:2015
@@ -3601,6 +3638,10 @@ msgstr "无法更新自动发现规则"
 msgid "Cannot update event"
 msgid_plural "Cannot update events"
 msgstr[0] "无法更新事件"
+
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr "无法更新事件"
 
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
@@ -3838,6 +3879,11 @@ msgstr "采集所有符合规则的 SNMP 信息，如果没有规则则会采集
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "采集所有SNMP traps规则以外的snmptrap[]"
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr "起因"
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -3894,6 +3940,10 @@ msgstr "修改密码"
 #: include/items.inc.php:1844
 msgid "Change per second"
 msgstr "每秒更改"
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
+msgstr "变更问题排名"
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4191,7 +4241,7 @@ msgstr "合并的结果"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:68
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
-msgstr "初始加载部件时显示的逗号分隔中心坐标和缩放级别。"
+msgstr "初始加载小组件时显示的逗号分隔中心坐标和缩放级别。"
 
 #: app/views/administration.script.edit.php:175 include/actions.inc.php:1943
 #: include/views/administration.auditacts.list.php:105
@@ -4465,6 +4515,15 @@ msgstr "配置已更新"
 msgid "Configure DB connection"
 msgstr "配置数据库连接"
 
+#: app/views/administration.authentication.edit.php:417
+#: app/views/popup.ldap.edit.php:115
+msgid "Configure JIT provisioning"
+msgstr "配置准时(JIT)服务开通"
+
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr "确认修改"
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "确认文字"
@@ -4712,6 +4771,14 @@ msgstr "合同号码"
 msgid "Convert to JSON"
 msgstr "转换到 JSON"
 
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr "转换为起因"
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr "将故障现象事件转换回起因事件"
+
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
 msgid "Coordinates"
@@ -4724,6 +4791,24 @@ msgstr "坐标"
 #: jsLoader.php:164 jsLoader.php:281
 msgid "Copy"
 msgstr "复制"
+
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] ""
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] ""
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] ""
 
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
@@ -5066,6 +5151,15 @@ msgstr "当前"
 msgid "Current host"
 msgstr "当前主机"
 
+#: app/controllers/CControllerUserUpdateGeneral.php:85
+#: app/views/administration.user.edit.php:174
+msgid "Current password"
+msgstr "当前密码"
+
+#: include/classes/api/services/CUser.php:474
+msgid "Current password is mandatory."
+msgstr "当前密码是强制性的。"
+
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
 msgstr "当前用户"
@@ -5300,6 +5394,10 @@ msgstr "数据概览"
 #: include/classes/widgets/views/widget.svggraph.form.view.php:304
 msgid "Data set"
 msgstr "数据集"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr "数据集标签"
 
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
@@ -5726,6 +5824,10 @@ msgstr "删除选定的 SLA？"
 msgid "Delete selected SLAs?"
 msgstr "删除所选的SLAs?"
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr "删除选定的动作?"
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "删除选定的动作?"
@@ -5980,6 +6082,23 @@ msgstr "已弃用"
 msgid "Deprecated parameter \"%1$s\" cannot be used with \"%2$s\"."
 msgstr "将被弃用的参数“%1$s”不能与“%2$s”一起使用。"
 
+#: app/views/administration.authentication.edit.php:50
+msgid "Deprovisioned users group"
+msgstr "取消配置的用户组"
+
+#: include/classes/api/services/CUserGroup.php:1011
+msgid "Deprovisioned users group cannot be deleted."
+msgstr "无法删除已取消配置的用户组。"
+
+#: include/classes/api/services/CAuthentication.php:183
+msgid "Deprovisioned users group cannot be empty."
+msgstr "取消配置的用户组不能为空。"
+
+#: include/classes/api/services/CAuthentication.php:178
+#: include/classes/api/services/CUserGroup.php:321
+msgid "Deprovisioned users group cannot be enabled."
+msgstr "无法启用已取消配置的用户组。"
+
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
 #: app/partials/hostmacros.list.html.php:37
@@ -6011,6 +6130,10 @@ msgstr "将被弃用的参数“%1$s”不能与“%2$s”一起使用。"
 #: include/views/inventory.host.view.php:129
 msgid "Description"
 msgstr "描述"
+
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr "已安装包的详细列表。返回JSON格式文本"
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
@@ -6131,6 +6254,10 @@ msgstr "停用所选的SLA?"
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
 msgstr "禁用所选的SLAs?"
+
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
+msgstr "停用所选的动作?"
 
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
@@ -6833,6 +6960,15 @@ msgstr "启用"
 msgid "Enable HTTP authentication"
 msgstr "启用HTTP 验证"
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr "所有用户使用HTTP认证方式"
+
+#: app/views/administration.authentication.edit.php:202
+#: app/views/administration.authentication.edit.php:276
+msgid "Enable JIT provisioning"
+msgstr "启用准时(JIT)服务开通"
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "启用LDAP 验证"
@@ -6840,6 +6976,10 @@ msgstr "启用LDAP 验证"
 #: app/views/administration.authentication.edit.php:215
 msgid "Enable SAML authentication"
 msgstr "启用SAML身份验证"
+
+#: app/views/administration.authentication.edit.php:543
+msgid "Enable SCIM provisioning"
+msgstr "启用 SCIM 配置"
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
@@ -6911,6 +7051,10 @@ msgstr "启用所选的SLA?"
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
 msgstr "启用所选的SLAs?"
+
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
+msgstr "启用所选的动作?"
 
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
@@ -7485,7 +7629,7 @@ msgstr "无法粘贴仪表盘页面。"
 
 #: jsLoader.php:138
 msgid "Failed to paste widget."
-msgstr "无法粘贴部件。"
+msgstr "无法粘贴小组件。"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:390
 msgid "Failed to select default LDAP server."
@@ -7513,7 +7657,7 @@ msgstr "未能更新仪表盘共享。"
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
-msgstr "部件属性更新失败。"
+msgstr "小组件属性更新失败。"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
@@ -7575,6 +7719,11 @@ msgstr "字段 \"%1$s\" 缺少拓扑图 \"%2$s\" 的值。"
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "字段 \"%1$s\" 设置错误: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr "字段 \"%1$s\" 错误: %2$s。"
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -7589,6 +7738,13 @@ msgstr "字段 \"%1$s\"不是字符串"
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "字段\"%1$s\"不可以填写"
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr "字段名"
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -8183,19 +8339,40 @@ msgstr "主机 \"%2$s\" 的群组 \"%1$s\" 不存在."
 msgid "Group added"
 msgstr "群组已添加"
 
+#: app/views/popup.ldap.edit.php:134
+msgid "Group base DN"
+msgstr "基准目录(DN)组"
+
+#: app/views/popup.ldap.edit.php:122
+msgid "Group configuration"
+msgstr "组配置"
+
 #: hostgroups.php:134 hostgroups.php:155
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "组已删除"
 
+#: app/views/popup.ldap.edit.php:182
+msgid "Group filter"
+msgstr "组过滤器"
+
 #: app/views/administration.miscconfig.edit.php:40
 msgid "Group for discovered hosts"
 msgstr "自动发现到的主机的群组"
+
+#: app/views/popup.ldap.edit.php:156
+msgid "Group member attribute"
+msgstr "组成员属性"
 
 #: app/views/administration.usergroup.edit.php:43 hostgroups.php:36
 #: include/views/configuration.hostgroups.edit.php:38
 msgid "Group name"
 msgstr "组名"
+
+#: app/views/administration.authentication.edit.php:427
+#: app/views/popup.ldap.edit.php:148
+msgid "Group name attribute"
+msgstr "组名属性"
 
 #: include/classes/api/services/CHostPrototype.php:1165
 #, c-format
@@ -9117,6 +9294,10 @@ msgstr "位于 %2$s 的模块使用了相同的命名空间 (%1$s)。"
 msgid "Identification of the system. Returns string"
 msgstr "识别系统。返回 字符串"
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr "如HTTP认证启用，所有用户(包括设置LDAP/内部方式通过前端访问)将通过web服务器认证，而不过zabbix"
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -9263,6 +9444,11 @@ msgstr "已成功导入"
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr "无法按库存字段“%1$s”过滤，该字段不存在。"
 
+#: app/views/js/administration.user.edit.js.php:61
+#: app/views/js/administration.userprofile.edit.js.php:69
+msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
+msgstr "如密码更改成功，用户将从所有活动会话中注销。是否继续？"
+
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
 msgstr "维修中"
@@ -9279,6 +9465,10 @@ msgstr "区间值"
 #: app/controllers/CControllerDashboardWidgetEdit.php:363
 msgid "Inaccessible SLA"
 msgstr "无法访问SLA"
+
+#: app/controllers/CControllerDashboardWidgetEdit.php:452
+msgid "Inaccessible action"
+msgstr "无法访问动作"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
@@ -9329,6 +9519,10 @@ msgstr "无法访问的维护"
 msgid "Inaccessible map"
 msgstr "无法访问的拓扑图"
 
+#: app/controllers/CControllerDashboardWidgetEdit.php:453
+msgid "Inaccessible media type"
+msgstr "无法访问的媒介类型"
+
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
 msgstr "无法访问服务"
@@ -9363,22 +9557,22 @@ msgstr "无法访问用户组"
 
 #: jsLoader.php:147 jsLoader.php:175
 msgid "Inaccessible widget"
-msgstr ""
+msgstr "不可访问的小组件"
 
 #: app/controllers/CControllerDashboardWidgetCheck.php:52
 #: app/controllers/CControllerDashboardWidgetEdit.php:65
 #: include/classes/helpers/CDashboardHelper.php:453
 #: include/classes/helpers/CDashboardHelper.php:461
 msgid "Inaccessible widget type."
-msgstr ""
+msgstr "不可访问的小组件类型"
 
 #: jsLoader.php:138
 msgid "Inaccessible widgets were not copied."
-msgstr ""
+msgstr "未复制不可访问的小组件。"
 
 #: jsLoader.php:139
 msgid "Inaccessible widgets were not pasted."
-msgstr ""
+msgstr "未粘贴不可访问的小组件。"
 
 #: app/partials/js/scheduledreport.subscription.js.php:165
 #: app/partials/js/scheduledreport.subscription.js.php:181
@@ -9626,6 +9820,10 @@ msgstr "主机名称 \"%1$s\" 中有不支持的字符。"
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "自动发现规则\"%1$s\"的条件不正确."
+
+#: include/classes/api/services/CUser.php:468
+msgid "Incorrect current password."
+msgstr "当前密码不正确。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -10438,12 +10636,28 @@ msgstr "不合法的IP地址\"%1$s\"."
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "无效的JSON. 当解析JSON文字时, 在服务器端发生了一个错误."
 
+#: app/controllers/CControllerAuthenticationUpdate.php:171
+msgid "Invalid LDAP JIT provisioning media type mapping configuration."
+msgstr "无效的 LDAP 准时(JIT)服务开通媒介类型映射配置。"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:164
+msgid "Invalid LDAP JIT provisioning user group mapping configuration."
+msgstr "无效的 LDAP准时(JIT)服务开通用户组映射配置。"
+
 #: app/controllers/CControllerPopupLdapCheck.php:52
 #: app/controllers/CControllerPopupLdapEdit.php:49
 #: app/controllers/CControllerPopupLdapTestEdit.php:44
 #: app/controllers/CControllerPopupLdapTestSend.php:50
 msgid "Invalid LDAP configuration"
 msgstr "LDAP 配置无效"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:214
+msgid "Invalid SAML JIT provisioning media type mapping configuration."
+msgstr "SAML准时(JIT)服务开通媒介类型映射配置无效。"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:208
+msgid "Invalid SAML JIT provisioning user group mapping configuration."
+msgstr "SAML准时(JIT)服务开通用户组映射配置无效。"
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -10506,6 +10720,12 @@ msgstr "\"%3$s\": %4$s上的监控项目模板 \"%2$s\" 使用了不合法的关
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "不舍法的关键字 \"%1$s\": %2$s"
+
+#: app/controllers/CControllerPopupLdapCheck.php:67
+#: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
+#: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
+msgid "Invalid media type mapping configuration."
+msgstr "媒介类型映射配置无效。"
 
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
@@ -10807,6 +11027,12 @@ msgstr "标签无效 \"%1$s\": %2$s。"
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
 msgstr "无效的时间段"
+
+#: app/controllers/CControllerPopupLdapCheck.php:62
+#: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
+#: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
+msgid "Invalid user group mapping configuration."
+msgstr "无效的用户组映射配置。"
 
 #: include/classes/validators/CApiInputValidator.php:2852
 #, c-format
@@ -11273,6 +11499,10 @@ msgstr "LDAP认证"
 #: include/classes/api/services/CUser.php:1491
 msgid "LDAP authentication is disabled."
 msgstr "LDAP 身份验证已禁用。"
+
+#: app/views/popup.ldap.edit.php:235
+msgid "LDAP group pattern"
+msgstr "LDAP 组模式"
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -11798,6 +12028,13 @@ msgstr "Mac 地址 A"
 msgid "MAC address B"
 msgstr "Mac 地址 B"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr "MAC (16进制字符串)"
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -12035,6 +12272,22 @@ msgstr "拓扑图形状"
 msgid "Map update failed."
 msgstr "拓扑图更新失败."
 
+#: app/views/popup.ldap.edit.php:257
+msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:513
+msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:257
+msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr "将用户的 LDAP 媒介属性（例如电子邮件）映射到 Zabbix 用户媒介以便发送通知。"
+
+#: app/views/administration.authentication.edit.php:508
+msgid "Map user’s SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr "将用户的 SAML 媒介属性（例如email）映射到 Zabbix 用户媒介以便发送通知。"
+
 #: include/classes/api/services/CDashboardGeneral.php:594
 #, c-format
 msgid "Map with ID \"%1$s\" is not available."
@@ -12071,6 +12324,10 @@ msgstr "三月"
 msgid "March"
 msgstr "三月"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr "标记为起因"
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr "触发器状态上的标记组件改变"
@@ -12082,6 +12339,10 @@ msgstr "标记其他"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "标记所选"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr "标记为故障现象"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -12156,6 +12417,23 @@ msgstr "概览表中的最大列数和行数"
 msgid "Max period for time selector"
 msgstr "时间选择器的最大周期"
 
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr "最大重复次数"
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr "最大重复计数仅适用于自动发现和 snmp.walk。"
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
 msgstr "最大缩放级别"
@@ -12211,6 +12489,12 @@ msgstr "报警媒介"
 msgid "Media type"
 msgstr "报警媒介类型"
 
+#: widgets/actionlog/views/widget.view.php:40
+#: widgets/actionlog/views/widget.view.php:41
+msgctxt "compact table header"
+msgid "Media type"
+msgstr "媒介类型"
+
 #: include/classes/api/services/CMediatype.php:408
 #, c-format
 msgid "Media type \"%1$s\" already exists."
@@ -12238,6 +12522,12 @@ msgstr "媒介类型已被管理禁用。"
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
 msgstr[0] "消息介质类型已启用"
+
+#: app/views/administration.authentication.edit.php:506
+#: app/views/popup.ldap.edit.php:255
+#: app/views/popup.mediatypemapping.edit.php:85
+msgid "Media type mapping"
+msgstr "媒体类型映射"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -12874,6 +13164,10 @@ msgctxt "user first name"
 msgid "Name"
 msgstr "用户名第一部分"
 
+#: app/views/administration.authentication.edit.php:520
+msgid "Name "
+msgstr "名称"
+
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
 msgstr "用户ID"
@@ -12885,6 +13179,10 @@ msgstr "表单字段的名称不得超过255个字符。"
 #: app/views/administration.module.edit.php:43
 msgid "Namespace"
 msgstr "命名空间"
+
+#: app/views/popup.usergroupmapping.edit.php:80
+msgid "Naming requirements:"
+msgstr "命名要求："
 
 #: jsLoader.php:189
 msgid "Navigate to default view"
@@ -12960,6 +13258,11 @@ msgstr "添加LDAP 服务器"
 msgid "New SLA"
 msgstr "添加 SLA"
 
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
+msgstr "新的动作"
+
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
 msgstr "添加附加规则"
@@ -13010,6 +13313,10 @@ msgstr "添加主机"
 msgid "New host group"
 msgstr "新建主机组"
 
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "New media type mapping"
+msgstr "新媒介类型映射"
+
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
 msgstr "添加操作"
@@ -13038,6 +13345,10 @@ msgstr "新建模板组"
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
 msgstr "新触发器"
+
+#: app/views/popup.usergroupmapping.edit.php:114
+msgid "New user group mapping"
+msgstr "新用户组映射"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -13650,6 +13961,11 @@ msgstr "不允许设定用户\"guest\"的密码."
 msgid "Not allowed to set theme for user \"guest\"."
 msgstr "不允许为用户“guest”设置主题。"
 
+#: include/classes/api/services/CUser.php:484
+#, c-format
+msgid "Not allowed to update field \"%1$s\" for provisioned user."
+msgstr "不允许为配置的用户更新字段“%1$s”。"
+
 #: include/classes/api/clients/CLocalApiClient.php:164
 #: include/classes/api/clients/CLocalApiClient.php:192
 #: include/classes/api/clients/CLocalApiClient.php:218
@@ -13878,6 +14194,17 @@ msgstr "数字 (无正负)"
 msgid "OEM"
 msgstr "OEM"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr "OID"
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr "OID前缀"
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14009,6 +14336,10 @@ msgstr "只有Zabbix代理, SNMPv1,SNMPv2 和 SNMPv3检查才是独特的."
 msgid "Only administrators can set map owner."
 msgstr "只有管理员才可以设置拓扑图的所有人。"
 
+#: app/views/administration.authentication.edit.php:51
+msgid "Only disabled group can be set for deprovisioned users."
+msgstr "只能为已取消配置的用户设置禁用组。"
+
 #: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "只计算指派给启用的主机的监控项"
@@ -14033,6 +14364,11 @@ msgstr "只允许进行一项不受支持的值检查。"
 #: include/classes/api/services/CItemGeneral.php:1470
 msgid "Only one throttling step is allowed."
 msgstr "只允许一个节流步骤。"
+
+#: include/classes/api/services/CUserDirectory.php:519
+#, c-format
+msgid "Only one user directory of type \"%1$s\" can exist."
+msgstr "只能存在一个“%1$s”类型的用户目录。"
 
 #: app/views/popup.acknowledge.edit.php:58
 msgid "Only selected problem"
@@ -14074,6 +14410,10 @@ msgstr "Opera"
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
 msgstr "操作系统信息。返回字符串"
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
+msgstr "操作系统版本信息。 返回 JSON"
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -14297,7 +14637,7 @@ msgstr "输出"
 #: include/classes/api/services/CDashboardGeneral.php:336
 #, c-format
 msgid "Overlapping widgets at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\"."
-msgstr "在仪表盘“%1$s”的第 #%2$d 页上的 X:%3$d、Y:%4$d 重叠部件。"
+msgstr "在仪表盘“%1$s”的第 #%2$d 页上的 X:%3$d、Y:%4$d 重叠小组件。"
 
 #: include/views/configuration.item.edit.php:838
 #: include/views/configuration.item.edit.php:875
@@ -14709,6 +15049,10 @@ msgstr "密码"
 msgid "Password (once again)"
 msgstr "密码 (再次确认)"
 
+#: app/views/administration.user.edit.php:199
+msgid "Password can only be changed for users using the internal Zabbix authentication."
+msgstr "仅限使用 Zabbix 自身身份验证的用户更改密码。"
+
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
 msgstr "非内部身份验证类型的密码不是强制的。"
@@ -14739,7 +15083,7 @@ msgstr "粘贴页面"
 #: app/views/js/configuration.dashboard.edit.js.php:210
 #: app/views/js/monitoring.dashboard.view.js.php:298 jsLoader.php:143
 msgid "Paste widget"
-msgstr "粘贴部件"
+msgstr "粘贴小组件"
 
 #: jsLoader.php:283
 msgid "Paste without external links"
@@ -14752,6 +15096,10 @@ msgstr "图案"
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
 msgstr "针对被抑制的问题暂停操作"
+
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
+msgstr "暂停操作故障现象问题"
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -14948,6 +15296,10 @@ msgstr "位置"
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
 msgstr "对于 s、uptime 和 unixtime 单位，位置将被忽略。"
+
+#: include/classes/core/ZBase.php:764
+msgid "Possibly the session has expired or the password was changed."
+msgstr "可能会话已过期或密码已更改。"
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -15261,6 +15613,26 @@ msgstr "提供的秘密路径“%1$s”无效。"
 msgid "Provided secret query string \"%1$s\" is invalid."
 msgstr "提供的秘密查询字符串“%1$s”无效。"
 
+#: app/views/administration.user.list.php:301
+msgid "Provision now"
+msgstr "现在开通"
+
+#: app/views/administration.user.list.php:303
+msgid "Provision selected LDAP users?"
+msgstr "开通选定的 LDAP 用户？"
+
+#: app/views/administration.user.list.php:141
+msgid "Provisioned"
+msgstr "已开通"
+
+#: app/views/administration.authentication.edit.php:251
+msgid "Provisioning period"
+msgstr "开通期限"
+
+#: app/controllers/CControllerUserProvision.php:65
+msgid "Provisioning successful."
+msgstr "开通成功。"
+
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
 #: app/views/administration.proxy.list.php:34
@@ -15423,6 +15795,10 @@ msgstr "已解决"
 msgid "RMCP+"
 msgstr "RMCP+"
 
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr "排名"
+
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
 #: include/views/configuration.item.edit.php:356
@@ -15523,6 +15899,18 @@ msgstr "收件人"
 msgid "Recipient already exists."
 msgstr "收件人已经存在。"
 
+#: app/views/reports.actionlog.list.csv.php:39
+msgid "Recipient's Zabbix username"
+msgstr "收件人的 Zabbix 用户名"
+
+#: app/views/reports.actionlog.list.csv.php:40
+msgid "Recipient's name"
+msgstr "收件人的姓名"
+
+#: app/views/reports.actionlog.list.csv.php:41
+msgid "Recipient's surname"
+msgstr "收件人姓氏"
+
 #: include/views/administration.auditacts.list.php:32
 msgid "Recipients"
 msgstr "收件人"
@@ -15575,6 +15963,10 @@ msgstr "恢复时间"
 #: include/views/js/monitoring.sysmaps.js.php:531
 msgid "Rectangle"
 msgstr "矩形"
+
+#: app/views/popup.ldap.edit.php:168
+msgid "Reference attribute"
+msgstr "引用属性"
 
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
@@ -15648,7 +16040,7 @@ msgstr "关联报表"
 
 #: jsLoader.php:151
 msgid "Release to create a widget."
-msgstr "释放以创建小部件。"
+msgstr "释放以创建小组件。"
 
 #: include/views/general.login.php:77
 msgid "Remember me for 30 days"
@@ -16132,7 +16524,7 @@ msgstr "结果已使用值映射"
 #: include/views/configuration.item.edit.php:456
 #: include/views/configuration.item.prototype.edit.php:434
 msgid "Retrieve mode"
-msgstr "恢复模式"
+msgstr "检索模式"
 
 #: include/classes/data/CItemData.php:1154
 msgid "Retrieving contents of a file. Returns text"
@@ -16300,6 +16692,16 @@ msgstr "S"
 msgctxt "Sunday short"
 msgid "S"
 msgstr "S"
+
+#: app/views/administration.user.list.php:224
+#: app/views/administration.user.list.php:225
+#: app/views/popup.usergroupmapping.edit.php:77
+msgid "SAML"
+msgstr "SAML"
+
+#: app/views/administration.authentication.edit.php:483
+msgid "SAML group pattern"
+msgstr "SAML 组模式"
 
 #: app/views/administration.authentication.edit.php:337
 msgid "SAML settings"
@@ -16469,6 +16871,14 @@ msgstr "SNMP采集键值是无效的"
 #: app/views/popup.itemtestedit.view.php:125
 msgid "SNMP version"
 msgstr "SNMP 版本"
+
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr "SNMP 遍历为JSON"
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
+msgstr "SNMP遍历值"
 
 #: include/items.inc.php:1299
 #, c-format
@@ -16785,6 +17195,11 @@ msgstr "搜索过滤器"
 msgid "Search pattern is empty"
 msgstr "查找式样为空"
 
+#: app/views/reports.actionlog.list.php:108
+#: widgets/actionlog/includes/WidgetForm.php:61
+msgid "Search string"
+msgstr "搜索字符串"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
 msgid "Season"
@@ -16949,6 +17364,11 @@ msgstr "发送给用户"
 #: include/views/administration.auditacts.list.php:79
 msgid "Sent"
 msgstr "已送达"
+
+#: app/controllers/CControllerActionLogList.php:210
+#: widgets/actionlog/includes/WidgetForm.php:56
+msgid "Sent/Executed"
+msgstr "发送/执行"
 
 #: include/func.inc.php:244
 msgid "Sep"
@@ -17362,6 +17782,11 @@ msgstr "显示侧边栏"
 #: include/views/monitoring.sysmap.edit.php:273
 msgid "Show suppressed problems"
 msgstr "显示处理的问题"
+
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr "显示故障现象"
 
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
@@ -18032,6 +18457,11 @@ msgstr "瑞士(sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "切换认证方法将重设除了此会话之外的所有会话!继续吗?"
 
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
+msgstr "故障现象"
+
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
 msgid "System"
@@ -18533,6 +18963,11 @@ msgstr "文本"
 msgid "Text, supports {INVENTORY.*}, {HOST.*} macros"
 msgstr "文本，支持 {INVENTORY.*}、{HOST.*} 宏"
 
+#: include/classes/api/clients/CLocalApiClient.php:96
+#, c-format
+msgid "The \"%1$s.%2$s\" method must be called without authorization header."
+msgstr "必须在没有授权请求头的情况下调用“%1$s.%2$s”方法。"
+
 #: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
@@ -18667,6 +19102,10 @@ msgstr "上周的这一天"
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr "该字段由监控项“%1$s”自动填充。"
 
+#: include/classes/scim/API.php:77
+msgid "This filter is not supported"
+msgstr "不支持此过滤器"
+
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:82
 msgid "This is the test message from Zabbix"
 msgstr "来自 Zabbix 的测试消息"
@@ -18701,6 +19140,10 @@ msgstr "应启用此设置，因为趋势表包含压缩块。"
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
 msgstr "此类信息可能与密钥不匹配。"
+
+#: app/views/administration.user.edit.php:59
+msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
+msgstr "此用户已配置 IdP。不允许手动更改已提供的字段。"
 
 #: include/func.inc.php:2474
 msgid "This week"
@@ -19466,6 +19909,10 @@ msgstr "图形界面元素“%2$s”不适用于用户角色“%1$s”。"
 msgid "UNKNOWN"
 msgstr "未知的"
 
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr "更新中"
+
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
 #: include/classes/widgets/CWidgetConfig.php:73
@@ -19527,6 +19974,13 @@ msgstr "拓扑图 \"%1$s\" URL、名称为必填项。"
 msgid "URLs"
 msgstr "URLs"
 
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr "UTF-8 (16进制字符串)"
+
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
 msgid "UUIDv4 is expected"
@@ -19550,6 +20004,11 @@ msgstr "无法创建配置文件。"
 #, c-format
 msgid "Unable to determine current Zabbix database version: %1$s."
 msgstr "无法确定当前 Zabbix 数据库版本：%1$s。"
+
+#: include/classes/helpers/CAuthenticationHelper.php:88
+#: include/classes/helpers/CAuthenticationHelper.php:107
+msgid "Unable to find SAML userdirectory."
+msgstr "无法找到 SAML 用户目录。"
 
 #: include/classes/helpers/CAuthenticationHelper.php:75
 msgid "Unable to load authentication API parameters."
@@ -19624,6 +20083,13 @@ msgstr "解锁"
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "解除锁定所选的用户?"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr "未更新"
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -19955,6 +20421,10 @@ msgstr "已更新"
 msgid "Updated status of host \"%1$s\"."
 msgstr "已更新主机 \"%1$s\" 的状态。"
 
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr ""
+
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
 msgstr "上传"
@@ -19983,9 +20453,17 @@ msgstr "Zabbix服务器进程的在线时间单位秒."
 msgid "Uptime/Downtime"
 msgstr "在线/不在线"
 
+#: app/views/popup.ldap.edit.php:169
+msgid "Use %{ref} in group filter to reference value of this user attribute."
+msgstr "在组过滤器中使用 %{ref} 来引用此用户属性的值。"
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "使用大量请求"
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
+msgstr "使用组合请求"
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -20060,6 +20538,11 @@ msgstr "用户 \"%1$s\" 用于 \"%2$s\" 操作。"
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr "用户“%1$s”是代表其创建报表“%2$s”的用户。"
 
+#: app/controllers/CControllerUserProvision.php:61
+#, c-format
+msgid "User \"%1$s\" provisioned."
+msgstr "用户“%1$s”已开通。"
+
 #: app/controllers/CControllerUserUnblock.php:61
 #, c-format
 msgid "User \"%1$s\" unblocked."
@@ -20104,6 +20587,19 @@ msgstr "用户目录"
 #, c-format
 msgid "User directory \"%1$s\" already exists."
 msgstr "用户目录“%1$s”已存在。"
+
+#: include/classes/api/services/CUser.php:715
+#, c-format
+msgid "User directory with ID \"%1$s\" is not available."
+msgstr "ID 为“%1$s”的用户目录不可用。"
+
+#: app/views/administration.user.list.php:211
+msgid "User does not have user groups."
+msgstr "此用户没有用户组。"
+
+#: app/views/administration.user.list.php:232
+msgid "User does not have user role."
+msgstr "此用户没有用户角色。"
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -20153,6 +20649,16 @@ msgstr[0] "用户组已删除"
 msgid "User group for database down message"
 msgstr "用于资料库断线信息的用户群组"
 
+#: app/views/administration.authentication.edit.php:471
+#: app/views/popup.ldap.edit.php:226
+#: app/views/popup.usergroupmapping.edit.php:126
+msgid "User group mapping"
+msgstr "用户组映射"
+
+#: app/views/popup.ldap.edit.php:196
+msgid "User group membership attribute"
+msgstr "用户组成员属性"
+
 #: include/classes/api/services/CMap.php:784
 #: include/classes/api/services/CMap.php:1252
 #, c-format
@@ -20188,6 +20694,11 @@ msgstr "用户群组"
 msgid "User is not allowed to delete himself."
 msgstr "用户是不允许删除自己"
 
+#: app/views/administration.authentication.edit.php:457
+#: app/views/popup.ldap.edit.php:218
+msgid "User last name attribute"
+msgstr "用户姓氏属性"
+
 #: include/classes/widgets/views/widget.item.form.view.php:64
 msgid "User macros"
 msgstr "用户自定义宏"
@@ -20206,6 +20717,11 @@ msgstr "用户菜单"
 #: include/views/configuration.item.prototype.edit.php:655 items.php:94
 msgid "User name"
 msgstr "用户名称"
+
+#: app/views/administration.authentication.edit.php:443
+#: app/views/popup.ldap.edit.php:210
+msgid "User name attribute"
+msgstr "用户名属性"
 
 #: app/views/administration.authentication.edit.php:206
 msgid "User password"
@@ -21182,22 +21698,22 @@ msgstr "当启用时"
 #: include/classes/api/services/CDashboardGeneral.php:349
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
-msgstr "位于仪表盘“%1$s”的第 #%2$d 页上 X:%3$d, Y:%4$d 的部件超出范围。"
+msgstr "位于仪表盘“%1$s”的第 #%2$d 页上 X:%3$d, Y:%4$d 的小组件超出范围。"
 
 #: include/classes/widgets/CWidgetHelper.php:68
 msgid "Widget is deprecated."
-msgstr "部件已弃用。"
+msgstr "小组件已弃用。"
 
 #: jsLoader.php:196
 msgid "Widget is too small for the specified number of columns and rows."
-msgstr "对于指定的列数和行数而言部件太小。"
+msgstr "对于指定的列数和行数而言小组件太小。"
 
 #: app/controllers/CControllerDashboardWidgetCheck.php:46
 #: app/controllers/CControllerDashboardWidgetConfigure.php:46
 #: app/controllers/CControllerDashboardWidgetEdit.php:47
 #: app/controllers/CControllerDashboardWidgetsSanitize.php:66
 msgid "Widget type is not supported in this context."
-msgstr "内容不适用此部件类型。"
+msgstr "小组件类型不适用此内容。"
 
 #: graphs.php:44 include/classes/widgets/CWidgetHelper.php:923
 #: include/classes/widgets/CWidgetHelper.php:956
@@ -21291,7 +21807,7 @@ msgstr "写"
 #: include/classes/core/CModuleManager.php:136
 #, c-format
 msgid "Wrong %1$s.php class name for module located at %2$s."
-msgstr ""
+msgstr "位于 %2$s 的模块的错误 %1$s.php 类名。"
 
 #: include/classes/core/CModuleManager.php:203
 #, c-format
@@ -21842,11 +22358,11 @@ msgstr "所有介质"
 
 #: include/classes/api/services/CItemGeneral.php:1877
 msgid "allowed count of dependency levels would be exceeded"
-msgstr ""
+msgstr "将超出允许的依赖层级数"
 
 #: include/classes/api/services/CItemGeneral.php:1888
 msgid "allowed count of dependent items would be exceeded"
-msgstr ""
+msgstr "将超出允许的依赖监控项数"
 
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
@@ -22084,19 +22600,19 @@ msgstr "可用于将“@2x”添加到 URL 以加载高清瓦片地图。"
 
 #: include/classes/api/services/CItemGeneral.php:2383
 msgid "cannot be a value map ID from another host or template"
-msgstr ""
+msgstr "不能是来自其他主机或模板的值映射 ID"
 
 #: include/classes/api/services/CItemGeneral.php:1942
 msgid "cannot be an item ID from another host or template"
-msgstr ""
+msgstr "不能是来自其他主机或模板的监控项 ID"
 
 #: include/classes/api/services/CItemGeneral.php:1956
 msgid "cannot be an item prototype ID from another LLD rule"
-msgstr ""
+msgstr "不能是来自另一个 LLD 规则的监控项原型 ID"
 
 #: include/classes/api/services/CItemGeneral.php:1941
 msgid "cannot be an item/item prototype ID from another host or template"
-msgstr ""
+msgstr "不能是来自另一个主机或模板的监控项/监控项原型 ID"
 
 #: include/classes/api/services/CItemGeneral.php:229
 msgid "cannot be changed"
@@ -22200,7 +22716,7 @@ msgstr "不能为空"
 
 #: include/classes/validators/CApiInputValidator.php:3560
 msgid "cannot be equal to zero without custom intervals"
-msgstr ""
+msgstr "自定义间隔不能等于零"
 
 #: include/classes/validators/CApiInputValidator.php:2982
 #, c-format
@@ -22215,7 +22731,7 @@ msgstr "无法指定参数“%1$s”的值"
 
 #: include/classes/api/services/CItemGeneral.php:1658
 msgid "cannot be the host interface ID from another host"
-msgstr ""
+msgstr "不能是另一主机的主机接口 ID"
 
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
@@ -22552,6 +23068,11 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "全局管家设置"
 
+#: app/views/popup.usergroupmapping.edit.php:82
+#, c-format
+msgid "group name must match %1$s group name"
+msgstr "组名必须与 %1$s 组名匹配"
+
 #: include/func.inc.php:594 jsLoader.php:224
 msgctxt "hour short"
 msgid "h"
@@ -22651,6 +23172,12 @@ msgstr "\"%1$s\"附近语法错误"
 msgid "incorrect usage of function \"%1$s\""
 msgstr "函数“%1$s”使用不正确"
 
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr "不正确的值"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert() - 将指定的字符或空格插入到字符串中，从字符串中的指定位置开始"
@@ -22686,6 +23213,10 @@ msgstr "无效的聚合方法"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8中无效的字节排序"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr "无效的数据类型"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"
@@ -22965,6 +23496,10 @@ msgstr "达到最大依赖项数"
 msgid "maximum number of dependency levels reached"
 msgstr "达到最大数量的依赖关系"
 
+#: app/views/popup.ldap.edit.php:123
+msgid "memberOf is a preferable way to configure groups because it is faster. Use groupOfNames if your LDAP server does not support memberOf or group filtering is required."
+msgstr "memberOf 是配置组的首选方法，因为它速度更快。如果您的 LDAP 服务器不支持 memberOf 或需要组过滤，请使用 groupOfNames。"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:784
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr "mid() - 返回从 start 指定的字符位置开始的 N 个字符的子字符串"
@@ -23051,11 +23586,11 @@ msgstr "必须至少包含一个特殊字符"
 
 #: include/classes/validators/CApiInputValidator.php:3818
 msgid "must have a polling interval not blocked by non-active interval periods"
-msgstr ""
+msgstr "必须有一个不被非活动间隔周期阻塞的轮询间隔"
 
 #: include/classes/validators/CApiInputValidator.php:3653
 msgid "must have at least one interval greater than 0"
-msgstr ""
+msgstr "必须至少有一个间隔大于 0"
 
 #: app/views/administration.authentication.edit.php:98
 #: app/views/administration.user.edit.php:150
@@ -23126,6 +23661,14 @@ msgstr "无权更改问题严重性"
 msgid "no permissions to close problems"
 msgstr "无权关闭问题"
 
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr "没有将起因问题转换为故障现象问题的权限"
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
+msgstr "没有将故障现象问题转换为起因问题的权限"
+
 #: include/classes/api/services/CConfiguration.php:168
 msgid "no permissions to create and edit maps"
 msgstr "没有创建和编辑拓扑图权限"
@@ -23148,7 +23691,7 @@ msgstr "nodata() - 在时间段 T 内没有接收到数据（1 - 真，0 - 假�
 
 #: include/classes/validators/CApiInputValidator.php:3681
 msgid "non-active intervals cannot fill the entire time"
-msgstr ""
+msgstr "非活动间隔不能填满整个时间"
 
 #: app/views/popup.tophosts.column.edit.php:113
 #: app/views/popup.tophosts.column.edit.php:125
@@ -23228,7 +23771,7 @@ msgstr "于"
 #: include/classes/validators/CApiInputValidator.php:2388
 #, c-format
 msgid "only one object can exist within the combinations of %1$s"
-msgstr ""
+msgstr "%1$s 的组合中只能存在一个对象"
 
 #: app/controllers/CControllerPopupItemTestSend.php:182
 msgid "only one time unit is allowed"
@@ -23496,6 +24039,10 @@ msgstr "stddevpop() - 群体标准差"
 msgid "stddevsamp() - Sample standard deviation"
 msgstr "stddevsamp() - 样本标准差"
 
+#: widgets/actionlog/views/widget.edit.php:49
+msgid "subject or body text"
+msgstr "标题或正文"
+
 #: app/views/popup.tophosts.column.edit.php:130 include/graphs.inc.php:84
 msgid "sum"
 msgstr "总和"
@@ -23553,7 +24100,7 @@ msgstr "需要主机接口 ID"
 #: include/classes/api/services/CItemGeneral.php:1668
 #, c-format
 msgid "the host interface ID of type \"%1$s\" is expected"
-msgstr ""
+msgstr "需要类型为“%1$s”的主机接口 ID"
 
 #: include/classes/validators/CApiInputValidator.php:2813
 msgid "the last new line feed is missing"
@@ -23802,7 +24349,7 @@ msgstr "这个版本已经不被支持"
 #: include/classes/validators/CApiInputValidator.php:3626
 #, c-format
 msgid "update interval \"%1$s\" is longer than period \"%2$s\""
-msgstr ""
+msgstr "更新间隔“%1$s”比周期“%2$s”长"
 
 #: include/classes/validators/CApiInputValidator.php:509
 msgid "uppercase identifier expected"
@@ -24008,6 +24555,10 @@ msgstr "通过"
 msgctxt "week short"
 msgid "w"
 msgstr "周"
+
+#: app/views/popup.usergroupmapping.edit.php:83
+msgid "wildcard patterns with '*' may be used"
+msgstr "可以使用带有“*”的通配符模式"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

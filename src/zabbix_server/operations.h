@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@
 #define ZABBIX_OPERATIONS_H
 
 #include "zbxcacheconfig.h"
-
-extern int	CONFIG_TIMEOUT;
 
 void	op_template_add(const ZBX_DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids);
 void	op_template_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *del_templateids);

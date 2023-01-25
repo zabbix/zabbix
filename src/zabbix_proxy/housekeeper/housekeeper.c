@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
-
-extern unsigned char			program_type;
 
 static int	hk_period;
 
@@ -66,7 +64,7 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 		goto rollback;
 
 	ZBX_STR2UINT64(lastid, row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect("select min(clock) from %s",
 			table);
@@ -75,7 +73,7 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 		goto rollback;
 
 	minclock = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect("select max(id) from %s",
 			table);
@@ -84,7 +82,7 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 		goto rollback;
 
 	ZBX_STR2UINT64(maxid, row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	records = DBexecute(
 			"delete from %s"
@@ -101,7 +99,7 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 
 	return records;
 rollback:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	DBrollback();
 
@@ -152,7 +150,10 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	int			server_num = info->server_num;
 	int			process_num = info->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zbx_thread_proxy_housekeeper_args	*housekeeper_args_in = (zbx_thread_proxy_housekeeper_args *)
+			((((zbx_thread_args_t *)args))->args);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -171,7 +172,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d hour(s)", CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 
-	zbx_rtc_subscribe(&rtc, process_type, process_num);
+	zbx_rtc_subscribe(process_type, process_num, housekeeper_args_in->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -214,7 +215,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		time_now = zbx_time();
 		time_slept = time_now - sec;
-		zbx_update_env(time_now);
+		zbx_update_env(get_process_type_string(process_type), time_now);
 
 		hk_period = get_housekeeper_period(time_slept);
 

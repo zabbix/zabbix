@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,24 +31,30 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		$themes[] = THEME_DEFAULT;
 
 		$fields = [
-			'userid' =>			'fatal|required|db users.userid',
-			'password1' =>		'string',
-			'password2' =>		'string',
-			'medias' =>			'array',
-			'lang' =>			'db users.lang|in '.implode(',', $locales),
-			'timezone' =>		'db users.timezone|in '.implode(',', $this->timezones),
-			'theme' =>			'db users.theme|in '.implode(',', $themes),
-			'autologin' =>		'db users.autologin|in 0,1',
-			'autologout' =>		'db users.autologout|not_empty',
-			'refresh' =>		'db users.refresh|not_empty',
-			'rows_per_page' =>	'db users.rows_per_page',
-			'url' =>			'db users.url',
-			'messages' =>		'array',
-			'form_refresh' =>	'int32'
+			'userid' =>				'fatal|required|db users.userid',
+			'current_password' =>	'string',
+			'password1' =>			'string',
+			'password2' =>			'string',
+			'medias' =>				'array',
+			'lang' =>				'db users.lang|in '.implode(',', $locales),
+			'timezone' =>			'db users.timezone|in '.implode(',', $this->timezones),
+			'theme' =>				'db users.theme|in '.implode(',', $themes),
+			'autologin' =>			'db users.autologin|in 0,1',
+			'autologout' =>			'db users.autologout|not_empty',
+			'refresh' =>			'db users.refresh|not_empty',
+			'rows_per_page' =>		'db users.rows_per_page',
+			'url' =>				'db users.url',
+			'messages' =>			'array',
+			'form_refresh' =>		'int32'
 		];
 
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
+
+		if ($ret && !$this->validateCurrentPassword()) {
+			$error = self::VALIDATION_ERROR;
+			$ret = false;
+		}
 
 		if ($ret && !$this->validatePassword()) {
 			$error = self::VALIDATION_ERROR;
@@ -89,23 +95,18 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		]);
 		$user['userid'] = CWebUser::$data['userid'];
 
+		if ($this->getInput('current_password', '') !== ''
+				|| ($this->hasInput('current_password') && CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL)) {
+			$user['current_passwd'] = $this->getInput('current_password');
+		}
+
 		if ($this->getInput('password1', '') !== ''
-				|| ($this->hasInput('password1') && $this->auth_type == ZBX_AUTH_INTERNAL)) {
+				|| ($this->hasInput('password1') && CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL)) {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$user['medias'] = [];
-
-			foreach ($this->getInput('medias', []) as $media) {
-				$user['medias'][] = [
-					'mediatypeid' => $media['mediatypeid'],
-					'sendto' => $media['sendto'],
-					'active' => $media['active'],
-					'severity' => $media['severity'],
-					'period' => $media['period']
-				];
-			}
+		if (CWebUser::$data['userdirectoryid'] == 0 && CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+			$user['medias'] = $this->getInputUserMedia();
 		}
 
 		DBstart();
@@ -114,6 +115,9 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		$result = DBend($result);
 
 		if ($result) {
+			if (array_key_exists('passwd', $user)) {
+				redirect('index.php');
+			}
 			$response = new CControllerResponseRedirect(CMenuHelper::getFirstUrl());
 			CMessageHelper::setSuccessTitle(_('User updated'));
 		}

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -249,6 +249,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '2',
 							'community' => '{$SNMP_COMMUNITY}',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3504,6 +3505,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '1',
 							'community' => 'public',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3525,6 +3527,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '1',
 							'community' => 'public',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3546,6 +3549,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '2',
 							'community' => 'public',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3567,6 +3571,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '2',
 							'community' => 'public',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3594,7 +3599,8 @@ class CImportDataAdapterTest extends TestCase {
 							'authpassphrase' => 'test',
 							'privprotocol' => '0',
 							'privpassphrase' => 'test',
-							'community' => ''
+							'community' => '',
+							'max_repetitions' => '10'
 						],
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -3615,7 +3621,8 @@ class CImportDataAdapterTest extends TestCase {
 							'authpassphrase' => 'test',
 							'privprotocol' => '0',
 							'privpassphrase' => 'test',
-							'community' => ''
+							'community' => '',
+							'max_repetitions' => '10'
 						],
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -3636,7 +3643,8 @@ class CImportDataAdapterTest extends TestCase {
 							'authpassphrase' => 'test',
 							'privprotocol' => '0',
 							'privpassphrase' => 'test',
-							'community' => ''
+							'community' => '',
+							'max_repetitions' => '10'
 						],
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -4298,7 +4306,6 @@ class CImportDataAdapterTest extends TestCase {
 		$source = (new CConstantImportConverter($schema))->convert($source);
 		$source = (new CDefaultImportConverter($schema))->convert($source);
 		$source = (new CImportDataNormalizer($schema))->normalize($source);
-		$source = (new CTransformImportConverter($schema))->convert($source);
 
 		$adapter = new CImportDataAdapter();
 		$adapter->load($source);

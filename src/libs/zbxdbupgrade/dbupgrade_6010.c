@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
-
-extern unsigned char	program_type;
+#include "zbxavailability.h"
+#include "zbx_host_constants.h"
 
 /*
  * 6.2 development database patches
@@ -34,7 +34,7 @@ extern unsigned char	program_type;
 static int	DBpatch_6010000(void)
 {
 #define ZBX_MD5_SIZE	32
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update users set passwd='' where length(passwd)=%d", ZBX_MD5_SIZE))
@@ -84,7 +84,7 @@ static int	DBpatch_6010002(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -135,7 +135,7 @@ static int	DBpatch_6010005(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -236,7 +236,7 @@ static int	DBpatch_6010013(void)
 		zbx_free(base_dn_esc);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_DB_OK > rc)
 		return FAIL;
@@ -322,7 +322,7 @@ static int	DBpatch_6010023(void)
 		ZBX_STR2UINT64(hostid, row[0]);
 		zbx_db_insert_add_values(&insert, hostid, INTERFACE_AVAILABLE_UNKNOWN);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != insert.rows.values_num)
 		ret = zbx_db_insert_execute(&insert);
@@ -349,7 +349,7 @@ static int	DBpatch_6010024(void)
 	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
 	char		*out = NULL;
 
-	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER != DBget_program_type())
 		return SUCCEED;
 
 	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -391,7 +391,7 @@ static int	DBpatch_6010024(void)
 
 		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -416,7 +416,7 @@ static int	DBpatch_6010025(void)
 	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
 	char		*out = NULL;
 
-	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER != DBget_program_type())
 		return SUCCEED;
 
 	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -460,7 +460,7 @@ static int	DBpatch_6010025(void)
 
 		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -484,7 +484,7 @@ static int	DBpatch_6010025(void)
 
 static int	DBpatch_6010026(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.auditlog.filter.action' and value_int=-1"))
@@ -495,7 +495,7 @@ static int	DBpatch_6010026(void)
 
 static int	DBpatch_6010028(void)
 {
-	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type()))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute(
@@ -663,7 +663,7 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), groupid, permission,
 					hstgrps->values[i]->newgroupid);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update hosts_groups"
@@ -703,7 +703,7 @@ out:
 		ZBX_STR2UINT64(groupid, row[0]);							\
 		zbx_vector_uint64_append(&host_groupids, groupid);					\
 	}												\
-	DBfree_result(result);
+	zbx_db_free_result(result);
 #define ADD_GROUPIDS_FROM(table) ADD_GROUPIDS_FROM_FIELD(table, "groupid")
 
 static int	DBpatch_6010033_split_groups(void)
@@ -734,7 +734,7 @@ static int	DBpatch_6010033_split_groups(void)
 
 		zbx_vector_hstgrp_append(&hstgrps, hstgrp);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect(
 			"select distinct g.groupid"
@@ -748,7 +748,7 @@ static int	DBpatch_6010033_split_groups(void)
 		ZBX_STR2UINT64(groupid, row[0]);
 		zbx_vector_uint64_append(&host_groupids, groupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ADD_GROUPIDS_FROM("group_prototype");
 	ADD_GROUPIDS_FROM_FIELD("config", "discovery_groupid");
@@ -767,7 +767,7 @@ static int	DBpatch_6010033_split_groups(void)
 		ZBX_STR2UINT64(groupid, row[0]);
 		zbx_vector_uint64_append(&host_groupids, groupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* 3 - SYSMAP_ELEMENT_TYPE_HOST_GROUP */
 	result = DBselect("select distinct elementid from sysmaps_elements where elementtype=3");
@@ -777,7 +777,7 @@ static int	DBpatch_6010033_split_groups(void)
 		ZBX_STR2UINT64(groupid, row[0]);
 		zbx_vector_uint64_append(&host_groupids, groupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect(
 			"select distinct g.groupid"
@@ -791,7 +791,7 @@ static int	DBpatch_6010033_split_groups(void)
 		ZBX_STR2UINT64(groupid, row[0]);
 		zbx_vector_uint64_append(&template_groupids, groupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(&template_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_sort(&host_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -837,7 +837,7 @@ out:
 
 static int	DBpatch_6010033(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return DBpatch_6010033_split_groups();
@@ -854,7 +854,7 @@ static int	DBpatch_6010034(void)
 			"web.groups.filter.active", "web.hostgroups.filter.active",
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
@@ -868,7 +868,7 @@ static int	DBpatch_6010034(void)
 
 static int	DBpatch_6010035(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute(
@@ -887,7 +887,7 @@ static int	DBpatch_6010035(void)
 
 static int	DBpatch_6010036(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute(

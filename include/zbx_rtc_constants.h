@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,8 @@
 #define ZBX_RTC_USER_PARAMETERS_RELOAD		17
 #define ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD	18
 #define ZBX_RTC_PROXYPOLLER_PROCESS		19
+#define ZBX_RTC_PROF_ENABLE			20
+#define ZBX_RTC_PROF_DISABLE			21
 
 /* internal rtc messages */
 #define ZBX_RTC_SUBSCRIBE			100
@@ -47,5 +49,23 @@
 #define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
 
 #define ZBX_IPC_RTC_MAX				9999
+
+/* runtime control options */
+#define ZBX_CONFIG_CACHE_RELOAD		"config_cache_reload"
+#define ZBX_SERVICE_CACHE_RELOAD	"service_cache_reload"
+#define ZBX_SECRETS_RELOAD		"secrets_reload"
+#define ZBX_HOUSEKEEPER_EXECUTE		"housekeeper_execute"
+#define ZBX_LOG_LEVEL_INCREASE		"log_level_increase"
+#define ZBX_LOG_LEVEL_DECREASE		"log_level_decrease"
+#define ZBX_SNMP_CACHE_RELOAD		"snmp_cache_reload"
+#define ZBX_DIAGINFO			"diaginfo"
+#define ZBX_TRIGGER_HOUSEKEEPER_EXECUTE "trigger_housekeeper_execute"
+#define ZBX_HA_STATUS			"ha_status"
+#define ZBX_HA_REMOVE_NODE		"ha_remove_node"
+#define ZBX_HA_SET_FAILOVER_DELAY	"ha_set_failover_delay"
+#define ZBX_USER_PARAMETERS_RELOAD	"userparameter_reload"
+#define ZBX_PROXY_CONFIG_CACHE_RELOAD	"proxy_config_cache_reload"
+#define ZBX_PROF_ENABLE			"prof_enable"
+#define ZBX_PROF_DISABLE		"prof_disable"
 
 #endif

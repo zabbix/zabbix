@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,14 +20,13 @@
 #include "dbupgrade.h"
 
 #include "zbxdbhigh.h"
+#include "zbx_host_constants.h"
 
 /*
  * 4.4 development database patches
  */
 
 #ifndef HAVE_SQLITE3
-
-extern unsigned char	program_type;
 
 static int	DBpatch_4030000(void)
 {
@@ -112,7 +111,7 @@ static int	DBpatch_4030009(void)
 
 static int	DBpatch_4030010(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	/* 8 - SCREEN_RESOURCE_SCREEN */
@@ -164,7 +163,7 @@ static int	DBpatch_4030016(void)
 			"alarm_disaster"
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i++)
@@ -199,7 +198,7 @@ static int	DBpatch_4030018(void)
 			"web.problem.filter.show_latest_values", "web.problem.filter.show_opdata"
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
@@ -213,7 +212,7 @@ static int	DBpatch_4030018(void)
 
 static int	DBpatch_4030019(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute(
@@ -245,7 +244,7 @@ static int	DBpatch_4030020(void)
 	zbx_uint32_t	id, next_id = 0;
 	zbx_uint64_t	last_widgetid = 0, widgetid, fieldid;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	result = DBselect("SELECT widgetid,widget_fieldid,name,value_str"
@@ -321,7 +320,7 @@ static int	DBpatch_4030020(void)
 
 	zbx_free(token);
 	zbx_free(value);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 #undef FIELD_LEN
 	return ret;
@@ -371,7 +370,7 @@ static int	DBpatch_4030025(void)
 
 static int	DBpatch_4030026(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute("insert into config_autoreg_tls (autoreg_tlsid) values (1)"))
@@ -388,7 +387,7 @@ static int	DBpatch_4030027(void)
 	char		*exec_params = NULL, *exec_params_esc;
 	size_t		exec_params_alloc = 0;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	/* type : 1 - MEDIA_TYPE_EXEC, 3 - MEDIA_TYPE_JABBER, 100 - MEDIA_TYPE_EZ_TEXTING */
@@ -426,7 +425,7 @@ static int	DBpatch_4030027(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(exec_params);
 
 	return ret;
@@ -451,7 +450,7 @@ static int	DBpatch_4030030(void)
 
 static int	DBpatch_4030031(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute(

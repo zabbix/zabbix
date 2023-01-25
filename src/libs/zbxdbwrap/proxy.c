@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,8 @@
 #include "zbxip.h"
 #include "version.h"
 #include "zbxversion.h"
+#include "zbx_host_constants.h"
+#include "zbx_item_constants.h"
 
 extern char	*CONFIG_SERVER;
 
@@ -80,7 +82,8 @@ typedef struct
 }
 zbx_history_table_t;
 
-typedef int	(*zbx_client_item_validator_t)(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error);
+typedef int	(*zbx_client_item_validator_t)(zbx_history_recv_item_t *item, zbx_socket_t *sock, void *args,
+		char **error);
 
 typedef struct
 {
@@ -226,7 +229,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
  *     FAIL    - otherwise                                                    *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *sock, char **error)
+static int	zbx_host_check_permissions(const zbx_history_recv_host_t *host, const zbx_socket_t *sock, char **error)
 {
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
@@ -347,7 +350,8 @@ int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *pro
  *                          Value: ZBX_SEND_RESPONSE or                       *
  *                          ZBX_DO_NOT_SEND_RESPONSE                          *
  *     req            - [IN] request, included into error message             *
- *     zbx_config_tls - [IN] configured requirements to allow access          *
+ *     config_tls     - [IN] configured requirements to allow access          *
+ *     config_timeout - [IN]                                                  *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - access is allowed                                            *
@@ -355,7 +359,7 @@ int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *pro
  *                                                                            *
  ******************************************************************************/
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	char	*msg = NULL;
 
@@ -365,12 +369,12 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 				zbx_socket_strerror());
 
 		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_proxy_response(sock, FAIL, "connection is not allowed", CONFIG_TIMEOUT);
+			zbx_send_proxy_response(sock, FAIL, "connection is not allowed", config_timeout);
 
 		return FAIL;
 	}
 
-	if (0 == (zbx_config_tls->accept_modes & sock->connection_type))
+	if (0 == (config_tls->accept_modes & sock->connection_type))
 	{
 		msg = zbx_dsprintf(NULL, "%s over connection of type \"%s\" is not allowed", req,
 				zbx_tcp_connection_type_name(sock->connection_type));
@@ -379,7 +383,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 				msg, sock->peer);
 
 		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_proxy_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+			zbx_send_proxy_response(sock, FAIL, msg, config_timeout);
 
 		zbx_free(msg);
 		return FAIL;
@@ -388,8 +392,8 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
-		if (SUCCEED == zbx_check_server_issuer_subject(sock, zbx_config_tls->server_cert_issuer,
-				zbx_config_tls->server_cert_subject, &msg))
+		if (SUCCEED == zbx_check_server_issuer_subject(sock, config_tls->server_cert_issuer,
+				config_tls->server_cert_subject, &msg))
 		{
 			return SUCCEED;
 		}
@@ -397,7 +401,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: %s", req, sock->peer, msg);
 
 		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_proxy_response(sock, FAIL, "certificate issuer or subject mismatch", CONFIG_TIMEOUT);
+			zbx_send_proxy_response(sock, FAIL, "certificate issuer or subject mismatch", config_timeout);
 
 		zbx_free(msg);
 		return FAIL;
@@ -411,7 +415,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 				" configured for proxy communication with server", req, sock->peer);
 
 		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_proxy_response(sock, FAIL, "wrong PSK used", CONFIG_TIMEOUT);
+			zbx_send_proxy_response(sock, FAIL, "wrong PSK used", config_timeout);
 
 		return FAIL;
 	}
@@ -562,7 +566,7 @@ static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zb
 		*lastid = 0;
 	else
 		ZBX_STR2UINT64(*lastid, row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64,	__func__, *lastid);
 }
@@ -586,7 +590,7 @@ static void	proxy_set_lastid(const char *table_name, const char *lastidfield, co
 		DBexecute("update ids set nextid=" ZBX_FS_UI64 " where table_name='%s' and field_name='%s'",
 				lastid, table_name, lastidfield);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -624,7 +628,7 @@ int	proxy_get_delay(const zbx_uint64_t lastid)
 	if (NULL != (row = DBfetch(result)))
 		ts = (int)time(NULL) - atoi(row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -670,7 +674,7 @@ try_again:
 			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
 			if (0 < retries--)
 			{
-				DBfree_result(result);
+				zbx_db_free_result(result);
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
 						" Waiting " ZBX_FS_DBL " sec, retrying.",
 						__func__, *lastid - *id - 1,
@@ -711,7 +715,7 @@ try_again:
 
 		*id = *lastid;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_MAX_HRECORDS == *records_num - records_num_last)
 		*more = ZBX_PROXY_DATA_MORE;
@@ -799,7 +803,7 @@ try_again:
 				if (0 >= total_retries--)
 					break;
 
-				DBfree_result(result);
+				zbx_db_free_result(result);
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
 						" Waiting " ZBX_FS_DBL " sec, retrying.",
 						__func__, id - lastid - 1,
@@ -870,7 +874,7 @@ try_again:
 
 		lastid = id;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_MAX_HRECORDS != data_num && 1 == retries)
 		*more = ZBX_PROXY_DATA_DONE;
@@ -1158,8 +1162,8 @@ int	proxy_get_host_active_availability(struct zbx_json *j)
  *           manager.                                                         *
  *                                                                            *
  ******************************************************************************/
-static void	process_item_value(const DC_ITEM *item, AGENT_RESULT *result, zbx_timespec_t *ts, int *h_num,
-		char *error)
+static void	process_item_value(const zbx_history_recv_item_t *item, AGENT_RESULT *result, zbx_timespec_t *ts,
+		int *h_num, char *error)
 {
 	if (0 == item->host.proxy_hostid)
 	{
@@ -1194,7 +1198,7 @@ static void	process_item_value(const DC_ITEM *item, AGENT_RESULT *result, zbx_ti
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, int *h_num)
+static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_value_t *value, int *h_num)
 {
 	if (ITEM_STATUS_ACTIVE != item->status)
 		return FAIL;
@@ -1219,7 +1223,8 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 	if (ITEM_STATE_NOTSUPPORTED == value->state ||
 			(NULL != value->value && 0 == strcmp(value->value, ZBX_NOTSUPPORTED)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s", item->host.host, item->key_orig, value->value);
+		zabbix_log(LOG_LEVEL_DEBUG, "hostid:" ZBX_FS_UI64 " item %s error: %s", item->host.hostid,
+				item->key_orig, value->value);
 
 		item->state = ITEM_STATE_NOTSUPPORTED;
 		process_item_value(item, NULL, &value->ts, h_num, value->value);
@@ -1296,7 +1301,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
  * Return value: the number of processed values                               *
  *                                                                            *
  ******************************************************************************/
-int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num,
+int	process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes, size_t values_num,
 		zbx_proxy_suppress_t *nodata_win)
 {
 	size_t	i;
@@ -1314,7 +1319,6 @@ int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcode
 		if (SUCCEED != process_history_data_value(&items[i], &values[i], &history_num))
 		{
 			/* clean failed items to avoid updating their runtime data */
-			DCconfig_clean_items(&items[i], &errcodes[i], 1);
 			errcodes[i] = FAIL;
 			continue;
 		}
@@ -1732,7 +1736,7 @@ out:
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error)
+static int	proxy_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *sock, void *args, char **error)
 {
 	zbx_uint64_t	*proxyid = (zbx_uint64_t *)args;
 
@@ -1781,7 +1785,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	const char		*pnext = NULL;
 	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
 	double			sec;
-	DC_ITEM			*items;
+	zbx_history_recv_item_t	*items;
 	char			*error = NULL;
 	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX], last_valueid = 0;
 	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
@@ -1789,7 +1793,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	items = (DC_ITEM *)zbx_calloc(NULL, 1, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
+	items = (zbx_history_recv_item_t *)zbx_malloc(NULL, sizeof(zbx_history_recv_item_t) * ZBX_HISTORY_VALUES_MAX);
 	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * ZBX_HISTORY_VALUES_MAX);
 
 	sec = zbx_time();
@@ -1797,7 +1801,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	while (SUCCEED == parse_history_data_by_itemids(jp_data, &pnext, values, itemids, &values_num, &read_num,
 			&unique_shift, &error) && 0 != values_num)
 	{
-		DCconfig_get_items_by_itemids_partial(items, itemids, errcodes, values_num, mode);
+		zbx_dc_config_history_recv_get_items_by_itemids(items, itemids, errcodes, (size_t)values_num, mode);
 
 		for (i = 0; i < values_num; i++)
 		{
@@ -1807,7 +1811,6 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 			/* check and discard if duplicate data */
 			if (NULL != session && 0 != values[i].id && values[i].id <= session->last_id)
 			{
-				DCconfig_clean_items(&items[i], &errcodes[i], 1);
 				errcodes[i] = FAIL;
 				continue;
 			}
@@ -1820,7 +1823,6 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 					zbx_free(error);
 				}
 
-				DCconfig_clean_items(&items[i], &errcodes[i], 1);
 				errcodes[i] = FAIL;
 			}
 		}
@@ -1831,7 +1833,6 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 
 		last_valueid = values[values_num - 1].id;
 
-		DCconfig_clean_items(items, errcodes, values_num);
 		zbx_agent_values_clean(values, values_num);
 
 		if (NULL == pnext)
@@ -1882,7 +1883,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-static int	agent_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error)
+static int	agent_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *sock, void *args, char **error)
 {
 	zbx_host_rights_t	*rights = (zbx_host_rights_t *)args;
 
@@ -1914,7 +1915,7 @@ static int	agent_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error)
+static int	sender_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *sock, void *args, char **error)
 {
 	zbx_host_rights_t	*rights;
 	char			key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
@@ -1949,8 +1950,7 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 		int	ret;
 
 		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
-				&allowed_peers, MACRO_TYPE_ALLOWED_HOSTS, NULL, 0);
+		zbx_substitute_simple_macros_allowed_hosts(item, &allowed_peers);
 		ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
 		zbx_free(allowed_peers);
 
@@ -1982,7 +1982,7 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 	const char		*pnext = NULL;
 	char			*error = NULL;
 	zbx_host_key_t		*hostkeys;
-	DC_ITEM			*items;
+	zbx_history_recv_item_t	*items;
 	zbx_session_t		*session = NULL;
 	zbx_uint64_t		last_hostid = 0;
 	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
@@ -1991,14 +1991,14 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 
 	sec = zbx_time();
 
-	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
+	items = (zbx_history_recv_item_t *)zbx_malloc(NULL, sizeof(zbx_history_recv_item_t) * ZBX_HISTORY_VALUES_MAX);
 	hostkeys = (zbx_host_key_t *)zbx_malloc(NULL, sizeof(zbx_host_key_t) * ZBX_HISTORY_VALUES_MAX);
 	memset(hostkeys, 0, sizeof(zbx_host_key_t) * ZBX_HISTORY_VALUES_MAX);
 
 	while (SUCCEED == parse_history_data(jp_data, &pnext, values, hostkeys, &values_num, &read_num,
 			&unique_shift) && 0 != values_num)
 	{
-		DCconfig_get_items_by_keys(items, hostkeys, errcodes, values_num);
+		zbx_dc_config_history_recv_get_items_by_keys(items, hostkeys, errcodes, (size_t)values_num);
 
 		for (i = 0; i < values_num; i++)
 		{
@@ -2023,7 +2023,6 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 			/* check and discard if duplicate data */
 			if (NULL != session && 0 != values[i].id && values[i].id <= session->last_id)
 			{
-				DCconfig_clean_items(&items[i], &errcodes[i], 1);
 				errcodes[i] = FAIL;
 				continue;
 			}
@@ -2041,7 +2040,6 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 							(NULL == items[i].key) ? items[i].key_orig : items[i].key);
 				}
 
-				DCconfig_clean_items(&items[i], &errcodes[i], 1);
 				errcodes[i] = FAIL;
 			}
 
@@ -2052,7 +2050,6 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 		processed_num += process_history_data(items, values, errcodes, values_num, NULL);
 		total_num += read_num;
 
-		DCconfig_clean_items(items, errcodes, values_num);
 		zbx_agent_values_clean(values, values_num);
 
 		if (NULL == pnext)
@@ -2327,7 +2324,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 				dchecks++;
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		if (0 != i)
 		{
@@ -2552,7 +2549,7 @@ json_parse_error:
 			ZBX_STR2UINT64(unique_dcheckid, row[0]);
 		else
 			unique_dcheckid = 0;
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		for (j = 0; j < drule->ips.values_num && SUCCEED == ret2; j++)
 		{
 			int	processed_num = 0;
@@ -2769,7 +2766,7 @@ int	proxy_get_history_count(void)
 	if (NULL != (row = DBfetch(result)))
 		count = atoi(row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	DBclose();
 
@@ -2785,9 +2782,9 @@ int	proxy_get_history_count(void)
  ******************************************************************************/
 static void	process_tasks_contents(struct zbx_json_parse *jp_tasks)
 {
-	zbx_vector_ptr_t	tasks;
+	zbx_vector_tm_task_t	tasks;
 
-	zbx_vector_ptr_create(&tasks);
+	zbx_vector_tm_task_create(&tasks);
 
 	zbx_tm_json_deserialize_tasks(jp_tasks, &tasks);
 
@@ -2795,8 +2792,8 @@ static void	process_tasks_contents(struct zbx_json_parse *jp_tasks)
 	zbx_tm_save_tasks(&tasks);
 	DBcommit();
 
-	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
-	zbx_vector_ptr_destroy(&tasks);
+	zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
+	zbx_vector_tm_task_destroy(&tasks);
 }
 
 /******************************************************************************

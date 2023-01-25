@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,9 +110,7 @@ $available_js = [
 	'items.js' => 'pages/',
 	'report2.js' => 'pages/',
 	'report4.js' => 'pages/',
-	'setup.js' => 'pages/',
-	'popup.condition.common.js' => 'pages/',
-	'popup.operation.common.js' => 'pages/'
+	'setup.js' => 'pages/'
 ];
 
 $translate_strings = [
@@ -195,6 +193,9 @@ $translate_strings = [
 		'Success message' => _('Success message'),
 		'Error message' => _('Error message'),
 		'Warning message' => _('Warning message')
+	],
+	'inputsecret.js' => [
+		'value' => _('value')
 	],
 	'class.calendar.js' => [
 		'S_CALENDAR' => _('Calendar'),
@@ -292,7 +293,8 @@ $translate_strings = [
 	'hostmacrosmanager.js' => [
 		'Change' => _x('Change', 'verb'),
 		'Remove' => _('Remove'),
-		'Revert' => _('Revert')
+		'Revert' => _('Revert'),
+		'value' => _('value')
 	],
 	'multilineinput.js' => [
 		'S_N_CHAR_COUNT' => _('%1$s characters'),
@@ -320,7 +322,7 @@ $translate_strings = [
 	'menupopup.js' => [
 		'500 latest values' => _('500 latest values'),
 		'Actions' => _('Actions'),
-		'Acknowledge' => _('Acknowledge'),
+		'Update problem' => _('Update problem'),
 		'Configuration' => _('Configuration'),
 		'Clone' => _('Clone'),
 		'Create new' => _('Create new'),
@@ -355,6 +357,9 @@ $translate_strings = [
 		'Last month graph' => _('Last month graph'),
 		'Last week graph' => _('Last week graph'),
 		'Problems' => _('Problems'),
+		'Problem' => _('Problem'),
+		'Mark as cause' => _('Mark as cause'),
+		'Mark selected as symptoms' => _('Mark selected as symptoms'),
 		'Scripts' => _('Scripts'),
 		'Submap' => _('Submap'),
 		'S_TRIGGER' => _('Trigger'),
@@ -393,9 +398,6 @@ $translate_strings = [
 	'macrovalue.js' => [
 		'Set new value' => _('Set new value'),
 		'value' => _('value')
-	],
-	'popup.condition.common.js' => [
-		'Services' => _('Services')
 	]
 ];
 

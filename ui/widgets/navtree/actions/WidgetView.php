@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -288,6 +288,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'object' => EVENT_OBJECT_TRIGGER,
 					'objectids' => array_keys($problems_per_trigger),
 					'severities' => range($severity_min, TRIGGER_SEVERITY_COUNT - 1),
+					'symptom' => false,
 					'preservekeys' => true
 				]);
 

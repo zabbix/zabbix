@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_host_constants.h"
 
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation)
 {
@@ -94,7 +96,7 @@ static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrid
 		tag = zbx_db_tag_create(row[1], row[2]);
 		zbx_vector_db_tag_ptr_append(&op->tags, tag);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -153,7 +155,7 @@ static void	lld_override_operations_load_templates(const zbx_vector_uint64_t *ov
 		ZBX_STR2UINT64(templateid, row[1]);
 		zbx_vector_uint64_append(&op->templateids, templateid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -247,7 +249,7 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 
 		object_mask |= (1 << override_operation->operationtype);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != (object_mask & ((1 << ZBX_LLD_OVERRIDE_OP_OBJECT_HOST) | (1 << ZBX_LLD_OVERRIDE_OP_OBJECT_TRIGGER) |
 			(1 << ZBX_LLD_OVERRIDE_OP_OBJECT_ITEM))))

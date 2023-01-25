@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -109,24 +109,6 @@ class testUsers extends CAPITest {
 			// Check user group.
 			[
 				'user' => [
-					'username' => 'User without group parameter',
-					'roleid' => 1,
-					'passwd' => 'zabbix'
-				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "usrgrps" is missing.'
-			],
-			[
-				'user' => [
-					'username' => 'User without group',
-					'roleid' => 1,
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/usrgrps": cannot be empty.'
-			],
-			[
-				'user' => [
 					'username' => 'Group unexpected parameter',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
@@ -191,19 +173,6 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
-			],
-			// Roleid is missing.
-			[
-				'user' => [
-					[
-						'username' => 'API user create 1',
-						'passwd' => 'zabbix',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "roleid" is missing.'
 			],
 			// Roleid is as a string.
 			[
@@ -277,6 +246,16 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			[
+				'user' => [
+					[
+						'username' => 'API user with non-existing userdirectory',
+						'passwd' => 'Z@bb1x1234',
+						'userdirectoryid' => 1234
+					]
+				],
+				'expected_error' => 'User directory with ID "1234" is not available.'
 			]
 		];
 	}
@@ -410,6 +389,22 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => 'Not allowed to set password for user "guest".'
 			],
+			// Check super admin type user password change for himself/herself.
+			[
+				'user' => [[
+					'userid' => '1',
+					'passwd' => 'Z@bb1x1234'
+				]],
+				'expected_error' => 'Current password is mandatory.'
+			],
+			[
+				'user' => [[
+					'userid' => '1',
+					'current_passwd' => 'test1234',
+					'passwd' => 'test1234'
+				]],
+				'expected_error' => 'Incorrect current password.'
+			],
 			// Check user username.
 			[
 				'user' => [[
@@ -455,15 +450,6 @@ class testUsers extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/username": value is too long.'
 			],
 			// Check user group.
-			[
-				'user' => [[
-					'userid' => '9',
-					'username' => 'User without group',
-					'usrgrps' => [
-					]
-				]],
-				'expected_error' => 'Invalid parameter "/1/usrgrps": cannot be empty.'
-			],
 			[
 				'user' => [[
 					'userid' => '9',
@@ -600,6 +586,20 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			// Check super admin type user password change for another super admin type user.
+			[
+				'user' => [
+					[
+						'userid' => '16',
+						'username' => 'api-user-for-password-super-admin',
+						'passwd' => 'GreatNewP',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						]
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -633,6 +633,10 @@ class testUsers extends CAPITest {
 				$this->assertEquals($dbRowUser['theme'], 'default');
 				$this->assertEquals($dbRowUser['url'], '');
 
+				if ($id == '16') {
+					$this->assertEquals(1, password_verify('GreatNewP', $dbRowUser['passwd']));
+				}
+
 				$this->assertEquals(1, CDBHelper::getCount('select * from users_groups where userid='.zbx_dbstr($id).
 						' and usrgrpid='.zbx_dbstr($users[$key]['usrgrps'][0]['usrgrpid']))
 				);
@@ -657,6 +661,52 @@ class testUsers extends CAPITest {
 				$this->assertEquals($oldHashUser, CDBHelper::getHash($sqlUser));
 			}
 		}
+	}
+
+		public static function user_password() {
+		return [
+			[
+				'method' => 'user.update',
+				'login' => ['user' => 'api-user-for-password-user', 'password' => 'test1234u'],
+				'user' => [
+					'userid' => '17',
+					'passwd' => 'trytochangep',
+					'username' => 'api-user-for-password-user'
+				],
+				'expected_error' => 'Current password is mandatory.'
+			],
+			[
+				'method' => 'user.update',
+				'login' => ['user' => 'api-user-for-password-user', 'password' => 'test1234u'],
+				'user' => [
+					'userid' => '17',
+					'passwd' => 'TryToChangeP',
+					'current_passwd' => 'IncorrectCurrentP',
+					'username' => 'api-user-for-password-user'
+				],
+				'expected_error' => 'Incorrect current password.'
+			],
+			// Successfully user update.
+			[
+				'method' => 'user.update',
+				'login' => ['user' => 'api-user-for-password-user', 'password' => 'test1234u'],
+				'user' => [
+					'userid' => '17',
+					'passwd' => 'AcceptableNewP',
+					'current_passwd' => 'test1234u',
+					'username' => 'api-user-for-password-user'
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	* @dataProvider user_password
+	*/
+	public function testUser_UpdatePassword($method, $login, $user, $expected_error) {
+		$this->authorize($login['user'], $login['password']);
+		$this->call($method, $user, $expected_error);
 	}
 
 	public static function user_properties() {
@@ -878,17 +928,6 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/roleid": a number is expected.'
-			],
-			[
-				'user' => [
-					'username' => 'User with invalid roleid',
-					'roleid' => 0,
-					'passwd' => 'Z@bb1x1234',
-					'usrgrps' => [
-						['usrgrpid' => '7']
-					]
-				],
-				'expected_error' => 'User role with ID "0" is not available.'
 			],
 			[
 				'user' => [
@@ -1856,33 +1895,24 @@ class testUsers extends CAPITest {
 	* @dataProvider auth_data
 	*/
 	public function testUsers_Session($data) {
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId('12345');
-		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
+		$this->checkResult($this->callRaw($data, '12345'), 'Session terminated, re-login, please.');
 	}
 
 	public function testUsers_Logout() {
 		$this->authorize('Admin', 'zabbix');
 
-		$logout = [
-			'jsonrpc' => '2.0',
-			'method' => 'user.logout',
-			'params' => [],
-			'id' => '1'
-		];
-		$this->checkResult($this->callRaw($logout));
+		$this->checkResult($this->call('user.logout', []));
 
 		$data = [
 			'jsonrpc' => '2.0',
 			'method' => 'user.update',
-			'params' =>
-				[
-					'userid' => '9',
-					'username' => 'check authentication'
-				],
+			'params' => [
+				'userid' => '9',
+				'username' => 'check authentication'
+			],
 			'id' => '1'
 		];
-		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
+		$this->checkResult($this->callRaw($data, CAPIHelper::getSessionId()), 'Session terminated, re-login, please.');
 	}
 
 	public static function login_data() {
@@ -1997,9 +2027,6 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenIncorrect() {
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId(bin2hex(random_bytes(32)));
-
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2008,7 +2035,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], bin2hex(random_bytes(32)));
 
 		$this->assertTrue(array_key_exists('error', $res));
 
@@ -2018,15 +2045,13 @@ class testUsers extends CAPITest {
 
 	public function testUsers_AuthTokenDisabled() {
 		$token = bin2hex(random_bytes(32));
+
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_DISABLED,
 			'userid' => 1,
 			'name' => 'disabled',
 			'token' => hash('sha512', $token)
 		]]);
-
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
 
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
@@ -2036,7 +2061,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		$this->assertTrue(array_key_exists('error', $res));
 
@@ -2047,6 +2072,7 @@ class testUsers extends CAPITest {
 	public function testUsers_AuthTokenExpired() {
 		$now = time();
 		$token = bin2hex(random_bytes(32));
+
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
 			'userid' => 1,
@@ -2054,9 +2080,6 @@ class testUsers extends CAPITest {
 			'expires_at' => $now - 1,
 			'token' => hash('sha512', $token)
 		]]);
-
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
 
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
@@ -2066,7 +2089,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		$this->assertTrue(array_key_exists('error', $res));
 
@@ -2086,9 +2109,6 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
-
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2097,7 +2117,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		$this->assertTrue(array_key_exists('result', $res));
 	}
@@ -2117,9 +2137,6 @@ class testUsers extends CAPITest {
 			'where' => ['usrgrpid' => 7]
 		]);
 
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
-
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2129,7 +2146,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		DB::update('usrgrp', [
 			'values' => ['debug_mode' => GROUP_DEBUG_MODE_DISABLED],
@@ -2150,9 +2167,6 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
-
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2162,7 +2176,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		$this->assertTrue(array_key_exists('error', $res), 'Expected error to occur.');
 		$this->assertTrue(!array_key_exists('debug', $res['error']), 'Not expected debug trace in error.');
@@ -2180,9 +2194,6 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
-
 		$this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2191,7 +2202,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		[['lastaccess' => $lastaccess]] = DB::select('token', [
 			'output' => ['lastaccess'],
@@ -2211,9 +2222,6 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
-
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2222,7 +2230,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		$this->assertTrue(array_key_exists('error', $res), 'Expected error to occur.');
 		$this->assertEquals($res['error']['data'], 'Not authorized.');

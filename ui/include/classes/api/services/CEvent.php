@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,6 +93,7 @@ class CEvent extends CApiService {
 			'problem_time_till'			=> null,
 			'acknowledged'				=> null,
 			'suppressed'				=> null,
+			'symptom'					=> null,
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
 			'filter'					=> null,
@@ -400,11 +401,21 @@ class CEvent extends CApiService {
 		// suppressed
 		if ($options['suppressed'] !== null) {
 			$sqlParts['where'][] = (!$options['suppressed'] ? 'NOT ' : '').
-					'EXISTS ('.
-						'SELECT NULL'.
-						' FROM event_suppress es'.
-						' WHERE es.eventid=e.eventid'.
-					')';
+				'EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_suppress es'.
+					' WHERE es.eventid=e.eventid'.
+				')';
+		}
+
+		// symptom
+		if ($options['symptom'] !== null) {
+			$sqlParts['where'][] = (!$options['symptom'] ? 'NOT ' : '').
+				'EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_symptom es'.
+					' WHERE es.eventid=e.eventid'.
+				')';
 		}
 
 		// tags
@@ -447,6 +458,15 @@ class CEvent extends CApiService {
 		// filter
 		if (is_array($options['filter'])) {
 			$this->dbFilter('events e', $options, $sqlParts);
+
+			// Filter symptom events for given cause.
+			if (array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null) {
+				zbx_value2array($options['filter']['cause_eventid']);
+
+				$sqlParts['from']['event_symptom'] = 'event_symptom es';
+				$sqlParts['where']['ese'] = 'es.eventid=e.eventid';
+				$sqlParts['where']['es'] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);
+			}
 		}
 
 		// limit
@@ -516,17 +536,20 @@ class CEvent extends CApiService {
 	 *
 	 * @param array  $data                  	And array of operation data.
 	 * @param mixed  $data['eventids']      	An event ID or an array of event IDs.
+	 * @param string $data['cause_eventid']     Cause event ID. Used if $data['action'] yields 0x100.
 	 * @param string $data['message']      		Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
 	 * @param string $data['severity']      	New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
 	 * @param string $data['suppress_until']	Suppress until time if ZBX_PROBLEM_UPDATE_SUPPRESS flag is passed.
 	 * @param int    $data['action']        	Flags of performed operations combined:
-	 *                                       	 - 0x01 - ZBX_PROBLEM_UPDATE_CLOSE
-	 *                                       	 - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
-	 *                                       	 - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
-	 *                                       	 - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
-	 *                                       	 - 0x10 - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
-	 *                                       	 - 0x20 - ZBX_PROBLEM_UPDATE_SUPPRESS
-	 *                                       	 - 0x40 - ZBX_PROBLEM_UPDATE_UNSUPPRESS
+	 *                                       	 - 0x01  - ZBX_PROBLEM_UPDATE_CLOSE
+	 *                                       	 - 0x02  - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
+	 *                                       	 - 0x04  - ZBX_PROBLEM_UPDATE_MESSAGE
+	 *                                       	 - 0x08  - ZBX_PROBLEM_UPDATE_SEVERITY
+	 *                                       	 - 0x10  - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
+	 *                                       	 - 0x20  - ZBX_PROBLEM_UPDATE_SUPPRESS
+	 *                                       	 - 0x40  - ZBX_PROBLEM_UPDATE_UNSUPPRESS
+	 *                                           - 0x80  - ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+	 *                                           - 0x100 - ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 	 *
 	 * @return array
 	 */
@@ -540,19 +563,30 @@ class CEvent extends CApiService {
 		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
 		$has_suppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS);
 		$has_unsuppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS);
+		$has_change_rank_to_symptom_action =
+			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM);
 
+		// Validation of event permissions has already been done in validateAcknowledge().
 		$events = $this->get([
-			'output' => ['objectid', 'acknowledged', 'severity', 'r_eventid'],
+			'output' => ['objectid', 'acknowledged', 'severity', 'r_eventid', 'cause_eventid'],
+			// "acknowledges" used in CEvent::isEventClosed().
 			'select_acknowledges' => $has_close_action || $has_suppress_action || $has_unsuppress_action
 				? ['action']
 				: null,
+			// "suppression_data" used in CEvent::isEventSuppressed().
 			'selectSuppressionData' => $has_unsuppress_action ? ['maintenanceid'] : null,
 			'eventids' => $data['eventids'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
+
+		// Get current data of the new cause event and get symptom events of the given cause events.
+		if ($has_change_rank_to_symptom_action) {
+			$update_symptom_eventids = validateEventRankChangeToSymptom($data['eventids'], $data['cause_eventid']);
+		}
 
 		$ack_eventids = [];
 		$unack_eventids = [];
@@ -560,6 +594,9 @@ class CEvent extends CApiService {
 		$acknowledges = [];
 		$suppress_eventids = [];
 		$unsuppress_eventids = [];
+		$tasks_update_event_rank_cause = [];
+		$tasks_update_event_rank_symptom = [];
+		$n = 0;
 
 		foreach ($events as $eventid => $event) {
 			$action = ZBX_PROBLEM_UPDATE_NONE;
@@ -615,9 +652,26 @@ class CEvent extends CApiService {
 				$unsuppress_eventids[] = $eventid;
 			}
 
+			// Perform ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE action flag.
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+					&& $event['cause_eventid'] != 0) {
+				$action |= ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE;
+				$tasks_update_event_rank_cause[$n] = ['eventid' => $eventid];
+			}
+
+			// Perform ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM action flag.
+			if ($has_change_rank_to_symptom_action && $update_symptom_eventids
+					&& in_array($eventid, $update_symptom_eventids)) {
+				$action |= ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM;
+				$tasks_update_event_rank_symptom[$n] = [
+					'eventid' => $eventid,
+					'cause_eventid' => $data['cause_eventid']
+				];
+			}
+
 			// For some of selected events action might not be performed, as event is already with given change.
 			if ($action != ZBX_PROBLEM_UPDATE_NONE) {
-				$acknowledges[] = [
+				$acknowledges[$n] = [
 					'userid' => self::$userData['userid'],
 					'eventid' => $eventid,
 					'clock' => $time,
@@ -627,6 +681,7 @@ class CEvent extends CApiService {
 					'new_severity' => $new_severity,
 					'suppress_until' => $suppress_until
 				];
+				$n++;
 			}
 		}
 
@@ -710,7 +765,7 @@ class CEvent extends CApiService {
 				// Create tasks to suppress problems manually.
 				if (($acknowledgement['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
 					$tasks[$k] = [
-						'type' => ZBX_TM_TASK_DATA ,
+						'type' => ZBX_TM_TASK_DATA,
 						'status' => ZBX_TM_STATUS_NEW,
 						'clock' => $time
 					];
@@ -730,7 +785,7 @@ class CEvent extends CApiService {
 				// Create tasks to unsuppress problems manually.
 				if (($acknowledgement['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
 					$tasks[$k] = [
-						'type' => ZBX_TM_TASK_DATA ,
+						'type' => ZBX_TM_TASK_DATA,
 						'status' => ZBX_TM_STATUS_NEW,
 						'clock' => $time
 					];
@@ -777,6 +832,114 @@ class CEvent extends CApiService {
 				$tasks_ack = array_replace_recursive($tasks_ack, zbx_toObject($taskids, 'taskid', true));
 				DB::insertBatch('task_acknowledge', $tasks_ack, false);
 			}
+
+			// Create tasks for event rank change actions - convert symptoms to cause.
+			$tasks = [];
+			$task_update_event_rank = [];
+
+			foreach ($acknowledgeids as $k => $id) {
+				$acknowledgement = $acknowledges[$k];
+
+				if (($acknowledgement['action']
+						& ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) {
+					$tasks[$k] = [
+						'type' => ZBX_TM_TASK_DATA,
+						'status' => ZBX_TM_STATUS_NEW,
+						'clock' => $time
+					];
+
+					$task_update_event_rank[$k] = [
+						'taskid' => $id,
+						'type' => ZBX_TM_DATA_TYPE_RANK_EVENT,
+						'data' => json_encode([
+							'acknowledgeid' => $id,
+							'action' => $acknowledgement['action'],
+							'eventid' => $tasks_update_event_rank_cause[$k]['eventid'],
+							'userid' => $acknowledgement['userid']
+						])
+					];
+				}
+			}
+
+			if ($tasks) {
+				$taskids = DB::insertBatch('task', $tasks);
+				$task_update_event_rank = array_replace_recursive($task_update_event_rank,
+					zbx_toObject($taskids, 'taskid', true)
+				);
+				DB::insertBatch('task_data', $task_update_event_rank, false);
+
+				$upd_acknowledges = [];
+
+				foreach ($acknowledgeids as $k => $id) {
+					$acknowledgement = $acknowledges[$k];
+
+					if (($acknowledgement['action']
+							& ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) {
+						$upd_acknowledges[] = [
+							'values' => ['taskid' => $taskids[$k]],
+							'where' => ['acknowledgeid' => $id]
+						];
+					}
+				}
+
+				DB::update('acknowledges', $upd_acknowledges);
+			}
+
+			/*
+			 * Create tasks for event rank change actions - convert cause to symptoms or update symptoms by changing
+			 * cause to a different cause.
+			 */
+			$tasks = [];
+			$task_update_event_rank = [];
+
+			foreach ($acknowledgeids as $k => $id) {
+				$acknowledgement = $acknowledges[$k];
+
+				if (($acknowledgement['action']
+						& ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
+					$tasks[$k] = [
+						'type' => ZBX_TM_TASK_DATA,
+						'status' => ZBX_TM_STATUS_NEW,
+						'clock' => $time
+					];
+
+					$task_update_event_rank[$k] = [
+						'taskid' => $id,
+						'type' => ZBX_TM_DATA_TYPE_RANK_EVENT,
+						'data' => json_encode([
+							'acknowledgeid' => $id,
+							'action' => $acknowledgement['action'],
+							'eventid' => $tasks_update_event_rank_symptom[$k]['eventid'],
+							'cause_eventid' => $tasks_update_event_rank_symptom[$k]['cause_eventid'],
+							'userid' => $acknowledgement['userid']
+						])
+					];
+				}
+			}
+
+			if ($tasks) {
+				$taskids = DB::insertBatch('task', $tasks);
+				$task_update_event_rank = array_replace_recursive($task_update_event_rank,
+					zbx_toObject($taskids, 'taskid', true)
+				);
+				DB::insertBatch('task_data', $task_update_event_rank, false);
+
+				$upd_acknowledges = [];
+
+				foreach ($acknowledgeids as $k => $id) {
+					$acknowledgement = $acknowledges[$k];
+
+					if (($acknowledgement['action']
+							& ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
+						$upd_acknowledges[] = [
+							'values' => ['taskid' => $taskids[$k]],
+							'where' => ['acknowledgeid' => $id]
+						];
+					}
+				}
+
+				DB::update('acknowledges', $upd_acknowledges);
+			}
 		}
 
 		return ['eventids' => $data['eventids']];
@@ -787,38 +950,47 @@ class CEvent extends CApiService {
 	 *
 	 * @param array         $data                    And array of operation data.
 	 * @param string|array  $data['eventids']        An event ID or an array of event IDs.
+	 * @param string        $data['cause_eventid']   Cause event ID. Used if $data['action'] yields 0x100.
 	 * @param string        $data['message']         Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
 	 * @param string        $data['severity']        New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
 	 * @param int           $data['suppress_until']  Suppress until time if ZBX_PROBLEM_UPDATE_SUPPRESS flag is passed.
 	 * @param int           $data['action']          Flags of performed operations combined:
-	 *                                                - 0x01 - ZBX_PROBLEM_UPDATE_CLOSE
-	 *                                                - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
-	 *                                                - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
-	 *                                                - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
-	 *                                                - 0x10 - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
-	 *                                                - 0x20 - ZBX_PROBLEM_UPDATE_SUPPRESS
-	 *                                                - 0x40 - ZBX_PROBLEM_UPDATE_UNSUPPRESS
+	 *                                                - 0x01  - ZBX_PROBLEM_UPDATE_CLOSE
+	 *                                                - 0x02  - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
+	 *                                                - 0x04  - ZBX_PROBLEM_UPDATE_MESSAGE
+	 *                                                - 0x08  - ZBX_PROBLEM_UPDATE_SEVERITY
+	 *                                                - 0x10  - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
+	 *                                                - 0x20  - ZBX_PROBLEM_UPDATE_SUPPRESS
+	 *                                                - 0x40  - ZBX_PROBLEM_UPDATE_UNSUPPRESS
+	 *                                                - 0x80  - ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+	 *                                                - 0x100 - ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 	 *
 	 * @throws APIException                          If the input is invalid.
 	 */
 	protected function validateAcknowledge(array $data, int $time) {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+		$fields =  [
 			'eventids' =>		['type' => API_IDS, 'flags' => API_REQUIRED | API_NORMALIZE],
 			'action' =>			['type' => API_INT32, 'flags' => API_REQUIRED],
 			'message' =>		['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'default' => DB::getDefault('acknowledges', 'message'), 'length' => DB::getFieldLength('acknowledges', 'message')],
 			'severity' =>		['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => DB::getDefault('acknowledges', 'new_severity')],
-			'suppress_until' =>	['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null]
-		]];
+			'suppress_until' =>	['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'cause_eventid' => ['type' => API_MULTIPLE, 'rules' => [
+				// "cause_eventid" should only be accessible if a cause event is converted to symptom event.
+				['if' => static function ($data) { return ($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) != 0; }, 'type' => API_ID, 'flags' => API_REQUIRED],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]]
+		];
 
-		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
+		if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $fields], $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		// Check that at least one valid flag is set.
 		$action_mask = ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE
 				| ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS
-				| ZBX_PROBLEM_UPDATE_UNSUPPRESS;
+				| ZBX_PROBLEM_UPDATE_UNSUPPRESS | ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+				| ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM;
 
+		// Check that at least one valid flag is set.
 		if (($data['action'] & $action_mask) != $data['action']) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
 				_s('unexpected value "%1$s"', $data['action'])
@@ -832,6 +1004,10 @@ class CEvent extends CApiService {
 		$has_unack_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE);
 		$has_suppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS);
 		$has_unsuppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS);
+		$has_rank_change_to_cause_action =
+			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE);
+		$has_change_rank_to_symptom_action =
+			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM);
 
 		// Check access rules.
 		if ($has_close_action && !self::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)) {
@@ -839,16 +1015,19 @@ class CEvent extends CApiService {
 				_('no permissions to close problems')
 			));
 		}
+
 		if ($has_message_action && !self::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
 				_('no permissions to add problem comments')
 			));
 		}
+
 		if ($has_severity_action && !self::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
 				_('no permissions to change problem severity')
 			));
 		}
+
 		if (($has_ack_action || $has_unack_action) && !self::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
 				$has_ack_action
@@ -856,12 +1035,23 @@ class CEvent extends CApiService {
 					: _('no permissions to unacknowledge problems')
 			));
 		}
+
 		if (($has_suppress_action || $has_unsuppress_action)
 				&& !self::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
 				$has_suppress_action
 					? _('no permissions to suppress problems')
 					: _('no permissions to unsuppress problems')
+			));
+		}
+
+		// Check permissions in user roles if user is allowed to change event rank.
+		if (($has_rank_change_to_cause_action || $has_change_rank_to_symptom_action)
+				&& !self::checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				$has_rank_change_to_cause_action
+					? _('no permissions to convert symptom problems to cause problems')
+					: _('no permissions to convert cause problems to symptom problems')
 			));
 		}
 
@@ -884,15 +1074,28 @@ class CEvent extends CApiService {
 		if ($has_close_action && ($has_suppress_action || $has_unsuppress_action)) {
 			$action = $has_suppress_action ? ZBX_PROBLEM_UPDATE_SUPPRESS : ZBX_PROBLEM_UPDATE_UNSUPPRESS;
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
-				_s('value must be one of %1$s', implode(', ', [ZBX_PROBLEM_UPDATE_CLOSE, $action
+				_s('value must be one of %1$s', implode(', ', [ZBX_PROBLEM_UPDATE_CLOSE, $action]))
+			));
+		}
+
+		if ($has_rank_change_to_cause_action && $has_change_rank_to_symptom_action) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_s('value must be one of %1$s', implode(', ', [ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE,
+					ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 				]))
 			));
+		}
+
+		// Add the new cause ID to validate if the event exists and is still a problem.
+		$eventids = array_fill_keys($data['eventids'], true);
+		if ($has_change_rank_to_symptom_action && $data['cause_eventid'] !== null) {
+			$eventids[$data['cause_eventid']] = true;
 		}
 
 		$events = $this->get([
 			'output' => ['r_eventid'],
 			'selectRelatedObject' => $has_close_action ? ['manual_close'] : null,
-			'eventids' => $data['eventids'],
+			'eventids' => array_keys($eventids),
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE
@@ -905,13 +1108,13 @@ class CEvent extends CApiService {
 		 *   - no read rights for related trigger
 		 *   - unexisting eventid
 		 */
-		if (count($data['eventids']) != count($events)) {
+		if (count($eventids) != count($events)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$editable_events_count = $this->get([
 			'countOutput' => true,
-			'eventids' => $data['eventids'],
+			'eventids' => array_keys($eventids),
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'editable' => true
@@ -922,16 +1125,16 @@ class CEvent extends CApiService {
 		}
 
 		if ($has_message_action && $data['message'] === '') {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": %2$s.', 'message', _('cannot be empty'))
-			);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'message',
+				_('cannot be empty')
+			));
 		}
 
 		if ($has_severity_action) {
-			$this->checkCanChangeSeverity($data['eventids'], $editable_events_count, $data['severity']);
+			$this->checkCanChangeSeverity($events, $editable_events_count, $data['severity']);
 		}
 
-		if($has_suppress_action) {
+		if ($has_suppress_action) {
 			$this->CheckIfValidTime($data, $time);
 		}
 	}
@@ -1027,12 +1230,12 @@ class CEvent extends CApiService {
 	}
 
 	/**
-	 * Checks if event are closed.
+	 * Checks if event is closed.
 	 *
-	 * @param array $event                              Event object.
-	 * @param array $event['r_eventid']                 OK event id. 0 if not resolved.
-	 * @param array $event['acknowledges']              List of problem updates.
-	 * @param array $event['acknowledges'][]['action']  Action performed in update.
+	 * @param array  $event                              Event object.
+	 * @param string $event['r_eventid']                 OK event id. 0 if not resolved.
+	 * @param array  $event['acknowledges']              List of problem updates.
+	 * @param int    $event['acknowledges'][]['action']  Action performed in update.
 	 *
 	 * @return bool
 	 */
@@ -1064,16 +1267,15 @@ class CEvent extends CApiService {
 			}
 
 			// Select fields from event_recovery table using LEFT JOIN.
-			$left_join = false;
-
+			$left_join_recovery = false;
 			foreach (['c_eventid', 'correlationid', 'userid'] as $field) {
 				if ($this->outputIsRequested($field, $options['output'])) {
 					$sqlParts['select'][$field] = 'er2.'.$field;
-					$left_join = true;
+					$left_join_recovery = true;
 				}
 			}
 
-			if ($left_join) {
+			if ($left_join_recovery) {
 				$sqlParts['left_join'][] = ['alias' => 'er2', 'table' => 'event_recovery', 'using' => 'r_eventid'];
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
@@ -1081,6 +1283,17 @@ class CEvent extends CApiService {
 			if ($options['selectRelatedObject'] !== null || $options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect('e.object', $sqlParts);
 				$sqlParts = $this->addQuerySelect('e.objectid', $sqlParts);
+			}
+
+			$left_join_symptom = false;
+			if ($this->outputIsRequested('cause_eventid', $options['output'])) {
+				$sqlParts['select']['cause_eventid'] = 'es1.cause_eventid';
+				$left_join_symptom = true;
+			}
+
+			if ($left_join_symptom) {
+				$sqlParts['left_join'][] = ['alias' => 'es1', 'table' => 'event_symptom', 'using' => 'eventid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
 		}
 

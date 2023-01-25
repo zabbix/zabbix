@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,6 +115,9 @@ class WidgetForm extends CWidgetForm {
 					OPERATIONAL_DATA_SHOW_SEPARATELY => _('Separately'),
 					OPERATIONAL_DATA_SHOW_WITH_PROBLEM => _('With problem name')
 				]))->setDefault(OPERATIONAL_DATA_SHOW_NONE)
+			)
+			->addField(
+				(new CWidgetFieldCheckBox('show_symptoms', _('Show symptoms')))->setDefault(0)
 			)
 			->addField(
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))

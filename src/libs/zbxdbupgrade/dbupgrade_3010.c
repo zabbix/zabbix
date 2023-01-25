@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -320,7 +320,7 @@ static int	DBpatch_3010021_update_event_recovery(zbx_hashset_t *events, zbx_uint
 			zbx_vector_uint64_clear(&object_events->eventids);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ret = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
@@ -413,7 +413,7 @@ static int	DBpatch_3010023(void)
 	zbx_db_insert_prepare(&db_insert, "operations", "operationid", "actionid", "operationtype", "recovery", NULL);
 	zbx_db_insert_prepare(&db_insert_msg, "opmessage", "operationid", "default_msg", "subject", "message", NULL);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	result = DBselect("select actionid,r_shortdata,r_longdata from actions where recovery_msg=1");
 
 	while (NULL != (row = DBfetch(result)))
@@ -433,7 +433,7 @@ static int	DBpatch_3010023(void)
 	zbx_db_insert_clean(&db_insert);
 
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -534,7 +534,7 @@ static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsourc
 				ret = ZBX_3010024_ACTION_NOTHING;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_3010024_ACTION_CONVERT == ret)
 	{
@@ -559,7 +559,7 @@ static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsourc
 			}
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	return ret;
@@ -603,7 +603,7 @@ static int	DBpatch_3010024(void)
 					" operations during database upgrade.", row[1]);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ret = SUCCEED;
 
@@ -748,7 +748,7 @@ static void	DBpatch_3010026_get_conditionids(zbx_uint64_t actionid, const char *
 	}
 
 	zbx_free(condition);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -1092,7 +1092,7 @@ static int	DBpatch_3010026(void)
 
 	/* reset action evaltype to AND/OR if it has no more conditions left */
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	result = DBselect("select a.actionid,a.name,a.evaltype,count(c.conditionid)"
 			" from actions a"
 			" left join conditions c"
@@ -1127,7 +1127,7 @@ static int	DBpatch_3010026(void)
 	ret = SUCCEED;
 
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 	zbx_vector_str_destroy(&filter);
 	zbx_vector_uint64_destroy(&actionids);
@@ -1614,7 +1614,7 @@ static int	DBpatch_3010079(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class CScript extends CApiService {
 	 * Fields from "actions" table. Used in get() validation and addRelatedObjects() when selecting action fields.
 	 */
 	private $action_fields = ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed',
-		'notify_if_canceled'
+		'notify_if_canceled', 'pause_symptoms'
 	];
 
 	/**
@@ -1188,7 +1188,7 @@ class CScript extends CApiService {
 		}
 
 		$events = API::Event()->get([
-			'output' => ['objectid', 'value', 'name', 'severity'],
+			'output' => ['eventid', 'objectid', 'value', 'name', 'severity', 'cause_eventid'],
 			'selectHosts' => ['hostid'],
 			'object' => EVENT_OBJECT_TRIGGER,
 			'source' => EVENT_SOURCE_TRIGGERS,
@@ -1198,6 +1198,54 @@ class CScript extends CApiService {
 
 		if (!$events) {
 			return $scripts_by_events;
+		}
+
+		$symptom_cause_eventids = [];
+
+		foreach ($events as &$event) {
+			if ($event['cause_eventid'] != 0) {
+				// There is not need to select already preselected events again.
+				if (array_key_exists($event['cause_eventid'], $events)) {
+					$event['cause'] = [
+						'eventid' => $events[$event['cause_eventid']]['eventid'],
+						'value' => $events[$event['cause_eventid']]['value'],
+						'name' => $events[$event['cause_eventid']]['name'],
+						'severity' => $events[$event['cause_eventid']]['severity']
+					];
+				}
+				else {
+					$event['cause'] = [];
+					// Collect cause event IDs for symptom events.
+					$symptom_cause_eventids[] = $event['cause_eventid'];
+				}
+			}
+		}
+		unset($event);
+
+		if ($symptom_cause_eventids) {
+			$cause_events = API::Event()->get([
+				'output' => ['eventid', 'value', 'name', 'severity'],
+				'object' => EVENT_OBJECT_TRIGGER,
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'eventids' => $symptom_cause_eventids,
+				'preservekeys' => true
+			]);
+
+			if ($cause_events) {
+				foreach ($events as &$event) {
+					foreach ($cause_events as $cause_event) {
+						if (bccomp($event['cause_eventid'], $cause_event['eventid']) == 0) {
+							$event['cause'] = [
+								'eventid' => $cause_event['eventid'],
+								'value' => $cause_event['value'],
+								'name' => $cause_event['name'],
+								'severity' => $cause_event['severity']
+							];
+						}
+					}
+				}
+				unset($event);
+			}
 		}
 
 		$hostids = [];

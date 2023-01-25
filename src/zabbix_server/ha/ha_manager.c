@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -218,7 +218,7 @@ static void	ha_update_parent(zbx_ipc_async_socket_t *rtc_socket, zbx_ha_info_t *
 static void	ha_send_heartbeat(zbx_ipc_async_socket_t *rtc_socket)
 {
 	if (SUCCEED != zbx_ipc_async_socket_send(rtc_socket, ZBX_IPC_SERVICE_HA_HEARTBEAT, NULL, 0) ||
-		SUCCEED != zbx_ipc_async_socket_flush(rtc_socket, ZBX_HA_SERVICE_TIMEOUT))
+			SUCCEED != zbx_ipc_async_socket_flush(rtc_socket, ZBX_HA_SERVICE_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send HA heartbeat to main process");
 		exit(EXIT_FAILURE);
@@ -269,6 +269,8 @@ static int	ha_db_begin(zbx_ha_info_t *info)
 
 	if (ZBX_DB_FAIL == info->db_status)
 		ha_set_error(info, "database error");
+	else if (ZBX_DB_DOWN == info->db_status)
+		DBclose();
 
 	return info->db_status;
 }
@@ -290,6 +292,8 @@ static int	ha_db_rollback(zbx_ha_info_t *info)
 
 	if (ZBX_DB_FAIL == info->db_status)
 		ha_set_error(info, "database error");
+	else if (ZBX_DB_DOWN == info->db_status)
+		DBclose();
 
 	return info->db_status;
 }
@@ -394,7 +398,7 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -440,7 +444,7 @@ static int	ha_db_get_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int
 		zbx_vector_ha_node_append(nodes, node);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -508,7 +512,7 @@ static int	ha_db_lock_nodes(zbx_ha_info_t *info)
 	if (NULL == (result = ha_db_select(info, "select null from ha_node order by ha_nodeid" ZBX_FOR_UPDATE)))
 		return FAIL;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -637,7 +641,7 @@ static int	ha_db_get_time(zbx_ha_info_t *info, int *db_time)
 	else
 		*db_time = 0;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ret = SUCCEED;
 out:
@@ -1403,7 +1407,7 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 	else
 		error = "database error";
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zbx_serialize_prepare_str(len, error);
 
@@ -1595,10 +1599,17 @@ int	zbx_ha_dispatch_message(const char *ha_node_name, zbx_ipc_message_t *message
 		}
 	}
 
-	if (0 != is_ha_cluster(ha_node_name) && *ha_status == ZBX_NODE_STATUS_ACTIVE && 0 != last_hb)
+	if (is_ha_cluster(ha_node_name) && 0 != last_hb)
 	{
 		if (last_hb + *ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_hb)
-			*ha_status = ZBX_NODE_STATUS_STANDBY;
+		{
+			last_hb = 0;
+
+			if (ZBX_NODE_STATUS_ACTIVE == *ha_status)
+				*ha_status = ZBX_NODE_STATUS_STANDBY;
+			else
+				*ha_status = ZBX_NODE_STATUS_HATIMEOUT;
+		}
 	}
 out:
 	return ret;
@@ -1838,10 +1849,10 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	nextcheck = ZBX_HA_POLL_PERIOD;
 
-	/* double the initial database check delay in standby mode to avoid the same node becoming active */
+	/* triple the initial database check delay in standby mode to avoid the same node becoming active */
 	/* immediately after switching to standby mode or crashing and being restarted                    */
 	if (ZBX_NODE_STATUS_STANDBY == info.ha_status)
-		nextcheck *= 2;
+		nextcheck *= 3;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager started in %s mode", zbx_ha_status_str(info.ha_status));
 
@@ -1875,7 +1886,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					nextcheck += delay;
 			}
 
-			if (ZBX_DB_OK <= info.db_status)
+			if (ZBX_DB_OK <= info.db_status || ZBX_NODE_STATUS_ACTIVE != info.ha_status)
 				ha_send_heartbeat(&rtc_socket);
 
 			while (tick <= now)

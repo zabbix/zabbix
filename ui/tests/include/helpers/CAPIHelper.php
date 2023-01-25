@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,8 +33,6 @@ class CAPIHelper {
 	protected static $debug = [];
 	// Session id.
 	protected static $session = null;
-	// Use authorization header.
-	protected static $use_auth = null;
 
 	/**
 	 * Reset API helper state.
@@ -49,13 +47,14 @@ class CAPIHelper {
 	/**
 	 * Make API call.
 	 *
-	 * @param mixed $data     string containing request data as json.
+	 * @param mixed  $data       String containing request data as json.
+	 * @param string $sessionid  Authorization token.
 	 *
 	 * @return array
 	 *
 	 * @throws Exception      if API call fails.
 	 */
-	public static function callRaw($data) {
+	public static function callRaw($data, string $sessionid = null) {
 		global $URL;
 		if (!is_string($URL)) {
 			$URL = PHPUNIT_URL.'api_jsonrpc.php';
@@ -81,8 +80,8 @@ class CAPIHelper {
 			]
 		];
 
-		if (static::$use_auth) {
-			$params['http']['header'][] = 'Authorization: Bearer '.static::$session;
+		if ($sessionid !== null) {
+			$params['http']['header'][] = 'Authorization: Bearer '.$sessionid;
 		}
 
 		$handle = @fopen($URL, 'rb', false, stream_context_create($params));
@@ -126,13 +125,12 @@ class CAPIHelper {
 	 * @return array
 	 */
 	public static function call($method, $params) {
-		$data = [
+		return static::callRaw([
 			'jsonrpc' => '2.0',
 			'method' => $method,
 			'params' => $params,
 			'id' => static::$request_id
-		];
-		return static::callRaw($data);
+		], static::$session);
 	}
 
 	/**
@@ -181,7 +179,6 @@ class CAPIHelper {
 
 		$result = static::call('user.login', ['username' => $username, 'password' => $password]);
 		if (array_key_exists('result', $result)) {
-			static::setAuth(true);
 			static::setSessionId($result['result']);
 		}
 	}
@@ -228,13 +225,5 @@ class CAPIHelper {
 	 */
 	public static function clearDebugInfo() {
 		static::$debug = [];
-	}
-
-	public static function setAuth(bool $use_auth): void {
-		static::$use_auth = $use_auth;
-	}
-
-	public static function getAuth(): bool {
-		return static::$use_auth;
 	}
 }

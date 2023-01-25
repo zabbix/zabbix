@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "actions.h"
 #include "zbxserver.h"
+#include "server.h"
+#include "actions.h"
 
 #include "log.h"
 #include "operations.h"
@@ -27,6 +28,8 @@
 #include "zbxnum.h"
 #include "zbxip.h"
 #include "zbxdbwrap.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_item_constants.h"
 
 /******************************************************************************
  *                                                                            *
@@ -187,7 +190,7 @@ static int	check_host_group_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 			add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
 
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 	{
@@ -361,7 +364,7 @@ static void	check_object_hierarchy(int object, const zbx_vector_ptr_t *esc_event
 			}
 		}
 		zbx_free(sql);
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		/* resolve in next select only those triggerids that have template id and not equal to condition */
 		zbx_vector_uint64_pair_clear(objectids_pair);
@@ -433,7 +436,7 @@ static int	check_host_template_condition(const zbx_vector_ptr_t *esc_events, zbx
 		if (FAIL != (i = zbx_vector_uint64_pair_search(&objectids_pair, pair, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			ZBX_STR2UINT64(objectids_pair.values[i].second, row[1]);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	check_object_hierarchy(EVENT_OBJECT_TRIGGER, esc_events, &objectids, &objectids_pair, condition, condition_value,
 			"select distinct t.triggerid,t.templateid,i.hostid"
@@ -504,7 +507,7 @@ static int	check_host_condition(const zbx_vector_ptr_t *esc_events, zbx_conditio
 		ZBX_STR2UINT64(objectid, row[0]);
 		add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_destroy(&objectids);
 	zbx_free(sql);
@@ -786,7 +789,7 @@ static int	check_acknowledged_condition(const zbx_vector_ptr_t *esc_events, zbx_
 		}
 
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&eventids);
@@ -1051,7 +1054,7 @@ static int	check_drule_condition(const zbx_vector_ptr_t *esc_events, zbx_conditi
 			ZBX_STR2UINT64(objectid, row[0]);
 			add_condition_match(esc_events, condition, objectid, objects[i]);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&objectids[0]);
@@ -1125,7 +1128,7 @@ static int	check_dcheck_condition(const zbx_vector_ptr_t *esc_events, zbx_condit
 			ZBX_STR2UINT64(objectid, row[0]);
 			add_condition_match(esc_events, condition, objectid, object);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&objectids);
@@ -1246,7 +1249,7 @@ static int	check_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_conditi
 			ZBX_STR2UINT64(objectid, row[0]);
 			add_condition_match(esc_events, condition, objectid, objects[i]);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&objectids[0]);
@@ -1348,7 +1351,7 @@ static int	check_dvalue_condition(const zbx_vector_ptr_t *esc_events, zbx_condit
 					break;
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&objectids);
@@ -1436,7 +1439,7 @@ static int	check_dhost_ip_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 					break;
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&objectids[0]);
@@ -1517,7 +1520,7 @@ static int	check_dservice_type_condition(const zbx_vector_ptr_t *esc_events, zbx
 					break;
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&objectids);
@@ -1648,7 +1651,7 @@ static int	check_duptime_condition(const zbx_vector_ptr_t *esc_events, zbx_condi
 					break;
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&objectids[0]);
@@ -1723,7 +1726,7 @@ static int	check_dservice_port_condition(const zbx_vector_ptr_t *esc_events, zbx
 					break;
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&objectids);
@@ -1873,7 +1876,7 @@ static int	check_hostname_metadata_condition(const zbx_vector_ptr_t *esc_events,
 				break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_destroy(&objectids);
 	zbx_free(sql);
@@ -1941,7 +1944,7 @@ static int	check_areg_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 				break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_destroy(&objectids);
 	zbx_free(sql);
@@ -2201,7 +2204,7 @@ static int	check_intern_host_group_condition(const zbx_vector_ptr_t *esc_events,
 			else
 				add_condition_match(esc_events, condition, objectid, objects[i]);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	for (i = 0; i < (int)ARRSIZE(objects); i++)
@@ -2315,7 +2318,7 @@ static int	check_intern_host_template_condition(const zbx_vector_ptr_t *esc_even
 				ZBX_STR2UINT64(objectids_pair_ptr->values[j].second, row[1]);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		check_object_hierarchy(objects[i], esc_events, objectids_ptr, objectids_pair_ptr, condition, condition_value,
 				0 == i ?
@@ -2428,7 +2431,7 @@ static int	check_intern_host_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 			ZBX_STR2UINT64(objectid, row[0]);
 			add_condition_match(esc_events, condition, objectid, objects[i]);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	for (i = 0; i < (int)ARRSIZE(objects); i++)
@@ -2777,7 +2780,7 @@ static void	execute_operations(const ZBX_DB_EVENT *event, zbx_uint64_t actionid)
 				;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != del_templateids.values_num)
 	{
@@ -3111,7 +3114,7 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 	}
 
 	zbx_vector_ptr_create(&actions);
-	zbx_dc_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
+	zbx_dc_config_history_sync_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
 	prepare_actions_conditions_eval(&actions, uniq_conditions);
 	get_escalation_events(events, esc_events);
 
@@ -3227,7 +3230,7 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 			zbx_vector_uint64_pair_append(&rec_escalations, pair);
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		zbx_free(sql);
 		zbx_vector_uint64_destroy(&eventids);
 	}
@@ -3338,7 +3341,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 	}
 
 	zbx_vector_ptr_create(&actions);
-	zbx_dc_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
+	zbx_dc_config_history_sync_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
 	prepare_actions_conditions_eval(&actions, uniq_conditions);
 
 	if (0 == actions.values_num)
@@ -3496,7 +3499,8 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "actionid", actionids->values,
 			actionids->values_num);
 
-	result = DBselect("select actionid,name,status,eventsource,esc_period,pause_suppressed,notify_if_canceled"
+	result = DBselect("select actionid,name,status,eventsource,esc_period,pause_suppressed,notify_if_canceled,"
+					"pause_symptoms"
 				" from actions"
 				" where%s order by actionid", filter);
 
@@ -3522,12 +3526,13 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 
 		ZBX_STR2UCHAR(action->pause_suppressed, row[5]);
 		ZBX_STR2UCHAR(action->notify_if_canceled, row[6]);
+		ZBX_STR2UCHAR(action->pause_symptoms, row[7]);
 		action->name = zbx_strdup(NULL, row[1]);
 		action->recovery = ZBX_ACTION_RECOVERY_NONE;
 
 		zbx_vector_ptr_append(actions, action);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect("select actionid from operations where recovery=%d and%s",
 			ZBX_OPERATION_MODE_RECOVERY, filter);
@@ -3544,7 +3549,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 			action->recovery = ZBX_ACTION_RECOVERY_OPERATIONS;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(filter);
 }

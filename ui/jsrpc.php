@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,8 +129,7 @@ switch ($data['method']) {
 		break;
 
 	/**
-	 * Create multi select data.
-	 * Supported objects: "hosts", "hostGroup", "templates", "templateGroup", "triggers"
+	 * Create multiselect data.
 	 *
 	 * @param string $data['object_name']
 	 * @param string $data['search']
@@ -447,11 +446,17 @@ switch ($data['method']) {
 				break;
 
 			case 'usersGroups':
-				$groups = API::UserGroup()->get([
+				$options = [
 					'output' => ['usrgrpid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'limit' => $limit
-				]);
+				];
+
+				if (array_key_exists('group_status', $data)) {
+					$options['status'] = $data['group_status'];
+				}
+
+				$groups = API::UserGroup()->get($options);
 
 				if ($groups) {
 					CArrayHelper::sort($groups, [
@@ -543,6 +548,7 @@ switch ($data['method']) {
 				break;
 
 			case 'valuemaps':
+			case 'template_valuemaps':
 				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
 					break;
 				}

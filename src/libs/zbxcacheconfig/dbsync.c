@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,10 @@
 #include "base64.h"
 #include "zbxeval.h"
 #include "zbxnum.h"
+
+/* global correlation constants */
+#define ZBX_CORRELATION_ENABLED				0
+/*#define ZBX_CORRELATION_DISABLED			1*/
 
 #define ZBX_DBSYNC_OBJ_HOST		1
 #define ZBX_DBSYNC_OBJ_HOST_TAG		2
@@ -379,7 +383,7 @@ static void	dbsync_prune_changelog(void)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -494,7 +498,7 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 			changelog_num++;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
 	{
@@ -628,7 +632,7 @@ static int	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, si
 
 			zbx_vector_uint64_append(&read_ids, rowid);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_sort(&read_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -754,7 +758,7 @@ void	zbx_dbsync_clear(zbx_dbsync_t *sync)
 	}
 	else
 	{
-		DBfree_result(sync->dbresult);
+		zbx_db_free_result(sync->dbresult);
 		sync->dbresult = NULL;
 	}
 }
@@ -873,7 +877,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* global configuration will be always synchronized directly with database */
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -947,7 +951,7 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 	if (1 == num_records && NULL != DBfetch(result))
 		zabbix_log(LOG_LEVEL_ERR, "table 'config_autoreg_tls' has multiple records");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 #undef CONFIG_AUTOREG_TLS_FIELD_COUNT
@@ -1147,7 +1151,7 @@ int	zbx_dbsync_compare_host_inventory(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1226,7 +1230,7 @@ int	zbx_dbsync_compare_host_templates(zbx_dbsync_t *sync)
 		dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, del_row);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_hashset_destroy(&htmpls);
 
 	return SUCCEED;
@@ -1350,7 +1354,7 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1478,7 +1482,7 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1578,6 +1582,9 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const DB_
 
 		if (FAIL == dbsync_compare_str(dbrow[21], snmp->contextname))
 			return FAIL;
+
+		if (FAIL == dbsync_compare_int(dbrow[22], snmp->max_repetitions))
+			return FAIL;
 	}
 	else if (NULL != snmp)
 		return FAIL;
@@ -1608,14 +1615,14 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 			"select i.interfaceid,i.hostid,i.type,i.main,i.useip,i.ip,i.dns,i.port,"
 			"i.available,i.disable_until,i.error,i.errors_from,"
 			"s.version,s.bulk,s.community,s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,"
-			"s.authprotocol,s.privprotocol,s.contextname"
+			"s.authprotocol,s.privprotocol,s.contextname,s.max_repetitions"
 			" from interface i"
 			" left join interface_snmp s on i.interfaceid=s.interfaceid")))
 	{
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 22, NULL);
+	dbsync_prepare(sync, 23, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -1650,7 +1657,7 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1807,7 +1814,7 @@ int	zbx_dbsync_compare_item_discovery(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1888,7 +1895,7 @@ int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -2110,7 +2117,7 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
 		dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, del_row);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_hashset_destroy(&deps);
 
 	return SUCCEED;
@@ -2276,7 +2283,7 @@ int	zbx_dbsync_compare_expressions(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -2371,7 +2378,7 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -2468,7 +2475,7 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 
 	dbsync_compare_action_op(sync, actionid, opflags);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -2568,7 +2575,7 @@ int	zbx_dbsync_compare_action_conditions(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -2769,7 +2776,7 @@ int	zbx_dbsync_compare_correlations(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -2905,7 +2912,7 @@ int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3001,7 +3008,7 @@ int	zbx_dbsync_compare_corr_operations(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3082,7 +3089,7 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3255,7 +3262,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3322,7 +3329,7 @@ int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3415,7 +3422,7 @@ int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3526,7 +3533,7 @@ int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3600,7 +3607,7 @@ int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync)
 		dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, del_row);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_hashset_destroy(&mgroups);
 
 	return SUCCEED;
@@ -3675,7 +3682,7 @@ int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync)
 		dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, del_row);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_hashset_destroy(&mhosts);
 
 	return SUCCEED;
@@ -3760,7 +3767,7 @@ int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
 		dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, del_row);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_hashset_destroy(&groups);
 
 	return SUCCEED;

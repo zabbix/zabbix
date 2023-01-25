@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@
 				->addValue('IP', INTERFACE_USE_IP, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_IP.']')
 				->addValue('DNS', INTERFACE_USE_DNS, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_DNS.']')
 				->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_USEIP.' '.ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
-				->setModern(true)
+				->setModern()
 		))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL . ' ' . ZBX_STYLE_HOST_INTERFACE_CELL_USEIP),
 		(new CDiv(
 			(new CTextBox('interfaces[#{iface.interfaceid}][port]', '#{iface.port}', false, DB::getFieldLength('interface', 'port')))
@@ -99,6 +99,19 @@
 							->setAriaRequired()
 					))
 						->setId('snmp_community_field_#{iface.interfaceid}')
+				])
+				->addItem([
+					(new CLabel([
+						_('Max repetition count'),
+						makeHelpIcon(_('Max repetition count is applicable to discovery and walk only.'))
+					], 'interfaces[#{iface.interfaceid}][details][max_repetitions]'))
+						->setId('snmp_repetition_count_label_#{iface.interfaceid}'),
+					(new CFormField(
+						(new CNumericBox('interfaces[#{iface.interfaceid}][details][max_repetitions]',
+							'#{iface.details.max_repetitions}', 20, false, false, false
+						))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+					))
+						->setId('snmp_repetition_count_field_#{iface.interfaceid}')
 				])
 				->addItem([
 					(new CLabel(_('Context name'), 'interfaces[#{iface.interfaceid}][details][contextname]'))
@@ -191,7 +204,7 @@
 				->addItem(
 					new CFormField(
 						(new CCheckBox('interfaces[#{iface.interfaceid}][details][bulk]', SNMP_BULK_ENABLED))
-							->setLabel(_('Use bulk requests'))
+							->setLabel(_('Use combined requests'))
 					)
 				)
 		))

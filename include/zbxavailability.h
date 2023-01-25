@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,11 @@
 #include "zbxtypes.h"
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
+
+/* interface availability */
+#define INTERFACE_AVAILABLE_UNKNOWN		0
+#define INTERFACE_AVAILABLE_TRUE		1
+#define INTERFACE_AVAILABLE_FALSE		2
 
 #define ZBX_IPC_SERVICE_AVAILABILITY		"availability"
 #define ZBX_IPC_AVAILABILITY_REQUEST		1

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 **/
 
 #include "service_manager.h"
+#include "../server.h"
 
 #include "log.h"
 #include "zbxself.h"
@@ -28,8 +29,9 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"
+#include "zbxcacheconfig.h"
+#include "zbx_trigger_constants.h"
 
-extern unsigned char			program_type;
 extern int				CONFIG_SERVICEMAN_SYNC_FREQUENCY;
 
 /* keep deleted problem eventids up to 2 hours in case problem deletion arrived before problem or before recovery */
@@ -271,7 +273,7 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 			zbx_vector_ptr_append(&event->tags, tag);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -517,7 +519,7 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, in
 					service_problem_tag);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->service_problem_tags, &iter);
 	while (NULL != (service_problem_tag = (zbx_service_problem_tag_t *)zbx_hashset_iter_next(&iter)))
@@ -622,7 +624,7 @@ static void	sync_services(zbx_service_manager_t *service_manager, int *updated, 
 		if (0 != update)
 			(*updated)++;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->services, &iter);
 	while (NULL != (service = (zbx_service_t *)zbx_hashset_iter_next(&iter)))
@@ -728,7 +730,7 @@ static void	sync_service_rules(zbx_service_manager_t *service_manager, int *upda
 		if (0 != update)
 			(*updated)++;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->service_rules, &iter);
 	while (NULL != (rule = (zbx_service_rule_t *)zbx_hashset_iter_next(&iter)))
@@ -778,7 +780,7 @@ static void	sync_service_tags(zbx_service_manager_t *service_manager, int revisi
 
 		service_tag->revision = revision;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->service_tags, &iter);
 	while (NULL != (service_tag = (zbx_service_tag_t *)zbx_hashset_iter_next(&iter)))
@@ -845,7 +847,7 @@ static void	sync_services_links(zbx_service_manager_t *service_manager, int *upd
 		zbx_vector_ptr_append(&parent->children, child);
 		zbx_vector_ptr_append(&child->parents, parent);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->services_links, &iter);
 	while (NULL != (services_link = (zbx_services_link_t *)zbx_hashset_iter_next(&iter)))
@@ -892,7 +894,7 @@ static void	sync_service_problems(zbx_hashset_t *services, zbx_hashset_t *servic
 
 		add_service_problem(service, service_problems_index, service_problem);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -930,7 +932,7 @@ static void	sync_actions(zbx_service_manager_t *service_manager, int revision)
 		ZBX_STR2UCHAR(action->evaltype, row[1]);
 		action->revision = revision;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->actions, &iter);
 	while (NULL != (action = (zbx_service_action_t *)zbx_hashset_iter_next(&iter)))
@@ -1059,7 +1061,7 @@ static void	sync_action_conditions(zbx_service_manager_t *service_manager, int r
 
 		zbx_vector_ptr_append(&actions, action);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->action_conditions, &iter);
 	while (NULL != (action_condition = (zbx_service_action_condition_t *)zbx_hashset_iter_next(&iter)))
@@ -1132,7 +1134,7 @@ static void	sync_config(zbx_service_manager_t *service_manager)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static void	service_clean(zbx_service_t *service)
@@ -2000,6 +2002,9 @@ static char	*service_get_event_name(zbx_service_manager_t *manager, const char *
 		return zbx_dsprintf(NULL, "Status of unknown service changed to %s", severity);
 }
 
+/* business service values */
+#define SERVICE_VALUE_OK		0
+#define SERVICE_VALUE_PROBLEM		1
 /******************************************************************************
  *                                                                            *
  * Purpose: create service events based on service updates                    *
@@ -2163,7 +2168,7 @@ static void	db_get_service_problems(zbx_vector_uint64_t *serviceids, zbx_vector_
 		zbx_vector_uint64_pair_append(problem_service, pair);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 }
 
@@ -2312,6 +2317,8 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+#undef SERVICE_VALUE_OK
+#undef SERVICE_VALUE_PROBLEM
 
 static int	compare_uint64_pair_second(const void *d1, const void *d2)
 {
@@ -3273,7 +3280,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 				server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -3377,7 +3384,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@
  */
 
 #ifndef HAVE_SQLITE3
-
-extern unsigned char program_type;
 
 static int	DBpatch_2030000(void)
 {
@@ -278,7 +276,7 @@ static int	DBpatch_2030024(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -379,7 +377,7 @@ static int	DBpatch_2030037(void)
 				NULL
 			};
 
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	return DBcreate_table(&table);
@@ -387,7 +385,7 @@ static int	DBpatch_2030037(void)
 
 static int	DBpatch_2030038(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -431,7 +429,7 @@ static int	DBpatch_2030040(void)
 
 static int	DBpatch_2030041(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -445,7 +443,7 @@ static int	DBpatch_2030041(void)
 
 static int	DBpatch_2030042(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	return DBdrop_table("ids_tmp");
@@ -504,7 +502,7 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 
 	if (NULL != (row = DBfetch(result)))
 		local_nodeid = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == local_nodeid)
 		return SUCCEED;
@@ -548,7 +546,7 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 
 		zbx_free(name_esc);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(name);
 
@@ -573,7 +571,7 @@ static int	check_data_uniqueness(const char *table_name, const char *field_name)
 				" Remove it manually and restart the process.", row[0], field_name, table_name);
 		ret = FAIL;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -686,7 +684,7 @@ static int	DBpatch_2030065(void)
 
 	if (NULL != (row = DBfetch(result)))
 		local_nodeid = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == local_nodeid)
 		return SUCCEED;
@@ -718,7 +716,7 @@ static int	DBpatch_2030067(void)
 
 static int	DBpatch_2030068(void)
 {
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 	{
 		/* "name" is empty on proxy side, because it is not synchronized between server and proxy */
 		/* in 2.2, and should therefore be filled with unique values to create a unique index.    */
@@ -964,7 +962,7 @@ static int	DBpatch_2030094(void)
 			zbx_free(expr_esc);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(expr);
 
@@ -1198,7 +1196,7 @@ static int	DBpatch_2030095(void)
 			zbx_free(params_esc);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(params);
 

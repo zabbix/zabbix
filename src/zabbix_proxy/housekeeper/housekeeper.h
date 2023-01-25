@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,12 @@
 extern int	CONFIG_HOUSEKEEPING_FREQUENCY;
 extern int	CONFIG_PROXY_LOCAL_BUFFER;
 extern int	CONFIG_PROXY_OFFLINE_BUFFER;
+
+typedef struct
+{
+	int			config_timeout;
+}
+zbx_thread_proxy_housekeeper_args;
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args);
 

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -211,6 +211,9 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		))->addClass('dataset-actions');
 
 		return (new CListItem([
+			(new CLabel(''))
+				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
+				->addClass('js-dataset-label'),
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
 				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
@@ -290,8 +293,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 									->setMin(0)
 									->setMax(10)
 							)
-						]),
-					(new CFormGrid())
+						])
 						->addItem([
 							new CLabel(_('Missing data')),
 							new CFormField(
@@ -311,7 +313,8 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setModern()
 							)
-						])
+						]),
+					(new CFormGrid())
 						->addItem([
 							new CLabel(_('Y-axis')),
 							new CFormField(
@@ -375,9 +378,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Approximation'),
-								'label-'.$field_name.'_'.$row_num.'_approximation'
-							),
+							new CLabel(_('Approximation'), 'label-'.$field_name.'_'.$row_num.'_approximation'),
 							new CFormField(
 								(new CSelect($field_name.'['.$row_num.'][approximation]'))
 									->setId($field_name.'_'.$row_num.'_approximation')
@@ -393,6 +394,17 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 										APPROXIMATION_MAX => _('max')
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							)
+						])
+						->addItem([
+							new CLabel([
+								_('Data set label'),
+								makeHelpIcon(_('Also used as legend label for aggregated data sets.'))
+							], $field_name.'_'.$row_num.'_data_set_label'),
+							new CFormField(
+								(new CTextBox($field_name.'['.$row_num.'][data_set_label]', $value['data_set_label']))
+									->setId($field_name.'_'.$row_num.'_data_set_label')
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							)
 						])
 				])

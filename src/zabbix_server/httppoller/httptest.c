@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,15 @@
 #include "httpmacro.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
+#include "zbx_host_constants.h"
+#include "zbx_item_constants.h"
+
+/* HTTP item types */
+#define ZBX_HTTPITEM_TYPE_RSPCODE	0
+#define ZBX_HTTPITEM_TYPE_TIME		1
+#define ZBX_HTTPITEM_TYPE_SPEED		2
+#define ZBX_HTTPITEM_TYPE_LASTSTEP	3
+#define ZBX_HTTPITEM_TYPE_LASTERROR	4
 
 typedef struct
 {
@@ -141,7 +150,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 		ZBX_STR2UINT64(itemids[num], row[1]);
 		num++;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < num)
 	{
@@ -280,7 +289,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 		ZBX_STR2UINT64(itemids[num], row[1]);
 		num++;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < num)
 	{
@@ -478,7 +487,7 @@ out:
 	httppairs_free(&headers);
 	httppairs_free(&query_fields);
 	httppairs_free(&post_fields);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -597,7 +606,7 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 	httpstep_pairs_join(&httptest->headers, &alloc_len, &offset, ":", "\r\n", &headers);
 out:
 	httppairs_free(&headers);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -662,7 +671,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest, int *delay
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
@@ -990,7 +1000,7 @@ httptest_error:
 					"%s", db_httpstep.name, httptest->httptest.name, host->name, err_str);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != speed_download_num)
 		speed_download /= speed_download_num;
@@ -1061,7 +1071,7 @@ int	process_httptests(int now, time_t *nextcheck)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot process web scenario \"%s\" on host \"%s\": "
 						"cannot load web scenario data", httptest.httptest.name, host.name);
-				DBfree_result(result);
+				zbx_db_free_result(result);
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
@@ -1138,7 +1148,7 @@ int	process_httptests(int now, time_t *nextcheck)
 
 			httptests_count++;	/* performance metric */
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 	while (ZBX_IS_RUNNING() && SUCCEED == zbx_dc_httptest_next(now, &httptestid, nextcheck));
 

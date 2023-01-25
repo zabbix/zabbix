@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-10-24T17:40:14Z'
+  date: '2022-12-19T09:58:24Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -339,6 +339,18 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: bf99f88e47a64ecab98de4f3cfe6592f
+          name: 'Get filesystems'
+          key: vfs.fs.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: daf35c33bb84443f893bb06bfe10f870
           name: 'Available memory'
           key: 'vm.memory.size[available]'
@@ -403,23 +415,33 @@ zabbix_export:
         -
           uuid: c537fbe006d7434dab08add1dcf87537
           name: 'Mounted filesystem discovery'
-          key: vfs.fs.discovery
-          delay: 1h
+          type: DEPENDENT
+          key: vfs.fs.dependent.discovery
+          delay: '0'
           filter:
             conditions:
               -
                 macro: '{#FSTYPE}'
                 value: '@File systems for discovery'
                 formulaid: A
-          description: 'Discovery of different types of file systems as defined in the global regular expression "File systems for discovery".'
+          description: 'Discovery of different types of file systems as defined in the global regular expression "File systems for discovery". Note that the option to exclude dmg software images from discovery is available only with Zabbix agents 6.4 and higher.'
           item_prototypes:
             -
               uuid: b7560dc2b6f743458128961cc962bcd3
-              name: '{#FSNAME}: Free inodes (percentage)'
-              key: 'vfs.fs.inode[{#FSNAME},pfree]'
+              name: '{#FSNAME}: Free inodes, %'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.inode[{#FSNAME},pfree]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.inodes.pfree
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -430,7 +452,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 91cccd7935854a47bf4ca184b1d4d09a
-                  expression: 'last(/macOS/vfs.fs.inode[{#FSNAME},pfree])<20'
+                  expression: 'last(/macOS/vfs.fs.dependent.inode[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free inodes is less than 20%'
                   priority: WARNING
                   tags:
@@ -443,9 +465,18 @@ zabbix_export:
             -
               uuid: 29340ac4c5d3419cb4508641e85d787d
               name: '{#FSNAME}: Free disk space'
-              key: 'vfs.fs.size[{#FSNAME},free]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},free]'
+              delay: '0'
               history: 7d
               units: B
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.free
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -455,11 +486,20 @@ zabbix_export:
                   value: '{#FSNAME}'
             -
               uuid: 6d9aa50bddb642499ad575a0cc71146b
-              name: '{#FSNAME}: Free disk space (percentage)'
-              key: 'vfs.fs.size[{#FSNAME},pfree]'
+              name: '{#FSNAME}: Free disk space, %'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},pfree]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.pfree
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -470,7 +510,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 673dbc5aec474abda3a3b392d31b6c11
-                  expression: 'last(/macOS/vfs.fs.size[{#FSNAME},pfree])<20'
+                  expression: 'last(/macOS/vfs.fs.dependent.size[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free disk space is less than 20%'
                   priority: WARNING
                   tags:
@@ -483,10 +523,18 @@ zabbix_export:
             -
               uuid: c311ced2b4204b368af1c8a8c27f9c99
               name: '{#FSNAME}: Total disk space'
-              key: 'vfs.fs.size[{#FSNAME},total]'
-              delay: 1h
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},total]'
+              delay: '0'
               history: 7d
               units: B
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.total
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -497,13 +545,48 @@ zabbix_export:
             -
               uuid: 748612098b4e4befa0f39f11b99eced4
               name: '{#FSNAME}: Used disk space'
-              key: 'vfs.fs.size[{#FSNAME},used]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},used]'
+              delay: '0'
               history: 7d
               units: B
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.used
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
                   value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: c035c0bc26a24f58900e1af301007914
+              name: '{#FSNAME}: Get filesystem data'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent[{#FSNAME},data]'
+              delay: '0'
+              history: 1h
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.fsname==''{#FSNAME}'')].first()'
+              master_item:
+                key: vfs.fs.get
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: filesystem
                   value: '{#FSNAME}'
@@ -523,13 +606,69 @@ zabbix_export:
                   type: GRAPH_SUM
                   item:
                     host: macOS
-                    key: 'vfs.fs.size[{#FSNAME},total]'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},total]'
                 -
                   sortorder: '1'
                   color: 00C800
                   item:
                     host: macOS
-                    key: 'vfs.fs.size[{#FSNAME},free]'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},free]'
+          master_item:
+            key: vfs.fs.get
+          lld_macro_paths:
+            -
+              lld_macro: '{#FSNAME}'
+              path: $.fsname
+            -
+              lld_macro: '{#FSOPTIONS}'
+              path: $.options
+            -
+              lld_macro: '{#FSTYPE}'
+              path: $.fstype
+          overrides:
+            -
+              name: 'Exclude dmg'
+              step: '1'
+              filter:
+                evaltype: AND
+                conditions:
+                  -
+                    macro: '{#FSOPTIONS}'
+                    operator: EXISTS
+                    formulaid: A
+                  -
+                    macro: '{#FSOPTIONS}'
+                    value: '(?:^|,)noowners\b'
+                    formulaid: B
+                  -
+                    macro: '{#FSOPTIONS}'
+                    value: '(?:^|,)read-only\b'
+                    formulaid: C
+                  -
+                    macro: '{#FSTYPE}'
+                    value: hfs
+                    formulaid: D
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: .+
+                  discover: NO_DISCOVER
+            -
+              name: 'Skip metadata collection for dynamic FS'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: inode
+                  discover: NO_DISCOVER
       tags:
         -
           tag: class

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,14 +24,12 @@
  */
 class CLdapAuthValidator extends CValidator {
 
-	public $conf = [
-		'host' => null,
-		'port' => null,
-		'base_dn' => null,
-		'bind_dn' => null,
-		'bind_password' => null,
-		'search_attribute' => null
-	];
+	/**
+	 * Initialized LDAP service instance to test user credentials.
+	 *
+	 * @var CLdap
+	 */
+	public $ldap;
 
 	/**
 	 * Switch between more detailed or more generic error message mode.
@@ -52,14 +50,10 @@ class CLdapAuthValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($value) {
-		$status = false;
-
-		$ldap = new CLdap($this->conf);
-
-		$status = $ldap->checkPass($value['username'], $value['password']);
+		$status = $this->ldap->checkCredentials($value['username'], $value['password']);
 
 		if (!$status) {
-			$this->setError($ldap->error);
+			$this->setError($this->ldap->error);
 		}
 
 		return $status;
@@ -80,7 +74,8 @@ class CLdapAuthValidator extends CValidator {
 			CLdap::ERR_OPT_PROTOCOL_FAILED => _('Setting LDAP protocol failed.'),
 			CLdap::ERR_OPT_TLS_FAILED => _('Starting TLS failed.'),
 			CLdap::ERR_OPT_REFERRALS_FAILED => _('Setting LDAP referrals to "Off" failed.'),
-			CLdap::ERR_OPT_DEREF_FAILED => _('Setting LDAP dereferencing mode failed.')
+			CLdap::ERR_OPT_DEREF_FAILED => _('Setting LDAP dereferencing mode failed.'),
+			CLdap::ERR_BIND_DNSTRING_UNAVAILABLE => _('Cannot bind to LDAP server.')
 		];
 
 		$messages[CLdap::ERR_USER_NOT_FOUND] = $this->detailed_errors

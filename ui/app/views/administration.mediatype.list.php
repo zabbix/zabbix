@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('administration.mediatype.list.js.php');
+
 if ($data['uncheck']) {
 	uncheckTableRows('mediatype');
 }
@@ -36,9 +38,10 @@ $html_page = (new CHtmlPage())
 			->addItem(
 				(new CButton('', _('Import')))
 					->onClick(
-						'return PopUp("popup.import", {rules_preset: "mediatype"},
-							{dialogue_class: "modal-popup-generic"}
-						);'
+						'return PopUp("popup.import", {rules_preset: "mediatype"},{
+							dialogueid: "popup_import",
+							dialogue_class: "modal-popup-generic"
+						});'
 					)
 					->removeId()
 			)
@@ -121,13 +124,11 @@ foreach ($data['mediatypes'] as $mediaType) {
 	$actionLinks = [];
 	if (!empty($mediaType['listOfActions'])) {
 		foreach ($mediaType['listOfActions'] as $action) {
-			$actionLinks[] = new CLink($action['name'],
-				(new CUrl('actionconf.php'))
-					->setArgument('eventsource', $action['eventsource'])
-					->setArgument('form', 'update')
-					->setArgument('actionid', $action['actionid'])
-					->getUrl()
-			);
+			$actionLinks[] = (new CLink($action['name']))
+				->addClass('js-action-edit')
+				->setAttribute('data-actionid', $action['actionid'])
+				->setAttribute('data-eventsource', $action['eventsource']);
+
 			$actionLinks[] = ', ';
 		}
 		array_pop($actionLinks);
@@ -203,4 +204,8 @@ $mediaTypeForm->addItem([
 // append form to widget
 $html_page
 	->addItem($mediaTypeForm)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();
