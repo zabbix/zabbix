@@ -72,7 +72,7 @@ $filter = (new CFilter())
 			->addItem([
 				new CLabel(_('Name'), 'filter_name'),
 				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			]),
 		(new CFormGrid())->addItem([
 			new CLabel(_('State')),
