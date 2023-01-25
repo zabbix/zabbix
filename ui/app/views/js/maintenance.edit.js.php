@@ -207,6 +207,10 @@ window.maintenance_edit = new class {
 			}
 		}
 
+		if (typeof(fields.timeperiods) === 'object') {
+			fields.timeperiods = Object.values(fields.timeperiods);
+		}
+
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php', false);

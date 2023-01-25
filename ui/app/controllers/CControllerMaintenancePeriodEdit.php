@@ -86,6 +86,7 @@ class CControllerMaintenancePeriodEdit extends CController {
 				'timeperiod_type' =>	$this->getInput('timeperiod_type'),
 				'every' =>				$this->getInput('every'),
 				'day' =>				$this->getInput('day'),
+				'month' =>				$this->getInput('month'),
 				'dayofweek' =>			$this->getInput('dayofweek'),
 				'start_date' =>			$this->getInput('start_date'),
 				'period' =>				$this->getInput('period'),

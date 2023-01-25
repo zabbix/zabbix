@@ -137,15 +137,12 @@ window.maintenance_period_edit = new class {
 				break;
 			case '<?= TIMEPERIOD_TYPE_DAILY ?>':
 				fields.every = document.getElementById('every_day').value;
-				console.log(document.getElementById('every_day'));
 				break;
 			case '<?= TIMEPERIOD_TYPE_WEEKLY ?>':
 				fields.every = document.getElementById('every_week').value;
-				console.log(document.getElementById('every_week'));
 				break;
 			case '<?= TIMEPERIOD_TYPE_MONTHLY ?>':
 				fields.every = document.getElementById('every_dow').value;
-				console.log(document.getElementById('every_dow'));
 				break;
 		}
 

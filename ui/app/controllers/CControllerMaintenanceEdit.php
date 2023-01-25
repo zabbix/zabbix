@@ -94,7 +94,7 @@ class CControllerMaintenanceEdit extends CController {
 					'schedule' => $timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME
 						? $timeperiod['start_date']
 						: schedule2str($timeperiod),
-					'period_table_entry' =>zbx_date2age(0, $timeperiod['period'])
+					'period_table_entry' => zbx_date2age(0, $timeperiod['period'])
 				];
 			}
 			unset($timeperiod);
