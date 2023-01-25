@@ -1386,6 +1386,11 @@ class CTemplate extends CHostGeneral {
 			}
 
 			$vendor = array_filter($vendor, 'strlen');
+
+			if (!$vendor) {
+				continue;
+			}
+
 			$empty_fields = array_keys(array_diff_key($vendor_field_keys, $vendor));
 
 			if ($empty_fields) {
