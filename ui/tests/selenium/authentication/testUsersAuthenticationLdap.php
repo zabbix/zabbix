@@ -1806,7 +1806,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			// Check DB configuration.
 			foreach ($data['db_check'] as $table => $rows) {
 				foreach ($rows as $i => $row) {
-					$rows = array_map('trim', $row);
+					if (CTestArrayHelper::get($data, 'trim', false)) {
+						$rows = array_map('trim', $row);
+					}
+
 					$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table.' LIMIT 1 OFFSET '.$i;
 					$this->assertEquals([$row], CDBHelper::getAll($sql));
 				}
