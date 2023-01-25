@@ -204,7 +204,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					'error' => 'Incorrect value for field "saml_group_name": cannot be empty.'
 				]
 			],
-			// #4 Configure SAML with only.
+			// #5 Configure SAML with minimal fields.
 			[
 				[
 					'fields' => [
@@ -215,43 +215,225 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					]
 				]
 			],
-			// #5 Various UTF-8 characters in SAML settings fields.
+			// #6 Various UTF-8 characters in SAML settings fields.
 			[
 				[
 					'fields' => [
 						'IdP entity ID' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 						'SSO service URL' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+						'SLO service URL' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 						'Username attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 						'SP entity ID' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-						'SLO service URL' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-						'SP name ID format' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
+						'Enable JIT provisioning' => true,
+						'SP name ID format' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+						'Group name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+						'User name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+						'User last name attribute'=> '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
+					],
+					'User group mapping' => [
+						[
+							'LDAP group pattern' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+							'User groups' => 'Test timezone',
+							'User role' => 'User role'
+						]
+					],
+					'Media type mapping' => [
+						[
+							'Name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+							'Media type' => 'Discord',
+							'Attribute' => 'test discord'
+						]
+					],
+					'db_check' => [
+						'config' => [
+							'saml_auth_enabled' => 1,
+							'saml_case_sensitive' => 1,
+							'saml_jit_status' => 1
+						],
+						'userdirectory_saml' => [
+							'idp_entityid' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+							'sso_url' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+							'slo_url' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+							'username_attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+							'sp_entityid' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+							'nameid_format' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						],
+						'userdirectory_media' => [
+							[
+								'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'mediatypeid' => 10,
+								'attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
+							],
+							[
+								'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'mediatypeid' => 22,
+								'attribute' => 'test iLert'
+							]
+						]
 					]
 				]
 			],
-			// #6 SAML settings with leading and trailing spaces.
+			// #7 SAML settings with leading and trailing spaces.
 			[
 				[
+					'trim' => true,
 					'fields' => [
 						'IdP entity ID' => '   leading.trailing   ',
 						'SSO service URL' => '   leading.trailing   ',
+						'SLO service URL' => '   leading.trailing   ',
 						'Username attribute' => '   leading.trailing   ',
 						'SP entity ID' => '   leading.trailing   ',
-						'SLO service URL' => '   leading.trailing   ',
-						'SP name ID format' => '   leading.trailing   '
+						'SP name ID format' => '   leading.trailing   ',
+						'Enable JIT provisioning' => true,
+						'Group name attribute' => '   leading.trailing   ',
+						'User name attribute' => '   leading.trailing   ',
+						'User last name attribute'=> '   leading.trailing   '
 					],
-					'trim' => true
+					'User group mapping' => [
+						[
+							'LDAP group pattern' => '   leading.trailing   ',
+							'User groups' => 'Test timezone',
+							'User role' => 'User role'
+						]
+					],
+					'Media type mapping' => [
+						[
+							'Name' => '   leading.trailing   ',
+							'Media type' => 'Discord',
+							'Attribute' => 'test discord'
+						]
+					],
+					'db_check' => [
+						'config' => [
+							'saml_auth_enabled' => 1,
+							'saml_case_sensitive' => 1,
+							'saml_jit_status' => 1
+						],
+						'userdirectory_saml' => [
+							'idp_entityid' => 'leading.trailing',
+							'sso_url' => 'leading.trailing',
+							'slo_url' => 'leading.trailing',
+							'username_attribute' => 'leading.trailing',
+							'sp_entityid' => 'leading.trailing',
+							'nameid_format' => 'leading.trailing',
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => 'leading.trailing',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						],
+						'userdirectory_media' => [
+							[
+								'name' => 'leading.trailing',
+								'mediatypeid' => 10,
+								'attribute' => 'test discord'
+							],
+							[
+								'name' => 'leading.trailing',
+								'mediatypeid' => 22,
+								'attribute' => 'test iLert'
+							]
+						]
+					]
 				]
 			],
-			// #7 Configure SAML with all possible parameters.
+			// #8 SAML settings with long values in fields.
 			[
 				[
+					'trim' => true,
+					'fields' => [
+						'IdP entity ID' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+						'SSO service URL' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+						'SLO service URL' => '   leading.trailing   ',
+						'Username attribute' => '   leading.trailing   ',
+						'SP entity ID' => '   leading.trailing   ',
+						'SP name ID format' => '   leading.trailing   ',
+						'Enable JIT provisioning' => true,
+						'Group name attribute' => '   leading.trailing   ',
+						'User name attribute' => '   leading.trailing   ',
+						'User last name attribute'=> '   leading.trailing   '
+					],
+					'User group mapping' => [
+						[
+							'LDAP group pattern' => '   leading.trailing   ',
+							'User groups' => 'Test timezone',
+							'User role' => 'User role'
+						]
+					],
+					'Media type mapping' => [
+						[
+							'Name' => '   leading.trailing   ',
+							'Media type' => 'Discord',
+							'Attribute' => 'test discord'
+						]
+					],
+					'db_check' => [
+						'config' => [
+							'saml_auth_enabled' => 1,
+							'saml_case_sensitive' => 1,
+							'saml_jit_status' => 1
+						],
+						'userdirectory_saml' => [
+							'idp_entityid' => 'leading.trailing',
+							'sso_url' => 'leading.trailing',
+							'slo_url' => 'leading.trailing',
+							'username_attribute' => 'leading.trailing',
+							'sp_entityid' => 'leading.trailing',
+							'nameid_format' => 'leading.trailing',
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => 'leading.trailing',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						],
+						'userdirectory_media' => [
+							[
+								'name' => 'leading.trailing',
+								'mediatypeid' => 10,
+								'attribute' => 'test discord'
+							],
+							[
+								'name' => 'leading.trailing',
+								'mediatypeid' => 22,
+								'attribute' => 'test iLert'
+							]
+						]
+					]
+				]
+			],
+			// #8 Configure SAML with all  parameters, but no JIT.
+			[
+				[
+					'Deprovisioned users group' => 'Disabled',
 					'fields' => [
 						'IdP entity ID' => 'IdP_saml_zabbix.com',
 						'SSO service URL' => 'SSO_saml_zabbix.com',
 						'SLO service URL' => 'SLO_saml_zabbix.com',
 						'Username attribute' => 'Username attribute',
 						'SP entity ID' => 'SP entity ID',
-						'Enable JIT provisioning' => true,
 						'SP name ID format' => 'SP name ID format',
 						// Sign.
 						'id:sign_messages' => true,
@@ -262,33 +444,33 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						// Encrypt.
 						'id:encrypt_nameid' => true,
 						'id:encrypt_assertions' => true,
-						'Case-sensitive login' => true
-					],
-					'Deprovisioned users group' => 'Disabled',
-					'db_check' => [
-						'config' => [
-							'saml_auth_enabled' => 1,
-							'saml_case_sensitive' => 1,
-							'saml_jit_status' => 1
-						],
-						'userdirectory_saml' => [
-							'idp_entityid' => 'IdP_saml_zabbix.com',
-							'sso_url' => 'SSO_saml_zabbix.com',
-							'slo_url' => 'SLO_saml_zabbix.com',
-							'username_attribute' => 'Username attribute',
-							'sp_entityid' => 'SP entity ID',
-							'nameid_format' => 'SP name ID format',
-							'sign_messages' => 1,
-							'sign_assertions' => 1,
-							'sign_authn_requests' => 1,
-							'sign_logout_requests' => 1,
-							'sign_logout_responses' => 1,
-							'encrypt_nameid' => 1,
-							'encrypt_assertions' => 1
+						'Case-sensitive login' => true,
+						'db_check' => [
+							'config' => [
+								'saml_auth_enabled' => 1,
+								'saml_case_sensitive' => 1,
+							],
+							'userdirectory_saml' => [
+								'idp_entityid' => 'IdP_saml_zabbix.com',
+								'sso_url' => 'SSO_saml_zabbix.com',
+								'slo_url' => 'SLO_saml_zabbix.com',
+								'username_attribute' => 'Username attribute',
+								'sp_entityid' => 'SP entity ID',
+								'nameid_format' => 'SP name ID format',
+								'sign_messages' => 1,
+								'sign_assertions' => 1,
+								'sign_authn_requests' => 1,
+								'sign_logout_requests' => 1,
+								'sign_logout_responses' => 1,
+								'encrypt_nameid' => 1,
+								'encrypt_assertions' => 1
+							]
 						]
 					]
 				]
-			]
+			],
+			// #9 Configure SAML with all possible parameters and with  JIT.
+
 		];
 	}
 
