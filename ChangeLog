@@ -1,6 +1,9 @@
 Changes for 6.4.0beta6
 
 New features:
+.......... [ZBX-20110] added single field search option to oracle archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys for Zabbix agent 2 (esneiders)
+.........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
+.........T [ZBXNEXT-7775] added veeam backup and replication templates (egordymov)
 ..F....... [ZBXNEXT-7605] replaced column "Ack" with "Update" in problem lists (Ivo)
 ....I..... [ZBXNEXT-8213] added database upgrade patch for renamed Actions filters (dpetra)
 ..F....... [ZBXNEXT-1354] implemented host filtering by status (dpetra)
