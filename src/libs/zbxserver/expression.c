@@ -6232,7 +6232,7 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 		char **exp, size_t *exp_alloc, size_t *exp_offset, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t max_error_len)
 {
-	int		ret = SUCCEED;
+	int		ret = SUCCEED, index = 0;
 	size_t		sep_pos;
 	char		*param = NULL;
 	const char	*p;
@@ -6287,14 +6287,17 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 		}
 		else
 		{
-			int	is_lld_macro = 0;
+			int	check_quoting = 0;
 
-			if (0 == strncmp(param, "{#", 2))
-				is_lld_macro = 1;
+			/* don't attempt to quote first two parameters - /host/key placeholder and time period. */
+			/* While depending on function time period might have different syntax, it still does   */
+			/* not have to be quoted.                                                               */
+			if (2 <= index && 0 == strncmp(param, "{#", 2))
+				check_quoting = 1;
 
 			substitute_lld_macros(&param, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
-			if (0 == quoted && 0 != is_lld_macro && SUCCEED != zbx_eval_suffixed_number_parse(param, NULL))
+			if (0 == quoted && 0 != check_quoting && SUCCEED != zbx_eval_suffixed_number_parse(param, NULL))
 				quoted = 1;
 		}
 
@@ -6312,6 +6315,8 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 		if (sep_pos < rel_len)
 			zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p + param_pos + param_len,
 					sep_pos - param_pos - param_len + 1);
+
+		index++;
 	}
 out:
 	zbx_free(param);
