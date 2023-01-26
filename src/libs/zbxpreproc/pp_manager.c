@@ -177,10 +177,12 @@ void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
 {
 	int	i;
 
+	pp_task_queue_lock(&manager->queue);
 	for (i = 0; i < manager->workers_num; i++)
 		pp_worker_stop(&manager->workers[i]);
 
 	pp_task_queue_notify_all(&manager->queue);
+	pp_task_queue_unlock(&manager->queue);
 
 	for (i = 0; i < manager->workers_num; i++)
 		pp_worker_destroy(&manager->workers[i]);
@@ -221,8 +223,8 @@ void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t 
 	task = pp_task_test_create(preproc, value, ts, client);
 	pp_task_queue_lock(&manager->queue);
 	pp_task_queue_push_test(&manager->queue, task);
-	pp_task_queue_unlock(&manager->queue);
 	pp_task_queue_notify(&manager->queue);
+	pp_task_queue_unlock(&manager->queue);
 }
 
 /******************************************************************************
@@ -262,8 +264,8 @@ int	zbx_pp_manager_queue_preproc(zbx_pp_manager_t *manager, zbx_uint64_t itemid,
 
 	pp_task_queue_lock(&manager->queue);
 	pp_task_queue_push(&manager->queue, item, task);
-	pp_task_queue_unlock(&manager->queue);
 	pp_task_queue_notify(&manager->queue);
+	pp_task_queue_unlock(&manager->queue);
 
 	return SUCCEED;
 }
@@ -307,6 +309,8 @@ static zbx_pp_item_t	*pp_manager_get_cacheable_dependent_item(zbx_pp_manager_t *
  *             ts             - [IN] the value timestamp                      *
  *             cache          - [IN] the preprocessing cache                  *
  *                                   (optional, can be NULL)                  *
+ *                                                                            *
+ * Comments: This function called within task queue lock.                     *
  *                                                                            *
  ******************************************************************************/
 static void	pp_manager_queue_dependents(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc,
@@ -358,6 +362,8 @@ static void	pp_manager_queue_dependents(zbx_pp_manager_t *manager, zbx_pp_item_p
  * Parameters: manager - [IN] the manager                                     *
  *             task    - [IN] the finished value task                         *
  *                                                                            *
+ * Comments: This function called within task queue lock.                     *
+ *                                                                            *
  ******************************************************************************/
 static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp_task_t *task)
 {
@@ -392,6 +398,8 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
  * Parameters: manager - [IN] the manager                                     *
  *             task    - [IN] the finished dependent task                     *
  *                                                                            *
+ * Comments: This function called within task queue lock.                     *
+ *                                                                            *
  ******************************************************************************/
 static zbx_pp_task_t	*pp_manager_queue_dependent_task_result(zbx_pp_manager_t *manager, zbx_pp_task_t *task)
 {
@@ -414,6 +422,8 @@ static zbx_pp_task_t	*pp_manager_queue_dependent_task_result(zbx_pp_manager_t *m
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
  *             task    - [IN] the finished sequence task                      *
+ *                                                                            *
+ * Comments: This function called within task queue lock.                     *
  *                                                                            *
  ******************************************************************************/
 static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *manager, zbx_pp_task_t *task_seq)
