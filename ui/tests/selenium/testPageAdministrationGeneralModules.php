@@ -929,6 +929,99 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		}
 	}
 
+	public function getWidgetDimensions() {
+		return [
+			// Widget with pre-defined dimentions.
+			[
+				[
+					'module_name' => 'Clock2',
+					'widget_name' => 'Local',
+					'widget_type' => 'ALARM CLOCK',
+					'enable' => true,
+					'page' => 'Map page',
+					'dimentions' => ['width: 33.3333%', 'height: 280px']
+				]
+			],
+			// Widget with pre-defined dimentions on template.
+			[
+				[
+					'module_name' => 'Clock2',
+					'widget_name' => 'Local',
+					'widget_type' => 'ALARM CLOCK',
+					'page' => 'Alarm clock page',
+					'template' => true,
+					'dimentions' => ['width: 33.3333%', 'height: 280px']
+				]
+			],
+			// Widget with default dimentions.
+			[
+				[
+					'module_name' => 'Empty widget',
+					'widget_name' => 'Empty widget',
+					'widget_type' => 'Empty widget',
+					'enable' => true,
+					'page' => 'Map page',
+					'dimentions' => ['width: 50%', 'height: 350px']
+				]
+			]
+		];
+	}
+
+	/**
+	 *
+	 * @depends testPageAdministrationGeneralModules_ChangeWidgetModuleStatus
+	 *
+	 * @dataProvider getWidgetDimensions
+	 */
+	public function testPageAdministrationGeneralModules_CheckWidgetDimentions($data) {
+		$this->page->login();
+
+		if (CTestArrayHelper::get($data, 'enable')) {
+			$this->page->open('zabbix.php?action=module.list');
+			$this->enableModule($data, 'list');
+		}
+
+		$this->checkWidgetDimentions($data);
+
+		// Cancel editing dashboard not to interfere with following cases from data provider.
+		$this->query('link:Cancel')->one()->click();
+		$this->page->acceptAlert();
+	}
+
+	/**
+	 * Add a widget of a specific type to dashboard or template dashboard and check its default dimentions.
+	 *
+	 * @param array	$data	data provider.
+	 */
+	private function checkWidgetDimentions($data) {
+		// Open required dashboard page in edit mode.
+		$url = CTestArrayHelper::get($data, 'template')
+			? 'zabbix.php?action=template.dashboard.edit&dashboardid='.self::$template_dashboardid
+			: 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
+		$this->page->open($url)->waitUntilReady($url);
+
+		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
+		$dashboard->selectPage($data['page']);
+
+		if (!CTestArrayHelper::get($data, 'template')) {
+			$dashboard->edit();
+		}
+
+		// Add widget from the data provider.
+		$widget_form = $dashboard->addWidget()->asForm();
+		$widget_form->fill(['Type' => CFormElement::RELOADABLE_FILL($data['widget_type'])]);
+		$widget_form->submit();
+
+		// Get widget dimentions from the style attribute of the widget grid element and compare with expected values.
+		$grid_selector = 'xpath:.//div[contains(@class, "dashboard-grid-widget-head")]/../..';
+		$widget_dimentions = $dashboard->getWidget($data['widget_name'])->query($grid_selector)->one()->getAttribute('style');
+		$dimention_array = array_map('trim', explode(';', $widget_dimentions));
+
+		foreach ($data['dimentions'] as $dimention) {
+			$this->assertTrue(in_array($dimention, $dimention_array));
+		}
+	}
+
 	/**
 	 * @depends testPageAdministrationGeneralModules_ChangeWidgetModuleStatus
 	 */

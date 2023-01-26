@@ -7,10 +7,6 @@
 	"version": "1.0",
 	"author": "Some Zabbix employee",
 	"widget": {
-		"size": {
-			"width": 3,
-			"height": 4
-		},
 		"refresh_rate": "120"
 	}
 }
