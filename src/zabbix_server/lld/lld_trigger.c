@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -362,7 +362,7 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 
 		zbx_vector_ptr_append(trigger_prototypes, trigger_prototype);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(trigger_prototypes, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
@@ -503,7 +503,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 
 		zbx_vector_ptr_append(triggers, trigger);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -604,7 +604,7 @@ static void	lld_functions_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_p
 				lld_function_free(function);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		if (NULL != trigger_prototypes)
 		{
@@ -712,7 +712,7 @@ static void	lld_dependencies_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vecto
 			zbx_ptr_free(dependency);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < trigger_prototypes->values_num; i++)
 	{
@@ -811,7 +811,7 @@ static void	lld_tags_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -873,7 +873,7 @@ static void	lld_items_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t
 
 		zbx_vector_ptr_append(items, item);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -2210,7 +2210,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 
 			zbx_vector_ptr_append(&db_triggers, db_trigger);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_vector_ptr_sort(&db_triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -3284,7 +3284,7 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 				}
 			}
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 		}
 
 		/* load dependencies */
@@ -3321,7 +3321,7 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 				zbx_vector_uint64_append(&triggerids_down, trigger_node_local.trigger_ref.triggerid);
 			}
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 		}
 
 	}

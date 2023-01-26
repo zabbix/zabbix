@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -397,7 +397,7 @@ static void	lld_hosts_get_tags(zbx_vector_ptr_t *hosts)
 		zbx_vector_db_tag_ptr_append(&host->tags, tag);
 	}
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&hostids);
 }
@@ -546,7 +546,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 
 		zbx_vector_ptr_append(hosts, host);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -811,7 +811,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				}
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_free(sql);
 	}
@@ -845,6 +845,9 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		host = (zbx_lld_host_t *)hosts->values[i];
 
 		if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		if (0 == host->hostid)
 			continue;
 
 		buffer = zbx_strdup(buffer, host->host_proto);
@@ -1055,7 +1058,7 @@ static void	lld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_
 		ZBX_STR2UINT64(groupid, row[0]);
 		zbx_vector_uint64_append(groupids, groupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
@@ -1169,7 +1172,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 				zbx_vector_uint64_remove(&host->new_groupids, i);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_vector_uint64_sort(del_hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
@@ -1211,7 +1214,7 @@ static void	lld_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_
 
 		zbx_vector_ptr_append(group_prototypes, group_prototype);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(group_prototypes, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -1259,7 +1262,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *groups)
 
 		zbx_vector_ptr_append(groups, group);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(groups, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -1562,7 +1565,7 @@ static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 				}
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_free(sql);
 	}
@@ -1694,7 +1697,7 @@ static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 
 		zbx_vector_uint64_pair_append(&rights->rights, pair);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(&group_rights, lld_group_rights_compare);
 
@@ -1978,7 +1981,7 @@ static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2044,7 +2047,7 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < masterhostmacros->values_num; i++)
 	{
@@ -2224,7 +2227,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 
 			lld_hostmacro_make(&host->new_hostmacros, hostmacroid, row[2], row[3], row[4], type, automatic);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
@@ -2260,7 +2263,7 @@ static void	lld_proto_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr
 		tag = zbx_db_tag_create(row[0], row[1]);
 		zbx_vector_db_tag_ptr_append(tags, tag);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2297,7 +2300,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 		ZBX_STR2UINT64(templateid, row[0]);
 		zbx_vector_uint64_append(&templateids, templateid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -2371,7 +2374,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 					zbx_vector_uint64_remove(&host->lnk_templateids, i);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		for (i = 0; i < hosts->values_num; i++)
 		{
@@ -2415,8 +2418,8 @@ static void	lld_interface_snmp_prepare_sql(zbx_uint64_t hostid, const zbx_uint64
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "version=%d", (int)snmp->version);
 		d = ",";
 
-		zbx_audit_host_update_json_update_interface_version(hostid, interfaceid,
-						snmp->version_orig, snmp->version);
+		zbx_audit_host_update_json_update_interface_version(hostid, interfaceid, snmp->version_orig,
+				snmp->version);
 	}
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK))
@@ -3794,7 +3797,7 @@ static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, un
 
 		zbx_vector_ptr_append(interfaces, interface);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(interfaces, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
@@ -4248,7 +4251,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 
 			zbx_vector_lld_interface_append(&old_interfaces, interface);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		if (0 != old_interfaces.values_num)
 			lld_host_interfaces_make(last_hostid, hosts, &old_interfaces);
@@ -4380,7 +4383,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 				}
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	/* validate interfaces which should be deleted */
@@ -4459,7 +4462,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 				}
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_destroy(&interfaceids);
@@ -4514,7 +4517,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		tls_psk_identity = zbx_strdup(NULL, row[9]);
 		tls_psk = zbx_strdup(NULL, row[10]);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (NULL == row)
 	{
@@ -4571,10 +4574,13 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 
 		if (0 != hosts.values_num)
 			lld_hosts_get_tags(&hosts);
+
 		lld_proto_tags_get(parent_hostid, &tags);
 
 		lld_simple_groups_get(parent_hostid, &groupids);
+
 		lld_group_prototypes_get(parent_hostid, &group_prototypes);
+
 		lld_groups_get(parent_hostid, &groups);
 
 		lld_hostmacros_get(parent_hostid, &masterhostmacros, &hostmacros);
@@ -4640,7 +4646,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 			zbx_vector_ptr_destroy(&interfaces_custom);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_clear_ext(&masterhostmacros, (zbx_clean_func_t)lld_hostmacro_free);
 	zbx_vector_ptr_clear_ext(&interfaces, (zbx_clean_func_t)lld_interface_free);

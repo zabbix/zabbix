@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -268,7 +268,7 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 
 		zbx_vector_ptr_append(graphs, graph);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(graphs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -362,7 +362,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 			lld_gitem_free(gitem);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(gitems_proto, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -442,7 +442,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *gitems_proto, zbx_uint64_t ymi
 
 			zbx_vector_ptr_append(items, item);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
@@ -952,7 +952,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 				}
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_free(sql);
 	}
@@ -1538,7 +1538,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		lld_gitems_free(&gitems_proto);
 		lld_graphs_free(&graphs);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_destroy(&items);
 	zbx_vector_ptr_destroy(&gitems_proto);

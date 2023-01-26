@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ static void	DBpatch_get_problems_by_triggerid(zbx_uint64_t triggerid, zbx_vector
 		zbx_vector_uint64_append(eventids, eventid);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static int	DBpatch_5050009(void)
@@ -207,7 +207,7 @@ out:
 	zbx_db_insert_clean(&ins_service_problem_tag);
 	zbx_db_insert_clean(&ins_trigger_tag);
 	zbx_db_insert_clean(&ins_problem_tag);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -513,7 +513,7 @@ static int	dbpatch_update_simple_macro(const char *table, const char *field, con
 
 		zbx_free(out);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -667,7 +667,7 @@ static int	DBpatch_5050068_calc_services_write_value(zbx_uint64_t roleid, int *v
 	*value = default_access;
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -708,7 +708,7 @@ static int	DBpatch_5050068(void)
 		}
 
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
 	ret = zbx_db_insert_execute(&db_insert);
@@ -1211,7 +1211,7 @@ static int	DBpatch_5050114(void)
 		params_offset = 0;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1701,7 +1701,7 @@ static int	DBpatch_5050128(void)
 			zbx_vector_services_times_append(&sla->services_times, service_time);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < slas.values_num; i++)
 	{
@@ -1735,7 +1735,7 @@ static int	DBpatch_5050128(void)
 		THIS_SHOULD_NEVER_HAPPEN;
 		default_timezone = zbx_strdup(NULL, "UTC");
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ret = db_insert_sla(&uniq_slas, default_timezone);
 
@@ -1792,7 +1792,7 @@ static int	DBpatch_5050132(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -398,7 +398,7 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -444,7 +444,7 @@ static int	ha_db_get_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int
 		zbx_vector_ha_node_append(nodes, node);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -512,7 +512,7 @@ static int	ha_db_lock_nodes(zbx_ha_info_t *info)
 	if (NULL == (result = ha_db_select(info, "select null from ha_node order by ha_nodeid" ZBX_FOR_UPDATE)))
 		return FAIL;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -641,7 +641,7 @@ static int	ha_db_get_time(zbx_ha_info_t *info, int *db_time)
 	else
 		*db_time = 0;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ret = SUCCEED;
 out:
@@ -1407,7 +1407,7 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 	else
 		error = "database error";
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zbx_serialize_prepare_str(len, error);
 

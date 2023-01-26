@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -144,7 +144,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 
 	zbx_free(info);
 finish:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	DBbegin();
 
@@ -191,7 +191,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		ZBX_STR2UINT64(itemid, row[0]);
 		zbx_vector_uint64_append(&itemids, itemid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != (processed_num = itemids.values_num))
 		zbx_dc_reschedule_items(&itemids, zbx_time(), NULL);
@@ -302,7 +302,7 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 
 	zbx_free(info);
 finish:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	DBbegin();
 
@@ -374,7 +374,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
 				break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < check_now_taskids.values_num)
 		processed_num += tm_process_check_now(&check_now_taskids);

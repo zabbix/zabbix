@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-12-01 13:30+0000\n"
+"PO-Revision-Date: 2023-01-23 10:27+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -930,11 +930,11 @@ msgstr "Adicionar de"
 
 #: app/partials/configuration.valuemap.php:51
 msgid "Add from host"
-msgstr ""
+msgstr "Adicionar a partir do servidor"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from template"
-msgstr ""
+msgstr "Adicionar a partir do modelo"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -4857,6 +4857,27 @@ msgstr "Coordenadas"
 #: jsLoader.php:164 jsLoader.php:281
 msgid "Copy"
 msgstr "Copiar"
+
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
@@ -20524,6 +20545,10 @@ msgstr ""
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "O status do host \"%1$s\" foi actualizado."
+
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr ""
 
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
