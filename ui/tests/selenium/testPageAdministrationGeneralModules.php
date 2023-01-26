@@ -1034,6 +1034,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->query('button:Disable')->waitUntilCLickable()->one()->click();
 		$this->page->acceptAlert();
 
+		// Wait for the Success message to confirm that modules were disabled before heading to the dashboard.
+		$this->assertTrue(CMessageElement::find()->waitUntilVisible()->one()->isGood());
+
 		// Open dashboard and check that all widgets are inaccessible.
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$this->checkAllWidgetsDisabledOnPage();
