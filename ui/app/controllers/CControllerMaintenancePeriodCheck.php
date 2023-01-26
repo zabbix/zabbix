@@ -94,7 +94,7 @@ class CControllerMaintenancePeriodCheck extends CController {
 				break;
 
 			case TIMEPERIOD_TYPE_WEEKLY:
-				$rules = [
+				$rules += [
 					'every'	=>		'required|ge 1',
 					'days' =>		'required|not_empty'
 				];
@@ -139,7 +139,7 @@ class CControllerMaintenancePeriodCheck extends CController {
 			'every' =>				1,
 			'month' =>				0,
 			'dayofweek' =>			0,
-			'day' =>				1,
+			'day' =>				0,
 			'start_time' =>			0,
 			'period' =>				SEC_PER_HOUR,
 			'start_date' =>			date(ZBX_DATE_TIME)
@@ -152,45 +152,32 @@ class CControllerMaintenancePeriodCheck extends CController {
 				break;
 			case TIMEPERIOD_TYPE_DAILY:
 				$this->getInputs($timeperiod, ['every', 'hour', 'minute']);
+				$timeperiod['start_time'] = ($timeperiod['hour'] * SEC_PER_HOUR) + ($timeperiod['minute'] * SEC_PER_MIN);
 				break;
 			case TIMEPERIOD_TYPE_WEEKLY:
 				$this->getInputs($timeperiod, ['every', 'days', 'hour', 'minute']);
+				$timeperiod['dayofweek'] = array_sum($timeperiod['days']);
+				$timeperiod['start_time'] = ($timeperiod['hour'] * SEC_PER_HOUR) + ($timeperiod['minute'] * SEC_PER_MIN);
 				break;
 			case TIMEPERIOD_TYPE_MONTHLY:
 				$timeperiod['month_date_type'] = $this->getInput('month_date_type');
-				if ($timeperiod['month_date_type']) {
-					$this->getInputs($timeperiod, ['months', 'every', 'monthly_days', 'hour', 'minute']);
-				}
-				else {
+
+
+				if ($timeperiod['month_date_type'] == 0) {
 					$this->getInputs($timeperiod, ['months', 'day', 'hour', 'minute']);
 				}
+				else {
+					$this->getInputs($timeperiod, ['months', 'every', 'monthly_days', 'hour', 'minute']);
+					$timeperiod['dayofweek'] = array_sum($timeperiod['monthly_days']);
+				}
+
+				$timeperiod['start_time'] = ($timeperiod['hour'] * SEC_PER_HOUR) + ($timeperiod['minute'] * SEC_PER_MIN);
+				$timeperiod['month'] = array_sum($timeperiod['months']);
 				break;
 		}
 
 		$timeperiod['period'] = ($timeperiod['period_days'] * SEC_PER_DAY)
 				+ ($timeperiod['period_hours'] * SEC_PER_HOUR) + ($timeperiod['period_minutes'] * SEC_PER_MIN);
-
-		if (array_key_exists('hour', $timeperiod) && array_key_exists('minute', $timeperiod)) {
-			$timeperiod['start_time'] = ($timeperiod['hour'] * SEC_PER_HOUR) + ($timeperiod['minute'] * SEC_PER_MIN);
-		}
-
-		if (array_key_exists('days', $timeperiod)) {
-			$timeperiod['dayofweek'] = array_sum($timeperiod['days']);
-		}
-
-		if (array_key_exists('months', $timeperiod)) {
-			$timeperiod['month'] = array_sum($timeperiod['months']);
-		}
-
-		if ($timeperiod['timeperiod_type'] === TIMEPERIOD_TYPE_MONTHLY) {
-			if ($timeperiod['month_date_type'] == 1) {
-				$timeperiod['dayofweek'] = array_sum($timeperiod['monthly_days']);
-				unset($timeperiod['day']);
-			}
-			else {
-				unset($timeperiod['every']);
-			}
-		}
 
 		$timeperiod += [
 			'period_type' => 		timeperiod_type2str($timeperiod['timeperiod_type']),

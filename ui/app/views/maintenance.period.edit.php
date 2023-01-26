@@ -187,7 +187,7 @@ $form_grid = (new CFormGrid())
 		(new CLabel(_('Maintenance period length'), 'period_days'))->setAsteriskMark(),
 		(new CFormField(
 			(new CDiv([
-				(new CNumericBox('period_days', $data['form']['period_days'], 4))
+				(new CNumericBox('period_days', $data['form']['period_days'], 3))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 				new CLabel(_('Days'), 'period_days'),
 				(new CSelect('period_hours'))

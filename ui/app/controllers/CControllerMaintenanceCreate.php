@@ -84,24 +84,42 @@ class CControllerMaintenanceCreate extends CController {
 		$active_till_date = $absolute_time_parser->getDateTime(true);
 
 		$timeperiods = $this->getInput('timeperiods', []);
-		$type_fields = [
-			TIMEPERIOD_TYPE_ONETIME => ['start_date'],
-			TIMEPERIOD_TYPE_DAILY => ['start_time', 'every'],
-			TIMEPERIOD_TYPE_WEEKLY => ['start_time', 'every', 'dayofweek'],
-			TIMEPERIOD_TYPE_MONTHLY => ['start_time', 'every', 'day', 'dayofweek', 'month']
-		];
 
 		foreach ($timeperiods as &$timeperiod) {
-			if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-				$absolute_time_parser->parse($timeperiod['start_date']);
-				$timeperiod['start_date'] = $absolute_time_parser
-					->getDateTime(true)
-					->getTimestamp();
-			}
+			switch ($timeperiod['timeperiod_type']) {
+				case TIMEPERIOD_TYPE_ONETIME:
+					unset($timeperiod['every']);
+					unset($timeperiod['dayofweek']);
+					unset($timeperiod['month']);
+					unset($timeperiod['day']);
+					unset($timeperiod['start_time']);
+					break;
 
-			$timeperiod = array_intersect_key($timeperiod,
-				array_flip(['period', 'timeperiod_type']) + array_flip($type_fields[$timeperiod['timeperiod_type']])
-			);
+				case TIMEPERIOD_TYPE_DAILY:
+					unset($timeperiod['start_date']);
+					unset($timeperiod['dayofweek']);
+					unset($timeperiod['month']);
+					unset($timeperiod['day']);
+					break;
+
+				case TIMEPERIOD_TYPE_WEEKLY:
+					unset($timeperiod['start_date']);
+					unset($timeperiod['month']);
+					unset($timeperiod['day']);
+					break;
+
+				case TIMEPERIOD_TYPE_MONTHLY:
+					unset($timeperiod['start_date']);
+
+					if ($timeperiod['dayofweek'] == 0) {
+						unset($timeperiod['every']);
+						unset($timeperiod['dayofweek']);
+					}
+					else {
+						unset($timeperiod['day']);
+					}
+					break;
+			}
 		}
 		unset($timeperiod);
 
@@ -142,7 +160,7 @@ class CControllerMaintenanceCreate extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot edd maintenance period'),
+				'title' => _('Cannot add maintenance period'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
