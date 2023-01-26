@@ -75,19 +75,19 @@ class CControllerConnectorUpdate extends CController {
 	}
 
 	protected function doAction(): void {
+		$db_defaults = DB::getDefaults('connector');
+
 		$connector = [
 			'max_records' => $this->getInput('max_records_mode') == 1
 				? $this->getInput('max_records')
-				: DB::getDefault('connector', 'max_records'),
+				: $db_defaults['max_records'],
 			'status' => $this->getInput('status', ZBX_CONNECTOR_STATUS_DISABLED),
 			'tags' => []
 		];
 
-		$fields = ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_senders', 'max_attempts', 'timeout',
-			'token', 'http_proxy', 'authtype', 'username', 'password', 'description', 'tags_evaltype'
-		];
-
-		$this->getInputs($connector, $fields);
+		$this->getInputs($connector, ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_senders',
+			'max_attempts', 'timeout', 'token', 'description', 'tags_evaltype'
+		]);
 
 		foreach ($this->getInput('tags', []) as $tag) {
 			if ($tag['tag'] === '' && $tag['value'] === '') {
@@ -111,14 +111,14 @@ class CControllerConnectorUpdate extends CController {
 				$this->getInputs($connector, ['username', 'password']);
 			}
 			else {
-				$connector['username'] = DB::getDefault('connector', 'username');
-				$connector['password'] = DB::getDefault('connector', 'password');
+				$connector['username'] = $db_defaults['username'];
+				$connector['password'] = $db_defaults['password'];
 			}
 		}
 		else {
 			foreach (['http_proxy', 'authtype', 'username', 'password', 'verify_peer', 'verify_host', 'ssl_cert_file',
 					'ssl_key_file', 'ssl_key_password'] as $field) {
-				$connector[$field] = DB::getDefault('connector', $field);
+				$connector[$field] = $db_defaults[$field];
 			}
 		}
 

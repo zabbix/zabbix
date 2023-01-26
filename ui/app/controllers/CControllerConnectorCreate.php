@@ -83,7 +83,7 @@ class CControllerConnectorCreate extends CController {
 		];
 
 		$this->getInputs($connector, ['name', 'protocol', 'data_type', 'url', 'max_senders', 'max_attempts', 'timeout',
-			'token', 'http_proxy', 'authtype', 'username', 'password', 'description', 'tags_evaltype'
+			'token', 'description', 'tags_evaltype'
 		]);
 
 		foreach ($this->getInput('tags', []) as $tag) {
