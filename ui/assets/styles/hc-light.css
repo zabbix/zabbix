@@ -2849,7 +2849,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
     cursor: pointer;
     border-bottom: none; }
     .list-table .zi-wrench-alt::before {
-      vertical-align: baseline;
+      vertical-align: middle;
       padding-left: 6px;
       font-size: 12px;
       color: #f3a914; }
