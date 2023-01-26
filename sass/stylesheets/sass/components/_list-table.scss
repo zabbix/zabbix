@@ -785,6 +785,7 @@
 		border-bottom: none;
 
 		&::before {
+			vertical-align: baseline;
 			padding-left: 6px;
 			font-size: 12px;
 			color: #f3a914;

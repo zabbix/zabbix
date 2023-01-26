@@ -28,6 +28,7 @@ z-select,
 		}
 
 		&::after {
+			content: $zi-chevron-down ;
 			float: right;
 		}
 

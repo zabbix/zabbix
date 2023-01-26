@@ -236,7 +236,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		border: 1px transparent;
 		line-height: 22px;
 		vertical-align: middle;
-		padding: 0 6px 7px 9px;
+		padding: 0 9px 7px 9px;
 		margin-bottom: -7px;
 	}
 
@@ -259,6 +259,11 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		.zi-filter {
 			&::after {
 				display: none;
+			}
+
+			&::before {
+				vertical-align: middle;
+				font-size: 18px;
 			}
 		}
 	}
