@@ -56,6 +56,7 @@ header {
 			font-size: 0;
 
 			&::before {
+				vertical-align: middle;
 				font-size: 17px;
 			}
 		}
@@ -153,7 +154,6 @@ header {
 			padding: 0 0 0 10px;
 
 			.btn-split {
-				top: 1px;
 				margin-right: 0;
 
 				li {

@@ -131,7 +131,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 		.btn-time-left,
 		.btn-time-right {
-			left: 1px;
 			position: relative;
 
 			@if ($ui-transitions) {
@@ -161,19 +160,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 				&:hover {
 					background-color: transparent;
 				}
-			}
-
-			&::before {
-				top: -1px;
-				left: -1px;
-			}
-		}
-
-		.btn-iterator-page-next,
-		.btn-time-right {
-			&::before {
-				top: -1px;
-				left: 1px;
 			}
 		}
 	}

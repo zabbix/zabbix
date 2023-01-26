@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20230110';
-$browser-sprite-path: '../img/browser-sprite.png?20221026';
+$sprite-path: '../img/icon-sprite.svg?20220722';
+$browser-sprite-path: '../img/browser-sprite.png?20220722';
 
 @import "utils/mixins";
 
@@ -538,10 +538,6 @@ form {
 	@extend %webkit-hor-scrollbar;
 }
 
-.problem-expand-td {
-	border-bottom-color: $transparent !important;
-}
-
 // Timeline in table view.
 .timeline-date {
 	text-align: right;
@@ -619,13 +615,13 @@ form {
 		&::after {
 			padding-left: 10px;
 			font-size: 18px;
-			top: -1px;
 			vertical-align: top;
 		}
 	}
 
 	.zi-filter {
 		&::after {
+			content: $zi-filter; // TODO acikuns WHY>>>???
 			padding-left: 8px;
 
 			vertical-align: middle;
@@ -639,6 +635,8 @@ form {
 
 	.zi-chevron-left,
 	.zi-chevron-right {
+		width: 24px;
+		height: 24px;
 		padding: 0 3px;
 		vertical-align: top;
 		border: none;
@@ -669,7 +667,6 @@ form {
 		}
 
 		&::before {
-			top: -1px;
 			opacity: .75;
 		}
 	}
@@ -680,8 +677,9 @@ form {
 		&::before {
 			display: none;
 		}
+
 		&::after {
-			top: -1px;
+			content: $zi-clock; // TODO acikuns WHY IS IT NOT WORKING??????!!!!!!!!!!
 			padding-left: 10px;
 			vertical-align: middle;
 
@@ -1675,7 +1673,6 @@ button {
 	opacity: .5;
 	@extend %btn-reset;
 	&::before {
-		left: -1px;
 		color: $icon-color;
 	}
 
@@ -1808,11 +1805,6 @@ button {
 
 		.zi-clock {
 			padding: 1px 6px 6px 10px !important;
-
-			&::before {
-				top: -1px;
-				left: -2px;
-			}
 		}
 	}
 
@@ -1858,7 +1850,6 @@ button {
 }
 
 .btn-time-out {
-	left: 1px;
 	margin: 0 5px 0 5px;
 	height: 24px;
 	line-height: 22px;
@@ -1866,6 +1857,7 @@ button {
 	background: none;
 	border: 1px solid transparent;
 	color: $font-color;
+
 	&:disabled {
 		background: transparent !important;
 		border-color: transparent !important;
@@ -1967,8 +1959,8 @@ button {
 
 .calendar-control {
 	.zi-calendar {
+		vertical-align: middle;
 		position: relative;
-		top: -1px;
 		padding: 0 1px;
 
 		@extend %btn-reset;
@@ -2015,8 +2007,14 @@ button {
 	}
 
 	.zi-minimize {
-		padding: 0 2px;
+		width: 24px;
+		height: 24px;
+		padding: 0 3px;
 		font-size: 0;
+
+		&:before {
+			vertical-align: middle;
+		}
 	}
 }
 
@@ -2080,6 +2078,10 @@ button {
 	&.zi-calendar {
 		opacity: .3;
 		background-color: transparent;
+
+		&::before {
+			vertical-align: middle;
+		}
 	}
 }
 
@@ -2205,7 +2207,7 @@ $trigger-expression-tree-icons: (
 		width: 14px;
 		height: 14px;
 		color: $white;
-		font-size: 15px;
+		font-size: 16px;
 	}
 
 	&.status-red {
@@ -4193,6 +4195,7 @@ svg {
 	width: calc(100% - 15px);
 
 	.zi-chevron-up {
+		font-size: 0;
 		width: 24px;
 		height: 24px;
 		padding: 0;
@@ -4208,8 +4211,6 @@ svg {
 		}
 
 		&::before {
-			top: -1px;
-			left: 2px;
 			font-size: 16px;
 			color: $icon-color;
 		}
@@ -4321,10 +4322,6 @@ svg {
 		padding: 5px 5px 5px 0;
 	}
 
-	.preprocessing-step {
-		align-items: baseline;
-	}
-
 	.step-name {
 		flex: 0 0 $name-width;
 		max-width: $name-width;
@@ -4342,10 +4339,6 @@ svg {
 			&:not(:last-child) {
 				margin-right: 5px;
 			}
-		}
-
-		.table-forms-separator {
-			width: 100%;
 		}
 	}
 
@@ -4512,6 +4505,7 @@ svg {
 					.zi-plus,
 					.zi-copy,
 					.zi-pencil {
+						vertical-align: middle;
 						display: inline-block;
 						width: 18px;
 						height: 18px;
@@ -4703,16 +4697,6 @@ a.icon-count {
 	}
 }
 
-// TODO - AS: check. ZBXNEXT-7964
-//.icon-action-cause::before {
-//	background-position: -123px -693px;
-//}
-
-// TODO - AS: check. ZBXNEXT-7964
-//.icon-action-symptom::before {
-//	background-position: -122px -656px;
-//}
-
 :-ms-input-placeholder {
 	color: $input-placeholder-color !important;
 }
@@ -4745,6 +4729,7 @@ a.icon-count {
 }
 
 .zi-plus {
+	vertical-align: middle;
 	width: unset;
 	height: unset;
 
@@ -4755,7 +4740,7 @@ a.icon-count {
 
 	&::before {
 		padding-right: 5px;
-		vertical-align: unset;
+		vertical-align: middle;
 
 		font-size: 8px;
 	}
@@ -5017,7 +5002,7 @@ a.icon-count {
 	.zi-lock {
 		padding: 0 5px;
 		&::before {
-			font-size: 15px;
+			font-size: 16px;
 			color: $icon-color;
 		}
 		&:hover,
@@ -5105,8 +5090,8 @@ a.icon-count {
 			color: $btn-alt-font-color;
 
 			&::before {
+				vertical-align: middle;
 				display: inline-block;
-				top: 1px;
 				font-size: 12px;
 
 				transition: $ui-transition-duration;
@@ -5640,6 +5625,6 @@ z-select,
 	opacity: .5;
 
 	&::before {
-		font-size: 22px;
+		font-size: 24px;
 	}
 }

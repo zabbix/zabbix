@@ -14,6 +14,7 @@ z-select,
 		@extend %form-input-style;
 		@extend %webkit-scrollbar;
 
+		vertical-align: middle;
 		padding: 3px 2px 3px 4px;
 		border-radius: unset;
 		text-align: left;
@@ -28,7 +29,6 @@ z-select,
 
 		&::after {
 			float: right;
-			top: 1px;
 		}
 
 		&:active,

@@ -4,6 +4,14 @@
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
 
+	.zi-i,
+	.zi-alert {
+		&:before {
+			vertical-align: middle;
+			position: relative;
+		}
+	}
+
 	.action-container {
 		display: flex;
 		width: 100%;
@@ -766,6 +774,10 @@
 	.zi-calendar-check,
 	.zi-envelope-filled {
 		color: $icon-action-list-table-color;
+
+		&::before {
+			vertical-align: middle;
+		}
 	}
 
 	.zi-wrench-alt {
@@ -782,7 +794,6 @@
 	.zi-more {
 		@extend %btn-reset;
 
-		top: -1px;
 		padding: 0 2px;
 		opacity: .5;
 

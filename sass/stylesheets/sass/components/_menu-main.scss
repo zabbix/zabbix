@@ -52,7 +52,6 @@ $menu-main-icons-opacity: .75 !default;
 	.has-submenu {
 		& > a {
 			&::after {
-				top: 1px;
 				display: inline-block;
 				float: right;
 				font-size: 7px; // TODO - AS: need to use extend chevron icon
@@ -252,7 +251,7 @@ $menu-main-icons-opacity: .75 !default;
 	.zi-cog,
 	.zi-eye-alt {
 		&::before {
-			top: -1px;
+			vertical-align: middle;
 			padding-right: 11px;
 			font-size: 24px;
 			color: $menu-icon-color;

@@ -41,7 +41,8 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 			font-size: 0;
 
 			&::before {
-				font-size: 15px;
+				vertical-align: middle;
+				font-size: 16px;
 				opacity: .75;
 			}
 

@@ -76,7 +76,6 @@ $menu-user-icons-opacity: .75 !default;
 	.has-submenu {
 		& > a {
 			&::after {
-				top: 1px;
 				display: inline-block;
 				float: right;
 				font-size: 7px; // TODO - AS: need to use extend chevron icon
@@ -250,9 +249,9 @@ $menu-user-icons-opacity: .75 !default;
 	.zi-signout,
 	.zi-z {
 		&::before {
-			top: -2px;
-			width: 15px;
-			height: 15px;
+			vertical-align: middle;
+			width: 16px;
+			height: 16px;
 			padding-right: 17px;
 			font-size: 16px;
 			color: $menu-user-icon-color;

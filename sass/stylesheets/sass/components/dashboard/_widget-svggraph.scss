@@ -149,6 +149,20 @@ form.dashboard-widget-svggraph {
 				padding-left: 0;
 			}
 		}
+
+		.zi-drag-handle {
+			opacity: .7;
+
+			&::before {
+				vertical-align: text-bottom;
+				font-size: 24px;
+				color: $icon-color;
+			}
+
+			&.disabled {
+				opacity: .35;
+			}
+		}
 	}
 
 	.single-item-table {
@@ -202,20 +216,6 @@ form.dashboard-widget-svggraph {
 			top: 0;
 			vertical-align: baseline;
 		}
-
-		.zi-drag-handle {
-			opacity: .7;
-
-			&::before {
-				top: 2px;
-				font-size: 22px;
-				color: $icon-color;
-			}
-
-			&.disabled {
-				opacity: .35;
-			}
-		}
 	}
 
 	.overrides-foot {
@@ -237,10 +237,6 @@ form.dashboard-widget-svggraph {
 
 			.color-picker {
 				line-height: 22px;
-			}
-
-			.zi-plus {
-				padding: 0 3px 0 8px;
 			}
 
 			> div {

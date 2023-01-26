@@ -12,10 +12,12 @@
 		.zi-chevron-right,
 		.zi-chevron-left,
 		.zi-pause {
-			padding: 0 2px;
+			padding: 0 3px;
+			width: 24px;
+			height: 24px;
 
-			&::before {
-				top: -1px;
+			&:before {
+				vertical-align: middle;
 			}
 		}
 	}
@@ -55,6 +57,7 @@
 			}
 
 			.zi-plus { // TODO - AS: need to check
+				vertical-align: middle;
 				width: unset;
 				height: unset;
 				padding: 0 11px 0 8px;
@@ -70,7 +73,7 @@
 
 				&::before {
 					padding-right: 5px;
-					vertical-align: unset;
+					vertical-align: middle;
 					font-size: 8px;
 				}
 			}
@@ -206,7 +209,6 @@
 		transition: opacity .2s ease-out;
 
 		&::before {
-			top: -1px;
 			padding: 0 3px;
 		}
 
@@ -422,7 +424,6 @@
 	.zi-more,
 	.zi-cog-filled {
 		position: relative;
-		top: 2px;
 		width: 24px;
 		height: 24px;
 		padding: 0;
