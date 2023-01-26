@@ -702,6 +702,7 @@ static void	preprocessor_free_direct_request(zbx_preprocessing_direct_request_t 
  ******************************************************************************/
 static void	preprocessor_flush_value(const zbx_preproc_item_value_t *value)
 {
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, preprocessor_flush_value");
 	if (0 == (value->item_flags & ZBX_FLAG_DISCOVERY_RULE) || 0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		dc_add_history(value->itemid, value->item_value_type, value->item_flags, value->result,
@@ -718,6 +719,7 @@ static void	preprocessor_flush_dep_results(zbx_preprocessing_manager_t *manager,
 		zbx_preprocessing_dep_request_t *request)
 {
 	int	i;
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, preprocess_flush_dep_results");
 
 	for (i = 0; i < request->results_alloc; i++)
 	{
@@ -1188,9 +1190,13 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		case ITEM_VALUE_TYPE_UINT64:
 			type = ZBX_VARIANT_UI64;
 			break;
-		default:
-			/* ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG */
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_LOG:
 			type = ZBX_VARIANT_STR;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
 	if (FAIL != (ret = zbx_variant_convert(value, type)))
@@ -1240,6 +1246,8 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 			case ITEM_VALUE_TYPE_TEXT:
 				SET_TEXT_RESULT(request->value.result, value->data.str);
 				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
 		zbx_variant_set_none(value);

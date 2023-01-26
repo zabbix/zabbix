@@ -229,6 +229,8 @@ static void	add_history_uint(const zbx_vector_ptr_t *history)
 	int		i;
 	zbx_db_insert_t	*db_insert;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, add_history_uint");
+
 	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 	zbx_db_insert_prepare(db_insert, "history_uint", "itemid", "clock", "ns", "value", NULL);
 
@@ -270,6 +272,8 @@ static void	add_history_text(const zbx_vector_ptr_t *history)
 {
 	int		i;
 	zbx_db_insert_t	*db_insert;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, add_history_text");
 
 	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 	zbx_db_insert_prepare(db_insert, "history_text", "itemid", "clock", "ns", "value", NULL);
@@ -670,6 +674,8 @@ static int	sql_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int st
 static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history)
 {
 	int	i, h_num = 0;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, sql_add_values");
 
 	for (i = 0; i < history->values_num; i++)
 	{

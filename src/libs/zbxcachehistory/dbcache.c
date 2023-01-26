@@ -3356,6 +3356,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_uint64_t		itemids;
 	zbx_hashset_t			trigger_info;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, sync_server_history");
+
 	item_retrieve_mode = 0 == zbx_has_export_dir() ? ZBX_ITEM_GET_SYNC : ZBX_ITEM_GET_SYNC_EXPORT;
 
 	if (NULL == history_float && NULL != history_float_cbs)
@@ -3381,6 +3383,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 	if (NULL == history_text && NULL != history_text_cbs)
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, sync_server_history history_text");
 		module_enabled = SUCCEED;
 		history_text = (ZBX_HISTORY_TEXT *)zbx_malloc(history_text,
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_TEXT));
@@ -3395,6 +3398,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 	if (NULL == history_bin && NULL != history_bin_cbs)
 	{
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, sync_server_history history_bin");
 		module_enabled = SUCCEED;
 		history_bin = (ZBX_HISTORY_BIN *)zbx_malloc(history_bin,
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_BIN));
@@ -3431,7 +3436,9 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 		*more = ZBX_SYNC_DONE;
 
+
 		LOCK_CACHE;
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, before hc_pop_items, queue size: %lu", hc_queue_get_size());
 		hc_pop_items(&history_items);		/* select and take items out of history cache */
 		UNLOCK_CACHE;
 
@@ -3871,6 +3878,8 @@ static void	dc_bin_buffer_realloc(size_t len)
 
 static dc_item_value_t	*dc_local_get_history_slot(void)
 {
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_get_history_slot");
+
 	if (ZBX_MAX_VALUES_LOCAL == item_values_num)
 		dc_flush_history();
 
@@ -4208,6 +4217,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		}
 		else if (ZBX_ISSET_UI64(result))
 		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA dc_add_history ISSET_UINT");
 			dc_local_add_history_uint(itemid, item_value_type, ts, result->ui64, result->lastlogsize,
 					result->mtime, value_flags);
 		}
@@ -4223,11 +4233,13 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		}
 		else if (ZBX_ISSET_TEXT(result))
 		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA dc_add_history ISSET_TEXT");
 			dc_local_add_history_text(itemid, item_value_type, ts, result->text, result->lastlogsize,
 					result->mtime, value_flags);
 		}
 		else if (ZBX_ISSET_BIN(result))
 		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA dc_add_history ISSET_BIN");
 			dc_local_add_history_bin(itemid, item_value_type, ts, result->bin->value, result->lastlogsize,
 					result->mtime, value_flags);
 		}
@@ -4250,6 +4262,8 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 
 void	dc_flush_history(void)
 {
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_flush_history, item_values_num: %d", item_values_num);
+
 	if (0 == item_values_num)
 		return;
 
@@ -4658,6 +4672,8 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 	int		i;
 	zbx_hc_item_t	*item;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "hc_add_item_value: %d", values_num);
+
 	for (i = 0; i < values_num; i++)
 	{
 		zbx_hc_data_t	*data = NULL;
@@ -4788,10 +4804,16 @@ static void	hc_pop_items(zbx_vector_ptr_t *history_items)
 	zbx_binary_heap_elem_t	*elem;
 	zbx_hc_item_t		*item;
 
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, hc_pop_items, ZBX_HC_SYNC_MAX: %lu, hsitory_items->values_num: %lu ", ZBX_HC_SYNC_MAX, history_items->values_num);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, hc_pop_items, zbx_binary_heap_empty(&cache->history_queue): %d", zbx_binary_heap_empty(&cache->history_queue));
+
 	while (ZBX_HC_SYNC_MAX > history_items->values_num && FAIL == zbx_binary_heap_empty(&cache->history_queue))
 	{
 		elem = zbx_binary_heap_find_min(&cache->history_queue);
 		item = (zbx_hc_item_t *)elem->data;
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, hc_pop_items, itemid: %lu", item->itemid);
 		zbx_vector_ptr_append(history_items, item);
 
 		zbx_binary_heap_remove_min(&cache->history_queue);
@@ -4841,6 +4863,8 @@ void	hc_push_items(zbx_vector_ptr_t *history_items)
 	int		i;
 	zbx_hc_item_t	*item;
 	zbx_hc_data_t	*data_free;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "hc_push_items");
 
 	for (i = 0; i < history_items->values_num; i++)
 	{

@@ -1224,6 +1224,8 @@ static void	agent_result_set_value(zbx_variant_t *value, zbx_item_value_type_t v
 
 	zbx_init_agent_result(result);
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA agent_result_set_value, value_type: %d", value->type);
+
 	if (NULL != *error)
 		return;
 

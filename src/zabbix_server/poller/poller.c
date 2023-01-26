@@ -446,6 +446,13 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 
 	for (i = 0; i < num; i++)
 	{
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA zbx_prepare_items, next item itemid: %lu", items[i].itemid);
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA zbx_prepare_items, next item key: %s", items[i].key);
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA zbx_prepare_items, next item key_orig: %s", items[i].key_orig);
+
 		zbx_init_agent_result(&results[i]);
 		errcodes[i] = SUCCEED;
 
@@ -728,6 +735,8 @@ void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *resul
 	}
 	else if (1 == num)
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, zbx_check_items, itemid: %lu",items[0].itemid);
+
 		if (SUCCEED == errcodes[0])
 			errcodes[0] = get_value(&items[0], &results[0], add_results, config_comms,
 				config_startup_time);
