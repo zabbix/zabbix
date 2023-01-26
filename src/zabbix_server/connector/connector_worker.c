@@ -41,7 +41,6 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 	int		i;
 	char		*str = NULL, *out = NULL, *error = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
-	char		delim = '\0';
 
 	zbx_connector_deserialize_connector_and_data_point(message->data, message->size, &connector,
 			connector_data_points);
@@ -49,9 +48,8 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 	zbx_vector_connector_data_point_sort(connector_data_points, connector_object_compare_func);
 	for (i = 0; i < connector_data_points->values_num; i++)
 	{
-		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, delim);
 		zbx_strcpy_alloc(&str, &str_alloc, &str_offset, connector_data_points->values[i].str);
-		delim = '\n';
+		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, '\n');
 	}
 
 	*processed_num += connector_data_points->values_num;

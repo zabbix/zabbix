@@ -199,65 +199,71 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 		const char *token, char **error)
 {
 	CURLcode	err;
+	long		curlauth = 0;
+	char		auth[MAX_STRING_LEN];
 
-	if (NULL != token && '\0' != *token)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "setting CURLOPT_XOAUTH2_BEARER");
-
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_XOAUTH2_BEARER, token)))
-		{
-			*error = zbx_dsprintf(*error, "Cannot set HTTP server authentication method: %s",
-					curl_easy_strerror(err));
-			return FAIL;
-		}
-
+	if (HTTPTEST_AUTH_NONE == authtype)
 		return SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "setting HTTPAUTH [%d]", authtype);
+
+	switch (authtype)
+	{
+		case HTTPTEST_AUTH_BASIC:
+			curlauth = CURLAUTH_BASIC;
+			break;
+		case HTTPTEST_AUTH_NTLM:
+			curlauth = CURLAUTH_NTLM;
+			break;
+		case HTTPTEST_AUTH_NEGOTIATE:
+#if LIBCURL_VERSION_NUM >= 0x072600
+			curlauth = CURLAUTH_NEGOTIATE;
+#else
+			curlauth = CURLAUTH_GSSNEGOTIATE;
+#endif
+			break;
+		case HTTPTEST_AUTH_DIGEST:
+			curlauth = CURLAUTH_DIGEST;
+			break;
+		case HTTPTEST_AUTH_BEARER:
+			curlauth = CURLAUTH_BEARER;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			break;
 	}
 
-	if (HTTPTEST_AUTH_NONE != authtype)
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH, curlauth)))
 	{
-		long		curlauth = 0;
-		char		auth[MAX_STRING_LEN];
+		*error = zbx_dsprintf(*error, "Cannot set HTTP server authentication method: %s",
+				curl_easy_strerror(err));
+		return FAIL;
+	}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "setting HTTPAUTH [%d]", authtype);
+	switch (authtype)
+	{
+		case HTTPTEST_AUTH_BEARER:
+			if (NULL == token || '\0' == *token)
+			{
+				*error = zbx_dsprintf(*error, "cannot set empty bearer token");
+				return FAIL;
+			}
 
-		switch (authtype)
-		{
-			case HTTPTEST_AUTH_BASIC:
-				curlauth = CURLAUTH_BASIC;
-				break;
-			case HTTPTEST_AUTH_NTLM:
-				curlauth = CURLAUTH_NTLM;
-				break;
-			case HTTPTEST_AUTH_NEGOTIATE:
-#if LIBCURL_VERSION_NUM >= 0x072600
-				curlauth = CURLAUTH_NEGOTIATE;
-#else
-				curlauth = CURLAUTH_GSSNEGOTIATE;
-#endif
-				break;
-			case HTTPTEST_AUTH_DIGEST:
-				curlauth = CURLAUTH_DIGEST;
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-				break;
-		}
-
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH, curlauth)))
-		{
-			*error = zbx_dsprintf(*error, "Cannot set HTTP server authentication method: %s",
-					curl_easy_strerror(err));
-			return FAIL;
-		}
-
-		zbx_snprintf(auth, sizeof(auth), "%s:%s", username, password);
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
-		{
-			*error = zbx_dsprintf(*error, "Cannot set user name and password: %s",
-					curl_easy_strerror(err));
-			return FAIL;
-		}
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_XOAUTH2_BEARER, token)))
+			{
+				*error = zbx_dsprintf(*error, "Cannot set bearer: %s", curl_easy_strerror(err));
+				return FAIL;
+			}
+			break;
+		default:
+			zbx_snprintf(auth, sizeof(auth), "%s:%s", username, password);
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
+			{
+				*error = zbx_dsprintf(*error, "Cannot set user name and password: %s",
+						curl_easy_strerror(err));
+				return FAIL;
+			}
+			break;
 	}
 
 	return SUCCEED;
