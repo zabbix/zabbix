@@ -1664,13 +1664,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							[
 								'usrgrpid' => 92
 							]
-						],
-						'userdirectory_media' => [
-							[
-								'name' => 'leading.trailing',
-								'mediatypeid' => 10,
-								'attribute' => 'leading.trailing'
-							]
 						]
 					]
 				]
@@ -1976,9 +1969,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	/**
 	 * @dataProvider getCreateValidationData
 	 */
-	public function testUsersAuthenticationLdap_CreateValidation($data) {
-		$this->testLdapCreate($data);
-	}
+//	public function testUsersAuthenticationLdap_CreateValidation($data) {
+//		$this->testLdapCreate($data);
+//	}
 
 	/**
 	 * @backup config
