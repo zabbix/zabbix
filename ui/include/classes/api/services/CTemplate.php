@@ -394,7 +394,7 @@ class CTemplate extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->validateVendorFields($templates, []);
+		$this->checkVendorFields($templates, []);
 		$this->checkGroups($templates);
 		$this->checkDuplicates($templates);
 		self::checkAndAddUuid($templates);
@@ -519,7 +519,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->addAffectedObjects($templates, $db_templates);
 
-		$this->validateVendorFields($templates, $db_templates);
+		$this->checkVendorFields($templates, $db_templates);
 		$this->checkDuplicates($templates, $db_templates);
 		$this->checkGroups($templates, $db_templates);
 		$this->checkTemplates($templates, $db_templates);
@@ -1362,15 +1362,15 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Validates vendor fields for update or create operation.
+	 * Check vendor fields for update or create operation.
 	 * Expects updating template data to be set in $db_templates array.
 	 *
 	 * @param array $templates     Array of arrays with template data.
 	 * @param array $db_templates  Associative array of templates, templateid as key.
 	 *
-	 * @throws Exception when vendor fields contain invalid data.
+	 * @throws Exception when vendor field contain invalid data.
 	 */
-	private function validateVendorFields(array $templates, array $db_templates): void {
+	private function checkVendorFields(array $templates, array $db_templates): void {
 		$vendor_field_keys = array_fill_keys(['vendor_name', 'vendor_version'], '');
 		$is_update = (bool) $db_templates;
 
@@ -1395,8 +1395,8 @@ class CTemplate extends CHostGeneral {
 
 			if ($empty_fields) {
 				$path = '/'.($i + 1).'/'.array_shift($empty_fields);
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-					$path, _('cannot be empty')
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+					_('cannot be empty')
 				));
 			}
 		}
