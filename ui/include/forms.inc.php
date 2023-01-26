@@ -1838,19 +1838,19 @@ function getTriggerFormData(array $data) {
 				$hosts = [];
 
 				if ($expression_parser->parse($data['expression']) == CParser::PARSE_SUCCESS) {
-					$hosts += $expression_parser->getResult()->getHosts();
+					$hosts = $expression_parser->getResult()->getHosts();
 				}
 
 				if ($data['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
 						&& $expression_parser->parse($data['recovery_expression']) == CParser::PARSE_SUCCESS) {
-					$hosts += $expression_parser->getResult()->getHosts();
+					$hosts = array_merge($hosts, $expression_parser->getResult()->getHosts());
 				}
 
 				if ($hosts) {
 					if ($data['context'] === 'template') {
 						$db_templates = API::Template()->get([
 							'output' => ['templateid'],
-							'filter' => ['host' => array_values($hosts)]
+							'filter' => ['host' => array_unique($hosts)]
 						]);
 
 						$hostids = array_column($db_templates, 'templateid');
@@ -1858,7 +1858,7 @@ function getTriggerFormData(array $data) {
 					else {
 						$db_hosts = API::Host()->get([
 							'output' => ['hostid'],
-							'filter' => ['host' => array_values($hosts)]
+							'filter' => ['host' => array_unique($hosts)]
 						]);
 
 						$hostids = array_column($db_hosts, 'hostid');
