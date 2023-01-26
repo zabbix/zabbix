@@ -136,7 +136,7 @@ window.maintenance_period_edit = new class {
 				var months = document.querySelectorAll('[id^="months_"]:checked');
 
 				for (var i = 0; i < months.length; i++) {
-				  fields.months.push(months[i].value)
+					fields.months.push(months[i].value);
 				}
 				break;
 		}
