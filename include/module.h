@@ -221,7 +221,7 @@ typedef struct
 	zbx_uint64_t		itemid;
 	int			clock;
 	int			ns;
-	const zbx_bin_value_t	*value;
+	const zbx_bin_value_t	*bin_value;
 }
 ZBX_HISTORY_BIN;
 

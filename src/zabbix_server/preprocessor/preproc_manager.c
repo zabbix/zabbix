@@ -719,30 +719,45 @@ static void	preprocessor_flush_dep_results(zbx_preprocessing_manager_t *manager,
 		zbx_preprocessing_dep_request_t *request)
 {
 	int	i;
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, preprocess_flush_dep_results");
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, TESLA preprocess_flush_dep_results");
 
 	for (i = 0; i < request->results_alloc; i++)
 	{
 		unsigned char	state;
 
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, TESLA 1");
 		state = (NULL == request->results[i].error ? ITEM_STATE_NORMAL : ITEM_STATE_NOTSUPPORTED);
 
 		if (0 == (request->results[i].flags & ZBX_FLAG_DISCOVERY_RULE) ||
 				0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, TESLA 2");
 			dc_add_history(request->results[i].itemid, request->results[i].value_type,
 					request->results[i].flags, &request->results[i].value, &request->ts, state,
 					request->results[i].error);
+
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, TESLA 3");
 		}
 		else
 		{
+
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, TESLA 4");
 			zbx_lld_process_agent_result(request->results[i].itemid, request->hostid,
 					&request->results[i].value, &request->ts, request->results[i].error);
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, TESLA 5");
 		}
 	}
 
 	manager->processed_num += (zbx_uint64_t)request->results_alloc;
 	manager->preproc_num--;
+
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, TESLA preprocess_flush_dep_results END");
 }
 
 /******************************************************************************
@@ -761,22 +776,32 @@ static void	preprocessing_flush_request(zbx_preprocessing_manager_t *manager,
 	zbx_preprocessing_dep_request_t	*dep_request;
 	int				i;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SKODA preprocessing_flush_request");
+
 	switch (base->kind)
 	{
 		case ZBX_PREPROC_ITEM:
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SKODA 1");
 			request = (zbx_preprocessing_request_t *)base;
 			preprocessor_flush_value(&request->value);
 			manager->processed_num++;
 			manager->queued_num--;
 			break;
 		case ZBX_PREPROC_DEPS:
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SKODA 2");
 			dep_request = (zbx_preprocessing_dep_request_t *)base;
 			preprocessor_flush_dep_results(manager, dep_request);
 			break;
 	}
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SKODA 3");
 	for (i = 0; i < base->flush_queue.values_num; i++)
 		preprocessing_flush_request(manager, base->flush_queue.values[i]);
+
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SKODA preprocessing_flush_request END");
 }
 
 /******************************************************************************
@@ -793,21 +818,33 @@ static void	preprocessing_flush_queue(zbx_preprocessing_manager_t *manager)
 	zbx_list_iterator_t			iterator;
 
 	zbx_list_iterator_init(&manager->queue, &iterator);
+
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, VW 0");
 	while (SUCCEED == zbx_list_iterator_next(&iterator))
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, VW 1");
+
 		zbx_list_iterator_peek(&iterator, (void **)&base);
 
 		if (REQUEST_STATE_DONE != base->state)
 			break;
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, VW 2");
 		preprocessing_flush_request(manager, base);
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, VW 3");
 		if (SUCCEED == zbx_list_iterator_equal(&iterator, &manager->priority_tail))
 			zbx_list_iterator_clear(&manager->priority_tail);
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, VW 4");
 		zbx_list_pop(&manager->queue, NULL);
 		preprocessor_free_request(base);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, VW 5");
 	}
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, VW 6");
 }
 
 static void	preproc_link_nodes(zbx_preprocessing_manager_t *manager, zbx_uint64_t itemid,
@@ -1395,28 +1432,46 @@ static void	preprocessor_finalize_dep_results(zbx_preprocessing_manager_t *manag
 {
 	int	i;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SUPRA 0");
+
 	if (request->results_alloc != request->results_offset)
 		return;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SUPRA 1");
+
 	for (i = 0; i < request->results_alloc; i++)
 	{
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SUPRA 2");
 		if (NULL == request->results[i].error)
 		{
+
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SUPRA 3");
 			preprocessor_update_history(manager, request->results[i].itemid, &request->results[i].history);
 
+			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SUPRA 4");
 			preprocessor_enqueue_dependent(manager, request->hostid, request->results[i].itemid,
 					&request->results[i].value, request->results[i].value_type, &request->ts);
 		}
 
 	}
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SUPRA 5");
 	preprocessor_set_request_state_done(manager, (zbx_preprocessing_request_base_t *)request,
 			(zbx_list_item_t *)worker->task);
 
 	worker->task = NULL;
 
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SUPRA 6");
 	preprocessor_assign_tasks(manager);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SUPRA 7");
 	preprocessing_flush_queue(manager);
+
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, SUPRA 8");
 }
 
 /******************************************************************************
@@ -1438,12 +1493,18 @@ static void	preprocessor_process_dep_result(zbx_preprocessing_manager_t *manager
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	worker = preprocessor_get_worker_by_client(manager, client);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA TOYOTA 0");
 	node = (zbx_list_item_t *)worker->task;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA TOYOTA 1");
 	request = (zbx_preprocessing_dep_request_t *)node->data;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA TOYOTA 2");
 	zbx_preprocessor_unpack_dep_result(&request->results_alloc, &request->results_offset, &request->results,
 			message->data);
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA TOYOTA 3");
 	preprocessor_finalize_dep_results(manager, request, worker);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -2000,8 +2061,11 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	{
 		time_now = zbx_time();
 
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 0");
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 1");
 			zbx_setproctitle("%s #%d [queued " ZBX_FS_UI64 ", processed " ZBX_FS_UI64 " values, idle "
 					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
 					get_process_type_string(process_type), process_num,
@@ -2012,17 +2076,24 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			manager.processed_num = 0;
 		}
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 2");
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 3");
 		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 4");
 		if (NULL != message)
 		{
+
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 44, message not null: %u", message->code);
 			switch (message->code)
 			{
 				case ZBX_IPC_PREPROCESSOR_WORKER:
@@ -2038,7 +2109,10 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 					preprocessor_next_dep_request(&manager, client);
 					break;
 				case ZBX_IPC_PREPROCESSOR_DEP_RESULT:
+
+					zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 45");
 					preprocessor_process_dep_result(&manager, client, message);
+					zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 46");
 					break;
 				case ZBX_IPC_PREPROCESSOR_DEP_RESULT_CONT:
 					preprocessor_process_dep_result_cont(&manager, client, message);
@@ -2067,16 +2141,23 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			zbx_ipc_message_free(message);
 		}
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 6");
+
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
 		if (0 == manager.preproc_num || 1 < time_now - time_flush)
 		{
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 7");
 			dc_flush_history();
 			time_flush = time_now;
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 8");
 		}
 	}
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 9");
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)

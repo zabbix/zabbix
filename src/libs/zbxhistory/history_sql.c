@@ -334,9 +334,12 @@ static void	add_history_bin(const zbx_vector_ptr_t *history)
 		if (ITEM_VALUE_TYPE_BIN != h->value_type)
 			continue;
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin value: %c",( (char*)(h->value.bin->value))[0]);
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin  hash: %s",( h->value.bin->hash));
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin len: %lu", h->value.bin->len);
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin value: %c",( (char*)(h->value.bin->value))[0]);
+
 
 		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.bin->value,
 				h->value.bin->hash);

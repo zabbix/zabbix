@@ -10854,7 +10854,7 @@ void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 {
 	WRLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, DCpoller_requeue_items, num: %d", num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, DCpoller_requeue_items, num: %lu", num);
 
 	dc_requeue_items(itemids, lastclocks, errcodes, num);
 	*nextcheck = dc_config_get_queue_nextcheck(&config->queues[poller_type]);
