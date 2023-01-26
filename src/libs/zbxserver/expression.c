@@ -6287,9 +6287,14 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 		}
 		else
 		{
+			int	is_lld_macro = 0;
+
+			if (0 == strncmp(param, "{#", 2))
+				is_lld_macro = 1;
+
 			substitute_lld_macros(&param, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
-			if (SUCCEED != zbx_eval_suffixed_number_parse(param, NULL))
+			if (0 == quoted && 0 != is_lld_macro && SUCCEED != zbx_eval_suffixed_number_parse(param, NULL))
 				quoted = 1;
 		}
 
