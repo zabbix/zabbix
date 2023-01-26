@@ -208,15 +208,9 @@ class CConnector extends CApiService {
 			]],
 			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
 			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],
-			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_cert_file'), 'default' => DB::getDefault('connector', 'ssl_cert_file')],
-			'ssl_key_file' =>		['type' => API_MULTIPLE, 'default' => DB::getDefault('connector', 'ssl_key_file'), 'rules' => [
-										['if' => ['field' => 'ssl_cert_file', 'in' => DB::getDefault('connector', 'ssl_cert_file')], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'ssl_key_file')],
-										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_file')]
-			]],
-			'ssl_key_password' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'ssl_key_file', 'in' => DB::getDefault('connector', 'ssl_key_file')], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'ssl_key_password')],
-										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_password')]
-			]],
+			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_cert_file')],
+			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_file')],
+			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_password')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'description')],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_STATUS_DISABLED, ZBX_CONNECTOR_STATUS_ENABLED])],
 			'tags_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR])],
@@ -317,9 +311,7 @@ class CConnector extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$connectors = $this->extendObjectsByKey($connectors, $db_connectors, 'connectorid', ['authtype',
-			'ssl_cert_file', 'ssl_key_file'
-		]);
+		$connectors = $this->extendObjectsByKey($connectors, $db_connectors, 'connectorid', ['authtype']);
 
 		$db_defaults = DB::getDefaults('connector');
 
@@ -329,16 +321,6 @@ class CConnector extends CApiService {
 					'username' => $db_defaults['username'],
 					'password' => $db_defaults['password']
 				];
-			}
-
-			if ($connector['ssl_cert_file'] === '') {
-				$connector += [
-					'ssl_key_file' => $db_defaults['ssl_key_file'],
-					'ssl_key_password' => $db_defaults['ssl_key_password']
-				];
-			}
-			elseif ($connector['ssl_key_file'] === '') {
-				$connector += ['ssl_key_password' => $db_defaults['ssl_key_password']];
 			}
 		}
 		unset($connector);
@@ -367,14 +349,8 @@ class CConnector extends CApiService {
 			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
 			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_cert_file')],
-			'ssl_key_file' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'ssl_cert_file', 'in' => ''], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'ssl_key_file')],
-										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_file')]
-			]],
-			'ssl_key_password' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'ssl_key_file', 'in' => ''], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'ssl_key_password')],
-										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_password')]
-			]],
+			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_file')],
+			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'ssl_key_password')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'description')],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_STATUS_DISABLED, ZBX_CONNECTOR_STATUS_ENABLED])],
 			'tags_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR])],
