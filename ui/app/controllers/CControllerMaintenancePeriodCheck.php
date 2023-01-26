@@ -31,32 +31,26 @@ class CControllerMaintenancePeriodCheck extends CController {
 	 */
 	protected function checkInput(): bool {
 		$fields = [
-			'update' =>				'in 0,1',
-			'form_refresh' =>		'in 0,1',
+			'edit' =>				'in 0,1',
 			'row_index' =>			'required|int32',
+			'timeperiod_type' =>	'in '.implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]),
+			'every' =>				'db timeperiods.every',
 			'days' =>				'array',
 			'months' =>				'array',
 			'month_date_type' =>	'in 0,1',
-			'period_days' =>		'int32',
+			'monthly_days' =>		'array',
+			'day' =>				'db timeperiods.day',
+			'start_date' =>			'string',
 			'hour' =>				'int32|ge 0|le 23',
 			'minute' =>				'int32|ge 0|le 59',
+			'period_days' =>		'int32',
 			'period_hours' =>		'int32|ge 0|le 23',
-			'period_minutes' =>		'int32|ge 0|le 59',
-			'start_date' =>			'string',
-			'monthly_days' =>		'array',
-			'timeperiodid' =>		'id',
-			'timeperiod_type' =>	'in '.implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]),
-			'every' =>				'db timeperiods.every',
-			'month' =>				'db timeperiods.month',
-			'dayofweek' =>			'db timeperiods.dayofweek',
-			'day' =>				'db timeperiods.day',
-			'start_time' =>			'db timeperiods.start_time',
-			'period' =>				'db timeperiods.period'
+			'period_minutes' =>		'int32|ge 0|le 59'
 		];
 
 		$ret = $this->validateInput($fields);
 
-		$ret = ($ret && $this->getInput('form_refresh', 0)) ? $this->validateTypeSpecificInput() : $ret;
+		$ret = ($ret && $this->validateTypeSpecificInput());
 
 		if (!$ret) {
 			$this->setResponse(
@@ -141,89 +135,72 @@ class CControllerMaintenancePeriodCheck extends CController {
 
 	protected function doAction(): void {
 		$timeperiod = [
-			'update' =>				0,
 			'timeperiod_type' => 	TIMEPERIOD_TYPE_ONETIME,
 			'every' =>				1,
-			'day' =>				1,
+			'month' =>				0,
 			'dayofweek' =>			0,
-			'start_date' =>			date(ZBX_DATE_TIME),
+			'day' =>				1,
+			'start_time' =>			0,
 			'period' =>				SEC_PER_HOUR,
-			'start_time' =>			0
+			'start_date' =>			date(ZBX_DATE_TIME)
 		];
-		$fields = [
-			TIMEPERIOD_TYPE_ONETIME =>	['start_date'],
-			TIMEPERIOD_TYPE_DAILY =>	['every', 'start_time', 'hour', 'minute'],
-			TIMEPERIOD_TYPE_WEEKLY =>	['dayofweek', 'every', 'start_time', 'hour', 'minute', 'days'],
-			TIMEPERIOD_TYPE_MONTHLY =>	['day', 'dayofweek', 'month', 'months', 'month_date_type', 'monthly_days',
-				'start_time', 'hour', 'minute', 'every'
-			]
-		];
-		$this->getInputs($timeperiod, ['update', 'form_refresh', 'row_index', 'period_days', 'period', 'period_hours',
-			'period_minutes', 'timeperiodid', 'timeperiod_type'
-		]);
+		$this->getInputs($timeperiod, ['row_index', 'timeperiod_type', 'period_days', 'period_hours', 'period_minutes']);
 
-		if (array_key_exists($timeperiod['timeperiod_type'], $fields)) {
-			$this->getInputs($timeperiod, $fields[$timeperiod['timeperiod_type']]);
-		}
-
-		if ($this->getInput('form_refresh', 0)) {
-			$timeperiod += [
-				'month_date_type' => 0,
-				'hour' => 0,
-				'minute' => 0
-			];
-
-			if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-				$parser = new CAbsoluteTimeParser();
-				$parser->parse($timeperiod['start_date']);
-				$start_date = $parser->getDateTime(true);
-				$timeperiod['start_date'] = $start_date->format(ZBX_DATE_TIME);
-			}
-			elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
-				$timeperiod['dayofweek'] = array_sum($this->getInput('days', []));
-			}
-			elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
-				$timeperiod['month'] = array_sum($this->getInput('months', []));
-
-				if ($timeperiod['month_date_type'] == 1) {
-					$timeperiod['dayofweek'] = array_sum($this->getInput('monthly_days', []));
-					unset($timeperiod['day']);
+		switch ($timeperiod['timeperiod_type']) {
+			case TIMEPERIOD_TYPE_ONETIME:
+				$this->getInputs($timeperiod, ['start_date']);
+				break;
+			case TIMEPERIOD_TYPE_DAILY:
+				$this->getInputs($timeperiod, ['every', 'hour', 'minute']);
+				break;
+			case TIMEPERIOD_TYPE_WEEKLY:
+				$this->getInputs($timeperiod, ['every', 'days', 'hour', 'minute']);
+				break;
+			case TIMEPERIOD_TYPE_MONTHLY:
+				$timeperiod['month_date_type'] = $this->getInput('month_date_type');
+				if ($timeperiod['month_date_type']) {
+					$this->getInputs($timeperiod, ['months', 'every', 'monthly_days', 'hour', 'minute']);
 				}
 				else {
-					unset($timeperiod['every']);
+					$this->getInputs($timeperiod, ['months', 'day', 'hour', 'minute']);
 				}
-			}
+				break;
+		}
 
-			$timeperiod['period'] = ($timeperiod['period_days'] * SEC_PER_DAY)
+		$timeperiod['period'] = ($timeperiod['period_days'] * SEC_PER_DAY)
 				+ ($timeperiod['period_hours'] * SEC_PER_HOUR) + ($timeperiod['period_minutes'] * SEC_PER_MIN);
+
+		if (array_key_exists('hour', $timeperiod) && array_key_exists('minute', $timeperiod)) {
 			$timeperiod['start_time'] = ($timeperiod['hour'] * SEC_PER_HOUR) + ($timeperiod['minute'] * SEC_PER_MIN);
-			$timeperiod += DB::getDefaults('timeperiods');
-		}
-		else {
-			// Initialize form fields from database field values.
-			$timeperiod += [
-				'period_days' =>		floor($timeperiod['period'] / SEC_PER_DAY),
-				'period_hours' =>		floor(($timeperiod['period'] % SEC_PER_DAY) / SEC_PER_HOUR),
-				'period_minutes' => 	floor((($timeperiod['period'] % SEC_PER_DAY) % SEC_PER_HOUR) / SEC_PER_MIN),
-				'hour' =>				sprintf("%02d", floor($timeperiod['start_time'] / SEC_PER_HOUR)),
-				'minute' =>				sprintf("%02d", floor(($timeperiod['start_time'] % SEC_PER_HOUR) / SEC_PER_MIN)),
-				'month_date_type' =>	($timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_MONTHLY
-					|| $timeperiod['day'] > 0) ? 0 : 1
-			];
 		}
 
-		$params = array_intersect_key($timeperiod, DB::getSchema('timeperiods')['fields']);
-		$params['row_index'] = $timeperiod['row_index'];
+		if (array_key_exists('days', $timeperiod)) {
+			$timeperiod['dayofweek'] = array_sum($timeperiod['days']);
+		}
 
-		$params += [
-			'period_type' => timeperiod_type2str($timeperiod['timeperiod_type']),
-			'schedule' => $timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME
-				? $timeperiod['start_date']
-				: schedule2str($timeperiod),
+		if (array_key_exists('months', $timeperiod)) {
+			$timeperiod['month'] = array_sum($timeperiod['months']);
+		}
+
+		if ($timeperiod['timeperiod_type'] === TIMEPERIOD_TYPE_MONTHLY) {
+			if ($timeperiod['month_date_type'] == 1) {
+				$timeperiod['dayofweek'] = array_sum($timeperiod['monthly_days']);
+				unset($timeperiod['day']);
+			}
+			else {
+				unset($timeperiod['every']);
+			}
+		}
+
+		$timeperiod += [
+			'period_type' => 		timeperiod_type2str($timeperiod['timeperiod_type']),
+			'schedule' => 			$timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME
+										? $timeperiod['start_date']
+										: schedule2str($timeperiod),
 			'period_table_entry' => zbx_date2age(0, $timeperiod['period'])
 		];
 
-		$data['body'] = $params;
+		$data['body'] = $timeperiod;
 
 		if ($this->getDebugMode() == GROUP_DEBUG_MODE_ENABLED) {
 			CProfiler::getInstance()->stop();
