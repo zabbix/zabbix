@@ -1024,6 +1024,10 @@ footer {
     .form-grid > label .zi-circle-question-filled,
     .form-grid > label .zi-i {
       margin-left: 5px; }
+      .form-grid > label .zi-circle-question-filled:before,
+      .form-grid > label .zi-i:before {
+        vertical-align: middle;
+        position: relative; }
   .form-grid > .form-field,
   .form-grid > .field-fluid,
   .form-grid .form-actions {
@@ -2730,25 +2734,29 @@ div.dashboard-widget-tophosts z-bar-gauge {
       border-bottom: 0; }
   .list-table .list-table-actions .zi-plus,
   .list-table .list-table-actions .zi-pencil {
+    vertical-align: middle;
+    display: inline-block;
     width: 18px;
     height: 18px;
-    min-height: 18px;
-    margin-left: 5px;
-    padding: 0 2px;
-    vertical-align: middle;
-    color: #768d99; }
+    min-height: unset;
+    min-width: unset;
+    padding: 0;
+    margin-right: 5px;
+    opacity: 0.5;
+    transition: transform 0.3s; }
     .list-table .list-table-actions .zi-plus::before,
     .list-table .list-table-actions .zi-pencil::before {
-      top: -1px;
-      right: 2px;
       vertical-align: middle;
-      font-size: 18px;
-      opacity: 0.5; }
-    .list-table .list-table-actions .zi-plus:hover::before, .list-table .list-table-actions .zi-plus:focus::before, .list-table .list-table-actions .zi-plus:active::before,
-    .list-table .list-table-actions .zi-pencil:hover::before,
-    .list-table .list-table-actions .zi-pencil:focus::before,
-    .list-table .list-table-actions .zi-pencil:active::before {
+      color: #768d99;
+      font-size: 18px; }
+    .list-table .list-table-actions .zi-plus:hover, .list-table .list-table-actions .zi-plus:active, .list-table .list-table-actions .zi-plus:focus,
+    .list-table .list-table-actions .zi-pencil:hover,
+    .list-table .list-table-actions .zi-pencil:active,
+    .list-table .list-table-actions .zi-pencil:focus {
       opacity: 1; }
+    .list-table .list-table-actions .zi-plus:focus,
+    .list-table .list-table-actions .zi-pencil:focus {
+      box-shadow: 0 0 0 2px #000000; }
   .list-table a.zi-bullet-right, .list-table a.zi-bullet-alt-up, .list-table a.zi-bullet-alt-down, .list-table a.zi-arrow-up, .list-table a.zi-arrow-down, .list-table a.zi-arrows-top-bottom, .list-table a.zi-alert,
   .list-table button.zi-bullet-right,
   .list-table button.zi-bullet-alt-up,
@@ -5249,7 +5257,8 @@ button {
 .sidebar .sidebar-header-buttons .zi-chevron-double-right, .sidebar-nav-toggle .zi-menu, .dashboard-edit .zi-cog-filled, .dashboard-navigation-tabs .zi-more, .dashboard-grid-widget-actions .zi-more,
 .dashboard-grid-widget-actions .zi-cog-filled,
 .dashboard-grid-iterator-actions .zi-more,
-.dashboard-grid-iterator-actions .zi-cog-filled, .list-table .list-table-actions, .list-table a.zi-bullet-right, .list-table a.zi-bullet-alt-up, .list-table a.zi-bullet-alt-down, .list-table a.zi-arrow-up, .list-table a.zi-arrow-down, .list-table a.zi-arrows-top-bottom, .list-table a.zi-alert,
+.dashboard-grid-iterator-actions .zi-cog-filled, .list-table .list-table-actions, .list-table .list-table-actions .zi-plus,
+.list-table .list-table-actions .zi-pencil, .list-table a.zi-bullet-right, .list-table a.zi-bullet-alt-up, .list-table a.zi-bullet-alt-down, .list-table a.zi-arrow-up, .list-table a.zi-arrow-down, .list-table a.zi-arrows-top-bottom, .list-table a.zi-alert,
 .list-table button.zi-bullet-right,
 .list-table button.zi-bullet-alt-up,
 .list-table button.zi-bullet-alt-down,

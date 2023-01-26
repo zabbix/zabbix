@@ -628,29 +628,33 @@
 
 		.zi-plus,
 		.zi-pencil {
+			vertical-align: middle;
+			display: inline-block;
 			width: 18px;
 			height: 18px;
-			min-height: 18px;
-			margin-left: 5px;
-			padding: 0 2px;
-			vertical-align: middle;
-			color: $icon-color;
+			min-height: unset;
+			min-width: unset;
+			padding: 0;
+			margin-right: 5px;
 
+			opacity: 0.5;
+			transition: transform $ui-transition-duration;
 			&::before {
-				top: -1px;
-				right: 2px;
 				vertical-align: middle;
+				color: $icon-color;
 				font-size: 18px;
-				opacity: 0.5;
 			}
 
 			&:hover,
-			&:focus,
-			&:active {
-				&::before {
-					opacity: 1;
-				}
+			&:active,
+			&:focus {
+				opacity: 1;
 			}
+			&:focus {
+				box-shadow: 0 0 0 2px $btn-border-focus-color;
+			}
+
+			@extend %btn-reset;
 		}
 	}
 

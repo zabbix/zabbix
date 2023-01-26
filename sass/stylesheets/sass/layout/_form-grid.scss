@@ -29,6 +29,11 @@
 		.zi-circle-question-filled,
 		.zi-i {
 			margin-left: 5px;
+
+			&:before {
+				vertical-align: middle;
+				position: relative;
+			}
 		}
 	}
 
