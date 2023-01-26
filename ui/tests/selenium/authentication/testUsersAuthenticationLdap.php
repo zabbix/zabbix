@@ -1504,12 +1504,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'host' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'port' => 389,
 								'base_dn' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-								'bind_dn' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-								'bind_password' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'search_attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'group_name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-								'group_member' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-								'group_filter' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'user_username' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'user_lastname' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							]
@@ -1571,7 +1567,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-
 					'db_check' => [
 						'userdirectory' => [
 							['name' => '', 'description' => '', 'provision_status' => 0],
@@ -1646,19 +1641,15 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'db_check' => [
 						'userdirectory' => [
 							['name' => '', 'description' => '', 'provision_status' => 0],
-							['name' => 'leading.trailing', 'description' => 'leading.trailing', 'provision_status' => 1]
+							['name' => 'leading.trailing', 'description' => '', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
 							[
 								'host' => 'leading.trailing',
 								'port' => 389,
 								'base_dn' => 'leading.trailing',
-								'bind_dn' => 'leading.trailing',
 								'search_attribute' => 'leading.trailing',
-								'group_basedn' => 'leading.trailing',
 								'group_name' => 'leading.trailing',
-								'group_member' => 'leading.trailing',
-								'group_filter' => 'leading.trailing',
 								'user_username' => 'leading.trailing',
 								'user_lastname' => 'leading.trailing'
 							]
@@ -1898,8 +1889,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'group_filter' => 'create test group filter',
 								'user_username' => 'create user name attribute',
 								'user_lastname' => 'create user last name',
-								'StartTLS' => true,
-								'Search filter' => 'search filter'
+								'start_tls' => true,
+								'search_filter' => 'search filter'
 							]
 						],
 						'userdirectory_idpgroup' => [
@@ -1994,7 +1985,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 *
 	 * @dataProvider getCreateData
 	 */
-	public function testUsersAuthenticationLdap_Create1($data) {
+	public function testUsersAuthenticationLdap_Create($data) {
 		$this->testLdapCreate($data);
 	}
 

@@ -224,6 +224,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'IdP entity ID' => 'IdP entity',
 						'SSO service URL' => 'SSO',
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP',
@@ -240,11 +241,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					'error' => 'Invalid parameter "/1/provision_groups": cannot be empty.'
 				]
 			],
-			// # Media mapping dialog form validation.
+			// #7 Media mapping dialog form validation.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'IdP entity ID' => 'IdP entity',
 						'SSO service URL' => 'SSO',
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP',
@@ -618,10 +620,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 
 	public function testUsersAuthenticationSaml_CheckStatusChange() {
 		$settings = [
-			'IdP entity ID' => 'IdP',
-			'SSO service URL' => 'SSO',
-			'Username attribute' => 'UA',
-			'SP entity ID' => 'SP'
+			'fields' => [
+				'IdP entity ID' => 'IdP',
+				'SSO service URL' => 'SSO',
+				'Username attribute' => 'UA',
+				'SP entity ID' => 'SP'
+			]
 		];
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 
@@ -743,12 +747,14 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 	public function testUsersAuthenticationSaml_Authenticate($data) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$settings = [
-			'IdP entity ID' => PHPUNIT_IDP_ENTITY_ID,
-			'SSO service URL' => PHPUNIT_SSO_SERVICE_URL,
-			'SLO service URL' => PHPUNIT_SLO_SERVICE_URL,
-			'Username attribute' => PHPUNIT_USERNAME_ATTRIBUTE,
-			'SP entity ID' => PHPUNIT_SP_ENTITY_ID,
-			'Case-sensitive login' => false
+			'fields' => [
+				'IdP entity ID' => PHPUNIT_IDP_ENTITY_ID,
+				'SSO service URL' => PHPUNIT_SSO_SERVICE_URL,
+				'SLO service URL' => PHPUNIT_SLO_SERVICE_URL,
+				'Username attribute' => PHPUNIT_USERNAME_ATTRIBUTE,
+				'SP entity ID' => PHPUNIT_SP_ENTITY_ID,
+				'Case-sensitive login' => false
+			]
 		];
 
 		// Override particular SAML settings with values from data provider.
