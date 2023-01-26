@@ -5,7 +5,7 @@
 
 This template is designed to monitor Microsoft Azure by HTTP.
 It works without any external scripts and uses the script item.
-Currently the template supports the discovery of Virtual Machines (VMs), MySQL, and PostgreSQL servers.
+Currently the template supports the discovery of Virtual Machines (VMs), Microsoft SQL, MySQL, and PostgreSQL servers.
 
 ## Requirements
 
@@ -82,23 +82,25 @@ There are no template links in this template.
 |Azure |Azure: Get resources |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.get.resources<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Azure |Azure: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure: Get storages |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.get.storages<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Azure |Azure: Storage: [{#NAME}]: Get data |<p>The HTTP API endpoint that returns storage metrics with the name `[{#NAME}]`.</p> |SCRIPT |azure.get.storage[{#NAME}]<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Azure |Azure: Storage [{#NAME}]: Blob Capacity |<p>The amount of storage used by the blob service of the storage account with the name `[{#NAME}]`, expressed  in bytes."</p> |DEPENDENT |azure.storage.blob.capacity[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.BlobCapacity.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Get storages errors |<p>The errors from API requests.</p> |DEPENDENT |azure.get.storages.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Get data |<p>The HTTP API endpoint that returns storage metrics with the name `[{#NAME}]`.</p> |SCRIPT |azure.get.storage[{#NAME}]<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure: Storage [{#NAME}]: Blob Capacity |<p>The amount of storage used by the blob service of the storage account with the name `[{#NAME}]`, expressed in bytes."</p> |DEPENDENT |azure.storage.blob.capacity[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.BlobCapacity.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Azure |Azure: Storage [{#NAME}]: Blob Count |<p>The number of blob objects stored in the storage account with the name `[{#NAME}]`.</p> |DEPENDENT |azure.storage.blob.count[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.BlobCount.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Azure |Azure: Storage [{#NAME}]: Container Count |<p>The number of containers in the storage account with the name `[{#NAME}]`.</p> |DEPENDENT |azure.storage.container.count[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.ContainerCount.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Azure |Azure: Storage [{#NAME}]: Index Capacity |<p>The amount of storage with the name `[{#NAME}]` used by the Azure Data Lake Storage Gen2 hierarchical index.</p> |DEPENDENT |azure.storage.index.capacity[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.IndexCapacity.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Transactions |<p>The number of requests made to the storage service or a specified API operation. </p><p>This number includes successful and failed requests and also requests, which produced errors. </p><p>Use `ResponseType` dimension for the number of different type of responses.</p> |DEPENDENT |azure.storage.transactions[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Transactions.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Transactions |<p>The number of requests made to the storage service or a specified API operation.</p><p>This number includes successful and failed requests and also requests, which produced errors.</p><p>Use `ResponseType` dimension for the number of different type of responses.</p> |DEPENDENT |azure.storage.transactions[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Transactions.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Azure |Azure: Storage [{#NAME}]: Ingress |<p>The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.</p> |DEPENDENT |azure.storage.ingress[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Ingress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Egress |<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure. </p><p>As a result, this number does not reflect billable egress.</p> |DEPENDENT |azure.storage.engress[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Egress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Success Server Latency |<p>The average time used to process a successful request by Azure Storage. </p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p> |DEPENDENT |azure.storage.success.server.latency[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.SuccessServerLatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Success E2E Latency |<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds. </p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p> |DEPENDENT |azure.storage.success.e2e.latency[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.SuccessE2ELatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage [{#NAME}]: Availability |<p>The percentage of availability for the storage service or a specified API operation. </p><p>Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.</p><p>All unexpected errors result in reduced availability for the storage service or the specified API operation.</p> |DEPENDENT |azure.storage.availability[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Availability.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Egress |<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p> |DEPENDENT |azure.storage.engress[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Egress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Success Server Latency |<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p> |DEPENDENT |azure.storage.success.server.latency[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.SuccessServerLatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Success E2E Latency |<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p> |DEPENDENT |azure.storage.success.e2e.latency[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.SuccessE2ELatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure: Storage [{#NAME}]: Availability |<p>The percentage of availability for the storage service or a specified API operation.</p><p>Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.</p><p>All unexpected errors result in reduced availability for the storage service or the specified API operation.</p> |DEPENDENT |azure.storage.availability[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Availability.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Azure: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure by HTTP/azure.get.errors))>0` |AVERAGE | |
+|Azure: There are errors in storages requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure by HTTP/azure.get.storages.errors))>0` |AVERAGE |<p>**Depends on**:</p><p>- Azure: There are errors in requests to API</p> |
 
 ## Feedback
 
@@ -157,7 +159,7 @@ There are no template links in this template.
 |Azure |Azure: Get data |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.vm.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Azure |Azure: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.vm.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure: Availability state |<p>The availability status of the resource.</p> |DEPENDENT |azure.vm.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Azure |Azure: Availability status detailed |<p>The summary description of the availability status.</p> |DEPENDENT |azure.vm.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure: Availability status detailed |<p>The summary description of availability status.</p> |DEPENDENT |azure.vm.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure: Percentage CPU |<p>The percentage of allocated computing units that are currently in use by VMs.</p> |DEPENDENT |azure.vm.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.PercentageCPU.average`</p> |
 |Azure |Azure: Disk read rate |<p>Bytes read from the disk during the monitoring period (1 minute).</p> |DEPENDENT |azure.vm.disk.read.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DiskReadBytes.total`</p><p>- MULTIPLIER: `0.0167`</p> |
 |Azure |Azure: Disk write rate |<p>Bytes written to the disk during the monitoring period (1 minute).</p> |DEPENDENT |azure.vm.disk.write.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DiskWriteBytes.total`</p><p>- MULTIPLIER: `0.0167`</p> |
@@ -169,7 +171,7 @@ There are no template links in this template.
 |Azure |Azure: Data disk write rate |<p>Bytes per second written to a single disk during the monitoring period.</p> |DEPENDENT |azure.vm.data.disk.write.bps<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DataDiskWriteBytessec.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure: Data disk read operations/sec |<p>The read IOPS from a single disk during the monitoring period.</p> |DEPENDENT |azure.vm.data.disk.read.ops<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DataDiskReadOperationsSec.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure: Data disk write operations/sec |<p>The write IOPS from a single disk during the monitoring period.</p> |DEPENDENT |azure.vm.data.disk.write.ops<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DataDiskWriteOperationsSec.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure: Data disk queue depth |<p>The number of current outstanding IO requests that are waiting to be read from or written to the OS disk.The queue depth (or queue length) of the Data Disk.</p> |DEPENDENT |azure.vm.data.disk.queue.depth<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DataDiskQueueDepth.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure: Data disk queue depth |<p>The number of outstanding IO requests that are waiting to be performed on a disk.</p> |DEPENDENT |azure.vm.data.disk.queue.depth<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DataDiskQueueDepth.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure: Data disk bandwidth consumed percentage |<p>The percentage of the data disk's bandwidth consumed per minute.</p> |DEPENDENT |azure.vm.data.disk.bandwidth.consumed.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DataDiskBandwidthConsumedPercentage.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure: Data disk IOPS consumed percentage |<p>The percentage of the data disk input/otput (I/O) consumed per minute.</p> |DEPENDENT |azure.vm.data.disk.iops.consumed.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DataDiskIOPSConsumedPercentage.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure: Data disk target bandwidth |<p>Baseline bytes per second throughput Data Disk can achieve without bursting.</p> |DEPENDENT |azure.vm.data.disk.target.bandwidth<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.DataDiskTargetBandwidth.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
@@ -186,7 +188,7 @@ There are no template links in this template.
 |Azure |Azure: OS disk bandwidth consumed percentage |<p>The percentage of the operating system's disk bandwidth consumed per minute.</p> |DEPENDENT |azure.vm.os.disk.bandwidth.consumed.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.OSDiskBandwidthConsumedPercentage.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure: OS disk IOPS consumed percentage |<p>The percentage of the operating system's disk I/Os consumed per minute.</p> |DEPENDENT |azure.vm.os.disk.iops.consumed.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.OSDiskIOPSConsumedPercentage.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure: OS disk target bandwidth |<p>Baseline bytes per second throughput OS Disk can achieve without bursting.</p> |DEPENDENT |azure.vm.os.disk.target.bandwidth<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.OSDiskTargetBandwidth.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure: OS disk target IOPS |<p>Baseline IOPS thet the OS disk can achieve without bursting.</p> |DEPENDENT |azure.vm.os.disk.target.iops<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.OSDiskTargetIOPS.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure: OS disk target IOPS |<p>Baseline IOPS that the OS disk can achieve without bursting.</p> |DEPENDENT |azure.vm.os.disk.target.iops<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.OSDiskTargetIOPS.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure: OS disk max burst bandwidth |<p>Maximum bytes per second throughput OS Disk can achieve with bursting.</p> |DEPENDENT |azure.vm.os.disk.max.bandwidth<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.OSDiskMaxBurstBandwidth.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure: OS disk max burst IOPS |<p>Maximum IOPS OS Disk can achieve with bursting.</p> |DEPENDENT |azure.vm.os.disk.max.iops<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.OSDiskMaxBurstIOPS.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure: OS disk used burst BPS credits percentage |<p>The percentage of the OS Disk burst bandwidth credits used so far.</p> |DEPENDENT |azure.vm.os.disk.used.burst.bandwidth<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.OSDiskUsedBurstBPSCreditsPercentage.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
@@ -204,18 +206,18 @@ There are no template links in this template.
 |Azure |Azure: VM uncached bandwidth consumed percentage |<p>The percentage of the uncached disk bandwidth consumed by the VM.</p> |DEPENDENT |azure.vm.uncached.bandwidth.consumed.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.VMUncachedBandwidthConsumedPercentage.average`</p> |
 |Azure |Azure: VM uncached IOPS consumed percentage |<p>The percentage of the uncached disk IOPS consumed by the VM.</p> |DEPENDENT |azure.vm.uncached.iops.consumed.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.VMUncachedIOPSConsumedPercentage.average`</p> |
 |Azure |Azure: Network in total |<p>The number of bytes received on all network interfaces by the VMs (incoming traffic).</p> |DEPENDENT |azure.vm.network.in.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.NetworkInTotal.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.1333`</p> |
-|Azure |Azure: Network out total |<p>The number of bytes out on all network interfaces by the VMs) (outgoing traffic).</p> |DEPENDENT |azure.vm.network.out.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.NetworkOutTotal.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.1333`</p> |
+|Azure |Azure: Network out total |<p>The number of bytes out on all network interfaces by the VMs (outgoing traffic).</p> |DEPENDENT |azure.vm.network.out.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.NetworkOutTotal.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.1333`</p> |
 |Azure |Azure: Available memory |<p>The amount of physical memory (in bytes) immediately available for the allocation to a process or for a system use in the VM.</p> |DEPENDENT |azure.vm.memory.available<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.AvailableMemoryBytes.average`</p> |
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Azure: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure virtual machine by HTTP/azure.vm.data.errors))>0` |AVERAGE | |
-|Azure: Virtual machine is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure virtual machine by HTTP/azure.vm.availability.state)=2` |HIGH | |
-|Azure: Virtual machine is degraded |<p>The resource is in degraded state.</p> |`last(/Azure virtual machine by HTTP/azure.vm.availability.state)=1` |AVERAGE | |
-|Azure: Virtual machine is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure virtual machine by HTTP/azure.vm.availability.state)=3` |WARNING | |
-|Azure: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure virtual machine by HTTP/azure.vm.cpu.percentage,5m)>{$AZURE.VM.CPU.UTIL.CRIT}` |HIGH | |
+|Azure: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure Virtual Machine by HTTP/azure.vm.data.errors))>0` |AVERAGE | |
+|Azure: Virtual machine is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=2` |HIGH | |
+|Azure: Virtual machine is degraded |<p>The resource is in degraded state.</p> |`last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=1` |AVERAGE | |
+|Azure: Virtual machine is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=3` |WARNING | |
+|Azure: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure Virtual Machine by HTTP/azure.vm.cpu.percentage,5m)>{$AZURE.VM.CPU.UTIL.CRIT}` |HIGH | |
 
 ## Feedback
 
@@ -299,14 +301,14 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Azure MySQL: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure MySQL flexible server by HTTP/azure.db.mysql.data.errors))>0` |AVERAGE | |
-|Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
-|Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
-|Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
-|Azure MySQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
-|Azure MySQL: Server has aborted connections |<p>The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.ABORTED_CONN.MAX.WARN}`.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED_CONN.MAX.WARN}` |AVERAGE | |
-|Azure MySQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
-|Azure MySQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
+|Azure MySQL: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.data.errors))>0` |AVERAGE | |
+|Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
+|Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
+|Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
+|Azure MySQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure MySQL: Server has aborted connections |<p>The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.ABORTED_CONN.MAX.WARN}`.</p> |`min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED_CONN.MAX.WARN}` |AVERAGE | |
+|Azure MySQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure MySQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
@@ -369,7 +371,7 @@ There are no template links in this template.
 |Azure |Azure MySQL: Get data |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Azure |Azure MySQL: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.mysql.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure MySQL: Availability state |<p>The availability status of the resource.</p> |DEPENDENT |azure.db.mysql.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Azure |Azure MySQL: Availability status detailed |<p>The summary description of availability status.</p> |DEPENDENT |azure.db.mysql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Availability status detailed |<p>The summary description of the availability status.</p> |DEPENDENT |azure.db.mysql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure MySQL: Percentage CPU |<p>The CPU percent of a host.</p> |DEPENDENT |azure.db.mysql.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.average`</p> |
 |Azure |Azure MySQL: Memory utilization |<p>The memory percent of a host.</p> |DEPENDENT |azure.db.mysql.memory.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.memory_percent.average`</p> |
 |Azure |Azure MySQL: Network out |<p>The network outbound traffic across the active connections.</p> |DEPENDENT |azure.db.mysql.network.egress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_egress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.0088`</p> |
@@ -390,15 +392,15 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Azure MySQL: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure MySQL single server by HTTP/azure.db.mysql.data.errors))>0` |AVERAGE | |
-|Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
-|Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
-|Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
-|Azure MySQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
-|Azure MySQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
-|Azure MySQL: Server has failed connections |<p>The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.FAILED_CONN.MAX.WARN}`.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED_CONN.MAX.WARN}` |AVERAGE | |
-|Azure MySQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
-|Azure MySQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
+|Azure MySQL: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure MySQL Single Server by HTTP/azure.db.mysql.data.errors))>0` |AVERAGE | |
+|Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
+|Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
+|Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
+|Azure MySQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure MySQL Single Server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure MySQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL Single Server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
+|Azure MySQL: Server has failed connections |<p>The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.FAILED_CONN.MAX.WARN}`.</p> |`min(/Azure MySQL Single Server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED_CONN.MAX.WARN}` |AVERAGE | |
+|Azure MySQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure MySQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
@@ -441,9 +443,9 @@ No specific Zabbix configuration is required.
 |{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of CPU utilization expressed in %.</p> |`90` |
-|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization expressed in %.</p> |`90` |
-|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization expressed in %.</p> |`90` |
-|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization expressed in %.</p> |`80` |
+|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of memory utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of storage utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of storage utilization expressed in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
 |{$AZURE.RESOURCE_ID} |<p>Microsoft Azure PostgreSQL server ID.</p> |`` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
@@ -463,8 +465,8 @@ There are no template links in this template.
 |Azure |Azure PostgreSQL: Availability status detailed |<p>The summary description of the availability status.</p> |DEPENDENT |azure.db.pgsql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure PostgreSQL: Percentage CPU |<p>The CPU percent of a host.</p> |DEPENDENT |azure.db.pgsql.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.average`</p> |
 |Azure |Azure PostgreSQL: Memory utilization |<p>The memory percent of a host.</p> |DEPENDENT |azure.db.pgsql.memory.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.memory_percent.average`</p> |
-|Azure |Azure PostgreSQL: Network out |<p>Network outbound traffic across the active connections.</p> |DEPENDENT |azure.db.pgsql.network.egress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_egress.total`</p><p>- MULTIPLIER: `0.1333`</p> |
-|Azure |Azure PostgreSQL: Network in |<p>Network inbound traffic across the active connections.</p> |DEPENDENT |azure.db.pgsql.network.ingress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_ingress.total`</p><p>- MULTIPLIER: `0.1333`</p> |
+|Azure |Azure PostgreSQL: Network out |<p>The network outbound traffic across the active connections.</p> |DEPENDENT |azure.db.pgsql.network.egress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_egress.total`</p><p>- MULTIPLIER: `0.1333`</p> |
+|Azure |Azure PostgreSQL: Network in |<p>The network inbound traffic across the active connections.</p> |DEPENDENT |azure.db.pgsql.network.ingress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_ingress.total`</p><p>- MULTIPLIER: `0.1333`</p> |
 |Azure |Azure PostgreSQL: Connections active |<p>The count of active connections.</p> |DEPENDENT |azure.db.pgsql.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.average`</p> |
 |Azure |Azure PostgreSQL: Connections succeeded |<p>The count of succeeded connections.</p> |DEPENDENT |azure.db.pgsql.connections.succeeded<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connections_succeeded.total`</p> |
 |Azure |Azure PostgreSQL: Connections failed |<p>The count of failed connections.</p> |DEPENDENT |azure.db.pgsql.connections.failed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connections_failed.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
@@ -487,14 +489,14 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Azure PostgreSQL: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.data.errors))>0` |AVERAGE | |
-|Azure PostgreSQL: PostgreSQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.availability.state)=2` |HIGH | |
-|Azure PostgreSQL: PostgreSQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.availability.state)=1` |AVERAGE | |
-|Azure PostgreSQL: PostgreSQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.availability.state)=3` |WARNING | |
-|Azure PostgreSQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
-|Azure PostgreSQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
-|Azure PostgreSQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
-|Azure PostgreSQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
+|Azure PostgreSQL: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.data.errors))>0` |AVERAGE | |
+|Azure PostgreSQL: PostgreSQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=2` |HIGH | |
+|Azure PostgreSQL: PostgreSQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=1` |AVERAGE | |
+|Azure PostgreSQL: PostgreSQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=3` |WARNING | |
+|Azure PostgreSQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure PostgreSQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
+|Azure PostgreSQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure PostgreSQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
@@ -534,12 +536,12 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>The AppID of Microsoft Azure.</p> |`` |
+|{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of CPU utilization expressed in %.</p> |`90` |
-|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization expressed in %.</p> |`90` |
-|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization expressed in %.</p> |`90` |
-|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization expressed in %.</p> |`80` |
+|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of memory utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of storage utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of storage utilization expressed in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
 |{$AZURE.RESOURCE_ID} |<p>Microsoft Azure PostgreSQL server ID.</p> |`` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
@@ -578,14 +580,14 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Azure PostgreSQL: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.data.errors))>0` |AVERAGE | |
-|Azure PostgreSQL: PostgreSQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.availability.state)=2` |HIGH | |
-|Azure PostgreSQL: PostgreSQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.availability.state)=1` |AVERAGE | |
-|Azure PostgreSQL: PostgreSQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.availability.state)=3` |WARNING | |
-|Azure PostgreSQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
-|Azure PostgreSQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
-|Azure PostgreSQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
-|Azure PostgreSQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
+|Azure PostgreSQL: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.data.errors))>0` |AVERAGE | |
+|Azure PostgreSQL: PostgreSQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=2` |HIGH | |
+|Azure PostgreSQL: PostgreSQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=1` |AVERAGE | |
+|Azure PostgreSQL: PostgreSQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=3` |WARNING | |
+|Azure PostgreSQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure PostgreSQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
+|Azure PostgreSQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure PostgreSQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
@@ -650,7 +652,7 @@ There are no template links in this template.
 |Azure |Azure Microsoft SQL: Availability status detailed |<p>The summary description of the availability status.</p> |DEPENDENT |azure.db.mssql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure Microsoft SQL: Percentage CPU |<p>The CPU percent of a host.</p> |DEPENDENT |azure.db.mssql.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.average`</p> |
 |Azure |Azure Microsoft SQL: Data IO percentage |<p>The physical data read percentage.</p> |DEPENDENT |azure.db.mssql.data.read.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.physical_data_read_percent.average`</p> |
-|Azure |Azure Microsoft SQL: Log IO percentage |<p>The percentage of I/O written log files. Not applicable to the data warehouses.</p> |DEPENDENT |azure.db.mssql.log.write.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.log_write_percent.average`</p> |
+|Azure |Azure Microsoft SQL: Log IO percentage |<p>The percentage of I/O log. Not applicable to the data warehouses.</p> |DEPENDENT |azure.db.mssql.log.write.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.log_write_percent.average`</p> |
 |Azure |Azure Microsoft SQL: Data space used |<p>Data space used. Not applicable to the data warehouses.</p> |DEPENDENT |azure.db.mssql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure Microsoft SQL: Connections successful |<p>The count of successful connections.</p> |DEPENDENT |azure.db.mssql.connections.successful<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connection_successful.total`</p> |
 |Azure |Azure Microsoft SQL: Connections failed: System errors |<p>The count of failed connections with system errors.</p> |DEPENDENT |azure.db.mssql.connections.failed.system<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connection_failed.total`</p> |
@@ -665,24 +667,24 @@ There are no template links in this template.
 |Azure |Azure Microsoft SQL: SQL Server process core percent |<p>The CPU usage as a percentage of the SQL DB process. Not applicable to the data warehouses.</p> |DEPENDENT |azure.db.mssql.server.cpu.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.sqlserver_process_core_percent.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure Microsoft SQL: SQL Server process memory percent |<p>Memory usage as a percentage of the SQL DB process. Not applicable to the data warehouses.</p> |DEPENDENT |azure.db.mssql.server.memory.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.sqlserver_process_memory_percent.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure Microsoft SQL: Tempdb data file size |<p>Space used in `tempdb` data files expressed in bytes. Not applicable to the data warehouses.</p> |DEPENDENT |azure.db.mssql.tempdb.data.size<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.tempdb_data_size.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `1024`</p> |
-|Azure |Azure Microsoft SQL: Tempdb log file size |<p>Space used in `tempdb` transaction log files expressed in bytes. Not applicable to data warehouses.</p> |DEPENDENT |azure.db.mssql.tempdb.log.size<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.tempdb_log_size.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `1024`</p> |
+|Azure |Azure Microsoft SQL: Tempdb log file size |<p>Space used in `tempdb` transaction log files expressed in bytes. Not applicable to the data warehouses.</p> |DEPENDENT |azure.db.mssql.tempdb.log.size<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.tempdb_log_size.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `1024`</p> |
 |Azure |Azure Microsoft SQL: Tempdb log used percent |<p>The percentage of space used in `tempdb` transaction log files. Not applicable to the data warehouses.</p> |DEPENDENT |azure.db.mssql.tempdb.log.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.tempdb_log_used_percent.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure Microsoft SQL: App CPU billed |<p>The metric to calculate billing costs. Applies to the serverless databases.</p> |DEPENDENT |azure.db.mssql.app.cpu.billed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.app_cpu_billed.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure Microsoft SQL: App CPU percentage |<p>The metric to calculate CPU percentage used by the App. Applies to serverless databases.</p> |DEPENDENT |azure.db.mssql.app.cpu.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.app_cpu_percent.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure Microsoft SQL: App memory percentage |<p>The metric is used to calculate App memory percentage. Applies to serverless databases.</p> |DEPENDENT |azure.db.mssql.app.memory.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.app_memory_percent.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure Microsoft SQL: App CPU billed |<p>App CPU billed. Applies to serverless databases.</p> |DEPENDENT |azure.db.mssql.app.cpu.billed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.app_cpu_billed.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure Microsoft SQL: App CPU percentage |<p>App CPU percentage. Applies to serverless databases.</p> |DEPENDENT |azure.db.mssql.app.cpu.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.app_cpu_percent.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure Microsoft SQL: App memory percentage |<p>App memory percentage. Applies to serverless databases.</p> |DEPENDENT |azure.db.mssql.app.memory.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.app_memory_percent.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure Microsoft SQL: Data space allocated |<p>The allocated data storage. Not applicable to the data warehouses.</p> |DEPENDENT |azure.db.mssql.storage.allocated<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.allocated_data_storage.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Azure Microsoft SQL: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.data.errors))>0` |AVERAGE | |
-|Azure Microsoft SQL: Microsoft SQL database is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.availability.state)=2` |HIGH | |
-|Azure Microsoft SQL: Microsoft SQL database is degraded |<p>The resource is in degraded state.</p> |`last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.availability.state)=1` |AVERAGE | |
-|Azure Microsoft SQL: Microsoft SQL database is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.availability.state)=3` |WARNING | |
-|Azure Microsoft SQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
-|Azure Microsoft SQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
-|Azure Microsoft SQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
+|Azure Microsoft SQL: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.data.errors))>0` |AVERAGE | |
+|Azure Microsoft SQL: Microsoft SQL database is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=2` |HIGH | |
+|Azure Microsoft SQL: Microsoft SQL database is degraded |<p>The resource is in degraded state.</p> |`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=1` |AVERAGE | |
+|Azure Microsoft SQL: Microsoft SQL database is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=3` |WARNING | |
+|Azure Microsoft SQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure Microsoft SQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure Microsoft SQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
@@ -744,10 +746,10 @@ There are no template links in this template.
 |Azure |Azure Microsoft SQL: Get data |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.db.mssql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Azure |Azure Microsoft SQL: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.mssql.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure Microsoft SQL: Availability state |<p>The availability status of the resource.</p> |DEPENDENT |azure.db.mssql.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Azure |Azure Microsoft SQL: Availability status detailed |<p>The summary description of availability status.</p> |DEPENDENT |azure.db.mssql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure Microsoft SQL: Availability status detailed |<p>The summary description of the availability status.</p> |DEPENDENT |azure.db.mssql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure Microsoft SQL: Percentage CPU |<p>The CPU percent of a host.</p> |DEPENDENT |azure.db.mssql.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.average`</p> |
 |Azure |Azure Microsoft SQL: Data IO percentage |<p>The percentage of physical data read.</p> |DEPENDENT |azure.db.mssql.data.read.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.physical_data_read_percent.average`</p> |
-|Azure |Azure Microsoft SQL: Log IO percentage |<p>The percentage of I/O log files. Not applicable to the data warehouses.</p> |DEPENDENT |azure.db.mssql.log.write.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.log_write_percent.average`</p> |
+|Azure |Azure Microsoft SQL: Log IO percentage |<p>The percentage of I/O log. Not applicable to the data warehouses.</p> |DEPENDENT |azure.db.mssql.log.write.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.log_write_percent.average`</p> |
 |Azure |Azure Microsoft SQL: Data space used |<p>Data space used. Not applicable to the data warehouses.</p> |DEPENDENT |azure.db.mssql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure Microsoft SQL: Connections successful |<p>The count of successful connections.</p> |DEPENDENT |azure.db.mssql.connections.successful<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connection_successful.total`</p> |
 |Azure |Azure Microsoft SQL: Connections failed: System errors |<p>The count of failed connections with system errors.</p> |DEPENDENT |azure.db.mssql.connections.failed.system<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connection_failed.total`</p> |
@@ -774,13 +776,13 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Azure Microsoft SQL: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.data.errors))>0` |AVERAGE | |
-|Azure Microsoft SQL: Microsoft SQL database is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.availability.state)=2` |HIGH | |
-|Azure Microsoft SQL: Microsoft SQL database is degraded |<p>The resource is in degraded state.</p> |`last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.availability.state)=1` |AVERAGE | |
-|Azure Microsoft SQL: Microsoft SQL database is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.availability.state)=3` |WARNING | |
-|Azure Microsoft SQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure Microsoft SQL database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
-|Azure Microsoft SQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
-|Azure Microsoft SQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
+|Azure Microsoft SQL: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.data.errors))>0` |AVERAGE | |
+|Azure Microsoft SQL: Microsoft SQL database is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=2` |HIGH | |
+|Azure Microsoft SQL: Microsoft SQL database is degraded |<p>The resource is in degraded state.</p> |`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=1` |AVERAGE | |
+|Azure Microsoft SQL: Microsoft SQL database is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=3` |WARNING | |
+|Azure Microsoft SQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure Microsoft SQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure Microsoft SQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
