@@ -31,7 +31,7 @@ class CControllerConnectorCreate extends CController {
 			'protocol' =>				'db connector.protocol|in 0',
 			'data_type' =>				'db connector.data_type|in '.implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]),
 			'url' =>					'required|not_empty|db connector.url',
-			'max_records_mode' =>		'in 0,1',
+			'max_records_mode' =>		'required|in 0,1',
 			'max_records' =>			'required|db connector.max_records|ge 0',
 			'max_senders' =>			'required|db connector.max_senders|ge 1|le 100',
 			'max_attempts' =>			'required|db connector.max_attempts|ge 1|le 5',
