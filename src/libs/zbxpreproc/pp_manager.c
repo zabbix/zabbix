@@ -219,7 +219,9 @@ void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t 
 	zbx_pp_task_t	*task;
 
 	task = pp_task_test_create(preproc, value, ts, client);
+	pp_task_queue_lock(&manager->queue);
 	pp_task_queue_push_test(&manager->queue, task);
+	pp_task_queue_unlock(&manager->queue);
 	pp_task_queue_notify(&manager->queue);
 }
 
@@ -258,7 +260,9 @@ int	zbx_pp_manager_queue_preproc(zbx_pp_manager_t *manager, zbx_uint64_t itemid,
 	else
 		task = pp_task_value_seq_create(item->itemid, item->preproc, value, ts, value_opt, NULL);
 
+	pp_task_queue_lock(&manager->queue);
 	pp_task_queue_push(&manager->queue, item, task);
+	pp_task_queue_unlock(&manager->queue);
 	pp_task_queue_notify(&manager->queue);
 
 	return SUCCEED;
