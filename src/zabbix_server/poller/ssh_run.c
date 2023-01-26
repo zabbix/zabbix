@@ -56,11 +56,11 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 {
 	int	ret = SUCCEED;
 	char	opt_copy[1024] = {0};
-	char	*line, *rest = opt_copy;
+	char	*line, *saveptr, *rest = opt_copy;
 
 	zbx_strscpy(opt_copy, options);
 
-	while (NULL != (line = strtok_r(rest, ";", &rest)))
+	for (line = strtok_r(rest, ";", &saveptr); NULL != line; line = strtok_r(NULL, ";", &saveptr))
 	{
 		char	*eq_str = strchr(line, '=');
 
