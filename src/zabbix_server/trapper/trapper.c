@@ -121,7 +121,7 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = process_agent_history_data(sock, jp, ts, &info)))
+	if (SUCCEED != (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
 	}
@@ -152,7 +152,7 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = process_sender_history_data(sock, jp, ts, &info)))
+	if (SUCCEED != (ret = zbx_process_sender_history_data(sock, jp, ts, &info)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid sender data from \"%s\": %s", sock->peer, info);
 	}
@@ -182,7 +182,7 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != get_active_proxy_from_request(jp, &proxy, &error))
+	if (SUCCEED != zbx_get_active_proxy_from_request(jp, &proxy, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse heartbeat from active proxy at \"%s\": %s",
 				sock->peer, error);
@@ -1245,7 +1245,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			av.state = ITEM_STATE_NOTSUPPORTED;
 
 		zbx_dc_config_history_recv_get_items_by_keys(&item, &hk, &errcode, 1);
-		process_history_data(&item, &av, &errcode, 1, NULL);
+		zbx_process_history_data(&item, &av, &errcode, 1, NULL);
 
 		zbx_alarm_on(config_comms->config_timeout);
 		if (SUCCEED != zbx_tcp_send_raw(sock, "OK"))

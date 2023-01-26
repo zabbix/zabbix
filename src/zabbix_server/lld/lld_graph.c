@@ -1531,7 +1531,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,
 				percent_right, ymin_type, ymax_type);
 
-		lld_remove_lost_objects("graph_discovery", "graphid", &graphs, lifetime, lastcheck, DBdelete_graphs,
+		lld_remove_lost_objects("graph_discovery", "graphid", &graphs, lifetime, lastcheck, zbx_db_delete_graphs,
 				get_graph_info);
 
 		lld_items_free(&items);

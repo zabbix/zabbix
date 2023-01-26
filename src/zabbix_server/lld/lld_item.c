@@ -4336,7 +4336,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 	}
 
 	lld_item_links_populate(&item_prototypes, lld_rows, &items_index);
-	lld_remove_lost_objects("item_discovery", "itemid", &items, lifetime, lastcheck, DBdelete_items, get_item_info);
+	lld_remove_lost_objects("item_discovery", "itemid", &items, lifetime, lastcheck, zbx_db_delete_items, get_item_info);
 clean:
 	zbx_hashset_destroy(&items_index);
 

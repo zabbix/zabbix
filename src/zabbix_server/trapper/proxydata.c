@@ -137,7 +137,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (status = get_active_proxy_from_request(jp, &proxy, &error)))
+	if (SUCCEED != (status = zbx_get_active_proxy_from_request(jp, &proxy, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy data from active proxy at \"%s\": %s",
 				sock->peer, error);
@@ -171,7 +171,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	if (SUCCEED == ret)
 	{
-		if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, NULL, &error)))
+		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, NULL, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 					proxy.host, sock->peer, error);
@@ -273,7 +273,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
+	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
 			config_comms->config_tls, config_comms->config_timeout))
 	{
 		/* do not send any reply to server in this case as the server expects proxy data */
@@ -284,11 +284,11 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
-	get_interface_availability_data(&j, &availability_ts);
-	proxy_get_hist_data(&j, &history_lastid, &more_history);
-	proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
-	proxy_get_areg_data(&j, &areg_lastid, &more_areg);
-	proxy_get_host_active_availability(&j);
+	zbx_get_interface_availability_data(&j, &availability_ts);
+	zbx_proxy_get_hist_data(&j, &history_lastid, &more_history);
+	zbx_proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
+	zbx_proxy_get_areg_data(&j, &areg_lastid, &more_areg);
+	zbx_proxy_get_host_active_availability(&j);
 
 	zbx_vector_tm_task_create(&tasks);
 	zbx_tm_get_remote_tasks(&tasks, 0, 0);
@@ -306,7 +306,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
 
-	if (0 != history_lastid && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
+	if (0 != history_lastid && 0 != (proxy_delay = zbx_proxy_get_delay(history_lastid)))
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
 	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
@@ -341,14 +341,14 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 			zbx_db_free_result(result);
 
 			reset_proxy_history_count(history_maxid - history_lastid);
-			proxy_set_hist_lastid(history_lastid);
+			zbx_proxy_set_hist_lastid(history_lastid);
 		}
 
 		if (0 != discovery_lastid)
-			proxy_set_dhis_lastid(discovery_lastid);
+			zbx_proxy_set_dhis_lastid(discovery_lastid);
 
 		if (0 != areg_lastid)
-			proxy_set_areg_lastid(areg_lastid);
+			zbx_proxy_set_areg_lastid(areg_lastid);
 
 		if (0 != tasks.values_num)
 		{
@@ -403,7 +403,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
+	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
 			config_comms->config_tls, config_comms->config_timeout))
 	{
 		/* do not send any reply to server in this case as the server expects proxy data */

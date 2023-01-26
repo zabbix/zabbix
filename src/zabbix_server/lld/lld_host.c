@@ -3446,7 +3446,7 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->del_templateids.values_num)
 		{
-			if (SUCCEED != DBdelete_template_elements(host->hostid, host->host,
+			if (SUCCEED != zbx_db_delete_template_elements(host->hostid, host->host,
 					&host->del_templateids, &err))
 			{
 				*error = zbx_strdcatf(*error, "Cannot unlink template: %s.\n", err);
@@ -3456,7 +3456,7 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->lnk_templateids.values_num)
 		{
-			if (SUCCEED != DBcopy_template_elements(host->hostid, &host->lnk_templateids, ZBX_TEMPLATE_LINK_LLD,
+			if (SUCCEED != zbx_db_copy_template_elements(host->hostid, &host->lnk_templateids, ZBX_TEMPLATE_LINK_LLD,
 					&err))
 			{
 				*error = zbx_strdcatf(*error, "Cannot link template(s) %s.\n", err);
@@ -3588,7 +3588,7 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 
 		DBbegin();
 
-		DBdelete_hosts(&del_hostids, &del_hosts);
+		zbx_db_delete_hosts(&del_hostids, &del_hosts);
 
 		DBcommit();
 	}
@@ -3692,7 +3692,7 @@ static void	lld_groups_remove(const zbx_vector_ptr_t *groups, int lifetime, int 
 
 		DBbegin();
 
-		DBdelete_groups(&del_groupids);
+		zbx_db_delete_groups(&del_groupids);
 
 		DBcommit();
 	}

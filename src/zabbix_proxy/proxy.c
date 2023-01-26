@@ -1462,7 +1462,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	proxy_db_init();
 
-	change_proxy_history_count(proxy_get_history_count());
+	change_proxy_history_count(zbx_proxy_get_history_count());
 
 	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 		threads_num += CONFIG_FORKS[i];

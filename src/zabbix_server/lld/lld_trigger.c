@@ -3650,7 +3650,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	lld_trigger_dependencies_validate(&triggers, error);
 	lld_trigger_tags_make(&trigger_prototypes, &triggers, lld_rows, lld_macro_paths, error);
 	ret = lld_triggers_save(hostid, &trigger_prototypes, &triggers);
-	lld_remove_lost_objects("trigger_discovery", "triggerid", &triggers, lifetime, lastcheck, DBdelete_triggers,
+	lld_remove_lost_objects("trigger_discovery", "triggerid", &triggers, lifetime, lastcheck, zbx_db_delete_triggers,
 			get_trigger_info);
 	/* cleaning */
 

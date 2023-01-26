@@ -2070,7 +2070,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update", config_tls,
+	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update", config_tls,
 			config_timeout))
 	{
 		goto out;
