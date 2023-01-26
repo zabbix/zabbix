@@ -19,7 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -1222,7 +1221,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 	public function getCreateData() {
 		return [
-			// #0 Using cyrillic in settings.
+			// #0 Using cyrillic symbols in fields (groupOfNames).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1243,7 +1242,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Reference attribute' => 'кириллица',
 								'Group filter' => 'кириллица',
 								'User name attribute' => 'кириллица',
-								'User last name attribute' => 'кириллица'
+								'User last name attribute' => 'кириллица',
+								'Advanced configuration' => true,
+								'Search filter' => 'кириллица'
 							],
 							'User group mapping' => [
 								[
@@ -1274,7 +1275,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory_ldap' => [
 							[
 								'host' => 'кириллица',
-								'port' => '389',
+								'port' => 389,
 								'base_dn' => 'кириллица',
 								'bind_dn' => 'кириллица',
 								'bind_password' => '',
@@ -1285,7 +1286,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'user_ref_attr' => 'кириллица',
 								'group_filter' => 'кириллица',
 								'user_username' => 'кириллица',
-								'user_lastname' => 'кириллица'
+								'user_lastname' => 'кириллица',
+								'search_filter' => 'кириллица'
 							]
 						],
 						'userdirectory_idpgroup' => [
@@ -1314,33 +1316,77 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
-			// #1 Using symbols in settings.
+			// #1 Using cyrillic symbols in fields (memberOf).
 			[
 				[
 					'expected' => TEST_GOOD,
 					'servers_settings' => [
 						[
 							'fields' => [
-								'Name' => '~`!@#$%^7*()_+=/',
-								'Host' => '~`!@#$%^7*()_+=/',
-								'Base DN' => '~`!@#$%^7*()_+=/',
-								'Search attribute' => '~`!@#$%^7*()_+=/',
-								'Bind DN' => '~`!@#$%^7*()_+=/',
-								'Bind password' => '~`!@#$%^7*()_+=/',
-								'Description' => '~`!@#$%^7*()_+=/',
+								'Name' => 'кириллица',
+								'Host' => 'кириллица',
+								'Base DN' => 'кириллица',
+								'Search attribute' => 'кириллица',
+								'Configure JIT provisioning' => true,
+								'Group name attribute' => 'кириллица',
+								'User group membership attribute' => 'кириллица',
+								'User name attribute' => 'кириллица',
+								'User last name attribute' => 'кириллица'
+							]
+						]
+					],
+					'db_check' => [
+						'userdirectory' => [
+							['name' => '', 'description' => '', 'provision_status' => 0],
+							['name' => 'кириллица', 'description' => '', 'provision_status' => 1]
+						],
+						'userdirectory_ldap' => [
+							[
+								'host' => 'кириллица',
+								'port' => 389,
+								'base_dn' => 'кириллица',
+								'bind_dn' => 'кириллица',
+								'bind_password' => 'кириллица',
+								'search_attribute' => 'кириллица',
+								'group_name' => 'кириллица',
+								'group_member' => 'кириллица',
+								'group_filter' => 'кириллица',
+								'user_username' => 'кириллица',
+								'user_lastname' => 'кириллица'
+							]
+						]
+					]
+				]
+			],
+			// #2 Using symbols in settings (groupOfNames).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Host' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Base DN' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Search attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Bind DN' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Bind password' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Description' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'Configure JIT provisioning' => true,
 								'Group configuration' => 'groupOfNames',
-								'Group base DN' => '~`!@#$%^7*()_+=/',
-								'Group name attribute' => '~`!@#$%^7*()_+=/',
-								'Group member attribute' => '~`!@#$%^7*()_+=/',
-								'Reference attribute' => '~`!@#$%^7*()_+=/',
-								'Group filter' => '~`!@#$%^7*()_+=/',
-								'User name attribute' => '~`!@#$%^7*()_+=/',
-								'User last name attribute' => '~`!@#$%^7*()_+=/'
+								'Group base DN' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Group name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Group member attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Reference attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Group filter' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'User name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'User last name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Advanced configuration' => true,
+								'Search filter' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							],
 							'User group mapping' => [
 								[
-									'LDAP group pattern' => '~`!@#$%^7*()_+=/',
+									'LDAP group pattern' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 									'User groups' => 'Test timezone',
 									'User role' => 'User role'
 								]
@@ -1349,12 +1395,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								[
 									'Name' => '~`!@#$%^7*()_+=/1',
 									'Media type' => 'Discord',
-									'Attribute' => '~`!@#$%^7*()_+=/'
+									'Attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 								],
 								[
 									'Name' => '~`!@#$%^7*()_+=/2',
 									'Media type' => 'iLert',
-									'Attribute' => '~`!@#$%^7*()_+=/'
+									'Attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 								]
 							]
 						]
@@ -1362,28 +1408,29 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'db_check' => [
 						'userdirectory' => [
 							['name' => '', 'description' => '', 'provision_status' => 0],
-							['name' => '~`!@#$%^7*()_+=/', 'description' => '~`!@#$%^7*()_+=/', 'provision_status' => 1]
+							['name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ', 'description' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
 							[
-								'host' => '~`!@#$%^7*()_+=/',
+								'host' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'port' => '389',
-								'base_dn' => '~`!@#$%^7*()_+=/',
-								'bind_dn' => '~`!@#$%^7*()_+=/',
-								'bind_password' => '~`!@#$%^7*()_+=/',
-								'search_attribute' => '~`!@#$%^7*()_+=/',
-								'group_basedn' => '~`!@#$%^7*()_+=/',
-								'group_name' => '~`!@#$%^7*()_+=/',
-								'group_member' => '~`!@#$%^7*()_+=/',
-								'user_ref_attr' => '~`!@#$%^7*()_+=/',
-								'group_filter' => '~`!@#$%^7*()_+=/',
-								'user_username' => '~`!@#$%^7*()_+=/',
-								'user_lastname' => '~`!@#$%^7*()_+=/'
+								'base_dn' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'bind_dn' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'bind_password' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'search_attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'group_basedn' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'group_name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'group_member' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'user_ref_attr' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'group_filter' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'user_username' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'user_lastname' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'search_filter' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							]
 						],
 						'userdirectory_idpgroup' => [
 							[
-								'name' => '~`!@#$%^7*()_+=/',
+								'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'roleid' => 1
 							]
 						],
@@ -1396,18 +1443,60 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							[
 								'name' => '~`!@#$%^7*()_+=/1',
 								'mediatypeid' => 10,
-								'attribute' => '~`!@#$%^7*()_+=/'
+								'attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							],
 							[
 								'name' => '~`!@#$%^7*()_+=/2',
 								'mediatypeid' => 22,
-								'attribute' => '~`!@#$%^7*()_+=/'
+								'attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
 							]
 						]
 					]
 				]
 			],
-			// #2 Checking trim of the leading and trailing settings.
+			// #3 Using symbols in settings (memberOf).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Host' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Base DN' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Search attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'Configure JIT provisioning' => true,
+								'Group name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'User group membership attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'User name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'User last name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
+							]
+						]
+					],
+					'db_check' => [
+						'userdirectory' => [
+							['name' => '', 'description' => '', 'provision_status' => 0],
+							['name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ', 'description' => '', 'provision_status' => 1]
+						],
+						'userdirectory_ldap' => [
+							[
+								'host' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'port' => 389,
+								'base_dn' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'bind_dn' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'bind_password' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'search_attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'group_name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'group_member' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'group_filter' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'user_username' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'user_lastname' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
+							]
+						]
+					]
+				]
+			],
+			// #4 Checking trim of the leading and trailing settings (groupOfNames).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1420,15 +1509,19 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Base DN' => '   leading.trailing   ',
 								'Search attribute' => '   leading.trailing   ',
 								'Bind DN' => '   leading.trailing   ',
+								'Bind password' => '   leading.trailing   ',
 								'Description' => '   leading.trailing   ',
 								'Configure JIT provisioning' => true,
 								'Group configuration' => 'groupOfNames',
 								'Group base DN' => '   leading.trailing   ',
 								'Group name attribute' => '   leading.trailing   ',
 								'Group member attribute' => '   leading.trailing   ',
+								'Reference attribute' => '   leading.trailing   ',
 								'Group filter' => '   leading.trailing   ',
 								'User name attribute' => '   leading.trailing   ',
-								'User last name attribute' => '   leading.trailing   '
+								'User last name attribute' => '   leading.trailing   ',
+								'Advanced configuration' => true,
+								'Search filter' => '   leading.trailing   '
 							],
 							'User group mapping' => [
 								[
@@ -1443,6 +1536,70 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 									'Media type' => 'Discord',
 									'Attribute' => '   leading.trailing   '
 								]
+							]
+						]
+					],
+					'db_check' => [
+						'userdirectory' => [
+							['name' => '', 'description' => '', 'provision_status' => 0],
+							['name' => 'leading.trailing', 'description' => 'leading.trailing', 'provision_status' => 1]
+						],
+						'userdirectory_ldap' => [
+							[
+								'host' => 'leading.trailing',
+								'port' => 389,
+								'base_dn' => 'leading.trailing',
+								'bind_dn' => 'leading.trailing',
+								'bind_password' => '   leading.trailing   ',
+								'search_attribute' => 'leading.trailing',
+								'group_basedn' => 'leading.trailing',
+								'group_name' => 'leading.trailing',
+								'group_member' => 'leading.trailing',
+								'user_ref_attr' => '   leading.trailing   ',
+								'group_filter' => 'leading.trailing',
+								'user_username' => 'leading.trailing',
+								'user_lastname' => 'leading.trailing',
+								'search_filter' => 'leading.trailing'
+							]
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => 'leading.trailing',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						],
+						'userdirectory_media' => [
+							[
+								'name' => 'leading.trailing',
+								'mediatypeid' => 10,
+								'attribute' => 'leading.trailing'
+							]
+						]
+					]
+				]
+			],
+			// #5 Checking trim of the leading and trailing settings (memberOf).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'trim' => true,
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => '   leading.trailing   ',
+								'Host' => '   leading.trailing   ',
+								'Base DN' => '   leading.trailing   ',
+								'Search attribute' => '   leading.trailing   ',
+								'Configure JIT provisioning' => true,
+								'Group name attribute' => '   leading.trailing   ',
+								'User group membership attribute' => '   leading.trailing   ',
+								'User name attribute' => '   leading.trailing   ',
+								'User last name attribute' => '   leading.trailing   '
 							]
 						]
 					],
@@ -1487,7 +1644,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
-			// #3 Long values.
+			// #6 Long values.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1510,8 +1667,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Reference attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 								'Group filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 								'User name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'User last name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
-							],
+								'User last name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'StartTLS' => true,
+								'Search filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
+								],
 							'User group mapping' => [
 								[
 									'LDAP group pattern' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
@@ -1558,8 +1717,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'user_ref_attr' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 								'group_filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 								'user_username' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'user_lastname' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
-							]
+								'user_lastname' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'start_tls' => 1,
+								'search_filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
+								]
 						],
 						'userdirectory_idpgroup' => [
 							[
@@ -1589,7 +1750,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
-			// #4 LDAP server with every field filled (no JIT).
+			// #7 LDAP server with every field filled (no JIT).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1622,13 +1783,15 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'base_dn' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 								'bind_dn' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 								'bind_password' => 'Secret123',
-								'search_attribute' => 'uid'
+								'search_attribute' => 'uid',
+								'start_tls' => 1,
+								'search_filter' => 'filter'
 							]
 						]
 					]
 				]
 			],
-			// #5 LDAP server with every field filled with JIT (groupOfNames).
+			// #8 LDAP server with every field filled with JIT (groupOfNames).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1650,7 +1813,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Reference attribute' => 'create test reference attribute',
 								'Group filter' => 'create test group filter',
 								'User name attribute' => 'create user name attribute',
-								'User last name attribute' => 'create user last name'
+								'User last name attribute' => 'create user last name',
+								'Advanced configuration' => true,
+								'StartTLS' => true,
+								'Search filter' => 'search filter'
 							],
 							'User group mapping' => [
 								[
@@ -1691,7 +1857,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'user_ref_attr' => 'create test reference attribute',
 								'group_filter' => 'create test group filter',
 								'user_username' => 'create user name attribute',
-								'user_lastname' => 'create user last name'
+								'user_lastname' => 'create user last name',
+								'StartTLS' => true,
+								'Search filter' => 'search filter'
 							]
 						],
 						'userdirectory_idpgroup' => [
@@ -1720,7 +1888,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
-			// #6 Two LDAP servers with different names.
+			// #9 Two LDAP servers with different names.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1748,15 +1916,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							[
-								'name' => ''
-							],
-							[
-								'name' => 'ldap1'
-							],
-							[
-								'name' => 'ldap2'
-							]
+							['name' => ''],
+							['name' => 'ldap1'],
+							['name' => 'ldap2']
 						],
 						'userdirectory_ldap' => [
 							[
@@ -1792,7 +1954,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 *
 	 * @dataProvider getCreateData
 	 */
-	public function testUsersAuthenticationLdap_Create($data) {
+	public function testUsersAuthenticationLdap_Create1($data) {
 		$this->testLdapCreate($data);
 	}
 
@@ -1803,7 +1965,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		if (CTestArrayHelper::get($data, 'expected', TEST_BAD) === TEST_GOOD) {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
-			// Check DB configuration.
+			// Check LDAP configuration in DB.
 			foreach ($data['db_check'] as $table => $rows) {
 				foreach ($rows as $i => $row) {
 					if (CTestArrayHelper::get($data, 'trim', false)) {

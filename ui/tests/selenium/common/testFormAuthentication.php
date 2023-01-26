@@ -27,6 +27,11 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testFormAuthentication extends CWebTest {
 
+	/**
+	 * Open specific Authentication form tab and check basic common fields.
+	 *
+	 * @param string    $auth_type    LDAP or SAML
+	 */
 	protected function openFormAndCheckBasics($auth_type) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('id:authentication-form')->asForm()->one();
@@ -34,9 +39,9 @@ class testFormAuthentication extends CWebTest {
 		$this->page->assertHeader('Authentication');
 		$this->page->assertTitle('Configuration of authentication');
 
-		$enable_saml = $form->getField('Enable '.$auth_type.' authentication');
-		$this->assertTrue($enable_saml->isEnabled());
-		$this->assertTrue($enable_saml->isVisible());
+		$enable_saml_checkbox = $form->getField('Enable '.$auth_type.' authentication');
+		$this->assertTrue($enable_saml_checkbox->isEnabled());
+		$this->assertTrue($enable_saml_checkbox->isVisible());
 		$form->checkValue(['Enable '.$auth_type.' authentication' => false]);
 
 		// Check that Update button is clickable and no other buttons present.
@@ -46,6 +51,14 @@ class testFormAuthentication extends CWebTest {
 		return $form;
 	}
 
+	/**
+	 * Check hints and form fields in mapping popups.
+	 *
+	 * @param CFormElement    $form              given form
+	 * @param array           $hintboxes         hintboxes to be checked
+	 * @param array           $mapping_tables    mapping tables to be checked
+	 * @param string          $auth_type         LDAP or SAML
+	 */
 	protected function checkFormHintsAndMapping($form, $hintboxes, $mapping_tables, $auth_type) {
 		// Open hintboxes and compare text.
 		$this->checkHints($hintboxes, $form);
@@ -181,4 +194,3 @@ class testFormAuthentication extends CWebTest {
 		}
 	}
 }
-

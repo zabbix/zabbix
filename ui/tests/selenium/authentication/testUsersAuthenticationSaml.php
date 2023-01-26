@@ -19,7 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
 
@@ -219,6 +218,47 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					],
 					'error' => 'Invalid parameter "/1/provision_groups": cannot be empty.'
 				]
+			],
+			// #6 Group mapping dialog form validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP',
+						'Configure JIT provisioning' => true,
+						'Group name attribute' => 'group name attribute'
+					],
+					'User group mapping' => [[]],
+					'mapping_error' => 'Invalid user group mapping configuration.',
+					'mapping_error_details' => [
+						'Field "roleid" is mandatory.',
+						'Incorrect value for field "name": cannot be empty.',
+						'Field "user_groups" is mandatory.'
+					],
+					'error' => 'Invalid parameter "/1/provision_groups": cannot be empty.'
+				]
+			],
+			// #7 Media mapping dialog form validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'SSO service URL' => 'SSO',
+						'Username attribute' => 'UA',
+						'SP entity ID' => 'SP',
+						'Configure JIT provisioning' => true,
+						'Group name attribute' => 'group name attribute'
+					],
+					'User group mapping' => [[]],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "attribute": cannot be empty.'
+					],
+					'error' => 'Invalid parameter "/1/provision_groups": cannot be empty.'
+				]
 			]
 		];
 	}
@@ -236,15 +276,19 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					],
 					'db_check' => [
 						'config' => [
-							'saml_auth_enabled' => 1,
-							'saml_case_sensitive' => 0,
-							'saml_jit_status' => 0
+							[
+								'saml_auth_enabled' => 1,
+								'saml_case_sensitive' => 0,
+								'saml_jit_status' => 0
+							]
 						],
 						'userdirectory_saml' => [
-							'idp_entityid' => 'IdP',
-							'sso_url' => 'SSO',
-							'username_attribute' => 'UA',
-							'sp_entityid' => 'SP'
+							[
+								'idp_entityid' => 'IdP',
+								'sso_url' => 'SSO',
+								'username_attribute' => 'UA',
+								'sp_entityid' => 'SP'
+							]
 						]
 					]
 				]
@@ -252,6 +296,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			// #1 Various UTF-8 characters in SAML settings fields + All possible fields with JIT configuration.
 			[
 				[
+					'Deprovisioned users group' => 'Disabled',
 					'fields' => [
 						'Enable JIT provisioning' => true,
 						'IdP entity ID' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
@@ -273,7 +318,8 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'SP name ID format' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 						'Group name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 						'User name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-						'User last name attribute'=> '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
+						'User last name attribute'=> '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+						'Enable SCIM provisioning' => true
 					],
 					'User group mapping' => [
 						[
@@ -291,25 +337,31 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					],
 					'db_check' => [
 						'config' => [
-							'saml_auth_enabled' => 1,
-							'saml_case_sensitive' => 1,
-							'saml_jit_status' => 1,
-							'saml_provision_status' => 1
+							[
+								'saml_auth_enabled' => 1,
+								'saml_case_sensitive' => 1,
+								'saml_jit_status' => 1
+							]
 						],
 						'userdirectory_saml' => [
-							'idp_entityid' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-							'sso_url' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-							'slo_url' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-							'username_attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-							'sp_entityid' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-							'nameid_format' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-							'sign_messages' => 1,
-							'sign_assertions' => 1,
-							'sign_authn_requests' => 1,
-							'sign_logout_requests' => 1,
-							'sign_logout_responses' => 1,
-							'encrypt_nameid' => 1,
-							'encrypt_assertions' => 1
+							[
+								'idp_entityid' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'sso_url' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'slo_url' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'username_attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'sp_entityid' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'sign_messages' => 1,
+								'sign_assertions' => 1,
+								'sign_authn_requests' => 1,
+								'sign_logout_requests' => 1,
+								'sign_logout_responses' => 1,
+								'encrypt_nameid' => 1,
+								'encrypt_assertions' => 1,
+								'nameid_format' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'group_name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'user_username' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'user_lastname' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
+							]
 						],
 						'userdirectory_idpgroup' => [
 							[
@@ -327,11 +379,6 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 								'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'mediatypeid' => 10,
 								'attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
-							],
-							[
-								'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
-								'mediatypeid' => 22,
-								'attribute' => 'test iLert'
 							]
 						]
 					]
@@ -355,7 +402,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					],
 					'User group mapping' => [
 						[
-							'LDAP group pattern' => '   leading.trailing   ',
+							'SAML group pattern' => '   leading.trailing   ',
 							'User groups' => 'Test timezone',
 							'User role' => 'User role'
 						]
@@ -364,22 +411,22 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						[
 							'Name' => '   leading.trailing   ',
 							'Media type' => 'Discord',
-							'Attribute' => 'test discord'
+							'Attribute' => 'leading.trailing'
 						]
 					],
 					'db_check' => [
-						'config' => [
-							'saml_auth_enabled' => 1,
-							'saml_case_sensitive' => 1,
-							'saml_jit_status' => 1
-						],
 						'userdirectory_saml' => [
-							'idp_entityid' => 'leading.trailing',
-							'sso_url' => 'leading.trailing',
-							'slo_url' => 'leading.trailing',
-							'username_attribute' => 'leading.trailing',
-							'sp_entityid' => 'leading.trailing',
-							'nameid_format' => 'leading.trailing',
+							[
+								'idp_entityid' => 'leading.trailing',
+								'sso_url' => 'leading.trailing',
+								'slo_url' => 'leading.trailing',
+								'username_attribute' => 'leading.trailing',
+								'sp_entityid' => 'leading.trailing',
+								'nameid_format' => 'leading.trailing',
+								'group_name' => 'leading.trailing',
+								'user_username' => 'leading.trailing',
+								'user_lastname' => 'leading.trailing'
+							]
 						],
 						'userdirectory_idpgroup' => [
 							[
@@ -396,7 +443,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 							[
 								'name' => 'leading.trailing',
 								'mediatypeid' => 10,
-								'attribute' => 'test discord'
+								'attribute' => 'leading.trailing'
 							]
 						]
 					]
@@ -407,48 +454,49 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 				[
 					'trim' => true,
 					'fields' => [
-						'IdP entity ID' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-						'SSO service URL' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-						'SLO service URL' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-						'Username attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-						'SP entity ID' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-						'SP name ID format' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+						'IdP entity ID' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+						'SSO service URL' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+						'SLO service URL' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+						'Username attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+						'SP entity ID' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+						'SP name ID format' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
 						'Configure JIT provisioning' => true,
-						'Group name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-						'User name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-						'User last name attribute'=> 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
+						'Group name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+						'User name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+						'User last name attribute'=> 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va'
 					],
 					'User group mapping' => [
 						[
-							'LDAP group pattern' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+							'SAML group pattern' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
 							'User groups' => 'Test timezone',
 							'User role' => 'User role'
 						]
 					],
 					'Media type mapping' => [
 						[
-							'Name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+							// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
+							'Name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
 							'Media type' => 'Discord',
-							'Attribute' => 'test discord'
+							'Attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va'
 						]
 					],
 					'db_check' => [
-						'config' => [
-							'saml_auth_enabled' => 1,
-							'saml_case_sensitive' => 1,
-							'saml_jit_status' => 1
-						],
 						'userdirectory_saml' => [
-							'idp_entityid' => 'leading.trailing',
-							'sso_url' => 'leading.trailing',
-							'slo_url' => 'leading.trailing',
-							'username_attribute' => 'leading.trailing',
-							'sp_entityid' => 'leading.trailing',
-							'nameid_format' => 'leading.trailing',
+							[
+								'idp_entityid' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'sso_url' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'slo_url' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'username_attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'sp_entityid' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'nameid_format' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'group_name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'user_username' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'user_lastname' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va'
+							]
 						],
 						'userdirectory_idpgroup' => [
 							[
-								'name' => 'leading.trailing',
+								'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
 								'roleid' => 1
 							]
 						],
@@ -459,14 +507,9 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						],
 						'userdirectory_media' => [
 							[
-								'name' => 'leading.trailing',
+								'name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
 								'mediatypeid' => 10,
-								'attribute' => 'test discord'
-							],
-							[
-								'name' => 'leading.trailing',
-								'mediatypeid' => 22,
-								'attribute' => 'test iLert'
+								'attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va'
 							]
 						]
 					]
@@ -493,13 +536,11 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						// Encrypt.
 						'id:encrypt_nameid' => true,
 						'id:encrypt_assertions' => true,
-						'Case-sensitive login' => true,
-						'db_check' => [
-							'config' => [
-								'saml_auth_enabled' => 1,
-								'saml_case_sensitive' => 1,
-							],
-							'userdirectory_saml' => [
+						'Case-sensitive login' => true
+					],
+					'db_check' => [
+						'userdirectory_saml' => [
+							[
 								'idp_entityid' => 'IdP_saml_zabbix.com',
 								'sso_url' => 'SSO_saml_zabbix.com',
 								'slo_url' => 'SLO_saml_zabbix.com',
@@ -533,7 +574,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 	 *
 	 * @dataProvider getConfigureData
 	 */
-	public function testUsersAuthenticationSaml_Configure1($data) {
+	public function testUsersAuthenticationSaml_Configure($data) {
 		$this->testSamlConfiguration($data);
 	}
 
@@ -562,10 +603,14 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 
 			$form->checkValue($data['fields']);
 
-			if (array_key_exists('db_check', $data)) {
-				foreach ($data['db_check'] as $table => $values) {
-					$sql = 'SELECT '.implode(",", array_keys($values)).' FROM '.$table;
-					$this->assertEquals($values, CDBHelper::getRow($sql));
+			foreach ($data['db_check'] as $table => $rows) {
+				foreach ($rows as $i => $row) {
+					if (CTestArrayHelper::get($data, 'trim', false)) {
+						$rows = array_map('trim', $row);
+					}
+
+					$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table.' LIMIT 1 OFFSET '.$i;
+					$this->assertEquals([$row], CDBHelper::getAll($sql));
 				}
 			}
 		}
