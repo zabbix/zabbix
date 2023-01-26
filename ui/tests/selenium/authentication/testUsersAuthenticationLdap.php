@@ -1332,6 +1332,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'User group membership attribute' => 'кириллица',
 								'User name attribute' => 'кириллица',
 								'User last name attribute' => 'кириллица'
+							],
+							'User group mapping' => [
+								[
+									'LDAP group pattern' => 'кириллица',
+									'User groups' => 'Test timezone',
+									'User role' => 'User role'
+								]
 							]
 						]
 					],
@@ -1345,16 +1352,23 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'host' => 'кириллица',
 								'port' => 389,
 								'base_dn' => 'кириллица',
-								'bind_dn' => 'кириллица',
-								'bind_password' => 'кириллица',
 								'search_attribute' => 'кириллица',
 								'group_name' => 'кириллица',
-								'group_member' => 'кириллица',
-								'group_filter' => 'кириллица',
 								'user_username' => 'кириллица',
 								'user_lastname' => 'кириллица'
 							]
-						]
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => 'кириллица',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
+							]
+						],
 					]
 				]
 			],
@@ -1470,6 +1484,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'User group membership attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'User name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'User last name attribute' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
+							],
+							'User group mapping' => [
+								[
+									'LDAP group pattern' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+									'User groups' => 'Test timezone',
+									'User role' => 'User role'
+								]
 							]
 						]
 					],
@@ -1491,6 +1512,17 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'group_filter' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'user_username' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
 								'user_lastname' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
+							]
+						],
+						'userdirectory_idpgroup' => [
+							[
+								'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+								'roleid' => 1
+							]
+						],
+						'userdirectory_usrgrp' => [
+							[
+								'usrgrpid' => 92
 							]
 						]
 					]
@@ -1539,6 +1571,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
+
 					'db_check' => [
 						'userdirectory' => [
 							['name' => '', 'description' => '', 'provision_status' => 0],
@@ -1600,6 +1633,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'User group membership attribute' => '   leading.trailing   ',
 								'User name attribute' => '   leading.trailing   ',
 								'User last name attribute' => '   leading.trailing   '
+							],
+							'User group mapping' => [
+								[
+									'LDAP group pattern' => '   leading.trailing   ',
+									'User groups' => 'Test timezone',
+									'User role' => 'User role'
+								]
 							]
 						]
 					],

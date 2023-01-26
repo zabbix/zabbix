@@ -27,11 +27,11 @@ require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
  */
 class testUsersAuthenticationSaml extends testFormAuthentication {
 
-//	protected function onBeforeTestSuite() {
-//		if (!defined('PHPUNIT_SAML_TESTS_ENABLED') || !PHPUNIT_SAML_TESTS_ENABLED) {
-//			self::markTestSuiteSkipped();
-//		}
-//	}
+	protected function onBeforeTestSuite() {
+		if (!defined('PHPUNIT_SAML_TESTS_ENABLED') || !PHPUNIT_SAML_TESTS_ENABLED) {
+			self::markTestSuiteSkipped();
+		}
+	}
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -240,7 +240,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					'error' => 'Invalid parameter "/1/provision_groups": cannot be empty.'
 				]
 			],
-			// #7 Media mapping dialog form validation.
+			// # Media mapping dialog form validation.
 			[
 				[
 					'expected' => TEST_BAD,
