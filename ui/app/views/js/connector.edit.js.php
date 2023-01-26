@@ -102,7 +102,7 @@ window.connector_edit_popup = new class {
 		}
 
 		const fields_to_trim = ['name', 'url', 'timeout', 'token', 'http_proxy', 'username', 'ssl_cert_file',
-			'ssl_key_file', 'ssl_key_password', 'description'
+			'ssl_key_file', 'description'
 		];
 		for (const field of fields_to_trim) {
 			if (field in fields) {
