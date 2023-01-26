@@ -28,7 +28,7 @@ class CControllerConnectorCreate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'name' =>					'required|not_empty|db connector.name',
-			'protocol' =>				'db connector.protocol|in 0',
+			'protocol' =>				'db connector.protocol|in '.ZBX_STREAMING_PROTOCOL_V1,
 			'data_type' =>				'db connector.data_type|in '.implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]),
 			'url' =>					'required|not_empty|db connector.url',
 			'max_records_mode' =>		'required|in 0,1',

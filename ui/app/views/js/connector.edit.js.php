@@ -34,25 +34,19 @@ window.connector_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		jQuery(document.getElementById('tags'))
-			.dynamicRows({
-				template: '#tag-row-tmpl',
-				rows: tags
-			})
-			.on('change', () => this._update());
+		jQuery(document.getElementById('tags')).dynamicRows({
+			template: '#tag-row-tmpl',
+			rows: tags
+		});
 
-		for (const id of ['max_records_mode', 'advanced_configuration', 'authtype']) {
-			document.getElementById(id).addEventListener('change', () => this._update());
+		for (const id of ['tags', 'max_records_mode', 'advanced_configuration', 'authtype']) {
+			document.getElementById(id).addEventListener('change', () => this._updateForm());
 		}
 
-		this._update();
+		this._updateForm();
 	}
 
-	_update() {
-		const max_records_mode = this.form.querySelector('[name="max_records_mode"]:checked').value;
-		const max_records = document.getElementById('max_records');
-		max_records.style.display = max_records_mode == 0 ? 'none' : '';
-
+	_updateForm() {
 		for (const tag_operator of document.getElementById('tags').querySelectorAll('.js-tag-operator')) {
 			const tag_value = tag_operator.closest('.form_row').querySelector('.js-tag-value');
 
@@ -60,19 +54,22 @@ window.connector_edit_popup = new class {
 				|| tag_operator.value == <?= CONDITION_OPERATOR_NOT_EXISTS ?>) ? 'none' : '';
 		}
 
-		const advanced_configuration = document.getElementById('advanced_configuration').checked;
+		const max_records_mode = this.form.querySelector('[name="max_records_mode"]:checked').value;
+		document.getElementById('max_records').style.display = max_records_mode == 0 ? 'none' : '';
+
+		const advanced_configuration_enabled = document.getElementById('advanced_configuration').checked;
 		const advanced_configuration_fields = ['.js-field-http-proxy', '.js-field-authtype', '.js-field-verify-peer',
 			'.js-field-verify-host', '.js-field-ssl-cert-file', '.js-field-ssl-key-file', '.js-field-ssl-key-password'
 		];
 
 		for (const field of this.form.querySelectorAll(advanced_configuration_fields.join())) {
-			field.style.display = advanced_configuration ? '' : 'none';
+			field.style.display = advanced_configuration_enabled ? '' : 'none';
 		}
 
 		const authtype_none = document.getElementById('authtype').value == <?= ZBX_HTTP_AUTH_NONE ?>;
 
 		for (const field of this.form.querySelectorAll('.js-field-username, .js-field-password')) {
-			field.style.display = advanced_configuration && !authtype_none ? '' : 'none';
+			field.style.display = advanced_configuration_enabled && !authtype_none ? '' : 'none';
 		}
 	}
 

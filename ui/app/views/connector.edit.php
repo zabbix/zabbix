@@ -88,36 +88,35 @@ $connector_tab = (new CFormGrid())
 							->addClass('element-table-add')
 					)
 				),
-			(new CTemplateTag('tag-row-tmpl'))
-				->addItem(
-					(new CRow([
-						(new CTextBox('tags[#{rowNum}][tag]', '#{tag}', false,
-							DB::getFieldLength('connector_tag', 'tag')
-						))
-							->setAttribute('placeholder', _('tag'))
-							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-						(new CSelect('tags[#{rowNum}][operator]'))
-							->addClass('js-tag-operator')
-							->setValue(CONDITION_OPERATOR_EQUAL)
-							->addOptions(CSelect::createOptionsFromArray([
-								CONDITION_OPERATOR_EXISTS => _('Exists'),
-								CONDITION_OPERATOR_EQUAL => _('Equals'),
-								CONDITION_OPERATOR_LIKE => _('Contains'),
-								CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist'),
-								CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal'),
-								CONDITION_OPERATOR_NOT_LIKE => _('Does not contain')
-							])),
-						(new CTextBox('tags[#{rowNum}][value]', '#{value}', false,
-							DB::getFieldLength('connector_tag', 'value')
-						))
-							->addClass('js-tag-value')
-							->setAttribute('placeholder', _('value'))
-							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-						(new CSimpleButton(_('Remove')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('element-table-remove')
-					]))->addClass('form_row')
-				)
+			(new CTemplateTag('tag-row-tmpl'))->addItem(
+				(new CRow([
+					(new CTextBox('tags[#{rowNum}][tag]', '#{tag}', false,
+						DB::getFieldLength('connector_tag', 'tag')
+					))
+						->setAttribute('placeholder', _('tag'))
+						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+					(new CSelect('tags[#{rowNum}][operator]'))
+						->addClass('js-tag-operator')
+						->setValue(CONDITION_OPERATOR_EQUAL)
+						->addOptions(CSelect::createOptionsFromArray([
+							CONDITION_OPERATOR_EXISTS => _('Exists'),
+							CONDITION_OPERATOR_EQUAL => _('Equals'),
+							CONDITION_OPERATOR_LIKE => _('Contains'),
+							CONDITION_OPERATOR_NOT_EXISTS => _('Does not exist'),
+							CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal'),
+							CONDITION_OPERATOR_NOT_LIKE => _('Does not contain')
+						])),
+					(new CTextBox('tags[#{rowNum}][value]', '#{value}', false,
+						DB::getFieldLength('connector_tag', 'value')
+					))
+						->addClass('js-tag-value')
+						->setAttribute('placeholder', _('value'))
+						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+					(new CSimpleButton(_('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+				]))->addClass('form_row')
+			)
 		])
 	)
 	->addItem([
