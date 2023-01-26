@@ -6286,7 +6286,12 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 				param = key;
 		}
 		else
+		{
 			substitute_lld_macros(&param, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+
+			if (SUCCEED != zbx_eval_suffixed_number_parse(param, NULL))
+				quoted = 1;
+		}
 
 		if (SUCCEED != zbx_function_param_quote(&param, quoted))
 		{

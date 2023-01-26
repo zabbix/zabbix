@@ -344,7 +344,7 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 	if (0 != check_value)
 	{
 		if (ZBX_VARIANT_STR == token->value.type &&
-				SUCCEED != eval_suffixed_number_parse(token->value.data.str, NULL))
+				SUCCEED != zbx_eval_suffixed_number_parse(token->value.data.str, NULL))
 		{
 			quoted = 1;
 		}
