@@ -1275,14 +1275,16 @@ footer {
   margin-right: 6px; }
 .header-kioskmode-controls .dashboard-kioskmode-controls .zi-chevron-right,
 .header-kioskmode-controls .dashboard-kioskmode-controls .zi-chevron-left,
-.header-kioskmode-controls .dashboard-kioskmode-controls .zi-pause {
+.header-kioskmode-controls .dashboard-kioskmode-controls .zi-pause,
+.header-kioskmode-controls .dashboard-kioskmode-controls .zi-play {
   padding: 0 3px;
   width: 24px;
   height: 24px; }
   .header-kioskmode-controls .dashboard-kioskmode-controls .zi-chevron-right:before,
   .header-kioskmode-controls .dashboard-kioskmode-controls .zi-chevron-left:before,
-  .header-kioskmode-controls .dashboard-kioskmode-controls .zi-pause:before {
-    vertical-align: middle; }
+  .header-kioskmode-controls .dashboard-kioskmode-controls .zi-pause:before,
+  .header-kioskmode-controls .dashboard-kioskmode-controls .zi-play:before {
+    vertical-align: baseline; }
 
 .dashboard-toggle-slideshow.slideshow-state-started .slideshow-state-stopped, .dashboard-toggle-slideshow.slideshow-state-stopped .slideshow-state-started,
 .dashboard-kioskmode-toggle-slideshow.slideshow-state-started .slideshow-state-stopped,

@@ -11,13 +11,14 @@
 
 		.zi-chevron-right,
 		.zi-chevron-left,
-		.zi-pause {
+		.zi-pause,
+		.zi-play {
 			padding: 0 3px;
 			width: 24px;
 			height: 24px;
 
 			&:before {
-				vertical-align: middle;
+				vertical-align: baseline;
 			}
 		}
 	}

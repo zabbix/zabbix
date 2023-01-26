@@ -236,7 +236,9 @@ class CDashboard extends CBaseComponent {
 
 		if (this._buttons.slideshow !== null) {
 			this._buttons.slideshow.classList.remove('slideshow-state-stopped');
+			this._buttons.slideshow.classList.remove('zi-pause');
 			this._buttons.slideshow.classList.add('slideshow-state-started');
+			this._buttons.slideshow.classList.add('zi-play');
 
 			if (this._buttons.slideshow.title !== '') {
 				this._buttons.slideshow.title = t('Stop slideshow');
@@ -260,7 +262,9 @@ class CDashboard extends CBaseComponent {
 
 		if (this._buttons.slideshow !== null) {
 			this._buttons.slideshow.classList.remove('slideshow-state-started');
+			this._buttons.slideshow.classList.remove('zi-play');
 			this._buttons.slideshow.classList.add('slideshow-state-stopped');
+			this._buttons.slideshow.classList.add('zi-pause');
 
 			if (this._buttons.slideshow.title !== '') {
 				this._buttons.slideshow.title = t('Start slideshow');
