@@ -94,7 +94,7 @@ class CControllerConnectorList extends CController {
 
 		$data['connectors'] = API::Connector()->get($options);
 
-		$page_num = getRequest('page', 1);
+		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('connector.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['connectors'], $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
