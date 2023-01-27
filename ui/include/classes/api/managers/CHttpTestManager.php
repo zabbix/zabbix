@@ -1340,7 +1340,7 @@ class CHttpTestManager {
 	 * where $httptests belong.
 	 *
 	 * @param array $httptests
-	 * @param array $hostIds
+	 * @param array $hostids
 	 *
 	 * @return bool
 	 */

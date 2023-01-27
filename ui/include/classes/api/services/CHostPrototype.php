@@ -1662,17 +1662,11 @@ class CHostPrototype extends CHostBase {
 		];
 		$hostids = DBfetchColumn(DBselect(DB::makeSql('host_discovery', $options)), 'hostid');
 
-		$upd_host_prototypes = [];
-
-		foreach ($hostids as $hostid) {
-			$upd_host_prototypes[] = [
+		if ($hostids) {
+			DB::update('hosts', [
 				'values' => ['templateid' => 0],
-				'where' => ['hostid' => $hostid]
-			];
-		}
-
-		if ($upd_host_prototypes) {
-			DB::update('hosts', $upd_host_prototypes);
+				'where' => ['hostid' => $hostids]
+			]);
 
 			DB::update('group_prototype', [
 				'values' => ['templateid' => 0],
@@ -2212,7 +2206,7 @@ class CHostPrototype extends CHostBase {
 
 		// Lock also inherited host prototypes before the deletion to prevent server from adding new LLD hosts.
 		$db_host_prototypes += DBfetchArrayAssoc(DBselect(
-			'SELECT hostid,host'.
+			'SELECT hostid'.
 			' FROM hosts h'.
 			' WHERE '.dbConditionId('h.templateid', array_keys($db_host_prototypes)).
 			' FOR UPDATE'
