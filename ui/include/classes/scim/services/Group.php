@@ -47,7 +47,7 @@ class Group extends ScimApiService {
 		'schemas' => [self::SCIM_GROUP_SCHEMA]
 	];
 
-	protected array $patch_op = ['add', 'remove', 'replace'];
+	protected array $patch_op = ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'];
 	protected array $patch_path = ['members'];
 
 	/**
@@ -111,6 +111,7 @@ class Group extends ScimApiService {
 	 */
 	private function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'displayName' =>	['type' => API_STRING_UTF8],
 			'id' =>				['type' => API_ID],
 			'startIndex' =>		['type' => API_INT32, 'default' => 1],
 			'count' =>			['type' => API_INT32, 'default' => 100]
@@ -398,7 +399,7 @@ class Group extends ScimApiService {
 	 *
 	 * @throws APIException if input is invalid.
 	 */
-	private function validatePatch(array $options): void {
+	private function validatePatch(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
@@ -417,6 +418,10 @@ class Group extends ScimApiService {
 
 		if (!in_array(self::SCIM_PATCH_SCEMA, $options['schemas'], true)) {
 			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		}
+
+		foreach ($options['Operations'] as &$operation) {
+			$operation['op'] = strtolower($operation['op']);
 		}
 	}
 
