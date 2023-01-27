@@ -379,11 +379,6 @@ void	zbx_strquote_alloc_opt(char **str, size_t *str_alloc, size_t *str_offset, c
 	*str_offset += size;
 }
 
-void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str)
-{
-	zbx_strquote_alloc_opt(str, str_alloc, str_offset, value_str, ZBX_STRQUOTE_DEFAULT);
-}
-
 /* Has to be rewritten to avoid malloc */
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2)
 {
