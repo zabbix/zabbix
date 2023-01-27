@@ -609,7 +609,7 @@ class CZabbixServer {
 						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
 				}
 
-				$this->error = $dErrorMsg.$errorMsg;
+				$this->error = rtrim($dErrorMsg.$errorMsg);
 			}
 
 			$this->socket = $socket;
