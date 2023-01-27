@@ -37,6 +37,9 @@ typedef enum
 }
 zbx_host_template_link_type;
 
+typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_EVALUATE_ITEM *, const char *, const char *,
+		const zbx_timespec_t *, char **);
+
 int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
 		const zbx_config_tls_t *config_tls, int config_timeout);
 
@@ -116,9 +119,6 @@ void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64
 void	zbx_db_trigger_get_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
 void	zbx_db_trigger_get_recovery_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
 void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
-
-typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_EVALUATE_ITEM *, const char *, const char *,
-		const zbx_timespec_t *, char **);
 
 void	zbx_db_trigger_explain_expression(const ZBX_DB_TRIGGER *trigger, char **expression,
 		zbx_trigger_func_t eval_func_cb, int recovery);
