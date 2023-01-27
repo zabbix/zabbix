@@ -521,6 +521,7 @@ static size_t	get_string_field_size(unsigned char type)
 {
 	switch(type)
 	{
+		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
 			return ZBX_SIZE_T_MAX;
 		case ZBX_TYPE_CHAR:
@@ -539,6 +540,7 @@ static size_t	get_string_field_size(unsigned char type)
 {
 	switch(type)
 	{
+		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
 			return ZBX_SIZE_T_MAX;
@@ -568,7 +570,7 @@ static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx
 {
 	size_t	length;
 
-	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
+	if ((ZBX_TYPE_LONGTEXT == field->type || ZBX_TYPE_BLOB == field->type) && 0 == field->length)
 		length = ZBX_SIZE_T_MAX;
 	else if (ZBX_TYPE_CUID == field->type)
 		length = CUID_LEN;
