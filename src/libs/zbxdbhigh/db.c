@@ -3932,7 +3932,7 @@ void	zbx_tsdb_recalc_time_period(int *ts_from, int tables)
 		hk_period = cfg.hk.trends;
 	}
 
-	least_ts = (int)time(NULL) - cfg.hk.history + 1;
+	least_ts = (int)time(NULL) - hk_period + 1;
 
 	if (least_ts > *ts_from)
 		*ts_from = least_ts;
