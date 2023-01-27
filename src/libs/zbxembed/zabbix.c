@@ -87,11 +87,14 @@ static duk_ret_t	es_zabbix_log(duk_context *ctx)
 
 	zabbix_log(level, "%s", message);
 
-	zbx_json_addobject(env->json, NULL);
-	zbx_json_adduint64(env->json, "level", (zbx_uint64_t)level);
-	zbx_json_adduint64(env->json, "ms", zbx_get_duration_ms(&env->start_time));
-	zbx_json_addstring(env->json, "message", message, ZBX_JSON_TYPE_STRING);
-	zbx_json_close(env->json);
+	if (NULL != env->json)
+	{
+		zbx_json_addobject(env->json, NULL);
+		zbx_json_adduint64(env->json, "level", (zbx_uint64_t)level);
+		zbx_json_adduint64(env->json, "ms", zbx_get_duration_ms(&env->start_time));
+		zbx_json_addstring(env->json, "message", message, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(env->json);
+	}
 out:
 	env->log_size += strlen(message);
 	zbx_free(message);
