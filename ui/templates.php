@@ -577,10 +577,13 @@ if (hasRequest('form')) {
 			'templateids' => $data['templateid']
 		]);
 		$data['dbTemplate'] = reset($dbTemplates);
-		$data['vendor'] = array_filter([
-			'name' => $data['dbTemplate']['vendor_name'],
-			'version' => $data['dbTemplate']['vendor_version']
-		], 'strlen');
+
+		if ($data['form'] !== 'full_clone') {
+			$data['vendor'] = array_filter([
+				'name' => $data['dbTemplate']['vendor_name'],
+				'version' => $data['dbTemplate']['vendor_version']
+			], 'strlen');
+		}
 
 		foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
 			$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
