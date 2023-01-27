@@ -152,12 +152,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
 
 	if (MAX_HTTPREQUEST_OBJECT_COUNT == env->http_req_objects)
-	{
-		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,
-				"maximum count of HttpRequest objects was reached");
-
-		return duk_throw(ctx);
-	}
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "maximum count of HttpRequest objects was reached");
 
 	duk_push_this(ctx);
 
@@ -227,7 +222,7 @@ static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 
 	header_sz = strlen(utf8);
 
-	if (ZBX_ES_MAX_HEADERS_SIZE + header_sz <= request->headers_sz)
+	if (ZBX_ES_MAX_HEADERS_SIZE < request->headers_sz + header_sz)
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "headers exceeded maximum size of "
 				ZBX_FS_UI64 " bytes.", ZBX_ES_MAX_HEADERS_SIZE);

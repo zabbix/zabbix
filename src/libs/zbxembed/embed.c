@@ -643,8 +643,6 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	duk_pop(es->env->ctx);
 	es->env->rt_error_num = 0;
 out:
-	es->env->http_req_objects = 0;
-
 	if (NULL != es->env->json)
 	{
 		zbx_json_close(es->env->json);
