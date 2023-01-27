@@ -21,6 +21,30 @@
 
 abstract class CGraphDraw {
 
+	protected $stime;
+	protected $fullSizeX;
+	protected $fullSizeY;
+	protected $m_minY;
+	protected $m_maxY;
+	protected $data;
+	protected $items;
+	private $header;
+	protected $from_time;
+	protected $to_time;
+	private $colors;
+	private $colorsrgb;
+	protected $im;
+	protected $period;
+	protected $sizeX;
+	protected $sizeY;
+	protected $shiftXleft;
+	protected $shiftXright;
+	protected $num;
+	protected $type;
+	protected $drawLegend;
+	protected $graphtheme;
+	protected $shiftY;
+
 	/**
 	 * Default top padding including header label height and vertical padding.
 	 */
@@ -51,11 +75,6 @@ abstract class CGraphDraw {
 		$this->m_maxY = null;
 		$this->data = [];
 		$this->items = [];
-		$this->min = null;
-		$this->max = null;
-		$this->avg = null;
-		$this->clock = null;
-		$this->count = null;
 		$this->header = null;
 		$this->from_time = null;
 		$this->to_time = null;
@@ -67,7 +86,6 @@ abstract class CGraphDraw {
 		$this->sizeY = 200; // default graph size Y
 		$this->shiftXleft = 100;
 		$this->shiftXright = 50;
-		$this->shiftXCaption = 0;
 		$this->num = 0;
 		$this->type = $type; // graph type
 		$this->drawLegend = 1;
