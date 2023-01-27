@@ -59,6 +59,11 @@ class C10FunctionMacroParser extends CParser {
 	 */
 	private $host_name_parser;
 
+	/**
+	 * @var CSetParser
+	 */
+	private $host_macro_parser;
+
 	private $host = '';
 	private $item = '';
 	private $function = '';
