@@ -21,11 +21,6 @@
 
 class CControllerImageUpdate extends CController {
 
-	/**
-	 * @var array
-	 */
-	private $image = [];
-
 	protected function checkInput() {
 		$fields = [
 			'name'      => 'required|not_empty|db images.name',
