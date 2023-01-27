@@ -38,10 +38,10 @@
 
 		_initActions() {
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-maintenance-create')) {
+				if (e.target.classList.contains('js-create-maintenance')) {
 					this._edit();
 				}
-				else if (e.target.classList.contains('js-maintenance-edit')) {
+				else if (e.target.classList.contains('js-edit-maintenance')) {
 					this._edit({maintenanceid: e.target.dataset.maintenanceid});
 				}
 				else if (e.target.classList.contains('js-massdelete-maintenance')) {
@@ -57,7 +57,9 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+			const dialogue = overlay.$dialogue[0];
+
+			dialogue.addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);
 
 				if ('messages' in e.detail) {
@@ -67,7 +69,7 @@
 				location.href = location.href;
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+			dialogue.addEventListener('dialogue.delete', (e) => {
 				uncheckTableRows('maintenance');
 
 				postMessageOk(e.detail.title);

@@ -28,7 +28,7 @@ class CControllerMaintenanceEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'maintenanceid' =>	'db maintenances.maintenanceid'
+			'maintenanceid' => 'db maintenances.maintenanceid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -46,9 +46,6 @@ class CControllerMaintenanceEdit extends CController {
 		return $ret;
 	}
 
-	/**
-	 * @throws APIException
-	 */
 	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)) {
 			return false;
@@ -78,6 +75,7 @@ class CControllerMaintenanceEdit extends CController {
 	 */
 	protected function doAction(): void {
 		$empty_tags = [['tag' => '', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => '']];
+		$defaults = DB::getDefaults('maintenances');
 
 		if ($this->maintenance !== null) {
 			CArrayHelper::sort($this->maintenance['tags'], ['tag', 'value', 'operator']);
@@ -125,38 +123,20 @@ class CControllerMaintenanceEdit extends CController {
 		}
 		else {
 			$data = [
-				'maintenanceid' => $this->getInput('maintenanceid', 0),
-				'mname' => $this->getInput('mname', ''),
-				'maintenance_type' => $this->getInput('maintenance_type', 0),
-				'active_since' => $this->getInput('active_since', date(ZBX_DATE_TIME, strtotime('today'))),
-				'active_till' => $this->getInput('active_till', date(ZBX_DATE_TIME, strtotime('tomorrow'))),
-				'timeperiods' => $this->getInput('timeperiods', []),
-				'tags_evaltype' => $this->getInput('tags_evaltype', MAINTENANCE_TAG_EVAL_TYPE_AND_OR),
+				'maintenanceid' => null,
+				'mname' => $defaults['name'],
+				'maintenance_type' => $defaults['maintenance_type'],
+				'active_since' => date(ZBX_DATE_TIME, strtotime('today')),
+				'active_till' => date(ZBX_DATE_TIME, strtotime('tomorrow')),
+				'timeperiods' => [],
+				'tags_evaltype' => $defaults['tags_evaltype'],
 				'tags' => $empty_tags,
-				'description' => $this->getInput('description', '')
+				'description' => $defaults['description']
 			];
 
-			$hostids = $this->getInput('hostids', []);
-			$groupids = $this->getInput('groupids', []);
-
-			$db_hosts = $hostids
-				? API::Host()->get([
-					'output' => ['hostid', 'name'],
-					'hostids' => $hostids,
-					'editable' => true
-				])
-				: [];
-
-			$db_groups = $groupids
-				? API::HostGroup()->get([
-					'output' => ['groupid', 'name'],
-					'groupids' => $groupids,
-					'editable' => true
-				])
-				: [];
+			$db_hosts = [];
+			$db_groups = [];
 		}
-
-		$data['allowed_edit'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
 
 		$data['hosts_ms'] = CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']);
 		CArrayHelper::sort($data['hosts_ms'], ['name']);
@@ -164,6 +144,7 @@ class CControllerMaintenanceEdit extends CController {
 		$data['groups_ms'] = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
 		CArrayHelper::sort($data['groups_ms'], ['name']);
 
+		$data['allowed_edit'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$this->setResponse(new CControllerResponseData($data));

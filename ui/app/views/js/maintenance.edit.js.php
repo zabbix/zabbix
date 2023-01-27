@@ -26,6 +26,7 @@ window.maintenance_edit = new class {
 		this._initTemplates();
 
 		this.maintenanceid = maintenanceid;
+		this.allowed_edit = allowed_edit;
 
 		this.overlay = overlays_stack.getById('maintenance-edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -49,58 +50,8 @@ window.maintenance_edit = new class {
 			rows: maintenance_tags
 		});
 
-		if (!allowed_edit) {
-			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"], .js-edit, .js-remove')
-				.forEach((element) => {
-					element.disabled = true;
-					element.setAttribute('readonly', 'readonly')
-				});
-		}
-
-		if (document.querySelector('input[name=maintenance_type]:checked').value  == <?= MAINTENANCE_TYPE_NODATA ?>) {
-			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"]').forEach((element) => {
-				element.disabled = true;
-			});
-			document.querySelectorAll('input[name$="[tag]"], input[name$="[value]').forEach((element) => {
-				element.removeAttribute('placeholder');
-			});
-		}
-
-		// Update form field state according to the form data and allowed_edit.
-
-		document.getElementById('maintenance_type').addEventListener('change', () => {
-			var maintenance_type = document.querySelector('input[name=maintenance_type]:checked').value;
-			var tags_table_disabled = maintenance_type == <?= MAINTENANCE_TYPE_NODATA ?>;
-
-			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"]').forEach((element) => {
-				element.disabled = tags_table_disabled;
-			});
-
-			if (tags_table_disabled) {
-				document.querySelectorAll('input[name$="[tag]"], input[name$="[value]').forEach((element) => {
-					element.removeAttribute('placeholder');
-				});
-			}
-			else {
-				document.querySelectorAll('input[name$="[tag]"]').forEach((element) => {
-					element.setAttribute('placeholder', <?= json_encode(_('tag')) ?>);
-				});
-				document.querySelectorAll('input[name$="[value]"]').forEach((element) => {
-					element.setAttribute('placeholder', <?= json_encode(_('value')) ?>);
-				});
-			}
-		});
-
 		this._initPeriodActionButtons();
-		this._updateHostGroupMs();
-		this._updateHostMs();
-
-		this.hostgroup_ms.on('change', () => {
-			this._updateHostGroupMs();
-		});
-		this.host_ms.on('change', () => {
-			this._updateHostMs();
-		});
+		this._update();
 	}
 
 	_initTemplates() {
@@ -297,6 +248,57 @@ window.maintenance_edit = new class {
 		});
 	}
 
+	_update () {
+		if (!this.allowed_edit) {
+			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"], .js-edit, .js-remove')
+				.forEach((element) => {
+					element.disabled = true;
+					element.setAttribute('readonly', 'readonly')
+				});
+		}
+
+		if (document.querySelector('input[name=maintenance_type]:checked').value  == <?= MAINTENANCE_TYPE_NODATA ?>) {
+			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"]').forEach((element) => {
+				element.disabled = true;
+			});
+			document.querySelectorAll('input[name$="[tag]"], input[name$="[value]').forEach((element) => {
+				element.removeAttribute('placeholder');
+			});
+		}
+
+		document.getElementById('maintenance_type').addEventListener('change', () => {
+			var maintenance_type = document.querySelector('input[name=maintenance_type]:checked').value;
+			var tags_table_disabled = maintenance_type == <?= MAINTENANCE_TYPE_NODATA ?>;
+
+			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"]').forEach((element) => {
+				element.disabled = tags_table_disabled;
+			});
+
+			if (tags_table_disabled) {
+				document.querySelectorAll('input[name$="[tag]"], input[name$="[value]').forEach((element) => {
+					element.removeAttribute('placeholder');
+				});
+			}
+			else {
+				document.querySelectorAll('input[name$="[tag]"]').forEach((element) => {
+					element.setAttribute('placeholder', <?= json_encode(_('tag')) ?>);
+				});
+				document.querySelectorAll('input[name$="[value]"]').forEach((element) => {
+					element.setAttribute('placeholder', <?= json_encode(_('value')) ?>);
+				});
+			}
+		});
+
+		this._updateHostGroupMs();
+		this._updateHostMs();
+
+		this.hostgroup_ms.on('change', () => {
+			this._updateHostGroupMs();
+		});
+		this.host_ms.on('change', () => {
+			this._updateHostMs();
+		});
+	}
 	_updateHostGroupMs() {
 		this.hostgroup_ms = $('#groupids_');
 

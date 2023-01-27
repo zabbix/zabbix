@@ -36,7 +36,7 @@ $html_page = (new CHtmlPage())
 				->addItem(
 					(new CSimpleButton(_('Create maintenance period')))
 						->setEnabled($data['allowed_edit'])
-						->addClass('js-maintenance-create')
+						->addClass('js-create-maintenance')
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
@@ -97,9 +97,8 @@ $form = (new CForm())
 $maintenance_list = (new CTableInfo())
 	->setHeader([
 		$data['allowed_edit']
-			? (new CColHeader(
-				(new CCheckBox('all_maintenances'))
-					->onClick("checkAll('".$form->getName()."', 'all_maintenances', 'maintenanceids');")
+			? (new CColHeader((new CCheckBox('all_maintenances'))
+				->onClick("checkAll('".$form->getName()."', 'all_maintenances', 'maintenanceids');")
 			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $action_url->getUrl()),
@@ -118,9 +117,11 @@ if ($data['maintenances']) {
 			case MAINTENANCE_STATUS_EXPIRED:
 				$maintenance_status = (new CSpan(_x('Expired', 'maintenance status')))->addClass(ZBX_STYLE_RED);
 				break;
+
 			case MAINTENANCE_STATUS_APPROACH:
 				$maintenance_status = (new CSpan(_x('Approaching', 'maintenance status')))->addClass(ZBX_STYLE_ORANGE);
 				break;
+
 			case MAINTENANCE_STATUS_ACTIVE:
 				$maintenance_status = (new CSpan(_x('Active', 'maintenance status')))->addClass(ZBX_STYLE_GREEN);
 				break;
@@ -129,7 +130,7 @@ if ($data['maintenances']) {
 		$maintenance_list->addRow([
 			$data['allowed_edit'] ? new CCheckBox('maintenanceids[' . $maintenanceid . ']', $maintenanceid) : null,
 			(new CLink($maintenance['name']))
-				->addClass('js-maintenance-edit')
+				->addClass('js-edit-maintenance')
 				->setAttribute('data-maintenanceid', $maintenance['maintenanceid']),
 			$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
 			zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_since']),

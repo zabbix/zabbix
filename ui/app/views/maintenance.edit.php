@@ -32,9 +32,8 @@ $form = (new CForm())
 
 $periods = (new CTable())
 	->setId('periods')
-	->setHeader(
-		(new CRowHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')]))->addClass(ZBX_STYLE_GREY)
-	);
+	->setHeader(new CRowHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')]))
+	->setAriaRequired();
 
 $periods->addItem(
 	(new CTag('tfoot', true))
@@ -48,17 +47,58 @@ $periods->addItem(
 		)
 );
 
+$tags = (new CTable())
+	->setId('maintenance-tags')
+	->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setHeader(
+		(new CCol(
+			(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
+				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
+				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
+				->setModern(true)
+		))->setColSpan(4)
+	)
+	->setFooter(
+		(new CCol(
+			(new CButton('tags_add', _('Add')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-add')
+		))->setColSpan(4)
+	);
+
+$template_tag = (new CTemplateTag('maintenance-tag-row-tmpl'))
+	->addItem(
+		(new CRow([
+			(new CTextBox('maintenance_tags[#{rowNum}][tag]', '#{tag}', false,
+				DB::getFieldLength('maintenance_tag', 'tag')
+			))
+				->setAttribute('placeholder', _('tag'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CRadioButtonList('maintenance_tags[#{rowNum}][operator]', MAINTENANCE_TAG_OPERATOR_LIKE))
+				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
+				->setModern(true),
+			(new CTextBox('maintenance_tags[#{rowNum}][value]', '#{value}', false,
+				DB::getFieldLength('maintenance_tag', 'value')
+			))
+				->setAttribute('placeholder',  _('value'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CButton('maintenance_tags[#{rowNum}][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		]))->addClass('form_row')
+	);
+
 $form->addItem(
 	(new CFormGrid())
 		->addItem([
 			(new CLabel(_('Name'), 'mname'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('mname', $data['mname'] ?: ''))
+				(new CTextBox('mname', $data['mname'], false, DB::getFieldLength('maintenances', 'name')))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAriaRequired()
-					->setEnabled($data['allowed_edit'])
 					->setAttribute('autofocus', 'autofocus')
-					->setAttribute('maxlength', DB::getFieldLength('maintenances', 'name'))
+					->setAriaRequired()
+					->setReadonly(!$data['allowed_edit'])
 			)
 		])
 		->addItem([
@@ -150,49 +190,7 @@ $form->addItem(
 		->addItem([
 			new CLabel(_('Tags')),
 			new CFormField(
-				(new CDiv([
-					(new CTable())
-						->setId('maintenance-tags')
-						->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-						->setHeader(
-							(new CCol(
-								(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
-									->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
-									->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
-									->setModern(true)
-							))->setColSpan(4)
-						)
-						->setFooter(
-							(new CCol(
-								(new CButton('tags_add', _('Add')))
-									->addClass(ZBX_STYLE_BTN_LINK)
-									->addClass('element-table-add')
-							))->setColSpan(4)
-						),
-					(new CTemplateTag('maintenance-tag-row-tmpl'))
-						->addItem(
-							(new CRow([
-								(new CTextBox('maintenance_tags[#{rowNum}][tag]', '#{tag}', false,
-									DB::getFieldLength('maintenance_tag', 'tag')
-								))
-									->setAttribute('placeholder', _('tag'))
-									->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-								(new CRadioButtonList('maintenance_tags[#{rowNum}][operator]',
-										MAINTENANCE_TAG_OPERATOR_LIKE))
-									->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
-									->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
-									->setModern(true),
-								(new CTextBox('maintenance_tags[#{rowNum}][value]', '#{value}', false,
-									DB::getFieldLength('maintenance_tag', 'value')
-								))
-									->setAttribute('placeholder',  _('value'))
-									->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-								(new CButton('maintenance_tags[#{rowNum}][remove]', _('Remove')))
-									->addClass(ZBX_STYLE_BTN_LINK)
-									->addClass('element-table-remove')
-							]))->addClass('form_row')
-						)
-				]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				(new CDiv([$tags, $template_tag]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			)
 		])
 		->addItem([
@@ -215,12 +213,12 @@ $form->addItem(
 	'))->setOnDocumentReady()
 );
 
-if ($data['maintenanceid'] !== 0) {
+if ($data['maintenanceid'] !== null) {
 	$title = _('Maintenance period');
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => '',
+			'class' => 'js-update',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'enabled' => $data['allowed_edit'],

@@ -51,18 +51,18 @@ class CControllerMaintenanceList extends CController {
 	}
 
 	protected function doAction(): void {
-		$sort_field = $this->getInput('sort', CProfile::get('web.maintenance.list.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.maintenance.list.sortorder', ZBX_SORT_UP));
-
-		CProfile::update('web.maintenance.list.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.maintenance.list.sortorder', $sort_order, PROFILE_TYPE_STR);
-
 		if ($this->getInput('filter_set', 0)) {
 			$this->updateProfiles();
 		}
 		elseif ($this->getInput('filter_rst', 0)) {
 			$this->deleteProfiles();
 		}
+
+		$sort_field = $this->getInput('sort', CProfile::get('web.maintenance.list.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.maintenance.list.sortorder', ZBX_SORT_UP));
+
+		CProfile::update('web.maintenance.list.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.maintenance.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$filter = [
 			'name' => CProfile::get('web.maintenance.filter_name', ''),
@@ -80,6 +80,7 @@ class CControllerMaintenanceList extends CController {
 			: [];
 
 		$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+
 		if ($filter_groupids) {
 			$filter_groupids = getSubGroups($filter_groupids);
 		}
@@ -95,9 +96,7 @@ class CControllerMaintenanceList extends CController {
 
 		$options = [
 			'output' => ['maintenanceid', 'name', 'maintenance_type', 'active_since', 'active_till', 'description'],
-			'search' => [
-				'name' => ($filter['name'] === '') ? null : $filter['name']
-			],
+			'search' => ['name' => $filter['name'] === '' ? null : $filter['name']],
 			'groupids' => $filter_groupids,
 			'editable' => true,
 			'sortfield' => $sort_field,
