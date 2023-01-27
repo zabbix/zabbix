@@ -42,10 +42,13 @@ class User extends ScimApiService {
 
 	private const SCIM_USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
 	private const SCIM_LIST_RESPONSE_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:ListResponse';
+	private const SCIM_PATCH_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:PatchOp';
 
 	protected array $data = [
 		'schemas' => [self::SCIM_USER_SCHEMA]
 	];
+
+	protected array $patch_op = ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'];
 
 	/**
 	 * Returns information on specific user or all users if no specific information is requested.
@@ -340,6 +343,143 @@ class User extends ScimApiService {
 		}
 
 		return $db_user;
+	}
+
+	/**
+	 * Updates user in the database with newly received information.
+	 *
+	 * @param array  $options                                      Array with data from request.
+	 * @param string $options['id']                                User id.
+	 * @param array  $options['Operations']                        List of operations that need to be performed.
+	 * @param string $options['Operations'][]['op']                Operation that needs to be performed -'add',
+	 *                                                             'replace', 'remove'.
+	 * @param string $options['Operations'][]['path']              On what operation should be performed, filters are
+	 *                                                             not supported, supported 'path' is only 'userName',
+	 *                                                             'active' and the one that matches custom user
+	 *                                                             attributes .
+	 * @param string $options['Operations'][]['value']             Value on which operation should be
+	 *                                                             performed. If operation is 'remove' this can be
+	 *                                                             ommited.
+	 *
+	 * @return array  Returns array with data necessary for SCIM response.
+	 *
+	 * @throws APIException
+	 */
+	public function patch(array $options): array {
+		$this->validatePatch($options, $db_user);
+
+		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
+		$supported_paths = array_merge($provisioning->getUserIdpAttributes(), ['active', 'userName']);
+		$user_data = $provisioning->getCurrentUserAttributes($db_user);
+		$operations = $options['Operations'];
+
+		$add = [];
+		$replace = [];
+		$remove = [];
+
+		foreach ($operations as $operation) {
+			if (!in_array($operation['path'], $supported_paths, true)) {
+				continue;
+			}
+
+			switch ($operation['op']) {
+				case 'add':
+					$add[$operation['path']] = $operation['value'];
+					break;
+				case 'replace':
+					$replace[$operation['path']] = $operation['value'];
+					break;
+				case 'remove':
+					$remove[] = $operation['path'];
+					break;
+			}
+		}
+
+		if ($add || $replace) {
+			$user_data = array_merge($user_data, $add);
+		}
+
+		if ($replace) {
+			$user_data = array_merge($user_data, $replace);
+		}
+
+		if ($remove) {
+			foreach ($remove as $remove_path) {
+				unset($user_data[$remove_path]);
+			}
+		}
+
+		// If user status 'active' is changed to false, user needs to be added to disabled group.
+		if (array_key_exists('active', $user_data) && strtolower($user_data['active']) == false) {
+			$user_data['usrgrps'] = [];
+
+			$user_groups = DB::select('user_scim_group', [
+				'output' => ['scim_groupid'],
+				'filter' => ['userid' => $options['id']]
+			]);
+
+			if ($user_groups) {
+				DB::delete('user_scim_group', [
+					'userid' => $options['id']
+				]);
+			}
+		}
+
+		$new_user_data = $provisioning->getUserAttributes($user_data);
+		$new_user_data['medias'] = $provisioning->getUserMedias($user_data);
+		$new_user_data['userid'] = $options['id'];
+
+		APIRPC::User()->updateProvisionedUser($new_user_data);
+
+		$this->setData($db_user['userid'], $db_user['userdirectoryid'], $user_data);
+
+		return $this->data;
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $db_user
+	 *
+	 * @throws APIException if input is invalid.
+	 */
+	private function validatePatch(array &$options, array &$db_user = null): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
+			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'Operations' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'op' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $this->patch_op)],
+				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (!in_array(self::SCIM_PATCH_SCHEMA, $options['schemas'], true)) {
+			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		}
+
+		[$db_user] = APIRPC::User()->get([
+			'output' => ['userid', 'username', 'name', 'surname', 'userdirectoryid'],
+			'userids' => $options['id'],
+			'selectMedias' => ['mediatypeid', 'sendto']
+		]);
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
+
+		if (!$db_user) {
+			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+		}
+		elseif ($db_user['userdirectoryid'] != $userdirectoryid) {
+			self::exception(self::SCIM_ERROR_BAD_REQUEST,
+				'The user '.$options['id'].' belongs to another userdirectory.'
+			);
+		}
+
+		foreach ($options['Operations'] as &$operation) {
+			$operation['op'] = strtolower($operation['op']);
+		}
 	}
 
 	/**

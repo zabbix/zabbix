@@ -318,4 +318,28 @@ class CProvisioning {
 
 		return $user;
 	}
+
+	/**
+	 * Returns user data from the database in the form of user directory attributes.
+	 *
+	 * @param array $db_user  Array with user information as returned from CUser()->get() method.
+	 *
+	 * @return array
+	 */
+	public function getCurrentUserAttributes(array $db_user): array {
+		$db_user_for_idp = [];
+		$db_user_for_idp['userName'] = $db_user['username'];
+		$db_user_for_idp[$this->userdirectory['user_username']] = $db_user['name'];
+		$db_user_for_idp[$this->userdirectory['user_lastname']] = $db_user['surname'];
+
+		foreach ($db_user['medias'] as $user_media) {
+			foreach ($this->userdirectory['provision_media'] as $provision_media) {
+				if ($user_media['mediatypeid'] == $provision_media['mediatypeid']) {
+					$db_user_for_idp[$provision_media['attribute']] = $user_media['sendto'][0];
+				}
+			}
+		}
+
+		return $db_user_for_idp;
+	}
 }
