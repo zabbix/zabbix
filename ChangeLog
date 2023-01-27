@@ -266,7 +266,6 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.7rc1
 
 New features:
-.......... [ZBX-20110] added single field search option to the archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys in Zabbix agent 2 Oracle plugin (esneiders)
 .........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
 .........T [ZBXNEXT-7775] added Veeam backup and replication templates (egordymov)
 .......PS. [ZBXNEXT-8054] updated MariaDB maximum supported version to 10.10 (MVekslers)
@@ -276,7 +275,6 @@ A.F....... [ZBXNEXT-7951] improved import configuration by changing UI, matching
 .........T [ZBXNEXT-7962] fixed interfaces discovery rules in OPNsense, PFSense and TrueNAS templates (drasikhov)
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (vkhaliev)
 ..F....... [ZBXNEXT-7963] added a hint box to the "Enable HTTP authentication" field; added confirmation dialog box for enabling HTTP authentication  (kkuzmina)
-...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 ...G...... [ZBXNEXT-6119] added the option to retrieve all JSON data from docker.container_info key in Zabbix agent 2 Docker plugin (esneiders)
 .........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
 .........T [ZBXNEXT-7924] switched templates to proc.get (egordymov)
@@ -351,6 +349,8 @@ A......... [ZBX-22042] fixed inability to get the existing group prototypes by h
 ..F....... [ZBX-20050] fixed broken macro value and type input when changing to/from inherited macros (epulke, rdetlavs)
 .........T [ZBX-21594] optimized RabbitMQ cluster templates (egordymov)
 ..F....... [ZBX-21864] fixed the fatal error in system warning page (Ivo)
+.......... [ZBX-20110] added single field search option to the archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys in Zabbix agent 2 Oracle plugin (esneiders)
+...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.6
@@ -865,7 +865,6 @@ Changes for 6.0.13rc1
 
 New features:
 .........T [ZBXNEXT-8170] added AWS cloud templates (abakaldin)
-.......... [ZBX-20110] added single field search option to the archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys in Zabbix agent 2 Oracle plugin (esneiders)
 .........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
 .........T [ZBXNEXT-7775] added Veeam backup and replication templates (egordymov)
 .......PS. [ZBXNEXT-8054] updated MariaDB maximum supported version to 10.10 (MVekslers)
@@ -876,7 +875,6 @@ A.F....... [ZBXNEXT-7951] implemented configuration import improvements (rdetlav
 .......PS. [ZBXNEXT-7615] added hmac function for JavaScript (wiper)
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (egordymov)
 .......PS. [ZBXNEXT-8076] added prof_enable and prof_disable commands for profiling (vso)
-...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 ..F....... [ZBXNEXT-7963] added a hint box to the "Enable HTTP authentication" field; added confirmation dialog box for enabling HTTP authentication (kkuzmina)
 .........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
 ...G...... [ZBXNEXT-6119] added the option to retrieve all JSON data from docker.container_info key in Zabbix agent 2 Docker plugin (esneiders)
@@ -945,6 +943,8 @@ A......... [ZBX-22042] fixed inability to get the existing group prototypes by h
 .........T [ZBX-21594] optimized RabbitMQ cluster templates (egordymov)
 ..F....... [ZBX-20050] fixed broken macro value and type input when changing to/from inherited macros (epulke, rdetlavs)
 ..F....... [ZBX-21864] fixed the fatal error in system warning page (Ivo)
+.......... [ZBX-20110] added single field search option to the archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys in Zabbix agent 2 Oracle plugin (esneiders)
+...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.12
