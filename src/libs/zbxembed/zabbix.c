@@ -78,20 +78,7 @@ static duk_ret_t	es_zabbix_log(duk_context *ctx)
 	duk_get_memory_functions(ctx, &out_funcs);
 	env = (zbx_es_env_t *)out_funcs.udata;
 
-	if (NULL == env->json)
-	{
-		if (ZBX_ES_LOG_MEMORY_LIMIT < env->log_size)
-		{
-			err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "log exceeds the maximum size of "
-					ZBX_FS_UI64 " bytes.", ZBX_ES_LOG_MEMORY_LIMIT);
-		}
-		else
-			zabbix_log(level, "%s", message);
-
-		goto out;
-	}
-
-	if (ZBX_ES_LOG_MEMORY_LIMIT < env->json->buffer_size)	/* approximate limit */
+	if (ZBX_ES_LOG_MEMORY_LIMIT < env->log_size)
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "log exceeds the maximum size of "
 				ZBX_FS_UI64 " bytes.", ZBX_ES_LOG_MEMORY_LIMIT);
