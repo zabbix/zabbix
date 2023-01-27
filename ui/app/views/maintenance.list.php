@@ -66,6 +66,7 @@ $filter = (new CFilter())
 						]
 					]
 				]))
+					->setId('filter_groups_')
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
 			])

@@ -117,7 +117,9 @@ $form->addItem(
 							'editable' => true
 						]
 					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				]))
+					->setId('groupids_')
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 		])
 		->addItem([
@@ -137,7 +139,9 @@ $form->addItem(
 							'editable' => true
 						]
 					]
-				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				]))
+					->setId('hostids_')
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 		])
 		->addItem(

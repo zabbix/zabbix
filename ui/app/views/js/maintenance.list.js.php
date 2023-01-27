@@ -29,6 +29,11 @@
 
 		init() {
 			this._initActions();
+			this._updateHostGroupMs();
+
+			this.hostgroup_ms.on('change', () => {
+				this._updateHostGroupMs();
+			});
 		}
 
 		_initActions() {
@@ -131,6 +136,14 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
+		}
+
+		_updateHostGroupMs() {
+			this.hostgroup_ms = $('#filter_groups_');
+
+			this.hostgroup_ms.multiSelect('setDisabledEntries',
+				[... document.querySelectorAll('[name^="filter_groups["]')].map((input) => input.value)
+			);
 		}
 	};
 </script>

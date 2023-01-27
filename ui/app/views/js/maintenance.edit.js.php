@@ -92,6 +92,15 @@ window.maintenance_edit = new class {
 		});
 
 		this._initPeriodActionButtons();
+		this._updateHostGroupMs();
+		this._updateHostMs();
+
+		this.hostgroup_ms.on('change', () => {
+			this._updateHostGroupMs();
+		});
+		this.host_ms.on('change', () => {
+			this._updateHostMs();
+		});
 	}
 
 	_initTemplates() {
@@ -288,4 +297,19 @@ window.maintenance_edit = new class {
 		});
 	}
 
+	_updateHostGroupMs() {
+		this.hostgroup_ms = $('#groupids_');
+
+		this.hostgroup_ms.multiSelect('setDisabledEntries',
+			[... this.form.querySelectorAll('[name^="groupids["]')].map((input) => input.value)
+		);
+	}
+
+	_updateHostMs() {
+		this.host_ms = $('#hostids_');
+
+		this.host_ms.multiSelect('setDisabledEntries',
+			[... this.form.querySelectorAll('[name^="hostids["]')].map((input) => input.value)
+		);
+	}
 }
