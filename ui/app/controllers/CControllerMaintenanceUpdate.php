@@ -62,9 +62,6 @@ class CControllerMaintenanceUpdate extends CController {
 		return $ret;
 	}
 
-	/**
-	 * @throws APIException
-	 */
 	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
 				|| !$this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE)) {

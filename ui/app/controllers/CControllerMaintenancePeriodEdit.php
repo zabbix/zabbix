@@ -21,7 +21,7 @@
 
 class CControllerMaintenancePeriodEdit extends CController {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'edit' => 				'in 1',
 			'row_index' =>			'required|int32',
@@ -79,7 +79,7 @@ class CControllerMaintenancePeriodEdit extends CController {
 	/**
 	 * @throws Exception
 	 */
-	protected function doAction() {
+	protected function doAction(): void {
 		if ($this->hasInput('edit')) {
 			$form = [
 				'edit' => 				$this->getInput('edit'),

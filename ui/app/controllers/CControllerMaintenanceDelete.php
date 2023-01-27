@@ -47,12 +47,15 @@ class CControllerMaintenanceDelete extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
+			&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
 	}
 
-	protected function doAction(): void {
+	/**
+	 * @throws APIException
+	 */
+		protected function doAction(): void {
 		$maintenanceids = $this->getInput('maintenanceids');
-		$maintenance_count = count($maintenanceids);
 
 		$result = API::Maintenance()->delete($maintenanceids);
 
@@ -60,7 +63,7 @@ class CControllerMaintenanceDelete extends CController {
 
 		if ($result) {
 			$output['success']['title'] = _n('Maintenance period deleted', 'Maintenance periods deleted',
-				$maintenance_count);
+				count($maintenanceids));
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -69,7 +72,7 @@ class CControllerMaintenanceDelete extends CController {
 		else {
 			$output['error'] = [
 				'title' => _n('Cannot delete maintenance period', 'Cannot delete maintenance periods',
-					$maintenance_count),
+					count($maintenanceids)),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 

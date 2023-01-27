@@ -29,10 +29,8 @@ $form = (new CForm())
 	->setName('maintenance_period_form')
 	->addVar('edit', $data['is_edit'] ? '1' : null)
 	->addVar('row_index', $data['row_index'])
-	->addItem(getMessages());
-
-// Enable form submitting on Enter.
-$form->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addItem(getMessages())
+	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $days_weekly = [];
 $days_monthly = [];

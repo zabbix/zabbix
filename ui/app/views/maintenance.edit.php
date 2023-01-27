@@ -195,9 +195,10 @@ $form->addItem(
 		])
 		->addItem([
 			new CLabel(_('Description'), 'description'),
-			new CFormField((new CTextArea('description', $data['description']))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setReadonly(!$data['allowed_edit'])
+			new CFormField(
+				(new CTextArea('description', $data['description']))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setReadonly(!$data['allowed_edit'])
 			)
 		])
 	);
