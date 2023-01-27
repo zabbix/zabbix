@@ -187,10 +187,14 @@ typedef zbx_uint64_t	(*zbx_dc_get_nextid_func_t)(const char *table_name, int num
 
 #define ZBX_SQL_NULLCMP(f1, f2)	"((" f1 " is null and " f2 " is null) or " f1 "=" f2 ")"
 
-#define ZBX_DBROW2UINT64(uint, row)	if (SUCCEED == zbx_db_is_null(row))	\
-						uint = 0;			\
-					else					\
-						zbx_is_uint64(row, &uint)
+#define ZBX_DBROW2UINT64(uint, row)			\
+	do {						\
+		if (SUCCEED == zbx_db_is_null(row))	\
+			uint = 0;			\
+		else					\
+			zbx_is_uint64(row, &uint);	\
+	}						\
+	while (0)
 
 #define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 
