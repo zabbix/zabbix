@@ -268,20 +268,23 @@ zabbix_export:
             var Azure = {
                 params: {},
                 token: '',
-            
+
                 setParams: function (params) {
                     ['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: ' + field + '.';
                         }
                     });
-            
+
                     Azure.params = params;
                 },
                 
                 login: function () {
-            
+
                     var resp, login = new HttpRequest();
+                    if (typeof Azure.params.http_proxy !== 'undefined' && Azure.params.http_proxy !== '') {
+                        login.setProxy(Azure.params.http_proxy);
+                    }
                     login.addHeader('Content-Type: application/x-www-form-urlencoded');
                     resp = login.post(
                         'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) +'/oauth2/token',
@@ -301,10 +304,13 @@ zabbix_export:
                     }
                     Azure.token = resp['access_token']
                 },
-            
+
                 request: function (url) {
               
                     var response, request = new HttpRequest();
+                    if (typeof Azure.params.http_proxy !== 'undefined' && Azure.params.http_proxy !== '') {
+                        request.setProxy(Azure.params.http_proxy);
+                    }
                     if (!Azure.token) {
                         throw 'Failed authentication token for the request session.'; 
                     }
@@ -321,28 +327,39 @@ zabbix_export:
                         throw 'Failed to parse response received from API.';
                     } 
                 },
-            
+
+                getField: function (data, path, defaultValue, separator) {
+                    separator = separator || '.';
+                    var steps = path.split(separator);
+                    for (var i = 0; i < steps.length; i++) {
+                        var step = steps[i];
+                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                            return defaultValue;
+                        }
+                        data = data[step];
+                    }
+                    return data;
+                },
+
                 getMetricsData: function() {
-                    var input = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + 'Microsoft.Storage/storageAccounts?api-version=2021-05-01');
-                    output = [];
-                    try {
-                        input.value.forEach(function (field) {
-                            output.push({
-                                'name': field['name'],
-                                'id': field['id'],
-                                'resourceGroup': field['id'].split("/")[4],
-                                'location': field['location'],
-                                'token': Azure.token
-                            });
+                    
+                    var metric = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) 
+                        + '/providers/' + 'Microsoft.Storage/storageAccounts?api-version=2021-05-01');
+                    texterror = 'ERROR getting required field. Check debug log for more information.'
+                    data = [];
+                    for (k in metric.value) {
+                        data.push({
+                            'name' : Azure.getField(metric.value[k], 'name', texterror),
+                            'id' : Azure.getField(metric.value[k], 'id', texterror),
+                            'resourceGroup' : Azure.getField(metric.value[k], 'id', '////'+texterror).split("/")[4],
+                            'location' : Azure.getField(metric.value[k], 'location', texterror),
+                            'token' : Azure.token
                         });
                     }
-                    catch (error) {
-                        throw 'Failed to parse request data.'; 
-                    }
-                    return output;
+                    return data;
                 }
             };
-            
+
             try {
                 Azure.setParams(JSON.parse(value));
                 Azure.login();
@@ -869,14 +886,14 @@ zabbix_export:
                 var AzureStorage = {
                     params: {},
                     token: '',
-                
+
                     setParams: function (params) {
                         [ 'token' , 'id'].forEach(function (field) {
                             if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                                 throw 'Required param is not set: ' + field + '.';
                             }
                         });
-                
+
                         AzureStorage.params = params;
                     },
                     
@@ -902,7 +919,20 @@ zabbix_export:
                             throw 'Failed to parse response received from API.';
                         } 
                     },
-                
+
+                    getField: function (data, path, defaultValue, separator) {
+                        separator = separator || '.';
+                        var steps = path.split(separator);
+                        for (var i = 0; i < steps.length; i++) {
+                            var step = steps[i];
+                            if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                                return defaultValue;
+                            }
+                            data = data[step];
+                        }
+                        return data;
+                    },
+
                     getMetricsData: function() {
                         var 
                         data = {};
@@ -920,12 +950,9 @@ zabbix_export:
                         ],
                         prepared_metrics = [],
                         data['metrics'] = {};
-                        start_date = new Date((new Date().getTime()) - 7200000).toISOString().replace(/\.\d+/, '');
-                        end_date = new Date((new Date().getTime()) - 3600000).toISOString().replace(/\.\d+/, '');
-                
                         for (var i = 0; i < metrics.length; i += 20) {
                             var chunk = metrics.slice(i, i + 20);
-                
+
                             prepared_metrics.push(
                                 chunk.map(function(element) {
                                     return encodeURIComponent(element);
@@ -933,32 +960,26 @@ zabbix_export:
                             );
                         }
                         for (var j in prepared_metrics) {
-                            try {
-                                metrics_data = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id + '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&interval=PT1H&api-version=2021-05-01&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date));
-                                if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
-                                    for (k in metrics_data.value) {
-                                        if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' 
-                                            && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' 
-                                            && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) 
-                                            && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] 
-                                            && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
-                                            data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
-                                        }
-                                    }
-                                }
+                            metrics_data = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id + '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=' 
+                                + prepared_metrics[j] + '&interval=PT1H&api-version=2021-05-01');
+                            if (!metrics_data.hasOwnProperty('value')) {
+                                throw 'Failed getting required field. Check debug log for more information.';
                             }
-                            catch (error) {
-                                throw 'Failed to parse request data.'; 
-                            }    
+                            for (k in metrics_data.value) {
+                                key = AzureStorage.getField(metrics_data.value[k], 'name.value', 'ERROR')
+                                if (key === 'ERROR') {
+                                    throw 'Failed getting required field. Check debug log for more information.';
+                                }
+                                data.metrics[key] = AzureStorage.getField(metrics_data.value[k], 'timeseries.0.data.0');
+                            }
                         }
                         return data;
                     }
                 };
-                
                 try {
                     AzureStorage.setParams(JSON.parse(value));
                     return JSON.stringify(AzureStorage.getMetricsData());
-                
+
                 }
                 catch (error) {
                     error += (String(error).endsWith('.')) ? '' : '.';
