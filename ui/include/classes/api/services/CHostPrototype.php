@@ -2206,7 +2206,7 @@ class CHostPrototype extends CHostBase {
 
 		// Lock also inherited host prototypes before the deletion to prevent server from adding new LLD hosts.
 		$db_host_prototypes += DBfetchArrayAssoc(DBselect(
-			'SELECT hostid'.
+			'SELECT hostid,host'.
 			' FROM hosts h'.
 			' WHERE '.dbConditionId('h.templateid', array_keys($db_host_prototypes)).
 			' FOR UPDATE'
