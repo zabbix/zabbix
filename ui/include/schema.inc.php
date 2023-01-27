@@ -9505,13 +9505,13 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0'
+				'default' => '1'
 			],
 			'verify_host' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0'
+				'default' => '1'
 			],
 			'ssl_cert_file' => [
 				'null' => false,
