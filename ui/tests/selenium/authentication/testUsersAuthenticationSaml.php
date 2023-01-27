@@ -760,7 +760,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		// Override particular SAML settings with values from data provider.
 		if (array_key_exists('custom_settings', $data)) {
 			foreach ($data['custom_settings'] as $key => $value) {
-				$settings[$key] = $value;
+				$settings['fields'][$key] = $value;
 			}
 		}
 
