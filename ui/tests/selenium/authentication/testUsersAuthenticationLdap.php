@@ -1692,6 +1692,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Group filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 								'User name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
 								'User last name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'Advanced configuration' => true,
 								'StartTLS' => true,
 								'Search filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
 								],
@@ -1978,7 +1979,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 *
 	 * @dataProvider getCreateData
 	 */
-	public function testUsersAuthenticationLdap_Create($data) {
+	public function testUsersAuthenticationLdap_Create1($data) {
 		$this->testLdapCreate($data);
 	}
 
