@@ -1506,19 +1506,9 @@ static int	DBpatch_6030160(void)
 
 static int	DBpatch_6030161(void)
 {
-	return DBcreate_index("hosts", "hosts_7", "vendor_name", 0);
-}
-
-static int	DBpatch_6030162(void)
-{
 	const ZBX_FIELD field = {"vendor_version", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
-}
-
-static int	DBpatch_6030163(void)
-{
-	return DBcreate_index("hosts", "hosts_8", "vendor_version", 0);
 }
 #endif
 
@@ -1688,7 +1678,5 @@ DBPATCH_ADD(6030158, 0, 1)
 DBPATCH_ADD(6030159, 0, 1)
 DBPATCH_ADD(6030160, 0, 1)
 DBPATCH_ADD(6030161, 0, 1)
-DBPATCH_ADD(6030162, 0, 1)
-DBPATCH_ADD(6030163, 0, 1)
 
 DBPATCH_END()

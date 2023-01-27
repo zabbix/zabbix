@@ -24,7 +24,7 @@
  */
 class CTemplate extends CHostGeneral {
 
-	protected $sortColumns = ['hostid', 'host', 'name', 'vendor_name', 'vendor_version'];
+	protected $sortColumns = ['hostid', 'host', 'name'];
 
 	/**
 	 * Get template data.
