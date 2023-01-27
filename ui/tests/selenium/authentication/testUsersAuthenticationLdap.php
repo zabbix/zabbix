@@ -1969,9 +1969,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	/**
 	 * @dataProvider getCreateValidationData
 	 */
-//	public function testUsersAuthenticationLdap_CreateValidation($data) {
-//		$this->testLdapCreate($data);
-//	}
+	public function testUsersAuthenticationLdap_CreateValidation($data) {
+		$this->testLdapCreate($data);
+	}
 
 	/**
 	 * @backup config
