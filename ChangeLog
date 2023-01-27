@@ -12,7 +12,6 @@ A.F....... [ZBXNEXT-7951] implemented configuration import improvements (rdetlav
 .......PS. [ZBXNEXT-7615] added hmac function for JavaScript (wiper)
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (egordymov)
 .......PS. [ZBXNEXT-8076] added prof_enable and prof_disable commands for profiling (vso)
-...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 ..F....... [ZBXNEXT-7963] added a hint box to the "Enable HTTP authentication" field; added confirmation dialog box for enabling HTTP authentication (kkuzmina)
 .........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
 ...G...... [ZBXNEXT-6119] added the option to retrieve all JSON data from docker.container_info key in Zabbix agent 2 Docker plugin (esneiders)
