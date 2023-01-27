@@ -452,12 +452,12 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, hostid, hostname);
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
-					DBadd_host_inventory(hostid, cfg->default_inventory_mode);
+					zbx_db_add_host_inventory(hostid, cfg->default_inventory_mode);
 
 				zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(hostid,
 						proxy_hostid, host_unique, cfg->default_inventory_mode);
 
-				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
+				interfaceid = zbx_db_add_interface(hostid, interface_type, 1, row[2], row[3], port,
 						ZBX_CONN_DEFAULT);
 
 				zbx_free(host_unique);
@@ -467,7 +467,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			else
 			{
 				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
-				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
+				interfaceid = zbx_db_add_interface(hostid, interface_type, 1, row[2], row[3], port,
 						ZBX_CONN_DEFAULT);
 			}
 
@@ -485,7 +485,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				else if (SVC_SNMPv3 == svc_type)
 					version = ZBX_IF_SNMP_VERSION_3;
 
-				DBadd_interface_snmp(interfaceid, version, SNMP_BULK_ENABLED, row[9], row[10],
+				zbx_db_add_interface_snmp(interfaceid, version, SNMP_BULK_ENABLED, row[9], row[10],
 						securitylevel, row[12], row[13], authprotocol, privprotocol, row[16],
 						hostid);
 			}
@@ -605,12 +605,12 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_insert_clean(&db_insert_host_rtdata);
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
-					DBadd_host_inventory(hostid, cfg->default_inventory_mode);
+					zbx_db_add_host_inventory(hostid, cfg->default_inventory_mode);
 
 				zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(hostid,
 						proxy_hostid, hostname, cfg->default_inventory_mode);
 
-				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
+				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 
 				add_discovered_host_groups(hostid, &groupids);
 			}
@@ -634,7 +634,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 							proxy_hostid);
 				}
 
-				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
+				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 			}
 			zbx_db_free_result(result2);
 out:
@@ -725,7 +725,7 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_vector_str_create(&hostnames);
 	zbx_vector_str_append(&hostnames, zbx_strdup(NULL, hostname));
 
-	DBdelete_hosts_with_prototypes(&hostids, &hostnames);
+	zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames);
 
 	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
@@ -831,7 +831,7 @@ void	op_host_inventory_mode(const zbx_db_event *event, zbx_config_t *cfg, int in
 	if (0 == (hostid = add_discovered_host(event, &status, cfg)))
 		goto out;
 
-	DBset_host_inventory(hostid, inventory_mode);
+	zbx_db_set_host_inventory(hostid, inventory_mode);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -990,7 +990,7 @@ void	op_template_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_ui
 	if (0 == (hostid = add_discovered_host(event, &status, cfg)))
 		goto out;
 
-	if (SUCCEED != DBcopy_template_elements(hostid, lnk_templateids, ZBX_TEMPLATE_LINK_MANUAL, &error))
+	if (SUCCEED != zbx_db_copy_template_elements(hostid, lnk_templateids, ZBX_TEMPLATE_LINK_MANUAL, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s", error);
 		zbx_free(error);
@@ -1020,7 +1020,7 @@ void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templat
 	if (0 == (hostid = select_discovered_host(event, &hostname)))
 		goto out;
 
-	if (SUCCEED != DBdelete_template_elements(hostid, hostname, del_templateids, &error))
+	if (SUCCEED != zbx_db_delete_template_elements(hostid, hostname, del_templateids, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot unlink template: %s", error);
 		zbx_free(error);

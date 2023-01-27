@@ -1006,7 +1006,7 @@ out:
  * Parameters: triggerids - [IN] trigger identifiers from database            *
  *                                                                            *
  ******************************************************************************/
-void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
+void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
@@ -1094,8 +1094,8 @@ static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids)
 	zbx_audit_DBselect_delete_for_trigger(sql, &children_triggerids);
 	zbx_vector_uint64_setdiff(triggerids, &children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	DBdelete_triggers(&children_triggerids);
-	DBdelete_triggers(triggerids);
+	zbx_db_delete_triggers(&children_triggerids);
+	zbx_db_delete_triggers(triggerids);
 
 	zbx_vector_uint64_destroy(&children_triggerids);
 
@@ -1146,7 +1146,7 @@ out:
  * Parameters: graphids - [IN] array of graph id's from database              *
  *                                                                            *
  ******************************************************************************/
-void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
+void	zbx_db_delete_graphs(zbx_vector_uint64_t *graphids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
@@ -1220,8 +1220,8 @@ static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids)
 	zbx_audit_DBselect_delete_for_graph(sql, &children_graphids);
 	zbx_vector_uint64_setdiff(graphids, &children_graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	DBdelete_graphs(&children_graphids);
-	DBdelete_graphs(graphids);
+	zbx_db_delete_graphs(&children_graphids);
+	zbx_db_delete_graphs(graphids);
 
 	zbx_vector_uint64_destroy(&children_graphids);
 
@@ -1348,7 +1348,7 @@ static int	db_get_linked_items(zbx_vector_uint64_t *itemids, const char *filter,
  * Parameters: itemids - [IN] array of item identifiers from database         *
  *                                                                            *
  ******************************************************************************/
-void	DBdelete_items(zbx_vector_uint64_t *itemids)
+void	zbx_db_delete_items(zbx_vector_uint64_t *itemids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
@@ -1540,7 +1540,7 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids)
 
 	zbx_db_execute("%s", sql);
 
-	DBdelete_items(&itemids);
+	zbx_db_delete_items(&itemids);
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httptest where");
@@ -1581,7 +1581,7 @@ static void	DBgroup_prototypes_delete(const zbx_vector_uint64_t *del_group_proto
 
 	zbx_db_select_uint64(sql, &groupids);
 
-	DBdelete_groups(&groupids);
+	zbx_db_delete_groups(&groupids);
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from group_prototype where");
@@ -1634,7 +1634,7 @@ static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_i
 		goto clean;
 
 	if (0 != hostids.values_num)
-		DBdelete_hosts(&hostids, &hostnames);
+		zbx_db_delete_hosts(&hostids, &hostnames);
 
 	/* delete group prototypes */
 
@@ -1874,7 +1874,7 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, const zbx_vector_uint64
 	if (FAIL == zbx_audit_DBselect_delete_for_item(sql, &itemids))
 		goto clean;
 
-	DBdelete_items(&itemids);
+	zbx_db_delete_items(&itemids);
 clean:
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_free(sql);
@@ -1922,7 +1922,7 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_vector_uint64_t *del_templateids,
+int	zbx_db_delete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_vector_uint64_t *del_templateids,
 		char **error)
 {
 	char			*sql = NULL, err[MAX_STRING_LEN];
@@ -3963,7 +3963,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
  * Parameters: hostid               - [IN] host id                            *
  *             templateids          - [IN] host template ids                  *
  *             db_insert_htemplates - [IN/OUT] templates insert structure     *
- * Comments: auxiliary function for DBcopy_template_elements()                *
+ * Comments: auxiliary function for zbx_db_copy_template_elements()           *
  *                                                                            *
  ******************************************************************************/
 static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
@@ -5371,7 +5371,7 @@ static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
  ******************************************************************************/
-int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
+int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
 		zbx_host_template_link_type link_type, char **error)
 {
 	zbx_vector_uint64_t	templateids;
@@ -5469,7 +5469,7 @@ clean:
  *             hostnames - [IN] names of hosts                                *
  *                                                                            *
  ******************************************************************************/
-void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames)
+void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames)
 {
 	int			i;
 	zbx_vector_uint64_t	itemids, httptestids, selementids;
@@ -5511,7 +5511,7 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 	if (FAIL == zbx_audit_DBselect_delete_for_item(sql, &itemids))
 		goto clean;
 
-	DBdelete_items(&itemids);
+	zbx_db_delete_items(&itemids);
 
 	zbx_vector_uint64_destroy(&itemids);
 
@@ -5566,7 +5566,7 @@ out:
  *             hostnames - [IN] names of hosts                                *
  *                                                                            *
  ******************************************************************************/
-void	DBdelete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames)
+void	zbx_db_delete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames)
 {
 	zbx_vector_uint64_t	host_prototype_ids;
 	zbx_vector_str_t	host_prototype_names;
@@ -5590,7 +5590,7 @@ void	DBdelete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zb
 
 	DBdelete_host_prototypes(&host_prototype_ids, &host_prototype_names);
 
-	DBdelete_hosts(hostids, hostnames);
+	zbx_db_delete_hosts(hostids, hostnames);
 clean:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&host_prototype_ids);
@@ -5614,7 +5614,7 @@ clean:
  * Return value: upon successful completion return interface identifier       *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
+zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
 		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags)
 {
 	DB_RESULT		result;
@@ -5762,7 +5762,7 @@ out:
  *             contextname    - [IN] snmp v3 context name                     *
  *                                                                            *
  ******************************************************************************/
-void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version,
+void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version,
 		const unsigned char bulk, const char *community, const char *securityname,
 		const unsigned char securitylevel, const char *authpassphrase, const char *privpassphrase,
 		const unsigned char authprotocol, const unsigned char privprotocol, const char *contextname,
@@ -6019,7 +6019,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
  * Parameters: groupids - [IN] array of group identifiers from database       *
  *                                                                            *
  ******************************************************************************/
-void	DBdelete_groups(zbx_vector_uint64_t *groupids)
+void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
@@ -6076,7 +6076,7 @@ out:
  *             inventory_mode - [IN] the host inventory mode                  *
  *                                                                            *
  ******************************************************************************/
-void	DBadd_host_inventory(zbx_uint64_t hostid, int inventory_mode)
+void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 {
 	zbx_db_insert_t	db_insert;
 
@@ -6100,7 +6100,7 @@ void	DBadd_host_inventory(zbx_uint64_t hostid, int inventory_mode)
  *           setting manual or automatic host inventory mode is supported.    *
  *                                                                            *
  ******************************************************************************/
-void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode)
+void	zbx_db_set_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -6111,7 +6111,7 @@ void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 
 	if (NULL == (row = zbx_db_fetch(result)))
 	{
-		DBadd_host_inventory(hostid, inventory_mode);
+		zbx_db_add_host_inventory(hostid, inventory_mode);
 	}
 	else if (inventory_mode != atoi(row[0]))
 	{

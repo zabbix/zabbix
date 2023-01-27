@@ -318,7 +318,7 @@ static int	zbx_host_check_permissions(const zbx_history_recv_host_t *host, const
  *               configured in passive mode or access denied)                 *
  *                                                                            *
  ******************************************************************************/
-int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *proxy, char **error)
+int	zbx_get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *proxy, char **error)
 {
 	char	*ch_error, host[ZBX_HOSTNAME_BUF_LEN];
 
@@ -358,7 +358,7 @@ int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *pro
  *     FAIL    - access is denied                                             *
  *                                                                            *
  ******************************************************************************/
-int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
+int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
 		const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	char	*msg = NULL;
@@ -429,7 +429,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
  *                FAIL - no interface availability has been changed           *
  *                                                                            *
  ******************************************************************************/
-int	get_interface_availability_data(struct zbx_json *json, int *ts)
+int	zbx_get_interface_availability_data(struct zbx_json *json, int *ts)
 {
 	int				i, ret = FAIL;
 	zbx_vector_ptr_t		interfaces;
@@ -595,22 +595,22 @@ static void	proxy_set_lastid(const char *table_name, const char *lastidfield, co
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	proxy_set_hist_lastid(const zbx_uint64_t lastid)
+void	zbx_proxy_set_hist_lastid(const zbx_uint64_t lastid)
 {
 	proxy_set_lastid("proxy_history", "history_lastid", lastid);
 }
 
-void	proxy_set_dhis_lastid(const zbx_uint64_t lastid)
+void	zbx_proxy_set_dhis_lastid(const zbx_uint64_t lastid)
 {
 	proxy_set_lastid(dht.table, dht.lastidfield, lastid);
 }
 
-void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
+void	zbx_proxy_set_areg_lastid(const zbx_uint64_t lastid)
 {
 	proxy_set_lastid(areg.table, areg.lastidfield, lastid);
 }
 
-int	proxy_get_delay(const zbx_uint64_t lastid)
+int	zbx_proxy_get_delay(const zbx_uint64_t lastid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -978,7 +978,7 @@ static int	proxy_add_hist_data(struct zbx_json *j, int records_num, const DC_ITE
 	return records_num;
 }
 
-int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+int	zbx_proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int			records_num = 0, data_num, i, *errcodes = NULL, items_alloc = 0;
 	zbx_uint64_t		id;
@@ -1071,7 +1071,7 @@ int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	return records_num;
 }
 
-int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+int	zbx_proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int		records_num = 0;
 	zbx_uint64_t	id;
@@ -1096,7 +1096,7 @@ int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	return records_num;
 }
 
-int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+int	zbx_proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int		records_num = 0;
 	zbx_uint64_t	id;
@@ -1122,7 +1122,7 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	return records_num;
 }
 
-int	proxy_get_host_active_availability(struct zbx_json *j)
+int	zbx_proxy_get_host_active_availability(struct zbx_json *j)
 {
 	zbx_ipc_message_t	response;
 	int			records_num = 0;
@@ -1301,8 +1301,8 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
  * Return value: the number of processed values                               *
  *                                                                            *
  ******************************************************************************/
-int	process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes, size_t values_num,
-		zbx_proxy_suppress_t *nodata_win)
+int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
+		size_t values_num, zbx_proxy_suppress_t *nodata_win)
 {
 	size_t	i;
 	int	processed_num = 0, history_num;
@@ -1827,7 +1827,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 			}
 		}
 
-		processed_num += process_history_data(items, values, errcodes, values_num, nodata_win);
+		processed_num += zbx_process_history_data(items, values, errcodes, values_num, nodata_win);
 
 		total_num += read_num;
 
@@ -2047,7 +2047,7 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 				session->last_id = values[i].id;
 		}
 
-		processed_num += process_history_data(items, values, errcodes, values_num, NULL);
+		processed_num += zbx_process_history_data(items, values, errcodes, values_num, NULL);
 		total_num += read_num;
 
 		zbx_agent_values_clean(values, values_num);
@@ -2172,7 +2172,7 @@ out:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
+int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
 {
 	zbx_host_rights_t	rights = {0};
 
@@ -2193,7 +2193,7 @@ int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
+int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
 {
 	zbx_host_rights_t	rights = {0};
 	int			ret;
@@ -2746,7 +2746,7 @@ out:
  * Return value: the number of history values                                 *
  *                                                                            *
  ******************************************************************************/
-int	proxy_get_history_count(void)
+int	zbx_proxy_get_history_count(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2891,7 +2891,7 @@ static void	check_proxy_nodata_empty(zbx_timespec_t *ts, unsigned char proxy_sta
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
+int	zbx_process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
 		unsigned char proxy_status, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;

@@ -109,22 +109,22 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	if (SUCCEED == upload_state && CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp &&
 			ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state)
 	{
-		if (SUCCEED == get_interface_availability_data(&j, &availability_ts))
+		if (SUCCEED == zbx_get_interface_availability_data(&j, &availability_ts))
 			flags |= ZBX_DATASENDER_AVAILABILITY;
 
-		history_records = proxy_get_hist_data(&j, &history_lastid, &more_history);
+		history_records = zbx_proxy_get_hist_data(&j, &history_lastid, &more_history);
 		if (0 != history_lastid)
 			flags |= ZBX_DATASENDER_HISTORY;
 
-		discovery_records = proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
+		discovery_records = zbx_proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
 		if (0 != discovery_records)
 			flags |= ZBX_DATASENDER_DISCOVERY;
 
-		areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg);
+		areg_records = zbx_proxy_get_areg_data(&j, &areg_lastid, &more_areg);
 		if (0 != areg_records)
 			flags |= ZBX_DATASENDER_AUTOREGISTRATION;
 
-		host_avail_records = proxy_get_host_active_availability(&j);
+		host_avail_records = zbx_proxy_get_host_active_availability(&j);
 
 		if (ZBX_PROXY_DATA_MORE != more_history && ZBX_PROXY_DATA_MORE != more_discovery &&
 						ZBX_PROXY_DATA_MORE != more_areg)
@@ -170,7 +170,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts.sec);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts.ns);
 
-		if (0 != (flags & ZBX_DATASENDER_HISTORY) && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
+		if (0 != (flags & ZBX_DATASENDER_HISTORY) && 0 != (proxy_delay = zbx_proxy_get_delay(history_lastid)))
 			zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
 		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
@@ -251,14 +251,14 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 					zbx_db_free_result(result);
 
 					reset_proxy_history_count(history_maxid - history_lastid);
-					proxy_set_hist_lastid(history_lastid);
+					zbx_proxy_set_hist_lastid(history_lastid);
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_DISCOVERY))
-					proxy_set_dhis_lastid(discovery_lastid);
+					zbx_proxy_set_dhis_lastid(discovery_lastid);
 
 				if (0 != (flags & ZBX_DATASENDER_AUTOREGISTRATION))
-					proxy_set_areg_lastid(areg_lastid);
+					zbx_proxy_set_areg_lastid(areg_lastid);
 
 				zbx_db_commit();
 			}
