@@ -777,11 +777,11 @@ class testConnector extends CAPITest {
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
 					'tags' => [
-						['tag' => 'abc', 'value' => '123'],
-						['tag' => 'abc', 'value' => '123']
+						['tag' => 'abc', 'operator' => CONDITION_OPERATOR_EQUAL, 'value' => '123'],
+						['tag' => 'abc', 'operator' => CONDITION_OPERATOR_EQUAL, 'value' => '123']
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/tags/2": value (tag, value)=(abc, 123) already exists.'
+				'expected_error' => 'Invalid parameter "/1/tags/2": value (tag, operator, value)=(abc, 0, 123) already exists.'
 			]
 		];
 	}
@@ -1912,11 +1912,11 @@ class testConnector extends CAPITest {
 				'connector' => [
 					'connectorid' => 'update_custom_defaults',
 					'tags' => [
-						['tag' => 'abc', 'value' => '123'],
-						['tag' => 'abc', 'value' => '123']
+						['tag' => 'abc', 'operator' => CONDITION_OPERATOR_EQUAL, 'value' => '123'],
+						['tag' => 'abc', 'operator' => CONDITION_OPERATOR_EQUAL, 'value' => '123']
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/tags/2": value (tag, value)=(abc, 123) already exists.'
+				'expected_error' => 'Invalid parameter "/1/tags/2": value (tag, operator, value)=(abc, 0, 123) already exists.'
 			]
 		];
 	}
