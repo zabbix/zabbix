@@ -283,6 +283,7 @@ A.F....... [ZBXNEXT-7951] improved import configuration by changing UI, matching
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+........S. [ZBX-22149] fixed wrong escaping in trigger expression during upgrade and escaping as a workaround for calculated items (asestakovs, kprutkovs)
 ...G...... [ZBX-22061] fixed custom query parameter read on an empty parameter for Oracle plugin in Zabbix agent 2 (esneiders)
 ...G...... [ZBX-21227] improved error logging during agent start as a Windows service (asestakovs)
 ........S. [ZBX-22178] fixed action operations being executed on the current host only if a host group is selected (vso)
