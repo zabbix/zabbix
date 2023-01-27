@@ -1,6 +1,7 @@
 Changes for 6.0.13rc1
 
 New features:
+.........T [ZBXNEXT-8170] added AWS cloud templates (abakaldin)
 .......... [ZBX-20110] added single field search option to the archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys in Zabbix agent 2 Oracle plugin (esneiders)
 .........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
 .........T [ZBXNEXT-7775] added Veeam backup and replication templates (egordymov)
@@ -20,6 +21,7 @@ A.F....... [ZBXNEXT-7951] implemented configuration import improvements (rdetlav
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+........S. [ZBX-22149] fixed wrong escaping in trigger expression during upgrade and escaping as a workaround for calculated items (asestakovs, kprutkovs)
 ...G...... [ZBX-22061] fixed custom query parameter read on an empty parameter for Oracle plugin in Zabbix agent 2 (esneiders)
 ...G...... [ZBX-21227] improved error logging during agent start as a Windows service (asestakovs)
 ........S. [ZBX-22178] fixed action operations being executed on the current host only if a host group is selected (vso)

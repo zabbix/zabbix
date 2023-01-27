@@ -1,1 +1,0 @@
-........S. [ZBX-22149] fixed wrong escaping in trigger expression during upgrade and escaping as a workaround for calculated items (asestakovs, kprutkovs)
