@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -331,7 +331,7 @@ next:
 		zbx_free(key);
 		zbx_free(path);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 end:
 	zbx_json_close(j);
 	zbx_json_close(j);
@@ -425,7 +425,7 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 			proxyconfig_add_row(j, row, table, recids);
 			zbx_json_close(j);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_json_close(j);
@@ -592,7 +592,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 				zbx_vector_proxyconfig_dep_item_ptr_append(&dep_items, dep_item);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		/* add dependent items processed by proxy */
 		if (0 != dep_items.values_num)

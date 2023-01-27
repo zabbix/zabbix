@@ -4863,6 +4863,27 @@ msgstr "Koordinaten"
 msgid "Copy"
 msgstr "Kopieren"
 
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
 msgstr "In Zwischenablage kopieren"
@@ -20562,6 +20583,10 @@ msgstr "Geändert"
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "Aktualisierter Status des Hosts \"%1$s\"."
+
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr ""
 
 #: app/views/administration.image.edit.php:53
 msgid "Upload"

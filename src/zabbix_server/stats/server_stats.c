@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,6 +127,4 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy data: %s", error);
 		zbx_free(error);
 	}
-
-	zbx_json_close(json);
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -371,7 +371,7 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 
 		zbx_vector_history_record_append_ptr(values, &value);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	return SUCCEED;
 }
@@ -452,7 +452,7 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 
 			count--;
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		clock_to -= periods[step];
 		step++;
@@ -544,7 +544,7 @@ static int	db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_type,
 
 		zbx_vector_history_record_append_ptr(values, &value);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < count)
 	{
