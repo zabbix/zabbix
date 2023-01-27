@@ -974,7 +974,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 
 	ipmi_manager_init(&ipmi_manager);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	nextcleanup = time(NULL) + ZBX_IPMI_MANAGER_CLEANUP_DELAY;
 

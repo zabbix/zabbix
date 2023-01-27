@@ -323,7 +323,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	{
 		zbx_set_availability_diff_ts(availability_ts);
 
-		DBbegin();
+		zbx_db_begin();
 
 		if (0 != history_lastid)
 		{
@@ -331,9 +331,9 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 			DB_RESULT	result;
 			DB_ROW		row;
 
-			result = DBselect("select max(id) from proxy_history");
+			result = zbx_db_select("select max(id) from proxy_history");
 
-			if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+			if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
 				history_maxid = history_lastid;
 			else
 				ZBX_STR2UINT64(history_maxid, row[0]);
@@ -365,7 +365,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 			}
 		}
 
-		DBcommit();
+		zbx_db_commit();
 	}
 	else
 	{
@@ -434,7 +434,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, config_comms->config_timeout,
 			&error))
 	{
-		DBbegin();
+		zbx_db_begin();
 
 		if (0 != tasks.values_num)
 		{
@@ -451,7 +451,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 			}
 		}
 
-		DBcommit();
+		zbx_db_commit();
 	}
 	else
 	{

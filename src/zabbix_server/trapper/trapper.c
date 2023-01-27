@@ -455,10 +455,10 @@ static int	DBget_template_count(zbx_uint64_t *count)
 	DB_ROW		row;
 	int		ret = FAIL;
 
-	if (NULL == (result = DBselect("select count(*) from hosts where status=%d", HOST_STATUS_TEMPLATE)))
+	if (NULL == (result = zbx_db_select("select count(*) from hosts where status=%d", HOST_STATUS_TEMPLATE)))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED != zbx_is_uint64(row[0], count))
+	if (NULL == (row = zbx_db_fetch(result)) || SUCCEED != zbx_is_uint64(row[0], count))
 		goto out;
 
 	ret = SUCCEED;
@@ -475,22 +475,22 @@ static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offl
 	zbx_uint64_t	users_offline, users_online = 0;
 	int		now, ret = FAIL;
 
-	if (NULL == (result = DBselect("select count(*) from users")))
+	if (NULL == (result = zbx_db_select("select count(*) from users")))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED != zbx_is_uint64(row[0], &users_offline))
+	if (NULL == (row = zbx_db_fetch(result)) || SUCCEED != zbx_is_uint64(row[0], &users_offline))
 		goto out;
 
 	zbx_db_free_result(result);
 	now = time(NULL);
 
-	if (NULL == (result = DBselect("select max(lastaccess) from sessions where status=%d group by userid,status",
+	if (NULL == (result = zbx_db_select("select max(lastaccess) from sessions where status=%d group by userid,status",
 			ZBX_SESSION_ACTIVE)))
 	{
 		goto out;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 #define ZBX_USER_ONLINE_TIME	600
 		if (atoi(row[0]) + ZBX_USER_ONLINE_TIME < now)
@@ -1299,7 +1299,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 #ifdef HAVE_NETSNMP
 	zbx_rtc_subscribe(process_type, process_num, trapper_args_in->config_comms->config_timeout, &rtc);
