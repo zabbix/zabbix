@@ -2,7 +2,6 @@ Changes for 6.0.13rc1
 
 New features:
 .........T [ZBXNEXT-8170] added AWS cloud templates (abakaldin)
-.......... [ZBX-20110] added single field search option to the archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys in Zabbix agent 2 Oracle plugin (esneiders)
 .........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
 .........T [ZBXNEXT-7775] added Veeam backup and replication templates (egordymov)
 .......PS. [ZBXNEXT-8054] updated MariaDB maximum supported version to 10.10 (MVekslers)
@@ -82,6 +81,8 @@ A......... [ZBX-22042] fixed inability to get the existing group prototypes by h
 .........T [ZBX-21594] optimized RabbitMQ cluster templates (egordymov)
 ..F....... [ZBX-20050] fixed broken macro value and type input when changing to/from inherited macros (epulke, rdetlavs)
 ..F....... [ZBX-21864] fixed the fatal error in system warning page (Ivo)
+.......... [ZBX-20110] added single field search option to the archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys in Zabbix agent 2 Oracle plugin (esneiders)
+...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.12
