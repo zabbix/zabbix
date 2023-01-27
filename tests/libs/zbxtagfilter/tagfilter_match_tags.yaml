@@ -540,4 +540,268 @@ in:
       value: 3
 out:
   return: SUCCEED
+---
+test case: Match not equal (1)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: not equal
+  tags:
+    - tag: b
+      value: 2
+out:
+  return: SUCCEED
+---
+test case: Match not equal (2)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: not equal
+    - tag: b
+      value: 2
+      operator: not equal
+  tags:
+    - tag: b
+      value: 2
+out:
+  return: FAIL
+---
+test case: Match not equal (3)
+in:
+  eval_type: or
+  match_tags:
+    - tag: b
+      value: 2
+      operator: not equal
+  tags:
+    - tag: b
+      value: 2
+    - tag: a
+      value: 1
+out:
+  return: FAIL
+---
+test case: Match not equal (4)
+in:
+  eval_type: or
+  match_tags:
+    - tag: b
+      value: 2
+      operator: not equal
+  tags:
+    - tag: b
+      value: 2
+    - tag: b
+      value: 1
+out:
+  return: FAIL
+---
+test case: Match exist (1)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: exist
+  tags:
+    - tag: a
+      value: 2
+out:
+  return: SUCCEED
+---
+test case: Match exist (2)
+in:
+  eval_type: or
+  match_tags:
+    - tag: b
+      value: 1
+      operator: exist
+  tags:
+    - tag: a
+      value: 2
+    - tag: b
+      value: 2
+    - tag: c
+      value: 2
+out:
+  return: SUCCEED
+---
+test case: Match exist (3)
+in:
+  eval_type: or
+  match_tags:
+    - tag: c
+      value: 1
+      operator: exist
+  tags:
+    - tag: a
+      value: 2
+    - tag: b
+      value: 2
+    - tag: c
+      value: 2
+out:
+  return: SUCCEED
+---
+test case: Match exist (4)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: exist
+  tags:
+    - tag: a
+      value: 2
+    - tag: b
+      value: 2
+    - tag: c
+      value: 2
+out:
+  return: SUCCEED
+---
+test case: Match exist (5)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: exist
+  tags:
+    - tag: b
+      value: 2
+    - tag: c
+      value: 2
+out:
+  return: FAIL
+---
+test case: Match exist (6)
+in:
+  eval_type: or
+  match_tags:
+    - tag: b
+      value: 1
+      operator: exist
+  tags:
+    - tag: a
+      value: 2
+    - tag: c
+      value: 2
+out:
+  return: FAIL
+---
+test case: Match exist (7)
+in:
+  eval_type: or
+  match_tags:
+    - tag: c
+      value: 1
+      operator: exist
+  tags:
+    - tag: a
+      value: 2
+    - tag: b
+      value: 2
+out:
+  return: FAIL
+---
+test case: Match not exist (8)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: not exist
+  tags:
+    - tag: b
+      value: 2
+    - tag: c
+      value: 2
+out:
+  return: SUCCEED
+---
+test case: Match not exist (9)
+in:
+  eval_type: or
+  match_tags:
+    - tag: b
+      value: 1
+      operator: not exist
+  tags:
+    - tag: a
+      value: 2
+    - tag: c
+      value: 2
+out:
+  return: SUCCEED
+---
+test case: Match not exist (10)
+in:
+  eval_type: or
+  match_tags:
+    - tag: c
+      value: 1
+      operator: not exist
+  tags:
+    - tag: a
+      value: 2
+    - tag: b
+      value: 2
+out:
+  return: SUCCEED
+---
+test case: Match not exist (11)
+in:
+  eval_type: or
+  match_tags:
+    - tag: b
+      value: 1
+      operator: not exist
+  tags:
+    - tag: a
+      value: 2
+    - tag: b
+      value: 2
+    - tag: c
+      value: 2
+out:
+  return: FAIL
+---
+test case: Match not exist (12)
+in:
+  eval_type: or
+  match_tags:
+    - tag: c
+      value: 1
+      operator: not exist
+  tags:
+    - tag: a
+      value: 2
+    - tag: b
+      value: 2
+    - tag: c
+      value: 2
+out:
+  return: FAIL
+---
+test case: Match not exist (13)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: not exist
+  tags:
+    - tag: a
+      value: 2
+    - tag: b
+      value: 2
+    - tag: c
+      value: 2
+out:
+  return: FAIL
 ...
