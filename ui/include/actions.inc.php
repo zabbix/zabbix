@@ -1561,7 +1561,7 @@ function makeEventActionsIcons($eventid, $actions, $users, $is_acknowledged) {
 	$action_icons = [];
 
 	if ($is_acknowledged) {
-		$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_ACK_GREEN, 'title' => _('Acknowledged')]); // TODO - AS: check constant
+		$action_icons[] = makeActionIcon(['icon' => ZBX_ICON_CHECK, 'title' => _('Acknowledged')]); // TODO - AS: check constant
 	}
 
 	if ($suppression_icon !== null) {
@@ -2039,12 +2039,12 @@ function makeActionTableIcon(array $action): ?CTag {
 
 			if (($action['action']
 					& ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) {
-				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_CAUSE, 'title' => _('Cause')]);
+				$action_icons[] = makeActionIcon(['icon' => ZBX_ICON_ARROW_RIGHT_TOP, 'title' => _('Cause')]);
 			}
 
 			if (($action['action']
 					& ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
-				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')]);
+				$action_icons[] = makeActionIcon(['icon' => ZBX_ICON_ARROW_TOP_RIGHT, 'title' => _('Symptom')]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {

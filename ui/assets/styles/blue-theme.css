@@ -2457,6 +2457,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .list-table .zi-alert:before {
     vertical-align: middle;
     position: relative; }
+  .list-table .zi-check::before {
+    color: #009900; }
   .list-table .action-container {
     display: flex;
     width: 100%;
@@ -4699,6 +4701,8 @@ form.is-loading {
   display: inline-block;
   padding: 5px;
   position: relative; }
+  .table-forms-separator .zi-arrow-top-right::before,
+  .table-forms-separator .zi-arrow-right-top::before,
   .table-forms-separator .zi-check::before,
   .table-forms-separator .zi-alert-more::before {
     color: #768d99; }

@@ -12,6 +12,12 @@
 		}
 	}
 
+	.zi-check {
+		&::before {
+			color: $icon-action-severity-down;
+		}
+	}
+
 	.action-container {
 		display: flex;
 		width: 100%;

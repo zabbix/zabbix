@@ -1482,7 +1482,7 @@ class CScreenProblem extends CScreenBase {
 			$checkbox_col = new CCol(new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']));
 			$empty_col = new CCol();
 			$symptom_col = (new CCol(
-				makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')])
+				makeActionIcon(['icon' => ZBX_ICON_ARROW_TOP_RIGHT, 'title' => _('Symptom')])
 			));
 
 			if ($data['show_timeline']) {
