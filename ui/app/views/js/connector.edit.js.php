@@ -34,7 +34,7 @@ window.connector_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		jQuery(document.getElementById('tags')).dynamicRows({
+		jQuery('#tags').dynamicRows({
 			template: '#tag-row-tmpl',
 			rows: tags
 		});
