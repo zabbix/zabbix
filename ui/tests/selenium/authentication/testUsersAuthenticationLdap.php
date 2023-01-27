@@ -1979,7 +1979,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 *
 	 * @dataProvider getCreateData
 	 */
-	public function testUsersAuthenticationLdap_Create1($data) {
+	public function testUsersAuthenticationLdap_Create($data) {
 		$this->testLdapCreate($data);
 	}
 
