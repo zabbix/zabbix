@@ -67,7 +67,7 @@ class CControllerMaintenancePeriodCheck extends CController {
 
 	protected function validateTypeSpecificInput() {
 		$rules = [
-			'period' => 'int32'
+			'period' => 'required|int32'
 		];
 		$data = [
 			'period' =>	strval(($this->getInput('period_days', 0) * SEC_PER_DAY)
@@ -162,7 +162,6 @@ class CControllerMaintenancePeriodCheck extends CController {
 			case TIMEPERIOD_TYPE_MONTHLY:
 				$timeperiod['month_date_type'] = $this->getInput('month_date_type');
 
-
 				if ($timeperiod['month_date_type'] == 0) {
 					$this->getInputs($timeperiod, ['months', 'day', 'hour', 'minute']);
 				}
@@ -173,6 +172,7 @@ class CControllerMaintenancePeriodCheck extends CController {
 
 				$timeperiod['start_time'] = ($timeperiod['hour'] * SEC_PER_HOUR) + ($timeperiod['minute'] * SEC_PER_MIN);
 				$timeperiod['month'] = array_sum($timeperiod['months']);
+				unset($timeperiod['month_date_type']);
 				break;
 		}
 
@@ -186,6 +186,12 @@ class CControllerMaintenancePeriodCheck extends CController {
 										: schedule2str($timeperiod),
 			'period_table_entry' => zbx_date2age(0, $timeperiod['period'])
 		];
+
+		$redundant_fields = ['period_days', 'period_hours', 'period_minutes', 'months', 'monthly_days', 'hour',
+			'minute'
+		];
+
+		$timeperiod = array_diff_key($timeperiod, array_flip($redundant_fields));
 
 		$data['body'] = $timeperiod;
 

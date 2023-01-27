@@ -116,7 +116,6 @@ window.maintenance_period_edit = new class {
 	submit() {
 		const fields = getFormFields(this.form);
 
-		fields.months = [];
 		fields.name = fields.start_date.trim();
 
 		switch (fields.timeperiod_type) {
@@ -135,8 +134,12 @@ window.maintenance_period_edit = new class {
 				fields.every = document.getElementById('every_dow').value;
 				var months = document.querySelectorAll('[id^="months_"]:checked');
 
-				for (var i = 0; i < months.length; i++) {
-					fields.months.push(months[i].value);
+				if (months.length !== 0) {
+					fields.months = [];
+
+					for (var i = 0; i < months.length; i++) {
+						fields.months.push(months[i].value);
+					}
 				}
 				break;
 		}

@@ -98,7 +98,7 @@ window.maintenance_edit = new class {
 		this.periods_template = new Template(`
 			<tr data-row_index="#{row_index}">
 				<td>#{period_type}</td>
-				<td>#{schedule}</td>
+				<td class="wordwrap">#{schedule}</td>
 				<td>#{period_table_entry}</td>
 				<td>
 					<input type="hidden" name="timeperiods[#{row_index}][timeperiod_type]" value="#{timeperiod_type}">

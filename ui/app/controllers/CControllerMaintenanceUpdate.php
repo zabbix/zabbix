@@ -21,11 +21,6 @@
 
 class CControllerMaintenanceUpdate extends CController {
 
-	/**
-	 * @var array
-	 */
-	private $maintenance = [];
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -82,6 +77,9 @@ class CControllerMaintenanceUpdate extends CController {
 		]);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected function doAction(): void {
 		$absolute_time_parser = new CAbsoluteTimeParser();
 
@@ -93,10 +91,10 @@ class CControllerMaintenanceUpdate extends CController {
 
 		$timeperiods = $this->getInput('timeperiods', []);
 		$type_fields = [
-			TIMEPERIOD_TYPE_ONETIME => ['start_date'],
-			TIMEPERIOD_TYPE_DAILY => ['start_time', 'every'],
-			TIMEPERIOD_TYPE_WEEKLY => ['start_time', 'every', 'dayofweek'],
-			TIMEPERIOD_TYPE_MONTHLY => ['start_time', 'every', 'day', 'dayofweek', 'month']
+			TIMEPERIOD_TYPE_ONETIME => ['timeperiod_type', 'start_date', 'period'],
+			TIMEPERIOD_TYPE_DAILY => ['timeperiod_type', 'start_time', 'every', 'period'],
+			TIMEPERIOD_TYPE_WEEKLY => ['timeperiod_type', 'start_time', 'every', 'dayofweek', 'period'],
+			TIMEPERIOD_TYPE_MONTHLY => ['timeperiod_type', 'start_time', 'every', 'day', 'dayofweek', 'month', 'period']
 		];
 
 		foreach ($timeperiods as &$timeperiod) {
@@ -107,9 +105,7 @@ class CControllerMaintenanceUpdate extends CController {
 					->getTimestamp();
 			}
 
-			$timeperiod = array_intersect_key($timeperiod,
-				array_flip(['period', 'timeperiod_type']) + array_flip($type_fields[$timeperiod['timeperiod_type']])
-			);
+			$timeperiod = array_intersect_key($timeperiod, array_flip($type_fields[$timeperiod['timeperiod_type']])			);
 		}
 		unset($timeperiod);
 

@@ -21,11 +21,6 @@
 
 class CControllerMaintenanceCreate extends CController {
 
-	/**
-	 * @var array
-	 */
-	private $maintenance = [];
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -84,42 +79,22 @@ class CControllerMaintenanceCreate extends CController {
 		$active_till_date = $absolute_time_parser->getDateTime(true);
 
 		$timeperiods = $this->getInput('timeperiods', []);
+		$type_fields = [
+			TIMEPERIOD_TYPE_ONETIME => ['timeperiod_type', 'start_date', 'period'],
+			TIMEPERIOD_TYPE_DAILY => ['timeperiod_type', 'start_time', 'every', 'period'],
+			TIMEPERIOD_TYPE_WEEKLY => ['timeperiod_type', 'start_time', 'every', 'dayofweek', 'period'],
+			TIMEPERIOD_TYPE_MONTHLY => ['timeperiod_type', 'start_time', 'every', 'day', 'dayofweek', 'month', 'period']
+		];
 
 		foreach ($timeperiods as &$timeperiod) {
-			switch ($timeperiod['timeperiod_type']) {
-				case TIMEPERIOD_TYPE_ONETIME:
-					unset($timeperiod['every']);
-					unset($timeperiod['dayofweek']);
-					unset($timeperiod['month']);
-					unset($timeperiod['day']);
-					unset($timeperiod['start_time']);
-					break;
-
-				case TIMEPERIOD_TYPE_DAILY:
-					unset($timeperiod['start_date']);
-					unset($timeperiod['dayofweek']);
-					unset($timeperiod['month']);
-					unset($timeperiod['day']);
-					break;
-
-				case TIMEPERIOD_TYPE_WEEKLY:
-					unset($timeperiod['start_date']);
-					unset($timeperiod['month']);
-					unset($timeperiod['day']);
-					break;
-
-				case TIMEPERIOD_TYPE_MONTHLY:
-					unset($timeperiod['start_date']);
-
-					if ($timeperiod['dayofweek'] == 0) {
-						unset($timeperiod['every']);
-						unset($timeperiod['dayofweek']);
-					}
-					else {
-						unset($timeperiod['day']);
-					}
-					break;
+			if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
+				$absolute_time_parser->parse($timeperiod['start_date']);
+				$timeperiod['start_date'] = $absolute_time_parser
+					->getDateTime(true)
+					->getTimestamp();
 			}
+
+			$timeperiod = array_intersect_key($timeperiod, array_flip($type_fields[$timeperiod['timeperiod_type']])			);
 		}
 		unset($timeperiod);
 
