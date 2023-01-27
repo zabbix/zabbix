@@ -582,6 +582,7 @@ class User extends ScimApiService {
 	 *         ['id']
 	 *         ['userName']
 	 *         ['active']
+	 *         ['name']
 	 *         ['attribute']                                      Some other attributes set up in SAML settings.
 	 */
 	private function prepareData(array $user, array $options = []): array {
@@ -590,10 +591,7 @@ class User extends ScimApiService {
 			'id' 		=> $user['userid'],
 			'userName'	=> $user['username'],
 			'active'	=> true,
-			'name' => [
-				'givenName' => $options['name']['givenName'],
-				'familyName' => $options['name']['familyName']
-			]
+			'name' => array_key_exists('name', $options) ? $options['name'] : ['givenName' => [], 'familyName' => []]
 		];
 
 		$provisioning = CProvisioning::forUserDirectoryId($user['userdirectoryid']);
