@@ -335,9 +335,12 @@ static void	add_history_bin(const zbx_vector_ptr_t *history)
 			continue;
 
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin len: %lu", h->value.bin->len);
+		if (0 == h->value.bin->len)
+			continue;
+
 		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin  hash: %s",( h->value.bin->hash));
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin len: %lu", h->value.bin->len);
 		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin value: %c",( (char*)(h->value.bin->value))[0]);
 
 

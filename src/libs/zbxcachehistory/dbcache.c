@@ -170,7 +170,6 @@ typedef struct
 	unsigned char	state;
 	unsigned char	flags;		/* see ZBX_DC_FLAG_* above */
 
-	size_t		bin_len;
 	char		*bin_hash;
 }
 dc_item_value_t;
@@ -3063,6 +3062,8 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 				if (NULL == history_bin_cbs)
 					continue;
 
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 				h_bin = &history_bin[(*history_bin_num)++];
 				h_bin->itemid = h->itemid;
 				h_bin->clock = h->ts.sec;
@@ -3998,16 +3999,18 @@ static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_val
 
 	if (0 != (item_value->flags & ZBX_DC_FLAG_META))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_add_history_bin 1");
 		item_value->lastlogsize = lastlogsize;
 		item_value->mtime = mtime;
 	}
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_add_history_bin 1");
 
 	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 	{
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_add_history_bin 2, bin len: %lu", bin->len);
+		item_value->bin_hash = zbx_strdup(NULL, bin->hash);
 		item_value->value.value_str.len = bin->len;
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_add_history_bin 222, bin hash: %s", item_value->bin_hash);
 
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, LAMBO 0, len: %lu", item_value->value.value_str.len);
@@ -4025,6 +4028,7 @@ static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_val
 	else
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_add_history_bin 3");
+		item_value->bin_hash = NULL;
 		item_value->value.value_str.len = 0;
 	}
 
@@ -4447,20 +4451,6 @@ static char	*hc_mem_value_str_dup(const dc_value_str_t *str)
 
 	return ptr;
 }
-//
-//static void	*hc_mem_value_bin_dup(const dc_value_str_t *bin)
-//{
-//	void	*ptr;
-//
-//	if (NULL == (ptr = (char *)__hc_shmem_malloc_func(NULL, bin->len)))
-//		return NULL;
-//
-//	memcpy(ptr, &bin_values[bin->pvalue], bin->len);
-//
-//	return ptr;
-//}
-//
-
 
 /******************************************************************************
  *                                                                            *
@@ -4491,21 +4481,6 @@ static int	hc_clone_history_str_data(char **dst, const dc_value_str_t *str)
 
 	return FAIL;
 }
-
-//static int	hc_clone_history_bin2_data(void **dst, const dc_value_str_t *bin)
-//{
-//	if (0 == bin->len)
-//		return SUCCEED;
-//
-//	if (NULL != *dst)
-//		return SUCCEED;
-//
-//	if (NULL != (*dst = hc_mem_value_bin_dup(bin)))
-//		return SUCCEED;
-//
-//	return FAIL;
-//}
-//
 
 /******************************************************************************
  *                                                                            *
@@ -4547,6 +4522,8 @@ static int	hc_clone_history_log_data(zbx_log_value_t **dst, const dc_item_value_
 
 static int	hc_clone_history_bin_data(zbx_bin_value_t **dst, const dc_item_value_t *item_value)
 {
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, hc_clone_history_bin_data START");
+
 	if (NULL == *dst)
 	{
 		/* using realloc instead of malloc just to suppress 'not used' warning for realloc */
@@ -4556,14 +4533,18 @@ static int	hc_clone_history_bin_data(zbx_bin_value_t **dst, const dc_item_value_
 		memset(*dst, 0, sizeof(zbx_bin_value_t));
 	}
 
-//	if (SUCCEED != hc_clone_history_bin2_data(&(*dst)->value, &item_value->value.value_str))
-//		return FAIL;
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, clone ITEM VALUE LEN: %lu", item_value->value.value_str.len);
 
 	if (SUCCEED != hc_clone_history_str_data((char**)(&(*dst)->value), &item_value->value.value_str))
 		return FAIL;
 
-	(*dst)->len = item_value->bin_len;
-	(*dst)->hash = item_value->bin_hash;
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, clone dst_str: %s", (char*)(*dst)->value);
+
+	(*dst)->hash = zbx_strdup(NULL, item_value->bin_hash);
+	(*dst)->len = item_value->value.value_str.len;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, clone dst_hash: %s", (*dst)->hash);
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, clone dst_len: %lu", (*dst)->len);
 
 	return SUCCEED;
 }
@@ -4825,10 +4806,25 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 				break;
 			case ITEM_VALUE_TYPE_BIN:
 
+				zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, LLL bin len: %lu", data->value.bin->len);
+
 				history->value.bin = (zbx_bin_value_t *)zbx_malloc(NULL, sizeof(zbx_bin_value_t));
 				history->value.bin->len = data->value.bin->len;
-				history->value.bin->hash = zbx_strdup(NULL, data->value.bin->hash);
-				memcpy(history->value.bin->value, data->value.bin->value, history->value.bin->len);
+
+				if (0 < data->value.bin->len)
+				{
+					zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, LLL hash: %s", ZBX_NULL2EMPTY_STR(data->value.bin->hash));
+
+					if (NULL != data->value.bin->hash)
+					{
+						history->value.bin->hash = zbx_strdup(NULL, data->value.bin->hash);
+					}
+					else
+					{
+						history->value.bin->hash = NULL;
+					}
+					memcpy(history->value.bin->value, data->value.bin->value, history->value.bin->len);
+				}
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;

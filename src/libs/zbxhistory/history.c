@@ -325,7 +325,9 @@ char	*zbx_history_value2str_dyn(const zbx_history_value_t *value, int value_type
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 			str = zbx_strdup(NULL, value->bin->value);
-		THIS_SHOULD_NEVER_HAPPEN;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
 	return str;
