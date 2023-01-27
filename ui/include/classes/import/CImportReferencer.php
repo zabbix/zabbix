@@ -252,6 +252,49 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get value map ID by uuid.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
+	public function findValuemapidByUuid(string $uuid): ?string {
+		if ($this->db_valuemaps === null) {
+			$this->selectValuemaps();
+		}
+
+		foreach ($this->db_valuemaps as $valuemapid => $db_valuemap) {
+			if ($db_valuemap['uuid'] === $uuid) {
+				return $valuemapid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get value map ID by host ID and value map name.
+	 *
+	 * @param string $hostid
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findValuemapidByName(string $hostid, string $name): ?string {
+		if ($this->db_valuemaps === null) {
+			$this->selectValuemaps();
+		}
+
+		foreach ($this->db_valuemaps as $valuemapid => $db_valuemap) {
+			if (bccomp($db_valuemap['hostid'], $hostid) == 0 && $db_valuemap['name'] === $name) {
+				return $valuemapid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Initializes references for items.
 	 */
 	public function initItemsReferences(): void {
@@ -298,28 +341,6 @@ class CImportReferencer {
 		foreach ($this->db_items as $itemid => $item) {
 			if ($item['hostid'] === $hostid && $item['key_'] === $key && ($inherited || $item['templateid'] == 0)) {
 				return $itemid;
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Get valuemap ID by valuemap name.
-	 *
-	 * @param string $hostid
-	 * @param string $name
-	 *
-	 * @return string|null
-	 */
-	public function findValuemapidByName(string $hostid, string $name): ?string {
-		if ($this->db_valuemaps === null) {
-			$this->selectValuemaps();
-		}
-
-		foreach ($this->db_valuemaps as $valuemapid => $valuemap) {
-			if ($valuemap['hostid'] === $hostid && $valuemap['name'] === $name) {
-				return $valuemapid;
 			}
 		}
 
@@ -860,6 +881,20 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Add value map name association with value map ID.
+	 *
+	 * @param string $valuemapid
+	 * @param array  $valuemap
+	 */
+	public function setDbValueMap(string $valuemapid, array $valuemap): void {
+		$this->db_valuemaps[$valuemapid] = [
+			'uuid' => $valuemap['uuid'],
+			'name' => $valuemap['name'],
+			'hostid' => $valuemap['hostid']
+		];
+	}
+
+	/**
 	 * Add trigger description/expression/recovery_expression that need association with a database trigger ID.
 	 *
 	 * @param array $triggers
@@ -1109,6 +1144,56 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Select value map IDs for previously added value map names.
+	 */
+	protected function selectValuemaps(): void {
+		$this->db_valuemaps = [];
+
+		if (!$this->valuemaps) {
+			return;
+		}
+
+		$sql_where = [];
+
+		foreach ($this->valuemaps as $host => $valuemaps) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
+
+			if ($hostid !== null) {
+				$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid)
+					.' AND ('
+						.dbConditionString('vm.name', array_keys($valuemaps))
+						.' OR '.dbConditionString('vm.uuid', array_column($valuemaps, 'uuid'))
+					.'))';
+			}
+		}
+
+		if ($sql_where) {
+			$db_valuemaps = DBselect(
+				'SELECT vm.valuemapid,vm.uuid,vm.name,vm.hostid'.
+				' FROM valuemap vm'.
+				' WHERE '.implode(' OR ', $sql_where)
+			);
+
+			while ($db_valuemap = DBfetch($db_valuemaps)) {
+				$this->db_valuemaps[$db_valuemap['valuemapid']] = [
+					'uuid' => $db_valuemap['uuid'],
+					'name' => $db_valuemap['name'],
+					'hostid' => $db_valuemap['hostid']
+				];
+			}
+		}
+
+		$this->valuemaps = [];
+	}
+
+	/**
+	 * Unset value map refs to make referencer select them from db again.
+	 */
+	public function refreshValueMaps(): void {
+		$this->db_valuemaps = null;
+	}
+
+	/**
 	 * Select item ids for previously added item keys.
 	 */
 	protected function selectItems(): void {
@@ -1153,45 +1238,6 @@ class CImportReferencer {
 	 */
 	public function refreshItems(): void {
 		$this->db_items = null;
-	}
-
-	/**
-	 * Select value map IDs for previously added value map names.
-	 */
-	protected function selectValuemaps(): void {
-		$this->db_valuemaps = [];
-
-		if (!$this->valuemaps) {
-			return;
-		}
-
-		$sql_where = [];
-
-		foreach ($this->valuemaps as $host => $valuemap_names) {
-			$hostid = $this->findTemplateidOrHostidByHost($host);
-
-			if ($hostid !== null) {
-				$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
-					dbConditionString('vm.name', array_keys($valuemap_names)).')';
-			}
-		}
-
-		if ($sql_where) {
-			$db_valuemaps = DBselect(
-				'SELECT vm.valuemapid,vm.hostid,vm.name'.
-				' FROM valuemap vm'.
-				' WHERE '.implode(' OR ', $sql_where)
-			);
-
-			while ($valuemap = DBfetch($db_valuemaps)) {
-				$this->db_valuemaps[$valuemap['valuemapid']] = [
-					'name' => $valuemap['name'],
-					'hostid' => $valuemap['hostid']
-				];
-			}
-		}
-
-		$this->valuemaps = [];
 	}
 
 	/**
