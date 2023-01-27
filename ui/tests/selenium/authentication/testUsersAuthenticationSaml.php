@@ -198,7 +198,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'IdP entity ID' => 'IdP',
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP entity',
-						'Configure JIT provisioning' => true,
+						'Configure JIT provisioning' => true
 					],
 					'error' => 'Incorrect value for field "saml_group_name": cannot be empty.'
 				]

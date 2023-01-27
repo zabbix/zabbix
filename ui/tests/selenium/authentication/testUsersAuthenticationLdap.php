@@ -1173,7 +1173,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Search attribute' => 'tets',
 								'Configure JIT provisioning' => true
 							],
-							'User group mapping' => [[]],
+							'User group mapping' => [[]]
 						]
 					],
 					'mapping_error' => 'Invalid user group mapping configuration.',
@@ -1201,7 +1201,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Search attribute' => 'tets no media',
 								'Configure JIT provisioning' => true
 							],
-							'Media type mapping' => [[]],
+							'Media type mapping' => [[]]
 						]
 					],
 					'mapping_error' => 'Invalid media type mapping configuration.',
@@ -1368,7 +1368,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							[
 								'usrgrpid' => 92
 							]
-						],
+						]
 					]
 				]
 			],
