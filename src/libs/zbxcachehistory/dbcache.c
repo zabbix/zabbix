@@ -136,9 +136,6 @@ static ZBX_DC_CACHE	*cache = NULL;
 #define ZBX_STRUCT_REALLOC_STEP	8
 #define ZBX_STRING_REALLOC_STEP	ZBX_KIBIBYTE
 
-
-#define ZBX_BIN_REALLOC_STEP	ZBX_KIBIBYTE
-
 typedef struct
 {
 	size_t	pvalue;
@@ -175,9 +172,7 @@ typedef struct
 dc_item_value_t;
 
 static char		*string_values = NULL;
-static void		*bin_values = NULL;
 static size_t		string_values_alloc = 0, string_values_offset = 0;
-static size_t		bin_values_alloc = 0, bin_values_offset = 0;
 
 static dc_item_value_t	*item_values = NULL;
 static size_t		item_values_alloc = 0, item_values_num = 0;
@@ -3873,21 +3868,6 @@ static void	dc_string_buffer_realloc(size_t len)
 	string_values = (char *)zbx_realloc(string_values, string_values_alloc);
 }
 
-static void	dc_bin_buffer_realloc(size_t len)
-{
-	if (bin_values_alloc >= bin_values_offset + len)
-		return;
-
-	do
-	{
-		bin_values_alloc += ZBX_BIN_REALLOC_STEP;
-	}
-	while (bin_values_alloc < bin_values_offset + len);
-
-	bin_values = (char *)zbx_realloc(bin_values, bin_values_alloc);
-}
-
-
 static dc_item_value_t	*dc_local_get_history_slot(void)
 {
 	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_get_history_slot");
@@ -4860,23 +4840,8 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 				else
 					history->value.bin->hash = NULL;
 
-
 				zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, LLL hash: %s", ZBX_NULL2EMPTY_STR(data->value.bin->hash));
 
-				/* if (0 < data->value.bin->len) */
-				/* { */
-				/*	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, LLL hash: %s", ZBX_NULL2EMPTY_STR(data->value.bin->hash)); */
-
-				/*	if (NULL != data->value.bin->hash) */
-				/*	{ */
-				/*		history->value.bin->hash = zbx_strdup(NULL, data->value.bin->hash); */
-				/*	} */
-				/*	else */
-				/*	{ */
-				/*		history->value.bin->hash = NULL; */
-				/*	} */
-				/*	memcpy(history->value.bin->value, data->value.bin->value, history->value.bin->len); */
-				/* } */
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
