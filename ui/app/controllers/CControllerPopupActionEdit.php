@@ -21,6 +21,11 @@
 
 class CControllerPopupActionEdit extends CController {
 
+	/**
+	 * @var mixed
+	 */
+	private $action;
+
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', [
