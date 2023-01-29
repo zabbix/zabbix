@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-08-25T03:46:56Z'
+  date: '2023-01-27T09:02:45Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: e2d2b4e4ac28483996cc11fe42823d57
       template: 'Zabbix server health'
       name: 'Zabbix server health'
-      description: 'Template tooling version used: 0.42'
+      description: 'Template tooling version used: 0.43'
       groups:
         -
           name: Templates/Applications
@@ -28,6 +28,17 @@ zabbix_export:
             -
               tag: component
               value: raw
+        -
+          uuid: 1a185ce77d4e4dd49be5b9ded51c1460
+          name: 'Zabbix server: Connector queue'
+          type: INTERNAL
+          key: 'zabbix[connector_queue]'
+          history: 1w
+          description: 'Count of values enqueued in the connector queue.'
+          tags:
+            -
+              tag: component
+              value: system
         -
           uuid: d596a84dece14aa59ca53e9f53b21edb
           name: 'Zabbix server: LLD queue'
@@ -175,6 +186,58 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)<65'
               name: 'Zabbix server: Utilization of configuration syncer processes is high'
               event_name: 'Zabbix server: Utilization of configuration syncer processes over 75%'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 2fcfd911ae8647149bad91c883abf41d
+          name: 'Zabbix server: Utilization of connector manager internal processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,connector manager,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time connector manager processes have been busy in the last minute'
+          tags:
+            -
+              tag: component
+              value: internal-process
+          triggers:
+            -
+              uuid: 5d72f9b951144e6797e19315b3a2da2b
+              expression: 'avg(/Zabbix server health/zabbix[process,connector manager,avg,busy],10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,connector manager,avg,busy],10m)<65'
+              name: 'Zabbix server: Utilization of connector manager processes is high'
+              event_name: 'Zabbix server: Utilization of connector manager processes over 75%'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 1c8c3b3045384a39af8baa9e40f2b487
+          name: 'Zabbix server: Utilization of connector worker internal processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,connector worker,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time connector worker processes have been busy in the last minute'
+          tags:
+            -
+              tag: component
+              value: internal-process
+          triggers:
+            -
+              uuid: c6322f7a90d847b5a630bc9c64ce3c1b
+              expression: 'avg(/Zabbix server health/zabbix[process,connector worker,avg,busy],10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,connector worker,avg,busy],10m)<65'
+              name: 'Zabbix server: Utilization of connector worker processes is high'
+              event_name: 'Zabbix server: Utilization of connector worker processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -910,13 +973,13 @@ zabbix_export:
                   value: performance
         -
           uuid: 6fb9d6a8d3f84c679e7af4b9ef437239
-          name: 'Zabbix stats proxy'
+          name: 'Zabbix proxies stats'
           type: INTERNAL
           key: 'zabbix[proxy,discovery]'
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Zabbix proxy statistics master item.'
+          description: 'Zabbix proxies statistics master item.'
           tags:
             -
               tag: component
@@ -1122,7 +1185,7 @@ zabbix_export:
               name: 'Zabbix server: Version has changed'
               event_name: 'Zabbix server: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Zabbix server version has changed. Ack to close.'
+              description: 'The Zabbix server version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1398,13 +1461,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.id=="{#NODE.ID}")].address.first()'
+                    - $.address
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[cluster,discovery,nodes]'
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
               tags:
                 -
                   tag: component
@@ -1428,9 +1491,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.id=="{#NODE.ID}")].lastaccess_age.first()'
+                    - $.lastaccess_age
               master_item:
-                key: 'zabbix[cluster,discovery,nodes]'
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
               tags:
                 -
                   tag: component
@@ -1454,13 +1517,43 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.id=="{#NODE.ID}")].lastaccess.first()'
+                    - $.lastaccess
+              master_item:
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: node-id
+                  value: '{#NODE.ID}'
+                -
+                  tag: node-name
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 4cf654a5bbb74ad69847b4ff15d0b623
+              name: 'Cluster node [{#NODE.NAME}]: Stats'
+              type: DEPENDENT
+              key: 'zabbix.nodes.stats[{#NODE.ID}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Node stats.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.id=="{#NODE.ID}")].first()'
               master_item:
                 key: 'zabbix[cluster,discovery,nodes]'
               tags:
                 -
                   tag: component
                   value: cluster
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: node-id
                   value: '{#NODE.ID}'
@@ -1481,13 +1574,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.id=="{#NODE.ID}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[cluster,discovery,nodes]'
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
               tags:
                 -
                   tag: component
@@ -1542,7 +1635,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].cert.first()'
+                    - $.cert
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -1552,7 +1645,7 @@ zabbix_export:
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[proxy,discovery]'
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -1574,13 +1667,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].compatibility.first()'
+                    - $.compatibility
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[proxy,discovery]'
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -1618,7 +1711,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].compression.first()'
+                    - $.compression
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -1628,7 +1721,7 @@ zabbix_export:
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[proxy,discovery]'
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -1648,13 +1741,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].hosts.first()'
+                    - $.hosts
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[proxy,discovery]'
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -1674,13 +1767,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].items.first()'
+                    - $.items
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[proxy,discovery]'
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -1703,9 +1796,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].last_seen.first()'
+                    - $.last_seen
               master_item:
-                key: 'zabbix[proxy,discovery]'
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -1755,7 +1848,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].passive.first()'
+                    - $.passive
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -1765,7 +1858,7 @@ zabbix_export:
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[proxy,discovery]'
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -1787,7 +1880,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].psk.first()'
+                    - $.psk
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -1797,7 +1890,7 @@ zabbix_export:
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[proxy,discovery]'
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -1819,17 +1912,44 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].requiredperformance.first()'
+                    - $.requiredperformance
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
+              master_item:
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 76b3dc42b38b4f4a9d6979a64e8f6a4b
+              name: 'Proxy [{#PROXY.NAME}]: Stats'
+              type: DEPENDENT
+              key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Discovered proxy statistics.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].first()'
               master_item:
                 key: 'zabbix[proxy,discovery]'
               tags:
                 -
                   tag: component
                   value: proxy
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: proxy-name
                   value: '{#PROXY.NAME}'
@@ -1847,7 +1967,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].unencrypted.first()'
+                    - $.unencrypted
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -1857,7 +1977,7 @@ zabbix_export:
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[proxy,discovery]'
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -1879,13 +1999,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.name=="{#PROXY.NAME}")].version.first()'
+                    - $.version
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[proxy,discovery]'
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
               tags:
                 -
                   tag: component
@@ -2270,6 +2390,18 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,lld manager,avg,busy]'
+        -
+          sortorder: '5'
+          color: CE93D8
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,connector worker,avg,busy]'
+        -
+          sortorder: '6'
+          color: '274482'
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,connector manager,avg,busy]'
     -
       uuid: df8944bf1e2f4149b5fbfe945548d1d8
       name: 'Zabbix server: Internal processes'
@@ -2643,6 +2775,18 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,trigger housekeeper,avg,busy]'
+        -
+          sortorder: '20'
+          color: '274482'
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,connector manager,avg,busy]'
+        -
+          sortorder: '21'
+          color: CE93D8
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,connector worker,avg,busy]'
     -
       uuid: b053dc416ee3422b94e46fb415ea87e6
       name: 'Zabbix server: Zabbix internal queues'
@@ -2658,6 +2802,12 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[lld_queue]'
+        -
+          sortorder: '2'
+          color: '274482'
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[connector_queue]'
     -
       uuid: 3d256a358da74f469700eea05173343a
       name: 'Zabbix server: Zabbix server performance'
