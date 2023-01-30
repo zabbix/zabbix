@@ -293,7 +293,9 @@ class CImportDataAdapterTest extends TestCase {
 				'name' => 'empty-template',
 				'description' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'vendor_name' => '',
+				'vendor_version' => ''
 			],
 			[
 				'uuid' => '00fda66f07e4479498058bf352711a06',
@@ -328,7 +330,9 @@ class CImportDataAdapterTest extends TestCase {
 				'name' => 'export-template',
 				'description' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'vendor_name' => '',
+				'vendor_version' => ''
 			]
 		]);
 	}
@@ -2061,7 +2065,9 @@ class CImportDataAdapterTest extends TestCase {
 					'name' => 'Template_Linux',
 					'description' => '',
 					'tags' => [],
-					'valuemaps' => []
+					'valuemaps' => [],
+					'vendor_name' => '',
+					'vendor_version' => ''
 				],
 				[
 					'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
@@ -2076,7 +2082,9 @@ class CImportDataAdapterTest extends TestCase {
 					'name' => 'Template_Simple',
 					'description' => '',
 					'tags' => [],
-					'valuemaps' => []
+					'valuemaps' => [],
+					'vendor_name' => '',
+					'vendor_version' => ''
 				]
 			]
 		);
@@ -2525,7 +2533,9 @@ class CImportDataAdapterTest extends TestCase {
 					'name' => 'Template_Simple',
 					'description' => '',
 					'tags' => [],
-					'valuemaps' => []
+					'valuemaps' => [],
+					'vendor_name' => '',
+					'vendor_version' => ''
 				]
 			]
 		);
@@ -2860,7 +2870,9 @@ class CImportDataAdapterTest extends TestCase {
 				'name' => 'Test 1',
 				'description' => '',
 				'tags' => [],
-				'valuemaps' => []
+				'valuemaps' => [],
+				'vendor_name' => '',
+				'vendor_version' => ''
 			]
 		]);
 
@@ -4270,6 +4282,30 @@ class CImportDataAdapterTest extends TestCase {
 					'key_' => 'drule3',
 					'trapper_hosts' => ''
 				]
+			]
+		]);
+	}
+
+	public function testTemplateVendorFields() {
+		$adapter = $this->getAdapter($this->getFile('vendor_fields.xml'));
+
+		$this->assertEquals($adapter->getTemplates(), [
+			[
+				'groups' => [
+					[
+						'name' => 'Templates'
+					]
+				],
+				'macros' => [],
+				'templates' => [],
+				'uuid' => '0c45e5ed44ea494dabfa4136f420aa65',
+				'host' => 'vendor test',
+				'name' => 'vendor test',
+				'description' => '',
+				'tags' => [],
+				'valuemaps' => [],
+				'vendor_name' => 'Zabbix',
+				'vendor_version' => '6.4-0'
 			]
 		]);
 	}

@@ -1137,8 +1137,8 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 				'template' =>				['type' => XML_ARRAY, 'rules' => [
 					'vendor' =>				['type' => XML_ARRAY, 'rules' => [
-						'name' =>				['type' => XML_STRING, 'default' => ''],
-						'version' =>			['type' => XML_STRING, 'default' => '']
+						'name' =>				['type' => XML_STRING | XML_REQUIRED],
+						'version' =>			['type' => XML_STRING | XML_REQUIRED]
 					]],
 					'uuid' =>				['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 					'template' =>				['type' => XML_STRING | XML_REQUIRED],
