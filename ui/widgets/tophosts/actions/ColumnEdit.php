@@ -42,6 +42,7 @@ class ColumnEdit extends CController {
 		'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
 		'min' => '',
 		'max' => '',
+		'decimal_places' => CWidgetFieldColumnsList::DEFAULT_DECIMAL_PLACES,
 		'base_color' => '',
 		'text' => '',
 		'thresholds' => []
@@ -64,6 +65,7 @@ class ColumnEdit extends CController {
 			'history' => 'int32',
 			'min' => 'string',
 			'max' => 'string',
+			'decimal_places' => 'string',
 			'base_color' => 'string',
 			'thresholds' => 'array',
 			'text' => 'string',

@@ -209,6 +209,14 @@ $form_grid->addItem([
 	)
 ]);
 
+// Decimal places.
+$form_grid->addItem([
+	new CLabel([_('Decimal places'), makeHelpIcon(_('This setting applies only to numeric data.'))], 'decimal_places'),
+	(new CFormField(
+		(new CTextBox('decimal_places', $data['decimal_places']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	))
+]);
+
 // Thresholds table.
 $header_row = [
 	'',

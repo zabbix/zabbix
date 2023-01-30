@@ -95,11 +95,15 @@ foreach ($data['rows'] as $columns) {
 				break;
 
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
+				$formatted_value = formatHistoryValue($column['value'], $column['item'], true,
+					$column_config['decimal_places']
+				);
+
 				if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
 					$row[] = (new CCol())
 						->addStyle($color !== '' ? 'background-color: #'.$color : null)
 						->addItem(
-							(new CDiv(formatHistoryValue($column['value'], $column['item'])))
+							(new CDiv($formatted_value))
 								->addClass(ZBX_STYLE_CENTER)
 								->addClass(ZBX_STYLE_CURSOR_POINTER)
 								->setHint(
@@ -133,7 +137,7 @@ foreach ($data['rows'] as $columns) {
 				$row[] = (new CCol())
 					->addStyle('width: 0;')
 					->addItem(
-						(new CDiv(formatHistoryValue($column['value'], $column['item'])))
+						(new CDiv($formatted_value))
 							->addClass(ZBX_STYLE_CURSOR_POINTER)
 							->addClass(ZBX_STYLE_NOWRAP)
 							->setHint(
