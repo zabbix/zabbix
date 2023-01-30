@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-26T07:35:08Z'
+  date: '2023-01-30T15:23:43Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -257,9 +257,9 @@ zabbix_export:
               value: raw
         -
           uuid: 91b2290d65b949ad9ea801763c35cf40
-          name: 'Azure: Get storages'
+          name: 'Azure: Get storage accounts'
           type: SCRIPT
-          key: azure.get.storages
+          key: azure.get.storage.acc
           delay: 10m
           history: 0d
           trends: '0'
@@ -268,23 +268,20 @@ zabbix_export:
             var Azure = {
                 params: {},
                 token: '',
-
+            
                 setParams: function (params) {
                     ['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: ' + field + '.';
                         }
                     });
-
+            
                     Azure.params = params;
                 },
                 
                 login: function () {
-
+            
                     var resp, login = new HttpRequest();
-                    if (typeof Azure.params.http_proxy !== 'undefined' && Azure.params.http_proxy !== '') {
-                        login.setProxy(Azure.params.http_proxy);
-                    }
                     login.addHeader('Content-Type: application/x-www-form-urlencoded');
                     resp = login.post(
                         'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) +'/oauth2/token',
@@ -304,13 +301,10 @@ zabbix_export:
                     }
                     Azure.token = resp['access_token']
                 },
-
+            
                 request: function (url) {
               
                     var response, request = new HttpRequest();
-                    if (typeof Azure.params.http_proxy !== 'undefined' && Azure.params.http_proxy !== '') {
-                        request.setProxy(Azure.params.http_proxy);
-                    }
                     if (!Azure.token) {
                         throw 'Failed authentication token for the request session.'; 
                     }
@@ -327,7 +321,7 @@ zabbix_export:
                         throw 'Failed to parse response received from API.';
                     } 
                 },
-
+            
                 getField: function (data, path, defaultValue, separator) {
                     separator = separator || '.';
                     var steps = path.split(separator);
@@ -340,7 +334,7 @@ zabbix_export:
                     }
                     return data;
                 },
-
+            
                 getMetricsData: function() {
                     
                     var metric = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) 
@@ -359,7 +353,7 @@ zabbix_export:
                     return data;
                 }
             };
-
+            
             try {
                 Azure.setParams(JSON.parse(value));
                 Azure.login();
@@ -391,9 +385,9 @@ zabbix_export:
               value: raw
         -
           uuid: 2e425a9ef8d34ea68f7998ceed30ebc4
-          name: 'Azure: Get storages errors'
+          name: 'Azure: Get storage accounts errors'
           type: DEPENDENT
-          key: azure.get.storages.errors
+          key: azure.get.storage.acc.errors
           delay: '0'
           history: 7d
           trends: '0'
@@ -410,7 +404,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: azure.get.storages
+            key: azure.get.storage.acc
           tags:
             -
               tag: component
@@ -418,7 +412,7 @@ zabbix_export:
           triggers:
             -
               uuid: 253f0835cd134d2591bb2be1b9dc9b29
-              expression: 'length(last(/Azure by HTTP/azure.get.storages.errors))>0'
+              expression: 'length(last(/Azure by HTTP/azure.get.storage.acc.errors))>0'
               name: 'Azure: There are errors in storages requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -508,26 +502,26 @@ zabbix_export:
             key: azure.get.resources
           lld_macro_paths:
             -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
+            -
               lld_macro: '{#ID}'
               path: $.id
-            -
-              lld_macro: '{#NAME}'
-              path: $.name
             -
               lld_macro: '{#LOCATION}'
               path: $.location
             -
-              lld_macro: '{#TYPE}'
-              path: $.type
+              lld_macro: '{#NAME}'
+              path: $.name
             -
               lld_macro: '{#SIZE}'
               path: $.sku.name
             -
+              lld_macro: '{#TYPE}'
+              path: $.type
+            -
               lld_macro: '{#VERSION}'
               path: $.kind
-            -
-              lld_macro: '{#GROUP}'
-              path: $.resourceGroup
           preprocessing:
             -
               type: JSONPATH
@@ -641,26 +635,26 @@ zabbix_export:
             key: azure.get.resources
           lld_macro_paths:
             -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
+            -
               lld_macro: '{#ID}'
               path: $.id
-            -
-              lld_macro: '{#NAME}'
-              path: $.name
             -
               lld_macro: '{#LOCATION}'
               path: $.location
             -
-              lld_macro: '{#TYPE}'
-              path: $.type
+              lld_macro: '{#NAME}'
+              path: $.name
             -
               lld_macro: '{#SIZE}'
               path: $.sku.name
             -
+              lld_macro: '{#TYPE}'
+              path: $.type
+            -
               lld_macro: '{#VERSION}'
               path: $.properties.version
-            -
-              lld_macro: '{#GROUP}'
-              path: $.resourceGroup
           preprocessing:
             -
               type: JSONPATH
@@ -774,26 +768,26 @@ zabbix_export:
             key: azure.get.resources
           lld_macro_paths:
             -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
+            -
               lld_macro: '{#ID}'
               path: $.id
-            -
-              lld_macro: '{#NAME}'
-              path: $.name
             -
               lld_macro: '{#LOCATION}'
               path: $.location
             -
-              lld_macro: '{#TYPE}'
-              path: $.type
+              lld_macro: '{#NAME}'
+              path: $.name
             -
               lld_macro: '{#SIZE}'
               path: $.sku.name
             -
+              lld_macro: '{#TYPE}'
+              path: $.type
+            -
               lld_macro: '{#VERSION}'
               path: $.properties.version
-            -
-              lld_macro: '{#GROUP}'
-              path: $.resourceGroup
           preprocessing:
             -
               type: JSONPATH
@@ -840,27 +834,27 @@ zabbix_export:
           uuid: 3b9bde32dd6b4e3aa2dd8d7949f655e9
           name: 'Storage accounts discovery'
           type: DEPENDENT
-          key: azure.starage.discovery
+          key: azure.starage.acc.discovery
           delay: '0'
           filter:
             evaltype: AND
             conditions:
               -
                 macro: '{#NAME}'
-                value: '{$AZURE.STORAGE.NAME.MATCHES}'
+                value: '{$AZURE.STORAGE.ACC.NAME.MATCHES}'
                 formulaid: E
               -
                 macro: '{#NAME}'
-                value: '{$AZURE.STORAGE.NAME.NOT_MATCHES}'
+                value: '{$AZURE.STORAGE.ACC.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
               -
                 macro: '{#LOCATION}'
-                value: '{$AZURE.STORAGE.LOCATION.MATCHES}'
+                value: '{$AZURE.STORAGE.ACC.LOCATION.MATCHES}'
                 formulaid: C
               -
                 macro: '{#LOCATION}'
-                value: '{$AZURE.STORAGE.LOCATION.NOT_MATCHES}'
+                value: '{$AZURE.STORAGE.ACC.LOCATION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               -
@@ -876,9 +870,9 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 3361508a601748f5aca339f952430889
-              name: 'Azure: Storage [{#NAME}]: Get data'
+              name: 'Azure: Storage account [{#NAME}]: Get data'
               type: SCRIPT
-              key: 'azure.get.storage[{#NAME}]'
+              key: 'azure.get.storage.acc[{#NAME}]'
               history: 0d
               trends: '0'
               value_type: TEXT
@@ -886,23 +880,20 @@ zabbix_export:
                 var AzureStorage = {
                     params: {},
                     token: '',
-
+                
                     setParams: function (params) {
                         [ 'token' , 'id'].forEach(function (field) {
                             if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                                 throw 'Required param is not set: ' + field + '.';
                             }
                         });
-
+                
                         AzureStorage.params = params;
                     },
                     
                     request: function (url) {
                   
                         var response, request = new HttpRequest();
-                        if (typeof AzureStorage.params.http_proxy !== 'undefined' && AzureStorage.params.http_proxy !== '') {
-                            request.setProxy(Azure.params.http_proxy);
-                        }
                         if (!AzureStorage.params.token) {
                             throw 'Failed authentication token for the request session.'; 
                         }
@@ -919,7 +910,7 @@ zabbix_export:
                             throw 'Failed to parse response received from API.';
                         } 
                     },
-
+                
                     getField: function (data, path, defaultValue, separator) {
                         separator = separator || '.';
                         var steps = path.split(separator);
@@ -932,7 +923,7 @@ zabbix_export:
                         }
                         return data;
                     },
-
+                
                     getMetricsData: function() {
                         var 
                         data = {};
@@ -952,7 +943,7 @@ zabbix_export:
                         data['metrics'] = {};
                         for (var i = 0; i < metrics.length; i += 20) {
                             var chunk = metrics.slice(i, i + 20);
-
+                
                             prepared_metrics.push(
                                 chunk.map(function(element) {
                                     return encodeURIComponent(element);
@@ -979,7 +970,7 @@ zabbix_export:
                 try {
                     AzureStorage.setParams(JSON.parse(value));
                     return JSON.stringify(AzureStorage.getMetricsData());
-
+                
                 }
                 catch (error) {
                     error += (String(error).endsWith('.')) ? '' : '.';
@@ -1006,7 +997,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 9ae0af76a37047f5ba84de2f43dfb5c4
-              name: 'Azure: Storage [{#NAME}]: Availability'
+              name: 'Azure: Storage account [{#NAME}]: Availability'
               type: DEPENDENT
               key: 'azure.storage.availability[{#NAME}]'
               delay: '0'
@@ -1028,7 +1019,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'azure.get.storage[{#NAME}]'
+                key: 'azure.get.storage.acc[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1036,9 +1027,20 @@ zabbix_export:
                 -
                   tag: storage
                   value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 4cd8ac56b50c4120bf9de56bb1f06245
+                  expression: '(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))>{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}'
+                  name: 'Azure: Storage account [{#NAME}]: storage account availability is low'
+                  opdata: '{ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: c6437ade4fee44f783ab379fb179508d
-              name: 'Azure: Storage [{#NAME}]: Blob Capacity'
+              name: 'Azure: Storage account [{#NAME}]: Blob Capacity'
               type: DEPENDENT
               key: 'azure.storage.blob.capacity[{#NAME}]'
               delay: '0'
@@ -1057,7 +1059,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'azure.get.storage[{#NAME}]'
+                key: 'azure.get.storage.acc[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1067,7 +1069,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 9bd8b8f1b5844298a245d449548de46e
-              name: 'Azure: Storage [{#NAME}]: Blob Count'
+              name: 'Azure: Storage account [{#NAME}]: Blob Count'
               type: DEPENDENT
               key: 'azure.storage.blob.count[{#NAME}]'
               delay: '0'
@@ -1084,7 +1086,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'azure.get.storage[{#NAME}]'
+                key: 'azure.get.storage.acc[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1094,7 +1096,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 707be15f02a141548ce5f89097c303a0
-              name: 'Azure: Storage [{#NAME}]: Container Count'
+              name: 'Azure: Storage account [{#NAME}]: Container Count'
               type: DEPENDENT
               key: 'azure.storage.container.count[{#NAME}]'
               delay: '0'
@@ -1111,7 +1113,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'azure.get.storage[{#NAME}]'
+                key: 'azure.get.storage.acc[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1121,7 +1123,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: ae28bbd289644619b20b1907212d8293
-              name: 'Azure: Storage [{#NAME}]: Egress'
+              name: 'Azure: Storage account [{#NAME}]: Egress'
               type: DEPENDENT
               key: 'azure.storage.engress[{#NAME}]'
               delay: '0'
@@ -1142,7 +1144,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'azure.get.storage[{#NAME}]'
+                key: 'azure.get.storage.acc[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1152,7 +1154,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 8e73a2aba92444dd9c02c6f94227a4e5
-              name: 'Azure: Storage [{#NAME}]: Index Capacity'
+              name: 'Azure: Storage account [{#NAME}]: Index Capacity'
               type: DEPENDENT
               key: 'azure.storage.index.capacity[{#NAME}]'
               delay: '0'
@@ -1171,7 +1173,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'azure.get.storage[{#NAME}]'
+                key: 'azure.get.storage.acc[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1181,7 +1183,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: ff40325efb174839bef7bc775049837e
-              name: 'Azure: Storage [{#NAME}]: Ingress'
+              name: 'Azure: Storage account [{#NAME}]: Ingress'
               type: DEPENDENT
               key: 'azure.storage.ingress[{#NAME}]'
               delay: '0'
@@ -1200,7 +1202,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'azure.get.storage[{#NAME}]'
+                key: 'azure.get.storage.acc[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1210,7 +1212,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: e17d6f2ed79c4b5eaa54730c82d6840f
-              name: 'Azure: Storage [{#NAME}]: Success E2E Latency'
+              name: 'Azure: Storage account [{#NAME}]: Success E2E Latency'
               type: DEPENDENT
               key: 'azure.storage.success.e2e.latency[{#NAME}]'
               delay: '0'
@@ -1235,7 +1237,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'azure.get.storage[{#NAME}]'
+                key: 'azure.get.storage.acc[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1245,7 +1247,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 727fb792fe5c4229995f7aa5bbb681ed
-              name: 'Azure: Storage [{#NAME}]: Success Server Latency'
+              name: 'Azure: Storage account [{#NAME}]: Success Server Latency'
               type: DEPENDENT
               key: 'azure.storage.success.server.latency[{#NAME}]'
               delay: '0'
@@ -1270,7 +1272,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'azure.get.storage[{#NAME}]'
+                key: 'azure.get.storage.acc[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1280,7 +1282,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 48ecb880def34474b73a03eb895db3ea
-              name: 'Azure: Storage [{#NAME}]: Transactions'
+              name: 'Azure: Storage account [{#NAME}]: Transactions'
               type: DEPENDENT
               key: 'azure.storage.transactions[{#NAME}]'
               delay: '0'
@@ -1300,7 +1302,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'azure.get.storage[{#NAME}]'
+                key: 'azure.get.storage.acc[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1309,20 +1311,20 @@ zabbix_export:
                   tag: storage
                   value: '{#NAME}'
           master_item:
-            key: azure.get.storages
+            key: azure.get.storage.acc
           lld_macro_paths:
+            -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
             -
               lld_macro: '{#ID}'
               path: $.id
             -
-              lld_macro: '{#NAME}'
-              path: $.name
-            -
               lld_macro: '{#LOCATION}'
               path: $.location
             -
-              lld_macro: '{#GROUP}'
-              path: $.resourceGroup
+              lld_macro: '{#NAME}'
+              path: $.name
             -
               lld_macro: '{#TOKEN}'
               path: $.token
@@ -1405,26 +1407,26 @@ zabbix_export:
             key: azure.get.resources
           lld_macro_paths:
             -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
+            -
               lld_macro: '{#ID}'
               path: $.id
-            -
-              lld_macro: '{#NAME}'
-              path: $.name
             -
               lld_macro: '{#LOCATION}'
               path: $.location
             -
-              lld_macro: '{#TYPE}'
-              path: $.type
-            -
-              lld_macro: '{#SIZE}'
-              path: $.properties.hardwareProfile.vmSize
+              lld_macro: '{#NAME}'
+              path: $.name
             -
               lld_macro: '{#OS}'
               path: $.properties.storageProfile.osDisk.osType
             -
-              lld_macro: '{#GROUP}'
-              path: $.resourceGroup
+              lld_macro: '{#SIZE}'
+              path: $.properties.hardwareProfile.vmSize
+            -
+              lld_macro: '{#TYPE}'
+              path: $.type
           preprocessing:
             -
               type: JSONPATH
@@ -1514,19 +1516,23 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in discovery rules.'
         -
-          macro: '{$AZURE.STORAGE.LOCATION.MATCHES}'
+          macro: '{$AZURE.STORAGE.ACC.AVAILABILITY}'
+          value: '70'
+          description: 'The warning threshold of the storage account availability.'
+        -
+          macro: '{$AZURE.STORAGE.ACC.LOCATION.MATCHES}'
           value: '.*'
           description: 'This macro is used in storage accounts discovery rule.'
         -
-          macro: '{$AZURE.STORAGE.LOCATION.NOT_MATCHES}'
+          macro: '{$AZURE.STORAGE.ACC.LOCATION.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in storage accounts discovery rule.'
         -
-          macro: '{$AZURE.STORAGE.NAME.MATCHES}'
+          macro: '{$AZURE.STORAGE.ACC.NAME.MATCHES}'
           value: '.*'
           description: 'This macro is used in storage accounts discovery rule.'
         -
-          macro: '{$AZURE.STORAGE.NAME.NOT_MATCHES}'
+          macro: '{$AZURE.STORAGE.ACC.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in storage accounts discovery rule.'
         -
@@ -8531,27 +8537,6 @@ zabbix_export:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.miss
     -
-      uuid: 62a9a5e1fb044a52a0b534bd4eeea914
-      name: 'Azure Microsoft SQL: Connections'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.connections.successful
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.connections.failed.system
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.firewall.blocked
-    -
       uuid: 3b278de1b81a4be7acc865568962c323
       name: 'Azure Microsoft SQL: Connections'
       graph_items:
@@ -8573,20 +8558,26 @@ zabbix_export:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.firewall.blocked
     -
-      uuid: 083d307db8954fc59e8e5cfccefc16c1
-      name: 'Azure Microsoft SQL: CPU usage'
+      uuid: 62a9a5e1fb044a52a0b534bd4eeea914
+      name: 'Azure Microsoft SQL: Connections'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.cpu.limit
+            key: azure.db.mssql.connections.successful
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.cpu.used
+            key: azure.db.mssql.connections.failed.system
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
+            key: azure.db.mssql.firewall.blocked
     -
       uuid: fe250a5f509d45babea9fcd12accbcac
       name: 'Azure Microsoft SQL: CPU usage'
@@ -8603,20 +8594,20 @@ zabbix_export:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.cpu.used
     -
-      uuid: f541b6591683433aba4b3e58a8ad1e5c
-      name: 'Azure Microsoft SQL: Storage utilization'
+      uuid: 083d307db8954fc59e8e5cfccefc16c1
+      name: 'Azure Microsoft SQL: CPU usage'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.storage.used
+            key: azure.db.mssql.cpu.limit
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.storage.allocated
+            key: azure.db.mssql.cpu.used
     -
       uuid: ec5714017c744484be8c264d24a0e694
       name: 'Azure Microsoft SQL: Storage utilization'
@@ -8631,6 +8622,21 @@ zabbix_export:
           color: 2774A4
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
+            key: azure.db.mssql.storage.allocated
+    -
+      uuid: f541b6591683433aba4b3e58a8ad1e5c
+      name: 'Azure Microsoft SQL: Storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
+            key: azure.db.mssql.storage.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.storage.allocated
     -
       uuid: 750ae48e6ef749c19a06f4bbe716f92f
