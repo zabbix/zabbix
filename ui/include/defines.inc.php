@@ -2207,6 +2207,8 @@ define('ZBX_ICON_ALERT', 'zi-alert');
 define('ZBX_ICON_ALERT_MORE', 'zi-alert-more');
 define('ZBX_ICON_ARROW_BACK', 'zi-arrow-back');
 define('ZBX_ICON_ARROW_DOWN', 'zi-arrow-down');
+define('ZBX_ICON_ARROW_RIGHT_TOP', 'zi-arrow-right-top');
+define('ZBX_ICON_ARROW_TOP_RIGHT', 'zi-arrow-top-right');
 define('ZBX_ICON_ARROW_UP', 'zi-arrow-up');
 define('ZBX_ICON_ARROWS_TOP_BOTTOM', 'zi-arrows-top-bottom');
 define('ZBX_ICON_BELL', 'zi-bell');
