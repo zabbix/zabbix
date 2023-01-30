@@ -1233,7 +1233,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-							'Item' => 'Software installed',
+							'Item' => 'Get filesystems',
 							'Name' => 'Item Widget with type of information - text',
 							'Advanced configuration' => true
 					]

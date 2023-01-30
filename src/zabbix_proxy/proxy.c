@@ -1036,12 +1036,12 @@ static void	zbx_on_exit(int ret)
 	zbx_free_metrics();
 	zbx_ipc_service_free_env();
 
-	DBconnect(ZBX_DB_CONNECT_EXIT);
+	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
 	free_database_cache(ZBX_SYNC_ALL);
 	free_configuration_cache();
-	DBclose();
+	zbx_db_close();
 
-	DBdeinit();
+	zbx_db_deinit();
 
 	/* free vmware support */
 	zbx_vmware_destroy();
@@ -1221,14 +1221,14 @@ static void	proxy_db_init(void)
 	zbx_stat_t	db_stat;
 #endif
 
-	if (SUCCEED != DBinit(DCget_nextid, program_type, &error))
+	if (SUCCEED != zbx_db_init(DCget_nextid, program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
-	DBinit_autoincrement_options();
+	zbx_db_init_autoincrement_options();
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
@@ -1243,7 +1243,7 @@ static void	proxy_db_init(void)
 		exit(EXIT_FAILURE);
 	}
 
-	DBcheck_character_set();
+	zbx_db_check_character_set();
 	zbx_check_db();
 
 	if (SUCCEED != (version_check = DBcheck_version()))
@@ -1253,7 +1253,7 @@ static void	proxy_db_init(void)
 			exit(EXIT_FAILURE);
 
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", CONFIG_DBNAME);
-		DBdeinit();
+		zbx_db_deinit();
 
 		if (0 != unlink(CONFIG_DBNAME))
 		{
@@ -1462,7 +1462,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	proxy_db_init();
 
-	change_proxy_history_count(proxy_get_history_count());
+	change_proxy_history_count(zbx_proxy_get_history_count());
 
 	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 		threads_num += CONFIG_FORKS[i];

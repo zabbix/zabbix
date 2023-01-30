@@ -3442,7 +3442,7 @@ form.is-loading {
       margin: 0;
       line-height: 14px;
       top: 0; }
-    .list-table.compact-view td [class*='icon-']:last-of-type {
+    .list-table.compact-view td button[class*='icon-']:last-of-type {
       margin-right: 0; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
@@ -6706,14 +6706,14 @@ a.icon-count {
   box-shadow: 0 0 0 2px #000000;
   border-radius: 2px; }
 
-button.icon-action-command, button.icon-action-close, button.icon-action-msg, button.icon-action-msgs, button.icon-action-severity-up, button.icon-action-severity-down, button.icon-action-severity-changed, button.icon-action-message, button.icon-action-ack, button.icon-action-ack-green, button.icon-action-suppress, button.icon-action-unsuppress, button.icon-problem-generated, button.icon-problem-recovery, button.icon-actions-number-gray, button.icon-actions-number-yellow, button.icon-actions-number-red {
+button.icon-action-command, button.icon-action-close, button.icon-action-msg, button.icon-action-msgs, button.icon-action-severity-up, button.icon-action-severity-down, button.icon-action-severity-changed, button.icon-action-message, button.icon-action-ack, button.icon-action-suppress, button.icon-action-unsuppress, button.icon-problem-generated, button.icon-problem-recovery, button.icon-actions-number-gray, button.icon-actions-number-yellow, button.icon-actions-number-red {
   background: none;
   border: none;
   padding: 0px;
   margin: 0px;
   margin-right: 5px;
   min-height: 0px; }
-  button.icon-action-command::after, button.icon-action-close::after, button.icon-action-msg::after, button.icon-action-msgs::after, button.icon-action-severity-up::after, button.icon-action-severity-down::after, button.icon-action-severity-changed::after, button.icon-action-message::after, button.icon-action-ack::after, button.icon-action-ack-green::after, button.icon-action-suppress::after, button.icon-action-unsuppress::after, button.icon-problem-generated::after, button.icon-problem-recovery::after, button.icon-actions-number-gray::after, button.icon-actions-number-yellow::after, button.icon-actions-number-red::after {
+  button.icon-action-command::after, button.icon-action-close::after, button.icon-action-msg::after, button.icon-action-msgs::after, button.icon-action-severity-up::after, button.icon-action-severity-down::after, button.icon-action-severity-changed::after, button.icon-action-message::after, button.icon-action-ack::after, button.icon-action-suppress::after, button.icon-action-unsuppress::after, button.icon-problem-generated::after, button.icon-problem-recovery::after, button.icon-actions-number-gray::after, button.icon-actions-number-yellow::after, button.icon-actions-number-red::after {
     left: 0px;
     top: 4px; }
 
