@@ -24,7 +24,7 @@
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 
-ZBX_PTR_VECTOR_DECL(service, ZBX_DB_SERVICE *)
+ZBX_PTR_VECTOR_DECL(service, zbx_db_service *)
 
 #define ZBX_IPC_SERVICE_SERVICE			"service"
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS	1

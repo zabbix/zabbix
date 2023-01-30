@@ -57,18 +57,18 @@ zbx_db_value_t;
 #	define ZBX_FOR_UPDATE	" for update"
 #endif
 
-int	zbx_db_init(const char *dbname, const char *const dbschema, char **error);
-void	zbx_db_deinit(void);
+int	zbx_db_init_basic(const char *dbname, const char *const dbschema, char **error);
+void	zbx_db_deinit_basic(void);
 
-void	zbx_db_init_autoincrement_options(void);
+void	zbx_db_init_autoincrement_options_basic(void);
 
-int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
-			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13);
-void	zbx_db_close(void);
+int	zbx_db_connect_basic(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket,
+		int port, char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13);
+void	zbx_db_close_basic(void);
 
-int	zbx_db_begin(void);
-int	zbx_db_commit(void);
-int	zbx_db_rollback(void);
+int	zbx_db_begin_basic(void);
+int	zbx_db_commit_basic(void);
+int	zbx_db_rollback_basic(void);
 int	zbx_db_txn_level(void);
 int	zbx_db_txn_error(void);
 int	zbx_db_txn_end_error(void);
@@ -112,7 +112,7 @@ typedef struct
 }
 zbx_db_bind_context_t;
 
-int		zbx_db_statement_prepare(const char *sql);
+int		zbx_db_statement_prepare_basic(const char *sql);
 int		zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsigned char type,
 				zbx_db_value_t **rows, int rows_num);
 void		zbx_db_clean_bind_context(zbx_db_bind_context_t *context);
@@ -120,11 +120,11 @@ int		zbx_db_statement_execute(int iters);
 #endif
 int		zbx_db_vexecute(const char *fmt, va_list args);
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
-DB_RESULT	zbx_db_select_n(const char *query, int n);
+DB_RESULT	zbx_db_select_n_basic(const char *query, int n);
 
-DB_ROW		zbx_db_fetch(DB_RESULT result);
+DB_ROW		zbx_db_fetch_basic(DB_RESULT result);
 void		zbx_db_free_result(DB_RESULT result);
-int		zbx_db_is_null(const char *field);
+int		zbx_db_is_null_basic(const char *field);
 
 typedef enum
 {
@@ -132,10 +132,10 @@ typedef enum
 	ESCAPE_SEQUENCE_ON
 }
 zbx_escape_sequence_t;
-char		*zbx_db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_chars,
+char		*zbx_db_dyn_escape_string_basic(const char *src, size_t max_bytes, size_t max_chars,
 		zbx_escape_sequence_t flag);
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
-char		*zbx_db_dyn_escape_like_pattern(const char *src);
+char		*zbx_db_dyn_escape_like_pattern_basic(const char *src);
 
 int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
