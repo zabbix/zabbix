@@ -357,7 +357,7 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 	}
 	else if (1 == seconds)
 	{
-		if (time_from != end_timestamp + 1)
+		if (time_from != end_timestamp - seconds)
 		{
 			zbx_free(sql);
 			goto out;
