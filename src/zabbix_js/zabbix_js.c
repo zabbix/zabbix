@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "zbxembed.h"
 #include "zbxmutexs.h"
 #include "zbxstr.h"
+#include "cfg.h"
 
 const char	*progname;
 const char	title_message[] = "zabbix_js";
@@ -36,6 +37,13 @@ const char	*usage_message[] = {
 
 unsigned char	program_type;
 
+#define JS_TIMEOUT_MIN		1
+#define JS_TIMEOUT_MAX		60
+#define JS_TIMEOUT_DEF		ZBX_ES_TIMEOUT
+#define JS_TIMEOUT_MIN_STR	ZBX_STR(JS_TIMEOUT_MIN)
+#define JS_TIMEOUT_MAX_STR	ZBX_STR(JS_TIMEOUT_MAX)
+#define JS_TIMEOUT_DEF_STR	ZBX_STR(JS_TIMEOUT_DEF)
+
 const char	*help_message[] = {
 	"Execute script using Zabbix embedded scripting engine.",
 	"",
@@ -46,7 +54,9 @@ const char	*help_message[] = {
 	"                               standard input.",
 	"  -p,--param input-param       Specify input parameter",
 	"  -l,--loglevel log-level      Specify log level",
-	"  -t,--timeout timeout         Specify timeout in seconds",
+	"  -t --timeout timeout         Specify the timeout in seconds. Valid range: " JS_TIMEOUT_MIN_STR "-"
+			JS_TIMEOUT_MAX_STR " seconds",
+	"                               (default: " JS_TIMEOUT_DEF_STR " seconds)",
 	"  -h --help                    Display this help message",
 	"  -V --version                 Display version number",
 	"",
@@ -132,6 +142,8 @@ int	main(int argc, char **argv)
 
 	progname = get_program_name(argv[0]);
 
+	zbx_init_library_cfg(program_type);
+
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
 			&zbx_optind)))
@@ -154,7 +166,14 @@ int	main(int argc, char **argv)
 				loglevel = atoi(zbx_optarg);
 				break;
 			case 't':
-				timeout = atoi(zbx_optarg);
+				if (FAIL == zbx_is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &timeout,
+						sizeof(timeout), JS_TIMEOUT_MIN, JS_TIMEOUT_MAX))
+				{
+					zbx_error("Invalid timeout, valid range [" JS_TIMEOUT_MIN_STR ":"
+							JS_TIMEOUT_MAX_STR "] seconds");
+					exit(EXIT_FAILURE);
+				}
+
 				break;
 			case 'h':
 				zbx_help();

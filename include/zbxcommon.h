@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -462,6 +462,7 @@ typedef unsigned char	(*zbx_get_program_type_f)(void);
 typedef const char	*(*zbx_get_progname_f)(void);
 typedef int		(*zbx_get_config_forks_f)(unsigned char process_type);
 typedef const char	*(*zbx_get_config_str_f)(void);
+typedef int		(*zbx_get_config_int_f)(void);
 
 typedef enum
 {

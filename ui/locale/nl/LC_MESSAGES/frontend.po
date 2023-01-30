@@ -1072,6 +1072,10 @@ msgstr ""
 msgid "Advanced labels"
 msgstr "Geavanceerde labels"
 
+#: app/views/popup.import.php:175
+msgid "Advanced options"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
 msgstr ""
@@ -4847,6 +4851,27 @@ msgstr "Coordinaten"
 #: jsLoader.php:164 jsLoader.php:281
 msgid "Copy"
 msgstr "Kopie"
+
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
@@ -12340,6 +12365,14 @@ msgid "Map update failed."
 msgstr "Bijwerken van kaart is mislukt."
 
 #: app/views/popup.ldap.edit.php:257
+msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:513
+msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:257
 msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
 msgstr ""
 
@@ -12487,6 +12520,10 @@ msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:106
 msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and walk only."
 msgstr ""
 
 #: app/views/administration.geomaps.edit.php:98
@@ -20503,6 +20540,10 @@ msgstr ""
 #: include/classes/api/services/CHost.php:1256
 #, c-format
 msgid "Updated status of host \"%1$s\"."
+msgstr ""
+
+#: include/events.inc.php:346
+msgid "Updating"
 msgstr ""
 
 #: app/views/administration.image.edit.php:53

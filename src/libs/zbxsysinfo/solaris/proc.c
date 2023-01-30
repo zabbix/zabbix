@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,8 +32,6 @@
 #if !defined(HAVE_ZONE_H) && defined(HAVE_SYS_UTSNAME_H)
 #	include <sys/utsname.h>
 #endif
-
-extern int	CONFIG_TIMEOUT;
 
 typedef struct
 {
@@ -1006,7 +1004,7 @@ int	proc_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	zbx_timespec(&ts_timeout);
-	ts_timeout.sec += CONFIG_TIMEOUT;
+	ts_timeout.sec += sysinfo_get_config_timeout();
 
 	while (SUCCEED != zbx_procstat_get_util(procname, username, cmdline, zoneflag, period, type, &value, &errmsg))
 	{

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -974,7 +974,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 
 	ipmi_manager_init(&ipmi_manager);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	nextcleanup = time(NULL) + ZBX_IPMI_MANAGER_CLEANUP_DELAY;
 

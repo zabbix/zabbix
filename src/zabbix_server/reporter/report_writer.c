@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -327,7 +327,7 @@ static int	rw_send_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispat
 {
 	int			ret = FAIL;
 	zbx_vector_str_t	recipients;
-	ZBX_DB_MEDIATYPE		mt;
+	zbx_db_mediatype		mt;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

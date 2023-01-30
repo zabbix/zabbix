@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,16 +27,17 @@
  *                                                                            *
  * Purpose: get program type (proxy) specific internal statistics             *
  *                                                                            *
- * Parameters: json         - [OUT]                                           *
- *             config_comms - [IN] proxy config                               *
+ * Parameters: json         - [OUT] json data                                 *
+ *             arg          - [IN] anonymous argument provided by register    *
  *                                                                            *
  * Comments: This function is used to gather proxy specific internal          *
  *           statistics.                                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *config_comms)
+void	zbx_proxy_stats_ext_get(struct zbx_json *json, const void *arg)
 {
-	unsigned int	encryption;
+	const zbx_config_comms_args_t	*config_comms = (const zbx_config_comms_args_t *)arg;
+	unsigned int			encryption;
 
 	zbx_json_addstring(json, "name", ZBX_NULL2EMPTY_STR(config_comms->hostname), ZBX_JSON_TYPE_STRING);
 

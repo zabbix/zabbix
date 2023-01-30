@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -220,9 +220,9 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 	if (NULL != error)
 		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.error", error);
 
-	details_esc = DBdyn_escape_string(details_json.buffer);
+	details_esc = zbx_db_dyn_escape_string(details_json.buffer);
 
-	if (ZBX_DB_OK > DBexecute("insert into auditlog (auditid,userid,username,clock,action,ip,resourceid,"
+	if (ZBX_DB_OK > zbx_db_execute("insert into auditlog (auditid,userid,username,clock,action,ip,resourceid,"
 			"resourcename,resourcetype,recordsetid,details) values ('%s'," ZBX_FS_UI64 ",'%s',%d,'%d','%s',"
 			ZBX_FS_UI64 ",'%s',%d,'%s','%s')", auditid_cuid, userid, username, (int)time(NULL),
 			ZBX_AUDIT_ACTION_EXECUTE, clientip, hostid, hostname, AUDIT_RESOURCE_SCRIPT, auditid_cuid,
@@ -381,10 +381,10 @@ int	zbx_audit_flush_once(void)
 			pvalue = (*audit_entry)->cuid;
 		}
 
-		name_esc = DBdyn_escape_string((*audit_entry)->name);
-		details_esc = DBdyn_escape_string((*audit_entry)->details_json.buffer);
+		name_esc = zbx_db_dyn_escape_string((*audit_entry)->name);
+		details_esc = zbx_db_dyn_escape_string((*audit_entry)->details_json.buffer);
 
-		ret = DBexecute_once("insert into auditlog (auditid,userid,username,"
+		ret = zbx_db_execute_once("insert into auditlog (auditid,userid,username,"
 				"clock,action,ip,%s,resourcename,resourcetype,recordsetid,details) values"
 				" ('%s'," AUDIT_USERID_SQL ",'%s','%d','%d','%s','%s','%s',%d,'%s','%s')",
 				pfield, (*audit_entry)->audit_cuid, AUDIT_USERNAME, (int)time(NULL),
@@ -418,7 +418,7 @@ static int	audit_field_default(const char *table_name, const char *field_name, c
 
 	if ('\0' == cached_table_name[0] || 0 != strcmp(cached_table_name, table_name))
 	{
-		if (NULL == (table = DBget_table(table_name)))
+		if (NULL == (table = zbx_db_get_table(table_name)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot find table '%s'", __func__, table_name);
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -428,7 +428,7 @@ static int	audit_field_default(const char *table_name, const char *field_name, c
 		zbx_strlcpy(cached_table_name, table_name, sizeof(cached_table_name));
 	}
 
-	if (NULL == (field = DBget_field(table, field_name)))
+	if (NULL == (field = zbx_db_get_field(table, field_name)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "%s(): table '%s', cannot find field '%s'", __func__, table_name,
 				field_name);
