@@ -169,7 +169,27 @@ class testTemplate extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix']
-			]
+			],
+			[
+				'request' => [
+					[
+						'host' => 'vendor-template-error',
+						'groups' => ['groupid' => 1],
+						'vendor_name' => 'Zabbix'
+					]
+				],
+				'expected_error' => 'Invalid parameter "vendor_version": cannot be empty.'
+			],
+			[
+				'request' => [
+					[
+						'host' => 'vendor-template',
+						'groups' => ['groupid' => 1],
+						'vendor_name' => 'Zabbix',
+						'vendor_version' => '6.4-0'
+					]
+				]
+			],
 		];
 	}
 
