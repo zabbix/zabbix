@@ -104,9 +104,9 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
 	switch (mtag->op)
 	{
 		case ZBX_CONDITION_OPERATOR_EXIST:
-			return i == etags->values_num ? FAIL : SUCCEED;
+			return i == etags->values_num || 0 < ret ? FAIL : SUCCEED;
 		case ZBX_CONDITION_OPERATOR_NOT_EXIST:
-			return i == etags->values_num ? SUCCEED : FAIL;
+			return i == etags->values_num || 0 < ret ? SUCCEED : FAIL;
 	}
 
 	if (i == etags->values_num || 0 < ret)

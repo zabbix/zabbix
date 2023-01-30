@@ -63,6 +63,39 @@ static unsigned char	get_operator(const char *op_str)
 	return op;
 }
 
+static const char	*get_operator_str(unsigned char op)
+{
+	const char	*op_str;
+
+	switch (op)
+	{
+		case ZBX_CONDITION_OPERATOR_EQUAL:
+			op_str = "ZBX_CONDITION_OPERATOR_EQUAL";
+			break;
+		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+			op_str = "ZBX_CONDITION_OPERATOR_NOT_EQUAL";
+			break;
+		case ZBX_CONDITION_OPERATOR_LIKE:
+			op_str = "ZBX_CONDITION_OPERATOR_LIKE";
+			break;
+		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
+			op_str = "ZBX_CONDITION_OPERATOR_NOT_LIKE";
+			break;
+		case ZBX_CONDITION_OPERATOR_EXIST:
+			op_str = "ZBX_CONDITION_OPERATOR_EXIST";
+			break;
+		case ZBX_CONDITION_OPERATOR_NOT_EXIST:
+			op_str = "ZBX_CONDITION_OPERATOR_NOT_EXIST";
+			break;
+		default:
+			op_str = "unknown operator value";
+			fail_msg("unknown operator value '%d'", op);
+			break;
+	}
+
+	return op_str;
+}
+
 static void	get_mtags(zbx_mock_handle_t handle, zbx_vector_match_tags_t *tags)
 {
 	zbx_mock_error_t	mock_err;
@@ -102,6 +135,32 @@ static void	get_etags(zbx_mock_handle_t handle, zbx_vector_tags_t *tags)
 	zbx_vector_tags_sort(tags, zbx_compare_tags);
 }
 
+void	dump_debug_info(const zbx_vector_match_tags_t *mtags, const zbx_vector_tags_t *etags, int expected_ret,
+		int returned_ret)
+{
+	printf("\n");
+
+	printf("mtags (%d):\n", mtags->values_num);
+	for (int i = 0; i < mtags->values_num; i++)
+	{
+		printf("- tag: '%s', value: '%s', op: %s\n",
+				mtags->values[i]->tag, mtags->values[i]->value, get_operator_str(mtags->values[i]->op));
+	}
+	printf("\n");
+
+	printf("etags (%d):\n", etags->values_num);
+	for (int i = 0; i < etags->values_num; i++)
+	{
+		printf("- tag: '%s', value: '%s'\n", etags->values[i]->tag, etags->values[i]->value);
+	}
+	printf("\n");
+
+	printf("expected_ret = %d\n", expected_ret);
+	printf("returned_ret = %d\n", returned_ret);
+
+	printf("\n");
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	int			eval_type;
@@ -121,20 +180,10 @@ void	zbx_mock_test_entry(void **state)
 	returned_ret = zbx_match_tags(eval_type, &mtags, &etags);
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-
-	printf("\n");
-	printf("mtags (%d):\n", mtags.values_num);
-	for (int i = 0; i < mtags.values_num; i++)
+	if (returned_ret != expected_ret)
 	{
-		printf("- tag: '%s', value: '%s', op: '%d'\n", mtags.values[i]->tag, mtags.values[i]->value, mtags.values[i]->op);
+		dump_debug_info(&mtags, &etags, expected_ret, returned_ret);
 	}
-	printf("etags (%d):\n", etags.values_num);
-	for (int i = 0; i < etags.values_num; i++)
-	{
-		printf("- tag: '%s', value: '%s'\n", etags.values[i]->tag, etags.values[i]->value);
-	}
-	printf("\n");
-
 
 	zbx_mock_assert_int_eq("tagfilter_match_tags return value", expected_ret, returned_ret);
 
