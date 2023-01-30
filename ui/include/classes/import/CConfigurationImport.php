@@ -2148,7 +2148,7 @@ class CConfigurationImport {
 				}
 
 				if ($valuemapid !== null) {
-					$valuemapids[$valuemapid] = [];
+					$valuemapids[$valuemapid] = true;
 				}
 			}
 		}
@@ -2163,8 +2163,6 @@ class CConfigurationImport {
 
 		if ($del_valuemapids) {
 			API::ValueMap()->delete(array_keys($del_valuemapids));
-
-			$this->referencer->refreshValueMaps();
 		}
 	}
 

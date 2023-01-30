@@ -1187,13 +1187,6 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Unset value map refs to make referencer select them from db again.
-	 */
-	public function refreshValueMaps(): void {
-		$this->db_valuemaps = null;
-	}
-
-	/**
 	 * Select item ids for previously added item keys.
 	 */
 	protected function selectItems(): void {
