@@ -22,10 +22,14 @@
 /**
  * @var CView $this
  */
+
+$show_gui_messaging = !defined('ZBX_PAGE_NO_MENU') || $data['web_layout_mode'] == ZBX_LAYOUT_KIOSKMODE
+	? (int)!CWebUser::isGuest()
+	: null;
 ?>
 
 <script type="text/javascript">
-	jQuery(document).ready(function() {
+	$(function() {
 		<?php if (isset($page['scripts']) && in_array('flickerfreescreen.js', $page['scripts'])): ?>
 			window.flickerfreeScreen.responsiveness = <?php echo SCREEN_REFRESH_RESPONSIVENESS * 1000; ?>;
 		<?php endif ?>
@@ -33,6 +37,10 @@
 		// the chkbxRange.init() method must be called after the inserted post scripts and initializing cookies
 		cookie.init();
 		chkbxRange.init();
+
+		<?php if ($show_gui_messaging): ?>
+			startGuiNotifications(<?= json_encode(CCsrfTokenHelper::get('notifications')) ?>);
+		<?php endif ?>
 	});
 
 	/**
@@ -83,17 +91,5 @@
 				_csrf_token: <?= json_encode(CCsrfTokenHelper::get('favorite')) ?>
 			}
 		});
-	}
-
-	/**
-	 * Registering notifications instance.
-	 * Notifications code is included by jsLoader for all user types except guest.
-	 */
-	if (typeof window['ZBX_Notifications'] === 'function') {
-		ZABBIX.namespace('instances.notifications', new ZBX_Notifications(
-			ZABBIX.namespace('instances.localStorage'),
-			ZABBIX.namespace('instances.browserTab'),
-			<?= json_encode(CCsrfTokenHelper::get('notifications')) ?>
-		));
 	}
 </script>
