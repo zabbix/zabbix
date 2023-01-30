@@ -76,17 +76,13 @@ class CImportDataAdapter {
 		$templates = [];
 
 		if (array_key_exists('templates', $this->data)) {
+			$vendor_defaults = ['name' => '', 'version' => ''];
+
 			foreach ($this->data['templates'] as $template) {
 				$template = CArrayHelper::renameKeys($template, ['template' => 'host']);
-
-				if (array_key_exists('vendor', $template) && is_array($template['vendor'])) {
-					foreach ($template['vendor'] as $field => $value) {
-						$template['vendor_'.$field] = $value;
-					}
-
-					unset($template['vendor']);
-				}
-
+				$vendor = $template['vendor'] + $vendor_defaults;
+				$template['vendor_name'] = $vendor['name'];
+				$template['vendor_version'] = $vendor['version'];
 				$templates[] = CArrayHelper::getByKeys($template, [
 					'uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags',
 					'valuemaps', 'vendor_name', 'vendor_version'
