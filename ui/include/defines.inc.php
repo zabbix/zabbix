@@ -1956,6 +1956,7 @@ define('ZBX_STYLE_ACTION_ICON_SEV_DOWN', 'icon-action-severity-down');
 define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause'); // TODO - AS: check. ZBXNEXT-7964
 define('ZBX_STYLE_ACTION_ICON_SYMPTOM', 'icon-action-symptom'); // TODO - AS: check. ZBXNEXT-7964
 define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');
+define('ZBX_STYLE_PROBLEM_LIST', 'problem-list');
 define('ZBX_STYLE_PROBLEM_RECOVERY', 'icon-problem-recovery');
 define('ZBX_STYLE_ACTIONS_NUM_GRAY', 'icon-actions-number-gray');
 define('ZBX_STYLE_ACTIONS_NUM_YELLOW', 'icon-actions-number-yellow');

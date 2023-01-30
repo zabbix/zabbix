@@ -1017,6 +1017,8 @@ class CScreenProblem extends CScreenBase {
 				$header[] = $header_clock;
 			}
 
+			$table = (new CTableInfo())->addClass(ZBX_STYLE_PROBLEM_LIST);
+
 			// Create table.
 			if ($this->data['filter']['compact_view']) {
 				if ($this->data['filter']['show_tags'] == SHOW_TAGS_NONE) {
@@ -1038,47 +1040,45 @@ class CScreenProblem extends CScreenBase {
 					}
 				}
 
-				$table = (new CTableInfo())
-					->setHeader(array_merge($header, [
-						make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
-							$link
-						)->addStyle('width: 120px;'),
-						$show_recovery_data ? (new CColHeader(_('Recovery time')))->addStyle('width: 115px;') : null,
-						$show_recovery_data ? (new CColHeader(_('Status')))->addStyle('width: 70px;') : null,
-						(new CColHeader(_('Info')))->addStyle('width: 24px;'),
-						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
-							->addStyle('width: 42%;'),
-						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
-							->addStyle('width: 58%;'),
-						(new CColHeader(_('Duration')))->addStyle('width: 73px;'),
-						(new CColHeader(_('Update')))->addStyle('width: 40px;'),
-						(new CColHeader(_('Actions')))->addStyle('width: 64px;'),
-						$tags_header
-					]))
-						->addClass(ZBX_STYLE_COMPACT_VIEW)
-						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+				$table->setHeader(array_merge($header, [
+					make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
+						$link
+					)->addStyle('width: 120px;'),
+					$show_recovery_data ? (new CColHeader(_('Recovery time')))->addStyle('width: 115px;') : null,
+					$show_recovery_data ? (new CColHeader(_('Status')))->addStyle('width: 70px;') : null,
+					(new CColHeader(_('Info')))->addStyle('width: 24px;'),
+					make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
+						->addStyle('width: 42%;'),
+					make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
+						->addStyle('width: 58%;'),
+					(new CColHeader(_('Duration')))->addStyle('width: 73px;'),
+					(new CColHeader(_('Update')))->addStyle('width: 40px;'),
+					(new CColHeader(_('Actions')))->addStyle('width: 64px;'),
+					$tags_header
+				]))
+					->addClass(ZBX_STYLE_COMPACT_VIEW)
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 			}
 			else {
-				$table = (new CTableInfo())
-					->setHeader(array_merge($header, [
-						make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
-							$link
-						),
-						$show_recovery_data
-							? (new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH)
-							: null,
-						$show_recovery_data ? _('Status') : null,
-						_('Info'),
-						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
-						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
-						($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY)
-							? _('Operational data')
-							: null,
-						_('Duration'),
-						_('Update'),
-						_('Actions'),
-						$this->data['filter']['show_tags'] ? _('Tags') : null
-					]));
+				$table->setHeader(array_merge($header, [
+					make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
+						$link
+					),
+					$show_recovery_data
+						? (new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH)
+						: null,
+					$show_recovery_data ? _('Status') : null,
+					_('Info'),
+					make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
+					make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
+					($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY)
+						? _('Operational data')
+						: null,
+					_('Duration'),
+					_('Update'),
+					_('Actions'),
+					$this->data['filter']['show_tags'] ? _('Tags') : null
+				]));
 			}
 
 			$tags = $this->data['filter']['show_tags']
@@ -1132,9 +1132,7 @@ class CScreenProblem extends CScreenBase {
 				]
 			], 'problem');
 
-			return $this->getOutput(
-				$form->addItem([$table->addClass('problem-list'), $paging, $footer]), false, $this->data
-			);
+			return $this->getOutput($form->addItem([$table, $paging, $footer]), false, $this->data);
 		}
 
 		/*

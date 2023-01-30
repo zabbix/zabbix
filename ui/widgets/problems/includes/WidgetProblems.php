@@ -35,10 +35,7 @@ use CTableInfo,
 	CHintBoxHelper,
 	CMenuPopupHelper,
 	CSeverityHelper,
-	CMacrosResolverHelper,
-	CWebUser;
-
-use Widgets\Problems\Widget;
+	CMacrosResolverHelper;
 
 class WidgetProblems extends CTableInfo {
 	private array $data;
@@ -50,6 +47,8 @@ class WidgetProblems extends CTableInfo {
 	}
 
 	private function build(): void {
+		$this->addClass(ZBX_STYLE_PROBLEM_LIST);
+
 		$sort_div = (new CSpan())->addClass(
 			($this->data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP
 		);
@@ -124,7 +123,6 @@ class WidgetProblems extends CTableInfo {
 			'show_recovery_data' => $show_recovery_data
 		];
 
-		$this->addClass('problem-list');
 		$this->addProblemsToTable($this->data['problems'], $this->data);
 
 		if ($this->data['info'] !== '') {
