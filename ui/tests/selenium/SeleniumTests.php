@@ -245,6 +245,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUpdateProblem');
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testPageHistory');
+		$suite->addTestSuite('testPageHostGraph');
 		$suite->addTestSuite('testPageHostInterfaces');
 		$suite->addTestSuite('testPageHostPrototypes');
 		$suite->addTestSuite('testPageHosts');
