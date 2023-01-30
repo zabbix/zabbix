@@ -1,9 +1,9 @@
 @font-face {
   font-family: "zabbix-icons";
-  src: url("zabbix-icons.woff2?t=1674637999940") format("woff2"),
-  url("zabbix-icons.woff?t=1674637999940") format("woff"),
-  url('zabbix-icons.ttf?t=1674637999940') format('truetype'),
-  url('zabbix-icons.svg?t=1674637999940#zabbix-icons') format('svg');
+  src: url("zabbix-icons.woff2?t=1675074678109") format("woff2"),
+  url("zabbix-icons.woff?t=1675074678109") format("woff"),
+  url('zabbix-icons.ttf?t=1675074678109') format('truetype'),
+  url('zabbix-icons.svg?t=1675074678109#zabbix-icons') format('svg');
 }
 
 [class^="zi-"]::before, [class*=" zi-"]::before {
@@ -93,28 +93,29 @@
 .zi-play:before { content: "\ea4e"; }
 .zi-plus:before { content: "\ea4f"; }
 .zi-reload:before { content: "\ea50"; }
-.zi-report:before { content: "\ea51"; }
-.zi-search:before { content: "\ea52"; }
-.zi-signout:before { content: "\ea53"; }
-.zi-speaker-off:before { content: "\ea54"; }
-.zi-speaker:before { content: "\ea55"; }
-.zi-star-filled:before { content: "\ea56"; }
-.zi-star:before { content: "\ea57"; }
-.zi-stop-sign:before { content: "\ea58"; }
-.zi-support:before { content: "\ea59"; }
-.zi-text:before { content: "\ea5a"; }
-.zi-time-period:before { content: "\ea5b"; }
-.zi-trash:before { content: "\ea5c"; }
-.zi-triangle-flipped-warning:before { content: "\ea5d"; }
-.zi-triangle-warning:before { content: "\ea5e"; }
-.zi-uncheck:before { content: "\ea5f"; }
-.zi-user-filled:before { content: "\ea60"; }
-.zi-user:before { content: "\ea61"; }
-.zi-users-filled:before { content: "\ea62"; }
-.zi-users:before { content: "\ea63"; }
-.zi-widget-add:before { content: "\ea64"; }
-.zi-widget-resize:before { content: "\ea65"; }
-.zi-wrench-alt:before { content: "\ea66"; }
-.zi-wrench:before { content: "\ea67"; }
-.zi-z:before { content: "\ea68"; }
+.zi-remove:before { content: "\ea51"; }
+.zi-report:before { content: "\ea52"; }
+.zi-search:before { content: "\ea53"; }
+.zi-signout:before { content: "\ea54"; }
+.zi-speaker-off:before { content: "\ea55"; }
+.zi-speaker:before { content: "\ea56"; }
+.zi-star-filled:before { content: "\ea57"; }
+.zi-star:before { content: "\ea58"; }
+.zi-stop-sign:before { content: "\ea59"; }
+.zi-support:before { content: "\ea5a"; }
+.zi-text:before { content: "\ea5b"; }
+.zi-time-period:before { content: "\ea5c"; }
+.zi-trash:before { content: "\ea5d"; }
+.zi-triangle-flipped-warning:before { content: "\ea5e"; }
+.zi-triangle-warning:before { content: "\ea5f"; }
+.zi-uncheck:before { content: "\ea60"; }
+.zi-user-filled:before { content: "\ea61"; }
+.zi-user:before { content: "\ea62"; }
+.zi-users-filled:before { content: "\ea63"; }
+.zi-users:before { content: "\ea64"; }
+.zi-widget-add:before { content: "\ea65"; }
+.zi-widget-resize:before { content: "\ea66"; }
+.zi-wrench-alt:before { content: "\ea67"; }
+.zi-wrench:before { content: "\ea68"; }
+.zi-z:before { content: "\ea69"; }
 

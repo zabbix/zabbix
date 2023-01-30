@@ -54,6 +54,10 @@ $overlay-bg-color: #ffffff !default;
 $overlay-border-color: #ccd5d9 !default;
 
 // Icons
+$icon-btn-icon-color: lighten(#768d99, 25%) !default;
+$icon-btn-icon-hover-color: #768d99 !default;
+$icon-btn-icon-disabled-color: lighten(#768d99, 35%) !default;
+
 $icon-color: #768d99 !default;
 $icon-hint-color: #768d99 !default;
 $icon-calendar-color: #acbbc2 !default;

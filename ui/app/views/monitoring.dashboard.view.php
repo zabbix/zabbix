@@ -106,7 +106,7 @@ $html_page = (new CHtmlPage())
 							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
 					)
 					->addItem(
-						(new CButton('', '&nbsp;'))
+						(new CButton(null))
 							->addClass(ZBX_STYLE_BTN_ACTION)
 							->addClass(ZBX_ICON_MENU)
 							->setId('dashboard-actions')

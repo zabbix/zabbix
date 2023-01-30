@@ -1,4 +1,4 @@
-%btn-icon {
+%btn-icon { // TODO - AS: should be checked and removed
 	display: inline-block;
 	width: 18px;
 	height: 18px;
@@ -24,7 +24,7 @@
 	}
 }
 
-%btn-remove-icon {
+%btn-remove-icon { // TODO - AS: should be checked and removed
 	font-size: 20px;
 	color: $font-alt-color;
 	text-align: center;
@@ -41,6 +41,139 @@
 	&:active {
 		color: $font-alt-color;
 		outline: none;
+	}
+}
+
+button {
+	min-height: 24px;
+	padding: 0 11px;
+	margin: 0;
+	font-family: $font-stack;
+	font-size: $font-form-size;
+	color: $btn-font-color;
+	cursor: pointer;
+	background-color: $btn-bg-color;
+	border: 1px solid $btn-bg-color;
+	border-radius: 2px;
+	outline: 0;
+
+	@if $ui-transitions {
+		transition: border-color .2s ease-out, background-color .2s ease-out;
+	}
+
+	&:hover {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px rgba($blue, .35);
+
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:active {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&::-moz-focus-inner {
+		padding: 0;
+		border: 0;
+		vertical-align: middle;
+	}
+
+	&[class^="zi-"],
+	&[class*=" zi-"] {
+
+		&:empty {
+			width: 24px;
+			padding: 0;
+		}
+
+		&::before {
+			vertical-align: middle;
+			font-size: $btn-icon-size;
+
+			@if $ui-transitions {
+				transition: color $ui-transition-duration ease-out;
+			}
+		}
+	}
+
+	&[disabled] {
+		cursor: default;
+
+		&,
+		&:hover,
+		&:focus,
+		&:active {
+			color: $btn-disabled-font-color;
+			background-color: $btn-disabled-bg-color;
+			border-color: $btn-disabled-border-color;
+		}
+	}
+}
+
+.btn-alt {
+	color: $btn-alt-font-color;
+	background-color: $btn-alt-bg-color;
+
+	&:hover,
+	&:focus,
+	&:active {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+}
+
+.btn-grey {
+	color: $btn-form-font-color;
+	background-color: $btn-form-bg-color;
+	border-color: $btn-form-border-color;
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: $btn-form-font-color;
+		background-color: $btn-form-hover-color;
+		border-color: $btn-form-border-color;
+	}
+
+	&:focus,
+	&:active {
+		border-color: $form-border-focus-color;
+	}
+}
+
+.btn-icon {
+	background: transparent;
+	border: none;
+
+	&::before {
+		color: $icon-btn-icon-color;
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+		background: transparent;
+
+		&::before {
+			color: $icon-btn-icon-hover-color;
+		}
+	}
+
+	&[disabled] {
+		cursor: default;
+
+		&,
+		&:hover,
+		&:focus,
+		&:active {
+			background: transparent;
+
+			&::before {
+				color: $icon-btn-icon-disabled-color;
+			}
+		}
 	}
 }
 

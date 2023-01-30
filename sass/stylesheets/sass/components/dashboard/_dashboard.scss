@@ -57,27 +57,28 @@
 				padding: 0;
 			}
 
-			.zi-plus { // TODO - AS: need to check
-				vertical-align: middle;
-				width: unset;
-				height: unset;
-				padding: 0 11px 0 8px;
-				color: $btn-alt-font-color;
-				background-color: $btn-alt-bg-color;
-				font-size: 100%;
+			// TODO - AS: need to check
+			//.zi-plus {
+			//	vertical-align: middle;
+			//	width: unset;
+			//	height: unset;
+			//	padding: 0 11px 0 8px;
+			//	color: $btn-alt-font-color;
+			//	background-color: $btn-alt-bg-color;
+			//	font-size: 100%;
 
-				&:hover,
-				&:focus,
-				&:active {
-					@include btn-hover-active($btn-font-color, $btn-bg-color);
-				}
+			//	&:hover,
+			//	&:focus,
+			//	&:active {
+			//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+			//	}
 
-				&::before {
-					padding-right: 5px;
-					vertical-align: middle;
-					font-size: 8px;
-				}
-			}
+			//	&::before {
+			//		padding-right: 5px;
+			//		vertical-align: middle;
+			//		font-size: 8px;
+			//	}
+			//}
 		}
 	}
 

@@ -161,7 +161,7 @@ function get_icon($type, $params = []) {
 
 		case 'kioskmode':
 			if ($params['mode'] == ZBX_LAYOUT_KIOSKMODE) {
-				$icon = (new CButton(null, '&nbsp;'))
+				$icon = (new CButton(null))
 					->setTitle(_('Normal view'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
 					->addClass(ZBX_LAYOUT_MODE)
@@ -170,7 +170,7 @@ function get_icon($type, $params = []) {
 					->addClass(ZBX_ICON_MINIMIZE);
 			}
 			else {
-				$icon = (new CButton(null, '&nbsp;'))
+				$icon = (new CButton(null))
 					->setTitle(_('Kiosk mode'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
 					->addClass(ZBX_LAYOUT_MODE)

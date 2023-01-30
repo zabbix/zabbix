@@ -594,6 +594,16 @@
 	.list-table-actions {
 		text-align: right;
 		white-space: nowrap;
+
+		.btn-icon {
+			width: 18px;
+			min-height: 18px;
+			vertical-align: top;
+
+			&:not(:first-of-type) {
+				margin-left: 5px;
+			}
+		}
 	}
 
 	&.sticky-header {
@@ -629,40 +639,41 @@
 		}
 	}
 
-	.list-table-actions {
-		@extend %btn-reset;
+	// TODO - AS: check
+	//.list-table-actions {
+		//@extend %btn-reset;
 
-		.zi-plus,
-		.zi-pencil {
-			vertical-align: middle;
-			display: inline-block;
-			width: 18px;
-			height: 18px;
-			min-height: unset;
-			min-width: unset;
-			padding: 0;
-			margin-right: 5px;
+	//	.zi-plus,
+	//	.zi-pencil {
+	//		vertical-align: middle;
+	//		display: inline-block;
+	//		width: 18px;
+	//		height: 18px;
+	//		min-height: unset;
+	//		min-width: unset;
+	//		padding: 0;
+	//		margin-right: 5px;
 
-			opacity: 0.5;
-			transition: transform $ui-transition-duration;
-			&::before {
-				vertical-align: middle;
-				color: $icon-color;
-				font-size: 18px;
-			}
+	//		opacity: 0.5;
+	//		transition: transform $ui-transition-duration;
+	//		&::before {
+	//			vertical-align: middle;
+	//			color: $icon-color;
+	//			font-size: 18px;
+	//		}
 
-			&:hover,
-			&:active,
-			&:focus {
-				opacity: 1;
-			}
-			&:focus {
-				box-shadow: 0 0 0 2px $btn-border-focus-color;
-			}
+	//		&:hover,
+	//		&:active,
+	//		&:focus {
+	//			opacity: 1;
+	//		}
+	//		&:focus {
+	//			box-shadow: 0 0 0 2px $btn-border-focus-color;
+	//		}
 
-			@extend %btn-reset;
-		}
-	}
+	//		@extend %btn-reset;
+	//	}
+	//}
 
 	a,
 	button {

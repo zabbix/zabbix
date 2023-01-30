@@ -46,20 +46,20 @@ header {
 			}
 		}
 
-		.zi-cog-filled,
-		.zi-menu,
-		.zi-fullscreen {
-			@extend %button-icon-size;
+		//.zi-cog-filled,
+		//.zi-menu,
+		//.zi-fullscreen {
+		//	@extend %button-icon-size;
 
-			vertical-align: top;
-			line-height: 0;
-			font-size: 0;
+		//	vertical-align: top;
+		//	line-height: 0;
+		//	font-size: 0;
 
-			&::before {
-				vertical-align: middle;
-				font-size: 17px;
-			}
-		}
+		//	&::before {
+		//		vertical-align: middle;
+		//		font-size: 17px;
+		//	}
+		//}
 
 		.zi-star,
 		.zi-star-filled {

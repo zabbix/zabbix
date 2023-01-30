@@ -115,21 +115,24 @@ foreach ($data['services'] as $serviceid => $service) {
 		$data['tags'][$serviceid],
 		(new CCol([
 			(new CButton(null))
-				->addClass(ZBX_STYLE_BTN_ADD)
+				->addClass(ZBX_STYLE_BTN_ICON)
+				->addClass(ZBX_STYLE_BTN_ADD) // TODO - AS: check if needed
 				->addClass(ZBX_ICON_PLUS)
 				->addClass('js-add-child-service')
 				->setAttribute('data-serviceid', $serviceid)
 				->setTitle(_('Add child service'))
 				->setEnabled(!$service['readonly'] && $service['problem_tags'] == 0),
 			(new CButton(null))
-				->addClass(ZBX_STYLE_BTN_EDIT)
+				->addClass(ZBX_STYLE_BTN_ICON)
+				->addClass(ZBX_STYLE_BTN_EDIT) // TODO - AS: check if needed
 				->addClass(ZBX_ICON_PENCIL)
 				->addClass('js-edit-service')
 				->setAttribute('data-serviceid', $serviceid)
 				->setTitle(_('Edit'))
 				->setEnabled(!$service['readonly']),
 			(new CButton(null))
-				->addClass(ZBX_STYLE_BTN_REMOVE)
+				->addClass(ZBX_STYLE_BTN_ICON)
+				->addClass(ZBX_ICON_REMOVE)
 				->addClass('js-delete-service')
 				->setAttribute('data-serviceid', $serviceid)
 				->setTitle(_('Delete'))

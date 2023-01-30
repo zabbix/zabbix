@@ -6,8 +6,9 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20220722';
-$browser-sprite-path: '../img/browser-sprite.png?20220722';
+$sprite-path: '../img/icon-sprite.svg?20220722'; // TODO - AS: should be removed
+$icons-path: '../fonts/';
+$browser-sprite: '../img/browser-sprite.png?20220722';
 
 @import "utils/mixins";
 
@@ -1485,7 +1486,7 @@ select {
 	color: $btn-alt-font-color;
 	background-color: $btn-alt-bg-color;
 
-	.plus-icon {
+	.plus-icon { // TODO - AS: should be checked and removed
 		background-color: $btn-alt-font-color;
 		margin-right: 8px;
 
@@ -1497,7 +1498,7 @@ select {
 	&:hover {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 
-		.plus-icon {
+		.plus-icon { // TODO - AS: should be checked and removed
 			background-color: $btn-font-color;
 
 			&::after {
@@ -1509,7 +1510,7 @@ select {
 	&:focus {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 
-		.plus-icon {
+		.plus-icon { // TODO - AS: should be checked and removed
 			background-color: $btn-font-color;
 
 			&::after {
@@ -1521,7 +1522,7 @@ select {
 	&:active {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 
-		.plus-icon {
+		.plus-icon { // TODO - AS: should be checked and removed
 			background-color: $btn-font-color;
 
 			&::after {
@@ -1531,41 +1532,41 @@ select {
 	}
 }
 
-button::-moz-focus-inner {
-	padding: 0;
-	border: 0;
-	vertical-align: middle;
-}
+// button::-moz-focus-inner {
+//	padding: 0;
+//	border: 0;
+//	vertical-align: middle;
+// }
 
-button {
-	font: {
-		family: $font-stack;
-		size: $font-form-size;
-	}
-	background-color: $btn-bg-color;
-	border: 1px solid $btn-bg-color;
-	border-radius: 2px;
-	color: $btn-font-color;
-	margin: 0;
-	padding: 0 11px;
-	min-height: 24px;
-	cursor: pointer;
-	outline: 0;
-	transition: border-color .2s ease-out, background-color .2s ease-out;
+// button {
+//	font: {
+//		family: $font-stack;
+//		size: $font-form-size;
+//	}
+//	background-color: $btn-bg-color;
+//	border: 1px solid $btn-bg-color;
+//	border-radius: 2px;
+//	color: $btn-font-color;
+//	margin: 0;
+//	padding: 0 11px;
+//	min-height: 24px;
+//	cursor: pointer;
+//	outline: 0;
+//	transition: border-color .2s ease-out, background-color .2s ease-out;
 
-	&:hover {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
+//	&:hover {
+//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+//	}
 
-	&:focus {
-		box-shadow: 0 0 0 2px rgba($blue, .35);
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
+//	&:focus {
+//		box-shadow: 0 0 0 2px rgba($blue, .35);
+//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+//	}
 
-	&:active {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
-}
+//	&:active {
+//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+//	}
+//}
 
 .btn-tag {
 	@extend .tag;
@@ -1583,30 +1584,30 @@ button {
 	}
 }
 
-.btn-grey {
-	color: $btn-form-font-color;
-	background-color: $btn-form-bg-color;
-	border-color: $btn-form-border-color;
-	vertical-align: top;
+//.btn-grey {
+//	color: $btn-form-font-color;
+//	background-color: $btn-form-bg-color;
+//	border-color: $btn-form-border-color;
+//	vertical-align: top;
 
-	&:hover {
-		color: $btn-form-font-color;
-		background-color: $btn-form-hover-color;
-		border-color: $btn-form-border-color;
-	}
+//	&:hover {
+//		color: $btn-form-font-color;
+//		background-color: $btn-form-hover-color;
+//		border-color: $btn-form-border-color;
+//	}
 
-	&:focus {
-		color: $btn-form-font-color;
-		background-color: $btn-form-hover-color;
-		border-color: $form-border-focus-color;
-	}
+//	&:focus {
+//		color: $btn-form-font-color;
+//		background-color: $btn-form-hover-color;
+//		border-color: $form-border-focus-color;
+//	}
 
-	&:active {
-		color: $btn-form-font-color;
-		background-color: $btn-form-hover-color;
-		border-color: $form-border-focus-color;
-	}
-}
+//	&:active {
+//		color: $btn-form-font-color;
+//		background-color: $btn-form-hover-color;
+//		border-color: $form-border-focus-color;
+//	}
+//}
 
 .btn-link {
 	position: relative;
@@ -1960,27 +1961,8 @@ button {
 }
 
 .calendar-control {
-	.zi-calendar {
-		vertical-align: middle;
-		position: relative;
-		padding: 0 1px;
-
-		@extend %btn-reset;
-
-		opacity: .7;
-
-		&::before {
-			font-size: 24px;
-			color: $icon-calendar-color;
-		}
-
-		&:focus,
-		&:hover,
-		&:active {
-			opacity: 1;
-		}
-
-		transition: opacity $ui-transition-duration ease-out;
+	.zi-calendar::before {
+		font-size: 22px;
 	}
 }
 
@@ -2071,22 +2053,6 @@ button {
 	padding: 0;
 }
 
-%btn-disabled {
-	color: $btn-disabled-font-color !important;
-	background-color: $btn-disabled-bg-color;
-	border-color: $btn-disabled-border-color !important;
-	cursor: default;
-
-	&.zi-calendar {
-		opacity: .3;
-		background-color: transparent;
-
-		&::before {
-			vertical-align: middle;
-		}
-	}
-}
-
 %form-disabled {
 	color: $form-disabled-font-color;
 	background-color: $form-disabled-bg-color !important;
@@ -2102,18 +2068,6 @@ button {
 %btn-widget-hover-active {
 	background-color: $transparent;
 	opacity: 1;
-}
-
-button[disabled] {
-	@extend %btn-disabled;
-
-	&:hover {
-		@extend %btn-disabled;
-	}
-
-	&:active {
-		@extend %btn-disabled;
-	}
 }
 
 .action-buttons {
@@ -3909,7 +3863,7 @@ $browser-logos: (
 );
 
 %browser-logo-style {
-	background: url($browser-sprite-path) no-repeat;
+	background: url($browser-sprite) no-repeat;
 	width: 66px;
 	height: 66px;
 	margin: 0 auto;
@@ -4504,37 +4458,38 @@ svg {
 						}
 					}
 
-					.zi-plus,
-					.zi-copy,
-					.zi-pencil {
-						vertical-align: middle;
-						display: inline-block;
-						width: 18px;
-						height: 18px;
-						min-height: unset;
-						min-width: unset;
-						padding: 0;
-						margin-right: 5px;
+					// TODO - AS: check
+					//.zi-plus,
+					//.zi-copy,
+					//.zi-pencil {
+					//	vertical-align: middle;
+					//	display: inline-block;
+					//	width: 18px;
+					//	height: 18px;
+					//	min-height: unset;
+					//	min-width: unset;
+					//	padding: 0;
+					//	margin-right: 5px;
 
-						opacity: 0.5;
-						transition: transform $ui-transition-duration;
-						&::before {
-							vertical-align: middle;
-							color: $icon-color;
-							font-size: 18px;
-						}
+					//	opacity: 0.5;
+					//	transition: transform $ui-transition-duration;
+					//	&::before {
+					//		vertical-align: middle;
+					//		color: $icon-color;
+					//		font-size: 18px;
+					//	}
 
-						&:hover,
-						&:active,
-						&:focus {
-							opacity: 1;
-						}
-						&:focus {
-							box-shadow: 0 0 0 2px $btn-border-focus-color;
-						}
+					//	&:hover,
+					//	&:active,
+					//	&:focus {
+					//		opacity: 1;
+					//	}
+					//	&:focus {
+					//		box-shadow: 0 0 0 2px $btn-border-focus-color;
+					//	}
 
-						@extend %btn-reset;
-					}
+					//	@extend %btn-reset;
+					//}
 				}
 
 				> .content {
@@ -4730,35 +4685,36 @@ a.icon-count {
 	}
 }
 
-.zi-plus {
-	vertical-align: middle;
-	width: unset;
-	height: unset;
+// TODO - AS: check
+//.zi-plus {
+//	vertical-align: middle;
+//	width: unset;
+//	height: unset;
 
-	padding: 0 11px 0 8px;
-	color: $btn-alt-font-color;
-	background-color: $btn-alt-bg-color;
-	font-size: 100%;
+//	padding: 0 11px 0 8px;
+//	color: $btn-alt-font-color;
+//	background-color: $btn-alt-bg-color;
+//	font-size: 100%;
 
-	&::before {
-		padding-right: 5px;
-		vertical-align: middle;
+//	&::before {
+//		padding-right: 5px;
+//		vertical-align: middle;
 
-		font-size: 8px;
-	}
+//		font-size: 8px;
+//	}
 
-	&:hover {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
+//	&:hover {
+//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+//	}
 
-	&:focus {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
+//	&:focus {
+//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+//	}
 
-	&:active {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
-}
+//	&:active {
+//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+//	}
+//}
 
 .icon-doc-link {
 	display: inline-block;
