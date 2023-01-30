@@ -32,7 +32,7 @@ abstract class CGraphDraw {
 	protected $from_time;
 	protected $to_time;
 	private $colors;
-	private $colorsrgb;
+	protected $colorsrgb;
 	protected $im;
 	protected $period;
 	protected $sizeX;
@@ -271,30 +271,5 @@ abstract class CGraphDraw {
 		}
 
 		return get_color($this->im, $color, $alfa);
-	}
-
-	public function getShadow($color, $alpha = 0) {
-		if (isset($this->colorsrgb[$color])) {
-			$red = $this->colorsrgb[$color][0];
-			$green = $this->colorsrgb[$color][1];
-			$blue = $this->colorsrgb[$color][2];
-		}
-		else {
-			list($red, $green, $blue) = hex2rgb($color);
-		}
-
-		if ($this->sum > 0) {
-			$red = (int) ($red * 0.6);
-			$green = (int) ($green * 0.6);
-			$blue = (int) ($blue * 0.6);
-		}
-
-		$RGB = [$red, $green, $blue];
-
-		if ($alpha != 0) {
-			return imagecolorexactalpha($this->im, $RGB[0], $RGB[1], $RGB[2], $alpha);
-		}
-
-		return imagecolorallocate($this->im, $RGB[0], $RGB[1], $RGB[2]);
 	}
 }
