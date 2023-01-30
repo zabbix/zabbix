@@ -9471,12 +9471,6 @@ return [
 				'length' => 255,
 				'default' => '5s'
 			],
-			'token' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
-				'default' => ''
-			],
 			'http_proxy' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -9499,6 +9493,12 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
+				'default' => ''
+			],
+			'token' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
 				'default' => ''
 			],
 			'verify_peer' => [
