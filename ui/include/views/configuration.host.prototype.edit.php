@@ -104,7 +104,7 @@ if ($host_prototype['templates']) {
 	$header = $data['readonly'] ? [_('Name')] : [_('Name'), _('Action')];
 
 	$linked_templates = (new CTable())
-		->setHeader([$header])
+		->setHeader($header)
 		->setId('linked-templates')
 		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
