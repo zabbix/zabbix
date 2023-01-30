@@ -41,7 +41,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 		foreach ($rows as $field_name => $value) {
 			$field_xpath = '//label[text()="'.$field_name.'"]/../..//*[@id]';
-			$tag = $this->webDriver->findElement(WebDriverBy::xpath($field_xpath))->getTagName();
+			$tag = $this->query('xpath', $field_xpath)->one()->getTagName();
 			$field_id = $this->zbxTestGetAttributeValue($field_xpath, 'id');
 
 			if ($tag === 'input' || $tag === 'textarea') {
