@@ -33,6 +33,7 @@ class CPieGraphDraw extends CGraphDraw {
 	private $graphheight3d;
 	private $shiftlegendright;
 	private $dataFrom;
+	private $shiftYLegend;
 
 	public function __construct($type = GRAPH_TYPE_PIE) {
 		parent::__construct($type);
