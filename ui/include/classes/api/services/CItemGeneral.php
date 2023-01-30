@@ -2586,7 +2586,7 @@ abstract class CItemGeneral extends CApiService {
 		DB::update('graphs', [
 			'values' => [
 				'ymin_type' => GRAPH_YAXIS_TYPE_CALCULATED,
-				'ymin_itemid' => null
+				'ymin_itemid' => 0
 			],
 			'where' => ['ymin_itemid' => $del_itemids]
 		]);
@@ -2594,7 +2594,7 @@ abstract class CItemGeneral extends CApiService {
 		DB::update('graphs', [
 			'values' => [
 				'ymax_type' => GRAPH_YAXIS_TYPE_CALCULATED,
-				'ymax_itemid' => null
+				'ymax_itemid' => 0
 			],
 			'where' => ['ymax_itemid' => $del_itemids]
 		]);
