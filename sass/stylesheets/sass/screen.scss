@@ -4955,6 +4955,7 @@ a.icon-count {
 
 .btn-dropdown-container {
 	display: flex;
+
 	.zi-text,
 	.zi-eye-off,
 	.zi-lock {
@@ -4974,6 +4975,7 @@ a.icon-count {
 
 	.zi-chevron-down {
 		border-radius: 0 2px 2px 0;
+
 		&::after {
 			display: inline-block;
 			padding-left: 3px;
@@ -4983,6 +4985,7 @@ a.icon-count {
 			font-size: 7px;
 
 			transform: rotate(0deg) translateX(0) translateY(0);
+
 			@if $menu-main-icons-opacity < 1 {
 				opacity: $menu-main-icons-opacity;
 			}
@@ -5020,72 +5023,34 @@ a.icon-count {
 	li {
 		display: inline-block;
 
-		button {
-			margin: 0 -1px 0 0;
-			border-radius: 0;
-		}
-
 		&:first-child button {
-			border-radius: 2px 0 0 2px;
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
 		}
 
-		&:last-child button {
-			border-radius: 0 2px 2px 0;
+		&:last-child {
+			margin-left: -1px;
+
+			button {
+				border-top-left-radius: 0;
+				border-bottom-left-radius: 0;
+			}
 		}
 
 		&:only-child button {
 			border-radius: 2px;
 		}
 
-		.zi-chevron-down {
-			padding: 0 5px;
-			vertical-align: middle;
-			line-height: 0;
-			font-size: 0;
-			position: relative;
-			background-color: transparent;
-
-			color: $btn-alt-font-color;
-
+		.zi-chevron-down,
+		.zi-plus {
 			&::before {
-				vertical-align: middle;
-				display: inline-block;
-				font-size: 12px;
-
-				transition: $ui-transition-duration;
+				font-size: $btn-icon-small-size;
 			}
+		}
 
+		.zi-chevron-down {
 			&[aria-expanded="true"] {
-				@include btn-hover-active($btn-font-color, $btn-bg-color);
-			}
-
-			&[disabled] {
-				&::before {
-					border-top-color: $btn-disabled-font-color;
-					border-right-color: $btn-disabled-font-color;
-				}
-			}
-
-			&:enabled {
-				&:active,
-				&[aria-expanded="true"] {
-					&::before {
-						transform: rotate(180deg) translate(-1px,1px);
-					}
-				}
-
-				&:hover,
-				&:focus,
-				&:active,
-				&[aria-expanded="true"] {
-					@include btn-hover-active($btn-font-color, $btn-bg-color);
-
-					&::before {
-						border-top-color:  $btn-font-color;
-						border-right-color: $btn-font-color;
-					}
-
-				}
+				@extend button:hover;
 			}
 		}
 	}

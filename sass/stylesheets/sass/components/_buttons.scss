@@ -61,18 +61,16 @@ button {
 		transition: border-color .2s ease-out, background-color .2s ease-out;
 	}
 
-	&:hover {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	&:hover,
+	&:focus,
+	&:active {
+		color: $btn-font-color;
+		background-color: darken($btn-bg-color, 5%);
+		border-color: darken($btn-bg-color, 5%);
 	}
 
 	&:focus {
 		box-shadow: 0 0 0 2px rgba($blue, .35);
-
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
-
-	&:active {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
 	&::-moz-focus-inner {
@@ -83,18 +81,28 @@ button {
 
 	&[class^="zi-"],
 	&[class*=" zi-"] {
+		display: inline-flex;
+		align-items: center;
+		vertical-align: top;
 
 		&:empty {
+			justify-content: center;
 			width: 24px;
 			padding: 0;
 		}
 
+		&:not(:empty) {
+			&::before {
+				margin-right: 4px;
+				margin-left: -4px;
+			}
+		}
+
 		&::before {
-			vertical-align: middle;
 			font-size: $btn-icon-size;
 
 			@if $ui-transitions {
-				transition: color $ui-transition-duration ease-out;
+				transition: color .2s ease-out;
 			}
 		}
 	}
@@ -177,7 +185,7 @@ button {
 	}
 }
 
-.btn-remove {
+.btn-remove { // TODO - AS: should be removed
 	@extend %btn-icon;
 	@extend %btn-remove-icon;
 
@@ -186,7 +194,7 @@ button {
 	}
 }
 
-.btn-remove {
+.btn-remove { // TODO - AS: should be removed
 	&[disabled],
 	&[disabled]:hover {
 		background-color: transparent;

@@ -47,7 +47,7 @@ class CButtonExport extends CList {
 							->getUrl()
 					).');'
 				),
-			(new CButton('export', '&#8203;'))
+			(new CButton('export'))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass(ZBX_ICON_CHEVRON_DOWN)
 				->setMenuPopup([

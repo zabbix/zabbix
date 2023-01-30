@@ -41,7 +41,7 @@ svg *:focus {
 
 @font-face {
   font-family: "zabbix-icons";
-  src: url("../fonts/zabbix-icons.woff2?t=1675074678109") format("woff2"), url("../fonts/zabbix-icons.woff?t=1675074678109") format("woff"), url("../fonts/zabbix-icons.ttf?t=1675074678109") format("truetype"), url("../fonts/zabbix-icons.svg?t=1675074678109#zabbix-icons") format("svg"); }
+  src: url("../fonts/zabbix-icons.woff2?t=1675092480310") format("woff2"), url("../fonts/zabbix-icons.woff?t=1675092480310") format("woff"), url("../fonts/zabbix-icons.ttf?t=1675092480310") format("truetype"), url("../fonts/zabbix-icons.svg?t=1675092480310#zabbix-icons") format("svg"); }
 [class^="zi-"]::before, [class*=" zi-"]::before {
   font-family: 'zabbix-icons' !important;
   font-size: 16px;
@@ -1123,33 +1123,33 @@ button {
   border-radius: 2px;
   outline: 0;
   transition: border-color .2s ease-out, background-color .2s ease-out; }
-  button:hover {
+  button:hover, .btn-split li .zi-chevron-down[aria-expanded="true"], button:focus, button:active {
     color: #ffffff;
     background-color: #484848;
     border-color: #484848; }
   button:focus {
-    box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35);
-    color: #ffffff;
-    background-color: #484848;
-    border-color: #484848; }
-  button:active {
-    color: #ffffff;
-    background-color: #484848;
-    border-color: #484848; }
+    box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35); }
   button::-moz-focus-inner {
     padding: 0;
     border: 0;
     vertical-align: middle; }
-  button[class^="zi-"]:empty, button[class*=" zi-"]:empty {
-    width: 24px;
-    padding: 0; }
-  button[class^="zi-"]::before, button[class*=" zi-"]::before {
-    vertical-align: middle;
-    font-size: 18px;
-    transition: color 0.3s ease-out; }
+  button[class^="zi-"], button[class*=" zi-"] {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: top; }
+    button[class^="zi-"]:empty, button[class*=" zi-"]:empty {
+      justify-content: center;
+      width: 24px;
+      padding: 0; }
+    button[class^="zi-"]:not(:empty)::before, button[class*=" zi-"]:not(:empty)::before {
+      margin-right: 4px;
+      margin-left: -4px; }
+    button[class^="zi-"]::before, button[class*=" zi-"]::before {
+      font-size: 18px;
+      transition: color .2s ease-out; }
   button[disabled] {
     cursor: default; }
-    button[disabled], button[disabled]:hover, button[disabled]:focus, button[disabled]:active {
+    button[disabled], button[disabled]:hover, .btn-split li [disabled].zi-chevron-down[aria-expanded="true"], button[disabled]:focus, button[disabled]:active {
       color: #999999;
       background-color: transparent;
       border-color: #999999; }
@@ -1266,7 +1266,7 @@ button {
   border-radius: 0;
   vertical-align: middle;
   transition: none; }
-  .color-picker-dialogue > div:not(:first-of-type) button:hover, .color-picker-dialogue > div:not(:first-of-type) button:focus {
+  .color-picker-dialogue > div:not(:first-of-type) button:hover, .color-picker-dialogue > div:not(:first-of-type) .btn-split li .zi-chevron-down[aria-expanded="true"], .btn-split li .color-picker-dialogue > div:not(:first-of-type) .zi-chevron-down[aria-expanded="true"], .color-picker-dialogue > div:not(:first-of-type) button:focus {
     border-color: #000000;
     box-shadow: inset 0 0 0 1px #ffffff; }
   .color-picker-dialogue > div:not(:first-of-type) button:active {
@@ -5648,7 +5648,7 @@ z-select .zi-chevron-down,
     .multilineinput-control button:not([disabled]):not([readonly]) {
       background-color: #ffffff;
       border-color: #888888; }
-      .multilineinput-control button:not([disabled]):not([readonly]):hover {
+      .multilineinput-control button:not([disabled]):not([readonly]):hover, .multilineinput-control .btn-split li .zi-chevron-down[aria-expanded="true"]:not([disabled]):not([readonly]), .btn-split li .multilineinput-control .zi-chevron-down[aria-expanded="true"]:not([disabled]):not([readonly]) {
         background-color: #f4f4f4; }
   .multilineinput-control.multilineinput-readonly input[type=text][readonly] {
     background-color: #f0f0f0 !important; }
@@ -5834,7 +5834,7 @@ z-select .zi-chevron-down,
     float: left; }
   .calendar-year button:last-child, .calendar-month button:last-child {
     float: right; }
-  .calendar-year button:hover, .calendar-month button:hover {
+  .calendar-year button:hover, .calendar-month button:hover, .calendar-year .btn-split li .zi-chevron-down[aria-expanded="true"], .btn-split li .calendar-year .zi-chevron-down[aria-expanded="true"], .calendar-month .btn-split li .zi-chevron-down[aria-expanded="true"], .btn-split li .calendar-month .zi-chevron-down[aria-expanded="true"] {
     background-color: #f4f4f4;
     cursor: pointer; }
 
@@ -7094,7 +7094,7 @@ a.icon-count {
       .macro-input-group button.zi-arrow-back::before {
         top: -1px;
         font-size: 14px; }
-      .macro-input-group button.zi-arrow-back:hover, .macro-input-group button.zi-arrow-back:focus, .macro-input-group button.zi-arrow-back:active {
+      .macro-input-group button.zi-arrow-back:hover, .macro-input-group .btn-split li .zi-arrow-back.zi-chevron-down[aria-expanded="true"], .btn-split li .macro-input-group .zi-arrow-back.zi-chevron-down[aria-expanded="true"], .macro-input-group button.zi-arrow-back:focus, .macro-input-group button.zi-arrow-back:active {
         border-top: 1px solid #000000;
         border-bottom: 1px solid #000000;
         color: #ffffff;
@@ -7113,7 +7113,7 @@ a.icon-count {
     left: 0;
     width: 100%;
     opacity: 0; }
-    .input-secret button:enabled:hover, .input-secret button:enabled:focus, .input-secret button:enabled:active {
+    .input-secret button:enabled:hover, .input-secret .btn-split li .zi-chevron-down[aria-expanded="true"]:enabled, .btn-split li .input-secret .zi-chevron-down[aria-expanded="true"]:enabled, .input-secret button:enabled:focus, .input-secret button:enabled:active {
       opacity: 1;
       animation: fadein .2s; }
 
@@ -7154,44 +7154,19 @@ a.icon-count {
   margin-right: 10px; }
   .btn-split li {
     display: inline-block; }
-    .btn-split li button {
-      margin: 0 -1px 0 0;
-      border-radius: 0; }
     .btn-split li:first-child button {
-      border-radius: 2px 0 0 2px; }
-    .btn-split li:last-child button {
-      border-radius: 0 2px 2px 0; }
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0; }
+    .btn-split li:last-child {
+      margin-left: -1px; }
+      .btn-split li:last-child button {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0; }
     .btn-split li:only-child button {
       border-radius: 2px; }
-    .btn-split li .zi-chevron-down {
-      padding: 0 5px;
-      vertical-align: middle;
-      line-height: 0;
-      font-size: 0;
-      position: relative;
-      background-color: transparent;
-      color: #000000; }
-      .btn-split li .zi-chevron-down::before {
-        vertical-align: middle;
-        display: inline-block;
-        font-size: 12px;
-        transition: 0.3s; }
-      .btn-split li .zi-chevron-down[aria-expanded="true"] {
-        color: #ffffff;
-        background-color: #484848;
-        border-color: #484848; }
-      .btn-split li .zi-chevron-down[disabled]::before {
-        border-top-color: #999999;
-        border-right-color: #999999; }
-      .btn-split li .zi-chevron-down:enabled:active::before, .btn-split li .zi-chevron-down:enabled[aria-expanded="true"]::before {
-        transform: rotate(180deg) translate(-1px, 1px); }
-      .btn-split li .zi-chevron-down:enabled:hover, .btn-split li .zi-chevron-down:enabled:focus, .btn-split li .zi-chevron-down:enabled:active, .btn-split li .zi-chevron-down:enabled[aria-expanded="true"] {
-        color: #ffffff;
-        background-color: #484848;
-        border-color: #484848; }
-        .btn-split li .zi-chevron-down:enabled:hover::before, .btn-split li .zi-chevron-down:enabled:focus::before, .btn-split li .zi-chevron-down:enabled:active::before, .btn-split li .zi-chevron-down:enabled[aria-expanded="true"]::before {
-          border-top-color: #ffffff;
-          border-right-color: #ffffff; }
+    .btn-split li .zi-chevron-down::before,
+    .btn-split li .zi-plus::before {
+      font-size: 12px; }
 
 .checkbox-block {
   margin: 10px 0; }

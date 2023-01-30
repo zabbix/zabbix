@@ -136,7 +136,7 @@ $html_page = (new CHtmlPage())
 								->addClass(ZBX_ICON_PLUS)
 						)
 						->addItem(
-							(new CButton('dashboard-add', '&#8203;'))
+							(new CButton('dashboard-add'))
 								->addClass(ZBX_STYLE_BTN_ALT)
 								->addClass(ZBX_ICON_CHEVRON_DOWN)
 						),

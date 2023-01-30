@@ -61,16 +61,18 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 	public function getFooterView(): CList {
 		return (new CList())
 			->addClass(ZBX_STYLE_BTN_SPLIT)
-			->addItem([
+			->addItem(
 				(new CButton(null, _('Add new data set')))
 					->addClass(ZBX_ICON_PLUS)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->setId('dataset-add'),
-				(new CButton(null, '&#8203;'))
+			)
+			->addItem(
+				(new CButton(null))
 					->setId('dataset-menu')
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass(ZBX_ICON_CHEVRON_DOWN)
-			]);
+			);
 	}
 
 	public function getTemplates(): array {
