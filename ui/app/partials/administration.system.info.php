@@ -120,7 +120,7 @@ if (!$data['system_info']['float_double_precision']) {
 	$info_table->addRow([
 		_('Database history tables upgraded'),
 		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
-		''
+		(new CCol(_('Support for disabled DOUBLE_IEEE754 is deprecated.')))->addClass(ZBX_STYLE_RED)
 	]);
 }
 
