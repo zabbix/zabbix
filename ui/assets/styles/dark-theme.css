@@ -2525,8 +2525,6 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .list-table .zi-alert:before {
     vertical-align: middle;
     position: relative; }
-  .list-table .zi-check::before {
-    color: #009900; }
   .list-table .action-container {
     display: flex;
     width: 100%;
@@ -7598,6 +7596,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   opacity: .5; }
   .zi-drag-handle::before {
     font-size: 24px; }
+
+.list-table.problem-list .zi-check::before {
+  color: #009900; }
 
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }

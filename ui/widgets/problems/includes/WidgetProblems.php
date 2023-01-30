@@ -124,6 +124,7 @@ class WidgetProblems extends CTableInfo {
 			'show_recovery_data' => $show_recovery_data
 		];
 
+		$this->addClass('problem-list');
 		$this->addProblemsToTable($this->data['problems'], $this->data);
 
 		if ($this->data['info'] !== '') {
@@ -377,7 +378,7 @@ class WidgetProblems extends CTableInfo {
 
 			$symptom_col = (new CCol(
 				makeActionIcon([
-					'icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM,
+					'icon' => ZBX_ICON_ARROW_TOP_RIGHT,
 					'title' => _('Symptom'),
 					'style' => 'margin-right: 0'
 				])

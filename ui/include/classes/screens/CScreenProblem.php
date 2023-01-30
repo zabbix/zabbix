@@ -1132,7 +1132,9 @@ class CScreenProblem extends CScreenBase {
 				]
 			], 'problem');
 
-			return $this->getOutput($form->addItem([$table, $paging, $footer]), false, $this->data);
+			return $this->getOutput(
+				$form->addItem([$table->addClass('problem-list'), $paging, $footer]), false, $this->data
+			);
 		}
 
 		/*

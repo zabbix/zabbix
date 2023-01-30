@@ -5586,3 +5586,13 @@ z-select,
 		font-size: 24px;
 	}
 }
+
+.list-table {
+	&.problem-list {
+		.zi-check {
+			&::before {
+				color: $icon-action-severity-down;
+			}
+		}
+	}
+}
