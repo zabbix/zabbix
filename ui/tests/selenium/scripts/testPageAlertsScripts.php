@@ -18,10 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
-class testPageAdministrationScripts extends CLegacyWebTest {
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+
+class testPageAlertsScripts extends CLegacyWebTest
+{
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -48,7 +50,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 		return CDBHelper::getDataProvider('SELECT scriptid,name FROM scripts');
 	}
 
-	public function testPageAdministrationScripts_CheckLayout() {
+	public function testPageAlertsScripts_CheckLayout() {
 		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckTitle('Configuration of scripts');
 
@@ -69,7 +71,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 	/**
 	 * @dataProvider allScripts
 	 */
-	public function testPageAdministrationScripts_SimpleUpdate($script) {
+	public function testPageAlertsScripts_SimpleUpdate($script) {
 		$this->calculateHash($script['scriptid']);
 
 		$this->zbxTestLogin('zabbix.php?action=script.list');
@@ -85,7 +87,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 	/**
 	 * @backup scripts
 	 */
-	public function testPageAdministrationScripts_MassDeleteAll() {
+	public function testPageAlertsScripts_MassDeleteAll() {
 		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckboxSelect('all_scripts');
 		$this->zbxTestClickButton('script.delete');
@@ -98,7 +100,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 	 * @dataProvider allScripts
 	 * @backupOnce scripts
 	 */
-	public function testPageAdministrationScripts_MassDelete($script) {
+	public function testPageAlertsScripts_MassDelete($script) {
 		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckboxSelect('scriptids_'.$script['scriptid']);
 		$this->zbxTestClickButton('script.delete');
