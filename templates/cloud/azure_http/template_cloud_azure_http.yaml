@@ -1030,7 +1030,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 4cd8ac56b50c4120bf9de56bb1f06245
-                  expression: '(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))>{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}'
+                  expression: '(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}'
                   name: 'Azure: Storage account [{#NAME}]: storage account availability is low'
                   opdata: '{ITEM.LASTVALUE1}'
                   priority: WARNING
