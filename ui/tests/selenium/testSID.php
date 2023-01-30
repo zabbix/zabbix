@@ -1487,7 +1487,7 @@ class testSID extends CWebTest {
 	 */
 	public function testSID_ElementRemove($data) {
 		$hash_before = CDBHelper::getHash($data['db']);
-		$url = (!str_contains($data['link'], 'tokenid') ? $data['link'] : $data['link'].self::$token_id);
+		$url = (!strstr($data['link'], 'tokenid') ? $data['link'] : $data['link'].self::$token_id);
 		$this->page->login()->open($url)->waitUntilReady();
 
 		if (array_key_exists('case', $data)) {
@@ -1535,7 +1535,7 @@ class testSID extends CWebTest {
 			$element = $this;
 		}
 
-		$element->query('xpath:.//input[@name="sid"]')->one()->delete();
+		$element->query('xpath:.//input[@name="_csrf_token"]')->one()->delete();
 
 		$query = ($this->query('button:Update')->exists())
 			? 'button:Update'
