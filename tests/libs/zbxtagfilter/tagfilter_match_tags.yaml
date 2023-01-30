@@ -568,7 +568,7 @@ in:
     - tag: b
       value: 2
 out:
-  return: FAIL
+  return: SUCCEED
 ---
 test case: Match not equal (3)
 in:

@@ -41,6 +41,27 @@ static int	get_eval_type(const char *eval_type_str)
 	return eval_type;
 }
 
+static const char	*get_eval_type_str(int eval_type)
+{
+	const char	*eval_type_str;
+
+	switch (eval_type)
+	{
+		case ZBX_CONDITION_EVAL_TYPE_AND_OR:
+			eval_type_str = "ZBX_CONDITION_EVAL_TYPE_AND_OR";
+			break;
+		case ZBX_CONDITION_EVAL_TYPE_OR:
+			eval_type_str = "ZBX_CONDITION_EVAL_TYPE_OR";
+			break;
+		default:
+			eval_type_str = "unknown eval_type value";
+			fail_msg("unknown eval_type value '%s'", eval_type_str);
+			break;
+	}
+
+	return eval_type_str;
+}
+
 static unsigned char	get_operator(const char *op_str)
 {
 	unsigned char op;
@@ -135,9 +156,12 @@ static void	get_etags(zbx_mock_handle_t handle, zbx_vector_tags_t *tags)
 	zbx_vector_tags_sort(tags, zbx_compare_tags);
 }
 
-void	dump_debug_info(const zbx_vector_match_tags_t *mtags, const zbx_vector_tags_t *etags, int expected_ret,
-		int returned_ret)
+static void	dump_debug_info(int eval_type, const zbx_vector_match_tags_t *mtags, const zbx_vector_tags_t *etags,
+		int expected_ret, int returned_ret)
 {
+	printf("\n");
+
+	printf("eval_type = %s\n", get_eval_type_str(eval_type));
 	printf("\n");
 
 	printf("mtags (%d):\n", mtags->values_num);
@@ -182,7 +206,7 @@ void	zbx_mock_test_entry(void **state)
 
 	if (returned_ret != expected_ret)
 	{
-		dump_debug_info(&mtags, &etags, expected_ret, returned_ret);
+		dump_debug_info(eval_type, &mtags, &etags, expected_ret, returned_ret);
 	}
 
 	zbx_mock_assert_int_eq("tagfilter_match_tags return value", expected_ret, returned_ret);

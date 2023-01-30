@@ -112,6 +112,10 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
 	if (i == etags->values_num || 0 < ret)
 	{
 		*et_pos = i;
+
+		if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == mtag->op || ZBX_CONDITION_OPERATOR_NOT_LIKE == mtag->op)
+			return SUCCEED;
+
 		return FAIL;
 	}
 
