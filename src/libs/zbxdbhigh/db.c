@@ -3907,7 +3907,7 @@ char	*zbx_db_get_schema_esc(void)
 	return name;
 }
 
-void	zbx_tsdb_recalc_time_period(int *ts_from, int tables)
+void	zbx_tsdb_recalc_time_period(int *ts_from, int table_group)
 {
 	int		least_ts, hk_period;
 	zbx_config_t	cfg;
@@ -3917,14 +3917,14 @@ void	zbx_tsdb_recalc_time_period(int *ts_from, int tables)
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
 
-	if (ZBX_TSDB_RECALC_TIME_PERIOD_HISTORY == tables)
+	if (ZBX_TSDB_RECALC_TIME_PERIOD_HISTORY == table_group)
 	{
 		if (1 != cfg.hk.history_global)
 			return;
 
 		hk_period = cfg.hk.history;
 	}
-	else if (ZBX_TSDB_RECALC_TIME_PERIOD_TRENDS == tables)
+	else if (ZBX_TSDB_RECALC_TIME_PERIOD_TRENDS == table_group)
 	{
 		if (1 != cfg.hk.trends_global)
 			return;
