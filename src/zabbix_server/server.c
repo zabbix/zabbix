@@ -62,7 +62,6 @@
 #include "events.h"
 #include "zbxcachevalue.h"
 #include "zbxcachehistory.h"
-#include "setproctitle.h"
 #include "zbxhistory.h"
 #include "postinit.h"
 #include "zbxvault.h"
@@ -1140,9 +1139,7 @@ static void	zbx_on_exit(int ret)
 
 	zbx_locks_destroy();
 
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
+	zbx_setproctitle_deinit();
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		zbx_export_deinit(problems_export);
@@ -1185,9 +1182,7 @@ int	main(int argc, char **argv)
 	int				zbx_optind = 0;
 
 	zbx_config_tls = zbx_config_tls_new();
-#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	argv = setproctitle_save_env(argc, argv);
-#endif
+	argv = zbx_setproctitle_init(argc, argv);
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
