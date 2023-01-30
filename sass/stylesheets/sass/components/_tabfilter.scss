@@ -268,11 +268,11 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		}
 	}
 
+	// TODO - AS: need to check
 	.zi-cog-filled {
 		@extend %btn-widget-defaults;
 		width: 24px;
 		height: 22px;
-
 		color: $icon-color;
 		cursor: pointer;
 		margin: 0;

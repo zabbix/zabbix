@@ -126,7 +126,7 @@ $html_page = (new CHtmlPage())
 			->addItem((new CListItem(
 				(new CTag('nav', true, new CList([
 					(new CButton('dashboard-config'))
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF)
+						->addClass(ZBX_STYLE_BTN_ICON)
 						->addClass(ZBX_ICON_COG_FILLED),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)

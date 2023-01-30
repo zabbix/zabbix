@@ -468,10 +468,6 @@ $icon-widget-btn: (
 	}
 }
 
-.btn-dashboard-conf {
-	background: url($sprite-path) no-repeat -354px -619px !important; // TODO - AS: should be removed
-}
-
 .subfilter-enabled {
 	.link-action {
 		color: $link-hover-color;
