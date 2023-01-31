@@ -21,6 +21,7 @@
 #define ZABBIX_MODULE_H
 
 #include "zbxtypes.h"
+
 #define ZBX_MODULE_OK	0
 #define ZBX_MODULE_FAIL	-1
 
@@ -80,7 +81,6 @@ typedef struct
 {
 	void		*value;
 	size_t		len;
-//	char		*hash;
 }
 zbx_bin_t;
 
@@ -212,7 +212,6 @@ typedef struct
 {
 	void	*value;
 	size_t	len;
-//	char	*hash;
 }
 zbx_bin_value_t;
 

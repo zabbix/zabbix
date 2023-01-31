@@ -166,8 +166,6 @@ typedef struct
 	unsigned char	value_type;
 	unsigned char	state;
 	unsigned char	flags;		/* see ZBX_DC_FLAG_* above */
-
-	//dc_value_str_t	bin_hash;
 }
 dc_item_value_t;
 
@@ -1950,7 +1948,7 @@ static void	dc_history_clean_value(ZBX_DC_HISTORY *history)
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 			zbx_free(history->value.bin->value);
-			//zbx_free(history->value.bin->hash);
+			zbx_free(history->value.bin);
 	}
 }
 
