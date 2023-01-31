@@ -33,10 +33,12 @@ class CWidgetElement extends CElement {
 	 * @return integer
 	 */
 	public function getRefreshInterval() {
-		$action = $this->query('class:btn-widget-action')->one();
-		$settings = json_decode($action->getAttribute('data-menu-popup'));
+		$this->query('xpath:.//button[contains(@class, "btn-widget-action")]')->waitUntilPresent()->one()->click(true);
+		$menu = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$selected = $menu->query('xpath:.//a[contains(@aria-label, "selected")]')->one();
+		$aria_label = explode(', ', $selected->getAttribute('aria-label'), 3);
 
-		return $settings->data->currentRate;
+		return $aria_label[1];
 	}
 
 	/**

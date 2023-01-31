@@ -169,8 +169,15 @@ class CDashboardElement extends CElement {
 
 		if ($controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
 			$button = $controls->query('id:dashbrd-save')->one()->waitUntilClickable();
-			$button->getLocationOnScreenOnceScrolledIntoView();
 			$button->click();
+
+			try {
+				$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible(2);
+			}
+			catch (\Exception $ex) {
+				$button->click(true);
+			}
+
 			$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
 		}
 
@@ -263,5 +270,22 @@ class CDashboardElement extends CElement {
 		if ($this->isEditable($editable) === false) {
 			throw new \Exception('Dashboard is'.($editable ? ' not' : '').' in editing mode.');
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getReadyCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			foreach ($target->getWidgets() as $widget) {
+				if (!$widget->isReady()) {
+					return false;
+				}
+			}
+
+			return true;
+		};
 	}
 }

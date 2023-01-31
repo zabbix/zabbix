@@ -73,12 +73,12 @@ class testDashboardURLWidget extends CWebTest {
 						'height' => 5,
 						'fields' => [
 							[
-								'type' => 1,
+								'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 								'name' => 'url',
 								'value' => 'http://zabbix.com'
 							],
 							[
-								'type' => 0,
+								'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 								'name' => 'dynamic',
 								'value' => '1'
 							]
@@ -93,7 +93,7 @@ class testDashboardURLWidget extends CWebTest {
 						'height' => 5,
 						'fields' => [
 							[
-								'type' => 1,
+								'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 								'name' => 'url',
 								'value' => 'zabbix.php?action=dashboard.view'
 							]
@@ -113,7 +113,7 @@ class testDashboardURLWidget extends CWebTest {
 						'height' => 5,
 						'fields' => [
 							[
-								'type' => 1,
+								'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 								'name' => 'url',
 								'value' => 'https://zabbix.com'
 							]
@@ -230,7 +230,6 @@ class testDashboardURLWidget extends CWebTest {
 		$dashboard->save();
 
 		// Check parameter 'Dynamic item' true/false state.
-		$dashboard = CDashboardElement::find()->one();
 		$this->assertTrue($dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one()->isVisible());
 		$this->assertEquals('No host selected.', $dashboard->getWidget(self::$default_widget)
 				->query('class:nothing-to-show')->one()->getText());
@@ -277,7 +276,17 @@ class testDashboardURLWidget extends CWebTest {
 					'fields' => [
 						'URL' => 'message://zabbix.com'
 					],
-					'error' => ['Invalid parameter "URL": unacceptable URL.']
+					'error' => 'Invalid parameter "URL": unacceptable URL.'
+				]
+			],
+			// Widget name "URL", if no name is given.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '',
+						'URL' => 'zabbix.php?action=dashboard.view'
+					]
 				]
 			],
 			// The 'Refresh interval' value depends on the previous test case value = 'No refresh'.
@@ -404,14 +413,14 @@ class testDashboardURLWidget extends CWebTest {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
 
-		$data['fields']['Name'] = 'URL widget create '.microtime();
+		$data['fields']['Name'] = CTestArrayHelper::get($data, 'fields.Name', 'URL widget test '.microtime());
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
 		$form = ($update)
-			? $dashboard->getWidget(self::$update_widget)->edit()->asForm()
-			: $dashboard->edit()->addWidget()->asForm();
+				? $dashboard->getWidget(self::$update_widget)->edit()->asForm()
+				: $dashboard->edit()->addWidget()->asForm();
 
 		if ($form->getField('Type') !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
@@ -431,16 +440,16 @@ class testDashboardURLWidget extends CWebTest {
 			$this->assertFalse($dashboard->getWidget($data['fields']['Name'], false)->isValid());
 		}
 		else {
+			// If name is empty string it is replaced by default name "URL".
+			$header = ($data['fields']['Name'] === '') ? 'URL' : $data['fields']['Name'];
 			if ($update) {
-				self::$update_widget = $data['fields']['Name'];
+				self::$update_widget = $header;
 			}
 
 			COverlayDialogElement::ensureNotPresent();
-			$header = CTestArrayHelper::get($data['fields'], 'Name');
-			$dashboard->getWidget($header);
+			$widget = $dashboard->getWidget($header);
 
 			// Save Dashboard to ensure that widget is correctly saved.
-			$this->page->scrollToTop();
 			$dashboard->save();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -449,7 +458,7 @@ class testDashboardURLWidget extends CWebTest {
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
 
 			// Check new widget form fields and values in frontend.
-			$saved_form = $dashboard->getWidget($header)->edit();
+			$saved_form = $widget->edit();
 			$this->assertEquals($values, $saved_form->getValues());
 
 			if (array_key_exists('Show header', $data['fields'])) {
@@ -458,28 +467,15 @@ class testDashboardURLWidget extends CWebTest {
 
 			$saved_form->submit();
 			COverlayDialogElement::ensureNotPresent();
-			$this->page->scrollToTop();
 			$dashboard->save();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Check new widget update interval.
 			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (No refresh)')
-				? 'No refresh'
-				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'No refresh'));
-
-			$mapping = [
-			'Default (No refresh)' => 0,
-			'No refresh' => 0,
-			'10 seconds' => 10,
-			'30 seconds' => 30,
-			'1 minute' => 60,
-			'2 minutes' => 120,
-			'10 minutes' => 600,
-			'15 minutes' => 900
-			];
-
-			$this->assertEquals($mapping[$refresh], CDashboardElement::find()->one()->getWidget($header)->getRefreshInterval());
+					? 'No refresh'
+					: (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'No refresh'));
+			$this->assertEquals($refresh, $widget->getRefreshInterval());
 		}
 	}
 
@@ -524,7 +520,7 @@ class testDashboardURLWidget extends CWebTest {
 		$new_name = 'Widget to be cancelled';
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one()->edit();;
+		$dashboard = CDashboardElement::find()->one()->edit();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
 		// Start updating or creating a widget.
