@@ -523,7 +523,7 @@ if ($data['graphid'] != 0) {
 		$updateButton->setEnabled(false);
 	}
 
-	if ($data['templateid'] != 0) {
+	if (array_key_exists('templateid', $data) && $data['templateid'] != 0) {
 		$deleteButton->setEnabled(false);
 	}
 
