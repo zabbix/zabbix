@@ -2976,8 +2976,7 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, zbx_history_sync_ite
 static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, ZBX_HISTORY_FLOAT *history_float,
 		int *history_float_num, ZBX_HISTORY_INTEGER *history_integer, int *history_integer_num,
 		ZBX_HISTORY_STRING *history_string, int *history_string_num, ZBX_HISTORY_TEXT *history_text,
-		int *history_text_num, ZBX_HISTORY_LOG *history_log, int *history_log_num /*,
-		ZBX_HISTORY_BIN *history_bin, int *history_bin_num */)
+		int *history_text_num, ZBX_HISTORY_LOG *history_log, int *history_log_num)
 {
 	ZBX_DC_HISTORY		*h;
 	ZBX_HISTORY_FLOAT	*h_float;
@@ -2985,7 +2984,6 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 	ZBX_HISTORY_STRING	*h_string;
 	ZBX_HISTORY_TEXT	*h_text;
 	ZBX_HISTORY_LOG		*h_log;
-	//ZBX_HISTORY_BIN		*h_bin;
 	int			i;
 	const zbx_log_value_t	*log;
 
@@ -2994,7 +2992,6 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 	*history_string_num = 0;
 	*history_text_num = 0;
 	*history_log_num = 0;
-	//*history_bin_num = 0;
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -3061,17 +3058,8 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 				h_log->severity = log->severity;
 				break;
 			case ITEM_VALUE_TYPE_BIN:
-				//if (NULL == history_bin_cbs)
-				//	continue;
-
 				THIS_SHOULD_NEVER_HAPPEN;
 				exit(EXIT_FAILURE);
-//				h_bin = &history_bin[(*history_bin_num)++];
-//				h_bin->itemid = h->itemid;
-//				h_bin->clock = h->ts.sec;
-//				h_bin->ns = h->ts.ns;
-//				h_bin->bin_value = h->value.bin;
-
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -3158,21 +3146,6 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 
 		zabbix_log(LOG_LEVEL_DEBUG, "synced %d log values with modules", history_log_num);
 	}
-
-//	if (0 != history_bin_num)
-//	{
-//		int	i;
-//
-//		zabbix_log(LOG_LEVEL_DEBUG, "syncing bin history data with modules...");
-//
-//		for (i = 0; NULL != history_bin_cbs[i].module; i++)
-//		{
-//			zabbix_log(LOG_LEVEL_DEBUG, "... module \"%s\"", history_bin_cbs[i].module->name);
-//			history_bin_cbs[i].history_bin_cb(history_bin, history_bin_num);
-//		}
-//
-//		zabbix_log(LOG_LEVEL_DEBUG, "synced %d bin values with modules", history_bin_num);
-//	}
 }
 
 /******************************************************************************
@@ -3405,15 +3378,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		history_log = (ZBX_HISTORY_LOG *)zbx_malloc(history_log,
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
 	}
-
-//	if (NULL == history_bin && NULL != history_bin_cbs)
-//	{
-//
-//		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, sync_server_history history_bin");
-//		module_enabled = SUCCEED;
-//		history_bin = (ZBX_HISTORY_BIN *)zbx_malloc(history_bin,
-//				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_BIN));
-//	}
 
 	compression_age = hc_get_history_compression_age();
 
@@ -3996,13 +3960,6 @@ static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_val
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_add_history_bin 2, bin len: %lu", bin->len);
 
-//		if (NULL != bin->hash && '\0' != *bin->hash)
-//			item_value->bin_hash.len = zbx_db_strlen_n(bin->hash, ZBX_HISTORY_BIN_HASH_LEN) + 1;
-//		else
-//		{
-//			item_value->bin_hash.len = 0;
-//		}
-
 		item_value->value.value_str.len = bin->len;
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, LAMBO 0, len: %lu", item_value->value.value_str.len);
@@ -4020,33 +3977,10 @@ static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_val
 	else
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_add_history_bin 3");
-		//item_value->bin_hash.len = 0;
 		item_value->value.value_str.len = 0;
 	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, LAMBO OUT");
-
-//
-//	if (0 != item_value->value.value_str.len + item_value->bin_hash.len)
-//	{
-//		dc_string_buffer_realloc(item_value->value.value_str.len + item_value->bin_hash.len);
-//
-//		if (0 != item_value->value.value_str.len)
-//		{
-//			item_value->value.value_str.pvalue = string_values_offset;
-//			memcpy(&string_values[string_values_offset], bin->value, item_value->value.value_str.len);
-//			string_values_offset += item_value->value.value_str.len;
-//		}
-//
-//		if (0 != item_value->bin_hash.len)
-//		{
-//			item_value->bin_hash.pvalue = string_values_offset;
-//			memcpy(&string_values[string_values_offset], bin->hash, item_value->bin_hash.len);
-//			string_values_offset += item_value->bin_hash.len;
-//		}
-//	}
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, LAMBO OUT 2");
 }
 
 static void	dc_local_add_history_log(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
@@ -4393,10 +4327,6 @@ static void	hc_free_data(zbx_hc_data_t *data)
 					break;
 				case ITEM_VALUE_TYPE_BIN:
 					__hc_shmem_free_func(data->value.bin->value);
-
-//					if (NULL != data->value.bin->hash)
-//						__hc_shmem_free_func(data->value.bin->hash);
-
 					__hc_shmem_free_func(data->value.bin);
 					break;
 
@@ -4563,14 +4493,8 @@ static int	hc_clone_history_bin_data(zbx_bin_value_t **dst, const dc_item_value_
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, clone dst_str: %s", (char*)(*dst)->value);
 
-	//cannot do it
-	//(*dst)->hash = zbx_strdup(NULL, item_value->bin_hash);
-
-	//if (SUCCEED != hc_clone_history_str_data(&(*dst)->hash, &item_value->bin_hash))
-	//	return FAIL;
 	(*dst)->len = item_value->value.value_str.len;
 
-	//zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, clone dst_hash: %s", (*dst)->hash);
 	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, clone dst_len: %lu", (*dst)->len);
 
 	return SUCCEED;
@@ -4838,13 +4762,6 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 				history->value.bin = (zbx_bin_value_t *)zbx_malloc(NULL, sizeof(zbx_bin_value_t));
 				history->value.bin->value = zbx_strdup(NULL, data->value.bin->value);
 				history->value.bin->len = data->value.bin->len;
-
-				//if (NULL != data->value.bin->hash)
-				//	history->value.bin->hash = zbx_strdup(NULL, data->value.bin->hash);
-				//else
-				//	history->value.bin->hash = NULL;
-
-				//zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, LLL hash: %s", ZBX_NULL2EMPTY_STR(data->value.bin->hash));
 
 				break;
 			default:

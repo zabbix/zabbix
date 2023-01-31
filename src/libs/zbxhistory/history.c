@@ -214,7 +214,6 @@ static void	history_logfree(zbx_log_value_t *log)
 static void	history_binfree(zbx_bin_value_t *bin)
 {
 	zbx_free(bin->value);
-	//zbx_free(bin->hash);
 	zbx_free(bin);
 }
 

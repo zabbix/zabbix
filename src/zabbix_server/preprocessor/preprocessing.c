@@ -1272,8 +1272,6 @@ static void	agent_result_set_value(zbx_variant_t *value, zbx_item_value_type_t v
 			memset(bin, 0, sizeof(zbx_bin_t));
 			bin->value = value->data.str;
 			bin->len = strlen(value->data.str);
-			//bin->hash = zbx_strdup(NULL, "badger_100");
-
 			SET_BIN_RESULT(result, bin);
 			zbx_variant_set_none(value);
 			break;
@@ -1288,7 +1286,7 @@ static void	agent_result_set_value(zbx_variant_t *value, zbx_item_value_type_t v
 			SET_UI64_RESULT(result, value->data.ui64);
 			break;
 		default:
-			*error = zbx_dsprintf(*error, "x2 Unsupported value \"%s\" of type \"%s\"",
+			*error = zbx_dsprintf(*error, "Unsupported value \"%s\" of type \"%s\"",
 					zbx_variant_value_desc(value), zbx_variant_type_desc(value));
 			return;
 	}

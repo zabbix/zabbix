@@ -87,7 +87,6 @@ static void	row2value_binary(zbx_history_value_t *value, DB_ROW row)
 	value->bin = (zbx_bin_value_t *)zbx_malloc(NULL, sizeof(zbx_bin_value_t));
 
 	value->bin->value = zbx_strdup(NULL, row[0]);
-	//value->bin->hash = zbx_strdup(NULL, row[1]);
 }
 
 /* value_type - history table data mapping */
@@ -318,56 +317,6 @@ static void	add_history_log(const zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-static unsigned char    *badger(const char *src)
-{
-	unsigned char	*dst;
-	int	data_len, src_len;
-
-	if (NULL == src || '\0' == *src)
-		return NULL;
-
-	src_len = strlen(src) * 3 / 4;
-	//dst = __config_shmem_malloc_func(NULL, src_len);
-	dst = (unsigned char*)zbx_malloc(NULL, src_len);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA badger LEN: %d", src_len);
-	str_base64_decode(src, (char *)dst, src_len, &data_len);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA badger LEN 2: %d", data_len);
-	return dst;
-}
-
-//static void	add_history_bin(const zbx_vector_ptr_t *history)
-//{
-//	int		i;
-//	zbx_db_insert_t	*db_insert;
-//
-//	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin");
-//
-//	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
-//	zbx_db_insert_prepare(db_insert, "history_binary", "itemid", "clock", "ns", "value", NULL);
-//
-//	for (i = 0; i < history->values_num; i++)
-//	{
-//		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
-//
-//		if (ITEM_VALUE_TYPE_BIN != h->value_type)
-//			continue;
-//
-//
-//		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin len: %lu", h->value.bin->len);
-//		if (0 == h->value.bin->len)
-//			continue;
-//
-//		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin value: %c",( (char*)(h->value.bin->value))[0]);
-//
-//
-//		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, DBdyn_escape_string(h->value.bin->value));
-//	}
-//
-//	sql_writer_add_dbinsert(db_insert);
-//}
-//
 static void	add_history_bin(const zbx_vector_ptr_t *history)
 {
 	int		i;
@@ -387,47 +336,30 @@ static void	add_history_bin(const zbx_vector_ptr_t *history)
 
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin badger BEFORE: %s", (char*)(h->value.bin->value));
-	//	unsigned char	*badger_str = badger(h->value.bin->value);
 
 
-	char	*dst = NULL;
-	int	data_len, src_len;
+		char	*dst = NULL;
+		int	data_len, src_len;
 
-	//unsigned char *badger_str = NULL;
-	if (!(NULL ==  h->value.bin->value|| '\0' == *((char*) h->value.bin->value)))
-	{
-		src_len = strlen(h->value.bin->value) * 3 / 4 ;
-		//dst = __config_shmem_malloc_func(NULL, src_len);
-		dst = (char*)zbx_malloc(NULL, src_len);
+		if (!(NULL ==  h->value.bin->value|| '\0' == *((char*) h->value.bin->value)))
+		{
+			src_len = strlen(h->value.bin->value) * 3 / 4 ;
+			dst = (char*)zbx_malloc(NULL, src_len);
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA badger LEN: %d", src_len);
-		str_base64_decode(h->value.bin->value, (char *)dst, src_len, &data_len);
-		dst[data_len] = '\0';
+			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA badger LEN: %d", src_len);
+			str_base64_decode(h->value.bin->value, (char *)dst, src_len, &data_len);
+			dst[data_len] = '\0';
 
-		//	char chunk[2*data_len+1];
-		char *chunk = (char*)zbx_malloc(NULL, 2*data_len+1);
+			char *chunk = (char*)zbx_malloc(NULL, 2*data_len+1);
 
-		badger_escape((char*)dst, chunk, data_len);
+			badger_escape((char*)dst, chunk, data_len);
 
-		//char *st = "INSERT INTO history_binary(itemid, clock, value, ns) VALUES('%lu','%lu','%lu','%s')";
+			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA badger LEN 2: %d", data_len);
+			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin value: %c",( (char*)(chunk))[0]);
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA badger LEN 2: %d", data_len);
-
-		//zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin badger_str: %s", badger_str);
-
-		// zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin len: %lu", h->value.bin->len);
-		//if (0 == h->value.bin->len)
-		//	continue;
-
-		//zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin  hash: %s",( h->value.bin->hash));
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin value: %c",( (char*)(chunk))[0]);
-
-		//zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.bin->value);
-
-		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, chunk);
-		zbx_free(dst);
-}
+			zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, chunk);
+			zbx_free(dst);
+		}
 	}
 
 	sql_writer_add_dbinsert(db_insert);
