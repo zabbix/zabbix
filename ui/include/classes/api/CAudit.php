@@ -251,16 +251,16 @@ class CAudit {
 		],
 		self::RESOURCE_CONNECTOR => [
 			[
-				'paths' => ['connector.token'],
-				'conditions' => ['authtype' => ZBX_HTTP_AUTH_BEARER]
-			],
-			[
 				'paths' => ['connector.password'],
 				'conditions' => [
 					'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
 						ZBX_HTTP_AUTH_DIGEST
 					]
 				]
+			],
+			[
+				'paths' => ['connector.token'],
+				'conditions' => ['authtype' => ZBX_HTTP_AUTH_BEARER]
 			],
 			['paths' => ['connector.ssl_key_password']]
 		],
