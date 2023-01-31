@@ -48,13 +48,12 @@ ZBX_Notifications.ALARM_ONCE_SERVER = 1;
  * @param {ZBX_LocalStorage} store
  * @param {ZBX_BrowserTab} tab
  */
-function ZBX_Notifications(store, tab, csrf_token) {
+function ZBX_Notifications(store, tab) {
 	if (!(store instanceof ZBX_LocalStorage) || !(tab instanceof ZBX_BrowserTab)) {
 		throw 'Unmatched signature!';
 	}
 
 	this.active = false;
-	this.csrf_token = csrf_token;
 
 	this.poll_interval = ZBX_Notifications.POLL_INTERVAL;
 
@@ -560,18 +559,14 @@ ZBX_Notifications.prototype.renderAudio = function() {
 
 /**
  * @param {string} resource  A value for 'action' parameter.
- * @param {object} params    Data to be sent as request body.
+ * @param {object} params    Form data to be sent.
  *
  * @return {Promise}
  */
 ZBX_Notifications.prototype.fetch = function(resource, params) {
-	if (resource !== 'notifications.get') {
-		params._csrf_token = this.csrf_token;
-	}
-
 	return new Promise(function(resolve, reject) {
 		sendAjaxData('zabbix.php?action=' + resource, {
-			data: params,
+			data: params || {},
 			success: resolve,
 			error: reject
 		});
