@@ -327,6 +327,7 @@ char	*CONFIG_SERVER			= NULL;		/* not used in zabbix_server, required for linkin
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
+int     CONFIG_HOUSEKEEPING_MAX_CHUNK_SIZE = 0;
 int	CONFIG_HISTSYNCER_FREQUENCY	= 1;
 int	CONFIG_CONFSYNCER_FREQUENCY	= 10;
 
@@ -873,6 +874,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			24},
 		{"MaxHousekeeperDelete",	&CONFIG_MAX_HOUSEKEEPER_DELETE,		TYPE_INT,
 			PARM_OPT,	0,			1000000},
+                {"HousekeeperMaxChunkSize",	&CONFIG_HOUSEKEEPING_MAX_CHUNK_SIZE,	TYPE_INT,
+                        PARM_OPT,	0,			50000000},
 		{"TmpDir",			&CONFIG_TMPDIR,				TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"FpingLocation",		&CONFIG_FPING_LOCATION,			TYPE_STRING,
