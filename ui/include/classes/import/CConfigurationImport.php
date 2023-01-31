@@ -763,7 +763,7 @@ class CConfigurationImport {
 				if ($valuemapid !== null) {
 					if ($this->options['valueMaps']['updateExisting']) {
 						$upd_valuemaps[] = ['valuemapid' => $valuemapid] + $valuemap;
-						$this->referencer->setDbValueMap($valuemapid, $valuemap);
+						$this->referencer->setDbValueMap($valuemapid, ['hostid' => $hostid] + $valuemap);
 					}
 				}
 				else {
