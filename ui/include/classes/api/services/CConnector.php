@@ -36,7 +36,7 @@ class CConnector extends CApiService {
 	protected $sortColumns = ['connectorid', 'name', 'data_type', 'status'];
 
 	private array $output_fields = ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_records', 'max_senders',
-		'max_attempts', 'timeout', 'token', 'http_proxy', 'authtype', 'username', 'password', 'verify_peer',
+		'max_attempts', 'timeout', 'http_proxy', 'authtype', 'username', 'password', 'token', 'verify_peer',
 		'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'status', 'tags_evaltype'
 	];
 
@@ -58,7 +58,7 @@ class CConnector extends CApiService {
 			// filter
 			'connectorids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['connectorid', 'name', 'protocol', 'data_type', 'authtype', 'status']],
-			'search' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'url', 'token', 'http_proxy', 'username', 'description']],
+			'search' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'url', 'http_proxy', 'username', 'token', 'description']],
 			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>				['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
@@ -195,9 +195,8 @@ class CConnector extends CApiService {
 			'max_senders' =>		['type' => API_INT32, 'in' => '1:100'],
 			'max_attempts' =>		['type' => API_INT32, 'in' => '0:5'],
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
-			'token' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'token')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
-			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST]), 'default' => DB::getDefault('connector', 'authtype')],
+			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER]), 'default' => DB::getDefault('connector', 'authtype')],
 			'username' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'username')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'username')]
@@ -205,6 +204,10 @@ class CConnector extends CApiService {
 			'password' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'password')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'password')]
+			]],
+			'token' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'authtype', 'in' => ZBX_HTTP_AUTH_BEARER], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'token')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'token')]
 			]],
 			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
 			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],
@@ -316,11 +319,15 @@ class CConnector extends CApiService {
 		$db_defaults = DB::getDefaults('connector');
 
 		foreach ($connectors as &$connector) {
-			if ($connector['authtype'] == ZBX_HTTP_AUTH_NONE) {
+			if ($connector['authtype'] == ZBX_HTTP_AUTH_NONE || $connector['authtype'] == ZBX_HTTP_AUTH_BEARER) {
 				$connector += [
 					'username' => $db_defaults['username'],
 					'password' => $db_defaults['password']
 				];
+			}
+
+			if ($connector['authtype'] != ZBX_HTTP_AUTH_BEARER) {
+				$connector += ['token' => $db_defaults['token']];
 			}
 		}
 		unset($connector);
@@ -335,9 +342,8 @@ class CConnector extends CApiService {
 			'max_senders' =>		['type' => API_INT32, 'in' => '1:100'],
 			'max_attempts' =>		['type' => API_INT32, 'in' => '0:5'],
 			'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_MIN],
-			'token' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'token')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'http_proxy')],
-			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])],
+			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER])],
 			'username' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'username')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'username')]
@@ -345,6 +351,10 @@ class CConnector extends CApiService {
 			'password' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('connector', 'password')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'password')]
+			]],
+			'token' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'authtype', 'in' => ZBX_HTTP_AUTH_BEARER], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('connector', 'token')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('connector', 'token')]
 			]],
 			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
 			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],

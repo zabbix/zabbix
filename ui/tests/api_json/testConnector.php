@@ -67,11 +67,6 @@ class testConnector extends CAPITest {
 				'name' => 'API test connector.get with URL (user macro)',
 				'url' => '{$URL}'
 			],
-			'get_token' => [
-				'name' => 'API test connector.get with token (user macro)',
-				'url' => 'http://localhost/',
-				'token' => '{$BEARER_TOKEN}'
-			],
 			'get_http_proxy' => [
 				'name' => 'API test connector.get with HTTP proxy (user macro)',
 				'url' => 'http://localhost/',
@@ -83,6 +78,12 @@ class testConnector extends CAPITest {
 				'authtype' => ZBX_HTTP_AUTH_BASIC,
 				'username' => 'test',
 				'password' => '12345678'
+			],
+			'get_authtype_bearer' => [
+				'name' => 'API test connector.get with authtype (bearer)',
+				'url' => 'http://localhost/',
+				'authtype' => ZBX_HTTP_AUTH_BEARER,
+				'token' => '{$BEARER_TOKEN}'
 			],
 			'get_status_disabled' => [
 				'name' => 'API test connector.get with status (disabled)',
@@ -371,24 +372,6 @@ class testConnector extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/timeout": value must be one of 1-'.SEC_PER_MIN.'.'
 			],
 
-			// Check "token".
-			'Test connector.create: invalid "token" (boolean)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'token' => false
-				],
-				'expected_error' => 'Invalid parameter "/1/token": a character string is expected.'
-			],
-			'Test connector.create: invalid "token" (too long)' => [
-				'connector' => [
-					'name' => 'API create connector',
-					'url' => 'http://localhost/',
-					'token' => str_repeat('a', DB::getFieldLength('connector', 'token') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/token": value is too long.'
-			],
-
 			// Check "http_proxy".
 			'Test connector.create: invalid "http_proxy" (boolean)' => [
 				'connector' => [
@@ -424,7 +407,7 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
 					implode(', ', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
-						ZBX_HTTP_AUTH_DIGEST
+						ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER
 					]).'.'
 			],
 
@@ -482,6 +465,33 @@ class testConnector extends CAPITest {
 					'password' => str_repeat('a', DB::getFieldLength('connector', 'password') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/password": value is too long.'
+			],
+
+			// Check "token".
+			'Test connector.create: invalid "token" (boolean)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'token' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/token": a character string is expected.'
+			],
+			'Test connector.create: invalid "token" (incompatible authtype)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'token' => '{$BEARER_TOKEN}'
+				],
+				'expected_error' => 'Invalid parameter "/1/token": value must be empty.'
+			],
+			'Test connector.create: invalid "token" (too long)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'authtype' => ZBX_HTTP_AUTH_BEARER,
+					'token' => str_repeat('a', DB::getFieldLength('connector', 'token') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/token": value is too long.'
 			],
 
 			// Check "verify_peer".
@@ -842,6 +852,7 @@ class testConnector extends CAPITest {
 			self::$data['created'] = array_merge(self::$data['created'], $result['result']['connectorids']);
 
 			$db_connectors = $this->getConnectors($result['result']['connectorids']);
+			$db_defaults = DB::getDefaults('connector');
 
 			// Check individual fields.
 			foreach ($result['result']['connectorids'] as $num => $connectorid) {
@@ -861,7 +872,7 @@ class testConnector extends CAPITest {
 						$this->assertEquals($connector[$field], $db_connector[$field]);
 					}
 					else {
-						$this->assertEquals(DB::getDefault('connector', $field), $db_connector[$field]);
+						$this->assertEquals($db_defaults[$field], $db_connector[$field]);
 					}
 				}
 
@@ -870,11 +881,10 @@ class testConnector extends CAPITest {
 					$this->assertSame($connector['timeout'], $db_connector['timeout']);
 				}
 				else {
-					$this->assertSame(DB::getDefault('connector', 'timeout'), $db_connector['timeout']);
+					$this->assertSame($db_defaults['timeout'], $db_connector['timeout']);
 				}
 
-				foreach (['token', 'http_proxy', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description'] as
-						$field) {
+				foreach (['http_proxy', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description'] as $field) {
 					if (array_key_exists($field, $connector)) {
 						$this->assertSame($connector[$field], $db_connector[$field]);
 					}
@@ -897,6 +907,14 @@ class testConnector extends CAPITest {
 				else {
 					$this->assertEmpty($db_connector['username']);
 					$this->assertEmpty($db_connector['password']);
+				}
+
+				if ($db_connector['authtype'] == ZBX_HTTP_AUTH_BEARER) {
+					$this->assertNotEmpty($db_connector['token']);
+					$this->assertSame($connector['token'], $db_connector['token']);
+				}
+				else {
+					$this->assertEmpty($db_connector['token']);
 				}
 
 				// Tags.
@@ -998,7 +1016,7 @@ class testConnector extends CAPITest {
 					'output' => ['abc']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "connectorid", "name", "protocol", "data_type", "url", "max_records", "max_senders", "max_attempts", "timeout", "token", "http_proxy", "authtype", "username", "password", "verify_peer", "verify_host", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "description", "status", "tags_evaltype".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "connectorid", "name", "protocol", "data_type", "url", "max_records", "max_senders", "max_attempts", "timeout", "http_proxy", "authtype", "username", "password", "token", "verify_peer", "verify_host", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "description", "status", "tags_evaltype".'
 			],
 
 			// Check "selectTags" option.
@@ -1212,23 +1230,6 @@ class testConnector extends CAPITest {
 				'expected_error' => null
 			],
 
-			// Search by token.
-			'Test connector.get: search by "token"' => [
-				'request' => [
-					'output' => ['name', 'token'],
-					'search' => [
-						'token' => '{$BEARER_TOKEN}'
-					]
-				],
-				'expected_result' => [
-					[
-						'name' => 'API test connector.get with token (user macro)',
-						'token' => '{$BEARER_TOKEN}'
-					]
-				],
-				'expected_error' => null
-			],
-
 			// Search by HTTP proxy.
 			'Test connector.get: search by "http_proxy"' => [
 				'request' => [
@@ -1261,6 +1262,24 @@ class testConnector extends CAPITest {
 						'authtype' => (string) ZBX_HTTP_AUTH_BASIC,
 						'username' => 'test',
 						'password' => '12345678'
+					]
+				],
+				'expected_error' => null
+			],
+
+			// Search by Bearer token.
+			'Test connector.get: search by "token"' => [
+				'request' => [
+					'output' => ['name', 'authtype', 'token'],
+					'search' => [
+						'token' => '{$BEARER_TOKEN}'
+					]
+				],
+				'expected_result' => [
+					[
+						'name' => 'API test connector.get with authtype (bearer)',
+						'authtype' => (string) ZBX_HTTP_AUTH_BEARER,
+						'token' => '{$BEARER_TOKEN}'
 					]
 				],
 				'expected_error' => null
@@ -1558,22 +1577,6 @@ class testConnector extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/timeout": value must be one of 1-'.SEC_PER_MIN.'.'
 			],
 
-			// Check "token".
-			'Test connector.update: invalid "token" (boolean)' => [
-				'connector' => [
-					'connectorid' => 'update_custom_defaults',
-					'token' => false
-				],
-				'expected_error' => 'Invalid parameter "/1/token": a character string is expected.'
-			],
-			'Test connector.update: invalid "token" (too long)' => [
-				'connector' => [
-					'connectorid' => 'update_custom_defaults',
-					'token' => str_repeat('a', DB::getFieldLength('connector', 'token') + 1)
-				],
-				'expected_error' => 'Invalid parameter "/1/token": value is too long.'
-			],
-
 			// Check "http_proxy".
 			'Test connector.update: invalid "http_proxy" (boolean)' => [
 				'connector' => [
@@ -1605,7 +1608,7 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/authtype": value must be one of '.
 					implode(', ', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
-						ZBX_HTTP_AUTH_DIGEST
+						ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER
 					]).'.'
 			],
 
@@ -1653,6 +1656,30 @@ class testConnector extends CAPITest {
 					'password' => str_repeat('a', DB::getFieldLength('connector', 'password') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/password": value is too long.'
+			],
+
+			// Check "token".
+			'Test connector.update: invalid "token" (boolean)' => [
+				'connector' => [
+					'connectorid' => 'update_authtype_basic',
+					'token' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/token": a character string is expected.'
+			],
+			'Test connector.update: invalid "token" (incompatible authtype)' => [
+				'connector' => [
+					'connectorid' => 'update_authtype_basic',
+					'token' => '{$BEARER_TOKEN}'
+				],
+				'expected_error' => 'Invalid parameter "/1/token": value must be empty.'
+			],
+			'Test connector.update: invalid "token" (too long)' => [
+				'connector' => [
+					'connectorid' => 'update_authtype_basic',
+					'authtype' => ZBX_HTTP_AUTH_BEARER,
+					'token' => str_repeat('a', DB::getFieldLength('connector', 'token') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/token": value is too long.'
 			],
 
 			// Check "verify_peer".
@@ -2000,8 +2027,8 @@ class testConnector extends CAPITest {
 				}
 
 				// Text fields.
-				foreach (['timeout', 'token', 'http_proxy', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-						'description'] as $field) {
+				foreach (['timeout', 'http_proxy', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description']
+						as $field) {
 					if (array_key_exists($field, $connector)) {
 						$this->assertSame($connector[$field], $connector_upd[$field]);
 					}
@@ -2024,6 +2051,20 @@ class testConnector extends CAPITest {
 				else {
 					$this->assertEmpty($connector_upd['username']);
 					$this->assertEmpty($connector_upd['password']);
+				}
+
+				if ($connector_upd['authtype'] == ZBX_HTTP_AUTH_BEARER) {
+					$this->assertNotEmpty($connector_upd['token']);
+
+					if (array_key_exists($field, $connector)) {
+						$this->assertSame($connector['token'], $connector_upd['token']);
+					}
+					else {
+						$this->assertSame($db_connector['token'], $connector_upd['token']);
+					}
+				}
+				else {
+					$this->assertEmpty($connector_upd['token']);
 				}
 
 				// Tags.
@@ -2147,7 +2188,7 @@ class testConnector extends CAPITest {
 	private function getConnectors(array $connectorids): array {
 		$response = $this->call('connector.get', [
 			'output' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_records', 'max_senders',
-				'max_attempts', 'timeout', 'token', 'http_proxy', 'authtype', 'username', 'password', 'verify_peer',
+				'max_attempts', 'timeout', 'http_proxy', 'authtype', 'username', 'password', 'token', 'verify_peer',
 				'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'status',
 				'tags_evaltype'
 			],

@@ -120,76 +120,21 @@ $connector_tab = (new CFormGrid())
 		])
 	)
 	->addItem([
-		(new CLabel(_('Max records per message'), 'max_records'))->setAsteriskMark(),
-		new CFormField([
-			(new CDiv(
-				(new CRadioButtonList('max_records_mode', $data['form']['max_records_mode']))
-					->addValue(_('Unlimited'), 0)
-					->addValue(_('Custom'), 1)
-					->setModern()
-			))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CNumericBox('max_records', $data['form']['max_records'], 10, false, false, false))
-				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->setAriaRequired()
-		])
-	])
-	->addItem([
-		(new CLabel(_('Processes'), 'max_senders'))->setAsteriskMark(),
+		new CLabel(_('HTTP authentication'), 'authtype-focusable'),
 		new CFormField(
-			(new CNumericBox('max_senders', $data['form']['max_senders'], 3, false, false, false))
-				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->setAriaRequired()
-		)
-	])
-	->addItem([
-		(new CLabel(_('Attempts'), 'max_attempts'))->setAsteriskMark(),
-		new CFormField(
-			(new CNumericBox('max_attempts', $data['form']['max_attempts'], 1, false, false, false))
-				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->setAriaRequired()
-		)
-	])
-	->addItem([
-		(new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
-		new CFormField(
-			(new CTextBox('timeout', $data['form']['timeout'], false, DB::getFieldLength('connector', 'timeout')))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-		)
-	])
-	->addItem([
-		new CLabel(_('Bearer'), 'token'),
-		new CFormField(
-			(new CTextBox('token', $data['form']['token'], false, DB::getFieldLength('connector', 'token')))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-	])
-	->addItem([
-		new CLabel(_('Advanced configuration'), 'advanced_configuration'),
-		new CFormField(
-			(new CCheckBox('advanced_configuration'))->setChecked($data['form']['advanced_configuration'])
-		)
-	])
-	->addItem([
-		(new CLabel(_('HTTP proxy'), 'http_proxy'))->addClass('js-field-http-proxy'),
-		(new CFormField(
-			(new CTextBox('http_proxy', $data['form']['http_proxy'], false,
-				DB::getFieldLength('connector', 'http_proxy')
-			))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
-				->disableAutocomplete()
-		))->addClass('js-field-http-proxy')
-	])
-	->addItem([
-		(new CLabel(_('HTTP authentication'), 'authtype-focusable'))->addClass('js-field-authtype'),
-		(new CFormField(
 			(new CSelect('authtype'))
 				->setId('authtype')
 				->setFocusableElementId('authtype-focusable')
 				->setValue($data['form']['authtype'])
-				->addOptions(CSelect::createOptionsFromArray(httptest_authentications()))
-		))->addClass('js-field-authtype')
+				->addOptions(CSelect::createOptionsFromArray([
+					ZBX_HTTP_AUTH_NONE => _('None'),
+					ZBX_HTTP_AUTH_BASIC => _('Basic'),
+					ZBX_HTTP_AUTH_NTLM => _('NTLM'),
+					ZBX_HTTP_AUTH_KERBEROS => _('Kerberos'),
+					ZBX_HTTP_AUTH_DIGEST => _('Digest'),
+					ZBX_HTTP_AUTH_BEARER => _('Bearer')
+				]))
+		)
 	])
 	->addItem([
 		(new CLabel(_('Username'), 'username'))->addClass('js-field-username'),
@@ -205,6 +150,78 @@ $connector_tab = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->disableAutocomplete()
 		))->addClass('js-field-password')
+	])
+	->addItem([
+		(new CLabel(_('Bearer token'), 'token'))
+			->addClass('js-field-token')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('token', $data['form']['token'], false, DB::getFieldLength('connector', 'token')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->addClass('js-field-token')
+	])
+	->addItem([
+		new CLabel(_('Advanced configuration'), 'advanced_configuration'),
+		new CFormField(
+			(new CCheckBox('advanced_configuration'))->setChecked($data['form']['advanced_configuration'])
+		)
+	])
+	->addItem([
+		(new CLabel(_('Max records per message'), 'max_records'))
+			->addClass('js-field-max-records')
+			->setAsteriskMark(),
+		(new CFormField([
+			(new CDiv(
+				(new CRadioButtonList('max_records_mode', $data['form']['max_records_mode']))
+					->addValue(_('Unlimited'), 0)
+					->addValue(_('Custom'), 1)
+					->setModern()
+			))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CNumericBox('max_records', $data['form']['max_records'], 10, false, false, false))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		]))->addClass('js-field-max-records')
+	])
+	->addItem([
+		(new CLabel(_('Concurrent sessions'), 'max_senders'))
+			->addClass('js-field-max-senders')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CNumericBox('max_senders', $data['form']['max_senders'], 3, false, false, false))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		))->addClass('js-field-max-senders')
+	])
+	->addItem([
+		(new CLabel(_('Attempts'), 'max_attempts'))
+			->addClass('js-field-max-attempts')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CNumericBox('max_attempts', $data['form']['max_attempts'], 1, false, false, false))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		))->addClass('js-field-max-attempts')
+	])
+	->addItem([
+		(new CLabel(_('Timeout'), 'timeout'))
+			->addClass('js-field-timeout')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('timeout', $data['form']['timeout'], false, DB::getFieldLength('connector', 'timeout')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+		))->addClass('js-field-timeout')
+	])
+	->addItem([
+		(new CLabel(_('HTTP proxy'), 'http_proxy'))->addClass('js-field-http-proxy'),
+		(new CFormField(
+			(new CTextBox('http_proxy', $data['form']['http_proxy'], false,
+				DB::getFieldLength('connector', 'http_proxy')
+			))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+				->disableAutocomplete()
+		))->addClass('js-field-http-proxy')
 	])
 	->addItem([
 		(new CLabel(_('SSL verify peer'), 'verify_peer'))->addClass('js-field-verify-peer'),

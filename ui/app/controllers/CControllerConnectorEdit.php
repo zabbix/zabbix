@@ -57,7 +57,7 @@ class CControllerConnectorEdit extends CController {
 		if ($this->hasInput('connectorid')) {
 			$db_connectors = API::Connector()->get([
 				'output' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_records', 'max_senders',
-					'max_attempts', 'timeout', 'token', 'http_proxy', 'authtype', 'username', 'password', 'verify_peer',
+					'max_attempts', 'timeout', 'http_proxy', 'authtype', 'username', 'password', 'token', 'verify_peer',
 					'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'status',
 					'tags_evaltype'
 				],
@@ -90,25 +90,26 @@ class CControllerConnectorEdit extends CController {
 					'protocol' => $this->connector['protocol'],
 					'data_type' => (int) $this->connector['data_type'],
 					'url' => $this->connector['url'],
-					'max_records_mode' => $this->connector['max_records'] == 0 ? 0 : 1,
-					'max_records' => (int) $this->connector['max_records'],
-					'max_senders' => (int) $this->connector['max_senders'],
-					'max_attempts' => (int) $this->connector['max_attempts'],
-					'timeout' => $this->connector['timeout'],
+					'authtype' => (int) $this->connector['authtype'],
+					'username' => $this->connector['username'],
+					'password' => $this->connector['password'],
 					'token' => $this->connector['token'],
-					'advanced_configuration' => $this->connector['http_proxy'] !== $db_defaults['http_proxy']
-						|| $this->connector['authtype'] != $db_defaults['authtype']
-						|| $this->connector['username'] !== $db_defaults['username']
-						|| $this->connector['password'] !== $db_defaults['password']
+					'advanced_configuration' => $this->connector['max_records'] != $db_defaults['max_records']
+						|| $this->connector['max_senders'] != $db_defaults['max_senders']
+						|| $this->connector['max_attempts'] != $db_defaults['max_attempts']
+						|| $this->connector['timeout'] !== $db_defaults['timeout']
+						|| $this->connector['http_proxy'] !== $db_defaults['http_proxy']
 						|| $this->connector['verify_peer'] != $db_defaults['verify_peer']
 						|| $this->connector['verify_host'] != $db_defaults['verify_host']
 						|| $this->connector['ssl_cert_file'] !== $db_defaults['ssl_cert_file']
 						|| $this->connector['ssl_key_file'] !== $db_defaults['ssl_key_file']
 						|| $this->connector['ssl_key_password'] !== $db_defaults['ssl_key_password'],
 					'http_proxy' => $this->connector['http_proxy'],
-					'authtype' => (int) $this->connector['authtype'],
-					'username' => $this->connector['username'],
-					'password' => $this->connector['password'],
+					'max_records_mode' => $this->connector['max_records'] == 0 ? 0 : 1,
+					'max_records' => (int) $this->connector['max_records'],
+					'max_senders' => (int) $this->connector['max_senders'],
+					'max_attempts' => (int) $this->connector['max_attempts'],
+					'timeout' => $this->connector['timeout'],
 					'verify_peer' => (int) $this->connector['verify_peer'],
 					'verify_host' => (int) $this->connector['verify_host'],
 					'ssl_cert_file' => $this->connector['ssl_cert_file'],
@@ -137,17 +138,17 @@ class CControllerConnectorEdit extends CController {
 					'protocol' => (int) $db_defaults['protocol'],
 					'data_type' => (int) $db_defaults['data_type'],
 					'url' => $db_defaults['url'],
+					'authtype' => (int) $db_defaults['authtype'],
+					'username' => $db_defaults['username'],
+					'password' => $db_defaults['password'],
+					'token' => $db_defaults['token'],
+					'advanced_configuration' => false,
 					'max_records_mode' => 0,
 					'max_records' => (int) $db_defaults['max_records'],
 					'max_senders' => (int) $db_defaults['max_senders'],
 					'max_attempts' => (int) $db_defaults['max_attempts'],
 					'timeout' => $db_defaults['timeout'],
-					'token' => $db_defaults['token'],
-					'advanced_configuration' => false,
 					'http_proxy' => $db_defaults['http_proxy'],
-					'authtype' => (int) $db_defaults['authtype'],
-					'username' => $db_defaults['username'],
-					'password' => $db_defaults['password'],
 					'verify_peer' => (int) $db_defaults['verify_peer'],
 					'verify_host' => (int) $db_defaults['verify_host'],
 					'ssl_cert_file' => $db_defaults['ssl_cert_file'],

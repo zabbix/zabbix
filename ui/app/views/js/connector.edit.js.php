@@ -39,7 +39,7 @@ window.connector_edit_popup = new class {
 			rows: tags
 		});
 
-		for (const id of ['tags', 'max_records_mode', 'advanced_configuration', 'authtype']) {
+		for (const id of ['tags', 'authtype', 'advanced_configuration', 'max_records_mode']) {
 			document.getElementById(id).addEventListener('change', () => this._updateForm());
 		}
 
@@ -50,15 +50,26 @@ window.connector_edit_popup = new class {
 		for (const tag_operator of document.getElementById('tags').querySelectorAll('.js-tag-operator')) {
 			const tag_value = tag_operator.closest('.form_row').querySelector('.js-tag-value');
 
-			tag_value.style.display = (tag_operator.value == <?= CONDITION_OPERATOR_EXISTS ?>
-				|| tag_operator.value == <?= CONDITION_OPERATOR_NOT_EXISTS ?>) ? 'none' : '';
+			tag_value.style.display = tag_operator.value == <?= CONDITION_OPERATOR_EXISTS ?>
+				|| tag_operator.value == <?= CONDITION_OPERATOR_NOT_EXISTS ?> ? 'none' : '';
 		}
 
-		const max_records_mode = this.form.querySelector('[name="max_records_mode"]:checked').value;
-		document.getElementById('max_records').style.display = max_records_mode == 0 ? 'none' : '';
+		const authtype = document.getElementById('authtype').value;
+		const use_username_password = authtype == <?= ZBX_HTTP_AUTH_BASIC ?> || authtype == <?= ZBX_HTTP_AUTH_NTLM ?>
+			|| authtype == <?= ZBX_HTTP_AUTH_KERBEROS ?> || authtype == <?= ZBX_HTTP_AUTH_DIGEST ?>;
+		const use_token = authtype == <?= ZBX_HTTP_AUTH_BEARER ?>;
+
+		for (const field of this.form.querySelectorAll('.js-field-username, .js-field-password')) {
+			field.style.display = use_username_password ? '' : 'none';
+		}
+
+		for (const field of this.form.querySelectorAll('.js-field-token')) {
+			field.style.display = use_token ? '' : 'none';
+		}
 
 		const advanced_configuration_enabled = document.getElementById('advanced_configuration').checked;
-		const advanced_configuration_fields = ['.js-field-http-proxy', '.js-field-authtype', '.js-field-verify-peer',
+		const advanced_configuration_fields = ['.js-field-max-records', '.js-field-max-senders',
+			'.js-field-max-attempts', '.js-field-timeout', '.js-field-http-proxy', '.js-field-verify-peer',
 			'.js-field-verify-host', '.js-field-ssl-cert-file', '.js-field-ssl-key-file', '.js-field-ssl-key-password'
 		];
 
@@ -66,11 +77,8 @@ window.connector_edit_popup = new class {
 			field.style.display = advanced_configuration_enabled ? '' : 'none';
 		}
 
-		const authtype_none = document.getElementById('authtype').value == <?= ZBX_HTTP_AUTH_NONE ?>;
-
-		for (const field of this.form.querySelectorAll('.js-field-username, .js-field-password')) {
-			field.style.display = advanced_configuration_enabled && !authtype_none ? '' : 'none';
-		}
+		const max_records_mode = this.form.querySelector('[name="max_records_mode"]:checked').value;
+		document.getElementById('max_records').style.display = max_records_mode == 0 ? 'none' : '';
 	}
 
 	clone({title, buttons}) {
@@ -98,7 +106,7 @@ window.connector_edit_popup = new class {
 			fields.connectorid = this.connectorid;
 		}
 
-		const fields_to_trim = ['name', 'url', 'timeout', 'token', 'http_proxy', 'username', 'ssl_cert_file',
+		const fields_to_trim = ['name', 'url', 'username', 'token', 'timeout', 'http_proxy', 'ssl_cert_file',
 			'ssl_key_file', 'description'
 		];
 		for (const field of fields_to_trim) {
