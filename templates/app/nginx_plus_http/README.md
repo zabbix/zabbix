@@ -27,7 +27,7 @@ For Zabbix version: 6.0 and higher.
 > Refer to the [vendor documentation](https://www.nginx.com/products/nginx/live-activity-monitoring/).
 2. Set the {$NGINX.API.ENDPOINT} such as `<scheme>://<host>:<port>/<location>/`.
 
-**Note**, that depending on the number of zones and upstreams discovery operation may be expensive. 
+**Note** that depending on the number of zones and upstreams discovery operation may be expensive. 
 Therefore, use the following filters with these macros:
 
 - {$NGINX.LLD.FILTER.HTTP.ZONE.MATCHES}
