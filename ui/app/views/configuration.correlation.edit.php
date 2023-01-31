@@ -37,10 +37,6 @@ $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('correlation.edit')
 	->setName('correlation.edit')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'correlation.condition.add')
-		->getUrl()
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['correlationid'] != 0) {
