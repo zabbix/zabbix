@@ -978,20 +978,19 @@ ZBX_NotificationsAlarm.prototype.acceptNotification = function(notif) {
 };
 
 /**
- * Create and register ZBX_Notifications instance.
- * Appends notifications list node to DOM when document is ready, then make it draggable.
- *
- * @param {string} csrf_token  CSRF token to use for notifications.read and notifications.mute fetch requests.
+ * Registering instance.
  */
-function startGuiNotifications(csrf_token) {
-	ZABBIX.namespace('instances.notifications', new ZBX_Notifications(
-		ZABBIX.namespace('instances.localStorage'),
-		ZABBIX.namespace('instances.browserTab'),
-		csrf_token
-	));
+ZABBIX.namespace('instances.notifications', new ZBX_Notifications(
+	ZABBIX.namespace('instances.localStorage'),
+	ZABBIX.namespace('instances.browserTab')
+));
 
-	let wrapper = document.querySelector('.wrapper'),
-		main = document.querySelector('main'),
+/**
+ * Appends list node to DOM when document is ready, then make it draggable.
+ */
+$(function() {
+	let wrapper = document.querySelector(".wrapper"),
+		main = document.querySelector("main"),
 		ntf_node = ZABBIX.namespace('instances.notifications.collection.node'),
 		store = ZABBIX.namespace('instances.localStorage'),
 		ntf_pos = store.readKey('web.notifications.pos', null),
@@ -1045,4 +1044,4 @@ function startGuiNotifications(csrf_token) {
 			store.writeKey('web.notifications.pos', ntf_pos);
 		}
 	});
-}
+});

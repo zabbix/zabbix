@@ -22,10 +22,6 @@
 /**
  * @var CView $this
  */
-
-$show_gui_messaging = !defined('ZBX_PAGE_NO_MENU') || $data['web_layout_mode'] == ZBX_LAYOUT_KIOSKMODE
-	? (int)!CWebUser::isGuest()
-	: null;
 ?>
 
 <script type="text/javascript">
@@ -37,10 +33,6 @@ $show_gui_messaging = !defined('ZBX_PAGE_NO_MENU') || $data['web_layout_mode'] =
 		// the chkbxRange.init() method must be called after the inserted post scripts and initializing cookies
 		cookie.init();
 		chkbxRange.init();
-
-		<?php if ($show_gui_messaging): ?>
-			startGuiNotifications(<?= json_encode(CCsrfTokenHelper::get('notifications')) ?>);
-		<?php endif ?>
 	});
 
 	/**
