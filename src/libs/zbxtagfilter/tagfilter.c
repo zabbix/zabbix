@@ -31,10 +31,7 @@ ZBX_PTR_VECTOR_IMPL(match_tags, zbx_match_tag_t*)
  ******************************************************************/
 static int	match_tag(const zbx_match_tag_t *mtag, const zbx_tag_t *etag, unsigned char op)
 {
-	if (NULL == etag)
-		return FAIL;
-
-	if (ZBX_CONDITION_OPERATOR_EXIST == op)
+	if (ZBX_CONDITION_OPERATOR_EXIST == op && NULL != mtag && NULL != etag)
 		return SUCCEED;
 
 	return zbx_strmatch_condition(etag->value, mtag->value, op);
