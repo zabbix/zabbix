@@ -413,7 +413,7 @@ Overlay.prototype.unsetProperty = function(key) {
 			break;
 
 		case 'doc_url':
-			const doc_link = this.$dialogue.$head[0].querySelector('.zi-help');
+			const doc_link = this.$dialogue.$head[0].querySelector(ZBX_ICON_HELP);
 			if (doc_link !== null) {
 				doc_link.remove();
 			}

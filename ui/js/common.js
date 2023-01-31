@@ -31,6 +31,7 @@ const ZBX_ICON_COPY = 'zi-copy';
 const ZBX_ICON_DRAG_HANDLE = 'zi-drag-handle';
 const ZBX_ICON_EYE_OFF = 'zi-eye-off';
 const ZBX_ICON_FILTER = 'zi-filter';
+const ZBX_ICON_HELP = 'zi-help';
 const ZBX_ICON_HOME = 'zi-home';
 const ZBX_ICON_LOCK = 'zi-lock';
 const ZBX_ICON_MORE = 'zi-more';
