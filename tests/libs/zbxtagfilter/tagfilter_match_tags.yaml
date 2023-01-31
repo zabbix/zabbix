@@ -1,5 +1,5 @@
 ---
-test case: No match tags and event tags (1)
+test case: No match tags, no event tags (1)
 in:
   eval_type: and/or
   match_tags: []
@@ -7,7 +7,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: No match tags and event tags (2)
+test case: No match tags, no event tags (2)
 in:
   eval_type: or
   match_tags: []
@@ -15,7 +15,27 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Match tags with no event tags (1)
+test case: No match tags, one event tag (1)
+in:
+  eval_type: and/or
+  match_tags: []
+  tags:
+    - tag: a
+      value: 1
+out:
+  return: SUCCEED
+---
+test case: No match tags, one event tag (2)
+in:
+  eval_type: or
+  match_tags: []
+  tags:
+    - tag: a
+      value: 1
+out:
+  return: SUCCEED
+---
+test case: One match tag, no event tags (1)
 in:
   eval_type: and/or
   match_tags:
@@ -26,7 +46,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Match tags with no event tags (2)
+test case: One match tag, no event tags (2)
 in:
   eval_type: and/or
   match_tags:
@@ -37,7 +57,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Match tags with no event tags (3)
+test case: One match tag, no event tags (3)
 in:
   eval_type: and/or
   match_tags:
@@ -48,7 +68,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Match tags with no event tags (4)
+test case: One match tag, no event tags (4)
 in:
   eval_type: and/or
   match_tags:
@@ -59,7 +79,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Match tags with no event tags (5)
+test case: One match tag, no event tags (5)
 in:
   eval_type: and/or
   match_tags:
@@ -70,7 +90,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Match tags with no event tags (6)
+test case: One match tag, no event tags (6)
 in:
   eval_type: and/or
   match_tags:
@@ -81,7 +101,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Match tags with no event tags (7)
+test case: One match tag, no event tags (7)
 in:
   eval_type: or
   match_tags:
@@ -92,7 +112,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Match tags with no event tags (8)
+test case: One match tag, no event tags (8)
 in:
   eval_type: or
   match_tags:
@@ -103,7 +123,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Match tags with no event tags (9)
+test case: One match tag, no event tags (9)
 in:
   eval_type: or
   match_tags:
@@ -114,7 +134,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Match tags with no event tags (10)
+test case: One match tag, no event tags (10)
 in:
   eval_type: or
   match_tags:
@@ -125,7 +145,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Match tags with no event tags (11)
+test case: One match tag, no event tags (11)
 in:
   eval_type: or
   match_tags:
@@ -136,7 +156,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Match tags with no event tags (12)
+test case: One match tag, no event tags (12)
 in:
   eval_type: or
   match_tags:
