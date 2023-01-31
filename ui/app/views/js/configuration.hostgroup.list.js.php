@@ -183,6 +183,7 @@
 				postMessageDetails('success', success.messages);
 			}
 
+			uncheckTableRows('hostgroup');
 			location.href = location.href;
 		}
 	};
