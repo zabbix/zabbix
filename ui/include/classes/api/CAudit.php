@@ -250,7 +250,10 @@ class CAudit {
 			'paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']
 		],
 		self::RESOURCE_CONNECTOR => [
-			['paths' => ['connector.token']],
+			[
+				'paths' => ['connector.token'],
+				'conditions' => ['authtype' => ZBX_HTTP_AUTH_BEARER]
+			],
 			[
 				'paths' => ['connector.password'],
 				'conditions' => [
