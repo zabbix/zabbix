@@ -888,7 +888,6 @@ class CImportReferencer {
 	 */
 	public function setDbValueMap(string $valuemapid, array $valuemap): void {
 		$this->db_valuemaps[$valuemapid] = [
-			'uuid' => $valuemap['uuid'],
 			'name' => $valuemap['name'],
 			'hostid' => $valuemap['hostid']
 		];

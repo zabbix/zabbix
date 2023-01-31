@@ -765,6 +765,7 @@ class CConfigurationImport {
 				if ($valuemapid !== null) {
 					if ($this->options['valueMaps']['updateExisting']) {
 						$upd_valuemaps[] = ['valuemapid' => $valuemapid] + $valuemap;
+						$this->referencer->setDbValueMap($valuemapid, ['hostid' => $hostid] + $valuemap);
 					}
 				}
 				else {
@@ -775,26 +776,15 @@ class CConfigurationImport {
 			}
 		}
 
-		$upd_valuemapids = [];
-
 		if ($upd_valuemaps) {
 			API::ValueMap()->update($upd_valuemaps);
-			$upd_valuemapids = array_column($upd_valuemapids, 'valuemapid');
 		}
 
 		if ($ins_valuemaps) {
 			$ins_valuemapids = API::ValueMap()->create($ins_valuemaps)['valuemapids'];
-			$upd_valuemapids = array_merge($upd_valuemapids, $ins_valuemapids);
-		}
 
-		if ($upd_valuemapids) {
-			$db_valuemaps = API::ValueMap()->get([
-				'output' => ['uuid', 'name', 'hostid'],
-				'valuemapids' => array_flip($upd_valuemapids),
-				'preservekeys' => true
-			]);
-
-			foreach ($db_valuemaps as $valuemapid => $valuemap) {
+			foreach ($ins_valuemaps as $valuemap) {
+				$valuemapid = array_shift($ins_valuemapids);
 				$this->referencer->setDbValueMap($valuemapid, $valuemap);
 			}
 		}
