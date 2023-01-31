@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2023-01-30T16:04:40Z'
+  date: '2023-02-01T09:10:22Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1288,7 +1288,9 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'The effectiveness statistics of Zabbix trend function cache. The percentage of cached items calculated from the sum of cached items plus requests. Low percentage most likely means that the cache size can be reduced.'
+          description: |
+            The effectiveness statistics of Zabbix trend function cache. The percentage of cached items calculated from the sum of cached items plus requests.
+            Low percentage most likely means that the cache size can be reduced.
           preprocessing:
             -
               type: JSONPATH
@@ -1454,7 +1456,7 @@ zabbix_export:
           history: 1w
           trends: '0'
           value_type: CHAR
-          description: 'A version of the Zabbix server.'
+          description: 'A version of Zabbix server.'
           preprocessing:
             -
               type: JSONPATH
@@ -1477,7 +1479,7 @@ zabbix_export:
               name: 'Remote Zabbix server: Version has changed'
               event_name: 'Remote Zabbix server: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Zabbix server version has changed. Acknowledge to close manually.'
+              description: 'Zabbix server version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1897,7 +1899,7 @@ zabbix_export:
           type: DEPENDENT
           key: zabbix.nodes.discovery
           delay: '0'
-          description: 'LLD rule with item and trigger prototypes for node discovery.'
+          description: 'LLD rule with item and trigger prototypes for the node discovery.'
           item_prototypes:
             -
               uuid: caca3ccdcec141a3a9c3233ba72b8d0d
@@ -1908,7 +1910,7 @@ zabbix_export:
               history: 1w
               trends: '0'
               value_type: CHAR
-              description: 'The IPv4 address of the node.'
+              description: 'The IPv4 address of a node.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1991,7 +1993,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Provides the statistics of the node.'
+              description: 'Provides the statistics of a node.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2019,7 +2021,7 @@ zabbix_export:
               key: 'zabbix.nodes.status[{#NODE.ID}]'
               delay: '0'
               history: 1w
-              description: 'The node status.'
+              description: 'The status of a node.'
               valuemap:
                 name: 'Cluster node status'
               preprocessing:
@@ -2076,7 +2078,7 @@ zabbix_export:
           type: DEPENDENT
           key: zabbix.proxy.discovery
           delay: '0'
-          description: 'LLD rule with item and trigger prototypes for proxy discovery.'
+          description: 'LLD rule with item and trigger prototypes for the proxy discovery.'
           item_prototypes:
             -
               uuid: b1fe4bb454a543a78cfa84810e320b46
@@ -2085,7 +2087,7 @@ zabbix_export:
               key: 'zabbix.proxy.cert[{#PROXY.NAME}]'
               delay: '0'
               history: 1w
-              description: 'The encryption status for connections from the proxy.'
+              description: 'The encryption status for connections from a proxy.'
               valuemap:
                 name: 'Service state'
               preprocessing:
@@ -2117,7 +2119,7 @@ zabbix_export:
               key: 'zabbix.proxy.compatibility[{#PROXY.NAME}]'
               delay: '0'
               history: 1w
-              description: 'The compatibility of the Zabbix proxy.'
+              description: 'The compatibility of Zabbix proxy.'
               valuemap:
                 name: Compatibility
               preprocessing:
@@ -2145,7 +2147,7 @@ zabbix_export:
                   name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy is incompatible'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'The Zabbix proxy is incompatible with your server.'
+                  description: 'Zabbix proxy is incompatible with the server.'
                   dependencies:
                     -
                       name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy never seen'
@@ -2161,7 +2163,7 @@ zabbix_export:
               key: 'zabbix.proxy.compression[{#PROXY.NAME}]'
               delay: '0'
               history: 1w
-              description: 'The compression status of the proxy.'
+              description: 'The compression status of a proxy.'
               valuemap:
                 name: 'Service state'
               preprocessing:
@@ -2193,7 +2195,7 @@ zabbix_export:
               key: 'zabbix.proxy.hosts[{#PROXY.NAME}]'
               delay: '0'
               history: 1w
-              description: 'The number of enabled hosts assigned to the proxy.'
+              description: 'The number of enabled hosts assigned to a proxy.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2219,7 +2221,7 @@ zabbix_export:
               key: 'zabbix.proxy.items[{#PROXY.NAME}]'
               delay: '0'
               history: 1w
-              description: 'The number of enabled items on enabled hosts assigned to the proxy.'
+              description: 'The number of enabled items on enabled hosts assigned to a proxy.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2246,7 +2248,7 @@ zabbix_export:
               delay: '0'
               history: 1w
               value_type: FLOAT
-              description: 'The time when the proxy was last seen by the server.'
+              description: 'The time when a proxy was last seen by a server.'
               valuemap:
                 name: 'Last seen'
               preprocessing:
@@ -2271,7 +2273,7 @@ zabbix_export:
                   event_name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy last seen more than {$PROXY.LAST_SEEN.MAX} seconds ago'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'The Zabbix proxy is not updating the configuration data.'
+                  description: 'Zabbix proxy is not updating the configuration data.'
                   dependencies:
                     -
                       name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy never seen'
@@ -2286,7 +2288,7 @@ zabbix_export:
                   name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy never seen'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'The Zabbix proxy is not updating the configuration data.'
+                  description: 'Zabbix proxy is not updating the configuration data.'
                   tags:
                     -
                       tag: scope
@@ -2298,7 +2300,7 @@ zabbix_export:
               key: 'zabbix.proxy.mode[{#PROXY.NAME}]'
               delay: '0'
               history: 1w
-              description: 'The mode of the Zabbix proxy.'
+              description: 'The mode of Zabbix proxy.'
               valuemap:
                 name: 'Proxy mode'
               preprocessing:
@@ -2330,7 +2332,7 @@ zabbix_export:
               key: 'zabbix.proxy.psk[{#PROXY.NAME}]'
               delay: '0'
               history: 1w
-              description: 'The encryption status for connections from the proxy.'
+              description: 'The encryption status for connections from a proxy.'
               valuemap:
                 name: 'Service state'
               preprocessing:
@@ -2364,7 +2366,7 @@ zabbix_export:
               history: 1w
               value_type: FLOAT
               units: '!vps'
-              description: 'The required performance of the proxy (the number of values that need to be collected per second).'
+              description: 'The required performance of a proxy (the number of values that need to be collected per second).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2417,7 +2419,7 @@ zabbix_export:
               key: 'zabbix.proxy.unencrypted[{#PROXY.NAME}]'
               delay: '0'
               history: 1w
-              description: 'The encryption status for connections from the proxy.'
+              description: 'The encryption status for connections from a proxy.'
               valuemap:
                 name: 'Service state'
               preprocessing:
@@ -2451,7 +2453,7 @@ zabbix_export:
               history: 1w
               trends: '0'
               value_type: CHAR
-              description: 'A version of the Zabbix proxy.'
+              description: 'A version of Zabbix proxy.'
               preprocessing:
                 -
                   type: JSONPATH
