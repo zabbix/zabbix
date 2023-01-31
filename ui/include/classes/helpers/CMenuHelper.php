@@ -433,6 +433,7 @@ class CMenuHelper {
 
 		$menu->add(
 			(new CMenuItem(_('Help')))
+				->addClass(ZBX_STYLE_BTN_ICON)
 				->setIcon(ZBX_ICON_HELP)
 				->setUrl(new CUrl(CBrandHelper::getHelpUrl()))
 				->setTitle(_('Help'))

@@ -151,7 +151,12 @@ button {
 	}
 }
 
-.btn-icon {
+a.btn-icon {
+	@extend button;
+}
+
+.btn-icon,
+a.btn-icon{
 	background: transparent;
 	border: none;
 

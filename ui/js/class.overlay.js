@@ -413,7 +413,7 @@ Overlay.prototype.unsetProperty = function(key) {
 			break;
 
 		case 'doc_url':
-			const doc_link = this.$dialogue.$head[0].querySelector('.icon-doc-link');
+			const doc_link = this.$dialogue.$head[0].querySelector('.zi-help');
 			if (doc_link !== null) {
 				doc_link.remove();
 			}
@@ -472,7 +472,7 @@ Overlay.prototype.setProperties = function(obj) {
 			case 'doc_url':
 				this.unsetProperty(key);
 				this.$dialogue.$header[0].insertAdjacentHTML('afterend', `
-					<a class="icon-doc-link" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
+					<a class="btn-icon zi-help" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
 				`);
 				break;
 

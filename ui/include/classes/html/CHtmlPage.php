@@ -177,7 +177,8 @@ class CHtmlPage {
 				(new CLink(null, $this->doc_url))
 					->setTitle(_('Help'))
 					->setTarget('_blank')
-					->addClass(ZBX_STYLE_ICON_DOC_LINK)
+					->addClass(ZBX_STYLE_BTN_ICON)
+					->addClass(ZBX_ICON_HELP)
 			))->addClass(self::ZBX_STYLE_HEADER_DOC_LINK);
 		}
 

@@ -2171,9 +2171,6 @@ define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
 
 define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
 
-// Icons.
-define('ZBX_STYLE_ICON_DOC_LINK', 'icon-doc-link'); // TODO - AS: ??? rename constant to ZBX_ICON_HELP
-
 // Host interface styles.
 define('ZBX_STYLE_HOST_INTERFACES', 'interfaces');
 define('ZBX_STYLE_HOST_INTERFACE_CONTAINER', 'interface-container');
