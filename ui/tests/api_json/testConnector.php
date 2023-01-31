@@ -1307,7 +1307,7 @@ class testConnector extends CAPITest {
 				'request' => [
 					'output' => ['connectorid', 'name'],
 					'selectTags' => ['tag', 'operator', 'value'],
-					'connectorids' => ['get_custom_defaults', 'get_tags'],
+					'connectorids' => ['get_custom_defaults', 'get_tags']
 				],
 				'expected_result' => [
 					[
@@ -1340,7 +1340,7 @@ class testConnector extends CAPITest {
 				'request' => [
 					'output' => ['connectorid', 'name'],
 					'selectTags' => API_OUTPUT_COUNT,
-					'connectorids' => ['get_custom_defaults', 'get_tags'],
+					'connectorids' => ['get_custom_defaults', 'get_tags']
 				],
 				'expected_result' => [
 					[
