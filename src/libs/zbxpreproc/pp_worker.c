@@ -117,8 +117,8 @@ static void	*pp_worker_entry(void *arg)
 	worker->stop = 0;
 
 	pp_context_init(&worker->execute_ctx);
-	pp_task_queue_register_worker(queue);
 	pp_task_queue_lock(queue);
+	pp_task_queue_register_worker(queue);
 
 	while (0 == worker->stop)
 	{
