@@ -65,6 +65,10 @@
 
 #define ZBX_MEDIA_CONTENT_TYPE_DEFAULT		255
 
+extern char	*CONFIG_DBHOST;
+extern char	*CONFIG_DBNAME;
+extern int	CONFIG_DBPORT;
+
 /*
  * The alert queue is implemented as a nested queue.
  *

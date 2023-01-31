@@ -27,21 +27,6 @@
 #include "zbxnum.h"
 #include "zbxversion.h"
 
-extern char	*CONFIG_DBHOST;
-extern char	*CONFIG_DBNAME;
-extern char	*CONFIG_DBSCHEMA;
-extern char	*CONFIG_DBUSER;
-extern char	*CONFIG_DBPASSWORD;
-extern char	*CONFIG_DBSOCKET;
-extern char	*CONFIG_DB_TLS_CONNECT;
-extern char	*CONFIG_DB_TLS_CERT_FILE;
-extern char	*CONFIG_DB_TLS_KEY_FILE;
-extern char	*CONFIG_DB_TLS_CA_FILE;
-extern char	*CONFIG_DB_TLS_CIPHER;
-extern char	*CONFIG_DB_TLS_CIPHER_13;
-extern int	CONFIG_DBPORT;
-extern int	CONFIG_UNAVAILABLE_DELAY;
-
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1
 #define ZBX_DB_CONNECT_ONCE	2
@@ -484,6 +469,11 @@ typedef struct
 }
 zbx_service_alarm_t;
 
+void	zbx_init_library_dbhigh(char *config_dbhost, char *config_dbname, char *config_dbschema, char *config_dbuser,
+		char *config_dbpassword, char *config_dbsocket, char *config_db_tls_connect,
+		char *config_db_tls_cert_file, char *config_db_tls_key_file, char *config_db_tls_ca_file,
+		char *config_db_tls_cipher, char *config_db_tls_cipher_13, int config_dbport,
+		int config_unavailable_delay);
 int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char **error);
 void	zbx_db_deinit(void);
 

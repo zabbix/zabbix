@@ -24,6 +24,9 @@
 #include "zbxdbhigh.h"
 #include "log.h"
 
+extern char	*CONFIG_DBNAME;
+extern char	*CONFIG_DBSCHEMA;
+
 typedef struct
 {
 	zbx_dbpatch_t	*patches;

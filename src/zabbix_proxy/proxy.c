@@ -1174,6 +1174,10 @@ int	main(int argc, char **argv)
 	zbx_init_library_ipcservice(program_type);
 	zbx_init_library_sysinfo(get_config_timeout);
 	zbx_init_library_stats(get_program_type);
+	zbx_init_library_dbhigh(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBUSER, CONFIG_DBPASSWORD,
+			CONFIG_DBSOCKET, CONFIG_DB_TLS_CONNECT, CONFIG_DB_TLS_CERT_FILE, CONFIG_DB_TLS_KEY_FILE,
+			CONFIG_DB_TLS_CA_FILE, CONFIG_DB_TLS_CIPHER, CONFIG_DB_TLS_CIPHER_13, CONFIG_DBPORT,
+			CONFIG_UNAVAILABLE_DELAY);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
