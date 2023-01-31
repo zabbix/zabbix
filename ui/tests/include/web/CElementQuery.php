@@ -327,15 +327,17 @@ class CElementQuery implements IWaitable {
 	 * @param IWaitable $target       target for wait operation
 	 * @param string    $condition    condition to be waited for
 	 * @param array     $params       condition params
+	 * @param integer   $timeout	  timeout in seconds
 	 */
-	public static function waitUntil($target, $condition, $params = []) {
+	public static function waitUntil($target, $condition, $params = [], $timeout = null) {
 		$selector = $target->getSelectorAsText();
 		if ($selector !== null) {
 			$selector = ' located by '.$selector;
 		}
 
 		$callable = call_user_func_array([$target, CElementFilter::getConditionCallable($condition)], $params);
-		self::wait()->until($callable, 'Failed to wait for element'.$selector.' to be '.$condition.'.');
+		$wait = forward_static_call_array([get_class(), 'wait'], $timeout !== null ? [$timeout] : []);
+		$wait->until($callable, 'Failed to wait for element'.$selector.' to be '.$condition.'.');
 	}
 
 	/**
@@ -357,7 +359,7 @@ class CElementQuery implements IWaitable {
 				else {
 					$elements = $this->context->findElements($this->by);
 					if (!$elements) {
-						throw new NoSuchElementException(null);
+						throw new NoSuchElementException('');
 					}
 
 					$element = end($elements);

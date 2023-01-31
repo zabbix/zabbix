@@ -24,11 +24,23 @@
 class CMessageElement extends CElement {
 
 	/**
-	 * @inheritdoc
+	 * Simplified selector for message element that can be located directly on page.
+	 *
+	 * @param sting   $selector    message element search area
+	 * @param boolean $strict      absolute or relative path to message element
+	 *
+	 * @return CMessageElement
 	 */
-	public static function find() {
-		return (new CElementQuery('xpath:.//output[@role="contentinfo" or '.
-				CXPathHelper::fromClass('msg-global').']'))->waitUntilVisible()->asMessage();
+	public static function find($selector = null, $strict = false) {
+		$preffix = 'xpath:./'.(!$strict ? '/' : '');
+		$query = new CElementQuery($preffix.'output[@role="contentinfo" or '.CXPathHelper::fromClass('msg-global').']');
+		if ($selector) {
+			if (!$selector instanceof CElement) {
+				$selector = (new CElementQuery($selector))->waitUntilPresent()->one();
+			}
+			$query->setContext($selector);
+		}
+		return $query->waitUntilVisible()->asMessage();
 	}
 
 	/**

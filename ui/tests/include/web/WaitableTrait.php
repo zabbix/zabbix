@@ -42,10 +42,12 @@ trait WaitableTrait {
 	/**
 	 * Wait until object is ready.
 	 *
+	 * @param integer $timeout    timeout in seconds
+	 *
 	 * @return $this
 	 */
-	public function waitUntilReady() {
-		CElementQuery::waitUntil($this, CElementFilter::READY);
+	public function waitUntilReady($timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::READY, [], $timeout);
 
 		return $this;
 	}
@@ -53,10 +55,12 @@ trait WaitableTrait {
 	/**
 	 * Wait until object is visible.
 	 *
+	 * @param integer $timeout    timeout in seconds
+	 *
 	 * @return $this
 	 */
-	public function waitUntilVisible() {
-		CElementQuery::waitUntil($this, CElementFilter::VISIBLE);
+	public function waitUntilVisible($timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::VISIBLE, [], $timeout);
 
 		return $this;
 	}
@@ -64,10 +68,12 @@ trait WaitableTrait {
 	/**
 	 * Wait until object is not visible.
 	 *
+	 * @param integer $timeout    timeout in seconds
+	 *
 	 * @return $this
 	 */
-	public function waitUntilNotVisible() {
-		CElementQuery::waitUntil($this, CElementFilter::NOT_VISIBLE);
+	public function waitUntilNotVisible($timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::NOT_VISIBLE, [], $timeout);
 
 		return $this;
 	}
@@ -75,10 +81,12 @@ trait WaitableTrait {
 	/**
 	 * Wait until object is present.
 	 *
+	 * @param integer $timeout    timeout in seconds
+	 *
 	 * @return $this
 	 */
-	public function waitUntilPresent() {
-		CElementQuery::waitUntil($this, CElementFilter::PRESENT);
+	public function waitUntilPresent($timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::PRESENT, [], $timeout);
 
 		return $this;
 	}
@@ -86,10 +94,12 @@ trait WaitableTrait {
 	/**
 	 * Wait until object is not present.
 	 *
+	 * @param integer $timeout    timeout in seconds
+	 *
 	 * @return $this
 	 */
-	public function waitUntilNotPresent() {
-		CElementQuery::waitUntil($this, CElementFilter::NOT_PRESENT);
+	public function waitUntilNotPresent($timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::NOT_PRESENT, [], $timeout);
 
 		return $this;
 	}
@@ -97,12 +107,13 @@ trait WaitableTrait {
 	/**
 	 * Wait until object text is present.
 	 *
-	 * @param string $text    text to be present
+	 * @param string  $text        text to be present
+	 * @param integer $timeout     timeout in seconds
 	 *
 	 * @return $this
 	 */
-	public function waitUntilTextPresent($text) {
-		CElementQuery::waitUntil($this, CElementFilter::TEXT_PRESENT, [$text]);
+	public function waitUntilTextPresent($text, $timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::TEXT_PRESENT, [$text], $timeout);
 
 		return $this;
 	}
@@ -110,12 +121,13 @@ trait WaitableTrait {
 	/**
 	 * Wait until object text is not present.
 	 *
-	 * @param string $text    text not to be present
+	 * @param string  $text        text not to be present
+	 * @param integer $timeout     timeout in seconds
 	 *
 	 * @return $this
 	 */
-	public function waitUntilTextNotPresent($text) {
-		CElementQuery::waitUntil($this, CElementFilter::TEXT_NOT_PRESENT, [$text]);
+	public function waitUntilTextNotPresent($text, $timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::TEXT_NOT_PRESENT, [$text], $timeout);
 
 		return $this;
 	}
@@ -124,11 +136,12 @@ trait WaitableTrait {
 	 * Wait until object attribute is present.
 	 *
 	 * @param string|array $attributes    attributes to be present
+	 * @param integer      $timeout       timeout in seconds
 	 *
 	 * @return $this
 	 */
-	public function waitUntilAttributesPresent($attributes) {
-		CElementQuery::waitUntil($this, CElementFilter::ATTRIBUTES_PRESENT, [$attributes]);
+	public function waitUntilAttributesPresent($attributes, $timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::ATTRIBUTES_PRESENT, [$attributes], $timeout);
 
 		return $this;
 	}
@@ -137,11 +150,12 @@ trait WaitableTrait {
 	 * Wait until object attribute is not present.
 	 *
 	 * @param string|array $attributes    attributes not to be present
+	 * @param integer      $timeout       timeout in seconds
 	 *
 	 * @return $this
 	 */
-	public function waitUntilAttributesNotPresent($attributes) {
-		CElementQuery::waitUntil($this, CElementFilter::ATTRIBUTES_NOT_PRESENT, [$attributes]);
+	public function waitUntilAttributesNotPresent($attributes, $timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::ATTRIBUTES_NOT_PRESENT, [$attributes], $timeout);
 
 		return $this;
 	}
@@ -150,11 +164,12 @@ trait WaitableTrait {
 	 * Wait until object class is present.
 	 *
 	 * @param string|array $classes    classes to be present
+	 * @param integer      $timeout    timeout in seconds
 	 *
 	 * @return $this
 	 */
-	public function waitUntilClassesPresent($classes) {
-		CElementQuery::waitUntil($this, CElementFilter::CLASSES_PRESENT, [$classes]);
+	public function waitUntilClassesPresent($classes, $timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::CLASSES_PRESENT, [$classes], $timeout);
 
 		return $this;
 	}
@@ -163,11 +178,12 @@ trait WaitableTrait {
 	 * Wait until object class is not present.
 	 *
 	 * @param string|array $classes    classes not to be present
+	 * @param integer      $timeout    timeout in seconds
 	 *
 	 * @return $this
 	 */
-	public function waitUntilClassesNotPresent($classes) {
-		CElementQuery::waitUntil($this, CElementFilter::CLASSES_NOT_PRESENT, [$classes]);
+	public function waitUntilClassesNotPresent($classes, $timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::CLASSES_NOT_PRESENT, [$classes], $timeout);
 
 		return $this;
 	}
@@ -175,10 +191,12 @@ trait WaitableTrait {
 	/**
 	 * Wait until object is clickable.
 	 *
+	 * @param integer $timeout    timeout in seconds
+	 *
 	 * @return $this
 	 */
-	public function waitUntilClickable() {
-		CElementQuery::waitUntil($this, CElementFilter::CLICKABLE);
+	public function waitUntilClickable($timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::CLICKABLE, [], $timeout);
 
 		return $this;
 	}
@@ -186,10 +204,12 @@ trait WaitableTrait {
 	/**
 	 * Wait until object is not clickable.
 	 *
+	 * @param integer $timeout    timeout in seconds
+	 *
 	 * @return $this
 	 */
-	public function waitUntilNotClickable() {
-		CElementQuery::waitUntil($this, CElementFilter::NOT_CLICKABLE);
+	public function waitUntilNotClickable($timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::NOT_CLICKABLE, [], $timeout);
 
 		return $this;
 	}

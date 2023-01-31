@@ -173,8 +173,15 @@ class CDashboardElement extends CElement {
 
 		if ($controls->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isDisplayed()) {
 			$button = $controls->query('id:dashboard-save')->one()->waitUntilClickable();
-			$button->getLocationOnScreenOnceScrolledIntoView();
 			$button->click();
+
+			try {
+				$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilNotVisible(2);
+			}
+			catch (\Exception $ex) {
+				$button->click(true);
+			}
+
 			$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilNotVisible();
 		}
 
@@ -293,5 +300,22 @@ class CDashboardElement extends CElement {
 		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($name).']';
 		$this->query('xpath:('.$selection.')['.$index.']')->waitUntilClickable()->one()->click();
 		$this->query('xpath:'.$selection.'/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getReadyCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			foreach ($target->getWidgets() as $widget) {
+				if (!$widget->isReady()) {
+					return false;
+				}
+			}
+
+			return true;
+		};
 	}
 }

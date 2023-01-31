@@ -504,7 +504,7 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return boolean
 	 */
 	public function isReady() {
-		return $this->isClickable();
+		return call_user_func($this->getReadyCondition());
 	}
 
 	/**
@@ -570,16 +570,19 @@ class CElement extends CBaseElement implements IWaitable {
 	/**
 	 * Wait until element changes it's state from stalled to normal.
 	 *
+	 * @param integer $timeout    timeout in seconds
+	 *
 	 * @return $this
 	 * @throws Exception
 	 */
-	public function waitUntilReloaded() {
+	public function waitUntilReloaded($timeout = null) {
 		if ($this->by === null) {
 			throw new Exception('Cannot wait for element reload on element selected in multi-element query.');
 		}
 
 		$element = $this;
-		CElementQuery::wait()->until(function () use ($element) {
+		$wait = forward_static_call_array([CElementQuery::class, 'wait'], $timeout !== null ? [$timeout] : []);
+		$wait->until(function () use ($element) {
 				if ($element->isStalled()) {
 					$element->reload();
 
@@ -596,10 +599,13 @@ class CElement extends CBaseElement implements IWaitable {
 	/**
 	 * Wait until element is selected.
 	 *
+	 * @param integer $timeout    timeout in seconds
+	 *
 	 * @return $this
 	 */
-	public function waitUntilSelected() {
-		CElementQuery::wait()->until(WebDriverExpectedCondition::elementToBeSelected($this));
+	public function waitUntilSelected($timeout = null) {
+		$wait = forward_static_call_array([CElementQuery::class, 'wait'], $timeout !== null ? [$timeout] : []);
+		$wait->until(WebDriverExpectedCondition::elementToBeSelected($this));
 
 		return $this;
 	}
