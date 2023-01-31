@@ -21,10 +21,131 @@ in:
   match_tags:
     - tag: a
       value: 1
+      operator: equal
+  tags: []
+out:
+  return: FAIL
+---
+test case: Match tags with no event tags (2)
+in:
+  eval_type: and/or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: not equal
+  tags: []
+out:
+  return: SUCCEED
+---
+test case: Match tags with no event tags (3)
+in:
+  eval_type: and/or
+  match_tags:
+    - tag: a
+      value: 1
       operator: like
   tags: []
 out:
   return: FAIL
+---
+test case: Match tags with no event tags (4)
+in:
+  eval_type: and/or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: not like
+  tags: []
+out:
+  return: SUCCEED
+---
+test case: Match tags with no event tags (5)
+in:
+  eval_type: and/or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: exist
+  tags: []
+out:
+  return: FAIL
+---
+test case: Match tags with no event tags (6)
+in:
+  eval_type: and/or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: not exist
+  tags: []
+out:
+  return: SUCCEED
+---
+test case: Match tags with no event tags (7)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: equal
+  tags: []
+out:
+  return: FAIL
+---
+test case: Match tags with no event tags (8)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: not equal
+  tags: []
+out:
+  return: SUCCEED
+---
+test case: Match tags with no event tags (9)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: like
+  tags: []
+out:
+  return: FAIL
+---
+test case: Match tags with no event tags (10)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: not like
+  tags: []
+out:
+  return: SUCCEED
+---
+test case: Match tags with no event tags (11)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: exist
+  tags: []
+out:
+  return: FAIL
+---
+test case: Match tags with no event tags (12)
+in:
+  eval_type: or
+  match_tags:
+    - tag: a
+      value: 1
+      operator: not exist
+  tags: []
+out:
+  return: SUCCEED
 ---
 test case: Match tags with matching event tags (1)
 in:
