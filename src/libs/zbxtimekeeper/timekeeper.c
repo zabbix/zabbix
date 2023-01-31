@@ -339,8 +339,7 @@ void	zbx_timekeeper_collect(zbx_timekeeper_t *timekeeper)
 	zbx_timekeeper_unit_t	*unit;
 	clock_t			ticks, ticks_done;
 	struct tms		buf;
-	unsigned char		i;
-	int			index, last;
+	int			i, index, last;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

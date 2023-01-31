@@ -35,7 +35,7 @@
 
 typedef struct
 {
-	zbx_timekeeper_t		*monitor;
+	zbx_timekeeper_t	*monitor;
 	zbx_timekeeper_sync_t	sync;
 	int			process_index[ZBX_PROCESS_TYPE_COUNT];
 }
@@ -68,6 +68,18 @@ static void	sm_sync_unlock(void *data)
 }
 
 #ifndef _WINDOWS
+
+int	selfmon_is_process_monitored(unsigned char proc_type)
+{
+	switch (proc_type)
+	{
+		case ZBX_PROCESS_TYPE_PREPROCESSOR:
+			return FAIL;
+		default:
+			return SUCCEED;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Initialize structures and prepare state                           *
@@ -86,6 +98,9 @@ int	zbx_init_selfmon_collector(zbx_get_config_forks_f get_config_forks, char **e
 
 	for (proc_type = 0; ZBX_PROCESS_TYPE_COUNT > proc_type; proc_type++)
 	{
+		if (SUCCEED != selfmon_is_process_monitored(proc_type))
+			continue;
+
 		collector.process_index[proc_type] = units_num;
 		units_num += get_config_forks_cb(proc_type);
 	}
@@ -182,22 +197,30 @@ void	zbx_get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proc_type:%u proc_num:%d", __func__, proc_type, proc_num);
 
-	int	unit_count;
-	int	unit_index = collector.process_index[proc_type];
-
-	if (0 < proc_num)
+	if (SUCCEED == selfmon_is_process_monitored(proc_type))
 	{
-		unit_index += proc_num - 1;
-		unit_count = 1;
+		int	unit_count;
+		int	unit_index = collector.process_index[proc_type];
+
+		if (0 < proc_num)
+		{
+			unit_index += proc_num - 1;
+			unit_count = 1;
+		}
+		else
+			unit_count = get_config_forks_cb(proc_type);
+
+		if (SUCCEED != zbx_timekeeper_get_stat(collector.monitor, unit_index, unit_count, aggr_func, state, value, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get self monitoring statistics: %s", error);
+			*value = 0;
+			zbx_free(error);
+		}
 	}
 	else
-		unit_count = get_config_forks_cb(proc_type);
-
-	if (SUCCEED != zbx_timekeeper_get_stat(collector.monitor, unit_index, unit_count, aggr_func, state, value, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get self monitoring statistics: %s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "process is not monitored by self-monitoring library");
 		*value = 0;
-		zbx_free(error);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -230,6 +253,9 @@ int	zbx_get_all_process_stats(zbx_process_info_t *stats)
 				total_min = 0, counter_min_busy = 0, counter_min_idle = 0;
 
 		stats[proc_type].count = get_config_forks_cb(proc_type);
+
+		if (SUCCEED != selfmon_is_process_monitored(proc_type))
+			continue;
 
 		for (proc_num = 0; proc_num < stats[proc_type].count; proc_num++)
 		{
