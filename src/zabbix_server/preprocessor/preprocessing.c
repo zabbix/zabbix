@@ -1272,7 +1272,7 @@ static void	agent_result_set_value(zbx_variant_t *value, zbx_item_value_type_t v
 			memset(bin, 0, sizeof(zbx_bin_t));
 			bin->value = value->data.str;
 			bin->len = strlen(value->data.str);
-			bin->hash = zbx_strdup(NULL, "badger_100");
+			//bin->hash = zbx_strdup(NULL, "badger_100");
 
 			SET_BIN_RESULT(result, bin);
 			zbx_variant_set_none(value);

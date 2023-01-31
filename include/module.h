@@ -80,7 +80,7 @@ typedef struct
 {
 	void		*value;
 	size_t		len;
-	char		*hash;
+//	char		*hash;
 }
 zbx_bin_t;
 
@@ -212,7 +212,7 @@ typedef struct
 {
 	void	*value;
 	size_t	len;
-	char	*hash;
+//	char	*hash;
 }
 zbx_bin_value_t;
 

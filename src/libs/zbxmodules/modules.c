@@ -40,7 +40,7 @@ zbx_history_integer_cb_t	*history_integer_cbs = NULL;
 zbx_history_string_cb_t		*history_string_cbs = NULL;
 zbx_history_text_cb_t		*history_text_cbs = NULL;
 zbx_history_log_cb_t		*history_log_cbs = NULL;
-zbx_history_bin_cb_t		*history_bin_cbs = NULL;
+//zbx_history_bin_cb_t		*history_bin_cbs = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -204,26 +204,26 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 		history_log_cbs[j + 1].module = NULL;
 	}
 
-	if (NULL != history_write_cbs.history_bin_cb)
-	{
-		int	j = 0;
-
-		if (NULL == history_bin_cbs)
-		{
-			history_bin_cbs = (zbx_history_bin_cb_t *)zbx_malloc(history_bin_cbs,
-					sizeof(zbx_history_bin_cb_t));
-			history_bin_cbs[0].module = NULL;
-		}
-
-		while (NULL != history_bin_cbs[j].module)
-			j++;
-
-		history_bin_cbs = (zbx_history_bin_cb_t *)zbx_realloc(history_bin_cbs, (j + 2) *
-				sizeof(zbx_history_bin_cb_t));
-		history_bin_cbs[j].module = module;
-		history_bin_cbs[j].history_bin_cb = history_write_cbs.history_bin_cb;
-		history_bin_cbs[j + 1].module = NULL;
-	}
+//	if (NULL != history_write_cbs.history_bin_cb)
+//	{
+//		int	j = 0;
+//
+//		if (NULL == history_bin_cbs)
+//		{
+//			history_bin_cbs = (zbx_history_bin_cb_t *)zbx_malloc(history_bin_cbs,
+//					sizeof(zbx_history_bin_cb_t));
+//			history_bin_cbs[0].module = NULL;
+//		}
+//
+//		while (NULL != history_bin_cbs[j].module)
+//			j++;
+//
+//		history_bin_cbs = (zbx_history_bin_cb_t *)zbx_realloc(history_bin_cbs, (j + 2) *
+//				sizeof(zbx_history_bin_cb_t));
+//		history_bin_cbs[j].module = module;
+//		history_bin_cbs[j].history_bin_cb = history_write_cbs.history_bin_cb;
+//		history_bin_cbs[j + 1].module = NULL;
+//	}
 }
 
 static int	zbx_module_compare_func(const void *d1, const void *d2)

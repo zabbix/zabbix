@@ -1453,6 +1453,16 @@ out:
 }
 #endif
 
+//int	zbx_db_binary_insert(const char *st)
+//{
+//}
+
+void	badger_escape(char* dst, char chunk[], size_t size)
+{
+	mysql_real_escape_string(conn, chunk, dst, size);
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Execute SQL statement. For non-select statements only.            *

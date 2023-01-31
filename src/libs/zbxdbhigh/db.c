@@ -2912,7 +2912,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_CUID:
-			case ZBX_TYPE_BLOB:
+			//case ZBX_TYPE_BLOB:
 #ifdef HAVE_ORACLE
 				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_OFF);
 #else
@@ -2969,6 +2969,11 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 			case ZBX_TYPE_BLOB:
 				value->str = va_arg(args, char *);
 				break;
+//			case ZBX_TYPE_BLOB:
+//				value->bin = va_arg(args, void *);
+//				value->bin_len = va_arg(args, int);
+//				zabbix_log(LOG_LEVEL_INFORMATION, "FORD: bin len: %d", value->bin_len);
+//				break;
 			case ZBX_TYPE_INT:
 				value->i32 = va_arg(args, int);
 				break;
@@ -3182,6 +3187,10 @@ retry_oracle:
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
+//				case ZBX_TYPE_BLOB:
+//					zabbix_log(LOG_LEVEL_INFORMATION, "FORD 2 len: %d", value->bin_len);
+//					zbx_str_memcpy_alloc(&sql, &sql_alloc, &sql_offset, (char*)value->bin, value->bin_len);
+//					break;
 				case ZBX_TYPE_INT:
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%d", value->i32);
 					break;

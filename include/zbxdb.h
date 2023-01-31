@@ -41,6 +41,8 @@ typedef union
 	zbx_uint64_t	ui64;
 	double		dbl;
 	char		*str;
+	void		*bin;
+	int		bin_len;
 }
 zbx_db_value_t;
 
@@ -118,6 +120,9 @@ int		zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, uns
 void		zbx_db_clean_bind_context(zbx_db_bind_context_t *context);
 int		zbx_db_statement_execute(int iters);
 #endif
+
+void    badger_escape(char* dst, char chunk[], size_t size);
+
 int		zbx_db_vexecute(const char *fmt, va_list args);
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
 DB_RESULT	zbx_db_select_n(const char *query, int n);
