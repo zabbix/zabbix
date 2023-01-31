@@ -29,29 +29,25 @@ ZBX_PTR_VECTOR_IMPL(match_tags, zbx_match_tag_t*)
  * Purpose: perform match tag comparison using match tag operator *
  *                                                                *
  ******************************************************************/
-static int	match_tag_value(const zbx_match_tag_t *mtag, const zbx_tag_t *etag)
+static int	match_tag(const zbx_match_tag_t *mtag, const zbx_tag_t *etag, unsigned char op)
 {
-	switch (mtag->op)
-	{
-		case ZBX_CONDITION_OPERATOR_EQUAL:
-		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
-		case ZBX_CONDITION_OPERATOR_LIKE:
-		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
-			return zbx_strmatch_condition(etag->value, mtag->value, mtag->op);
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-	}
+	if (NULL == etag)
+		return FAIL;
+
+	if (ZBX_CONDITION_OPERATOR_EXIST == op)
+		return SUCCEED;
+
+	return zbx_strmatch_condition(etag->value, mtag->value, op);
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: matches tags with [*mt_pos] match tag name                        *
  *                                                                            *
- * Parameters: mtags    - [IN] the match tags, sorted by tag names            *
- *             etags    - [IN] the entity tags, sorted by tag names           *
- *             mt_pos   - [IN/OUT] the next match tag index                   *
- *             et_pos   - [IN/OUT] the next entity tag index                  *
+ * Parameters: mtags    - [IN] match tags, sorted by tag names                *
+ *             etags    - [IN] entity tags, sorted by tag names               *
+ *             mt_pos   - [IN/OUT] next match tag index                       *
+ *             et_pos   - [IN/OUT] next entity tag index                      *
  *                                                                            *
  * Return value: SUCCEED - found matching tag                                 *
  *               FAIL    - no matching tags found                             *
@@ -60,14 +56,11 @@ static int	match_tag_value(const zbx_match_tag_t *mtag, const zbx_tag_t *etag)
 static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vector_tags_t *etags,
 		int *mt_pos, int *et_pos)
 {
-	const zbx_match_tag_t	*mtag;
-	const zbx_tag_t		*etag;
-	const char		*name;
+	const char		*tag_name;
 	int			i, j, ret = -1, mt_start, mt_end, et_start, et_end;
 
 	/* get the match tag name */
-	mtag = (const zbx_match_tag_t *)mtags->values[*mt_pos];
-	name = mtag->tag;
+	tag_name = mtags->values[*mt_pos]->tag;
 
 	/* find match tag and entity tag ranges matching the first match tag name  */
 	/* (match tag range [mt_start,mt_end], entity tag range [et_start,et_end]) */
@@ -79,8 +72,7 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
 
 	for (i = mt_start + 1; i < mtags->values_num; i++)
 	{
-		mtag = (const zbx_match_tag_t *)mtags->values[i];
-		if (0 != strcmp(mtag->tag, name))
+		if (0 != strcmp(mtags->values[i]->tag, tag_name))
 			break;
 	}
 	mt_end = i - 1;
@@ -90,8 +82,7 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
 
 	for (i = et_start; i < etags->values_num; i++)
 	{
-		etag = etags->values[i];
-		if (0 < (ret = strcmp(etag->tag, name)))
+		if (0 < (ret = strcmp(etags->values[i]->tag, tag_name)))
 		{
 			*et_pos = i;
 			break;
@@ -101,49 +92,84 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
 			break;
 	}
 
-	switch (mtag->op)
+	if (i < etags->values_num && 0 >= ret)
 	{
-		case ZBX_CONDITION_OPERATOR_EXIST:
-			return i == etags->values_num || 0 < ret ? FAIL : SUCCEED;
-		case ZBX_CONDITION_OPERATOR_NOT_EXIST:
-			return i == etags->values_num || 0 < ret ? SUCCEED : FAIL;
+		et_start = i++;
+
+		/* find last entity tag with the required name */
+
+		for (; i < etags->values_num; i++)
+		{
+			if (0 != strcmp(etags->values[i]->tag, tag_name))
+				break;
+		}
+
+		et_end = i - 1;
+	}
+	else
+	{
+		/* no matching tag names */
+		et_end = -1;
 	}
 
-	if (i == etags->values_num || 0 < ret)
-	{
-		*et_pos = i;
-
-		if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == mtag->op || ZBX_CONDITION_OPERATOR_NOT_LIKE == mtag->op)
-			return SUCCEED;
-
-		return FAIL;
-	}
-
-	et_start = i++;
-
-	/* find last entity tag with the required name */
-
-	for (; i < etags->values_num; i++)
-	{
-		etag = etags->values[i];
-		if (0 != strcmp(etag->tag, name))
-			break;
-	}
-
-	et_end = i - 1;
 	*et_pos = i;
 
 	/* cross-compare match tags and entity tags within the found ranges */
 
 	for (i = mt_start; i <= mt_end; i++)
 	{
-		mtag = (const zbx_match_tag_t *)mtags->values[i];
+		const zbx_match_tag_t	*mtag = mtags->values[i];
+		unsigned char		op;
 
-		for (j = et_start; j <= et_end; j++)
+		switch (mtag->op)
 		{
-			etag = etags->values[j];
-			if (SUCCEED == match_tag_value(mtag, etag))
-				return SUCCEED;
+			case ZBX_CONDITION_OPERATOR_EQUAL:
+			case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+				op = ZBX_CONDITION_OPERATOR_EQUAL;
+				break;
+			case ZBX_CONDITION_OPERATOR_LIKE:
+			case ZBX_CONDITION_OPERATOR_NOT_LIKE:
+				op = ZBX_CONDITION_OPERATOR_LIKE;
+				break;
+			case ZBX_CONDITION_OPERATOR_EXIST:
+			case ZBX_CONDITION_OPERATOR_NOT_EXIST:
+				op = ZBX_CONDITION_OPERATOR_EXIST;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				return FAIL;
+		}
+
+		if (0 <= et_end)
+		{
+			for (j = et_start; j <= et_end; j++)
+			{
+				const zbx_tag_t	*etag = etags->values[j];
+
+				if (SUCCEED == (ret = match_tag(mtag, etag, op)))
+					break;
+			}
+		}
+		else
+			ret = FAIL;
+
+		switch (mtag->op)
+		{
+			case ZBX_CONDITION_OPERATOR_EQUAL:
+			case ZBX_CONDITION_OPERATOR_LIKE:
+			case ZBX_CONDITION_OPERATOR_EXIST:
+				if (SUCCEED == ret)
+					return SUCCEED;
+				break;
+			case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+			case ZBX_CONDITION_OPERATOR_NOT_LIKE:
+			case ZBX_CONDITION_OPERATOR_NOT_EXIST:
+				if (SUCCEED != ret)
+					return SUCCEED;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				return FAIL;
 		}
 	}
 
@@ -154,8 +180,8 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
  *                                                                            *
  * Purpose: matches filter tags and entity tags using AND/OR eval type        *
  *                                                                            *
- * Parameters: mtags    - [IN] the match tags, sorted by tag names            *
- *             etags    - [IN] the entity tags, sorted by tag names           *
+ * Parameters: mtags    - [IN] match tags, sorted by tag names                *
+ *             etags    - [IN] entity tags, sorted by tag names               *
  *                                                                            *
  * Return value: SUCCEED - entity tags do match                               *
  *               FAIL    - otherwise                                          *
@@ -165,7 +191,7 @@ static int	match_tags_andor(const zbx_vector_match_tags_t *mtags, const zbx_vect
 {
 	int	mt_pos = 0, et_pos = 0;
 
-	while (mt_pos < mtags->values_num && et_pos < etags->values_num)
+	while (mt_pos < mtags->values_num)
 	{
 		if (FAIL == match_tag_range(mtags, etags, &mt_pos, &et_pos))
 			return FAIL;
@@ -181,8 +207,8 @@ static int	match_tags_andor(const zbx_vector_match_tags_t *mtags, const zbx_vect
  *                                                                            *
  * Purpose: matches filter tags and entity tags using OR eval type            *
  *                                                                            *
- * Parameters: mtags    - [IN] the filter tags, sorted by tag names           *
- *             etags    - [IN] the entity tags, sorted by tag names           *
+ * Parameters: mtags    - [IN] filter tags, sorted by tag names               *
+ *             etags    - [IN] entity tags, sorted by tag names               *
  *                                                                            *
  * Return value: SUCCEED - entity tags do match                               *
  *               FAIL    - otherwise                                          *
@@ -192,7 +218,7 @@ static int	match_tags_or(const zbx_vector_match_tags_t *mtags, const zbx_vector_
 {
 	int	mt_pos = 0, et_pos = 0;
 
-	while (mt_pos < mtags->values_num && et_pos < etags->values_num)
+	while (mt_pos < mtags->values_num)
 	{
 		if (SUCCEED == match_tag_range(mtags, etags, &mt_pos, &et_pos))
 			return SUCCEED;
@@ -206,10 +232,10 @@ static int	match_tags_or(const zbx_vector_match_tags_t *mtags, const zbx_vector_
  * Purpose: check if the entity tags match filter tags                        *
  *                                                                            *
  * Parameters: eval_type   - [IN] evaluation type (and/or, or)                *
- *             match_tags  - [IN] the filter                                  *
- *             entity_tags - [IN] the tags to check                           *
+ *             match_tags  - [IN] filter tags, sorted by tag names            *
+ *             entity_tags - [IN] entity tags, sorted by tag names            *
  *                                                                            *
- * Return value: SUCCEED - the tags do match                                  *
+ * Return value: SUCCEED - entity tags do match                               *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -223,9 +249,6 @@ int	zbx_match_tags(int eval_type, const zbx_vector_match_tags_t *match_tags, con
 
 	if (0 == match_tags->values_num)
 		return SUCCEED;
-
-	if (0 == entity_tags->values_num)
-		return FAIL;
 
 	if (ZBX_CONDITION_EVAL_TYPE_AND_OR == eval_type)
 		return match_tags_andor(match_tags, entity_tags);
