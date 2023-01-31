@@ -750,7 +750,11 @@ class CConfigurationImport {
 			}
 
 			foreach ($valuemaps as $valuemap) {
-				$valuemapid = $this->referencer->findValuemapidByUuid($valuemap['uuid']);
+				$valuemapid = null;
+
+				if (array_key_exists('uuid', $valuemap)) {
+					$valuemapid = $this->referencer->findValuemapidByUuid($valuemap['uuid']);
+				}
 
 				if ($valuemapid === null) {
 					$valuemapid = $this->referencer->findValuemapidByName($hostid, $valuemap['name']);
