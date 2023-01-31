@@ -44,7 +44,6 @@ class CButtonExport extends CList {
 							->setArgument('action', $action)
 							->setArgument('format', CExportWriterFactory::YAML)
 							->setArgument('backurl', $back_url)
-							->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get($action))
 							->getUrl()
 					).');'
 				),
@@ -62,9 +61,6 @@ class CButtonExport extends CList {
 											->setArgument('action', $action)
 											->setArgument('format', CExportWriterFactory::YAML)
 											->setArgument('backurl', $back_url)
-											->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME,
-												CCsrfTokenHelper::get($action)
-											)
 											->getUrl()
 							],
 							[
@@ -73,9 +69,6 @@ class CButtonExport extends CList {
 											->setArgument('action', $action)
 											->setArgument('format', CExportWriterFactory::XML)
 											->setArgument('backurl', $back_url)
-											->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME,
-												CCsrfTokenHelper::get($action)
-											)
 											->getUrl()
 							],
 							[
@@ -84,9 +77,6 @@ class CButtonExport extends CList {
 											->setArgument('action', $action)
 											->setArgument('format', CExportWriterFactory::JSON)
 											->setArgument('backurl', $back_url)
-											->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME,
-												CCsrfTokenHelper::get($action)
-											)
 											->getUrl()
 							]
 						]
