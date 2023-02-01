@@ -77,23 +77,15 @@ typedef struct
 }
 zbx_log_t;
 
-typedef struct
-{
-	void		*value;
-	size_t		len;
-}
-zbx_bin_t;
-
 /* agent result types */
 #define AR_UINT64	0x01
 #define AR_DOUBLE	0x02
 #define AR_STRING	0x04
 #define AR_TEXT		0x08
-#define AR_LOG		0x10
-#define AR_BIN		0x20
+#define AR_BIN		0x10
+#define AR_LOG		0x20
 #define AR_MESSAGE	0x40
 #define AR_META		0x80
-
 
 /* agent return structure */
 typedef struct
@@ -105,7 +97,7 @@ typedef struct
 	char		*text;
 	char		*msg;		/* possible error message */
 	zbx_log_t	*log;
-	zbx_bin_t	*bin;
+	char		*bin;
 	int		type;		/* flags: see AR_* above */
 	int		mtime;		/* meta information */
 }
@@ -149,18 +141,19 @@ ZBX_METRIC;
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
+#define SET_BIN_RESULT(res, val)		\
+(						\
+	(res)->type |= AR_BIN,			\
+	(res)->bin = (char *)(val)		\
+)
+
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_LOG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_LOG,			\
 	(res)->log = (zbx_log_t *)(val)		\
 )
 
-/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
-#define SET_BIN_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_BIN,			\
-	(res)->bin = (zbx_bin_t *)(val)		\
-)
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_MSG_RESULT(res, val)		\
@@ -210,17 +203,10 @@ ZBX_HISTORY_TEXT;
 
 typedef struct
 {
-	void	*value;
-	size_t	len;
-}
-zbx_bin_value_t;
-
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	int			clock;
-	int			ns;
-	const zbx_bin_value_t	*bin_value;
+	zbx_uint64_t	itemid;
+	int		clock;
+	int		ns;
+	const char	*value;
 }
 ZBX_HISTORY_BIN;
 

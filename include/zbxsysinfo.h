@@ -126,6 +126,7 @@ do										\
 	if (!(exc_type & AR_DOUBLE))	ZBX_UNSET_DBL_RESULT(res);		\
 	if (!(exc_type & AR_STRING))	ZBX_UNSET_STR_RESULT(res);		\
 	if (!(exc_type & AR_TEXT))	ZBX_UNSET_TEXT_RESULT(res);		\
+	if (!(exc_type & AR_BIN))	ZBX_UNSET_BIN_RESULT(res);		\
 	if (!(exc_type & AR_LOG))	ZBX_UNSET_LOG_RESULT(res);		\
 	if (!(exc_type & AR_MESSAGE))	ZBX_UNSET_MSG_RESULT(res);		\
 }										\
@@ -137,6 +138,7 @@ while (0)
 #define ZBX_GET_DBL_RESULT(res)		((double *)get_result_value_by_type(res, AR_DOUBLE))
 #define ZBX_GET_STR_RESULT(res)		((char **)get_result_value_by_type(res, AR_STRING))
 #define ZBX_GET_TEXT_RESULT(res)	((char **)get_result_value_by_type(res, AR_TEXT))
+#define ZBX_GET_BIN_RESULT(res)		((char **)get_result_value_by_type(res, AR_BIN))
 #define ZBX_GET_LOG_RESULT(res)		((zbx_log_t *)get_result_value_by_type(res, AR_LOG))
 #define ZBX_GET_MSG_RESULT(res)		((char **)get_result_value_by_type(res, AR_MESSAGE))
 

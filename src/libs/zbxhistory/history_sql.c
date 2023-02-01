@@ -80,15 +80,6 @@ static void	row2value_log(zbx_history_value_t *value, DB_ROW row)
 	value->log->value = zbx_strdup(NULL, row[4]);
 }
 
-static void	row2value_binary(zbx_history_value_t *value, DB_ROW row)
-{
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA ROW2VALUE");
-
-	value->bin = (zbx_bin_value_t *)zbx_malloc(NULL, sizeof(zbx_bin_value_t));
-
-	value->bin->value = zbx_strdup(NULL, row[0]);
-}
-
 /* value_type - history table data mapping */
 static zbx_vc_history_table_t	vc_history_tables[] = {
 	{"history", "value", row2value_dbl},
@@ -96,7 +87,7 @@ static zbx_vc_history_table_t	vc_history_tables[] = {
 	{"history_log", "timestamp,logeventid,severity,source,value", row2value_log},
 	{"history_uint", "value", row2value_ui64},
 	{"history_text", "value", row2value_str},
-	{"history_binary", "value,hash", row2value_binary}
+	{"history_binary", "value", row2value_str}
 };
 
 /******************************************************************************************************************
@@ -335,19 +326,22 @@ static void	add_history_bin(const zbx_vector_ptr_t *history)
 			continue;
 
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin badger BEFORE: %s", (char*)(h->value.bin->value));
+		//zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin badger BEFORE: %s", (char*)(h->value.bin->value));
 
 
 		char	*dst = NULL;
 		int	data_len, src_len;
 
-		if (!(NULL ==  h->value.bin->value|| '\0' == *((char*) h->value.bin->value)))
 		{
-			src_len = strlen(h->value.bin->value) * 3 / 4 ;
+			//src_len = strlen(h->value.bin->value) * 3 / 4 ;
+			src_len = strlen(h->value.str) * 3 / 4 ;
+
 			dst = (char*)zbx_malloc(NULL, src_len);
 
 			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA badger LEN: %d", src_len);
-			str_base64_decode(h->value.bin->value, (char *)dst, src_len, &data_len);
+//			str_base64_decode(h->value.bin->value, (char *)dst, src_len, &data_len);
+
+			str_base64_decode(h->value.str, (char *)dst, src_len, &data_len);
 			dst[data_len] = '\0';
 
 			char *chunk = (char*)zbx_malloc(NULL, 2*data_len+1);

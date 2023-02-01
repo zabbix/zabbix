@@ -211,12 +211,6 @@ static void	history_logfree(zbx_log_value_t *log)
 	zbx_free(log);
 }
 
-static void	history_binfree(zbx_bin_value_t *bin)
-{
-	zbx_free(bin->value);
-	zbx_free(bin);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: destroys value vector and frees resources allocated for it        *
@@ -279,13 +273,11 @@ void	zbx_history_value2str(char *buffer, size_t size, const zbx_history_value_t 
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_BIN:
 			zbx_strlcpy_utf8(buffer, value->str, size);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			zbx_strlcpy_utf8(buffer, value->log->value, size);
-			break;
-		case ITEM_VALUE_TYPE_BIN:
-			zbx_strlcpy_utf8(buffer, value->bin->value, size);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -317,13 +309,11 @@ char	*zbx_history_value2str_dyn(const zbx_history_value_t *value, int value_type
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_BIN:
 			str = zbx_strdup(NULL, value->str);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			str = zbx_strdup(NULL, value->log->value);
-			break;
-		case ITEM_VALUE_TYPE_BIN:
-			str = zbx_strdup(NULL, value->bin->value);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -367,6 +357,7 @@ void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int va
 	{
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_BIN:
 			for (i = 0; i < vector->values_num; i++)
 				zbx_free(vector->values[i].value.str);
 
@@ -375,9 +366,14 @@ void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int va
 			for (i = 0; i < vector->values_num; i++)
 				history_logfree(vector->values[i].value.log);
 			break;
-		case ITEM_VALUE_TYPE_BIN:
-			for (i = 0; i < vector->values_num; i++)
-				history_binfree(vector->values[i].value.bin);
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_UINT64:
+		case ITEM_VALUE_TYPE_MAX:
+		case ITEM_VALUE_TYPE_NONE:
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	zbx_vector_history_record_clear(vector);
