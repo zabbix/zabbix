@@ -1509,7 +1509,7 @@ static int	DBpatch_6030161(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update sessions set secret=sessionid"))
+	if (ZBX_DB_OK > zbx_db_execute("update sessions set secret=sessionid"))
 		return FAIL;
 
 	return SUCCEED;
