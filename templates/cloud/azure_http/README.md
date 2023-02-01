@@ -102,7 +102,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Azure: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure by HTTP/azure.get.errors))>0` |AVERAGE | |
 |Azure: There are errors in storages requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure by HTTP/azure.get.storage.acc.errors))>0` |AVERAGE |<p>**Depends on**:</p><p>- Azure: There are errors in requests to API</p> |
-|Azure: Storage account [{#NAME}]: storage account availability is low |<p>-</p> |`(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}` |WARNING | |
+|Azure: Storage account [{#NAME}]: Availability is low |<p>-</p> |`(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}` |WARNING | |
 
 ## Feedback
 

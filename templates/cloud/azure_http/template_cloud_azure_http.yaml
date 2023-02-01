@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-30T15:23:43Z'
+  date: '2023-02-01T10:43:10Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -280,7 +280,6 @@ zabbix_export:
                 },
                 
                 login: function () {
-            
                     var resp, login = new HttpRequest();
                     login.addHeader('Content-Type: application/x-www-form-urlencoded');
                     resp = login.post(
@@ -303,7 +302,6 @@ zabbix_export:
                 },
             
                 request: function (url) {
-              
                     var response, request = new HttpRequest();
                     if (!Azure.token) {
                         throw 'Failed authentication token for the request session.'; 
@@ -322,13 +320,12 @@ zabbix_export:
                     } 
                 },
             
-                getField: function (data, path, defaultValue, separator) {
-                    separator = separator || '.';
-                    var steps = path.split(separator);
+                getField: function (data, path) {
+                    var steps = path.split('.');
                     for (var i = 0; i < steps.length; i++) {
                         var step = steps[i];
                         if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            return defaultValue;
+                            throw('Not found requred field: ' + path);
                         }
                         data = data[step];
                     }
@@ -336,17 +333,18 @@ zabbix_export:
                 },
             
                 getMetricsData: function() {
-                    
                     var metric = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) 
                         + '/providers/' + 'Microsoft.Storage/storageAccounts?api-version=2021-05-01');
-                    texterror = 'ERROR getting required field. Check debug log for more information.'
                     data = [];
+                    if (!metric.hasOwnProperty('value')) {
+                        throw 'Failed getting required field. Check debug log for more information.';
+                    }
                     for (k in metric.value) {
                         data.push({
-                            'name' : Azure.getField(metric.value[k], 'name', texterror),
-                            'id' : Azure.getField(metric.value[k], 'id', texterror),
-                            'resourceGroup' : Azure.getField(metric.value[k], 'id', '////'+texterror).split("/")[4],
-                            'location' : Azure.getField(metric.value[k], 'location', texterror),
+                            'name' : Azure.getField(metric.value[k], 'name'),
+                            'id' : Azure.getField(metric.value[k], 'id'),
+                            'resourceGroup' : Azure.getField(metric.value[k], 'id').split("/")[4],
+                            'location' : Azure.getField(metric.value[k], 'location'),
                             'token' : Azure.token
                         });
                     }
@@ -879,7 +877,6 @@ zabbix_export:
               params: |
                 var AzureStorage = {
                     params: {},
-                    token: '',
                 
                     setParams: function (params) {
                         [ 'token' , 'id'].forEach(function (field) {
@@ -892,14 +889,12 @@ zabbix_export:
                     },
                     
                     request: function (url) {
-                  
                         var response, request = new HttpRequest();
-                        if (!AzureStorage.params.token) {
-                            throw 'Failed authentication token for the request session.'; 
-                        }
                         request.addHeader('Accept: application/json');
                         request.addHeader('Authorization: Bearer ' + AzureStorage.params.token);
+                        Zabbix.log(4, '[ Azure ] Sending request: ' + url );
                         response = request.get(url);
+                
                         if (request.getStatus() !== 200 || response === null) {
                             throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                         }
@@ -911,13 +906,12 @@ zabbix_export:
                         } 
                     },
                 
-                    getField: function (data, path, defaultValue, separator) {
-                        separator = separator || '.';
-                        var steps = path.split(separator);
+                    getField: function (data, path) {
+                        var steps = path.split('.');
                         for (var i = 0; i < steps.length; i++) {
                             var step = steps[i];
                             if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                                return defaultValue;
+                                throw('Not found requred field: ' + path);
                             }
                             data = data[step];
                         }
@@ -926,51 +920,24 @@ zabbix_export:
                 
                     getMetricsData: function() {
                         var 
-                        data = {};
-                        metrics = [
-                            'BlobCapacity',
-                            'BlobCount',
-                            'ContainerCount',
-                            'IndexCapacity',
-                            'Transactions',
-                            'Ingress',
-                            'Egress',
-                            'SuccessServerLatency',
-                            'SuccessE2ELatency',
-                            'Availability'
-                        ],
-                        prepared_metrics = [],
-                        data['metrics'] = {};
-                        for (var i = 0; i < metrics.length; i += 20) {
-                            var chunk = metrics.slice(i, i + 20);
-                
-                            prepared_metrics.push(
-                                chunk.map(function(element) {
-                                    return encodeURIComponent(element);
-                                }).join(',')
-                            );
+                        data = {'metrics':{}};
+                        metrics = ['BlobCapacity,BlobCount,ContainerCount,IndexCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability'],
+                        metrics_data = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id + '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=' 
+                            + metrics + '&interval=PT1H&api-version=2021-05-01');
+                        if (!metrics_data.hasOwnProperty('value')) {
+                            throw 'Failed getting required field. Check debug log for more information.';
                         }
-                        for (var j in prepared_metrics) {
-                            metrics_data = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id + '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=' 
-                                + prepared_metrics[j] + '&interval=PT1H&api-version=2021-05-01');
-                            if (!metrics_data.hasOwnProperty('value')) {
-                                throw 'Failed getting required field. Check debug log for more information.';
-                            }
-                            for (k in metrics_data.value) {
-                                key = AzureStorage.getField(metrics_data.value[k], 'name.value', 'ERROR')
-                                if (key === 'ERROR') {
-                                    throw 'Failed getting required field. Check debug log for more information.';
-                                }
-                                data.metrics[key] = AzureStorage.getField(metrics_data.value[k], 'timeseries.0.data.0');
-                            }
+                        for (k in metrics_data.value) {
+                            key = AzureStorage.getField(metrics_data.value[k], 'name.value')
+                            data.metrics[key] = AzureStorage.getField(metrics_data.value[k], 'timeseries.0.data.0');
                         }
                         return data;
                     }
                 };
+                
                 try {
                     AzureStorage.setParams(JSON.parse(value));
                     return JSON.stringify(AzureStorage.getMetricsData());
-                
                 }
                 catch (error) {
                     error += (String(error).endsWith('.')) ? '' : '.';
@@ -1031,7 +998,7 @@ zabbix_export:
                 -
                   uuid: 4cd8ac56b50c4120bf9de56bb1f06245
                   expression: '(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}'
-                  name: 'Azure: Storage account [{#NAME}]: storage account availability is low'
+                  name: 'Azure: Storage account [{#NAME}]: Availability is low'
                   opdata: '{ITEM.LASTVALUE1}'
                   priority: WARNING
                   tags:
