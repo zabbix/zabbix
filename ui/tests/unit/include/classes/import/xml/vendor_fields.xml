@@ -9,13 +9,13 @@
     </template_groups>
     <templates>
         <template>
+            <uuid>0c45e5ed44ea494dabfa4136f420aa65</uuid>
+            <template>vendor test</template>
+            <name>vendor test</name>
             <vendor>
                 <name>Zabbix</name>
                 <version>6.4-0</version>
             </vendor>
-            <uuid>0c45e5ed44ea494dabfa4136f420aa65</uuid>
-            <template>vendor test</template>
-            <name>vendor test</name>
             <groups>
                 <group>
                     <name>Templates</name>

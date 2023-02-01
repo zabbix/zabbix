@@ -200,7 +200,7 @@ class testTemplate extends CAPITest {
 						'vendor_name' => 'Zabbix'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/vendor_version": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": both vendor_name and vendor_version should be either present or empty.'
 			],
 			[
 				'request' => [
@@ -211,7 +211,7 @@ class testTemplate extends CAPITest {
 						'vendor_version' => '6.4-0'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/vendor_name": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": both vendor_name and vendor_version should be either present or empty.'
 			]
 		];
 	}
@@ -234,7 +234,7 @@ class testTemplate extends CAPITest {
 						'vendor_name' => 'ZABBIX'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/vendor_version": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": both vendor_name and vendor_version should be either present or empty.'
 			],
 			[
 				'request' => [
@@ -261,7 +261,7 @@ class testTemplate extends CAPITest {
 						'vendor_version' => ''
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/vendor_version": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": both vendor_name and vendor_version should be either present or empty.'
 			]
 		];
 	}

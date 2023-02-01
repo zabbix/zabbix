@@ -292,10 +292,10 @@ class CImportDataAdapterTest extends TestCase {
 				'host' => 'empty-template',
 				'name' => 'empty-template',
 				'description' => '',
-				'tags' => [],
-				'valuemaps' => [],
 				'vendor_name' => '',
-				'vendor_version' => ''
+				'vendor_version' => '',
+				'tags' => [],
+				'valuemaps' => []
 			],
 			[
 				'uuid' => '00fda66f07e4479498058bf352711a06',
@@ -329,10 +329,10 @@ class CImportDataAdapterTest extends TestCase {
 				'host' => 'export-template',
 				'name' => 'export-template',
 				'description' => '',
-				'tags' => [],
-				'valuemaps' => [],
 				'vendor_name' => '',
-				'vendor_version' => ''
+				'vendor_version' => '',
+				'tags' => [],
+				'valuemaps' => []
 			]
 		]);
 	}
@@ -2064,10 +2064,10 @@ class CImportDataAdapterTest extends TestCase {
 					'templates' => [],
 					'name' => 'Template_Linux',
 					'description' => '',
-					'tags' => [],
-					'valuemaps' => [],
 					'vendor_name' => '',
-					'vendor_version' => ''
+					'vendor_version' => '',
+					'tags' => [],
+					'valuemaps' => []
 				],
 				[
 					'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
@@ -2081,10 +2081,10 @@ class CImportDataAdapterTest extends TestCase {
 					'templates' => [],
 					'name' => 'Template_Simple',
 					'description' => '',
-					'tags' => [],
-					'valuemaps' => [],
 					'vendor_name' => '',
-					'vendor_version' => ''
+					'vendor_version' => '',
+					'tags' => [],
+					'valuemaps' => []
 				]
 			]
 		);
@@ -2532,10 +2532,10 @@ class CImportDataAdapterTest extends TestCase {
 					'host' => 'Template_Simple',
 					'name' => 'Template_Simple',
 					'description' => '',
-					'tags' => [],
-					'valuemaps' => [],
 					'vendor_name' => '',
-					'vendor_version' => ''
+					'vendor_version' => '',
+					'tags' => [],
+					'valuemaps' => []
 				]
 			]
 		);
@@ -2869,10 +2869,10 @@ class CImportDataAdapterTest extends TestCase {
 				'host' => 'Test 1',
 				'name' => 'Test 1',
 				'description' => '',
-				'tags' => [],
-				'valuemaps' => [],
 				'vendor_name' => '',
-				'vendor_version' => ''
+				'vendor_version' => '',
+				'tags' => [],
+				'valuemaps' => []
 			]
 		]);
 
@@ -4302,10 +4302,10 @@ class CImportDataAdapterTest extends TestCase {
 				'host' => 'vendor test',
 				'name' => 'vendor test',
 				'description' => '',
-				'tags' => [],
-				'valuemaps' => [],
 				'vendor_name' => 'Zabbix',
-				'vendor_version' => '6.4-0'
+				'vendor_version' => '6.4-0',
+				'tags' => [],
+				'valuemaps' => []
 			]
 		]);
 	}

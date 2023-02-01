@@ -286,17 +286,18 @@ class CConfigurationExportBuilder {
 			$vendor = [];
 
 			if ($template['vendor_name'] !== '' && $template['vendor_version'] !== '') {
-				$vendor = ['vendor' => [
+				$vendor = [
 					'name' => $template['vendor_name'],
 					'version' => $template['vendor_version']
-				]];
+				];
 			}
 
-			$result[] = $vendor + [
+			$result[] = [
 				'uuid' => $template['uuid'],
 				'template' => $template['host'],
 				'name' => $template['name'],
 				'description' => $template['description'],
+				'vendor' => $vendor,
 				'groups' => $this->formatGroups($template['templategroups']),
 				'items' => $this->formatItems($template['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
