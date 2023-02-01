@@ -171,7 +171,6 @@ dc_item_value_t;
 
 static char		*string_values = NULL;
 static size_t		string_values_alloc = 0, string_values_offset = 0;
-
 static dc_item_value_t	*item_values = NULL;
 static size_t		item_values_alloc = 0, item_values_num = 0;
 
@@ -2040,20 +2039,8 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_BIN:
-
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
-			if (ITEM_VALUE_TYPE_BIN != hdata->value_type)
-			{
-				dc_history_clean_value(hdata);
-				hdata->value.bin = (zbx_bin_value_t *)zbx_malloc(NULL, sizeof(zbx_bin_value_t));
-				memset(hdata->value.bin, 0, sizeof(zbx_bin_value_t));
-			}
-			hdata->value.bin->value = value->data.str;
-			hdata->value.bin->len = strlen(value->data.str);
-			//hdata->value.bin->hash = value->data.hash;
-
-			//hdata->value.bin->hash = zbx_strdup(NULL, "badger_99999");
 	}
 
 	hdata->value_type = value_type;
@@ -3066,9 +3053,9 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 }
 
 static void	DCmodule_sync_history(int history_float_num, int history_integer_num, int history_string_num,
-		int history_text_num, int history_log_num, /*int history_bin_num,*/ ZBX_HISTORY_FLOAT *history_float,
+		int history_text_num, int history_log_num, ZBX_HISTORY_FLOAT *history_float,
 		ZBX_HISTORY_INTEGER *history_integer, ZBX_HISTORY_STRING *history_string,
-		ZBX_HISTORY_TEXT *history_text, ZBX_HISTORY_LOG *history_log /*, ZBX_HISTORY_BIN *history_bin */)
+		ZBX_HISTORY_TEXT *history_text, ZBX_HISTORY_LOG *history_log)
 {
 	if (0 != history_float_num)
 	{
@@ -3319,10 +3306,9 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	static ZBX_HISTORY_STRING	*history_string;
 	static ZBX_HISTORY_TEXT		*history_text;
 	static ZBX_HISTORY_LOG		*history_log;
-	//static ZBX_HISTORY_BIN		*history_bin;
 	static int			module_enabled = FAIL;
 	int				i, history_num, history_float_num, history_integer_num, history_string_num,
-					history_text_num, history_log_num, /*history_bin_num,*/ txn_error, compression_age;
+					history_text_num, history_log_num, txn_error, compression_age;
 	unsigned int			item_retrieve_mode;
 	time_t				sync_start;
 	zbx_vector_uint64_t		triggerids ;
@@ -3407,7 +3393,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		ZBX_DC_TREND		*trends = NULL;
 
 		*more = ZBX_SYNC_DONE;
-
 
 		LOCK_CACHE;
 		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, before hc_pop_items, queue size: %d", hc_queue_get_size());
@@ -3598,12 +3583,12 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 					DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
 							history_integer, &history_integer_num, history_string,
 							&history_string_num, history_text, &history_text_num, history_log,
-							&history_log_num /*, history_bin, &history_bin_num*/ );
+							&history_log_num);
 
 					DCmodule_sync_history(history_float_num, history_integer_num, history_string_num,
-							history_text_num, history_log_num, /*history_bin_num,*/
+							history_text_num, history_log_num,
 							history_float, history_integer, history_string, history_text,
-							history_log /*, history_bin*/);
+							history_log);
 				}
 
 				if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
@@ -4041,8 +4026,6 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, unsigned char item_val
 	}
 }
 
-
-
 static void	dc_local_add_history_notsupported(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *error,
 		zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
@@ -4153,8 +4136,6 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
 	if (!ZBX_ISSET_VALUE(result) && !ZBX_ISSET_META(result) && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return;
-
-
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, KIA 3");
 	value_flags = 0;

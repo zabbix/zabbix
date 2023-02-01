@@ -41,8 +41,8 @@ typedef union
 	zbx_uint64_t	ui64;
 	double		dbl;
 	char		*str;
-	void		*bin;
-	int		bin_len;
+//	void		*bin;
+//	int		bin_len;
 }
 zbx_db_value_t;
 
