@@ -409,7 +409,9 @@ class testSID extends CWebTest {
 			// #60 Correlation condition add.
 			[['link' => 'zabbix.php?action=correlation.condition.add&form_refresh=2&name=add&evaltype=0&formula=&'.
 					'description=ssdsd&op_close_old=1&op_close_new=1&status=0&new_condition%5Btype%5D=0&new_condition%5B'.
-					'operator%5D=0&new_condition%5Btag%5D=1111&add_condition=1']],
+					'operator%5D=0&new_condition%5Btag%5D=1111&add_condition=1',
+				'page_not_found' => true
+			]],
 
 			// #61 GUI update.
 			[['link' => 'zabbix.php?action=gui.update&form_refresh=1&default_lang=en_GB&default_timezone=system&'.
@@ -446,14 +448,14 @@ class testSID extends CWebTest {
 				'link' => 'zabbix.php?new_group_right%5Bgroupids%5D%5B%5D=50012&new_group_right%5Binclude_subgroups%5D=0&'.
 					'new_group_right%5Bpermission%5D=-1&group_rights%5B0%5D%5Bname%5D=&group_rights%5B0%5D%5Bgrouped%5D=1&'.
 					'group_rights%5B0%5D%5Bpermission%5D=-1&action=usergroup.groupright.add',
-				'json_output' => true
+				'json_result' => '{"body":"&lt;table id=\"group-right-table\" style=\"width: 100%;\"&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Host'
 			]],
 
 			// #68 User group tag filter add.
 			[[
 				'link' => 'zabbix.php?new_tag_filter%5Binclude_subgroups%5D=0&new_tag_filter%5Btag%5D=&new_tag_filter'.
 					'%5Bvalue%5D=&action=usergroup.tagfilter.add',
-				'json_output' => true
+				'json_result' => '{"error":{"messages":["Incorrect value for field \"Host groups\": cannot be empty."]}}'
 			]],
 
 			// #69 Script creation.
@@ -635,16 +637,13 @@ class testSID extends CWebTest {
 					'dchecks%5B2%5D%5Bname%5D=Zabbix+agent+%22system.uname%22&dchecks%5B2%5D%5Bkey_%5D=system.uname&'.
 					'uniqueness_criteria=-1&host_source=1&name_source=0&status=1&action=discovery.update']],
 
-			// #94 Export.
-			[['link' => 'zabbix.php?action=export.hosts&format=yaml&backurl=hosts.php&form_refresh=1&hosts%5B50011%5D=50011']],
-
-			// #95 Favorite create.
+			// #94 Favorite create.
 			[['link' => 'zabbix.php?action=favorite.create&object=screenid&objectid=200021']],
 
-			// #96 Favorite delete.
+			// #95 Favorite delete.
 			[['link' => 'zabbix.php?action=favorite.delete&object=screenid&objectid=200021']],
 
-			// #97 Host creation.
+			// #96 Host creation.
 			[[
 				'link' => 'zabbix.php?action=host.create&flags=0&tls_connect=1&tls_accept=1&host=1111&visiblename=&'.
 						'groups%5B%5D%5Bnew%5D=111&interfaces%5B1%5D%5Bitems%5D=&interfaces%5B1%5D%5Blocked%5D=&'.
@@ -658,7 +657,7 @@ class testSID extends CWebTest {
 				'json_output' => true
 			]],
 
-			// #98 Host update.
+			// #97 Host update.
 			[[
 				'link' => 'zabbix.php?action=host.update&form=update&flags=0&tls_connect=1&tls_accept=1&psk_edit_mode=1&'.
 						'hostid=99452&host=11111111&visiblename=&groups%5B%5D=50020&interfaces%5B55079%5D%5Bitems%5D=false&'.
@@ -672,59 +671,63 @@ class testSID extends CWebTest {
 				'json_output' => true
 			]],
 
-			// #99 Host delete.
+			// #98 Host delete.
 			[[
 				'link' => 'zabbix.php?action=host.massdelete&hostids%5B0%5D=99452',
 				'json_output' => true
 			]],
 
-			// #100 Host disable.
+			// #99 Host disable.
 			[[
 				'link' => 'zabbix.php?action=popup.massupdate.host&visible%5Bstatus%5D=1&update=1&backurl='.
 					'zabbix.php%3Faction%3Dhost.list&status=1',
 				'json_output' => true
 			]],
 
-			// #101 Host enable.
+			// #100 Host enable.
 			[[
 				'link' => 'zabbix.php?action=popup.massupdate.host&visible%5Bstatus%5D=1&update=1&backurl='.
 					'zabbix.php%3Faction%3Dhost.list&status=0',
 				'json_output' => true
 			]],
 
-			// #102 Notifications get.
+			// #101 Notifications get.
 			[[
 				'link' => 'zabbix.php?action=notifications.get&known_eventids%5B%5D=126',
-				'json_output' => true
+				'json_result' => '{"notifications":[],"settings":{"enabled":false,"alarm_timeout":1,"msg_recovery_timeout"'.
+						':60,"msg_timeout":60,"muted":false,"severity_styles":{"-1":"normal-bg","3":"average-bg","5":"disaster-bg",'.
+						'"4":"high-bg","1":"info-bg","0":"na-bg","2":"warning-bg"},"files":{"-1":"alarm_ok.mp3","3":"alarm_average.mp3",'.
+						'"5":"alarm_disaster.mp3","4":"alarm_high.mp3","1":"alarm_information.mp3","0":"no_sound.mp3","2":"alarm_warning.mp3"}}}'
 			]],
 
-			// #103 Notifications mute.
+			// #102 Notifications mute.
 			[[
 				'link' => 'zabbix.php?action=notifications.mute&muted=1',
-				'json_output' => true
+				'json_result' => '{"muted":1}'
 			]],
 
-			// #104 Popup import.
+			// #103 Popup import.
 			[[
 				'link' => 'zabbix.php?rules_preset=host&action=popup.import',
 				'json_output' => true
 			]],
 
-			// #105 Popup item test edit.
+			// #104 Popup item test edit.
 			[[
 				'link' => 'zabbix.php?action=popup.itemtest.edit&key=agent.hostname&delay=1m&value_type=3&item_type=0&'.
 					'itemid=0&interfaceid=50040&hostid=50012&test_type=0&step_obj=-2&show_final_result=1&get_value=1',
-				'json_output' => true
+				'json_result' => '{"header":"Test item","doc_url":"https:\/\/www.zabbix.com\/documentation\/6.'.
+						'4\/en\/manual\/config\/items\/item#testing","script_inline":"\n\/**\n *'
 			]],
 
-			// #106 Popup item test get value.
+			// #105 Popup item test get value.
 			[[
 				'link' => 'zabbix.php?action=popup.itemtest.getvalue&key=agent.hostname&value_type=3&item_type=0&itemid=0&'.
 					'interface%5Baddress%5D=127.0.0.1&interface%5Bport%5D=10050&proxy_hostid=0&test_type=0&hostid=50012&value=',
 				'json_output' => true
 			]],
 
-			// #107 Popup item test send.
+			// #106 Popup item test send.
 			[[
 				'link' => 'zabbix.php?key=agent.hostname&delay=&value_type=4&item_type=0&itemid=0&interfaceid=0&get_value=1&'.
 					'interface%5Baddress%5D=127.0.0.1&interface%5Bport%5D=10050&proxy_hostid=0&show_final_result=1&'.
@@ -732,43 +735,45 @@ class testSID extends CWebTest {
 				'json_output' => true
 			]],
 
-			// #108 Popup maintenance period.
+			// #107 Popup maintenance period.
 			[[
 				'link' => 'zabbix.php?index=1&action=popup.maintenance.period',
-				'json_output' => true
+				'json_result' => '{"header":"Maintenance period","body":"&lt;div&gt;&lt;form method=\"post\" action=\"zabbix.'.
+						'php\" accept-charset=\"utf-8\" spellcheck=\"false\"'
 			]],
 
-			// #109 Popup massupdate host.
+			// #108 Popup massupdate host.
 			[[
 				'link' => 'zabbix.php?ids%5B%5D=50011&ids%5B%5D=50012&action=popup.massupdate.host',
 				'json_output' => true
 			]],
 
-			// #110 Popup massupdate item.
+			// #109 Popup massupdate item.
 			[[
 				'link' => 'zabbix.php?ids%5B%5D=99086&context=host&prototype=0&action=popup.massupdate.item',
 				'json_output' => true
 			]],
 
-			// #111 Popup massupdate template.
+			// #110 Popup massupdate template.
 			[[
 				'link' => 'zabbix.php?ids%5B%5D=10076&action=popup.massupdate.template',
 				'json_output' => true
 			]],
 
-			// #112 Popup massupdate trigger.
+			// #111 Popup massupdate trigger.
 			[[
 				'link' => 'zabbix.php?ids%5B%5D=100034&context=host&action=popup.massupdate.trigger',
 				'json_output' => true
 			]],
 
-			// #113 Popup media type test edit.
+			// #112 Popup media type test edit.
 			[[
 				'link' => 'zabbix.php?mediatypeid=29&action=popup.mediatypetest.edit',
-				'json_output' => true
+				'json_result' => '{"header":"Test media type \"Brevis.one\"","script_inline":"\n\/**\n * Send'.
+						' media type test data to server and get a response.'
 			]],
 
-			// #114 Popup media type test send.
+			// #113 Popup media type test send.
 			[['link' => 'zabbix.php?action=popup.mediatypetest.send&mediatypeid=10&parameters%5B0%5D%5Bname%5D=alert_message&'.
 					'parameters%5B0%5D%5Bvalue%5D=%7BALERT.MESSAGE%7D&parameters%5B1%5D%5Bname%5D=alert_subject&'.
 					'parameters%5B1%5D%5Bvalue%5D=%7BALERT.SUBJECT%7D&parameters%5B2%5D%5Bname%5D=discord_endpoint&'.
@@ -799,13 +804,13 @@ class testSID extends CWebTest {
 				'json_output' => true
 			]],
 
-			// #115 Popup script execution.
+			// #114 Popup script execution.
 			[[
 				'link' => 'zabbix.php?scriptid=1&hostid=10386&action=popup.scriptexec',
 				'json_output' => true
 			]],
 
-			// #116 Profile update.
+			// #115 Profile update.
 			[['link' => 'zabbix.php?form_refresh=1&action=userprofile.edit&userid=1&medias%5B3%5D%5Bmediatypeid%5D=10&'.
 					'medias%5B3%5D%5Bperiod%5D=1-7%2C00%3A00-24%3A00&medias%5B3%5D%5Bsendto%5D=test%40jabber.com&'.
 					'medias%5B3%5D%5Bseverity%5D=16&medias%5B3%5D%5Bactive%5D=0&medias%5B3%5D%5Bname%5D=Discord&'.
@@ -823,12 +828,12 @@ class testSID extends CWebTest {
 					'timezone=default&theme=default&autologin=1&autologout=0&refresh=30s&rows_per_page=99&url=&'.
 					'messages%5Benabled%5D=0&action=userprofile.update']],
 
-			// #117 User creation.
+			// #116 User creation.
 			[['link' => 'zabbix.php?form_refresh=2&action=user.edit&userid=0&username=1111&name=&surname=&'.
 					'user_groups%5B%5D=8&password1=1&password2=1&lang=default&timezone=default&theme=default&autologin=0&'.
 					'autologout=0&refresh=30s&rows_per_page=50&url=&roleid=1&user_type=User&action=user.create']],
 
-			// #118 User delete.
+			// #117 User delete.
 			[['link' => 'zabbix.php?action=user.delete&userids[]=95']],
 
 			// User update.
@@ -836,10 +841,10 @@ class testSID extends CWebTest {
 					'user_groups%5B%5D=8&lang=default&timezone=default&theme=default&autologin=0&autologout=0&'.
 					'refresh=30s&rows_per_page=50&url=&roleid=1&user_type=User&action=user.update']],
 
-			// #119 User unblock.
+			// #118 User unblock.
 			[['link' => 'zabbix.php?form_refresh=1&userids%5B6%5D=6&action=user.unblock']],
 
-			// #120 Scheduled report creation.
+			// #119 Scheduled report creation.
 			[['link' => 'zabbix.php?form_refresh=1&userid=1&name=testsid&dashboardid=1&period=0&cycle=0&hours=00&'.
 				'minutes=00&weekdays%5B1%5D=1&weekdays%5B8%5D=8&weekdays%5B32%5D=32&weekdays%5B2%5D=2&'.
 				'weekdays%5B16%5D=16&weekdays%5B64%5D=64&weekdays%5B4%5D=4&active_since=&active_till='.
@@ -850,10 +855,10 @@ class testSID extends CWebTest {
 				'subscriptions%5B0%5D%5Bcreator_inaccessible%5D=0&subscriptions%5B0%5D%5Bexclude%5D=0&description=&'.
 				'status=0&action=scheduledreport.create']],
 
-			// #121 Scheduled report delete.
+			// #120 Scheduled report delete.
 			[['link' => 'zabbix.php?action=scheduledreport.delete&reportids[]=1']],
 
-			// #122 Scheduled report update.
+			// #121 Scheduled report update.
 			[['link' => 'zabbix.php?form_refresh=1&reportid=8&old_dashboardid=2&userid=1&'.
 				'name=Report+for+filter+-+enabled+sid&dashboardid=2&period=3&cycle=2&hours=00&'.
 				'minutes=00&weekdays%5B1%5D=1&weekdays%5B8%5D=8&weekdays%5B32%5D=32&weekdays%5B2%5D=2&'.
@@ -865,7 +870,7 @@ class testSID extends CWebTest {
 				'subscriptions%5B0%5D%5Bcreator_inaccessible%5D=0&subscriptions%5B0%5D%5Bexclude%5D=0&description=&'.
 				'status=0&action=scheduledreport.update']],
 
-			// #123 Scheduled report test.
+			// #122 Scheduled report test.
 			[[
 				'link' => 'zabbix.php?action=popup.scheduledreport.test&period=2&now=1627543595&dashboardid=1'.
 						'&name=Report+for+testFormScheduledReport&subject=Report+subject+for+testFormScheduledReport&'.
@@ -873,42 +878,42 @@ class testSID extends CWebTest {
 				'json_output' => true
 			]],
 
-			// #124 Host group creation.
+			// #123 Host group creation.
 			[[
 				'link' => 'zabbix.php?action=hostgroup.create&name=aaaaaaa',
 				'json_output' => true
 			]],
-			// #125 Host group update.
+			// #124 Host group update.
 			[[
 				'link' => 'zabbix.php?action=hostgroup.update&name=aaabbb&groupid=6',
 				'json_output' => true
 			]],
-			// #126 Host group delete.
+			// #125 Host group delete.
 			[[
 				'link' => 'zabbix.php?action=hostgroup.delete&groupids%5B0%5D=7',
 				'json_output' => true
 			]],
-			// #127 Host group disable.
+			// #126 Host group disable.
 			[[
 				'link' => 'zabbix.php?action=hostgroup.enable&groupids%5B0%5D=7',
 				'json_output' => true
 			]],
-			// #128 Host group enable.
+			// #127 Host group enable.
 			[[
 				'link' => 'zabbix.php?action=hostgroup.disable&groupids%5B0%5D=7',
 				'json_output' => true
 			]],
-			// #129 Template group creation.
+			// #128 Template group creation.
 			[[
 				'link' => 'zabbix.php?action=templategroup.create&name=aaa',
 				'json_output' => true
 			]],
-			// #130 Template group update.
+			// #129 Template group update.
 			[[
 				'link' => 'zabbix.php?action=templategroup.update&name=aaabbb&groupid=14',
 				'json_output' => true
 			]],
-			// #131 Template group delete.
+			// #130 Template group delete.
 			[[
 				'link' => 'zabbix.php?action=templategroup.delete&groupids%5B0%5D=14',
 				'json_output' => true
