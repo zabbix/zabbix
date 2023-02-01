@@ -316,10 +316,14 @@ static zbx_pp_item_t	*pp_manager_get_cacheable_dependent_item(zbx_pp_manager_t *
 static void	pp_manager_queue_dependents(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc,
 		zbx_uint64_t exclude_itemid, const zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_cache_t *cache)
 {
-	int	queued_num = 0;
+	zbx_vector_pp_task_ptr_t	tasks;
 
 	if (0 == preproc->dep_itemids_num)
 		return;
+
+	zbx_vector_pp_task_ptr_create(&tasks);
+
+	pp_task_queue_unlock(&manager->queue);
 
 	cache = pp_cache_copy(cache);
 
@@ -329,7 +333,7 @@ static void	pp_manager_queue_dependents(zbx_pp_manager_t *manager, zbx_pp_item_p
 	for (int i = 0; i < preproc->dep_itemids_num; i++)
 	{
 		zbx_pp_item_t	*item;
-		zbx_pp_task_t	*new_task;
+		zbx_pp_task_t	*task;
 
 		/* skip already preprocessed dependent item */
 		if (preproc->dep_itemids[i] == exclude_itemid)
@@ -340,18 +344,26 @@ static void	pp_manager_queue_dependents(zbx_pp_manager_t *manager, zbx_pp_item_p
 			continue;
 
 		if (ZBX_PP_PROCESS_PARALLEL == item->preproc->mode)
-			new_task = pp_task_value_create(item->itemid, item->preproc, NULL, ts, NULL, cache);
+			task = pp_task_value_create(item->itemid, item->preproc, NULL, ts, NULL, cache);
 		else
-			new_task = pp_task_value_seq_create(item->itemid, item->preproc, NULL, ts, NULL, cache);
+			task = pp_task_value_seq_create(item->itemid, item->preproc, NULL, ts, NULL, cache);
 
-		pp_task_queue_push_immediate(&manager->queue, new_task);
-		queued_num++;
+		zbx_vector_pp_task_ptr_append(&tasks, task);
 	}
 
-	if (0 < queued_num)
-		pp_task_queue_notify_all(&manager->queue);
-
 	pp_cache_release(cache);
+
+	pp_task_queue_lock(&manager->queue);
+
+	if (0 != tasks.values_num)
+	{
+		for (int i = 0; i < tasks.values_num; i++)
+			pp_task_queue_push_immediate(&manager->queue, tasks.values[i]);
+
+		pp_task_queue_notify_all(&manager->queue);
+	}
+
+	zbx_vector_pp_task_ptr_destroy(&tasks);
 }
 
 
