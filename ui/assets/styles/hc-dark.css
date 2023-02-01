@@ -1068,7 +1068,7 @@ footer {
     .form-grid .table-forms-separator td {
       padding: 5px 5px 5px 0; }
 
-.btn-remove, .overlay-close-btn, .subfilter-disable-btn, .filter-container.tabfilter-container nav .zi-chevron-left,
+.btn-remove, .subfilter-disable-btn, .filter-container.tabfilter-container nav .zi-chevron-left,
 .filter-container.tabfilter-container nav .zi-chevron-right,
 .filter-container.tabfilter-container nav .zi-chevron-down {
   display: inline-block;
@@ -1085,11 +1085,11 @@ footer {
   border-radius: 2px;
   opacity: .5;
   transition: opacity .2s ease-out; }
-  .btn-remove:hover, .overlay-close-btn:hover, .subfilter-disable-btn:hover, .filter-container.tabfilter-container nav .zi-chevron-left:hover,
+  .btn-remove:hover, .subfilter-disable-btn:hover, .filter-container.tabfilter-container nav .zi-chevron-left:hover,
   .filter-container.tabfilter-container nav .zi-chevron-right:hover,
-  .filter-container.tabfilter-container nav .zi-chevron-down:hover, .btn-remove:focus, .overlay-close-btn:focus, .subfilter-disable-btn:focus, .filter-container.tabfilter-container nav .zi-chevron-left:focus,
+  .filter-container.tabfilter-container nav .zi-chevron-down:hover, .btn-remove:focus, .subfilter-disable-btn:focus, .filter-container.tabfilter-container nav .zi-chevron-left:focus,
   .filter-container.tabfilter-container nav .zi-chevron-right:focus,
-  .filter-container.tabfilter-container nav .zi-chevron-down:focus, .btn-remove:active, .overlay-close-btn:active, .subfilter-disable-btn:active, .filter-container.tabfilter-container nav .zi-chevron-left:active,
+  .filter-container.tabfilter-container nav .zi-chevron-down:focus, .btn-remove:active, .subfilter-disable-btn:active, .filter-container.tabfilter-container nav .zi-chevron-left:active,
   .filter-container.tabfilter-container nav .zi-chevron-right:active,
   .filter-container.tabfilter-container nav .zi-chevron-down:active {
     text-decoration: none;
@@ -1097,16 +1097,16 @@ footer {
     outline: none;
     opacity: 1; }
 
-.btn-remove, .overlay-close-btn, .subfilter-disable-btn {
+.btn-remove, .subfilter-disable-btn {
   font-size: 20px;
   color: #cacaca;
   text-align: center;
   cursor: pointer; }
-  .btn-remove::before, .overlay-close-btn::before, .subfilter-disable-btn::before {
+  .btn-remove::before, .subfilter-disable-btn::before {
     display: block;
     content: '+';
     transform: rotate(45deg); }
-  .btn-remove:hover, .overlay-close-btn:hover, .subfilter-disable-btn:hover, .btn-remove:focus, .overlay-close-btn:focus, .subfilter-disable-btn:focus, .btn-remove:active, .overlay-close-btn:active, .subfilter-disable-btn:active {
+  .btn-remove:hover, .subfilter-disable-btn:hover, .btn-remove:focus, .subfilter-disable-btn:focus, .btn-remove:active, .subfilter-disable-btn:active {
     color: #cacaca;
     outline: none; }
 
@@ -1212,12 +1212,6 @@ a.btn-icon {
 .btn-remove[disabled], .btn-remove[disabled]:hover {
   background-color: transparent;
   opacity: .25; }
-
-.overlay-close-btn {
-  position: absolute;
-  top: 1px;
-  right: 1px;
-  z-index: 1000; }
 
 .subfilter-disable-btn {
   margin: 0;
@@ -3195,8 +3189,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
   background-color: #000000;
   border: 2px solid;
   border-radius: 2px; }
-  .zi-circle-info-filled .overlay-close-btn,
-  .zi-circle-check-filled .overlay-close-btn {
+  .zi-circle-info-filled .zi-plus,
+  .zi-circle-check-filled .zi-plus {
     color: #cacaca; }
   .zi-circle-info-filled .link-action,
   .zi-circle-check-filled .link-action {
@@ -5574,10 +5568,10 @@ z-select .zi-chevron-down,
     position: fixed;
     overflow: hidden;
     margin: 0 10px; }
+    .overlay-dialogue.modal .zi-plus::before {
+      transform: rotate(45deg); }
     .overlay-dialogue.modal .dashboard-widget-head {
       margin-bottom: 12px; }
-      .overlay-dialogue.modal .dashboard-widget-head .overlay-close-btn {
-        position: static; }
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow: auto;
       overflow-x: hidden;

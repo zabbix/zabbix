@@ -1801,7 +1801,8 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
-			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
+			->addClass('btn-icon')
+			->addClass(ZBX_ICON_PLUS)
 			->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
 			->setTitle(_('Close')));
 	}

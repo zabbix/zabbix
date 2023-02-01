@@ -2522,14 +2522,14 @@ $trigger-expression-tree-icons: (
 		overflow: hidden;
 		margin: 0 10px;
 
+		.zi-plus {
+			&::before {
+				transform: rotate(45deg);
+			}
+		}
+
 		.dashboard-widget-head {
 			margin-bottom: 12px;
-
-			.overlay-close-btn {
-				position: static; // TODO: acikuns NEEDS TO BE DELETED
-				//margin: -9px -6px 0 30px;
-				//font-size: 25px;
-			}
 		}
 
 		.overlay-dialogue-body {

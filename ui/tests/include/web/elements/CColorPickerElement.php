@@ -54,7 +54,7 @@ class CColorPickerElement extends CElement {
 			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
 		}
 
-		$overlay->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible();
+		$overlay->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible(); // TODO check
 
 		return $this;
 	}

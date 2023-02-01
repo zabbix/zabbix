@@ -207,15 +207,6 @@ a.btn-icon {
 	}
 }
 
-.overlay-close-btn {
-	@extend %btn-icon;
-	@extend %btn-remove-icon;
-	position: absolute;
-	top: 1px;
-	right: 1px;
-	z-index: 1000;
-}
-
 .subfilter-disable-btn {
 	@extend %btn-icon;
 	@extend %btn-remove-icon;

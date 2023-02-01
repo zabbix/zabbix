@@ -792,7 +792,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 
 	if (show_close_box) {
 		var $button = jQuery('<button>')
-				.addClass('overlay-close-btn')
+				.addClass('btn-icon '+ ZBX_ICON_PLUS)
 				.attr('type', 'button')
 				.attr('title', t('Close'))
 				.click(function() {
