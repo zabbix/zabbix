@@ -245,8 +245,11 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 	zbx_uint32_t			offset = 0;
 	zbx_preproc_item_value_t	value;
 	zbx_uint64_t			queued_num = 0;
+	zbx_vector_pp_task_ptr_t	tasks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_pp_task_ptr_create(&tasks);
 
 	preprocessor_sync_configuration(manager);
 
@@ -255,11 +258,12 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 		zbx_variant_t		var;
 		zbx_pp_value_opt_t	var_opt;
 		zbx_timespec_t		ts;
+		zbx_pp_task_t		*task;
 
 		offset += zbx_preprocessor_unpack_value(&value, message->data + offset);
 		preproc_item_value_extract_data(&value, &var, &ts, &var_opt);
 
-		if (SUCCEED != zbx_pp_manager_queue_preproc(manager, value.itemid, &var, ts, &var_opt))
+		if (NULL == (task = zbx_pp_manager_create_task(manager, value.itemid, &var, ts, &var_opt)))
 		{
 			preprocessing_flush_value(manager, value.itemid, value.item_value_type, value.item_flags,
 					&var, ts, &var_opt);
@@ -268,10 +272,16 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 			zbx_pp_value_opt_clear(&var_opt);
 		}
 		else
-			queued_num++;
+			zbx_vector_pp_task_ptr_append(&tasks, task);
 
 		preproc_item_value_clear(&value);
 	}
+
+	if (0 != tasks.values_num)
+		zbx_pp_manager_queue_value_preproc(manager, &tasks);
+
+	queued_num = tasks.values_num;
+	zbx_vector_pp_task_ptr_destroy(&tasks);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

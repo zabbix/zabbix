@@ -277,11 +277,12 @@ void	pp_task_queue_push_test(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
  *           or testing requests.                                             *
  *                                                                            *
  ******************************************************************************/
-void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_item_t *item, zbx_pp_task_t *task)
+void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 {
+	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 	queue->pending_num++;
 
-	if (ITEM_TYPE_INTERNAL != item->preproc->type)
+	if (ITEM_TYPE_INTERNAL != d->preproc->type)
 	{
 		zbx_list_append(&queue->pending, task, NULL);
 		return;

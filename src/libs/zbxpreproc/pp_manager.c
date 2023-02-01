@@ -229,7 +229,27 @@ void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: queue item value for preprocessing                                *
+ * Purpose: queue value/value_sec preprocessing tasks                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks)
+{
+	pp_task_queue_lock(&manager->queue);
+
+	for (int i = 0; i < tasks->values_num; i++)
+		pp_task_queue_push(&manager->queue, tasks->values[i]);
+
+	if (1 == tasks->values_num)
+		pp_task_queue_notify(&manager->queue);
+	else
+		pp_task_queue_notify_all(&manager->queue);
+
+	pp_task_queue_unlock(&manager->queue);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create preprocessing task from request                            *
  *                                                                            *
  * Parameters: manager   - [IN] the manager                                   *
  *             itemid    - [IN] the item identifier                           *
@@ -238,36 +258,27 @@ void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t 
  *             ts        - [IN] the value timestamp                           *
  *             value_opt - [IN] the optional value data (optional)            *
  *                                                                            *
- * Return value: SUCCEED - new task was created and queued for preprocessing  *
- *               FAIl    - item does not need preprocessing                   *
+ * Return value: The created task or NULL if the data can be flushed directly.*
  *                                                                            *
  ******************************************************************************/
-int	zbx_pp_manager_queue_preproc(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value,
+zbx_pp_task_t	*zbx_pp_manager_create_task(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value,
 		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt)
 {
 	zbx_pp_item_t	*item;
-	zbx_pp_task_t	*task;
 
 	if (ZBX_VARIANT_NONE == value->type)
-		return FAIL;
+		return NULL;
 
 	if (NULL == (item = (zbx_pp_item_t *)zbx_hashset_search(&manager->items, &itemid)))
-		return FAIL;
+		return NULL;
 
 	if (0 == item->preproc->dep_itemids_num && 0 == item->preproc->steps_num)
-		return FAIL;
+		return NULL;
 
 	if (ZBX_PP_PROCESS_PARALLEL == item->preproc->mode)
-		task = pp_task_value_create(item->itemid, item->preproc, value, ts, value_opt, NULL);
+		return pp_task_value_create(item->itemid, item->preproc, value, ts, value_opt, NULL);
 	else
-		task = pp_task_value_seq_create(item->itemid, item->preproc, value, ts, value_opt, NULL);
-
-	pp_task_queue_lock(&manager->queue);
-	pp_task_queue_push(&manager->queue, item, task);
-	pp_task_queue_notify(&manager->queue);
-	pp_task_queue_unlock(&manager->queue);
-
-	return SUCCEED;
+		return pp_task_value_seq_create(item->itemid, item->preproc, value, ts, value_opt, NULL);
 }
 
 /******************************************************************************
