@@ -38,14 +38,14 @@ static int	DBpatch_6030000(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	result = DBselect("select roleid,type,name,value_int from role_rule where name in ("
+	result = zbx_db_select("select roleid,type,name,value_int from role_rule where name in ("
 			"'ui.configuration.actions',"
 			"'ui.services.actions',"
 			"'ui.administration.general')");
 
 	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int", NULL);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	roleid;
 		int		value_int, type;
@@ -94,7 +94,7 @@ static int	DBpatch_6030000(void)
 
 	if (SUCCEED == (ret = zbx_db_insert_execute(&db_insert)))
 	{
-		if (ZBX_DB_OK > DBexecute("delete from role_rule where name in ("
+		if (ZBX_DB_OK > zbx_db_execute("delete from role_rule where name in ("
 			"'ui.configuration.actions',"
 			"'ui.services.actions')"))
 		{
@@ -116,7 +116,7 @@ static int	DBpatch_6030001(void)
 
 static int	DBpatch_6030002(void)
 {
-	if (ZBX_DB_OK > DBexecute(
+	if (ZBX_DB_OK > zbx_db_execute(
 			"update group_discovery gd"
 			" set name=("
 				"select gp.name"
@@ -487,11 +487,11 @@ static int	DBpatch_6030062(void)
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect("select moduleid,relative_path from module");
+	result = zbx_db_select("select moduleid,relative_path from module");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		const char	*rel_path = row[1];
 		char		*updated_path, *updated_path_esc;
@@ -501,7 +501,7 @@ static int	DBpatch_6030062(void)
 
 		updated_path = zbx_dsprintf(NULL, "modules/%s", rel_path);
 
-		updated_path_esc = DBdyn_escape_string(updated_path);
+		updated_path_esc = zbx_db_dyn_escape_string(updated_path);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update module set relative_path='%s' "
 				"where moduleid=%s;\n", updated_path_esc, row[0]);
@@ -509,15 +509,15 @@ static int	DBpatch_6030062(void)
 		zbx_free(updated_path);
 		zbx_free(updated_path_esc);
 
-		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 	zbx_db_free_result(result);
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
 
@@ -564,7 +564,7 @@ static int	DBpatch_6030064(void)
 {
 	const ZBX_FIELD	field = {"name_upper", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("hosts", "hosts_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
 				" skipping patch of adding \"name_upper\" column to \"hosts\" table");
@@ -576,7 +576,7 @@ static int	DBpatch_6030064(void)
 
 static int	DBpatch_6030065(void)
 {
-	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("hosts", "hosts_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
 				" skipping patch of adding index to \"name_upper\" column");
@@ -588,7 +588,7 @@ static int	DBpatch_6030065(void)
 
 static int	DBpatch_6030066(void)
 {
-	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("hosts", "hosts_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
 				" skipping patch of updating \"name_upper\" column");
@@ -596,7 +596,7 @@ static int	DBpatch_6030066(void)
 		return SUCCEED;
 	}
 
-	if (ZBX_DB_OK > DBexecute("update hosts set name_upper=upper(name)"))
+	if (ZBX_DB_OK > zbx_db_execute("update hosts set name_upper=upper(name)"))
 		return FAIL;
 
 	return SUCCEED;
@@ -604,7 +604,7 @@ static int	DBpatch_6030066(void)
 
 static int	DBpatch_6030067(void)
 {
-	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_insert"))
+	if (SUCCEED == zbx_db_trigger_exists("hosts", "hosts_name_upper_insert"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_insert trigger for table \"hosts\" already exists,"
 				" skipping patch of adding it to \"hosts\" table");
@@ -616,7 +616,7 @@ static int	DBpatch_6030067(void)
 
 static int	DBpatch_6030068(void)
 {
-	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("hosts", "hosts_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
 				" skipping patch of adding it to \"hosts\" table");
@@ -630,7 +630,7 @@ static int	DBpatch_6030069(void)
 {
 	const ZBX_FIELD field = {"name_upper", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("items", "items_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
 				" skipping patch of adding \"name_upper\" column to \"items\" table");
@@ -642,7 +642,7 @@ static int	DBpatch_6030069(void)
 
 static int	DBpatch_6030070(void)
 {
-	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("items", "items_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
 				" skipping patch of adding index to \"name_upper\" column");
@@ -655,14 +655,14 @@ static int	DBpatch_6030070(void)
 
 static int	DBpatch_6030071(void)
 {
-	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("items", "items_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
 				" skipping patch of updating \"name_upper\" column");
 		return SUCCEED;
 	}
 
-	if (ZBX_DB_OK > DBexecute("update items set name_upper=upper(name)"))
+	if (ZBX_DB_OK > zbx_db_execute("update items set name_upper=upper(name)"))
 		return FAIL;
 
 	return SUCCEED;
@@ -670,7 +670,7 @@ static int	DBpatch_6030071(void)
 
 static int	DBpatch_6030072(void)
 {
-	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_insert"))
+	if (SUCCEED == zbx_db_trigger_exists("items", "items_name_upper_insert"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_insert trigger for table \"items\" already exists,"
 				" skipping patch of adding it to \"items\" table");
@@ -682,7 +682,7 @@ static int	DBpatch_6030072(void)
 
 static int	DBpatch_6030073(void)
 {
-	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("items", "items_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
 				" skipping patch of adding it to \"items\" table");
@@ -707,7 +707,7 @@ static int	DBpatch_6030074(void)
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
 	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
 			return FAIL;
 	}
 
@@ -1138,7 +1138,7 @@ static int	DBpatch_6030123(void)
 
 static int	migrate_ldap_data(void)
 {
-	DB_RESULT	result = DBselect("select userdirectoryid,host,port,base_dn,bind_dn,bind_password,"
+	DB_RESULT	result = zbx_db_select("select userdirectoryid,host,port,base_dn,bind_dn,bind_password,"
 					"search_attribute,start_tls,search_filter"
 					" from userdirectory");
 	if (NULL == result)
@@ -1146,16 +1146,16 @@ static int	migrate_ldap_data(void)
 
 	DB_ROW	row;
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		char	*host = DBdyn_escape_string(row[1]);
-		char	*base_dn = DBdyn_escape_string(row[3]);
-		char	*bind_dn = DBdyn_escape_string(row[4]);
-		char	*bind_password = DBdyn_escape_string(row[5]);
-		char	*search_attribute = DBdyn_escape_string(row[6]);
-		char	*search_filter = DBdyn_escape_string(row[8]);
+		char	*host = zbx_db_dyn_escape_string(row[1]);
+		char	*base_dn = zbx_db_dyn_escape_string(row[3]);
+		char	*bind_dn = zbx_db_dyn_escape_string(row[4]);
+		char	*bind_password = zbx_db_dyn_escape_string(row[5]);
+		char	*search_attribute = zbx_db_dyn_escape_string(row[6]);
+		char	*search_filter = zbx_db_dyn_escape_string(row[8]);
 
-		int	rc = DBexecute("insert into userdirectory_ldap (userdirectoryid,host,port,"
+		int	rc = zbx_db_execute("insert into userdirectory_ldap (userdirectoryid,host,port,"
 					"base_dn,search_attribute,bind_dn,bind_password,start_tls,search_filter)"
 					" values (%s,'%s',%s,'%s','%s','%s','%s',%s,'%s')", row[0], host, row[2],
 					base_dn, search_attribute, bind_dn, bind_password, row[7], search_filter);
@@ -1174,7 +1174,7 @@ static int	migrate_ldap_data(void)
 		}
 
 #define IDP_TYPE_LDAP	1	/* user directory of type LDAP */
-		if (ZBX_DB_OK > DBexecute("update userdirectory set idp_type=%d where userdirectoryid=%s",
+		if (ZBX_DB_OK > zbx_db_execute("update userdirectory set idp_type=%d where userdirectoryid=%s",
 				IDP_TYPE_LDAP, row[0]))
 		{
 			zbx_db_free_result(result);
@@ -1198,7 +1198,7 @@ static int	DBpatch_6030124(void)
 
 static int	migrate_saml_data(void)
 {
-	DB_RESULT	result = DBselect("select saml_idp_entityid,saml_sso_url,saml_slo_url,saml_username_attribute,"
+	DB_RESULT	result = zbx_db_select("select saml_idp_entityid,saml_sso_url,saml_slo_url,saml_username_attribute,"
 					"saml_sp_entityid,saml_nameid_format,saml_sign_messages,saml_sign_assertions,"
 					"saml_sign_authn_requests,saml_sign_logout_requests,saml_sign_logout_responses,"
 					"saml_encrypt_nameid,saml_encrypt_assertions"
@@ -1206,7 +1206,7 @@ static int	migrate_saml_data(void)
 	if (NULL == result)
 		return FAIL;
 
-	DB_ROW	row = DBfetch(result);
+	DB_ROW	row = zbx_db_fetch(result);
 
 	if (NULL == row)
 	{
@@ -1222,10 +1222,10 @@ static int	migrate_saml_data(void)
 		return SUCCEED;
 	}
 
-	zbx_uint64_t	userdirectoryid = DBget_maxid("userdirectory");
+	zbx_uint64_t	userdirectoryid = zbx_db_get_maxid("userdirectory");
 
 #define IDP_TYPE_SAML	2	/* user directory of type SAML */
-	int	rc = DBexecute("insert into userdirectory (userdirectoryid,idp_type,description) values"
+	int	rc = zbx_db_execute("insert into userdirectory (userdirectoryid,idp_type,description) values"
 			" (" ZBX_FS_UI64 ",%d,'')", userdirectoryid, IDP_TYPE_SAML);
 #undef IDP_TYPE_SAML
 	if (ZBX_DB_OK > rc)
@@ -1234,14 +1234,14 @@ static int	migrate_saml_data(void)
 		return FAIL;
 	}
 
-	char	*idp_entityid = DBdyn_escape_string(row[0]);
-	char	*sso_url = DBdyn_escape_string(row[1]);
-	char	*slo_url = DBdyn_escape_string(row[2]);
-	char	*username_attribute = DBdyn_escape_string(row[3]);
-	char	*sp_entityid = DBdyn_escape_string(row[4]);
-	char	*nameid_format = DBdyn_escape_string(row[5]);
+	char	*idp_entityid = zbx_db_dyn_escape_string(row[0]);
+	char	*sso_url = zbx_db_dyn_escape_string(row[1]);
+	char	*slo_url = zbx_db_dyn_escape_string(row[2]);
+	char	*username_attribute = zbx_db_dyn_escape_string(row[3]);
+	char	*sp_entityid = zbx_db_dyn_escape_string(row[4]);
+	char	*nameid_format = zbx_db_dyn_escape_string(row[5]);
 
-	int	rc2 = DBexecute("insert into userdirectory_saml (userdirectoryid,idp_entityid,sso_url,slo_url,"
+	int	rc2 = zbx_db_execute("insert into userdirectory_saml (userdirectoryid,idp_entityid,sso_url,slo_url,"
 				"username_attribute,sp_entityid,nameid_format,sign_messages,sign_assertions,"
 				"sign_authn_requests,sign_logout_requests,sign_logout_responses,encrypt_nameid,"
 				"encrypt_assertions) values (" ZBX_FS_UI64 ",'%s','%s','%s','%s','%s','%s',%s,%s,%s,%s,"
@@ -1490,7 +1490,7 @@ static int	DBpatch_6030159(void)
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
 	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
 			return FAIL;
 	}
 

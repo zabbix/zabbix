@@ -1069,7 +1069,7 @@ void	zbx_alerter_deserialize_begin_dispatch(const unsigned char *data, char **su
  *                                                                            *
  ******************************************************************************/
 
-zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const ZBX_DB_MEDIATYPE *mt,
+zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const zbx_db_mediatype *mt,
 		const zbx_vector_str_t *recipients)
 {
 	unsigned char	*ptr;
@@ -1106,7 +1106,7 @@ zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const ZBX
 	return data_len + data_offset;
 }
 
-void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, ZBX_DB_MEDIATYPE *mt,
+void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, zbx_db_mediatype *mt,
 		zbx_vector_str_t *recipients)
 {
 	zbx_uint32_t	len;
@@ -1199,7 +1199,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const ZBX_DB_MEDIATYPE *mediatype,
+int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const zbx_db_mediatype *mediatype,
 		const zbx_vector_str_t *recipients, char **error)
 {
 	unsigned char	*data;

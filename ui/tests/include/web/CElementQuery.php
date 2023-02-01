@@ -357,7 +357,7 @@ class CElementQuery implements IWaitable {
 				else {
 					$elements = $this->context->findElements($this->by);
 					if (!$elements) {
-						throw new NoSuchElementException(null);
+						throw new NoSuchElementException('');
 					}
 
 					$element = end($elements);
