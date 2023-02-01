@@ -95,6 +95,19 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: clear task list                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	pp_task_queue_clear_tasks(zbx_list_t *tasks)
+{
+	zbx_pp_task_t	*task = NULL;
+
+	while (SUCCEED == zbx_list_pop(tasks, (void **)&task))
+		pp_task_free(task);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: destroy task queue                                                *
  *                                                                            *
  ******************************************************************************/
@@ -106,11 +119,16 @@ void	pp_task_queue_destroy(zbx_pp_queue_t *queue)
 	if (0 != (queue->init_flags & PP_TASK_QUEUE_INIT_EVENT))
 		pthread_cond_destroy(&queue->event);
 
-	zbx_hashset_destroy(&queue->sequences);
-
+	pp_task_queue_clear_tasks(&queue->pending);
 	zbx_list_destroy(&queue->pending);
+
+	pp_task_queue_clear_tasks(&queue->immediate);
 	zbx_list_destroy(&queue->immediate);
+
+	pp_task_queue_clear_tasks(&queue->finished);
 	zbx_list_destroy(&queue->finished);
+
+	zbx_hashset_destroy(&queue->sequences);
 
 	queue->init_flags = PP_TASK_QUEUE_INIT_NONE;
 }
