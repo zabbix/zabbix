@@ -850,7 +850,22 @@ in:
 out:
   return: FAIL
 ---
-test case: Match not exist (8)
+test case: Match exist (8)
+in:
+  eval_type: and/or
+  match_tags:
+    - tag: c
+      value: 1
+      operator: exist
+  tags:
+    - tag: a
+      value: 2
+    - tag: c
+      value: 1
+out:
+  return: SUCCEED
+---
+test case: Match not exist (1)
 in:
   eval_type: or
   match_tags:
@@ -865,7 +880,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Match not exist (9)
+test case: Match not exist (2)
 in:
   eval_type: or
   match_tags:
@@ -880,7 +895,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Match not exist (10)
+test case: Match not exist (3)
 in:
   eval_type: or
   match_tags:
@@ -895,7 +910,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Match not exist (11)
+test case: Match not exist (4)
 in:
   eval_type: or
   match_tags:
@@ -912,7 +927,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Match not exist (12)
+test case: Match not exist (5)
 in:
   eval_type: or
   match_tags:
@@ -929,7 +944,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Match not exist (13)
+test case: Match not exist (6)
 in:
   eval_type: or
   match_tags:

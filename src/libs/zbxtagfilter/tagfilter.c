@@ -24,17 +24,40 @@
 
 ZBX_PTR_VECTOR_IMPL(match_tags, zbx_match_tag_t*)
 
-/******************************************************************
- *                                                                *
- * Purpose: perform match tag comparison using match tag operator *
- *                                                                *
- ******************************************************************/
-static int	match_tag(const zbx_match_tag_t *mtag, const zbx_tag_t *etag, unsigned char op)
+static int	match_single_tag(const zbx_match_tag_t *mtag, zbx_tag_t * const *tags, int tags_num)
 {
-	if (ZBX_CONDITION_OPERATOR_EXIST == op && NULL != mtag && NULL != etag)
-		return SUCCEED;
+	int	i;
 
-	return zbx_strmatch_condition(etag->value, mtag->value, op);
+	switch (mtag->op)
+	{
+		case ZBX_CONDITION_OPERATOR_EXIST:
+			return NULL == tags ? FAIL : SUCCEED;
+		case ZBX_CONDITION_OPERATOR_NOT_EXIST:
+			return NULL == tags ? SUCCEED : FAIL;
+		case ZBX_CONDITION_OPERATOR_EQUAL:
+		case ZBX_CONDITION_OPERATOR_LIKE:
+			for (i = 0; i < tags_num; i++)
+			{
+				const zbx_tag_t	*etag = tags[i];
+
+				if (SUCCEED == zbx_strmatch_condition(etag->value, mtag->value, mtag->op))
+					return SUCCEED;
+			}
+			return FAIL;
+		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
+			for (i = 0; i < tags_num; i++)
+			{
+				const zbx_tag_t	*etag = tags[i];
+
+				if (SUCCEED != zbx_strmatch_condition(etag->value, mtag->value, mtag->op))
+					return FAIL;
+			}
+			return SUCCEED;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
 }
 
 /******************************************************************************
@@ -53,8 +76,10 @@ static int	match_tag(const zbx_match_tag_t *mtag, const zbx_tag_t *etag, unsigne
 static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vector_tags_t *etags,
 		int *mt_pos, int *et_pos)
 {
-	const char		*tag_name;
-	int			i, j, ret = -1, mt_start, mt_end, et_start, et_end;
+	const char	*tag_name;
+	int		i, ret = -1, mt_start, mt_end, et_start;
+	zbx_tag_t	* const *tags;
+	int		tags_num;
 
 	/* get the match tag name */
 	tag_name = mtags->values[*mt_pos]->tag;
@@ -79,17 +104,18 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
 
 	for (i = et_start; i < etags->values_num; i++)
 	{
-		if (0 < (ret = strcmp(etags->values[i]->tag, tag_name)))
-		{
-			*et_pos = i;
-			break;
-		}
-
-		if (0 == ret)
+		if (0 <= (ret = strcmp(etags->values[i]->tag, tag_name)))
 			break;
 	}
 
-	if (i < etags->values_num && 0 >= ret)
+	if (i == etags->values_num || 0 < ret)
+	{
+		/* entity tags with matching name not found */
+
+		tags = NULL;
+		tags_num = 0;
+	}
+	else
 	{
 		et_start = i++;
 
@@ -101,12 +127,8 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
 				break;
 		}
 
-		et_end = i - 1;
-	}
-	else
-	{
-		/* no matching tag names */
-		et_end = -1;
+		tags = etags->values + et_start;
+		tags_num = i - et_start;
 	}
 
 	*et_pos = i;
@@ -116,58 +138,9 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
 	for (i = mt_start; i <= mt_end; i++)
 	{
 		const zbx_match_tag_t	*mtag = mtags->values[i];
-		unsigned char		op;
 
-		switch (mtag->op)
-		{
-			case ZBX_CONDITION_OPERATOR_EQUAL:
-			case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
-				op = ZBX_CONDITION_OPERATOR_EQUAL;
-				break;
-			case ZBX_CONDITION_OPERATOR_LIKE:
-			case ZBX_CONDITION_OPERATOR_NOT_LIKE:
-				op = ZBX_CONDITION_OPERATOR_LIKE;
-				break;
-			case ZBX_CONDITION_OPERATOR_EXIST:
-			case ZBX_CONDITION_OPERATOR_NOT_EXIST:
-				op = ZBX_CONDITION_OPERATOR_EXIST;
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-				return FAIL;
-		}
-
-		if (0 <= et_end)
-		{
-			for (j = et_start; j <= et_end; j++)
-			{
-				const zbx_tag_t	*etag = etags->values[j];
-
-				if (SUCCEED == (ret = match_tag(mtag, etag, op)))
-					break;
-			}
-		}
-		else
-			ret = FAIL;
-
-		switch (mtag->op)
-		{
-			case ZBX_CONDITION_OPERATOR_EQUAL:
-			case ZBX_CONDITION_OPERATOR_LIKE:
-			case ZBX_CONDITION_OPERATOR_EXIST:
-				if (SUCCEED == ret)
-					return SUCCEED;
-				break;
-			case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
-			case ZBX_CONDITION_OPERATOR_NOT_LIKE:
-			case ZBX_CONDITION_OPERATOR_NOT_EXIST:
-				if (SUCCEED != ret)
-					return SUCCEED;
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
-				return FAIL;
-		}
+		if (SUCCEED == match_single_tag(mtag, tags, tags_num))
+			return SUCCEED;
 	}
 
 	return FAIL;
