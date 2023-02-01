@@ -1552,7 +1552,7 @@ static int	DBpatch_6030162(void)
 	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG TODO: for existing alerts that are not sent, generate alerts.parameters"
 			" by resolving ALERT.SENDTO, ALERT.SUBJECT and ALERT.MESSAGE macros from media_type.exec_params");
 
-	return FAIL;
+	return SUCCEED;
 }
 
 static int	DBpatch_6030163(void)
