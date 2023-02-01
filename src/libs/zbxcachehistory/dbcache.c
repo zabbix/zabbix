@@ -1368,7 +1368,7 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 		switch (h->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_json_addfloat(&json, ZBX_PROTO_TAG_VALUE, h->value.dbl);
+				zbx_json_adddouble(&json, ZBX_PROTO_TAG_VALUE, h->value.dbl);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_VALUE, h->value.ui64);

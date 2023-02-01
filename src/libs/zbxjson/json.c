@@ -460,6 +460,14 @@ void	zbx_json_addfloat(struct zbx_json *j, const char *name, double value)
 	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_INT);
 }
 
+void	zbx_json_adddouble(struct zbx_json *j, const char *name, double value)
+{
+	char	buffer[MAX_ID_LEN];
+
+	zbx_print_double(buffer, sizeof(buffer), value);
+	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_INT);
+}
+
 int	zbx_json_close(struct zbx_json *j)
 {
 	if (1 == j->level)
