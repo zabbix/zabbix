@@ -931,24 +931,28 @@ class testSID extends CWebTest {
 	public function testSID_Links($data) {
 		foreach ([$data['link'], $data['link'].'&sid=test111116666666'] as $link) {
 			$this->page->login()->open($link)->waitUntilReady();
+			$source = $this->page->getSource();
 
 			if (CTestArrayHelper::get($data, 'json_output')) {
 				$message = [];
-				preg_match('/<pre[^>]+>(.+)<\/pre>/', $this->page->getSource(), $message);
+				preg_match('/<pre[^>]+>(.+)<\/pre>/', $source, $message);
 				$this->assertEquals('{"error":{"title":"Access denied","messages":["You are logged in as \"Admin\". '.
 					'You have no permissions to access this page.","If you think this message is wrong, please consult'.
 					' your administrators about getting the necessary permissions."]}}', $message[1]
 				);
 			}
 			elseif (array_key_exists('json_result', $data)) {
-				$this->assertStringContainsString($data['json_result'], $this->page->getSource());
+				$this->assertStringContainsString($data['json_result'], $source);
+			}
+			elseif (array_key_exists('page_not_found', $data)) {
+				$this->assertStringContainsString('Page not found', $source);
 			}
 			else {
 				$this->assertMessage(TEST_BAD, 'Access denied',
 						'You are logged in as "Admin". You have no permissions to access this page.'
 				);
 				$this->query('button:Go to "Dashboards"')->one()->waitUntilClickable()->click();
-				$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
+				$this->assertStringContainsString('zabbix.php?action=dashboard', $source);
 			}
 		}
 	}
