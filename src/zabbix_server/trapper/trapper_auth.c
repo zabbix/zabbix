@@ -79,14 +79,14 @@ int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, ch
 #define	SID_SESSION_LENGTH	32
 		if (SID_SESSION_LENGTH == buf_len)
 		{
-			ret = DBget_user_by_active_session(buffer, user);
+			ret = zbx_db_get_user_by_active_session(buffer, user);
 		}
 		else if (ZBX_SID_AUTH_TOKEN_LENGTH == buf_len)
 		{
 			char	hash_res_stringhexes[ZBX_SID_AUTH_TOKEN_LENGTH * 2 + 1];
 
 			format_auth_token_hash(buffer, hash_res_stringhexes);
-			ret = DBget_user_by_auth_token(hash_res_stringhexes, user);
+			ret = zbx_db_get_user_by_auth_token(hash_res_stringhexes, user);
 		}
 		else
 		{

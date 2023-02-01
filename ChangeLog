@@ -1,3 +1,10 @@
+Changes for 6.4.0rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 6.4.0beta6
 
 New features:
@@ -263,10 +270,14 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
 
 --------------------------------------------------------------------------------
+Changes for 6.2.7
+
+6.2.7rc1 was released as 6.2.7 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.2.7rc1
 
 New features:
-.......... [ZBX-20110] added single field search option to the archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys in Zabbix agent 2 Oracle plugin (esneiders)
 .........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
 .........T [ZBXNEXT-7775] added Veeam backup and replication templates (egordymov)
 .......PS. [ZBXNEXT-8054] updated MariaDB maximum supported version to 10.10 (MVekslers)
@@ -276,13 +287,13 @@ A.F....... [ZBXNEXT-7951] improved import configuration by changing UI, matching
 .........T [ZBXNEXT-7962] fixed interfaces discovery rules in OPNsense, PFSense and TrueNAS templates (drasikhov)
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (vkhaliev)
 ..F....... [ZBXNEXT-7963] added a hint box to the "Enable HTTP authentication" field; added confirmation dialog box for enabling HTTP authentication  (kkuzmina)
-...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 ...G...... [ZBXNEXT-6119] added the option to retrieve all JSON data from docker.container_info key in Zabbix agent 2 Docker plugin (esneiders)
 .........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
 .........T [ZBXNEXT-7924] switched templates to proc.get (egordymov)
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+........S. [ZBX-22149] fixed wrong escaping in trigger expression during upgrade and escaping as a workaround for calculated items (asestakovs, kprutkovs)
 ...G...... [ZBX-22061] fixed custom query parameter read on an empty parameter for Oracle plugin in Zabbix agent 2 (esneiders)
 ...G...... [ZBX-21227] improved error logging during agent start as a Windows service (asestakovs)
 ........S. [ZBX-22178] fixed action operations being executed on the current host only if a host group is selected (vso)
@@ -350,6 +361,8 @@ A......... [ZBX-22042] fixed inability to get the existing group prototypes by h
 ..F....... [ZBX-20050] fixed broken macro value and type input when changing to/from inherited macros (epulke, rdetlavs)
 .........T [ZBX-21594] optimized RabbitMQ cluster templates (egordymov)
 ..F....... [ZBX-21864] fixed the fatal error in system warning page (Ivo)
+.......... [ZBX-20110] added single field search option to the archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys in Zabbix agent 2 Oracle plugin (esneiders)
+...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.6
@@ -860,10 +873,15 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.13
+
+6.0.13rc1 was released as 6.0.13 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.13rc1
 
 New features:
-.......... [ZBX-20110] added single field search option to the archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys in Zabbix agent 2 Oracle plugin (esneiders)
+.........T [ZBXNEXT-8170] added AWS cloud templates (abakaldin)
 .........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
 .........T [ZBXNEXT-7775] added Veeam backup and replication templates (egordymov)
 .......PS. [ZBXNEXT-8054] updated MariaDB maximum supported version to 10.10 (MVekslers)
@@ -874,7 +892,6 @@ A.F....... [ZBXNEXT-7951] implemented configuration import improvements (rdetlav
 .......PS. [ZBXNEXT-7615] added hmac function for JavaScript (wiper)
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (egordymov)
 .......PS. [ZBXNEXT-8076] added prof_enable and prof_disable commands for profiling (vso)
-...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 ..F....... [ZBXNEXT-7963] added a hint box to the "Enable HTTP authentication" field; added confirmation dialog box for enabling HTTP authentication (kkuzmina)
 .........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
 ...G...... [ZBXNEXT-6119] added the option to retrieve all JSON data from docker.container_info key in Zabbix agent 2 Docker plugin (esneiders)
@@ -882,6 +899,7 @@ A.F....... [ZBXNEXT-7951] implemented configuration import improvements (rdetlav
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+........S. [ZBX-22149] fixed wrong escaping in trigger expression during upgrade and escaping as a workaround for calculated items (asestakovs, kprutkovs)
 ...G...... [ZBX-22061] fixed custom query parameter read on an empty parameter for Oracle plugin in Zabbix agent 2 (esneiders)
 ...G...... [ZBX-21227] improved error logging during agent start as a Windows service (asestakovs)
 ........S. [ZBX-22178] fixed action operations being executed on the current host only if a host group is selected (vso)
@@ -942,6 +960,8 @@ A......... [ZBX-22042] fixed inability to get the existing group prototypes by h
 .........T [ZBX-21594] optimized RabbitMQ cluster templates (egordymov)
 ..F....... [ZBX-20050] fixed broken macro value and type input when changing to/from inherited macros (epulke, rdetlavs)
 ..F....... [ZBX-21864] fixed the fatal error in system warning page (Ivo)
+.......... [ZBX-20110] added single field search option to the archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys in Zabbix agent 2 Oracle plugin (esneiders)
+...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.12
@@ -3201,6 +3221,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.32rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.31
+
+5.0.31rc2 was released as 5.0.31 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.31rc2

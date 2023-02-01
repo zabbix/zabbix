@@ -1375,7 +1375,7 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_am_alert_t *alert,
 		const char *scripts_path, char **cmd, char **error)
 {
-	DB_ALERT	db_alert;
+	zbx_db_alert	db_alert;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 	int		ret = FAIL;
 
@@ -1975,7 +1975,7 @@ static void	am_process_begin_dispatch(zbx_ipc_client_t *client, const unsigned c
  *             content_type - [OUT] message content type                      *
  *                                                                            *
  ******************************************************************************/
-static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, ZBX_DB_MEDIATYPE *mt,
+static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, zbx_db_mediatype *mt,
 		zbx_shared_str_t *message, unsigned char *content_type)
 {
 	char	*body = NULL;
@@ -2017,7 +2017,7 @@ static void	am_process_send_dispatch(zbx_am_t *manager, zbx_ipc_client_t *client
 	int			i;
 	zbx_vector_str_t	recipients;
 	zbx_am_alert_t		*alert;
-	ZBX_DB_MEDIATYPE		mt;
+	zbx_db_mediatype		mt;
 	zbx_shared_str_t	message;
 	unsigned char		content_type;
 	zbx_uint64_t		id;
@@ -2321,8 +2321,8 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 
 		if ((time_ping + ZBX_DB_PING_FREQUENCY) < now)
 		{
-			manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE);
-			DBclose();
+			manager.dbstatus = zbx_db_connect(ZBX_DB_CONNECT_ONCE);
+			zbx_db_close();
 			time_ping = now;
 		}
 		if (ZBX_DB_DOWN == manager.dbstatus)
