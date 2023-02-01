@@ -1817,7 +1817,7 @@ function getTriggerFormData(array $data) {
 				$parent_trigger = reset($parent_triggers);
 			}
 			else {
-				$parent_trigger = array_key_exists('parent_trigger', $data) ? $data['parent_trigger'] : false;
+				$parent_trigger = array_key_exists('parent_trigger', $data) ? $data['parent_trigger'] : [];
 			}
 
 			if ($parent_trigger || !hasRequest('form_refresh')) {
