@@ -461,11 +461,11 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
 		if (0 < j)
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " clock<%d and", clocks[j - 1]);
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, *itemids_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, *itemids_num);
 
-		result = DBselect("%s", sql);
+		result = zbx_db_select("%s", sql);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[0]);
 			uint64_array_remove(itemids, itemids_num, &itemid, 1);
@@ -587,14 +587,14 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 			" where clock=%d and",
 			table_name, clock);
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
 
-	result = DBselect("%s order by itemid,clock", sql);
+	result = zbx_db_select("%s order by itemid,clock", sql);
 
 	sql_offset = 0;
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 
@@ -628,15 +628,15 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 
 		--*inserts_num;
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	zbx_db_free_result(result);
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 }
 
 /******************************************************************************
@@ -1020,11 +1020,11 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 				" where g.groupid=hg.groupid"
 					" and");
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids->values, hostids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids->values, hostids->values_num);
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	hostid;
 		zbx_host_info_t	*host_info;
@@ -1066,11 +1066,11 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 	DB_ROW		row;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,name from items where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	itemid;
 		zbx_item_info_t	*item_info;
@@ -1091,11 +1091,11 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select itemid,tag,value from item_tag where");
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	itemid;
 		zbx_item_info_t	*item_info;
@@ -1560,12 +1560,12 @@ static void	DCsync_trends(void)
 	if (0 < trends_num)
 		qsort(trends, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
 
-	DBbegin();
+	zbx_db_begin();
 
 	while (trends_num > 0)
 		DBflush_trends(trends, &trends_num, NULL);
 
-	DBcommit();
+	zbx_db_commit();
 
 	zbx_free(trends);
 
@@ -1845,7 +1845,7 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const zbx_
 		return;
 
 	if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags) ||
-			NULL == (inventory_field = DBget_inventory_field(item->inventory_link)))
+			NULL == (inventory_field = zbx_db_get_inventory_field(item->inventory_link)))
 	{
 		return;
 	}
@@ -1887,13 +1887,13 @@ static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_ptr_
 	{
 		const zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
 
-		value_esc = DBdyn_escape_field("host_inventory", inventory_value->field_name, inventory_value->value);
+		value_esc = zbx_db_dyn_escape_field("host_inventory", inventory_value->field_name, inventory_value->value);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 				"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
 				inventory_value->field_name, value_esc, inventory_value->hostid);
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, sql_offset);
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, sql_offset);
 
 		zbx_free(value_esc);
 	}
@@ -2222,7 +2222,7 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 
 	if (i != item_diff->values_num || 0 != inventory_values->values_num)
 	{
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (i != item_diff->values_num)
 		{
@@ -2233,10 +2233,10 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 		if (0 != inventory_values->values_num)
 			DCadd_update_inventory_sql(&sql_offset, inventory_values);
 
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 
 		DCconfig_update_inventory_values(inventory_values);
 	}
@@ -2299,15 +2299,15 @@ static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
 
 		zbx_vector_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
 				ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME);
 
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -2366,9 +2366,9 @@ static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char 
 	if (NULL == query->sql)
 		return;
 
-	result = DBselect("%s", query->sql);
+	result = zbx_db_select("%s", query->sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_DC_HISTORY	*d = (ZBX_DC_HISTORY *)zbx_malloc(NULL, sizeof(ZBX_DC_HISTORY));
 
@@ -3207,12 +3207,12 @@ static void	sync_proxy_history(int *total_num, int *more)
 
 		do
 		{
-			DBbegin();
+			zbx_db_begin();
 
 			DBmass_proxy_add_history(history, history_num);
 			DBmass_proxy_update_items(&item_diff);
 		}
-		while (ZBX_DB_DOWN == (txn_rc = DBcommit()));
+		while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
 
 		LOCK_CACHE;
 
@@ -3423,7 +3423,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 				do
 				{
-					DBbegin();
+					zbx_db_begin();
 
 					DBmass_update_items(&item_diff, &inventory_values);
 					DBmass_update_trends(trends, trends_num, &trends_diff);
@@ -3431,7 +3431,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 					/* process internal events generated by DCmass_prepare_history() */
 					zbx_process_events(NULL, NULL);
 
-					if (ZBX_DB_OK == (txn_error = DBcommit()))
+					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
 						DCupdate_trends(&trends_diff);
 					else
 						zbx_reset_event_recovery();
@@ -3475,7 +3475,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 				do
 				{
-					DBbegin();
+					zbx_db_begin();
 
 					recalculate_triggers(history, history_num, &itemids, items, errcodes,
 							&trigger_timers, &trigger_diff, trigger_itemids,
@@ -3486,7 +3486,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 					if (0 != trigger_diff.values_num)
 						zbx_db_save_trigger_changes(&trigger_diff);
 
-					if (ZBX_DB_OK == (txn_error = DBcommit()))
+					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
 						DCconfig_triggers_apply_changes(&trigger_diff);
 					else
 						zbx_clean_events();
@@ -4968,16 +4968,16 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 		exit(EXIT_FAILURE);
 	}
 
-	table = DBget_table(table_name);
+	table = zbx_db_get_table(table_name);
 
-	result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+	result = zbx_db_select("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
 			table->recid, table_name, table->recid, min, max);
 
 	if (NULL != result)
 	{
 		zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
 
-		if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+		if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
 			id->lastid = min;
 		else
 			ZBX_STR2UINT64(id->lastid, row[0]);

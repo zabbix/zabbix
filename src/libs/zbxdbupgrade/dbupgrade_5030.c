@@ -43,7 +43,7 @@ static int	DBpatch_5030000(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.queue.config'"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.queue.config'"))
 		return FAIL;
 
 	return SUCCEED;
@@ -134,10 +134,10 @@ static int	DBpatch_5030001(void)
 		DB_RESULT		result;
 		zbx_dbpatch_profile_t	profile = {0};
 
-		result = DBselect("select profileid,userid,idx,idx2,value_id,value_int,value_str,source,type"
+		result = zbx_db_select("select profileid,userid,idx,idx2,value_id,value_int,value_str,source,type"
 				" from profiles where idx='%s'", keys[i]);
 
-		if (NULL == (row = DBfetch(result)))
+		if (NULL == (row = zbx_db_fetch(result)))
 		{
 			zbx_db_free_result(result);
 			continue;
@@ -153,28 +153,28 @@ static int	DBpatch_5030001(void)
 			ret = FAIL;
 		}
 
-		if (SUCCEED == ret && ZBX_DB_OK > DBexecute("insert into profiles "
+		if (SUCCEED == ret && ZBX_DB_OK > zbx_db_execute("insert into profiles "
 				"(profileid,userid,idx,idx2,value_id,value_int,value_str,source,type) values "
 				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'web.hosts.%s.%s.%s'," ZBX_FS_UI64 ","
 				ZBX_FS_UI64 ",%d,'%s','%s',%d)",
-				DBget_maxid("profiles"), profile.userid, subsect, key, field, profile.idx2, profile.value_id,
+				zbx_db_get_maxid("profiles"), profile.userid, subsect, key, field, profile.idx2, profile.value_id,
 				profile.value_int, profile.value_str, profile.source, profile.type))
 		{
 			ret = FAIL;
 		}
 
-		if (SUCCEED == ret && ZBX_DB_OK > DBexecute("insert into profiles "
+		if (SUCCEED == ret && ZBX_DB_OK > zbx_db_execute("insert into profiles "
 				"(profileid,userid,idx,idx2,value_id,value_int,value_str,source,type) values "
 				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'web.templates.%s.%s.%s'," ZBX_FS_UI64 ","
 				ZBX_FS_UI64 ",%d,'%s','%s',%d)",
-				DBget_maxid("profiles"), profile.userid, subsect, key, field, profile.idx2, profile.value_id,
+				zbx_db_get_maxid("profiles"), profile.userid, subsect, key, field, profile.idx2, profile.value_id,
 				profile.value_int, profile.value_str, profile.source, profile.type))
 		{
 			ret = FAIL;
 		}
 
 		if (SUCCEED == ret &&
-				ZBX_DB_OK > DBexecute("delete from profiles where profileid=" ZBX_FS_UI64, profile.id))
+				ZBX_DB_OK > zbx_db_execute("delete from profiles where profileid=" ZBX_FS_UI64, profile.id))
 		{
 			ret = FAIL;
 		}
@@ -195,7 +195,7 @@ static int	DBpatch_5030002(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from profiles where "
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where "
 			"idx like 'web.items.%%filter%%' or "
 			"idx like 'web.triggers.%%filter%%' or "
 			"idx like 'web.graphs.%%filter%%' or "
@@ -222,18 +222,18 @@ static int	DBpatch_5030003(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	result = DBselect("select profileid,userid,idx,idx2,value_id,value_int,value_str,source,type"
+	result = zbx_db_select("select profileid,userid,idx,idx2,value_id,value_int,value_str,source,type"
 			" from profiles where idx in ('web.dashbrd.list.sort','web.dashbrd.list.sortorder')");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		DBpatch_get_key_fields(row, &profile, &subsect, &field, &key);
 
-		if (ZBX_DB_OK > DBexecute("insert into profiles "
+		if (ZBX_DB_OK > zbx_db_execute("insert into profiles "
 				"(profileid,userid,idx,idx2,value_id,value_int,value_str,source,type) values "
 				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'web.templates.%s.%s.%s'," ZBX_FS_UI64 ","
 				ZBX_FS_UI64 ",%d,'%s','%s',%d)",
-				DBget_maxid("profiles"), profile.userid, subsect, key, field, profile.idx2,
+				zbx_db_get_maxid("profiles"), profile.userid, subsect, key, field, profile.idx2,
 				profile.value_id, profile.value_int, profile.value_str, profile.source, profile.type))
 		{
 			ret = FAIL;
@@ -371,8 +371,11 @@ static int	DBpatch_5030025(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.overview.type' or idx='web.actionconf.eventsource'"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.overview.type' or"
+			" idx='web.actionconf.eventsource'"))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -582,12 +585,12 @@ static void	get_discovered_itemids(const zbx_vector_uint64_t *itemids, zbx_vecto
 	DB_ROW		row;
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid from item_discovery where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid", itemids->values, itemids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid", itemids->values, itemids->values_num);
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 	zbx_free(sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	itemid;
 
@@ -620,13 +623,13 @@ static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids
 					" where i2.templateid=i1.itemid"
 				")"
 				" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.templateid", templateids_tmp.values,
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.templateid", templateids_tmp.values,
 			templateids_tmp.values_num);
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 	zbx_free(sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	itemid;
 
@@ -641,13 +644,13 @@ static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids
 			" from items i1,item_discovery i2"
 			" where i2.parent_itemid=i1.itemid"
 			" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.templateid", templateids_tmp.values,
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.templateid", templateids_tmp.values,
 			templateids_tmp.values_num);
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 	zbx_free(sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	itemid;
 
@@ -699,16 +702,16 @@ static int	DBpatch_5030046(void)
 	zbx_vector_uint64_create(&discovered_itemids);
 	zbx_vector_uint64_reserve(&discovered_itemids, 1000);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select m.valuemapid,v.name,m.value,m.newvalue"
 			" from valuemaps v"
 			" left join mappings m on v.valuemapid=m.valuemapid");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_ptr_pair_t	pair;
 
-		if (SUCCEED == DBis_null(row[0]))
+		if (SUCCEED == zbx_db_is_null(row[0]))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "empty valuemap '%s' was removed", row[1]);
 			continue;
@@ -730,14 +733,14 @@ static int	DBpatch_5030046(void)
 	}
 	zbx_db_free_result(result);
 
-	result = DBselect("select h.flags,i.hostid,i.valuemapid,i.itemid"
+	result = zbx_db_select("select h.flags,i.hostid,i.valuemapid,i.itemid"
 			" from items i,hosts h"
 			" where i.templateid is null"
 				" and i.valuemapid is not null"
 				" and i.flags in (0,2)"
 				" and h.hostid=i.hostid");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_host_t	host_local, *host;
 		zbx_uint64_t	itemid;
@@ -799,7 +802,7 @@ static int	DBpatch_5030046(void)
 	zbx_db_insert_execute(&db_insert_valuemap_mapping);
 	zbx_db_insert_clean(&db_insert_valuemap_mapping);
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0, valuemapid = 0; i < hosts.values_num; i++)
 	{
@@ -818,7 +821,7 @@ static int	DBpatch_5030046(void)
 
 		/* update valuemapid for top level items on a template/host */
 		zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		DBprepare_multiple_query(buffer, "itemid", &host->itemids, &sql, &sql_alloc, &sql_offset);
+		zbx_db_prepare_multiple_query(buffer, "itemid", &host->itemids, &sql, &sql_alloc, &sql_offset);
 		/* get discovered itemids for not templated item prototypes on a host */
 		get_discovered_itemids(&host->itemids, &discovered_itemids);
 
@@ -828,20 +831,20 @@ static int	DBpatch_5030046(void)
 		/* make sure if multiple hosts are linked to same not nested template then there is only */
 		/* update by templateid from template and no selection by numerous itemids               */
 		zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		DBprepare_multiple_query(buffer, "templateid", &host->itemids, &sql, &sql_alloc, &sql_offset);
+		zbx_db_prepare_multiple_query(buffer, "templateid", &host->itemids, &sql, &sql_alloc, &sql_offset);
 
 		if (0 != discovered_itemids.values_num)
 		{
 			zbx_vector_uint64_sort(&discovered_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			DBprepare_multiple_query(buffer, "itemid", &discovered_itemids, &sql, &sql_alloc, &sql_offset);
+			zbx_db_prepare_multiple_query(buffer, "itemid", &discovered_itemids, &sql, &sql_alloc, &sql_offset);
 			zbx_vector_uint64_clear(&discovered_itemids);
 		}
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 
 	zbx_free(sql);
 
@@ -890,7 +893,7 @@ static int	DBpatch_5030050(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from profiles where"
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where"
 			" idx in ('web.valuemap.list.sort', 'web.valuemap.list.sortorder')"))
 	{
 		return FAIL;
@@ -926,8 +929,11 @@ static int	DBpatch_5030055(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.filter_username' where idx='web.user.filter_alias'"))
+	if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='web.user.filter_username'"
+			" where idx='web.user.filter_alias'"))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -937,8 +943,11 @@ static int	DBpatch_5030056(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update profiles set value_str='username' where idx='web.user.sort' and value_str like 'alias'"))
+	if (ZBX_DB_OK > zbx_db_execute("update profiles set value_str='username'"
+			" where idx='web.user.sort' and value_str like 'alias'"))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -959,12 +968,12 @@ static int	is_valid_opcommand_type(const char *type_str, const char *scriptid)
 		case ZBX_SCRIPT_TYPE_IPMI:
 		case ZBX_SCRIPT_TYPE_SSH:
 		case ZBX_SCRIPT_TYPE_TELNET:
-			if (SUCCEED == DBis_null(scriptid))
+			if (SUCCEED == zbx_db_is_null(scriptid))
 				return SUCCEED;
 			else
 				return FAIL;
 		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-			if (FAIL == DBis_null(scriptid))
+			if (FAIL == zbx_db_is_null(scriptid))
 				return SUCCEED;
 			else
 				return FAIL;
@@ -983,19 +992,19 @@ static int	validate_types_in_opcommand(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	if (NULL == (result = DBselect("select operationid,type,scriptid from opcommand")))
+	if (NULL == (result = zbx_db_select("select operationid,type,scriptid from opcommand")))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'opcommand'", __func__);
 		return FAIL;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (SUCCEED != is_valid_opcommand_type(row[1], row[2]))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "%s(): invalid record in table \"opcommand\": operationid: %s"
 					" type: %s scriptid: %s", __func__, row[0], row[1],
-					(SUCCEED == DBis_null(row[2])) ? "value is NULL" : row[2]);
+					(SUCCEED == zbx_db_is_null(row[2])) ? "value is NULL" : row[2]);
 			ret = FAIL;
 			break;
 		}
@@ -1084,7 +1093,7 @@ static int	DBpatch_5030066(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update scripts set scope=%d"
+	if (ZBX_DB_OK > zbx_db_execute("update scripts set scope=%d"
 			" where scriptid not in ("
 			"select distinct scriptid"
 			" from opcommand"
@@ -1135,7 +1144,7 @@ static int	DBpatch_5030067(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	if (NULL == (result = DBselect("select scriptid,command"
+	if (NULL == (result = zbx_db_select("select scriptid,command"
 			" from scripts"
 			" where scriptid in (select distinct scriptid from opcommand where scriptid is not null)")))
 	{
@@ -1143,16 +1152,16 @@ static int	DBpatch_5030067(void)
 		return FAIL;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		char	*command, *command_esc;
 		int	rc;
 
-		command_esc = DBdyn_escape_field("scripts", "command", (command = zbx_rename_host_macros(row[1])));
+		command_esc = zbx_db_dyn_escape_field("scripts", "command", (command = zbx_rename_host_macros(row[1])));
 
 		zbx_free(command);
 
-		rc = DBexecute("update scripts set command='%s' where scriptid=%s", command_esc, row[0]);
+		rc = zbx_db_execute("update scripts set command='%s' where scriptid=%s", command_esc, row[0]);
 
 		zbx_free(command_esc);
 
@@ -1229,13 +1238,13 @@ static int	zbx_make_script_name_unique(const char *name, int *suffix, char **uni
 
 		(*suffix)++;
 
-		try_name_esc = DBdyn_escape_string(try_name);
+		try_name_esc = zbx_db_dyn_escape_string(try_name);
 
 		sql = zbx_dsprintf(NULL, "select scriptid from scripts where name='%s'", try_name_esc);
 
 		zbx_free(try_name_esc);
 
-		if (NULL == (result = DBselectN(sql, 1)))
+		if (NULL == (result = zbx_db_select_n(sql, 1)))
 		{
 			zbx_free(try_name);
 			zbx_free(sql);
@@ -1245,7 +1254,7 @@ static int	zbx_make_script_name_unique(const char *name, int *suffix, char **uni
 
 		zbx_free(sql);
 
-		if (NULL == DBfetch(result))
+		if (NULL == zbx_db_fetch(result))
 		{
 			*unique_name = try_name;
 			zbx_db_free_result(result);
@@ -1273,14 +1282,14 @@ static int	DBpatch_5030068(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	if (NULL == (result = DBselect("select scriptid,name"
+	if (NULL == (result = zbx_db_select("select scriptid,name"
 			" from scripts")))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'scripts'", __func__);
 		return FAIL;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		const char	*scriptid = row[0];
 		const char	*name = row[1];
@@ -1301,10 +1310,10 @@ static int	DBpatch_5030068(void)
 			break;
 		}
 
-		menu_path_esc = DBdyn_escape_string(menu_path);
-		name_esc = DBdyn_escape_string(name_without_path_unique);
+		menu_path_esc = zbx_db_dyn_escape_string(menu_path);
+		name_esc = zbx_db_dyn_escape_string(name_without_path_unique);
 
-		rc = DBexecute("update scripts set menu_path='%s',name='%s' where scriptid=%s",
+		rc = zbx_db_execute("update scripts set menu_path='%s',name='%s' where scriptid=%s",
 				menu_path_esc, name_esc, scriptid);
 
 		zbx_free(name_esc);
@@ -1455,7 +1464,7 @@ static int	DBpatch_5030069(void)
 
 	zbx_vector_opcommands_create(&opcommands);
 
-	if (NULL == (result = DBselect("select command,username,password,publickey,privatekey,type,execute_on,port,"
+	if (NULL == (result = zbx_db_select("select command,username,password,publickey,privatekey,type,execute_on,port,"
 			"authtype,operationid"
 			" from opcommand"
 			" where scriptid is null"
@@ -1467,7 +1476,7 @@ static int	DBpatch_5030069(void)
 		return FAIL;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		char			*operationid;
 		int			index;
@@ -1498,24 +1507,24 @@ static int	DBpatch_5030069(void)
 				break;
 			}
 
-			scriptid = DBget_maxid("scripts");
+			scriptid = zbx_db_get_maxid("scripts");
 
 			ZBX_DBROW2UINT64(type, parts.type);
 			ZBX_DBROW2UINT64(execute_on, parts.execute_on);
 			ZBX_DBROW2UINT64(authtype, parts.authtype);
 			ZBX_DBROW2UINT64(operationid_num, operationid);
 
-			script_name_esc = DBdyn_escape_string(script_name);
-			command_esc = DBdyn_escape_string(parts.command);
-			port_esc = DBdyn_escape_string(parts.port);
-			username_esc = DBdyn_escape_string(parts.username);
-			password_esc = DBdyn_escape_string(parts.password);
-			publickey_esc = DBdyn_escape_string(parts.publickey);
-			privatekey_esc = DBdyn_escape_string(parts.privatekey);
+			script_name_esc = zbx_db_dyn_escape_string(script_name);
+			command_esc = zbx_db_dyn_escape_string(parts.command);
+			port_esc = zbx_db_dyn_escape_string(parts.port);
+			username_esc = zbx_db_dyn_escape_string(parts.username);
+			password_esc = zbx_db_dyn_escape_string(parts.password);
+			publickey_esc = zbx_db_dyn_escape_string(parts.publickey);
+			privatekey_esc = zbx_db_dyn_escape_string(parts.privatekey);
 
 			zbx_free(script_name);
 
-			rc = DBexecute("insert into scripts (scriptid,name,command,description,type,execute_on,scope,"
+			rc = zbx_db_execute("insert into scripts (scriptid,name,command,description,type,execute_on,scope,"
 					"port,authtype,username,password,publickey,privatekey) values ("
 					ZBX_FS_UI64 ",'%s','%s',''," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',"
 					ZBX_FS_UI64 ",'%s','%s','%s','%s')",
@@ -1531,7 +1540,7 @@ static int	DBpatch_5030069(void)
 			zbx_free(command_esc);
 			zbx_free(script_name_esc);
 
-			if (ZBX_DB_OK > rc || ZBX_DB_OK > DBexecute("update opcommand set scriptid=" ZBX_FS_UI64
+			if (ZBX_DB_OK > rc || ZBX_DB_OK > zbx_db_execute("update opcommand set scriptid=" ZBX_FS_UI64
 						" where operationid=" ZBX_FS_UI64, scriptid, operationid_num))
 			{
 				ret = FAIL;
@@ -1547,7 +1556,7 @@ static int	DBpatch_5030069(void)
 			/* link to a previously migrated script */
 			scriptid = opcommands.values[index].scriptid;
 
-			if (ZBX_DB_OK > DBexecute("update opcommand set scriptid=" ZBX_FS_UI64
+			if (ZBX_DB_OK > zbx_db_execute("update opcommand set scriptid=" ZBX_FS_UI64
 					" where operationid=%s", scriptid, operationid))
 			{
 				ret = FAIL;
@@ -1678,7 +1687,7 @@ static int	DBpatch_5030086(void)
 	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type()))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute(
+	if (ZBX_DB_OK > zbx_db_execute(
 			"insert into dashboard_page (dashboard_pageid,dashboardid)"
 			" select dashboardid,dashboardid from dashboard"))
 	{
@@ -1703,7 +1712,7 @@ static int	DBpatch_5030088(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update widget set dashboard_pageid=dashboardid"))
+	if (ZBX_DB_OK > zbx_db_execute("update widget set dashboard_pageid=dashboardid"))
 		return FAIL;
 
 	return SUCCEED;
@@ -1918,16 +1927,16 @@ static int DBpatch_dashboard_name(char *name, char **new_name)
 
 		zbx_db_free_result(result);
 
-		name_esc = DBdyn_escape_string(*new_name);
+		name_esc = zbx_db_dyn_escape_string(*new_name);
 
-		result = DBselect("select count(*)"
+		result = zbx_db_select("select count(*)"
 				" from dashboard"
 				" where name='%s' and templateid is null",
 				name_esc);
 
 		zbx_free(name_esc);
 
-		if (NULL == result || NULL == (row = DBfetch(result)))
+		if (NULL == result || NULL == (row = zbx_db_fetch(result)))
 		{
 			zbx_free(*new_name);
 			break;
@@ -1970,12 +1979,12 @@ static int DBpatch_reference_name(char **ref_name)
 
 		zbx_db_free_result(result);
 
-		result = DBselect("select count(*)"
+		result = zbx_db_select("select count(*)"
 			" from widget_field"
 			" where value_str='%s' and name='reference'",
 			name);
 
-		if (NULL == result || NULL == (row = DBfetch(result)))
+		if (NULL == result || NULL == (row = zbx_db_fetch(result)))
 			break;
 
 		if (0 == strcmp("0", row[0]))
@@ -2856,12 +2865,12 @@ static int 	DBpatch_add_dashboard(zbx_db_dashboard_t *dashboard)
 	char	*name_esc;
 	int	res;
 
-	dashboard->dashboardid = DBget_maxid("dashboard");
-	name_esc = DBdyn_escape_string(dashboard->name);
+	dashboard->dashboardid = zbx_db_get_maxid("dashboard");
+	name_esc = zbx_db_dyn_escape_string(dashboard->name);
 
 	zabbix_log(LOG_LEVEL_TRACE, "adding dashboard id:" ZBX_FS_UI64, dashboard->dashboardid);
 
-	res = DBexecute("insert into dashboard (dashboardid,name,userid,private,display_period) values "
+	res = zbx_db_execute("insert into dashboard (dashboardid,name,userid,private,display_period) values "
 			"("ZBX_FS_UI64 ",'%s',"ZBX_FS_UI64 ",%d,%d)",
 			dashboard->dashboardid, name_esc, dashboard->userid, dashboard->private,
 			dashboard->display_period);
@@ -2878,13 +2887,13 @@ static int 	DBpatch_add_dashboard_page(zbx_db_dashboard_page_t *dashboard_page, 
 	int	res;
 	char	*name_esc;
 
-	dashboard_page->dashboard_pageid = DBget_maxid("dashboard_page");
+	dashboard_page->dashboard_pageid = zbx_db_get_maxid("dashboard_page");
 	dashboard_page->dashboardid = dashboardid;
 
 	zabbix_log(LOG_LEVEL_TRACE, "adding dashboard_page id:" ZBX_FS_UI64, dashboard_page->dashboard_pageid);
 
-	name_esc = DBdyn_escape_string(name);
-	res = DBexecute("insert into dashboard_page (dashboard_pageid,dashboardid,name,display_period,sortorder)"
+	name_esc = zbx_db_dyn_escape_string(name);
+	res = zbx_db_execute("insert into dashboard_page (dashboard_pageid,dashboardid,name,display_period,sortorder)"
 			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ",'%s',%d,%d)",
 			dashboard_page->dashboard_pageid, dashboardid, name_esc, display_period, sortorder);
 	zbx_free(name_esc);
@@ -2899,13 +2908,13 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 	int		i, ret = SUCCEED;
 	char		*name_esc;
 
-	widget->widgetid = DBget_maxid("widget");
+	widget->widgetid = zbx_db_get_maxid("widget");
 	widget->dashboardid = dashboardid;
-	name_esc = DBdyn_escape_string(widget->name);
+	name_esc = zbx_db_dyn_escape_string(widget->name);
 
 	zabbix_log(LOG_LEVEL_TRACE, "adding widget id: " ZBX_FS_UI64 ", type: %s", widget->widgetid, widget->type);
 
-	if (ZBX_DB_OK > DBexecute("insert into widget (widgetid,dashboard_pageid,type,name,x,y,width,height,view_mode) "
+	if (ZBX_DB_OK > zbx_db_execute("insert into widget (widgetid,dashboard_pageid,type,name,x,y,width,height,view_mode) "
 			"values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s',%d,%d,%d,%d,%d)",
 			widget->widgetid, widget->dashboardid, widget->type, name_esc,
 			widget->x, widget->y, widget->width, widget->height, widget->view_mode))
@@ -2916,7 +2925,7 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 	zbx_free(name_esc);
 
 	if (SUCCEED == ret && 0 < fields->values_num)
-		new_fieldid = DBget_maxid_num("widget_field", fields->values_num);
+		new_fieldid = zbx_db_get_maxid_num("widget_field", fields->values_num);
 
 	for (i = 0; SUCCEED == ret && i < fields->values_num; i++)
 	{
@@ -2924,15 +2933,15 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 		zbx_db_widget_field_t	*f;
 
 		f = (zbx_db_widget_field_t *)fields->values[i];
-		url_esc = DBdyn_escape_string(f->value_str);
+		url_esc = zbx_db_dyn_escape_string(f->value_str);
 
-		if (ZBX_DB_OK > DBexecute("insert into widget_field (widget_fieldid,widgetid,type,name,value_int,"
+		if (ZBX_DB_OK > zbx_db_execute("insert into widget_field (widget_fieldid,widgetid,type,name,value_int,"
 				"value_str,value_itemid,value_graphid,value_groupid,value_hostid,value_sysmapid)"
 				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',%d,'%s',%s,%s,%s,%s,%s)",
 				new_fieldid++, widget->widgetid, f->type, f->name, f->value_int, url_esc,
-				DBsql_id_ins(f->value_itemid), DBsql_id_ins(f->value_graphid),
-				DBsql_id_ins(f->value_groupid), DBsql_id_ins(f->value_hostid),
-				DBsql_id_ins(f->value_sysmapid)))
+				zbx_db_sql_id_ins(f->value_itemid), zbx_db_sql_id_ins(f->value_graphid),
+				zbx_db_sql_id_ins(f->value_groupid), zbx_db_sql_id_ins(f->value_hostid),
+				zbx_db_sql_id_ins(f->value_sysmapid)))
 		{
 			ret = FAIL;
 		}
@@ -2949,13 +2958,13 @@ static int DBpatch_set_permissions_screen(uint64_t dashboardid, uint64_t screeni
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect("select userid,permission from screen_user where screenid=" ZBX_FS_UI64, screenid);
+	result = zbx_db_select("select userid,permission from screen_user where screenid=" ZBX_FS_UI64, screenid);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (ZBX_DB_OK > DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
+		if (ZBX_DB_OK > zbx_db_execute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
 			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
-			DBget_maxid("dashboard_user"), dashboardid, row[0], row[1]))
+			zbx_db_get_maxid("dashboard_user"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
@@ -2963,14 +2972,14 @@ static int DBpatch_set_permissions_screen(uint64_t dashboardid, uint64_t screeni
 	}
 	zbx_db_free_result(result);
 
-	result = DBselect("select usrgrpid,permission from screen_usrgrp where screenid=" ZBX_FS_UI64, screenid);
+	result = zbx_db_select("select usrgrpid,permission from screen_usrgrp where screenid=" ZBX_FS_UI64, screenid);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp"
+		if (ZBX_DB_OK > zbx_db_execute("insert into dashboard_usrgrp"
 			" (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
 			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
-			DBget_maxid("dashboard_usrgrp"), dashboardid, row[0], row[1]))
+			zbx_db_get_maxid("dashboard_usrgrp"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
@@ -2988,13 +2997,13 @@ static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slid
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect("select userid,permission from slideshow_user where slideshowid=" ZBX_FS_UI64, slideshowid);
+	result = zbx_db_select("select userid,permission from slideshow_user where slideshowid=" ZBX_FS_UI64, slideshowid);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (ZBX_DB_OK > DBexecute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
+		if (ZBX_DB_OK > zbx_db_execute("insert into dashboard_user (dashboard_userid,dashboardid,userid,permission)"
 			" values ("ZBX_FS_UI64 ","ZBX_FS_UI64 ",%s,%s)",
-			DBget_maxid("dashboard_user"), dashboardid, row[0], row[1]))
+			zbx_db_get_maxid("dashboard_user"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
@@ -3002,15 +3011,15 @@ static int DBpatch_set_permissions_slideshow(uint64_t dashboardid, uint64_t slid
 	}
 	zbx_db_free_result(result);
 
-	result = DBselect("select usrgrpid,permission from slideshow_usrgrp where slideshowid=" ZBX_FS_UI64,
+	result = zbx_db_select("select usrgrpid,permission from slideshow_usrgrp where slideshowid=" ZBX_FS_UI64,
 			slideshowid);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (ZBX_DB_OK > DBexecute("insert into dashboard_usrgrp"
+		if (ZBX_DB_OK > zbx_db_execute("insert into dashboard_usrgrp"
 			" (dashboard_usrgrpid,dashboardid,usrgrpid,permission)"
 			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s,%s)",
-			DBget_maxid("dashboard_usrgrp"), dashboardid, row[0], row[1]))
+			zbx_db_get_maxid("dashboard_usrgrp"), dashboardid, row[0], row[1]))
 		{
 			ret = FAIL;
 			goto out;
@@ -3024,10 +3033,10 @@ out:
 
 static int	DBpatch_delete_screen(uint64_t screenid)
 {
-	if (ZBX_DB_OK > DBexecute("delete from screens_items where screenid=" ZBX_FS_UI64, screenid))
+	if (ZBX_DB_OK > zbx_db_execute("delete from screens_items where screenid=" ZBX_FS_UI64, screenid))
 		return FAIL;
 
-	if (ZBX_DB_OK > DBexecute("delete from screens where screenid=" ZBX_FS_UI64, screenid))
+	if (ZBX_DB_OK > zbx_db_execute("delete from screens where screenid=" ZBX_FS_UI64, screenid))
 		return FAIL;
 
 	return SUCCEED;
@@ -3046,7 +3055,7 @@ static int	DBpatch_convert_screen_items(DB_RESULT result, uint64_t id)
 
 	zbx_vector_ptr_create(&screen_items);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		scr_item = (zbx_db_screen_item_t*)zbx_calloc(NULL, 1, sizeof(zbx_db_screen_item_t));
 
@@ -3216,7 +3225,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t userid
 	zbx_db_dashboard_t	dashboard;
 	zbx_db_dashboard_page_t	dashboard_page;
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select screenitemid,screenid,resourcetype,resourceid,width,height,x,y,colspan,rowspan"
 			",elements,style,url,sort_triggers,application,dynamic from screens_items"
 			" where screenid=" ZBX_FS_UI64, screenid);
@@ -3300,7 +3309,7 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 			" where slideshowid=" ZBX_FS_UI64
 			" order by step asc", slideshowid);
 
-	result = DBselectN(sql, 50);
+	result = zbx_db_select_n(sql, 50);
 	zbx_free(sql);
 
 	if (NULL == result)
@@ -3318,7 +3327,7 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 	if (SUCCEED != (ret = DBpatch_add_dashboard(&dashboard)))
 		goto out;
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		int			step, page_delay;
 		zbx_db_dashboard_page_t	dashboard_page;
@@ -3330,9 +3339,9 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 		page_delay = atoi(row[3]);
 		ZBX_DBROW2UINT64(screenid, row[1]);
 
-		result2 = DBselect("select name from screens where screenid=" ZBX_FS_UI64, screenid);
+		result2 = zbx_db_select("select name from screens where screenid=" ZBX_FS_UI64, screenid);
 
-		if (NULL == result2 || NULL == (row2 = DBfetch(result2)))
+		if (NULL == result2 || NULL == (row2 = zbx_db_fetch(result2)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot convert screen " ZBX_FS_UI64, screenid);
 			zbx_db_free_result(result2);
@@ -3347,7 +3356,7 @@ static int	DBpatch_convert_slideshow(uint64_t slideshowid, char *name, int delay
 			continue;
 		}
 
-		result3 = DBselect(
+		result3 = zbx_db_select(
 			"select screenitemid,screenid,resourcetype,resourceid,width,height,x,y,colspan,rowspan"
 			",elements,style,url,sort_triggers,application,dynamic from screens_items"
 			" where screenid=" ZBX_FS_UI64, screenid);
@@ -3380,9 +3389,9 @@ static int	DBpatch_5030094(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	result = DBselect("select slideshowid,name,delay,userid,private from slideshows");
+	result = zbx_db_select("select slideshowid,name,delay,userid,private from slideshows");
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		uint64_t	slideshowid, userid;
 		int		private, delay;
@@ -3411,9 +3420,9 @@ static int	DBpatch_5030095(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	result = DBselect("select screenid,name,userid,private from screens");
+	result = zbx_db_select("select screenid,name,userid,private from screens");
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		uint64_t	screenid, userid;
 		int		private;
@@ -3522,7 +3531,7 @@ static int	DBpatch_5030103(void)
 
 static int	DBpatch_5030104(void)
 {
-	if (ZBX_DB_OK > DBexecute("delete from widget where type='favscreens'"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from widget where type='favscreens'"))
 		return FAIL;
 
 	return SUCCEED;
@@ -3530,7 +3539,7 @@ static int	DBpatch_5030104(void)
 
 static int	DBpatch_5030105(void)
 {
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx in ("
 			"'web.favorite.screenids', "
 			"'web.screenconf.filter.active', "
 			"'web.screenconf.filter_name', "
@@ -3563,7 +3572,7 @@ static int	DBpatch_5030105(void)
 
 static int	DBpatch_5030106(void)
 {
-	if (ZBX_DB_OK > DBexecute("delete from role_rule"
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule"
 			" where name like 'api.method.%%'"
 			" and (value_str like 'screen.%%' or value_str like 'screenitem.%%')"))
 		return FAIL;
@@ -3573,7 +3582,7 @@ static int	DBpatch_5030106(void)
 
 static int	DBpatch_5030107(void)
 {
-	if (ZBX_DB_OK > DBexecute("delete from role_rule where name='ui.monitoring.screens'"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule where name='ui.monitoring.screens'"))
 		return FAIL;
 
 	return SUCCEED;
@@ -3606,7 +3615,7 @@ static int	DBpatch_5030108(void)
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
 	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
 			return FAIL;
 	}
 
@@ -3618,7 +3627,7 @@ static int	DBpatch_5030109(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update profiles set idx=CONCAT('web.dashboard.widget.navtree.item-', SUBSTR(idx, 21))"
+	if (ZBX_DB_OK > zbx_db_execute("update profiles set idx=CONCAT('web.dashboard.widget.navtree.item-', SUBSTR(idx, 21))"
 			" where idx like 'web.dashbrd.navtree-%%.toggle'"))
 	{
 		return FAIL;
@@ -3735,15 +3744,15 @@ static int	DBpatch_5030120(void)
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
-	result = DBselect(
+	result = zbx_db_select(
 			"select i.itemid,a.name from items i"
 			" join items_applications ip on i.itemid=ip.itemid"
 			" join applications a on ip.applicationid=a.applicationid");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_DBROW2UINT64(itemid, row[0]);
-		value = DBdyn_escape_string(row[1]);
+		value = zbx_db_dyn_escape_string(row[1]);
 		zbx_db_insert_add_values(&db_insert, itemtagid++, itemid, "Application", value);
 		zbx_free(value);
 	}
@@ -3769,15 +3778,15 @@ static int	DBpatch_5030121(void)
 
 	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select i.itemid,ap.name from items i"
 			" join item_application_prototype ip on i.itemid=ip.itemid"
 			" join application_prototype ap on ip.application_prototypeid=ap.application_prototypeid");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_DBROW2UINT64(itemid, row[0]);
-		value = DBdyn_escape_string(row[1]);
+		value = zbx_db_dyn_escape_string(row[1]);
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), itemid, "Application", value);
 		zbx_free(value);
 	}
@@ -3803,14 +3812,14 @@ static int	DBpatch_5030122(void)
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "httptest_tag", "httptesttagid", "httptestid", "tag", "value", NULL);
-	result = DBselect(
+	result = zbx_db_select(
 			"select h.httptestid,a.name from httptest h"
 			" join applications a on h.applicationid=a.applicationid");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_DBROW2UINT64(httptestid, row[0]);
-		value = DBdyn_escape_string(row[1]);
+		value = zbx_db_dyn_escape_string(row[1]);
 		zbx_db_insert_add_values(&db_insert, httptesttagid++, httptestid, "Application", value);
 		zbx_free(value);
 	}
@@ -3835,14 +3844,14 @@ static int	DBpatch_5030123(void)
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "sysmaps_element_tag", "selementtagid", "selementid", "tag", "value", NULL);
-	result = DBselect(
+	result = zbx_db_select(
 			"select selementid,application from sysmaps_elements"
 			" where elementtype in (0,3) and application<>''");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_DBROW2UINT64(selementid, row[0]);
-		value = DBdyn_escape_string(row[1]);
+		value = zbx_db_dyn_escape_string(row[1]);
 		zbx_db_insert_add_values(&db_insert, selementtagid++, selementid, "Application", value);
 		zbx_free(value);
 	}
@@ -3860,7 +3869,7 @@ static int	DBpatch_5030127(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=%d,value2='Application' where conditiontype=%d",
+	if (ZBX_DB_OK > zbx_db_execute("update conditions set conditiontype=%d,value2='Application' where conditiontype=%d",
 			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_APPLICATION))
 	{
 		return FAIL;
@@ -3876,7 +3885,7 @@ static int	DBpatch_5030128(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from auditlog where resourcetype=%d", AUDIT_RESOURCE_APPLICATION))
+	if (ZBX_DB_OK > zbx_db_execute("delete from auditlog where resourcetype=%d", AUDIT_RESOURCE_APPLICATION))
 		return FAIL;
 
 	return SUCCEED;
@@ -3888,7 +3897,7 @@ static int	DBpatch_5030129(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx in ("
 			"'web.applications.filter','web.latest.filter.application',"
 			"'web.overview.filter.application','web.applications.filter.active',"
 			"'web.applications.filter_groups','web.applications.filter_hostids',"
@@ -4083,12 +4092,12 @@ static int	DBpatch_5030130(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect("select profileid,value_str from profiles"
+	result = zbx_db_select("select profileid,value_str from profiles"
 			" where idx='web.monitoring.problem.properties'");
 
-	while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
+	while (NULL != (row = zbx_db_fetch(result)) && SUCCEED == ret)
 	{
 		struct zbx_json_parse		jp;
 		struct zbx_json			json;
@@ -4105,13 +4114,13 @@ static int	DBpatch_5030130(void)
 		{
 			ZBX_DBROW2UINT64(profileid, row[0]);
 
-			value_str = DBdyn_escape_string(json.buffer);
+			value_str = zbx_db_dyn_escape_string(json.buffer);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update profiles set value_str='%s' where profileid=" ZBX_FS_UI64 ";\n",
 					value_str, profileid);
 			zbx_free(value_str);
 
-			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 		else
 			zabbix_log(LOG_LEVEL_ERR, "failed to parse web.monitoring.problem.properties JSON");
@@ -4123,9 +4132,9 @@ static int	DBpatch_5030130(void)
 	}
 	zbx_db_free_result(result);
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 
 	zbx_free(sql);
@@ -4149,18 +4158,18 @@ static int	DBpatch_5030131(void)
 
 	zbx_vector_uint64_create(&widget_fieldids);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select w.widgetid,wf.value_str,wf.widget_fieldid from widget w"
 			" join widget_field wf on wf.widgetid=w.widgetid"
 			" where w.type in ('dataover','trigover') and wf.type=1 and wf.name='application'");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	widgetid, widget_fieldid;
 		char		*val;
 
 		ZBX_DBROW2UINT64(widgetid, row[0]);
-		val = DBdyn_escape_string(row[1]);
+		val = zbx_db_dyn_escape_string(row[1]);
 		ZBX_DBROW2UINT64(widget_fieldid, row[2]);
 
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "tags.operator.0", 0, "");
@@ -4184,10 +4193,10 @@ static int	DBpatch_5030131(void)
 		size_t	sql_alloc = 0, sql_offset = 0;
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from widget_field where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "widget_fieldid", widget_fieldids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "widget_fieldid", widget_fieldids.values,
 				widget_fieldids.values_num);
 
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 
 		zbx_free(sql);
@@ -4204,7 +4213,7 @@ static int	DBpatch_5030132(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from role_rule where name like 'api.method.%%'"
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule where name like 'api.method.%%'"
 			" and value_str like 'application.%%'"))
 		return FAIL;
 
@@ -4270,7 +4279,7 @@ static int	DBpatch_5030143(void)
 			{"message", 65535}
 	};
 
-	result = DBselect("select om.operationid,om.subject,om.message"
+	result = zbx_db_select("select om.operationid,om.subject,om.message"
 			" from opmessage om,operations o,actions a"
 			" where om.operationid=o.operationid"
 				" and o.actionid=a.actionid"
@@ -4293,7 +4302,7 @@ static int	DBpatch_5030144(void)
 			{"message", 65535}
 	};
 
-	result = DBselect("select mediatype_messageid,subject,message from media_type_message where recovery=1");
+	result = zbx_db_select("select mediatype_messageid,subject,message from media_type_message where recovery=1");
 
 	ret = db_rename_macro(result, "media_type_message", "mediatype_messageid", fields, ARRSIZE(fields),
 			"{EVENT.NAME}", "{EVENT.RECOVERY.NAME}");
@@ -4672,7 +4681,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&r_hostids);
 
-	result = DBselect("select f.functionid,f.itemid,f.name,f.parameter,h.hostid"
+	result = zbx_db_select("select f.functionid,f.itemid,f.name,f.parameter,h.hostid"
 			" from functions f"
 			" join items i"
 				" on f.itemid=i.itemid"
@@ -4682,7 +4691,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 			" order by functionid",
 			trigger->triggerid);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		char		*replace = NULL;
 		unsigned char	location;
@@ -4830,12 +4839,12 @@ static int	DBpatch_5030165(void)
 
 	zbx_db_insert_prepare(&db_insert_functions, "functions", "functionid", "itemid", "triggerid", "name",
 			"parameter", NULL);
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect("select triggerid,recovery_mode,expression,recovery_expression from triggers"
+	result = zbx_db_select("select triggerid,recovery_mode,expression,recovery_expression from triggers"
 			" order by triggerid");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		char			delim, *esc;
 		zbx_dbpatch_trigger_t	trigger;
@@ -4865,7 +4874,7 @@ static int	DBpatch_5030165(void)
 							"delete from functions where functionid=" ZBX_FS_UI64 ";\n",
 							func->functionid);
 
-					if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+					if (FAIL == (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 						break;
 
 					continue;
@@ -4876,7 +4885,7 @@ static int	DBpatch_5030165(void)
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update functions set");
 				if (0 != (func->flags & ZBX_DBPATCH_FUNCTION_UPDATE_NAME))
 				{
-					esc = DBdyn_escape_field("functions", "name", func->name);
+					esc = zbx_db_dyn_escape_field("functions", "name", func->name);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,"%cname='%s'", delim, esc);
 					zbx_free(esc);
 					delim = ',';
@@ -4884,7 +4893,7 @@ static int	DBpatch_5030165(void)
 
 				if (0 != (func->flags & ZBX_DBPATCH_FUNCTION_UPDATE_PARAM))
 				{
-					esc = DBdyn_escape_field("functions", "parameter", func->parameter);
+					esc = zbx_db_dyn_escape_field("functions", "parameter", func->parameter);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,"%cparameter='%s'", delim, esc);
 					zbx_free(esc);
 				}
@@ -4892,7 +4901,7 @@ static int	DBpatch_5030165(void)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where functionid=" ZBX_FS_UI64
 						";\n", func->functionid);
 
-				if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+				if (FAIL == (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 					break;
 			}
 
@@ -4903,7 +4912,7 @@ static int	DBpatch_5030165(void)
 
 				if (0 != (trigger.flags & ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION))
 				{
-					esc = DBdyn_escape_field("triggers", "expression", trigger.expression);
+					esc = zbx_db_dyn_escape_field("triggers", "expression", trigger.expression);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,"%cexpression='%s'", delim,
 							esc);
 					zbx_free(esc);
@@ -4912,7 +4921,7 @@ static int	DBpatch_5030165(void)
 
 				if (0 != (trigger.flags & ZBX_DBPATCH_TRIGGER_UPDATE_RECOVERY_EXPRESSION))
 				{
-					esc = DBdyn_escape_field("triggers", "recovery_expression",
+					esc = zbx_db_dyn_escape_field("triggers", "recovery_expression",
 							trigger.recovery_expression);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,"%crecovery_expression='%s'",
 							delim, esc);
@@ -4922,7 +4931,7 @@ static int	DBpatch_5030165(void)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggerid=" ZBX_FS_UI64
 						";\n", trigger.triggerid);
 
-				if (FAIL == (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+				if (FAIL == (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 					break;
 			}
 		}
@@ -4936,11 +4945,11 @@ static int	DBpatch_5030165(void)
 
 	zbx_db_free_result(result);
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
 
@@ -4963,10 +4972,10 @@ static int	DBpatch_5030166(void)
 	/* When upgrading from version 5.0 or less trigger_queue will be created later. */
 	/* Only when upgrading from version 5.2 there will be trigger queue table which */
 	/* must be updated.                                                             */
-	if (SUCCEED != DBtable_exists("trigger_queue"))
+	if (SUCCEED != zbx_db_table_exists("trigger_queue"))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update trigger_queue set type=4 where type=3"))
+	if (ZBX_DB_OK > zbx_db_execute("update trigger_queue set type=4 where type=3"))
 		return FAIL;
 
 	return SUCCEED;
@@ -5039,11 +5048,11 @@ static int	DBpatch_5030167(void)
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect("select triggerid,event_name from triggers order by triggerid");
+	result = zbx_db_select("select triggerid,event_name from triggers order by triggerid");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_token_t	token;
 		char		*out = NULL;
@@ -5101,23 +5110,23 @@ static int	DBpatch_5030167(void)
 		{
 			char	*esc;
 
-			esc = DBdyn_escape_field("triggers", "event_name", out);
+			esc = zbx_db_dyn_escape_field("triggers", "event_name", out);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set event_name='%s'"
 					" where triggerid=%s;\n", esc, row[0]);
 			zbx_free(esc);
 
-			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 		zbx_free(out);
 	}
 	zbx_db_free_result(result);
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
 
@@ -5232,15 +5241,15 @@ static int	DBpatch_5030168(void)
 
 	zbx_vector_ptr_create(&functions);
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect("select i.itemid,i.params"
+	result = zbx_db_select("select i.itemid,i.params"
 			" from items i,hosts h"
 			" where i.type=15"
 				" and h.hostid=i.hostid"
 			" order by i.itemid");
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	itemid, index;
 		char		*expression, *out = NULL;
@@ -5318,12 +5327,12 @@ static int	DBpatch_5030168(void)
 		{
 			char	*esc;
 
-			esc = DBdyn_escape_field("items", "params", out);
+			esc = zbx_db_dyn_escape_field("items", "params", out);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set params='%s' where itemid="
 					ZBX_FS_UI64 ";\n", esc, itemid);
 			zbx_free(esc);
 
-			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 		zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
@@ -5334,11 +5343,11 @@ static int	DBpatch_5030168(void)
 	zbx_db_free_result(result);
 	zbx_vector_ptr_destroy(&functions);
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
 
@@ -5460,12 +5469,12 @@ static int	DBpatch_5030169(void)
 	char		*sql = NULL, *params = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0, params_alloc = 0, params_offset;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* ITEM_TYPE_AGGREGATE = 8 */
-	result = DBselect("select itemid,key_ from items where type=8");
+	result = zbx_db_select("select itemid,key_ from items where type=8");
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		AGENT_REQUEST	request;
 		char		*error = NULL, *esc;
@@ -5492,21 +5501,21 @@ static int	DBpatch_5030169(void)
 			continue;
 		}
 
-		esc = DBdyn_escape_field("items", "params", params);
+		esc = zbx_db_dyn_escape_field("items", "params", params);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update items set type=15,params='%s' where itemid=%s;\n", esc, row[0]);
 		zbx_free(esc);
 
-		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	zbx_db_free_result(result);
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
 
@@ -5535,7 +5544,7 @@ static int	DBpatch_5030171(void)
 	/*   2) create new table with the primary key (DBpatch_5030172)                    */
 	/*   2) copy data from old table into new table (DBpatch_5030173)                  */
 	/*   2) delete the old (renamed) table (DBpatch_5030174)                           */
-	if (SUCCEED != DBtable_exists("trigger_queue"))
+	if (SUCCEED != zbx_db_table_exists("trigger_queue"))
 		return SUCCEED;
 
 	return DBrename_table("trigger_queue", "trigger_queue_tmp");
@@ -5567,14 +5576,14 @@ static int	DBpatch_5030173(void)
 	zbx_uint64_t	objectid, type, clock, ns;
 	int		ret;
 
-	if (SUCCEED != DBtable_exists("trigger_queue_tmp"))
+	if (SUCCEED != zbx_db_table_exists("trigger_queue_tmp"))
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns", NULL);
 
-	result = DBselect("select objectid,type,clock,ns from trigger_queue_tmp");
+	result = zbx_db_select("select objectid,type,clock,ns from trigger_queue_tmp");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(objectid, row[0]);
 		ZBX_STR2UINT64(type, row[1]);
@@ -5594,7 +5603,7 @@ static int	DBpatch_5030173(void)
 
 static int	DBpatch_5030174(void)
 {
-	if (SUCCEED != DBtable_exists("trigger_queue_tmp"))
+	if (SUCCEED != zbx_db_table_exists("trigger_queue_tmp"))
 		return SUCCEED;
 
 	return DBdrop_table("trigger_queue_tmp");
@@ -5645,9 +5654,9 @@ static int	DBpatch_5030181(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	result = DBselect("select valuemapid from valuemap order by valuemapid asc");
+	result = zbx_db_select("select valuemapid from valuemap order by valuemapid asc");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		int		i = 0;
 		char		*sql = NULL;
@@ -5658,27 +5667,27 @@ static int	DBpatch_5030181(void)
 
 		ZBX_DBROW2UINT64(valuemapid, row[0]);
 
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		in_result = DBselect("select valuemap_mappingid"
+		in_result = zbx_db_select("select valuemap_mappingid"
 				" from valuemap_mapping"
 				" where valuemapid=" ZBX_FS_UI64
 				" order by valuemap_mappingid asc", valuemapid);
 
-		while (NULL != (in_row = DBfetch(in_result)))
+		while (NULL != (in_row = zbx_db_fetch(in_result)))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update valuemap_mapping set sortorder=%d where valuemap_mappingid=%s;\n",
 					i, in_row[0]);
 			i++;
 
-			if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 				goto out;
 		}
 
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 out:
 		zbx_db_free_result(in_result);
@@ -5771,15 +5780,15 @@ static int	DBpatch_5030190(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select h.hostid,h.host"
 			" from hosts h"
 			" where h.status=%d",
 			HOST_STATUS_TEMPLATE);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		name = zbx_strdup(NULL, row[1]);
 		name = zbx_update_template_name(name);
@@ -5789,13 +5798,13 @@ static int	DBpatch_5030190(void)
 		zbx_free(name);
 		zbx_free(uuid);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -5815,16 +5824,16 @@ static int	DBpatch_5030191(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select i.itemid,i.key_,h.host"
 			" from items i"
 			" join hosts h on h.hostid=i.hostid"
 			" where h.status=%d and i.flags in (%d,%d) and i.templateid is null",
 			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		name = zbx_strdup(NULL, row[2]);
 		name = zbx_update_template_name(name);
@@ -5836,13 +5845,13 @@ static int	DBpatch_5030191(void)
 		zbx_free(uuid);
 		zbx_free(seed);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -5862,9 +5871,9 @@ static int	DBpatch_5030192(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
 			" from triggers t"
 			" join functions f on f.triggerid=t.triggerid"
@@ -5873,7 +5882,7 @@ static int	DBpatch_5030192(void)
 			" where t.templateid is null and t.flags=%d",
 			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		char		*uuid, *seed = NULL;
 		char		*composed_expr[] = { NULL, NULL };
@@ -5900,13 +5909,13 @@ static int	DBpatch_5030192(void)
 		zbx_free(uuid);
 		zbx_free(seed);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -5926,8 +5935,8 @@ static int	DBpatch_5030193(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	result = DBselect(
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	result = zbx_db_select(
 			"select distinct g.graphid,g.name"
 			" from graphs g"
 			" join graphs_items gi on gi.graphid=g.graphid"
@@ -5936,14 +5945,14 @@ static int	DBpatch_5030193(void)
 			" where g.templateid is null and g.flags=%d",
 			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_NORMAL);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		DB_ROW		row2;
 		DB_RESULT	result2;
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", row[1]);
 
-		result2 = DBselect(
+		result2 = zbx_db_select(
 				"select h.host"
 				" from graphs_items gi"
 				" join items i on i.itemid=gi.itemid"
@@ -5952,7 +5961,7 @@ static int	DBpatch_5030193(void)
 				" order by h.host",
 				row[0]);
 
-		while (NULL != (row2 = DBfetch(result2)))
+		while (NULL != (row2 = zbx_db_fetch(result2)))
 		{
 			host_name = zbx_strdup(NULL, row2[0]);
 			host_name = zbx_update_template_name(host_name);
@@ -5969,13 +5978,13 @@ static int	DBpatch_5030193(void)
 
 		zbx_db_free_result(result2);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -5995,16 +6004,16 @@ static int	DBpatch_5030194(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select d.dashboardid,d.name,h.host"
 			" from dashboard d"
 			" join hosts h on h.hostid=d.templateid"
 			" where h.status=%d",
 			HOST_STATUS_TEMPLATE);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		template_name = zbx_strdup(NULL, row[2]);
 		template_name = zbx_update_template_name(template_name);
@@ -6016,13 +6025,13 @@ static int	DBpatch_5030194(void)
 		zbx_free(uuid);
 		zbx_free(seed);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6042,16 +6051,16 @@ static int	DBpatch_5030195(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select ht.httptestid,ht.name,h.host"
 			" from httptest ht"
 			" join hosts h on h.hostid=ht.hostid and h.status=%d"
 			" where ht.templateid is null",
 			HOST_STATUS_TEMPLATE);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		template_name = zbx_strdup(NULL, row[2]);
 		template_name = zbx_update_template_name(template_name);
@@ -6063,13 +6072,13 @@ static int	DBpatch_5030195(void)
 		zbx_free(uuid);
 		zbx_free(seed);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6089,16 +6098,16 @@ static int	DBpatch_5030196(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select v.valuemapid,v.name,h.host"
 			" from valuemap v"
 			" join hosts h on h.hostid=v.hostid"
 			" where h.status=%d",
 			HOST_STATUS_TEMPLATE);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		template_name = zbx_strdup(NULL, row[2]);
 		template_name = zbx_update_template_name(template_name);
@@ -6110,13 +6119,13 @@ static int	DBpatch_5030196(void)
 		zbx_free(uuid);
 		zbx_free(seed);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6136,24 +6145,24 @@ static int	DBpatch_5030197(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect("select groupid,name from hstgrp");
+	result = zbx_db_select("select groupid,name from hstgrp");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		uuid = zbx_gen_uuid4(row[1]);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update hstgrp set uuid='%s' where groupid=%s;\n", uuid, row[0]);
 		zbx_free(uuid);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6173,9 +6182,9 @@ static int	DBpatch_5030198(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select i.itemid,i.key_,h.host,i2.key_"
 			" from items i"
 			" join hosts h on h.hostid=i.hostid"
@@ -6184,7 +6193,7 @@ static int	DBpatch_5030198(void)
 			" where h.status=%d and i.flags=%d and i.templateid is null",
 			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		template_name = zbx_strdup(NULL, row[2]);
 		template_name = zbx_update_template_name(template_name);
@@ -6196,13 +6205,13 @@ static int	DBpatch_5030198(void)
 		zbx_free(uuid);
 		zbx_free(seed);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6222,9 +6231,9 @@ static int	DBpatch_5030199(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
 			" from triggers t"
 			" join functions f on f.triggerid=t.triggerid"
@@ -6233,7 +6242,7 @@ static int	DBpatch_5030199(void)
 			" where t.templateid is null and t.flags=%d",
 			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		char		*uuid, *seed = NULL;
 		char		*composed_expr[] = { NULL, NULL };
@@ -6241,7 +6250,7 @@ static int	DBpatch_5030199(void)
 		DB_ROW		row2;
 		DB_RESULT	result2;
 
-		result2 = DBselect(
+		result2 = zbx_db_select(
 				"select distinct i2.key_"
 				" from items i"
 				" join item_discovery id on id.itemid=i.itemid"
@@ -6250,7 +6259,7 @@ static int	DBpatch_5030199(void)
 				" where i.flags=%d",
 				row[0], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-		if (NULL == (row2 = DBfetch(result2)))
+		if (NULL == (row2 = zbx_db_fetch(result2)))
 		{
 			zbx_db_free_result(result2);
 			continue;
@@ -6281,13 +6290,13 @@ static int	DBpatch_5030199(void)
 		zbx_free(uuid);
 		zbx_free(seed);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6307,8 +6316,8 @@ static int	DBpatch_5030200(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	result = DBselect(
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	result = zbx_db_select(
 			"select distinct g.graphid,g.name,h.host,i2.key_"
 			" from graphs g"
 			" join graphs_items gi on gi.graphid=g.graphid"
@@ -6319,7 +6328,7 @@ static int	DBpatch_5030200(void)
 			" where g.templateid is null and g.flags=%d",
 			ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		templ_name = zbx_strdup(NULL, row[2]);
 		templ_name = zbx_update_template_name(templ_name);
@@ -6332,13 +6341,13 @@ static int	DBpatch_5030200(void)
 		zbx_free(uuid);
 		zbx_free(seed);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6358,9 +6367,9 @@ static int	DBpatch_5030201(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select h.hostid,h.host,h2.host,i.key_"
 			" from hosts h"
 			" join host_discovery hd on hd.hostid=h.hostid"
@@ -6369,7 +6378,7 @@ static int	DBpatch_5030201(void)
 			" where h.flags=%d and h.templateid is null",
 			HOST_STATUS_TEMPLATE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		name_tmpl = zbx_strdup(NULL, row[2]);
 		name_tmpl = zbx_update_template_name(name_tmpl);
@@ -6381,13 +6390,13 @@ static int	DBpatch_5030201(void)
 		zbx_free(seed);
 		zbx_free(uuid);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);

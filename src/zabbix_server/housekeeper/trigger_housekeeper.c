@@ -55,14 +55,14 @@ static int	housekeep_problems_without_triggers(void)
 
 	zbx_vector_uint64_create(&ids);
 
-	result = DBselect("select eventid"
+	result = zbx_db_select("select eventid"
 			" from problem"
 			" where source=%d"
 				" and object=%d"
 				" and not exists (select NULL from triggers where triggerid=objectid)",
 				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	id;
 
@@ -75,7 +75,7 @@ static int	housekeep_problems_without_triggers(void)
 
 	if (0 != ids.values_num)
 	{
-		if (SUCCEED != DBexecute_multiple_query(
+		if (SUCCEED != zbx_db_execute_multiple_query(
 				"update problem"
 				" set cause_eventid=null"
 				" where", "cause_eventid", &ids))
@@ -85,7 +85,7 @@ static int	housekeep_problems_without_triggers(void)
 			goto fail;
 		}
 
-		if (SUCCEED != DBexecute_multiple_query(
+		if (SUCCEED != zbx_db_execute_multiple_query(
 				"delete"
 				" from event_symptom"
 				" where", "cause_eventid", &ids))
@@ -95,7 +95,7 @@ static int	housekeep_problems_without_triggers(void)
 			goto fail;
 		}
 
-		if (SUCCEED != DBexecute_multiple_query(
+		if (SUCCEED != zbx_db_execute_multiple_query(
 				"delete"
 				" from problem"
 				" where", "eventid", &ids))
@@ -134,7 +134,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s [startup idle for %d second(s)]", get_process_type_string(process_type),
 			CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
@@ -173,7 +173,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 				CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
 	}
 
-	DBclose();
+	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
