@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-07-01T09:59:17Z'
+  date: '2023-02-01T10:27:31Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -740,6 +740,11 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled. This metric included in PostgreSQL 12'
           preprocessing:
+            -
+              type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
             -
               type: JSONPATH
               parameters:
