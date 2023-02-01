@@ -417,12 +417,11 @@ static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediaty
  *                                                                            *
  ******************************************************************************/
 static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, unsigned char type,
-		const char *smtp_server, const char *smtp_helo, const char *smtp_email,
-		const char *exec_path, const char *gsm_modem, const char *username, const char *passwd,
-		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
-		unsigned char smtp_verify_host, unsigned char smtp_authentication, const char *exec_params,
-		int maxsessions, int maxattempts, const char *attempt_interval, unsigned char content_type,
-		const char *script, const char *timeout, unsigned char flags)
+		const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *exec_path,
+		const char *gsm_modem, const char *username, const char *passwd, unsigned short smtp_port,
+		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
+		unsigned char smtp_authentication, int maxsessions, int maxattempts, const char *attempt_interval,
+		unsigned char content_type, const char *script, const char *timeout, unsigned char flags)
 {
 	zbx_am_mediatype_t	*mediatype;
 
@@ -454,7 +453,6 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, uns
 	ZBX_UPDATE_STR(mediatype->smtp_helo, smtp_helo);
 	ZBX_UPDATE_STR(mediatype->smtp_email, smtp_email);
 	ZBX_UPDATE_STR(mediatype->exec_path, exec_path);
-	ZBX_UPDATE_STR(mediatype->exec_params, exec_params);
 	ZBX_UPDATE_STR(mediatype->gsm_modem, gsm_modem);
 	ZBX_UPDATE_STR(mediatype->username, username);
 	ZBX_UPDATE_STR(mediatype->passwd, passwd);
@@ -546,7 +544,6 @@ static void am_remove_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
 	zbx_free(mediatype->smtp_helo);
 	zbx_free(mediatype->smtp_email);
 	zbx_free(mediatype->exec_path);
-	zbx_free(mediatype->exec_params);
 	zbx_free(mediatype->gsm_modem);
 	zbx_free(mediatype->username);
 	zbx_free(mediatype->passwd);
@@ -1706,9 +1703,9 @@ static void	am_update_mediatypes(zbx_am_t *manager, zbx_ipc_message_t *message)
 
 		am_update_mediatype(manager, mt->mediatypeid, mt->type, mt->smtp_server, mt->smtp_helo, mt->smtp_email,
 				mt->exec_path, mt->gsm_modem, mt->username, mt->passwd, mt->smtp_port, mt->smtp_security,
-				mt->smtp_verify_peer, mt->smtp_verify_host, mt->smtp_authentication, mt->exec_params,
-				mt->maxsessions, mt->maxattempts, mt->attempt_interval, mt->content_type,
-				mt->script, mt->timeout, ZBX_AM_MEDIATYPE_FLAG_NONE);
+				mt->smtp_verify_peer, mt->smtp_verify_host, mt->smtp_authentication, mt->maxsessions,
+				mt->maxattempts, mt->attempt_interval, mt->content_type, mt->script, mt->timeout,
+				ZBX_AM_MEDIATYPE_FLAG_NONE);
 
 		zbx_am_db_mediatype_clear(mt);
 		zbx_free(mt);
@@ -1890,7 +1887,7 @@ static void	am_process_external_alert_request(zbx_am_t *manager, zbx_uint64_t id
 {
 	zbx_uint64_t	mediatypeid;
 	char		*sendto, *subject, *message, *params, *smtp_server, *smtp_helo, *smtp_email, *exec_path,
-			*gsm_modem, *username, *passwd, *exec_params, *attempt_interval, *script, *timeout;
+			*gsm_modem, *username, *passwd, *attempt_interval, *script, *timeout;
 	unsigned short	smtp_port;
 	int		maxsessions, maxattempts;
 	unsigned char	type, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, content_type;
@@ -1899,17 +1896,16 @@ static void	am_process_external_alert_request(zbx_am_t *manager, zbx_uint64_t id
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_alerter_deserialize_alert_send(data, &mediatypeid, &type, &smtp_server, &smtp_helo, &smtp_email, &exec_path,
-			&gsm_modem, &username, &passwd, &smtp_port, &smtp_security, &smtp_verify_peer,
-			&smtp_verify_host, &smtp_authentication, &exec_params, &maxsessions, &maxattempts,
-			&attempt_interval, &content_type, &script, &timeout, &sendto, &subject, &message,
-			&params);
+	zbx_alerter_deserialize_alert_send(data, &mediatypeid, &type, &smtp_server, &smtp_helo, &smtp_email,  &exec_path,
+			&gsm_modem, &username, &passwd, &smtp_port, &smtp_security, &smtp_verify_peer, &smtp_verify_host,
+			&smtp_authentication, &maxsessions, &maxattempts, &attempt_interval, &content_type, &script,
+			&timeout, &sendto, &subject, &message, &params);
 
 	/* update with initial 'remove' flag so the mediatype is removed if it's not used by other alerts */
-	am_update_mediatype(manager, mediatypeid, type, smtp_server, smtp_helo, smtp_email, exec_path,
-			gsm_modem, username, passwd, smtp_port, smtp_security, smtp_verify_peer,
-			smtp_verify_host, smtp_authentication, exec_params, maxsessions, maxattempts,
-			attempt_interval, content_type, script, timeout, ZBX_AM_MEDIATYPE_FLAG_REMOVE);
+	am_update_mediatype(manager, mediatypeid, type, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem,
+			username, passwd, smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
+			smtp_authentication, maxsessions, maxattempts, attempt_interval, content_type, script, timeout,
+			ZBX_AM_MEDIATYPE_FLAG_REMOVE);
 
 	alert = am_create_alert(id, mediatypeid, ALERT_SOURCE_EXTERNAL, 0, id, sendto, subject, shared_str_new(message),
 			params, content_type, 0, 0, 0);
@@ -1928,7 +1924,6 @@ static void	am_process_external_alert_request(zbx_am_t *manager, zbx_uint64_t id
 	zbx_free(gsm_modem);
 	zbx_free(username);
 	zbx_free(passwd);
-	zbx_free(exec_params);
 	zbx_free(attempt_interval);
 	zbx_free(script);
 	zbx_free(timeout);
@@ -2043,8 +2038,8 @@ static void	am_process_send_dispatch(zbx_am_t *manager, zbx_ipc_client_t *client
 	/* if it's not used by other test alerts/dispatches              */
 	am_update_mediatype(manager, mt.mediatypeid, mt.type, mt.smtp_server, mt.smtp_helo, mt.smtp_email, mt.exec_path,
 			mt.gsm_modem, mt.username, mt.passwd, mt.smtp_port, mt.smtp_security, mt.smtp_verify_peer,
-			mt.smtp_verify_host, mt.smtp_authentication, mt.exec_params, mt.maxsessions, mt.maxattempts,
-			mt.attempt_interval, mt.content_type, mt.script, mt.timeout, ZBX_AM_MEDIATYPE_FLAG_REMOVE);
+			mt.smtp_verify_host, mt.smtp_authentication, mt.maxsessions, mt.maxattempts, mt.attempt_interval,
+			mt.content_type, mt.script, mt.timeout, ZBX_AM_MEDIATYPE_FLAG_REMOVE);
 
 	am_prepare_dispatch_message(dispatch, &mt, &message, &content_type);
 

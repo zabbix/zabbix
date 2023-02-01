@@ -109,9 +109,9 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 		const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *exec_path,
 		const char *gsm_modem, const char *username, const char *passwd, unsigned short smtp_port,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
-		unsigned char smtp_authentication, const char *exec_params, int maxsessions, int maxattempts,
-		const char *attempt_interval, unsigned char content_type, const char *script, const char *timeout,
-		const char *sendto, const char *subject, const char *message, const char *params);
+		unsigned char smtp_authentication, int maxsessions, int maxattempts, const char *attempt_interval,
+		unsigned char content_type, const char *script, const char *timeout, const char *sendto,
+		const char *subject, const char *message, const char *params);
 
 void	zbx_alerter_deserialize_result_ext(const unsigned char *data, char **recipient, char **value, int *errcode,
 		char **error, char **debug);

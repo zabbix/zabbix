@@ -1496,6 +1496,69 @@ static int	DBpatch_6030159(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_6030160(void)
+{
+	const ZBX_FIELD field = {"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type_param", &field);
+}
+
+static int	DBpatch_6030161(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	DB_RESULT	result = zbx_db_select("select mediatypeid,exec_params from media_type where type=1");
+	DB_ROW		row;
+	zbx_db_insert_t	db_insert;
+
+	zbx_db_insert_prepare(&db_insert, "media_type_param", "mediatype_paramid", "mediatypeid", "name", "value",
+			"sortorder", NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	mediatypeid;
+
+		ZBX_STR2UINT64(mediatypeid, row[0]);
+
+		char	*params = zbx_strdup(NULL, row[1]);
+		char	*saveptr;
+		char	*token = strtok_r(params, "\r\n", &saveptr);
+
+		for (int i = 0; NULL != token; i++)
+		{
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), mediatypeid, "", token, i);
+
+			token = strtok_r(NULL, "\r\n", &saveptr);
+		}
+
+		zbx_free(params);
+	}
+
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "mediatype_paramid");
+
+	int	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6030162(void)
+{
+	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG TODO: for existing alerts that are not sent, generate alerts.parameters"
+			" by resolving ALERT.SENDTO, ALERT.SUBJECT and ALERT.MESSAGE macros from media_type.exec_params");
+
+	return FAIL;
+}
+
+static int	DBpatch_6030163(void)
+{
+	return DBdrop_field("media_type", "exec_params");
+}
 #endif
 
 DBPATCH_START(6030)
@@ -1662,5 +1725,9 @@ DBPATCH_ADD(6030156, 0, 1)
 DBPATCH_ADD(6030157, 0, 1)
 DBPATCH_ADD(6030158, 0, 1)
 DBPATCH_ADD(6030159, 0, 1)
+DBPATCH_ADD(6030160, 0, 1)
+DBPATCH_ADD(6030161, 0, 1)
+DBPATCH_ADD(6030162, 0, 0)
+DBPATCH_ADD(6030163, 0, 0)
 
 DBPATCH_END()
