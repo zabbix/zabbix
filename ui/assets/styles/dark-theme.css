@@ -5582,6 +5582,19 @@ z-select .zi-chevron-down,
   .overlay-dialogue .dashboard-widget-head {
     margin: -8px -10px 6px -10px;
     padding: 8px 10px; }
+    .overlay-dialogue .dashboard-widget-head .btn-icon,
+    .overlay-dialogue .dashboard-widget-head a.btn-icon {
+      width: 18px;
+      height: 18px;
+      min-height: 18px;
+      margin-top: -9px;
+      margin-left: 4px; }
+      .overlay-dialogue .dashboard-widget-head .btn-icon::before,
+      .overlay-dialogue .dashboard-widget-head a.btn-icon::before {
+        font-size: 12px; }
+      .overlay-dialogue .dashboard-widget-head .btn-icon:last-child,
+      .overlay-dialogue .dashboard-widget-head a.btn-icon:last-child {
+        margin-right: -6px; }
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
@@ -5589,9 +5602,7 @@ z-select .zi-chevron-down,
     .overlay-dialogue.modal .dashboard-widget-head {
       margin-bottom: 12px; }
       .overlay-dialogue.modal .dashboard-widget-head .overlay-close-btn {
-        position: static;
-        margin: -9px -6px 0 30px;
-        font-size: 25px; }
+        position: static; }
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow: auto;
       overflow-x: hidden;

@@ -2498,6 +2498,23 @@ $trigger-expression-tree-icons: (
 	.dashboard-widget-head {
 		margin: -8px -10px 6px -10px;
 		padding: 8px 10px;
+
+		.btn-icon,
+		a.btn-icon {
+			width: 18px;
+			height: 18px;
+			min-height: 18px;
+			margin-top: -9px;
+			margin-left: 4px;
+
+			&::before {
+				font-size: $btn-icon-small-size;
+			}
+
+			&:last-child {
+				margin-right: -6px;
+			}
+		}
 	}
 
 	&.modal {
@@ -2509,9 +2526,9 @@ $trigger-expression-tree-icons: (
 			margin-bottom: 12px;
 
 			.overlay-close-btn {
-				position: static;
-				margin: -9px -6px 0 30px;
-				font-size: 25px;
+				position: static; // TODO: acikuns NEEDS TO BE DELETED
+				//margin: -9px -6px 0 30px;
+				//font-size: 25px;
 			}
 		}
 
