@@ -264,7 +264,7 @@ class CImportReferencer {
 		}
 
 		foreach ($this->db_valuemaps as $valuemapid => $db_valuemap) {
-			if ($db_valuemap['uuid'] === $uuid) {
+			if (array_key_exists('uuid', $db_valuemap) && $db_valuemap['uuid'] === $uuid) {
 				return $valuemapid;
 			}
 		}
@@ -887,10 +887,7 @@ class CImportReferencer {
 	 * @param array  $valuemap
 	 */
 	public function setDbValueMap(string $valuemapid, array $valuemap): void {
-		$this->db_valuemaps[$valuemapid] = [
-			'name' => $valuemap['name'],
-			'hostid' => $valuemap['hostid']
-		];
+		$this->db_valuemaps[$valuemapid] = array_intersect_key($valuemap, array_flip(['uuid', 'name', 'hostid']));
 	}
 
 	/**
