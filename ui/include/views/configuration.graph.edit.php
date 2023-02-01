@@ -108,7 +108,7 @@ if (array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CRE
 $graphFormList
 	->addRow(
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['name'], $data['readonly'] && $data['form'] != 'clone', DB::getFieldLength('graphs', 'name')))
+		(new CTextBox('name', $data['name'], $data['readonly'], DB::getFieldLength('graphs', 'name')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
@@ -129,7 +129,7 @@ $graphFormList
 			->setFocusableElementId('label-graphtype')
 			->setValue($data['graphtype'])
 			->addOptions(CSelect::createOptionsFromArray(graphType()))
-			->setReadonly($data['readonly'])
+			->setDisabled($data['readonly'])
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))

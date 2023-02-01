@@ -406,7 +406,7 @@ if (isset($_REQUEST['form'])) {
 		'hostid' => $hostid,
 		'normal_only' => getRequest('normal_only'),
 		'context' => getRequest('context'),
-		'readonly' => getRequest('readonly', 0) == 1
+		'readonly' => hasRequest('graphid') && getRequest('readonly', 0) == 1
 	];
 
 	if ($data['graphid'] != 0 && ($data['readonly'] || !$data['form_refresh'])) {
