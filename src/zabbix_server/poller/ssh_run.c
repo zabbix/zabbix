@@ -143,6 +143,7 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 	char		*output, *publickey = NULL, *privatekey = NULL, *buffer = NULL, *err_msg = NULL;
 	char		tmp_buf[DATA_BUFFER_SIZE], userauthlist[64];
 	size_t		offset = 0, buf_size = DATA_BUFFER_SIZE;
+	int		proc_config = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -157,6 +158,13 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 
 	/* set blocking mode on session */
 	ssh_set_blocking(session, 1);
+
+	if (0 != ssh_options_set(session, SSH_OPTIONS_PROCESS_CONFIG, &proc_config))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot turn off SSH default config processing: %s",
+				ssh_get_error(session)));
+		goto session_free;
+	}
 
 	/* create a session instance and start it up */
 	if (0 != ssh_options_set(session, SSH_OPTIONS_HOST, item->interface.addr) ||
