@@ -75,6 +75,13 @@ void	zbx_variant_clear(zbx_variant_t *value)
 			zbx_vector_dbl_destroy(value->data.dbl_vector);
 			zbx_free(value->data.dbl_vector);
 			break;
+		case ZBX_VARIANT_NONE:
+		case ZBX_VARIANT_DBL:
+		case ZBX_VARIANT_UI64:
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	value->type = ZBX_VARIANT_NONE;

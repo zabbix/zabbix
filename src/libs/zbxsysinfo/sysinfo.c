@@ -832,6 +832,7 @@ void	zbx_free_agent_result(AGENT_RESULT *result)
 	ZBX_UNSET_DBL_RESULT(result);
 	ZBX_UNSET_STR_RESULT(result);
 	ZBX_UNSET_TEXT_RESULT(result);
+	ZBX_UNSET_BIN_RESULT(result);
 	ZBX_UNSET_LOG_RESULT(result);
 	ZBX_UNSET_MSG_RESULT(result);
 }
