@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-02 07:26+0000\n"
+"PO-Revision-Date: 2023-01-26 11:28+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -1069,6 +1069,10 @@ msgstr "הגדרות מתקדמות"
 #: include/views/monitoring.sysmap.edit.php:160
 msgid "Advanced labels"
 msgstr "תוויות מתקדמות"
+
+#: app/views/popup.import.php:175
+msgid "Advanced options"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -3710,7 +3714,7 @@ msgstr[1] "לא ניתן לעדכן אירועים"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
-msgstr ""
+msgstr "לא ניתן לעדכן אירועים"
 
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
@@ -3955,7 +3959,7 @@ msgstr "תופסת את כל מלכודות ה־SNMP שלא נתפסו על יד
 #: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
 #: include/events.inc.php:256
 msgid "Cause"
-msgstr ""
+msgstr "גורם"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
@@ -4016,7 +4020,7 @@ msgstr "שינויים בשנייה"
 
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
-msgstr ""
+msgstr "החלפת דירוג בעיה"
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4846,11 +4850,11 @@ msgstr "המרה ל־JSON"
 
 #: app/views/popup.acknowledge.edit.php:134
 msgid "Convert to cause"
-msgstr ""
+msgstr "המרה לגורם"
 
 #: app/views/popup.acknowledge.edit.php:135
 msgid "Converts a symptom event back to cause event"
-msgstr ""
+msgstr "המרת אירוע תסמין בחזרה לאירוע גורם"
 
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
@@ -4864,6 +4868,27 @@ msgstr "נקודות ציון"
 #: jsLoader.php:164 jsLoader.php:281
 msgid "Copy"
 msgstr "העתקה"
+
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] "העתקת תרשים אחד"
+msgstr[1] "העתקת %1$s תרשימים"
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] "העתקת פריט אחד"
+msgstr[1] "העתקת %1$s פריטים"
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] "העתקת הקפצה אחת"
+msgstr[1] "העתקת %1$s הקפצות"
 
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
@@ -5212,11 +5237,11 @@ msgstr "מארח נוכחי"
 #: app/controllers/CControllerUserUpdateGeneral.php:85
 #: app/views/administration.user.edit.php:174
 msgid "Current password"
-msgstr ""
+msgstr "סיסמה נוכחית"
 
 #: include/classes/api/services/CUser.php:474
 msgid "Current password is mandatory."
-msgstr ""
+msgstr "הסיסמה הנוכחית היא בגדר חובה."
 
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
@@ -6316,7 +6341,7 @@ msgstr "להשבית את ה־SLAs הנבחרים?"
 
 #: app/views/js/action.list.js.php:109
 msgid "Disable selected action?"
-msgstr ""
+msgstr "להשבית את המשימה הנבחרת?"
 
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
@@ -7024,7 +7049,7 @@ msgstr "הפעלת אימות HTTP"
 
 #: app/views/js/administration.authentication.edit.js.php:140
 msgid "Enable HTTP authentication for all users."
-msgstr ""
+msgstr "להפעיל אימות HTTP לכל המשתמשים."
 
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
@@ -7116,7 +7141,7 @@ msgstr "להפעיל את ה־SLAs הנבחרים?"
 
 #: app/views/js/action.list.js.php:94
 msgid "Enable selected action?"
-msgstr ""
+msgstr "להפעיל את המשימה הנבחרת?"
 
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
@@ -7785,7 +7810,7 @@ msgstr "השדה „%1$s” שגוי: %2$s"
 #: include/validate.inc.php:185 include/validate.inc.php:190
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s."
-msgstr ""
+msgstr "השדה „%1$s” שגוי: %2$s."
 
 #: include/validate.inc.php:167
 #, c-format
@@ -7807,7 +7832,7 @@ msgstr "השדה „%1$s” ודאי חסר."
 #: include/views/js/item.preprocessing.js.php:164
 #: include/views/js/item.preprocessing.js.php:210
 msgid "Field name"
-msgstr ""
+msgstr "שם השדה"
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -9894,7 +9919,7 @@ msgstr "תנאים שגויים לכלל הגילוי „%1$s”."
 
 #: include/classes/api/services/CUser.php:468
 msgid "Incorrect current password."
-msgstr ""
+msgstr "הסיסמה הנוכחית שגויה."
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -12354,6 +12379,14 @@ msgid "Map update failed."
 msgstr "עדכון המפה נכשל."
 
 #: app/views/popup.ldap.edit.php:257
+msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:513
+msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:257
 msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
 msgstr ""
 
@@ -12399,7 +12432,7 @@ msgstr "מרץ"
 
 #: jsLoader.php:361
 msgid "Mark as cause"
-msgstr ""
+msgstr "סימון כגורם"
 
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
@@ -12415,7 +12448,7 @@ msgstr "סימון הנבחרים"
 
 #: jsLoader.php:362
 msgid "Mark selected as symptoms"
-msgstr ""
+msgstr "סימון הנבחרים כתסמינים"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -12497,11 +12530,15 @@ msgstr "הטווח המרבי לבורר זמן"
 #: app/partials/configuration.host.interface.row.php:105
 #: app/views/popup.itemtestedit.view.php:154
 msgid "Max repetition count"
-msgstr ""
+msgstr "כמות החזרות המרבית"
 
 #: app/partials/configuration.host.interface.row.php:106
 msgid "Max repetition count is applicable to discovery and snmp.walk only."
-msgstr ""
+msgstr "כמות החזרות המרבית חלה על גילוי ו־snmp.walk בלבד."
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and walk only."
+msgstr "כמות החזרות המרבית חלה על גילוי ו־walk (הליכה) בלבד."
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -20518,6 +20555,10 @@ msgstr "מעודכן"
 msgid "Updated status of host \"%1$s\"."
 msgstr "מצב מעודכן של המארח „%1$s”."
 
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr "מתבצע עדכון"
+
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
 msgstr "העלאה"
@@ -20556,7 +20597,7 @@ msgstr "שימוש בבקשות קבוצתיות"
 
 #: app/partials/configuration.host.interface.row.php:207
 msgid "Use combined requests"
-msgstr ""
+msgstr "להשתמש בבקשות משולבות"
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -20685,7 +20726,7 @@ msgstr "ספריית המשתמשים „%1$s” כבר קיימת."
 #: include/classes/api/services/CUser.php:715
 #, c-format
 msgid "User directory with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ספריית משתמשים עם המזהה „%1$s” אינה זמינה."
 
 #: app/views/administration.user.list.php:211
 msgid "User does not have user groups."

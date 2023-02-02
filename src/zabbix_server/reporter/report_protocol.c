@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -297,7 +297,7 @@ void	report_deserialize_begin_report(const unsigned char *data, char **name, cha
  *                                                                            *
  ******************************************************************************/
 
-zbx_uint32_t	report_serialize_send_report(unsigned char **data, const ZBX_DB_MEDIATYPE *mt,
+zbx_uint32_t	report_serialize_send_report(unsigned char **data, const zbx_db_mediatype *mt,
 		const zbx_vector_str_t *emails)
 {
 	zbx_uint32_t	data_len = 0, data_alloc = 1024, data_offset = 0, *params_len;
@@ -332,7 +332,7 @@ zbx_uint32_t	report_serialize_send_report(unsigned char **data, const ZBX_DB_MED
 	return data_offset + data_len;
 }
 
-void	report_deserialize_send_report(const unsigned char *data, ZBX_DB_MEDIATYPE *mt, zbx_vector_str_t *sendtos)
+void	report_deserialize_send_report(const unsigned char *data, zbx_db_mediatype *mt, zbx_vector_str_t *sendtos)
 {
 	zbx_uint32_t	len;
 	int		i, sendto_num;

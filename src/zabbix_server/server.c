@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1097,9 +1097,9 @@ static void	zbx_on_exit(int ret)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		DBconnect(ZBX_DB_CONNECT_EXIT);
+		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
 		free_database_cache(ZBX_SYNC_ALL);
-		DBclose();
+		zbx_db_close();
 	}
 
 	if (SUCCEED != zbx_ha_stop(&error))
@@ -1307,13 +1307,13 @@ static void	zbx_check_db(void)
 		result = FAIL;
 	}
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	if (SUCCEED == DBfield_exists("config", "dbversion_status"))
+	if (SUCCEED == zbx_db_field_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
 
-		if (SUCCEED == DBpk_exists("history"))
+		if (SUCCEED == zbx_db_pk_exists("history"))
 		{
 			db_version_info.history_pk = 1;
 		}
@@ -1338,7 +1338,7 @@ static void	zbx_check_db(void)
 		zbx_json_free(&db_version_json);
 	}
 
-	DBclose();
+	zbx_db_close();
 
 	if (SUCCEED != result)
 	{
@@ -1362,12 +1362,12 @@ static void	zbx_db_save_server_status(void)
 
 	zbx_json_close(&json);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	if (ZBX_DB_OK > DBexecute("update config set server_status='%s'", json.buffer))
+	if (ZBX_DB_OK > zbx_db_execute("update config set server_status='%s'", json.buffer))
 		zabbix_log(LOG_LEVEL_WARNING, "Failed to save server status to database");
 
-	DBclose();
+	zbx_db_close();
 
 	zbx_json_free(&json);
 }
@@ -1502,7 +1502,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				thread_args.args = &dbconfig_args;
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
 
-				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc, rtc_process_request_ex)))
+				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc, rtc_process_request_ex_server)))
 					goto out;
 
 				if (SUCCEED != (ret = zbx_ha_get_status(CONFIG_HA_NODE_NAME, ha_stat, ha_failover,
@@ -1516,14 +1516,14 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				if (ZBX_NODE_STATUS_ACTIVE != *ha_stat)
 					goto out;
 
-				DBconnect(ZBX_DB_CONNECT_NORMAL);
+				zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 				if (SUCCEED != zbx_check_postinit_tasks(&error))
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "cannot complete post initialization tasks: %s",
 							error);
 					zbx_free(error);
-					DBclose();
+					zbx_db_close();
 
 					ret = FAIL;
 					goto out;
@@ -1532,7 +1532,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				/* update maintenance states */
 				zbx_dc_update_maintenances();
 
-				DBclose();
+				zbx_db_close();
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_NORMAL;
@@ -1954,7 +1954,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != DBinit(DCget_nextid, program_type, &error))
+	if (SUCCEED != zbx_db_init(DCget_nextid, program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
@@ -1981,7 +1981,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		return FAIL;
 	}
 
-	DBcheck_character_set();
+	zbx_db_check_character_set();
 	zbx_check_db();
 	zbx_db_save_server_status();
 
@@ -1989,7 +1989,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_DISABLED;
 		zbx_update_epsilon_to_float_precision();
-		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
+		zabbix_log(LOG_LEVEL_WARNING, "Database is not upgraded to use double precision values. Support for the"
+				" old numeric type will be removed in the future versions.");
 	}
 
 	if (SUCCEED != zbx_db_check_instanceid())
@@ -2099,7 +2100,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
 					ZBX_RTC_LOG_LEVEL_INCREASE == message->code)
 			{
-				zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_ex);
+				zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_ex_server);
 			}
 			else
 			{

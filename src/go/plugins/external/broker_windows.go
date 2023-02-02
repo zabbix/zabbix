@@ -1,9 +1,9 @@
-//go:build (linux && 386) || (linux && amd64) || (linux && arm64) || (linux && mips64le) || (linux && mipsle)
-// +build linux,386 linux,amd64 linux,arm64 linux,mips64le linux,mipsle
+//go:build windows
+// +build windows
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,16 +20,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package uname
+package external
 
-func arrayToString(unameArray *[65]int8) string {
-	var byteString [65]byte
-	var indexLength int
-	for ; indexLength < len(unameArray); indexLength++ {
-		if 0 == unameArray[indexLength] {
-			break
-		}
-		byteString[indexLength] = uint8(unameArray[indexLength])
-	}
-	return string(byteString[:indexLength])
+import (
+	"errors"
+	"github.com/Microsoft/go-winio"
+)
+
+func isErrConnectionClosed(err error) bool {
+	return errors.Is(err, winio.ErrFileClosed)
 }

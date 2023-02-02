@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -466,7 +466,7 @@ class testUserDirectory extends CAPITest {
 						['name' => 'zabbix-devs', 'roleid' => 1, 'user_groups' => [['usrgrpid' => 7]]]
 					]
 				]],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "provision_groups".'
+				'expected_error' => 'Invalid parameter "/1/provision_groups": value is too long.'
 			],
 			'Enable provisioning without giving provision groups' => [
 				'userdirectories' => [[

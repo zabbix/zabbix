@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ package oracle
 
 import (
 	"context"
+	"fmt"
 
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
@@ -29,24 +30,7 @@ func asmDiskGroupsHandler(ctx context.Context, conn OraClient, params map[string
 	_ ...string) (interface{}, error) {
 	var diskGroups string
 
-	row, err := conn.QueryRow(ctx, `
-		SELECT
-			JSON_ARRAYAGG(
-				JSON_OBJECT(NAME VALUE
-					JSON_OBJECT(
-						'total_bytes' VALUE 
-							ROUND(TOTAL_MB / DECODE(TYPE, 'EXTERN', 1, 'NORMAL', 2, 'HIGH', 3) * 1024 * 1024),
-						'free_bytes'  VALUE 
-							ROUND(USABLE_FILE_MB * 1024 * 1024),
-						'used_pct'    VALUE 
-							ROUND(100 - (USABLE_FILE_MB / (TOTAL_MB / 
-							DECODE(TYPE, 'EXTERN', 1, 'NORMAL', 2, 'HIGH', 3))) * 100, 2)
-				    )
-				) RETURNING CLOB 
-			)
-         FROM 
-         	V$ASM_DISKGROUP
-	`)
+	row, err := conn.QueryRow(ctx, getDiskGRoupQuery(params["Diskgroup"]))
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
@@ -61,4 +45,31 @@ func asmDiskGroupsHandler(ctx context.Context, conn OraClient, params map[string
 	}
 
 	return diskGroups, nil
+}
+
+func getDiskGRoupQuery(name string) string {
+	var whereStr string
+	if name != "" {
+		whereStr = fmt.Sprintf(`WHERE NAME = '%s'`, name)
+	}
+
+	return fmt.Sprintf(`
+	SELECT
+		JSON_ARRAYAGG(
+			JSON_OBJECT(NAME VALUE
+				JSON_OBJECT(
+					'total_bytes' VALUE 
+						ROUND(TOTAL_MB / DECODE(TYPE, 'EXTERN', 1, 'NORMAL', 2, 'HIGH', 3) * 1024 * 1024),
+					'free_bytes'  VALUE 
+						ROUND(USABLE_FILE_MB * 1024 * 1024),
+					'used_pct'    VALUE 
+						ROUND(100 - (USABLE_FILE_MB / (TOTAL_MB / 
+						DECODE(TYPE, 'EXTERN', 1, 'NORMAL', 2, 'HIGH', 3))) * 100, 2)
+				)
+			) RETURNING CLOB 
+		)
+	 FROM 
+		 V$ASM_DISKGROUP
+	 %s
+`, whereStr)
 }

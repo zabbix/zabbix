@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -215,18 +215,18 @@ int	zbx_check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 				" and",
 			hostid);
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids.values,
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids.values,
 			groupids.values_num);
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&groupids);
 
-	if (NULL == DBfetch(result))
+	if (NULL == zbx_db_fetch(result))
 		ret = FAIL;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -241,7 +241,7 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " scriptid:" ZBX_FS_UI64,
 			__func__, userid, hostid, script->scriptid);
 
-	result = DBselect(
+	result = zbx_db_select(
 		"select null"
 			" from hosts_groups hg,rights r,users_groups ug"
 		" where hg.groupid=r.id"
@@ -256,10 +256,10 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 		PERM_DENY,
 		script->host_access);
 
-	if (NULL == DBfetch(result))
+	if (NULL == zbx_db_fetch(result))
 		ret = FAIL;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -401,7 +401,7 @@ int	DBfetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64, __func__, scriptid);
 
-	result = DBselect("select name,value from script_param where scriptid=" ZBX_FS_UI64, scriptid);
+	result = zbx_db_select("select name,value from script_param where scriptid=" ZBX_FS_UI64, scriptid);
 
 	if (NULL == result)
 	{
@@ -410,14 +410,14 @@ int	DBfetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params,
 		goto out;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		pair.first = zbx_strdup(NULL, row[0]);
 		pair.second = zbx_strdup(NULL, row[1]);
 		zbx_vector_ptr_pair_append(params, pair);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -535,9 +535,9 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *h
 	else
 		port = 0;
 
-	DBbegin();
+	zbx_db_begin();
 
-	taskid = DBget_maxid("task");
+	taskid = zbx_db_get_maxid("task");
 
 	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_REMOTE_COMMAND, ZBX_TM_STATUS_NEW, now,
 			ZBX_REMOTE_COMMAND_TTL, host->proxy_hostid);
@@ -549,7 +549,7 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *h
 	if (FAIL == zbx_tm_save_task(task))
 		taskid = 0;
 
-	DBcommit();
+	zbx_db_commit();
 
 	zbx_tm_task_free(task);
 

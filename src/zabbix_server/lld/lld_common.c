@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -130,9 +130,9 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 
 	/* update discovery table */
 
-	DBbegin();
+	zbx_db_begin();
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < discovery_ts.values_num; i++)
 	{
@@ -142,35 +142,35 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 				" where %s=" ZBX_FS_UI64 ";\n",
 				table, (int)discovery_ts.values[i].second, id_name, discovery_ts.values[i].first);
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (0 != lc_ids.values_num)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set lastcheck=%d where",
 				table, lastcheck);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, id_name,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, id_name,
 				lc_ids.values, lc_ids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (0 != ts_ids.values_num)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ts_delete=0 where",
 				table);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, id_name,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, id_name,
 				ts_ids.values, ts_ids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 
 	zbx_free(sql);
 
@@ -182,7 +182,7 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 		cb(&del_ids);
 	}
 
-	DBcommit();
+	zbx_db_commit();
 clean:
 	zbx_vector_uint64_pair_destroy(&discovery_ts);
 	zbx_vector_uint64_destroy(&ts_ids);

@@ -83,32 +83,15 @@
                             <uuid>4d34d26d2480480c862261b1b9e9d99d</uuid>
                             <name>DepItemProtoDependsOnNormalItem1</name>
                             <type>DEPENDENT</type>
-                            <key>depitemproto_deponnormal</key>
+			    <key>depitemproto_deponnormal[{#LLDMACRO}]</key>
                             <delay>0</delay>
                             <master_item>
                                 <key>tmpltrap</key>
                             </master_item>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <uuid>c64594a285b64df79b137eeaec10e52b</uuid>
-                                    <expression>last(/SampleTemplate/depitemproto_deponnormal[WA])=10</expression>
-                                    <name>proto_dep {#LLDMACRO}</name>
-                                    <dependencies>
-                                        <dependency>
-                                            <name>proto {#LLDMACRO}</name>
-                                            <expression>last(/SampleTemplate/depitemproto_deponnormal[WA])=110</expression>
-                                        </dependency>
-                                    </dependencies>
-                                    <tags>
-                                        <tag>
-                                            <tag>xxx</tag>
-                                            <value>yyy1y</value>
-                                        </tag>
-                                    </tags>
-                                </trigger_prototype>
-                                <trigger_prototype>
                                     <uuid>1f2fbda374544b0cb77869c6f1d88314</uuid>
-                                    <expression>last(/SampleTemplate/depitemproto_deponnormal[WA])=10</expression>
+                                    <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=10</expression>
                                     <name>proto {#LLDMACRO}</name>
                                     <tags>
                                         <tag>
@@ -118,6 +101,23 @@
                                         <tag>
                                             <tag>CCC</tag>
                                             <value>dda1d</value>
+                                        </tag>
+                                    </tags>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <uuid>c64594a285b64df79b137eeaec10e52b</uuid>
+				    <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=20</expression>
+                                    <name>proto_dep {#LLDMACRO}</name>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>proto {#LLDMACRO}</name>
+                                            <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=10</expression>
+                                        </dependency>
+                                    </dependencies>
+                                    <tags>
+                                        <tag>
+                                            <tag>xxx</tag>
+                                            <value>yyy1y</value>
                                         </tag>
                                     </tags>
                                 </trigger_prototype>

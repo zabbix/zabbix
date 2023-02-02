@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -109,7 +109,7 @@ static char	*db_string_from_json_dyn(const struct zbx_json_parse *jp, const char
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp, name, &string, &size, NULL))
 		return string;
 
-	return zbx_strdup(NULL, DBget_field(table, fieldname)->default_value);
+	return zbx_strdup(NULL, zbx_db_get_field(table, fieldname)->default_value);
 }
 
 static void	db_string_from_json(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
@@ -117,7 +117,7 @@ static void	db_string_from_json(const struct zbx_json_parse *jp, const char *nam
 {
 
 	if (SUCCEED != zbx_json_value_by_name(jp, name, string, len, NULL))
-		zbx_strlcpy(string, DBget_field(table, fieldname)->default_value, len);
+		zbx_strlcpy(string, zbx_db_get_field(table, fieldname)->default_value, len);
 }
 
 static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
@@ -128,7 +128,7 @@ static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name
 	if (SUCCEED == zbx_json_value_by_name(jp, name, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UCHAR(*string, tmp);
 	else
-		ZBX_STR2UCHAR(*string, DBget_field(table, fieldname)->default_value);
+		ZBX_STR2UCHAR(*string, zbx_db_get_field(table, fieldname)->default_value);
 }
 
 static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
@@ -139,7 +139,7 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 	if (SUCCEED == zbx_json_value_by_name(jp, name, tmp, sizeof(tmp), NULL))
 		*num = atoi(tmp);
 	else
-		*num = atoi(DBget_field(table, fieldname)->default_value);
+		*num = atoi(zbx_db_get_field(table, fieldname)->default_value);
 }
 
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **info,
@@ -157,7 +157,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	memset(&item, 0, sizeof(item));
 
 	if (NULL == table_items)
-		table_items = DBget_table("items");
+		table_items = zbx_db_get_table("items");
 
 	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_TYPE, table_items, "type", &item.type);
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_", item.key_orig, sizeof(item.key_orig));
@@ -218,7 +218,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		item.script_params = zbx_strdup(NULL, "");
 
 	if (NULL == table_interface)
-		table_interface = DBget_table("interface");
+		table_interface = zbx_db_get_table("interface");
 
 	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_INTERFACE, &jp_interface))
 		zbx_json_open("{}", &jp_interface);
@@ -253,7 +253,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		zbx_json_open("{}", &jp_details);
 
 	if (NULL == table_interface_snmp)
-		table_interface_snmp = DBget_table("interface_snmp");
+		table_interface_snmp = zbx_db_get_table("interface_snmp");
 
 	db_uchar_from_json(&jp_details, ZBX_PROTO_TAG_VERSION, table_interface_snmp, "version", &item.snmp_version);
 	item.snmp_community = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_COMMUNITY, table_interface_snmp, "community");
@@ -280,7 +280,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			"contextname");
 
 	if (NULL == table_hosts)
-		table_hosts = DBget_table("hosts");
+		table_hosts = zbx_db_get_table("hosts");
 
 	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
 		zbx_json_open("{}", &jp_host);
@@ -299,7 +299,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_IPMI_AUTHTYPE, tmp, sizeof(tmp), NULL))
 		item.host.ipmi_authtype = atoi(tmp);
 	else
-		item.host.ipmi_authtype = atoi(DBget_field(table_hosts, "ipmi_authtype")->default_value);
+		item.host.ipmi_authtype = atoi(zbx_db_get_field(table_hosts, "ipmi_authtype")->default_value);
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_PRIVILEGE, table_hosts, "ipmi_privilege",
 			&item.host.ipmi_privilege);
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_USERNAME, table_hosts, "ipmi_username",

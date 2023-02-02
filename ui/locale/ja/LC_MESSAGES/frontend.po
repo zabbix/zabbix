@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-06 13:59+0000\n"
+"PO-Revision-Date: 2023-01-08 02:32+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -1048,6 +1048,10 @@ msgstr "高度な設定"
 #: include/views/monitoring.sysmap.edit.php:160
 msgid "Advanced labels"
 msgstr "拡張ラベル"
+
+#: app/views/popup.import.php:175
+msgid "Advanced options"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -4784,6 +4788,24 @@ msgstr "座標"
 #: jsLoader.php:164 jsLoader.php:281
 msgid "Copy"
 msgstr "コピー"
+
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] ""
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] ""
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] ""
 
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
@@ -12247,6 +12269,14 @@ msgid "Map update failed."
 msgstr "マップの更新に失敗しました。"
 
 #: app/views/popup.ldap.edit.php:257
+msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:513
+msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:257
 msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
 msgstr "通知を送信するために、ユーザーのLDAPのメディア属性(電子メールなど)をZabbixのユーザーメディアにマップします。"
 
@@ -12395,6 +12425,10 @@ msgstr "最大繰り返し回数"
 #: app/partials/configuration.host.interface.row.php:106
 msgid "Max repetition count is applicable to discovery and snmp.walk only."
 msgstr "最大繰り返し回数は、検出とsnmp.walkにのみ適用されます。"
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and walk only."
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -20383,6 +20417,10 @@ msgstr "更新しました"
 msgid "Updated status of host \"%1$s\"."
 msgstr "ホスト\"%1$s\"のステータスを更新しました。"
 
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr ""
+
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
 msgstr "アップロード"
@@ -23174,7 +23212,7 @@ msgstr "UTF-8のバイトシーケンスが正しくありません"
 
 #: include/validate.inc.php:190
 msgid "invalid data type"
-msgstr ""
+msgstr "データタイプが正しくありません"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"

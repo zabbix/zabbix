@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -299,7 +299,7 @@ static void	DCdump_host_inventories(void)
 
 		for (j = 0; j < HOST_INVENTORY_FIELD_COUNT; j++)
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "  %s: '%s'", DBget_inventory_field(j + 1),
+			zabbix_log(LOG_LEVEL_TRACE, "  %s: '%s'", zbx_db_get_inventory_field(j + 1),
 					host_inventory->values[j]);
 		}
 	}

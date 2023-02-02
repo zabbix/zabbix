@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -157,7 +157,7 @@ static void	proxyconfig_add_row(struct zbx_json *j, const DB_ROW row, const ZBX_
 			case ZBX_TYPE_INT:
 			case ZBX_TYPE_UINT:
 			case ZBX_TYPE_ID:
-				if (SUCCEED != DBis_null(row[fld]))
+				if (SUCCEED != zbx_db_is_null(row[fld]))
 					zbx_json_addstring(j, NULL, row[fld], ZBX_JSON_TYPE_INT);
 				else
 					zbx_json_addstring(j, NULL, NULL, ZBX_JSON_TYPE_NULL);
@@ -237,7 +237,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	table = DBget_table(table_name);
+	table = zbx_db_get_table(table_name);
 	zbx_json_addobject(j, table->table);
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
@@ -254,7 +254,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 			goto end;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 		offset = 1;
 	}
 	else
@@ -263,7 +263,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by ");
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, table->recid);
 
-	if (NULL == (result = DBselect("%s", sql)))
+	if (NULL == (result = zbx_db_select("%s", sql)))
 	{
 		*error = zbx_dsprintf(*error, "failed to get data from table \"%s\"", table->table);
 		goto out;
@@ -271,7 +271,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s", table->table);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_keys_path_t	*keys_path, keys_path_local;
 		unsigned char	type;
@@ -331,7 +331,7 @@ next:
 		zbx_free(key);
 		zbx_free(path);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 end:
 	zbx_json_close(j);
 	zbx_json_close(j);
@@ -377,7 +377,7 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	table = DBget_table(table_name);
+	table = zbx_db_get_table(table_name);
 	zbx_json_addobject(j, table->table);
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
@@ -396,7 +396,7 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 			if (NULL != key_ids)
 			{
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, keyword);
-				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, key_name, key_ids->values,
+				zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, key_name, key_ids->values,
 						key_ids->values_num);
 				keyword = " and";
 			}
@@ -411,7 +411,7 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by ");
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, table->recid);
 
-		if (NULL == (result = DBselect("%s", sql)))
+		if (NULL == (result = zbx_db_select("%s", sql)))
 		{
 			*error = zbx_dsprintf(*error, "failed to get data from table \"%s\"", table->table);
 			goto out;
@@ -419,13 +419,13 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s", table->table);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			zbx_json_addarray(j, NULL);
 			proxyconfig_add_row(j, row, table, recids);
 			zbx_json_close(j);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_json_close(j);
@@ -522,7 +522,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 	zbx_hashset_create(&items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_proxyconfig_dep_item_ptr_create(&dep_items);
 
-	table = DBget_table("items");
+	table = zbx_db_get_table("items");
 
 	/* get type, key_ field indexes used to check if item is processed by server */
 	for (i = 0, fld = 1; 0 != table->fields[i].name; i++)
@@ -555,11 +555,11 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 	if (0 != hostids->values_num)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s where", table->table);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and flags<>%d and type<>%d",
 				ZBX_FLAG_DISCOVERY_PROTOTYPE, ITEM_TYPE_CALCULATED);
 
-		if (NULL == (result = DBselect("%s", sql)))
+		if (NULL == (result = zbx_db_select("%s", sql)))
 		{
 			*error = zbx_dsprintf(*error, "failed to get data from table \"%s\"", table->table);
 			goto out;
@@ -567,7 +567,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s", table->table);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			unsigned char	type;
 
@@ -592,7 +592,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 				zbx_vector_proxyconfig_dep_item_ptr_append(&dep_items, dep_item);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		/* add dependent items processed by proxy */
 		if (0 != dep_items.values_num)
@@ -914,7 +914,7 @@ static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_conf
 
 	if (0 != flags)
 	{
-		DBbegin();
+		zbx_db_begin();
 
 		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_HOSTS) &&
 				SUCCEED != proxyconfig_get_host_data(&updated_hostids, j, error))
@@ -1009,7 +1009,7 @@ static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_conf
 	ret = SUCCEED;
 out:
 	if (0 != flags)
-		DBcommit();
+		zbx_db_commit();
 
 	zbx_vector_ptr_clear_ext(&keys_paths, key_path_free);
 	zbx_vector_ptr_destroy(&keys_paths);
@@ -1119,7 +1119,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != get_active_proxy_from_request(jp, &proxy, &error))
+	if (SUCCEED != zbx_get_active_proxy_from_request(jp, &proxy, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data request from active proxy at"
 				" \"%s\": %s", sock->peer, error);

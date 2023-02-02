@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -283,7 +283,7 @@ void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t s
 
 	while (data < end)
 	{
-		ZBX_DB_SERVICE	*service, service_local;
+		zbx_db_service	*service, service_local;
 		int		values_num, i;
 
 		data += zbx_deserialize_value(data, &service_local.serviceid);

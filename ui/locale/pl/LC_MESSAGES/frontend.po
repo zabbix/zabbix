@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-01 22:59+0000\n"
+"PO-Revision-Date: 2023-01-27 19:48+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -1092,6 +1092,10 @@ msgstr "Ustawienia zaawansowane"
 #: include/views/monitoring.sysmap.edit.php:160
 msgid "Advanced labels"
 msgstr "Zaawansowane etykiety"
+
+#: app/views/popup.import.php:175
+msgid "Advanced options"
+msgstr "Opcje zaawansowane"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -3540,42 +3544,42 @@ msgstr "Nie można ustawić \"%1$s\" dla pozycji \"%2$s\"."
 #: include/classes/api/services/CItemGeneral.php:2237
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "Nie można ustawić zależności dla reguły LLD z kluczem \"%1$s\" od pozycji nadrzędnej z kluczem \"%2$s\" na hoście \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2236
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "Nie można ustawić zależności dla reguły LLD z kluczem \"%1$s\" od pozycji nadrzędnej z kluczem \"%2$s\" na szablpnie \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2231
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "Nie można ustawić zależności dla prototypu pozycji z kluczem \"%1$s\" od prototypu pozycji nadrzędnej z kluczem \"%2$s\" na hoście \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2230
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "Nie można ustawić zależności dla prototypu pozycji z kluczem \"%1$s\" od prototypu pozycji nadrzędnej z kluczem \"%2$s\" na szablonie \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2226
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "Nie można ustawić zależności dla prototypu pozycji z kluczem \"%1$s\" od pozycji nadrzędnej z kluczem \"%2$s\" na hoście \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2225
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "Nie można ustawić zależności dla prototypu pozycji z kluczem \"%1$s\" od pozycji nadrzędnej z kluczem \"%2$s\" na szablonie \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2220
 #, c-format
 msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "Nie można ustawić zależności dla pozycji z kluczem \"%1$s\" od pozycji nadrzędnej z kluczem \"%2$s\" na hoście \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2219
 #, c-format
 msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "Nie można ustawić zależności dla pozycji z kluczem \"%1$s\" od pozycji nadrzędnej z kluczem \"%2$s\" na szablonie \"%3$s\": %4$s."
 
 #: include/classes/api/services/CHost.php:1037
 #: include/classes/api/services/CHost.php:2015
@@ -4098,7 +4102,7 @@ msgstr "Zmiana na sekundę"
 
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
-msgstr ""
+msgstr "Zmień ranking problemów"
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4928,11 +4932,11 @@ msgstr "Konwertuj do JSON"
 
 #: app/views/popup.acknowledge.edit.php:134
 msgid "Convert to cause"
-msgstr ""
+msgstr "Konwertuj na przyczynę"
 
 #: app/views/popup.acknowledge.edit.php:135
 msgid "Converts a symptom event back to cause event"
-msgstr ""
+msgstr "Konwertuje zdarzenie objawu z powrotem na zdarzenie przyczyny"
 
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
@@ -4946,6 +4950,30 @@ msgstr "Współrzędne"
 #: jsLoader.php:164 jsLoader.php:281
 msgid "Copy"
 msgstr "Skopiuj"
+
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] "Kopiuj %1$s wykres"
+msgstr[1] "Kopiuj %1$s wykresy"
+msgstr[2] "Kopiuj %1$s wykresów"
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] "Kopiuj %1$s podmiot"
+msgstr[1] "Kopiuj %1$s podmioty"
+msgstr[2] "Kopiuj %1$s podmiotów"
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] "Kopiuj %1$s wyzwalacz"
+msgstr[1] "Kopiuj %1$s wyzwalacze"
+msgstr[2] "Kopiuj %1$s wyzwalaczy"
 
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
@@ -5297,11 +5325,11 @@ msgstr "Bieżący host"
 #: app/controllers/CControllerUserUpdateGeneral.php:85
 #: app/views/administration.user.edit.php:174
 msgid "Current password"
-msgstr ""
+msgstr "Bieżące hasło"
 
 #: include/classes/api/services/CUser.php:474
 msgid "Current password is mandatory."
-msgstr ""
+msgstr "Podanie bieżącego hasła jest wymagane."
 
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
@@ -5542,7 +5570,7 @@ msgstr "Dane zapisane"
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
 msgid "Data set label"
-msgstr ""
+msgstr "Etykieta zestawu danych"
 
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
@@ -5971,7 +5999,7 @@ msgstr "Usunąć wybrane SLA?"
 
 #: app/views/js/action.list.js.php:124
 msgid "Delete selected action?"
-msgstr ""
+msgstr "Usunąć wybraną akcję?"
 
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
@@ -6278,7 +6306,7 @@ msgstr "Opis"
 
 #: include/classes/data/CItemData.php:1167
 msgid "Detailed listing of installed packages. Returns text in JSON format"
-msgstr ""
+msgstr "Szczegółowa lista zainstalowanych pakietów. Zwraca tekst w formacie JSON"
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
@@ -6402,7 +6430,7 @@ msgstr "Wyłączyć wybrane SLA?"
 
 #: app/views/js/action.list.js.php:109
 msgid "Disable selected action?"
-msgstr ""
+msgstr "Wyłączyć wybraną akcję?"
 
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
@@ -7113,7 +7141,7 @@ msgstr "Włącz autentykację HTTP"
 
 #: app/views/js/administration.authentication.edit.js.php:140
 msgid "Enable HTTP authentication for all users."
-msgstr ""
+msgstr "Włącz uwierzytelnienie HTTP dla wszystkich użytkowników."
 
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
@@ -7205,7 +7233,7 @@ msgstr "Włączyć wybrane SLA?"
 
 #: app/views/js/action.list.js.php:94
 msgid "Enable selected action?"
-msgstr ""
+msgstr "Włączyć wybraną akcję?"
 
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
@@ -7897,7 +7925,7 @@ msgstr "Pole \"%1$s\" musi być puste."
 #: include/views/js/item.preprocessing.js.php:164
 #: include/views/js/item.preprocessing.js.php:210
 msgid "Field name"
-msgstr ""
+msgstr "Nazwa pola"
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -8496,11 +8524,11 @@ msgstr "Dodano grupę"
 
 #: app/views/popup.ldap.edit.php:134
 msgid "Group base DN"
-msgstr ""
+msgstr "Bazowe DN grupy"
 
 #: app/views/popup.ldap.edit.php:122
 msgid "Group configuration"
-msgstr ""
+msgstr "Konfiguracja grupy"
 
 #: hostgroups.php:134 hostgroups.php:155
 msgid "Group deleted"
@@ -8511,7 +8539,7 @@ msgstr[2] "Usunięto grupy"
 
 #: app/views/popup.ldap.edit.php:182
 msgid "Group filter"
-msgstr ""
+msgstr "Filtr grupy"
 
 #: app/views/administration.miscconfig.edit.php:40
 msgid "Group for discovered hosts"
@@ -8519,7 +8547,7 @@ msgstr "Grupa dla wykrytych hostów"
 
 #: app/views/popup.ldap.edit.php:156
 msgid "Group member attribute"
-msgstr ""
+msgstr "Atrybut członka grupy"
 
 #: app/views/administration.usergroup.edit.php:43 hostgroups.php:36
 #: include/views/configuration.hostgroups.edit.php:38
@@ -8529,7 +8557,7 @@ msgstr "Nazwa grupy"
 #: app/views/administration.authentication.edit.php:427
 #: app/views/popup.ldap.edit.php:148
 msgid "Group name attribute"
-msgstr ""
+msgstr "Atrybut nazwy grupy"
 
 #: include/classes/api/services/CHostPrototype.php:1165
 #, c-format
@@ -9617,7 +9645,7 @@ msgstr "Niemożliwe filtrowanie przez pole inwenatrza \"%1$s\", które nie istni
 #: app/views/js/administration.user.edit.js.php:61
 #: app/views/js/administration.userprofile.edit.js.php:69
 msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
-msgstr ""
+msgstr "W przypadku udanej zmiany hasła, użytkownik zostanie wylogowany ze wszystkich aktywnych sesji. Kontynuować?"
 
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
@@ -9638,7 +9666,7 @@ msgstr "Niedostępne SLA"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:452
 msgid "Inaccessible action"
-msgstr ""
+msgstr "Akcja niedostępna"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
@@ -9691,7 +9719,7 @@ msgstr "Nieosiągalna mapa"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:453
 msgid "Inaccessible media type"
-msgstr ""
+msgstr "Niedostępny typ mediów"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
@@ -9727,22 +9755,22 @@ msgstr "Niedostępna grupa użytkowników"
 
 #: jsLoader.php:147 jsLoader.php:175
 msgid "Inaccessible widget"
-msgstr ""
+msgstr "Niedostępny widżet"
 
 #: app/controllers/CControllerDashboardWidgetCheck.php:52
 #: app/controllers/CControllerDashboardWidgetEdit.php:65
 #: include/classes/helpers/CDashboardHelper.php:453
 #: include/classes/helpers/CDashboardHelper.php:461
 msgid "Inaccessible widget type."
-msgstr ""
+msgstr "Niedostępny typ widżetu."
 
 #: jsLoader.php:138
 msgid "Inaccessible widgets were not copied."
-msgstr ""
+msgstr "Niedostępne widżety nie zostały skopiowane."
 
 #: jsLoader.php:139
 msgid "Inaccessible widgets were not pasted."
-msgstr ""
+msgstr "Niedostępne widżety nie zostały wklejone."
 
 #: app/partials/js/scheduledreport.subscription.js.php:165
 #: app/partials/js/scheduledreport.subscription.js.php:181
@@ -9993,7 +10021,7 @@ msgstr "Błędne warunki dla reguły wykrywania \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:468
 msgid "Incorrect current password."
-msgstr ""
+msgstr "Bieżące hasło jest nieprawidłowe."
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -12463,6 +12491,14 @@ msgid "Map update failed."
 msgstr "Aktualizacja mapy nieudana."
 
 #: app/views/popup.ldap.edit.php:257
+msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:513
+msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:257
 msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
 msgstr ""
 
@@ -12508,7 +12544,7 @@ msgstr "Marzec"
 
 #: jsLoader.php:361
 msgid "Mark as cause"
-msgstr ""
+msgstr "Oznacz jako przyczynę"
 
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
@@ -12524,7 +12560,7 @@ msgstr "Zaznacz wybrane"
 
 #: jsLoader.php:362
 msgid "Mark selected as symptoms"
-msgstr ""
+msgstr "Oznacz zaznaczone jako objawy"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -12606,10 +12642,14 @@ msgstr "Maksymalny okres dla wyboru czasu"
 #: app/partials/configuration.host.interface.row.php:105
 #: app/views/popup.itemtestedit.view.php:154
 msgid "Max repetition count"
-msgstr ""
+msgstr "Maksymalna ilość powtórzeń"
 
 #: app/partials/configuration.host.interface.row.php:106
 msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and walk only."
 msgstr ""
 
 #: app/views/administration.geomaps.edit.php:98
@@ -12673,7 +12713,7 @@ msgstr "Typ mediów"
 #: widgets/actionlog/views/widget.view.php:41
 msgctxt "compact table header"
 msgid "Media type"
-msgstr ""
+msgstr "Typ mediów"
 
 #: include/classes/api/services/CMediatype.php:408
 #, c-format
@@ -12713,7 +12753,7 @@ msgstr[2] "Włączono typy mediów"
 #: app/views/popup.ldap.edit.php:255
 #: app/views/popup.mediatypemapping.edit.php:85
 msgid "Media type mapping"
-msgstr ""
+msgstr "Mapowanie typów mediów"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -13362,7 +13402,7 @@ msgstr "Imię"
 
 #: app/views/administration.authentication.edit.php:520
 msgid "Name "
-msgstr ""
+msgstr "Imię"
 
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
@@ -13378,7 +13418,7 @@ msgstr "Przestrzeń nazw"
 
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "Naming requirements:"
-msgstr ""
+msgstr "Wymagania co do nazewnictwa:"
 
 #: jsLoader.php:189
 msgid "Navigate to default view"
@@ -13457,7 +13497,7 @@ msgstr "Nowe SLA"
 #: app/views/js/popup.action.edit.js.php:413
 #: app/views/popup.action.edit.php:302
 msgid "New action"
-msgstr ""
+msgstr "Nowa akcja"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
@@ -13511,7 +13551,7 @@ msgstr "Nowa grupa hostów"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
-msgstr ""
+msgstr "Nowe mapowanie typów mediów"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -13544,7 +13584,7 @@ msgstr "Nowe wyzwalacze"
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
-msgstr ""
+msgstr "Nowe mapowanie grup użytkowników"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -14392,14 +14432,14 @@ msgstr "OEM"
 
 #: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
 msgid "OID"
-msgstr ""
+msgstr "OID"
 
 #: include/forms.inc.php:1477 include/forms.inc.php:1507
 #: include/views/js/item.preprocessing.js.php:154
 #: include/views/js/item.preprocessing.js.php:169
 #: include/views/js/item.preprocessing.js.php:215
 msgid "OID prefix"
-msgstr ""
+msgstr "Prefiks OID"
 
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
@@ -14611,7 +14651,7 @@ msgstr "Informacje o systemie operacyjnym. Zwraca ciąg znaków"
 
 #: include/classes/data/CItemData.php:1165
 msgid "Operating system version information. Returns JSON"
-msgstr ""
+msgstr "Informacje o systemie operacyjnym. Zwraca JSON"
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -15103,7 +15143,7 @@ msgstr "Czas wyświetlania strony"
 
 #: include/classes/core/ZBase.php:565
 msgid "Page not found"
-msgstr ""
+msgstr "Nie znaleziono strony"
 
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
 #: include/validate.inc.php:435
@@ -15249,7 +15289,7 @@ msgstr "Hasło (ponownie)"
 
 #: app/views/administration.user.edit.php:199
 msgid "Password can only be changed for users using the internal Zabbix authentication."
-msgstr ""
+msgstr "Hasło może zostać zmienione wyłącznie dla użytkowników korzystających z wewnętrznego mechanizmu uwierzytelniającego Zabbix."
 
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
@@ -16105,11 +16145,11 @@ msgstr ""
 
 #: app/views/reports.actionlog.list.csv.php:40
 msgid "Recipient's name"
-msgstr ""
+msgstr "Imię odbiorcy"
 
 #: app/views/reports.actionlog.list.csv.php:41
 msgid "Recipient's surname"
-msgstr ""
+msgstr "Nazwisko odbiorcy"
 
 #: include/views/administration.auditacts.list.php:32
 msgid "Recipients"
@@ -16899,7 +16939,7 @@ msgstr "N"
 #: app/views/administration.user.list.php:225
 #: app/views/popup.usergroupmapping.edit.php:77
 msgid "SAML"
-msgstr ""
+msgstr "SAML"
 
 #: app/views/administration.authentication.edit.php:483
 msgid "SAML group pattern"
@@ -17414,7 +17454,7 @@ msgstr "Pusty wzorzec wyszukiwania"
 #: app/views/reports.actionlog.list.php:108
 #: widgets/actionlog/includes/WidgetForm.php:61
 msgid "Search string"
-msgstr ""
+msgstr "Znajdź frazę"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
@@ -17584,7 +17624,7 @@ msgstr "Wysłano"
 #: app/controllers/CControllerActionLogList.php:210
 #: widgets/actionlog/includes/WidgetForm.php:56
 msgid "Sent/Executed"
-msgstr ""
+msgstr "Wysłano/Wykonano"
 
 #: include/func.inc.php:244
 msgid "Sep"
@@ -18004,7 +18044,7 @@ msgstr "Pokaż wstrzymane problemy"
 #: app/partials/monitoring.problem.filter.php:129
 #: widgets/problems/includes/WidgetForm.php:120
 msgid "Show symptoms"
-msgstr ""
+msgstr "Pokaż objawy"
 
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
@@ -18678,7 +18718,7 @@ msgstr "Zmiana metody uwierzytelniania spowoduje zresetowanie wszystkich sesji p
 #: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
 #: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
 msgid "Symptom"
-msgstr ""
+msgstr "Objaw"
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -19328,7 +19368,7 @@ msgstr "To pole jest automatycznie uzupełniane przez element \"%1$s\"."
 
 #: include/classes/scim/API.php:77
 msgid "This filter is not supported"
-msgstr ""
+msgstr "Ten filtr nie jest wspierany"
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:82
 msgid "This is the test message from Zabbix"
@@ -20143,7 +20183,7 @@ msgstr "NIEZNANE"
 
 #: include/events.inc.php:336 include/events.inc.php:343
 msgid "UPDATING"
-msgstr ""
+msgstr "AKTUALIZACJA"
 
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
@@ -20655,6 +20695,10 @@ msgstr "Zaktualizowano"
 msgid "Updated status of host \"%1$s\"."
 msgstr "Zaktualizowano stan hosta \"%1$s\"."
 
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr ""
+
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
 msgstr "Wyślij"
@@ -20827,11 +20871,11 @@ msgstr ""
 
 #: app/views/administration.user.list.php:211
 msgid "User does not have user groups."
-msgstr ""
+msgstr "Użytkownik nie należy do grupy użytkowników."
 
 #: app/views/administration.user.list.php:232
 msgid "User does not have user role."
-msgstr ""
+msgstr "Użytkownik nie posiada roli użytkownika."
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -20887,7 +20931,7 @@ msgstr "Grupa użytkowników dla wiadomości o wyłączeniu bazy danych"
 #: app/views/popup.ldap.edit.php:226
 #: app/views/popup.usergroupmapping.edit.php:126
 msgid "User group mapping"
-msgstr ""
+msgstr "Mapowanie grup użytkowników"
 
 #: app/views/popup.ldap.edit.php:196
 msgid "User group membership attribute"
@@ -20933,7 +20977,7 @@ msgstr "Użytkownik nie może siebie usunąć."
 #: app/views/administration.authentication.edit.php:457
 #: app/views/popup.ldap.edit.php:218
 msgid "User last name attribute"
-msgstr ""
+msgstr "Atrybut nazwiska użytkownika"
 
 #: include/classes/widgets/views/widget.item.form.view.php:64
 msgid "User macros"
@@ -20957,7 +21001,7 @@ msgstr "Nazwa użytkownika"
 #: app/views/administration.authentication.edit.php:443
 #: app/views/popup.ldap.edit.php:210
 msgid "User name attribute"
-msgstr ""
+msgstr "Atrybut nazwy użytkownika"
 
 #: app/views/administration.authentication.edit.php:206
 msgid "User password"
@@ -23834,7 +23878,7 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:3653
 msgid "must have at least one interval greater than 0"
-msgstr ""
+msgstr "przynajmniej jeden z interwałów musi być większy niż 0"
 
 #: app/views/administration.authentication.edit.php:98
 #: app/views/administration.user.edit.php:150

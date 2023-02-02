@@ -1,9 +1,6 @@
-//go:build (linux && arm) || (linux && ppc64le) || (linux && s390x)
-// +build linux,arm linux,ppc64le linux,s390x
-
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,16 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package uname
+package util
 
-func arrayToString(unameArray *[65]uint8) string {
+func UnameArrayToString[T ~int8 | ~uint8](unameArray *[65]T) string {
 	var byteString [65]byte
 	var indexLength int
 	for ; indexLength < len(unameArray); indexLength++ {
 		if 0 == unameArray[indexLength] {
 			break
 		}
-		byteString[indexLength] = uint8(unameArray[indexLength])
+		byteString[indexLength] = byte(unameArray[indexLength])
 	}
+
 	return string(byteString[:indexLength])
 }
