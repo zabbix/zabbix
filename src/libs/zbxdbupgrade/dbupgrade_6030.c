@@ -1548,14 +1548,14 @@ static int	DBpatch_6030161(void)
 	return ret;
 }
 
-static void	substitute_macro(const char *in, const char *oldmacro, const char *newmacro, char **out,
+static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out,
 		size_t *out_alloc)
 {
 	zbx_token_t	token;
 	int		pos = 0;
-	size_t		out_offset = 0, newmacro_len;
+	size_t		out_offset = 0, macrovalue_len;
 
-	newmacro_len = strlen(newmacro);
+	macrovalue_len = strlen(macrovalue);
 	zbx_strcpy_alloc(out, out_alloc, &out_offset, in);
 	out_offset++;
 
@@ -1563,10 +1563,10 @@ static void	substitute_macro(const char *in, const char *oldmacro, const char *n
 	{
 		pos = token.loc.r;
 
-		if (0 == strncmp(*out + token.loc.l, oldmacro, token.loc.r - token.loc.l + 1))
+		if (0 == strncmp(*out + token.loc.l, macro, token.loc.r - token.loc.l + 1))
 		{
 			pos += zbx_replace_mem_dyn(out, out_alloc, &out_offset, token.loc.l,
-					token.loc.r - token.loc.l + 1, newmacro, newmacro_len);
+					token.loc.r - token.loc.l + 1, macrovalue, macrovalue_len);
 		}
 	}
 }
