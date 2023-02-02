@@ -21,6 +21,7 @@
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
+#include "zbxeval.h"
 
 /*
  * 6.4 development database patches
@@ -1547,12 +1548,121 @@ static int	DBpatch_6030161(void)
 	return ret;
 }
 
+static void	substitute_macro(const char *in, const char *oldmacro, const char *newmacro, char **out,
+		size_t *out_alloc)
+{
+	zbx_token_t	token;
+	int		pos = 0;
+	size_t		out_offset = 0, newmacro_len;
+
+	newmacro_len = strlen(newmacro);
+	zbx_strcpy_alloc(out, out_alloc, &out_offset, in);
+	out_offset++;
+
+	for (; SUCCEED == zbx_token_find(*out, pos, &token, ZBX_TOKEN_SIMPLE_MACRO); pos++)
+	{
+		pos = token.loc.r;
+
+		if (0 == strncmp(*out + token.loc.l, oldmacro, token.loc.r - token.loc.l + 1))
+		{
+			pos += zbx_replace_mem_dyn(out, out_alloc, &out_offset, token.loc.l,
+					token.loc.r - token.loc.l + 1, newmacro, newmacro_len);
+		}
+	}
+}
+
+static void	get_mediatype_params(zbx_uint64_t mediatypeid, const char *sendto, const char *subject,
+		const char *message, char **params)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	struct zbx_json		json;
+	char			*value;
+	size_t			value_alloc = 0;
+
+	result = zbx_db_select(
+			"select value"
+			" from media_type_param"
+				" where mediatypeid=" ZBX_FS_UI64
+			" order by sortorder",
+			mediatypeid);
+
+	zbx_json_initarray(&json, 1024);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		char	*param = NULL;
+
+		param = zbx_strdup(param, row[0]);
+		substitute_macro(param, "{ALERT.SENDTO}", sendto, &value, &value_alloc);
+
+		param = zbx_strdup(param, value);
+		substitute_macro(param, "{ALERT.SUBJECT}", subject, &value, &value_alloc);
+
+		param = zbx_strdup(param, value);
+		substitute_macro(param, "{ALERT.MESSAGE}", message, &value, &value_alloc);
+
+		zbx_free(param);
+
+		zbx_json_addstring(&json, NULL, value, ZBX_JSON_TYPE_STRING);
+	}
+
+	zbx_db_free_result(result);
+
+	zbx_free(value);
+
+	*params = zbx_strdup(NULL, json.buffer);
+
+	zbx_json_free(&json);
+}
+
 static int	DBpatch_6030162(void)
 {
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG TODO: for existing alerts that are not sent, generate alerts.parameters"
-			" by resolving ALERT.SENDTO, ALERT.SUBJECT and ALERT.MESSAGE macros from media_type.exec_params");
+	int	ret = FAIL;
 
-	return SUCCEED;
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* select alerts of Script Mediatype that aren't sent */
+	DB_RESULT	result = zbx_db_select(
+			"select a.alertid,m.mediatypeid,a.sendto,a.subject,a.message"
+			" from alerts a,media_type m"
+			" where a.mediatypeid=m.mediatypeid"
+				" and a.status in (0,3)"
+				" and m.type=1"
+			" order by a.mediatypeid");
+
+	DB_ROW		row;
+
+	/* set their parameters according to how we now store them */
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	alertid, mediatypeid;
+		char		*params, *params_esc;
+
+		ZBX_STR2UINT64(alertid, row[0]);
+		ZBX_STR2UINT64(mediatypeid, row[1]);
+
+		get_mediatype_params(mediatypeid, row[2], row[3], row[4], &params);
+
+		params_esc = zbx_db_dyn_escape_field("alerts", "parameters", params);
+
+		zbx_free(params);
+
+		int	rv = zbx_db_execute("update alerts set parameters='%s' where alertid=" ZBX_FS_UI64,
+				params_esc, alertid);
+
+		zbx_free(params_esc);
+
+		if (ZBX_DB_OK > rv)
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_db_free_result(result);
+
+	return ret;
 }
 
 static int	DBpatch_6030163(void)
