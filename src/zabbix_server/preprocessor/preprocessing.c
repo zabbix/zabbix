@@ -1308,7 +1308,6 @@ static zbx_uint32_t	preprocessor_unpack_dep_result(const unsigned char *data, zb
 	offset += zbx_deserialize_value(offset, &result->flags);
 	offset += zbx_deserialize_value(offset, &result->value_type);
 	offset += preprocesser_unpack_variant(offset, &value);
-
 	offset += zbx_deserialize_str(offset, &result->error, error_len);
 
 	zbx_vector_ptr_create(&result->history);
