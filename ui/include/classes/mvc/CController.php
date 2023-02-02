@@ -181,6 +181,19 @@ abstract class CController {
 	}
 
 	/**
+	 * Validate session ID (SID).
+	 *
+	 * @deprecated
+	 */
+	protected function disableSIDvalidation() {
+		$this->validate_csrf_token = false;
+		trigger_error(
+			_s('Method %1$s is deprecated, use %2$s instead.', 'disableSIDvalidation', 'disableCsrfValidation'),
+			E_USER_DEPRECATED
+		);
+	}
+
+	/**
 	 * @return array
 	 */
 	private static function getFormInput(): array {
