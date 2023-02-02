@@ -71,12 +71,15 @@ class CControllerMaintenanceList extends CController {
 		];
 
 		$filter['groups'] = $filter['groups']
-			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => $filter['groups'],
-				'editable' => true,
-				'preservekeys' => true
-			]), ['groupid' => 'id'])
+			? CArrayHelper::renameObjectsKeys(
+				API::HostGroup()->get([
+					'output' => ['groupid', 'name'],
+					'groupids' => $filter['groups'],
+					'editable' => true,
+					'preservekeys' => true
+				]),
+				['groupid' => 'id']
+			)
 			: [];
 
 		$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
@@ -96,7 +99,9 @@ class CControllerMaintenanceList extends CController {
 
 		$options = [
 			'output' => ['maintenanceid', 'name', 'maintenance_type', 'active_since', 'active_till', 'description'],
-			'search' => ['name' => $filter['name'] === '' ? null : $filter['name']],
+			'search' => [
+				'name' => $filter['name'] !== '' ? $filter['name'] : null
+			],
 			'groupids' => $filter_groupids,
 			'editable' => true,
 			'sortfield' => $sort_field,
@@ -146,8 +151,8 @@ class CControllerMaintenanceList extends CController {
 	}
 
 	private function deleteProfiles(): void {
-			CProfile::delete('web.maintenance.filter_name');
-			CProfile::delete('web.maintenance.filter_status');
-			CProfile::deleteIdx('web.maintenance.filter_groups');
+		CProfile::delete('web.maintenance.filter_name');
+		CProfile::delete('web.maintenance.filter_status');
+		CProfile::deleteIdx('web.maintenance.filter_groups');
 	}
 }
