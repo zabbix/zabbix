@@ -1394,12 +1394,6 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'exec_params' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
 			'maxsessions' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -1498,6 +1492,12 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
 				'default' => ''
+			],
+			'sortorder' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
