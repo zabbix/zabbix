@@ -1709,7 +1709,7 @@ abstract class CItemGeneralOld extends CApiService {
 						}
 
 						if (!in_array($params[1], [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX,
-								ZBX_PREPROC_SNMP_MAC_FROM_HEX])) {
+								ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('incorrect value'))
 							);
@@ -1745,7 +1745,7 @@ abstract class CItemGeneralOld extends CApiService {
 							// Field "Treat as" every 3rd value. Check that field is correct.
 							if ($n % 3 === 0) {
 								if (!in_array($param, [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX,
-										ZBX_PREPROC_SNMP_MAC_FROM_HEX])) {
+										ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
 										_s('Incorrect value for field "%1$s": %2$s.', 'params', _('incorrect value'))
 									);

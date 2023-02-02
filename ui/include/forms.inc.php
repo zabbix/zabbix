@@ -1450,7 +1450,8 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 						->addOptions([
 							new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
 							new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
-							new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING'))
+							new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+							new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
 						])
 						->setReadonly($readonly)
 				];
@@ -1482,7 +1483,8 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 									->addOptions([
 										new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
 										new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
-										new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING'))
+										new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+										new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
 									])
 									->setReadonly($readonly)
 							),
