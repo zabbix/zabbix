@@ -64,6 +64,7 @@
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
 #include "../zabbix_server/preprocessor/preproc_stats.h"
+#include "../zabbix_server/ipmi/ipmi_manager.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
