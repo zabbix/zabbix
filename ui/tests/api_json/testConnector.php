@@ -335,7 +335,7 @@ class testConnector extends CAPITest {
 					'url' => 'http://localhost/',
 					'max_attempts' => self::INVALID_NUMBER
 				],
-				'expected_error' => 'Invalid parameter "/1/max_attempts": value must be one of 0-5.'
+				'expected_error' => 'Invalid parameter "/1/max_attempts": value must be one of 1-5.'
 			],
 
 			// Check "timeout".
@@ -1544,7 +1544,7 @@ class testConnector extends CAPITest {
 					'connectorid' => 'update_custom_defaults',
 					'max_attempts' => self::INVALID_NUMBER
 				],
-				'expected_error' => 'Invalid parameter "/1/max_attempts": value must be one of 0-5.'
+				'expected_error' => 'Invalid parameter "/1/max_attempts": value must be one of 1-5.'
 			],
 
 			// Check "timeout".
