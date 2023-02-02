@@ -69,7 +69,7 @@ static void	sm_sync_unlock(void *data)
 
 #ifndef _WINDOWS
 
-int	selfmon_is_process_monitored(unsigned char proc_type)
+static int	selfmon_is_process_monitored(unsigned char proc_type)
 {
 	switch (proc_type)
 	{
