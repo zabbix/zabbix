@@ -251,6 +251,7 @@ void	zbx_mock_test_entry(void **state)
 	int				mib_translation_case = 0;
 
 	preproc_init_snmp();
+	pp_context_init(&ctx);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
 		mib_translation_case = 1;
