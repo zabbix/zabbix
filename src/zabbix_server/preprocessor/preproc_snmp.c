@@ -477,7 +477,7 @@ static int	preproc_parse_value_from_walk_params(const char *params, char **oid_n
 static int	preproc_snmp_convert_hex_value(char **value, int format, char **error)
 {
 #define ZBX_PREPROC_SNMP_UTF8_FROM_HEX	1
-#define ZBX_PREPROC_SNMP_UTF8_FROM_MAC	2
+#define ZBX_PREPROC_SNMP_MAC_FROM_HEX	2
 	char	*out = NULL;
 
 	switch (format)
@@ -491,7 +491,7 @@ static int	preproc_snmp_convert_hex_value(char **value, int format, char **error
 			}
 
 			break;
-		case ZBX_PREPROC_SNMP_UTF8_FROM_MAC:
+		case ZBX_PREPROC_SNMP_MAC_FROM_HEX:
 			if (SUCCEED != snmp_hex_to_mac_dyn(*value, &out))
 			{
 				*error = zbx_dsprintf(NULL, "Cannot convert hex value '%s' to mac address",
@@ -507,8 +507,8 @@ static int	preproc_snmp_convert_hex_value(char **value, int format, char **error
 	*value = out;
 
 	return SUCCEED;
+#undef ZBX_PREPROC_SNMP_MAC_FROM_HEX
 #undef ZBX_PREPROC_SNMP_UTF8_FROM_HEX
-#undef ZBX_PREPROC_SNMP_UTF8_FROM_MAC
 }
 
 /******************************************************************************

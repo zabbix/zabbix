@@ -1448,9 +1448,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 						->setValue($step_param_1_value)
 						->setAdaptiveWidth(202)
 						->addOptions([
-							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
-							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
-							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+							new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
+							new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+							new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING'))
 						])
 						->setReadonly($readonly)
 				];
@@ -1480,9 +1480,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 									->setValue($step['params'][$j + 2])
 									->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
 									->addOptions([
-										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
-										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
-										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+										new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
+										new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+										new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING'))
 									])
 									->setReadonly($readonly)
 							),
