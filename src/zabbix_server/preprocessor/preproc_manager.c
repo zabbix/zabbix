@@ -612,7 +612,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			timeout.ns = PP_MANAGER_DELAY_NS;
 		}
 
-		if (0 == pending_num || 1 < time_now - time_flush)
+		if (0 == pending_num || 1 < sec - time_flush)
 		{
 			dc_flush_history();
 			time_flush = time_now;
