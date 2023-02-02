@@ -127,6 +127,8 @@ static void	*pp_worker_entry(void *arg)
 		{
 			pp_task_queue_unlock(queue);
 
+			zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_BUSY);
+
 			zabbix_log(LOG_LEVEL_TRACE, "[%d] %s() process task type:%u itemid:" ZBX_FS_UI64, __zbxthread__,
 					__func__, in->type, in->itemid);
 
@@ -147,13 +149,13 @@ static void	*pp_worker_entry(void *arg)
 					break;
 			}
 
+			zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_IDLE);
+
 			pp_task_queue_lock(queue);
 			pp_task_queue_push_finished(queue, in);
 
 			continue;
 		}
-
-		zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != pp_task_queue_wait(queue, &error))
 		{
@@ -161,8 +163,6 @@ static void	*pp_worker_entry(void *arg)
 			zbx_free(error);
 			worker->stop = 1;
 		}
-
-		zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_BUSY);
 	}
 
 	pp_task_queue_deregister_worker(queue);
