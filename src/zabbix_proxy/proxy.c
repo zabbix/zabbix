@@ -1285,7 +1285,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								&listen_sock, config_startup_time};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {config_timeout};
 	zbx_thread_pinger_args			pinger_args = {config_timeout};
+#ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args		ipmimanager_args = {config_timeout, config_unavailable_delay};
+#endif
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
 
