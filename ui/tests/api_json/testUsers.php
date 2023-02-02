@@ -52,7 +52,7 @@ class testUsers extends CAPITest {
 			'disabled' => null,
 			'valid' => null,
 			'valid_for_user_with_disabled_usergroup' => null
-			]
+		]
 	];
 
 	/**
@@ -131,7 +131,6 @@ class testUsers extends CAPITest {
 		$users = CDataHelper::call('user.create', $users_data);
 		$this->assertArrayHasKey('userids', $users, 'prepareUsersData() failed: Could not create users.');
 
-		self::$data['userids']['user_with_not_authorized_session'] = $users['userids'][0];
 		self::$data['userids']['user_with_expired_session'] = $users['userids'][0];
 		self::$data['userids']['user_with_passive_session'] = $users['userids'][1];
 		self::$data['userids']['user_with_disabled_usergroup'] = $users['userids'][2];
@@ -525,8 +524,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider user_create
-	*/
+	 * @dataProvider user_create
+	 */
 	public function testUsers_Create($user, $expected_error) {
 		$result = $this->call('user.create', $user, $expected_error);
 
@@ -567,8 +566,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* Create user with multiple email address
-	*/
+	 * Create user with multiple email address
+	 */
 	public function testUsers_CreateUserWithMultipleEmails() {
 		$user = [
 			'username' => 'API user create with multiple emails',
@@ -848,8 +847,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider user_update
-	*/
+	 * @dataProvider user_update
+	 */
 	public function testUsers_Update($users, $expected_error) {
 		foreach ($users as $user) {
 			if (array_key_exists('userid', $user) && filter_var($user['userid'], FILTER_VALIDATE_INT)
@@ -1800,8 +1799,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider user_properties
-	*/
+	 * @dataProvider user_properties
+	 */
 	public function testUser_NotRequiredPropertiesAndMedias($user, $expected_error) {
 		$methods = ['user.create', 'user.update'];
 
@@ -1906,8 +1905,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider user_delete
-	*/
+	 * @dataProvider user_delete
+	 */
 	public function testUsers_Delete($user, $expected_error) {
 		$result = $this->call('user.delete', $user, $expected_error);
 
@@ -2067,8 +2066,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider user_permissions
-	*/
+	 * @dataProvider user_permissions
+	 */
 	public function testUsers_UserPermissions($method, $login, $user, $expected_error) {
 		$this->authorize($login['user'], $login['password']);
 		$this->call($method, $user, $expected_error);
@@ -2098,8 +2097,8 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider auth_data
-	*/
+	 * @dataProvider auth_data
+	 */
 	public function testUsers_Session($data) {
 		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
 	}
@@ -2622,7 +2621,7 @@ class testUsers extends CAPITest {
 	 */
 	public function testUser_checkAuthentication_Authorization(array $data, ?string $expected_error) {
 		foreach ($data as $parameter => $name) {
-			$parameter_key = $parameter == 'sessionids' ? 'sessionid' : 'token';
+			$parameter_key = $parameter === 'sessionids' ? 'sessionid' : 'token';
 
 			$res = $this->callRaw([
 				'jsonrpc' => '2.0',
@@ -2671,8 +2670,10 @@ class testUsers extends CAPITest {
 
 		$this->checkResult($res);
 
-		$lastaccess = CDBHelper::getValue('SELECT lastaccess FROM sessions WHERE sessionid='
-			.zbx_dbstr(self::$data['sessionids']['for_extend_parameter_tests'])
+		$lastaccess = CDBHelper::getValue(
+			'SELECT lastaccess'.
+			' FROM sessions'.
+			' WHERE sessionid='.zbx_dbstr(self::$data['sessionids']['for_extend_parameter_tests'])
 		);
 
 		$extend
