@@ -112,7 +112,8 @@ static void	*pp_worker_entry(void *arg)
 
 	__zbxthread__ = worker->id;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "[%d] In %s()", __zbxthread__, __func__);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
+			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
 
 	worker->stop = 0;
 
@@ -167,7 +168,8 @@ static void	*pp_worker_entry(void *arg)
 	pp_task_queue_deregister_worker(queue);
 	pp_task_queue_unlock(queue);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ", __zbxthread__, __func__);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped [%s #%d]",
+			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
 
 	return (void *)0;
 }
