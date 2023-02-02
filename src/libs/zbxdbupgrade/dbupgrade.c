@@ -1110,9 +1110,11 @@ int	DBcheck_double_type(zbx_config_dbhigh_t *config_dbhigh)
 	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
 			" where table_schema='%s' and data_type='double precision'", sql);
 #elif defined(HAVE_ORACLE)
+	ZBX_UNUSED(config_dbhigh);
 	sql = zbx_strdup(sql, "select count(*) from user_tab_columns"
 			" where data_type='BINARY_DOUBLE'");
 #elif defined(HAVE_SQLITE3)
+	ZBX_UNUSED(config_dbhigh);
 	/* upgrade patch is not required for sqlite3 */
 	ret = SUCCEED;
 	goto out;
