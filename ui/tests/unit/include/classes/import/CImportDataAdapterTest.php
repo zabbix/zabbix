@@ -103,8 +103,7 @@ class CImportDataAdapterTest extends TestCase {
 				'ipmi_password' => '',
 				'name' => 'empty-host',
 				'inventory_mode' => '0',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			],
 			[
 				'inventory' => [
@@ -270,8 +269,7 @@ class CImportDataAdapterTest extends TestCase {
 				'ipmi_password' => 'impi password',
 				'name' => 'export-host',
 				'inventory_mode' => '0',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			]
 		]);
 	}
@@ -288,12 +286,10 @@ class CImportDataAdapterTest extends TestCase {
 					]
 				],
 				'macros' => [],
-				'templates' => [],
 				'host' => 'empty-template',
 				'name' => 'empty-template',
 				'description' => '',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			],
 			[
 				'uuid' => '00fda66f07e4479498058bf352711a06',
@@ -316,19 +312,10 @@ class CImportDataAdapterTest extends TestCase {
 						'description' => ''
 					]
 				],
-				'templates' => [
-					[
-						'name' => 'Template App FTP Service'
-					],
-					[
-						'name' => 'Template OS Linux by Zabbix agent'
-					]
-				],
 				'host' => 'export-template',
 				'name' => 'export-template',
 				'description' => '',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			]
 		]);
 	}
@@ -2028,8 +2015,7 @@ class CImportDataAdapterTest extends TestCase {
 					'proxy' => [],
 					'description' => '',
 					'name' => 'host',
-					'tags' => [],
-					'valuemaps' => []
+					'tags' => []
 				]
 			]
 		);
@@ -2057,11 +2043,9 @@ class CImportDataAdapterTest extends TestCase {
 							'name' => 'Templates'
 						]
 					],
-					'templates' => [],
 					'name' => 'Template_Linux',
 					'description' => '',
-					'tags' => [],
-					'valuemaps' => []
+					'tags' => []
 				],
 				[
 					'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
@@ -2072,11 +2056,9 @@ class CImportDataAdapterTest extends TestCase {
 							'name' => 'Templates'
 						]
 					],
-					'templates' => [],
 					'name' => 'Template_Simple',
 					'description' => '',
-					'tags' => [],
-					'valuemaps' => []
+					'tags' => []
 				]
 			]
 		);
@@ -2494,8 +2476,7 @@ class CImportDataAdapterTest extends TestCase {
 					'ipmi_password' => '',
 					'ipmi_username' => '',
 					'macros' => [],
-					'tags' => [],
-					'valuemaps' => []
+					'tags' => []
 				]
 			]
 		);
@@ -2515,17 +2496,11 @@ class CImportDataAdapterTest extends TestCase {
 							'description' => ''
 						]
 					],
-					'templates' => [
-						[
-							'name' => 'template'
-						]
-					],
 					'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
 					'host' => 'Template_Simple',
 					'name' => 'Template_Simple',
 					'description' => '',
-					'tags' => [],
-					'valuemaps' => []
+					'tags' => []
 				]
 			]
 		);
@@ -2854,13 +2829,11 @@ class CImportDataAdapterTest extends TestCase {
 					]
 				],
 				'macros' => [],
-				'templates' => [],
 				'uuid' => '206a9b642b3e46c89a61696ab28f3d5c',
 				'host' => 'Test 1',
 				'name' => 'Test 1',
 				'description' => '',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			]
 		]);
 
@@ -3661,8 +3634,7 @@ class CImportDataAdapterTest extends TestCase {
 				'ipmi_password' => '',
 				'name' => 'SNMP host',
 				'inventory_mode' => '-1',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			]
 		]);
 
