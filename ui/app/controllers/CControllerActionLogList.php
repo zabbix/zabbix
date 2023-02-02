@@ -57,10 +57,10 @@ class CControllerActionLogList extends CController {
 	}
 
 	protected function doAction(): void {
-		if ($this->getInput('filter_set', 0)) {
+		if ($this->hasInput('filter_set')) {
 			$this->updateProfiles();
 		}
-		elseif ($this->getInput('filter_rst', 0)) {
+		elseif ($this->hasInput('filter_rst')) {
 			$this->deleteProfiles();
 		}
 
