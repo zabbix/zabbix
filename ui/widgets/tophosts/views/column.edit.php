@@ -211,7 +211,7 @@ $form_grid->addItem([
 
 // Decimal places.
 $form_grid->addItem([
-	new CLabel([_('Decimal places'), makeHelpIcon(_('This setting applies only to numeric data.'))], 'decimal_places'),
+	new CLabel(_('Decimal places'), 'decimal_places'),
 	(new CFormField(
 		(new CNumericBox('decimal_places', $data['decimal_places'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	))
