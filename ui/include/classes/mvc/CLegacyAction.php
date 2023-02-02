@@ -104,7 +104,6 @@ class CLegacyAction extends CAction {
 		if ($user_type == USER_TYPE_ZABBIX_ADMIN || $user_type == USER_TYPE_SUPER_ADMIN) {
 			$rule_actions += [
 				CRoleHelper::UI_CONFIGURATION_HOSTS => ['host.list'],
-				CRoleHelper::UI_CONFIGURATION_MAINTENANCE => ['maintenance.list'],
 				CRoleHelper::UI_CONFIGURATION_TEMPLATES => ['templates.php'],
 				CRoleHelper::UI_REPORTS_NOTIFICATIONS => ['report4.php']
 			];
