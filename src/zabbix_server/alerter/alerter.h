@@ -88,6 +88,7 @@ typedef struct
 {
 	zbx_get_config_forks_f	get_process_forks_cb_arg;
 	zbx_get_config_str_f	get_scripts_path_cb_arg;
+	zbx_config_dbhigh_t	*config_dbhigh;
 }
 zbx_thread_alert_manager_args;
 

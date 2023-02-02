@@ -67,25 +67,6 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 
 static int	connection_failure;
 
-typedef struct
-{
-	char	*config_dbhost;
-	char	*config_dbname;
-	char	*config_dbschema;
-	char	*config_dbuser;
-	char	*config_dbpassword;
-	char	*config_dbsocket;
-	char	*config_db_tls_connect;
-	char	*config_db_tls_cert_file;
-	char	*config_db_tls_key_file;
-	char	*config_db_tls_ca_file;
-	char	*config_db_tls_cipher;
-	char	*config_db_tls_cipher_13;
-	int	config_dbport;
-	int	config_unavailable_delay;
-}
-zbx_config_dbhigh_t;
-
 static zbx_config_dbhigh_t	zbx_cfg_dbhigh;
 
 static zbx_dc_get_nextid_func_t				zbx_cb_nextid;
@@ -136,26 +117,62 @@ int	zbx_db_validate_config_features(unsigned char program_type)
 	return 0 != err ? FAIL : SUCCEED;
 }
 
-void	zbx_init_library_dbhigh(char *config_dbhost, char *config_dbname, char *config_dbschema, char *config_dbuser,
-		char *config_dbpassword, char *config_dbsocket, char *config_db_tls_connect,
-		char *config_db_tls_cert_file, char *config_db_tls_key_file, char *config_db_tls_ca_file,
-		char *config_db_tls_cipher, char *config_db_tls_cipher_13, int config_dbport,
-		int config_unavailable_delay)
+zbx_config_dbhigh_t	*zbx_config_dbhigh_new(void)
 {
-	zbx_cfg_dbhigh.config_dbhost = config_dbhost;
-	zbx_cfg_dbhigh.config_dbname = config_dbname;
-	zbx_cfg_dbhigh.config_dbschema = config_dbschema;
-	zbx_cfg_dbhigh.config_dbuser = config_dbuser;
-	zbx_cfg_dbhigh.config_dbpassword = config_dbpassword;
-	zbx_cfg_dbhigh.config_dbsocket = config_dbsocket;
-	zbx_cfg_dbhigh.config_db_tls_connect = config_db_tls_connect;
-	zbx_cfg_dbhigh.config_db_tls_cert_file = config_db_tls_cert_file;
-	zbx_cfg_dbhigh.config_db_tls_key_file = config_db_tls_key_file;
-	zbx_cfg_dbhigh.config_db_tls_ca_file = config_db_tls_ca_file;
-	zbx_cfg_dbhigh.config_db_tls_cipher = config_db_tls_cipher;
-	zbx_cfg_dbhigh.config_db_tls_cipher_13 = config_db_tls_cipher_13;
-	zbx_cfg_dbhigh.config_dbport = config_dbport;
-	zbx_cfg_dbhigh.config_unavailable_delay = config_unavailable_delay;
+	zbx_config_dbhigh_t	*config_dbhigh;
+
+	config_dbhigh = (zbx_config_dbhigh_t *)zbx_malloc(NULL, sizeof(zbx_config_dbhigh_t));
+
+	config_dbhigh->config_dbhost = NULL;
+	config_dbhigh->config_dbname = NULL;
+	config_dbhigh->config_dbschema = NULL;
+	config_dbhigh->config_dbuser = NULL;
+	config_dbhigh->config_dbpassword = NULL;
+	config_dbhigh->config_dbsocket = NULL;
+	config_dbhigh->config_db_tls_connect = NULL;
+	config_dbhigh->config_db_tls_cert_file = NULL;
+	config_dbhigh->config_db_tls_key_file = NULL;
+	config_dbhigh->config_db_tls_ca_file = NULL;
+	config_dbhigh->config_db_tls_cipher = NULL;
+	config_dbhigh->config_db_tls_cipher_13 = NULL;
+	config_dbhigh->config_dbport = 0;
+
+	return config_dbhigh;
+}
+
+void	zbx_config_dbhigh_free(zbx_config_dbhigh_t *config_dbhigh)
+{
+	zbx_free(config_dbhigh->config_dbhost);
+	zbx_free(config_dbhigh->config_dbname);
+	zbx_free(config_dbhigh->config_dbschema);
+	zbx_free(config_dbhigh->config_dbuser);
+	zbx_free(config_dbhigh->config_dbpassword);
+	zbx_free(config_dbhigh->config_dbsocket);
+	zbx_free(config_dbhigh->config_db_tls_connect);
+	zbx_free(config_dbhigh->config_db_tls_cert_file);
+	zbx_free(config_dbhigh->config_db_tls_key_file);
+	zbx_free(config_dbhigh->config_db_tls_ca_file);
+	zbx_free(config_dbhigh->config_db_tls_cipher);
+	zbx_free(config_dbhigh->config_db_tls_cipher_13);
+
+	zbx_free(config_dbhigh);
+}
+
+void	zbx_init_library_dbhigh(zbx_config_dbhigh_t *config_dbhigh)
+{
+	zbx_cfg_dbhigh.config_dbhost = config_dbhigh->config_dbhost;
+	zbx_cfg_dbhigh.config_dbname = config_dbhigh->config_dbname;
+	zbx_cfg_dbhigh.config_dbschema = config_dbhigh->config_dbschema;
+	zbx_cfg_dbhigh.config_dbuser = config_dbhigh->config_dbuser;
+	zbx_cfg_dbhigh.config_dbpassword = config_dbhigh->config_dbpassword;
+	zbx_cfg_dbhigh.config_dbsocket = config_dbhigh->config_dbsocket;
+	zbx_cfg_dbhigh.config_db_tls_connect = config_dbhigh->config_db_tls_connect;
+	zbx_cfg_dbhigh.config_db_tls_cert_file = config_dbhigh->config_db_tls_cert_file;
+	zbx_cfg_dbhigh.config_db_tls_key_file = config_dbhigh->config_db_tls_key_file;
+	zbx_cfg_dbhigh.config_db_tls_ca_file = config_dbhigh->config_db_tls_ca_file;
+	zbx_cfg_dbhigh.config_db_tls_cipher = config_dbhigh->config_db_tls_cipher;
+	zbx_cfg_dbhigh.config_db_tls_cipher_13 = config_dbhigh->config_db_tls_cipher_13;
+	zbx_cfg_dbhigh.config_dbport = config_dbhigh->config_dbport;
 }
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)

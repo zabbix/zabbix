@@ -193,6 +193,24 @@ typedef zbx_uint64_t	(*zbx_dc_get_nextid_func_t)(const char *table_name, int num
 
 typedef struct
 {
+	char	*config_dbhost;
+	char	*config_dbname;
+	char	*config_dbschema;
+	char	*config_dbuser;
+	char	*config_dbpassword;
+	char	*config_dbsocket;
+	char	*config_db_tls_connect;
+	char	*config_db_tls_cert_file;
+	char	*config_db_tls_key_file;
+	char	*config_db_tls_ca_file;
+	char	*config_db_tls_cipher;
+	char	*config_db_tls_cipher_13;
+	int	config_dbport;
+}
+zbx_config_dbhigh_t;
+
+typedef struct
+{
 	zbx_uint64_t	druleid;
 	zbx_uint64_t	unique_dcheckid;
 	char		*iprange;
@@ -469,11 +487,10 @@ typedef struct
 }
 zbx_service_alarm_t;
 
-void	zbx_init_library_dbhigh(char *config_dbhost, char *config_dbname, char *config_dbschema, char *config_dbuser,
-		char *config_dbpassword, char *config_dbsocket, char *config_db_tls_connect,
-		char *config_db_tls_cert_file, char *config_db_tls_key_file, char *config_db_tls_ca_file,
-		char *config_db_tls_cipher, char *config_db_tls_cipher_13, int config_dbport,
-		int config_unavailable_delay);
+zbx_config_dbhigh_t	*zbx_config_dbhigh_new(void);
+void			zbx_config_dbhigh_free(zbx_config_dbhigh_t *config_dbhigh);
+
+void	zbx_init_library_dbhigh(zbx_config_dbhigh_t *config_dbhigh);
 int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char **error);
 void	zbx_db_deinit(void);
 

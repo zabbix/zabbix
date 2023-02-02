@@ -66,7 +66,6 @@ extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 extern int	CONFIG_PROXYDATA_FREQUENCY;
-extern int	CONFIG_UNAVAILABLE_DELAY;
 
 typedef struct
 {
@@ -765,8 +764,8 @@ void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_
 int	DCinterface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
 		zbx_agent_availability_t *out);
 
-int	DCinterface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
-		zbx_agent_availability_t *out, const char *error_msg);
+int	DCinterface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, int unavailable_delay,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error_msg);
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */

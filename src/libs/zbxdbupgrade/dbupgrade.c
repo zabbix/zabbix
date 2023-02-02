@@ -21,11 +21,7 @@
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
 
-#include "zbxdbhigh.h"
 #include "log.h"
-
-extern char	*CONFIG_DBNAME;
-extern char	*CONFIG_DBSCHEMA;
 
 typedef struct
 {
@@ -1092,7 +1088,7 @@ out:
 	return ret;
 }
 
-int	DBcheck_double_type(void)
+int	DBcheck_double_type(zbx_config_dbhigh_t *config_dbhigh)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1105,11 +1101,12 @@ int	DBcheck_double_type(void)
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 #if defined(HAVE_MYSQL)
-	sql = zbx_db_dyn_escape_string(CONFIG_DBNAME);
+	sql = zbx_db_dyn_escape_string(config_dbhigh->config_dbname);
 	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
 			" where table_schema='%s' and column_type='double'", sql);
 #elif defined(HAVE_POSTGRESQL)
-	sql = zbx_db_dyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ? "public" : CONFIG_DBSCHEMA);
+	sql = zbx_db_dyn_escape_string(NULL == config_dbhigh->config_dbschema ||
+			'\0' == *config_dbhigh->config_dbschema ? "public" : config_dbhigh->config_dbschema);
 	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
 			" where table_schema='%s' and data_type='double precision'", sql);
 #elif defined(HAVE_ORACLE)
