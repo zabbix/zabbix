@@ -51,7 +51,8 @@ ZBX_PTR_VECTOR_DECL(snmp_walk_to_json_output_val, zbx_snmp_walk_json_output_valu
 typedef enum
 {
 	ZBX_SNMP_TYPE_UNDEFINED,
-	ZBX_SNMP_TYPE_HEX
+	ZBX_SNMP_TYPE_HEX,
+	ZBX_SNMP_TYPE_BITS
 }
 zbx_snmp_type_t;
 

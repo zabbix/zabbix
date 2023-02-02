@@ -273,7 +273,7 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_value_pair_t *p
 		}
 		else
 		{
-			if (ZBX_SNMP_TYPE_HEX == p->type)
+			if (ZBX_SNMP_TYPE_HEX == p->type || ZBX_SNMP_TYPE_BITS == p->type)
 			{
 				while ('.' != *(ptr + 1) && '\0' != *(ptr + 1))
 					ptr++;
@@ -387,7 +387,23 @@ reparse_type:
 		}
 	}
 
-	p->type = (NULL != type && 0 == strcmp(type, "Hex-STRING") ? ZBX_SNMP_TYPE_HEX : ZBX_SNMP_TYPE_UNDEFINED);
+	if (NULL != type)
+	{
+		if (0 == strcmp(type, "Hex-STRING"))
+		{
+			p->type = ZBX_SNMP_TYPE_HEX;
+		}
+		else if (0 == strcmp(type, "BITS"))
+		{
+			p->type = ZBX_SNMP_TYPE_BITS;
+		}
+		else
+			p->type = ZBX_SNMP_TYPE_UNDEFINED;
+	}
+	else
+	{
+		p->type = ZBX_SNMP_TYPE_UNDEFINED;
+	}
 
 	len = preproc_snmp_parse_value(data, p);
 	data += len;
@@ -474,11 +490,44 @@ static int	preproc_parse_value_from_walk_params(const char *params, char **oid_n
 	return SUCCEED;
 }
 
+#define ZBX_PREPROC_SNMP_UTF8_FROM_HEX	1
+#define ZBX_PREPROC_SNMP_UTF8_FROM_MAC	2
+#define ZBX_PREPROC_SNMP_UINT_FROM_BITS	3
+
+static int	preproc_snmp_convert_bits_value(char **value, int format, char **error)
+{
+#define SNMP_UINT_FROM_BITS_MAX_BYTES	8 * 2
+	if (ZBX_PREPROC_SNMP_UINT_FROM_BITS == format)
+	{
+		zbx_uint64_t	iout;
+		size_t		len;
+
+		zbx_remove_chars((char *)*value, " ");
+		len = strlen(*value);
+
+		if (0 != len % 2)
+		{
+			*error = zbx_dsprintf(NULL, "Cannot convert bit value '%s' to unsigned integer", *value);
+			return FAIL;
+		}
+
+		if (len > SNMP_UINT_FROM_BITS_MAX_BYTES)
+		{
+			(*value)[SNMP_UINT_FROM_BITS_MAX_BYTES] = '\0';
+		}
+
+		iout = strtoull(*value, NULL, 16);
+
+		zbx_free(*value);
+		*value = zbx_dsprintf(*value, ZBX_FS_UI64, iout);
+	}
+
+	return SUCCEED;
+#undef SNMP_UINT_FROM_BITS_MAX_BYTES
+}
+
 static int	preproc_snmp_convert_hex_value(char **value, int format, char **error)
 {
-#define ZBX_PREPROC_SNMP_UTF8_FROM_HEX	1
-#define ZBX_PREPROC_SNMP_MAC_FROM_HEX	2
-#define ZBX_PREPROC_SNMP_INT_FROM_BITS	3
 	char	*out = NULL;
 
 	switch (format)
@@ -492,7 +541,7 @@ static int	preproc_snmp_convert_hex_value(char **value, int format, char **error
 			}
 
 			break;
-		case ZBX_PREPROC_SNMP_MAC_FROM_HEX:
+		case ZBX_PREPROC_SNMP_UTF8_FROM_MAC:
 			if (SUCCEED != snmp_hex_to_mac_dyn(*value, &out))
 			{
 				*error = zbx_dsprintf(NULL, "Cannot convert hex value '%s' to mac address",
@@ -508,10 +557,11 @@ static int	preproc_snmp_convert_hex_value(char **value, int format, char **error
 	*value = out;
 
 	return SUCCEED;
-#undef ZBX_PREPROC_SNMP_INT_FROM_BITS
-#undef ZBX_PREPROC_SNMP_MAC_FROM_HEX
-#undef ZBX_PREPROC_SNMP_UTF8_FROM_HEX
 }
+
+#undef ZBX_PREPROC_SNMP_UTF8_FROM_HEX
+#undef ZBX_PREPROC_SNMP_UTF8_FROM_MAC
+#undef ZBX_PREPROC_SNMP_UINT_FROM_BITS
 
 /******************************************************************************
  *                                                                            *
@@ -534,6 +584,9 @@ static int	preproc_snmp_convert_value(char **value, zbx_snmp_type_t type, int fo
 	{
 		case ZBX_SNMP_TYPE_HEX:
 			return preproc_snmp_convert_hex_value(value, format, error);
+		case ZBX_SNMP_TYPE_BITS:
+			return preproc_snmp_convert_bits_value(value, format, error);
+		case ZBX_SNMP_TYPE_UNDEFINED:
 		default:
 			return SUCCEED;
 	}
