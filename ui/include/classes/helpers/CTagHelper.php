@@ -99,6 +99,7 @@ final class CTagHelper {
 		foreach ($tags as &$tag) {
 			if (array_key_exists($tag['tag'], $inherited_tags)
 					&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+				$tag = $inherited_tags[$tag['tag']][$tag['value']];
 				$tag['type'] = ZBX_PROPERTY_BOTH;
 				unset($inherited_tags[$tag['tag']][$tag['value']]);
 			}
