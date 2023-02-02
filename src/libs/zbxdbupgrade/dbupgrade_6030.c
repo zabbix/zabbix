@@ -1501,8 +1501,8 @@ static int	DBpatch_6030160(void)
 {
 	int		i;
 	const char	*values[] = {
-			"web.maintenance.php.sortorder", "web.maintenance.sortorder",
-			"web.maintenance.php.sort", "web.maintenance.sort"
+			"web.maintenance.php.sortorder", "web.maintenance.list.sortorder",
+			"web.maintenance.php.sort", "web.maintenance.list.sort"
 		};
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
