@@ -407,7 +407,8 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?action=correlation.delete&correlationids%5B0%5D=99005']],
 
 			// #60 Correlation condition add.
-			[['link' => 'zabbix.php?action=correlation.condition.add&form_refresh=2&name=add&evaltype=0&formula=&'.
+			[[
+				'link' => 'zabbix.php?action=correlation.condition.add&form_refresh=2&name=add&evaltype=0&formula=&'.
 					'description=ssdsd&op_close_old=1&op_close_new=1&status=0&new_condition%5Btype%5D=0&new_condition%5B'.
 					'operator%5D=0&new_condition%5Btag%5D=1111&add_condition=1',
 				'page_not_found' => true
@@ -952,7 +953,7 @@ class testSID extends CWebTest {
 						'You are logged in as "Admin". You have no permissions to access this page.'
 				);
 				$this->query('button:Go to "Dashboards"')->one()->waitUntilClickable()->click();
-				$this->assertStringContainsString('zabbix.php?action=dashboard', $source);
+				$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 			}
 		}
 	}
