@@ -1494,10 +1494,6 @@ function getNumericFormatting(): array {
  * @return string
  */
 function formatFloat(float $number, array $options = []): string {
-	if ($number == 0) {
-		return '0';
-	}
-
 	if ($number == INF) {
 		return _('Infinity');
 	}
@@ -1562,10 +1558,6 @@ function formatFloat(float $number, array $options = []): string {
 
 		$number = sprintf('%.'.($precision - 1).'E', $number);
 		$digits = $precision == 1 ? 1 : strlen(rtrim(explode('E', $number)[0], '0')) - ($number[0] === '-' ? 2 : 1);
-	}
-
-	if ($number == 0) {
-		return '0';
 	}
 
 	[
