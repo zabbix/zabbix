@@ -159,13 +159,6 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 	/* set blocking mode on session */
 	ssh_set_blocking(session, 1);
 
-	if (0 != ssh_options_set(session, SSH_OPTIONS_PROCESS_CONFIG, &proc_config))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot turn off SSH default config processing: %s",
-				ssh_get_error(session)));
-		goto session_free;
-	}
-
 	/* create a session instance and start it up */
 	if (0 != ssh_options_set(session, SSH_OPTIONS_HOST, item->interface.addr) ||
 			0 != ssh_options_set(session, SSH_OPTIONS_PORT, &item->interface.port) ||
@@ -176,10 +169,19 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 		goto session_free;
 	}
 
-	if (SUCCEED != ssh_parse_options(session, options, &err_msg))
-	{
-		SET_MSG_RESULT(result, err_msg);
-		goto session_free;
+	if (0 < strlen(options)) {
+		if (0 != ssh_options_set(session, SSH_OPTIONS_PROCESS_CONFIG, &proc_config))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot turn off SSH default config processing: %s",
+					ssh_get_error(session)));
+			goto session_free;
+		}
+
+		if (SUCCEED != ssh_parse_options(session, options, &err_msg))
+		{
+			SET_MSG_RESULT(result, err_msg);
+			goto session_free;
+		}
 	}
 
 	if (SSH_OK != ssh_connect(session))
