@@ -526,10 +526,6 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 	}
 	zbx_free(value);
 
-	pthread_mutex_lock(&dmanager.queue.lock);
-	pthread_cond_broadcast(&dmanager.queue.event);
-	pthread_mutex_unlock(&dmanager.queue.lock);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -1209,6 +1205,13 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 			if (0 == nextcheck)
 				nextcheck = time(NULL) + DISCOVERER_DELAY;
+
+			if (0 < rule_count)
+			{
+				pthread_mutex_lock(&dmanager.queue.lock);
+				pthread_cond_broadcast(&dmanager.queue.event);
+				pthread_mutex_unlock(&dmanager.queue.lock);
+			}
 		}
 
 		/* update sleeptime and process title */
