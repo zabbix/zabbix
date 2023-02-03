@@ -807,6 +807,8 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 			}
 		}
 
+		memset(&dhost, 0, sizeof(ZBX_DB_DHOST));
+
 		process_services(result->drule, &dhost, result->ip, result->dns, result->now, &result->services);
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
