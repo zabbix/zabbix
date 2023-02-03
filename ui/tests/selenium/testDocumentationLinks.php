@@ -1272,21 +1272,33 @@ class testDocumentationLinks extends CWebTest {
 			// #133 Maintenance list view.
 			[
 				[
-					'url' => 'maintenance.php',
+					'url' => 'zabbix.php?action=maintenance.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/maintenance'
 				]
 			],
-			// #134 Create maintenance form view.
+			// #134 Create maintenance form popup.
 			[
 				[
-					'url' => 'maintenance.php?form=create',
+					'url' => 'zabbix.php?action=maintenance.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create maintenance period'
+						]
+					],
 					'doc_link' => '/en/manual/maintenance#configuration'
 				]
 			],
-			// #135 Edit maintenance form view.
+			// #135 Edit maintenance form popup.
 			[
 				[
-					'url' => 'maintenance.php?form=update&maintenanceid=4',
+					'url' => 'zabbix.php?action=maintenance.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath://a[text()="Maintenance for update (data collection)"]'
+						]
+					],
 					'doc_link' => '/en/manual/maintenance#configuration'
 				]
 			],
