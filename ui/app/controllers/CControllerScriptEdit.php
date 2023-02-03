@@ -22,7 +22,7 @@
 class CControllerScriptEdit extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -86,7 +86,6 @@ class CControllerScriptEdit extends CController {
 		// Default values.
 		$data = [
 			'form_refresh' => $this->getInput('form_refresh', 0),
-			'sid' => $this->getUserSID(),
 			'scriptid' => 0,
 			'name' => '',
 			'scope' => ZBX_SCRIPT_SCOPE_ACTION,

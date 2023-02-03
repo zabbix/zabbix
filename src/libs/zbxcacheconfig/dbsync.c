@@ -45,8 +45,10 @@
 #define ZBX_DBSYNC_OBJ_HTTPSTEP		14
 #define ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD	15
 #define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM	16
+#define ZBX_DBSYNC_OBJ_CONNECTOR	17
+#define ZBX_DBSYNC_OBJ_CONNECTOR_TAG	18
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		16
+#define ZBX_DBSYNC_OBJ_COUNT		18
 
 #define ZBX_DBSYNC_JOURNAL(X)		(X - 1)
 
@@ -3989,4 +3991,60 @@ out:
 void	zbx_dbsync_clear_user_macros(void)
 {
 	um_cache_remove_hosts(config->um_cache, &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)].deletes);
+}
+
+int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select connectorid,protocol,data_type,url,max_records,"
+			"max_senders,timeout,max_attempts,token,http_proxy,authtype,username,password,verify_peer,"
+			"verify_host,ssl_cert_file,ssl_key_file,ssl_key_password,status,"
+			"tags_evaltype"
+		" from connector");
+
+	dbsync_prepare(sync, 20, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "connectorid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CONNECTOR)]);
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
+
+int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select connector_tagid,connectorid,operator,tag,value"
+			" from connector_tag");
+
+	dbsync_prepare(sync, 5, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "connector_tagid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CONNECTOR_TAG)]);
+out:
+	zbx_free(sql);
+
+	return ret;
 }

@@ -39,6 +39,7 @@
 #include "zbxversion.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxcachehistory.h"
 
 extern char	*CONFIG_SERVER;
 

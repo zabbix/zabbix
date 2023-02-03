@@ -27,7 +27,7 @@ class CControllerIconMapEdit extends CController {
 	private $iconmap = [];
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {

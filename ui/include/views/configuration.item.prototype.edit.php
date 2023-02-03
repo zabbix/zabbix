@@ -39,6 +39,7 @@ $url = (new CUrl('disc_prototypes.php'))
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('disc_prototypes.php')))->removeId())
 	->setId('item-prototype-form')
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -494,17 +495,17 @@ $item_tab
 	// Append ITEM_TYPE_HTTPAGENT SSL verify peer to form list.
 	->addItem([
 		(new CLabel(_('SSL verify peer'), 'verify_peer'))->setId('js-item-verify-peer-label'),
-		(new CFormField((new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_ON))
+		(new CFormField((new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
 			->setEnabled(!$readonly)
-			->setChecked($data['verify_peer'] == HTTPTEST_VERIFY_PEER_ON)
+			->setChecked($data['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
 		))->setId('js-item-verify-peer-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT SSL verify host to form list.
 	->addItem([
 		(new CLabel(_('SSL verify host'), 'verify_host'))->setId('js-item-verify-host-label'),
-		(new CFormField((new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_ON))
+		(new CFormField((new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
 			->setEnabled(!$readonly)
-			->setChecked($data['verify_host'] == HTTPTEST_VERIFY_HOST_ON)
+			->setChecked($data['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
 		))->setId('js-item-verify-host-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT SSL certificate file to form list.
@@ -929,7 +930,8 @@ if ($data['itemid'] != 0) {
 			new CSubmit('clone', _('Clone')),
 			(new CSimpleButton(_('Test')))->setId('test_item'),
 			(new CButtonDelete(_('Delete item prototype?'),
-				url_params(['form', 'itemid', 'parent_discoveryid', 'context']), 'context'
+				url_params(['form', 'itemid', 'parent_discoveryid', 'context']).'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.
+				'='.CCsrfTokenHelper::get('disc_prototypes.php'), 'context'
 			))->setEnabled(!$readonly),
 			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]

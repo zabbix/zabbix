@@ -49,7 +49,6 @@
 #include "setproctitle.h"
 #include "zbxcomms.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
-#include "../zabbix_server/preprocessor/preproc_worker.h"
 #include "zbxvault.h"
 #include "zbxdiag.h"
 #include "diag/diag_proxy.h"
@@ -64,6 +63,7 @@
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
 #include "../zabbix_server/preprocessor/preproc_stats.h"
+#include "preproc.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -243,7 +243,9 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_REPORTWRITER */
 	0, /* ZBX_PROCESS_TYPE_SERVICEMAN */
 	0, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
-	1 /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	1, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	0, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
+	0 /* ZBX_PROCESS_TYPE_CONNECTORWORKER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -385,12 +387,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_PREPROCMAN;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCMAN];
-	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]))
-	{
-		/* data collection processes might utilize CPU fully, start manager and worker processes beforehand */
-		*local_process_type = ZBX_PROCESS_TYPE_PREPROCESSOR;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR];
 	}
 	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_DATASENDER]))
 	{
@@ -1293,6 +1289,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								&listen_sock, config_startup_time};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {config_timeout};
 	zbx_thread_pinger_args			pinger_args = {config_timeout};
+	zbx_thread_preprocessing_manager_args	preproc_man_args =
+						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
 
@@ -1465,7 +1463,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	change_proxy_history_count(zbx_proxy_get_history_count());
 
 	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
+	{
+		/* skip threaded components */
+		if (ZBX_PROCESS_TYPE_PREPROCESSOR == i)
+			continue;
+
 		threads_num += CONFIG_FORKS[i];
+	}
 
 	threads = (pid_t *)zbx_calloc(threads, (size_t)threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)threads_num, sizeof(int));
@@ -1486,6 +1490,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_register_stats_data_func(zbx_preproc_stats_ext_get, NULL);
 	zbx_register_stats_data_func(zbx_proxy_stats_ext_get, &config_comms);
 	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get, NULL);
+	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_get_worker_info);
 	zbx_diag_init(diag_add_section_info);
 
 	thread_args.info.program_type = program_type;
@@ -1577,10 +1582,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(taskmanager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
+				thread_args.args = &preproc_man_args;
 				zbx_thread_start(preprocessing_manager_thread, &thread_args, &threads[i]);
-				break;
-			case ZBX_PROCESS_TYPE_PREPROCESSOR:
-				zbx_thread_start(preprocessing_worker_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;

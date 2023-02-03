@@ -23,7 +23,7 @@ class CControllerPopupActionOperationsList extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {

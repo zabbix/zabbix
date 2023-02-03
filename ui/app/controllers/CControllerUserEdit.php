@@ -117,7 +117,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'role' => [],
 			'modules_rules' => [],
 			'user_type' => '',
-			'sid' => $this->getUserSID(),
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
 			'db_user' => ['username' => ''],

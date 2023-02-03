@@ -148,7 +148,7 @@ class CControllerPopupGeneric extends CController {
 	private $page_options = [];
 
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 
 		$this->popup_properties = [
 			'hosts' => [

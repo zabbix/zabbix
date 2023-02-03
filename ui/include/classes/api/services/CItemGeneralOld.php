@@ -2630,17 +2630,17 @@ abstract class CItemGeneralOld extends CApiService {
 			],
 			'verify_peer' => [
 				'type' => API_INT32,
-				'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])
+				'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])
 			],
 			'verify_host' => [
 				'type' => API_INT32,
-				'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])
+				'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])
 			],
 			'authtype' => [
 				'type' => API_INT32,
 				'in' => implode(',', [
-					HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-					HTTPTEST_AUTH_DIGEST
+					ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+					ZBX_HTTP_AUTH_DIGEST
 				])
 			]
 		];
@@ -2648,8 +2648,8 @@ abstract class CItemGeneralOld extends CApiService {
 		$data = $item + $db_item;
 
 		if (array_key_exists('authtype', $data)
-				&& ($data['authtype'] == HTTPTEST_AUTH_BASIC || $data['authtype'] == HTTPTEST_AUTH_NTLM
-					|| $data['authtype'] == HTTPTEST_AUTH_KERBEROS || $data['authtype'] == HTTPTEST_AUTH_DIGEST)) {
+				&& ($data['authtype'] == ZBX_HTTP_AUTH_BASIC || $data['authtype'] == ZBX_HTTP_AUTH_NTLM
+					|| $data['authtype'] == ZBX_HTTP_AUTH_KERBEROS || $data['authtype'] == ZBX_HTTP_AUTH_DIGEST)) {
 			$rules += [
 				'username' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 				'password' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')]

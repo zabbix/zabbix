@@ -471,7 +471,7 @@ window.operation_popup = new class {
 		this.form.append(this._createHiddenInput('row_index', this.row_index));
 		this.form.append(this._createHiddenInput('actionid', this.actionid));
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'action.operation.check');
 
 		const fields = getFormFields(this.form);

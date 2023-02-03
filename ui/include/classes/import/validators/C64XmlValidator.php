@@ -412,7 +412,6 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 	public function getSchema() {
 		return ['type' => XML_ARRAY, 'rules' => [
 			'version' =>				['type' => XML_STRING | XML_REQUIRED],
-			'date' =>					['type' => XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
 			'host_groups' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_group', 'rules' => [
 				'host_group' =>				['type' => XML_ARRAY, 'rules' => [
 					'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
@@ -1136,10 +1135,14 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 			]],
 			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 				'template' =>				['type' => XML_ARRAY, 'rules' => [
-					'uuid' =>				['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
+					'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 					'template' =>				['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING, 'default' => ''],
 					'description' =>			['type' => XML_STRING, 'default' => ''],
+					'vendor' =>					['type' => XML_ARRAY, 'rules' => [
+						'name' =>					['type' => XML_STRING | XML_REQUIRED],
+						'version' =>				['type' => XML_STRING | XML_REQUIRED]
+					]],
 					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 						'template' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -2047,25 +2050,6 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 	 */
 	public function validate(array $data, $path) {
 		return $this->doValidate($this->getSchema(), $data, $path);
-	}
-
-	/**
-	 * Validate date and time format.
-	 *
-	 * @param string      $data         Import data.
-	 * @param array|null  $parent_data  Data's parent array.
-	 * @param string      $path         XML path (for error reporting).
-	 *
-	 * @throws Exception if the date or time is invalid.
-	 *
-	 * @return string
-	 */
-	public function validateDateTime($data, ?array $parent_data, $path) {
-		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $data)) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
-		}
-
-		return $data;
 	}
 
 	/**

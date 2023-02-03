@@ -26,6 +26,10 @@ class CControllerPopupActionEdit extends CController {
 	 */
 	private $action;
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', [
