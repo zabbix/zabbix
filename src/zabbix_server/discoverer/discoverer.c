@@ -149,6 +149,18 @@ static void	proxy_update_host(zbx_uint64_t druleid, const char *ip, const char *
 	zbx_free(ip_esc);
 }
 
+static int	results_compare(const void *d1, const void *d2)
+{
+	int				ret;
+	const zbx_discovery_results_t	*r1 = *((const zbx_discovery_results_t * const *)d1);
+	const zbx_discovery_results_t	*r2 = *((const zbx_discovery_results_t * const *)d2);
+
+	if (0 == (ret = (int)r1->drule->druleid - (int)r2->drule->druleid))
+		ret = strcmp(r1->ip, r2->ip);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: check if service is available                                     *
@@ -820,7 +832,6 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 	}
 
 	zbx_vector_ptr_clear_ext(&manager->results, (zbx_clean_func_t)results_free);
-
 	pthread_rwlock_unlock(&manager->results_rwlock);
 }
 
@@ -900,8 +911,6 @@ static void	*discoverer_net_check(void *net_check_worker)
 	int				err;
 	size_t				value_alloc = 128;
 	zbx_discoverer_worker_t		*worker = (zbx_discoverer_worker_t*)net_check_worker;
-	zbx_service_t			*service = NULL;
-	zbx_discovery_results_t		*result = NULL;
 	zbx_discoverer_net_check_job_t	*job;
 
 	worker->queue->workers_num++;
@@ -915,8 +924,11 @@ static void	*discoverer_net_check(void *net_check_worker)
 	{
 		if (NULL != (job = discoverer_job_net_check_pop(worker->queue)))
 		{
+			int			index, skip = 1;
 			zbx_uint64_pair_t	revision, *revision_updated;
-			int			i, skip = 1;
+			zbx_service_t		*service = NULL;
+			zbx_discovery_results_t	*result = NULL, result_cmp;
+			DC_DRULE		drule_cmp;
 
 			pthread_mutex_unlock(&dmanager.queue.lock);
 
@@ -925,10 +937,10 @@ static void	*discoverer_net_check(void *net_check_worker)
 			revision.first = job->druleid;
 			pthread_rwlock_rdlock(&dmanager.revisions_rwlock);
 
-			if (FAIL != (i = zbx_vector_uint64_pair_bsearch(&dmanager.revisions, revision,
+			if (FAIL != (index = zbx_vector_uint64_pair_bsearch(&dmanager.revisions, revision,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
-				revision_updated = (zbx_uint64_pair_t*)&dmanager.revisions.values[i];
+				revision_updated = (zbx_uint64_pair_t*)&dmanager.revisions.values[index];
 
 				if (revision_updated->second == job->drule->revision)
 					skip = 0;
@@ -955,24 +967,31 @@ static void	*discoverer_net_check(void *net_check_worker)
 			service->port = job->port;
 			zbx_strlcpy_utf8(service->value, value, ZBX_MAX_DISCOVERED_VALUE_SIZE);
 
-			result = (zbx_discovery_results_t *)zbx_malloc(result, sizeof(zbx_discovery_results_t));
-			zbx_vector_ptr_create(&result->services);
-			zbx_vector_ptr_append(&result->services, service);
-
-			result->drule = job->drule;
-			result->ip = job->ip;
-			result->dns = job->dns;
-			result->now = job->now;
+			drule_cmp.druleid = job->druleid;
+			result_cmp.drule = &drule_cmp;
+			result_cmp.ip = job->ip;
 
 			pthread_rwlock_wrlock(&dmanager.results_rwlock);
-			zbx_vector_ptr_append(&dmanager.results, result);
+
+			if (FAIL == (index = zbx_vector_ptr_search(&dmanager.results, &result_cmp, results_compare)))
+			{
+				result = (zbx_discovery_results_t *)zbx_malloc(result, sizeof(zbx_discovery_results_t));
+				zbx_vector_ptr_create(&result->services);
+				result->drule = job->drule;
+				result->ip = job->ip;
+				result->dns = job->dns;
+				result->now = job->now;
+				zbx_vector_ptr_append(&dmanager.results, result);
+			}
+			else
+				result = (zbx_discovery_results_t *)dmanager.results.values[index];
+
+			zbx_vector_ptr_append(&result->services, service);
+
 			pthread_rwlock_unlock(&dmanager.results_rwlock);
 
 			dcheck_free(job->dcheck);
 			zbx_free(job);
-
-			result = NULL;
-			service = NULL;
 
 			pthread_mutex_lock(&dmanager.queue.lock);
 			continue;
@@ -1139,9 +1158,9 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
 	zbx_thread_discoverer_args	*discoverer_args_in = (zbx_thread_discoverer_args *)
 							(((zbx_thread_args_t *)args)->args);
-	int				sleeptime = -1, rule_count = 0, old_rule_count = 0;
+	int				sleeptime = -1, sleeptime_res = -1, rule_count = 0, old_rule_count = 0;
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t				last_stat_time, nextcheck = 0;
+	time_t				last_stat_time, nextcheck = 0, nextresult = 0;
 	zbx_ipc_async_socket_t		rtc;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
@@ -1194,7 +1213,11 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		zbx_dc_drule_revisions_get(&dmanager.revisions);
 		pthread_rwlock_unlock(&dmanager.revisions_rwlock);
 
-		process_results(&dmanager);
+		if ((int)sec >= nextresult)
+		{
+			process_results(&dmanager);
+			nextresult = time(NULL) + DISCOVERER_DELAY;
+		}
 
 		/* process discovery rules and create net check jobs */
 
@@ -1217,6 +1240,9 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		/* update sleeptime and process title */
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
+
+		if (sleeptime > (sleeptime_res = zbx_calculate_sleeptime(nextresult, DISCOVERER_DELAY)))
+			sleeptime = sleeptime_res;
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
