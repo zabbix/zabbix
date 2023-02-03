@@ -9347,7 +9347,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 		{
 			zbx_uint64_t	macro_revision = *revision;
 
-			if (SUCCEED == um_cache_get_host_revision(config->um_cache, dc_host->hostid, &macro_revision) &&
+			if (SUCCEED != um_cache_get_host_revision(config->um_cache, dc_host->hostid, &macro_revision) ||
 					*revision >= macro_revision)
 			{
 				/* no host/macro changes - update item revision without actually syncing it */
