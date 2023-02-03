@@ -30,8 +30,11 @@ $html_page = (new CHtmlPage())
 	->setTitle(_('User roles'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERROLE_EDIT));
 
+$csrf_token = CCsrfTokenHelper::get('userrole');
+
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('userrole-form')
 	->setName('user_role_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
@@ -384,7 +387,7 @@ if ($data['roleid'] !== null) {
 		(new CRedirectButton(_('Delete'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'userrole.delete')
 				->setArgument('roleids', [$data['roleid']])
-				->setArgumentSID(),
+				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 			_('Delete selected role?')
 		))
 			->setId('delete')

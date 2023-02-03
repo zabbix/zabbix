@@ -153,6 +153,8 @@ $httpTable = (new CTableInfo())
 $httpTestsLastData = $this->data['httpTestsLastData'];
 $http_tests = $data['http_tests'];
 
+$csrf_token = CCsrfTokenHelper::get('httpconf.php');
+
 foreach ($http_tests as $httptestid => $http_test) {
 	$name = [];
 
@@ -227,30 +229,37 @@ foreach ($http_tests as $httptestid => $http_test) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(httptest_status2style($http_test['status']))
-			->addSID(),
+			->addClass(httptest_status2style($http_test['status'])),
 		$data['tags'][$http_test['httptestid']],
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }
 
 $button_list = [
-	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')],
-	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')]
+	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?'),
+		'csrf_token' => $csrf_token
+	],
+	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 if ($data['context'] === 'host') {
 	$button_list += [
 		'httptest.massclearhistory' => [
 			'name' => _('Clear history'),
-			'confirm' => _('Delete history of selected web scenarios?')
+			'confirm' => _('Delete history of selected web scenarios?'),
+			'csrf_token' => $csrf_token
 		]
 	];
 }
 
 $button_list += [
-	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?')]
+	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?'),
+			'csrf_token' => $csrf_token
+	]
 ];
 
 // Append table to form.

@@ -30,46 +30,42 @@ $page['scripts'] = ['class.tagfilteritem.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-//		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
+//		VAR						TYPE		OPTIONAL FLAGS					VALIDATION	EXCEPTION
 $fields = [
-	'groups'			=> [null,      O_OPT, P_ONLY_ARRAY,	NOT_EMPTY,	'isset({add}) || isset({update})'],
-	'templates'			=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
-	'templateid'		=> [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form}) && {form} == "update"'],
-	'template_name'		=> [T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Template name')],
-	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
-	'groupids'			=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,	null],
-	'tags'				=> [T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
-	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
-	'macros'			=> [null,      O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
-	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
-	'valuemaps'			=> [null,      O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'groups' =>					[null,      O_OPT, P_ONLY_ARRAY,			NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'templates' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,			DB_ID,	null],
+	'templateid' =>				[T_ZBX_INT, O_OPT, P_SYS,					DB_ID,	'isset({form}) && {form} == "update"'],
+	'template_name' =>			[T_ZBX_STR, O_OPT, null,					NOT_EMPTY,	'isset({add}) || isset({update})', _('Template name')],
+	'visiblename' =>			[T_ZBX_STR, O_OPT, null,					null,	'isset({add}) || isset({update})'],
+	'groupids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,			DB_ID,	null],
+	'tags' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,			null,	null],
+	'description' =>			[T_ZBX_STR, O_OPT, null,					null,	null],
+	'macros' =>					[null,      O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
+	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null,					IN([0,1]),	null],
+	'valuemaps' =>				[null,      O_OPT, P_ONLY_TD_ARRAY,			null,	null],
 	// actions
-	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN('"template.export","template.massdelete","template.massdeleteclear"'),
-								null
-							],
-	'add'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'update'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'clone'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'full_clone'		=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'delete'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'delete_and_clear'	=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'cancel'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'form'				=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'form_refresh'		=> [T_ZBX_INT, O_OPT, P_SYS,		null,	null],
+	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,				IN('"template.export","template.massdelete","template.massdeleteclear"'),	null],
+	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,				null,	null],
+	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,				null,	null],
+	'clone' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,				null,	null],
+	'full_clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,				null,	null],
+	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,				null,	null],
+	'delete_and_clear' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,				null,	null],
+	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,					null,	null],
+	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,					null,	null],
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,					null,	null],
 	// filter
-	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'filter_name'		=> [T_ZBX_STR, O_OPT, null,			null,	null],
-	'filter_groups'		=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
-	'filter_evaltype'	=> [T_ZBX_INT, O_OPT, null,
-								IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
-								null
-							],
-	'filter_tags'		=> [T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,		null,		null],
+	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,					null,	null],
+	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,					null,	null],
+	'filter_name' =>			[T_ZBX_STR, O_OPT, null,					null,	null],
+	'filter_vendor_name' =>		[T_ZBX_STR, O_OPT, null,					null,	null],
+	'filter_vendor_version' =>	[T_ZBX_STR, O_OPT, null,					null,	null],
+	'filter_groups' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,			DB_ID,	null],
+	'filter_evaltype' =>		[T_ZBX_INT, O_OPT, null,					IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),	null],
+	'filter_tags' =>			[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,			null,	null],
 	// sort and sortorder
-	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null],
-	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, 					IN('"name"'),	null],
+	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS,					IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
 
@@ -480,6 +476,7 @@ if (hasRequest('form')) {
 		'templateid' => getRequest('templateid', 0),
 		'tags' => $tags,
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
+		'vendor' => [],
 		'readonly' => false,
 		'macros' => $macros,
 		'valuemaps' => array_values(getRequest('valuemaps', []))
@@ -495,6 +492,13 @@ if (hasRequest('form')) {
 			'templateids' => $data['templateid']
 		]);
 		$data['dbTemplate'] = reset($dbTemplates);
+
+		if ($data['form'] !== 'full_clone') {
+			$data['vendor'] = array_filter([
+				'name' => $data['dbTemplate']['vendor_name'],
+				'version' => $data['dbTemplate']['vendor_version']
+			], 'strlen');
+		}
 
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
@@ -636,6 +640,8 @@ else {
 	// filter
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.templates.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.templates.filter_vendor_name', getRequest('filter_vendor_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.templates.filter_vendor_version', getRequest('filter_vendor_version', ''), PROFILE_TYPE_STR);
 		CProfile::updateArray('web.templates.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
 		CProfile::update('web.templates.filter.evaltype', getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
 			PROFILE_TYPE_INT
@@ -657,6 +663,8 @@ else {
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.templates.filter_name');
+		CProfile::delete('web.templates.filter_vendor_name');
+		CProfile::delete('web.templates.filter_vendor_version');
 		CProfile::deleteIdx('web.templates.filter_groups');
 		CProfile::delete('web.templates.filter.evaltype');
 		CProfile::deleteIdx('web.templates.filter.tags.tag');
@@ -666,6 +674,8 @@ else {
 
 	$filter = [
 		'name' => CProfile::get('web.templates.filter_name', ''),
+		'vendor_name' => CProfile::get('web.templates.filter_vendor_name', ''),
+		'vendor_version' => CProfile::get('web.templates.filter_vendor_version', ''),
 		'groups' => CProfile::getArray('web.templates.filter_groups', null),
 		'evaltype' => CProfile::get('web.templates.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 		'tags' => []
@@ -700,9 +710,11 @@ else {
 		'output' => ['templateid', $sortField],
 		'evaltype' => $filter['evaltype'],
 		'tags' => $filter['tags'],
-		'search' => [
-			'name' => ($filter['name'] === '') ? null : $filter['name']
-		],
+		'search' => array_filter([
+			'name' => $filter['name'],
+			'vendor_name' => $filter['vendor_name'],
+			'vendor_version' => $filter['vendor_version']
+		]),
 		'groupids' => $filter_groupids,
 		'editable' => true,
 		'sortfield' => $sortField,
@@ -727,7 +739,7 @@ else {
 	$paging = CPagerHelper::paginate($page_num, $templates, $sortOrder, new CUrl('templates.php'));
 
 	$templates = API::Template()->get([
-		'output' => ['templateid', 'name'],
+		'output' => ['templateid', 'name', 'vendor_name', 'vendor_version'],
 		'selectHosts' => ['hostid'],
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,

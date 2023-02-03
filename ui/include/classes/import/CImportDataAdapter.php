@@ -79,9 +79,17 @@ class CImportDataAdapter {
 			foreach ($this->data['templates'] as $template) {
 				$template = CArrayHelper::renameKeys($template, ['template' => 'host']);
 
-				$templates[] = array_intersect_key($template,
-					array_flip(['uuid', 'host', 'name', 'description', 'groups', 'tags', 'macros'])
-				);
+				if ($template['vendor']) {
+					$template['vendor_name'] = $template['vendor']['name'];
+					$template['vendor_version'] = $template['vendor']['version'];
+				}
+				else {
+					$template += array_fill_keys(['vendor_name', 'vendor_version'], '');
+				}
+
+				$templates[] = array_intersect_key($template, array_flip(['uuid', 'host', 'name', 'description',
+					'vendor_name', 'vendor_version', 'groups', 'tags', 'macros'
+				]));
 			}
 		}
 

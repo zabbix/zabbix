@@ -37,7 +37,7 @@ class CControllerPopupTestTriggerExpr extends CController {
 	];
 
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 
 		define('ZBX_PAGE_NO_MENU', true);
 		define('NO_LINK_IN_TESTING', true);

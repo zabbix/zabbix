@@ -126,7 +126,8 @@ $form->addItem([
 	$table,
 	$this->data['paging'],
 	new CActionButtonList('action', 'roleids', [
-		'userrole.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected roles?')]
+		'userrole.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected roles?'),
+			'csrf_token' => CCsrfTokenHelper::get('userrole')]
 	], 'userrole')
 ]);
 

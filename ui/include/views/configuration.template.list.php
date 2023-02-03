@@ -62,6 +62,16 @@ $filter = (new CFilter())
 			)
 			->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(_('Vendor'),
+				(new CTextBox('filter_vendor_name', $data['filter']['vendor_name'], false,
+					DB::getFieldLength('hosts', 'vendor_name')
+				))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(_('Version'),
+				(new CTextBox('filter_vendor_version', $data['filter']['vendor_version'], false,
+					DB::getFieldLength('hosts', 'vendor_version'))
+				)->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			),
 		(new CFormList())->addRow(_('Tags'), $filter_tags_table)
 	]);
@@ -79,7 +89,10 @@ $html_page = (new CHtmlPage())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", {rules_preset: "template"}, {
+					->onClick('return PopUp("popup.import", {
+						rules_preset: "template", "'.
+						CCsrfTokenHelper::CSRF_TOKEN_NAME.'": "'.CCsrfTokenHelper::get('import').'"
+					}, {
 						dialogueid: "popup_import",
 						dialogue_class: "modal-popup-generic"
 					});')
@@ -107,6 +120,8 @@ $table = (new CTableInfo())
 		_('Dashboards'),
 		_('Discovery'),
 		_('Web'),
+		_('Vendor'),
+		_('Version'),
 		_('Tags')
 	]);
 
@@ -181,6 +196,8 @@ foreach ($data['templates'] as $template) {
 			),
 			CViewHelper::showNum($template['httpTests'])
 		],
+		$template['vendor_name'],
+		$template['vendor_version'],
 		$data['tags'][$template['templateid']]
 	]);
 }
@@ -200,7 +217,9 @@ $form->addItem([
 			'popup.massupdate.template' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"openMassupdatePopup('popup.massupdate.template', {}, {
+						"openMassupdatePopup('popup.massupdate.template', ".
+							json_encode([CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('template')]).
+						", {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
 						});"
@@ -208,9 +227,12 @@ $form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?')],
+			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?'),
+				'csrf_token' => CCsrfTokenHelper::get('templates.php')
+			],
 			'template.massdeleteclear' => ['name' => _('Delete and clear'),
-				'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)')
+				'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'),
+				'csrf_token' => CCsrfTokenHelper::get('templates.php')
 			]
 		]
 	)

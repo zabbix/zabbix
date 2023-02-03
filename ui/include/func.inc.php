@@ -38,7 +38,7 @@ function zbx_is_callable(array $names) {
 
 /************ REQUEST ************/
 function redirect($url) {
-	$curl = (new CUrl($url))->removeArgument('sid');
+	$curl = (new CUrl($url))->removeArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME);
 	header('Location: '.$curl->getUrl());
 	exit;
 }
@@ -1635,7 +1635,8 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	// deny access to a page
 	else {
 		// url to redirect the user to after he logs in
-		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))->removeArgument('sid');
+		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))
+			->removeArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME);
 
 		if (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
 				&& CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED

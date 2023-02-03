@@ -1500,6 +1500,38 @@ static int	DBpatch_6030159(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6030160(void)
+{
+	const ZBX_FIELD	field = {"secret", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sessions", &field);
+}
+
+static int	DBpatch_6030161(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update sessions set secret=sessionid"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030162(void)
+{
+	const ZBX_FIELD field = {"vendor_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6030163(void)
+{
+	const ZBX_FIELD field = {"vendor_version", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
 #undef HOST_STATUS_TEMPLATE
 #define HOST_STATUS_TEMPLATE		3
 #define MAX_LONG_NAME_COLLISIONS	999999
@@ -1801,7 +1833,7 @@ static void	correct_entity_name(char **name, int uniq, size_t max_len, int *long
 		*name = zbx_dsprintf(*name, "%s %d", *name, uniq);
 }
 
-static int	DBpatch_6030160(void)
+static int	DBpatch_6030164(void)
 {
 	zbx_vector_valuemap_ptr_t		valuemaps;
 	zbx_vector_child_valuemap_ptr_t		child_valuemaps;
@@ -2195,7 +2227,7 @@ static void	collect_hostmacros(zbx_vector_uint64_t *parent_ids, zbx_vector_uint6
 }
 
 
-static int	DBpatch_6030161(void)
+static int	DBpatch_6030165(void)
 {
 	zbx_vector_hostmacro_ptr_t		hostmacros;
 	zbx_vector_child_hostmacro_ptr_t	child_hostmacros;
@@ -2436,7 +2468,7 @@ static void	DBpatch_propogate_tag(zbx_vector_tag_ptr_t *tags, zbx_db_patch_tag_t
 	zbx_db_free_result(result);
 }
 
-static int	DBpatch_6030162(void)
+static int	DBpatch_6030166(void)
 {
 	zbx_vector_tag_ptr_t		tags;
 	zbx_vector_child_tag_ptr_t	child_tags;
@@ -2618,7 +2650,7 @@ static void	DBpatch_propogate_tag_web(zbx_vector_tag_ptr_t *tags, zbx_db_patch_t
 	zbx_db_free_result(result);
 }
 
-static int	DBpatch_6030163(void)
+static int	DBpatch_6030167(void)
 {
 	zbx_vector_tag_ptr_t		tags;
 	zbx_vector_child_tag_ptr_t	child_tags;
@@ -3362,7 +3394,7 @@ static void	collect_dashboards(zbx_vector_uint64_t *parent_ids, zbx_vector_uint6
 	zbx_vector_uint64_destroy(&loc_child_templateids);
 }
 
-static int	DBpatch_6030164(void)
+static int	DBpatch_6030168(void)
 {
 	zbx_vector_dashboard_ptr_t		dashboards;
 	zbx_vector_child_dashboard_ptr_t	child_dashboards;
@@ -3591,7 +3623,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6030165(void)
+static int	DBpatch_6030169(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -3602,7 +3634,7 @@ static int	DBpatch_6030165(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6030166(void)
+static int	DBpatch_6030170(void)
 {
 	zbx_vector_uint64_t	itemids;
 	zbx_vector_str_t	uuids;
@@ -3677,7 +3709,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6030167(void)
+static int	DBpatch_6030171(void)
 {
 	int		ret = SUCCEED;
 	char		*sql = NULL;
@@ -3739,7 +3771,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6030168(void)
+static int	DBpatch_6030172(void)
 {
 	int		ret = SUCCEED;
 	char		*host_name, *uuid, *sql = NULL, *seed = NULL;
@@ -3807,7 +3839,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6030169(void)
+static int	DBpatch_6030173(void)
 {
 	int		ret = SUCCEED;
 	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
@@ -3856,7 +3888,7 @@ out:
 #undef ZBX_FLAG_DISCOVERY_PROTOTYPE
 #define ZBX_FLAG_DISCOVERY_PROTOTYPE	0x02
 
-static int	DBpatch_6030170(void)
+static int	DBpatch_6030174(void)
 {
 	int		ret = SUCCEED;
 	char		*name_tmpl, *uuid, *seed = NULL, *sql = NULL;
@@ -3906,7 +3938,7 @@ out:
 }
 #undef ZBX_FLAG_DISCOVERY_PROTOTYPE
 
-static int	DBpatch_6030171(void)
+static int	DBpatch_6030175(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -4100,5 +4132,9 @@ DBPATCH_ADD(6030168, 0, 1)
 DBPATCH_ADD(6030169, 0, 1)
 DBPATCH_ADD(6030170, 0, 1)
 DBPATCH_ADD(6030171, 0, 1)
+DBPATCH_ADD(6030172, 0, 1)
+DBPATCH_ADD(6030173, 0, 1)
+DBPATCH_ADD(6030174, 0, 1)
+DBPATCH_ADD(6030175, 0, 1)
 
 DBPATCH_END()

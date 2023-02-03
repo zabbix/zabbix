@@ -71,6 +71,8 @@ $hostTable = (new CTableInfo())
 		_('Tags')
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('host_prototypes.php');
+
 foreach ($this->data['hostPrototypes'] as $host_prototype) {
 	$name = [];
 
@@ -134,10 +136,9 @@ foreach ($this->data['hostPrototypes'] as $host_prototype) {
 				: 'hostprototype.massdisable'
 			)
 			->setArgument('context', $data['context'])
-			->setArgumentSID()
 			->getUrl()
 	))
-		->addSID()
+		->addCsrfToken($csrf_token)
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($host_prototype['status']));
 
@@ -151,7 +152,7 @@ foreach ($this->data['hostPrototypes'] as $host_prototype) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addSID()
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -172,13 +173,13 @@ $itemForm->addItem([
 	new CActionButtonList('action', 'group_hostid',
 		[
 			'hostprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create hosts from selected prototypes as enabled?')
+				'confirm' => _('Create hosts from selected prototypes as enabled?'), 'csrf_token' => $csrf_token
 			],
 			'hostprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create hosts from selected prototypes as disabled?')
+				'confirm' => _('Create hosts from selected prototypes as disabled?'), 'csrf_token' => $csrf_token
 			],
 			'hostprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected host prototypes?')
+				'confirm' => _('Delete selected host prototypes?'), 'csrf_token' => $csrf_token
 			]
 		],
 		$data['discovery_rule']['itemid']
