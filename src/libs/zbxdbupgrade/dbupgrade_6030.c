@@ -1514,6 +1514,20 @@ static int	DBpatch_6030161(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_6030162(void)
+{
+	const ZBX_FIELD field = {"vendor_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6030163(void)
+{
+	const ZBX_FIELD field = {"vendor_version", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
 #endif
 
 DBPATCH_START(6030)
@@ -1682,5 +1696,7 @@ DBPATCH_ADD(6030158, 0, 1)
 DBPATCH_ADD(6030159, 0, 1)
 DBPATCH_ADD(6030160, 0, 1)
 DBPATCH_ADD(6030161, 0, 1)
+DBPATCH_ADD(6030162, 0, 1)
+DBPATCH_ADD(6030163, 0, 1)
 
 DBPATCH_END()

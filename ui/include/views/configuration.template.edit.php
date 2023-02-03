@@ -173,6 +173,13 @@ $template_tab
 			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	);
 
+if ($data['vendor']) {
+	$template_tab->addRow(_('Vendor and version'), implode(', ', [
+		$data['vendor']['name'],
+		$data['vendor']['version']
+	]));
+}
+
 $tabs->addTab('tmplTab', _('Templates'), $template_tab, false);
 
 // tags
