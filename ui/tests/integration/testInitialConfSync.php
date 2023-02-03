@@ -291,10 +291,16 @@ class testInitialConfSync extends CIntegrationTest
 			]
 		],
 		[
+			'connector' =>
+			[
 
+			]
 		],
 		[
+			'connector_tag' =>
+			[
 
+			]
 		]
 	];
 
@@ -650,10 +656,16 @@ class testInitialConfSync extends CIntegrationTest
 			]
 		],
 		[
+			'connector' =>
+			[
 
+			]
 		],
 		[
+			'connector_tag' =>
+			[
 
+			]
 		]
 	];
 
@@ -1002,10 +1014,16 @@ class testInitialConfSync extends CIntegrationTest
 			]
 		],
 		[
+			'connector' =>
+			[
 
+			]
 		],
 		[
+			'connector_tag' =>
+			[
 
+			]
 		]
 	];
 
