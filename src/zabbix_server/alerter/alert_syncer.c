@@ -216,13 +216,6 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 	else
 		status_limit = 1;
 
-	/*zabbix_log(LOG_LEVEL_WARNING, "DIMBUG In %s()", __func__);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG %s() alertid    :" ZBX_FS_UI64, __func__, alertid);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG %s() mediatypeid:" ZBX_FS_UI64, __func__, mediatypeid);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG %s() eventid    :" ZBX_FS_UI64, __func__, eventid);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG %s() status     :%d", __func__, status);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG End of %s():%s alerts:%d", __func__, zbx_result_string(ret), alerts->values_num);*/
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s alerts:%d", __func__, zbx_result_string(ret), alerts->values_num);
 
 	return ret;
@@ -396,8 +389,6 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 
 	if (FAIL == am_db_get_alerts(&alerts) || 0 == alerts.values_num)
 		goto out;
-
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alert syncer %s() got %d alerts", __func__, alerts.values_num);
 
 	for (i = 0; i < alerts.values_num; i++)
 	{

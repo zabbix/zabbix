@@ -225,8 +225,6 @@ static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
 
 	zbx_alerter_deserialize_exec(ipc_message->data, &alertid, &command);
 
-	/*zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alerter %s() \"%s\"", __func__, command);*/
-
 	ret = execute_script_alert(command, error, sizeof(error));
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 

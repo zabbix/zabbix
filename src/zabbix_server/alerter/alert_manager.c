@@ -914,7 +914,6 @@ static int	am_retry_alert(zbx_am_t *manager, zbx_am_alert_t *alert)
 	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alertid:" ZBX_FS_UI64, __func__, alert->alertid);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alert manager In %s() alertid:" ZBX_FS_UI64, __func__, alert->alertid);
 
 	if (NULL == (mediatype = am_get_mediatype(manager, alert->mediatypeid)))
 		goto out;
@@ -1376,10 +1375,6 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alert manager PREPARE COMMAND %s() eventid   :" ZBX_FS_UI64, __func__, alert->eventid);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alert manager PREPARE COMMAND %s() p_eventid :" ZBX_FS_UI64, __func__, alert->p_eventid);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alert manager PREPARE COMMAND %s() params    :%s", __func__, alert->params);
-
 	*cmd = (char *)zbx_malloc(NULL, cmd_alloc);
 
 	zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, "%s/%s", scripts_path, mediatype->exec_path);
@@ -1472,12 +1467,6 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alert manager PROCESS ALERT %s() mediatype type:%d", __func__, mediatype->type);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alert manager PROCESS ALERT %s() alertid       :" ZBX_FS_UI64, __func__, alert->alertid);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alert manager PROCESS ALERT %s() mediatypeid   :" ZBX_FS_UI64, __func__, alert->mediatypeid);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alert manager PROCESS ALERT %s() eventid       :" ZBX_FS_UI64, __func__, alert->eventid);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alert manager PROCESS ALERT %s() p_eventid     :" ZBX_FS_UI64, __func__, alert->p_eventid);
-
 	if (NULL != mediatype->error)
 	{
 		if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
@@ -1513,8 +1502,6 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 		case MEDIA_TYPE_EXEC:
 			command = ZBX_IPC_ALERTER_EXEC;
 
-			zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alert manager PROCESS ALERT %s() MEDIA_TYPE_EXEC params :%s", __func__, alert->params);
-
 			if (FAIL == am_prepare_mediatype_exec_command(mediatype, alert, scripts_path, &cmd, &error))
 			{
 				if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
@@ -1527,7 +1514,6 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 				goto out;
 			}
 			data_len = zbx_alerter_serialize_exec(&data, alert->alertid, cmd);
-			zabbix_log(LOG_LEVEL_WARNING, "DIMBUG alert manager PROCESS ALERT %s() THE COMMAND IS: \"%s\"", __func__, cmd);
 			zbx_free(cmd);
 			break;
 		case MEDIA_TYPE_WEBHOOK:

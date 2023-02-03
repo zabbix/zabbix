@@ -383,8 +383,6 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 	zbx_uint32_t	data_len = 0, data_alloc = 1024, data_offset = 0, sendto_len, subject_len, message_len,
 			params_len;
 
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG serialize sendto:%s, subject:%s, message:%s, params:%s", sendto, subject, message, params);
-
 	*data = zbx_malloc(0, data_alloc);
 	alerter_serialize_mediatype(data, &data_alloc, &data_offset, mediatypeid, type, smtp_server, smtp_helo,
 			smtp_email, exec_path, gsm_modem, username, passwd, smtp_port, smtp_security, smtp_verify_peer,
@@ -429,8 +427,6 @@ void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t 
 	data += zbx_deserialize_str(data, subject, len);
 	data += zbx_deserialize_str(data, message, len);
 	(void)zbx_deserialize_str(data, params, len);
-
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG deserialized sendto:%s, subject:%s, message:%s, params:%s", *sendto, *subject, *message, *params);
 }
 
 zbx_uint32_t	zbx_alerter_serialize_webhook(unsigned char **data, const char *script_bin, int script_sz,

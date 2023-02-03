@@ -96,7 +96,6 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	unsigned char		type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-	zabbix_log(LOG_LEVEL_WARNING, "DIMBUG received alert.send: %s", jp->start);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_user_init(&user);
