@@ -672,8 +672,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	int		err = 0;
 	unsigned short	port;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config task %p", task);
-
 	if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_UNREACHABLE] &&
 			0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_POLLER] + CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER])
 	{
@@ -682,15 +680,12 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 0");
-
 	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) &&
 			0 < CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER])
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"JavaGateway\" configuration parameter is not specified or empty");
 		err = 1;
 	}
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 1");
 
 	if (0 != CONFIG_VALUE_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_VALUE_CACHE_SIZE)
 	{
@@ -698,7 +693,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 				" or greater than 128KB");
 		err = 1;
 	}
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 2");
 
 	if (0 != CONFIG_TREND_FUNC_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_TREND_FUNC_CACHE_SIZE)
 	{
@@ -706,14 +700,12 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 				" or greater than 128KB");
 		err = 1;
 	}
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 3");
 
 	if (NULL != CONFIG_SOURCE_IP && SUCCEED != zbx_is_supported_ip(CONFIG_SOURCE_IP))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
 		err = 1;
 	}
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 4");
 
 	if (NULL != CONFIG_STATS_ALLOWED_IP && FAIL == zbx_validate_peer_list(CONFIG_STATS_ALLOWED_IP, &ch_error))
 	{
@@ -721,7 +713,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		zbx_free(ch_error);
 		err = 1;
 	}
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 5");
 
 	if (SUCCEED != zbx_validate_export_type(zbx_config_export.type, NULL))
 	{
@@ -729,7 +720,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 				zbx_config_export.type);
 		err = 1;
 	}
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 6");
 
 	if (FAIL == zbx_parse_serveractive_element(CONFIG_NODE_ADDRESS, &address, &port, 10051) ||
 			(FAIL == zbx_is_supported_ip(address) && FAIL == zbx_validate_hostname(address)))
@@ -738,9 +728,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 				" is invalid", CONFIG_NODE_ADDRESS);
 		err = 1;
 	}
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 7");
 	zbx_free(address);
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 8");
 
 #if !defined(HAVE_IPV6)
 	err |= (FAIL == check_cfg_feature_str("Fping6Location", CONFIG_FPING6_LOCATION, "IPv6 support"));
@@ -769,10 +757,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	/* because they have non-zero default values */
 #endif
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 9");
 	if (SUCCEED != zbx_validate_log_parameters(task, &log_file_cfg))
 		err = 1;
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 10");
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	err |= (FAIL == check_cfg_feature_str("TLSCAFile", zbx_config_tls->ca_file, "TLS support"));
@@ -797,22 +783,18 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 			"OpenSSL 1.1.1 or newer"));
 #endif
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 11");
 #if !defined(HAVE_OPENIPMI)
 	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER],
 			"IPMI support"));
 #endif
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 12");
 	err |= (FAIL == zbx_db_validate_config_features(program_type, zbx_config_dbhigh));
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 13");
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER] && NULL == CONFIG_WEBSERVICE_URL)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"WebServiceURL\" configuration parameter must be set when "
 				" setting \"StartReportWriters\" configuration parameter");
 	}
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 14");
 
 	if (0 != err)
 		exit(EXIT_FAILURE);
@@ -1052,22 +1034,15 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{NULL}
 	};
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 0");
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 1");
 	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 2");
 	zbx_set_defaults();
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 3");
 
 	log_file_cfg.log_type = zbx_get_log_type(log_file_cfg.log_type_str);
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 4");
 
 	zbx_validate_config(task);
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 5");
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 6");
 	zbx_db_validate_config(zbx_config_dbhigh);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -1198,12 +1173,8 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int				zbx_optind = 0;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG main");
-
 	zbx_config_tls = zbx_config_tls_new();
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG main 0");
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG main 1");
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
@@ -1275,7 +1246,6 @@ int	main(int argc, char **argv)
 
 	/* required for simple checks */
 	zbx_init_metrics();
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG main 2");
 	zbx_load_config(&t);
 
 	zbx_init_library_cfg(program_type);
