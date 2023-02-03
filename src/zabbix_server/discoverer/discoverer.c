@@ -500,6 +500,7 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 
 			net_check->drule = (DC_DRULE*)zbx_malloc(NULL, sizeof(DC_DRULE));
 			drule_copy(drule, net_check->drule);
+			zbx_vector_ptr_create(&net_check->drule->dchecks);
 
 			net_check->dcheck = (DC_DCHECK*)zbx_malloc(NULL, sizeof(DC_DCHECK));
 			dcheck_copy(dcheck, net_check->dcheck);
@@ -912,7 +913,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 
 	pthread_mutex_lock(&dmanager.queue.lock);
 
-	while(0 == worker->stop)
+	while (0 == worker->stop)
 	{
 		if (NULL != (job = discoverer_job_net_check_pop(worker->queue)))
 		{

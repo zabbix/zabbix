@@ -405,10 +405,10 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPPOLLER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]))
+	else if (local_server_num <= (server_count += 1))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_DISCOVERER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER];
+		*local_process_num = local_server_num - server_count + 1;
 	}
 	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTSYNCER]))
 	{
@@ -1451,7 +1451,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	change_proxy_history_count(proxy_get_history_count());
 
 	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
-		threads_num += CONFIG_FORKS[i];
+	{
+		/* skip threaded components */
+		if (ZBX_PROCESS_TYPE_DISCOVERER == i)
+			threads_num++;
+		else
+			threads_num += CONFIG_FORKS[i];
+	}
 
 	threads = (pid_t *)zbx_calloc(threads, (size_t)threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)threads_num, sizeof(int));
