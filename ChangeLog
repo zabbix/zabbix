@@ -1,8 +1,12 @@
 Changes for 6.0.14rc1
 
 New features:
+A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
+.........T [ZBX-21597] optimized Remote Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
+.........T [ZBX-21602] optimized Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.13
