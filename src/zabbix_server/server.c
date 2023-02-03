@@ -804,7 +804,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 #endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 12");
-	err |= (FAIL == zbx_db_validate_config_features(program_type));
+	err |= (FAIL == zbx_db_validate_config_features(program_type, zbx_config_dbhigh));
 	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_validate_config 13");
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER] && NULL == CONFIG_WEBSERVICE_URL)

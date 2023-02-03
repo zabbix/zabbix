@@ -719,7 +719,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (0 == CONFIG_PROXYCONFIG_FREQUENCY)
 		CONFIG_PROXYCONFIG_FREQUENCY = 10;
 
-	err |= (FAIL == zbx_db_validate_config_features(program_type));
+	err |= (FAIL == zbx_db_validate_config_features(program_type, zbx_config_dbhigh));
 
 	if (0 != err)
 		exit(EXIT_FAILURE);
