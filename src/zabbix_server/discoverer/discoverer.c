@@ -984,7 +984,12 @@ static void	*discoverer_net_check(void *net_check_worker)
 				zbx_vector_ptr_append(&dmanager.results, result);
 			}
 			else
+			{
+				drule_free(job->drule);
+				zbx_free(job->ip);
+				zbx_free(job->dns);
 				result = (zbx_discovery_results_t *)dmanager.results.values[index];
+			}
 
 			zbx_vector_ptr_append(&result->services, service);
 
