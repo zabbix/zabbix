@@ -22,7 +22,7 @@
 class CControllerTokenList extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {

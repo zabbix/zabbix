@@ -22,7 +22,7 @@
 class CControllerAuthenticationEdit extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	/**

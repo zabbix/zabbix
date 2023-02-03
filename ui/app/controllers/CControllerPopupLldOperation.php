@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/forms.inc.php';
 class CControllerPopupLldOperation extends CController {
 
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {

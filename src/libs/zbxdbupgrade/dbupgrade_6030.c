@@ -1496,6 +1496,24 @@ static int	DBpatch_6030159(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_6030160(void)
+{
+	const ZBX_FIELD	field = {"secret", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sessions", &field);
+}
+
+static int	DBpatch_6030161(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update sessions set secret=sessionid"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6030)
@@ -1662,5 +1680,7 @@ DBPATCH_ADD(6030156, 0, 1)
 DBPATCH_ADD(6030157, 0, 1)
 DBPATCH_ADD(6030158, 0, 1)
 DBPATCH_ADD(6030159, 0, 1)
+DBPATCH_ADD(6030160, 0, 1)
+DBPATCH_ADD(6030161, 0, 1)
 
 DBPATCH_END()

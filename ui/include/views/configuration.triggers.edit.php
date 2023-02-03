@@ -41,6 +41,7 @@ $url = (new CUrl('triggers.php'))
 // Create form.
 $triggersForm = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('triggers.php')))->removeId())
 	->setid('triggers-form')
 	->setName('triggersForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -714,8 +715,8 @@ if (!empty($data['triggerid'])) {
 			new CSubmit('clone', _('Clone')),
 			(new CButtonDelete(
 				_('Delete trigger?'),
-				url_params(['form', 'hostid', 'triggerid', 'context', 'backurl']),
-				'context'
+				url_params(['form', 'hostid', 'triggerid', 'context', 'backurl']).'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.
+				'='.CCsrfTokenHelper::get('triggers.php'), 'context'
 			))->setEnabled(!$data['limited']),
 			$cancelButton
 		]

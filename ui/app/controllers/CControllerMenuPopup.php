@@ -21,6 +21,10 @@
 
 class CControllerMenuPopup extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'type' => 'required|in history,host,item,item_prototype,map_element,trigger,trigger_macro',
@@ -230,7 +234,8 @@ class CControllerMenuPopup extends CController {
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
 				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 				'allowed_ui_hosts' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS),
-				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+				'csrf_token' => CCsrfTokenHelper::get('scriptexec')
 			];
 
 			if ($has_goto) {
@@ -860,6 +865,10 @@ class CControllerMenuPopup extends CController {
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation']
 				];
+			}
+
+			if ($scripts) {
+				$menu_data['csrf_token'] = CCsrfTokenHelper::get('scriptexec');
 			}
 
 			foreach (array_values($urls) as $url) {
