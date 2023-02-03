@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-06-07T19:33:02Z'
   template_groups:
     -
       uuid: 1d12408342854fd5a4436dd6d5d1bd4a
@@ -26,6 +25,9 @@ zabbix_export:
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410060-discussion-thread-for-official-zabbix-template-asterisk
         
         Template tooling version used: 0.41
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Telephony
