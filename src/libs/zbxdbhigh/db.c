@@ -173,38 +173,38 @@ static void	check_cfg_empty_str(const char *parameter, const char *value)
 	}
 }
 
-void	zbx_db_validate_config(void)
+void	zbx_db_validate_config(zbx_config_dbhigh_t *config_dbhigh)
 {
-	check_cfg_empty_str("DBTLSConnect", zbx_cfg_dbhigh->config_db_tls_connect);
-	check_cfg_empty_str("DBTLSCertFile", zbx_cfg_dbhigh->config_db_tls_cert_file);
-	check_cfg_empty_str("DBTLSKeyFile", zbx_cfg_dbhigh->config_db_tls_key_file);
-	check_cfg_empty_str("DBTLSCAFile", zbx_cfg_dbhigh->config_db_tls_ca_file);
-	check_cfg_empty_str("DBTLSCipher", zbx_cfg_dbhigh->config_db_tls_cipher);
-	check_cfg_empty_str("DBTLSCipher13", zbx_cfg_dbhigh->config_db_tls_cipher_13);
+	check_cfg_empty_str("DBTLSConnect", config_dbhigh->config_db_tls_connect);
+	check_cfg_empty_str("DBTLSCertFile", config_dbhigh->config_db_tls_cert_file);
+	check_cfg_empty_str("DBTLSKeyFile", config_dbhigh->config_db_tls_key_file);
+	check_cfg_empty_str("DBTLSCAFile", config_dbhigh->config_db_tls_ca_file);
+	check_cfg_empty_str("DBTLSCipher", config_dbhigh->config_db_tls_cipher);
+	check_cfg_empty_str("DBTLSCipher13", config_dbhigh->config_db_tls_cipher_13);
 
-	if (NULL != zbx_cfg_dbhigh->config_db_tls_connect &&
-			0 != strcmp(zbx_cfg_dbhigh->config_db_tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT) &&
-			0 != strcmp(zbx_cfg_dbhigh->config_db_tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT) &&
-			0 != strcmp(zbx_cfg_dbhigh->config_db_tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT))
+	if (NULL != config_dbhigh->config_db_tls_connect &&
+			0 != strcmp(config_dbhigh->config_db_tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT) &&
+			0 != strcmp(config_dbhigh->config_db_tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT) &&
+			0 != strcmp(config_dbhigh->config_db_tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"DBTLSConnect\" configuration parameter: '%s'",
-				zbx_cfg_dbhigh->config_db_tls_connect);
+				config_dbhigh->config_db_tls_connect);
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL != zbx_cfg_dbhigh->config_db_tls_connect &&
-			(0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT, zbx_cfg_dbhigh->config_db_tls_connect) ||
-			0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT, zbx_cfg_dbhigh->config_db_tls_connect)) &&
-			NULL == zbx_cfg_dbhigh->config_db_tls_ca_file)
+	if (NULL != config_dbhigh->config_db_tls_connect &&
+			(0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT, config_dbhigh->config_db_tls_connect) ||
+			0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT, config_dbhigh->config_db_tls_connect)) &&
+			NULL == config_dbhigh->config_db_tls_ca_file)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "parameter \"DBTLSConnect\" value \"%s\" requires \"DBTLSCAFile\", but it"
-				" is not defined", zbx_cfg_dbhigh->config_db_tls_connect);
+				" is not defined", config_dbhigh->config_db_tls_connect);
 		exit(EXIT_FAILURE);
 	}
 
-	if ((NULL != zbx_cfg_dbhigh->config_db_tls_cert_file || NULL != zbx_cfg_dbhigh->config_db_tls_key_file) &&
-			(NULL == zbx_cfg_dbhigh->config_db_tls_cert_file ||
-			NULL == zbx_cfg_dbhigh->config_db_tls_key_file || NULL == zbx_cfg_dbhigh->config_db_tls_ca_file))
+	if ((NULL != config_dbhigh->config_db_tls_cert_file || NULL != config_dbhigh->config_db_tls_key_file) &&
+			(NULL == config_dbhigh->config_db_tls_cert_file ||
+			NULL == config_dbhigh->config_db_tls_key_file || NULL == config_dbhigh->config_db_tls_ca_file))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "parameter \"DBTLSKeyFile\" or \"DBTLSCertFile\" is defined, but"
 				" \"DBTLSKeyFile\", \"DBTLSCertFile\" or \"DBTLSCAFile\" is not defined");

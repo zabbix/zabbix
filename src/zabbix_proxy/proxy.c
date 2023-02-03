@@ -981,7 +981,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	}
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-	zbx_db_validate_config();
+	zbx_db_validate_config(zbx_config_dbhigh);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_validate_config(zbx_config_tls, CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS],

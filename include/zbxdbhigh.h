@@ -501,7 +501,7 @@ void	zbx_db_close(void);
 
 int	zbx_db_validate_config_features(unsigned char program_type);
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-void	zbx_db_validate_config(void);
+void	zbx_db_validate_config(zbx_config_dbhigh_t *config_dbhigh);
 #endif
 
 #ifdef HAVE_ORACLE
