@@ -1490,7 +1490,10 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 		/* start single discoverer manager process */
 		if (ZBX_PROCESS_TYPE_DISCOVERER == i)
+		{
 			threads_num++;
+			continue;
+		}
 
 		threads_num += CONFIG_FORKS[i];
 	}

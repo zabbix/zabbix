@@ -1467,7 +1467,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		/* start single discoverer manager process */
 		if (ZBX_PROCESS_TYPE_DISCOVERER == i)
+		{
 			threads_num++;
+			continue;
+		}
 
 		threads_num += CONFIG_FORKS[i];
 	}
