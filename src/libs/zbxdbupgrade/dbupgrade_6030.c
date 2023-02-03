@@ -1542,7 +1542,7 @@ static int	DBpatch_6030164(void)
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
 	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
 			return FAIL;
 	}
 
