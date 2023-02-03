@@ -462,9 +462,12 @@ class CMediatype extends CApiService {
 			}
 
 			if (array_key_exists('exec_params', $mediatype)) {
-
 				if ($type == MEDIA_TYPE_EXEC && !array_key_exists('parameters', $mediatype)) {
-					$mediatype['parameters'] = explode("\n", trim($mediatype['exec_params']));
+					$parameters = explode("\n", trim($mediatype['exec_params']));
+
+					foreach ($parameters as $sortorder => $value) {
+						$mediatype['parameters'][] = ['sortorder' => $sortorder, 'value' => $value];
+					}
 				}
 
 				unset($mediatype['exec_params']);
