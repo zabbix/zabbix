@@ -175,6 +175,7 @@ static void	check_cfg_empty_str(const char *parameter, const char *value)
 
 void	zbx_db_validate_config(zbx_config_dbhigh_t *config_dbhigh)
 {
+	printf("AKDBG config_dbhigh %p\n", config_dbhigh);
 	check_cfg_empty_str("DBTLSConnect", config_dbhigh->config_db_tls_connect);
 	check_cfg_empty_str("DBTLSCertFile", config_dbhigh->config_db_tls_cert_file);
 	check_cfg_empty_str("DBTLSKeyFile", config_dbhigh->config_db_tls_key_file);
