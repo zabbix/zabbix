@@ -433,13 +433,6 @@ class CImportDataAdapter {
 					unset($message_template);
 				}
 
-				if ($media_type['type'] == MEDIA_TYPE_EXEC && array_key_exists('parameters', $media_type)) {
-					$media_type['exec_params'] = $media_type['parameters']
-						? implode("\n", $media_type['parameters'])."\n"
-						: '';
-					unset($media_type['parameters']);
-				}
-
 				$media_types[] = CArrayHelper::renameKeys($media_type, $keys);
 			}
 		}
