@@ -289,6 +289,22 @@ class testInitialConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '0'
 			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
 		]
 	];
 
@@ -642,6 +658,28 @@ class testInitialConfSync extends CIntegrationTest
 				"delete" =>
 				"0"
 			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'0',
+				'delete' =>
+				'0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'0',
+				'delete' =>
+				'0'
+			]
 		]
 	];
 
@@ -987,6 +1025,22 @@ class testInitialConfSync extends CIntegrationTest
 				'insert' => '0',
 				'update' => '0',
 				'delete' => '4'
+			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
 			]
 		]
 	];
