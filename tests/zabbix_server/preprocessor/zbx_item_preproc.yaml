@@ -2532,7 +2532,7 @@ in:
       3
 out:
   return: SUCCEED
-  value: '4277015829'
+  value: '353758974'
 ---
 test case: SNMP walk to value - BITS to integer - 2
 in:
@@ -2580,7 +2580,7 @@ in:
       3
 out:
   return: SUCCEED
-  value: '72623859790382856'
+  value: '578437695752307201'
 ---
 test case: SNMP walk to value - BITS to integer - 5
 in:
@@ -2596,7 +2596,7 @@ in:
       3
 out:
   return: SUCCEED
-  value: '72623859790382856'
+  value: '578437695752307201'
 ---
 test case: SNMP walk to value - BITS to integer - 6
 in:
@@ -3389,5 +3389,5 @@ in:
       3
 out:
   return: SUCCEED
-  value: '[{"{#SNMPINDEX}":"2","MACRO1":"21862","MACRO2":"10031136"},{"{#SNMPINDEX}":"1","MACRO1":"591879","MACRO2":"258"}]'
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"26197","MACRO2":"2101401"},{"{#SNMPINDEX}":"1","MACRO1":"460809","MACRO2":"513"}]'
 ...
