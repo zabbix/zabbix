@@ -182,6 +182,9 @@ static int	discover_service(const DC_DCHECK *dcheck, char *ip, int port, int con
 	const char	*service = NULL;
 	AGENT_RESULT	result;
 
+#ifndef HAVE_NETSNMP
+	ZBX_UNUSED(config_timeout);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_init_agent_result(&result);
