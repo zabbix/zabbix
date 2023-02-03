@@ -280,13 +280,10 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 
 		if (0 == steps.values_num)
 		{
-			zbx_variant_t	value;
-
 			result = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t));
 
 			result->action = ZBX_PREPROC_FAIL_DEFAULT;
-			zbx_variant_set_str(&value, zbx_strdup(NULL, values[i]));
-			zbx_variant_copy(&result->value, &value);
+			zbx_variant_set_str(&result->value, zbx_strdup(NULL, values[i]));
 			zbx_variant_set_none(&result->value_raw);
 			zbx_vector_pp_result_ptr_append(&results, result);
 		}
