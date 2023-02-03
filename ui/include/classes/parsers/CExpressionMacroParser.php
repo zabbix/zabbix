@@ -35,6 +35,11 @@ class CExpressionMacroParser extends CParser {
 	private $error = '';
 
 	/**
+	 * @var array
+	 */
+	private $tokens = [];
+
+	/**
 	 * An options array.
 	 *
 	 * Supported options:

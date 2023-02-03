@@ -106,14 +106,12 @@ class CLdap {
 	 */
 	protected $ds;
 
-	public function __construct($config = []) {
+	public function __construct(array $config = []) {
 		$this->ds = false;
 		$this->bound = static::BIND_NONE;
 		$this->error = static::ERR_NONE;
 
-		if (is_array($config)) {
-			$this->cnf = zbx_array_merge($this->cnf, $config);
-		}
+		$this->cnf = zbx_array_merge($this->cnf, $config);
 
 		if ($this->cnf['search_filter'] === '') {
 			$this->cnf['search_filter'] = static::DEFAULT_FILTER_USER;
