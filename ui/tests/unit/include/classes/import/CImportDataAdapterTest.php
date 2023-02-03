@@ -4269,7 +4269,6 @@ class CImportDataAdapterTest extends TestCase {
 					]
 				],
 				'macros' => [],
-				'templates' => [],
 				'uuid' => '0c45e5ed44ea494dabfa4136f420aa65',
 				'host' => 'vendor test',
 				'name' => 'vendor test',
