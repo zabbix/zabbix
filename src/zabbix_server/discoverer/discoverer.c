@@ -799,12 +799,12 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 	for (i = 0; i < manager->results.values_num; i++)
 	{
 		zbx_discovery_results_t	*result = manager->results.values[i];
-		ZBX_DB_DHOST		dhost;
+		zbx_db_dhost		dhost;
 		int			host_status = -1, k;
 
 		for (k = 0; k < result->services.values_num; k++)
 		{
-			zbx_service_t	*service = result->services.values[k];
+			zbx_dservice_t	*service = result->services.values[k];
 
 			if (-1 == host_status || DOBJECT_STATUS_UP == service->status)
 			{
@@ -815,7 +815,7 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 			}
 		}
 
-		memset(&dhost, 0, sizeof(ZBX_DB_DHOST));
+		memset(&dhost, 0, sizeof(zbx_db_dhost));
 
 		process_services(result->drule, &dhost, result->ip, result->dns, result->now, &result->services);
 
@@ -926,7 +926,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 		{
 			int			index, skip = 1;
 			zbx_uint64_pair_t	revision, *revision_updated;
-			zbx_service_t		*service = NULL;
+			zbx_dservice_t		*service = NULL;
 			zbx_discovery_results_t	*result = NULL, result_cmp;
 			DC_DRULE		drule_cmp;
 
@@ -956,7 +956,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 
 			/* perform net checks */
 
-			service = (zbx_service_t *)zbx_malloc(service, sizeof(zbx_service_t));
+			service = (zbx_dservice_t *)zbx_malloc(service, sizeof(zbx_dservice_t));
 
 			service->status = (SUCCEED == discover_service(job->dcheck, job->ip, job->port,
 					job->config_timeout, &value, &value_alloc)) ? DOBJECT_STATUS_UP :
