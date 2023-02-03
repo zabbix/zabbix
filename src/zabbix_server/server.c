@@ -1034,15 +1034,22 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{NULL}
 	};
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 0");
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 1");
 	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 2");
 	zbx_set_defaults();
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 3");
 
 	log_file_cfg.log_type = zbx_get_log_type(log_file_cfg.log_type_str);
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 4");
 
 	zbx_validate_config(task);
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 5");
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG zbx_load_config 6");
 	zbx_db_validate_config(zbx_config_dbhigh);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -1176,7 +1183,9 @@ int	main(int argc, char **argv)
 	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG main");
 
 	zbx_config_tls = zbx_config_tls_new();
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG main 0");
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG main 1");
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
@@ -1248,6 +1257,7 @@ int	main(int argc, char **argv)
 
 	/* required for simple checks */
 	zbx_init_metrics();
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG main 2");
 	zbx_load_config(&t);
 
 	zbx_init_library_cfg(program_type);
