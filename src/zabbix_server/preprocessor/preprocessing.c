@@ -931,7 +931,7 @@ zbx_uint64_t	zbx_preprocessor_get_queue_size(void)
  *                                                                            *
  ******************************************************************************/
 static zbx_uint32_t	preprocessor_pack_test_request(unsigned char **data, unsigned char value_type,
-		const char *value, const zbx_timespec_t *ts, const zbx_pp_history_t *history,
+		const char *value, const zbx_timespec_t *ts, unsigned char state, const zbx_pp_history_t *history,
 		const zbx_vector_pp_step_ptr_t *steps)
 {
 	zbx_packed_field_t	*offset, *fields;
@@ -942,7 +942,7 @@ static zbx_uint32_t	preprocessor_pack_test_request(unsigned char **data, unsigne
 	history_num = (NULL != history ? history->step_history.values_num : 0);
 
 	/* 6 is a max field count (without preprocessing step and history fields) */
-	fields = (zbx_packed_field_t *)zbx_malloc(NULL, (size_t)(6 + steps->values_num * 4 + history_num * 5)
+	fields = (zbx_packed_field_t *)zbx_malloc(NULL, (size_t)(7 + steps->values_num * 4 + history_num * 5)
 			* sizeof(zbx_packed_field_t));
 
 	offset = fields;
@@ -951,6 +951,7 @@ static zbx_uint32_t	preprocessor_pack_test_request(unsigned char **data, unsigne
 	*offset++ = PACKED_FIELD(value, 0);
 	*offset++ = PACKED_FIELD(&ts->sec, sizeof(int));
 	*offset++ = PACKED_FIELD(&ts->ns, sizeof(int));
+	*offset++ = PACKED_FIELD(&state, sizeof(unsigned char));
 
 	offset += preprocessor_pack_history(offset, history, &history_num);
 
@@ -983,13 +984,20 @@ void	zbx_preprocessor_unpack_test_request(zbx_pp_item_preproc_t *preproc, zbx_va
 	char			*str;
 	zbx_uint32_t		str_len;
 	const unsigned char	*offset = data;
+	unsigned char		state;
 
 	offset += zbx_deserialize_char(offset, &preproc->value_type);
 	offset += zbx_deserialize_str(offset, &str, str_len);
-	zbx_variant_set_str(value, str);
 
 	offset += zbx_deserialize_int(offset, &ts->sec);
 	offset += zbx_deserialize_int(offset, &ts->ns);
+
+	offset += zbx_deserialize_char(offset, &state);
+
+	if (ITEM_STATE_NORMAL == state)
+		zbx_variant_set_str(value, str);
+	else
+		zbx_variant_set_error(value, str);
 
 	preproc->history = zbx_pp_history_create(0);
 	offset += preprocessor_unpack_history(offset, preproc->history);
@@ -1008,15 +1016,15 @@ void	zbx_preprocessor_unpack_test_request(zbx_pp_item_preproc_t *preproc, zbx_va
  *                                                                            *
  ******************************************************************************/
 int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
-		const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
-		char **error)
+		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,
+		zbx_pp_history_t *history, char **error)
 {
 	unsigned char	*data = NULL;
 	zbx_uint32_t	size;
 	int		ret = FAIL;
 	unsigned char	*result;
 
-	size = preprocessor_pack_test_request(&data, value_type, value, ts, history, steps);
+	size = preprocessor_pack_test_request(&data, value_type, value, ts, state, history, steps);
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, ZBX_IPC_PREPROCESSOR_TEST_REQUEST,
 			SEC_PER_MIN, data, size, &result, error))

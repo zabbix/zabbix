@@ -287,7 +287,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 			zbx_variant_set_none(&result->value_raw);
 			zbx_vector_pp_result_ptr_append(&results, result);
 		}
-		else if (FAIL == zbx_preprocessor_test(value_type, values[i], &ts[i], &steps, &results, &history,
+		else if (FAIL == zbx_preprocessor_test(value_type, values[i], &ts[i], state, &steps, &results, &history,
 				error))
 		{
 			goto out;

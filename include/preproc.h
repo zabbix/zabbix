@@ -33,8 +33,8 @@ void	zbx_preprocessor_flush(void);
 zbx_uint64_t	zbx_preprocessor_get_queue_size(void);
 
 int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
-		const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
-		char **error);
+		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,
+		zbx_pp_history_t *history, char **error);
 
 int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
 		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, char **error);
