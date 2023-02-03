@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-12-23T19:05:57Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f

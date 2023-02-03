@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2020-10-16T09:33:49Z'
   media_types:
     -
       name: OTRS CE
