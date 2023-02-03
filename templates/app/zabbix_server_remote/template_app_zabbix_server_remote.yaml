@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:38:01Z'
+  date: '2023-01-31T19:12:42Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,12 @@ zabbix_export:
       uuid: 79b16cbbe593444eae3de66de0cb566b
       template: 'Remote Zabbix server health'
       name: 'Remote Zabbix server health'
-      description: 'Template tooling version used: 0.41'
+      description: |
+        This template is designed to monitor internal Zabbix metrics on the remote Zabbix server.
+        
+        Specify the address of the remote Zabbix server by changing {$ADDRESS} and {$PORT} macros. Don't forget to adjust the "StatsAllowedIP" parameter in the remote server's configuration file to allow the collection of statistics.
+        
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -22,7 +27,7 @@ zabbix_export:
           key: lld_queue
           delay: '0'
           history: 1w
-          description: 'Count of values enqueued in the low-level discovery processing queue.'
+          description: 'The count of values enqueued in the low-level discovery processing queue.'
           preprocessing:
             -
               type: JSONPATH
@@ -41,7 +46,7 @@ zabbix_export:
           key: preprocessing_queue
           delay: '0'
           history: 1w
-          description: 'Count of values enqueued in the preprocessing queue.'
+          description: 'The count of values enqueued in the preprocessing queue.'
           preprocessing:
             -
               type: JSONPATH
@@ -62,14 +67,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time alerter processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the alerter processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''alerter''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes alerter not started'
+              error_handler_params: 'No "alerter" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -98,14 +103,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time alert manager processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the alert manager processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''alert manager''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes alert manager not started'
+              error_handler_params: 'No "alert manager" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -134,14 +139,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time alert syncer processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the alert syncer processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''alert syncer''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes alert syncer not started'
+              error_handler_params: 'No "alert syncer" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -170,14 +175,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time availability manager processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the availability manager processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''availability manager''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes availability manager not started'
+              error_handler_params: 'No "availability manager" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -206,14 +211,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time configuration syncer processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the configuration syncer processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''configuration syncer''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes configuration syncer not started'
+              error_handler_params: 'No "configuration syncer" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -242,14 +247,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time discoverer processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the discoverer processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''discoverer''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes discoverer not started'
+              error_handler_params: 'No "discoverer" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -278,14 +283,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time escalator processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the escalator processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''escalator''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes escalator not started'
+              error_handler_params: 'No "escalator" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -314,14 +319,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time history poller processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the history poller processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''history poller''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes history poller not started'
+              error_handler_params: 'No "history poller" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -350,14 +355,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time history syncer processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the history syncer processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''history syncer''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes history syncer not started'
+              error_handler_params: 'No "history syncer" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -386,14 +391,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time housekeeper processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the housekeeper processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''housekeeper''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes housekeeper not started'
+              error_handler_params: 'No "housekeeper" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -422,14 +427,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time http poller processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the http poller processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''http poller''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes http poller not started'
+              error_handler_params: 'No "http poller" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -458,14 +463,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time icmp pinger processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the icmp pinger processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''icmp pinger''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes icmp pinger not started'
+              error_handler_params: 'No "icmp pinger" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -494,14 +499,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time ipmi manager processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the ipmi manager processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''ipmi manager''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes ipmi manager not started'
+              error_handler_params: 'No "ipmi manager" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -530,14 +535,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time ipmi poller processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the ipmi poller processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''ipmi poller''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes ipmi poller not started'
+              error_handler_params: 'No "ipmi poller" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -566,14 +571,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time java poller processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the java poller processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''java poller''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes java poller not started'
+              error_handler_params: 'No "java poller" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -602,14 +607,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time lld manager processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the lld manager processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''lld manager''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes LLD manager not started'
+              error_handler_params: 'No "LLD manager" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -638,14 +643,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time lld worker processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the lld worker processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''lld worker''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes LLD worker not started'
+              error_handler_params: 'No "LLD worker" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -674,7 +679,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time ODBC poller processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the ODBC poller processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -708,14 +713,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time poller processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the poller processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''poller''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes poller not started'
+              error_handler_params: 'No "poller" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -744,14 +749,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time preprocessing manager processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the preprocessing manager processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''preprocessing manager''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes preprocessing manager not started'
+              error_handler_params: 'No "preprocessing manager" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -780,14 +785,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time preprocessing worker processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the preprocessing worker processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''preprocessing worker''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes preprocessing worker not started'
+              error_handler_params: 'No "preprocessing worker" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -816,14 +821,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time proxy poller processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the proxy poller processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''proxy poller''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes proxy poller not started'
+              error_handler_params: 'No "proxy poller" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -852,14 +857,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time report manager processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the report manager processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''report manager''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes report manager not started'
+              error_handler_params: 'No "report manager" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -888,14 +893,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time report writer processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the report writer processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''report writer''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes report writer not started'
+              error_handler_params: 'No "report writer" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -924,14 +929,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time self-monitoring processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the self-monitoring processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''self-monitoring''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes self-monitoring not started'
+              error_handler_params: 'No "self-monitoring" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -960,14 +965,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time service manager processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the service manager processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''service manager''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes service manager not started'
+              error_handler_params: 'No "service manager" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -996,14 +1001,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time snmp trapper processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the snmp trapper processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''snmp trapper''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes snmp trapper not started'
+              error_handler_params: 'No "snmp trapper" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -1032,14 +1037,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time task manager processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the task manager processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''task manager''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes task manager not started'
+              error_handler_params: 'No "task manager" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -1068,14 +1073,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time timer processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the timer processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''timer''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes timer not started'
+              error_handler_params: 'No "timer" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -1104,14 +1109,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time trapper processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the trapper processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''trapper''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes trapper not started'
+              error_handler_params: 'No "trapper" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -1140,14 +1145,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time trigger housekeeper processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the trigger housekeeper processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''trigger housekeeper''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes trigger housekeeper not started'
+              error_handler_params: 'No "trigger housekeeper" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -1176,14 +1181,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time unreachable poller processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the unreachable poller processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''unreachable poller''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes unreachable poller not started'
+              error_handler_params: 'No "unreachable poller" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -1212,14 +1217,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time vmware collector processes have been busy in the last minute'
+          description: 'The average percentage of the time during which the vmware collector processes have been busy for the last minute.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.data.process[''vmware collector''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes vmware collector not started'
+              error_handler_params: 'No "vmware collector" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -1248,7 +1253,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Availability statistics of Zabbix configuration cache. Percentage of used buffer.'
+          description: 'The availability statistics of Zabbix configuration cache. The percentage of used data buffer.'
           preprocessing:
             -
               type: JSONPATH
@@ -1266,7 +1271,7 @@ zabbix_export:
               expression: 'max(/Remote Zabbix server health/rcache.buffer.pused,10m)>75'
               name: 'Remote Zabbix server: More than 75% used in the configuration cache'
               priority: AVERAGE
-              description: 'Consider increasing CacheSize in the zabbix_server.conf configuration file.'
+              description: 'Consider increasing `CacheSize` in the `zabbix_server.conf` configuration file.'
               tags:
                 -
                   tag: scope
@@ -1276,7 +1281,7 @@ zabbix_export:
                   value: performance
         -
           uuid: 1625b3470fbf4bd7aa5b7051e328b37c
-          name: 'Remote Zabbix server: Trend function cache, % unique requests'
+          name: 'Remote Zabbix server: Trend function cache, % of unique requests'
           type: DEPENDENT
           key: tcache.pitems
           delay: '0'
@@ -1284,16 +1289,15 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            Effectiveness statistics of the Zabbix trend function cache. Percentage
-            of cached items from cached items + requests. Low percentage most likely means
-            that the cache size can be reduced.
+            The effectiveness statistics of Zabbix trend function cache. The percentage of cached items calculated from the sum of cached items plus requests.
+            Low percentage most likely means that the cache size can be reduced.
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.data.tcache.pitems
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Not supported this version'
+              error_handler_params: 'Not supported in this version.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -1302,21 +1306,21 @@ zabbix_export:
               value: system
         -
           uuid: 2c8bf95e97dd48679e34591c72626c90
-          name: 'Remote Zabbix server: Trend function cache, % misses'
+          name: 'Remote Zabbix server: Trend function cache, % of misses'
           type: DEPENDENT
           key: tcache.pmisses
           delay: '0'
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Effectiveness statistics of the Zabbix trend function cache. Percentage of cache misses.'
+          description: 'The effectiveness statistics of Zabbix trend function cache. The percentage of cache misses.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.data.tcache.pmisses
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Not supported this version'
+              error_handler_params: 'Not supported in this version.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -1332,7 +1336,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Availability statistics of Zabbix value cache. Percentage of used buffer.'
+          description: 'The availability statistics of Zabbix value cache. The percentage of used data buffer.'
           preprocessing:
             -
               type: JSONPATH
@@ -1350,7 +1354,7 @@ zabbix_export:
               expression: 'max(/Remote Zabbix server health/vcache.buffer.pused,10m)>95'
               name: 'Remote Zabbix server: More than 95% used in the value cache'
               priority: AVERAGE
-              description: 'Consider increasing ValueCacheSize in the zabbix_server.conf configuration file.'
+              description: 'Consider increasing `ValueCacheSize` in the `zabbix_server.conf` configuration file.'
               tags:
                 -
                   tag: scope
@@ -1367,9 +1371,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: vps
-          description: |
-            Effectiveness statistics of Zabbix value cache. Number of cache hits
-            (history values taken from the cache).
+          description: 'The effectiveness statistics of Zabbix value cache. The number of cache hits (history values taken from the cache).'
           preprocessing:
             -
               type: JSONPATH
@@ -1394,9 +1396,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: vps
-          description: |
-            Effectiveness statistics of Zabbix value cache. Number of cache misses
-            (history values taken from the database).
+          description: 'The effectiveness statistics of Zabbix value cache. The number of cache misses (history values taken from the database).'
           preprocessing:
             -
               type: JSONPATH
@@ -1419,7 +1419,7 @@ zabbix_export:
           key: vcache.cache.mode
           delay: '0'
           history: 1w
-          description: 'Value cache operating mode.'
+          description: 'The operating mode of the value cache.'
           valuemap:
             name: 'Value cache operating mode'
           preprocessing:
@@ -1456,7 +1456,7 @@ zabbix_export:
           history: 1w
           trends: '0'
           value_type: CHAR
-          description: 'Version of Zabbix server.'
+          description: 'A version of Zabbix server.'
           preprocessing:
             -
               type: JSONPATH
@@ -1479,7 +1479,7 @@ zabbix_export:
               name: 'Remote Zabbix server: Version has changed'
               event_name: 'Remote Zabbix server: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Remote Zabbix server version has changed. Ack to close.'
+              description: 'Zabbix server version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1494,14 +1494,14 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Availability statistics of Zabbix vmware cache. Percentage of used buffer.'
+          description: 'The availability statistics of Zabbix vmware cache. The percentage of used data buffer.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.data.vmware.pused
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'No vmware collector processes started'
+              error_handler_params: 'No "vmware collector" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
@@ -1514,7 +1514,7 @@ zabbix_export:
               expression: 'max(/Remote Zabbix server health/vmware.buffer.pused,10m)>75'
               name: 'Remote Zabbix server: More than 75% used in the vmware cache'
               priority: AVERAGE
-              description: 'Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file.'
+              description: 'Consider increasing `VMwareCacheSize` in the `zabbix_server.conf` configuration file.'
               tags:
                 -
                   tag: scope
@@ -1532,8 +1532,8 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            Statistics and availability of Zabbix write cache. Percentage of used history buffer.
-            History cache is used to store item values. A high number indicates performance problems on the database side.
+            The statistics and availability of Zabbix write cache. The percentage of used history buffer.
+            The history cache is used to store item values. A high number indicates performance problems on the database side.
           preprocessing:
             -
               type: JSONPATH
@@ -1551,7 +1551,7 @@ zabbix_export:
               expression: 'max(/Remote Zabbix server health/wcache.history.pused,10m)>75'
               name: 'Remote Zabbix server: More than 75% used in the history cache'
               priority: AVERAGE
-              description: 'Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file.'
+              description: 'Consider increasing `HistoryCacheSize` in the `zabbix_server.conf` configuration file.'
               tags:
                 -
                   tag: scope
@@ -1569,8 +1569,8 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            Statistics and availability of Zabbix write cache. Percentage of used history index buffer.
-            History index cache is used to index values stored in history cache.
+            The statistics and availability of Zabbix write cache. The percentage of used history index buffer.
+            The history index cache is used to index values stored in the history cache.
           preprocessing:
             -
               type: JSONPATH
@@ -1588,7 +1588,7 @@ zabbix_export:
               expression: 'max(/Remote Zabbix server health/wcache.index.pused,10m)>75'
               name: 'Remote Zabbix server: More than 75% used in the history index cache'
               priority: AVERAGE
-              description: 'Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file.'
+              description: 'Consider increasing `HistoryIndexCacheSize` in the `zabbix_server.conf` configuration file.'
               tags:
                 -
                   tag: scope
@@ -1606,8 +1606,8 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            Statistics and availability of Zabbix write cache. Percentage of used trend buffer.
-            Trend cache stores aggregate for the current hour for all items that receive data.
+            The statistics and availability of Zabbix write cache. The percentage of used trend buffer.
+            The trend cache stores the aggregate of all items that have receive data for the current hour.
           preprocessing:
             -
               type: JSONPATH
@@ -1625,7 +1625,7 @@ zabbix_export:
               expression: 'max(/Remote Zabbix server health/wcache.trend.pused,10m)>75'
               name: 'Remote Zabbix server: More than 75% used in the trends cache'
               priority: AVERAGE
-              description: 'Consider increasing TrendCacheSize in the zabbix_server.conf configuration file.'
+              description: 'Consider increasing `TrendCacheSize` in the `zabbix_server.conf` configuration file.'
               tags:
                 -
                   tag: scope
@@ -1642,8 +1642,8 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           description: |
-            Statistics and availability of Zabbix write cache.
-            Total number of values processed by Zabbix server or Zabbix proxy, except unsupported items.
+            The statistics and availability of Zabbix write cache.
+            The total number of values processed by Zabbix server or Zabbix proxy, except unsupported items.
           preprocessing:
             -
               type: JSONPATH
@@ -1668,8 +1668,8 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           description: |
-            Statistics and availability of Zabbix write cache.
-            Number of processed float values.
+            The statistics and availability of Zabbix write cache.
+            The number of processed float values.
           preprocessing:
             -
               type: JSONPATH
@@ -1694,8 +1694,8 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           description: |
-            Statistics and availability of Zabbix write cache.
-            Number of processed log values.
+            The statistics and availability of Zabbix write cache.
+            The number of processed log values.
           preprocessing:
             -
               type: JSONPATH
@@ -1720,8 +1720,8 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           description: |
-            Statistics and availability of Zabbix write cache.
-            Number of times item processing resulted in item becoming unsupported or keeping that state.
+            The statistics and availability of Zabbix write cache.
+            The number of times the item processing resulted in an item becoming unsupported or keeping that state.
           preprocessing:
             -
               type: JSONPATH
@@ -1746,8 +1746,8 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           description: |
-            Statistics and availability of Zabbix write cache.
-            Number of processed character/string values.
+            The statistics and availability of Zabbix write cache.
+            The number of processed character/string values.
           preprocessing:
             -
               type: JSONPATH
@@ -1772,8 +1772,8 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           description: |
-            Statistics and availability of Zabbix write cache.
-            Number of processed text values.
+            The statistics and availability of Zabbix write cache.
+            The number of processed text values.
           preprocessing:
             -
               type: JSONPATH
@@ -1798,8 +1798,8 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           description: |
-            Statistics and availability of Zabbix write cache.
-            Number of processed numeric (unsigned) values.
+            The statistics and availability of Zabbix write cache.
+            The number of processed numeric (unsigned) values.
           preprocessing:
             -
               type: JSONPATH
@@ -1821,7 +1821,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[stats,{$ADDRESS},{$PORT},queue,10m]'
           history: 1w
-          description: 'Number of monitored items in the queue which are delayed at least by 10 minutes.'
+          description: 'The number of monitored items in the queue, which are delayed at least by 10 minutes.'
           preprocessing:
             -
               type: JSONPATH
@@ -1837,9 +1837,7 @@ zabbix_export:
               expression: 'min(/Remote Zabbix server health/zabbix[stats,{$ADDRESS},{$PORT},queue,10m],10m)>100'
               name: 'Remote Zabbix server: More than 100 items having missing data for more than 10 minutes'
               priority: WARNING
-              description: |
-                zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about
-                how many items are missing data for more than 10 minutes.
+              description: 'The `zabbix[stats,{$IP},{$PORT},queue,10m]` item collects data about the number of items that have been missing the data for more than 10 minutes.'
               tags:
                 -
                   tag: scope
@@ -1850,7 +1848,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[stats,{$ADDRESS},{$PORT},queue]'
           history: 1w
-          description: 'Number of monitored items in the queue which are delayed at least by 6 seconds.'
+          description: 'The number of monitored items in the queue, which are delayed at least by 6 seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -1868,7 +1866,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Zabbix server statistics master item.'
+          description: 'The master item of Zabbix server statistics.'
           tags:
             -
               tag: component
@@ -1880,7 +1878,7 @@ zabbix_export:
           type: DEPENDENT
           key: zabbix.nodes.discovery
           delay: '0'
-          description: 'LLD rule with item and trigger prototypes for node discovery.'
+          description: 'LLD rule with item and trigger prototypes for the node discovery.'
           item_prototypes:
             -
               uuid: caca3ccdcec141a3a9c3233ba72b8d0d
@@ -1891,18 +1889,18 @@ zabbix_export:
               history: 1w
               trends: '0'
               value_type: CHAR
-              description: 'Node IPv4 address.'
+              description: 'The IPv4 address of a node.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.data.ha[?(@.id=="{#NODE.ID}")].address.first()'
+                    - $.address
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
               tags:
                 -
                   tag: component
@@ -1921,14 +1919,14 @@ zabbix_export:
               delay: '0'
               history: 1w
               units: uptime
-              description: 'Time between database unix_timestamp() and last access time.'
+              description: 'The time between the database''s `unix_timestamp()` and the last access time.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.data.ha[?(@.id=="{#NODE.ID}")].lastaccess_age.first()'
+                    - $.lastaccess_age
               master_item:
-                key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
               tags:
                 -
                   tag: component
@@ -1952,13 +1950,43 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.data.ha[?(@.id=="{#NODE.ID}")].lastaccess.first()'
+                    - $.lastaccess
+              master_item:
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: node-id
+                  value: '{#NODE.ID}'
+                -
+                  tag: node-name
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 525b8142186b488eacb5db7a6044b3c4
+              name: 'Cluster node [{#NODE.NAME}]: Stats'
+              type: DEPENDENT
+              key: 'zabbix.nodes.stats[{#NODE.ID}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Provides the statistics of a node.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data.ha[?(@.id=="{#NODE.ID}")].first()'
               master_item:
                 key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
               tags:
                 -
                   tag: component
                   value: cluster
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: node-id
                   value: '{#NODE.ID}'
@@ -1972,20 +2000,20 @@ zabbix_export:
               key: 'zabbix.nodes.status[{#NODE.ID}]'
               delay: '0'
               history: 1w
-              description: 'Node status.'
+              description: 'The status of a node.'
               valuemap:
                 name: 'Cluster node status'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.data.ha[?(@.id=="{#NODE.ID}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+                key: 'zabbix.nodes.stats[{#NODE.ID}]'
               tags:
                 -
                   tag: component
