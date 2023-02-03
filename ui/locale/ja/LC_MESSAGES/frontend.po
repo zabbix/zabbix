@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-08 02:32+0000\n"
+"PO-Revision-Date: 2023-01-30 00:56+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -1051,7 +1051,7 @@ msgstr "拡張ラベル"
 
 #: app/views/popup.import.php:175
 msgid "Advanced options"
-msgstr ""
+msgstr "高度なオプション"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -1774,6 +1774,14 @@ msgstr "基本色"
 msgid "Basic"
 msgstr "Basic"
 
+#: app/views/connector.edit.php:136
+msgid "Bearer"
+msgstr ""
+
+#: app/views/connector.edit.php:156
+msgid "Bearer token"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
 msgstr "値の前"
@@ -2309,6 +2317,11 @@ msgstr "データベースへのコネクションを作成できません。"
 msgid "Cannot create circular dependencies."
 msgstr "循環する依存関係は作成できません。"
 
+#: app/controllers/CControllerConnectorCreate.php:89
+#: app/controllers/CControllerConnectorCreate.php:164
+msgid "Cannot create connector"
+msgstr ""
+
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
 msgstr "自身に対する依存関係は作成できません。"
@@ -2377,6 +2390,11 @@ msgstr "アクションを削除できません"
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
 msgstr "割り当てられたユーザーの役割\"%1$s\"が削除できません。"
+
+#: app/controllers/CControllerConnectorDelete.php:68
+msgid "Cannot delete connector"
+msgid_plural "Cannot delete connectors"
+msgstr[0] ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2658,6 +2676,11 @@ msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "アクションを無効にできません"
 
+#: app/controllers/CControllerConnectorDisable.php:77
+msgid "Cannot disable connector"
+msgid_plural "Cannot disable connectors"
+msgstr[0] ""
+
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
@@ -2729,6 +2752,11 @@ msgstr[0] "SLAを有効にできません"
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "アクションを有効にできません"
+
+#: app/controllers/CControllerConnectorEnable.php:77
+msgid "Cannot enable connector"
+msgid_plural "Cannot enable connectors"
+msgstr[0] ""
 
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
@@ -3613,6 +3641,11 @@ msgstr "認証の設定を更新できません"
 #: app/controllers/CControllerTrigDisplayUpdate.php:111
 msgid "Cannot update configuration"
 msgstr "設定を更新できません"
+
+#: app/controllers/CControllerConnectorUpdate.php:90
+#: app/controllers/CControllerConnectorUpdate.php:173
+msgid "Cannot update connector"
+msgstr ""
 
 #: app/controllers/CControllerCorrelationCreate.php:47
 #: app/controllers/CControllerCorrelationUpdate.php:48
@@ -4665,6 +4698,45 @@ msgstr "ホストへの接続"
 msgid "Connections to proxy"
 msgstr "プロキシへの接続"
 
+#: app/controllers/CControllerAuditLogList.php:212
+#: app/views/connector.edit.php:283 app/views/connector.edit.php:297
+msgid "Connector"
+msgstr ""
+
+#: include/classes/api/services/CConnector.php:446
+#, c-format
+msgid "Connector \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerConnectorCreate.php:156
+msgid "Connector created"
+msgstr ""
+
+#: app/controllers/CControllerConnectorDelete.php:60
+msgid "Connector deleted"
+msgid_plural "Connectors deleted"
+msgstr[0] ""
+
+#: app/controllers/CControllerConnectorDisable.php:69
+msgid "Connector disabled"
+msgid_plural "Connectors disabled"
+msgstr[0] ""
+
+#: app/controllers/CControllerConnectorEnable.php:69
+msgid "Connector enabled"
+msgid_plural "Connectors enabled"
+msgstr[0] ""
+
+#: app/controllers/CControllerConnectorUpdate.php:165
+msgid "Connector updated"
+msgstr ""
+
+#: app/controllers/CControllerConnectorList.php:104
+#: app/views/connector.list.php:132 include/classes/helpers/CMenuHelper.php:360
+#: include/html.inc.php:891
+msgid "Connectors"
+msgstr ""
+
 #: include/views/monitoring.sysmap.list.php:85
 #: include/views/monitoring.sysmap.list.php:86
 msgid "Constructor"
@@ -4870,6 +4942,10 @@ msgstr "ログローテーションに対応したログの一致行数。整数
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "ログの一致行数。整数値を返す。"
 
+#: include/classes/data/CItemData.php:1802
+msgid "Count of values enqueued in the connector queue."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1638
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr "ローレベルディスカバリ処理キュー内にキューイングされた値の数。"
@@ -4906,6 +4982,10 @@ msgstr "マップの作成と変更"
 #: app/views/administration.image.list.php:62
 msgid "Create background"
 msgstr "背景の作成"
+
+#: app/views/connector.list.php:139
+msgid "Create connector"
+msgstr ""
 
 #: app/views/configuration.correlation.list.php:37
 msgid "Create correlation"
@@ -5404,6 +5484,10 @@ msgstr "データセットラベル"
 msgid "Data storage period"
 msgstr "データ保存期間"
 
+#: app/views/connector.edit.php:54 app/views/connector.list.php:73
+msgid "Data type"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:565
 #: include/classes/setup/CSetupWizard.php:717
 #: include/classes/setup/CSetupWizard.php:976
@@ -5828,6 +5912,14 @@ msgstr "選択したアクションを削除しますか？"
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "選択したアクションを削除しますか？"
+
+#: app/views/connector.edit.php:332 app/views/js/connector.list.js.php:129
+msgid "Delete selected connector?"
+msgstr ""
+
+#: app/views/js/connector.list.js.php:128
+msgid "Delete selected connectors?"
+msgstr ""
 
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
@@ -6259,6 +6351,14 @@ msgstr "選択したアクションを無効にしますか？"
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
 msgstr "選択したアクションを無効にしますか？"
+
+#: app/views/js/connector.list.js.php:114
+msgid "Disable selected connector?"
+msgstr ""
+
+#: app/views/js/connector.list.js.php:113
+msgid "Disable selected connectors?"
+msgstr ""
 
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
@@ -7057,6 +7157,14 @@ msgstr "選択したアクションを有効にしますか？"
 msgid "Enable selected actions?"
 msgstr "選択したアクションを有効にしますか？"
 
+#: app/views/js/connector.list.js.php:99
+msgid "Enable selected connector?"
+msgstr ""
+
+#: app/views/js/connector.list.js.php:98
+msgid "Enable selected connectors?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
 msgstr "選択した相関関係を有効にしますか？"
@@ -7341,6 +7449,10 @@ msgstr "イベントタイプ"
 msgid "Event updated"
 msgid_plural "Events updated"
 msgstr[0] "イベントを更新しました"
+
+#: app/views/connector.edit.php:58 app/views/connector.list.php:99
+msgid "Events"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
@@ -10513,6 +10625,13 @@ msgstr "インストール"
 msgid "Installer name"
 msgstr "インストーラ名"
 
+#: include/forms.inc.php:1392 include/forms.inc.php:1425
+#: include/views/js/item.preprocessing.js.php:142
+#: include/views/js/item.preprocessing.js.php:180
+#: include/views/js/item.preprocessing.js.php:227
+msgid "Integer from BITS"
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:360
 msgid "Integrations"
 msgstr "インテグレーション"
@@ -12413,6 +12532,10 @@ msgstr "概要テーブル内の列と行の最大数"
 msgid "Max period for time selector"
 msgstr "タイムセレクターの最大期間"
 
+#: app/views/connector.edit.php:171
+msgid "Max records per message"
+msgstr ""
+
 #: app/controllers/CControllerPopupItemTest.php:1313
 #: app/controllers/CControllerPopupItemTest.php:1319
 #: app/controllers/CControllerPopupItemTest.php:1325
@@ -13272,6 +13395,10 @@ msgstr "新規列"
 #: app/controllers/CControllerPopupConditionOperations.php:68
 msgid "New condition"
 msgstr "新規条件"
+
+#: app/views/connector.edit.php:312 app/views/connector.edit.php:341
+msgid "New connector"
+msgstr ""
 
 #: app/controllers/CControllerDashboardView.php:154
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
@@ -14955,18 +15082,42 @@ msgstr "パラメータ"
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr "パラメーター\"esc_step_from\"と\"esc_step_to\"は一緒に設定してください。"
 
+#: include/views/configuration.host.discovery.edit.php:68
+msgid "Parent discovery rule"
+msgstr ""
+
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.prototype.edit.php:64
 msgid "Parent discovery rules"
 msgstr "親ディスカバリルール"
 
+#: include/views/configuration.graph.edit.php:88
+msgid "Parent graph"
+msgstr ""
+
+#: include/views/configuration.graph.edit.php:91
+msgid "Parent graph prototype"
+msgstr ""
+
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "親グラフ"
 
+#: include/views/configuration.host.prototype.edit.php:81
+msgid "Parent host prototype"
+msgstr ""
+
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
 msgstr "親ホストの値"
+
+#: include/views/configuration.item.edit.php:71
+msgid "Parent item"
+msgstr ""
+
+#: include/views/configuration.item.prototype.edit.php:70
+msgid "Parent item prototype"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -14978,14 +15129,30 @@ msgstr "親アイテム"
 msgid "Parent services"
 msgstr "親サービス"
 
+#: app/partials/configuration.tags.tab.php:38
+msgid "Parent template"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:42
 msgid "Parent templates"
 msgstr "親テンプレート"
+
+#: include/views/configuration.triggers.edit.php:104
+msgid "Parent trigger"
+msgstr ""
+
+#: include/views/configuration.trigger.prototype.edit.php:95
+msgid "Parent trigger prototype"
+msgstr ""
 
 #: include/views/configuration.trigger.prototype.edit.php:69
 #: include/views/configuration.triggers.edit.php:80
 msgid "Parent triggers"
 msgstr "親トリガー"
+
+#: include/views/configuration.httpconf.edit.php:76
+msgid "Parent web scenario"
+msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:59
 msgid "Parent web scenarios"
@@ -15578,6 +15745,10 @@ msgstr "PrometheusからJSON"
 #: include/views/monitoring.sysmap.list.php:83 jsLoader.php:144
 msgid "Properties"
 msgstr "プロパティ"
+
+#: app/views/connector.edit.php:47
+msgid "Protocol"
+msgstr ""
 
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
@@ -17141,6 +17312,10 @@ msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "スクリプトを削除しました"
 
+#: app/views/popup.mediatypetest.edit.php:60
+msgid "Script does not have parameters."
+msgstr ""
+
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
 msgstr "スクリプト実行ログ"
@@ -18403,6 +18578,10 @@ msgstr "特権管理者"
 msgid "Support"
 msgstr "サポート"
 
+#: app/partials/administration.system.info.php:124
+msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
+msgstr ""
+
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
 msgstr "サポートしているフォーマット："
@@ -19088,6 +19267,11 @@ msgstr "トリガーはディスカバリされなかったので次のディス
 #: app/views/administration.user.edit.php:255
 msgid "Theme"
 msgstr "テーマ"
+
+#: app/views/administration.mediatype.edit.php:139
+#: app/views/popup.mediatypetest.edit.php:47
+msgid "These parameters will be passed to the script as command-line arguments in the specified order."
+msgstr ""
 
 #: include/func.inc.php:2468
 msgid "This day last week"
@@ -21454,6 +21638,10 @@ msgstr "Vaultシークレットクエリ文字列"
 msgid "Vendor"
 msgstr "ベンダー"
 
+#: include/views/configuration.template.edit.php:93
+msgid "Vendor and version"
+msgstr ""
+
 #: include/items.inc.php:43
 msgid "Verbose"
 msgstr "Verbose"
@@ -22094,6 +22282,10 @@ msgstr "Zabbix"
 msgid "Zabbix Integrations"
 msgstr "Zabbixインテグレーション"
 
+#: app/views/connector.edit.php:49
+msgid "Zabbix Streaming Protocol v1.0"
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:356
 msgid "Zabbix Technical Support"
 msgstr "Zabbix技術サポート"
@@ -22576,6 +22768,10 @@ msgstr "点滅"
 #: include/classes/api/services/CItemGeneral.php:488
 msgid "both username and password should be either present or empty"
 msgstr "ユーザー名とパスワードの両方を指定するか空である必要があります"
+
+#: include/classes/api/services/CTemplate.php:522
+msgid "both vendor_name and vendor_version should be either present or empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
