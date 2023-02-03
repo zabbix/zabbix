@@ -26,7 +26,12 @@
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "zbxcacheconfig.h"
 
-int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
+#define KEY_EXCHANGE_STR	"KexAlgorithms"
+#define KEY_HOSTKEY_STR		"HostkeyAlgorithms"
+#define KEY_CIPHERS_STR		"Ciphers"
+#define KEY_MACS_STR		"MACs"
+
+int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const char *options);
 #endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/
 
 #endif
