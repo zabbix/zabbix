@@ -477,7 +477,9 @@ class CConfigurationExportBuilder {
 	private static function formatMediaTypeParameters(array $media_type) {
 		switch ($media_type['type']) {
 			case MEDIA_TYPE_EXEC:
-				return explode("\n", substr($media_type['exec_params'], 0, -1));
+				CArrayHelper::sort($media_type['parameters'], ['sortorder']);
+
+				return array_values($media_type['parameters']);
 
 			case MEDIA_TYPE_WEBHOOK:
 				CArrayHelper::sort($media_type['parameters'], ['name']);
