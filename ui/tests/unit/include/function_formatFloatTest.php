@@ -125,7 +125,7 @@ class function_formatFloatTest extends TestCase {
 			[100.00005,				['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false],	'100.0001'],
 
 			[0,						['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false, 'zero_as_zero' => false],	'0.0000'],
-			[1,						['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false, 'zero_as_zero' => false],	'1.0000'],
+			[1,						['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false, 'zero_as_zero' => false],	'1.0000']
 		];
 	}
 
