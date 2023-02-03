@@ -63,8 +63,8 @@ No specific Zabbix configuration is required.
 |{$NGINX.LLD.FILTER.HTTP.UPSTREAM.NOT_MATCHES} |<p>The filter to exclude discovered HTTP upstreams.</p> |`CHANGE_IF_NEEDED` |
 |{$NGINX.LLD.FILTER.HTTP.ZONE.MATCHES} |<p>The filter to include the necessary discovered HTTP server zones.</p> |`.*` |
 |{$NGINX.LLD.FILTER.HTTP.ZONE.NOT_MATCHES} |<p>The filter to exclude discovered HTTP server zones.</p> |`CHANGE_IF_NEEDED` |
-|{$NGINX.LLD.FILTER.RESOLVER.MATCHES} |<p>The filter to include the necessary discovered `Resolvers`</p> |`.*` |
-|{$NGINX.LLD.FILTER.RESOLVER.NOT_MATCHES} |<p>The filter to exclude discovered `Resolvers`</p> |`CHANGE_IF_NEEDED` |
+|{$NGINX.LLD.FILTER.RESOLVER.MATCHES} |<p>The filter to include the necessary discovered `Resolvers`.</p> |`.*` |
+|{$NGINX.LLD.FILTER.RESOLVER.NOT_MATCHES} |<p>The filter to exclude discovered `Resolvers`.</p> |`CHANGE_IF_NEEDED` |
 |{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES} |<p>The filter to include the necessary discovered upstreams of the "stream" directive.</p> |`.*` |
 |{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES} |<p>The filter to exclude discovered upstreams of the "stream" directive</p> |`CHANGE_IF_NEEDED` |
 |{$NGINX.LLD.FILTER.STREAM.ZONE.MATCHES} |<p>The filter to include discovered server zones of the "stream" directive.</p> |`.*` |

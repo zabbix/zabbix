@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-02-03T11:04:04Z'
+  date: '2023-02-03T11:18:27Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -3521,11 +3521,11 @@ zabbix_export:
         -
           macro: '{$NGINX.LLD.FILTER.RESOLVER.MATCHES}'
           value: '.*'
-          description: 'The filter to include the necessary discovered `Resolvers`'
+          description: 'The filter to include the necessary discovered `Resolvers`.'
         -
           macro: '{$NGINX.LLD.FILTER.RESOLVER.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'The filter to exclude discovered `Resolvers`'
+          description: 'The filter to exclude discovered `Resolvers`.'
         -
           macro: '{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}'
           value: '.*'
