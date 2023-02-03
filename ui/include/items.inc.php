@@ -2577,7 +2577,7 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 			case 'username':
 			case 'password':
 				return $input['type'] != ITEM_TYPE_HTTPAGENT || in_array($input['authtype'],
-					[HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]
+					[ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST]
 				);
 
 			case 'delay':

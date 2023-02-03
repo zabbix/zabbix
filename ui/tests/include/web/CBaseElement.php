@@ -50,7 +50,7 @@ abstract class CBaseElement extends RemoteWebElement {
 	 */
 	private function executeStaleSafe($method, $params = []) {
 		try {
-			return call_user_func_array(['parent', $method], $params);
+			return call_user_func_array([parent::class, $method], $params);
 		}
 		catch (StaleElementReferenceException $exception) {
 			if (!$this->reload_staled) {
@@ -66,7 +66,7 @@ abstract class CBaseElement extends RemoteWebElement {
 			}
 		}
 
-		return call_user_func_array(['parent', $method], $params);
+		return call_user_func_array([parent::class, $method], $params);
 	}
 
 	/**

@@ -51,12 +51,15 @@
 #include "vmware/vmware.h"
 #include "taskmanager/taskmanager.h"
 #include "preprocessor/preproc_manager.h"
-#include "preprocessor/preproc_worker.h"
 #include "availability/avail_manager.h"
+#include "connector/connector_manager.h"
+#include "connector/connector_worker.h"
+#include "zbxconnector.h"
 #include "service/service_manager.h"
 #include "housekeeper/trigger_housekeeper.h"
 #include "lld/lld_manager.h"
 #include "lld/lld_worker.h"
+#include "connector/connector_manager.h"
 #include "reporter/report_manager.h"
 #include "reporter/report_writer.h"
 #include "events.h"
@@ -82,6 +85,7 @@
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
 #include "preprocessor/preproc_stats.h"
+#include "preproc.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -120,7 +124,7 @@ const char	*help_message[] = {
 	"      " ZBX_SECRETS_RELOAD "                  Reload secrets from Vault",
 	"      " ZBX_DIAGINFO "=section                Log internal diagnostic information of the",
 	"                                        section (historycache, preprocessing, alerting,",
-	"                                        lld, valuecache, locks) or everything if section is",
+	"                                        lld, valuecache, locks, connector) or everything if section is",
 	"                                        not specified",
 	"      " ZBX_PROF_ENABLE "=target              Enable profiling, affects all processes if",
 	"                                        target is not specified",
@@ -145,7 +149,8 @@ const char	*help_message[] = {
 	"                                  self-monitoring, snmp trapper, task manager,",
 	"                                  timer, trapper, unreachable poller,",
 	"                                  vmware collector, history poller,",
-	"                                  availability manager, service manager, odbc poller)",
+	"                                  availability manager, service manager, odbc poller,",
+	"                                  connector manager, connector worker)",
 	"        process-type,N            Process type and number (e.g., poller,3)",
 	"        pid                       Process identifier",
 	"",
@@ -160,7 +165,8 @@ const char	*help_message[] = {
 	"                                  self-monitoring, snmp trapper, task manager,",
 	"                                  timer, trapper, unreachable poller,",
 	"                                  vmware collector, history poller,",
-	"                                  availability manager, service manager, odbc poller)",
+	"                                  availability manager, service manager, odbc poller,",
+	"                                  connector manager, connector worker)",
 	"        process-type,N            Process type and number (e.g., history syncer,1)",
 	"        pid                       Process identifier",
 	"        scope                     Profiling scope",
@@ -269,7 +275,9 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_REPORTWRITER */
 	1, /* ZBX_PROCESS_TYPE_SERVICEMAN */
 	1, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
-	1 /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	1, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	0, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
+	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -445,11 +453,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_PREPROCMAN;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCMAN];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_PREPROCESSOR;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR];
-	}
 	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDMANAGER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_LLDMANAGER;
@@ -586,6 +589,17 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_ODBCPOLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER];
 	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORMANAGER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_CONNECTORMANAGER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORMANAGER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_CONNECTORWORKER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER];
+	}
+
 	else
 		return FAIL;
 
@@ -656,6 +670,9 @@ static void	zbx_set_defaults(void)
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER])
 		CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTMANAGER] = 1;
+
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER])
+		CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORMANAGER] = 1;
 
 	if (NULL == CONFIG_NODE_ADDRESS)
 		CONFIG_NODE_ADDRESS = zbx_strdup(CONFIG_NODE_ADDRESS, "localhost");
@@ -1031,6 +1048,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"StartODBCPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
+		{"StartConnectors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER],	TYPE_INT,
+			PARM_OPT,	0,			1000},
 		{NULL}
 	};
 
@@ -1396,6 +1415,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_taskmanager_args	taskmanager_args = {config_timeout, config_startup_time};
 	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, config_timeout};
 	zbx_thread_pinger_args		pinger_args = {config_timeout};
+	zbx_thread_preprocessing_manager_args	preproc_man_args =
+						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
 
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args	ipmi_manager_args = {config_timeout, config_unavailable_delay};
@@ -1404,6 +1425,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_alert_scripts_path,
 			zbx_config_dbhigh};
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
+	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1447,6 +1469,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORMANAGER])
+		zbx_connector_init();
+
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER])
 	{
 		if (FAIL == zbx_tcp_listen(listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
@@ -1457,7 +1482,13 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	}
 
 	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
+	{
+		/* skip threaded components */
+		if (ZBX_PROCESS_TYPE_PREPROCESSOR == i)
+			continue;
+
 		threads_num += CONFIG_FORKS[i];
+	}
 
 	threads = (pid_t *)zbx_calloc(threads, (size_t)threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)threads_num, sizeof(int));
@@ -1589,10 +1620,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(taskmanager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
+				thread_args.args = &preproc_man_args;
 				zbx_thread_start(preprocessing_manager_thread, &thread_args, &threads[i]);
-				break;
-			case ZBX_PROCESS_TYPE_PREPROCESSOR:
-				zbx_thread_start(preprocessing_worker_thread, &thread_args, &threads[i]);
 				break;
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:
@@ -1626,6 +1655,14 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_CONNECTORMANAGER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				thread_args.args = &connector_manager_args;
+				zbx_thread_start(connector_manager_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_CONNECTORWORKER:
+				zbx_thread_start(connector_worker_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTMANAGER:
 				zbx_thread_start(report_manager_thread, &thread_args, &threads[i]);
@@ -2037,6 +2074,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_register_stats_data_func(zbx_preproc_stats_ext_get, NULL);
 	zbx_register_stats_data_func(zbx_server_stats_ext_get, NULL);
 	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get, NULL);
+	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_get_worker_info);
 	zbx_diag_init(diag_add_section_info);
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)

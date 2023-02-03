@@ -63,8 +63,6 @@ class CControllerImageUpdate extends CController {
 			return false;
 		}
 
-		$this->image = $images[0];
-
 		return true;
 	}
 

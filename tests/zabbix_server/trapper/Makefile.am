@@ -9,7 +9,8 @@ COMMON_SRC_FILES = \
 TRAPPER_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
+	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
+	$(top_srcdir)/src/libs/zbxtimekeeper/libzbxtimekeeper.a \
 	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
@@ -59,6 +60,6 @@ zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=zbx_free_agent_result
 
 zbx_trapper_preproc_test_run_CFLAGS = \
-	-I@top_srcdir@/tests @LIBXML2_CFLAGS@
+	-I@top_srcdir@/tests -I@top_srcdir@/src  @LIBXML2_CFLAGS@
 endif
 

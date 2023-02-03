@@ -221,6 +221,8 @@ tests/libs/zbxsysinfo/linux/system_boottime
 tests/libs/zbxsysinfo/linux/system_cpu_intr
 tests/libs/zbxsysinfo/linux/system_cpu_switches
 tests/libs/zbxsysinfo/linux/system_hw_chassis
+tests/libs/zbxsysinfo/linux/system_sw_packages_get
+tests/libs/zbxsysinfo/linux/system_sw_software
 tests/libs/zbxsysinfo/linux/vfs_fs_discovery
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
@@ -229,6 +231,7 @@ tests/libs/zbxcommon/zbx_tm_add
 tests/libs/zbxcommon/zbx_tm_sub
 tests/libs/zbxcommon/zbx_tm_round_up
 tests/libs/zbxcommon/zbx_tm_round_down
+tests/libs/zbxtagfilter/tagfilter_match_tags
 tests/libs/zbxtime/zbx_iso8601_utc
 tests/libs/zbxtrends/zbx_baseline_get_data
 tests/libs/zbxtrends/zbx_trends_parse_range

@@ -197,8 +197,6 @@ static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_
 #ifdef HAVE_NETSNMP
 			char	*oid_tr_tmp = NULL;
 
-			zbx_preproc_init_snmp();
-
 			if (SUCCEED == preproc_snmp_translate_oid(token, &oid_tr_tmp))
 				oid_prefix = oid_tr_tmp;
 			else
@@ -555,8 +553,6 @@ static int	preproc_snmp_value_from_walk(const char *data, const char *params, ch
 	}
 
 #ifdef HAVE_NETSNMP
-	zbx_preproc_init_snmp();
-
 	if (SUCCEED == preproc_snmp_translate_oid(oid_needle, &oid_tr_tmp))
 		oid_tr = oid_tr_tmp;
 	else
@@ -717,7 +713,7 @@ static void	snmp_walk_serialize_json(zbx_hashset_t *grouped_prefixes, char **res
 	zbx_json_free(&json);
 }
 
-int	item_preproc_snmp_walk_to_value(zbx_preproc_cache_t *cache, zbx_variant_t *value, const char *params,
+int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params,
 		char **errmsg)
 {
 	char	*value_out = NULL, *err = NULL;
@@ -729,9 +725,9 @@ int	item_preproc_snmp_walk_to_value(zbx_preproc_cache_t *cache, zbx_variant_t *v
 		return FAIL;
 	}
 
-	if (NULL == cache)
+	if (NULL == cache || ZBX_PREPROC_SNMP_WALK_TO_VALUE != cache->type)
 	{
-		if (FAIL == zbx_item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 			return FAIL;
 
 		ret = preproc_snmp_value_from_walk(value->data.str, params, &value_out, &err);
@@ -740,10 +736,9 @@ int	item_preproc_snmp_walk_to_value(zbx_preproc_cache_t *cache, zbx_variant_t *v
 	{
 		zbx_snmp_value_cache_t	*snmp_cache;
 
-		if (NULL == (snmp_cache = (zbx_snmp_value_cache_t *)zbx_preproc_cache_get(cache,
-				ZBX_PREPROC_SNMP_WALK_TO_VALUE)))
+		if (NULL == (snmp_cache = (zbx_snmp_value_cache_t *)cache->data))
 		{
-			if (FAIL == zbx_item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 				return FAIL;
 
 			snmp_cache = (zbx_snmp_value_cache_t *)zbx_malloc(NULL, sizeof(zbx_snmp_value_cache_t));
@@ -754,7 +749,7 @@ int	item_preproc_snmp_walk_to_value(zbx_preproc_cache_t *cache, zbx_variant_t *v
 				goto out;
 			}
 
-			zbx_preproc_cache_put(cache, ZBX_PREPROC_SNMP_WALK_TO_VALUE, snmp_cache);
+			cache->data = (void *)snmp_cache;
 		}
 
 		ret = snmp_value_from_cached_walk(snmp_cache, params, &value_out, &err);
@@ -782,7 +777,7 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 	zbx_vector_snmp_walk_to_json_param_t	parsed_params;
 	zbx_snmp_value_pair_t			p;
 
-	if (FAIL == zbx_item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
 	zbx_vector_snmp_walk_to_json_param_create(&parsed_params);
@@ -924,14 +919,14 @@ static void	zbx_init_snmp(void)
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
-void	zbx_preproc_init_snmp(void)
+void	preproc_init_snmp(void)
 {
 	zbx_init_snmp();
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, 1);
 	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, NETSNMP_OID_OUTPUT_NUMERIC);
 }
 
-void	zbx_preproc_shutdown_snmp(void)
+void	preproc_shutdown_snmp(void)
 {
 	sigset_t	mask, orig_mask;
 

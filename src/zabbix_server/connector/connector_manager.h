@@ -17,9 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "trapper_preproc_test_run.h"
+#ifndef ZABBIX_CONNECTOR_MANAGER_H
+#define ZABBIX_CONNECTOR_MANAGER_H
 
-int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
+#include "zbxthreads.h"
+
+typedef struct
 {
-	return trapper_preproc_test_run(jp, json, error);
+	zbx_get_config_forks_f	get_process_forks_cb_arg;
 }
+zbx_thread_connector_manager_args;
+
+ZBX_THREAD_ENTRY(connector_manager_thread, args);
+
+#endif
