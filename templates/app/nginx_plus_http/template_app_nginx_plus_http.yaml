@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-02-03T10:11:16Z'
+  date: '2023-02-03T11:04:04Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -351,7 +351,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The version number of NGINX.'
+          description: 'A version number of NGINX.'
           preprocessing:
             -
               type: JSONPATH
@@ -713,7 +713,7 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.1xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “1xx” status code per second.'
+              description: 'The number of responses with `1xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -739,7 +739,7 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.2xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “2xx” status code per second.'
+              description: 'The number of responses with `2xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -765,7 +765,7 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.3xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “3xx” status code per second.'
+              description: 'The number of responses with `3xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -791,7 +791,7 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.4xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “4xx” status code per second.'
+              description: 'The number of responses with `4xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -817,7 +817,7 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.5xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “5xx” status code per second.'
+              description: 'The number of responses with `5xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1108,7 +1108,7 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.1xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “1xx” status code per second.'
+              description: 'The number of responses with `1xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1134,7 +1134,7 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.2xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “2xx” status code per second.'
+              description: 'The number of responses with `2xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1160,7 +1160,7 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.3xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “3xx” status code per second.'
+              description: 'The number of responses with `3xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1186,7 +1186,7 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.4xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “4xx” status code per second.'
+              description: 'The number of responses with `4xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1212,7 +1212,7 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.5xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “5xx” status code per second.'
+              description: 'The number of responses with `5xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1620,7 +1620,7 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.1xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “1xx” status code per second.'
+              description: 'The number of responses with `1xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1649,7 +1649,7 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.2xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “2xx” status code per second.'
+              description: 'The number of responses with `2xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1678,7 +1678,7 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.3xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “3xx” status code per second.'
+              description: 'The number of responses with `3xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1707,7 +1707,7 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “4xx” status code per second.'
+              description: 'The number of responses with `4xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1736,7 +1736,7 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “5xx” status code per second.'
+              description: 'The number of responses with `5xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2179,7 +2179,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'The raw data of the Resolver with the name `{#NAME}`.'
+              description: 'The raw data of the `Resolver` with the name `{#NAME}`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2764,7 +2764,7 @@ zabbix_export:
               key: 'nginx.stream.server_zones.sessions.2xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of sessions completed with status code “2xx” per second.'
+              description: 'The total number of sessions completed with status code `2xx` per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2790,7 +2790,7 @@ zabbix_export:
               key: 'nginx.stream.server_zones.sessions.4xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of sessions completed with status code “4xx” per second.'
+              description: 'The total number of sessions completed with status code `4xx` per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2816,7 +2816,7 @@ zabbix_export:
               key: 'nginx.stream.server_zones.sessions.5xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of sessions completed with status code “5xx” per second.'
+              description: 'The total number of sessions completed with status code `5xx` per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3387,7 +3387,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'The raw data of the upstream with the name `[{#UPSTREAM}], configured in the "stream" directive.'
+              description: 'The raw data of the upstream with the name `[{#UPSTREAM}]`, configured in the "stream" directive.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3521,11 +3521,11 @@ zabbix_export:
         -
           macro: '{$NGINX.LLD.FILTER.RESOLVER.MATCHES}'
           value: '.*'
-          description: 'The filter to include the necessary discovered `Resolvers'
+          description: 'The filter to include the necessary discovered `Resolvers`'
         -
           macro: '{$NGINX.LLD.FILTER.RESOLVER.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'The filter to exclude discovered `Resolvers'
+          description: 'The filter to exclude discovered `Resolvers`'
         -
           macro: '{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}'
           value: '.*'
