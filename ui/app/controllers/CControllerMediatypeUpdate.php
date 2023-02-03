@@ -151,7 +151,7 @@ class CControllerMediatypeUpdate extends CController {
 
 				$this->getInputs($mediatype, ['exec_path']);
 
-				foreach ($this->getInput('parameters_exec', []) as $sortorder => $parameter) {
+				foreach (array_values($this->getInput('parameters_exec', [])) as $sortorder => $parameter) {
 					$mediatype['parameters'][] = ['sortorder' => $sortorder, 'value' => $parameter['value']];
 				}
 				break;

@@ -38,12 +38,17 @@ $form_grid = (new CFormGrid());
 
 switch ($data['type']) {
 	case MEDIA_TYPE_EXEC:
-		if ($data['exec_params']) {
-			foreach ($data['exec_params'] as $i => $exec_param) {
+		if ($data['parameters']) {
+			foreach ($data['parameters'] as $parameter) {
 				$form_grid->addItem([
-					$i == 0 ? new CLabel(_('Script parameters')) : null,
+					$parameter['sortorder'] == 0
+						? new CLabel([
+							_('Script parameters'),
+							makeHelpIcon(_('These parameters will be passed to the script as command-line arguments in the specified order.'))
+						])
+						: null,
 					new CFormField(
-						(new CTextBox('exec_params['.$i.'][exec_param]', $exec_param['exec_param']))
+						(new CTextBox('parameters['.$parameter['sortorder'].'][value]', $parameter['value']))
 							->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					)
 				]);
@@ -67,7 +72,8 @@ switch ($data['type']) {
 					new CLabel($parameter['name'], 'parameters['.$i.'][value]'),
 					new CFormField([
 						new CVar('parameters['.$i.'][name]', $parameter['name']),
-						(new CTextBox('parameters['.$i.'][value]', $parameter['value']))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+						(new CTextBox('parameters['.$i.'][value]', $parameter['value']))
+							->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					])
 				]);
 			$i++;
