@@ -92,8 +92,8 @@ class CControllerMaintenanceList extends CController {
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'filter' => $filter,
-			'profileIdx' => 'web.maintenance.filter',
-			'active_tab' => CProfile::get('web.maintenance.filter.active', 1),
+			'filter_profile' => 'web.maintenance.filter',
+			'filter_active_tab' => CProfile::get('web.maintenance.filter.active', 1),
 			'allowed_edit' => $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE)
 		];
 
@@ -106,37 +106,39 @@ class CControllerMaintenanceList extends CController {
 			'editable' => true,
 			'sortfield' => $sort_field,
 			'sortorder' => $sort_order,
-			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
+			'preservekeys' => true
 		];
 
 		$data['maintenances'] = API::Maintenance()->get($options);
 
-		foreach ($data['maintenances'] as $key => $maintenance) {
+		foreach ($data['maintenances'] as &$maintenance) {
 			if ($maintenance['active_till'] < time()) {
-				$data['maintenances'][$key]['status'] = MAINTENANCE_STATUS_EXPIRED;
+				$maintenance['status'] = MAINTENANCE_STATUS_EXPIRED;
 			}
 			elseif ($maintenance['active_since'] > time()) {
-				$data['maintenances'][$key]['status'] = MAINTENANCE_STATUS_APPROACH;
+				$maintenance['status'] = MAINTENANCE_STATUS_APPROACH;
 			}
 			else {
-				$data['maintenances'][$key]['status'] = MAINTENANCE_STATUS_ACTIVE;
+				$maintenance['status'] = MAINTENANCE_STATUS_ACTIVE;
 			}
 		}
+		unset($maintenance);
 
 		if ($filter['status'] != -1) {
-			foreach ($data['maintenances'] as $key => $maintenance) {
-				if ($data['maintenances'][$key]['status'] != $filter['status']) {
-					unset($data['maintenances'][$key]);
+			$data['maintenances'] = array_filter($data['maintenances'],
+				static function (array $maintenance) use ($filter): bool {
+					return $maintenance['status'] == $filter['status'];
 				}
-			}
+			);
 		}
 
 		CArrayHelper::sort($data['maintenances'], [['field' => $sort_field, 'order' => $sort_order]]);
 
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('maintenance.list', $page_num);
-		$data['paging'] = CPagerHelper::paginate($page_num, $data['maintenances'], $sort_order, (new CUrl('zabbix.php'))
-			->setArgument('action', 'maintenance.list')
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['maintenances'], $sort_order,
+			(new CUrl('zabbix.php'))->setArgument('action', 'maintenance.list')
 		);
 
 		$response = new CControllerResponseData($data);

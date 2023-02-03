@@ -27,48 +27,34 @@
 $this->addJsFile('class.calendar.js');
 $this->includeJsFile('maintenance.list.js.php');
 
-$html_page = (new CHtmlPage())
-	->setTitle(_('Maintenance periods'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_MAINTENANCE_LIST))
-	->setControls(
-		(new CTag('nav', true,
-			(new CList())
-				->addItem(
-					(new CSimpleButton(_('Create maintenance period')))
-						->setEnabled($data['allowed_edit'])
-						->addClass('js-create-maintenance')
-				)
-		))->setAttribute('aria-label', _('Content controls'))
-	);
-
-$action_url = (new CUrl('zabbix.php'))->setArgument('action', 'maintenance.list');
-
 $filter = (new CFilter())
-	->setResetUrl($action_url)
 	->addVar('action', 'maintenance.list')
-	->setProfile($data['profileIdx'])
-	->setActiveTab($data['active_tab'])
+	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'maintenance.list'))
+	->setProfile($data['filter_profile'])
+	->setActiveTab($data['filter_active_tab'])
 	->addFilterTab(_('Filter'), [
 		(new CFormGrid())
 			->addItem([
 				new CLabel(_('Host groups'), 'filter_groups__ms'),
-				(new CMultiSelect([
-					'name' => 'filter_groups[]',
-					'object_name' => 'hostGroup',
-					'data' => $data['filter']['groups'],
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'host_groups',
-							'srcfld1' => 'groupid',
-							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_groups_',
-							'editable' => 1
+				new CFormField(
+					(new CMultiSelect([
+						'name' => 'filter_groups[]',
+						'object_name' => 'hostGroup',
+						'data' => $data['filter']['groups'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'host_groups',
+								'srcfld1' => 'groupid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_groups_',
+								'editable' => 1
+							]
 						]
-					]
-				]))
-					->setId('filter_groups_')
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
+					]))
+						->setId('filter_groups_')
+						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+						->setAttribute('autofocus', 'autofocus')
+				)
 			])
 			->addItem([
 				new CLabel(_('Name'), 'filter_name'),
@@ -88,11 +74,13 @@ $filter = (new CFilter())
 		])
 	]);
 
-$action_url->removeArgument('filter_rst');
-
 $form = (new CForm())
 	->setId('maintenance-list')
 	->setName('maintenance_list');
+
+$view_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'maintenance.list')
+	->getUrl();
 
 $maintenance_list = (new CTableInfo())
 	->setHeader([
@@ -101,51 +89,46 @@ $maintenance_list = (new CTableInfo())
 				->onClick("checkAll('".$form->getName()."', 'all_maintenances', 'maintenanceids');")
 			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $action_url->getUrl()),
-		make_sorting_header(_('Type'), 'maintenance_type', $data['sort'], $data['sortorder'], $action_url->getUrl()),
-		make_sorting_header(_('Active since'), 'active_since', $data['sort'], $data['sortorder'], $action_url->getUrl()),
-		make_sorting_header(_('Active till'), 'active_till', $data['sort'], $data['sortorder'], $action_url->getUrl()),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Type'), 'maintenance_type', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Active since'), 'active_since', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Active till'), 'active_till', $data['sort'], $data['sortorder'], $view_url),
 		_('State'),
 		_('Description')
 	]);
 
-if ($data['maintenances']) {
-	foreach ($data['maintenances'] as $maintenance) {
-		$maintenanceid = $maintenance['maintenanceid'];
+foreach ($data['maintenances'] as $maintenanceid => $maintenance) {
+	switch ($maintenance['status']) {
+		case MAINTENANCE_STATUS_EXPIRED:
+			$maintenance_status = (new CSpan(_x('Expired', 'maintenance status')))->addClass(ZBX_STYLE_RED);
+			break;
 
-		switch ($maintenance['status']) {
-			case MAINTENANCE_STATUS_EXPIRED:
-				$maintenance_status = (new CSpan(_x('Expired', 'maintenance status')))->addClass(ZBX_STYLE_RED);
-				break;
+		case MAINTENANCE_STATUS_APPROACH:
+			$maintenance_status = (new CSpan(_x('Approaching', 'maintenance status')))->addClass(ZBX_STYLE_ORANGE);
+			break;
 
-			case MAINTENANCE_STATUS_APPROACH:
-				$maintenance_status = (new CSpan(_x('Approaching', 'maintenance status')))->addClass(ZBX_STYLE_ORANGE);
-				break;
-
-			case MAINTENANCE_STATUS_ACTIVE:
-				$maintenance_status = (new CSpan(_x('Active', 'maintenance status')))->addClass(ZBX_STYLE_GREEN);
-				break;
-		}
-
-		$maintenance_list->addRow([
-			$data['allowed_edit'] ? new CCheckBox('maintenanceids[' . $maintenanceid . ']', $maintenanceid) : null,
-			(new CLink($maintenance['name']))
-				->addClass('js-edit-maintenance')
-				->setAttribute('data-maintenanceid', $maintenance['maintenanceid']),
-			$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
-			zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_since']),
-			zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_till']),
-			$maintenance_status,
-			$maintenance['description']
-		]);
+		case MAINTENANCE_STATUS_ACTIVE:
+			$maintenance_status = (new CSpan(_x('Active', 'maintenance status')))->addClass(ZBX_STYLE_GREEN);
+			break;
 	}
+
+	$maintenance_list->addRow([
+		$data['allowed_edit'] ? new CCheckBox('maintenanceids['.$maintenanceid.']', $maintenanceid) : null,
+		(new CLink($maintenance['name']))
+			->addClass('js-edit-maintenance')
+			->setAttribute('data-maintenanceid', $maintenanceid),
+		$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
+		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_since']),
+		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_till']),
+		$maintenance_status,
+		$maintenance['description']
+	]);
 }
 
-$form->addItem($maintenance_list);
+$form->addItem([$maintenance_list, $data['paging']]);
 
 if ($data['allowed_edit']) {
-	$form->addItem([
-		$data['paging'],
+	$form->addItem(
 		new CActionButtonList('action', 'maintenanceids', [
 			'maintenance.massdelete' => [
 				'content' => (new CSimpleButton(_('Delete')))
@@ -154,10 +137,22 @@ if ($data['allowed_edit']) {
 					->addClass('no-chkbxrange')
 			]
 		], 'maintenance')
-	]);
+	);
 }
 
-$html_page
+(new CHtmlPage())
+	->setTitle(_('Maintenance periods'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_MAINTENANCE_LIST))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CSimpleButton(_('Create maintenance period')))
+						->addClass('js-create-maintenance')
+						->setEnabled($data['allowed_edit'])
+				)
+		))->setAttribute('aria-label', _('Content controls'))
+	)
 	->addItem($filter)
 	->addItem($form)
 	->show();
