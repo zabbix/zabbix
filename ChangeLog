@@ -3242,6 +3242,7 @@ Changes for 5.0.32rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.31
