@@ -28,6 +28,10 @@ class CControllerPopupServiceEdit extends CController {
 	 */
 	private $service;
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'serviceid' =>			'id',

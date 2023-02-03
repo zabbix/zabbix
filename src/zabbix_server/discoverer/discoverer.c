@@ -382,11 +382,11 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, i
 
 		for (port = first; port <= last; port++)
 		{
-			zbx_service_t	*service;
+			zbx_dservice_t	*service;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __func__, port);
 
-			service = (zbx_service_t *)zbx_malloc(NULL, sizeof(zbx_service_t));
+			service = (zbx_dservice_t *)zbx_malloc(NULL, sizeof(zbx_dservice_t));
 			service->status = (SUCCEED == discover_service(dcheck, ip, port, config_timeout, &value,
 					&value_alloc) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN);
 			service->dcheckid = dcheck->dcheckid;
@@ -478,7 +478,7 @@ static int	process_services(const zbx_db_drule *drule, zbx_db_dhost *dhost, cons
 
 	for (i = 0; i < services->values_num; i++)
 	{
-		zbx_service_t	*service = (zbx_service_t *)services->values[i];
+		zbx_dservice_t	*service = (zbx_dservice_t *)services->values[i];
 
 		if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;

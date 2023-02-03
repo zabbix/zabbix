@@ -249,7 +249,7 @@
 				url.setArgument(field.name, field.value);
 			});
 
-			redirect(url.getUrl(), 'post', 'action', undefined, false, true);
+			redirect(url.getUrl(), 'post', 'action', undefined, true);
 		});
 	});
 </script>

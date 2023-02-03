@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.4.0rc1');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030159);
+define('ZABBIX_DB_VERSION',		6030186);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -305,6 +305,14 @@ define('CONDITION_OPERATOR_NO',			11);
 define('CONDITION_OPERATOR_EXISTS',		12);
 define('CONDITION_OPERATOR_NOT_EXISTS',	13);
 
+define('ZBX_CONNECTOR_STATUS_DISABLED',	0);
+define('ZBX_CONNECTOR_STATUS_ENABLED',	1);
+
+define('ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES',	0);
+define('ZBX_CONNECTOR_DATA_TYPE_EVENTS',		1);
+
+define('ZBX_STREAMING_PROTOCOL_V1',	0);
+
 // correlation statuses
 define('ZBX_CORRELATION_ENABLED',		0);
 define('ZBX_CORRELATION_DISABLED',		1);
@@ -577,7 +585,7 @@ define('ITEM_DATA_TYPE_BOOLEAN',		3);
 
 define('ZBX_DEFAULT_KEY_DB_MONITOR',			'db.odbc.select[<unique short description>,<dsn>,<connection string>]');
 define('ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY',	'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]');
-define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
+define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port>,<encoding>,<ssh options>]');
 define('ZBX_DEFAULT_KEY_TELNET',				'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 
 define('ZBX_DEFAULT_JMX_ENDPOINT',	'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi');
@@ -1000,11 +1008,12 @@ define('PARAM_TYPE_COUNTS',		1);
 define('ZBX_DEFAULT_AGENT', 'Zabbix');
 define('ZBX_AGENT_OTHER', -1);
 
-define('HTTPTEST_AUTH_NONE',		0);
-define('HTTPTEST_AUTH_BASIC',		1);
-define('HTTPTEST_AUTH_NTLM',		2);
-define('HTTPTEST_AUTH_KERBEROS',	3);
-define('HTTPTEST_AUTH_DIGEST',		4);
+define('ZBX_HTTP_AUTH_NONE',		0);
+define('ZBX_HTTP_AUTH_BASIC',		1);
+define('ZBX_HTTP_AUTH_NTLM',		2);
+define('ZBX_HTTP_AUTH_KERBEROS',	3);
+define('ZBX_HTTP_AUTH_DIGEST',		4);
+define('ZBX_HTTP_AUTH_BEARER',		5);
 
 define('HTTPTEST_STATUS_ACTIVE',	0);
 define('HTTPTEST_STATUS_DISABLED',	1);
@@ -1043,11 +1052,11 @@ define('HTTPTEST_STEP_RETRIEVE_MODE_BOTH',		2);
 define('HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF',	0);
 define('HTTPTEST_STEP_FOLLOW_REDIRECTS_ON',		1);
 
-define('HTTPTEST_VERIFY_PEER_OFF',	0);
-define('HTTPTEST_VERIFY_PEER_ON',	1);
+define('ZBX_HTTP_VERIFY_PEER_OFF',	0);
+define('ZBX_HTTP_VERIFY_PEER_ON',	1);
 
-define('HTTPTEST_VERIFY_HOST_OFF',	0);
-define('HTTPTEST_VERIFY_HOST_ON',	1);
+define('ZBX_HTTP_VERIFY_HOST_OFF',	0);
+define('ZBX_HTTP_VERIFY_HOST_ON',	1);
 
 define('EVENT_NOT_ACKNOWLEDGED',	'0');
 define('EVENT_ACKNOWLEDGED',		'1');
