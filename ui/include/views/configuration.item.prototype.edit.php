@@ -52,11 +52,22 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if (!empty($data['templates'])) {
-	$item_tab->addItem([
-		new CLabel(_('Parent items')),
-		new CFormField($data['templates'])
-	]);
+if (array_key_exists('parent_item', $data)) {
+	if ($data['parent_item']['editable']) {
+		$parent_template_name = new CLink(CHtml::encode($data['parent_item']['template_name']),
+			(new CUrl('disc_prototypes.php'))
+				->setArgument('form', 'update')
+				->setArgument('itemid', $data['item']['templateid'])
+				->setArgument('parent_discoveryid',$data['parent_item']['ruleid'])
+				->setArgument('context', 'template')
+		);
+	}
+	else {
+		$parent_template_name = (new CSpan(CHtml::encode($data['parent_item']['template_name'])))
+			->addClass(ZBX_STYLE_GREY);
+	}
+
+	$item_tab->addItem([new CLabel(_('Parent item prototype')), new CFormField($parent_template_name)]);
 }
 
 $readonly = $data['limited'];
@@ -891,6 +902,7 @@ $item_tabs = (new CTabView())
 			'source' => 'item',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
+			'context' => $data['context'],
 			'readonly' => false,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab'

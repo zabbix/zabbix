@@ -222,6 +222,9 @@
                 <template>
                     <name>bbbtmpl</name>
                 </template>
+                <template>
+                    <name>SampleTemplate</name>
+                </template>
             </templates>
             <groups>
                 <group>
