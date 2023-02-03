@@ -4275,8 +4275,7 @@ class CImportDataAdapterTest extends TestCase {
 				'description' => '',
 				'vendor_name' => 'Zabbix',
 				'vendor_version' => '6.4-0',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			]
 		]);
 	}
