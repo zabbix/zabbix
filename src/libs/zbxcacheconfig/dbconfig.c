@@ -5657,15 +5657,15 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				proxy->revision = revision;
 		}
 
-		dc_strpool_replace(found, &drule->delay_str, row[2]);
+		dc_strpool_replace(found, (const char **)&drule->delay_str, row[2]);
 
 		delay_str = dc_expand_user_macros_dyn(row[2], NULL, 0, ZBX_MACRO_ENV_NONSECURE);
 		if (SUCCEED != zbx_is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
 			delay = ZBX_DEFAULT_INTERVAL;
 		zbx_free(delay_str);
 
-		dc_strpool_replace(found, &drule->name, row[3]);
-		dc_strpool_replace(found, &drule->iprange, row[4]);
+		dc_strpool_replace(found, (const char **)&drule->name, row[3]);
+		dc_strpool_replace(found, (const char **)&drule->iprange, row[4]);
 
 		if (DRULE_STATUS_MONITORED == drule->status && 0 == drule->proxy_hostid)
 		{
@@ -5739,17 +5739,17 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		dcheck->druleid = druleid;
 		ZBX_STR2UCHAR(dcheck->type, row[2]);
-		dc_strpool_replace(found, &dcheck->key_, row[3]);
-		dc_strpool_replace(found, &dcheck->snmp_community, row[4]);
-		dc_strpool_replace(found, &dcheck->ports, row[5]);
-		dc_strpool_replace(found, &dcheck->snmpv3_securityname, row[6]);
+		dc_strpool_replace(found, (const char **)&dcheck->key_, row[3]);
+		dc_strpool_replace(found, (const char **)&dcheck->snmp_community, row[4]);
+		dc_strpool_replace(found, (const char **)&dcheck->ports, row[5]);
+		dc_strpool_replace(found, (const char **)&dcheck->snmpv3_securityname, row[6]);
 		ZBX_STR2UCHAR(dcheck->snmpv3_securitylevel, row[7]);
-		dc_strpool_replace(found, &dcheck->snmpv3_authpassphrase, row[8]);
-		dc_strpool_replace(found, &dcheck->snmpv3_privpassphrase, row[9]);
+		dc_strpool_replace(found, (const char **)&dcheck->snmpv3_authpassphrase, row[8]);
+		dc_strpool_replace(found, (const char **)&dcheck->snmpv3_privpassphrase, row[9]);
 		ZBX_STR2UCHAR(dcheck->uniq, row[10]);
 		ZBX_STR2UCHAR(dcheck->snmpv3_authprotocol, row[11]);
 		ZBX_STR2UCHAR(dcheck->snmpv3_privprotocol, row[12]);
-		dc_strpool_replace(found, &dcheck->snmpv3_contextname, row[13]);
+		dc_strpool_replace(found, (const char **)&dcheck->snmpv3_contextname, row[13]);
 
 		if (drule->revision == revision)
 			continue;
