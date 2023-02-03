@@ -22,8 +22,8 @@
 class CControllerPopupMediaTypeMappingEdit extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {

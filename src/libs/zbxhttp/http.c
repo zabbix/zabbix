@@ -698,6 +698,12 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 		goto clean;
 	}
 
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")))
+	{
+		*error =  zbx_dsprintf(NULL, "Cannot enable cURL cookie engine: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+
 	/* try to retrieve page several times depending on number of retries */
 	do
 	{

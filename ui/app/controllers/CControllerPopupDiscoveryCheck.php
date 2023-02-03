@@ -30,7 +30,7 @@ class CControllerPopupDiscoveryCheck extends CController {
 	const DEFAULT_TYPE = SVC_FTP;
 
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {

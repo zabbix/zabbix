@@ -21,6 +21,10 @@
 
 class CControllerAuditLogList extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'page' =>					'ge 1',
@@ -173,10 +177,6 @@ class CControllerAuditLogList extends CController {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Audit log'));
 		$this->setResponse($response);
-	}
-
-	protected function init(): void {
-		$this->disableSIDValidation();
 	}
 
 	/**

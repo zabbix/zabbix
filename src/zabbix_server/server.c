@@ -2024,7 +2024,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_DISABLED;
 		zbx_update_epsilon_to_float_precision();
-		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
+		zabbix_log(LOG_LEVEL_WARNING, "Database is not upgraded to use double precision values. Support for the"
+				" old numeric type will be removed in the future versions.");
 	}
 
 	if (SUCCEED != zbx_db_check_instanceid())
