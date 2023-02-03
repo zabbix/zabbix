@@ -289,6 +289,12 @@ class testInitialConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '0'
 			]
+		],
+		[
+
+		],
+		[
+
 		]
 	];
 
@@ -642,6 +648,12 @@ class testInitialConfSync extends CIntegrationTest
 				"delete" =>
 				"0"
 			]
+		],
+		[
+
+		],
+		[
+
 		]
 	];
 
@@ -988,6 +1000,12 @@ class testInitialConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '4'
 			]
+		],
+		[
+
+		],
+		[
+
 		]
 	];
 
