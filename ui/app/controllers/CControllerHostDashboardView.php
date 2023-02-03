@@ -24,7 +24,7 @@ class CControllerHostDashboardView extends CController {
 	private $host;
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {

@@ -66,7 +66,6 @@ class CRouter {
 		'charts.view.json'							=> ['CControllerChartsViewJson',						'layout.json',			'monitoring.charts.view.json'],
 		'copy.create'								=> ['CControllerCopyCreate',							'layout.json',			null],
 		'copy.edit'									=> ['CControllerCopyEdit',								'layout.json',			'copy.edit'],
-		'correlation.condition.add'					=> ['CControllerCorrelationConditionAdd',				null,					null],
 		'correlation.create'						=> ['CControllerCorrelationCreate',						null,					null],
 		'correlation.delete'						=> ['CControllerCorrelationDelete',						null,					null],
 		'correlation.disable'						=> ['CControllerCorrelationDisable',					null,					null],

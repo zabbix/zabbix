@@ -123,7 +123,8 @@ $form->addItem([
 		'dashboard.delete' => [
 			'name' => _('Delete'),
 			'confirm' => _('Delete selected dashboards?'),
-			'disabled' => !$data['allowed_edit']
+			'disabled' => !$data['allowed_edit'],
+			'csrf_token' => CCsrfTokenHelper::get('dashboard')
 		]
 	], 'dashboard')
 ]);

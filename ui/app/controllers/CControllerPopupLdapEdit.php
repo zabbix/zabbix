@@ -24,6 +24,10 @@ class CControllerPopupLdapEdit extends CController {
 	const LDAP_MEMBER_OF = 0;
 	const LDAP_GROUP_OF_NAMES = 1;
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'row_index' =>						'required|int32',
