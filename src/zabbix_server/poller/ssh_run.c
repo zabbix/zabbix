@@ -168,7 +168,8 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 		goto session_free;
 	}
 
-	if (0 < strlen(options)) {
+	if (0 < strlen(options))
+	{
 		int	proc_config = 0;
 
 		if (0 != ssh_options_set(session, SSH_OPTIONS_PROCESS_CONFIG, &proc_config))
