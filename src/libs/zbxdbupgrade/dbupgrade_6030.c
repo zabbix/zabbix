@@ -1577,7 +1577,7 @@ static void	get_mediatype_params(zbx_uint64_t mediatypeid, const char *sendto, c
 	DB_RESULT		result;
 	DB_ROW			row;
 	struct zbx_json		json;
-	char			*value;
+	char			*value = NULL;
 	size_t			value_alloc = 0;
 
 	result = zbx_db_select(
