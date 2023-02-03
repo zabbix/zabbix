@@ -1371,7 +1371,6 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_am_alert_t *alert,
 		const char *scripts_path, char **cmd, char **error)
 {
-	zbx_db_alert	db_alert;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 	int		ret = FAIL;
 
@@ -1381,17 +1380,10 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 
 	if (0 == access(*cmd, X_OK))
 	{
-		zbx_dc_um_handle_t	*um_handle;
 		const char		*p;
 		struct zbx_json_parse	jp;
 		char			*buf = NULL;
 		size_t			buf_alloc = 0;
-
-		um_handle = zbx_dc_open_user_macros();
-
-		db_alert.sendto = (NULL != alert->sendto ? alert->sendto : zbx_strdup(NULL, ""));
-		db_alert.subject = (NULL != alert->subject ? alert->subject : zbx_strdup(NULL, ""));
-		db_alert.message = (NULL != alert->message ? alert->message : zbx_strdup(NULL, ""));
 
 		if (SUCCEED != zbx_json_open(alert->params, &jp))
 		{
@@ -1411,15 +1403,6 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 		}
 
 		zbx_free(buf);
-
-		if (db_alert.sendto != alert->sendto)
-			zbx_free(db_alert.sendto);
-		if (db_alert.subject != alert->subject)
-			zbx_free(db_alert.subject);
-		if (db_alert.message != alert->message)
-			zbx_free(db_alert.message);
-
-		zbx_dc_close_user_macros(um_handle);
 
 		ret = SUCCEED;
 	}
