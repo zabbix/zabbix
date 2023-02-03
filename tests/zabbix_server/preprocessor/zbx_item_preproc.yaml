@@ -2613,6 +2613,21 @@ in:
 out:
   return: FAIL
 ---
+test case: SNMP walk to value - BITS to integer - 7
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = BITS: QW 11
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      3
+out:
+  return: FAIL
+---
 test case: SNMP walk to value - Opaque wrapped type
 in:
   value:

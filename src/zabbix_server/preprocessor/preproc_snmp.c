@@ -509,7 +509,7 @@ static int	preproc_snmp_convert_bits_value(char **value, int format, char **erro
 
 		if (0 != len % 2)
 		{
-			*error = zbx_dsprintf(NULL, "Cannot convert bit value '%s' to unsigned integer", v);
+			*error = zbx_dsprintf(NULL, "Cannot convert bit value '%s' to unsigned integer", *value);
 			return FAIL;
 		}
 
@@ -518,7 +518,20 @@ static int	preproc_snmp_convert_bits_value(char **value, int format, char **erro
 
 		for (i = 0; i < len; i += 2)
 		{
-			iout += (zbx_uint64_t)(HEX_CONV(v[i]) * 16 + HEX_CONV(v[i + 1])) << (i * 4);
+			char	b1, b2;
+
+			b1 = (char)toupper(v[i]);
+			b2 = (char)toupper(v[i + 1]);
+
+			if (0 == isxdigit((unsigned char)b1) || 0 == isxdigit((unsigned char)b2))
+			{
+				*error = zbx_dsprintf(NULL, "Cannot convert bit value '%s' to unsigned integer",
+						*value);
+
+				return FAIL;
+			}
+
+			iout += (zbx_uint64_t)(HEX_CONV(b1) * 16 + HEX_CONV(b2)) << (i * 4);
 		}
 
 		*value = zbx_dsprintf(*value, ZBX_FS_UI64, iout);
