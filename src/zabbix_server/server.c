@@ -1173,7 +1173,7 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int				zbx_optind = 0;
 
-	printf("AKDBG main\n");
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG main");
 
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
