@@ -17,9 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef TRAPPER_PREPROC_TEST_RUN_H
-#define TRAPPER_PREPROC_TEST_RUN_H
+#ifndef ZABBIX_PP_ERROR_H
+#define ZABBIX_PP_ERROR_H
 
-int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
+#include "pp_item.h"
+#include "zbxpreproc.h"
+#include "zbxvariant.h"
 
-#endif /*TRAPPER_PREPROC_TEST_RUN_H*/
+void	pp_result_set(zbx_pp_result_t *result, const zbx_variant_t *value, int action, zbx_variant_t *value_raw);
+void	pp_free_results(zbx_pp_result_t *results, int results_num);
+
+void	pp_format_error(const zbx_variant_t *value, zbx_pp_result_t *results, int results_num, char **error);
+int	pp_error_on_fail(zbx_variant_t *value, const zbx_pp_step_t *step);
+
+
+#endif

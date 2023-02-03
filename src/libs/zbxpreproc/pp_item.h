@@ -17,14 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "item_preproc_test.h"
+#ifndef ZABBIX_PP_ITEM_H
+#define ZABBIX_PP_ITEM_H
 
-int	zbx_item_preproc_xpath(zbx_variant_t *value, const char *params, char **errmsg)
-{
-	return item_preproc_xpath(value, params, errmsg);
-}
+#include "pp_history.h"
+#include "zbxcommon.h"
+#include "zbxpreproc.h"
 
-int	zbx_item_preproc_csv_to_json(zbx_variant_t *value, const char *params, char **errmsg)
-{
-	return item_preproc_csv_to_json(value, params, errmsg);
-}
+void	pp_item_clear(zbx_pp_item_t *item);
+
+zbx_pp_item_preproc_t	*pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc);
+
+#endif

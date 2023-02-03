@@ -17,9 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "trapper_preproc_test_run.h"
+#ifndef ZABBIX_PP_HISTORY_H
+#define ZABBIX_PP_HISTORY_H
 
-int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
-{
-	return trapper_preproc_test_run(jp, json, error);
-}
+#include "zbxpreproc.h"
+
+void	pp_history_free(zbx_pp_history_t *history);
+void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts);
+
+#endif

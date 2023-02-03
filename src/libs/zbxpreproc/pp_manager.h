@@ -17,30 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PREPROC_HISTORY_H
-#define ZABBIX_PREPROC_HISTORY_H
+#ifndef ZABBIX_PP_MANAGER_H
+#define ZABBIX_PP_MANAGER_H
 
-#include "zbxvariant.h"
-#include "zbxtime.h"
+#include "pp_worker.h"
+#include "pp_queue.h"
+#include "zbxpreproc.h"
+#include "zbxalgo.h"
+#include "zbxtimekeeper.h"
 
-typedef struct
+struct zbx_pp_manager
 {
-	int		index;
-	zbx_variant_t	value;
-	zbx_timespec_t	ts;
-}
-zbx_preproc_op_history_t;
+	zbx_pp_worker_t		*workers;
+	int			workers_num;
+	int			program_type;
 
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	zbx_vector_ptr_t	history;
-}
-zbx_preproc_history_t;
+	zbx_hashset_t		items;
+	zbx_uint64_t		revision;
 
-void	zbx_preproc_op_history_free(zbx_preproc_op_history_t *ophistory);
-void	zbx_preproc_history_pop_value(zbx_vector_ptr_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts);
-void	zbx_preproc_history_add_value(zbx_vector_ptr_t *history, int index, zbx_variant_t *data,
-		const zbx_timespec_t *ts);
+	zbx_pp_queue_t		queue;
+
+	zbx_timekeeper_t	*timekeeper;
+};
 
 #endif

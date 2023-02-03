@@ -43,6 +43,7 @@ DIST_SUBDIRS = \
 	zbxnix \
 	zbxnum \
 	zbxparam \
+	zbxpreproc \
 	zbxprometheus \
 	zbxregexp \
 	zbxrtc \
@@ -58,6 +59,7 @@ DIST_SUBDIRS = \
 	zbxtasks \
 	zbxthreads \
 	zbxtime \
+	zbxtimekeeper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
@@ -93,6 +95,7 @@ SERVER_SUBDIRS = \
 	zbxmedia \
 	zbxnum \
 	zbxparam \
+	zbxpreproc \
 	zbxprometheus \
 	zbxrtc \
 	zbxself \
@@ -105,6 +108,7 @@ SERVER_SUBDIRS = \
 	zbxtagfilter \
 	zbxtasks \
 	zbxtime \
+	zbxtimekeeper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
@@ -136,6 +140,7 @@ PROXY_SUBDIRS = \
 	zbxkvs \
 	zbxnum \
 	zbxparam \
+	zbxpreproc \
 	zbxprometheus \
 	zbxrtc \
 	zbxself \
@@ -147,6 +152,7 @@ PROXY_SUBDIRS = \
 	zbxtagfilter \
 	zbxtasks \
 	zbxtime \
+	zbxtimekeeper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \

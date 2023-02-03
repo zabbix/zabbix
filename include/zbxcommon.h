@@ -694,6 +694,7 @@ int	zbx_alarm_timed_out(void);
 
 #define zbx_bsearch(key, base, nmemb, size, compar)	(0 == (nmemb) ? NULL : bsearch(key, base, nmemb, size, compar))
 
+#define ZBX_PREPROC_NONE			0
 #define ZBX_PREPROC_MULTIPLIER			1
 #define ZBX_PREPROC_RTRIM			2
 #define ZBX_PREPROC_LTRIM			3
@@ -729,9 +730,6 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_DISCARD_VALUE	1
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
-
-/* internal on fail actions */
-#define ZBX_PREPROC_FAIL_FORCE_ERROR	4
 
 #define ZBX_HTTPFIELD_HEADER		0
 #define ZBX_HTTPFIELD_VARIABLE		1

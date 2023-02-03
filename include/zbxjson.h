@@ -365,7 +365,9 @@ struct zbx_jsonobj
 {
 	zbx_json_type_t		type;
 	zbx_jsonobj_data_t	data;
+
 	zbx_jsonobj_index_t	*index;
+	int			index_num;	/* used by root object - number of indexed children */
 };
 
 typedef struct

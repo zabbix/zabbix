@@ -1988,6 +1988,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxnix/Makefile
 	src/libs/zbxnum/Makefile
 	src/libs/zbxparam/Makefile
+	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxrtc/Makefile
@@ -2017,6 +2018,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
+	src/libs/zbxtimekeeper/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
 	src/libs/zbxvault/Makefile
