@@ -28,6 +28,9 @@ zabbix_export:
           Device: Mikrotik 941-2nD, Mikrotik 951G-2HnD
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: 'Templates/Network devices'

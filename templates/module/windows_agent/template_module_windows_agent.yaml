@@ -10,6 +10,9 @@ zabbix_export:
       template: 'Windows CPU by Zabbix agent'
       name: 'Windows CPU by Zabbix agent'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -204,6 +207,9 @@ zabbix_export:
       template: 'Windows filesystems by Zabbix agent'
       name: 'Windows filesystems by Zabbix agent'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -481,6 +487,9 @@ zabbix_export:
       template: 'Windows generic by Zabbix agent'
       name: 'Windows generic by Zabbix agent'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -667,6 +676,9 @@ zabbix_export:
       template: 'Windows memory by Zabbix agent'
       name: 'Windows memory by Zabbix agent'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -916,6 +928,9 @@ zabbix_export:
       template: 'Windows network by Zabbix agent'
       name: 'Windows network by Zabbix agent'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -1535,6 +1550,9 @@ zabbix_export:
       template: 'Windows physical disks by Zabbix agent'
       name: 'Windows physical disks by Zabbix agent'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -1826,6 +1844,9 @@ zabbix_export:
         Template Services OS Windows
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules

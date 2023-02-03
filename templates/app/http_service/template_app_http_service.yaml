@@ -13,6 +13,9 @@ zabbix_export:
         Template module for monitoring HTTP service
         
         Template tooling version used: 0.41
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules

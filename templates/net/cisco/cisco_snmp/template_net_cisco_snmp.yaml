@@ -29,6 +29,9 @@ zabbix_export:
           Device: C2911, C7600
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: 'Templates/Network devices'
@@ -2575,6 +2578,9 @@ zabbix_export:
         ENTITY-MIB
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: 'Templates/Network devices'
@@ -3543,6 +3549,9 @@ zabbix_export:
         ENTITY-MIB
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: 'Templates/Network devices'

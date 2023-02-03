@@ -22,6 +22,9 @@ zabbix_export:
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications
@@ -354,6 +357,9 @@ zabbix_export:
       template: 'Cisco Meraki device by HTTP'
       name: 'Cisco Meraki device by HTTP'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications
@@ -809,6 +815,9 @@ zabbix_export:
       template: 'Cisco Meraki organization by HTTP'
       name: 'Cisco Meraki organization by HTTP'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications

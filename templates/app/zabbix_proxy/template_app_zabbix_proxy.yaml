@@ -10,6 +10,9 @@ zabbix_export:
       template: 'Zabbix proxy health'
       name: 'Zabbix proxy health'
       description: 'Template tooling version used: 0.41'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications

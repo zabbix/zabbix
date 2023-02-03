@@ -16,6 +16,9 @@ zabbix_export:
         CISCO-ENVMON-MIB
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -334,6 +337,9 @@ zabbix_export:
         CISCO-MEMORY-POOL-MIB
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -438,6 +444,9 @@ zabbix_export:
         CISCO-PROCESS-MIB
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -515,6 +524,9 @@ zabbix_export:
         CISCO-PROCESS-MIB
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -597,6 +609,9 @@ zabbix_export:
         SNMPv2-MIB
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -758,6 +773,9 @@ zabbix_export:
         OLD-CISCO-CPU-MIB
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules

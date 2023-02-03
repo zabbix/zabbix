@@ -19,6 +19,9 @@ zabbix_export:
         IF-MIB
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: 'Templates/Network devices'
@@ -2331,6 +2334,9 @@ zabbix_export:
           Device: ICX 7750 in stack
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: 'Templates/Network devices'

@@ -15,6 +15,9 @@ zabbix_export:
         Link this template to the local Zabbix server host.
         
         Template tooling version used: 0.43
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications

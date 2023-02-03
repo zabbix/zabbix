@@ -30,6 +30,9 @@ zabbix_export:
           Device: T2600G-28TS 2.0
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: 'Templates/Network devices'

@@ -10,6 +10,9 @@ zabbix_export:
       template: 'Windows CPU by Zabbix agent active'
       name: 'Windows CPU by Zabbix agent active'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -212,6 +215,9 @@ zabbix_export:
       template: 'Windows filesystems by Zabbix agent active'
       name: 'Windows filesystems by Zabbix agent active'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -490,6 +496,9 @@ zabbix_export:
       template: 'Windows generic by Zabbix agent active'
       name: 'Windows generic by Zabbix agent active'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -684,6 +693,9 @@ zabbix_export:
       template: 'Windows memory by Zabbix agent active'
       name: 'Windows memory by Zabbix agent active'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -942,6 +954,9 @@ zabbix_export:
       template: 'Windows network by Zabbix agent active'
       name: 'Windows network by Zabbix agent active'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -1568,6 +1583,9 @@ zabbix_export:
       template: 'Windows physical disks by Zabbix agent active'
       name: 'Windows physical disks by Zabbix agent active'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -1868,6 +1886,9 @@ zabbix_export:
         Template Services OS Windows
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
