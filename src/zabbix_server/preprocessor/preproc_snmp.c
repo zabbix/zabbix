@@ -495,12 +495,13 @@ static int	preproc_parse_value_from_walk_params(const char *params, char **oid_n
 static int	preproc_snmp_convert_bits_value(char **value, int format, char **error)
 {
 #define SNMP_UINT_FROM_BITS_MAX_BYTES	(8 * 2)
+#define HEX_CONV(x) (x > '9' ? x - 'A' + 10 : x - '0')
 	if (ZBX_PREPROC_SNMP_UINT_FROM_BITS == format)
 	{
-		zbx_uint64_t	iout;
+		zbx_uint64_t	iout = 0;
+		char		*v;
 		size_t		len;
-		char		*rev_buf, *v;
-		int		ri, i;
+		int		i;
 
 		v = *value;
 		zbx_remove_chars(v, " ");
@@ -513,29 +514,18 @@ static int	preproc_snmp_convert_bits_value(char **value, int format, char **erro
 		}
 
 		if (SNMP_UINT_FROM_BITS_MAX_BYTES < len)
-		{
-			v[SNMP_UINT_FROM_BITS_MAX_BYTES] = '\0';
 			len = SNMP_UINT_FROM_BITS_MAX_BYTES;
-		}
-
-		ri = len - 1;
-		rev_buf = (char *)zbx_calloc(NULL, len, 1);
 
 		for (i = 0; i < len; i += 2)
 		{
-			rev_buf[ri - 1] = v[i];
-			rev_buf[ri] = v[i + 1];
-			ri -= 2;
+			iout += (zbx_uint64_t)(HEX_CONV(v[i]) * 16 + HEX_CONV(v[i + 1])) << (i * 4);
 		}
 
-		iout = strtoull(rev_buf, NULL, 16);
-
-		zbx_free(v);
-		zbx_free(rev_buf);
-		*value = zbx_dsprintf(NULL, ZBX_FS_UI64, iout);
+		*value = zbx_dsprintf(*value, ZBX_FS_UI64, iout);
 	}
 
 	return SUCCEED;
+#undef HEX_CONV
 #undef SNMP_UINT_FROM_BITS_MAX_BYTES
 }
 
