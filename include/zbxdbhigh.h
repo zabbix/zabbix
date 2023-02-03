@@ -490,7 +490,7 @@ zbx_service_alarm_t;
 zbx_config_dbhigh_t	*zbx_config_dbhigh_new(void);
 void			zbx_config_dbhigh_free(zbx_config_dbhigh_t *config_dbhigh);
 
-void	zbx_init_library_dbhigh(zbx_config_dbhigh_t *config_dbhigh);
+void	zbx_init_library_dbhigh(const zbx_config_dbhigh_t *config_dbhigh);
 int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char **error);
 void	zbx_db_deinit(void);
 
@@ -499,9 +499,9 @@ void	zbx_db_init_autoincrement_options(void);
 int	zbx_db_connect(int flag);
 void	zbx_db_close(void);
 
-int	zbx_db_validate_config_features(unsigned char program_type, zbx_config_dbhigh_t *config_dbhig);
+int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config_dbhigh_t *config_dbhig);
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-void	zbx_db_validate_config(zbx_config_dbhigh_t *config_dbhigh);
+void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh);
 #endif
 
 #ifdef HAVE_ORACLE

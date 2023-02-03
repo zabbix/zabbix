@@ -76,7 +76,7 @@ void	zbx_db_close(void)
 	zbx_db_close_basic();
 }
 
-int	zbx_db_validate_config_features(unsigned char program_type, zbx_config_dbhigh_t *config_dbhigh)
+int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config_dbhigh_t *config_dbhigh)
 {
 	int	err = 0;
 
@@ -122,20 +122,7 @@ zbx_config_dbhigh_t	*zbx_config_dbhigh_new(void)
 	zbx_config_dbhigh_t	*config_dbhigh;
 
 	config_dbhigh = (zbx_config_dbhigh_t *)zbx_malloc(NULL, sizeof(zbx_config_dbhigh_t));
-
-	config_dbhigh->config_dbhost = NULL;
-	config_dbhigh->config_dbname = NULL;
-	config_dbhigh->config_dbschema = NULL;
-	config_dbhigh->config_dbuser = NULL;
-	config_dbhigh->config_dbpassword = NULL;
-	config_dbhigh->config_dbsocket = NULL;
-	config_dbhigh->config_db_tls_connect = NULL;
-	config_dbhigh->config_db_tls_cert_file = NULL;
-	config_dbhigh->config_db_tls_key_file = NULL;
-	config_dbhigh->config_db_tls_ca_file = NULL;
-	config_dbhigh->config_db_tls_cipher = NULL;
-	config_dbhigh->config_db_tls_cipher_13 = NULL;
-	config_dbhigh->config_dbport = 0;
+	memset(config_dbhigh, 0, sizeof(zbx_config_dbhigh_t));
 
 	return config_dbhigh;
 }
@@ -158,7 +145,7 @@ void	zbx_config_dbhigh_free(zbx_config_dbhigh_t *config_dbhigh)
 	zbx_free(config_dbhigh);
 }
 
-void	zbx_init_library_dbhigh(zbx_config_dbhigh_t *config_dbhigh)
+void	zbx_init_library_dbhigh(const zbx_config_dbhigh_t *config_dbhigh)
 {
 	zbx_cfg_dbhigh = config_dbhigh;
 }
@@ -173,7 +160,7 @@ static void	check_cfg_empty_str(const char *parameter, const char *value)
 	}
 }
 
-void	zbx_db_validate_config(zbx_config_dbhigh_t *config_dbhigh)
+void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh)
 {
 	check_cfg_empty_str("DBTLSConnect", config_dbhigh->config_db_tls_connect);
 	check_cfg_empty_str("DBTLSCertFile", config_dbhigh->config_db_tls_cert_file);
