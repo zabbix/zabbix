@@ -505,7 +505,7 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 			dcheck_copy(dcheck, net_check->dcheck);
 
 			net_check->ip = zbx_strdup(NULL, ip);
-			net_check->ip = zbx_strdup(NULL, dns);
+			net_check->dns = zbx_strdup(NULL, dns);
 			net_check->port = (unsigned short)port;
 			net_check->config_timeout = config_timeout;
 			net_check->now = now;
