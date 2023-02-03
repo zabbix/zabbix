@@ -1358,13 +1358,13 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
  *
  * @param int|float|string  $value
  * @param array             $item
- * @param bool              $trim      Whether to trim non-numeric value to a length of 20 characters.
- * @param int|null          $decimals  Force exact decimals and do not use scientific notation for small numbers.
+ * @param bool              $trim             Whether to trim non-numeric value to a length of 20 characters.
+ * @param array             $convert_options  Options for unit conversion. See @convertUnitsRaw.
  *
  * @return string
  */
-function formatHistoryValue($value, array $item, bool $trim = true, int $decimals = null): string {
-	$formatted_value = formatHistoryValueRaw($value, $item, $trim, $decimals);
+function formatHistoryValue($value, array $item, bool $trim = true, array $convert_options = []): string {
+	$formatted_value = formatHistoryValueRaw($value, $item, $trim, $convert_options);
 
 	return $formatted_value['value'].($formatted_value['units'] !== '' ? ' '.$formatted_value['units'] : '');
 }
@@ -1374,8 +1374,8 @@ function formatHistoryValue($value, array $item, bool $trim = true, int $decimal
  *
  * @param int|float|string  $value
  * @param array             $item
- * @param bool              $trim      Whether to trim non-numeric value to a length of 20 characters.
- * @param int|null          $decimals  Force exact decimals and do not use scientific notation for small numbers.
+ * @param bool              $trim             Whether to trim non-numeric value to a length of 20 characters.
+ * @param array             $convert_options  Options for unit conversion. See @convertUnitsRaw.
  *
  * $item = [
  *     'value_type' => (int)     ITEM_VALUE_TYPE_FLOAT | ITEM_VALUE_TYPE_UINT64, ...
@@ -1385,7 +1385,7 @@ function formatHistoryValue($value, array $item, bool $trim = true, int $decimal
  *
  * @return array
  */
-function formatHistoryValueRaw($value, array $item, bool $trim = true, int $decimals = null): array {
+function formatHistoryValueRaw($value, array $item, bool $trim = true, array $convert_options = []): array {
 	$mapped_value = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR])
 		? CValueMapHelper::getMappedValue($item['value_type'], $value, $item['valuemap'])
 		: false;
@@ -1401,20 +1401,10 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, int $deci
 				];
 			}
 
-			$convert_options = [
+			$converted_value = convertUnitsRaw([
 				'value' => $value,
 				'units' => $item['units']
-			];
-
-			if ($decimals !== null) {
-				$convert_options += [
-					'decimals' => $decimals,
-					'decimals_exact' => true,
-					'small_scientific' => false
-				];
-			}
-
-			$converted_value = convertUnitsRaw($convert_options);
+			] + $convert_options);
 
 			return [
 				'value' => $converted_value['value'],

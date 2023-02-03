@@ -95,9 +95,12 @@ foreach ($data['rows'] as $columns) {
 				break;
 
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
-				$formatted_value = formatHistoryValue($column['value'], $column['item'], true,
-					$column_config['decimal_places']
-				);
+				$formatted_value = formatHistoryValue($column['value'], $column['item'], true, [
+					'decimals' => $column_config['decimal_places'],
+					'decimals_exact' => true,
+					'small_scientific' => false,
+					'zero_as_zero' => false
+				]);
 
 				if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
 					$row[] = (new CCol())

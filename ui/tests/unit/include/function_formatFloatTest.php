@@ -63,7 +63,7 @@ class function_formatFloatTest extends TestCase {
 			[0.00129,				['precision' => 4, 'decimals' => 2, 'decimals_exact' => true],	'1.29E-3'],
 			[0.000129,				['precision' => 4, 'decimals' => 2, 'decimals_exact' => true],	'1.29E-4'],
 
-			[0,						['decimals' => 4, 'decimals_exact' => true],	'0.0000'],
+			[0,						['decimals' => 4, 'decimals_exact' => true],	'0'],
 			[0.0004,				['decimals' => 4, 'decimals_exact' => true],	'0.0004'],
 			[0.0005,				['decimals' => 4, 'decimals_exact' => true],	'0.0005'],
 			[0.00004,				['decimals' => 4, 'decimals_exact' => true],	'4.0000E-5'],
@@ -72,6 +72,9 @@ class function_formatFloatTest extends TestCase {
 			[100.0005,				['decimals' => 4, 'decimals_exact' => true],	'100.0005'],
 			[100.00004,				['decimals' => 4, 'decimals_exact' => true],	'100.0000'],
 			[100.00005,				['decimals' => 4, 'decimals_exact' => true],	'100.0001'],
+
+			[0,						['decimals' => 4, 'decimals_exact' => true, 'zero_as_zero' => false],	'0.0000'],
+			[1,						['decimals' => 4, 'decimals_exact' => true, 'zero_as_zero' => false],	'1.0000'],
 
 			[0,						['small_scientific' => false],	'0'],
 			[1,						['small_scientific' => false],	'1'],
@@ -111,7 +114,7 @@ class function_formatFloatTest extends TestCase {
 			[0.00129,				['precision' => 4, 'decimals' => 2, 'decimals_exact' => true, 'small_scientific' => false],	'0.00'],
 			[0.000129,				['precision' => 4, 'decimals' => 2, 'decimals_exact' => true, 'small_scientific' => false],	'0.00'],
 
-			[0,						['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false],	'0.0000'],
+			[0,						['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false],	'0'],
 			[0.0004,				['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false],	'0.0004'],
 			[0.0005,				['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false],	'0.0005'],
 			[0.00004,				['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false],	'0.0000'],
@@ -119,7 +122,10 @@ class function_formatFloatTest extends TestCase {
 			[100.0004,				['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false],	'100.0004'],
 			[100.0005,				['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false],	'100.0005'],
 			[100.00004,				['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false],	'100.0000'],
-			[100.00005,				['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false],	'100.0001']
+			[100.00005,				['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false],	'100.0001'],
+
+			[0,						['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false, 'zero_as_zero' => false],	'0.0000'],
+			[1,						['decimals' => 4, 'decimals_exact' => true, 'small_scientific' => false, 'zero_as_zero' => false],	'1.0000'],
 		];
 	}
 

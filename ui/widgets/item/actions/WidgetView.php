@@ -168,9 +168,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 							$item['units'] = '';
 						}
 
-						$formatted_value = formatHistoryValueRaw($last_value, $item, false,
-							$this->fields_values['decimal_places']
-						);
+						$formatted_value = formatHistoryValueRaw($last_value, $item, false, [
+							'decimals' => $this->fields_values['decimal_places'],
+							'decimals_exact' => true,
+							'small_scientific' => false,
+							'zero_as_zero' => false
+						]);
 
 						$value = $formatted_value['value'];
 						$units = $formatted_value['units'];

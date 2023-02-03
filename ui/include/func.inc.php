@@ -720,6 +720,7 @@ function convertUnits(array $options): string {
  *     'decimals_exact' =>      (bool)      Display exactly this number of decimals instead of first non-zeros.
  *                                          Default: false.
  *     'small_scientific' =>    (bool)      Allow scientific notation for small numbers. Default: true.
+ *     'zero_as_zero' =>        (bool)      Return zero as '0', regardless of other options. Default: true.
  * ]
  *
  * @return array
@@ -737,7 +738,8 @@ function convertUnitsRaw(array $options): array {
 		'precision' => ZBX_FLOAT_DIG,
 		'decimals' => null,
 		'decimals_exact' => false,
-		'small_scientific' => true
+		'small_scientific' => true,
+		'zero_as_zero' => true
 	];
 
 	$value = $options['value'] !== null ? $options['value'] : '';
@@ -794,7 +796,8 @@ function convertUnitsRaw(array $options): array {
 				'precision' => $options['precision'],
 				'decimals' => $options['decimals'] !== null ? $options['decimals'] : ZBX_UNITS_ROUNDOFF_UNSUFFIXED,
 				'decimals_exact' => $options['decimals_exact'],
-				'small_scientific' => $options['small_scientific']
+				'small_scientific' => $options['small_scientific'],
+				'zero_as_zero' => $options['zero_as_zero']
 			]),
 			'units' => $units,
 			'is_numeric' => true
@@ -818,7 +821,8 @@ function convertUnitsRaw(array $options): array {
 					? $options['decimals']
 					: ($prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED),
 				'decimals_exact' => $options['decimals_exact'],
-				'small_scientific' => $options['small_scientific']
+				'small_scientific' => $options['small_scientific'],
+				'zero_as_zero' => $options['zero_as_zero']
 			]);
 
 			$unit_prefix = $prefix;
@@ -838,7 +842,8 @@ function convertUnitsRaw(array $options): array {
 				? $options['decimals']
 				: ($unit_prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED),
 			'decimals_exact' => $options['decimals_exact'],
-			'small_scientific' => $options['small_scientific']
+			'small_scientific' => $options['small_scientific'],
+			'zero_as_zero' => $options['zero_as_zero']
 		]);
 	}
 
@@ -1487,6 +1492,7 @@ function getNumericFormatting(): array {
  *     'decimals' =>         (int)   Max number of first non-zero decimals to display. Default: 0.
  *     'decimals_exact' =>   (bool)  Display exactly this number of decimals instead of first non-zeros. Default: false.
  *     'small_scientific' => (bool)  Allow scientific notation for small numbers. Default: true.
+ *     'zero_as_zero' =>     (bool)  Return zero as '0', regardless of other options. Default: true.
  * ]
  *
  * Note: $decimals must be less than $precision.
@@ -1506,15 +1512,21 @@ function formatFloat(float $number, array $options = []): string {
 		'precision' => ZBX_FLOAT_DIG,
 		'decimals' => 0,
 		'decimals_exact' => false,
-		'small_scientific' => true
+		'small_scientific' => true,
+		'zero_as_zero' => true
 	];
 
 	[
 		'precision' => $precision,
 		'decimals' => $decimals,
 		'decimals_exact' => $decimals_exact,
-		'small_scientific' => $small_scientific
+		'small_scientific' => $small_scientific,
+		'zero_as_zero' => $zero_as_zero
 	] = $options + $defaults;
+
+	if ($zero_as_zero && $number == 0) {
+		return '0';
+	}
 
 	$number_original = $number;
 
@@ -1558,6 +1570,10 @@ function formatFloat(float $number, array $options = []): string {
 
 		$number = sprintf('%.'.($precision - 1).'E', $number);
 		$digits = $precision == 1 ? 1 : strlen(rtrim(explode('E', $number)[0], '0')) - ($number[0] === '-' ? 2 : 1);
+	}
+
+	if ($zero_as_zero && $number == 0) {
+		return '0';
 	}
 
 	[
