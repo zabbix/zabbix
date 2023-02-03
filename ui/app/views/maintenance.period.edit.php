@@ -25,7 +25,6 @@
  */
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('maintenance')))->removeId())
 	->setId('maintenance-period-form')
 	->setName('maintenance_period_form')
 	->addVar('edit', $data['is_edit'] ? '1' : null)
