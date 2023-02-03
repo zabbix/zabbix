@@ -154,7 +154,7 @@ class CControllerMediatypeCreate extends CController {
 				$this->getInputs($mediatype, ['script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
 					'event_menu_name'
 				]);
-				$parameters = $this->getInput('parameters', []);
+				$parameters = $this->getInput('parameters_webhook', []);
 
 				if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
 					$mediatype['parameters'] = array_map(function ($name, $value) {

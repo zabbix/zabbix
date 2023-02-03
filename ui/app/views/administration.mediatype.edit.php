@@ -118,9 +118,9 @@ $parameters_exec_table = (new CTable())
 
 foreach ($data['parameters_exec'] as $sortorder => $parameter) {
 	$parameters_exec_table->addRow([
-		(new CTextBox('parameters_exec['.$sortorder.'][value]', $parameter['value'], false, 255))
+		(new CTextBox('parameters_exec['.$parameter['sortorder'].'][value]', $parameter['value'], false, 255))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CButton('parameters_exec['.$sortorder.'][remove]', _('Remove')))
+		(new CButton('parameters_exec['.$parameter['sortorder'].'][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
 	], 'form_row');

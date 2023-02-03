@@ -213,7 +213,10 @@ class CControllerMediatypeEdit extends CController {
 		]);
 
 		if ($this->hasInput('form_refresh')) {
-			$data['parameters_exec'] = $this->getInput('parameters_exec', ['value' => []]);
+			$data['parameters_exec'] = [];
+			foreach (array_values($this->getInput('parameters_exec', [])) as $sortorder => $parameter) {
+				$data['parameters_exec'][] = ['sortorder' => $sortorder, 'value' => $parameter['value']];
+			}
 
 			$data['parameters_webhook'] = [];
 			$parameters = $this->getInput('parameters_webhook', ['name' => [], 'value' => []]);
