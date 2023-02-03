@@ -149,7 +149,7 @@ class urlParamTest extends CTest {
 					$result = call_user_func_array('url_param', [$inputData[0], $inputData[1]]);
 				}
 				elseif (isset($inputData[0])) {
-					$result = call_user_func_array('url_param', $inputData[0]);
+					$result = call_user_func_array('url_param', [$inputData[0]]);
 				}
 			}
 			catch (Exception $e) {
