@@ -21,6 +21,10 @@
 
 class CControllerRegExTest extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'ajaxdata' => 'array'

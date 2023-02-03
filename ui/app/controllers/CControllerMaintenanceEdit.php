@@ -26,6 +26,10 @@ class CControllerMaintenanceEdit extends CController {
 	 */
 	private $maintenance;
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'maintenanceid' => 'db maintenances.maintenanceid'

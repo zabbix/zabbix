@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm('post'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sla')))->removeId())
 	->setId('sla-form')
 	->setName('sla_form')
 	->addItem(getMessages());

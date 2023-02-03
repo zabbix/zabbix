@@ -27,7 +27,7 @@ class CControllerHintboxActionlist extends CController {
 	protected $event;
 
 	protected function init(): void {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {

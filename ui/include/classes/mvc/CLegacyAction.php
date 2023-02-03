@@ -23,11 +23,8 @@ use CController as CAction;
 
 class CLegacyAction extends CAction {
 
-	/**
-	 * Disable SID validation for legacy actions.
-	 */
 	protected function init(): void {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 	}
 
 	public function doAction(): void {

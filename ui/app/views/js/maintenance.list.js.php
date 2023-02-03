@@ -94,13 +94,17 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'maintenance.delete');
 
-			this._post(target, maintenanceids, curl.getUrl());
+			this._post(target, maintenanceids, curl);
 		}
 
-		_post(target, maintenanceids, url) {
+		_post(target, maintenanceids, curl) {
 			target.classList.add('is-loading');
 
-			return fetch(url, {
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('maintenance')) ?>
+			);
+
+			return fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({maintenanceids: maintenanceids})

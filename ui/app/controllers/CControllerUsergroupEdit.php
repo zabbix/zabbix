@@ -27,7 +27,7 @@ class CControllerUsergroupEdit extends CController {
 	private $user_group = [];
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
