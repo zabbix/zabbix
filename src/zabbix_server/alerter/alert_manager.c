@@ -1039,7 +1039,7 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
  * Return value: full database error message is allocated                     *
  *                                                                            *
  ******************************************************************************/
-static char	*am_create_db_alert_message(zbx_config_dbhigh_t *config_dbhigh)
+static char	*am_create_db_alert_message(const zbx_config_dbhigh_t *config_dbhigh)
 {
 	const char	*error;
 	char		*alert_message = NULL;
@@ -1077,7 +1077,7 @@ static char	*am_create_db_alert_message(zbx_config_dbhigh_t *config_dbhigh)
  * Purpose: queues 'database down' watchdog alerts                            *
  *                                                                            *
  ******************************************************************************/
-static void	am_queue_watchdog_alerts(zbx_am_t *manager, zbx_config_dbhigh_t *config_dbhigh)
+static void	am_queue_watchdog_alerts(zbx_am_t *manager, const zbx_config_dbhigh_t *config_dbhigh)
 {
 	zbx_am_media_t		*media;
 	zbx_am_mediatype_t	*mediatype;

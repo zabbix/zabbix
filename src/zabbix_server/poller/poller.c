@@ -209,20 +209,20 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/***************************************************************************************
- *                                                                                     *
- * Purpose: deactivate item interface                                                  *
- *                                                                                     *
- * Parameters: ts                - [IN] the timestamp                                  *
- *             item              - [IN/OUT] the item                                   *
- *             data              - [IN/OUT] the serialized availability data           *
- *             data_alloc        - [IN/OUT] the serialized availability data size      *
- *             data_alloc        - [IN/OUT] the serialized availability data offset    *
- *             ts                - [IN] the timestamp                                  *
- *             unavailable_delay - [IN]                                                *
- *             error             - [IN/OUT]                                            *
- *                                                                                     *
- **************************************************************************************/
+/***********************************************************************************
+ *                                                                                 *
+ * Purpose: deactivate item interface                                              *
+ *                                                                                 *
+ * Parameters: ts                - [IN] timestamp                                  *
+ *             item              - [IN/OUT] item                                   *
+ *             data              - [IN/OUT] serialized availability data           *
+ *             data_alloc        - [IN/OUT] serialized availability data size      *
+ *             data_alloc        - [IN/OUT] serialized availability data offset    *
+ *             ts                - [IN] timestamp                                  *
+ *             unavailable_delay - [IN]                                            *
+ *             error             - [IN/OUT]                                        *
+ *                                                                                 *
+ ***********************************************************************************/
 void	zbx_deactivate_item_interface(zbx_timespec_t *ts, DC_ITEM *item, unsigned char **data, size_t *data_alloc,
 		size_t *data_offset, int unavailable_delay, const char *error)
 {

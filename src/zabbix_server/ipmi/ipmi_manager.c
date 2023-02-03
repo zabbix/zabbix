@@ -847,10 +847,10 @@ static void	ipmi_manager_process_client_result(zbx_ipmi_manager_t *manager, zbx_
  *                                                                                    *
  * Purpose: processes IPMI check result received from IPMI poller                     *
  *                                                                                    *
- * Parameters: manager           - [IN] the IPMI manager                              *
- *             client            - [IN] the client (IPMI poller)                      *
- *             message           - [IN] the received ZBX_IPC_IPMI_VALUE_RESULT message*
- *             now               - [IN] the current time                              *
+ * Parameters: manager           - [IN] IPMI manager                                  *
+ *             client            - [IN] client (IPMI poller)                          *
+ *             message           - [IN] received ZBX_IPC_IPMI_VALUE_RESULT message    *
+ *             now               - [IN] current time                                  *
  *             unavailable_delay - [IN]                                               *
  *                                                                                    *
  *************************************************************************************/
