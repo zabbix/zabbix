@@ -24,7 +24,7 @@
 #include "zbxdbhigh.h"
 #include "zbxnum.h"
 #include "zbxvariant.h"
-#include "base64.h"
+//#include "base64.h"
 
 typedef struct
 {
@@ -313,7 +313,7 @@ static void	add_history_bin(const zbx_vector_ptr_t *history)
 	int		i;
 	zbx_db_insert_t	*db_insert;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin");
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, add_history_bin");
 
 	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 	zbx_db_insert_prepare(db_insert, "history_binary", "itemid", "clock", "ns", "value", NULL);
@@ -321,24 +321,11 @@ static void	add_history_bin(const zbx_vector_ptr_t *history)
 	for (i = 0; i < history->values_num; i++)
 	{
 		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
-		char			*chunk, *dst = NULL;
-		int			data_len, src_len;
 
 		if (ITEM_VALUE_TYPE_BIN != h->value_type)
 			continue;
 
-		src_len = strlen(h->value.str) * 3 / 4 ;
-		dst = (char*)zbx_malloc(NULL, src_len);
-		str_base64_decode(h->value.str, (char *)dst, src_len, &data_len);
-		chunk = (char*)zbx_malloc(NULL, 2 * data_len);
-		badger_escape((char*)dst, chunk, data_len);
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA badger LEN: %d", src_len);
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA badger LEN 2: %d", data_len);
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA add_history_bin value: %c",((char*)(chunk))[0]);
-
-		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, chunk);
-		zbx_free(dst);
+		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.str);
 	}
 
 	sql_writer_add_dbinsert(db_insert);

@@ -27,6 +27,7 @@
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
+#include "base64.h"
 
 #define ZBX_DB_WAIT_DOWN	10
 
@@ -2769,6 +2770,7 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 				case ZBX_TYPE_CUID:
 				case ZBX_TYPE_BLOB:
 					zbx_free(row[j].str);
+					break;
 			}
 		}
 
@@ -2803,7 +2805,8 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
  *             zbx_db_insert_clean(&ins);                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, const ZBX_FIELD **fields, int fields_num)
+void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, const ZBX_FIELD **fields,
+		int fields_num)
 {
 	int	i;
 
@@ -2887,7 +2890,7 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
  *           for insert preparation functions.                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num)
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values, int values_num)
 {
 	int		i;
 	zbx_db_value_t	*row;
@@ -2902,8 +2905,8 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 
 	for (i = 0; i < self->fields.values_num; i++)
 	{
-		ZBX_FIELD		*field = (ZBX_FIELD *)self->fields.values[i];
-		const zbx_db_value_t	*value = values[i];
+		ZBX_FIELD	*field = (ZBX_FIELD *)self->fields.values[i];
+		zbx_db_value_t	*value = values[i];
 
 		switch (field->type)
 		{
@@ -2923,9 +2926,27 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 			case ZBX_TYPE_UINT:
 			case ZBX_TYPE_ID:
 			case ZBX_TYPE_SERIAL:
-			case ZBX_TYPE_BLOB: /* already escaped */
 				row[i] = *value;
 				break;
+			case ZBX_TYPE_BLOB:
+			{
+				char	*chunk, *dst = NULL;
+				int	data_len, src_len;
+
+				src_len = strlen(value->str) * 3 / 4 ;
+				dst = (char*)zbx_malloc(NULL, src_len);
+				str_base64_decode(value->str, (char *)dst, src_len, &data_len);
+#ifdef HAVE_MYSQL
+				chunk = (char*)zbx_malloc(NULL, 2 * data_len);
+				badger_escape((char*)dst, chunk, data_len);
+#else
+				badger_escape((char*)dst, &chunk, data_len);
+#endif
+				zbx_free(dst);
+				row[i].str = chunk;
+
+				break;
+			}
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				exit(EXIT_FAILURE);
@@ -2996,7 +3017,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 
 	va_end(args);
 
-	zbx_db_insert_add_values_dyn(self, (const zbx_db_value_t **)values.values, values.values_num);
+	zbx_db_insert_add_values_dyn(self, (zbx_db_value_t **)values.values, values.values_num);
 
 	zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&values);

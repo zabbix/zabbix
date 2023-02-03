@@ -1453,10 +1453,21 @@ out:
 }
 #endif
 
+#ifdef HAVE_MYSQL
 void	badger_escape(char* dst, char chunk[], size_t size)
 {
 	mysql_real_escape_string(conn, chunk, dst, size);
 }
+#endif
+
+#ifdef HAVE_POSTGRESQL
+void	badger_escape(char* dst, char **chunk, size_t size)
+{
+	size_t	l;
+
+	*chunk = PQescapeByteaConn(conn, dst, size, &l);
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
