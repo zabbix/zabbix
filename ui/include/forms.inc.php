@@ -781,7 +781,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'ssl_key_password' => getRequest('ssl_key_password'),
 		'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
 		'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
-		'http_authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
+		'http_authtype' => getRequest('http_authtype', ZBX_HTTP_AUTH_NONE),
 		'http_username' => getRequest('http_username', ''),
 		'http_password' => getRequest('http_password', ''),
 		'preprocessing' => getRequest('preprocessing', []),

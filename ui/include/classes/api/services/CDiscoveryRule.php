@@ -482,8 +482,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 			}
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				// Clean username and password when authtype is set to HTTPTEST_AUTH_NONE.
-				if ($item['authtype'] == HTTPTEST_AUTH_NONE) {
+				// Clean username and password when authtype is set to ZBX_HTTP_AUTH_NONE.
+				if ($item['authtype'] == ZBX_HTTP_AUTH_NONE) {
 					$item['username'] = '';
 					$item['password'] = '';
 				}

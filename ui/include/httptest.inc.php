@@ -24,11 +24,11 @@ require_once dirname(__FILE__).'/items.inc.php';
 
 function httptest_authentications($type = null) {
 	$authentication_types = [
-		HTTPTEST_AUTH_NONE => _('None'),
-		HTTPTEST_AUTH_BASIC => _('Basic'),
-		HTTPTEST_AUTH_NTLM => _('NTLM'),
-		HTTPTEST_AUTH_KERBEROS => _('Kerberos'),
-		HTTPTEST_AUTH_DIGEST => _('Digest')
+		ZBX_HTTP_AUTH_NONE => _('None'),
+		ZBX_HTTP_AUTH_BASIC => _('Basic'),
+		ZBX_HTTP_AUTH_NTLM => _('NTLM'),
+		ZBX_HTTP_AUTH_KERBEROS => _('Kerberos'),
+		ZBX_HTTP_AUTH_DIGEST => _('Digest')
 	];
 
 	if (is_null($type)) {

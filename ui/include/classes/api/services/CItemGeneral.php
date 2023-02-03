@@ -1189,7 +1189,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if (array_key_exists('authtype', $item) && $item['authtype'] != $db_item['authtype']
-						&& $item['authtype'] == HTTPTEST_AUTH_NONE) {
+						&& $item['authtype'] == ZBX_HTTP_AUTH_NONE) {
 					$item += array_intersect_key($type_field_defaults, array_flip(['username', 'password']));
 				}
 
