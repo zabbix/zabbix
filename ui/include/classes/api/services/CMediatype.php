@@ -924,13 +924,6 @@ class CMediatype extends CApiService {
 				'filter' => ['mediatypeid' => array_keys($result)]
 			]);
 
-			foreach ($result as &$mediatype) {
-				if ($mediatype['type'] == MEDIA_TYPE_EXEC) {
-					CArrayHelper::sort($mediatype['parameters'], [['field' => 'sortorder', 'order' => ZBX_SORT_UP]]);
-				}
-			}
-			unset($mediatype);
-
 			foreach ($parameters as $parameter) {
 				if ($result[$parameter['mediatypeid']]['type'] == MEDIA_TYPE_EXEC) {
 					$result[$parameter['mediatypeid']]['parameters'][] = [
@@ -945,6 +938,14 @@ class CMediatype extends CApiService {
 					];
 				}
 			}
+
+			foreach ($result as &$mediatype) {
+				if ($mediatype['type'] == MEDIA_TYPE_EXEC) {
+					CArrayHelper::sort($mediatype['parameters'], [['field' => 'sortorder', 'order' => ZBX_SORT_UP]]);
+					$mediatype['parameters'] = array_values($mediatype['parameters']);
+				}
+			}
+			unset($mediatype);
 		}
 
 		return $result;
