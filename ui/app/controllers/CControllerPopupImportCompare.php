@@ -27,6 +27,10 @@ class CControllerPopupImportCompare extends CController {
 
 	private $toc = [];
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'import' => 'in 1',
@@ -96,7 +100,6 @@ class CControllerPopupImportCompare extends CController {
 				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
 				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				break;
 		}

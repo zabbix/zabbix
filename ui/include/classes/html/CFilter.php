@@ -100,7 +100,6 @@ class CFilter extends CDiv {
 			->setId(uniqid('filter_'));
 
 		$this->form = (new CForm('get'))
-			->cleanItems()
 			->setAttribute('name', self::FORM_NAME);
 
 		$this->reset_url = new CUrl();

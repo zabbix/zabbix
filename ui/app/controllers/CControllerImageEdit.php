@@ -21,8 +21,13 @@
 
 class CControllerImageEdit extends CController {
 
+	/**
+	 * @var array
+	 */
+	private $image = [];
+
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {

@@ -40,6 +40,8 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	public const HISTORY_DATA_HISTORY = 2;
 	public const HISTORY_DATA_TRENDS = 3;
 
+	public const DEFAULT_DECIMAL_PLACES = 2;
+
 	// Predefined colors for thresholds. Each next threshold takes next sequential value from palette.
 	public const THRESHOLDS_DEFAULT_COLOR_PALETTE = [
 		'FF465C', 'B0AF07', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7', 'EC1594', 'BAE37D',
@@ -83,6 +85,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				'base_color'			=> ['type' => API_COLOR],
 				'min'					=> ['type' => API_NUMERIC],
 				'max'					=> ['type' => API_NUMERIC],
+				'decimal_places'		=> ['type' => API_INT32, 'in' => '0:10', 'default' => self::DEFAULT_DECIMAL_PLACES],
 				'thresholds'			=> ['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
 					'color'					=> ['type' => API_COLOR],
 					'threshold'				=> ['type' => API_NUMERIC]
@@ -112,6 +115,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'min' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'max' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'decimal_places' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'display' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'history' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'base_color' => ZBX_WIDGET_FIELD_TYPE_STR,

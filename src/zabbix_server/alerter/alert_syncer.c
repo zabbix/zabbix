@@ -435,25 +435,6 @@ out:
 	return alerts_num;
 }
 
-static int	am_db_compare_tags(const void *d1, const void *d2)
-{
-	zbx_tag_t	*tag1 = *(zbx_tag_t **)d1;
-	zbx_tag_t	*tag2 = *(zbx_tag_t **)d2;
-	int		ret;
-
-	if (0 != (ret = strcmp(tag1->tag, tag2->tag)))
-		return ret;
-
-	return strcmp(tag1->value, tag2->value);
-}
-
-static void	tag_free(zbx_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
-}
-
 typedef struct
 {
 	zbx_uint64_t		eventid;
@@ -477,7 +458,7 @@ static int	zbx_event_tags_compare_func(const void *d1, const void *d2)
 
 static void	event_tags_free(zbx_event_tags_t *event_tags)
 {
-	zbx_vector_tags_clear_ext(&event_tags->tags, tag_free);
+	zbx_vector_tags_clear_ext(&event_tags->tags, zbx_free_tag);
 	zbx_vector_tags_destroy(&event_tags->tags);
 	zbx_free(event_tags);
 }
@@ -566,7 +547,7 @@ static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params, zb
 		zbx_rtrim(key, ZBX_WHITESPACE);
 		zbx_rtrim(value, ZBX_WHITESPACE);
 
-		if (FAIL == zbx_vector_tags_search(&(event_tags->tags), &tag_local, am_db_compare_tags))
+		if (FAIL == zbx_vector_tags_search(&(event_tags->tags), &tag_local, zbx_compare_tags_and_values))
 		{
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, key);
@@ -618,7 +599,7 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 				tag_local.value = row[1];
 
 				if (FAIL != (index = zbx_vector_tags_search(&(local_event_tags->tags), &tag_local,
-						am_db_compare_tags)))
+						zbx_compare_tags_and_values)))
 				{
 					zbx_free_tag(local_event_tags->tags.values[index]);
 					zbx_vector_tags_remove_noorder(&(local_event_tags->tags), index);

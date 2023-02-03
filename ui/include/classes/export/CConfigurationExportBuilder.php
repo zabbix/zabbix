@@ -31,7 +31,6 @@ class CConfigurationExportBuilder {
 	 */
 	public function __construct() {
 		$this->data['version'] = ZABBIX_EXPORT_VERSION;
-		$this->data['date'] = date(DATE_TIME_FORMAT_SECONDS_XML, time() - date('Z'));
 	}
 
 	/**
@@ -284,17 +283,26 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($templates, ['host']);
 
 		foreach ($templates as $template) {
+			$vendor = [];
+
+			if ($template['vendor_name'] !== '' && $template['vendor_version'] !== '') {
+				$vendor = [
+					'name' => $template['vendor_name'],
+					'version' => $template['vendor_version']
+				];
+			}
+
 			$result[] = [
 				'uuid' => $template['uuid'],
 				'template' => $template['host'],
 				'name' => $template['name'],
 				'description' => $template['description'],
+				'vendor' => $vendor,
 				'groups' => $this->formatGroups($template['templategroups']),
 				'items' => $this->formatItems($template['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
 				'httptests' => $this->formatHttpTests($template['httptests']),
 				'macros' => $this->formatMacros($template['macros']),
-				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
 				'dashboards' => $this->formatDashboards($template['dashboards']),
 				'tags' => $this->formatTags($template['tags']),
 				'valuemaps' => $this->formatValueMaps($template['valuemaps'])

@@ -52,7 +52,7 @@ zbx_poller_test_SOURCES = \
 	../../zbxmockdir.c
 
 zbx_poller_test_LDADD = $(POLLER_LIBS)
-zbx_poller_test_LDADD += @SERVER_LIBS@ 
+zbx_poller_test_LDADD += @SERVER_LIBS@
 zbx_poller_test_LDFLAGS = @SERVER_LDFLAGS@\
 	-Wl,--wrap=ssh_run \
 	-Wl,--wrap=telnet_run

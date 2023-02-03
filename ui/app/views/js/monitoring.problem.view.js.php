@@ -41,11 +41,11 @@
 		opened_eventids: [],
 
 		init({filter_options, refresh_url, refresh_interval, filter_defaults}) {
-			this.refresh_url = new Curl(refresh_url, false);
+			this.refresh_url = new Curl(refresh_url);
 			this.refresh_interval = refresh_interval;
 			this.filter_defaults = filter_defaults;
 
-			const url = new Curl('zabbix.php', false);
+			const url = new Curl('zabbix.php');
 			url.setArgument('action', 'problem.view.refresh');
 			this.refresh_simple_url = url.getUrl();
 
@@ -355,7 +355,7 @@
 		 */
 		refreshResults() {
 			const url = new Curl();
-			const refresh_url = new Curl('zabbix.php', false);
+			const refresh_url = new Curl('zabbix.php');
 			const data = Object.assign({}, this.filter_defaults, this.global_timerange, url.getArgumentsObject());
 
 			// Modify filter data.

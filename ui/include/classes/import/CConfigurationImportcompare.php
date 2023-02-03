@@ -400,18 +400,6 @@ class CConfigurationImportcompare {
 					continue;
 				}
 
-				if (!$options['templateLinkage']['createMissing'] && !$options['templateLinkage']['deleteMissing']) {
-					$entity['after']['templates'] = $entity['before']['templates'];
-				}
-				elseif ($options['templateLinkage']['createMissing'] && !$options['templateLinkage']['deleteMissing']) {
-					$entity['after']['templates'] = $this->afterForInnerCreateMissing($entity['before']['templates'],
-						$entity['after']['templates']);
-				}
-				elseif ($options['templateLinkage']['deleteMissing'] && !$options['templateLinkage']['createMissing']) {
-					$entity['after']['templates'] = $this->afterForInnerDeleteMissing($entity['before']['templates'],
-						$entity['after']['templates']);
-				}
-
 				if ($entity['before'] === $entity['after'] && count($entity) === 2) {
 					unset($diff['updated'][$key]);
 				}
@@ -487,63 +475,5 @@ class CConfigurationImportcompare {
 		}
 
 		return $diff;
-	}
-
-	/**
-	 * Create "after" that contains all entries from "before" and "after" combined.
-	 *
-	 * @param array $before
-	 * @param array $after
-	 *
-	 * @return array
-	 */
-	protected function afterForInnerCreateMissing(array $before, array $after): array {
-		$missing = [];
-
-		foreach ($after as $after_entity) {
-			$found = false;
-
-			foreach ($before as $before_entity) {
-				if ($before_entity === $after_entity) {
-					$found = true;
-					break;
-				}
-			}
-
-			if (!$found) {
-				$missing[] = $after_entity;
-			}
-		}
-
-		return array_merge($before, $missing);
-	}
-
-	/**
-	 * Create "after" that contains only entries from "after" that were also present in "before".
-	 *
-	 * @param array $before
-	 * @param array $after
-	 *
-	 * @return array
-	 */
-	protected function afterForInnerDeleteMissing(array $before, array $after): array {
-		$new_after = [];
-
-		foreach ($after as $after_entity) {
-			$found = false;
-
-			foreach ($before as $before_entity) {
-				if ($before_entity === $after_entity) {
-					$found = true;
-					break;
-				}
-			}
-
-			if ($found) {
-				$new_after[] = $after_entity;
-			}
-		}
-
-		return $new_after;
 	}
 }
