@@ -105,7 +105,7 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'connector.enable');
 
-			this._post(target, connectorids, curl.getUrl());
+			this._post(target, connectorids, curl);
 		}
 
 		_disable(target, connectorids) {
@@ -120,7 +120,7 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'connector.disable');
 
-			this._post(target, connectorids, curl.getUrl());
+			this._post(target, connectorids, curl);
 		}
 
 		_delete(target, connectorids) {
@@ -135,13 +135,17 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'connector.delete');
 
-			this._post(target, connectorids, curl.getUrl());
+			this._post(target, connectorids, curl);
 		}
 
 		_post(target, connectorids, url) {
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('connector')) ?>
+			);
+
 			target.classList.add('is-loading');
 
-			return fetch(url, {
+			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({connectorids})

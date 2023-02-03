@@ -57,6 +57,7 @@ $filter = (new CFilter())
 	]);
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('connector')))->removeId())
 	->setId('connector-list')
 	->setName('connector_list');
 

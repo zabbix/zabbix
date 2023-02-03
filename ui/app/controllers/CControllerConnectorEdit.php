@@ -26,6 +26,10 @@ class CControllerConnectorEdit extends CController {
 	 */
 	private ?array $connector = null;
 
+	protected function init(): void {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'connectorid' =>	'db connector.connectorid'

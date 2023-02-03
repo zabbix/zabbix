@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm('post'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('connector')))->removeId())
 	->setId('connector-form')
 	->setName('connector_form')
 	->addItem(getMessages());
