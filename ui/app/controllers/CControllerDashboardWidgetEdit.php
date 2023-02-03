@@ -44,6 +44,10 @@ class CControllerDashboardWidgetEdit extends CController {
 
 	private ?CWidget $widget;
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'type' =>						'string|required',

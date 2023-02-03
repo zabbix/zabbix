@@ -210,6 +210,7 @@ $discoveryTable = (new CTableInfo())
 	]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+$csrf_token = CCsrfTokenHelper::get('host_discovery.php');
 
 foreach ($data['discoveries'] as $discovery) {
 	// description
@@ -258,9 +259,9 @@ foreach ($data['discoveries'] as $discovery) {
 			->setArgument('context', $data['context'])
 			->getUrl()
 		))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']))
-			->addSID();
+			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
@@ -336,8 +337,12 @@ foreach ($data['discoveries'] as $discovery) {
 }
 
 $button_list = [
-	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?')],
-	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?')]
+	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?'),
+		'csrf_token' => $csrf_token
+	],
+	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 if ($data['context'] === 'host') {
@@ -353,7 +358,9 @@ if ($data['context'] === 'host') {
 }
 
 $button_list += [
-	'discoveryrule.massdelete' => ['name' => _('Delete'), 'confirm' =>_('Delete selected discovery rules?')]
+	'discoveryrule.massdelete' => ['name' => _('Delete'), 'confirm' =>_('Delete selected discovery rules?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 // Append table to form.

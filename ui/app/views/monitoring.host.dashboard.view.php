@@ -63,7 +63,6 @@ $html_page = (new CHtmlPage())
 		(new CList())
 			->addItem(
 				(new CForm('get'))
-					->cleanItems()
 					->addVar('action', 'host.dashboard.view')
 					->addVar('hostid', $data['host']['hostid'])
 					->addItem((new CLabel(_('Dashboard'), 'label-dashboard'))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))

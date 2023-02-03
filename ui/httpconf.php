@@ -50,26 +50,26 @@ $fields = [
 	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
 	'steps'           => [null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	'isset({add}) || isset({update})', _('Steps')],
 	'authentication'  => [T_ZBX_INT, O_OPT, null,
-								IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-									HTTPTEST_AUTH_DIGEST
+								IN([ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+									ZBX_HTTP_AUTH_DIGEST
 								]),
 								'isset({add}) || isset({update})'
 							],
 	'http_user' =>			[T_ZBX_STR, O_OPT, null,  null,
 								'(isset({add}) || isset({update})) && isset({authentication})'.
-									' && ({authentication}=='.HTTPTEST_AUTH_BASIC.
-										' || {authentication}=='.HTTPTEST_AUTH_NTLM.
-										' || {authentication}=='.HTTPTEST_AUTH_KERBEROS.
-										' || {authentication} == '.HTTPTEST_AUTH_DIGEST.
+									' && ({authentication} == '.ZBX_HTTP_AUTH_BASIC.
+										' || {authentication} == '.ZBX_HTTP_AUTH_NTLM.
+										' || {authentication} == '.ZBX_HTTP_AUTH_KERBEROS.
+										' || {authentication} == '.ZBX_HTTP_AUTH_DIGEST.
 									')',
 								_('User')
 							],
 	'http_password' =>		[T_ZBX_STR, O_OPT, P_NO_TRIM, null,
 								'(isset({add}) || isset({update})) && isset({authentication})'.
-									' && ({authentication}=='.HTTPTEST_AUTH_BASIC.
-										' || {authentication}=='.HTTPTEST_AUTH_NTLM.
-										' || {authentication}=='.HTTPTEST_AUTH_KERBEROS.
-										' || {authentication} == '.HTTPTEST_AUTH_DIGEST.
+									' && ({authentication} == '.ZBX_HTTP_AUTH_BASIC.
+										' || {authentication} == '.ZBX_HTTP_AUTH_NTLM.
+										' || {authentication} == '.ZBX_HTTP_AUTH_KERBEROS.
+										' || {authentication} == '.ZBX_HTTP_AUTH_DIGEST.
 									')',
 								_('Password')
 							],
@@ -254,10 +254,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'variables' => [],
 			'http_proxy' => $_REQUEST['http_proxy'],
 			'steps' => $steps,
-			'http_user' => ($_REQUEST['authentication'] == HTTPTEST_AUTH_NONE) ? '' : $_REQUEST['http_user'],
-			'http_password' => ($_REQUEST['authentication'] == HTTPTEST_AUTH_NONE) ? '' : $_REQUEST['http_password'],
-			'verify_peer' => getRequest('verify_peer', HTTPTEST_VERIFY_PEER_OFF),
-			'verify_host' => getRequest('verify_host', HTTPTEST_VERIFY_HOST_OFF),
+			'http_user' => $_REQUEST['authentication'] == ZBX_HTTP_AUTH_NONE ? '' : $_REQUEST['http_user'],
+			'http_password' => $_REQUEST['authentication'] == ZBX_HTTP_AUTH_NONE ? '' : $_REQUEST['http_password'],
+			'verify_peer' => getRequest('verify_peer', ZBX_HTTP_VERIFY_PEER_OFF),
+			'verify_host' => getRequest('verify_host', ZBX_HTTP_VERIFY_HOST_OFF),
 			'ssl_cert_file' => getRequest('ssl_cert_file'),
 			'ssl_key_file' => getRequest('ssl_key_file'),
 			'ssl_key_password' => getRequest('ssl_key_password'),
@@ -608,7 +608,7 @@ if (isset($_REQUEST['form'])) {
 			}
 		}
 
-		$data['authentication'] = getRequest('authentication', HTTPTEST_AUTH_NONE);
+		$data['authentication'] = getRequest('authentication', ZBX_HTTP_AUTH_NONE);
 		$data['http_user'] = getRequest('http_user', '');
 		$data['http_password'] = getRequest('http_password', '');
 		$data['http_proxy'] = getRequest('http_proxy', '');

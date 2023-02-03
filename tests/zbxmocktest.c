@@ -21,6 +21,7 @@
 
 #include "zbxnum.h"
 #include "zbxtypes.h"
+#include "log.h"
 
 /* unresolved symbols needed for linking */
 
@@ -63,7 +64,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_REPORTWRITER */
 	1, /* ZBX_PROCESS_TYPE_SERVICEMAN */
 	1, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
-	5 /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	5, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	0, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
 };
 
 int	CONFIG_LISTEN_PORT		= 0;
@@ -188,6 +190,8 @@ int	main (void)
 	{
 		cmocka_unit_test_setup_teardown(zbx_mock_test_entry, zbx_mock_data_init, zbx_mock_data_free)
 	};
+
+	zbx_log_level = LOG_LEVEL_INFORMATION;
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }

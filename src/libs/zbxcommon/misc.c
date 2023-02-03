@@ -667,10 +667,3 @@ zbx_uint64_t	suffix2factor(char c)
 			return 1;
 	}
 }
-
-void	zbx_free_tag(zbx_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
-}

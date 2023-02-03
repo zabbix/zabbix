@@ -138,7 +138,7 @@
 					}
 				}
 
-				const curl = new Curl('zabbix.php', false);
+				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'host.list');
 
 				location.href = curl.getUrl();

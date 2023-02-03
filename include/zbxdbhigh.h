@@ -275,7 +275,7 @@ typedef struct
 	int			severity;
 	unsigned char		suppressed;
 
-	zbx_vector_ptr_t	tags;	/* used for both zbx_tag_t and zbx_host_tag_t */
+	zbx_vector_tags_t	tags;
 
 #define ZBX_FLAGS_DB_EVENT_UNSET		0x0000
 #define ZBX_FLAGS_DB_EVENT_CREATE		0x0001

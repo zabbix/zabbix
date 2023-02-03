@@ -24,6 +24,7 @@
 #include "zbxshmem.h"
 #include "zbxcachehistory.h"
 #include "preproc.h"
+#include "zbxconnector.h"
 #include "log.h"
 #include "zbxmutexs.h"
 #include "zbxtime.h"
@@ -47,6 +48,9 @@
 #define ZBX_DIAG_PREPROC_INFO			0x00000001
 
 #define ZBX_DIAG_PREPROC_SIMPLE		(ZBX_DIAG_PREPROC_INFO)
+
+#define ZBX_DIAG_CONNECTOR_VALUES			0x00000001
+#define ZBX_DIAG_CONNECTOR_SIMPLE		(ZBX_DIAG_CONNECTOR_VALUES)
 
 static zbx_diag_add_section_info_func_t	add_diag_cb;
 
@@ -211,8 +215,8 @@ void	zbx_diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_s
  ******************************************************************************/
 static int	diag_compare_pair_second_desc(const void *d1, const void *d2)
 {
-	zbx_uint64_pair_t	*p1 = (zbx_uint64_pair_t *)d1;
-	zbx_uint64_pair_t	*p2 = (zbx_uint64_pair_t *)d2;
+	const zbx_uint64_pair_t	*p1 = (const zbx_uint64_pair_t *)d1;
+	const zbx_uint64_pair_t	*p2 = (const zbx_uint64_pair_t *)d2;
 
 	if (p1->second < p2->second)
 		return 1;
@@ -236,8 +240,8 @@ static void	diag_historycache_add_items(struct zbx_json *json, const char *field
 	for (i = 0; i < pairs_num; i++)
 	{
 		zbx_json_addobject(json, NULL);
-		zbx_json_addint64(json, "itemid", pairs[i].first);
-		zbx_json_addint64(json, "values", pairs[i].second);
+		zbx_json_adduint64(json, "itemid", pairs[i].first);
+		zbx_json_adduint64(json, "values", pairs[i].second);
 		zbx_json_close(json);
 	}
 
@@ -290,9 +294,9 @@ int	zbx_diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_j
 			time_total += time2 - time1;
 
 			if (0 != (fields & ZBX_DIAG_HISTORYCACHE_ITEMS))
-				zbx_json_addint64(json, "items", items_num);
+				zbx_json_adduint64(json, "items", items_num);
 			if (0 != (fields & ZBX_DIAG_HISTORYCACHE_VALUES))
-				zbx_json_addint64(json, "values", values_num);
+				zbx_json_adduint64(json, "values", values_num);
 		}
 
 		if (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEMORY))
@@ -495,6 +499,39 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add top list to output json                                       *
+ *                                                                            *
+ * Parameters: json            - [OUT] the output json                        *
+ *             field           - [IN] the field name                          *
+ *             connector_stats - [IN] a top connector list                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	diag_add_connector_items(struct zbx_json *json, const char *field,
+		const zbx_vector_ptr_t *connector_stats)
+{
+	int	i;
+
+	zbx_json_addarray(json, field);
+
+	for (i = 0; i < connector_stats->values_num; i++)
+	{
+		const zbx_connector_stat_t	*connector_stat;
+
+		connector_stat = (const zbx_connector_stat_t *)connector_stats->values[i];
+
+		zbx_json_addobject(json, NULL);
+		zbx_json_adduint64(json, "connectorid", connector_stat->connectorid);
+		zbx_json_addint64(json, "values", connector_stat->values_num);
+		zbx_json_addint64(json, "links", connector_stat->links_num);
+		zbx_json_addint64(json, "queued_links", connector_stat->queued_links_num);
+		zbx_json_close(json);
+	}
+
+	zbx_json_close(json);
+}
+
 static void	zbx_json_addhex(struct zbx_json *j, const char *name, zbx_uint64_t value)
 {
 	char	buffer[MAX_ID_LEN];
@@ -647,6 +684,9 @@ static void	diag_prepare_default_request(struct zbx_json *j, unsigned int flags)
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_LOCKS)))
 		diag_add_section_request(j, ZBX_DIAG_LOCKS, NULL);
+
+	if (0 != (flags & (1 << ZBX_DIAGINFO_CONNECTOR)))
+		diag_add_section_request(j, ZBX_DIAG_CONNECTOR, "values", NULL);
 }
 
 /******************************************************************************
@@ -886,6 +926,26 @@ static void	diag_log_alerting(struct zbx_json_parse *jp, char **out, size_t *out
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: log connector diagnostic information                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	diag_log_connector(struct zbx_json_parse *jp, char **out, size_t *out_alloc, size_t *out_offset)
+{
+	char	*msg = NULL;
+
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "== connector diagnostic information ==");
+
+	diag_get_simple_values(jp, &msg);
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "%s", msg);
+	zbx_free(msg);
+
+	diag_log_top_view(jp, "top.values", "$.top.values", out, out_alloc, out_offset);
+
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "==");
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: log diagnostic information                                        *
  *                                                                            *
  * Parameters: flags - [IN] flags describing section to log                   *
@@ -946,6 +1006,8 @@ void	zbx_diag_log_info(unsigned int flags, char **result)
 						&result_offset);
 				zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset, "==");
 			}
+			else if (0 == strcmp(section, ZBX_DIAG_CONNECTOR))
+				diag_log_connector(&jp_section, result, &result_alloc, &result_offset);
 		}
 	}
 	else
@@ -956,6 +1018,106 @@ void	zbx_diag_log_info(unsigned int flags, char **result)
 out:
 	zbx_free(info);
 	zbx_json_free(&j);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add requested connector diagnostic information to json data       *
+ *                                                                            *
+ * Parameters: jp    - [IN] the request                                       *
+ *             json  - [IN/OUT] the json to update                            *
+ *             error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the information was added successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_diag_add_connector_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
+{
+	zbx_vector_ptr_t	tops;
+	int			ret = FAIL;
+	double			time1, time2, time_total = 0;
+	zbx_uint64_t		fields;
+	zbx_diag_map_t		field_map[] = {
+					{"", ZBX_DIAG_CONNECTOR_VALUES},
+					{"values", ZBX_DIAG_CONNECTOR_VALUES},
+					{NULL, 0}
+					};
+
+	zbx_vector_ptr_create(&tops);
+
+	if (SUCCEED == (ret = zbx_diag_parse_request(jp, field_map, &fields, &tops, error)))
+	{
+		zbx_json_addobject(json, ZBX_DIAG_CONNECTOR);
+
+		if (0 != (fields & ZBX_DIAG_CONNECTOR_SIMPLE))
+		{
+			zbx_uint64_t	queued;
+
+			time1 = zbx_time();
+			if (FAIL == (ret = zbx_connector_get_diag_stats(&queued, error)))
+				goto out;
+
+			time2 = zbx_time();
+			time_total += time2 - time1;
+
+			if (0 != (fields & ZBX_DIAG_CONNECTOR_VALUES))
+				zbx_json_adduint64(json, "queued", queued);
+		}
+
+		if (0 != tops.values_num)
+		{
+			int	i;
+
+			zbx_json_addobject(json, "top");
+
+			for (i = 0; i < tops.values_num; i++)
+			{
+				zbx_diag_map_t	*map = (zbx_diag_map_t *)tops.values[i];
+
+				if (0 == strcmp(map->name, "values"))
+				{
+					zbx_vector_ptr_t	connector_stats;
+
+					zbx_vector_ptr_create(&connector_stats);
+					time1 = zbx_time();
+					if (0 == strcmp(map->name, "values"))
+					{
+						ret = zbx_connector_get_top_connectors((int)map->value,
+								&connector_stats, error);
+					}
+
+					if (FAIL == ret)
+					{
+						zbx_vector_ptr_destroy(&connector_stats);
+						goto out;
+					}
+					time2 = zbx_time();
+					time_total += time2 - time1;
+
+					diag_add_connector_items(json, map->name, &connector_stats);
+					zbx_vector_ptr_clear_ext(&connector_stats, zbx_ptr_free);
+					zbx_vector_ptr_destroy(&connector_stats);
+				}
+				else
+				{
+					*error = zbx_dsprintf(*error, "Unsupported top field: %s", map->name);
+					ret = FAIL;
+					goto out;
+				}
+			}
+
+			zbx_json_close(json);
+		}
+
+		zbx_json_addfloat(json, "time", time_total);
+		zbx_json_close(json);
+	}
+out:
+	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)zbx_diag_map_free);
+	zbx_vector_ptr_destroy(&tops);
+
+	return ret;
 }
 
 /******************************************************************************

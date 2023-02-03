@@ -26,6 +26,10 @@ class CControllerPopupSlaEdit extends CController {
 	 */
 	private $sla;
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'slaid' => 'db services.serviceid'

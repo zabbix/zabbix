@@ -29,7 +29,6 @@ $form_action = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $form = (new CForm('post', $form_action))
-	->cleanItems()
 	->setId('user-group-mapping-edit-form')
 	->setName('user-group-mapping-edit-form')
 	->addItem(

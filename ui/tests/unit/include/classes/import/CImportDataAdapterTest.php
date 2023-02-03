@@ -292,6 +292,8 @@ class CImportDataAdapterTest extends TestCase {
 				'host' => 'empty-template',
 				'name' => 'empty-template',
 				'description' => '',
+				'vendor_name' => '',
+				'vendor_version' => '',
 				'tags' => [],
 				'valuemaps' => []
 			],
@@ -327,6 +329,8 @@ class CImportDataAdapterTest extends TestCase {
 				'host' => 'export-template',
 				'name' => 'export-template',
 				'description' => '',
+				'vendor_name' => '',
+				'vendor_version' => '',
 				'tags' => [],
 				'valuemaps' => []
 			]
@@ -2060,6 +2064,8 @@ class CImportDataAdapterTest extends TestCase {
 					'templates' => [],
 					'name' => 'Template_Linux',
 					'description' => '',
+					'vendor_name' => '',
+					'vendor_version' => '',
 					'tags' => [],
 					'valuemaps' => []
 				],
@@ -2075,6 +2081,8 @@ class CImportDataAdapterTest extends TestCase {
 					'templates' => [],
 					'name' => 'Template_Simple',
 					'description' => '',
+					'vendor_name' => '',
+					'vendor_version' => '',
 					'tags' => [],
 					'valuemaps' => []
 				]
@@ -2524,6 +2532,8 @@ class CImportDataAdapterTest extends TestCase {
 					'host' => 'Template_Simple',
 					'name' => 'Template_Simple',
 					'description' => '',
+					'vendor_name' => '',
+					'vendor_version' => '',
 					'tags' => [],
 					'valuemaps' => []
 				]
@@ -2859,6 +2869,8 @@ class CImportDataAdapterTest extends TestCase {
 				'host' => 'Test 1',
 				'name' => 'Test 1',
 				'description' => '',
+				'vendor_name' => '',
+				'vendor_version' => '',
 				'tags' => [],
 				'valuemaps' => []
 			]
@@ -4270,6 +4282,30 @@ class CImportDataAdapterTest extends TestCase {
 					'key_' => 'drule3',
 					'trapper_hosts' => ''
 				]
+			]
+		]);
+	}
+
+	public function testTemplateVendorFields() {
+		$adapter = $this->getAdapter($this->getFile('vendor_fields.xml'));
+
+		$this->assertEquals($adapter->getTemplates(), [
+			[
+				'groups' => [
+					[
+						'name' => 'Templates'
+					]
+				],
+				'macros' => [],
+				'templates' => [],
+				'uuid' => '0c45e5ed44ea494dabfa4136f420aa65',
+				'host' => 'vendor test',
+				'name' => 'vendor test',
+				'description' => '',
+				'vendor_name' => 'Zabbix',
+				'vendor_version' => '6.4-0',
+				'tags' => [],
+				'valuemaps' => []
 			]
 		]);
 	}

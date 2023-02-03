@@ -231,6 +231,7 @@ tests/libs/zbxcommon/zbx_tm_add
 tests/libs/zbxcommon/zbx_tm_sub
 tests/libs/zbxcommon/zbx_tm_round_up
 tests/libs/zbxcommon/zbx_tm_round_down
+tests/libs/zbxtagfilter/tagfilter_match_tags
 tests/libs/zbxtime/zbx_iso8601_utc
 tests/libs/zbxtrends/zbx_baseline_get_data
 tests/libs/zbxtrends/zbx_trends_parse_range

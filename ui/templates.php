@@ -66,6 +66,8 @@ $fields = [
 	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'filter_name'		=> [T_ZBX_STR, O_OPT, null,			null,	null],
+	'filter_vendor_name'	=> [T_ZBX_STR, O_OPT, null,			null,	null],
+	'filter_vendor_version'	=> [T_ZBX_STR, O_OPT, null,			null,	null],
 	'filter_templates' =>  [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_groups'		=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_evaltype'	=> [T_ZBX_INT, O_OPT, null,
@@ -558,6 +560,7 @@ if (hasRequest('form')) {
 		'original_templates' => [],
 		'tags' => $tags,
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
+		'vendor' => [],
 		'readonly' => false,
 		'macros' => $macros,
 		'valuemaps' => array_values(getRequest('valuemaps', []))
@@ -574,6 +577,13 @@ if (hasRequest('form')) {
 			'templateids' => $data['templateid']
 		]);
 		$data['dbTemplate'] = reset($dbTemplates);
+
+		if ($data['form'] !== 'full_clone') {
+			$data['vendor'] = array_filter([
+				'name' => $data['dbTemplate']['vendor_name'],
+				'version' => $data['dbTemplate']['vendor_version']
+			], 'strlen');
+		}
 
 		foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
 			$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
@@ -765,6 +775,8 @@ else {
 	// filter
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.templates.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.templates.filter_vendor_name', getRequest('filter_vendor_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.templates.filter_vendor_version', getRequest('filter_vendor_version', ''), PROFILE_TYPE_STR);
 		CProfile::updateArray('web.templates.filter_templates', getRequest('filter_templates', []), PROFILE_TYPE_ID);
 		CProfile::updateArray('web.templates.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
 		CProfile::update('web.templates.filter.evaltype', getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
@@ -787,6 +799,8 @@ else {
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.templates.filter_name');
+		CProfile::delete('web.templates.filter_vendor_name');
+		CProfile::delete('web.templates.filter_vendor_version');
 		CProfile::deleteIdx('web.templates.filter_templates');
 		CProfile::deleteIdx('web.templates.filter_groups');
 		CProfile::delete('web.templates.filter.evaltype');
@@ -797,6 +811,8 @@ else {
 
 	$filter = [
 		'name' => CProfile::get('web.templates.filter_name', ''),
+		'vendor_name' => CProfile::get('web.templates.filter_vendor_name', ''),
+		'vendor_version' => CProfile::get('web.templates.filter_vendor_version', ''),
 		'templates' => CProfile::getArray('web.templates.filter_templates', null),
 		'groups' => CProfile::getArray('web.templates.filter_groups', null),
 		'evaltype' => CProfile::get('web.templates.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
@@ -840,9 +856,11 @@ else {
 		'output' => ['templateid', $sortField],
 		'evaltype' => $filter['evaltype'],
 		'tags' => $filter['tags'],
-		'search' => [
-			'name' => ($filter['name'] === '') ? null : $filter['name']
-		],
+		'search' => array_filter([
+			'name' => $filter['name'],
+			'vendor_name' => $filter['vendor_name'],
+			'vendor_version' => $filter['vendor_version']
+		], 'strlen'),
 		'parentTemplateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 		'groupids' => $filter_groupids,
 		'editable' => true,
@@ -868,7 +886,7 @@ else {
 	$paging = CPagerHelper::paginate($page_num, $templates, $sortOrder, new CUrl('templates.php'));
 
 	$templates = API::Template()->get([
-		'output' => ['templateid', 'name'],
+		'output' => ['templateid', 'name', 'vendor_name', 'vendor_version'],
 		'selectHosts' => ['hostid'],
 		'selectTemplates' => ['templateid', 'name'],
 		'selectParentTemplates' => ['templateid', 'name'],

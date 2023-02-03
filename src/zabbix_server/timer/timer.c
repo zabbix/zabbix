@@ -205,7 +205,7 @@ static void	event_queries_fetch(DB_RESULT result, zbx_vector_ptr_t *event_querie
 			ZBX_STR2UINT64(query->triggerid, row[1]);
 			ZBX_DBROW2UINT64(query->r_eventid, row[2]);
 			zbx_vector_uint64_create(&query->functionids);
-			zbx_vector_ptr_create(&query->tags);
+			zbx_vector_tags_create(&query->tags);
 			zbx_vector_uint64_pair_create(&query->maintenances);
 			zbx_vector_ptr_append(event_queries, query);
 		}
@@ -217,7 +217,7 @@ static void	event_queries_fetch(DB_RESULT result, zbx_vector_ptr_t *event_querie
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, row[3]);
 			tag->value = zbx_strdup(NULL, row[4]);
-			zbx_vector_ptr_append(&query->tags, tag);
+			zbx_vector_tags_append(&query->tags, tag);
 
 		}
 	}

@@ -24,7 +24,6 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setName('dashboard_page_properties_form')
 	->addItem(getMessages());
 

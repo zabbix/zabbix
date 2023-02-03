@@ -1496,6 +1496,138 @@ static int	DBpatch_6030159(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_6030160(void)
+{
+	const ZBX_FIELD	field = {"secret", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sessions", &field);
+}
+
+static int	DBpatch_6030161(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update sessions set secret=sessionid"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030162(void)
+{
+	const ZBX_FIELD field = {"vendor_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6030163(void)
+{
+	const ZBX_FIELD field = {"vendor_version", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6030164(void)
+{
+	const ZBX_TABLE table =
+		{"connector", "connectorid", 0,
+			{
+				{"connectorid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"protocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"data_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"max_records", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"max_senders", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"max_attempts", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"timeout", "5s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"http_proxy", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"authtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"username", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"token", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"verify_peer", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"verify_host", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"ssl_cert_file", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"ssl_key_file", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"ssl_key_password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"status", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"tags_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030165(void)
+{
+	return DBcreate_index("connector", "connector_1", "name", 1);
+}
+
+static int	DBpatch_6030166(void)
+{
+	return DBcreate_changelog_insert_trigger("connector", "connectorid");
+}
+
+static int	DBpatch_6030167(void)
+{
+	return DBcreate_changelog_update_trigger("connector", "connectorid");
+}
+
+static int	DBpatch_6030168(void)
+{
+	return DBcreate_changelog_delete_trigger("connector", "connectorid");
+}
+
+static int	DBpatch_6030169(void)
+{
+	const ZBX_TABLE table =
+		{"connector_tag", "connector_tagid", 0,
+			{
+				{"connector_tagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"connectorid", NULL, "connector", "connectorid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030170(void)
+{
+	return DBcreate_index("connector_tag", "connector_tag_1", "connectorid", 0);
+}
+
+static int	DBpatch_6030171(void)
+{
+	const ZBX_FIELD	field = {"connectorid", NULL, "connector", "connectorid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("connector_tag", 1, &field);
+}
+
+static int	DBpatch_6030172(void)
+{
+	return DBcreate_changelog_insert_trigger("connector_tag", "connector_tagid");
+}
+
+static int	DBpatch_6030173(void)
+{
+	return DBcreate_changelog_update_trigger("connector_tag", "connector_tagid");
+}
+
+static int	DBpatch_6030174(void)
+{
+	return DBcreate_changelog_delete_trigger("connector_tag", "connector_tagid");
+}
 #endif
 
 DBPATCH_START(6030)
@@ -1662,5 +1794,20 @@ DBPATCH_ADD(6030156, 0, 1)
 DBPATCH_ADD(6030157, 0, 1)
 DBPATCH_ADD(6030158, 0, 1)
 DBPATCH_ADD(6030159, 0, 1)
+DBPATCH_ADD(6030160, 0, 1)
+DBPATCH_ADD(6030161, 0, 1)
+DBPATCH_ADD(6030162, 0, 1)
+DBPATCH_ADD(6030163, 0, 1)
+DBPATCH_ADD(6030164, 0, 1)
+DBPATCH_ADD(6030165, 0, 1)
+DBPATCH_ADD(6030166, 0, 1)
+DBPATCH_ADD(6030167, 0, 1)
+DBPATCH_ADD(6030168, 0, 1)
+DBPATCH_ADD(6030169, 0, 1)
+DBPATCH_ADD(6030170, 0, 1)
+DBPATCH_ADD(6030171, 0, 1)
+DBPATCH_ADD(6030172, 0, 1)
+DBPATCH_ADD(6030173, 0, 1)
+DBPATCH_ADD(6030174, 0, 1)
 
 DBPATCH_END()
