@@ -1075,8 +1075,8 @@ out:
 	return ret;
 }
 
-static int	discoverer_workers_init(zbx_discoverer_worker_t *worker, zbx_discoverer_jobs_queue_t *queue, void *func,
-		char **error)
+static int	discoverer_workers_init(zbx_discoverer_worker_t *worker, zbx_discoverer_jobs_queue_t *queue,
+		void *func(void *), char **error)
 {
 	int	err;
 
