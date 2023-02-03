@@ -65,7 +65,8 @@ $form->addItem([
 	new CActionButtonList('action', 'dashboardids', [
 		'template.dashboard.delete' => [
 			'name' => _('Delete'),
-			'confirm' => _('Delete selected dashboards?')
+			'confirm' => _('Delete selected dashboards?'),
+			'csrf_token' => CCsrfTokenHelper::get('template')
 		]
 	], $checkbox_hash)
 ]);

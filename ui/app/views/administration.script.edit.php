@@ -52,8 +52,11 @@ $row_template = (new CTag('script', true))
 
 $html_page->addItem($row_template);
 
+$csrf_token = CCsrfTokenHelper::get('script');
+
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('script-form')
 	->setName('scripts')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -299,7 +302,7 @@ else {
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'script.delete')
 			->setArgument('scriptids[]', $data['scriptid'])
-			->setArgumentSID(),
+			->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 		_('Delete script?')
 	))->setId('delete');
 

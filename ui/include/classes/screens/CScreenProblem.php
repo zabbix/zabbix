@@ -950,8 +950,7 @@ class CScreenProblem extends CScreenBase {
 		if ($this->data['action'] === 'problem.view' || $this->data['action'] === 'problem.view.refresh') {
 			$form = (new CForm('post', 'zabbix.php'))
 				->setId('problem_form')
-				->setName('problem')
-				->cleanItems();
+				->setName('problem');
 
 			$header_check_box = (new CColHeader(
 				(new CCheckBox('all_eventids'))

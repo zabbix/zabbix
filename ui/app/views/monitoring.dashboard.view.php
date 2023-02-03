@@ -65,7 +65,6 @@ $main_filter_form = null;
 
 if ($data['dynamic']['has_dynamic_widgets']) {
 	$main_filter_form = (new CForm('get'))
-		->cleanItems()
 		->setAttribute('name', 'dashboard_filter')
 		->setAttribute('aria-label', _('Main filter'))
 		->addVar('action', 'dashboard.view')

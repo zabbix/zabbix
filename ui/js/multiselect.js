@@ -34,7 +34,7 @@
 	$.fn.multiSelectHelper = function(options) {
 		options = $.extend({objectOptions: {}}, options);
 
-		var curl = new Curl('jsrpc.php', false);
+		var curl = new Curl('jsrpc.php');
 		curl.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 		curl.setArgument('method', 'multiselect.get');
 		curl.setArgument('object_name', options.object_name);
@@ -278,7 +278,7 @@
 					return;
 				}
 
-				const link = new Curl(ms_parameters.options.url, false);
+				const link = new Curl(ms_parameters.options.url);
 				link.setArgument('disabledids', entries);
 
 				ms_parameters.options.url = link.getUrl();

@@ -24,7 +24,7 @@ class CControllerPopupDashboardShareEdit extends CController {
 	private $dashboard;
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
