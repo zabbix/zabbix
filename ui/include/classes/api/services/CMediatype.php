@@ -577,7 +577,7 @@ class CMediatype extends CApiService {
 				$api_input_rules['fields'] = [
 					'exec_path' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'exec_path')],
 					'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['sortorder']], 'fields' => [
-						'sortorder' =>			['type' => API_SORTORDER, 'default' => []],
+						'sortorder' =>			['type' => API_INT32, 'default' => 0],
 						'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_param', 'value')]
 					]]
 				];
