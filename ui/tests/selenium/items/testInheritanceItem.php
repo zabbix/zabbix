@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,8 +75,9 @@ class testInheritanceItem extends CLegacyWebTest {
 					'name' => 'itemInheritance',
 					'key' => 'key-item-inheritance',
 					'errors' => [
-						'Cannot inherit LLD rule with key "key-item-inheritance" of template "Inheritance test template" '.
-							'to host "Template inheritance test host", because an item with the same key already exists.'
+						'Cannot inherit item with key "key-item-inheritance" of template "Inheritance test template" '.
+							'to host "Template inheritance test host", because an item with the same key is already '.
+							'inherited from template "Inheritance test template 2".'
 					]
 				]
 			]

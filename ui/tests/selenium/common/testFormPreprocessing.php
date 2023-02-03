@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2825,7 +2825,16 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		if ($templated) {
 			// Check that right templated item is opened.
-			$label = ($item === 'Discovery rule') ? 'Parent discovery rules' : 'Parent items';
+			if ($item === 'Discovery rule') {
+				$label = 'Parent discovery rule';
+			}
+			elseif ($item === 'Item prototype') {
+				$label = 'Parent item prototype';
+			}
+			else {
+				$label = 'Parent item';
+			}
+
 			$this->assertEquals('Inheritance test template', $form->getField($label)->getText());
 		}
 

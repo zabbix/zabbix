@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -471,7 +471,7 @@ window.operation_popup = new class {
 		this.form.append(this._createHiddenInput('row_index', this.row_index));
 		this.form.append(this._createHiddenInput('actionid', this.actionid));
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'action.operation.check');
 
 		const fields = getFormFields(this.form);

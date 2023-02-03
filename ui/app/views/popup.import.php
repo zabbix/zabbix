@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,9 +21,12 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-$rules_table = new CTable();
+$rules_table = (new CTable())
+	->setId('rules_table')
+	->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH);
 
 $titles = [
 	'template_groups' => _('Template groups'),
@@ -59,8 +62,6 @@ switch ($data['rules_preset']) {
 	case 'mediatype':
 		$doc_url = CDocHelper::POPUP_MEDIA_IMPORT;
 		break;
-	default:
-		$doc_url = ZBX_DOCUMENTATION_URL;
 	}
 
 $col_update = false;
@@ -75,6 +76,27 @@ foreach ($titles as $key => $title) {
 	}
 }
 
+if ($data['advanced_config']) {
+	$rules_table->addRow([
+		(new CCol('All'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		$col_update
+			? 	(new CCol(
+					(new CCheckBox('update_all'))->setChecked(true)
+				))->addClass(ZBX_STYLE_CENTER)
+			: null,
+		$col_create
+			? 	(new CCol(
+					(new CCheckBox('create_all'))->setChecked(true)
+				))->addClass(ZBX_STYLE_CENTER)
+			: null,
+		$col_delete
+			? 	(new CCol(
+					(new CCheckBox('delete_all'))->setChecked(true)
+				))->addClass(ZBX_STYLE_CENTER)
+			: null
+	]);
+}
+
 foreach ($titles as $key => $title) {
 	if (!array_key_exists($key, $data['rules'])) {
 		continue;
@@ -86,28 +108,20 @@ foreach ($titles as $key => $title) {
 
 	if (array_key_exists('updateExisting', $data['rules'][$key])) {
 		$checkbox_update = (new CCheckBox('rules['.$key.'][updateExisting]'))
-			->setChecked($data['rules'][$key]['updateExisting']);
-
-		if ($key === 'images') {
-			$checkbox_update->onClick('updateWarning(this, '.json_encode(_('Images for all maps will be updated!')).')');
-		}
+			->setChecked($data['rules'][$key]['updateExisting'])
+			->addClass('js-update');
 	}
 
 	if (array_key_exists('createMissing', $data['rules'][$key])) {
 		$checkbox_create = (new CCheckBox('rules['.$key.'][createMissing]'))
-			->setChecked($data['rules'][$key]['createMissing']);
+			->setChecked($data['rules'][$key]['createMissing'])
+			->addClass('js-create');
 	}
 
 	if (array_key_exists('deleteMissing', $data['rules'][$key])) {
 		$checkbox_delete = (new CCheckBox('rules['.$key.'][deleteMissing]'))
 			->setChecked($data['rules'][$key]['deleteMissing'])
-			->addClass('deleteMissing');
-
-		if ($key === 'templateLinkage') {
-			$checkbox_delete->onClick('updateWarning(this, '.json_encode(
-				_('Template and host properties that are inherited through template linkage will be unlinked and cleared.')
-			).')');
-		}
+			->addClass('js-delete');
 	}
 
 	switch ($key) {
@@ -134,40 +148,60 @@ foreach ($titles as $key => $title) {
 			}
 	}
 
-	$rules_table->addRow([
+	$checkbox_row = (new CRow([
 		$title,
 		$col_update ? (new CCol($checkbox_update))->addClass(ZBX_STYLE_CENTER) : null,
 		$col_create ? (new CCol($checkbox_create))->addClass(ZBX_STYLE_CENTER) : null,
 		$col_delete ? (new CCol($checkbox_delete))->addClass(ZBX_STYLE_CENTER) : null
-	]);
+	]));
+
+	if ($data['advanced_config']) {
+		$checkbox_row
+			->addClass(ZBX_STYLE_DISPLAY_NONE)
+			->addClass('js-advanced-configuration');
+	}
+
+	$rules_table->addItem($checkbox_row);
 }
 
 $rules_table->setHeader([
 	'',
-	$col_update ? _('Update existing') : null,
-	$col_create ? _('Create new') : null,
-	$col_delete ? _('Delete missing') : null
+	$col_update ? (new CColHeader(_('Update existing')))->addClass(ZBX_STYLE_CENTER) : null,
+	$col_create ? (new CColHeader( _('Create new')))->addClass(ZBX_STYLE_CENTER) : null,
+	$col_delete ? (new CColHeader(_('Delete missing')))->addClass(ZBX_STYLE_CENTER) : null
 ]);
 
-$form_list = (new CFormList())
-	->addRow((new CLabel(_('Import file'), 'import_file'))->setAsteriskMark(),
-		(new CFile('import_file'))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
-	)
-	->addRow(_('Rules'), new CDiv($rules_table));
+$advanced_config_checkbox = $data['advanced_config']
+	? [new CLabel(_('Advanced options'), 'advanced_options'), new CFormField(
+			(new CCheckBox('advanced_options'))
+				->setChecked(false)
+		)]
+	: null;
+
+$form_grid = (new CFormGrid())
+	->addItem([
+		(new CLabel(_('Import file'), 'import_file'))->setAsteriskMark(),
+		new CFormField(
+			(new CFile('import_file'))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+				->setAttribute('autofocus', 'autofocus')
+		)
+	])
+	->addItem($advanced_config_checkbox)
+	->addItem([new CLabel(_('Rules')), new CFormField($rules_table)]);
 
 $form = (new CForm('post', null, 'multipart/form-data'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('import')))->removeId())
 	->setId('import-form')
 	->addVar('import', 1)
 	->addVar('rules_preset', $data['rules_preset'])
-	->addItem($form_list);
+	->addItem($form_grid)
+	->addItem((new CScriptTag('popup_import.init();'))->setOnDocumentReady());
 
 $output = [
 	'header' => $data['title'],
 	'doc_url' => CDocHelper::getUrl($doc_url),
-	'script_inline' => trim($this->readJsFile('popup.import.js.php')),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
@@ -175,9 +209,11 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return submitPopup(overlay);'
+			'action' => 'popup_import.submitPopup();'
 		]
-	]
+	],
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('popup.import.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

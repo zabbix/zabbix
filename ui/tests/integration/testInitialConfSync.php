@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'template_items' =>
 			[
-				'insert' => '54',
+				'insert' => '45',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -125,7 +125,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'prototype_items' =>
 			[
-				'insert' => '5',
+				'insert' => '4',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -133,7 +133,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'item_discovery' =>
 			[
-				'insert' => '5',
+				'insert' => '4',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -141,7 +141,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'triggers' =>
 			[
-				'insert' => '28',
+				'insert' => '25',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -149,7 +149,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'trigdeps' =>
 			[
-				'insert' => '7',
+				'insert' => '6',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -157,7 +157,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'trigtags' =>
 			[
-				'insert' => '22',
+				'insert' => '18',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -181,7 +181,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'functions' =>
 			[
-				'insert' => '28',
+				'insert' => '25',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -285,7 +285,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'httptests' =>
 			[
-				'insert' => '5',
+				'insert' => '4',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -372,11 +372,11 @@ class testInitialConfSync extends CIntegrationTest
 			"hostmacros" =>
 			[
 				"insert" =>
-				"0",
+				"2",
 				"update" =>
 				"2",
 				"delete" =>
-				"0"
+				"2"
 			]
 		],
 		[
@@ -396,7 +396,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"72",
+				"88",
 				"delete" =>
 				"0"
 			]
@@ -418,7 +418,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"1",
+				"4",
 				"delete" =>
 				"0"
 			]
@@ -438,33 +438,33 @@ class testInitialConfSync extends CIntegrationTest
 			"triggers" =>
 			[
 				"insert" =>
-				"6",
+				"7",
 				"update" =>
 				"10",
 				"delete" =>
-				"6"
+				"7"
 			]
 		],
 		[
 			"trigdeps" =>
 			[
 				"insert" =>
-				"1",
+				"3",
 				"update" =>
 				"0",
 				"delete" =>
-				"1"
+				"3"
 			]
 		],
 		[
 			"trigtags" =>
 			[
 				"insert" =>
-				"2",
+				"9",
 				"update" =>
 				"0",
 				"delete" =>
-				"2"
+				"9"
 			]
 		],
 		[
@@ -493,11 +493,11 @@ class testInitialConfSync extends CIntegrationTest
 			"functions" =>
 			[
 				"insert" =>
-				"12",
+				"13",
 				"update" =>
 				"0",
 				"delete" =>
-				"12"
+				"13"
 			]
 		],
 		[
@@ -638,7 +638,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"1",
+				"4",
 				"delete" =>
 				"0"
 			]
@@ -750,7 +750,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"152"
+				"143"
 			]
 		],
 		[
@@ -761,7 +761,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"54"
+				"45"
 			]
 		],
 		[
@@ -772,7 +772,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"152"
+				"143"
 			]
 		],
 		[
@@ -783,7 +783,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"5"
+				"4"
 			]
 		],
 		[
@@ -794,7 +794,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"28"
+				"25"
 			]
 		],
 		[
@@ -805,7 +805,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"7"
+				"6"
 			]
 		],
 		[
@@ -816,7 +816,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"22"
+				"18"
 			]
 		],
 		[
@@ -849,7 +849,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"28"
+				"25"
 			]
 		],
 		[
@@ -986,7 +986,7 @@ class testInitialConfSync extends CIntegrationTest
 			[
 				'insert' => '0',
 				'update' => '0',
-				'delete' => '5'
+				'delete' => '4'
 			]
 		]
 	];
@@ -1523,11 +1523,6 @@ class testInitialConfSync extends CIntegrationTest
 					'createMissing' => true,
 					'deleteMissing' => false
 				],
-				'templateLinkage' =>
-				[
-					'createMissing' => true,
-					'deleteMissing' => false
-				],
 				'items' =>
 				[
 					'updateExisting' => true,
@@ -1594,11 +1589,6 @@ class testInitialConfSync extends CIntegrationTest
 				'templateDashboards' =>
 				[
 					'updateExisting' => true,
-					'createMissing' => false,
-					'deleteMissing' => false
-				],
-				'templateLinkage' =>
-				[
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
@@ -1808,9 +1798,9 @@ class testInitialConfSync extends CIntegrationTest
 					'deleteMissing' => false
 				],
 				'triggers' => [
-					'createMissing' => true,
+					'createMissing' => false,
 					'updateExisting' => true,
-					'deleteMissing' => true
+					'deleteMissing' => false
 				],
 				'templateLinkage' => [
 					'createMissing' => false

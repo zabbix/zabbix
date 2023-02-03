@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ class CControllerMediatypeEdit extends CController {
 	private $mediatype = [];
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -116,7 +116,6 @@ class CControllerMediatypeEdit extends CController {
 		$email_defaults =  CMediatypeHelper::getEmailProviders(CMediatypeHelper::EMAIL_PROVIDER_SMTP);
 
 		$data = [
-			'sid' => $this->getUserSID(),
 			'mediatypeid' => 0,
 			'type' => MEDIA_TYPE_EMAIL,
 			'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,

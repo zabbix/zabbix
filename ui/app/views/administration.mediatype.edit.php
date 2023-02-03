@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,8 +38,12 @@ if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
+$csrf_token = CCsrfTokenHelper::get('mediatype');
+
 // create form
 $mediaTypeForm = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('media-type-form')
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])
@@ -369,8 +373,10 @@ if ($data['mediatypeid'] == 0) {
 else {
 	$updateButton = (new CSubmitButton(_('Update'), 'action', 'mediatype.update'))->setId('update');
 	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
-	$deleteButton = (new CRedirectButton(_('Delete'),
-		'zabbix.php?action=mediatype.delete&sid='.$data['sid'].'&mediatypeids[]='.$data['mediatypeid'],
+	$deleteButton = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'mediatype.delete')
+			->setArgument('mediatypeids', [$data['mediatypeid']])
+			->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 		_('Delete media type?')
 	))
 		->setId('delete');

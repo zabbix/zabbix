@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -160,7 +160,7 @@ static int	DBpatch_2010007(void)
 
 	for (i = 0; NULL != strings[i]; i++)
 	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='web.screens.%s' where idx='web.charts.%s'",
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='web.screens.%s' where idx='web.charts.%s'",
 				strings[i], strings[i]))
 		{
 			return FAIL;
@@ -200,7 +200,7 @@ static int	DBpatch_2010011(void)
 				" where a.applicationid = httptest.applicationid"
 			")";
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		return SUCCEED;
 
 	return FAIL;
@@ -319,7 +319,7 @@ static int	DBpatch_2010028(void)
 				"type=2"	/* PROFILE_TYPE_INT */
 			" where idx='web.httpconf.showdisabled'";
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		return SUCCEED;
 
 	return FAIL;
@@ -330,7 +330,7 @@ static int	DBpatch_2010029(void)
 	const char	*sql =
 			"delete from profiles where idx in ('web.httpconf.applications','web.httpmon.applications')";
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		return SUCCEED;
 
 	return FAIL;
@@ -340,7 +340,7 @@ static int	DBpatch_2010030(void)
 {
 	const char	*sql = "delete from profiles where idx='web.items.filter_groupid'";
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		return SUCCEED;
 
 	return FAIL;
@@ -355,7 +355,7 @@ static int	DBpatch_2010031(void)
 			" where idx like 'web.avail_report.%.groupid'"
 				" or idx like 'web.avail_report.%.hostid'";
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		return SUCCEED;
 
 	return FAIL;
@@ -370,7 +370,7 @@ static int	DBpatch_2010032(void)
 
 static int	DBpatch_2010033(void)
 {
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"delete from events"
 			" where source=%d"
 				" and object=%d"
@@ -395,7 +395,7 @@ static int	DBpatch_2010035(void)
 {
 	const char	*sql = "delete from profiles where idx='web.events.filter.showUnknown'";
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		return SUCCEED;
 
 	return FAIL;
@@ -410,7 +410,7 @@ static int	DBpatch_2010036(void)
 				"type=2"	/* PROFILE_TYPE_INT */
 			" where idx like '%isnow'";
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		return SUCCEED;
 
 	return FAIL;
@@ -418,7 +418,7 @@ static int	DBpatch_2010036(void)
 
 static int	DBpatch_2010037(void)
 {
-	if (ZBX_DB_OK <= DBexecute("update config set server_check_interval=10"))
+	if (ZBX_DB_OK <= zbx_db_execute("update config set server_check_interval=10"))
 		return SUCCEED;
 
 	return FAIL;
@@ -452,7 +452,7 @@ static int	DBpatch_2010043(void)
 
 static int	DBpatch_2010044(void)
 {
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"update items"
 			" set state=%d,"
 				"status=%d"
@@ -472,7 +472,7 @@ static int	DBpatch_2010045(void)
 
 static int	DBpatch_2010046(void)
 {
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"update proxy_history"
 			" set state=%d"
 			" where state=%d",
@@ -510,7 +510,7 @@ static int	DBpatch_2010050(void)
 
 	for (i = 0; NULL != fields[i]; i++)
 	{
-		result = DBselect(
+		result = zbx_db_select(
 				"select timeid,%s"
 				" from services_times"
 				" where type in (%d,%d)"
@@ -518,17 +518,17 @@ static int	DBpatch_2010050(void)
 				fields[i], 0 /* SERVICE_TIME_TYPE_UPTIME */, 1 /* SERVICE_TIME_TYPE_DOWNTIME */,
 				fields[i], SEC_PER_WEEK);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			if (SEC_PER_WEEK < (ts = (time_t)atoi(row[1])))
 			{
 				tm = localtime(&ts);
 				ts = tm->tm_wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN;
-				DBexecute("update services_times set %s=%d where timeid=%s",
+				zbx_db_execute("update services_times set %s=%d where timeid=%s",
 						fields[i], (int)ts, row[0]);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	return SUCCEED;
@@ -655,7 +655,7 @@ static int	DBpatch_2010067(void)
 
 static int	DBpatch_2010068(void)
 {
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"update config"
 			" set hk_events_mode=0,"
 				"hk_services_mode=0,"
@@ -710,7 +710,7 @@ static int	DBpatch_2010073(void)
 {
 	const char	*sql = "delete from ids where table_name='events'";
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		return SUCCEED;
 
 	return FAIL;
@@ -772,14 +772,14 @@ static int	DBpatch_2010080(void)
 	zbx_uint64_t	applicationid, templateid, application_templateid = 1;
 	int		ret = FAIL;
 
-	result = DBselect("select applicationid,templateid from applications where templateid is not null");
+	result = zbx_db_select("select applicationid,templateid from applications where templateid is not null");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(applicationid, row[0]);
 		ZBX_STR2UINT64(templateid, row[1]);
 
-		if (ZBX_DB_OK > DBexecute(
+		if (ZBX_DB_OK > zbx_db_execute(
 				"insert into application_template"
 					" (application_templateid,applicationid,templateid)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
@@ -791,7 +791,7 @@ static int	DBpatch_2010080(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -873,7 +873,7 @@ static int	DBpatch_2010093(void)
 
 static int	DBpatch_2010094(void)
 {
-	if (ZBX_DB_OK <= DBexecute("update items set history=1 where history=0"))
+	if (ZBX_DB_OK <= zbx_db_execute("update items set history=1 where history=0"))
 	{
 		return SUCCEED;
 	}
@@ -916,14 +916,14 @@ static int	DBpatch_2010101(void)
 	char		*key = NULL;
 	size_t		key_alloc = 0, key_offset;
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select i.itemid,i.key_,i.params,h.name"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and i.type=%d",
 			ITEM_TYPE_DB_MONITOR);
 
-	while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
+	while (NULL != (row = zbx_db_fetch(result)) && SUCCEED == ret)
 	{
 		char		*user = NULL, *password = NULL, *dsn = NULL, *sql = NULL, *error_message = NULL;
 		zbx_uint64_t	itemid;
@@ -981,12 +981,12 @@ static int	DBpatch_2010101(void)
 
 			ZBX_STR2UINT64(itemid, row[0]);
 
-			username_esc = DBdyn_escape_string(user);
-			password_esc = DBdyn_escape_string(password);
-			params_esc = DBdyn_escape_string(sql);
-			key_esc = DBdyn_escape_string(key);
+			username_esc = zbx_db_dyn_escape_string(user);
+			password_esc = zbx_db_dyn_escape_string(password);
+			params_esc = zbx_db_dyn_escape_string(sql);
+			key_esc = zbx_db_dyn_escape_string(key);
 
-			if (ZBX_DB_OK > DBexecute("update items set username='%s',password='%s',key_='%s',params='%s'"
+			if (ZBX_DB_OK > zbx_db_execute("update items set username='%s',password='%s',key_='%s',params='%s'"
 					" where itemid=" ZBX_FS_UI64,
 					username_esc, password_esc, key_esc, params_esc, itemid))
 			{
@@ -1011,7 +1011,7 @@ static int	DBpatch_2010101(void)
 		zbx_free(dsn);
 		zbx_free(sql);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(key);
 
@@ -1476,17 +1476,17 @@ static int	DBpatch_2010176(void)
 	char		*name, *name_esc;
 	int		ret = SUCCEED;
 
-	result = DBselect("select scriptid,name from scripts");
+	result = zbx_db_select("select scriptid,name from scripts");
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		name = zbx_dyn_escape_string(row[1], "/\\");
 
 		if (0 != strcmp(name, row[1]))
 		{
-			name_esc = DBdyn_escape_string_len(name, 255);
+			name_esc = zbx_db_dyn_escape_string_len(name, 255);
 
-			if (ZBX_DB_OK > DBexecute("update scripts set name='%s' where scriptid=%s", name_esc, row[0]))
+			if (ZBX_DB_OK > zbx_db_execute("update scripts set name='%s' where scriptid=%s", name_esc, row[0]))
 				ret = FAIL;
 
 			zbx_free(name_esc);
@@ -1494,7 +1494,7 @@ static int	DBpatch_2010176(void)
 
 		zbx_free(name);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1506,7 +1506,7 @@ static int	DBpatch_2010177(void)
 
 	for (i = 0; NULL != rf_rate_strings[i]; i++)
 	{
-		if (ZBX_DB_OK > DBexecute(
+		if (ZBX_DB_OK > zbx_db_execute(
 				"update profiles"
 				" set idx='web.dashboard.widget.%s.rf_rate'"
 				" where idx='web.dashboard.rf_rate.hat_%s'",
@@ -1527,7 +1527,7 @@ static int	DBpatch_2010178(void)
 
 	for (i = 0; NULL != state_strings[i]; i++)
 	{
-		if (ZBX_DB_OK > DBexecute(
+		if (ZBX_DB_OK > zbx_db_execute(
 				"update profiles"
 				" set idx='web.dashboard.widget.%s.state'"
 				" where idx='web.dashboard.hats.hat_%s.state'",
@@ -1584,7 +1584,7 @@ static int	DBpatch_2010184(void)
 
 static int	DBpatch_2010185(void)
 {
-	if (ZBX_DB_OK > DBexecute("update sysmaps_elements set label_location=-1 where label_location is null"))
+	if (ZBX_DB_OK > zbx_db_execute("update sysmaps_elements set label_location=-1 where label_location is null"))
 		return FAIL;
 
 	return SUCCEED;
@@ -1626,7 +1626,7 @@ static int	DBpatch_2010191(void)
 
 static int	DBpatch_2010192(void)
 {
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"update triggers"
 			" set state=%d,value=%d,lastchange=0,error=''"
 			" where exists ("
@@ -1647,7 +1647,7 @@ static int	DBpatch_2010192(void)
 
 static int	DBpatch_2010193(void)
 {
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"update items"
 			" set state=%d,error=''"
 			" where exists ("
@@ -1713,9 +1713,9 @@ static int	DBpatch_2010195(void)
 	char		*key = NULL, *key_esc, error[64];
 	int		ret = SUCCEED;
 
-	result = DBselect("select itemid,key_ from items where key_ like 'eventlog[%%'");
+	result = zbx_db_select("select itemid,key_ from items where key_ like 'eventlog[%%'");
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		key = zbx_strdup(key, row[1]);
 
@@ -1734,15 +1734,15 @@ static int	DBpatch_2010195(void)
 
 		if (0 != strcmp(key, row[1]))
 		{
-			key_esc = DBdyn_escape_string(key);
+			key_esc = zbx_db_dyn_escape_string(key);
 
-			if (ZBX_DB_OK > DBexecute("update items set key_='%s' where itemid=%s", key_esc, row[0]))
+			if (ZBX_DB_OK > zbx_db_execute("update items set key_='%s' where itemid=%s", key_esc, row[0]))
 				ret = FAIL;
 
 			zbx_free(key_esc);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(key);
 
@@ -1763,7 +1763,7 @@ static int	DBpatch_2010196(void)
 static int	DBpatch_2010197(void)
 {
 #ifdef HAVE_ORACLE
-	return ZBX_DB_OK > DBexecute("update alerts set message_tmp=message") ? FAIL : SUCCEED;
+	return ZBX_DB_OK > zbx_db_execute("update alerts set message_tmp=message") ? FAIL : SUCCEED;
 #else
 	return SUCCEED;
 #endif

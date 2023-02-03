@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,29 +27,17 @@ class CGraphPrototypeManager {
 	/**
 	 * Deletes graph prototypes and related entities without permission check.
 	 *
-	 * @param array $graphids
+	 * @param array $del_graphids
 	 */
-	public static function delete(array $graphids) {
-		$del_graphids = [];
-
-		// Selecting all inherited graphs.
-		$parent_graphids = array_flip($graphids);
-		do {
-			$db_graphs = DBselect(
-				'SELECT g.graphid FROM graphs g WHERE '.dbConditionInt('g.templateid', array_keys($parent_graphids))
-			);
-
-			$del_graphids += $parent_graphids;
-			$parent_graphids = [];
-
-			while ($db_graph = DBfetch($db_graphs)) {
-				if (!array_key_exists($db_graph['graphid'], $del_graphids)) {
-					$parent_graphids[$db_graph['graphid']] = true;
-				}
-			}
-		} while ($parent_graphids);
-
-		$del_graphids = array_keys($del_graphids);
+	public static function delete(array $del_graphids) {
+		// Add the inherited graphs.
+		$options = [
+			'output' => ['graphid'],
+			'filter' => ['templateid' => $del_graphids]
+		];
+		$del_graphids = array_merge($del_graphids,
+			DBfetchColumn(DBselect(DB::makeSql('graphs', $options)), 'graphid')
+		);
 
 		// Lock graph prototypes before delete to prevent server from adding new LLD elements.
 		DBselect(

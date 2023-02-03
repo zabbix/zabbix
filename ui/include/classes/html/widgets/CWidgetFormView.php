@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -157,7 +157,6 @@ class CWidgetFormView {
 			'header' => $this->data['unique_id'] !== null ? _('Edit widget') : _('Add widget'),
 			'body' => implode('', [
 				(new CForm())
-					->cleanItems()
 					->setId('widget-dialogue-form')
 					->setName($this->name)
 					->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FORM)

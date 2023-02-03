@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -483,13 +483,13 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		// tags
 		if ($options['tags'] !== null && $options['tags']) {
 			if ($options['inheritedTags']) {
 				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-				$sqlParts['where'][] = CApiTagHelper::addInheritedHostTagsWhereCondition($options['tags'],
-					$options['evaltype']
+
+				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
+					'host_tag', 'hostid', 'ht2.templateid'
 				);
 			}
 			else {
@@ -760,7 +760,7 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			$this->link($link_templateids, $link_hostids);
+			self::link($link_templateids, $link_hostids);
 		}
 
 		if ($hosts_inventory) {
@@ -772,6 +772,29 @@ class CHost extends CHostGeneral {
 		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST, $hosts);
 
 		return ['hostids' => array_column($hosts, 'hostid')];
+	}
+
+	/**
+	 * Creates user macros for hosts.
+	 *
+	 * @param array  $hosts
+	 * @param array  $hosts[]['hostid']
+	 * @param array  $hosts[]['macros']             (optional)
+	 */
+	private function createHostMacros(array $hosts): void {
+		$ins_hostmacros = [];
+
+		foreach ($hosts as $host) {
+			if (array_key_exists('macros', $host)) {
+				foreach ($host['macros'] as $macro) {
+					$ins_hostmacros[] = ['hostid' => $host['hostid']] + $macro;
+				}
+			}
+		}
+
+		if ($ins_hostmacros) {
+			DB::insert('hostmacro', $ins_hostmacros);
+		}
 	}
 
 	/**
@@ -875,42 +898,422 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Additionally allows to create new interfaces on hosts.
+	 * Updates user macros for hosts.
 	 *
-	 * Checks write permissions for hosts.
+	 * @param array  $hosts
+	 * @param array  $hosts[]['hostid']
+	 * @param array  $hosts[]['macros']             (optional)
+	 * @param array  $db_hosts
+	 * @param array  $db_hosts[<hostid>]['macros']  An array of host macros indexed by hostmacroid.
+	 */
+	private function updateHostMacros(array $hosts, array $db_hosts): void {
+		$ins_hostmacros = [];
+		$upd_hostmacros = [];
+		$del_hostmacroids = [];
+
+		foreach ($hosts as $host) {
+			if (!array_key_exists('macros', $host)) {
+				continue;
+			}
+
+			$db_host = $db_hosts[$host['hostid']];
+
+			foreach ($host['macros'] as $hostmacro) {
+				if (array_key_exists('hostmacroid', $hostmacro)) {
+					$db_hostmacro = $db_host['macros'][$hostmacro['hostmacroid']];
+					unset($db_host['macros'][$hostmacro['hostmacroid']]);
+
+					$upd_hostmacro = DB::getUpdatedValues('hostmacro', $hostmacro, $db_hostmacro);
+
+					if ($upd_hostmacro) {
+						$upd_hostmacros[] = [
+							'values' => $upd_hostmacro,
+							'where' => ['hostmacroid' => $hostmacro['hostmacroid']]
+						];
+					}
+				}
+				else {
+					$ins_hostmacros[] = $hostmacro + ['hostid' => $host['hostid']];
+				}
+			}
+
+			$del_hostmacroids = array_merge($del_hostmacroids, array_keys($db_host['macros']));
+		}
+
+		if ($del_hostmacroids) {
+			DB::delete('hostmacro', ['hostmacroid' => $del_hostmacroids]);
+		}
+
+		if ($upd_hostmacros) {
+			DB::update('hostmacro', $upd_hostmacros);
+		}
+
+		if ($ins_hostmacros) {
+			DB::insert('hostmacro', $ins_hostmacros);
+		}
+	}
+
+	/**
+	 * @param array $hosts
+	 * @param array $db_hosts
+	 */
+	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {
+		parent::addAffectedObjects($hosts, $db_hosts);
+		self::addAffectedTemplates($hosts, $db_hosts);
+	}
+
+	/**
+	 * Update table "hosts_templates" and change objects of linked or unlinked templates on target hosts.
 	 *
-	 * Additional supported $data parameters are:
-	 * - interfaces - an array of interfaces to create on the hosts
-	 * - templates  - an array of templates to link to the hosts, overrides the CHostGeneral::massAdd()
-	 *                'templates' parameter
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
+	 */
+	protected static function updateTemplates(array &$hosts, array $db_hosts = null): void {
+		parent::updateTemplates($hosts, $db_hosts);
+
+		$ins_links = [];
+		$del_links = [];
+		$del_links_clear = [];
+
+		foreach ($hosts as $host) {
+			if (!array_key_exists('templates', $host) && !array_key_exists('templates_clear', $host)) {
+				continue;
+			}
+
+			$db_templates = $db_hosts !== null
+				? array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid')
+				: [];
+
+			if (array_key_exists('templates', $host)) {
+				foreach ($host['templates'] as $template) {
+					if (array_key_exists($template['templateid'], $db_templates)) {
+						unset($db_templates[$template['templateid']]);
+					}
+					else {
+						$ins_links[$template['templateid']][] = $host['hostid'];
+					}
+				}
+
+				$templates_clear = array_key_exists('templates_clear', $host)
+					? array_column($host['templates_clear'], null, 'templateid')
+					: [];
+
+				foreach ($db_templates as $del_template) {
+					if (array_key_exists($del_template['templateid'], $templates_clear)) {
+						$del_links_clear[$del_template['templateid']][] = $host['hostid'];
+					}
+					else {
+						$del_links[$del_template['templateid']][] = $host['hostid'];
+					}
+				}
+			}
+			elseif (array_key_exists('templates_clear', $host)) {
+				foreach ($host['templates_clear'] as $template) {
+					$del_links_clear[$template['templateid']][] = $host['hostid'];
+				}
+			}
+		}
+
+		while ($del_links_clear) {
+			$templateid = key($del_links_clear);
+			$hostids = reset($del_links_clear);
+			$templateids = [$templateid];
+			unset($del_links_clear[$templateid]);
+
+			foreach ($del_links_clear as $templateid => $_hostids) {
+				if ($_hostids === $hostids) {
+					$templateids[] = $templateid;
+					unset($del_links_clear[$templateid]);
+				}
+			}
+
+			self::unlinkTemplatesObjects($templateids, $hostids, true);
+		}
+
+		while ($del_links) {
+			$templateid = key($del_links);
+			$hostids = reset($del_links);
+			$templateids = [$templateid];
+			unset($del_links[$templateid]);
+
+			foreach ($del_links as $templateid => $_hostids) {
+				if ($_hostids === $hostids) {
+					$templateids[] = $templateid;
+					unset($del_links[$templateid]);
+				}
+			}
+
+			self::unlinkTemplatesObjects($templateids, $hostids);
+		}
+
+		while ($ins_links) {
+			$templateid = key($ins_links);
+			$hostids = reset($ins_links);
+			$templateids = [$templateid];
+			unset($ins_links[$templateid]);
+
+			foreach ($ins_links as $templateid => $_hostids) {
+				if ($_hostids === $hostids) {
+					$templateids[] = $templateid;
+					unset($ins_links[$templateid]);
+				}
+			}
+
+			self::linkTemplatesObjects($templateids, $hostids);
+		}
+	}
+
+	/**
+	 * Unlink or clear objects of given templates from given hosts.
 	 *
+	 * @param array      $templateids
+	 * @param array|null $hostids
+	 * @param bool       $clear
+	 */
+	public static function unlinkTemplatesObjects(array $templateids, array $hostids = null,
+			bool $clear = false): void {
+		$flags = $clear
+			? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE]
+			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE];
+
+		// triggers
+		$db_triggers = DBselect(
+			'SELECT DISTINCT f.triggerid'.
+			' FROM functions f,items i'.
+			' WHERE f.itemid=i.itemid'.
+				' AND '.dbConditionId('i.hostid', $templateids)
+		);
+
+		$tpl_triggerids = DBfetchColumn($db_triggers, 'triggerid');
+		$upd_triggers = [
+			ZBX_FLAG_DISCOVERY_NORMAL => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+		];
+
+		if ($tpl_triggerids) {
+			$sql_distinct = ($hostids !== null) ? ' DISTINCT' : '';
+			$sql_from = ($hostids !== null) ? ',functions f,items i' : '';
+			$sql_where = ($hostids !== null)
+				? ' AND t.triggerid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND '.dbConditionId('i.hostid', $hostids)
+				: '';
+
+			$db_triggers = DBSelect(
+				'SELECT'.$sql_distinct.' t.triggerid,t.flags'.
+				' FROM triggers t'.$sql_from.
+				' WHERE '.dbConditionId('t.templateid', $tpl_triggerids).
+					' AND '.dbConditionInt('t.flags', $flags).
+					$sql_where
+			);
+
+			while ($db_trigger = DBfetch($db_triggers)) {
+				if ($clear) {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = true;
+				}
+				else {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = [
+						'values' => ['templateid' => 0],
+						'where' => ['triggerid' => $db_trigger['triggerid']]
+					];
+				}
+			}
+		}
+
+		if ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]) {
+			if ($clear) {
+				CTriggerManager::delete(array_keys($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]));
+			}
+			else {
+				DB::update('triggers', $upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]);
+			}
+		}
+
+		if ($upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+			if ($clear) {
+				CTriggerPrototypeManager::delete(array_keys($upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
+			}
+			else {
+				DB::update('triggers', $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+			}
+		}
+
+		// graphs
+		$db_tpl_graphs = DBselect(
+			'SELECT DISTINCT g.graphid'.
+			' FROM graphs g,graphs_items gi,items i'.
+			' WHERE g.graphid=gi.graphid'.
+				' AND gi.itemid=i.itemid'.
+				' AND '.dbConditionId('i.hostid', $templateids).
+				' AND '.dbConditionInt('g.flags', $flags)
+		);
+
+		$tpl_graphids = [];
+
+		while ($db_tpl_graph = DBfetch($db_tpl_graphs)) {
+			$tpl_graphids[] = $db_tpl_graph['graphid'];
+		}
+
+		if ($tpl_graphids) {
+			$upd_graphs = [
+				ZBX_FLAG_DISCOVERY_NORMAL => [],
+				ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+			];
+
+			$sql = ($hostids !== null)
+				? 'SELECT DISTINCT g.graphid,g.flags'.
+					' FROM graphs g,graphs_items gi,items i'.
+					' WHERE g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' AND '.dbConditionId('g.templateid', $tpl_graphids).
+						' AND '.dbConditionId('i.hostid', $hostids)
+				: 'SELECT g.graphid,g.flags'.
+					' FROM graphs g'.
+					' WHERE '.dbConditionId('g.templateid', $tpl_graphids);
+
+			$db_graphs = DBSelect($sql);
+
+			while ($db_graph = DBfetch($db_graphs)) {
+				if ($clear) {
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = true;
+				}
+				else {
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = [
+						'values' => ['templateid' => 0],
+						'where' => ['graphid' => $db_graph['graphid']]
+					];
+				}
+			}
+
+			if ($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+				if ($clear) {
+					CGraphPrototypeManager::delete(array_keys($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
+				}
+				else {
+					DB::update('graphs', $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				}
+			}
+
+			if ($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]) {
+				if ($clear) {
+					CGraphManager::delete(array_keys($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]));
+				}
+				else {
+					DB::update('graphs', $upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]);
+				}
+			}
+		}
+
+		if ($clear) {
+			CDiscoveryRule::clearTemplateObjects($templateids, $hostids);
+			CItem::clearTemplateObjects($templateids, $hostids);
+			CHttpTest::clearTemplateObjects($templateids, $hostids);
+		}
+		else {
+			CDiscoveryRule::unlinkTemplateObjects($templateids, $hostids);
+			CItem::unlinkTemplateObjects($templateids, $hostids);
+			CHttpTest::unlinkTemplateObjects($templateids, $hostids);
+		}
+	}
+
+	/**
+	 * Add objects of given templates to given hosts.
+	 *
+	 * @param array $templateids
+	 * @param array $hostids
+	 */
+	private static function linkTemplatesObjects(array $templateids, array $hostids): void {
+		// TODO: Modify parameters of syncTemplates methods when complete audit log will be implementing for hosts.
+		$link_request = [
+			'templateids' => $templateids,
+			'hostids' => $hostids
+		];
+
+		foreach ($templateids as $templateid) {
+			// Fist link web items, so that later regular items can use web item as their master item.
+			Manager::HttpTest()->link($templateid, $hostids);
+		}
+
+		CItem::linkTemplateObjects($templateids, $hostids);
+		$ruleids = API::DiscoveryRule()->syncTemplates($templateids, $hostids);
+
+		if ($ruleids) {
+			CItemPrototype::linkTemplateObjects($templateids, $hostids);
+			API::HostPrototype()->syncTemplates($ruleids, $hostids);
+		}
+
+		API::Trigger()->syncTemplates($link_request);
+
+		if ($ruleids) {
+			API::TriggerPrototype()->syncTemplates($link_request);
+			API::GraphPrototype()->syncTemplates($link_request);
+		}
+
+		API::Graph()->syncTemplates($link_request);
+
+		CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
+	}
+
+	/**
 	 * @param array $data
+	 * @param array $data['hosts']
+	 * @param array $data['groups']     (optional)
+	 * @param array $data['templates']  (optional)
+	 * @param array $data['interfaces'] (optional)
+	 * @param array $data['macros']     (optional)
 	 *
 	 * @return array
 	 */
-	public function massAdd(array $data) {
-		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : [];
-		$hostIds = zbx_objectValues($hosts, 'hostid');
+	public function massAdd(array $data): array {
+		if (!array_key_exists('hosts', $data) || !$data['hosts']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Incorrect arguments passed to function.'));
+		}
 
-		$this->checkPermissions($hostIds, _('You do not have permission to perform this operation.'));
+		$hosts = zbx_toArray($data['hosts']);
+		$hostids = array_column($hosts, 'hostid');
 
-		// add new interfaces
-		if (!empty($data['interfaces'])) {
+		self::checkPermissions($hostids, _('You do not have permission to perform this operation.'));
+
+		if (array_key_exists('interfaces', $data) && $data['interfaces']) {
 			API::HostInterface()->massAdd([
 				'hosts' => $data['hosts'],
 				'interfaces' => zbx_toArray($data['interfaces'])
 			]);
 		}
 
-		// rename the "templates" parameter to the common "templates_link"
-		if (isset($data['templates'])) {
-			$data['templates_link'] = $data['templates'];
-			unset($data['templates']);
+		if (array_key_exists('groups', $data) && $data['groups']) {
+			$options = [
+				'groups' => $data['groups'],
+				'hosts' => array_map(
+					static function($host) {
+						return array_intersect_key($host, array_flip(['hostid']));
+					},
+					$data['hosts']
+				)
+			];
+
+			API::HostGroup()->massAdd($options);
 		}
 
-		$data['templates'] = [];
+		if (array_key_exists('templates', $data) && $data['templates']) {
+			self::link(array_column(zbx_toArray($data['templates']), 'templateid'), $hostids);
+		}
 
-		return parent::massAdd($data);
+		if (array_key_exists('macros', $data) && $data['macros']) {
+			$data['macros'] = zbx_toArray($data['macros']);
+
+			$hostMacrosToAdd = [];
+			foreach ($data['macros'] as $hostMacro) {
+				foreach ($hostids as $hostid) {
+					$hostMacro['hostid'] = $hostid;
+					$hostMacrosToAdd[] = $hostMacro;
+				}
+			}
+
+			API::UserMacro()->create($hostMacrosToAdd);
+		}
+
+		return ['hostids' => $hostids];
 	}
 
 	/**
@@ -1109,7 +1512,7 @@ class CHost extends CHostGeneral {
 		 * Update template linkage
 		 */
 		if (isset($updateTemplatesClear)) {
-			$templateIdsClear = zbx_objectValues($updateTemplatesClear, 'templateid');
+			$templateIdsClear = array_column($updateTemplatesClear, 'templateid');
 
 			if ($updateTemplatesClear) {
 				$this->massRemove(['hostids' => $hostids, 'templateids_clear' => $templateIdsClear]);
@@ -1128,7 +1531,7 @@ class CHost extends CHostGeneral {
 			]);
 
 			$hostTemplateids = array_keys($hostTemplates);
-			$newTemplateids = zbx_objectValues($updateTemplates, 'templateid');
+			$newTemplateids = array_column($updateTemplates, 'templateid');
 
 			$templatesToDel = array_diff($hostTemplateids, $newTemplateids);
 			$templatesToDel = array_diff($templatesToDel, $templateIdsClear);
@@ -1276,8 +1679,8 @@ class CHost extends CHostGeneral {
 				'output' => ['groupid'],
 				'hostids' => $hostids
 			]);
-			$hostGroupIds = zbx_objectValues($hostGroups, 'groupid');
-			$newGroupIds = zbx_objectValues($updateGroups, 'groupid');
+			$hostGroupIds = array_column($hostGroups, 'groupid');
+			$newGroupIds = array_column($updateGroups, 'groupid');
 
 			$groupsToAdd = array_diff($newGroupIds, $hostGroupIds);
 			if ($groupsToAdd) {
@@ -1312,79 +1715,113 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Removes templates and interfaces from hosts.
-	 *
 	 * @param array $data
-	 * @param array $data['interfaces']         Interfaces to delete from the hosts.
-	 * @param array $data['templateids']        Templates to unlink from host.
-	 * @param array $data['templateids_clear']  Templates to unlink and clear from host.
-	 *
-	 * @throws APIException if the input is invalid.
+	 * @param array $data['hostids]            (optional)
+	 * @param array $data['templateids']       (optional)
+	 * @param array $data['templateids_clear'] (optional)
+	 * @param array $data['interfaces']        (optional)
+	 * @param array $data['groupids']          (optional)
+	 * @param array $data['macros']            (optional)
 	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
-	public function massRemove(array $data) {
+	public function massRemove(array $data): array {
 		if (!array_key_exists('hostids', $data) || $data['hostids'] === null) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 
+		self::checkPermissions($data['hostids'], _('No permissions to referred object or it does not exist!'));
+
+		$data += array_fill_keys(['templateids', 'templateids_clear', 'interfaces', 'groupids', 'macros'], []);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$this->checkPermissions($data['hostids'], _('No permissions to referred object or it does not exist!'));
+		if ($data['templateids'] || $data['templateids_clear']) {
+			$data['templateids'] = zbx_toArray($data['templateids']);
+			$data['templateids_clear'] = zbx_toArray($data['templateids_clear']);
 
-		if (isset($data['interfaces'])) {
-			$options = [
-				'hostids' => $data['hostids'],
-				'interfaces' => zbx_toArray($data['interfaces'])
-			];
-			API::HostInterface()->massRemove($options);
-		}
+			// Remove IDs of templates not allowed to be unlinked due to link_type.
+			$prohibited_templateids = [];
 
-		// rename the "templates" parameter to the common "templates_link"
-		if (isset($data['templateids'])) {
-			$data['templateids_link'] = $data['templateids'];
-			unset($data['templateids']);
-		}
-
-		$data['templateids'] = [];
-
-		if (array_key_exists('templateids_link', $data) && $data['templateids_link']
-				|| array_key_exists('templateids_clear', $data) && $data['templateids_clear']) {
-			// If unlink or clear is requested, get existing host templates to determine the link type.
-			$hosts_templates = $this->get([
+			$hosts_templates = API::Host()->get([
 				'selectParentTemplates' => ['templateid', 'link_type'],
 				'hostids' => $data['hostids'],
 				'preservekeys' => true,
 				'nopermissions' => true
 			]);
 
-			$prohibited_templateids = [];
-
 			foreach ($hosts_templates as $host_templates) {
-				if ($host_templates['parentTemplates']) {
-					foreach ($host_templates['parentTemplates'] as $template) {
-						if ($template['link_type'] == TEMPLATE_LINK_LLD) {
-							$prohibited_templateids[$template['templateid']] = true;
-						}
+				foreach ($host_templates['parentTemplates'] as $template) {
+					if ($template['link_type'] == TEMPLATE_LINK_LLD) {
+						$prohibited_templateids[$template['templateid']] = $template['templateid'];
 					}
 				}
 			}
 
-			// Some templates may not be allowed to unlink. Remove IDs from both lists.
 			if ($prohibited_templateids) {
-				foreach (['templateids_link', 'templateids_clear'] as $field) {
-					if (array_key_exists($field, $data) && $data[$field]) {
-						foreach ($data[$field] as $idx => $templateid) {
-							if (array_key_exists($templateid, $prohibited_templateids)) {
-								unset($data[$field][$idx]);
-							}
-						}
-					}
-				}
+				$data['templateids'] = array_diff($data['templateids'], $prohibited_templateids);
+				$data['templateids_clear'] = array_diff($data['templateids_clear'], $prohibited_templateids);
+			}
+
+			$templateids = array_unique(array_merge($data['templateids'], $data['templateids_clear']));
+
+			$count = API::Template()->get([
+				'countOutput' => true,
+				'templateids' => $templateids,
+				'editable' => true
+			]);
+
+			if ($count != count($templateids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			if ($data['templateids']) {
+				self::unlink($data['templateids'], $data['hostids']);
+			}
+
+			if ($data['templateids_clear']) {
+				self::unlink($data['templateids_clear'], $data['hostids'], true);
 			}
 		}
 
-		return parent::massRemove($data);
+		if ($data['macros']) {
+			$macros = API::UserMacro()->get([
+				'output' => ['hostmacroid'],
+				'hostids' => $data['hostids'],
+				'filter' => [
+					'macro' => $data['macros']
+				]
+			]);
+
+			$macroids = array_column($macros, 'hostmacroid');
+
+			if ($macroids) {
+				API::UserMacro()->delete($macroids);
+			}
+		}
+
+		if ($data['interfaces']) {
+			$options = [
+				'hostids' => $data['hostids'],
+				'interfaces' => zbx_toArray($data['interfaces'])
+			];
+
+			API::HostInterface()->massRemove($options);
+		}
+
+		if ($data['groupids']) {
+			$options = [
+				'hostids' => $data['hostids'],
+				'groupids' => $data['groupids']
+			];
+
+			API::HostGroup()->massRemove($options);
+		}
+
+		return ['hostids' => $data['hostids']];
 	}
 
 	/**
@@ -1619,9 +2056,9 @@ class CHost extends CHostGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		// adding groups
 		$this->addRelatedGroups($options, $result, 'selectGroups');
 		$this->addRelatedGroups($options, $result, 'selectHostGroups');
+		$this->addRelatedTemplates($options, $result);
 
 		$hostids = array_keys($result);
 
@@ -1841,6 +2278,94 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private function addRelatedTemplates(array $options, array &$result): void {
+		if ($options['selectParentTemplates'] === null) {
+			return;
+		}
+
+		foreach ($result as &$host) {
+			$host['parentTemplates'] = [];
+		}
+		unset($host);
+
+		if ($options['selectParentTemplates'] === API_OUTPUT_COUNT) {
+			$templates = API::Template()->get([
+				'hostids' => array_keys($result),
+				'countOutput' => true,
+				'groupCount' => true
+			]);
+
+			$host_templates = array_column($templates, 'rowscount', 'hostid');
+
+			foreach ($result as $hostid => &$host) {
+				$host['parentTemplates'] = array_key_exists($hostid, $host_templates)
+					? $host_templates[$hostid]
+					: '0';
+			}
+			unset($host);
+		}
+		else {
+			$template_options = [
+				'output' => ['hostid', 'templateid'],
+				'filter' => ['hostid' => array_keys($result)]
+			];
+
+			if ($this->outputIsRequested('link_type', $options['selectParentTemplates'])) {
+				$template_options['output'][] = 'link_type';
+			}
+
+			$hosts_templates = DBselect(DB::makeSql('hosts_templates', $template_options));
+
+			$template_links = [];
+
+			while ($row = DBfetch($hosts_templates)) {
+				$template_links[$row['templateid']][] = $row;
+			}
+
+			if ($options['selectParentTemplates'] === API_OUTPUT_EXTEND) {
+				$output = $options['selectParentTemplates'];
+			}
+			else {
+				$output = array_diff($options['selectParentTemplates'], ['link_type']);
+			}
+
+			$templates = API::Template()->get([
+				'output' => $output,
+				'templateids' => array_keys($template_links),
+				'nopermissions' => $options['nopermissions'],
+				'preservekeys' => true
+			]);
+
+			if ($options['limitSelects'] !== null) {
+				order_result($templates, 'host');
+			}
+
+			$templateid_requested = $this->outputIsRequested('templateid', $options['selectParentTemplates']);
+
+			foreach ($templates as $templateid => $template) {
+				if (!$templateid_requested) {
+					unset($template['templateid']);
+				}
+
+				foreach ($template_links[$templateid] as $link) {
+					$result[$link['hostid']]['parentTemplates'][] = $template
+						+ array_intersect_key($link, array_flip(['link_type']));
+				}
+			}
+
+			if ($options['limitSelects'] !== null) {
+				foreach ($result as &$host) {
+					$host['parentTemplates'] = array_slice($host['parentTemplates'], 0, $options['limitSelects']);
+				}
+				unset($host);
+			}
+		}
+	}
+
+	/**
 	 * Validates the input parameters for the get() method.
 	 *
 	 * @param array $options
@@ -1857,7 +2382,8 @@ class CHost extends CHostGeneral {
 			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value', 'automatic'])],
 			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
 			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
-			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])]
+			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])],
+			'limitSelects' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32]
 		]];
 
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
@@ -1870,16 +2396,16 @@ class CHost extends CHostGeneral {
 	/**
 	 * Checks if all of the given hosts are available for writing.
 	 *
-	 * @throws APIException     if a host is not writable or does not exist
-	 *
 	 * @param array  $hostids
 	 * @param string $error
+
+	 * @throws APIException
 	 */
-	protected function checkPermissions(array $hostids, $error) {
+	private static function checkPermissions(array $hostids, string $error): void {
 		if ($hostids) {
 			$hostids = array_unique($hostids);
 
-			$count = $this->get([
+			$count = API::Host()->get([
 				'countOutput' => true,
 				'hostids' => $hostids,
 				'editable' => true
@@ -2513,6 +3039,222 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
+	 * Adding "macros" to the each host object.
+	 *
+	 * @param array  $db_hosts
+	 *
+	 * @return array
+	 */
+	private function getHostMacros(array $db_hosts): array {
+		foreach ($db_hosts as &$db_host) {
+			$db_host['macros'] = [];
+		}
+		unset($db_host);
+
+		$options = [
+			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'value', 'description', 'automatic'],
+			'filter' => ['hostid' => array_keys($db_hosts)]
+		];
+		$db_macros = DBselect(DB::makeSql('hostmacro', $options));
+
+		while ($db_macro = DBfetch($db_macros)) {
+			$hostid = $db_macro['hostid'];
+			unset($db_macro['hostid']);
+
+			$db_hosts[$hostid]['macros'][$db_macro['hostmacroid']] = $db_macro;
+		}
+
+		return $db_hosts;
+	}
+
+	/**
+	 * Check template links.
+	 *
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
+	 */
+	protected static function checkTemplatesLinks(array $hosts, array $db_hosts = null): void {
+		$del_templates = [];
+		$del_links_clear = [];
+
+		foreach ($hosts as $host) {
+			if (array_key_exists('templates', $host)) {
+				$db_templates = ($db_hosts !== null)
+					? array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid')
+					: [];
+				$upd_templateids = [];
+
+				if ($db_hosts !== null
+						&& array_key_exists('nopermissions_templates', $db_hosts[$host['hostid']])) {
+					foreach ($db_hosts[$host['hostid']]['nopermissions_templates'] as $db_template) {
+						$upd_templateids[] = $db_template['templateid'];
+					}
+				}
+
+				foreach ($host['templates'] as $template) {
+					if (array_key_exists($template['templateid'], $db_templates)) {
+						$upd_templateids[] = $template['templateid'];
+						unset($db_templates[$template['templateid']]);
+					}
+				}
+
+				if ($upd_templateids) {
+					foreach ($db_templates as $db_template) {
+						$del_templates[$db_template['templateid']][$host['hostid']] = $upd_templateids;
+					}
+				}
+			}
+			elseif (array_key_exists('templates_clear', $host)) {
+				$templateids = array_column($host['templates_clear'], 'templateid');
+				$upd_templateids = [];
+
+				foreach ($db_hosts[$host['hostid']]['templates'] as $db_template) {
+					if (!in_array($db_template['templateid'], $templateids)) {
+						$upd_templateids[] = $db_template['templateid'];
+					}
+				}
+
+				if ($upd_templateids) {
+					foreach ($host['templates_clear'] as $template) {
+						$del_templates[$template['templateid']][$host['hostid']] = $upd_templateids;
+					}
+				}
+			}
+
+			if (array_key_exists('templates_clear', $host)) {
+				foreach ($host['templates_clear'] as $template) {
+					$del_links_clear[$template['templateid']][$host['hostid']] = true;
+				}
+			}
+		}
+
+		if ($del_templates) {
+			self::checkTriggerExpressionsOfDelTemplates($del_templates);
+		}
+
+		if ($del_links_clear) {
+			self::checkTriggerDependenciesOfHostTriggers($del_links_clear);
+		}
+
+		parent::checkTemplatesLinks($hosts, $db_hosts);
+	}
+
+	/**
+	 * Check whether all templates of triggers in templates being unlinked, are unlinked from all target hosts.
+	 *
+	 * @param array $del_templates
+	 * @param array $del_templates[<templateid>][<hostid>]  Array of IDs of existing templates.
+	 *
+	 * @throws APIException if not linked template is found.
+	 */
+	public static function checkTriggerExpressionsOfDelTemplates(array $del_templates): void {
+		$result = DBselect(
+			'SELECT DISTINCT i.hostid AS del_templateid,f.triggerid,ii.hostid'.
+			' FROM items i,functions f,functions ff,items ii'.
+			' WHERE i.itemid=f.itemid'.
+				' AND f.triggerid=ff.triggerid'.
+				' AND ff.itemid=ii.itemid'.
+				' AND '.dbConditionId('i.hostid', array_keys($del_templates))
+		);
+
+		while ($row = DBfetch($result)) {
+			foreach ($del_templates[$row['del_templateid']] as $hostid => $upd_templateids) {
+				if (in_array($row['hostid'], $upd_templateids)) {
+					$objects = DB::select('hosts', [
+						'output' => ['host'],
+						'hostids' => [$row['del_templateid'], $row['hostid'], $hostid],
+						'preservekeys' => true
+					]);
+
+					$triggers = DB::select('triggers', [
+						'output' => ['description'],
+						'triggerids' => $row['triggerid']
+					]);
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(
+						_('Cannot unlink template "%1$s" without template "%2$s" from host "%3$s" due to expression of trigger "%4$s".'),
+						$objects[$row['del_templateid']]['host'], $objects[$row['hostid']]['host'],
+						$objects[$hostid]['host'], $triggers[0]['description']
+					));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check whether the triggers of the target hosts don't have dependencies on the triggers of the templates being
+	 * unlinked (with cleaning).
+	 *
+	 * @param array $del_links_clear[<templateid>][<hostid>]
+	 *
+	 * @throws APIException
+	 */
+	public static function checkTriggerDependenciesOfHostTriggers(array $del_links_clear): void {
+		$del_host_templates = [];
+
+		foreach ($del_links_clear as $templateid => $hosts) {
+			foreach ($hosts as $hostid => $foo) {
+				$del_host_templates[$hostid][] = $templateid;
+			}
+		}
+
+		$result = DBselect(
+			'SELECT DISTINCT i.hostid AS templateid,t.triggerid,ii.hostid'.
+			' FROM items i,functions f,triggers t,functions ff,items ii'.
+			' WHERE i.itemid=f.itemid'.
+				' AND f.triggerid=t.templateid'.
+				' AND t.triggerid=ff.triggerid'.
+				' AND ff.itemid=ii.itemid'.
+				' AND '.dbConditionId('i.hostid', array_keys($del_links_clear)).
+				' AND '.dbConditionId('ii.hostid', array_keys($del_host_templates))
+		);
+
+		$trigger_links = [];
+
+		while ($row = DBfetch($result)) {
+			if (in_array($row['templateid'], $del_host_templates[$row['hostid']])) {
+				$trigger_links[$row['triggerid']][$row['hostid']] = $row['templateid'];
+			}
+		}
+
+		if (!$trigger_links) {
+			return;
+		}
+
+		$result = DBselect(
+			'SELECT DISTINCT td.triggerid_up,td.triggerid_down,i.hostid'.
+			' FROM trigger_depends td,functions f,items i'.
+			' WHERE td.triggerid_down=f.triggerid'.
+				' AND f.itemid=i.itemid'.
+				' AND '.dbConditionId('td.triggerid_up', array_keys($trigger_links)).
+				' AND '.dbConditionId('td.triggerid_down', array_keys($trigger_links), true).
+				' AND '.dbConditionId('i.hostid', array_keys($del_host_templates))
+		);
+
+		while ($row = DBfetch($result)) {
+			foreach ($trigger_links[$row['triggerid_up']] as $hostid => $templateid) {
+				if (bccomp($row['hostid'], $hostid) == 0) {
+					$objects = DB::select('hosts', [
+						'output' => ['host'],
+						'hostids' => [$templateid, $hostid],
+						'preservekeys' => true
+					]);
+
+					$triggers = DB::select('triggers', [
+						'output' => ['description'],
+						'triggerids' => $row['triggerid_down']
+					]);
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(
+						_('Cannot unlink template "%1$s" from host "%2$s" due to dependency of trigger "%3$s".'),
+						$objects[$templateid]['host'], $objects[$hostid]['host'], $triggers[0]['description']
+					));
+				}
+			}
+		}
+	}
+
+	/**
 	 * @param array $hosts
 	 *
 	 * @throws APIException
@@ -2592,5 +3334,588 @@ class CHost extends CHostGeneral {
 		}
 
 		return $hosts;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function getObjectsByData(array $data, array $db_objects): array {
+		$objects = parent::getObjectsByData($data, $db_objects);
+		$objects = array_column($objects, null, 'hostid');
+
+		foreach ($db_objects as $db_object) {
+			if (array_key_exists('templates', $db_object)) {
+				$object = $objects[$db_object['hostid']];
+
+				if (array_key_exists('templates', $data) || array_key_exists('templateids', $data)) {
+					$object['templates'] = [];
+
+					if (array_key_exists('templates', $data)) {
+						foreach ($data['templates'] as $template) {
+							$object['templates'][] = ['templateid' => $template['templateid']];
+						}
+					}
+				}
+
+				if (array_key_exists('templates_clear', $data) || array_key_exists('templateids_clear', $data)) {
+					$object['templates_clear'] = [];
+					$db_templateids = array_column($db_object['templates'], 'templateid');
+
+					if (array_key_exists('templates_clear', $data)) {
+						foreach ($data['templates_clear'] as $template) {
+							if (in_array($template['templateid'], $db_templateids)) {
+								$object['templates_clear'][] = ['templateid' => $template['templateid']];
+							}
+						}
+					}
+					else {
+						foreach ($data['templateids_clear'] as $templateid) {
+							if (in_array($templateid, $db_templateids)) {
+								$object['templates_clear'][] = ['templateid' => $templateid];
+							}
+						}
+					}
+				}
+
+				$objects[$db_object['hostid']] = $object;
+			}
+		}
+
+		return array_values($objects);
+	}
+
+	/**
+	 * Add the existing groups, macros or templates if affected by mass methods.
+	 *
+	 * @param string     $objects
+	 * @param array      $objectids
+	 * @param array      $db_hosts
+	 */
+	protected function massAddAffectedObjects(string $objects, array $objectids, array &$db_hosts): void {
+		parent::massAddAffectedObjects($objects, $objectids, $db_hosts);
+
+		if ($objects === 'templates') {
+			$permitted_templates = [];
+
+			if (!$objectids && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+				$permitted_templates = API::Template()->get([
+					'output' => [],
+					'hostids' => array_keys($db_hosts),
+					'preservekeys' => true
+				]);
+			}
+
+			$options = [
+				'output' => ['hosttemplateid', 'hostid', 'templateid'],
+				'filter' => [
+					'hostid' => array_keys($db_hosts)
+				]
+			];
+			$db_hosts_templates = DBselect(DB::makeSql('hosts_templates', $options));
+
+			while ($link = DBfetch($db_hosts_templates)) {
+				if ($objectids) {
+					if (in_array($link['templateid'], $objectids)) {
+						$db_hosts[$link['hostid']]['templates'][$link['hosttemplateid']] =
+							array_diff_key($link, array_flip(['hostid']));
+					}
+					else {
+						$db_hosts[$link['hostid']]['nopermissions_templates'][$link['hosttemplateid']] =
+							array_diff_key($link, array_flip(['hostid']));
+					}
+				}
+				else {
+					if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+							|| array_key_exists($link['templateid'], $permitted_templates)) {
+						$db_hosts[$link['hostid']]['templates'][$link['hosttemplateid']] =
+							array_diff_key($link, array_flip(['hostid']));
+					}
+					else {
+						$db_hosts[$link['hostid']]['nopermissions_templates'][$link['hosttemplateid']] =
+							array_diff_key($link, array_flip(['hostid']));
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Links the templates to the given hosts.
+	 *
+	 * @param array $templateIds
+	 * @param array $targetIds		an array of host IDs to link the templates to
+	 *
+	 * @return array 	an array of added hosts_templates rows, with 'hostid' and 'templateid' set for each row
+	 */
+	private static function link(array $templateIds, array $targetIds): array {
+		if (!$templateIds) {
+			return [];
+		}
+
+		// check if someone passed duplicate templates in the same query
+		$templateIdDuplicates = zbx_arrayFindDuplicates($templateIds);
+		if ($templateIdDuplicates) {
+			$duplicatesFound = [];
+			foreach ($templateIdDuplicates as $value => $count) {
+				$duplicatesFound[] = _s('template ID "%1$s" is passed %2$s times', $value, $count);
+			}
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot pass duplicate template IDs for the linkage: %1$s.', implode(', ', $duplicatesFound))
+			);
+		}
+
+		$count = API::Template()->get([
+			'countOutput' => true,
+			'templateids' => $templateIds
+		]);
+
+		if ($count != count($templateIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+		// get DB templates which exists in all targets
+		$res = DBselect('SELECT * FROM hosts_templates WHERE '.dbConditionInt('hostid', $targetIds));
+		$mas = [];
+		while ($row = DBfetch($res)) {
+			if (!isset($mas[$row['templateid']])) {
+				$mas[$row['templateid']] = [];
+			}
+			$mas[$row['templateid']][$row['hostid']] = 1;
+		}
+		$commonDBTemplateIds = [];
+		foreach ($mas as $templateId => $targetList) {
+			if (count($targetList) == count($targetIds)) {
+				$commonDBTemplateIds[] = $templateId;
+			}
+		}
+
+		// check if there are any template with triggers which depends on triggers in templates which will be not linked
+		$commonTemplateIds = array_unique(array_merge($commonDBTemplateIds, $templateIds));
+		foreach ($templateIds as $templateid) {
+			$triggerids = [];
+			$dbTriggers = get_triggers_by_hostid($templateid);
+			while ($trigger = DBfetch($dbTriggers)) {
+				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
+			}
+
+			$sql = 'SELECT DISTINCT h.host'.
+				' FROM trigger_depends td,functions f,items i,hosts h'.
+				' WHERE ('.
+				dbConditionInt('td.triggerid_down', $triggerids).
+				' AND f.triggerid=td.triggerid_up'.
+				' )'.
+				' AND i.itemid=f.itemid'.
+				' AND h.hostid=i.hostid'.
+				' AND '.dbConditionInt('h.hostid', $commonTemplateIds, true).
+				' AND h.status='.HOST_STATUS_TEMPLATE;
+			if ($dbDepHost = DBfetch(DBselect($sql))) {
+				$tmpTpls = API::Template()->get([
+					'output'=> ['host'],
+					'templateids' => $templateid
+				]);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Trigger in template "%1$s" has dependency with trigger in template "%2$s".', $tmpTpls[0]['host'], $dbDepHost['host']));
+			}
+		}
+
+		$res = DBselect(
+			'SELECT ht.hostid,ht.templateid'.
+				' FROM hosts_templates ht'.
+				' WHERE '.dbConditionInt('ht.hostid', $targetIds).
+				' AND '.dbConditionInt('ht.templateid', $templateIds)
+		);
+		$linked = [];
+		while ($row = DBfetch($res)) {
+			$linked[$row['templateid']][$row['hostid']] = true;
+		}
+
+		// add template linkages, if problems rollback later
+		$links = [];
+
+		foreach ($templateIds as $templateid) {
+			$linked_targets = array_key_exists($templateid, $linked) ? $linked[$templateid] : [];
+
+			foreach ($targetIds as $targetid) {
+				if (array_key_exists($targetid, $linked_targets)) {
+					continue;
+				}
+
+				$links[] = ['hostid' => $targetid, 'templateid' => $templateid];
+			}
+		}
+
+		if ($links) {
+			$hosttemplateids = DB::insertBatch('hosts_templates', $links);
+
+			foreach ($links as &$host_linkage) {
+				$host_linkage['hosttemplateid'] = array_shift($hosttemplateids);
+			}
+			unset($host_linkage);
+		}
+
+		// check if all trigger templates are linked to host.
+		// we try to find template that is not linked to hosts ($targetids)
+		// and exists trigger which reference that template and template from ($templateids)
+		$sql = 'SELECT DISTINCT h.host'.
+			' FROM functions f,items i,triggers t,hosts h'.
+			' WHERE f.itemid=i.itemid'.
+			' AND f.triggerid=t.triggerid'.
+			' AND i.hostid=h.hostid'.
+			' AND h.status='.HOST_STATUS_TEMPLATE.
+			' AND NOT EXISTS (SELECT 1 FROM hosts_templates ht WHERE ht.templateid=i.hostid AND '.dbConditionInt('ht.hostid', $targetIds).')'.
+			' AND EXISTS (SELECT 1 FROM functions ff,items ii WHERE ff.itemid=ii.itemid AND ff.triggerid=t.triggerid AND '.dbConditionInt('ii.hostid', $templateIds). ')';
+		if ($dbNotLinkedTpl = DBfetch(DBSelect($sql, 1))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Trigger has items from template "%1$s" that is not linked to host.', $dbNotLinkedTpl['host'])
+			);
+		}
+
+		$templates_hostids = [];
+		$link_requests = [];
+
+		foreach ($links as $host_tpl_ids) {
+			$templates_hostids[$host_tpl_ids['templateid']][] = $host_tpl_ids['hostid'];
+		}
+
+		foreach ($templates_hostids as $templateid => $hostids) {
+			// Fist link web items, so that later regular items can use web item as their master item.
+			Manager::HttpTest()->link($templateid, $hostids);
+		}
+
+		while ($templates_hostids) {
+			$templateid = key($templates_hostids);
+			$link_request = [
+				'hostids' => reset($templates_hostids),
+				'templateids' => [$templateid]
+			];
+			unset($templates_hostids[$templateid]);
+
+			foreach ($templates_hostids as $templateid => $hostids) {
+				if ($link_request['hostids'] === $hostids) {
+					$link_request['templateids'][] = $templateid;
+					unset($templates_hostids[$templateid]);
+				}
+			}
+
+			$link_requests[] = $link_request;
+		}
+
+		foreach ($link_requests as $link_request) {
+			CItem::linkTemplateObjects($link_request['templateids'], $link_request['hostids']);
+			$ruleids = API::DiscoveryRule()->syncTemplates($link_request['templateids'], $link_request['hostids']);
+
+			if ($ruleids) {
+				CItemPrototype::linkTemplateObjects($link_request['templateids'], $link_request['hostids']);
+				API::HostPrototype()->syncTemplates($ruleids, $link_request['hostids']);
+			}
+		}
+
+		// we do linkage in two separate loops because for triggers you need all items already created on host
+		foreach ($link_requests as $link_request){
+			API::Trigger()->syncTemplates($link_request);
+			API::TriggerPrototype()->syncTemplates($link_request);
+			API::GraphPrototype()->syncTemplates($link_request);
+			API::Graph()->syncTemplates($link_request);
+		}
+
+		foreach ($link_requests as $link_request){
+			CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
+		}
+
+		return $links;
+	}
+
+	/**
+	 * Unlinks the templates from the given hosts. If $targetids is set to null, the templates will be unlinked from
+	 * all hosts.
+	 *
+	 * @param array      $templateids
+	 * @param null|array $targetids		the IDs of the hosts to unlink the templates from
+	 * @param bool       $clear			delete all of the inherited objects from the hosts
+	 */
+	private static function unlink($templateids, $targetids = null, $clear = false) {
+		$flags = ($clear)
+			? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE]
+			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE];
+
+		// check that all triggers on templates that we unlink, don't have items from another templates
+		$sql = 'SELECT DISTINCT t.description'.
+			' FROM triggers t,functions f,items i'.
+			' WHERE t.triggerid=f.triggerid'.
+			' AND f.itemid=i.itemid'.
+			' AND '.dbConditionInt('i.hostid', $templateids).
+			' AND EXISTS ('.
+			'SELECT ff.triggerid'.
+			' FROM functions ff,items ii'.
+			' WHERE ff.itemid=ii.itemid'.
+			' AND ff.triggerid=t.triggerid'.
+			' AND '.dbConditionInt('ii.hostid', $templateids, true).
+			')'.
+			' AND t.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
+		if ($dbTrigger = DBfetch(DBSelect($sql, 1))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot unlink trigger "%1$s", it has items from template that is left linked to host.',
+					$dbTrigger['description']
+				)
+			);
+		}
+
+		$templ_triggerids = [];
+
+		$db_triggers = DBselect(
+			'SELECT DISTINCT f.triggerid'.
+			' FROM functions f,items i'.
+			' WHERE f.itemid=i.itemid'.
+				' AND '.dbConditionInt('i.hostid', $templateids)
+		);
+
+		while ($db_trigger = DBfetch($db_triggers)) {
+			$templ_triggerids[] = $db_trigger['triggerid'];
+		}
+
+		$upd_triggers = [
+			ZBX_FLAG_DISCOVERY_NORMAL => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+		];
+
+		if ($templ_triggerids) {
+			$sql_distinct = ($targetids !== null) ? ' DISTINCT' : '';
+			$sql_from = ($targetids !== null) ? ',functions f,items i' : '';
+			$sql_where = ($targetids !== null)
+				? ' AND t.triggerid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND '.dbConditionInt('i.hostid', $targetids)
+				: '';
+
+			$db_triggers = DBSelect(
+				'SELECT'.$sql_distinct.' t.triggerid,t.flags'.
+				' FROM triggers t'.$sql_from.
+				' WHERE '.dbConditionInt('t.templateid', $templ_triggerids).
+					' AND '.dbConditionInt('t.flags', $flags).
+					$sql_where
+			);
+
+			while ($db_trigger = DBfetch($db_triggers)) {
+				if ($clear) {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = true;
+				}
+				else {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = [
+						'values' => ['templateid' => 0],
+						'where' => ['triggerid' => $db_trigger['triggerid']]
+					];
+				}
+			}
+		}
+
+		if ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]) {
+			if ($clear) {
+				CTriggerManager::delete(array_keys($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]));
+			}
+			else {
+				DB::update('triggers', $upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]);
+			}
+		}
+
+		if ($upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+			if ($clear) {
+				CTriggerPrototypeManager::delete(array_keys($upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
+			}
+			else {
+				DB::update('triggers', $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+			}
+		}
+
+		/* GRAPHS {{{ */
+		$db_tpl_graphs = DBselect(
+			'SELECT DISTINCT g.graphid'.
+			' FROM graphs g,graphs_items gi,items i'.
+			' WHERE g.graphid=gi.graphid'.
+				' AND gi.itemid=i.itemid'.
+				' AND '.dbConditionInt('i.hostid', $templateids).
+				' AND '.dbConditionInt('g.flags', $flags)
+		);
+
+		$tpl_graphids = [];
+
+		while ($db_tpl_graph = DBfetch($db_tpl_graphs)) {
+			$tpl_graphids[] = $db_tpl_graph['graphid'];
+		}
+
+		if ($tpl_graphids) {
+			$upd_graphs = [
+				ZBX_FLAG_DISCOVERY_NORMAL => [],
+				ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+			];
+
+			$sql = ($targetids !== null)
+				? 'SELECT DISTINCT g.graphid,g.flags'.
+					' FROM graphs g,graphs_items gi,items i'.
+					' WHERE g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' AND '.dbConditionInt('g.templateid', $tpl_graphids).
+						' AND '.dbConditionInt('i.hostid', $targetids)
+				: 'SELECT g.graphid,g.flags'.
+					' FROM graphs g'.
+					' WHERE '.dbConditionInt('g.templateid', $tpl_graphids);
+
+			$db_graphs = DBSelect($sql);
+
+			while ($db_graph = DBfetch($db_graphs)) {
+				if ($clear) {
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = true;
+				}
+				else {
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = [
+						'values' => ['templateid' => 0],
+						'where' => ['graphid' => $db_graph['graphid']]
+					];
+				}
+			}
+
+			if ($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+				if ($clear) {
+					CGraphPrototypeManager::delete(array_keys($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
+				}
+				else {
+					DB::update('graphs', $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				}
+			}
+
+			if ($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]) {
+				if ($clear) {
+					CGraphManager::delete(array_keys($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]));
+				}
+				else {
+					DB::update('graphs', $upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]);
+				}
+			}
+		}
+		/* }}} GRAPHS */
+
+		if ($clear) {
+			CDiscoveryRule::clearTemplateObjects($templateids, $targetids);
+			CItem::clearTemplateObjects($templateids, $targetids);
+			CHttpTest::clearTemplateObjects($templateids, $targetids);
+		}
+		else {
+			CDiscoveryRule::unlinkTemplateObjects($templateids, $targetids);
+			CItem::unlinkTemplateObjects($templateids, $targetids);
+			CHttpTest::unlinkTemplateObjects($templateids, $targetids);
+		}
+
+		if ($targetids !== null) {
+			$hosts = API::Host()->get([
+				'hostids' => $targetids,
+				'output' => ['host'],
+				'nopermissions' => true
+			]);
+		}
+		else {
+			$hosts = API::Host()->get([
+				'templateids' => $templateids,
+				'output' => ['host'],
+				'nopermissions' => true
+			]);
+		}
+
+		$options = ['templateid' => $templateids];
+
+		if ($targetids !== null) {
+			$options['hostid'] = $targetids;
+		}
+
+		DB::delete('hosts_templates', $options);
+
+		if ($hosts) {
+			$templates = API::Template()->get([
+				'output' => ['host'],
+				'templateids' => $templateids,
+				'nopermissions' => true
+			]);
+
+			info(_s('Templates "%1$s" unlinked from hosts "%2$s".',	implode(', ', array_column($templates, 'host')),
+				implode(', ', array_column($hosts, 'host'))
+			));
+		}
+	}
+
+	/**
+	 * Check templates links for given data of mass API methods.
+	 *
+	 * @param string $method
+	 * @param array  $templateids
+	 * @param array  $db_hosts
+	 */
+	protected function massCheckTemplatesLinks(string $method, array $templateids, array $db_hosts,
+			array $templateids_clear = []): void {
+		$ins_templates = [];
+		$del_links = [];
+		$del_templates = [];
+		$del_links_clear  = [];
+
+		foreach ($db_hosts as $hostid => $db_host) {
+			$db_templateids = array_column($db_host['templates'], 'templateid');
+
+			if ($method === 'massadd') {
+				$_templateids = array_diff($templateids, $db_templateids);
+			}
+			elseif ($method === 'massremove') {
+				$_templateids = array_diff($db_templateids, $templateids);
+			}
+			else {
+				$_templateids = $templateids;
+			}
+
+			$permitted_templateids = $_templateids;
+			$templates_count = count($permitted_templateids);
+			$upd_templateids = [];
+
+			if (array_key_exists('nopermissions_templates', $db_host)) {
+				foreach ($db_host['nopermissions_templates'] as $db_template) {
+					$_templateids[] = $db_template['templateid'];
+					$templates_count++;
+					$upd_templateids[] = $db_template['templateid'];
+				}
+			}
+
+			foreach ($permitted_templateids as $templateid) {
+				$index = array_search($templateid, $db_templateids);
+
+				if ($index !== false) {
+					$upd_templateids[] = $templateid;
+					unset($db_templateids[$index]);
+				}
+				else {
+					$ins_templates[$templateid][$hostid] = $_templateids;
+				}
+			}
+
+			foreach ($db_templateids as $db_templateid) {
+				$del_links[$db_templateid][$hostid] = true;
+
+				if ($upd_templateids) {
+					$del_templates[$db_templateid][$hostid] = $upd_templateids;
+				}
+
+				if (array_key_exists($db_templateid, $templateids_clear)) {
+					$del_links_clear[$db_templateid][$hostid] = true;
+				}
+			}
+		}
+
+		if ($del_templates) {
+			self::checkTriggerExpressionsOfDelTemplates($del_templates);
+		}
+
+		if ($del_links_clear) {
+			self::checkTriggerDependenciesOfHostTriggers($del_links_clear);
+		}
+
+		if ($ins_templates) {
+			self::checkTriggerDependenciesOfInsTemplates($ins_templates);
+			self::checkTriggerExpressionsOfInsTemplates($ins_templates);
+		}
 	}
 }

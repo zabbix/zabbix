@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.4.0beta6');
+define('ZABBIX_VERSION',		'6.4.0rc1');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030158);
+define('ZABBIX_DB_VERSION',		6030186);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -34,7 +34,7 @@ define('DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR',		6);
 define('DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING',	7);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2022');
+define('ZABBIX_COPYRIGHT_TO',	'2023');
 
 define('ZBX_DOCUMENTATION_URL', 'https://www.zabbix.com/documentation');
 
@@ -236,6 +236,8 @@ define('P_NZERO',				0x0020);
 define('P_NO_TRIM',				0x0040);
 define('P_ALLOW_USER_MACRO',	0x0080);
 define('P_ALLOW_LLD_MACRO',		0x0100);
+define('P_ONLY_ARRAY',			0x0200);
+define('P_ONLY_TD_ARRAY',		0x0400);
 
 //	misc parameters
 define('IMAGE_FORMAT_PNG',	'PNG');
@@ -302,6 +304,14 @@ define('CONDITION_OPERATOR_YES',		10);
 define('CONDITION_OPERATOR_NO',			11);
 define('CONDITION_OPERATOR_EXISTS',		12);
 define('CONDITION_OPERATOR_NOT_EXISTS',	13);
+
+define('ZBX_CONNECTOR_STATUS_DISABLED',	0);
+define('ZBX_CONNECTOR_STATUS_ENABLED',	1);
+
+define('ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES',	0);
+define('ZBX_CONNECTOR_DATA_TYPE_EVENTS',		1);
+
+define('ZBX_STREAMING_PROTOCOL_V1',	0);
 
 // correlation statuses
 define('ZBX_CORRELATION_ENABLED',		0);
@@ -575,7 +585,7 @@ define('ITEM_DATA_TYPE_BOOLEAN',		3);
 
 define('ZBX_DEFAULT_KEY_DB_MONITOR',			'db.odbc.select[<unique short description>,<dsn>,<connection string>]');
 define('ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY',	'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]');
-define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
+define('ZBX_DEFAULT_KEY_SSH',					'ssh.run[<unique short description>,<ip>,<port>,<encoding>,<ssh options>]');
 define('ZBX_DEFAULT_KEY_TELNET',				'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 
 define('ZBX_DEFAULT_JMX_ENDPOINT',	'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi');
@@ -682,9 +692,10 @@ define('ZBX_PREPROC_PROMETHEUS_MAX',   'max');
 define('ZBX_PREPROC_PROMETHEUS_AVG',   'avg');
 define('ZBX_PREPROC_PROMETHEUS_COUNT', 'count');
 
-define('ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED', 0);
-define('ZBX_PREPROC_SNMP_WALK_TREAT_UTF8', 1);
-define('ZBX_PREPROC_SNMP_WALK_TREAT_MAC', 2);
+define('ZBX_PREPROC_SNMP_UNCHANGED', 0);
+define('ZBX_PREPROC_SNMP_UTF8_FROM_HEX', 1);
+define('ZBX_PREPROC_SNMP_MAC_FROM_HEX', 2);
+define('ZBX_PREPROC_SNMP_INT_FROM_BITS', 3);
 
 // LLD rule overrides.
 define('ZBX_LLD_OVERRIDE_STOP_NO',	0);
@@ -998,11 +1009,12 @@ define('PARAM_TYPE_COUNTS',		1);
 define('ZBX_DEFAULT_AGENT', 'Zabbix');
 define('ZBX_AGENT_OTHER', -1);
 
-define('HTTPTEST_AUTH_NONE',		0);
-define('HTTPTEST_AUTH_BASIC',		1);
-define('HTTPTEST_AUTH_NTLM',		2);
-define('HTTPTEST_AUTH_KERBEROS',	3);
-define('HTTPTEST_AUTH_DIGEST',		4);
+define('ZBX_HTTP_AUTH_NONE',		0);
+define('ZBX_HTTP_AUTH_BASIC',		1);
+define('ZBX_HTTP_AUTH_NTLM',		2);
+define('ZBX_HTTP_AUTH_KERBEROS',	3);
+define('ZBX_HTTP_AUTH_DIGEST',		4);
+define('ZBX_HTTP_AUTH_BEARER',		5);
 
 define('HTTPTEST_STATUS_ACTIVE',	0);
 define('HTTPTEST_STATUS_DISABLED',	1);
@@ -1041,11 +1053,11 @@ define('HTTPTEST_STEP_RETRIEVE_MODE_BOTH',		2);
 define('HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF',	0);
 define('HTTPTEST_STEP_FOLLOW_REDIRECTS_ON',		1);
 
-define('HTTPTEST_VERIFY_PEER_OFF',	0);
-define('HTTPTEST_VERIFY_PEER_ON',	1);
+define('ZBX_HTTP_VERIFY_PEER_OFF',	0);
+define('ZBX_HTTP_VERIFY_PEER_ON',	1);
 
-define('HTTPTEST_VERIFY_HOST_OFF',	0);
-define('HTTPTEST_VERIFY_HOST_ON',	1);
+define('ZBX_HTTP_VERIFY_HOST_OFF',	0);
+define('ZBX_HTTP_VERIFY_HOST_ON',	1);
 
 define('EVENT_NOT_ACKNOWLEDGED',	'0');
 define('EVENT_ACKNOWLEDGED',		'1');
@@ -1962,6 +1974,7 @@ define('ZBX_STYLE_ACTION_ICON_SEV_CHANGED', 'icon-action-severity-changed');
 define('ZBX_STYLE_ACTION_MESSAGE', 'icon-action-message');
 define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
 define('ZBX_STYLE_ACTION_ICON_UNACK', 'icon-action-unack');
+define('ZBX_STYLE_ACTION_ICON_ACK_GREEN', 'icon-action-ack-green');
 define('ZBX_STYLE_ACTION_ICON_SUPPRESS', 'icon-action-suppress');
 define('ZBX_STYLE_ACTION_ICON_UNSUPPRESS', 'icon-action-unsuppress');
 define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause');
@@ -2091,6 +2104,7 @@ define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
 define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK', 'overflow-break');
 define('ZBX_STYLE_TABLE_PAGING', 'table-paging');
+define('ZBX_STYLE_TABLE_INITIAL_WIDTH', 'table-initial-width');
 define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');

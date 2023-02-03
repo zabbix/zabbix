@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -964,7 +964,7 @@ class testFormTags extends CWebTest {
 				->asTable()->waitUntilReady()->one();
 		$table->findRow('Name', $this->clone_name)->select();
 		$this->query('button:Copy')->one()->click();
-		$copy_form = $this->query('name:elements_form')->asForm()->waitUntilPresent()->one();
+		$copy_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$copy_form->fill(['Target type' => $target_type.'s', 'Target' => $parent]);
 		$copy_form->submit();
 		$this->page->waitUntilReady();
@@ -1147,9 +1147,11 @@ class testFormTags extends CWebTest {
 		$this->page->waitUntilReady();
 		$tags_table->checkValue($this->prepareAllTags($data['tags'], array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS)));
 
-		// Check empty column "Parent templates" except for inherited unique template tags.
+		$parent = ($object === 'trigger' || $object === 'trigger prototype') ? 'Parent templates' : 'Parent template';
+
+		// Check empty column "Parent template" except for inherited unique template tags.
 		foreach ($tags_table->getRows() as $row) {
-			$parent_template = $row->getColumn('Parent templates')->getText();
+			$parent_template = $row->getColumn($parent)->getText();
 			$current_tag = [];
 			$current_tag['tag'] = $row->getColumn('Name')->getText();
 			$current_tag['value'] = $row->getColumn('Value')->getText();

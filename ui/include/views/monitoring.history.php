@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ $html_page = (new CHtmlPage())->setWebLayoutMode($web_layout_mode);
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($data['items'])),
 	'right' => (new CForm('get'))
-		->cleanItems()
 		->setName('filter_view_as')
 		->addVar('itemids', $data['itemids'])
 ];

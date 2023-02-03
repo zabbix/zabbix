@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,10 @@ class CControllerPopupLdapEdit extends CController {
 
 	const LDAP_MEMBER_OF = 0;
 	const LDAP_GROUP_OF_NAMES = 1;
+
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput(): bool {
 		$fields = [

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ function tabFilterDelete(overlay) {
 	url.setArgument('action', 'popup.tabfilter.delete');
 	url.setArgument('idx', form_data['idx']);
 	url.setArgument('idx2', form_data['idx2']);
+	url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', <?= json_encode(CCsrfTokenHelper::get('tabfilter')) ?>);
 
 	overlay.setLoading();
 	overlay.xhr = $.post(url.getUrl(), null, 'json')

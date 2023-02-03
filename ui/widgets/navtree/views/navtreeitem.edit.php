@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@
 use Widgets\NavTree\Widget;
 
 $form = (new CForm('post'))
-	->cleanItems()
 	->setId('widget-dialogue-form')
 	->setName('widget_dialogue_form')
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));

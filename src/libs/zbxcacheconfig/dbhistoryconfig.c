@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 #include "zbxserver.h"
 #include "actions.h"
 #include "zbx_item_constants.h"
+
+ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
 
 static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZBX_DC_HOST *src_host,
 		unsigned int mode)
@@ -214,6 +216,21 @@ void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int 
 		zbx_free(items[i].history_period);
 		zbx_free(items[i].trends_period);
 	}
+}
+
+void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *itemids)
+{
+	int	i;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	for (i = 0; i < itemids->values_num; i++)
+	{
+		if (NULL != zbx_hashset_search(&config->items, &itemids->values[i]))
+			zbx_vector_uint64_remove_noorder(itemids, i--);
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
 }
 
 /******************************************************************************
@@ -786,3 +803,220 @@ void	zbx_dc_items_update_nextcheck(zbx_history_recv_item_t *items, zbx_agent_val
 
 	UNLOCK_CACHE;
 }
+
+#define ZBX_CONNECTOR_STATUS_ENABLED	1
+
+void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filter_t *connector_filters_history,
+		zbx_vector_connector_filter_t *connector_filters_events)
+{
+#define ZBX_CONNECTOR_DATA_TYPE_HISTORY	0
+
+	zbx_dc_connector_t	*dc_connector;
+	zbx_hashset_iter_t	iter;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	zbx_hashset_iter_reset(&config->connectors, &iter);
+	while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_connector_filter_t		connector_filter;
+		zbx_vector_connector_filter_t	*connector_filter_dest;
+		int				i;
+
+		if (ZBX_CONNECTOR_STATUS_ENABLED != dc_connector->status)
+			continue;
+
+		if (dc_connector->data_type == ZBX_CONNECTOR_DATA_TYPE_HISTORY)
+		{
+			if (NULL == connector_filters_history)
+				continue;
+
+			connector_filter_dest = connector_filters_history;
+		}
+		else
+			connector_filter_dest = connector_filters_events;
+
+		connector_filter.connectorid = dc_connector->connectorid;
+		connector_filter.tags_evaltype = dc_connector->tags_evaltype;
+		zbx_vector_match_tags_create(&connector_filter.connector_tags);
+
+		if (0 != dc_connector->tags.values_num)
+		{
+			zbx_vector_match_tags_reserve(&connector_filter.connector_tags,
+					(size_t)dc_connector->tags.values_num);
+
+			for (i = 0; i < dc_connector->tags.values_num; i++)
+			{
+				zbx_match_tag_t	*connector_tag;
+
+				connector_tag = (zbx_match_tag_t *)zbx_malloc(NULL, sizeof(*connector_tag));
+
+				connector_tag->tag = zbx_strdup(NULL, dc_connector->tags.values[i]->tag);
+				connector_tag->value = zbx_strdup(NULL, dc_connector->tags.values[i]->value);
+				connector_tag->op = dc_connector->tags.values[i]->op;
+
+				zbx_vector_match_tags_append(&connector_filter.connector_tags, connector_tag);
+			}
+		}
+
+		zbx_vector_match_tags_sort(&connector_filter.connector_tags, zbx_compare_match_tags);
+
+		zbx_vector_connector_filter_append(connector_filter_dest, connector_filter);
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+#undef ZBX_CONNECTOR_DATA_TYPE_HISTORY
+}
+
+void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter)
+{
+	zbx_vector_match_tags_clear_ext(&connector_filter.connector_tags, zbx_match_tag_free);
+	zbx_vector_match_tags_destroy(&connector_filter.connector_tags);
+}
+
+static void	substitute_orig_unmasked(const char *orig, char **data)
+{
+	if (NULL == strstr(orig, "{$"))
+		return;
+
+	*data = zbx_strdup(*data, orig);
+	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			data, MACRO_TYPE_COMMON, NULL, 0);
+}
+
+static void	substitute_orig(const char *orig, char **data)
+{
+	if (NULL == strstr(orig, "{$"))
+		return;
+
+	*data = zbx_strdup(*data, orig);
+	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, data,
+			MACRO_TYPE_COMMON, NULL, 0);
+}
+
+void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,
+		zbx_uint64_t *config_revision, zbx_uint64_t *connector_revision, zbx_clean_func_t data_point_link_clean)
+{
+	zbx_dc_connector_t	*dc_connector;
+	zbx_connector_t		*connector;
+	zbx_hashset_iter_t	iter;
+	int			connectors_updated = FAIL, global_macro_updated = FAIL;
+	zbx_uint64_t		global_revision;
+
+	if (config->revision.config == *config_revision)
+		return;
+
+	global_revision = *config_revision;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	if (config->revision.connector != *connector_revision)
+	{
+		zbx_hashset_iter_reset(&config->connectors, &iter);
+		while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
+		{
+			if (ZBX_CONNECTOR_STATUS_ENABLED != dc_connector->status)
+				continue;
+
+			if (NULL == (connector = (zbx_connector_t *)zbx_hashset_search(connectors,
+					&dc_connector->connectorid)))
+			{
+				zbx_connector_t	connector_local = {.connectorid = dc_connector->connectorid};
+
+				connector = (zbx_connector_t *)zbx_hashset_insert(connectors, &connector_local,
+						sizeof(connector_local));
+				zbx_list_create(&connector->data_point_link_queue);
+
+				zbx_hashset_create_ext(&connector->data_point_links, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC, data_point_link_clean,
+						ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+						ZBX_DEFAULT_MEM_FREE_FUNC);
+
+				connector->senders = 0;
+				connector->time_flush = 0;
+			}
+
+			connector->revision = config->revision.connector;
+			connector->protocol = dc_connector->protocol;
+			connector->data_type = dc_connector->data_type;
+			connector->url_orig = zbx_strdup(connector->url_orig, dc_connector->url);
+			connector->url = zbx_strdup(connector->url, dc_connector->url);
+			connector->max_records = dc_connector->max_records;
+			connector->max_senders = dc_connector->max_senders;
+			connector->timeout_orig = zbx_strdup(connector->timeout_orig, dc_connector->timeout);
+			connector->timeout = zbx_strdup(connector->timeout, dc_connector->timeout);
+			connector->max_attempts = dc_connector->max_attempts;
+			connector->token_orig = zbx_strdup(connector->token_orig, dc_connector->token);
+			connector->token = zbx_strdup(connector->token, dc_connector->token);
+			connector->http_proxy_orig = zbx_strdup(connector->http_proxy_orig, dc_connector->http_proxy);
+			connector->http_proxy = zbx_strdup(connector->http_proxy, dc_connector->http_proxy);
+			connector->authtype = dc_connector->authtype;
+			connector->username_orig = zbx_strdup(connector->username_orig, dc_connector->username);
+			connector->username = zbx_strdup(connector->username, dc_connector->username);
+			connector->password_orig = zbx_strdup(connector->password_orig, dc_connector->password);
+			connector->password = zbx_strdup(connector->password, dc_connector->password);
+			connector->verify_peer = dc_connector->verify_peer;
+			connector->verify_host = dc_connector->verify_host;
+			connector->ssl_cert_file_orig = zbx_strdup(connector->ssl_cert_file_orig,
+					dc_connector->ssl_cert_file);
+			connector->ssl_cert_file = zbx_strdup(connector->ssl_cert_file, dc_connector->ssl_cert_file);
+			connector->ssl_key_file_orig = zbx_strdup(connector->ssl_key_file_orig,
+					dc_connector->ssl_key_file);
+			connector->ssl_key_file = zbx_strdup(connector->ssl_key_file, dc_connector->ssl_key_file);
+			connector->ssl_key_password_orig = zbx_strdup(connector->ssl_key_password_orig,
+					dc_connector->ssl_key_password);
+			connector->ssl_key_password = zbx_strdup(connector->ssl_key_password,
+					dc_connector->ssl_key_password);
+		}
+
+		*connector_revision = config->revision.connector;
+		connectors_updated = SUCCEED;
+	}
+
+	if (SUCCEED != um_cache_get_host_revision(config->um_cache, 0, &global_revision))
+		global_revision = 0;
+
+	if (global_revision > *config_revision)
+		global_macro_updated = SUCCEED;
+
+	*config_revision = config->revision.config;
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	if (SUCCEED == connectors_updated)
+	{
+		zbx_hashset_iter_reset(connectors, &iter);
+		while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
+		{
+			if (connector->revision != *connector_revision)
+				zbx_hashset_iter_remove(&iter);
+		}
+
+		zbx_hashset_iter_reset(connectors, connector_iter);
+	}
+
+	if (SUCCEED == global_macro_updated || SUCCEED == connectors_updated)
+	{
+		zbx_dc_um_handle_t	*um_handle;
+
+		um_handle = zbx_dc_open_user_macros();
+
+		zbx_hashset_iter_reset(connectors, &iter);
+		while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
+		{
+			substitute_orig_unmasked(connector->url_orig, &connector->url);
+			substitute_orig_unmasked(connector->token_orig, &connector->token);
+			substitute_orig_unmasked(connector->http_proxy_orig, &connector->http_proxy);
+			substitute_orig_unmasked(connector->username_orig, &connector->username);
+			substitute_orig_unmasked(connector->password_orig, &connector->password);
+			substitute_orig_unmasked(connector->ssl_cert_file_orig, &connector->ssl_cert_file);
+			substitute_orig_unmasked(connector->ssl_key_file_orig, &connector->ssl_key_file);
+			substitute_orig_unmasked(connector->ssl_key_password_orig, &connector->ssl_key_password);
+
+			substitute_orig(connector->timeout_orig, &connector->timeout);
+		}
+
+		zbx_dc_close_user_macros(um_handle);
+	}
+}
+#undef ZBX_CONNECTOR_STATUS_ENABLED

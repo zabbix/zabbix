@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,10 @@
  * Controller for the "Host->Monitoring" asynchronous refresh page.
  */
 class CControllerHostViewRefresh extends CControllerHostView {
+
+	protected function init(): void {
+		$this->disableCsrfValidation();
+	}
 
 	protected function doAction(): void {
 		$filter = static::FILTER_FIELDS_DEFAULT;

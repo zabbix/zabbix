@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,6 @@ global $ZBX_SERVER_NAME;
 		(new CDiv([
 			(new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass(ZBX_STYLE_SIGNIN_LOGO),
 			(new CForm())
-				->cleanItems()
 				->setAttribute('aria-label', _('Sign in'))
 				->addItem(hasRequest('request') ? new CVar('request', getRequest('request')) : null)
 				->addItem(

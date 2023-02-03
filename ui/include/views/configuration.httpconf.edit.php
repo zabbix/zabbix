@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,8 @@ $url = (new CUrl('httpconf.php'))
 
 // create form
 $http_form = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('httpconf.php')))->removeId())
 	->setId('http-form')
 	->setName('httpForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -54,9 +56,24 @@ if (!empty($this->data['httptestid'])) {
  */
 $http_form_list = new CFormList();
 
-// Parent http tests
-if (!empty($this->data['templates'])) {
-	$http_form_list->addRow(_('Parent web scenarios'), $this->data['templates']);
+if (array_key_exists('parent_httptest', $this->data)) {
+	$parent_httptest = $this->data['parent_httptest'];
+
+	if ($parent_httptest['editable']) {
+		$parent_template_name = new CLink(CHtml::encode($parent_httptest['template_name']),
+			(new CUrl('httpconf.php'))
+				->setArgument('form', 'update')
+				->setArgument('context', 'template')
+				->setArgument('hostid', $parent_httptest['templateid'])
+				->setArgument('httptestid', $data['templateid'])
+		);
+	}
+	else {
+		$parent_template_name = (new CSpan(CHtml::encode($parent_httptest['template_name'])))
+			->addClass(ZBX_STYLE_GREY);
+	}
+
+	$http_form_list->addRow(_('Parent web scenario'), $parent_template_name);
 }
 
 // Name
@@ -241,6 +258,7 @@ $http_tab = (new CTabView())
 			'source' => 'httptest',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
+			'context' => $data['context'],
 			'readonly' => false,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab'
@@ -248,7 +266,7 @@ $http_tab = (new CTabView())
 		TAB_INDICATOR_TAGS
 	)
 	->addTab('authenticationTab', _('Authentication'), $http_authentication_form_list, TAB_INDICATOR_HTTP_AUTH);
-if (!$this->data['form_refresh']) {
+if ($this->data['form_refresh'] == 0) {
 	$http_tab->setSelected(0);
 }
 
@@ -266,7 +284,8 @@ if (!empty($this->data['httptestid'])) {
 		);
 	}
 
-	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid', 'context']),
+	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid', 'context']).
+		'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('httpconf.php'),
 		'context'
 	))->setEnabled(!$data['templated']);
 	$buttons[] = new CButtonCancel(url_param('context'));

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,22 +122,6 @@ function is_string(obj) {
 function is_array(obj) {
 	return (obj != null) && (typeof obj == 'object') && ('splice' in obj) && ('join' in obj);
 }
-
-/**
- * Get elements existing exclusively in one of both arrays.
- * @deprecated
- *
- * @param {Array} arr
- *
- * @returns {Array}
- */
-Array.prototype.xor = function(arr) {
-	var merged_arr = this.concat(arr);
-
-	return merged_arr.filter(function(e) {
-		return (merged_arr.indexOf(e) === merged_arr.lastIndexOf(e));
-	});
-};
 
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
@@ -453,7 +437,7 @@ function acknowledgePopUp(parameters, trigger_element) {
 	overlay.trigger_parents = $(trigger_element).parents();
 
 	overlay.xhr.then(function() {
-		var url = new Curl('zabbix.php', false);
+		var url = new Curl('zabbix.php');
 		url.setArgument('action', 'popup');
 		url.setArgument('popup_action', 'acknowledge.edit');
 		url.setArgument('eventids', parameters.eventids);
@@ -756,11 +740,10 @@ function validate_trigger_expression(overlay) {
 	});
 }
 
-function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
+function redirect(uri, method, needle, invert_needle, allow_empty) {
 	method = (method || 'get').toLowerCase();
-	add_sid = (method !== 'get' && (typeof add_sid === 'undefined' || add_sid));
 
-	var url = new Curl(uri, add_sid);
+	var url = new Curl(uri);
 
 	if (method == 'get') {
 		window.location = url.getUrl();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,6 @@ $main_filter_form = null;
 
 if ($data['dynamic']['has_dynamic_widgets']) {
 	$main_filter_form = (new CForm('get'))
-		->cleanItems()
 		->setAttribute('name', 'dashboard_filter')
 		->setAttribute('aria-label', _('Main filter'))
 		->addVar('action', 'dashboard.view')

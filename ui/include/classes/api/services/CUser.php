@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1702,7 +1702,7 @@ class CUser extends CApiService {
 		$time = time();
 
 		$db_sessions = DB::select('sessions', [
-			'output' => ['userid', 'lastaccess'],
+			'output' => ['userid', 'lastaccess', 'secret'],
 			'sessionids' => $sessionid,
 			'filter' => ['status' => ZBX_SESSION_ACTIVE]
 		]);
@@ -1728,6 +1728,7 @@ class CUser extends CApiService {
 
 		$db_user = $db_users[0];
 		$db_user['sessionid'] = $sessionid;
+		$db_user['secret'] = $db_session['secret'];
 
 		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
 
@@ -2185,12 +2186,14 @@ class CUser extends CApiService {
 	 */
 	private static function createSession(array $db_user): array {
 		$db_user['sessionid'] = CEncryptHelper::generateKey();
+		$db_user['secret'] = CEncryptHelper::generateKey();
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
 			'userid' => $db_user['userid'],
 			'lastaccess' => time(),
-			'status' => ZBX_SESSION_ACTIVE
+			'status' => ZBX_SESSION_ACTIVE,
+			'secret' => $db_user['secret']
 		]], false);
 
 		self::$userData = $db_user;

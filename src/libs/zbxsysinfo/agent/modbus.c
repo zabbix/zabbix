@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "modbtype.h"
+#include "../sysinfo.h"
+
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxnum.h"
-
-#include "modbtype.h"
 
 #ifdef HAVE_LIBMODBUS
 #include "zbxmutexs.h"
@@ -528,12 +529,12 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 	{
 		struct timeval	tv;
 
-		tv.tv_sec = CONFIG_TIMEOUT;
+		tv.tv_sec = sysinfo_get_config_timeout();
 		tv.tv_usec = 0;
 		modbus_set_response_timeout(mdb_ctx, &tv);
 	}
 #else /* HAVE_LIBMODBUS_3_1 at the moment */
-	if (0 !=  modbus_set_response_timeout(mdb_ctx, CONFIG_TIMEOUT, 0))
+	if (0 !=  modbus_set_response_timeout(mdb_ctx, sysinfo_get_config_timeout(), 0))
 	{
 		*error = zbx_dsprintf(*error, "modbus_set_response_timeout() failed: %s", modbus_strerror(errno));
 		goto out;

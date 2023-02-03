@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -109,6 +109,10 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "ha manager";
 		case ZBX_PROCESS_TYPE_ODBCPOLLER:
 			return "odbc poller";
+		case ZBX_PROCESS_TYPE_CONNECTORMANAGER:
+			return "connector manager";
+		case ZBX_PROCESS_TYPE_CONNECTORWORKER:
+			return "connector worker";
 		case ZBX_PROCESS_TYPE_MAIN:
 			return "main";
 	}

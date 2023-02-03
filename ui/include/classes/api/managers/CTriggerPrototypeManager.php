@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,31 +27,17 @@ class CTriggerPrototypeManager {
 	/**
 	 * Deletes trigger prototypes and related entities without permission check.
 	 *
-	 * @param array $triggerids
+	 * @param array $del_triggerids
 	 */
-	public static function delete(array $triggerids) {
-		$del_triggerids = [];
-
-		// Selecting all inherited triggers.
-		$parent_triggerids = array_flip($triggerids);
-		do {
-			$db_triggers = DBselect(
-				'SELECT t.triggerid'.
-				' FROM triggers t'.
-				' WHERE '.dbConditionInt('t.templateid', array_keys($parent_triggerids))
-			);
-
-			$del_triggerids += $parent_triggerids;
-			$parent_triggerids = [];
-
-			while ($db_trigger = DBfetch($db_triggers)) {
-				if (!array_key_exists($db_trigger['triggerid'], $del_triggerids)) {
-					$parent_triggerids[$db_trigger['triggerid']] = true;
-				}
-			}
-		} while ($parent_triggerids);
-
-		$del_triggerids = array_keys($del_triggerids);
+	public static function delete(array $del_triggerids) {
+		// Add the inherited triggers.
+		$options = [
+			'output' => ['triggerid'],
+			'filter' => ['templateid' => $del_triggerids]
+		];
+		$del_triggerids = array_merge($del_triggerids,
+			DBfetchColumn(DBselect(DB::makeSql('triggers', $options)), 'triggerid')
+		);
 
 		// Lock trigger prototypes before delete to prevent server from adding new LLD elements.
 		DBselect(

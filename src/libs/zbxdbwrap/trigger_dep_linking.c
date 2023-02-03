@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -150,15 +150,15 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 			"select distinct td.triggerid_down,td.triggerid_up"
 			" from triggers t,trigger_depends td"
 			" where t.templateid in (td.triggerid_up,td.triggerid_down) and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids->values, trids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids->values, trids->values_num);
 
-	if (NULL == (result = DBselect("%s", sql)))
+	if (NULL == (result = zbx_db_select("%s", sql)))
 	{
 		res = FAIL;
 		goto clean;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_pair_t	dep_list_id;
 
@@ -169,7 +169,7 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		zbx_vector_uint64_append(&all_templ_ids, dep_list_id.second);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == dep_list_ids.values_num)	/* not all trigger templates have a dependency trigger */
 		goto clean;
@@ -189,19 +189,19 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 				" and i.hostid=" ZBX_FS_UI64
 				" and",
 				hostid);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.templateid", all_templ_ids.values,
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.templateid", all_templ_ids.values,
 			all_templ_ids.values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids->values,
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids->values,
 			trids->values_num);
 
-	if (NULL == (result = DBselect("%s", sql)))
+	if (NULL == (result = zbx_db_select("%s", sql)))
 	{
 		res = FAIL;
 		goto clean;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_pair_t			map_id;
 		resolve_dependencies_triggers_flags_t	temp_t;
@@ -223,7 +223,7 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		zbx_vector_uint64_pair_append(&map_ids, map_id);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < dep_list_ids.values_num; i++)
 	{
@@ -308,15 +308,15 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 			" from trigger_depends td,triggers t "
 			" where t.triggerid=td.triggerid_down"
 			" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_down", trids->values, trids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_down", trids->values, trids->values_num);
 
-	if (NULL == (result = DBselect("%s", sql)))
+	if (NULL == (result = zbx_db_select("%s", sql)))
 	{
 		res = FAIL;
 		goto clean;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		int				flags;
 		zbx_uint64_t			trigger_dep_id, trigger_id_down, trigger_id_up;
@@ -352,7 +352,7 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < links->values_num; i++)
 	{
@@ -433,7 +433,7 @@ static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashs
 		zbx_uint64_t	triggerdepid;
 		zbx_db_insert_t	db_insert;
 
-		triggerdepid = DBget_maxid_num("trigger_depends", links->values_num);
+		triggerdepid = zbx_db_get_maxid_num("trigger_depends", links->values_num);
 
 		zbx_db_insert_prepare(&db_insert, "trigger_depends", "triggerdepid", "triggerid_down", "triggerid_up",
 				NULL);
@@ -497,10 +497,10 @@ static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t *links
 	if (0 < trigger_dep_ids_del.values_num)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from trigger_depends where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerdepid",
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerdepid",
 				trigger_dep_ids_del.values, trigger_dep_ids_del.values_num);
 
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 		{
 			res = FAIL;
 			goto clean;

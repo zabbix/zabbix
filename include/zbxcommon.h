@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -304,7 +304,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_SERVICEMAN		34
 #define ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER	35
 #define ZBX_PROCESS_TYPE_ODBCPOLLER		36
-#define ZBX_PROCESS_TYPE_COUNT			37	/* number of process types */
+#define ZBX_PROCESS_TYPE_CONNECTORMANAGER	37
+#define ZBX_PROCESS_TYPE_CONNECTORWORKER	38
+#define ZBX_PROCESS_TYPE_COUNT			39	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -462,6 +464,7 @@ typedef unsigned char	(*zbx_get_program_type_f)(void);
 typedef const char	*(*zbx_get_progname_f)(void);
 typedef int		(*zbx_get_config_forks_f)(unsigned char process_type);
 typedef const char	*(*zbx_get_config_str_f)(void);
+typedef int		(*zbx_get_config_int_f)(void);
 
 typedef enum
 {
@@ -488,7 +491,8 @@ typedef enum
 	HTTPTEST_AUTH_BASIC,
 	HTTPTEST_AUTH_NTLM,
 	HTTPTEST_AUTH_NEGOTIATE,
-	HTTPTEST_AUTH_DIGEST
+	HTTPTEST_AUTH_DIGEST,
+	HTTPTEST_AUTH_BEARER
 }
 zbx_httptest_auth_t;
 
@@ -690,6 +694,7 @@ int	zbx_alarm_timed_out(void);
 
 #define zbx_bsearch(key, base, nmemb, size, compar)	(0 == (nmemb) ? NULL : bsearch(key, base, nmemb, size, compar))
 
+#define ZBX_PREPROC_NONE			0
 #define ZBX_PREPROC_MULTIPLIER			1
 #define ZBX_PREPROC_RTRIM			2
 #define ZBX_PREPROC_LTRIM			3
@@ -726,9 +731,6 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
 
-/* internal on fail actions */
-#define ZBX_PREPROC_FAIL_FORCE_ERROR	4
-
 #define ZBX_HTTPFIELD_HEADER		0
 #define ZBX_HTTPFIELD_VARIABLE		1
 #define ZBX_HTTPFIELD_POST_FIELD	2
@@ -738,6 +740,7 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_POSTTYPE_FORM		1
 #define ZBX_POSTTYPE_JSON		2
 #define ZBX_POSTTYPE_XML		3
+#define ZBX_POSTTYPE_NDJSON		4
 
 #define ZBX_RETRIEVE_MODE_CONTENT	0
 #define ZBX_RETRIEVE_MODE_HEADERS	1
@@ -778,8 +781,6 @@ typedef struct
 	char	*value;
 }
 zbx_tag_t;
-
-void	zbx_free_tag(zbx_tag_t *tag);
 
 #define ZBX_STR2UCHAR(var, string) var = (unsigned char)atoi(string)
 

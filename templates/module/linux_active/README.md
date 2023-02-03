@@ -3,13 +3,16 @@
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/6.4/manual/concepts/agent#agent-on-unix-like-systems).
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -20,14 +23,14 @@ No specific Zabbix configuration is required.
 |{$CPU.UTIL.CRIT} |<p>-</p> |`90` |
 |{$LOAD_AVG_PER_CPU.MAX.WARN} |<p>The CPU load per core is considered sustainable. If necessary, it can be tuned.</p> |`1.5` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -49,7 +52,7 @@ There are no template links in this template.
 |CPU |Context switches per second |<p>-</p> |ZABBIX_ACTIVE |system.cpu.switches<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |CPU |Interrupts per second |<p>-</p> |ZABBIX_ACTIVE |system.cpu.intr<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -64,13 +67,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/6.4/manual/concepts/agent#agent-on-unix-like-systems).
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -89,17 +95,17 @@ No specific Zabbix configuration is required.
 |{$VFS.FS.PUSED.MAX.CRIT} |<p>The critical threshold of the filesystem utilization.</p> |`90` |
 |{$VFS.FS.PUSED.MAX.WARN} |<p>The warning threshold of the filesystem utilization.</p> |`80` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Mounted filesystem discovery |<p>The discovery of mounted filesystems with different types.</p> |DEPENDENT |vfs.fs.dependent.discovery<p>**Filter**:</p>AND <p>- {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Skip metadata collection for dynamic FS<br> - {#FSTYPE} MATCHES_REGEX `^(btrfs|zfs)$`<br>  - ITEM_PROTOTYPE LIKE `inode`<br>  - NO_DISCOVER</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -111,7 +117,7 @@ There are no template links in this template.
 |Filesystems |{#FSNAME}: Free inodes in % |<p>-</p> |DEPENDENT |vfs.fs.dependent.inode[{#FSNAME},pfree]<p>**Preprocessing**:</p><p>- JSONPATH: `$.inodes.pfree`</p> |
 |Zabbix raw items |Get filesystems |<p>The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.</p> |ZABBIX_ACTIVE |vfs.fs.get |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -129,13 +135,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/6.4/manual/concepts/agent#agent-on-unix-like-systems).
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -147,14 +156,14 @@ No specific Zabbix configuration is required.
 |{$MEMORY.UTIL.MAX} |<p>This macro is used as a threshold in the memory utilization trigger.</p> |`90` |
 |{$SWAP.PFREE.MIN.WARN} |<p>-</p> |`50` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -166,7 +175,7 @@ There are no template links in this template.
 |Memory |Free swap space |<p>The free space of the swap volume/file expressed in bytes.</p> |ZABBIX_ACTIVE |system.swap.size[,free] |
 |Memory |Free swap space in % |<p>The free space of the swap volume/file expressed in %.</p> |ZABBIX_ACTIVE |system.swap.size[,pfree] |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -182,13 +191,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/6.4/manual/concepts/agent#agent-on-unix-like-systems).
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -201,17 +213,17 @@ No specific Zabbix configuration is required.
 |{$VFS.DEV.READ.AWAIT.WARN} |<p>The average response time (in ms) of disk read before the trigger would fire.</p> |`20` |
 |{$VFS.DEV.WRITE.AWAIT.WARN} |<p>The average response time (in ms) of disk write before the trigger would fire.</p> |`20` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Block devices discovery |<p>-</p> |ZABBIX_ACTIVE |vfs.dev.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#DEVTYPE} MATCHES_REGEX `disk`</p><p>- {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -225,7 +237,7 @@ There are no template links in this template.
 |Zabbix raw items |{#DEVNAME}: Disk read time (rate) |<p>The rate of total read time counter; used in `r_await` calculation.</p> |DEPENDENT |vfs.dev.read.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[3]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
 |Zabbix raw items |{#DEVNAME}: Disk write time (rate) |<p>The rate of total write time counter; used in `w_await` calculation.</p> |DEPENDENT |vfs.dev.write.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[7]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -239,13 +251,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/6.4/manual/concepts/agent#agent-on-unix-like-systems).
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -259,17 +274,17 @@ No specific Zabbix configuration is required.
 |{$NET.IF.IFNAME.MATCHES} |<p>-</p> |`^.*$` |
 |{$NET.IF.IFNAME.NOT_MATCHES} |<p>It filters out `loopbacks`, `nulls`, `docker veth` links and `docker0 bridge` by default.</p> |`(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Network interface discovery |<p>The discovery of network interfaces.</p> |ZABBIX_ACTIVE |net.if.discovery<p>**Filter**:</p>AND <p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -283,7 +298,7 @@ There are no template links in this template.
 |Network interfaces |Interface {#IFNAME}: Interface type |<p>It indicates the interface protocol type as a decimal value.</p><p>See `include/uapi/linux/if_arp.h` for all possible values.</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_ACTIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/type"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Network interfaces |Interface {#IFNAME}: Speed |<p>It indicates the latest or current speed value of the interface. The value is an integer representing the link speed expressed in bits/sec.</p><p>This attribute is only valid for the interfaces that implement the ethtool `get_link_ksettings` method (mostly Ethernet).</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_ACTIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1000000`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -300,13 +315,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/6.4/manual/concepts/agent#agent-on-unix-like-systems).
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -318,14 +336,14 @@ No specific Zabbix configuration is required.
 |{$KERNEL.MAXPROC.MIN} |<p>-</p> |`1024` |
 |{$SYSTEM.FUZZYTIME.MAX} |<p>-</p> |`60` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -340,20 +358,21 @@ There are no template links in this template.
 |General |Number of running processes |<p>-</p> |ZABBIX_ACTIVE |proc.num[,,run] |
 |Inventory |Operating system |<p>-</p> |ZABBIX_ACTIVE |system.sw.os<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Inventory |Operating system architecture |<p>The architecture of the operating system.</p> |ZABBIX_ACTIVE |system.sw.arch<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Inventory |Software installed |<p>-</p> |ZABBIX_ACTIVE |system.sw.packages<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Inventory |Number of installed packages |<p>-</p> |ZABBIX_ACTIVE |system.sw.packages.get<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p><p>- JSONPATH: `$.length()`</p> |
 |Security |Checksum of /etc/passwd |<p>-</p> |ZABBIX_ACTIVE |vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |System uptime |<p>The system uptime expressed in the following format:"N days, hh:mm:ss".</p> |ZABBIX_ACTIVE |system.uptime |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |System time is out of sync |<p>The host's system time is different from Zabbix server time.</p> |`fuzzytime(/Linux generic by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0` |WARNING |<p>Manual close: YES</p> |
-|System name has changed |<p>The name of the system has changed. `Ack` to close the problem manually.</p> |`last(/Linux generic by Zabbix agent active/system.hostname,#1)<>last(/Linux generic by Zabbix agent active/system.hostname,#2) and length(last(/Linux generic by Zabbix agent active/system.hostname))>0` |INFO |<p>Manual close: YES</p> |
+|System name has changed |<p>The name of the system has changed. `Ack` to close the problem manually.</p> |`change(/Linux generic by Zabbix agent active/system.hostname) and length(last(/Linux generic by Zabbix agent active/system.hostname))>0` |INFO |<p>Manual close: YES</p> |
 |Configured max number of open filedescriptors is too low |<p>-</p> |`last(/Linux generic by Zabbix agent active/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}` |INFO | |
 |Configured max number of processes is too low |<p>-</p> |`last(/Linux generic by Zabbix agent active/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}` |INFO |<p>**Depends on**:</p><p>- Getting closer to process limit</p> |
 |Getting closer to process limit |<p>-</p> |`last(/Linux generic by Zabbix agent active/proc.num)/last(/Linux generic by Zabbix agent active/kernel.maxproc)*100>80` |WARNING | |
-|Operating system description has changed |<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Ack to close the problem manually.</p> |`last(/Linux generic by Zabbix agent active/system.sw.os,#1)<>last(/Linux generic by Zabbix agent active/system.sw.os,#2) and length(last(/Linux generic by Zabbix agent active/system.sw.os))>0` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- System name has changed</p> |
+|Operating system description has changed |<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Ack to close the problem manually.</p> |`change(/Linux generic by Zabbix agent active/system.sw.os) and length(last(/Linux generic by Zabbix agent active/system.sw.os))>0` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- System name has changed</p> |
+|Number of installed packages has been changed |<p>-</p> |`change(/Linux generic by Zabbix agent active/system.sw.packages.get)<>0` |WARNING |<p>Manual close: YES</p> |
 |/etc/passwd has been changed |<p>-</p> |`last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Linux generic by Zabbix agent active/vfs.file.cksum[/etc/passwd,sha256],#2)` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Operating system description has changed</p><p>- System name has changed</p> |
 |has been restarted |<p>The host uptime is less than 10 minutes</p> |`last(/Linux generic by Zabbix agent active/system.uptime)<10m` |WARNING |<p>Manual close: YES</p> |
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1039,24 +1039,24 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
  * Return value: full database error message is allocated                     *
  *                                                                            *
  ******************************************************************************/
-static char	*am_create_db_alert_message(void)
+static char	*am_create_db_alert_message(const zbx_config_dbhigh_t *config_dbhigh)
 {
 	const char	*error;
 	char		*alert_message = NULL;
 	size_t		alert_message_alloc = 0, alert_message_offset = 0;
 
 	zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, "%s database \"%s\"",
-			ZBX_DATABASE_TYPE, CONFIG_DBNAME);
+			ZBX_DATABASE_TYPE, config_dbhigh->config_dbname);
 
-	if ('\0' != *CONFIG_DBHOST)
+	if ('\0' != *config_dbhigh->config_dbhost)
 	{
 		zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, " on \"%s",
-				CONFIG_DBHOST);
+				config_dbhigh->config_dbhost);
 
-		if (0 != CONFIG_DBPORT)
+		if (0 != config_dbhigh->config_dbport)
 		{
 			zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%d\"",
-					CONFIG_DBPORT);
+					config_dbhigh->config_dbport);
 		}
 		else
 			zbx_chrcpy_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, '\"');
@@ -1077,7 +1077,7 @@ static char	*am_create_db_alert_message(void)
  * Purpose: queues 'database down' watchdog alerts                            *
  *                                                                            *
  ******************************************************************************/
-static void	am_queue_watchdog_alerts(zbx_am_t *manager)
+static void	am_queue_watchdog_alerts(zbx_am_t *manager, const zbx_config_dbhigh_t *config_dbhigh)
 {
 	zbx_am_media_t		*media;
 	zbx_am_mediatype_t	*mediatype;
@@ -1100,7 +1100,7 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 
 		mediatype->refcount++;
 
-		alert_message = am_create_db_alert_message();
+		alert_message = am_create_db_alert_message(config_dbhigh);
 
 		if (ZBX_MEDIA_CONTENT_TYPE_HTML == mediatype->content_type)
 		{
@@ -1374,7 +1374,7 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_am_alert_t *alert,
 		const char *scripts_path, char **cmd, char **error)
 {
-	DB_ALERT	db_alert;
+	zbx_db_alert	db_alert;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 	int		ret = FAIL;
 
@@ -1953,7 +1953,7 @@ static void	am_process_begin_dispatch(zbx_ipc_client_t *client, const unsigned c
  *             content_type - [OUT] message content type                      *
  *                                                                            *
  ******************************************************************************/
-static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, ZBX_DB_MEDIATYPE *mt,
+static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, zbx_db_mediatype *mt,
 		zbx_shared_str_t *message, unsigned char *content_type)
 {
 	char	*body = NULL;
@@ -1995,7 +1995,7 @@ static void	am_process_send_dispatch(zbx_am_t *manager, zbx_ipc_client_t *client
 	int			i;
 	zbx_vector_str_t	recipients;
 	zbx_am_alert_t		*alert;
-	ZBX_DB_MEDIATYPE		mt;
+	zbx_db_mediatype		mt;
 	zbx_shared_str_t	message;
 	unsigned char		content_type;
 	zbx_uint64_t		id;
@@ -2299,8 +2299,8 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 
 		if ((time_ping + ZBX_DB_PING_FREQUENCY) < now)
 		{
-			manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE);
-			DBclose();
+			manager.dbstatus = zbx_db_connect(ZBX_DB_CONNECT_ONCE);
+			zbx_db_close();
 			time_ping = now;
 		}
 		if (ZBX_DB_DOWN == manager.dbstatus)
@@ -2310,7 +2310,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 
 			if (time_watchdog + ZBX_WATCHDOG_ALERT_FREQUENCY <= now)
 			{
-				am_queue_watchdog_alerts(&manager);
+				am_queue_watchdog_alerts(&manager, alert_manager_args_in->config_dbhigh);
 				time_watchdog = now;
 			}
 		}

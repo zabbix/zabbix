@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		);
 
 		// Check layout at Host tab.
-		$this->zbxTestAssertElementPresentXpath('//label[text()="Parent discovery rules"]/../..//'.
+		$this->zbxTestAssertElementPresentXpath('//label[text()="Parent host prototype"]/../..//'.
 				'a[contains(@href, "&hostid='.$host_prototype.'") and contains(@href, "&parent_discoveryid='.$discovery_id.'")]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="host"][@readonly]');

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class CWidgetGraph extends CWidget {
 			timeControl.objectList['graph_' + this._unique_id].objDims.width = graph_size.width;
 			timeControl.objectList['graph_' + this._unique_id].objDims.graphHeight = graph_size.height;
 
-			const image_curl = new Curl(image.src, false);
+			const image_curl = new Curl(image.src);
 
 			image_curl.setArgument('width', graph_size.width);
 			image_curl.setArgument('height', graph_size.height);
@@ -150,7 +150,7 @@ class CWidgetGraph extends CWidget {
 
 	_activateGraph() {
 		if (this._graph_url !== null) {
-			const curl = new Curl(this._graph_url, false);
+			const curl = new Curl(this._graph_url);
 
 			curl.setArgument('from', this._time_period.from);
 			curl.setArgument('to', this._time_period.to);
@@ -163,7 +163,7 @@ class CWidgetGraph extends CWidget {
 		this._time_control_data.objDims.width = graph_size.width;
 		this._time_control_data.objDims.graphHeight = graph_size.height;
 
-		const curl = new Curl(this._time_control_data.src, false);
+		const curl = new Curl(this._time_control_data.src);
 
 		curl.setArgument('from', this._time_period.from);
 		curl.setArgument('to', this._time_period.to);

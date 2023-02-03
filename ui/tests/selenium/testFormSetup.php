@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -375,7 +375,7 @@ class testFormSetup extends CWebTest {
 	}
 
 	public function getDbConnectionDetails() {
-		return [
+		$provider = [
 			// Incorrect DB host.
 			[
 				[
@@ -572,6 +572,31 @@ class testFormSetup extends CWebTest {
 				]
 			]
 		];
+
+		// MySQL database error depends on php version.
+		$mapping = [
+			'Error connecting to database. Empty cipher.' => [
+				'8.1.0' => '(trying to connect via (null))'
+			],
+			'php_network_getaddresses: getaddrinfo failed: Name or service not known' => [
+				'8.1.0' => 'php_network_getaddresses: getaddrinfo for incorrect_DB_host failed: Name or service not known'
+			]
+		];
+
+		foreach ($provider as &$data) {
+			if (array_key_exists('mysql_error', $data[0]) && array_key_exists($data[0]['mysql_error'], $mapping)) {
+				foreach ($mapping[$data[0]['mysql_error']] as $version => $map) {
+					if (version_compare(phpversion(), $version, '<')) {
+						continue;
+					}
+
+					$data[0]['mysql_error'] = $map;
+				}
+			}
+		}
+		unset($data);
+
+		return $provider;
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,8 +63,8 @@ class CItemTypeHttpAgent extends CItemType {
 			'authtype' =>			self::getCreateFieldRule('authtype', $item),
 			'username' =>			self::getCreateFieldRule('username', $item),
 			'password' =>			self::getCreateFieldRule('password', $item),
-			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
-			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
+			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
+			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
@@ -109,8 +109,8 @@ class CItemTypeHttpAgent extends CItemType {
 			'authtype' =>			self::getUpdateFieldRule('authtype', $db_item),
 			'username' =>			self::getUpdateFieldRule('username', $db_item),
 			'password' =>			self::getUpdateFieldRule('password', $db_item),
-			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
-			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
+			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
+			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],

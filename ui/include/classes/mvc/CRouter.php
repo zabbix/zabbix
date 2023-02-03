@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,15 @@ class CRouter {
 		'autoreg.update'							=> ['CControllerAutoregUpdate',							null,					null],
 		'charts.view'								=> ['CControllerChartsView',							'layout.htmlpage',		'monitoring.charts.view'],
 		'charts.view.json'							=> ['CControllerChartsViewJson',						'layout.json',			'monitoring.charts.view.json'],
-		'correlation.condition.add'					=> ['CControllerCorrelationConditionAdd',				null,					null],
+		'connector.create'							=> ['CControllerConnectorCreate',						'layout.json',			null],
+		'connector.delete'							=> ['CControllerConnectorDelete',						'layout.json',			null],
+		'connector.disable'							=> ['CControllerConnectorDisable',						'layout.json',			null],
+		'connector.edit'							=> ['CControllerConnectorEdit',							'layout.json',			'connector.edit'],
+		'connector.enable'							=> ['CControllerConnectorEnable',						'layout.json',			null],
+		'connector.list'							=> ['CControllerConnectorList',							'layout.htmlpage',		'connector.list'],
+		'connector.update'							=> ['CControllerConnectorUpdate',						'layout.json',			null],
+		'copy.create'								=> ['CControllerCopyCreate',							'layout.json',			null],
+		'copy.edit'									=> ['CControllerCopyEdit',								'layout.json',			'copy.edit'],
 		'correlation.create'						=> ['CControllerCorrelationCreate',						null,					null],
 		'correlation.delete'						=> ['CControllerCorrelationDelete',						null,					null],
 		'correlation.disable'						=> ['CControllerCorrelationDisable',					null,					null],

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ class CTabFilter extends CBaseComponent {
 		this._fetch = {};
 		this._idx_namespace = options.idx;
 		this._timeselector = null;
+		this._csrf_token = this._options.csrf_token;
 
 		this.init(options);
 		this.registerEvents();
@@ -253,6 +254,7 @@ class CTabFilter extends CBaseComponent {
 		}
 
 		body.idx = this._idx_namespace + '.' + property;
+		body._csrf_token = this._csrf_token;
 
 		if (property !== 'properties') {
 			this._fetch[property] = new AbortController();
@@ -660,7 +662,7 @@ class CTabFilter extends CBaseComponent {
 			 */
 			buttonResetAction: () => {
 				let current_url = new Curl(),
-					url = new Curl('zabbix.php', false);
+					url = new Curl('zabbix.php');
 
 				url.setArgument('action', current_url.getArgument('action'));
 				url.setArgument('filter_reset', 1);

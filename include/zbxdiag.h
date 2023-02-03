@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,8 @@ typedef enum
 	ZBX_DIAGINFO_PREPROCESSING,
 	ZBX_DIAGINFO_LLD,
 	ZBX_DIAGINFO_ALERTING,
-	ZBX_DIAGINFO_LOCKS
+	ZBX_DIAGINFO_LOCKS,
+	ZBX_DIAGINFO_CONNECTOR
 }
 zbx_diaginfo_section_t;
 
@@ -55,6 +56,7 @@ typedef int (*zbx_diag_add_section_info_func_t)(const char *section, const struc
 #define ZBX_DIAG_LLD		"lld"
 #define ZBX_DIAG_ALERTING	"alerting"
 #define ZBX_DIAG_LOCKS		"locks"
+#define ZBX_DIAG_CONNECTOR	"connector"
 
 void	zbx_diag_map_free(zbx_diag_map_t *map);
 int	zbx_diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *field_map, zbx_uint64_t
@@ -63,6 +65,7 @@ void	zbx_diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_s
 int	zbx_diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 void	zbx_diag_add_locks_info(struct zbx_json *json);
+int	zbx_diag_add_connector_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 
 void	zbx_diag_init(zbx_diag_add_section_info_func_t cb);
 int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info);

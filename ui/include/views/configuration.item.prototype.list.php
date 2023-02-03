@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,12 +76,27 @@ $itemTable = (new CTableInfo())
 	]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
+$csrf_token = CCsrfTokenHelper::get('disc_prototypes.php');
 
 foreach ($data['items'] as $item) {
 	$description = [];
-	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
-		$data['allowed_ui_conf_templates']
-	);
+
+	if (array_key_exists($item['templateid'], $data['parent_items'])) {
+		$parent_item = $data['parent_items'][$item['templateid']];
+
+		if ($parent_item['editable']) {
+			$parent_template_name = (new CLink(CHtml::encode($parent_item['template_name']),
+				(new CUrl('disc_prototypes.php'))
+					->setArgument('parent_discoveryid', $parent_item['ruleid'])
+					->setArgument('context', 'template')
+			))->addClass(ZBX_STYLE_LINK_ALT);
+		}
+		else {
+			$parent_template_name = new CSpan(CHtml::encode($parent_item['template_name']));
+		}
+
+		$description[] = [$parent_template_name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
+	}
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
@@ -133,9 +148,9 @@ foreach ($data['items'] as $item) {
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))
+		->addCsrfToken($csrf_token)
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(itemIndicatorStyle($item['status']))
-		->addSID();
+		->addClass(itemIndicatorStyle($item['status']));
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
@@ -176,7 +191,7 @@ foreach ($data['items'] as $item) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addSID()
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -202,15 +217,19 @@ $itemForm->addItem([
 	new CActionButtonList('action', 'group_itemid',
 		[
 			'itemprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create items from selected prototypes as enabled?')
+				'confirm' => _('Create items from selected prototypes as enabled?'),
+				'csrf_token' => $csrf_token
 			],
 			'itemprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create items from selected prototypes as disabled?')
+				'confirm' => _('Create items from selected prototypes as disabled?'),
+				'csrf_token' => $csrf_token
 			],
 			'popup.massupdate.itemprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"openMassupdatePopup('popup.massupdate.itemprototype', {}, {
+						"openMassupdatePopup('popup.massupdate.itemprototype', {".
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('itemprototype').
+						"'}, {
 							dialogue_class: 'modal-popup-preprocessing',
 							trigger_element: this
 						});"
@@ -219,7 +238,8 @@ $itemForm->addItem([
 					->removeAttribute('id')
 			],
 			'itemprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected item prototypes?')
+				'confirm' => _('Delete selected item prototypes?'),
+				'csrf_token' => $csrf_token
 			]
 		],
 		$data['parent_discoveryid']

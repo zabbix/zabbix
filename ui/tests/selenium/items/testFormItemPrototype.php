@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -555,13 +555,13 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Item prototypes');
 
 		if (isset($templateid)) {
-			$this->zbxTestTextPresent('Parent items');
+			$this->zbxTestTextPresent('Parent item');
 			if (isset($data['hostTemplate'])) {
 				$this->zbxTestAssertElementPresentXpath("//a[text()='".$data['hostTemplate']."']");
 			}
 		}
 		else {
-			$this->zbxTestTextNotPresent('Parent items');
+			$this->zbxTestTextNotPresent('Parent item');
 		}
 
 		$this->zbxTestTextPresent('Name');
@@ -617,7 +617,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if ($type == 'SSH agent' && !isset($itemid)) {
-			$this->zbxTestAssertElementValue('key', 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
+			$this->zbxTestAssertElementValue('key', 'ssh.run[<unique short description>,<ip>,<port>,<encoding>,<ssh options>]');
 		}
 
 		if ($type == 'TELNET agent' && !isset($itemid)) {

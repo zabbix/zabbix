@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,8 +125,8 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
  ******************************************************************************/
 static int	dc_compare_maintenance_tags(const void *d1, const void *d2)
 {
-	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t **)d1;
-	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t **)d2;
+	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t * const *)d1;
+	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t * const *)d2;
 
 	return strcmp(tag1->tag, tag2->tag);
 }
@@ -1219,7 +1219,7 @@ static int	dc_maintenance_tag_value_match(const zbx_dc_maintenance_tag_t *mt, co
  *               FAIL    - no matching tags found                             *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const zbx_vector_ptr_t *etags,
+static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const zbx_vector_tags_t *etags,
 		int *mt_pos, int *et_pos)
 {
 	const zbx_dc_maintenance_tag_t	*mtag;
@@ -1252,7 +1252,7 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
 
 	for (i = et_start; i < etags->values_num; i++)
 	{
-		etag = (const zbx_tag_t *)etags->values[i];
+		etag = etags->values[i];
 		if (0 < (ret = strcmp(etag->tag, name)))
 		{
 			*et_pos = i;
@@ -1275,7 +1275,7 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
 
 	for (; i < etags->values_num; i++)
 	{
-		etag = (const zbx_tag_t *)etags->values[i];
+		etag = etags->values[i];
 		if (0 != strcmp(etag->tag, name))
 			break;
 	}
@@ -1291,7 +1291,7 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
 
 		for (j = et_start; j <= et_end; j++)
 		{
-			etag = (const zbx_tag_t *)etags->values[j];
+			etag = etags->values[j];
 			if (SUCCEED == dc_maintenance_tag_value_match(mtag, etag))
 				return SUCCEED;
 		}
@@ -1311,7 +1311,7 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags)
+static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_t *tags)
 {
 	int	mt_pos = 0, et_pos = 0;
 
@@ -1335,7 +1335,7 @@ static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance,
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags)
+static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_t *tags)
 {
 	int	mt_pos = 0, et_pos = 0;
 
@@ -1362,7 +1362,7 @@ static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenan
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags)
+static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_t *tags)
 {
 	switch (maintenance->tags_evaltype)
 	{
@@ -1384,19 +1384,6 @@ static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, co
 		return dc_maintenance_match_tags_andor(maintenance, tags);
 	else
 		return dc_maintenance_match_tags_or(maintenance, tags);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: compare maintenance tags by tag name for sorting                  *
- *                                                                            *
- ******************************************************************************/
-static int	dc_compare_tags(const void *d1, const void *d2)
-{
-	const zbx_tag_t	*tag1 = *(const zbx_tag_t **)d1;
-	const zbx_tag_t	*tag2 = *(const zbx_tag_t **)d2;
-
-	return strcmp(tag1->tag, tag2->tag);
 }
 
 static void	host_event_maintenance_clean(zbx_host_event_maintenance_t *host_event_maintenance)
@@ -1440,7 +1427,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 	{
 		query = (zbx_event_suppress_query_t *)event_queries->values[i];
 		if (0 != query->tags.values_num)
-			zbx_vector_ptr_sort(&query->tags, dc_compare_tags);
+			zbx_vector_tags_sort(&query->tags, zbx_compare_tags);
 	}
 
 	RDLOCK_CACHE;
@@ -1570,8 +1557,8 @@ void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query)
 {
 	zbx_vector_uint64_destroy(&query->functionids);
 	zbx_vector_uint64_pair_destroy(&query->maintenances);
-	zbx_vector_ptr_clear_ext(&query->tags, (zbx_clean_func_t)zbx_free_tag);
-	zbx_vector_ptr_destroy(&query->tags);
+	zbx_vector_tags_clear_ext(&query->tags, zbx_free_tag);
+	zbx_vector_tags_destroy(&query->tags);
 	zbx_free(query);
 }
 

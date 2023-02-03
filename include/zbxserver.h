@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,15 +91,15 @@ typedef enum
 }
 zbx_dservice_type_t;
 
-int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
+int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
 		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const ZBX_DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen);
+		const zbx_db_alert *alert, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
+		const zbx_db_service *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen);
 
-int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event,
-		const ZBX_DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
-		const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
-		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz, char **data,
+int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zbx_db_event *event,
+		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
+		const DC_ITEM *dc_item, const zbx_db_alert *alert, const zbx_db_acknowledge *ack,
+		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz, char **data,
 		int macro_type, char *error, int maxerrlen);
 
 void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers);
@@ -144,7 +144,7 @@ void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_co
 void	zbx_expression_eval_clear(zbx_expression_eval_t *eval);
 void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const DC_ITEM *item);
 void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, const DC_ITEM *item);
-void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval, const ZBX_DB_TRIGGER *trigger);
+void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval, const zbx_db_trigger *trigger);
 int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_t *ts, zbx_variant_t *value,
 		char **error);
 

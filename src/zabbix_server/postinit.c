@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,12 +46,12 @@ static int	get_trigger_count(void)
 	DB_ROW		row;
 	int		triggers_num;
 
-	result = DBselect("select count(*) from triggers");
-	if (NULL != (row = DBfetch(result)))
+	result = zbx_db_select("select count(*) from triggers");
+	if (NULL != (row = zbx_db_fetch(result)))
 		triggers_num = atoi(row[0]);
 	else
 		triggers_num = 0;
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return triggers_num;
 }
@@ -111,14 +111,14 @@ static const char	*convert_historical_macro(int macro)
  *           better match the trigger name at event creation time.            *
  *                                                                            *
  ******************************************************************************/
-static void	preprocess_trigger_name(ZBX_DB_TRIGGER *trigger, int *historical)
+static void	preprocess_trigger_name(zbx_db_trigger *trigger, int *historical)
 {
 	int		pos = 0, macro_len, macro_type;
 	zbx_token_t	token;
 	size_t		name_alloc, name_len, replace_alloc = 64, replace_offset, r, l;
 	char		*replace;
 	const char	*macro;
-	ZBX_DB_EVENT	event;
+	zbx_db_event	event;
 
 	*historical = FAIL;
 
@@ -161,7 +161,7 @@ static void	preprocess_trigger_name(ZBX_DB_TRIGGER *trigger, int *historical)
 		pos = token.loc.r;
 	}
 
-	memset(&event, 0, sizeof(ZBX_DB_EVENT));
+	memset(&event, 0, sizeof(zbx_db_event));
 	event.object = EVENT_OBJECT_TRIGGER;
 	event.objectid = trigger->triggerid;
 	event.trigger = *trigger;
@@ -224,13 +224,13 @@ static void	preprocess_trigger_name(ZBX_DB_TRIGGER *trigger, int *historical)
  *           same and can be updated with a single sql query.                 *
  *                                                                            *
  ******************************************************************************/
-static int	process_event_bulk_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_t *sql_alloc,
+static int	process_event_bulk_update(const zbx_db_trigger *trigger, char **sql, size_t *sql_alloc,
 		size_t *sql_offset)
 {
 	char	*name_esc;
 	int	ret;
 
-	name_esc = DBdyn_escape_string_len(trigger->description, EVENT_NAME_LEN);
+	name_esc = zbx_db_dyn_escape_string_len(trigger->description, EVENT_NAME_LEN);
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 			"update events"
@@ -240,7 +240,7 @@ static int	process_event_bulk_update(const ZBX_DB_TRIGGER *trigger, char **sql, 
 				" and objectid=" ZBX_FS_UI64 ";\n",
 			name_esc, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid);
 
-	if (SUCCEED == (ret = DBexecute_overflowed_sql(sql, sql_alloc, sql_offset)))
+	if (SUCCEED == (ret = zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset)))
 	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 				"update problem"
@@ -250,7 +250,7 @@ static int	process_event_bulk_update(const ZBX_DB_TRIGGER *trigger, char **sql, 
 					" and objectid=" ZBX_FS_UI64 ";\n",
 				name_esc, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid);
 
-		ret = DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
+		ret = zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
 	}
 
 	zbx_free(name_esc);
@@ -276,17 +276,17 @@ static int	process_event_bulk_update(const ZBX_DB_TRIGGER *trigger, char **sql, 
  *           event.                                                           *
  *                                                                            *
  ******************************************************************************/
-static int	process_event_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_t *sql_alloc, size_t *sql_offset)
+static int	process_event_update(const zbx_db_trigger *trigger, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	ZBX_DB_EVENT	event;
+	zbx_db_event	event;
 	char		*name, *name_esc;
 	int		ret = SUCCEED;
 
-	memset(&event, 0, sizeof(ZBX_DB_EVENT));
+	memset(&event, 0, sizeof(zbx_db_event));
 
-	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged,ns,name"
+	result = zbx_db_select("select eventid,source,object,objectid,clock,value,acknowledged,ns,name"
 			" from events"
 			" where source=%d"
 				" and object=%d"
@@ -294,7 +294,7 @@ static int	process_event_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_
 			" order by eventid",
 			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid);
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(event.eventid, row[0]);
 		event.source = atoi(row[1]);
@@ -313,7 +313,7 @@ static int	process_event_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_
 		zbx_substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&name, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
-		name_esc = DBdyn_escape_string_len(name, EVENT_NAME_LEN);
+		name_esc = zbx_db_dyn_escape_string_len(name, EVENT_NAME_LEN);
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 				"update events"
@@ -321,7 +321,7 @@ static int	process_event_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_
 				" where eventid=" ZBX_FS_UI64 ";\n",
 				name_esc, event.eventid);
 
-		if (SUCCEED == (ret = DBexecute_overflowed_sql(sql, sql_alloc, sql_offset)))
+		if (SUCCEED == (ret = zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset)))
 		{
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 					"update problem"
@@ -329,14 +329,14 @@ static int	process_event_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_
 					" where eventid=" ZBX_FS_UI64 ";\n",
 					name_esc, event.eventid);
 
-			ret = DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
+			ret = zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
 		}
 
 		zbx_free(name_esc);
 		zbx_free(name);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -353,7 +353,7 @@ static int	update_event_names(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
-	ZBX_DB_TRIGGER		trigger;
+	zbx_db_trigger		trigger;
 	int			ret = SUCCEED, historical, triggers_num, processed_num = 0, completed,
 				last_completed = 0;
 	char			*sql;
@@ -365,12 +365,12 @@ static int	update_event_names(void)
 	if (0 == (triggers_num = get_trigger_count()))
 		goto out;
 
-	memset(&trigger, 0, sizeof(ZBX_DB_TRIGGER));
+	memset(&trigger, 0, sizeof(zbx_db_trigger));
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select triggerid,description,expression,priority,comments,url,url_name,"
 				"recovery_expression,recovery_mode,value"
 			" from triggers"
@@ -378,7 +378,7 @@ static int	update_event_names(void)
 
 	um_handle = zbx_dc_open_user_macros();
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(trigger.triggerid, row[0]);
 		trigger.description = zbx_strdup(NULL, row[1]);
@@ -411,15 +411,15 @@ static int	update_event_names(void)
 
 	zbx_dc_close_user_macros(um_handle);
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset) /* in ORACLE always present begin..end; */
 	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 out:
@@ -448,23 +448,23 @@ int	zbx_check_postinit_tasks(char **error)
 	/* avoid filling value cache with unnecessary data during event name update */
 	zbx_vc_disable();
 
-	result = DBselect("select taskid from task where type=%d and status=%d", ZBX_TM_TASK_UPDATE_EVENTNAMES,
+	result = zbx_db_select("select taskid from task where type=%d and status=%d", ZBX_TM_TASK_UPDATE_EVENTNAMES,
 			ZBX_TM_STATUS_NEW);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 	{
-		DBbegin();
+		zbx_db_begin();
 
 		if (SUCCEED == (ret = update_event_names()))
 		{
-			DBexecute("delete from task where taskid=%s", row[0]);
-			DBcommit();
+			zbx_db_execute("delete from task where taskid=%s", row[0]);
+			zbx_db_commit();
 		}
 		else
-			DBrollback();
+			zbx_db_rollback();
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (SUCCEED != ret)
 		*error = zbx_strdup(*error, "cannot update event names");

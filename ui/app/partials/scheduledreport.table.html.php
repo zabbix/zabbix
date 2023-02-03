@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,8 +107,8 @@ foreach ($data['reports'] as $report) {
 			->setArgument('reportids', [$report['reportid']])
 			->getUrl()
 		))
+			->addCsrfToken(CCsrfTokenHelper::get('scheduledreport'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addSID()
 		: new CSpan($status_name);
 	$status->addClass($status_class);
 

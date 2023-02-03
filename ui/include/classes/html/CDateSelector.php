@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,13 @@ class CDateSelector extends CTag {
 	 * Default CSS class name for HTML root element.
 	 */
 	const ZBX_STYLE_CLASS = 'calendar-control';
+
+	/**
+	 * Input name.
+	 *
+	 * @var string
+	 */
+	private $name = '';
 
 	/**
 	 * Default date format.
@@ -85,7 +92,7 @@ class CDateSelector extends CTag {
 	 *
 	 * @return CDateSelector
 	 */
-	public function __construct($name = 'calendar', $value = null) {
+	public function __construct(string $name = 'calendar', $value = null) {
 		parent::__construct('div', true);
 
 		$this->name = $name;

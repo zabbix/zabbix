@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,22 +31,10 @@
 
 #define ZBX_SELFMON_DELAY		1
 
-/* the process statistics */
-typedef struct
-{
-	double	busy_max;
-	double	busy_min;
-	double	busy_avg;
-	double	idle_max;
-	double	idle_min;
-	double	idle_avg;
-	int	count;
-}
-zbx_process_info_t;
-
 #ifndef _WINDOWS
 #include "zbxcommon.h"
 #include "zbxthreads.h"
+#include "zbxstats.h"
 
 ZBX_THREAD_ENTRY(zbx_selfmon_thread, args);
 

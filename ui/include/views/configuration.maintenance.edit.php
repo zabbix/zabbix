@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_MAINTENANCE_EDIT));
 
 $maintenance_form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('maintenance.php')))->removeId())
 	->setId('maintenance-form')
 	->setName('maintenanceForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -266,8 +268,9 @@ if (array_key_exists('maintenanceid', $data) && $data['maintenanceid']) {
 		(new CSubmit('update', _('Update')))->setEnabled($data['allowed_edit']),
 		[
 			(new CSubmit('clone', _('Clone')))->setEnabled($data['allowed_edit']),
-			(new CButtonDelete(_('Delete maintenance period?'), url_param('form').url_param('maintenanceid')))
-				->setEnabled($data['allowed_edit']),
+			(new CButtonDelete(_('Delete maintenance period?'), url_param('form').url_param('maintenanceid').'&'.
+				CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('maintenance.php')
+			))->setEnabled($data['allowed_edit']),
 			new CButtonCancel()
 		]
 	));

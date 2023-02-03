@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -304,17 +304,6 @@ class testTagFiltering extends CAPITest {
 					]
 				],
 				'expected' => []
-			],
-			'tests-inheritance-from-2nd-level-template' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'office', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Riga']
-					]
-				],
-				'expected' => [
-					'Host OS - Windows'
-				]
 			],
 
 			// evaltype: OR

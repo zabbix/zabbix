@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,13 +42,14 @@ class ColumnEdit extends CController {
 		'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
 		'min' => '',
 		'max' => '',
+		'decimal_places' => CWidgetFieldColumnsList::DEFAULT_DECIMAL_PLACES,
 		'base_color' => '',
 		'text' => '',
 		'thresholds' => []
 	];
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -64,6 +65,7 @@ class ColumnEdit extends CController {
 			'history' => 'int32',
 			'min' => 'string',
 			'max' => 'string',
+			'decimal_places' => 'string',
 			'base_color' => 'string',
 			'thresholds' => 'array',
 			'text' => 'string',

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,7 +76,10 @@ class CDateTimeHelper {
 	 * @return int
 	 */
 	public static function countDays($date = 'now', $period = 'P1Y') {
-		return (new DateTime($date))->diff((new DateTime($date))->sub(new DateInterval($period)))->days;
+		$to = new DateTime($date);
+		$from = (clone $to)->sub(new DateInterval($period));
+
+		return $from->diff($to)->days;
 	}
 
 	/**

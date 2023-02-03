@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,34 +71,48 @@ $hostTable = (new CTableInfo())
 		_('Tags')
 	]);
 
-foreach ($this->data['hostPrototypes'] as $hostPrototype) {
-	// name
+$csrf_token = CCsrfTokenHelper::get('host_prototypes.php');
+
+foreach ($this->data['hostPrototypes'] as $host_prototype) {
 	$name = [];
-	$name[] = makeHostPrototypeTemplatePrefix($hostPrototype['hostid'], $data['parent_templates'],
-		$data['allowed_ui_conf_templates']
-	);
-	$name[] = new CLink(CHtml::encode($hostPrototype['name']),
+
+	if (array_key_exists($host_prototype['templateid'], $data['parent_host_prototypes'])) {
+		$parent_host_prototype = $data['parent_host_prototypes'][$host_prototype['templateid']];
+
+		if ($parent_host_prototype['editable']) {
+			$parent_template_name = (new CLink(CHtml::encode($parent_host_prototype['template_name']),
+				(new CUrl('host_prototypes.php'))
+					->setArgument('parent_discoveryid', $parent_host_prototype['ruleid'])
+					->setArgument('context', 'template')
+			))->addClass(ZBX_STYLE_LINK_ALT);
+		}
+		else {
+			$parent_template_name = new CSpan(CHtml::encode($parent_host_prototype['template_name']));
+		}
+
+		$name[] = [$parent_template_name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
+	}
+
+	$name[] = new CLink(CHtml::encode($host_prototype['name']),
 		(new CUrl('host_prototypes.php'))
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
-			->setArgument('hostid', $hostPrototype['hostid'])
+			->setArgument('hostid', $host_prototype['hostid'])
 			->setArgument('context', $data['context'])
 	);
 
-	// template list
-	if (empty($hostPrototype['templates'])) {
-		$hostTemplates = '';
-	}
-	else {
-		$hostTemplates = [];
-		order_result($hostPrototype['templates'], 'name');
+	$host_templates = [];
 
-		foreach ($hostPrototype['templates'] as $template) {
-			$caption = [];
+	if ($host_prototype['templates']) {
+		order_result($host_prototype['templates'], 'name');
 
-			if ($data['allowed_ui_conf_templates']
-					&& array_key_exists($template['templateid'], $data['writable_templates'])) {
-				$caption[] = (new CLink($template['name'],
+		foreach ($host_prototype['templates'] as $template) {
+			if ($host_templates) {
+				$host_templates[] = ', ';
+			}
+
+			if (array_key_exists($template['templateid'], $data['editable_templates'])) {
+				$host_templates[] = (new CLink($template['name'],
 					(new CUrl('templates.php'))
 						->setArgument('form', 'update')
 						->setArgument('templateid', $template['templateid'])
@@ -107,82 +121,48 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 					->addClass(ZBX_STYLE_GREY);
 			}
 			else {
-				$caption[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
+				$host_templates[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 			}
-
-			$linkedTemplates = $this->data['linkedTemplates'][$template['templateid']]['parentTemplates'];
-			if ($linkedTemplates) {
-				order_result($linkedTemplates, 'name');
-
-				$caption[] = ' (';
-				foreach ($linkedTemplates as $tpl) {
-					if (array_key_exists($tpl['templateid'], $data['writable_templates'])) {
-						$caption[] = (new CLink($tpl['name'],
-							(new CUrl('templates.php'))
-								->setArgument('form', 'update')
-								->setArgument('templateid', $tpl['templateid'])
-						))
-							->addClass(ZBX_STYLE_LINK_ALT)
-							->addClass(ZBX_STYLE_GREY);
-					}
-					else {
-						$caption[] = (new CSpan($tpl['name']))->addClass(ZBX_STYLE_GREY);
-					}
-
-					$caption[] = ', ';
-				}
-				array_pop($caption);
-
-				$caption[] = ')';
-			}
-
-			$hostTemplates[] = $caption;
-			$hostTemplates[] = ', ';
-		}
-
-		if ($hostTemplates) {
-			array_pop($hostTemplates);
 		}
 	}
 
-	// status
 	$status = (new CLink(
-		($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
+		($host_prototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
 		(new CUrl('host_prototypes.php'))
-			->setArgument('group_hostid', $hostPrototype['hostid'])
+			->setArgument('group_hostid[]', $host_prototype['hostid'])
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
-			->setArgument('action', ($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
+			->setArgument('action', ($host_prototype['status'] == HOST_STATUS_NOT_MONITORED)
 				? 'hostprototype.massenable'
 				: 'hostprototype.massdisable'
 			)
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))
+		->addCsrfToken($csrf_token)
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(itemIndicatorStyle($hostPrototype['status']))
-		->addSID();
+		->addClass(itemIndicatorStyle($host_prototype['status']));
 
-	$nodiscover = ($hostPrototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
-	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
+	$no_discover = ($host_prototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
+	$discover = (new CLink($no_discover ? _('No') : _('Yes'),
 			(new CUrl('host_prototypes.php'))
-				->setArgument('hostid', $hostPrototype['hostid'])
+				->setArgument('hostid', $host_prototype['hostid'])
 				->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 				->setArgument('action', 'hostprototype.updatediscover')
-				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgument('discover', $no_discover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addSID()
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+			->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
 	$hostTable->addRow([
-		new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', $hostPrototype['hostid']),
+		new CCheckBox('group_hostid['.$host_prototype['hostid'].']', $host_prototype['hostid']),
 		$name,
-		$hostTemplates,
+		$host_templates,
 		$status,
 		$discover,
-		$data['tags'][$hostPrototype['hostid']]
+		$data['tags'][$host_prototype['hostid']]
 	]);
 }
 
@@ -193,13 +173,13 @@ $itemForm->addItem([
 	new CActionButtonList('action', 'group_hostid',
 		[
 			'hostprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create hosts from selected prototypes as enabled?')
+				'confirm' => _('Create hosts from selected prototypes as enabled?'), 'csrf_token' => $csrf_token
 			],
 			'hostprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create hosts from selected prototypes as disabled?')
+				'confirm' => _('Create hosts from selected prototypes as disabled?'), 'csrf_token' => $csrf_token
 			],
 			'hostprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected host prototypes?')
+				'confirm' => _('Delete selected host prototypes?'), 'csrf_token' => $csrf_token
 			]
 		],
 		$data['discovery_rule']['itemid']

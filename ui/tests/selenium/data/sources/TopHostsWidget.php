@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,6 +113,11 @@ class TopHostsWidget {
 									],
 									[
 										'type' => 0,
+										'name' => 'columns.decimal_places.0',
+										'value' =>  4
+									],
+									[
+										'type' => 0,
 										'name' => 'columns.display.0',
 										'value' => 1
 									],
@@ -155,6 +160,11 @@ class TopHostsWidget {
 										'type' => 0,
 										'name' => 'columns.aggregate_function.1',
 										'value' => 0
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.decimal_places.1',
+										'value' =>  2
 									],
 									[
 										'type' => 0,

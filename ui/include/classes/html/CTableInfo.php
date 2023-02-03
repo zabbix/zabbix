@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,12 +23,16 @@ class CTableInfo extends CTable {
 
 	protected $message;
 
+	/**
+	 * @var bool
+	 */
+	private $addMakeVerticalRotationJs = false;
+
 	public function __construct() {
 		parent::__construct();
 
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
 		$this->setNoDataMessage(_('No data found.'));
-		$this->addMakeVerticalRotationJs = false;
 	}
 
 	public function toString($destroy = true) {

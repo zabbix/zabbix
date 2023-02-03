@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,12 +30,15 @@ $html_page = (new CHtmlPage())
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_IMAGE_EDIT));
 
+$csrf_token = CCsrfTokenHelper::get('image');
+
 $form = (new CForm('post', (new CUrl('zabbix.php'))
-		->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
-		->getUrl(), 'multipart/form-data')
-	)
-		->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-		->addVar('imagetype', $data['imagetype']);
+	->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
+	->getUrl(), 'multipart/form-data')
+)
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+	->addVar('imagetype', $data['imagetype']);
 
 if ($data['imageid'] != 0) {
 	$form->addVar('imageid', $data['imageid']);
@@ -81,7 +84,7 @@ if ($data['imageid'] != 0) {
 					->setArgument('action', 'image.delete')
 					->setArgument('imageid', $data['imageid'])
 					->setArgument('imagetype', $data['imagetype'])
-					->setArgumentSID(),
+					->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 				_('Delete selected image?')
 			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

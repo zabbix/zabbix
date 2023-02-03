@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,9 +91,9 @@ foreach ($data['drules'] as $drule) {
 				)
 				->getUrl()
 		))
+			->addCsrfToken(CCsrfTokenHelper::get('discovery'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(discovery_status2style($drule['status']))
-			->addSID()
 	);
 
 	$discoveryTable->addRow([
@@ -110,14 +110,22 @@ foreach ($data['drules'] as $drule) {
 	]);
 }
 
+$csrf_token = CCsrfTokenHelper::get('discovery');
+
 // append table to form
 $discoveryForm->addItem([
 	$discoveryTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'druleids', [
-		'discovery.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?')],
-		'discovery.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?')],
-		'discovery.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?')]
+		'discovery.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?'),
+			'csrf_token' => $csrf_token
+		],
+		'discovery.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?'),
+			'csrf_token' => $csrf_token
+		],
+		'discovery.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?'),
+			'csrf_token' => $csrf_token
+		]
 	], 'discovery')
 ]);
 

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 class CControllerProblemView extends CControllerProblem {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -126,6 +126,7 @@ class CControllerProblemView extends CControllerProblem {
 				'support_custom_time' => 1,
 				'expanded' => $profile->expanded,
 				'page' => $filter['page'],
+				'csrf_token' => CCsrfTokenHelper::get('tabfilter'),
 				'timeselector' => [
 					'from' => $profile->from,
 					'to' => $profile->to,

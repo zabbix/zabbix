@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "log.h"
 #include "zbxversion.h"
 
-void	calc_timestamp(const char *line, int *timestamp, const char *format)
+void	zbx_calc_timestamp(const char *line, int *timestamp, const char *format)
 {
 	int		hh, mm, ss, yyyy, dd, MM;
 	int		hhc = 0, mmc = 0, ssc = 0, yyyyc = 0, ddc = 0, MMc = 0;

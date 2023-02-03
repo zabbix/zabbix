@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,10 @@
 
 <script>
 	const view = {
-		init() {
+		init({checkbox_hash, checkbox_object}) {
+			this.checkbox_hash = checkbox_hash;
+			this.checkbox_object = checkbox_object;
+
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
@@ -48,6 +51,30 @@
 					$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
 				})
 				.trigger('change');
+
+			this._initActions();
+		},
+
+		_initActions() {
+			document.querySelector('.js-copy').addEventListener('click', () => {
+				const overlay = this.openCopyPopup();
+				const dialogue = overlay.$dialogue[0];
+
+				dialogue.addEventListener('dialogue.submit', (e) => {
+					postMessageOk(e.detail.title);
+
+					const uncheckids = Object.keys(chkbxRange.getSelectedIds());
+					uncheckTableRows('triggers_' + this.checkbox_hash, [], false);
+					chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
+					chkbxRange.update(this.checkbox_object);
+
+					if ('messages' in e.detail) {
+						postMessageDetails('success', e.detail.messages);
+					}
+
+					location.href = location.href;
+				});
+			});
 		},
 
 		editHost(e, hostid) {
@@ -71,6 +98,18 @@
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		openCopyPopup() {
+			const parameters = {
+				triggerids: Object.keys(chkbxRange.getSelectedIds()),
+				source: 'triggers'
+			};
+
+			return PopUp('copy.edit', parameters, {
+				dialogueid: 'copy',
+				dialogue_class: 'modal-popup-static'
+			});
 		},
 
 		events: {
@@ -99,7 +138,7 @@
 					}
 				}
 
-				const curl = new Curl('zabbix.php', false);
+				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'host.list');
 
 				location.href = curl.getUrl();

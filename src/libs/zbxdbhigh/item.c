@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,13 +68,13 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 
 		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & flags))
 		{
-			value_esc = DBdyn_escape_field("item_rtdata", "error", diff->error);
+			value_esc = zbx_db_dyn_escape_field("item_rtdata", "error", diff->error);
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cerror='%s'", delim, value_esc);
 			zbx_free(value_esc);
 		}
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", diff->itemid);
 
-		DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
+		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ ZBX_VECTOR_IMPL(ptr_pair, zbx_ptr_pair_t)
 ZBX_VECTOR_IMPL(uint64_pair, zbx_uint64_pair_t)
 ZBX_VECTOR_IMPL(dbl, double)
 
+ZBX_PTR_VECTOR_IMPL(tags, zbx_tag_t*)
+
 void	zbx_ptr_free(void *data)
 {
 	zbx_free(data);
@@ -36,4 +38,32 @@ void	zbx_ptr_free(void *data)
 void	zbx_str_free(char *data)
 {
 	zbx_free(data);
+}
+
+void	zbx_free_tag(zbx_tag_t *tag)
+{
+	zbx_free(tag->tag);
+	zbx_free(tag->value);
+	zbx_free(tag);
+}
+
+int	zbx_compare_tags(const void *d1, const void *d2)
+{
+	const zbx_tag_t *tag1 = *(const zbx_tag_t * const *)d1;
+	const zbx_tag_t *tag2 = *(const zbx_tag_t * const *)d2;
+
+	return strcmp(tag1->tag, tag2->tag);
+}
+
+int	zbx_compare_tags_and_values(const void *d1, const void *d2)
+{
+	int ret;
+
+	const zbx_tag_t *tag1 = *(const zbx_tag_t * const *)d1;
+	const zbx_tag_t *tag2 = *(const zbx_tag_t * const *)d2;
+
+	if (0 == (ret = strcmp(tag1->tag, tag2->tag)))
+		ret = strcmp(tag1->value, tag2->value);
+
+	return ret;
 }

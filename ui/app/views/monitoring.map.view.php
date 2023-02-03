@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ $web_layout_mode = $this->getLayoutMode();
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([
 		(new CForm('get'))
-			->cleanItems()
 			->setName('map.view')
 			->addVar('action', 'map.view')
 			->addVar('sysmapid', $data['map']['sysmapid'])

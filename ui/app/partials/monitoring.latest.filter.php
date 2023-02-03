@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -197,7 +197,6 @@ $filter_template = (new CDiv())
 	]);
 
 $template = (new CForm('get'))
-	->cleanItems()
 	->setName('zbx_filter')
 	->addItem([
 		$filter_template,

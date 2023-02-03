@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,11 +40,11 @@
 		_popup_message_box: null,
 
 		init({filter_options, refresh_url, refresh_interval, applied_filter_groupids}) {
-			this.refresh_url = new Curl(refresh_url, false);
+			this.refresh_url = new Curl(refresh_url);
 			this.refresh_interval = refresh_interval;
 			this.applied_filter_groupids = applied_filter_groupids;
 
-			const url = new Curl('zabbix.php', false);
+			const url = new Curl('zabbix.php');
 			url.setArgument('action', 'host.view.refresh');
 			this.refresh_simple_url = url.getUrl();
 
@@ -93,7 +93,7 @@
 		},
 
 		reloadPartialAndTabCounters() {
-			this.refresh_url = new Curl('', false);
+			this.refresh_url = new Curl('');
 
 			this.unscheduleRefresh();
 			this.refresh();

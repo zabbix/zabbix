@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@
 			const fields = getFormFields(this.form);
 			fields.name = fields.name.trim();
 
-			const curl = new Curl('zabbix.php', false);
+			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', this.groupid !== null ? 'hostgroup.update' : 'hostgroup.create');
 
 			this._post(curl.getUrl(), fields, (response) => {
@@ -64,7 +64,7 @@
 					postMessageDetails('success', response.success.messages);
 				}
 
-				const url = new Curl('zabbix.php', false);
+				const url = new Curl('zabbix.php');
 				url.setArgument('action', 'hostgroup.list');
 
 				location.href = url.getUrl();
@@ -73,16 +73,18 @@
 
 		_clone() {
 			const fields = getFormFields(this.form);
-			const curl = new Curl('zabbix.php', false);
+			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'hostgroup.edit');
 
 			post(curl.getUrl(), {name: fields.name});
 		}
 
 		_delete() {
-			const curl = new Curl('zabbix.php', false);
+			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'hostgroup.delete');
-			curl.addSID();
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('hostgroup')) ?>
+			);
 
 			this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {
 				postMessageOk(response.success.title);
@@ -91,7 +93,7 @@
 					postMessageDetails('success', response.success.messages);
 				}
 
-				const url = new Curl('zabbix.php', false);
+				const url = new Curl('zabbix.php');
 				url.setArgument('action', 'hostgroup.list');
 
 				location.href = url.getUrl();

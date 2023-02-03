@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -252,6 +252,49 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get value map ID by uuid.
+	 *
+	 * @param string $uuid
+	 *
+	 * @return string|null
+	 */
+	public function findValuemapidByUuid(string $uuid): ?string {
+		if ($this->db_valuemaps === null) {
+			$this->selectValuemaps();
+		}
+
+		foreach ($this->db_valuemaps as $valuemapid => $db_valuemap) {
+			if (array_key_exists('uuid', $db_valuemap) && $db_valuemap['uuid'] === $uuid) {
+				return $valuemapid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get value map ID by host ID and value map name.
+	 *
+	 * @param string $hostid
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findValuemapidByName(string $hostid, string $name): ?string {
+		if ($this->db_valuemaps === null) {
+			$this->selectValuemaps();
+		}
+
+		foreach ($this->db_valuemaps as $valuemapid => $db_valuemap) {
+			if (bccomp($db_valuemap['hostid'], $hostid) == 0 && $db_valuemap['name'] === $name) {
+				return $valuemapid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Initializes references for items.
 	 */
 	public function initItemsReferences(): void {
@@ -286,39 +329,18 @@ class CImportReferencer {
 	 *
 	 * @param string $hostid
 	 * @param string $key
+	 * @param bool   $inherited
 	 *
 	 * @return string|null
 	 */
-	public function findItemidByKey(string $hostid, string $key): ?string {
+	public function findItemidByKey(string $hostid, string $key, bool $inherited = false): ?string {
 		if ($this->db_items === null) {
 			$this->selectItems();
 		}
 
 		foreach ($this->db_items as $itemid => $item) {
-			if ($item['hostid'] === $hostid && $item['key_'] === $key) {
+			if ($item['hostid'] === $hostid && $item['key_'] === $key && ($inherited || $item['templateid'] == 0)) {
 				return $itemid;
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Get valuemap ID by valuemap name.
-	 *
-	 * @param string $hostid
-	 * @param string $name
-	 *
-	 * @return string|null
-	 */
-	public function findValuemapidByName(string $hostid, string $name): ?string {
-		if ($this->db_valuemaps === null) {
-			$this->selectValuemaps();
-		}
-
-		foreach ($this->db_valuemaps as $valuemapid => $valuemap) {
-			if ($valuemap['hostid'] === $hostid && $valuemap['name'] === $name) {
-				return $valuemapid;
 			}
 		}
 
@@ -392,10 +414,12 @@ class CImportReferencer {
 	 * @param string $name
 	 * @param string $expression
 	 * @param string $recovery_expression
+	 * @param bool   $inherited
 	 *
 	 * @return string|null
 	 */
-	public function findTriggeridByName(string $name, string $expression, string $recovery_expression): ?string {
+	public function findTriggeridByName(string $name, string $expression, string $recovery_expression,
+			bool $inherited = false): ?string {
 		if ($this->db_triggers === null) {
 			$this->selectTriggers();
 		}
@@ -403,7 +427,8 @@ class CImportReferencer {
 		foreach ($this->db_triggers as $triggerid => $trigger) {
 			if ($trigger['description'] === $name
 					&& $trigger['expression'] === $expression
-					&& $trigger['recovery_expression'] === $recovery_expression) {
+					&& $trigger['recovery_expression'] === $recovery_expression
+					&& ($inherited || $trigger['templateid'] == 0)) {
 				return $triggerid;
 			}
 		}
@@ -437,16 +462,19 @@ class CImportReferencer {
 	 *
 	 * @param string $hostid
 	 * @param string $name
+	 * @param bool   $inherited
 	 *
 	 * @return string|null
 	 */
-	public function findGraphidByName(string $hostid, string $name): ?string {
+	public function findGraphidByName(string $hostid, string $name, bool $inherited = false): ?string {
 		if ($this->db_graphs === null) {
 			$this->selectGraphs();
 		}
 
 		foreach ($this->db_graphs as $graphid => $graph) {
-			if ($graph['name'] === $name && in_array($hostid, $graph['hosts'])) {
+			if ($graph['name'] === $name
+					&& in_array($hostid, $graph['hosts'])
+					&& ($inherited || $graph['templateid'] == 0)) {
 				return $graphid;
 			}
 		}
@@ -512,6 +540,28 @@ class CImportReferencer {
 
 		foreach ($this->db_template_dashboards as $dashboardid => $dashboard) {
 			if ($dashboard['uuid'] === $uuid) {
+				return $dashboardid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get template dashboard ID by dashboard name and template ID.
+	 *
+	 * @param string $name
+	 * @param int    $templateid
+	 *
+	 * @return string|null
+	 */
+	public function findTemplateDashboardidByNameAndId(string $name, int $templateid): ?string {
+		if ($this->db_template_dashboards === null) {
+			$this->selectTemplateDashboards();
+		}
+
+		foreach ($this->db_template_dashboards as $dashboardid => $dashboard) {
+			if ($dashboard['name'] === $name && $dashboard['templateid'] == $templateid) {
 				return $dashboardid;
 			}
 		}
@@ -816,7 +866,8 @@ class CImportReferencer {
 		$this->db_items[$itemid] = [
 			'hostid' => $item['hostid'],
 			'uuid' => array_key_exists('uuid', $item) ? $item['uuid'] : '',
-			'key_' => $item['key_']
+			'key_' => $item['key_'],
+			'templateid' => 0
 		];
 	}
 
@@ -827,6 +878,16 @@ class CImportReferencer {
 	 */
 	public function addValuemaps(array $valuemaps): void {
 		$this->valuemaps = $valuemaps;
+	}
+
+	/**
+	 * Add value map name association with value map ID.
+	 *
+	 * @param string $valuemapid
+	 * @param array  $valuemap
+	 */
+	public function setDbValueMap(string $valuemapid, array $valuemap): void {
+		$this->db_valuemaps[$valuemapid] = array_intersect_key($valuemap, array_flip(['uuid', 'name', 'hostid']));
 	}
 
 	/**
@@ -858,7 +919,8 @@ class CImportReferencer {
 			'uuid' => array_key_exists('uuid', $trigger) ? $trigger['uuid'] : '',
 			'description' => $trigger['description'],
 			'expression' => $trigger['expression'],
-			'recovery_expression' => $trigger['recovery_expression']
+			'recovery_expression' => $trigger['recovery_expression'],
+			'templateid' => 0
 		];
 	}
 
@@ -1078,6 +1140,49 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Select value map IDs for previously added value map names.
+	 */
+	protected function selectValuemaps(): void {
+		$this->db_valuemaps = [];
+
+		if (!$this->valuemaps) {
+			return;
+		}
+
+		$sql_where = [];
+
+		foreach ($this->valuemaps as $host => $valuemaps) {
+			$hostid = $this->findTemplateidOrHostidByHost($host);
+
+			if ($hostid !== null) {
+				$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid)
+					.' AND ('
+						.dbConditionString('vm.name', array_keys($valuemaps))
+						.' OR '.dbConditionString('vm.uuid', array_column($valuemaps, 'uuid'))
+					.'))';
+			}
+		}
+
+		if ($sql_where) {
+			$db_valuemaps = DBselect(
+				'SELECT vm.valuemapid,vm.uuid,vm.name,vm.hostid'.
+				' FROM valuemap vm'.
+				' WHERE '.implode(' OR ', $sql_where)
+			);
+
+			while ($db_valuemap = DBfetch($db_valuemaps)) {
+				$this->db_valuemaps[$db_valuemap['valuemapid']] = [
+					'uuid' => $db_valuemap['uuid'],
+					'name' => $db_valuemap['name'],
+					'hostid' => $db_valuemap['hostid']
+				];
+			}
+		}
+
+		$this->valuemaps = [];
+	}
+
+	/**
 	 * Select item ids for previously added item keys.
 	 */
 	protected function selectItems(): void {
@@ -1103,14 +1208,15 @@ class CImportReferencer {
 
 		if ($sql_where) {
 			$db_items = DBselect(
-				'SELECT i.itemid,i.hostid,i.key_,i.uuid FROM items i WHERE '.implode(' OR ', $sql_where)
+				'SELECT i.itemid,i.hostid,i.key_,i.uuid,i.templateid FROM items i WHERE '.implode(' OR ', $sql_where)
 			);
 
 			while ($db_item = DBfetch($db_items)) {
 				$this->db_items[$db_item['itemid']] = [
 					'uuid' => $db_item['uuid'],
 					'key_' => $db_item['key_'],
-					'hostid' => $db_item['hostid']
+					'hostid' => $db_item['hostid'],
+					'templateid' => $db_item['templateid']
 				];
 			}
 		}
@@ -1121,45 +1227,6 @@ class CImportReferencer {
 	 */
 	public function refreshItems(): void {
 		$this->db_items = null;
-	}
-
-	/**
-	 * Select value map IDs for previously added value map names.
-	 */
-	protected function selectValuemaps(): void {
-		$this->db_valuemaps = [];
-
-		if (!$this->valuemaps) {
-			return;
-		}
-
-		$sql_where = [];
-
-		foreach ($this->valuemaps as $host => $valuemap_names) {
-			$hostid = $this->findTemplateidOrHostidByHost($host);
-
-			if ($hostid !== null) {
-				$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
-					dbConditionString('vm.name', array_keys($valuemap_names)).')';
-			}
-		}
-
-		if ($sql_where) {
-			$db_valuemaps = DBselect(
-				'SELECT vm.valuemapid,vm.hostid,vm.name'.
-				' FROM valuemap vm'.
-				' WHERE '.implode(' OR ', $sql_where)
-			);
-
-			while ($valuemap = DBfetch($db_valuemaps)) {
-				$this->db_valuemaps[$valuemap['valuemapid']] = [
-					'name' => $valuemap['name'],
-					'hostid' => $valuemap['hostid']
-				];
-			}
-		}
-
-		$this->valuemaps = [];
 	}
 
 	/**
@@ -1181,7 +1248,7 @@ class CImportReferencer {
 		}
 
 		$db_triggers = API::Trigger()->get([
-			'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
+			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
 			'filter' => [
 				'uuid' => array_keys($uuids),
 				'flags' => [
@@ -1194,7 +1261,7 @@ class CImportReferencer {
 		]);
 
 		$db_triggers += API::Trigger()->get([
-			'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
+			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
 			'filter' => [
 				'description' => array_keys($this->triggers),
 				'flags' => [
@@ -1254,8 +1321,8 @@ class CImportReferencer {
 			$graph_names += array_flip(array_keys($graph));
 		}
 
-		$db_graphs =  API::Graph()->get([
-			'output' => ['uuid', 'name'],
+		$db_graphs = API::Graph()->get([
+			'output' => ['uuid', 'name', 'templateid'],
 			'selectHosts' => ['hostid'],
 			'filter' => [
 				'uuid' => array_keys($graph_uuids),
@@ -1265,7 +1332,7 @@ class CImportReferencer {
 		]);
 
 		$db_graphs += API::Graph()->get([
-			'output' => ['uuid', 'name'],
+			'output' => ['uuid', 'name', 'templateid'],
 			'selectHosts' => ['hostid'],
 			'filter' => [
 				'name' => array_keys($graph_names),
@@ -1368,17 +1435,15 @@ class CImportReferencer {
 			return;
 		}
 
-		$db_template_dashboards = API::TemplateDashboard()->get([
-			'output' => ['uuid'],
-			'filter' => ['uuid' => array_keys($this->template_dashboards)],
+		$this->db_template_dashboards = API::TemplateDashboard()->get([
+			'output' => ['uuid', 'name', 'templateid'],
+			'filter' => [
+				'uuid' => array_keys($this->template_dashboards),
+				'name' => array_unique(array_column($this->template_dashboards, 'name'))
+			],
+			'searchByAny' => true,
 			'preservekeys' => true
 		]);
-
-		foreach ($db_template_dashboards as $dashboardid => $dashboard) {
-			$this->db_template_dashboards[$dashboardid] = [
-				'uuid' => $dashboard['uuid']
-			];
-		}
 
 		$this->template_dashboards = [];
 	}
@@ -1559,6 +1624,7 @@ class CImportReferencer {
 
 			if ($hostid !== false) {
 				$sql_where[] = '(ht.hostid='.zbx_dbstr($hostid)
+					.' AND ht.templateid IS NULL'
 					.' AND ('
 						.dbConditionString('ht.name', array_keys($httptests))
 						.' OR '.dbConditionString('ht.uuid', array_column($httptests, 'uuid'))

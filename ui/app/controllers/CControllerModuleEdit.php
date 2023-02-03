@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class CControllerModuleEdit extends CController {
 	private array $module = [];
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -77,6 +77,7 @@ class CControllerModuleEdit extends CController {
 
 		if ($manifest !== null) {
 			$data = [
+				'form_refresh' => $this->getInput('form_refresh', 0),
 				'moduleid' => $this->getInput('moduleid'),
 				'name' => $manifest['name'],
 				'version' => $manifest['version'],

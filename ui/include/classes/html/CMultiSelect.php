@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,11 @@ class CMultiSelect extends CTag {
 	const SEARCH_METHOD = 'multiselect.get';
 
 	/**
+	 * @var array
+	 */
+	protected $params = [];
+
+	/**
 	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
 	 * @param bool  $options['multiple']       Allows multiple selections.
 	 * @param bool  $options['add_post_js']
@@ -49,8 +54,7 @@ class CMultiSelect extends CTag {
 			->addItem((new CDiv())
 				->setAttribute('aria-live', 'assertive')
 				->setAttribute('aria-atomic', 'true')
-			)
-			->js_event_name = sprintf('multiselect_%s_init', $this->getId());
+			);
 
 		if (array_key_exists('disabled', $options) && $options['disabled']) {
 			$this->setAttribute('aria-disabled', 'true');
@@ -237,8 +241,8 @@ class CMultiSelect extends CTag {
 					'hostid', 'parent_discoveryid', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes',
 					'with_items', 'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers',
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
-					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
-					'enabled_only', 'group_status'
+					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'context', 'enabled_only',
+					'group_status'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -319,7 +323,7 @@ class CMultiSelect extends CTag {
 				}
 
 				foreach (['with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
-						'with_simple_graph_item_prototypes', 'with_triggers', 'with_inherited'] as $name) {
+						'with_simple_graph_item_prototypes', 'with_triggers'] as $name) {
 					if (array_key_exists($name, $parameters) && $parameters[$name]) {
 						$popup_parameters[$name] = '1';
 						$autocomplete_parameters[$name] = true;

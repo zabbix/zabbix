@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 class CLink extends CTag {
 
-	private	$use_sid = false;
+	private $csrf_token = '';
 	private	$confirm_message = '';
 	private $url;
 
@@ -34,12 +34,17 @@ class CLink extends CTag {
 		$this->url = $url;
 	}
 
-	/*
-	 * Add a "sid" argument into the URL.
-	 * POST method will be used for the "sid" argument.
+	/**
+	 * Adds CSRF token into the URL.
+	 * POST method will be used for '_csrf_token' argument.
+	 *
+	 * @param string $csrf_token  already generated CSRF token string.
+	 *
+	 * @return $this
 	 */
-	public function addSID() {
-		$this->use_sid = true;
+	public function addCsrfToken(string $csrf_token) {
+		$this->csrf_token = $csrf_token;
+
 		return $this;
 	}
 
@@ -76,15 +81,17 @@ class CLink extends CTag {
 			$this->setAttribute('role', 'button');
 		}
 
-		if ($this->use_sid) {
+		if ($this->csrf_token != '') {
 			if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
 				$url .= (strpos($url, '&') !== false || strpos($url, '?') !== false) ? '&' : '?';
-				$url .= 'sid='.substr(CSessionHelper::getId(), 16, 16);
+				$url .= CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.$this->csrf_token;
 			}
 			$confirm_script = ($this->confirm_message !== '')
 				? 'Confirm('.CHtml::encode(json_encode($this->confirm_message)).') && '
 				: '';
-			$this->onClick("javascript: return ".$confirm_script."redirect('".$url."', 'post', 'sid', true)");
+			$this->onClick("javascript: return ".$confirm_script."redirect('".$url."', 'post', '".
+				CCsrfTokenHelper::CSRF_TOKEN_NAME."', true)"
+			);
 			$this->setAttribute('href', 'javascript:void(0)');
 		}
 		else {

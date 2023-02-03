@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -537,14 +537,14 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 
 	zbx_vector_valuemaps_ptr_create(&valuemaps);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select value,newvalue,type"
 			" from valuemap_mapping"
 			" where valuemapid=" ZBX_FS_UI64
 			" order by sortorder asc",
 			valuemapid);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_del_zeros(row[1]);
 
@@ -555,7 +555,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 		zbx_vector_valuemaps_ptr_append(&valuemaps, valuemap);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ret = evaluate_value_by_map(value, max_len, &valuemaps, value_type);
 

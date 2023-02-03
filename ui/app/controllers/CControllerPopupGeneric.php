@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -142,8 +142,13 @@ class CControllerPopupGeneric extends CController {
 	 */
 	protected $disableids = [];
 
+	/**
+	 * @var array
+	 */
+	private $page_options = [];
+
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 
 		$this->popup_properties = [
 			'hosts' => [
@@ -557,7 +562,6 @@ class CControllerPopupGeneric extends CController {
 			'with_monitored_triggers' =>			'in 1',
 			'with_monitored_items' =>				'in 1',
 			'with_httptests' => 					'in 1',
-			'with_inherited' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
 			'context' =>							'string|in host,template',
@@ -1636,8 +1640,7 @@ class CControllerPopupGeneric extends CController {
 				 * Show list of value maps with unique names for defined hosts or templates.
 				 *
 				 * hostids           (required) Array of host or template ids to get value maps from.
-				 * context           (required) Define context for inherited value maps: host, template
-				 * with_inherited    Include value maps from inherited templates.
+				 * context           (required) Define context for inherited value maps: host, template.
 				 */
 				$records = [];
 				$hostids = $this->getInput('hostids', []);
@@ -1647,8 +1650,8 @@ class CControllerPopupGeneric extends CController {
 					break;
 				}
 
-				if ($this->hasInput('with_inherited')) {
-					$hostids = CTemplateHelper::getParentTemplatesRecursive($hostids, $context);
+				if ($context === 'host') {
+					addParentTemplateIds($hostids);
 				}
 
 				$records = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([

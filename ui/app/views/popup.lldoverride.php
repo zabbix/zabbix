@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ $output = [
 $options = $data['options'];
 
 $overrides_popup_form = (new CForm())
-	->cleanItems()
 	->setId('lldoverride_form')
 	->addItem((new CVar('no', $options['no']))->removeId())
 	->addItem((new CVar('templated', $options['templated']))->removeId())

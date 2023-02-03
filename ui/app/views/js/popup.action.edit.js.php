@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ window.action_edit_popup = new class {
 
 		const fields = getFormFields(this.form);
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'popup.action.operations.list');
 		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 
@@ -360,7 +360,7 @@ window.action_edit_popup = new class {
 			fields.esc_period = fields.esc_period.trim();
 		}
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this.actionid !== 0 ? 'action.update' : 'action.create');
 
 		this._post(curl.getUrl(), fields);
@@ -434,6 +434,9 @@ window.action_edit_popup = new class {
 	delete() {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'action.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+			<?= json_encode(CCsrfTokenHelper::get('action')) ?>
+		);
 
 		this._post(curl.getUrl(), {actionids: [this.actionid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

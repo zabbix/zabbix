@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,11 +95,18 @@ foreach ($data['rows'] as $columns) {
 				break;
 
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
+				$formatted_value = formatHistoryValue($column['value'], $column['item'], true, [
+					'decimals' => $column_config['decimal_places'],
+					'decimals_exact' => true,
+					'small_scientific' => false,
+					'zero_as_zero' => false
+				]);
+
 				if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
 					$row[] = (new CCol())
 						->addStyle($color !== '' ? 'background-color: #'.$color : null)
 						->addItem(
-							(new CDiv(formatHistoryValue($column['value'], $column['item'])))
+							(new CDiv($formatted_value))
 								->addClass(ZBX_STYLE_CENTER)
 								->addClass(ZBX_STYLE_CURSOR_POINTER)
 								->setHint(
@@ -133,7 +140,7 @@ foreach ($data['rows'] as $columns) {
 				$row[] = (new CCol())
 					->addStyle('width: 0;')
 					->addItem(
-						(new CDiv(formatHistoryValue($column['value'], $column['item'])))
+						(new CDiv($formatted_value))
 							->addClass(ZBX_STYLE_CURSOR_POINTER)
 							->addClass(ZBX_STYLE_NOWRAP)
 							->setHint(

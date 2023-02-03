@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@ class C62ImportConverter extends CConverter {
 	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '6.4';
 
+		unset($data['zabbix_export']['date']);
+
 		if (array_key_exists('hosts', $data['zabbix_export'])) {
 			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
 		}
@@ -81,6 +83,10 @@ class C62ImportConverter extends CConverter {
 	 */
 	private static function convertTemplates(array $templates): array {
 		foreach ($templates as &$template) {
+			if (array_key_exists('templates', $template)) {
+				unset($template['templates']);
+			}
+
 			if (array_key_exists('discovery_rules', $template)) {
 				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
 			}

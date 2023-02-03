@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -357,6 +357,9 @@ class CMenuHelper {
 						(new CMenuItem(_('Modules')))
 							->setAction('module.list')
 							->setAliases(['module.edit', 'module.scan']),
+						(new CMenuItem(_('Connectors')))
+							->setAction('connector.list')
+							->setAliases(['connector.edit']),
 						(new CMenuItem(_('Other')))
 							->setAction('miscconfig.edit')
 					])))
@@ -478,7 +481,7 @@ class CMenuHelper {
 				->setIcon('icon-signout')
 				->setUrl(new CUrl('#signout'))
 				->setTitle(_('Sign out'))
-				->onClick('ZABBIX.logout()')
+				->onClick('ZABBIX.logout(event)')
 		);
 
 		return $menu;

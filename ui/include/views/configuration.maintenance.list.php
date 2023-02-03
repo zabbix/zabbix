@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,6 +124,7 @@ $maintenanceForm->addItem([
 	$this->data['paging'],
 	new CActionButtonList('action', 'maintenanceids', [
 		'maintenance.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maintenance periods?'),
+			'csrf_token' => CCsrfTokenHelper::get('maintenance.php'),
 			'disabled' => $data['allowed_edit'] ? null : 'disabled'
 		]
 	])

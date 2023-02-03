@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,25 +60,18 @@ $filter = (new CFilter())
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
-			->addRow(
-				(new CLabel(_('Linked templates'), 'filter_templates__ms')),
-				(new CMultiSelect([
-					'name' => 'filter_templates[]',
-					'object_name' => 'templates',
-					'data' => $data['filter']['templates'],
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'templates',
-							'srcfld1' => 'hostid',
-							'srcfld2' => 'host',
-							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_templates_'
-						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
 			->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(_('Vendor'),
+				(new CTextBox('filter_vendor_name', $data['filter']['vendor_name'], false,
+					DB::getFieldLength('hosts', 'vendor_name')
+				))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(_('Version'),
+				(new CTextBox('filter_vendor_version', $data['filter']['vendor_version'], false,
+					DB::getFieldLength('hosts', 'vendor_version'))
+				)->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			),
 		(new CFormList())->addRow(_('Tags'), $filter_tags_table)
 	]);
@@ -96,9 +89,13 @@ $html_page = (new CHtmlPage())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", {rules_preset: "template"},
-						{dialogue_class: "modal-popup-generic"}
-					);')
+					->onClick('return PopUp("popup.import", {
+						rules_preset: "template", "'.
+						CCsrfTokenHelper::CSRF_TOKEN_NAME.'": "'.CCsrfTokenHelper::get('import').'"
+					}, {
+						dialogueid: "popup_import",
+						dialogue_class: "modal-popup-generic"
+					});')
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
@@ -123,73 +120,13 @@ $table = (new CTableInfo())
 		_('Dashboards'),
 		_('Discovery'),
 		_('Web'),
-		_('Linked templates'),
-		_('Linked to templates'),
+		_('Vendor'),
+		_('Version'),
 		_('Tags')
 	]);
 
 foreach ($data['templates'] as $template) {
 	$name = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
-
-	$linked_templates_output = [];
-	$linked_to_output = [];
-
-	$i = 0;
-	foreach ($template['parentTemplates'] as $parent_template) {
-		$i++;
-
-		if ($i > $data['config']['max_in_table']) {
-			$linked_templates_output[] = ' &hellip;';
-
-			break;
-		}
-
-		if ($linked_templates_output) {
-			$linked_templates_output[] = ', ';
-		}
-
-		$url = (new CUrl('templates.php'))
-			->setArgument('form', 'update')
-			->setArgument('templateid', $parent_template['templateid']);
-
-		if (array_key_exists($parent_template['templateid'], $data['editable_templates'])) {
-			$linked_templates_output[] = (new CLink($parent_template['name'], $url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
-		}
-		else {
-			$linked_templates_output[] = (new CSpan($parent_template['name']))
-				->addClass(ZBX_STYLE_GREY);
-		}
-	}
-
-	$i = 0;
-	foreach ($template['templates'] as $child_template) {
-		$i++;
-
-		if ($i > $data['config']['max_in_table']) {
-			$linked_to_output[] = ' &hellip;';
-
-			break;
-		}
-
-		if ($linked_to_output) {
-			$linked_to_output[] = ', ';
-		}
-
-		if (array_key_exists($child_template['templateid'], $data['editable_templates'])) {
-			$url = (new CUrl('templates.php'))
-				->setArgument('form', 'update')
-				->setArgument('templateid', $child_template['templateid']);
-			$linked_to_output[] = (new CLink($child_template['name'], $url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
-		}
-		else {
-			$linked_to_output[] = (new CSpan($child_template['name']))
-				->addClass(ZBX_STYLE_GREY);
-		}
-	}
 
 	$table->addRow([
 		new CCheckBox('templates['.$template['templateid'].']', $template['templateid']),
@@ -259,8 +196,8 @@ foreach ($data['templates'] as $template) {
 			),
 			CViewHelper::showNum($template['httpTests'])
 		],
-		$linked_templates_output,
-		$linked_to_output,
+		$template['vendor_name'],
+		$template['vendor_version'],
 		$data['tags'][$template['templateid']]
 	]);
 }
@@ -280,7 +217,9 @@ $form->addItem([
 			'popup.massupdate.template' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"openMassupdatePopup('popup.massupdate.template', {}, {
+						"openMassupdatePopup('popup.massupdate.template', ".
+							json_encode([CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('template')]).
+						", {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
 						});"
@@ -288,9 +227,12 @@ $form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?')],
+			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?'),
+				'csrf_token' => CCsrfTokenHelper::get('templates.php')
+			],
 			'template.massdeleteclear' => ['name' => _('Delete and clear'),
-				'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)')
+				'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'),
+				'csrf_token' => CCsrfTokenHelper::get('templates.php')
 			]
 		]
 	)

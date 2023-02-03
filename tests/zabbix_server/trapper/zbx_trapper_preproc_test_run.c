@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,73 +22,105 @@
 #include "zbxmockutil.h"
 #include "zbxmockjson.h"
 #include "zbxembed.h"
-
-#include "../../../src/zabbix_server/preprocessor/item_preproc.h"
-#include "../../../src/zabbix_server/preprocessor/preproc_history.h"
-
-#include "trapper_preproc_test_run.h"
+#include "libs/zbxpreproc/pp_execute.h"
+#include "zabbix_server/trapper/trapper_preproc.h"
+#include "zbx_item_constants.h"
 
 zbx_es_t	es_engine;
 
 int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
-		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
-		char **preproc_error, char **error);
+		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,
+		zbx_pp_history_t *history, char **error);
 
-int	__wrap_DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
-int	__wrap_DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
+int	__wrap_zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user);
+int	__wrap_zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
 void	__wrap_zbx_user_init(zbx_user_t *user);
 void	__wrap_zbx_user_free(zbx_user_t *user);
 void	__wrap_zbx_init_agent_result(AGENT_RESULT *result);
 void	__wrap_zbx_free_agent_result(AGENT_RESULT *result);
 
 int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
-		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
-		char **preproc_error, char **error)
+		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,
+		zbx_pp_history_t *history, char **error)
 {
 	int			i, results_num;
-	zbx_preproc_op_t	*steps_array;
-	zbx_preproc_result_t	*results_array, *result;
-	zbx_vector_ptr_t	history_out;
-	zbx_variant_t		value_var;
+	zbx_pp_result_t		*results_out = NULL, *result;
+	zbx_variant_t		value_in, value_out;
+	zbx_pp_context_t	ctx;
+	zbx_pp_item_preproc_t	*preproc;
 
 	ZBX_UNUSED(error);
 
-	zbx_vector_ptr_create(&history_out);
-	zbx_variant_set_str(&value_var, zbx_strdup(NULL, value));
+	pp_context_init(&ctx);
 
-	steps_array = (zbx_preproc_op_t *)zbx_malloc(NULL, steps->values_num * sizeof(zbx_preproc_op_t));
+	if (ITEM_STATE_NORMAL == state)
+		zbx_variant_set_str(&value_in, zbx_strdup(NULL, value));
+	else
+		zbx_variant_set_error(&value_in, zbx_strdup(NULL, value));
+
+	preproc = zbx_pp_item_preproc_create(ITEM_TYPE_TRAPPER, value_type, 0);
+
+	preproc->steps = zbx_malloc(NULL, (size_t)steps->values_num * sizeof(zbx_pp_step_t));
 	for (i = 0; i < steps->values_num; i++)
-		steps_array[i] = *(zbx_preproc_op_t *)steps->values[i];
+		preproc->steps[i] = *steps->values[i];
+	preproc->steps_num = steps->values_num;
 
-	results_array = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * steps->values_num);
-	memset(results_array, 0, sizeof(zbx_preproc_result_t) * steps->values_num);
+	/* prepare history */
+	if (NULL != history)
+	{
+		preproc->history = zbx_pp_history_create(0);
+		*preproc->history = *history;
+		preproc->history_num = 1;
+		memset(history, 0, sizeof(zbx_pp_history_t));
+	}
 
-	zbx_item_preproc_test(value_type, &value_var, ts, steps_array, steps->values_num, history, &history_out,
-			results_array, &results_num, preproc_error);
+	zbx_variant_set_none(&value_out);
 
-	/* copy output history */
-	zbx_vector_ptr_clear_ext(history, (zbx_clean_func_t)zbx_preproc_op_history_free);
-
-	if (0 != history_out.values_num)
-		zbx_vector_ptr_append_array(history, history_out.values, history_out.values_num);
+	pp_execute(&ctx, preproc, NULL, &value_in, *ts, &value_out, &results_out, &results_num);
 
 	/* copy results */
 	for (i = 0; i < results_num; i++)
 	{
-		result = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t));
-		*result = results_array[i];
-		zbx_vector_ptr_append(results, result);
+		result = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t));
+		*result = results_out[i];
+		zbx_vector_pp_result_ptr_append(results, result);
 	}
 
-	zbx_variant_clear(&value_var);
-	zbx_free(steps_array);
-	zbx_free(results_array);
-	zbx_vector_ptr_destroy(&history_out);
+	/* copy history */
+	{
+		zbx_pp_history_clear(history);
+		zbx_pp_history_init(history);
+
+		if (NULL != preproc->history)
+		{
+			*history = *preproc->history;
+			zbx_free(preproc->history);
+		}
+	}
+
+	if (ZBX_VARIANT_ERR != value_out.type)
+	{
+		zbx_variant_clear(&value_out);
+	}
+	else
+	{
+		*error = value_out.data.err;
+		zbx_variant_set_none(&value_out);
+	}
+
+	zbx_variant_clear(&value_in);
+
+	preproc->steps_num = 0;
+	zbx_free(preproc->steps);
+	zbx_pp_item_preproc_release(preproc);
+
+	zbx_free(results_out);
+	pp_context_destroy(&ctx);
 
 	return SUCCEED;
 }
 
-int	__wrap_DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
+int	__wrap_zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user)
 {
 	ZBX_UNUSED(sessionid);
 
@@ -98,7 +130,7 @@ int	__wrap_DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	return SUCCEED;
 }
 
-int	__wrap_DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
+int	__wrap_zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
 {
 	ZBX_UNUSED(formatted_auth_token_hash);
 
@@ -145,11 +177,11 @@ void	zbx_mock_test_entry(void **state)
 	if (FAIL == zbx_json_open(request, &jp))
 		fail_msg("Invalid request format: %s", zbx_json_strerror());
 
-	returned_ret = zbx_trapper_preproc_test_run(&jp, &out, &error);
+	returned_ret = trapper_preproc_test_run(&jp, &out, &error);
 	if (FAIL == returned_ret)
-		printf("zbx_trapper_preproc_test_run error: %s\n", error);
+		printf("trapper_preproc_test_run error: %s\n", error);
 	else
-		printf("zbx_trapper_preproc_test_run output: %s\n", out.buffer);
+		printf("trapper_preproc_test_run output: %s\n", out.buffer);
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_result_eq("Return value", expected_ret, returned_ret);

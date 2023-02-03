@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 
 #include "zbxcacheconfig.h"
 #include "zbxshmem.h"
+#include "zbxpreproc.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -105,4 +106,11 @@ int	zbx_db_trigger_queue_locked(void);
 void	zbx_db_trigger_queue_unlock(void);
 
 int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
+
+void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
+		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
+void	dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
+		zbx_variant_t *value, zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);
+void	dc_flush_history(void);
+
 #endif

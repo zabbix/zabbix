@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-12-19T09:58:22Z'
+  date: '2023-01-16T07:04:29Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: aa226119d3e94f53b9a2809f1d4ebaee
       template: 'Linux block devices by Zabbix agent active'
       name: 'Linux block devices by Zabbix agent active'
-      description: 'Template tooling version used: 0.42'
+      description: 'Template tooling version used: 0.43'
       groups:
         -
           name: Templates/Modules
@@ -360,7 +360,7 @@ zabbix_export:
       uuid: da53e44145304098b4c3ff749996e3e7
       template: 'Linux CPU by Zabbix agent active'
       name: 'Linux CPU by Zabbix agent active'
-      description: 'Template tooling version used: 0.42'
+      description: 'Template tooling version used: 0.43'
       groups:
         -
           name: Templates/Modules
@@ -630,7 +630,7 @@ zabbix_export:
       uuid: c626d864a2894d29a9d661d6025536ff
       template: 'Linux filesystems by Zabbix agent active'
       name: 'Linux filesystems by Zabbix agent active'
-      description: 'Template tooling version used: 0.42'
+      description: 'Template tooling version used: 0.43'
       groups:
         -
           name: Templates/Modules
@@ -1033,7 +1033,7 @@ zabbix_export:
       uuid: 7e4dc41320fd48bd97549025f4c3bcc6
       template: 'Linux generic by Zabbix agent active'
       name: 'Linux generic by Zabbix agent active'
-      description: 'Template tooling version used: 0.42'
+      description: 'Template tooling version used: 0.43'
       groups:
         -
           name: Templates/Modules
@@ -1158,7 +1158,7 @@ zabbix_export:
           triggers:
             -
               uuid: 071532526e8842f8935bf9373a85b7da
-              expression: 'last(/Linux generic by Zabbix agent active/system.hostname,#1)<>last(/Linux generic by Zabbix agent active/system.hostname,#2) and length(last(/Linux generic by Zabbix agent active/system.hostname))>0'
+              expression: 'change(/Linux generic by Zabbix agent active/system.hostname) and length(last(/Linux generic by Zabbix agent active/system.hostname))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -1240,7 +1240,7 @@ zabbix_export:
           triggers:
             -
               uuid: fc45ac0cfc7641f2a52b95830df3e880
-              expression: 'last(/Linux generic by Zabbix agent active/system.sw.os,#1)<>last(/Linux generic by Zabbix agent active/system.sw.os,#2) and length(last(/Linux generic by Zabbix agent active/system.sw.os))>0'
+              expression: 'change(/Linux generic by Zabbix agent active/system.sw.os) and length(last(/Linux generic by Zabbix agent active/system.sw.os))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Ack to close the problem manually.'
@@ -1248,29 +1248,42 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'last(/Linux generic by Zabbix agent active/system.hostname,#1)<>last(/Linux generic by Zabbix agent active/system.hostname,#2) and length(last(/Linux generic by Zabbix agent active/system.hostname))>0'
+                  expression: 'change(/Linux generic by Zabbix agent active/system.hostname) and length(last(/Linux generic by Zabbix agent active/system.hostname))>0'
               tags:
                 -
                   tag: scope
                   value: notice
         -
           uuid: 42df39b3317a4bd6908686a491fd3d18
-          name: 'Software installed'
+          name: 'Number of installed packages'
           type: ZABBIX_ACTIVE
-          key: system.sw.packages
+          key: system.sw.packages.get
           delay: 1h
-          history: 2w
-          trends: '0'
-          value_type: TEXT
+          history: 7d
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 12h
+            -
+              type: JSONPATH
+              parameters:
+                - $.length()
           tags:
             -
               tag: component
               value: os
+          triggers:
+            -
+              uuid: 85a719a64e61402ab5562afe8c4ac14d
+              expression: 'change(/Linux generic by Zabbix agent active/system.sw.packages.get)<>0'
+              name: 'Number of installed packages has been changed'
+              priority: WARNING
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: d875142b4ea0442db59768be58c9d026
           name: 'System description'
@@ -1356,10 +1369,10 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Operating system description has changed'
-                  expression: 'last(/Linux generic by Zabbix agent active/system.sw.os,#1)<>last(/Linux generic by Zabbix agent active/system.sw.os,#2) and length(last(/Linux generic by Zabbix agent active/system.sw.os))>0'
+                  expression: 'change(/Linux generic by Zabbix agent active/system.sw.os) and length(last(/Linux generic by Zabbix agent active/system.sw.os))>0'
                 -
                   name: 'System name has changed'
-                  expression: 'last(/Linux generic by Zabbix agent active/system.hostname,#1)<>last(/Linux generic by Zabbix agent active/system.hostname,#2) and length(last(/Linux generic by Zabbix agent active/system.hostname))>0'
+                  expression: 'change(/Linux generic by Zabbix agent active/system.hostname) and length(last(/Linux generic by Zabbix agent active/system.hostname))>0'
               tags:
                 -
                   tag: scope
@@ -1378,7 +1391,7 @@ zabbix_export:
       uuid: 5f577b9e34a8444c920e8199170f7fe6
       template: 'Linux memory by Zabbix agent active'
       name: 'Linux memory by Zabbix agent active'
-      description: 'Template tooling version used: 0.42'
+      description: 'Template tooling version used: 0.43'
       groups:
         -
           name: Templates/Modules
@@ -1526,7 +1539,7 @@ zabbix_export:
       uuid: fac8b6986be24a8c91f7b0b15439bccf
       template: 'Linux network interfaces by Zabbix agent active'
       name: 'Linux network interfaces by Zabbix agent active'
-      description: 'Template tooling version used: 0.42'
+      description: 'Template tooling version used: 0.43'
       groups:
         -
           name: Templates/Modules
@@ -2391,12 +2404,6 @@ zabbix_export:
           item:
             host: 'Linux generic by Zabbix agent active'
             key: 'proc.num[,,run]'
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Linux generic by Zabbix agent active'
-            key: kernel.maxproc
     -
       uuid: d3169f2fa1b341e3a7527a305814a0ab
       name: 'Swap usage'

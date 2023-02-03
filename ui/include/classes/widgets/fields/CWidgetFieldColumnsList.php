@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,8 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	public const HISTORY_DATA_AUTO = 1;
 	public const HISTORY_DATA_HISTORY = 2;
 	public const HISTORY_DATA_TRENDS = 3;
+
+	public const DEFAULT_DECIMAL_PLACES = 2;
 
 	// Predefined colors for thresholds. Each next threshold takes next sequential value from palette.
 	public const THRESHOLDS_DEFAULT_COLOR_PALETTE = [
@@ -83,6 +85,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				'base_color'			=> ['type' => API_COLOR],
 				'min'					=> ['type' => API_NUMERIC],
 				'max'					=> ['type' => API_NUMERIC],
+				'decimal_places'		=> ['type' => API_INT32, 'in' => '0:10', 'default' => self::DEFAULT_DECIMAL_PLACES],
 				'thresholds'			=> ['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
 					'color'					=> ['type' => API_COLOR],
 					'threshold'				=> ['type' => API_NUMERIC]
@@ -112,6 +115,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'min' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'max' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'decimal_places' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'display' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'history' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'base_color' => ZBX_WIDGET_FIELD_TYPE_STR,

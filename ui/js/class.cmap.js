@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -121,6 +121,7 @@ ZABBIX.apps.map = (function($) {
 			this.defaultAutoIconId = mapData.defaultAutoIconId;
 			this.defaultIconId = mapData.defaultIconId;
 			this.defaultIconName = mapData.defaultIconName;
+			this.csrf_token = mapData.csrf_token;
 			this.container = $('#' + containerId);
 
 			if (this.container.length === 0) {
@@ -244,11 +245,12 @@ ZABBIX.apps.map = (function($) {
 				var url = new Curl();
 
 				$.ajax({
-					url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
+					url: url.getPath() + '?output=ajax',
 					type: 'post',
 					data: {
 						favobj: 'sysmap',
 						action: 'update',
+						_csrf_token: this.csrf_token,
 						sysmapid: this.sysmapid,
 						sysmap: JSON.stringify(this.data)
 					},

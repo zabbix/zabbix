@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,7 +146,9 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('desc_color', _('Color'))
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('decimal_places', _('Decimal places'), 0, 10))->setDefault(2)
+				(new CWidgetFieldIntegerBox('decimal_places', _('Decimal places'), 0, 10))
+					->setDefault(2)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('decimal_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))

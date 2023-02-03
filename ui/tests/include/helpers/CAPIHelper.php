@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -151,7 +151,10 @@ class CAPIHelper {
 	public static function createSessionId($userid = 1, $sessionid = '09e7d4286dfdca4ba7be15e0f3b2b55a') {
 		if (!CDBHelper::getRow('select null from sessions where status=0 and userid='.zbx_dbstr($userid).
 				' and sessionid='.zbx_dbstr($sessionid))) {
-			DBexecute('insert into sessions (sessionid, userid) values ('.zbx_dbstr($sessionid).', '.$userid.')');
+			$secret = bin2hex(random_bytes(16));
+			DBexecute('INSERT INTO sessions (sessionid,userid,secret)'.
+				' VALUES ('.zbx_dbstr($sessionid).','.$userid.','.zbx_dbstr($secret).')'
+			);
 		}
 
 		static::$session = $sessionid;

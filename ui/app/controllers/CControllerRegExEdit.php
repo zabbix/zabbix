@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ class CControllerRegExEdit extends CController {
 	protected $db_regex = [];
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -33,7 +33,7 @@ class CControllerRegExEdit extends CController {
 			'test_string'  => 'db regexps.test_string',
 			'regexid'      => 'db regexps.regexpid',
 			'expressions'  => 'array',
-			'form_refresh' => ''
+			'form_refresh' => 'int32'
 		];
 
 		$ret = $this->validateInput($fields);

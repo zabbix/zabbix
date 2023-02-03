@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,11 @@ $html_page = (new CHtmlPage())
 	->setTitle(_('User groups'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERGROUP_EDIT));
 
+$csrf_token = CCsrfTokenHelper::get('usergroup');
+
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('user-group-form')
 	->setName('user_group_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
@@ -314,7 +318,7 @@ $tabs = (new CTabView())
 	->addTab('template_permissions_tab', _('Template permissions'), $template_permissions_form_grid, TAB_INDICATOR_TEMPLATE_PERMISSIONS)
 	->addTab('permissions_tab', _('Host permissions'), $host_permissions_form_grid, TAB_INDICATOR_HOST_PERMISSIONS)
 	->addTab('tag_filter_tab', _('Problem tag filter'), $tag_filter_form_grid, TAB_INDICATOR_TAG_FILTER);
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
@@ -329,7 +333,8 @@ if ($data['usrgrpid'] != 0) {
 		[
 			(new CRedirectButton(_('Delete'),
 				(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.delete')
-					->setArgument('usrgrpids', [$data['usrgrpid']])->setArgumentSID(),
+					->setArgument('usrgrpids', [$data['usrgrpid']])
+					->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 				_('Delete selected group?')
 			))->setId('delete'),
 			$cancel_button

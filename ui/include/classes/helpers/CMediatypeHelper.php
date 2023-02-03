@@ -1,7 +1,7 @@
 <?php
 /*
  ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,8 +58,8 @@ class CMediatypeHelper {
 				'smtp_port' => 25,
 				'smtp_security' => SMTP_CONNECTION_SECURITY_NONE,
 				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
-				'smtp_verify_host' => HTTPTEST_VERIFY_HOST_OFF,
-				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
+				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
 				'content_type' => SMTP_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_GMAIL => [
@@ -69,8 +69,8 @@ class CMediatypeHelper {
 				'smtp_port' => 587,
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
 				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
-				'smtp_verify_host' => HTTPTEST_VERIFY_HOST_OFF,
-				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
+				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
 				'content_type' => SMTP_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_GMAIL_RELAY => [
@@ -80,8 +80,8 @@ class CMediatypeHelper {
 				'smtp_port' => 587,
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
 				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
-				'smtp_verify_host' => HTTPTEST_VERIFY_HOST_OFF,
-				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
+				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
 				'content_type' => SMTP_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_OFFICE365 => [
@@ -91,8 +91,8 @@ class CMediatypeHelper {
 				'smtp_port' => 587,
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
 				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
-				'smtp_verify_host' => HTTPTEST_VERIFY_HOST_OFF,
-				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
+				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
 				'content_type' => SMTP_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_OFFICE365_RELAY => [
@@ -102,8 +102,8 @@ class CMediatypeHelper {
 				'smtp_port' => 25,
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
 				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
-				'smtp_verify_host' => HTTPTEST_VERIFY_HOST_OFF,
-				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
+				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
 				'content_type' => SMTP_MESSAGE_FORMAT_HTML
 			]
 		];

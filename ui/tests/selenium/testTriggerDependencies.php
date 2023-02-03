@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,24 +43,24 @@ class testTriggerDependencies extends CLegacyWebTest {
 	const TEMPLATE_APACHE = 'Apache by HTTP';
 
 	protected static $agent_templateid;
-	protected static $freebsd_templateid;
 	protected static $apache_templateid;
 
 	/**
-	 * Function links Zabbix agent template to FreeBSD by Zabbix agent template.
+	 * Function links Zabbix agent template to Test host.
 	 */
 	public static function prepareTemplateData() {
-		$template_ids = CDBHelper::getAll('SELECT hostid FROM hosts WHERE host IN ('.zbx_dbstr(self::TEMPLATE_AGENT).','.
-				zbx_dbstr(self::TEMPLATE_FREEBSD).','.zbx_dbstr(self::TEMPLATE_APACHE).') ORDER BY host ASC'
+		$template_ids = CDBHelper::getAll('SELECT hostid FROM hosts WHERE host IN ('.zbx_dbstr(self::TEMPLATE_AGENT).',
+				'.zbx_dbstr(self::TEMPLATE_APACHE).') ORDER BY host ASC'
 		);
 
-		self::$apache_templateid = $template_ids[0]['hostid'];
-		self::$freebsd_templateid = $template_ids[1]['hostid'];
-		self::$agent_templateid = $template_ids[2]['hostid'];
+		$host_id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr('Test host'));
 
-		CDataHelper::call('template.update', [
+		self::$apache_templateid = $template_ids[0]['hostid'];
+		self::$agent_templateid = $template_ids[1]['hostid'];
+
+		CDataHelper::call('host.update', [
 			[
-				'templateid' => self::$freebsd_templateid,
+				'hostid' => $host_id,
 				'templates' => [
 					[
 						'templateid' => self::$agent_templateid
@@ -113,9 +113,9 @@ class testTriggerDependencies extends CLegacyWebTest {
 					'trigger' => 'Zabbix agent is not available',
 					'template' => self::TEMPLATE_FREEBSD,
 					'dependency' => '/etc/passwd has been changed on FreeBSD by Zabbix agent',
-					'error_message' => 'Trigger "Zabbix agent is not available" cannot depend on the trigger "/etc/passwd has been changed'.
-							' on {HOST.NAME}" from the template "FreeBSD by Zabbix agent", because dependencies on triggers'.
-							' from a child template or host are not allowed.'
+					'error_message' => 'Trigger "Zabbix agent is not available" cannot depend on the trigger "/etc/passwd '.
+							'has been changed on {HOST.NAME}", because the template "FreeBSD by Zabbix agent" is not '.
+							'linked to the host "Test host".'
 				]
 			],
 			[

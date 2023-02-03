@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,12 +27,15 @@ class CControllerPopupImportCompare extends CController {
 
 	private $toc = [];
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'import' => 'in 1',
 			'rules_preset' => 'in template',
-			'rules' => 'array',
-			'import_overlayid' => 'required|string'
+			'rules' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -97,7 +100,6 @@ class CControllerPopupImportCompare extends CController {
 				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
 				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				break;
 		}
@@ -133,7 +135,6 @@ class CControllerPopupImportCompare extends CController {
 
 		$data = [
 			'title' => _('Templates'),
-			'import_overlayid' => $this->getInput('import_overlayid'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

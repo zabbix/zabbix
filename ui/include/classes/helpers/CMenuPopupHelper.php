@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,8 @@ class CMenuPopupHelper {
 				'has_related_reports' => $has_related_reports,
 				'can_edit_dashboards' => $can_edit_dashboards,
 				'can_view_reports' => $can_view_reports,
-				'can_create_reports' => $can_create_reports
+				'can_create_reports' => $can_create_reports,
+				'csrf_token' => CCsrfTokenHelper::get('dashboard')
 			]
 		];
 	}
@@ -126,9 +127,9 @@ class CMenuPopupHelper {
 	 * Prepare data for Ajax trigger menu popup.
 	 *
 	 * @param string $triggerid
-	 * @param string $eventid      (optional) Mandatory for "Acknowledge", "Convert as cause" and
+	 * @param string $eventid      (optional) Mandatory for "Update problem", "Convert as cause" and
 	 *                             "Mark selected as symptoms" context menus.
-	 * @param array  $options      (optional) Whether to show "Acknowledge" menu, "Convert as cause" or
+	 * @param array  $options      (optional) Whether to show "Update problem" menu, "Convert as cause" or
 	 *                             "Mark selected as symptoms" context menus.
 	 *
 	 * @return array

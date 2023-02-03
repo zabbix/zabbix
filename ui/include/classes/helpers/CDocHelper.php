@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ class CDocHelper {
 	const ADMINISTRATION_ACTIONLOG_LIST =						'web_interface/frontend_sections/reports/action_log';
 	const ADMINISTRATION_AUDITLOG_EDIT =						'web_interface/frontend_sections/administration/audit_log';
 	const ADMINISTRATION_AUTOREG_EDIT =							'web_interface/frontend_sections/administration/general#autoregistration';
+	const ADMINISTRATION_CONNECTOR_LIST =						'web_interface/frontend_sections/administration/general#connectors';
 	const ADMINISTRATION_GEOMAPS_EDIT =							'web_interface/frontend_sections/administration/general#geographical-maps';
 	const ADMINISTRATION_GUI_EDIT =								'web_interface/frontend_sections/administration/general#gui';
 	const ADMINISTRATION_HOUSEKEEPING_EDIT =					'web_interface/frontend_sections/administration/housekeeping';
@@ -108,6 +109,7 @@ class CDocHelper {
 	const MONITORING_SYSMAP_CONSTRUCTOR =						'config/visualization/maps/map#overview';
 	const MONITORING_WEB_VIEW =									'web_interface/frontend_sections/monitoring/hosts/web';
 	const POPUP_ACKNOWLEDGMENT_EDIT =							'acknowledgment#updating-problems';
+	const POPUP_CONNECTOR_EDIT =								'config/connectors';
 	const POPUP_HOST_IMPORT =									'xml_export_import/hosts#importing';
 	const POPUP_HTTP_STEP_EDIT =								'web_monitoring#configuring-steps';
 	const POPUP_MAPS_IMPORT =									'xml_export_import/maps#importing';
