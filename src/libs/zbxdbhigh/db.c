@@ -102,6 +102,7 @@ int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config
 	}
 #else
 	ZBX_UNUSED(program_type);
+	ZBX_UNUSED(config_dbhigh);
 #endif
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS))
@@ -227,12 +228,7 @@ int	zbx_db_connect(int flag)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __func__, flag);
 
-	while (ZBX_DB_OK != (err = zbx_db_connect_basic(zbx_cfg_dbhigh->config_dbhost, zbx_cfg_dbhigh->config_dbuser,
-			zbx_cfg_dbhigh->config_dbpassword, zbx_cfg_dbhigh->config_dbname, zbx_cfg_dbhigh->config_dbschema,
-			zbx_cfg_dbhigh->config_dbsocket, zbx_cfg_dbhigh->config_dbport,
-			zbx_cfg_dbhigh->config_db_tls_connect, zbx_cfg_dbhigh->config_db_tls_cert_file,
-			zbx_cfg_dbhigh->config_db_tls_key_file, zbx_cfg_dbhigh->config_db_tls_ca_file,
-			zbx_cfg_dbhigh->config_db_tls_cipher, zbx_cfg_dbhigh->config_db_tls_cipher_13)))
+	while (ZBX_DB_OK != (err = zbx_db_connect_basic(zbx_cfg_dbhigh)))
 	{
 		if (ZBX_DB_CONNECT_ONCE == flag)
 			break;
