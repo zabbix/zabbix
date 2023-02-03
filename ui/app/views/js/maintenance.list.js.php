@@ -28,12 +28,10 @@
 	const view = new class {
 
 		init() {
-			this._initActions();
-			this._updateHostGroupMs();
+			this._updateFilterGroupsMs();
+			$('#filter_groups_').on('change', () => this._updateFilterGroupsMs());
 
-			this.hostgroup_ms.on('change', () => {
-				this._updateHostGroupMs();
-			});
+			this._initActions();
 		}
 
 		_initActions() {
@@ -107,7 +105,7 @@
 			return fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({maintenanceids: maintenanceids})
+				body: JSON.stringify({maintenanceids})
 			})
 				.then((response) => response.json())
 				.then((response) => {
@@ -144,11 +142,9 @@
 				});
 		}
 
-		_updateHostGroupMs() {
-			this.hostgroup_ms = $('#filter_groups_');
-
-			this.hostgroup_ms.multiSelect('setDisabledEntries',
-				[... document.querySelectorAll('[name^="filter_groups["]')].map((input) => input.value)
+		_updateFilterGroupsMs() {
+			$('#filter_groups_').multiSelect('setDisabledEntries',
+				[...document.querySelectorAll('[name^="filter_groups["]')].map((input) => input.value)
 			);
 		}
 	};

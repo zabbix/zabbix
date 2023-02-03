@@ -152,14 +152,14 @@
 			this._post(target, slaids, curl);
 		}
 
-		_post(target, slaids, url) {
-			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+		_post(target, slaids, curl) {
+			target.classList.add('is-loading');
+
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('sla')) ?>
 			);
 
-			target.classList.add('is-loading');
-
-			return fetch(url.getUrl(), {
+			return fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({slaids})
