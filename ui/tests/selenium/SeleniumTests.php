@@ -248,6 +248,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testFormUpdateProblem');
 		$suite->addTestSuite('testPageHistory');
+		$suite->addTestSuite('testPageHostGraph');
 		$suite->addTestSuite('testPageHostInterfaces');
 		$suite->addTestSuite('testPageHostPrototypes');
 		$suite->addTestSuite('testPageHosts');

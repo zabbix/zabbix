@@ -59,13 +59,23 @@ class CLdap {
 	 */
 	public $error;
 
-	public function __construct($arg = []) {
-		$this->ds = false;
-		$this->info = [];
+	/**
+	 * @var mixed
+	 */
+	private $ds = false;
 
-		if (is_array($arg)) {
-			$this->cnf = zbx_array_merge($this->cnf, $arg);
-		}
+	/**
+	 * @var mixed
+	 */
+	private $info = [];
+
+	/**
+	 * @var int
+	 */
+	private $bound = 0;
+
+	public function __construct(array $arg = []) {
+		$this->cnf = zbx_array_merge($this->cnf, $arg);
 
 		if ($this->cnf['search_filter'] === '') {
 			$this->cnf['search_filter'] = '(%{attr}=%{user})';

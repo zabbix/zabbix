@@ -21,6 +21,11 @@
 
 class CControllerIconMapEdit extends CController {
 
+	/**
+	 * @var array
+	 */
+	private $iconmap = [];
+
 	protected function init() {
 		$this->disableSIDValidation();
 	}

@@ -1331,7 +1331,7 @@ class CHistoryManager {
 	private function deleteHistoryFromSql(array $items) {
 		global $DB;
 
-		$item_tables = array_map('self::getTableName', array_unique($items));
+		$item_tables = array_map([self::class, 'getTableName'], array_unique($items));
 		$table_names = array_flip(self::getTableName());
 
 		if (in_array(ITEM_VALUE_TYPE_UINT64, $items)) {
