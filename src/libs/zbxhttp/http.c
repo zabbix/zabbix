@@ -818,8 +818,12 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 			}
 			else
 			{
-				zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset,
-						body.data, body.offset);
+				if (NULL != body.data)
+				{
+					zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset, body.data,
+							body.offset);
+				}
+
 				*out = header.data;
 				header.data = NULL;
 			}

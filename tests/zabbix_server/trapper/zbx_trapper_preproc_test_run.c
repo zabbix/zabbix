@@ -24,12 +24,13 @@
 #include "zbxembed.h"
 #include "libs/zbxpreproc/pp_execute.h"
 #include "zabbix_server/trapper/trapper_preproc.h"
+#include "zbx_item_constants.h"
 
 zbx_es_t	es_engine;
 
 int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
-		const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
-		char **error);
+		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,
+		zbx_pp_history_t *history, char **error);
 
 int	__wrap_zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user);
 int	__wrap_zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
@@ -39,8 +40,8 @@ void	__wrap_zbx_init_agent_result(AGENT_RESULT *result);
 void	__wrap_zbx_free_agent_result(AGENT_RESULT *result);
 
 int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
-		const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
-		char **error)
+		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,
+		zbx_pp_history_t *history, char **error)
 {
 	int			i, results_num;
 	zbx_pp_result_t		*results_out = NULL, *result;
@@ -52,7 +53,10 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 
 	pp_context_init(&ctx);
 
-	zbx_variant_set_str(&value_in, zbx_strdup(NULL, value));
+	if (ITEM_STATE_NORMAL == state)
+		zbx_variant_set_str(&value_in, zbx_strdup(NULL, value));
+	else
+		zbx_variant_set_error(&value_in, zbx_strdup(NULL, value));
 
 	preproc = zbx_pp_item_preproc_create(ITEM_TYPE_TRAPPER, value_type, 0);
 
