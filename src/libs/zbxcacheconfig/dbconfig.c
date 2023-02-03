@@ -11326,28 +11326,29 @@ out:
 	return ret;
 }
 
-/************************************************************************************
- *                                                                                  *
- * Purpose: attempt to set interface as unavailable based on agent availability     *
- *                                                                                  *
- * Parameters: interfaceid - [IN] the interface identifier                          *
- *             ts          - [IN] the last timestamp                                *
- *             in          - [IN/OUT] IN: the caller's interface availability data  *
- *                                   OUT: the interface availability data in cache  *
- *                                        before changes                            *
- *             out         - [OUT] the interface availability data after changes    *
- *             error_msg   - [IN] the error message                                 *
- *                                                                                  *
- * Return value: SUCCEED - the interface was deactivated successfully               *
- *               FAIL    - the interface was already deactivated or deactivation    *
- *                         failed                                                   *
- *                                                                                  *
- * Comments: The interface availability fields are updated according to the above   *
- *           schema.                                                                *
- *                                                                                  *
- ***********************************************************************************/
-int	DCinterface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
-		zbx_agent_availability_t *out, const char *error_msg)
+/***************************************************************************************
+ *                                                                                     *
+ * Purpose: attempt to set interface as unavailable based on agent availability        *
+ *                                                                                     *
+ * Parameters: interfaceid       - [IN] interface identifier                           *
+ *             ts                - [IN] last timestamp                                 *
+ *             unavailable_delay - [IN]                                                *
+ *             in                - [IN/OUT] IN: caller's interface availability data   *
+ *                                          OUT: interface availability data in cache  *
+ *                                               before changes                        *
+ *             out               - [OUT] interface availability data after changes     *
+ *             error_msg         - [IN] error message                                  *
+ *                                                                                     *
+ * Return value: SUCCEED - the interface was deactivated successfully                  *
+ *               FAIL    - the interface was already deactivated or deactivation       *
+ *                         failed                                                      *
+ *                                                                                     *
+ * Comments: The interface availability fields are updated according to the above      *
+ *           schema.                                                                   *
+ *                                                                                     *
+ ***************************************************************************************/
+int	DCinterface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, int unavailable_delay,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error_msg)
 {
 	int			ret = FAIL, errors_from, disable_until;
 	const char		*error;
@@ -11406,7 +11407,7 @@ int	DCinterface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, z
 			else
 			{
 				/* make host unavailable, schedule next unavailable check */
-				disable_until = ts->sec + CONFIG_UNAVAILABLE_DELAY;
+				disable_until = ts->sec + unavailable_delay;
 				available = INTERFACE_AVAILABLE_FALSE;
 				error = error_msg;
 			}

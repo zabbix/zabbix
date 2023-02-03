@@ -27,21 +27,6 @@
 #include "zbxnum.h"
 #include "zbxversion.h"
 
-extern char	*CONFIG_DBHOST;
-extern char	*CONFIG_DBNAME;
-extern char	*CONFIG_DBSCHEMA;
-extern char	*CONFIG_DBUSER;
-extern char	*CONFIG_DBPASSWORD;
-extern char	*CONFIG_DBSOCKET;
-extern char	*CONFIG_DB_TLS_CONNECT;
-extern char	*CONFIG_DB_TLS_CERT_FILE;
-extern char	*CONFIG_DB_TLS_KEY_FILE;
-extern char	*CONFIG_DB_TLS_CA_FILE;
-extern char	*CONFIG_DB_TLS_CIPHER;
-extern char	*CONFIG_DB_TLS_CIPHER_13;
-extern int	CONFIG_DBPORT;
-extern int	CONFIG_UNAVAILABLE_DELAY;
-
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1
 #define ZBX_DB_CONNECT_ONCE	2
@@ -485,6 +470,10 @@ typedef struct
 }
 zbx_service_alarm_t;
 
+zbx_config_dbhigh_t	*zbx_config_dbhigh_new(void);
+void			zbx_config_dbhigh_free(zbx_config_dbhigh_t *config_dbhigh);
+
+void	zbx_init_library_dbhigh(const zbx_config_dbhigh_t *config_dbhigh);
 int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char **error);
 void	zbx_db_deinit(void);
 
@@ -493,9 +482,9 @@ void	zbx_db_init_autoincrement_options(void);
 int	zbx_db_connect(int flag);
 void	zbx_db_close(void);
 
-int	zbx_db_validate_config_features(unsigned char program_type);
+int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config_dbhigh_t *config_dbhig);
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-void	zbx_db_validate_config(void);
+void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh);
 #endif
 
 #ifdef HAVE_ORACLE
