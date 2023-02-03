@@ -1384,7 +1384,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
 							CONFIG_TIMEOUT};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT,
+							CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP};
 	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, CONFIG_TIMEOUT};

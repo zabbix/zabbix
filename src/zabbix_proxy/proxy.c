@@ -1275,7 +1275,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type};
-	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT,
+								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
 								&listen_sock};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {CONFIG_TIMEOUT};
