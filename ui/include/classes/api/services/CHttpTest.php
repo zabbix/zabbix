@@ -649,25 +649,15 @@ class CHttpTest extends CApiService {
 	 * @param array $db_httptests
 	 */
 	private static function addInheritedHttptests(array &$db_httptests): void {
-		$templateids = array_keys($db_httptests);
+		$options = [
+			'output' => ['httptestid', 'name'],
+			'filter' => ['templateid' => array_keys($db_httptests)]
+		];
+		$result = DBselect(DB::makeSql('httptest', $options));
 
-		do {
-			$options = [
-				'output' => ['httptestid', 'name'],
-				'filter' => ['templateid' => $templateids]
-			];
-			$result = DBselect(DB::makeSql('httptest', $options));
-
-			$templateids = [];
-
-			while ($row = DBfetch($result)) {
-				if (!array_key_exists($row['httptestid'], $db_httptests)) {
-					$templateids[] = $row['httptestid'];
-
-					$db_httptests[$row['httptestid']] = $row;
-				}
-			}
-		} while ($templateids);
+		while ($row = DBfetch($result)) {
+			$db_httptests[$row['httptestid']] = $row;
+		}
 	}
 
 	/**
@@ -1186,10 +1176,9 @@ class CHttpTest extends CApiService {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('hht.hostid', $hostids) : '';
 
 		$result = DBselect(
-			'SELECT hht.httptestid,hht.name,h.status AS host_status'.
-			' FROM httptest ht,httptest hht,hosts h'.
+			'SELECT hht.httptestid,hht.name'.
+			' FROM httptest ht,httptest hht'.
 			' WHERE ht.httptestid=hht.templateid'.
-				' AND hht.hostid=h.hostid'.
 				' AND '.dbConditionId('ht.hostid', $templateids).
 				$hostids_condition
 		);
@@ -1197,17 +1186,11 @@ class CHttpTest extends CApiService {
 		$httptests = [];
 
 		while ($row = DBfetch($result)) {
-			$httptest = [
+			$httptests[] = [
 				'httptestid' => $row['httptestid'],
 				'name' => $row['name'],
 				'templateid' => 0
 			];
-
-			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
-				$httptest += ['uuid' => generateUuidV4()];
-			}
-
-			$httptests[] = $httptest;
 		}
 
 		if ($httptests) {

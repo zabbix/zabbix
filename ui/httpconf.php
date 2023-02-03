@@ -461,7 +461,6 @@ if (isset($_REQUEST['form'])) {
 		'httptestid' => getRequest('httptestid'),
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
-		'templates' => [],
 		'context' => getRequest('context'),
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0)
 	];
@@ -498,10 +497,6 @@ if (isset($_REQUEST['form'])) {
 		$data['delay'] = $db_httptest['delay'];
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
-		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
-			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
-
 		$data['agent'] = ZBX_AGENT_OTHER;
 		$data['agent_other'] = $db_httptest['agent'];
 
@@ -583,6 +578,7 @@ if (isset($_REQUEST['form'])) {
 		}
 		unset($step);
 
+		$tags = $db_httptest['tags'];
 	}
 	else {
 		if (isset($_REQUEST['form_refresh'])) {
@@ -623,7 +619,7 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	$i = 1;
-	foreach($data['steps'] as $stepid => $step) {
+	foreach ($data['steps'] as $stepid => $step) {
 		$pairs_grouped = [
 			'query_fields' => [],
 			'post_fields' => [],
@@ -640,44 +636,29 @@ if (isset($_REQUEST['form'])) {
 		$data['steps'][$stepid]['no'] = $i++;
 	}
 
-	if ($db_httptest) {
-		$parent_templates = getHttpTestParentTemplates($db_httptests)['templates'];
+	if ($db_httptest && $db_httptest['templateid'] != 0) {
+		$parent_httptests = getParentHttpTests([$db_httptest],
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
 
-		$rw_templates = $data['host']['parentTemplates']
-			? API::Template()->get([
-				'output' => [],
-				'templateids' => array_keys($parent_templates),
-				'editable' => true,
-				'preservekeys' => true
-			])
-			: [];
+		$data['templateid'] = $db_httptest['templateid'];
+		$data['parent_httptest'] = reset($parent_httptests);
+	}
 
-		foreach ($parent_templates as $templateid => &$template) {
-			if (array_key_exists($templateid, $rw_templates)) {
-				$template['permission'] = PERM_READ_WRITE;
-			}
-			else {
-				$template['name'] = _('Inaccessible template');
-				$template['permission'] = PERM_DENY;
-			}
-		}
-		unset($template);
+	if ($data['show_inherited_tags']) {
+		CTagHelper::addInheritedTags($tags, $data['context'], [$data['hostid']],
+			array_key_exists('parent_httptest', $data) ? $data['parent_httptest'] : []
+		);
+	}
 
-		$tags = getHttpTestTags([
-			'templates' => $parent_templates,
-			'hostid' => getRequest('hostid'),
-			'tags' => hasRequest('form_refresh') ? $tags : $db_httptest['tags'],
-			'show_inherited_tags' => $data['show_inherited_tags']
-		]);
+	if ($tags) {
+		CArrayHelper::sort($tags, ['tag', 'value']);
+	}
+	else {
+		$tags = [['tag' => '', 'value' => '']];
 	}
 
 	$data['tags'] = $tags;
-	if (!$data['tags']) {
-		$data['tags'][] = ['tag' => '', 'value' => ''];
-	}
-	else {
-		CArrayHelper::sort($data['tags'], ['tag', 'value']);
-	}
 
 	// render view
 	echo (new CView('configuration.httpconf.edit', $data))->getOutput();
@@ -872,10 +853,11 @@ else {
 
 	order_result($http_tests, $sortField, $sortOrder);
 
-	$data['parent_templates'] = getHttpTestParentTemplates($http_tests);
+	$data['parent_httptests'] = getParentHttpTests($http_tests,
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+	);
 	$data['http_tests'] = $http_tests;
 	$data['httpTestsLastData'] = $httpTestsLastData;
-	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	$data['tags'] = makeTags($data['http_tests'], true, 'httptestid', ZBX_TAG_COUNT_DEFAULT);
 
