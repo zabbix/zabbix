@@ -516,7 +516,7 @@ static int	preproc_snmp_convert_bits_value(char **value, int format, char **erro
 		if (SNMP_UINT_FROM_BITS_MAX_BYTES < len)
 			len = SNMP_UINT_FROM_BITS_MAX_BYTES;
 
-		for (i = 0; i < len; i += 2)
+		for (i = 0; i < (int)len; i += 2)
 		{
 			char	b1, b2;
 
