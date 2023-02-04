@@ -45,7 +45,7 @@ $timeperiods = (new CTable())
 					(new CSimpleButton(_('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('js-add')
-						->setEnabled($this->data['allowed_edit'])
+						->setEnabled($data['allowed_edit'])
 				))
 			)
 	);
@@ -69,11 +69,11 @@ $timeperiod_template = new CTemplateTag('timeperiod-row-tmpl',
 				(new CSimpleButton(_('Edit')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('js-edit')
-					->setEnabled($this->data['allowed_edit']),
+					->setEnabled($data['allowed_edit']),
 				(new CSimpleButton(_('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('js-remove')
-					->setEnabled($this->data['allowed_edit'])
+					->setEnabled($data['allowed_edit'])
 			]))
 		))
 	]))->setAttribute('data-row_index', '#{row_index}')
@@ -88,7 +88,7 @@ $tags = (new CTable())
 				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
 				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
 				->setModern()
-				->setEnabled($this->data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+				->setEnabled($data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 		))
 	)
 	->setFooter(
@@ -96,7 +96,7 @@ $tags = (new CTable())
 			(new CSimpleButton(_('Add')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-add')
-				->setEnabled($this->data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+				->setEnabled($data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 		))
 	);
 
@@ -105,20 +105,20 @@ $tag_template = new CTemplateTag('tag-row-tmpl',
 		(new CTextBox('tags[#{rowNum}][tag]', '#{tag}', false, DB::getFieldLength('maintenance_tag', 'tag')))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder', _('tag'))
-			->setReadonly(!$this->data['allowed_edit']),
+			->setReadonly(!$data['allowed_edit']),
 		(new CRadioButtonList('tags[#{rowNum}][operator]', MAINTENANCE_TAG_OPERATOR_LIKE))
 			->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
 			->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 			->setModern()
-			->setReadonly(!$this->data['allowed_edit']),
+			->setReadonly(!$data['allowed_edit']),
 		(new CTextBox('tags[#{rowNum}][value]', '#{value}', false, DB::getFieldLength('maintenance_tag', 'value')))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder',  _('value'))
-			->setReadonly(!$this->data['allowed_edit']),
+			->setReadonly(!$data['allowed_edit']),
 		(new CButton('tags[#{rowNum}][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
-			->setEnabled($this->data['allowed_edit'])
+			->setEnabled($data['allowed_edit'])
 	]))->addClass('form_row')
 );
 
@@ -131,7 +131,7 @@ $form->addItem(
 					->setAttribute('autofocus', 'autofocus')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
-					->setReadonly(!$this->data['allowed_edit'])
+					->setReadonly(!$data['allowed_edit'])
 			)
 		])
 		->addItem([
@@ -141,7 +141,7 @@ $form->addItem(
 					->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
 					->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
 					->setModern()
-					->setReadonly(!$this->data['allowed_edit'])
+					->setReadonly(!$data['allowed_edit'])
 			)
 		])
 		->addItem([
@@ -151,7 +151,7 @@ $form->addItem(
 					->setDateFormat(ZBX_DATE_TIME)
 					->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 					->setAriaRequired()
-					->setReadonly(!$this->data['allowed_edit'])
+					->setReadonly(!$data['allowed_edit'])
 			)
 		])
 		->addItem([
@@ -161,7 +161,7 @@ $form->addItem(
 					->setDateFormat(ZBX_DATE_TIME)
 					->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 					->setAriaRequired()
-					->setReadonly(!$this->data['allowed_edit'])
+					->setReadonly(!$data['allowed_edit'])
 			)
 		])
 		->addItem([
@@ -177,7 +177,7 @@ $form->addItem(
 					'name' => 'groupids[]',
 					'object_name' => 'hostGroup',
 					'data' => $data['groups_ms'],
-					'disabled' => !$this->data['allowed_edit'],
+					'disabled' => !$data['allowed_edit'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'host_groups',
@@ -197,7 +197,7 @@ $form->addItem(
 					'name' => 'hostids[]',
 					'object_name' => 'hosts',
 					'data' => $data['hosts_ms'],
-					'disabled' => !$this->data['allowed_edit'],
+					'disabled' => !$data['allowed_edit'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'hosts',
@@ -224,7 +224,7 @@ $form->addItem(
 			new CFormField(
 				(new CTextArea('description', $data['description']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setReadonly(!$this->data['allowed_edit'])
+					->setReadonly(!$data['allowed_edit'])
 			)
 		])
 	);
