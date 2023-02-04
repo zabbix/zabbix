@@ -183,9 +183,10 @@ class C62ImportConverter extends CConverter {
 		foreach ($media_types as &$media_type) {
 			if ($media_type['type'] == CXmlConstantName::SCRIPT && array_key_exists('parameters', $media_type)) {
 				$parameters = [];
+				$sortorder = 0;
 
-				foreach ($media_type['parameters'] as $sortorder => $value) {
-					$parameters[] = ['sortorder' => (string) $sortorder, 'value' => $value];
+				foreach ($media_type['parameters'] as $value) {
+					$parameters[] = ['sortorder' => (string) $sortorder++, 'value' => $value];
 				}
 
 				$media_type['parameters'] =  $parameters;
