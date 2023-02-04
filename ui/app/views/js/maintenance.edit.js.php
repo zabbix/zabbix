@@ -22,83 +22,86 @@
 
 window.maintenance_edit = new class {
 
-	init({maintenanceid, timeperiods, maintenance_tags, allowed_edit}) {
-		this._initTemplates();
-
+	init({maintenanceid, timeperiods, tags, allowed_edit}) {
 		this.maintenanceid = maintenanceid;
-		this.allowed_edit = allowed_edit;
 
 		this.overlay = overlays_stack.getById('maintenance-edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		// Add existing periods in maintenance edit form.
-		if (typeof(timeperiods) === 'object') {
-			timeperiods = Object.values(timeperiods);
-		}
-
-		for (const timeperiod of timeperiods) {
-			this._addPeriod(timeperiod);
-		}
-
-		// Setup tags.
-		const $maintenance_tags = jQuery(document.getElementById('maintenance-tags'));
-
-		$maintenance_tags.dynamicRows({
-			template: '#maintenance-tag-row-tmpl',
-			rows: maintenance_tags
+		timeperiods.forEach((timeperiod, row_index) => {
+			this._addTimePeriod({row_index, ...timeperiod});
 		});
 
-		this._initPeriodActionButtons();
-		this._update();
-	}
+		// Setup Tags.
+		jQuery(document.getElementById('tags')).dynamicRows({
+			template: '#tag-row-tmpl',
+			rows: tags
+		});
 
-	_initTemplates() {
-		this.periods_template = new Template(`
-			<tr data-row_index="#{row_index}">
-				<td>#{period_type}</td>
-				<td class="wordwrap">#{schedule}</td>
-				<td>#{period_table_entry}</td>
-				<td>
-					<input type="hidden" name="timeperiods[#{row_index}][timeperiod_type]" value="#{timeperiod_type}">
-					<input type="hidden" name="timeperiods[#{row_index}][every]" value="#{every}">
-					<input type="hidden" name="timeperiods[#{row_index}][month]" value="#{month}">
-					<input type="hidden" name="timeperiods[#{row_index}][dayofweek]" value="#{dayofweek}">
-					<input type="hidden" name="timeperiods[#{row_index}][day]" value="#{day}">
-					<input type="hidden" name="timeperiods[#{row_index}][start_time]" value="#{start_time}">
-					<input type="hidden" name="timeperiods[#{row_index}][period]" value="#{period}">
-					<input type="hidden" name="timeperiods[#{row_index}][start_date]" value="#{start_date}">
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit"><?= _('Edit') ?></button>
-						</li>
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-	}
-
-	_initPeriodActionButtons() {
-		document
-			.getElementById('periods')
-			.addEventListener('click', (e) => {
+		if (allowed_edit) {
+			// Setup Time periods.
+			document.getElementById('timeperiods').addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-add')) {
-					this._editPeriod();
+					this._editTimePeriod();
 				}
 				else if (e.target.classList.contains('js-edit')) {
-					this._editPeriod(e.target.closest('tr'));
+					this._editTimePeriod(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove();
 				}
 			});
+
+			// Preselect already selected data in multiselect popups.
+
+			const $groupids = $('#groupids_');
+
+			$groupids.on('change', () => this._updateMultiselect($groupids));
+			this._updateMultiselect($groupids);
+
+			const $hostids = $('#hostids_');
+
+			$hostids.on('change', () => this._updateMultiselect($hostids));
+			this._updateMultiselect($hostids);
+
+			// Update form field state according to the form data.
+
+			document.getElementById('maintenance_type').addEventListener('change', () => this._update());
+
+			this._update();
+		}
 	}
 
-	_editPeriod(row = null) {
+	_update () {
+		const tags_enabled =
+			this.form.querySelector('[name="maintenance_type"]:checked').value == <?= MAINTENANCE_TYPE_NORMAL ?>;
+
+		const tags_container = document.getElementById('tags');
+
+		tags_container.querySelectorAll('[name$="[tag]"], [name$="[value]"]').forEach((text_input) => {
+			text_input.readOnly = !tags_enabled;
+		});
+
+		tags_container.querySelectorAll('[name="tags_evaltype"], [name$="[operator]"]').forEach((radio_button) => {
+			radio_button.disabled = !tags_enabled;
+		});
+
+		tags_container.querySelectorAll('.element-table-add, .element-table-remove').forEach((button) => {
+			button.disabled = !tags_enabled;
+		});
+
+		tags_container.querySelectorAll('[name$="[tag]"]').forEach((tag_text_input) => {
+			tag_text_input.placeholder = tags_enabled ? <?= json_encode(_('tag')) ?> : '';
+		});
+
+		tags_container.querySelectorAll('[name$="[value]"]').forEach((value_text_input) => {
+			value_text_input.placeholder = tags_enabled ? <?= json_encode(_('value')) ?> : '';
+		});
+	}
+
+	_editTimePeriod(row = null) {
 		let popup_params;
 
 		if (row !== null) {
@@ -120,37 +123,64 @@ window.maintenance_edit = new class {
 		else {
 			let row_index = 0;
 
-			while (document.querySelector(`#periods [data-row_index="${row_index}"]`) !== null) {
+			while (document.querySelector(`#timeperiods [data-row_index="${row_index}"]`) !== null) {
 				row_index++;
 			}
 
 			popup_params = {row_index};
 		}
 
-		const overlay = PopUp('maintenance.period.edit', popup_params, {
-			dialogueid: 'maintenance_period_edit'
+		const overlay = PopUp('maintenance.timeperiod.edit', popup_params, {
+			dialogueid: 'maintenance-timeperiod-edit',
+			dialogue_class: 'modal-popup-medium'
 		});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			if (row !== null) {
-				this._updatePeriod(row, e.detail)
+				this._updateTimePeriod(row, e.detail)
 			}
 			else {
-				this._addPeriod(e.detail);
+				this._addTimePeriod(e.detail);
 			}
 		});
 	}
 
-	_addPeriod(period) {
+	_addTimePeriod(timeperiod) {
+		const template = new Template(document.getElementById('timeperiod-row-tmpl').innerHTML);
+
 		document
-			.querySelector('#periods tbody')
-			.insertAdjacentHTML('beforeend', this.periods_template.evaluate(period));
+			.querySelector('#timeperiods tbody')
+			.insertAdjacentHTML('beforeend', template.evaluate(timeperiod));
 	}
 
+	_updateTimePeriod(row, timeperiod) {
+		const template = new Template(document.getElementById('timeperiod-row-tmpl').innerHTML);
 
-	_updatePeriod(row, period) {
-		row.insertAdjacentHTML('afterend', this.periods_template.evaluate(period));
+		row.insertAdjacentHTML('afterend', template.evaluate(timeperiod));
 		row.remove();
+	}
+
+	clone({title, buttons}) {
+		this.maintenanceid = null;
+
+		this.overlay.unsetLoading();
+		this.overlay.setProperties({title, buttons});
+	}
+
+	delete() {
+		const post_data = {
+			maintenanceids: [this.maintenanceid],
+			<?= CCsrfTokenHelper::CSRF_TOKEN_NAME?>: <?= CCsrfTokenHelper::get('maintenance') ?>
+		};
+
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'maintenance.delete');
+
+		this._post(curl.getUrl(), post_data, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+		});
 	}
 
 	submit() {
@@ -159,28 +189,19 @@ window.maintenance_edit = new class {
 		if (this.maintenanceid !== null) {
 			fields.maintenanceid = this.maintenanceid;
 		}
-		else {
-			fields.maintenanceid = 0;
-		}
 
-		fields.mname = fields.mname.trim();
+		fields.name = fields.name.trim();
 		fields.description = fields.description.trim();
 
-		if ('maintenance_tags' in fields) {
-			for (const maintenance_tag of Object.values(fields.maintenance_tags)) {
-				maintenance_tag.tag = maintenance_tag.tag.trim();
-				maintenance_tag.value = maintenance_tag.value.trim();
+		if ('tags' in fields) {
+			for (const tag of Object.values(fields.tags)) {
+				tag.tag = tag.tag.trim();
+				tag.value = tag.value.trim();
 			}
 		}
 
-		if (typeof(fields.timeperiods) === 'object') {
-			fields.timeperiods = Object.values(fields.timeperiods);
-		}
-
-		this.overlay.setLoading();
-
 		const curl = new Curl('zabbix.php', false);
-		curl.setArgument('action', fields.maintenanceid === 0 ? 'maintenance.create' : 'maintenance.update');
+		curl.setArgument('action', this.maintenanceid !== null ? 'maintenance.update' : 'maintenance.create');
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
@@ -190,6 +211,8 @@ window.maintenance_edit = new class {
 	}
 
 	_post(url, data, success_callback) {
+		this.overlay.setLoading();
+
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -230,88 +253,7 @@ window.maintenance_edit = new class {
 			});
 	}
 
-	clone({title, buttons}) {
-		this.maintenanceid = null;
-
-		this.overlay.unsetLoading();
-		this.overlay.setProperties({title, buttons});
-	}
-
-	delete() {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'maintenance.delete');
-
-		this._post(curl.getUrl(), {maintenanceids: [this.maintenanceid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
-		});
-	}
-
-	_update () {
-		if (!this.allowed_edit) {
-			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"], .js-edit, .js-remove')
-				.forEach((element) => {
-					element.disabled = true;
-					element.setAttribute('readonly', 'readonly')
-				});
-		}
-
-		if (document.querySelector('input[name=maintenance_type]:checked').value  == <?= MAINTENANCE_TYPE_NODATA ?>) {
-			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"]').forEach((element) => {
-				element.disabled = true;
-			});
-			document.querySelectorAll('input[name$="[tag]"], input[name$="[value]').forEach((element) => {
-				element.removeAttribute('placeholder');
-			});
-		}
-
-		document.getElementById('maintenance_type').addEventListener('change', () => {
-			var maintenance_type = document.querySelector('input[name=maintenance_type]:checked').value;
-			var tags_table_disabled = maintenance_type == <?= MAINTENANCE_TYPE_NODATA ?>;
-
-			document.querySelectorAll('[id^="tags_"], [id^="maintenance_tags_"]').forEach((element) => {
-				element.disabled = tags_table_disabled;
-			});
-
-			if (tags_table_disabled) {
-				document.querySelectorAll('input[name$="[tag]"], input[name$="[value]').forEach((element) => {
-					element.removeAttribute('placeholder');
-				});
-			}
-			else {
-				document.querySelectorAll('input[name$="[tag]"]').forEach((element) => {
-					element.setAttribute('placeholder', <?= json_encode(_('tag')) ?>);
-				});
-				document.querySelectorAll('input[name$="[value]"]').forEach((element) => {
-					element.setAttribute('placeholder', <?= json_encode(_('value')) ?>);
-				});
-			}
-		});
-
-		this._updateHostGroupMs();
-		this._updateHostMs();
-
-		this.hostgroup_ms.on('change', () => {
-			this._updateHostGroupMs();
-		});
-		this.host_ms.on('change', () => {
-			this._updateHostMs();
-		});
-	}
-	_updateHostGroupMs() {
-		this.hostgroup_ms = $('#groupids_');
-
-		this.hostgroup_ms.multiSelect('setDisabledEntries',
-			[... this.form.querySelectorAll('[name^="groupids["]')].map((input) => input.value)
-		);
-	}
-
-	_updateHostMs() {
-		this.host_ms = $('#hostids_');
-
-		this.host_ms.multiSelect('setDisabledEntries',
-			[... this.form.querySelectorAll('[name^="hostids["]')].map((input) => input.value)
-		);
+	_updateMultiselect($ms) {
+		$ms.multiSelect('setDisabledEntries', [...$ms.multiSelect('getData').map((entry) => entry.id)]);
 	}
 }

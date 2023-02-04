@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerMaintenancePeriodEdit extends CController {
+class CControllerMaintenanceTimePeriodEdit extends CController {
 
 	protected function init() {
 		$this->disableCsrfValidation();
@@ -30,20 +30,20 @@ class CControllerMaintenancePeriodEdit extends CController {
 			'edit' => 				'in 1',
 			'row_index' =>			'required|int32',
 			'timeperiod_type' => 	'in '.implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]),
-			'every' =>				'db timeperiods.every',
-			'month' =>				'db timeperiods.month',
-			'dayofweek' =>			'db timeperiods.dayofweek',
-			'day' =>				'db timeperiods.day',
-			'start_time' =>			'db timeperiods.start_time',
-			'period' =>				'db timeperiods.period',
-			'start_date' =>			'string'
+			'every' =>				'int32',
+			'month' =>				'int32',
+			'dayofweek' =>			'int32',
+			'day' =>				'int32',
+			'start_time' =>			'int32',
+			'period' =>				'int32',
+			'start_date' =>			'int32'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret && $this->hasInput('edit')) {
 			$fields = [
-				'timeperiod_type' => 	'required',
+				'timeperiod_type' =>	'required',
 				'every' =>				'required',
 				'month' =>				'required',
 				'dayofweek' =>			'required',
@@ -56,7 +56,7 @@ class CControllerMaintenancePeriodEdit extends CController {
 			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
 
 			foreach ($validator->getAllErrors() as $error) {
-				info($error);
+				error($error);
 			}
 
 			$ret = !$validator->isErrorFatal() && !$validator->isError();
@@ -80,50 +80,62 @@ class CControllerMaintenancePeriodEdit extends CController {
 			&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	protected function doAction(): void {
+		$form = [
+			'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+			'every' => 1,
+			'month' => 0,
+			'dayofweek' => 0,
+			'month_date_type' => 0,
+			'day' => 1,
+			'start_date' => date(ZBX_DATE_TIME),
+			'hour' => '00',
+			'minute' => '00',
+			'period_days' => 0,
+			'period_hours' => 1,
+			'period_minutes' => 0
+		];
+
 		if ($this->hasInput('edit')) {
-			$form = [
-				'edit' => 				$this->getInput('edit'),
-				'timeperiod_type' =>	$this->getInput('timeperiod_type'),
-				'every' =>				$this->getInput('every'),
-				'month' =>				$this->getInput('month'),
-				'dayofweek' =>			$this->getInput('dayofweek'),
-				'day' =>				$this->getInput('day'),
-				'start_time' =>			$this->getInput('start_time'),
-				'period' =>				$this->getInput('period'),
-				'start_date' =>			$this->getInput('start_date'),
-				'period_days' =>		floor($this->getInput('period') / SEC_PER_DAY),
-				'period_hours' =>		floor(($this->getInput('period') % SEC_PER_DAY) / SEC_PER_HOUR),
-				'period_minutes' => 	floor((($this->getInput('period') % SEC_PER_DAY) % SEC_PER_HOUR) / SEC_PER_MIN),
-				'hour' =>				sprintf("%02d", floor($this->getInput('start_time') / SEC_PER_HOUR)),
-				'minute' =>				sprintf("%02d",
-											floor(($this->getInput('start_time') % SEC_PER_HOUR) / SEC_PER_MIN)
-										),
-				'month_date_type' =>	($this->getInput('timeperiod_type') != TIMEPERIOD_TYPE_MONTHLY
-											|| $this->getInput('day') > 0
-										) ? 0 : 1
-			];
-		}
-		else {
-			$form = [
-				'timeperiod_type' => 	TIMEPERIOD_TYPE_ONETIME,
-				'every' =>				1,
-				'month' =>				0,
-				'dayofweek' =>			0,
-				'day' =>				1,
-				'start_time' =>			0,
-				'period' =>				SEC_PER_HOUR,
-				'start_date' =>			date(ZBX_DATE_TIME),
-				'period_days' =>		0,
-				'period_hours' =>		1,
-				'period_minutes' => 	0,
-				'hour' =>				sprintf("%02d", 00),
-				'minute' =>				sprintf("%02d", 00),
-				'month_date_type' =>	0
-			];
+			$timeperiod_type = $this->getInput('timeperiod_type');
+			$month_date_type = $timeperiod_type == TIMEPERIOD_TYPE_MONTHLY && $this->getInput('day') == 0
+				? 1
+				: 0;
+
+			$form['timeperiod_type'] = $timeperiod_type;
+
+			if (in_array($timeperiod_type, [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])
+					|| ($timeperiod_type == TIMEPERIOD_TYPE_MONTHLY && $month_date_type == 1)) {
+				$form['every'] = $this->getInput('every');
+			}
+
+			if ($timeperiod_type == TIMEPERIOD_TYPE_MONTHLY) {
+				$form['month'] = $this->getInput('month');
+			}
+
+			if ($timeperiod_type == TIMEPERIOD_TYPE_WEEKLY
+					|| ($timeperiod_type == TIMEPERIOD_TYPE_MONTHLY && $month_date_type == 1)) {
+				$form['dayofweek'] = $this->getInput('dayofweek');
+			}
+
+			$form['month_date_type'] = $month_date_type;
+
+			if ($timeperiod_type == TIMEPERIOD_TYPE_MONTHLY && $month_date_type == 0) {
+				$form['day'] = $this->getInput('day');
+			}
+
+			if ($timeperiod_type == TIMEPERIOD_TYPE_ONETIME) {
+				$form['start_date'] = date(ZBX_DATE_TIME, $this->getInput('start_date'));
+			}
+
+			if (in_array($timeperiod_type, [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])) {
+				$form['hour'] = floor($this->getInput('start_time') / SEC_PER_HOUR);
+				$form['minute'] = floor(($this->getInput('start_time') % SEC_PER_HOUR) / SEC_PER_MIN);
+			}
+
+			$form['period_days'] = floor($this->getInput('period') / SEC_PER_DAY);
+			$form['period_hours'] = floor(($this->getInput('period') % SEC_PER_DAY) / SEC_PER_HOUR);
+			$form['period_minutes']= floor((($this->getInput('period') % SEC_PER_DAY) % SEC_PER_HOUR) / SEC_PER_MIN);
 		}
 
 		$data = [

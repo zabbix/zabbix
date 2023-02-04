@@ -28,8 +28,10 @@
 	const view = new class {
 
 		init() {
-			this._updateFilterGroupsMs();
-			$('#filter_groups_').on('change', () => this._updateFilterGroupsMs());
+			const $filter_groups = $('#filter_groups_');
+
+			$filter_groups.on('change', () => this._updateMultiselect($filter_groups));
+			this._updateMultiselect($filter_groups);
 
 			this._initActions();
 		}
@@ -142,10 +144,8 @@
 				});
 		}
 
-		_updateFilterGroupsMs() {
-			$('#filter_groups_').multiSelect('setDisabledEntries',
-				[...document.querySelectorAll('[name^="filter_groups["]')].map((input) => input.value)
-			);
+		_updateMultiselect($ms) {
+			$ms.multiSelect('setDisabledEntries', [...$ms.multiSelect('getData').map((entry) => entry.id)]);
 		}
 	};
 </script>

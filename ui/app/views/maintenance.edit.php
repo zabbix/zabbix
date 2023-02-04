@@ -29,77 +29,109 @@ $form = (new CForm())
 	->setId('maintenance-form')
 	->setName('maintenance_form')
 	->addVar('maintenanceid', $data['maintenanceid'] ?: 0)
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addItem(getMessages());
 
-$periods = (new CTable())
-	->setId('periods')
+// Enable form submitting on Enter.
+$form->addItem((new CInput('submit'))->addStyle('display: none;'));
+
+$timeperiods = (new CTable())
+	->setId('timeperiods')
+	->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	->setHeader(new CRowHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')]))
-	->setAriaRequired();
+	->addItem(
+		(new CTag('tfoot', true))
+			->addItem(
+				(new CCol(
+					(new CSimpleButton(_('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('js-add')
+						->setEnabled($this->data['allowed_edit'])
+				))
+			)
+	);
 
-$periods->addItem(
-	(new CTag('tfoot', true))
-		->addItem(
-			(new CCol(
-				(new CSimpleButton(_('Add')))
+$timeperiod_template = new CTemplateTag('timeperiod-row-tmpl',
+	(new CRow([
+		(new CCol('#{formatted_type}'))->addItem([
+			(new CVar('timeperiods[#{row_index}][timeperiod_type]', '#{timeperiod_type}'))->removeId(),
+			(new CVar('timeperiods[#{row_index}][every]', '#{every}'))->removeId(),
+			(new CVar('timeperiods[#{row_index}][month]', '#{month}'))->removeId(),
+			(new CVar('timeperiods[#{row_index}][dayofweek]', '#{dayofweek}'))->removeId(),
+			(new CVar('timeperiods[#{row_index}][day]', '#{day}'))->removeId(),
+			(new CVar('timeperiods[#{row_index}][start_time]', '#{start_time}'))->removeId(),
+			(new CVar('timeperiods[#{row_index}][period]', '#{period}'))->removeId(),
+			(new CVar('timeperiods[#{row_index}][start_date]', '#{start_date}'))->removeId()
+		]),
+		(new CCol('#{formatted_schedule}'))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CCol('#{formatted_period}')),
+		(new CCol(
+			(new CHorList([
+				(new CSimpleButton(_('Edit')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('js-add')
-					->setEnabled($data['allowed_edit'])
-			))->setColSpan(4)
-		)
+					->addClass('js-edit')
+					->setEnabled($this->data['allowed_edit']),
+				(new CSimpleButton(_('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('js-remove')
+					->setEnabled($this->data['allowed_edit'])
+			]))
+		))
+	]))->setAttribute('data-row_index', '#{row_index}')
 );
 
 $tags = (new CTable())
-	->setId('maintenance-tags')
+	->setId('tags')
 	->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setHeader(
 		(new CCol(
 			(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
 				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
 				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
-				->setModern(true)
-		))->setColSpan(4)
+				->setModern()
+				->setEnabled($this->data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+		))
 	)
 	->setFooter(
 		(new CCol(
-			(new CButton('tags_add', _('Add')))
+			(new CSimpleButton(_('Add')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-add')
-		))->setColSpan(4)
+				->setEnabled($this->data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+		))
 	);
 
-$template_tag = (new CTemplateTag('maintenance-tag-row-tmpl'))
-	->addItem(
-		(new CRow([
-			(new CTextBox('maintenance_tags[#{rowNum}][tag]', '#{tag}', false,
-				DB::getFieldLength('maintenance_tag', 'tag')
-			))
-				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CRadioButtonList('maintenance_tags[#{rowNum}][operator]', MAINTENANCE_TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
-				->setModern(true),
-			(new CTextBox('maintenance_tags[#{rowNum}][value]', '#{value}', false,
-				DB::getFieldLength('maintenance_tag', 'value')
-			))
-				->setAttribute('placeholder',  _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CButton('maintenance_tags[#{rowNum}][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		]))->addClass('form_row')
-	);
+$tag_template = new CTemplateTag('tag-row-tmpl',
+	(new CRow([
+		(new CTextBox('tags[#{rowNum}][tag]', '#{tag}', false, DB::getFieldLength('maintenance_tag', 'tag')))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setAttribute('placeholder', _('tag'))
+			->setReadonly(!$this->data['allowed_edit']),
+		(new CRadioButtonList('tags[#{rowNum}][operator]', MAINTENANCE_TAG_OPERATOR_LIKE))
+			->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
+			->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
+			->setModern()
+			->setReadonly(!$this->data['allowed_edit']),
+		(new CTextBox('tags[#{rowNum}][value]', '#{value}', false, DB::getFieldLength('maintenance_tag', 'value')))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setAttribute('placeholder',  _('value'))
+			->setReadonly(!$this->data['allowed_edit']),
+		(new CButton('tags[#{rowNum}][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+			->setEnabled($this->data['allowed_edit'])
+	]))->addClass('form_row')
+);
 
 $form->addItem(
 	(new CFormGrid())
 		->addItem([
-			(new CLabel(_('Name'), 'mname'))->setAsteriskMark(),
+			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('mname', $data['mname'], false, DB::getFieldLength('maintenances', 'name')))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				(new CTextBox('name', $data['name'], false, DB::getFieldLength('maintenances', 'name')))
 					->setAttribute('autofocus', 'autofocus')
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
-					->setReadonly(!$data['allowed_edit'])
+					->setReadonly(!$this->data['allowed_edit'])
 			)
 		])
 		->addItem([
@@ -108,8 +140,8 @@ $form->addItem(
 				(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))
 					->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
 					->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
-					->setModern(true)
-					->setEnabled($data['allowed_edit'])
+					->setModern()
+					->setReadonly(!$this->data['allowed_edit'])
 			)
 		])
 		->addItem([
@@ -119,7 +151,7 @@ $form->addItem(
 					->setDateFormat(ZBX_DATE_TIME)
 					->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 					->setAriaRequired()
-					->setReadonly(!$data['allowed_edit'])
+					->setReadonly(!$this->data['allowed_edit'])
 			)
 		])
 		->addItem([
@@ -129,16 +161,13 @@ $form->addItem(
 					->setDateFormat(ZBX_DATE_TIME)
 					->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 					->setAriaRequired()
-					->setReadonly(!$data['allowed_edit'])
+					->setReadonly(!$this->data['allowed_edit'])
 			)
 		])
 		->addItem([
 			(new CLabel(_('Periods')))->setAsteriskMark(),
 			new CFormField(
-				(new CDiv($periods))
-					->setId('periods')
-					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				(new CDiv([$timeperiods, $timeperiod_template]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			)
 		])
 		->addItem([
@@ -148,7 +177,7 @@ $form->addItem(
 					'name' => 'groupids[]',
 					'object_name' => 'hostGroup',
 					'data' => $data['groups_ms'],
-					'disabled' => !$data['allowed_edit'],
+					'disabled' => !$this->data['allowed_edit'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'host_groups',
@@ -158,9 +187,7 @@ $form->addItem(
 							'editable' => true
 						]
 					]
-				]))
-					->setId('groupids_')
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 		])
 		->addItem([
@@ -170,7 +197,7 @@ $form->addItem(
 					'name' => 'hostids[]',
 					'object_name' => 'hosts',
 					'data' => $data['hosts_ms'],
-					'disabled' => !$data['allowed_edit'],
+					'disabled' => !$this->data['allowed_edit'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'hosts',
@@ -180,9 +207,7 @@ $form->addItem(
 							'editable' => true
 						]
 					]
-				]))
-					->setId('hostids_')
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 		])
 		->addItem(
@@ -191,7 +216,7 @@ $form->addItem(
 		->addItem([
 			new CLabel(_('Tags')),
 			new CFormField(
-				(new CDiv([$tags, $template_tag]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				(new CDiv([$tags, $tag_template]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			)
 		])
 		->addItem([
@@ -199,7 +224,7 @@ $form->addItem(
 			new CFormField(
 				(new CTextArea('description', $data['description']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setReadonly(!$data['allowed_edit'])
+					->setReadonly(!$this->data['allowed_edit'])
 			)
 		])
 	);
@@ -209,7 +234,7 @@ $form->addItem(
 		maintenance_edit.init('.json_encode([
 			'maintenanceid' => $data['maintenanceid'],
 			'timeperiods' => $data['timeperiods'],
-			'maintenance_tags' => $data['tags'],
+			'tags' => $data['tags'],
 			'allowed_edit' => $data['allowed_edit']
 		]).');
 	'))->setOnDocumentReady()

@@ -27,19 +27,33 @@ class CControllerMaintenanceCreate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'mname' =>				'required|string|not_empty',
-			'maintenance_type' =>	'required|in '.implode(',', [MAINTENANCE_TYPE_NODATA, MAINTENANCE_TYPE_NORMAL]),
+			'name' =>				'required|string|not_empty',
+			'maintenance_type' =>	'required|in '.implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA]),
 			'active_since' =>		'required|abs_time',
 			'active_till' =>		'required|abs_time',
 			'timeperiods' =>		'required|array',
-			'groupids' =>			'array_db hosts.hostid',
-			'hostids' => 			'array_db hstgrp.groupid',
+			'groupids' =>			'array_id',
+			'hostids' => 			'array_id',
 			'tags_evaltype' =>		'in '.implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR]),
-			'maintenance_tags' =>	'array',
+			'tags' =>				'array',
 			'description' =>		'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret && $this->getInput('maintenance_type') == MAINTENANCE_TYPE_NORMAL) {
+			$fields = [
+				'tags_evaltype' => 'required'
+			];
+
+			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
+
+			foreach ($validator->getAllErrors() as $error) {
+				error($error);
+			}
+
+			$ret = !$validator->isErrorFatal() && !$validator->isError();
+		}
 
 		if ($ret && !$this->hasInput('groupids') && !$this->hasInput('hostids')) {
 			error(_('At least one host group or host must be selected.'));
@@ -51,7 +65,7 @@ class CControllerMaintenanceCreate extends CController {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'title' => _('Cannot add maintenance period'),
+						'title' => _('Cannot create maintenance period'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])])
@@ -66,58 +80,53 @@ class CControllerMaintenanceCreate extends CController {
 			&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	protected function doAction(): void {
 		$absolute_time_parser = new CAbsoluteTimeParser();
 
 		$absolute_time_parser->parse($this->getInput('active_since'));
-		$active_since_date = $absolute_time_parser->getDateTime(true);
+		$active_since_ts = $absolute_time_parser->getDateTime(true)->getTimestamp();
 
 		$absolute_time_parser->parse($this->getInput('active_till'));
-		$active_till_date = $absolute_time_parser->getDateTime(true);
+		$active_till_ts = $absolute_time_parser->getDateTime(true)->getTimestamp();
 
-		$timeperiods = $this->getInput('timeperiods', []);
-		$type_fields = [
+		$timeperiod_fields = [
 			TIMEPERIOD_TYPE_ONETIME => ['timeperiod_type', 'start_date', 'period'],
-			TIMEPERIOD_TYPE_DAILY => ['timeperiod_type', 'start_time', 'every', 'period'],
-			TIMEPERIOD_TYPE_WEEKLY => ['timeperiod_type', 'start_time', 'every', 'dayofweek', 'period'],
-			TIMEPERIOD_TYPE_MONTHLY => ['timeperiod_type', 'start_time', 'every', 'day', 'dayofweek', 'month', 'period']
+			TIMEPERIOD_TYPE_DAILY => ['timeperiod_type', 'every', 'start_time', 'period'],
+			TIMEPERIOD_TYPE_WEEKLY => ['timeperiod_type', 'every', 'dayofweek', 'start_time', 'period'],
+			TIMEPERIOD_TYPE_MONTHLY => ['timeperiod_type', 'every', 'month', 'dayofweek', 'day', 'start_time', 'period']
 		];
 
-		foreach ($timeperiods as &$timeperiod) {
-			if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-				$absolute_time_parser->parse($timeperiod['start_date']);
-				$timeperiod['start_date'] = $absolute_time_parser
-					->getDateTime(true)
-					->getTimestamp();
-			}
+		$timeperiods = $this->getInput('timeperiods', []);
 
-			$timeperiod = array_intersect_key($timeperiod, array_flip($type_fields[$timeperiod['timeperiod_type']])			);
+		foreach ($timeperiods as &$timeperiod) {
+			$timeperiod = array_intersect_key($timeperiod,
+				array_flip($timeperiod_fields[$timeperiod['timeperiod_type']])
+			);
 		}
 		unset($timeperiod);
 
 		$maintenance = [
-			'name' => $this->getInput('mname'),
+			'maintenanceid' => $this->getInput('maintenanceid'),
+			'name' => $this->getInput('name'),
 			'maintenance_type' => $this->getInput('maintenance_type'),
 			'description' => $this->getInput('description'),
-			'active_since' => $active_since_date->getTimestamp(),
-			'active_till' => $active_till_date->getTimestamp(),
+			'active_since' => $active_since_ts,
+			'active_till' => $active_till_ts,
 			'groups' => zbx_toObject($this->getInput('groupids', []), 'groupid'),
 			'hosts' => zbx_toObject($this->getInput('hostids', []), 'hostid'),
 			'timeperiods' => $timeperiods
 		];
 
-		if ($maintenance['maintenance_type'] != MAINTENANCE_TYPE_NODATA) {
+		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL) {
 			$maintenance += [
-				'tags_evaltype' => $this->getInput('tags_evaltype', MAINTENANCE_TAG_EVAL_TYPE_AND_OR),
-				'tags' => $this->getInput('maintenance_tags', [])
+				'tags_evaltype' => $this->getInput('tags_evaltype'),
+				'tags' => []
 			];
 
-			foreach ($maintenance['tags'] as $tnum => $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					unset($maintenance['tags'][$tnum]);
+			foreach ($this->getInput('tags', []) as $tag) {
+				if (array_key_exists('tag', $tag) && $tag['tag'] !== '' && array_key_exists('value', $tag)
+						&& $tag['value'] !== '') {
+					$maintenance['tags'][] = $tag;
 				}
 			}
 		}
@@ -127,7 +136,7 @@ class CControllerMaintenanceCreate extends CController {
 		$output = [];
 
 		if ($result) {
-			$output['success']['title'] = _('Maintenance period added');
+			$output['success']['title'] = _('Maintenance period created');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -135,7 +144,7 @@ class CControllerMaintenanceCreate extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot add maintenance period'),
+				'title' => _('Cannot create maintenance period'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
