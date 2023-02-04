@@ -142,7 +142,7 @@ class CControllerMaintenanceList extends CController {
 		);
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Maintenance periods'));
+		$response->setTitle(_('Configuration of maintenance periods'));
 		$this->setResponse($response);
 	}
 
