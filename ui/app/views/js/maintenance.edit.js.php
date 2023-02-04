@@ -170,7 +170,7 @@ window.maintenance_edit = new class {
 	delete() {
 		const post_data = {
 			maintenanceids: [this.maintenanceid],
-			<?= CCsrfTokenHelper::CSRF_TOKEN_NAME?>: <?= CCsrfTokenHelper::get('maintenance') ?>
+			<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>: <?= json_encode(CCsrfTokenHelper::get('maintenance')) ?>
 		};
 
 		const curl = new Curl('zabbix.php');
