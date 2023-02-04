@@ -739,7 +739,7 @@ class testSID extends CWebTest {
 			// #107 Popup maintenance period.
 			[[
 				'link' => 'zabbix.php?row_index=0&action=maintenance.period.edit',
-				'json_result' => '{"header":"New maintenance period","body":"&lt;div&gt;&lt;form method=\"post\" action=\"zabbix.'.
+				'json_result' => '{"header":"New maintenance period","body":"&lt;form method=\"post\" action=\"zabbix.'.
 						'php\" accept-charset=\"utf-8\"'
 			]],
 
