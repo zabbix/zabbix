@@ -298,7 +298,7 @@ class testUserRolesPermissions extends CWebTest {
 			}
 			$this->assertEquals($headers, $table->getHeadersText());
 
-			$table->getRow(0)->getColumn('Name')->click();
+			$table->getRow(0)->getColumn('Name')->query('tag:a')->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			foreach ($form_button as $text) {
 				$this->assertTrue($dialog->getFooter()->query('button', $text)->one()->isEnabled(($text === 'Cancel') ? true : $action_status));
@@ -781,7 +781,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Event correlation',
 						'Discovery'
 					],
-					'link' => ['maintenance.php']
+					'link' => ['zabbix.php?action=maintenance.list']
 				]
 			],
 			[
