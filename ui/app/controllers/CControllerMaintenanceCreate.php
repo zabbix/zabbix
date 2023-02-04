@@ -106,7 +106,6 @@ class CControllerMaintenanceCreate extends CController {
 		unset($timeperiod);
 
 		$maintenance = [
-			'maintenanceid' => $this->getInput('maintenanceid'),
 			'name' => $this->getInput('name'),
 			'maintenance_type' => $this->getInput('maintenance_type'),
 			'description' => $this->getInput('description'),
