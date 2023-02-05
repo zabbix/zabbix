@@ -48,6 +48,7 @@ class testFormMaintenance extends CLegacyWebTest {
 	}
 
 	public $name = 'Test maintenance';
+	public $periods_table = 'id:timeperiods';
 
 	/**
 	 * Create maintenance with periods and host group.
@@ -96,7 +97,7 @@ class testFormMaintenance extends CLegacyWebTest {
 			$period_overlay->fill($period['fields']);
 			$period_overlay->submit();
 			$period_overlay->waitUntilNotVisible();
-			$this->assertTableHasData($period['result'], 'id:periods');
+			$this->assertTableHasData($period['result'], $this->periods_table);
 		}
 
 		// Add problem tags.
@@ -117,12 +118,12 @@ class testFormMaintenance extends CLegacyWebTest {
 				'value' => $value
 			]
 		];
-		$this->query('id:maintenance-tags')->asMultifieldTable()->one()->fill($tags);
+		$this->query('id:tags')->asMultifieldTable()->one()->fill($tags);
 
 		// Create maintenance and check the results in frontend.
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
-		$this->assertMessage(TEST_GOOD, 'Maintenance period added');
+		$this->assertMessage(TEST_GOOD, 'Maintenance period created');
 		$this->assertTableHasData([['Name' => $this->name, 'Type' => 'With data collection']]);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
@@ -160,7 +161,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$form->checkValue(['Name' => $this->name]);
 
 		// Check that 4th period exist.
-		$this->assertTableHasData([['Period type' => 'Monthly']], 'id:periods');
+		$this->assertTableHasData([['Period type' => 'Monthly']], $this->periods_table);
 		$this->query('button:Cancel')->one()->click();
 		COverlayDialogElement::ensureNotPresent();
 	}
@@ -179,7 +180,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$form->fill(['Maintenance type' => 'No data collection']);
 
 		// Remove "One time only".
-		$table = $this->query('id:periods')->asTable()->one();
+		$table = $this->query($this->periods_table)->asTable()->one();
 		$table->findRow('Period type', 'One time only')->getColumn('Action')->query('button:Remove')->one()->click()->waitUntilNotvisible();
 
 		$periods = [
@@ -212,7 +213,7 @@ class testFormMaintenance extends CLegacyWebTest {
 
 			$period_overlay->submit();
 			$period_overlay->waitUntilNotVisible();
-			$this->assertTableHasData($period['result'], 'id:periods');
+			$this->assertTableHasData($period['result'], $this->periods_table);
 		}
 
 		// Check the results in frontend.
@@ -248,9 +249,9 @@ class testFormMaintenance extends CLegacyWebTest {
 				'value' => 'B1'
 			]
 		];
-		$this->query('id:maintenance-tags')->asMultifieldTable()->one()->fill($tags);
-		$this->query('xpath://label[@for="maintenance_tags_0_operator_1"]')->one()->click();
-		$this->query('xpath://label[@for="maintenance_tags_1_operator_0"]')->one()->click();
+		$this->query('id:tags')->asMultifieldTable()->one()->fill($tags);
+		$this->query('xpath://label[@for="tags_0_operator_1"]')->one()->click();
+		$this->query('xpath://label[@for="tags_1_operator_0"]')->one()->click();
 
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
@@ -280,7 +281,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		COverlayDialogElement::ensureNotPresent();
 
 		// Check the result in frontend.
-		$this->assertMessage(TEST_GOOD, 'Maintenance period added');
+		$this->assertMessage(TEST_GOOD, 'Maintenance period created');
 		$this->assertTableHasData([['Name' => $this->name], ['Name' => $this->name.$suffix]]);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
