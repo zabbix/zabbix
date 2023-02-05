@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2023-01-05T20:48:22Z'
   media_types:
     -
       name: Line

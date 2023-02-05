@@ -1478,8 +1478,7 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 		{
 			if (SUCCEED != zbx_substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL, &host,
 					NULL, NULL, ack, service_alarm, service, default_timezone, &script.command,
-					macro_type, error,
-					sizeof(error)))
+					macro_type, error, sizeof(error)))
 			{
 				rc = FAIL;
 				goto fail;
@@ -1575,10 +1574,11 @@ skip:
 
 #undef ZBX_IPMI_FIELDS_NUM
 
-static void	get_mediatype_params(const zbx_db_event *event, const zbx_db_event *r_event, zbx_uint64_t actionid,
-		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *sendto, const char *subject,
-		const char *message, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
-		const zbx_db_service *service, char **params, const char *tz)
+
+static void	get_mediatype_params_object(const zbx_db_event *event, const zbx_db_event *r_event,
+		zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *sendto,
+		const char *subject, const char *message, const zbx_db_acknowledge *ack,
+		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, char **params, const char *tz)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1625,6 +1625,59 @@ static void	get_mediatype_params(const zbx_db_event *event, const zbx_db_event *
 	zbx_json_free(&json);
 }
 
+static void	get_mediatype_params_array(const zbx_db_event *event, const zbx_db_event *r_event,
+		zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *sendto,
+		const char *subject, const char *message, const zbx_db_acknowledge *ack,
+		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, char **params, const char *tz)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_db_alert		alert = {.sendto = (char *)sendto,
+					.subject = (char *)(uintptr_t)subject,
+					.message = (char *)(uintptr_t)message
+				};
+
+	struct zbx_json		json;
+	char			*value;
+	int			message_type;
+	zbx_dc_um_handle_t	*um_handle;
+
+	if (NULL != ack)
+		message_type = MACRO_TYPE_MESSAGE_UPDATE;
+	else
+		message_type = (NULL != r_event ? MACRO_TYPE_MESSAGE_RECOVERY : MACRO_TYPE_MESSAGE_NORMAL);
+
+	um_handle = zbx_dc_open_user_macros();
+
+	result = zbx_db_select(
+			"select value"
+			" from media_type_param"
+				" where mediatypeid=" ZBX_FS_UI64
+			" order by sortorder",
+			mediatypeid);
+
+	zbx_json_initarray(&json, 1024);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		value = zbx_strdup(NULL, row[0]);
+
+		zbx_substitute_simple_macros_unmasked(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
+				ack, service_alarm, service, tz, &value, message_type, NULL, 0);
+
+		zbx_json_addstring(&json, NULL, value, ZBX_JSON_TYPE_STRING);
+
+		zbx_free(value);
+
+	}
+	zbx_db_free_result(result);
+
+	zbx_dc_close_user_macros(um_handle);
+
+	*params = zbx_strdup(NULL, json.buffer);
+	zbx_json_free(&json);
+}
+
 static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_event, zbx_uint64_t actionid,
 		int esc_step, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
@@ -1649,7 +1702,7 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 	if (0 == mediatypeid)
 	{
 		result = zbx_db_select(
-				"select m.mediatypeid,m.sendto,m.severity,m.period,mt.status,m.active"
+				"select m.mediatypeid,m.sendto,m.severity,m.period,mt.status,m.active,mt.type"
 				" from media m,media_type mt"
 				" where m.mediatypeid=mt.mediatypeid"
 					" and m.userid=" ZBX_FS_UI64,
@@ -1658,7 +1711,7 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 	else
 	{
 		result = zbx_db_select(
-				"select m.mediatypeid,m.sendto,m.severity,m.period,mt.status,m.active"
+				"select m.mediatypeid,m.sendto,m.severity,m.period,mt.status,m.active,mt.type"
 				" from media m,media_type mt"
 				" where m.mediatypeid=mt.mediatypeid"
 					" and m.userid=" ZBX_FS_UI64
@@ -1680,13 +1733,15 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		int		severity, status;
+		int		severity, status, type;
 		const char	*perror;
 		char		*params;
 
 		ZBX_STR2UINT64(mediatypeid, row[0]);
 		severity = atoi(row[2]);
 		period = zbx_strdup(period, row[3]);
+		type = atoi(row[6]);
+
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&period, MACRO_TYPE_COMMON, NULL, 0);
 
@@ -1740,8 +1795,16 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 					(NULL != r_event ? "p_eventid" : NULL), NULL);
 		}
 
-		get_mediatype_params(event, r_event, actionid, userid, mediatypeid, row[1], subject, message, ack,
-				service_alarm, service, &params, tz);
+		if (MEDIA_TYPE_EXEC == type)
+		{
+			get_mediatype_params_array(event, r_event, actionid, userid, mediatypeid, row[1], subject,
+					message, ack, service_alarm, service, &params, tz);
+		}
+		else
+		{
+			get_mediatype_params_object(event, r_event, actionid, userid, mediatypeid, row[1], subject,
+					message, ack, service_alarm, service, &params, tz);
+		}
 
 		if (NULL != r_event)
 		{
@@ -2302,8 +2365,13 @@ static int	check_unfinished_alerts(const zbx_db_escalation *escalation)
 	if (0 == escalation->r_eventid)
 		return SUCCEED;
 
-	sql = zbx_dsprintf(NULL, "select eventid from alerts where eventid=" ZBX_FS_UI64 " and actionid=" ZBX_FS_UI64
-			" and status in (0,3)", escalation->eventid, escalation->actionid);
+	sql = zbx_dsprintf(NULL,
+			"select eventid"
+			" from alerts"
+			" where eventid=" ZBX_FS_UI64
+				" and actionid=" ZBX_FS_UI64
+				" and status in (%d,%d)",
+			escalation->eventid, escalation->actionid, ALERT_STATUS_NOT_SENT, ALERT_STATUS_NEW);
 
 	result = zbx_db_select_n(sql, 1);
 	zbx_free(sql);

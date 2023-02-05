@@ -1948,6 +1948,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxalgo/Makefile
 	src/libs/zbxaudit/Makefile
 	src/libs/zbxavailability/Makefile
+	src/libs/zbxconnector/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
@@ -1987,6 +1988,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxnix/Makefile
 	src/libs/zbxnum/Makefile
 	src/libs/zbxparam/Makefile
+	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxrtc/Makefile
@@ -2012,9 +2014,11 @@ AC_CONFIG_FILES([
 	src/libs/zbxsysinfo/solaris/Makefile
 	src/libs/zbxsysinfo/unknown/Makefile
 	src/libs/zbxstats/Makefile
+	src/libs/zbxtagfilter/Makefile
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
+	src/libs/zbxtimekeeper/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
 	src/libs/zbxvault/Makefile
@@ -2038,6 +2042,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/Makefile
 	src/zabbix_server/alerter/Makefile
 	src/zabbix_server/availability/Makefile
+	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/diag/Makefile

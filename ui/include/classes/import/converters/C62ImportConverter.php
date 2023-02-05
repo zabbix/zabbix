@@ -53,6 +53,10 @@ class C62ImportConverter extends CConverter {
 			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
 		}
 
+		if (array_key_exists('media_types', $data['zabbix_export'])) {
+			$data['zabbix_export']['media_types'] = self::convertMediaTypes($data['zabbix_export']['media_types']);
+		}
+
 		return $data;
 	}
 
@@ -83,6 +87,10 @@ class C62ImportConverter extends CConverter {
 	 */
 	private static function convertTemplates(array $templates): array {
 		foreach ($templates as &$template) {
+			if (array_key_exists('templates', $template)) {
+				unset($template['templates']);
+			}
+
 			if (array_key_exists('discovery_rules', $template)) {
 				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
 			}
@@ -160,5 +168,32 @@ class C62ImportConverter extends CConverter {
 		unset($dashboard);
 
 		return $dashboards;
+	}
+
+	/**
+	 * Convert media types.
+	 *
+	 * @static
+	 *
+	 * @param array $media_types
+	 *
+	 * @return array
+	 */
+	private static function convertMediaTypes(array $media_types): array {
+		foreach ($media_types as &$media_type) {
+			if ($media_type['type'] == CXmlConstantName::SCRIPT && array_key_exists('parameters', $media_type)) {
+				$parameters = [];
+				$sortorder = 0;
+
+				foreach ($media_type['parameters'] as $value) {
+					$parameters[] = ['sortorder' => (string) $sortorder++, 'value' => $value];
+				}
+
+				$media_type['parameters'] =  $parameters;
+			}
+		}
+		unset($media_type);
+
+		return $media_types;
 	}
 }

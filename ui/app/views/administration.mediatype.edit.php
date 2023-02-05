@@ -110,27 +110,35 @@ $mediatype_formlist = (new CFormList())
 			->setAriaRequired()
 	);
 
-$exec_params_table = (new CTable())
+// MEDIA_TYPE_EXEC
+$parameters_exec_table = (new CTable())
 	->setId('exec_params_table')
-	->setHeader([_('Parameter'), _('Action')])
+	->setHeader([
+		(new CColHeader(_('Value')))->setWidth('100%'),
+		_('Action')
+	])
 	->setAttribute('style', 'width: 100%;');
 
-foreach ($data['exec_params'] as $i => $exec_param) {
-	$exec_params_table->addRow([
-		(new CTextBox('exec_params['.$i.'][exec_param]', $exec_param['exec_param'], false, 255))
+foreach ($data['parameters_exec'] as $sortorder => $parameter) {
+	$parameters_exec_table->addRow([
+		(new CTextBox('parameters_exec['.$parameter['sortorder'].'][value]', $parameter['value'], false, 255))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CButton('exec_params['.$i.'][remove]', _('Remove')))
+		(new CButton('parameters_exec['.$parameter['sortorder'].'][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
-		], 'form_row');
+	], 'form_row');
 }
 
-$exec_params_table->addRow([(new CButton('exec_param_add', _('Add')))
+$parameters_exec_table->addRow([(new CButton('exec_param_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
-$mediatype_formlist->addRow(_('Script parameters'),
-	(new CDiv($exec_params_table))
+$mediatype_formlist->addRow(
+	new CLabel([
+		_('Script parameters'),
+		makeHelpIcon(_('These parameters will be passed to the script as command-line arguments in the specified order.'))
+	]),
+	(new CDiv($parameters_exec_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 	'row_exec_params'
@@ -168,12 +176,12 @@ $parameters_table = (new CTable())
 	])
 	->setAttribute('style', 'width: 100%;');
 
-foreach ($data['parameters'] as $parameter) {
+foreach ($data['parameters_webhook'] as $parameter) {
 	$parameters_table->addRow([
-		(new CTextBox('parameters[name][]', $parameter['name'], false, DB::getFieldLength('media_type_param', 'name')))
+		(new CTextBox('parameters_webhook[name][]', $parameter['name'], false, DB::getFieldLength('media_type_param', 'name')))
 			->setAttribute('style', 'width: 100%;')
 			->removeId(),
-		(new CTextBox('parameters[value][]', $parameter['value'], false,
+		(new CTextBox('parameters_webhook[value][]', $parameter['value'], false,
 			DB::getFieldLength('media_type_param', 'value')
 		))
 			->setAttribute('style', 'width: 100%;')
@@ -191,10 +199,10 @@ $row_template = (new CTag('script', true))
 	->setAttribute('type', 'text/x-jquery-tmpl')
 	->addItem(
 		(new CRow([
-			(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
+			(new CTextBox('parameters_webhook[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
 				->setAttribute('style', 'width: 100%;')
 				->removeId(),
-			(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
+			(new CTextBox('parameters_webhook[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
 				->setAttribute('style', 'width: 100%;')
 				->removeId(),
 			(new CButton('', _('Remove')))
@@ -354,6 +362,7 @@ $mediaOptionsForm = (new CFormList('options'))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	);
+
 $tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm, TAB_INDICATOR_MEDIATYPE_OPTIONS);
 
 // append buttons to form

@@ -21,6 +21,11 @@
 
 class CControllerPopupActionEdit extends CController {
 
+	/**
+	 * @var mixed
+	 */
+	private $action;
+
 	protected function init() {
 		$this->disableCsrfValidation();
 	}

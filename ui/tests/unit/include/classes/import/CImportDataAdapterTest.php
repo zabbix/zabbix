@@ -103,8 +103,7 @@ class CImportDataAdapterTest extends TestCase {
 				'ipmi_password' => '',
 				'name' => 'empty-host',
 				'inventory_mode' => '0',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			],
 			[
 				'inventory' => [
@@ -270,8 +269,7 @@ class CImportDataAdapterTest extends TestCase {
 				'ipmi_password' => 'impi password',
 				'name' => 'export-host',
 				'inventory_mode' => '0',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			]
 		]);
 	}
@@ -288,14 +286,12 @@ class CImportDataAdapterTest extends TestCase {
 					]
 				],
 				'macros' => [],
-				'templates' => [],
 				'host' => 'empty-template',
 				'name' => 'empty-template',
 				'description' => '',
 				'vendor_name' => '',
 				'vendor_version' => '',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			],
 			[
 				'uuid' => '00fda66f07e4479498058bf352711a06',
@@ -318,21 +314,12 @@ class CImportDataAdapterTest extends TestCase {
 						'description' => ''
 					]
 				],
-				'templates' => [
-					[
-						'name' => 'Template App FTP Service'
-					],
-					[
-						'name' => 'Template OS Linux by Zabbix agent'
-					]
-				],
 				'host' => 'export-template',
 				'name' => 'export-template',
 				'description' => '',
 				'vendor_name' => '',
 				'vendor_version' => '',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			]
 		]);
 	}
@@ -1913,7 +1900,6 @@ class CImportDataAdapterTest extends TestCase {
 		$adapter = $this->getAdapter($this->getMediaTypeXml());
 
 		$defaults = DB::getDefaults('media_type') + ['message_templates' => []];
-		unset($defaults['exec_params']);
 
 		$this->assertEquals($adapter->getMediaTypes(), [
 			[
@@ -1930,15 +1916,19 @@ class CImportDataAdapterTest extends TestCase {
 				'name' => 'Script without parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SCRIPT,
 				'exec_path' => 'script.sh',
-				'exec_params' => '',
-				'status' => MEDIA_TYPE_STATUS_ACTIVE
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'parameters' => []
 			] + $defaults,
 			[
 				'name' => 'Script with parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SCRIPT,
 				'exec_path' => 'script.sh',
-				'exec_params' => "100\n200\n300\n",
-				'status' => MEDIA_TYPE_STATUS_ACTIVE
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'parameters' => [
+					['sortorder' => '0', 'value' => 100],
+					['sortorder' => '1', 'value' => 200],
+					['sortorder' => '2', 'value' => 300]
+				]
 			] + $defaults,
 			[
 				'name' => 'SMS',
@@ -2032,8 +2022,7 @@ class CImportDataAdapterTest extends TestCase {
 					'proxy' => [],
 					'description' => '',
 					'name' => 'host',
-					'tags' => [],
-					'valuemaps' => []
+					'tags' => []
 				]
 			]
 		);
@@ -2061,13 +2050,11 @@ class CImportDataAdapterTest extends TestCase {
 							'name' => 'Templates'
 						]
 					],
-					'templates' => [],
 					'name' => 'Template_Linux',
 					'description' => '',
 					'vendor_name' => '',
 					'vendor_version' => '',
-					'tags' => [],
-					'valuemaps' => []
+					'tags' => []
 				],
 				[
 					'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
@@ -2078,13 +2065,11 @@ class CImportDataAdapterTest extends TestCase {
 							'name' => 'Templates'
 						]
 					],
-					'templates' => [],
 					'name' => 'Template_Simple',
 					'description' => '',
 					'vendor_name' => '',
 					'vendor_version' => '',
-					'tags' => [],
-					'valuemaps' => []
+					'tags' => []
 				]
 			]
 		);
@@ -2502,8 +2487,7 @@ class CImportDataAdapterTest extends TestCase {
 					'ipmi_password' => '',
 					'ipmi_username' => '',
 					'macros' => [],
-					'tags' => [],
-					'valuemaps' => []
+					'tags' => []
 				]
 			]
 		);
@@ -2523,19 +2507,13 @@ class CImportDataAdapterTest extends TestCase {
 							'description' => ''
 						]
 					],
-					'templates' => [
-						[
-							'name' => 'template'
-						]
-					],
 					'uuid' => 'a038cce155ec42a4a85d6fea05632ed1',
 					'host' => 'Template_Simple',
 					'name' => 'Template_Simple',
 					'description' => '',
 					'vendor_name' => '',
 					'vendor_version' => '',
-					'tags' => [],
-					'valuemaps' => []
+					'tags' => []
 				]
 			]
 		);
@@ -2864,15 +2842,13 @@ class CImportDataAdapterTest extends TestCase {
 					]
 				],
 				'macros' => [],
-				'templates' => [],
 				'uuid' => '206a9b642b3e46c89a61696ab28f3d5c',
 				'host' => 'Test 1',
 				'name' => 'Test 1',
 				'description' => '',
 				'vendor_name' => '',
 				'vendor_version' => '',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			]
 		]);
 
@@ -3673,8 +3649,7 @@ class CImportDataAdapterTest extends TestCase {
 				'ipmi_password' => '',
 				'name' => 'SNMP host',
 				'inventory_mode' => '-1',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			]
 		]);
 
@@ -4297,15 +4272,13 @@ class CImportDataAdapterTest extends TestCase {
 					]
 				],
 				'macros' => [],
-				'templates' => [],
 				'uuid' => '0c45e5ed44ea494dabfa4136f420aa65',
 				'host' => 'vendor test',
 				'name' => 'vendor test',
 				'description' => '',
 				'vendor_name' => 'Zabbix',
 				'vendor_version' => '6.4-0',
-				'tags' => [],
-				'valuemaps' => []
+				'tags' => []
 			]
 		]);
 	}

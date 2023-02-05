@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2023-01-16T14:44:37Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -14,6 +13,9 @@ zabbix_export:
         Get Etcd metrics by HTTP agent.
         
         Template tooling version used: 0.43
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications

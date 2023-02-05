@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-10-27T19:26:05Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -17,6 +16,9 @@ zabbix_export:
         IF-MIB
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules

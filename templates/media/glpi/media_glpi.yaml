@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-03-24T18:54:55Z'
   media_types:
     -
       name: GLPi

@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2023-01-16T07:04:33Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -11,6 +10,9 @@ zabbix_export:
       template: 'Linux block devices by Zabbix agent'
       name: 'Linux block devices by Zabbix agent'
       description: 'Template tooling version used: 0.43'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -359,6 +361,9 @@ zabbix_export:
       template: 'Linux CPU by Zabbix agent'
       name: 'Linux CPU by Zabbix agent'
       description: 'Template tooling version used: 0.43'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -613,6 +618,9 @@ zabbix_export:
       template: 'Linux filesystems by Zabbix agent'
       name: 'Linux filesystems by Zabbix agent'
       description: 'Template tooling version used: 0.43'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -1015,6 +1023,9 @@ zabbix_export:
       template: 'Linux generic by Zabbix agent'
       name: 'Linux generic by Zabbix agent'
       description: 'Template tooling version used: 0.43'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -1359,6 +1370,9 @@ zabbix_export:
       template: 'Linux memory by Zabbix agent'
       name: 'Linux memory by Zabbix agent'
       description: 'Template tooling version used: 0.43'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules
@@ -1501,6 +1515,9 @@ zabbix_export:
       template: 'Linux network interfaces by Zabbix agent'
       name: 'Linux network interfaces by Zabbix agent'
       description: 'Template tooling version used: 0.43'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Modules

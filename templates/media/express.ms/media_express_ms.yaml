@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-06-09T11:50:44Z'
   media_types:
     -
       name: Express.ms

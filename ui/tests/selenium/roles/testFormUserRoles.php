@@ -919,8 +919,9 @@ class testFormUserRoles extends CWebTest {
 					'api_list' => [
 						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'auditlog.get',
 						'authentication.get', 'authentication.update', 'autoregistration.get', 'autoregistration.update',
-						'configuration.export', 'configuration.import', 'configuration.importcompare', 'correlation.create',
-						'correlation.delete', 'correlation.get', 'correlation.update', 'dashboard.create', 'dashboard.delete',
+						'configuration.export', 'configuration.import', 'configuration.importcompare', 'connector.create',
+						'connector.delete', 'connector.get', 'connector.update', 'correlation.create', 'correlation.delete',
+						'correlation.get', 'correlation.update', 'dashboard.create', 'dashboard.delete',
 						'dashboard.get', 'dashboard.update', 'dcheck.get', 'dhost.get', 'discoveryrule.copy',
 						'discoveryrule.create', 'discoveryrule.delete', 'discoveryrule.get', 'discoveryrule.update',
 						'drule.create', 'drule.delete', 'drule.get', 'drule.update', 'dservice.get', 'event.acknowledge',

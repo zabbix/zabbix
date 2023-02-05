@@ -1237,8 +1237,6 @@ class CControllerPopupTriggerExpr extends CController {
 
 		// Opening the popup when editing an expression in the trigger constructor.
 		if (($dstfld1 === 'expr_temp' || $dstfld1 === 'recovery_expr_temp') && $expression !== '') {
-			$expression = utf8RawUrlDecode($expression);
-
 			if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
 				$math_function_token = null;
 				$hist_function_token = null;

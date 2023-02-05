@@ -179,22 +179,49 @@ $csrf_token = CCsrfTokenHelper::get('graphs.php');
 foreach ($data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
 
-	$hostList = null;
-	if (empty($this->data['hostid'])) {
-		$hostList = [];
+	$host_list = null;
+
+	if ($this->data['hostid'] == 0) {
+		$host_list = [];
+
 		foreach ($graph['hosts'] as $host) {
-			$hostList[$host['name']] = $host['name'];
+			$host_list[$host['name']] = $host['name'];
 		}
 
 		foreach ($graph['templates'] as $template) {
-			$hostList[$template['name']] = $template['name'];
+			$host_list[$template['name']] = $template['name'];
 		}
-		$hostList = implode(', ', $hostList);
+
+		$host_list = implode(', ', $host_list);
 	}
 
-	$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
 	$name = [];
-	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], $flag, $data['allowed_ui_conf_templates']);
+
+	if (array_key_exists($graph['templateid'], $data['parent_graphs'])) {
+		$parent_graph = $data['parent_graphs'][$graph['templateid']];
+
+		if ($parent_graph['editable']) {
+			$url = (new CUrl('graphs.php'))->setArgument('context', 'template');
+
+			if ($data['parent_discoveryid'] === null) {
+				$url
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$parent_graph['templateid']]);
+			}
+			else {
+				$url->setArgument('parent_discoveryid', $parent_graph['ruleid']);
+			}
+
+			$name[] = (new CLink(CHtml::encode($parent_graph['template_name']), $url))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$name[] = (new CSpan(CHtml::encode($parent_graph['template_name'])))->addClass(ZBX_STYLE_GREY);
+		}
+
+		$name[] = NAME_DELIMITER;
+	}
 
 	if ($graph['discoveryRule'] && $data['parent_discoveryid'] === null) {
 		$name[] = (new CLink(CHtml::encode($graph['discoveryRule']['name']),
@@ -243,7 +270,7 @@ foreach ($data['graphs'] as $graph) {
 
 	$graphTable->addRow([
 		new CCheckBox('group_graphid['.$graphid.']', $graphid),
-		$hostList,
+		$host_list,
 		$name,
 		$graph['width'],
 		$graph['height'],

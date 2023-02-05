@@ -1,8 +1,25 @@
 Changes for 6.4.0rc1
 
 New features:
+A.F.....S. [ZBXNEXT-6796,ZBXNEXT-8203] added support for notification macros in Script Mediatype parameters (ashubin, dimir)
+.......PS. [ZBXNEXT-2732] improved network discovery by implementing concurrent checks within single discovery rule (asestakovs)
+A.F....... [ZBXNEXT-1111] added template versioning fields (gcalenko)
+.........T [ZBXNEXT-8249] updated attributes in template files (abakaldin)
+..F....... [ZBXNEXT-8165] added possibility to specify decimal places in Top hosts widget (averza, esekace)
+A.F....PS. [ZBXNEXT-8246] added support of bits in snmp preprocessing (dgoloscapov, Sasha)
+A.F.I...S. [ZBXNEXT-8105] added support for streaming metrics and events to external systems over HTTP (agriscenko, asitals, vso)
+.......PS. [ZBXNEXT-8166] reworked preprocessing manager to use worker threads instead of processes (wiper)
+A.F.....S. [ZBXNEXT-8087] removed template nesting (akozlovs, jfreibergs, vmaksimovs)
+A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
+.......PS. [ZBXNEXT-8091] added additional SSH options to ssh.run[] item as the 5th parameter (askolmeisters)
+.......PS. [ZBXNEXT-8250] updated soft minimal threshold for MySQL to version 8.0.29 (mprihodko)
+..F.....S. [ZBXNEXT-8074] implemented csrf tokens instead of sid (arimdjonoks, epulke)
+..F.....S. [ZBXNEXT-8236] deprecated support for old numeric type (akozlovs, miks)
 
 Bug fixes:
+.........T [ZBX-21597] optimized Remote Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
+.........T [ZBX-21602] optimized Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
+.......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta6
@@ -273,8 +290,12 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.8rc1
 
 New features:
+A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
+.........T [ZBX-21597] optimized Remote Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
+.........T [ZBX-21602] optimized Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.7
@@ -883,8 +904,12 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.14rc1
 
 New features:
+A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
+.........T [ZBX-21597] optimized Remote Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
+.........T [ZBX-21602] optimized Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.13
@@ -3242,6 +3267,7 @@ Changes for 5.0.32rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.31

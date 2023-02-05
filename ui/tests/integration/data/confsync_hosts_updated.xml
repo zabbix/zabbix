@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>6.4</version>
-    <date>2022-09-12T13:52:17Z</date>
     <host_groups>
         <host_group>
             <uuid>c9ad86935aa14454a99f3bb442dccb2c</uuid>
@@ -223,6 +222,9 @@
             <templates>
                 <template>
                     <name>bbbtmpl</name>
+                </template>
+                <template>
+                    <name>SampleTemplate</name>
                 </template>
             </templates>
             <groups>

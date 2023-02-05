@@ -1627,7 +1627,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select mediatypeid,type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
 					"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,"
-					"smtp_authentication,exec_params,maxsessions,maxattempts,attempt_interval,"
+					"smtp_authentication,maxsessions,maxattempts,attempt_interval,"
 					"content_type,script,timeout"
 				" from media_type"
 				" where");
@@ -1656,13 +1656,12 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 			ZBX_STR2UCHAR(mt.smtp_verify_peer, row[11]);
 			ZBX_STR2UCHAR(mt.smtp_verify_host, row[12]);
 			ZBX_STR2UCHAR(mt.smtp_authentication, row[13]);
-			mt.exec_params = zbx_strdup(NULL, row[14]);
-			mt.maxsessions = atoi(row[15]);
-			mt.maxattempts = atoi(row[16]);
-			mt.attempt_interval = zbx_strdup(NULL, row[17]);
-			ZBX_STR2UCHAR(mt.content_type, row[18]);
-			mt.script = zbx_strdup(NULL, row[19]);
-			mt.timeout = zbx_strdup(NULL, row[20]);
+			mt.maxsessions = atoi(row[14]);
+			mt.maxattempts = atoi(row[15]);
+			mt.attempt_interval = zbx_strdup(NULL, row[16]);
+			ZBX_STR2UCHAR(mt.content_type, row[17]);
+			mt.script = zbx_strdup(NULL, row[18]);
+			mt.timeout = zbx_strdup(NULL, row[19]);
 
 			for (; index < dsts.values_num; index++)
 			{

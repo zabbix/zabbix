@@ -51,11 +51,21 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if (!empty($data['templates'])) {
-	$item_tab->addItem([
-		new CLabel(_('Parent discovery rules')),
-		new CFormField($data['templates'])
-	]);
+if (array_key_exists('parent_item', $data)) {
+	if ($data['parent_item']['editable']) {
+		$parent_template_name = new CLink(CHtml::encode($data['parent_item']['template_name']),
+			(new CUrl('host_discovery.php'))
+				->setArgument('form', 'update')
+				->setArgument('itemid', $data['item']['templateid'])
+				->setArgument('context', 'template')
+		);
+	}
+	else {
+		$parent_template_name = (new CSpan(CHtml::encode($data['parent_item']['template_name'])))
+			->addClass(ZBX_STYLE_GREY);
+	}
+
+	$item_tab->addItem([new CLabel(_('Parent discovery rule')), new CFormField($parent_template_name)]);
 }
 
 $item_tab
@@ -452,18 +462,18 @@ $item_tab
 	// Append ITEM_TYPE_HTTPAGENT SSL verify peer to form list.
 	->addItem([
 		(new CLabel(_('SSL verify peer'), 'verify_peer'))->setId('js-item-verify-peer-label'),
-		(new CFormField((new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_ON))
+		(new CFormField((new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
 			->setEnabled(!$data['limited'])
-			->setChecked($data['verify_peer'] == HTTPTEST_VERIFY_PEER_ON)
+			->setChecked($data['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
 		))->setId('js-item-verify-peer-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT SSL verify host to form list.
 	->addItem([
 		(new CLabel(_('SSL verify host'), 'verify_host'))->setId('js-item-verify-host-label'),
 		(new CFormField(
-			(new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_ON))
+			(new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
 				->setEnabled(!$data['limited'])
-				->setChecked($data['verify_host'] == HTTPTEST_VERIFY_HOST_ON)
+				->setChecked($data['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
 		))->setId('js-item-verify-host-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT SSL certificate file to form list.

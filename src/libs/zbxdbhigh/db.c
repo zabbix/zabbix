@@ -67,6 +67,8 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 
 static int	connection_failure;
 
+static const zbx_config_dbhigh_t	*zbx_cfg_dbhigh = NULL;
+
 static zbx_dc_get_nextid_func_t				zbx_cb_nextid;
 
 void	zbx_db_close(void)
@@ -74,23 +76,24 @@ void	zbx_db_close(void)
 	zbx_db_close_basic();
 }
 
-int	zbx_db_validate_config_features(unsigned char program_type)
+int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config_dbhigh_t *config_dbhigh)
 {
 	int	err = 0;
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS) || defined(HAVE_POSTGRESQL))
-	err |= (FAIL == check_cfg_feature_str("DBTLSConnect", CONFIG_DB_TLS_CONNECT, "PostgreSQL or MySQL library"
-			" version that support TLS"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSCAFile", CONFIG_DB_TLS_CA_FILE,"PostgreSQL or MySQL library"
-			" version that support TLS"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSCertFile", CONFIG_DB_TLS_CERT_FILE, "PostgreSQL or MySQL library"
-			" version that support TLS"));
-	err |= (FAIL == check_cfg_feature_str("DBTLSKeyFile", CONFIG_DB_TLS_KEY_FILE, "PostgreSQL or MySQL library"
-			" version that support TLS"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSConnect", config_dbhigh->config_db_tls_connect,
+			"PostgreSQL or MySQL library version that support TLS"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSCAFile", config_dbhigh->config_db_tls_ca_file,
+			"PostgreSQL or MySQL library version that support TLS"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSCertFile", config_dbhigh->config_db_tls_cert_file,
+			"PostgreSQL or MySQL library version that support TLS"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSKeyFile", config_dbhigh->config_db_tls_key_file,
+			"PostgreSQL or MySQL library version that support TLS"));
 #endif
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_POSTGRESQL))
-	if (NULL != CONFIG_DB_TLS_CONNECT && 0 == strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
+	if (NULL != config_dbhigh->config_db_tls_connect && 0 == strcmp(config_dbhigh->config_db_tls_connect,
+			ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
 	{
 		zbx_error("\"DBTLSConnect\" configuration parameter value '%s' cannot be used: Zabbix %s was compiled"
 			" without PostgreSQL or MySQL library version that support this value",
@@ -99,19 +102,53 @@ int	zbx_db_validate_config_features(unsigned char program_type)
 	}
 #else
 	ZBX_UNUSED(program_type);
+	ZBX_UNUSED(config_dbhigh);
 #endif
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS))
-	err |= (FAIL == check_cfg_feature_str("DBTLSCipher", CONFIG_DB_TLS_CIPHER, "MySQL library version that support"
-			" configuration of cipher"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSCipher", config_dbhigh->config_db_tls_cipher,
+			"MySQL library version that support configuration of cipher"));
 #endif
 
 #if !defined(HAVE_MYSQL_TLS_CIPHERSUITES)
-	err |= (FAIL == check_cfg_feature_str("DBTLSCipher13", CONFIG_DB_TLS_CIPHER_13, "MySQL library version that"
-			" support configuration of TLSv1.3 ciphersuites"));
+	err |= (FAIL == check_cfg_feature_str("DBTLSCipher13", config_dbhigh->config_db_tls_cipher_13,
+			"MySQL library version that support configuration of TLSv1.3 ciphersuites"));
 #endif
 
 	return 0 != err ? FAIL : SUCCEED;
+}
+
+zbx_config_dbhigh_t	*zbx_config_dbhigh_new(void)
+{
+	zbx_config_dbhigh_t	*config_dbhigh;
+
+	config_dbhigh = (zbx_config_dbhigh_t *)zbx_malloc(NULL, sizeof(zbx_config_dbhigh_t));
+	memset(config_dbhigh, 0, sizeof(zbx_config_dbhigh_t));
+
+	return config_dbhigh;
+}
+
+void	zbx_config_dbhigh_free(zbx_config_dbhigh_t *config_dbhigh)
+{
+	zbx_free(config_dbhigh->config_dbhost);
+	zbx_free(config_dbhigh->config_dbname);
+	zbx_free(config_dbhigh->config_dbschema);
+	zbx_free(config_dbhigh->config_dbuser);
+	zbx_free(config_dbhigh->config_dbpassword);
+	zbx_free(config_dbhigh->config_dbsocket);
+	zbx_free(config_dbhigh->config_db_tls_connect);
+	zbx_free(config_dbhigh->config_db_tls_cert_file);
+	zbx_free(config_dbhigh->config_db_tls_key_file);
+	zbx_free(config_dbhigh->config_db_tls_ca_file);
+	zbx_free(config_dbhigh->config_db_tls_cipher);
+	zbx_free(config_dbhigh->config_db_tls_cipher_13);
+
+	zbx_free(config_dbhigh);
+}
+
+void	zbx_init_library_dbhigh(const zbx_config_dbhigh_t *config_dbhigh)
+{
+	zbx_cfg_dbhigh = config_dbhigh;
 }
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -124,38 +161,38 @@ static void	check_cfg_empty_str(const char *parameter, const char *value)
 	}
 }
 
-void	zbx_db_validate_config(void)
+void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh)
 {
-	check_cfg_empty_str("DBTLSConnect", CONFIG_DB_TLS_CONNECT);
-	check_cfg_empty_str("DBTLSCertFile", CONFIG_DB_TLS_CERT_FILE);
-	check_cfg_empty_str("DBTLSKeyFile", CONFIG_DB_TLS_KEY_FILE);
-	check_cfg_empty_str("DBTLSCAFile", CONFIG_DB_TLS_CA_FILE);
-	check_cfg_empty_str("DBTLSCipher", CONFIG_DB_TLS_CIPHER);
-	check_cfg_empty_str("DBTLSCipher13", CONFIG_DB_TLS_CIPHER_13);
+	check_cfg_empty_str("DBTLSConnect", config_dbhigh->config_db_tls_connect);
+	check_cfg_empty_str("DBTLSCertFile", config_dbhigh->config_db_tls_cert_file);
+	check_cfg_empty_str("DBTLSKeyFile", config_dbhigh->config_db_tls_key_file);
+	check_cfg_empty_str("DBTLSCAFile", config_dbhigh->config_db_tls_ca_file);
+	check_cfg_empty_str("DBTLSCipher", config_dbhigh->config_db_tls_cipher);
+	check_cfg_empty_str("DBTLSCipher13", config_dbhigh->config_db_tls_cipher_13);
 
-	if (NULL != CONFIG_DB_TLS_CONNECT &&
-			0 != strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_REQUIRED_TXT) &&
-			0 != strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT) &&
-			0 != strcmp(CONFIG_DB_TLS_CONNECT, ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT))
+	if (NULL != config_dbhigh->config_db_tls_connect &&
+			0 != strcmp(config_dbhigh->config_db_tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT) &&
+			0 != strcmp(config_dbhigh->config_db_tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT) &&
+			0 != strcmp(config_dbhigh->config_db_tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"DBTLSConnect\" configuration parameter: '%s'",
-				CONFIG_DB_TLS_CONNECT);
+				config_dbhigh->config_db_tls_connect);
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL != CONFIG_DB_TLS_CONNECT &&
-			(0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT, CONFIG_DB_TLS_CONNECT) ||
-			0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT, CONFIG_DB_TLS_CONNECT)) &&
-			NULL == CONFIG_DB_TLS_CA_FILE)
+	if (NULL != config_dbhigh->config_db_tls_connect &&
+			(0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT, config_dbhigh->config_db_tls_connect) ||
+			0 == strcmp(ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT, config_dbhigh->config_db_tls_connect)) &&
+			NULL == config_dbhigh->config_db_tls_ca_file)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "parameter \"DBTLSConnect\" value \"%s\" requires \"DBTLSCAFile\", but it"
-				" is not defined", CONFIG_DB_TLS_CONNECT);
+				" is not defined", config_dbhigh->config_db_tls_connect);
 		exit(EXIT_FAILURE);
 	}
 
-	if ((NULL != CONFIG_DB_TLS_CERT_FILE || NULL != CONFIG_DB_TLS_KEY_FILE) &&
-			(NULL == CONFIG_DB_TLS_CERT_FILE || NULL == CONFIG_DB_TLS_KEY_FILE ||
-			NULL == CONFIG_DB_TLS_CA_FILE))
+	if ((NULL != config_dbhigh->config_db_tls_cert_file || NULL != config_dbhigh->config_db_tls_key_file) &&
+			(NULL == config_dbhigh->config_db_tls_cert_file ||
+			NULL == config_dbhigh->config_db_tls_key_file || NULL == config_dbhigh->config_db_tls_ca_file))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "parameter \"DBTLSKeyFile\" or \"DBTLSCertFile\" is defined, but"
 				" \"DBTLSKeyFile\", \"DBTLSCertFile\" or \"DBTLSCAFile\" is not defined");
@@ -191,10 +228,7 @@ int	zbx_db_connect(int flag)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __func__, flag);
 
-	while (ZBX_DB_OK != (err = zbx_db_connect_basic(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
-			CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT, CONFIG_DB_TLS_CONNECT,
-			CONFIG_DB_TLS_CERT_FILE, CONFIG_DB_TLS_KEY_FILE, CONFIG_DB_TLS_CA_FILE, CONFIG_DB_TLS_CIPHER,
-			CONFIG_DB_TLS_CIPHER_13)))
+	while (ZBX_DB_OK != (err = zbx_db_connect_basic(zbx_cfg_dbhigh)))
 	{
 		if (ZBX_DB_CONNECT_ONCE == flag)
 			break;
@@ -226,7 +260,7 @@ int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char 
 	zbx_cb_nextid = cb_nextid;
 
 	if (ZBX_PROGRAM_TYPE_SERVER != program)
-		return zbx_db_init_basic(CONFIG_DBNAME, db_schema, error);
+		return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, db_schema, error);
 
 	return SUCCEED;
 }
@@ -1263,23 +1297,23 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 #endif
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: This function is similar to DBadd_condition_alloc(), except it is *
- *          designed for generating WHERE conditions for strings. Hence, this *
- *          function is simpler, because only IN condition is possible.       *
- *                                                                            *
- * Parameters: sql        - [IN/OUT] buffer for SQL query construction        *
- *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                 *
- *             sql_offset - [IN/OUT] current position in the 'sql' buffer     *
- *             fieldname  - [IN] field name to be used in SQL WHERE condition *
- *             values     - [IN] array of string values                       *
- *             num        - [IN] number of elements in 'values' array         *
- *                                                                            *
- * Comments: To support Oracle empty values are checked separately (is null   *
- *           for Oracle and ='' for the other databases).                     *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: This function is similar to zbx_db_add_condition_alloc(), except   *
+ *          it is designed for generating WHERE conditions for strings. Hence, *
+ *          this function is simpler, because only IN condition is possible.   *
+ *                                                                             *
+ * Parameters: sql        - [IN/OUT] buffer for SQL query construction         *
+ *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                  *
+ *             sql_offset - [IN/OUT] current position in the 'sql' buffer      *
+ *             fieldname  - [IN] field name to be used in SQL WHERE condition  *
+ *             values     - [IN] array of string values                        *
+ *             num        - [IN] number of elements in 'values' array          *
+ *                                                                             *
+ * Comments: To support Oracle empty values are checked separately (is null    *
+ *           for Oracle and ='' for the other databases).                      *
+ *                                                                             *
+ *******************************************************************************/
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char **values, const int num)
 {
@@ -2475,7 +2509,7 @@ void	zbx_db_check_character_set(void)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	database_name_esc = zbx_db_dyn_escape_string(CONFIG_DBNAME);
+	database_name_esc = zbx_db_dyn_escape_string(zbx_cfg_dbhigh->config_dbname);
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	result = zbx_db_select(
@@ -2485,7 +2519,7 @@ void	zbx_db_check_character_set(void)
 
 	if (NULL == result || NULL == (row = zbx_db_fetch(result)))
 	{
-		zbx_warn_no_charset_info(CONFIG_DBNAME);
+		zbx_warn_no_charset_info(zbx_cfg_dbhigh->config_dbname);
 	}
 	else
 	{
@@ -2493,13 +2527,13 @@ void	zbx_db_check_character_set(void)
 		char	*collation = row[1];
 
 		if (FAIL == zbx_str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET, char_set, ZBX_DB_STRLIST_DELIM))
-			zbx_warn_char_set(CONFIG_DBNAME, char_set);
+			zbx_warn_char_set(zbx_cfg_dbhigh->config_dbname, char_set);
 
 		if (SUCCEED != zbx_str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation(s)."
 					" Database \"%s\" has default collation \"%s\"", ZBX_SUPPORTED_DB_COLLATION,
-					CONFIG_DBNAME, collation);
+					zbx_cfg_dbhigh->config_dbname, collation);
 		}
 	}
 
@@ -2521,12 +2555,13 @@ void	zbx_db_check_character_set(void)
 
 	if (NULL == result || NULL == (row = zbx_db_fetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" tables", CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" tables",
+				zbx_cfg_dbhigh->config_dbname);
 	}
 	else if (0 != strcmp("0", row[0]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "character set name or collation name that is not supported by Zabbix"
-				" found in %s column(s) of database \"%s\"", row[0], CONFIG_DBNAME);
+				" found in %s column(s) of database \"%s\"", row[0], zbx_cfg_dbhigh->config_dbname);
 		zabbix_log(LOG_LEVEL_WARNING, "only character set(s) \"%s\" and corresponding collation(s) \"%s\""
 				" should be used in database", ZBX_SUPPORTED_DB_CHARACTER_SET,
 				ZBX_SUPPORTED_DB_COLLATION);
@@ -2547,7 +2582,7 @@ void	zbx_db_check_character_set(void)
 
 	if (NULL == result)
 	{
-		zbx_warn_no_charset_info(CONFIG_DBNAME);
+		zbx_warn_no_charset_info(zbx_cfg_dbhigh->config_dbname);
 	}
 	else
 	{
@@ -2568,7 +2603,7 @@ void	zbx_db_check_character_set(void)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "database \"%s\" parameter \"%s\" has value"
 							" \"%s\". Zabbix supports only \"%s\" or \"%s\" character sets",
-							CONFIG_DBNAME, parameter, value,
+							zbx_cfg_dbhigh->config_dbname, parameter, value,
 							ZBX_ORACLE_UTF8_CHARSET, ZBX_ORACLE_CESU8_CHARSET);
 				}
 			}
@@ -2584,7 +2619,7 @@ void	zbx_db_check_character_set(void)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	database_name_esc = zbx_db_dyn_escape_string(CONFIG_DBNAME);
+	database_name_esc = zbx_db_dyn_escape_string(zbx_cfg_dbhigh->config_dbname);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 	result = zbx_db_select(
@@ -2595,12 +2630,12 @@ void	zbx_db_check_character_set(void)
 
 	if (NULL == result || NULL == (row = zbx_db_fetch(result)))
 	{
-		zbx_warn_no_charset_info(CONFIG_DBNAME);
+		zbx_warn_no_charset_info(zbx_cfg_dbhigh->config_dbname);
 		goto out;
 	}
 	else if (strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
 	{
-		zbx_warn_char_set(CONFIG_DBNAME, row[0]);
+		zbx_warn_char_set(zbx_cfg_dbhigh->config_dbname, row[0]);
 		goto out;
 
 	}
@@ -2615,7 +2650,8 @@ void	zbx_db_check_character_set(void)
 
 	if (NULL == result || NULL == (row = zbx_db_fetch(result)) || '\0' == **row)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" fields", CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" fields",
+				zbx_cfg_dbhigh->config_dbname);
 		goto out;
 	}
 
@@ -2638,7 +2674,8 @@ void	zbx_db_check_character_set(void)
 
 	if (NULL == result || NULL == (row = zbx_db_fetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" fields", CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get character set of database \"%s\" fields",
+				zbx_cfg_dbhigh->config_dbname);
 	}
 	else if (0 != strcmp("0", row[0]))
 	{
@@ -2652,12 +2689,13 @@ void	zbx_db_check_character_set(void)
 
 	if (NULL == result || NULL == (row = zbx_db_fetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get info about database \"%s\" client encoding", CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get info about database \"%s\" client encoding",
+				zbx_cfg_dbhigh->config_dbname);
 	}
 	else if (0 != strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "client_encoding for database \"%s\" is \"%s\". Zabbix supports only"
-				" \"%s\"", CONFIG_DBNAME, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
+				" \"%s\"", zbx_cfg_dbhigh->config_dbname, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
 	}
 
 	zbx_db_free_result(result);
@@ -2666,12 +2704,13 @@ void	zbx_db_check_character_set(void)
 
 	if (NULL == result || NULL == (row = zbx_db_fetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get info about database \"%s\" server encoding", CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get info about database \"%s\" server encoding",
+				zbx_cfg_dbhigh->config_dbname);
 	}
 	else if (0 != strcasecmp(row[0], ZBX_SUPPORTED_DB_CHARACTER_SET))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server_encoding for database \"%s\" is \"%s\". Zabbix supports only"
-				" \"%s\"", CONFIG_DBNAME, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
+				" \"%s\"", zbx_cfg_dbhigh->config_dbname, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
 	}
 out:
 	zbx_db_free_result(result);
@@ -3648,8 +3687,8 @@ char	*zbx_db_get_schema_esc(void)
 
 	if (NULL == name)
 	{
-		name = zbx_db_dyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ?
-				"public" : CONFIG_DBSCHEMA);
+		name = zbx_db_dyn_escape_string(NULL == zbx_cfg_dbhigh->config_dbschema ||
+				'\0' == *zbx_cfg_dbhigh->config_dbschema ? "public" : zbx_cfg_dbhigh->config_dbschema);
 	}
 
 	return name;

@@ -39,6 +39,7 @@
 #include "zbxversion.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxcachehistory.h"
 
 extern char	*CONFIG_SERVER;
 
@@ -2235,7 +2236,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		zbx_vector_uint64_t *dcheckids, zbx_uint64_t unique_dcheckid, int *processed_num, int ip_idx)
 {
 	zbx_db_dhost		dhost;
-	zbx_service_t		*service;
+	zbx_dservice_t		*service;
 	int			services_num, ret = FAIL, i, dchecks = 0;
 	zbx_vector_ptr_t	services_old;
 	zbx_db_drule		drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
@@ -2249,7 +2250,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	/* find host update */
 	for (i = *processed_num; i < services->values_num; i++)
 	{
-		service = (zbx_service_t *)services->values[i];
+		service = (zbx_dservice_t *)services->values[i];
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64 " unique_dcheckid:"
 				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%hu status:%d value:'%s'",
@@ -2270,7 +2271,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		{
 			char	*ip_esc, *dns_esc, *value_esc;
 
-			service = (zbx_service_t *)services->values[i];
+			service = (zbx_dservice_t *)services->values[i];
 
 			ip_esc = zbx_db_dyn_escape_field("proxy_dhistory", "ip", ip);
 			dns_esc = zbx_db_dyn_escape_field("proxy_dhistory", "dns", service->dns);
@@ -2312,7 +2313,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 
 			if (0 == strcmp(ip, row[6]))
 			{
-				service = (zbx_service_t *)zbx_malloc(NULL, sizeof(zbx_service_t));
+				service = (zbx_dservice_t *)zbx_malloc(NULL, sizeof(zbx_dservice_t));
 				service->dcheckid = dcheckid;
 				service->itemtime = (time_t)atoi(row[1]);
 				service->port = atoi(row[2]);
@@ -2357,7 +2358,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 
 	for (i = 0; i < services_old.values_num; i++)
 	{
-		service = (zbx_service_t *)services_old.values[i];
+		service = (zbx_dservice_t *)services_old.values[i];
 
 		if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
@@ -2365,13 +2366,13 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 			continue;
 		}
 
-		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime);
+		zbx_discovery_update_service(drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
+				service->dns, service->port, service->status, service->value, service->itemtime);
 	}
 
 	for (;*processed_num < services_num; (*processed_num)++)
 	{
-		service = (zbx_service_t *)services->values[*processed_num];
+		service = (zbx_dservice_t *)services->values[*processed_num];
 
 		if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
@@ -2379,11 +2380,11 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 			continue;
 		}
 
-		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime);
+		zbx_discovery_update_service(drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
+				service->dns, service->port, service->status, service->value, service->itemtime);
 	}
 
-	service = (zbx_service_t *)services->values[(*processed_num)++];
+	service = (zbx_dservice_t *)services->values[(*processed_num)++];
 	zbx_discovery_update_host(&dhost, service->status, service->itemtime);
 
 	ret = SUCCEED;
@@ -2424,7 +2425,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 	zbx_vector_ptr_t	drules;
 	zbx_drule_t		*drule;
 	zbx_drule_ip_t		*drule_ip;
-	zbx_service_t		*service;
+	zbx_dservice_t		*service;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2513,7 +2514,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		else
 			drule_ip = drule->ips.values[i];
 
-		service = (zbx_service_t *)zbx_malloc(NULL, sizeof(zbx_service_t));
+		service = (zbx_dservice_t *)zbx_malloc(NULL, sizeof(zbx_dservice_t));
 		if (0 != (service->dcheckid = dcheckid))
 			zbx_vector_uint64_append(&drule->dcheckids, service->dcheckid);
 		service->port = port;

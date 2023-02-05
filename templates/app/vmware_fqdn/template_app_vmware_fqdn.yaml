@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-06-07T19:37:54Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,6 +17,9 @@ zabbix_export:
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
         Template tooling version used: 0.41
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications
@@ -308,6 +310,9 @@ zabbix_export:
       template: 'VMware Guest'
       name: 'VMware Guest'
       description: 'Template tooling version used: 0.41'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications
@@ -1110,6 +1115,9 @@ zabbix_export:
       template: 'VMware Hypervisor'
       name: 'VMware Hypervisor'
       description: 'Template tooling version used: 0.41'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications
