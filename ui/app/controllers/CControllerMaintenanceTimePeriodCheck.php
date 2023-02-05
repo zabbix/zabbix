@@ -201,8 +201,8 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 		}
 
 		$timeperiod += [
-			'formatted_type' => timeperiod_type2str($timeperiod_type),
-			'formatted_schedule' => schedule2str($timeperiod),
+			'formatted_type' => CMaintenanceHelper::getTimePeriodTypeNames()[$timeperiod_type],
+			'formatted_schedule' => CMaintenanceHelper::getTimePeriodSchedule($timeperiod),
 			'formatted_period' => zbx_date2age(0, $timeperiod['period'])
 		];
 

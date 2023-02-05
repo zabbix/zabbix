@@ -147,13 +147,7 @@ $form_grid = (new CFormGrid())
 		(new CFormField(
 			(new CSelect('every_dow'))
 				->setFocusableElementId('every-dow-focusable')
-				->addOptions(CSelect::createOptionsFromArray([
-					1 => _('first'),
-					2 => _x('second', 'adjective'),
-					3 => _('third'),
-					4 => _('fourth'),
-					5 => _x('last', 'week of month')
-				]))
+				->addOptions(CSelect::createOptionsFromArray(CMaintenanceHelper::getTimePeriodEveryNames()))
 				->setValue($data['form']['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY
 						&& $data['form']['month_date_type'] == 1
 					? $data['form']['every']

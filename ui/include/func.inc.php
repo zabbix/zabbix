@@ -396,32 +396,6 @@ function getColorVariations($color, $variations_requested = 1) {
 	return $variations;
 }
 
-function zbx_num2bitstr($num, $rev = false) {
-	if (!is_numeric($num)) {
-		return 0;
-	}
-
-	$strbin = '';
-
-	$len = 32;
-	if ($num > ZBX_MAX_INT32) {
-		$len = 64;
-	}
-
-	for ($i = 0; $i < $len; $i++) {
-		$sbin = 1 << $i;
-		$bit = ($sbin & $num) ? '1' : '0';
-		if ($rev) {
-			$strbin .= $bit;
-		}
-		else {
-			$strbin = $bit.$strbin;
-		}
-	}
-
-	return $strbin;
-}
-
 /**
  * Convert suffixed string to decimal bytes ('10K' => 10240).
  * Note: this function must not depend on optional PHP libraries, since it is used in Zabbix setup.

@@ -129,8 +129,8 @@ class CControllerMaintenanceTimePeriodEdit extends CController {
 			}
 
 			if (in_array($timeperiod_type, [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])) {
-				$form['hour'] = floor($this->getInput('start_time') / SEC_PER_HOUR);
-				$form['minute'] = floor(($this->getInput('start_time') % SEC_PER_HOUR) / SEC_PER_MIN);
+				$form['hour'] = sprintf('%02d', floor($this->getInput('start_time') / SEC_PER_HOUR));
+				$form['minute'] = sprintf('%02d', floor(($this->getInput('start_time') % SEC_PER_HOUR) / SEC_PER_MIN));
 			}
 
 			$form['period_days'] = floor($this->getInput('period') / SEC_PER_DAY);
