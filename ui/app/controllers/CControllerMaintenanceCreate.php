@@ -41,24 +41,28 @@ class CControllerMaintenanceCreate extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret && $this->getInput('maintenance_type') == MAINTENANCE_TYPE_NORMAL) {
-			$fields = [
-				'tags_evaltype' => 'required'
-			];
+		if ($ret) {
+			if ($this->getInput('maintenance_type') == MAINTENANCE_TYPE_NORMAL) {
+				$fields = [
+					'tags_evaltype' => 'required'
+				];
 
-			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
+				$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
 
-			foreach ($validator->getAllErrors() as $error) {
-				error($error);
+				foreach ($validator->getAllErrors() as $error) {
+					error($error);
+				}
+
+				if ($validator->isErrorFatal() || $validator->isError()) {
+					$ret = false;
+				}
 			}
 
-			$ret = !$validator->isErrorFatal() && !$validator->isError();
-		}
+			if (!$this->hasInput('groupids') && !$this->hasInput('hostids')) {
+				error(_('At least one host group or host must be selected.'));
 
-		if ($ret && !$this->hasInput('groupids') && !$this->hasInput('hostids')) {
-			error(_('At least one host group or host must be selected.'));
-
-			$ret = false;
+				$ret = false;
+			}
 		}
 
 		if (!$ret) {
@@ -123,8 +127,8 @@ class CControllerMaintenanceCreate extends CController {
 			];
 
 			foreach ($this->getInput('tags', []) as $tag) {
-				if (array_key_exists('tag', $tag) && $tag['tag'] !== '' && array_key_exists('value', $tag)
-						&& $tag['value'] !== '') {
+				if (array_key_exists('tag', $tag) && array_key_exists('value', $tag)
+						&& ($tag['tag'] !== '' || $tag['value'] !== '')) {
 					$maintenance['tags'][] = $tag;
 				}
 			}
