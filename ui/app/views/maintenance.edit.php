@@ -81,7 +81,7 @@ $timeperiod_template = new CTemplateTag('timeperiod-row-tmpl',
 
 $tags = (new CTable())
 	->setId('tags')
-	->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setHeader(
 		(new CCol(
 			(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
@@ -215,9 +215,7 @@ $form->addItem(
 		)
 		->addItem([
 			new CLabel(_('Tags')),
-			new CFormField(
-				(new CDiv([$tags, $tag_template]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			)
+			new CFormField([$tags, $tag_template])
 		])
 		->addItem([
 			new CLabel(_('Description'), 'description'),
