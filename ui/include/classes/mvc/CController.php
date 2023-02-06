@@ -411,11 +411,11 @@ abstract class CController {
 		}
 
 		$skip = ['popup', 'massupdate'];
-		$secret = $this->raw_input[CCsrfTokenHelper::CSRF_TOKEN_NAME];
+		$csrf_token_form = $this->raw_input[CCsrfTokenHelper::CSRF_TOKEN_NAME];
 
 		foreach (explode('.', $this->action) as $segment) {
 			if (!in_array($segment, $skip, true)) {
-				return is_string($secret) && CCsrfTokenHelper::check($secret, $segment);
+				return is_string($csrf_token_form) && CCsrfTokenHelper::check($csrf_token_form, $segment);
 			}
 		}
 
