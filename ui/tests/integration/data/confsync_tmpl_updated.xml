@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>6.4</version>
-    <date>2022-09-12T13:32:57Z</date>
     <template_groups>
         <template_group>
             <uuid>bb17447fffe04b7784ddbd77b209c05a</uuid>
@@ -13,11 +12,6 @@
             <uuid>beae65b7da0a4106bb34b9fc5d39120e</uuid>
             <template>bbbtmpl</template>
             <name>bbbtmpl</name>
-            <templates>
-                <template>
-                    <name>SampleTemplate</name>
-                </template>
-            </templates>
             <groups>
                 <group>
                     <name>TmplTests</name>

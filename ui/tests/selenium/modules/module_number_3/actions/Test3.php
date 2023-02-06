@@ -7,7 +7,7 @@ use CController as CAction;
 class Test2 extends CAction {
 
 	public function init() {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 	}
 
 	/**

@@ -42,7 +42,10 @@ $html_page = (new CHtmlPage())
 			->addItem(
 				(new CButton('form', _('Import')))
 					->onClick(
-						'return PopUp("popup.import", {rules_preset: "host"}, {
+						'return PopUp("popup.import", {
+							rules_preset: "host", '.
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.': "'. CCsrfTokenHelper::get('import').
+						'"}, {
 							dialogueid: "popup_import",
 							dialogue_class: "modal-popup-generic"
 						});'
@@ -213,6 +216,7 @@ $table = (new CTableInfo())
 	]);
 
 $current_time = time();
+$csrf_token_massupdate = CCsrfTokenHelper::get('host');
 
 foreach ($data['hosts'] as $host) {
 	// Select an interface from the list with highest priority.
@@ -272,8 +276,9 @@ foreach ($data['hosts'] as $host) {
 		->setArgument('hostids', [$host['hostid']])
 		->setArgument('visible[status]', 1)
 		->setArgument('update', 1)
+		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token_massupdate)
 		->setArgument('backurl',
-			(new CUrl('zabbix.php', false))
+			(new CUrl('zabbix.php'))
 				->setArgument('action', 'host.list')
 				->setArgument('page', CPagerHelper::loadPage('host.list', null))
 				->getUrl()
@@ -296,16 +301,14 @@ foreach ($data['hosts'] as $host) {
 		$toggle_status_link = (new CLink(_('Enabled'), $status_toggle_url->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
-			->addConfirmation(_('Disable host?'))
-			->addSID();
+			->addConfirmation(_('Disable host?'));
 	}
 	else {
 		$status_toggle_url->setArgument('status', HOST_STATUS_MONITORED);
 		$toggle_status_link = (new CLink(_('Disabled'), $status_toggle_url->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
-			->addConfirmation(_('Enable host?'))
-			->addSID();
+			->addConfirmation(_('Enable host?'));
 	}
 
 	if ($maintenance_icon) {
@@ -314,70 +317,33 @@ foreach ($data['hosts'] as $host) {
 
 	order_result($host['parentTemplates'], 'name');
 
-	$hostTemplates = [];
+	$templates = [];
 	$i = 0;
 
 	foreach ($host['parentTemplates'] as $template) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$hostTemplates[] = ' &hellip;';
-
+			$templates[] = ' &hellip;';
 			break;
 		}
 
-		if (array_key_exists($template['templateid'], $data['writable_templates'])
-				&& $data['allowed_ui_conf_templates']) {
-			$caption = [
-				(new CLink(CHtml::encode($template['name']),
+		if ($templates) {
+			$templates[] = ', ';
+		}
+
+		if (array_key_exists($template['templateid'], $data['editable_templates'])) {
+			$templates[] = (new CLink(CHtml::encode($template['name']),
 					(new CUrl('templates.php'))
 						->setArgument('form', 'update')
 						->setArgument('templateid', $template['templateid'])
 				))
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY)
-			];
+					->addClass(ZBX_STYLE_GREY);
 		}
 		else {
-			$caption = [
-				(new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY)
-			];
+			$templates[] = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
 		}
-
-		$parent_templates = $data['templates'][$template['templateid']]['parentTemplates'];
-
-		if ($parent_templates) {
-			order_result($parent_templates, 'name');
-
-			$caption[] = ' (';
-
-			foreach ($parent_templates as $parent_template) {
-				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])
-						&& $data['allowed_ui_conf_templates']) {
-					$caption[] = (new CLink(CHtml::encode($parent_template['name']),
-						(new CUrl('templates.php'))
-							->setArgument('form', 'update')
-							->setArgument('templateid', $parent_template['templateid'])
-					))
-						->addClass(ZBX_STYLE_LINK_ALT)
-						->addClass(ZBX_STYLE_GREY);
-				}
-				else {
-					$caption[] = (new CSpan(CHtml::encode($parent_template['name'])))->addClass(ZBX_STYLE_GREY);
-				}
-
-				$caption[] = ', ';
-			}
-
-			array_pop($caption);
-			$caption[] = ')';
-		}
-
-		if ($hostTemplates) {
-			$hostTemplates[] = ', ';
-		}
-
-		$hostTemplates[] = $caption;
 	}
 
 	$info_icons = [];
@@ -492,7 +458,7 @@ foreach ($data['hosts'] as $host) {
 		],
 		getHostInterface($interface),
 		$monitored_by,
-		$hostTemplates,
+		$templates,
 		$toggle_status_link,
 		getHostAvailabilityTable($host['interfaces']),
 		$encryption,
@@ -503,6 +469,7 @@ foreach ($data['hosts'] as $host) {
 
 $status_toggle_url =  (new CUrl('zabbix.php'))
 	->setArgument('action', 'popup.massupdate.host')
+	->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token_massupdate)
 	->setArgument('visible[status]', 1)
 	->setArgument('update', 1)
 	->setArgument('backurl',
@@ -539,7 +506,9 @@ $form->addItem([
 		'popup.massupdate.host' => [
 			'content' => (new CButton('', _('Mass update')))
 				->onClick(
-					"openMassupdatePopup('popup.massupdate.host', {}, {
+					"openMassupdatePopup('popup.massupdate.host', {".
+						CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".$csrf_token_massupdate.
+					"'}, {
 						dialogue_class: 'modal-popup-static',
 						trigger_element: this
 					});"

@@ -540,7 +540,7 @@ func (m *Manager) init() {
 }
 
 func (m *Manager) Start() {
-	log.Infof("%s", comms.GetPluginVersionMessage())
+	log.Infof("Plugin communication protocol version is %s", comms.ProtocolVersion)
 
 	monitor.Register(monitor.Scheduler)
 	go m.run()

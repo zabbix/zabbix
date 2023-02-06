@@ -301,7 +301,7 @@ func main() {
 	})
 
 	if argVersion {
-		version.Display([]string{fmt.Sprintf("Plugin support version %d.%d\n", comms.MajorVersion, comms.MinorVersion)})
+		version.Display([]string{fmt.Sprintf("Plugin communication protocol version is %s", comms.ProtocolVersion)})
 		os.Exit(0)
 	}
 

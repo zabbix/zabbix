@@ -23,12 +23,16 @@ class CTableInfo extends CTable {
 
 	protected $message;
 
+	/**
+	 * @var bool
+	 */
+	private $addMakeVerticalRotationJs = false;
+
 	public function __construct() {
 		parent::__construct();
 
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
 		$this->setNoDataMessage(_('No data found.'));
-		$this->addMakeVerticalRotationJs = false;
 	}
 
 	public function toString($destroy = true) {

@@ -187,13 +187,13 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, const 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select item_conditionid,macro,value,operator"
 			" from item_condition"
 			" where itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
-	while (NULL != (row = DBfetch(result)) && SUCCEED == (ret = lld_filter_condition_add(&filter->conditions,
+	while (NULL != (row = zbx_db_fetch(result)) && SUCCEED == (ret = lld_filter_condition_add(&filter->conditions,
 			row[0], row[1], row[2], row[3], item, error)))
 		;
 	zbx_db_free_result(result);
@@ -509,11 +509,11 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 			"select lld_overrideid,lld_override_conditionid,macro,value,operator"
 			" from lld_override_condition"
 			" where");
-	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "lld_overrideid", overrideids->values,
+	zbx_db_add_condition_alloc(sql, sql_alloc, &sql_offset, "lld_overrideid", overrideids->values,
 			overrideids->values_num);
 
-	result = DBselect("%s", *sql);
-	while (NULL != (row = DBfetch(result)))
+	result = zbx_db_select("%s", *sql);
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	overrideid;
 
@@ -650,16 +650,16 @@ static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rule
 
 	zbx_vector_uint64_create(&overrideids);
 
-	DBbegin();
+	zbx_db_begin();
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select lld_overrideid,step,evaltype,formula,stop"
 			" from lld_override"
 			" where itemid=" ZBX_FS_UI64
 			" order by lld_overrideid",
 			lld_ruleid);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		lld_override_t	*override;
 
@@ -685,7 +685,7 @@ static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rule
 		lld_override_operations_load(overrides, &overrideids, &sql, &sql_alloc);
 	}
 
-	DBcommit();
+	zbx_db_commit();
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&overrideids);
 
@@ -1150,13 +1150,13 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 		goto out;
 	}
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select hostid,key_,evaltype,formula,lifetime"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		char	*lifetime_str;
 

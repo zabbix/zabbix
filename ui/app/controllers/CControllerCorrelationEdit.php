@@ -24,7 +24,7 @@ class CControllerCorrelationEdit extends CController {
 	private $correlation = [];
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
