@@ -79,10 +79,10 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 				'start_date' =>		'abs_time'
 			],
 			TIMEPERIOD_TYPE_DAILY => [
-				'every_day' =>		'ge 0|le 999'
+				'every_day' =>		'ge 1|le 999'
 			],
 			TIMEPERIOD_TYPE_WEEKLY => [
-				'every_week' =>		'ge 0|le 99',
+				'every_week' =>		'ge 1|le 99',
 				'weekly_days' =>	'required'
 			],
 			TIMEPERIOD_TYPE_MONTHLY => [
