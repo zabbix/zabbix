@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ if ($data['form_refresh'] == 0) {
 
 // create form
 $mediaTypeForm = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('media-type-form')
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -4297,7 +4297,6 @@ class CImportDataAdapterTest extends TestCase {
 		$source = (new CConstantImportConverter($schema))->convert($source);
 		$source = (new CDefaultImportConverter($schema))->convert($source);
 		$source = (new CImportDataNormalizer($schema))->normalize($source);
-		$source = (new CTransformImportConverter($schema))->convert($source);
 
 		$adapter = new CImportDataAdapter();
 		$adapter->load($source);

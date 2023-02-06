@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ $widget = (new CWidget())
 
 // create form
 $actionForm = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('action-form')
 	->setName('action.edit')
 	->setAction((new CUrl('actionconf.php'))
@@ -502,7 +503,7 @@ $action_tabs = (new CTabView())
 	->addTab('actionTab', _('Action'), $action_tab)
 	->addTab('operationTab', _('Operations'), $operation_tab, TAB_INDICATOR_OPERATIONS);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$action_tabs->setSelected(0);
 }
 

@@ -657,7 +657,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    if (typeof AwsRds.params.proxy !== 'undefined' && AwsRds.params.proxy !== '') {
+                        request.setProxy(AwsRds.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
@@ -773,6 +776,9 @@ zabbix_export:
             -
               name: db_instance_id
               value: '{$AWS.RDS.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -852,7 +858,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    if (typeof AwsRds.params.proxy !== 'undefined' && AwsRds.params.proxy !== '') {
+                        request.setProxy(AwsRds.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
@@ -956,6 +965,9 @@ zabbix_export:
             -
               name: db_instance_id
               value: '{$AWS.RDS.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -1036,7 +1048,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    if (typeof AwsRds.params.proxy !== 'undefined' && AwsRds.params.proxy !== '') {
+                        request.setProxy(AwsRds.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
@@ -1115,6 +1130,9 @@ zabbix_export:
             -
               name: db_instance_id
               value: '{$AWS.RDS.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -1298,7 +1316,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri;
-            
+
+                    if (typeof AwsRds.params.proxy !== 'undefined' && AwsRds.params.proxy !== '') {
+                        request.setProxy(AwsRds.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('X-Amz-Target: GraniteServiceVersion20100801.GetMetricData')
                     request.addHeader('Accept: application/json');
@@ -1379,6 +1400,9 @@ zabbix_export:
             -
               name: db_instance_id
               value: '{$AWS.RDS.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -3364,6 +3388,9 @@ zabbix_export:
           tag: target
           value: rds
       macros:
+        -
+          macro: '{$AWS.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         -
           macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1305,15 +1305,24 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				",null,null,null,null");
 #endif
-	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o"
-			" join scripts s"
-				" on o.scriptid=s.scriptid"
-			" left join opcommand_hst oh"
-				" on o.operationid=oh.operationid"
-			" where  o.operationid=" ZBX_FS_UI64
-				" and oh.hostid is null",
-			operationid);
+	if (EVENT_SOURCE_SERVICE == event->source)
+	{
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
+				" from opcommand o,scripts s"
+				" where o.scriptid=s.scriptid"
+					" and o.operationid=" ZBX_FS_UI64,
+				operationid);
+	}
+	else
+	{
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
+				" from opcommand o,opcommand_hst oh,scripts s"
+				" where o.operationid=oh.operationid"
+					" and o.scriptid=s.scriptid"
+					" and o.operationid=" ZBX_FS_UI64
+					" and oh.hostid is null",
+				operationid);
+	}
 
 	result = DBselect("%s", buffer);
 
@@ -3325,8 +3334,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 					"acknowledgeid,servicealarmid,serviceid"
 				" from escalations"
 				" where %s and nextcheck<=%d"
-				" order by actionid,triggerid,itemid,escalationid", filter,
-				now + CONFIG_ESCALATOR_FREQUENCY);
+				" order by actionid,triggerid,itemid," ZBX_SQL_SORT_ASC("r_eventid") ",escalationid",
+				filter, now + CONFIG_ESCALATOR_FREQUENCY);
 	zbx_free(filter);
 
 	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())

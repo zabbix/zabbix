@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-10-24T17:39:52Z'
+  date: '2022-12-19T10:43:24Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -523,6 +523,22 @@ zabbix_export:
                   item:
                     host: 'HP-UX by Zabbix agent'
                     key: 'vfs.fs.size[{#FSNAME},free]'
+          overrides:
+            -
+              name: 'Skip metadata collection for dynamic FS'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: inode
+                  discover: NO_DISCOVER
       tags:
         -
           tag: class

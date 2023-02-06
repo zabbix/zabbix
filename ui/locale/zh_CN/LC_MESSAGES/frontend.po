@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-25 09:19+0000\n"
+"PO-Revision-Date: 2023-01-13 11:35+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -885,6 +885,14 @@ msgstr "添加子服务"
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
 msgstr "添加自"
+
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr "从主机添加"
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr "从模板添加"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -4134,6 +4142,10 @@ msgstr "配置已更新"
 msgid "Configure DB connection"
 msgstr "配置数据库连接"
 
+#: app/views/js/administration.authentication.edit.js.php:90
+msgid "Confirm changes"
+msgstr "确认修改"
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "确认文字"
@@ -6485,6 +6497,10 @@ msgstr "启用"
 msgid "Enable HTTP authentication"
 msgstr "启用HTTP 验证"
 
+#: app/views/js/administration.authentication.edit.js.php:93
+msgid "Enable HTTP authentication for all users."
+msgstr "所有用户启用HTTP认证方式"
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "启用LDAP 验证"
@@ -7218,6 +7234,11 @@ msgstr "字段 \"%1$s\" 缺少拓扑图 \"%2$s\" 的值。"
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "字段 \"%1$s\" 设置错误: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr "字段 \"%1$s\" 错误: %2$s。"
 
 #: include/validate.inc.php:167
 #, c-format
@@ -8760,6 +8781,10 @@ msgstr "位于 %2$s 的模块使用了相同的命名空间 (%1$s)。"
 #: include/classes/data/CItemData.php:1114
 msgid "Identification of the system. Returns string"
 msgstr "识别系统。返回 字符串"
+
+#: app/views/administration.authentication.edit.php:120
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr "如HTTP认证启用，所有用户(即使前端访问使用LDAP/内置认证)将通过web服务器认证，而不通过zabbix。"
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -15705,7 +15730,7 @@ msgstr "结果已使用值映射"
 #: include/views/configuration.item.edit.php:456
 #: include/views/configuration.item.prototype.edit.php:434
 msgid "Retrieve mode"
-msgstr "恢复模式"
+msgstr "检索模式"
 
 #: include/classes/data/CItemData.php:1154
 msgid "Retrieving contents of a file. Returns text"
@@ -22185,6 +22210,10 @@ msgstr "无效的聚合方法"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8中无效的字节排序"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr "无效的数据类型"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"

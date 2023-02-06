@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,13 +59,23 @@ class CLdap {
 	 */
 	public $error;
 
-	public function __construct($arg = []) {
-		$this->ds = false;
-		$this->info = [];
+	/**
+	 * @var mixed
+	 */
+	private $ds = false;
 
-		if (is_array($arg)) {
-			$this->cnf = zbx_array_merge($this->cnf, $arg);
-		}
+	/**
+	 * @var mixed
+	 */
+	private $info = [];
+
+	/**
+	 * @var int
+	 */
+	private $bound = 0;
+
+	public function __construct(array $arg = []) {
+		$this->cnf = zbx_array_merge($this->cnf, $arg);
 
 		if ($this->cnf['search_filter'] === '') {
 			$this->cnf['search_filter'] = '(%{attr}=%{user})';

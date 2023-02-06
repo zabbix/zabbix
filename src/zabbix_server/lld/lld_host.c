@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -842,6 +842,9 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		host = (zbx_lld_host_t *)hosts->values[i];
 
 		if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		if (0 == host->hostid)
 			continue;
 
 		buffer = zbx_strdup(buffer, host->host_proto);
@@ -2412,8 +2415,8 @@ static void	lld_interface_snmp_prepare_sql(zbx_uint64_t hostid, const zbx_uint64
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "version=%d", (int)snmp->version);
 		d = ",";
 
-		zbx_audit_host_update_json_update_interface_version(hostid, interfaceid,
-						snmp->version_orig, snmp->version);
+		zbx_audit_host_update_json_update_interface_version(hostid, interfaceid, snmp->version_orig,
+				snmp->version);
 	}
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK))
@@ -4568,10 +4571,13 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 
 		if (0 != hosts.values_num)
 			lld_hosts_get_tags(&hosts);
+
 		lld_proto_tags_get(parent_hostid, &tags);
 
 		lld_simple_groups_get(parent_hostid, &groupids);
+
 		lld_group_prototypes_get(parent_hostid, &group_prototypes);
+
 		lld_groups_get(parent_hostid, &groups);
 
 		lld_hostmacros_get(parent_hostid, &masterhostmacros, &hostmacros);

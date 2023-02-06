@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1006,6 +1006,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 */
 	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['description', 'expression']], 'fields' => [
+			'uuid' => 					['type' => API_UUID],
 			'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'description' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'description')],
 			'expression' =>				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_NOT_EMPTY | API_ALLOW_LLD_MACRO],
@@ -1029,6 +1030,7 @@ abstract class CTriggerGeneral extends CApiService {
 				'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
+
 		if ($this instanceof CTriggerPrototype) {
 			$api_input_rules['fields']['discover'] = ['type' => API_INT32, 'in' => implode(',', [TRIGGER_DISCOVER, TRIGGER_NO_DISCOVER])];
 		}

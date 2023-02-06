@@ -1,2 +1,3 @@
 dummy: dummy.c
-	gcc -fPIC -shared -o dummy.so dummy.c -I../../../include
+	cc -fPIC -shared -o dummy.so dummy.c -I../../../include -I../../../include/common
+

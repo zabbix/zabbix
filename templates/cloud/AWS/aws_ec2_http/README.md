@@ -83,6 +83,7 @@ No specific Zabbix configuration is required.
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES} |<p>Filter to exclude discovered volumes by type.</p> |`CHANGE_IF_NEEDED` |
 |{$AWS.REGION} |<p>Amazon EC2 Region code.</p> |`us-west-1` |
 |{$AWS.SECRET.ACCESS.KEY} |<p>Secret access key.</p> |`` |
+|{$AWS.PROXY} |<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p> |`` |
 
 ## Template links
 

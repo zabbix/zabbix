@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,12 +102,6 @@ foreach ($titles as $key => $title) {
 		$checkbox_delete = (new CCheckBox('rules['.$key.'][deleteMissing]'))
 			->setChecked($data['rules'][$key]['deleteMissing'])
 			->addClass('deleteMissing');
-
-		if ($key === 'templateLinkage') {
-			$checkbox_delete->onClick('updateWarning(this, '.json_encode(
-				_('Template and host properties that are inherited through template linkage will be unlinked and cleared.')
-			).')');
-		}
 	}
 
 	switch ($key) {

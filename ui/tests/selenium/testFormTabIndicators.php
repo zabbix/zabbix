@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -693,6 +693,11 @@ class testFormTabIndicators extends CWebTest {
 
 			$tab_selector = $form->query('xpath:.//a[text()="'.$tab['name'].'"]')->one();
 			$this->assertTabIndicator($tab_selector, $old_value);
+
+			if (CTestArrayHelper::get($tab, 'name') === 'HTTP settings') {
+				$form->fill(['Enable HTTP authentication' => true]);
+				$this->query('button:Ok')->one()->click();
+			}
 
 			// Populate fields in tab and check indicator value.
 			$this->updateTabFields($tab, $form);

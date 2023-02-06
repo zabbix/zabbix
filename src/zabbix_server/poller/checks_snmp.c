@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -421,16 +421,7 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_I
 		zbx_snprintf(error, max_error_len, "Cannot connect to \"%s:%hu\": %s.",
 				interface->addr, interface->port, snmp_api_errstring(ss->s_snmp_errno));
 
-		switch (ss->s_snmp_errno)
-		{
-			case SNMPERR_UNKNOWN_USER_NAME:
-			case SNMPERR_UNSUPPORTED_SEC_LEVEL:
-			case SNMPERR_AUTHENTICATION_FAILURE:
-				ret = NOTSUPPORTED;
-				break;
-			default:
-				ret = NETWORK_ERROR;
-		}
+		ret = NETWORK_ERROR;
 	}
 	else if (STAT_TIMEOUT == status)
 	{
@@ -1136,7 +1127,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		{
 			/* The logic of iteratively reducing request size here is the same as in function */
 			/* zbx_snmp_get_values(). Please refer to the description there for explanation.  */
-
+reduce_max_vars:
 			if (*min_fail > max_vars)
 				*min_fail = max_vars;
 
@@ -1155,6 +1146,9 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		}
 		else if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
+			if (1 >= level)
+				goto reduce_max_vars;
+
 			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
 			running = 0;
 			goto next;
@@ -1544,7 +1538,12 @@ halve:
 		}
 	}
 	else
+	{
+		if (1 <= level)
+			goto halve;
+
 		ret = zbx_get_snmp_response_error(ss, &items[0].interface, status, response, error, max_error_len);
+	}
 exit:
 	if (NULL != response)
 		snmp_free_pdu(response);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@
 #include "embed.h"
 
 #define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 64)
-#define ZBX_ES_TIMEOUT		10
-
 #define ZBX_ES_STACK_LIMIT	1000
 
 /* maximum number of consequent runtime errors after which it's treated as fatal error */
@@ -545,6 +543,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() param:%s", __func__, param);
 
 	zbx_timespec(&es->env->start_time);
+	es->env->http_req_objects = 0;
 
 	if (NULL != es->env->json)
 	{

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,11 @@ class CMultiSelect extends CTag {
 	protected $preselect_fields = ['hosts', 'hostgroups', 'templategroups'];
 
 	/**
+	 * @var array
+	 */
+	protected $params = [];
+
+	/**
 	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
 	 * @param bool  $options['multiple']       Allows multiple selections.
 	 * @param bool  $options['add_post_js']
@@ -56,8 +61,7 @@ class CMultiSelect extends CTag {
 			->addItem((new CDiv())
 				->setAttribute('aria-live', 'assertive')
 				->setAttribute('aria-atomic', 'true')
-			)
-			->js_event_name = sprintf('multiselect_%s_init', $this->getId());
+			);
 
 		if (array_key_exists('disabled', $options) && $options['disabled']) {
 			$this->setAttribute('aria-disabled', 'true');

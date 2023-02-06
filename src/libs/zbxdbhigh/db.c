@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -815,7 +815,7 @@ void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	if (NULL == (result = DBselect("select db_extension from config")))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = DBfetch(result)) || '\0' == *row[0])
 		goto clean;
 
 	version_info->extension = zbx_strdup(NULL, row[0]);

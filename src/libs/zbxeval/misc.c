@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -252,6 +252,26 @@ static int	compare_tokens_by_loc(const void *d1, const void *d2)
 	return 0;
 }
 
+static const zbx_eval_token_t	*eval_get_next_function_token(const zbx_eval_context_t *ctx, int token_index)
+{
+	if (0 != (ctx->stack.values[token_index].type & ZBX_EVAL_CLASS_FUNCTION))
+		return NULL;
+
+	for(int i = token_index + 1; i < ctx->stack.values_num; i++)
+	{
+		const zbx_eval_token_t	*token = &ctx->stack.values[i];
+		if (0 != (token->type & ZBX_EVAL_CLASS_FUNCTION))
+		{
+			if (token->opt < (zbx_uint32_t)(i - token_index))
+				return NULL;
+
+			return &ctx->stack.values[i];
+		}
+	}
+
+	return NULL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: print token into string quoting/escaping if necessary             *
@@ -263,11 +283,12 @@ static int	compare_tokens_by_loc(const void *d1, const void *d2)
  *             token      - [IN] the token to print                           *
  *                                                                            *
  ******************************************************************************/
-static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, size_t *str_alloc, size_t *str_offset,
-		const zbx_eval_token_t *token)
+static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, size_t *str_alloc,
+	size_t *str_offset, const zbx_eval_token_t *token)
 {
-	int		quoted = 0, check_value = 0;
-	const char	*value_str;
+	int			quoted = 0, check_value = 0;
+	const char		*value_str;
+	const zbx_eval_token_t	*func_token;
 
 	if (ZBX_VARIANT_NONE == token->value.type)
 		return;
@@ -323,7 +344,7 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 	if (0 != check_value)
 	{
 		if (ZBX_VARIANT_STR == token->value.type &&
-				SUCCEED != eval_suffixed_number_parse(token->value.data.str, NULL))
+				SUCCEED != zbx_eval_suffixed_number_parse(token->value.data.str, NULL))
 		{
 			quoted = 1;
 		}
@@ -334,7 +355,12 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 	if (0 == quoted)
 		zbx_strcpy_alloc(str, str_alloc, str_offset, value_str);
 	else
-		zbx_strquote_alloc(str, str_alloc, str_offset, value_str);
+	{
+		func_token = eval_get_next_function_token(ctx, (int)(token - ctx->stack.values));
+		zbx_strquote_alloc_opt(str, str_alloc, str_offset, value_str,
+				NULL != func_token && ZBX_EVAL_TOKEN_HIST_FUNCTION == func_token->type ?
+				ZBX_STRQUOTE_SKIP_BACKSLASH : ZBX_STRQUOTE_DEFAULT);
+	}
 }
 
 /******************************************************************************
@@ -550,6 +576,23 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 		zbx_eval_token_t	*token = &ctx->stack.values[i];
 		char			*value = NULL;
 		int			ret;
+
+		/* workaround is needed for calculated items for history functions */
+		if (ZBX_VARIANT_STR == token->value.type)
+		{
+			value = zbx_strdup(NULL, token->value.data.str);
+
+			if (SUCCEED != um_expand_cb(data, &value, hostids, hostids_num, error))
+			{
+				zbx_free(value);
+				return FAIL;
+			}
+
+			zbx_variant_clear(&token->value);
+			zbx_variant_set_str(&token->value, value);
+
+			continue;
+		}
 
 		switch (token->type)
 		{

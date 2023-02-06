@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
-require_once dirname(__FILE__).'/testPageAdministrationMediaTypes.php';
+require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
 require_once dirname(__FILE__).'/apiTokens/testPageApiTokensAdministrationGeneral.php';
 require_once dirname(__FILE__).'/apiTokens/testPageApiTokensUserSettings.php';
@@ -90,9 +90,9 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
-require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
-require_once dirname(__FILE__).'/testFormAdministrationMediaTypeMessageTemplates.php';
-require_once dirname(__FILE__).'/testFormAdministrationMediaTypeWebhook.php';
+require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypes.php';
+require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
+require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
 require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
 require_once dirname(__FILE__).'/apiTokens/testFormApiTokensAdministrationGeneral.php';
@@ -248,6 +248,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testFormUpdateProblem');
 		$suite->addTestSuite('testPageHistory');
+		$suite->addTestSuite('testPageHostGraph');
 		$suite->addTestSuite('testPageHostInterfaces');
 		$suite->addTestSuite('testPageHostPrototypes');
 		$suite->addTestSuite('testPageHosts');

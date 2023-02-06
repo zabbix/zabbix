@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,6 +113,7 @@ static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
 #if defined(HAVE_ORACLE)
+static void	OCI_DBclean_result_handle(DB_RESULT result);
 static void	OCI_DBclean_result(DB_RESULT result);
 #endif
 
@@ -972,7 +973,7 @@ void	zbx_db_close(void)
 		for (i = 0; i < oracle.db_results.values_num; i++)
 		{
 			/* deallocate all handles before environment is deallocated */
-			OCI_DBclean_result(oracle.db_results.values[i]);
+			OCI_DBclean_result_handle(oracle.db_results.values[i]);
 		}
 	}
 
@@ -1781,9 +1782,16 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 					}
 					else
 					{
+#define ZBX_MIN_OCI_NUMBER_WIDTH	22
 						/* retrieve the column width in bytes */
 						err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
 								(ub4 *)NULL, (ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
+
+						if (ZBX_MIN_OCI_NUMBER_WIDTH > col_width && SQLT_NUM == data_type)
+						{
+							col_width = ZBX_MIN_OCI_NUMBER_WIDTH;
+						}
+#undef ZBX_MIN_OCI_NUMBER_WIDTH
 					}
 				}
 				col_width++;	/* add 1 byte for terminating '\0' */
@@ -2146,19 +2154,14 @@ int	zbx_db_is_null(const char *field)
 }
 
 #ifdef HAVE_ORACLE
-static void	OCI_DBclean_result(DB_RESULT result)
+static void	OCI_DBclean_result_handle(DB_RESULT result)
 {
-	if (NULL == result)
-		return;
-
 	if (NULL != result->values)
 	{
 		int	i;
 
 		for (i = 0; i < result->ncolumn; i++)
 		{
-			zbx_free(result->values[i]);
-
 			/* deallocate the lob locator variable */
 			if (NULL != result->clobs[i])
 			{
@@ -2166,16 +2169,31 @@ static void	OCI_DBclean_result(DB_RESULT result)
 				result->clobs[i] = NULL;
 			}
 		}
-
-		zbx_free(result->values);
-		zbx_free(result->clobs);
-		zbx_free(result->values_alloc);
 	}
 
 	if (result->stmthp)
 	{
 		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
 		result->stmthp = NULL;
+	}
+}
+static void	OCI_DBclean_result(DB_RESULT result)
+{
+	if (NULL == result)
+		return;
+
+	OCI_DBclean_result_handle(result);
+
+	if (NULL != result->values)
+	{
+		int	i;
+
+		for (i = 0; i < result->ncolumn; i++)
+			zbx_free(result->values[i]);
+
+		zbx_free(result->values);
+		zbx_free(result->clobs);
+		zbx_free(result->values_alloc);
 	}
 }
 #endif

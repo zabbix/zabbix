@@ -7710,7 +7710,7 @@ td.log-info-bg,
 td.log-warning-bg,
 td.log-high-bg,
 td.log-disaster-bg {
-  padding-left: 42px;
+  padding-left: 42px !important;
   color: #000000; }
 
 .notif-body h4 {

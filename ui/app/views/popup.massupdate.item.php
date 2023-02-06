@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -203,7 +203,7 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	->addRow(
 		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
 			->setLabel(_('Preprocessing steps')),
-		(new CDiv(getItemPreprocessing($form, [], false, $data['preprocessing_types'])))
+		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))
 			->setId('preprocessing_div')
 	);
 

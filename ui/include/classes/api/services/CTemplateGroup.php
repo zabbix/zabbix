@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -338,11 +338,12 @@ class CTemplateGroup extends CApiService {
 
 	/**
 	 * @param array  $groups
+	 * @param bool   $allow_uuid_update
 	 *
 	 * @return array
 	 */
-	public function update(array $groups): array {
-		$this->validateUpdate($groups, $db_groups);
+	public function update(array $groups, bool $allow_uuid_update = false): array {
+		$this->validateUpdate($groups, $db_groups, $allow_uuid_update);
 
 		$upd_groups = [];
 
@@ -418,14 +419,19 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @param array $groups     [IN/OUT]
 	 * @param array $db_groups  [OUT]
+	 * @param bool  $allow_uuid_update
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$groups, array &$db_groups = null): void {
+	protected function validateUpdate(array &$groups, array &$db_groups = null, bool $allow_uuid_update = false): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
 			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_TG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
+
+		if ($allow_uuid_update) {
+			$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
+		}
 
 		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

@@ -1210,10 +1210,10 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'Host
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90280, 50009, 50004);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 50009, 50022);
 INSERT INTO items (itemid, name, key_, hostid, interfaceid, delay, value_type, params, description, posts, headers) VALUES (400660, 'tag.item', 'tag.key', 50009, 50022, '30s', 3, '', '', '', '');
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments) VALUES (100027, 'Trigger for tag permissions MySQL', '{13083}=0', 0, 1, '1339761311', '');
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments) VALUES (100027, 'Trigger for tag permissions MySQL', '{100028}=0', 0, 1, '1339761311', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100028, 400660, 100027, 'last', '$,#1');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9001, 'Service','MySQL', 100027);
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments) VALUES (100028, 'Trigger for tag permissions Oracle', '{13083}=0', 0, 1, '1339761311', '');
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments) VALUES (100028, 'Trigger for tag permissions Oracle', '{100029}=0', 0, 1, '1339761311', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100029, 400660, 100028, 'last', '$,#1');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9002, 'Service','Oracle', 100028);
 -- Tag based permissions: triggers problems events
@@ -2078,10 +2078,10 @@ INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (9005, 1410);
 INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5000, 133800, 'Override for update 1', 1, 1, 0);
 INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5001, 133800, 'Override for update 2', 2, 0, 0);
 
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (3000, 5000, 8, '{#MACRO1}', 'test expression_1');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (3001, 5000, 9, '{#MACRO2}', 'test expression_2');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (3002, 5000, 12, '{#MACRO3}', '');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (3003, 5000, 13, '{#MACRO4}', '');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (3100, 5000, 8, '{#MACRO1}', 'test expression_1');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (3101, 5000, 9, '{#MACRO2}', 'test expression_2');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (3102, 5000, 12, '{#MACRO3}', '');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (3103, 5000, 13, '{#MACRO4}', '');
 
 INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4000, 5000, 0, 0, 'test item pattern');
 INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4001, 5000, 1, 1, 'test trigger pattern');
@@ -2141,12 +2141,3 @@ INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, descri
 -- testPageHostPrototypes
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (9450, 90002, 'host_proto_tag_1', 'value1');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (9451, 90002, 'host_proto_tag_2', 'value2');
-
--- testFormAdministrationScripts
-INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, scope) VALUES (200, 5, 'Script for Update', 'test', 2, NULL, NULL, 'update description', 2);
-INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (100, 200, 'update_name', 'update_value');
-INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (101, 200, 'update_name2', 'update_value2');
-INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, scope) VALUES (201, 5, 'Script for Clone','test', 2, NULL, NULL, 'clone description', 2);
-INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (102, 201, 'name1', 'value1');
-INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (103, 201, 'name2', 'value2');
-INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, scope) VALUES (202, 5, 'Script for Delete','test', 2, NULL, NULL, 'delete description', 2);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ $widget = (new CWidget())
 
 // create form
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setName('module-form')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'module.update')
@@ -52,7 +53,7 @@ $module_tab = (new CFormList())
 $tabs = (new CTabView())
 	->addTab('moduleTab', _('Module'), $module_tab);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 

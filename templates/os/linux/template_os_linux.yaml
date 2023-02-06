@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-16T21:04:21Z'
+  date: '2023-01-12T06:39:22Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -746,7 +746,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
-          description: 'Monitoring agent availability status'
+          description: 'Monitoring the availability status of the agent.'
           valuemap:
             name: zabbix.host.available
           tags:
@@ -1676,6 +1676,22 @@ zabbix_export:
                   item:
                     host: 'Linux by Zabbix agent'
                     key: 'vfs.fs.size[{#FSNAME},used]'
+          overrides:
+            -
+              name: 'Skip metadata collection for dynamic FS'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: inode
+                  discover: NO_DISCOVER
       tags:
         -
           tag: class
@@ -2442,12 +2458,6 @@ zabbix_export:
           item:
             host: 'Linux by Zabbix agent'
             key: 'proc.num[,,run]'
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Linux by Zabbix agent'
-            key: kernel.maxproc
     -
       uuid: 1ca6e2d883114853bd402110c3fd211e
       name: 'Swap usage'

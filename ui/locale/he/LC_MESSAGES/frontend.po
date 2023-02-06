@@ -904,6 +904,14 @@ msgstr "הוספת שירותים צאצאים"
 msgid "Add from"
 msgstr "הוספה מתוך"
 
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
+
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "הוספת מארח"
@@ -4210,6 +4218,10 @@ msgstr "ההגדרות עודכנו"
 msgid "Configure DB connection"
 msgstr "הגדרת חיבור למסד הנתונים"
 
+#: app/views/js/administration.authentication.edit.js.php:90
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "טקסט אימות"
@@ -6568,6 +6580,10 @@ msgstr "הפעלה"
 msgid "Enable HTTP authentication"
 msgstr "הפעלת אימות HTTP"
 
+#: app/views/js/administration.authentication.edit.js.php:93
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "הפעלת אימות מול LDAP"
@@ -7302,6 +7318,11 @@ msgstr "לשדה „%1$s” חסר ערך עבור המפה „%2$s”."
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "השדה „%1$s” שגוי: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
 
 #: include/validate.inc.php:167
 #, c-format
@@ -8850,6 +8871,10 @@ msgstr "מרחב שם זהה (%1$s) משמש את המודולים תחת %2$s."
 #: include/classes/data/CItemData.php:1114
 msgid "Identification of the system. Returns string"
 msgstr "זיהוי המערכת. מחזירה מחרוזת"
+
+#: app/views/administration.authentication.edit.php:120
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -22322,6 +22347,10 @@ msgstr "שיטת האגירה שגויה"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "רצף בתים שגוי ב־UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"

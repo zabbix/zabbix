@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class CControllerAuthenticationEdit extends CController {
 	 */
 	protected function checkInput() {
 		$fields = [
-			'form_refresh' =>					'string',
+			'form_refresh' =>					'int32',
 			'change_bind_password' =>			'in 0,1',
 			'db_authentication_type' =>			'string',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,

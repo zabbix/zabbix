@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -361,13 +361,15 @@ static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, const z
  * Return value: SUCCEED - the text is a composite constant                   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
+ * Comments: This function uses old escaping rules where '\' was not escaped. *
+ *                                                                            *
  ******************************************************************************/
 void	dbpatch_strcpy_alloc_quoted(char **str, size_t *str_alloc, size_t *str_offset, const char *source)
 {
 	char	raw[ZBX_DBPATCH_FUNCTION_PARAM_LEN * 5 + 1], quoted[sizeof(raw)];
 
 	zbx_strlcpy(raw, source, sizeof(raw));
-	zbx_escape_string(quoted, sizeof(quoted), raw, "\"\\");
+	zbx_escape_string(quoted, sizeof(quoted), raw, "\"");
 	zbx_chrcpy_alloc(str, str_alloc, str_offset, '"');
 	zbx_strcpy_alloc(str, str_alloc, str_offset, quoted);
 	zbx_chrcpy_alloc(str, str_alloc, str_offset, '"');
@@ -425,6 +427,8 @@ void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_
 
 	while (ZBX_DBPATCH_ARG_NONE != (type = va_arg(args, int)))
 	{
+		int	dummy;
+
 		if (0 != param_num++)
 			zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ',');
 
@@ -434,7 +438,8 @@ void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_
 				if (-1 != (index = va_arg(args, int)) && index < params->values_num)
 				{
 					loc = &params->values[index];
-					arg = zbx_substr_unquote(parameter, loc->l, loc->r);
+					arg = zbx_function_param_unquote_dyn(parameter + loc->l, 1 + loc->r - loc->l,
+							&dummy);
 
 					if ('\0' != *arg)
 					{
@@ -450,7 +455,8 @@ void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_
 				if (-1 != (index = va_arg(args, int)) && index < params->values_num)
 				{
 					loc = &params->values[index];
-					arg = zbx_substr_unquote(parameter, loc->l, loc->r);
+					arg = zbx_function_param_unquote_dyn(parameter + loc->l, 1 + loc->r - loc->l,
+							&dummy);
 
 					if ('\0' != *arg)
 					{
@@ -473,7 +479,9 @@ void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_
 					char	*str;
 
 					loc = &params->values[index];
-					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					str = zbx_function_param_unquote_dyn(parameter + loc->l, 1 + loc->r - loc->l,
+							&dummy);
+
 					if ('\0' != *str)
 					{
 						if (SUCCEED == dbpatch_is_composite_constant(str))
@@ -493,7 +501,8 @@ void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_
 					char	*str;
 
 					loc = &params->values[index];
-					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					str = zbx_function_param_unquote_dyn(parameter + loc->l, 1 + loc->r - loc->l,
+							&dummy);
 
 					if (SUCCEED == dbpatch_is_composite_constant(str))
 						dbpatch_strcpy_alloc_quoted(out, &out_alloc, &out_offset, str);
@@ -509,9 +518,9 @@ void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_
 					char	*str;
 
 					loc = &params->values[index];
-					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					str = zbx_function_param_unquote_dyn(parameter + loc->l, 1 + loc->r - loc->l,
+							&dummy);
 					dbpatch_strcpy_alloc_quoted(out, &out_alloc, &out_offset, str);
-
 					zbx_free(str);
 				}
 				break;
@@ -521,7 +530,8 @@ void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_
 					char	*str;
 
 					loc = &params->values[index];
-					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					str = zbx_function_param_unquote_dyn(parameter + loc->l, 1 + loc->r - loc->l,
+							&dummy);
 					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
 					zbx_free(str);
 				}
@@ -530,7 +540,8 @@ void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_
 					char	*str;
 
 					loc = &params->values[index];
-					str = zbx_substr_unquote(parameter, loc->l, loc->r);
+					str = zbx_function_param_unquote_dyn(parameter + loc->l, 1 + loc->r - loc->l,
+							&dummy);
 					zbx_chrcpy_alloc(out, &out_alloc, &out_offset, ':');
 					zbx_strcpy_alloc(out, &out_alloc, &out_offset, str);
 					zbx_free(str);
@@ -541,7 +552,7 @@ void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_
 				{
 					char	quoted[MAX_STRING_LEN];
 
-					zbx_escape_string(quoted, sizeof(quoted), ptr, "\"\\");
+					zbx_escape_string(quoted, sizeof(quoted), ptr, "\"");
 					zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '"');
 					zbx_strcpy_alloc(out, &out_alloc, &out_offset, quoted);
 					zbx_chrcpy_alloc(out, &out_alloc, &out_offset, '"');

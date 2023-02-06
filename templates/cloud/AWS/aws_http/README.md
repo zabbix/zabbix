@@ -71,6 +71,7 @@ No specific Zabbix configuration is required.
 |{$AWS.S3.LLD.FILTER.NAME.MATCHES} |<p>Filter of discoverable S3 buckets by namespace.</p> |`.*` |
 |{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES} |<p>Filter to exclude discovered S3 buckets by namespace.</p> |`CHANGE_IF_NEEDED` |
 |{$AWS.SECRET.ACCESS.KEY} |<p>Secret access key.</p> |`` |
+|{$AWS.PROXY} |<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p> |`` |
 
 ## Template links
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,11 +44,11 @@ class testFormUpdateProblem extends CWebTest {
 	protected static $triggerids;
 
 	/**
-	 * Time when events were created.
+	 * Time when acknowledge was created.
 	 *
 	 * @var string
 	 */
-	protected static $time;
+	protected static $acktime;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -139,11 +139,11 @@ class testFormUpdateProblem extends CWebTest {
 		self::$triggerids = CDataHelper::getIds('description');
 
 		// Create events.
-		self::$time = time();
+		$time = time();
 		$i=0;
 		foreach (self::$triggerids as $name => $id) {
 			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.(100550 + $i).', 0, 0, '.
-					zbx_dbstr($id).', '.self::$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
+					zbx_dbstr($id).', '.$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
 			);
 			$i++;
 		}
@@ -152,7 +152,7 @@ class testFormUpdateProblem extends CWebTest {
 		$j=0;
 		foreach (self::$triggerids as $name => $id) {
 			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.(100550 + $j).', 0, 0, '.
-					zbx_dbstr($id).', '.self::$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
+					zbx_dbstr($id).', '.$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
 			);
 			$j++;
 		}
@@ -167,12 +167,18 @@ class testFormUpdateProblem extends CWebTest {
 		// Suppress the problem: 'Trigger for text'.
 		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (10050, 100554, NULL, 0)');
 
-		// Acknowledge the problem: 'Trigger for unsigned'.
+		// Acknowledge the problem: 'Trigger for unsigned' and get acknowledge time.
 		CDataHelper::call('event.acknowledge', [
 			'eventids' => 100553,
 			'action' => 6,
 			'message' => 'Acknowledged event'
 		]);
+
+		$event = CDataHelper::call('event.get', [
+			'eventids' => 100553,
+			'select_acknowledges' => ['clock']
+		]);
+		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
 
 	public function getLayoutData() {
@@ -324,7 +330,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check History field.
 		if (array_key_exists('history', $data)) {
-			$history = ($data['history'] === []) ? $data['history'] : [date('Y-m-d H:i:s', self::$time).$data['history'][0]];
+			$history = ($data['history'] === []) ? $data['history'] : [date('Y-m-d H:i:s', self::$acktime).$data['history'][0]];
 			$history_table = $form->getField('History')->asTable();
 			$this->assertEquals(['Time', 'User', 'User action', 'Message'], $history_table->getHeadersText());
 			$this->assertEquals($history, $history_table->getRows()->asText());
@@ -635,7 +641,7 @@ class testFormUpdateProblem extends CWebTest {
 						'id:severity' => 'High',
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
-						'id:suppress_until_problem' => 'now+15y'
+						'id:suppress_until_problem' => 'now+14y'
 					],
 					'db_check' => [
 						[

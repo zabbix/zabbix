@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -213,6 +213,21 @@ void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int 
 		zbx_free(items[i].history_period);
 		zbx_free(items[i].trends_period);
 	}
+}
+
+void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *itemids)
+{
+	int	i;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	for (i = 0; i < itemids->values_num; i++)
+	{
+		if (NULL != zbx_hashset_search(&config->items, &itemids->values[i]))
+			zbx_vector_uint64_remove_noorder(itemids, i--);
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
 }
 
 /******************************************************************************

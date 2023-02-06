@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,7 +115,11 @@ $auth_tab = (new CFormGrid())
 // HTTP authentication fields.
 $http_tab = (new CFormGrid())
 	->addItem([
-		new CLabel(_('Enable HTTP authentication'), 'http_auth_enabled'),
+		new CLabel([_('Enable HTTP authentication'),
+			makeHelpIcon(
+				_("If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix.")
+			)
+		], 'http_auth_enabled'),
 		new CFormField(
 			(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
 				->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
@@ -339,13 +343,14 @@ $saml_tab = (new CFormGrid())
 	->setTitle(_('Authentication'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTHENTICATION_EDIT))
 	->addItem((new CForm())
+		->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 		->addVar('action', $data['action_submit'])
 		->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
 		->setId('authentication-form')
 		->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 		->disablePasswordAutofill()
 		->addItem((new CTabView())
-			->setSelected($data['form_refresh'] ? null : 0)
+			->setSelected($data['form_refresh'] != 0 ? null : 0)
 			->addTab('auth', _('Authentication'), $auth_tab)
 			->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
 			->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)

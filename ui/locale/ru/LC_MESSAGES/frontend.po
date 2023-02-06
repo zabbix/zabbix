@@ -927,6 +927,14 @@ msgstr "Добавление дочерних услуг"
 msgid "Add from"
 msgstr "Добавить с"
 
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
+
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "Добавить узел сети"
@@ -4291,6 +4299,10 @@ msgstr "Настройки обновлены"
 msgid "Configure DB connection"
 msgstr "Настройка подключения к БД"
 
+#: app/views/js/administration.authentication.edit.js.php:90
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "Текст подтверждения"
@@ -6645,6 +6657,10 @@ msgstr "Активировать"
 msgid "Enable HTTP authentication"
 msgstr "Активация HTTP аутентификации"
 
+#: app/views/js/administration.authentication.edit.js.php:93
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "Активация LDAP аутентификации"
@@ -7380,6 +7396,11 @@ msgstr "В поле \"%1$s\" пропущено значение у карты �
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "Поле \"%1$s\" не корректно: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
 
 #: include/validate.inc.php:167
 #, c-format
@@ -8935,6 +8956,10 @@ msgstr "Одинаковые пространства имён (%1$s) испол
 #: include/classes/data/CItemData.php:1114
 msgid "Identification of the system. Returns string"
 msgstr "Идентификация системы. Возвращает строку"
+
+#: app/views/administration.authentication.edit.php:120
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -22451,6 +22476,10 @@ msgstr "ошибочный метод агрегации"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "ошибочная последовательность байт в UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"

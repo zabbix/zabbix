@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1215,6 +1215,9 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
 
+#define ZBX_STRQUOTE_DEFAULT		1
+#define ZBX_STRQUOTE_SKIP_BACKSLASH	0
+
 double		zbx_time(void);
 void		zbx_timespec(zbx_timespec_t *ts);
 double		zbx_current_time(void);
@@ -1239,7 +1242,7 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
-void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str);
+void	zbx_strquote_alloc_opt(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str, int option);
 
 void	zbx_strsplit_first(const char *src, char delimiter, char **left, char **right);
 void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **right);
@@ -1766,6 +1769,7 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 /* */
 char	*zbx_substr(const char *src, size_t left, size_t right);
 char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
+char	*zbx_substr_unquote_opt(const char *src, size_t left, size_t right, int option);
 
 /* UTF-8 trimming */
 void	zbx_ltrim_utf8(char *str, const char *charlist);

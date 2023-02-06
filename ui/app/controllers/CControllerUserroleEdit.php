@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -184,6 +184,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'output' => ['serviceid', 'name'],
 			'serviceids' => array_column($data['rules']['service_write_list'], 'serviceid')
 		]);
+
+		$data['form_refresh'] = $this->getInput('form_refresh', 0);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user roles'));

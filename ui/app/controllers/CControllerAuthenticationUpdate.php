@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'form_refresh' =>					'string',
+			'form_refresh' =>					'int32',
 			'ldap_test_user' =>					'string',
 			'ldap_test_password' =>				'string',
 			'ldap_test' =>						'in 1',
