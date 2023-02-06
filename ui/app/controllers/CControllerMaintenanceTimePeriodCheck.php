@@ -94,18 +94,20 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 			$validator = new CNewValidator($input, $strict_rules[$input['timeperiod_type']]);
 
 			$errors = $validator->getAllErrors();
+
+			if ($errors) {
+				return $errors;
+			}
 		}
-		else {
-			$errors = [];
-		}
+
+		$errors = [];
 
 		if ($input['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
 			$parser = new CAbsoluteTimeParser();
 			$parser->parse($input['start_date']);
 			$start_date = $parser->getDateTime(true);
 
-			if (!validateDateInterval($start_date->format('Y'), $start_date->format('m'),
-					$start_date->format('j'))) {
+			if (!validateDateInterval($start_date->format('Y'), $start_date->format('m'), $start_date->format('j'))) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Date'),
 					_s('value must be between "%1$s" and "%2$s"', '1970-01-01', '2038-01-18')
 				);
