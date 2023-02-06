@@ -456,7 +456,7 @@ abstract class CController {
 	 * @return CControllerResponse|null
 	 */
 	final public function run(): ?CControllerResponse {
-		if ($this->validate_csrf_token && !$this->checkCsrfToken()) {
+		if ($this->validate_csrf_token && (!CWebUser::isLoggedIn() || !$this->checkCsrfToken())) {
 			throw new CAccessDeniedException();
 		}
 
