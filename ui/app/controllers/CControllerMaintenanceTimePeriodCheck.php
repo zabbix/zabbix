@@ -116,7 +116,6 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 					'months' => 'required'
 				]))->getAllErrors());
 
-
 				switch ($input['month_date_type']) {
 					case 0:
 						$errors = array_merge($errors, (new CNewValidator($input, [
