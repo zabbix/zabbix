@@ -74,60 +74,62 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 	}
 
 	private static function validateTypeSpecificInput(array $input): array {
-		$strict_rules = [
-			TIMEPERIOD_TYPE_ONETIME => [
-				'start_date' =>		'abs_time'
-			],
-			TIMEPERIOD_TYPE_DAILY => [
-				'every_day' =>		'ge 1|le 999'
-			],
-			TIMEPERIOD_TYPE_WEEKLY => [
-				'every_week' =>		'ge 1|le 99',
-				'weekly_days' =>	'required'
-			],
-			TIMEPERIOD_TYPE_MONTHLY => [
-				'months' =>			'required'
-			]
-		];
-
-		if ($strict_rules[$input['timeperiod_type']]) {
-			$validator = new CNewValidator($input, $strict_rules[$input['timeperiod_type']]);
-
-			$errors = $validator->getAllErrors();
-
-			if ($errors) {
-				return $errors;
-			}
-		}
-
 		$errors = [];
 
-		if ($input['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-			$parser = new CAbsoluteTimeParser();
-			$parser->parse($input['start_date']);
-			$start_date = $parser->getDateTime(true);
+		switch ($input['timeperiod_type']) {
+			case TIMEPERIOD_TYPE_ONETIME:
+				$validator = new CNewValidator($input, [
+					'start_date' => 'abs_time'
+				]);
 
-			if (!validateDateInterval($start_date->format('Y'), $start_date->format('m'), $start_date->format('j'))) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Date'),
-					_s('value must be between "%1$s" and "%2$s"', '1970-01-01', '2038-01-18')
-				);
-			}
-		}
+				$errors = array_merge($errors, $validator->getAllErrors());
 
-		if ($input['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
-			switch ($input['month_date_type']) {
-				case 0:
-					$errors = array_merge($errors, (new CNewValidator($input, [
-						'day' => 'ge 1|le 99'
-					]))->getAllErrors());
-					break;
+				if (!$validator->isErrorFatal() && !$validator->isError()) {
+					$parser = new CAbsoluteTimeParser();
+					$parser->parse($input['start_date']);
+					$start_date = $parser->getDateTime(true);
 
-				case 1:
-					$errors = array_merge($errors, (new CNewValidator($input, [
-						'monthly_days' => 'required'
-					]))->getAllErrors());
-					break;
-			}
+					if (!validateDateInterval($start_date->format('Y'), $start_date->format('m'),
+							$start_date->format('j'))) {
+						$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Date'),
+							_s('value must be between "%1$s" and "%2$s"', '1970-01-01', '2038-01-18')
+						);
+					}
+				}
+				break;
+
+			case TIMEPERIOD_TYPE_DAILY:
+				$errors = array_merge($errors, (new CNewValidator($input, [
+					'every_day' => 'ge 1|le 999'
+				]))->getAllErrors());
+				break;
+
+			case TIMEPERIOD_TYPE_WEEKLY:
+				$errors = array_merge($errors, (new CNewValidator($input, [
+					'every_week' => 'ge 1|le 99',
+					'weekly_days' => 'required'
+				]))->getAllErrors());
+				break;
+
+			case TIMEPERIOD_TYPE_MONTHLY:
+				$errors = array_merge($errors, (new CNewValidator($input, [
+					'months' => 'required'
+				]))->getAllErrors());
+
+
+				switch ($input['month_date_type']) {
+					case 0:
+						$errors = array_merge($errors, (new CNewValidator($input, [
+							'day' => 'ge 1|le 31'
+						]))->getAllErrors());
+						break;
+
+					case 1:
+						$errors = array_merge($errors, (new CNewValidator($input, [
+							'monthly_days' => 'required'
+						]))->getAllErrors());
+						break;
+				}
 		}
 
 		if ($input['period_days'] == 0 && $input['period_hours'] == 0 && $input['period_minutes'] < 5) {
