@@ -62,7 +62,7 @@ $timeperiod_template = new CTemplateTag('timeperiod-row-tmpl',
 			(new CVar('timeperiods[#{row_index}][period]', '#{period}'))->removeId(),
 			(new CVar('timeperiods[#{row_index}][start_date]', '#{start_date}'))->removeId()
 		]),
-		(new CCol('#{formatted_schedule}'))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CCol('#{formatted_schedule}'))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol('#{formatted_period}')),
 		(new CCol(
 			(new CHorList([
