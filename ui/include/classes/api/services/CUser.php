@@ -1673,28 +1673,24 @@ class CUser extends CApiService {
 	public function checkAuthentication(array $session): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'sessionid' => ['type' => API_STRING_UTF8],
-			'extend' => ['type' => API_BOOLEAN],
+			'extend' => ['type' => API_MULTIPLE, 'rules' => [
+				['if' => function (array $data): bool {
+					return !array_key_exists('token', $data);
+				}, 'type' => API_BOOLEAN, 'default' => true],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'token' => ['type' => API_STRING_UTF8]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $session, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
+		var_dump($session);
 		$sessionid = array_key_exists('sessionid', $session) ? $session['sessionid'] : null;
 		$token = array_key_exists('token', $session) ? $session['token'] : null;
 
 		if (($token === null && $sessionid === null) || ($token !== null && $sessionid !== null)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session ID or token is expected.'));
-		}
-
-		if (array_key_exists('extend', $session)) {
-			if ($token !== null) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid parameter "/": unexpected parameter "extend".'));
-			}
-		}
-		else {
-			$session['extend'] = true;
 		}
 
 		$time = time();
