@@ -81,7 +81,7 @@ window.maintenance_edit = new class {
 		const tags_container = document.getElementById('tags');
 
 		tags_container.querySelectorAll('[name$="[tag]"], [name$="[value]"]').forEach((text_input) => {
-			text_input.readOnly = !tags_enabled;
+			text_input.disabled = !tags_enabled;
 		});
 
 		tags_container.querySelectorAll('[name="tags_evaltype"], [name$="[operator]"]').forEach((radio_button) => {
