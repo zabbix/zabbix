@@ -23,9 +23,9 @@
 window.maintenance_timeperiod_edit = new class {
 
 	init() {
-		this.overlay = overlays_stack.getById('maintenance-timeperiod-edit');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this._overlay = overlays_stack.getById('maintenance-timeperiod-edit');
+		this._dialogue = this._overlay.$dialogue[0];
+		this._form = this._overlay.$dialogue.$body[0].querySelector('form');
 
 		// Update form field state according to the form data.
 
@@ -36,53 +36,53 @@ window.maintenance_timeperiod_edit = new class {
 		this._update();
 
 		document.getElementById('maintenance-timeperiod-form').style.display = '';
-		this.form.querySelector('[name="timeperiod_type"]').focus();
+		this._form.querySelector('[name="timeperiod_type"]').focus();
 	}
 
 	_update() {
-		const timeperiod_type_value = this.form.querySelector('[name="timeperiod_type"]').value;
-		const month_date_type_value = this.form.querySelector('[name="month_date_type"]:checked').value;
+		const timeperiod_type_value = this._form.querySelector('[name="timeperiod_type"]').value;
+		const month_date_type_value = this._form.querySelector('[name="month_date_type"]:checked').value;
 
-		this.form.querySelectorAll('.js-every-day').forEach((element) => {
+		this._form.querySelectorAll('.js-every-day').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_DAILY ?>;
 		});
 
-		this.form.querySelectorAll('.js-every-week').forEach((element) => {
+		this._form.querySelectorAll('.js-every-week').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_WEEKLY ?>;
 		});
 
-		this.form.querySelectorAll('.js-weekly-days').forEach((element) => {
+		this._form.querySelectorAll('.js-weekly-days').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_WEEKLY ?>;
 		});
 
-		this.form.querySelectorAll('.js-months').forEach((element) => {
+		this._form.querySelectorAll('.js-months').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>;
 		});
 
-		this.form.querySelectorAll('.js-month-date-type').forEach((element) => {
+		this._form.querySelectorAll('.js-month-date-type').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>;
 		});
 
-		this.form.querySelectorAll('.js-every-dow').forEach((element) => {
+		this._form.querySelectorAll('.js-every-dow').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>
 				|| month_date_type_value != 1;
 		});
 
-		this.form.querySelectorAll('.js-monthly-days').forEach((element) => {
+		this._form.querySelectorAll('.js-monthly-days').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>
 				|| month_date_type_value != 1;
 		});
 
-		this.form.querySelectorAll('.js-day').forEach((element) => {
+		this._form.querySelectorAll('.js-day').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>
 				|| month_date_type_value != 0;
 		});
 
-		this.form.querySelectorAll('.js-start-date').forEach((element) => {
+		this._form.querySelectorAll('.js-start-date').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_ONETIME ?>;
 		});
 
-		this.form.querySelectorAll('.js-hour-minute').forEach((element) => {
+		this._form.querySelectorAll('.js-hour-minute').forEach((element) => {
 			element.hidden = timeperiod_type_value != <?= TIMEPERIOD_TYPE_DAILY ?>
 				&& timeperiod_type_value != <?= TIMEPERIOD_TYPE_WEEKLY ?>
 				&& timeperiod_type_value != <?= TIMEPERIOD_TYPE_MONTHLY ?>;
@@ -90,20 +90,20 @@ window.maintenance_timeperiod_edit = new class {
 	}
 
 	submit() {
-		const fields = getFormFields(this.form);
+		const fields = getFormFields(this._form);
 
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'maintenance.timeperiod.check');
 
 		this._post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+			overlayDialogueDestroy(this._overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
+			this._dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
 		});
 	}
 
 	_post(url, data, success_callback) {
-		this.overlay.setLoading();
+		this._overlay.setLoading();
 
 		fetch(url, {
 			method: 'POST',
@@ -120,7 +120,7 @@ window.maintenance_timeperiod_edit = new class {
 			})
 			.then(success_callback)
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this._form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -138,10 +138,10 @@ window.maintenance_timeperiod_edit = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this._form.parentNode.insertBefore(message_box, this._form);
 			})
 			.finally(() => {
-				this.overlay.unsetLoading();
+				this._overlay.unsetLoading();
 			});
 	}
 };
