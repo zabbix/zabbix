@@ -792,7 +792,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		const char	*d = "";
 
 		/* Even if there are no updates for an item, we must create audit entry for it */
-		/* to accomodate other entities changes that depend on an item (like tags).    */
+		/* to accommodate other entities changes that depend on an item (like tags).   */
 		zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name, item->flags);
 
 		if (0 == item->upd_flags)
