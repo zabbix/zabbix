@@ -362,8 +362,8 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 		{
 			zbx_free(sql);
 			goto out;
-#endif
 		}
+#endif
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", end_timestamp);
 	}
