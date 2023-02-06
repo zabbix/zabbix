@@ -153,6 +153,7 @@ class CWebUser {
 	public static function setDefault(): void {
 		self::$data = [
 			'sessionid' => CEncryptHelper::generateKey(),
+			'secret' => '',
 			'username' => ZBX_GUEST_USER,
 			'userid' => 0,
 			'lang' => CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG),
