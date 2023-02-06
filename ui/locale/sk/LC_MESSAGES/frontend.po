@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-09-13 08:37+0000\n"
+"PO-Revision-Date: 2022-12-27 09:02+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -3792,7 +3792,7 @@ msgstr "Zavrieť nový event"
 
 #: app/views/configuration.correlation.edit.php:154
 msgid "Close new events"
-msgstr ""
+msgstr "Zavrieť nové eventy"
 
 #: app/views/configuration.correlation.edit.php:149
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -4110,7 +4110,7 @@ msgstr "Konfigurovať DB spojenie"
 
 #: app/views/js/administration.authentication.edit.js.php:56
 msgid "Confirm changes"
-msgstr ""
+msgstr "Potvrdiť zmeny"
 
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
@@ -6361,7 +6361,7 @@ msgstr "Povoliť overenie HTTP"
 
 #: app/views/js/administration.authentication.edit.js.php:59
 msgid "Enable HTTP authentication for all users."
-msgstr ""
+msgstr "Povoliť HTTP autentifikáciu pre všetkých používateľov."
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
@@ -7076,6 +7076,11 @@ msgstr "Chýbajúca hodnota pola \"%1$s\" pre mapu \"%2$s\"."
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "Pole \"%1$s\" nie je správne: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
 
 #: include/validate.inc.php:167
 #, c-format
@@ -8589,7 +8594,7 @@ msgstr "Identifikácia systému. Vráti reťazec"
 
 #: app/views/administration.authentication.edit.php:113
 msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
-msgstr ""
+msgstr "Ak je povolená autentifikácia HTTP, všetci používatelia (aj s frontendovým prístupom nastaveným na LDAP/interný) budú autentifikovaní webovým serverom, nie Zabbixom."
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -13417,7 +13422,7 @@ msgstr "Len spúšťače priradené k monitorovaným hostom alebo závislé na m
 
 #: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
 msgid "Open log"
-msgstr ""
+msgstr "Otvoriť log"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -17833,12 +17838,12 @@ msgstr "Toto nastavenie platí len pre číselné údaje. Nečíselné údaje bu
 #: app/partials/administration.system.info.php:199
 #: app/views/administration.housekeeping.edit.php:134
 msgid "This setting should be enabled, because history tables contain compressed chunks."
-msgstr ""
+msgstr "Toto nastavenie by malo byť povolené, pretože tabuľky histórie obsahujú komprimované časti."
 
 #: app/partials/administration.system.info.php:213
 #: app/views/administration.housekeeping.edit.php:163
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
-msgstr ""
+msgstr "Toto nastavenie by malo byť povolené, pretože tabulky trendov obsahujú komprimované časti."
 
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
@@ -20602,7 +20607,7 @@ msgstr "reťazec znakov je očakávaný"
 
 #: include/classes/validators/CApiInputValidator.php:854
 msgid "a character string, integer or floating point value is expected"
-msgstr ""
+msgstr "očakáva sa reťazec znakov, celé číslo alebo hodnota s pohyblivou rádovou čiarkou"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -21543,6 +21548,10 @@ msgstr "neplatná metóda agregácie"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "neplatná sekvencia bajtov v UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
 msgid "invalid delay"

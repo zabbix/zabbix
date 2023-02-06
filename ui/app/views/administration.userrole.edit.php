@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ $this->includeJsFile('administration.userrole.edit.js.php');
 $widget = (new CWidget())->setTitle(_('User roles'));
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('userrole-form')
 	->setName('user_role_form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);

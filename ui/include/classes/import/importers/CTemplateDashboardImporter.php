@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,9 +52,14 @@ class CTemplateDashboardImporter extends CImporter {
 
 				$dashboardid = $this->referencer->findTemplateDashboardidByUuid($dashboard['uuid']);
 
+				if ($dashboardid === null) {
+					$dashboardid = $this->referencer->findTemplateDashboardidByNameAndId($dashboard['name'],
+						$templateid
+					);
+				}
+
 				if ($dashboardid !== null) {
 					$dashboard['dashboardid'] = $dashboardid;
-					unset($dashboard['uuid']);
 					$dashboards_to_update[] = $dashboard;
 				}
 				else {
@@ -94,6 +99,12 @@ class CTemplateDashboardImporter extends CImporter {
 			if ($templateid !== null) {
 				foreach ($dashboards as $dashboard) {
 					$dashboardid = $this->referencer->findTemplateDashboardidByUuid($dashboard['uuid']);
+
+					if ($dashboardid === null) {
+						$dashboardid = $this->referencer->findTemplateDashboardidByNameAndId($dashboard['name'],
+							$templateid
+						);
+					}
 
 					if ($dashboardid !== null) {
 						$dashboardids[$dashboardid] = true;
@@ -149,7 +160,7 @@ class CTemplateDashboardImporter extends CImporter {
 						$item_key = $field['value']['key'];
 
 						$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
-						$field['value'] = $this->referencer->findItemidByKey($hostid, $item_key);
+						$field['value'] = $this->referencer->findItemidByKey($hostid, $item_key, true);
 
 						if ($field['value'] === null) {
 							throw new Exception(_s('Cannot find item "%1$s" used in dashboard "%2$s".',
@@ -164,7 +175,7 @@ class CTemplateDashboardImporter extends CImporter {
 						$graph_name = $field['value']['name'];
 
 						$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
-						$field['value'] = $this->referencer->findGraphidByName($hostid, $graph_name);
+						$field['value'] = $this->referencer->findGraphidByName($hostid, $graph_name, true);
 
 						if ($field['value'] === null) {
 							throw new Exception(_s('Cannot find graph "%1$s" used in dashboard "%2$s".',
