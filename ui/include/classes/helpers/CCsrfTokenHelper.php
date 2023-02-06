@@ -36,11 +36,14 @@ class CCsrfTokenHelper {
 	 * @return string  Returns CSRF token in string format or null if session id is not set.
 	 */
 	public static function get(string $action): ?string {
-		if (!CWebUser::$data['secret']) {
+		$secret = is_array(CWebUser::$data) && array_key_exists('secret', CWebUser::$data)
+			? CWebUser::$data['secret'] : '';
+
+		if ($secret === '') {
 			throw new CAccessDeniedException();
 		}
 
-		return CEncryptHelper::sign(CWebUser::$data['secret'] . $action);
+		return CEncryptHelper::sign($secret . $action);
 	}
 
 	/**
