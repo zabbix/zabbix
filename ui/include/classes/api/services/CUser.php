@@ -1685,7 +1685,7 @@ class CUser extends CApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $session, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-		var_dump($session);
+
 		$sessionid = array_key_exists('sessionid', $session) ? $session['sessionid'] : null;
 		$token = array_key_exists('token', $session) ? $session['token'] : null;
 
