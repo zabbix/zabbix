@@ -24,7 +24,7 @@ class CControllerScheduledReportEdit extends CController {
 	protected $report = [];
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {

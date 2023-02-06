@@ -21,6 +21,10 @@
 
 class CControllerAuditLogList extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'page' =>					'ge 1',
@@ -175,10 +179,6 @@ class CControllerAuditLogList extends CController {
 		$this->setResponse($response);
 	}
 
-	protected function init(): void {
-		$this->disableSIDValidation();
-	}
-
 	/**
 	 * Return associated list of available actions and labels.
 	 *
@@ -209,6 +209,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_AUTH_TOKEN => _('API token'),
 			CAudit::RESOURCE_AUTHENTICATION => _('Authentication'),
 			CAudit::RESOURCE_AUTOREGISTRATION  => _('Autoregistration'),
+			CAudit::RESOURCE_CONNECTOR => _('Connector'),
 			CAudit::RESOURCE_CORRELATION => _('Event correlation'),
 			CAudit::RESOURCE_DASHBOARD => _('Dashboard'),
 			CAudit::RESOURCE_DISCOVERY_RULE => _('Discovery rule'),

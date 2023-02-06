@@ -23,6 +23,10 @@ require_once __DIR__.'/../../include/actions.inc.php';
 
 class CControllerPopupActionConditionEdit extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'actionid' =>			'db actions.actionid',

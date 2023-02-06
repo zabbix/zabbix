@@ -24,11 +24,13 @@
  * @var array    $data
  */
 
+$this->includeJsFile('common.template.edit.html.js.php');
 $this->includeJsFile('configuration.host.edit.html.js.php');
 
 $host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 
 $host_form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host')))->removeId())
 	->setId($data['form_name'])
 	->setName($data['form_name'])
 	->setAction((new CUrl('zabbix.php'))
@@ -531,4 +533,8 @@ if (array_key_exists('buttons', $data)) {
 
 $host_form
 	->addItem($tabs)
+	->show();
+
+(new CScriptTag('common_template_edit.init('.json_encode(['form_name' => $data['form_name']]).');'))
+	->setOnDocumentReady()
 	->show();

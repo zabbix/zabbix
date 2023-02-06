@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2023-01-10T15:09:10Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -29,6 +28,9 @@ zabbix_export:
         HOST-RESOURCES-MIB
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications

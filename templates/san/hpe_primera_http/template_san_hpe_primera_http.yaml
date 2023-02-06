@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-09-16T12:50:03Z'
   template_groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -26,6 +25,9 @@ zabbix_export:
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/SAN

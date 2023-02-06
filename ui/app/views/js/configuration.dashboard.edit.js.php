@@ -121,6 +121,9 @@
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'template.dashboard.update');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('template')) ?>
+			);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -173,7 +176,7 @@
 		},
 
 		cancelEditing() {
-			const curl = new Curl('zabbix.php', false);
+			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'template.dashboard.list');
 			curl.setArgument('templateid', this.dashboard.templateid);

@@ -397,7 +397,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * @param {URLSearchParams} search_params  Filter field values to be set in URL.
 	 */
 	setBrowserLocation(search_params) {
-		let url = new Curl('', false);
+		let url = new Curl('');
 
 		search_params.set('action', url.getArgument('action'));
 		url.query = search_params.toString();

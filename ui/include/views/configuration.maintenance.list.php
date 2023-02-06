@@ -124,6 +124,7 @@ $maintenanceForm->addItem([
 	$this->data['paging'],
 	new CActionButtonList('action', 'maintenanceids', [
 		'maintenance.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maintenance periods?'),
+			'csrf_token' => CCsrfTokenHelper::get('maintenance.php'),
 			'disabled' => $data['allowed_edit'] ? null : 'disabled'
 		]
 	])

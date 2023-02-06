@@ -26,8 +26,7 @@
  ******************************************************************************/
 char	*zbx_strerror(int errnum)
 {
-	/* !!! Attention: static !!! Not thread-safe for Win32 */
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
+	static ZBX_THREAD_LOCAL char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
 	zbx_snprintf(utf8_string, sizeof(utf8_string), "[%d] %s", errnum, strerror(errnum));
 

@@ -1708,6 +1708,7 @@ INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (100069, 1000
 
 -- testFormAdministrationMediaTypes
 INSERT INTO media_type (mediatypeid, type, name, exec_path, status, script, description) VALUES (100, 1, 'Test script', 'Selenium test script', 1, '', '');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value, sortorder) VALUES (1012, 100, '', '{ALERT.SUBJECT}', 0);
 
 -- testFormUser
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (10, 'Public map with image', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);

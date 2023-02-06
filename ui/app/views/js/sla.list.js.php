@@ -119,7 +119,7 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'sla.enable');
 
-			this._post(target, slaids, curl.getUrl());
+			this._post(target, slaids, curl);
 		}
 
 		_disable(target, slaids) {
@@ -134,7 +134,7 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'sla.disable');
 
-			this._post(target, slaids, curl.getUrl());
+			this._post(target, slaids, curl);
 		}
 
 		_delete(target, slaids) {
@@ -149,13 +149,17 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'sla.delete');
 
-			this._post(target, slaids, curl.getUrl());
+			this._post(target, slaids, curl);
 		}
 
 		_post(target, slaids, url) {
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('sla')) ?>
+			);
+
 			target.classList.add('is-loading');
 
-			return fetch(url, {
+			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({slaids})

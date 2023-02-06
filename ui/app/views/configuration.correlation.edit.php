@@ -30,14 +30,13 @@ $html_page = (new CHtmlPage())
 	->setTitle(_('Event correlation rules'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_EDIT));
 
+$csrf_token = CCsrfTokenHelper::get('correlation');
+
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('correlation.edit')
 	->setName('correlation.edit')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'correlation.condition.add')
-		->getUrl()
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['correlationid'] != 0) {
@@ -329,7 +328,7 @@ else {
 	$delete_button = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'correlation.delete')
 			->setArgument('correlationids', (array) $data['correlationid'])
-			->setArgumentSID(),
+			->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 		_('Delete current correlation?')
 	))->setId('delete');
 

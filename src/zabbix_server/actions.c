@@ -281,7 +281,7 @@ static void	objectids_to_pair(zbx_vector_uint64_t *objectids, zbx_vector_uint64_
  ******************************************************************************/
 static void	check_object_hierarchy(int object, const zbx_vector_ptr_t *esc_events, zbx_vector_uint64_t *objectids,
 		zbx_vector_uint64_pair_t *objectids_pair, zbx_condition_t *condition, zbx_uint64_t condition_value,
-		char *sql_str, char *sql_field)
+		const char *sql_str, const char *sql_field)
 {
 	int				i;
 	zbx_vector_uint64_t		objectids_tmp;
@@ -467,7 +467,8 @@ static int	check_host_template_condition(const zbx_vector_ptr_t *esc_events, zbx
  ******************************************************************************/
 static int	check_host_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
-	char			*sql = NULL, *operation;
+	char			*sql = NULL;
+	const char		*operation;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -824,7 +825,7 @@ static void	check_condition_event_tag(const zbx_vector_ptr_t *esc_events, zbx_co
 
 		for (j = 0; j < event->tags.values_num && ret == ret_continue; j++)
 		{
-			const zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[j];
+			const zbx_tag_t	*tag = event->tags.values[j];
 
 			ret = zbx_strmatch_condition(tag->tag, condition->value, condition->op);
 		}
@@ -861,7 +862,7 @@ static void	check_condition_event_tag_value(const zbx_vector_ptr_t *esc_events, 
 
 		for (j = 0; j < event->tags.values_num && ret == ret_continue; j++)
 		{
-			zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[j];
+			zbx_tag_t	*tag = event->tags.values[j];
 
 			if (0 == strcmp(condition->value2, tag->tag))
 				ret = zbx_strmatch_condition(tag->value, condition->value, condition->op);
@@ -982,7 +983,8 @@ static void	get_object_ids_discovery(const zbx_vector_ptr_t *esc_events, zbx_vec
  ******************************************************************************/
 static int	check_drule_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
-	char			*sql = NULL, *operation_and, *operation_where;
+	char			*sql = NULL;
+	const char		*operation_and, *operation_where;
 	size_t			sql_alloc = 0, i;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1078,7 +1080,8 @@ static int	check_drule_condition(const zbx_vector_ptr_t *esc_events, zbx_conditi
  ******************************************************************************/
 static int	check_dcheck_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
-	char			*sql = NULL, *operation_where;
+	char			*sql = NULL;
+	const char		*operation_where;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1181,7 +1184,8 @@ static int	check_dobject_condition(const zbx_vector_ptr_t *esc_events, zbx_condi
  ******************************************************************************/
 static int	check_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
-	char			*sql = NULL, *operation_and;
+	char			*sql = NULL;
+	const char		*operation_and;
 	size_t			sql_alloc = 0, i;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -2359,7 +2363,8 @@ static int	check_intern_host_template_condition(const zbx_vector_ptr_t *esc_even
  ******************************************************************************/
 static int	check_intern_host_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
-	char			*sql = NULL, *operation, *operation_item;
+	char			*sql = NULL;
+	const char		*operation, *operation_item;
 	size_t			sql_alloc = 0, i;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -2505,7 +2510,7 @@ static void	check_internal_condition(const zbx_vector_ptr_t *esc_events, zbx_con
  *                                   event ids that match condition           *
  *                                                                            *
  ******************************************************************************/
-static void	check_events_condition(const zbx_vector_ptr_t *esc_events, unsigned char source, zbx_condition_t *condition)
+static void	check_events_condition(const zbx_vector_ptr_t *esc_events, int source, zbx_condition_t *condition)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
 			" cond.value2:'%s'", __func__, condition->actionid, condition->conditionid,
