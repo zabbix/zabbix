@@ -65,7 +65,9 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 	insertPagePostJs(true);
 
-	require_once 'include/views/js/common.init.js.php';
+	if (CWebUser::isLoggedIn()) {
+		require_once 'include/views/js/common.init.js.php';
+	}
 
 	echo '</div></body></html>';
 }

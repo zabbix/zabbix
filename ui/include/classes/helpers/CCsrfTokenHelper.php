@@ -33,7 +33,7 @@ class CCsrfTokenHelper {
 	 *
 	 * @return string  Returns CSRF token in string format.
 	 */
-	public static function get(string $action): ?string {
+	public static function get(string $action): string {
 		return CEncryptHelper::sign(CWebUser::$data['secret'].$action);
 	}
 
