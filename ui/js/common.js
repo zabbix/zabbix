@@ -37,6 +37,7 @@ const ZBX_ICON_LOCK = 'zi-lock';
 const ZBX_ICON_MORE = 'zi-more';
 const ZBX_ICON_PENCIL = 'zi-pencil';
 const ZBX_ICON_PLUS = 'zi-plus';
+const ZBX_ICON_REMOVE = 'zi-remove';
 const ZBX_ICON_SPEAKER = 'zi-speaker';
 const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';

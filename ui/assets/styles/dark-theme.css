@@ -3219,8 +3219,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
   background-color: #2b2b2b;
   border: 2px solid;
   border-radius: 2px; }
-  .zi-circle-info-filled .zi-plus,
-  .zi-circle-check-filled .zi-plus {
+  .zi-circle-info-filled .zi-remove,
+  .zi-circle-check-filled .zi-remove {
     color: #737373; }
   .zi-circle-info-filled .link-action,
   .zi-circle-check-filled .link-action {
@@ -5589,12 +5589,12 @@ z-select .zi-chevron-down,
       .overlay-dialogue .dashboard-widget-head .btn-icon:last-child,
       .overlay-dialogue .dashboard-widget-head a.btn-icon:last-child {
         margin-right: -6px; }
+    .overlay-dialogue .dashboard-widget-head .zi-remove::before {
+      font-size: 18px; }
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
     margin: 0 10px; }
-    .overlay-dialogue.modal .zi-plus::before {
-      transform: rotate(45deg); }
     .overlay-dialogue.modal .dashboard-widget-head {
       margin-bottom: 12px; }
     .overlay-dialogue.modal .overlay-dialogue-body {

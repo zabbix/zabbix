@@ -2515,18 +2515,18 @@ $trigger-expression-tree-icons: (
 				margin-right: -6px;
 			}
 		}
+
+		.zi-remove {
+			&::before {
+				font-size: $btn-icon-size;
+			}
+		}
 	}
 
 	&.modal {
 		position: fixed;
 		overflow: hidden;
 		margin: 0 10px;
-
-		.zi-plus {
-			&::before {
-				transform: rotate(45deg);
-			}
-		}
 
 		.dashboard-widget-head {
 			margin-bottom: 12px;

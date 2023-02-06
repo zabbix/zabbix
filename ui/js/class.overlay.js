@@ -49,7 +49,7 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.$header = jQuery('<h4>', {id: this.headerid});
 
 	const $close_btn = jQuery('<button>', {
-		class: 'btn-icon '+ZBX_ICON_PLUS,
+		class: 'btn-icon '+ ZBX_ICON_REMOVE,
 		title: t('S_CLOSE')
 	}).click(function(e) {
 		overlayDialogueDestroy(this.dialogueid);
