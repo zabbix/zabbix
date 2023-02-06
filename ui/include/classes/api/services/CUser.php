@@ -1777,23 +1777,23 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	private static function tokenAuthentication(string $auth_token, int $time): array {
-		$api_tokens = DB::select('token', [
+		$db_tokens = DB::select('token', [
 			'output' => ['userid', 'expires_at', 'tokenid'],
 			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
 		]);
 
-		if (!$api_tokens) {
+		if (!$db_tokens) {
 			usleep(10000);
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		$api_token = $api_tokens[0];
+		$db_token = $db_tokens[0];
 
-		if ($api_token['expires_at'] != 0 && $api_token['expires_at'] < $time) {
+		if ($db_token['expires_at'] != 0 && $db_token['expires_at'] < $time) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
 		}
 
-		return $api_token;
+		return $db_token;
 	}
 
 	/**
