@@ -408,25 +408,9 @@ void	zbx_db_init_autoincrement_options_basic(void)
  *               ZBX_DB_FAIL - failed to connect                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
+int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
-	const char	*host, *user, *password, *dbname, *dbschema, *dbsocket, *tls_connect, *cert, *key, *ca, *cipher,
-			*cipher_13;
-	const int	port = config_dbhigh->config_dbport;
-
-	host = config_dbhigh->config_dbhost;
-	user = config_dbhigh->config_dbuser;
-	password = config_dbhigh->config_dbpassword;
-	dbname = config_dbhigh->config_dbname;
-	dbschema = config_dbhigh->config_dbschema;
-	dbsocket = config_dbhigh->config_dbsocket;
-	tls_connect = config_dbhigh->config_db_tls_connect;
-	cert = config_dbhigh->config_db_tls_cert_file;
-	key = config_dbhigh->config_db_tls_key_file;
-	ca = config_dbhigh->config_db_tls_ca_file;
-	cipher = config_dbhigh->config_db_tls_cipher;
-	cipher_13 = config_dbhigh->config_db_tls_cipher_13;
 #if defined(HAVE_MYSQL)
 #if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
 	bool		mysql_reconnect = 1;
@@ -452,9 +436,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 	char		*p, *path = NULL;
 #endif
 
-#ifndef HAVE_MYSQL
-	ZBX_UNUSED(dbsocket);
-#endif
 	/* Allow executing statements during a connection initialization. Make sure to mark transaction as failed. */
 	if (0 != txn_level)
 		txn_error = ZBX_DB_DOWN;
@@ -466,8 +447,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 	txn_level = 0;
 
 #if defined(HAVE_MYSQL)
-	ZBX_UNUSED(dbschema);
-
 	if (NULL == (conn = mysql_init(NULL)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
@@ -495,13 +474,13 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 	}
 
 #if defined(HAVE_MYSQL_TLS)
-	if (ZBX_DB_OK == ret && NULL != tls_connect)
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_connect)
 	{
 		unsigned int	mysql_tls_mode;
 
-		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+		if (0 == strcmp(cfg->config_db_tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 			mysql_tls_mode = SSL_MODE_REQUIRED;
-		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
+		else if (0 == strcmp(cfg->config_db_tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
 			mysql_tls_mode = SSL_MODE_VERIFY_CA;
 		else
 			mysql_tls_mode = SSL_MODE_VERIFY_IDENTITY;
@@ -513,44 +492,45 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 		}
 	}
 
-	if (ZBX_DB_OK == ret && NULL != ca && 0 != mysql_options(conn, MYSQL_OPT_SSL_CA, ca))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_ca_file && 0 != mysql_options(conn, MYSQL_OPT_SSL_CA,
+			cfg->config_db_tls_ca_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CA option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && NULL != key && 0 != mysql_options(conn, MYSQL_OPT_SSL_KEY, key))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_key_file && 0 != mysql_options(conn, MYSQL_OPT_SSL_KEY,
+			cfg->config_db_tls_key_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_KEY option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && NULL != cert && 0 != mysql_options(conn, MYSQL_OPT_SSL_CERT, cert))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_cert_file && 0 != mysql_options(conn, MYSQL_OPT_SSL_CERT,
+			cfg->config_db_tls_cert_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CERT option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && NULL != cipher && 0 != mysql_options(conn, MYSQL_OPT_SSL_CIPHER, cipher))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_cipher && 0 != mysql_options(conn, MYSQL_OPT_SSL_CIPHER,
+			cfg->config_db_tls_cipher))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CIPHER option.");
 		ret = ZBX_DB_FAIL;
 	}
 #if defined(HAVE_MYSQL_TLS_CIPHERSUITES)
-	if (ZBX_DB_OK == ret && NULL != cipher_13 && 0 != mysql_options(conn, MYSQL_OPT_TLS_CIPHERSUITES, cipher_13))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_cipher_13 && 0 != mysql_options(conn,
+			MYSQL_OPT_TLS_CIPHERSUITES, cfg->config_db_tls_cipher_13))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_TLS_CIPHERSUITES option.");
 		ret = ZBX_DB_FAIL;
 	}
-#else
-	ZBX_UNUSED(cipher_13);
 #endif
 #elif defined(HAVE_MARIADB_TLS)
-	ZBX_UNUSED(cipher_13);
-
-	if (ZBX_DB_OK == ret && NULL != tls_connect)
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_connect)
 	{
-		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+		if (0 == strcmp(cfg->config_db_tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 		{
 			my_bool	enforce_tls = 1;
 
@@ -572,43 +552,40 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 		}
 	}
 
-	if (ZBX_DB_OK == ret && NULL != ca && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CA, ca))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_ca_file && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CA,
+			cfg->config_db_tls_ca_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CA option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && NULL != key && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_KEY, key))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_key_file && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_KEY,
+			cfg->config_db_tls_key_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_KEY option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && NULL != cert && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CERT, cert))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_cert_file && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CERT,
+			cfg->config_db_tls_cert_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CERT option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && NULL != cipher && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CIPHER, cipher))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_cipher && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CIPHER,
+			cfg->config_db_tls_cipher))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CIPHER option.");
 		ret = ZBX_DB_FAIL;
 	}
-#else
-	ZBX_UNUSED(tls_connect);
-	ZBX_UNUSED(cert);
-	ZBX_UNUSED(key);
-	ZBX_UNUSED(ca);
-	ZBX_UNUSED(cipher);
-	ZBX_UNUSED(cipher_13);
 #endif
-	if (ZBX_DB_OK == ret &&
-			NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket,
-				CLIENT_MULTI_STATEMENTS))
+	if (ZBX_DB_OK == ret && NULL == mysql_real_connect(conn, cfg->config_dbhost, cfg->config_dbuser,
+			cfg->config_dbpassword, cfg->config_dbname, cfg->config_dbport, cfg->config_dbsocket,
+			CLIENT_MULTI_STATEMENTS))
 	{
 		err_no = (int)mysql_errno(conn);
-		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), dbname);
+		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), cfg->config_dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
@@ -636,14 +613,14 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
 	{
 		err_no = (int)mysql_errno(conn);
-		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), dbname);
+		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), cfg->config_dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
+	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, cfg->config_dbname))
 	{
 		err_no = (int)mysql_errno(conn);
-		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), dbname);
+		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), cfg->config_dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
@@ -651,33 +628,25 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 		ret = ZBX_DB_DOWN;
 
 #elif defined(HAVE_ORACLE)
-	ZBX_UNUSED(dbschema);
-	ZBX_UNUSED(tls_connect);
-	ZBX_UNUSED(cert);
-	ZBX_UNUSED(key);
-	ZBX_UNUSED(ca);
-	ZBX_UNUSED(cipher);
-	ZBX_UNUSED(cipher_13);
-
 	memset(&oracle, 0, sizeof(oracle));
 
 	zbx_vector_ptr_create(&oracle.db_results);
 
 	/* connection string format: [//]host[:port][/service name] */
 
-	if ('\0' != *host)
+	if ('\0' != *cfg->config_dbhost)
 	{
 		/* Easy Connect method */
-		connect = zbx_strdcatf(connect, "//%s", host);
-		if (0 != port)
-			connect = zbx_strdcatf(connect, ":%d", port);
-		if ('\0' != *dbname)
-			connect = zbx_strdcatf(connect, "/%s", dbname);
+		connect = zbx_strdcatf(connect, "//%s", cfg->config_dbhost);
+		if (0 != cfg->config_dbport)
+			connect = zbx_strdcatf(connect, ":%d", cfg->config_dbport);
+		if ('\0' != *cfg->config_dbname)
+			connect = zbx_strdcatf(connect, "/%s", cfg->config_dbname);
 	}
 	else
 	{
 		/* Net Service Name method */
-		connect = zbx_strdup(connect, dbname);
+		connect = zbx_strdup(connect, cfg->config_dbname);
 	}
 
 	while (ZBX_DB_OK == ret)
@@ -717,9 +686,10 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 
 		/* get the session */
 		err = OCILogon2(oracle.envhp, oracle.errhp, &oracle.svchp,
-				(text *)user, (ub4)(NULL != user ? strlen(user) : 0),
-				(text *)password, (ub4)(NULL != password ? strlen(password) : 0),
-				(text *)connect, (ub4)strlen(connect),
+				(text *)cfg->config_dbuser, (ub4)(NULL != cfg->config_dbuser ?
+				strlen(cfg->config_dbuser) : 0), (text *)cfg->config_dbpassword,
+				(ub4)(NULL != cfg->config_dbpassword ?
+				strlen(cfg->config_dbpassword) : 0), (text *)connect, (ub4)strlen(connect),
 				OCI_DEFAULT);
 
 		switch (err)
@@ -761,67 +731,64 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 
 	zbx_free(connect);
 #elif defined(HAVE_POSTGRESQL)
-	ZBX_UNUSED(cipher);
-	ZBX_UNUSED(cipher_13);
-
-	if (NULL != tls_connect)
+	if (NULL != cfg->config_db_tls_connect)
 	{
 		keywords[i] = "sslmode";
 
-		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+		if (0 == strcmp(cfg->config_db_tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 			values[i++] = "require";
-		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
+		else if (0 == strcmp(cfg->config_db_tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
 			values[i++] = "verify-ca";
 		else
 			values[i++] = "verify-full";
 	}
 
-	if (NULL != cert)
+	if (NULL != cfg->config_db_tls_cert_file)
 	{
 		keywords[i] = "sslcert";
-		values[i++] = cert;
+		values[i++] = cfg->config_db_tls_cert_file;
 	}
 
-	if (NULL != key)
+	if (NULL != cfg->config_db_tls_key_file)
 	{
 		keywords[i] = "sslkey";
-		values[i++] = key;
+		values[i++] = cfg->config_db_tls_key_file;
 	}
 
-	if (NULL != ca)
+	if (NULL != cfg->config_db_tls_ca_file)
 	{
 		keywords[i] = "sslrootcert";
-		values[i++] = ca;
+		values[i++] = cfg->config_db_tls_ca_file;
 	}
 
-	if (NULL != host)
+	if (NULL != cfg->config_dbhost)
 	{
 		keywords[i] = "host";
-		values[i++] = host;
+		values[i++] = cfg->config_dbhost;
 	}
 
-	if (NULL != dbname)
+	if (NULL != cfg->config_dbname)
 	{
 		keywords[i] = "dbname";
-		values[i++] = dbname;
+		values[i++] = cfg->config_dbname;
 	}
 
-	if (NULL != user)
+	if (NULL != cfg->config_dbuser)
 	{
 		keywords[i] = "user";
-		values[i++] = user;
+		values[i++] = cfg->config_dbuser;
 	}
 
-	if (NULL != password)
+	if (NULL != cfg->config_dbpassword)
 	{
 		keywords[i] = "password";
-		values[i++] = password;
+		values[i++] = cfg->config_dbpassword;
 	}
 
-	if (0 != port)
+	if (0 != cfg->config_dbport)
 	{
 		keywords[i] = "port";
-		values[i++] = cport = zbx_dsprintf(cport, "%d", port);
+		values[i++] = cport = zbx_dsprintf(cport, "%d", cfg->config_dbport);
 	}
 
 	keywords[i] = NULL;
@@ -834,16 +801,17 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 	/* check to see that the backend connection was successfully made */
 	if (CONNECTION_OK != PQstatus(conn))
 	{
-		zbx_db_errlog(ERR_Z3001, 0, PQerrorMessage(conn), dbname);
+		zbx_db_errlog(ERR_Z3001, 0, PQerrorMessage(conn), cfg->config_dbname);
 		ret = ZBX_DB_DOWN;
 		goto out;
 	}
 
-	if (NULL != dbschema && '\0' != *dbschema)
+	if (NULL != cfg->config_dbschema && '\0' != *cfg->config_dbschema)
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = zbx_db_dyn_escape_string_basic(dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
+		dbschema_esc = zbx_db_dyn_escape_string_basic(cfg->config_dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX,
+				ESCAPE_SEQUENCE_ON);
 		if (ZBX_DB_DOWN == (rc = zbx_db_execute_basic("set schema '%s'", dbschema_esc)) || ZBX_DB_FAIL == rc)
 			ret = rc;
 		zbx_free(dbschema_esc);
@@ -898,24 +866,13 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 	}
 out:
 #elif defined(HAVE_SQLITE3)
-	ZBX_UNUSED(host);
-	ZBX_UNUSED(user);
-	ZBX_UNUSED(password);
-	ZBX_UNUSED(dbschema);
-	ZBX_UNUSED(port);
-	ZBX_UNUSED(tls_connect);
-	ZBX_UNUSED(cert);
-	ZBX_UNUSED(key);
-	ZBX_UNUSED(ca);
-	ZBX_UNUSED(cipher);
-	ZBX_UNUSED(cipher_13);
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
-	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
+	if (SQLITE_OK != sqlite3_open_v2(cfg->config_dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
 #else
-	if (SQLITE_OK != sqlite3_open(dbname, &conn))
+	if (SQLITE_OK != sqlite3_open(cfg->config_dbname, &conn))
 #endif
 	{
-		zbx_db_errlog(ERR_Z3001, 0, sqlite3_errmsg(conn), dbname);
+		zbx_db_errlog(ERR_Z3001, 0, sqlite3_errmsg(conn), cfg->config_dbname);
 		ret = ZBX_DB_DOWN;
 		goto out;
 	}
@@ -935,7 +892,7 @@ out:
 	if (ZBX_DB_OK != ret)
 		goto out;
 
-	path = zbx_strdup(NULL, dbname);
+	path = zbx_strdup(NULL, cfg->config_dbname);
 
 	if (NULL != (p = strrchr(path, '/')))
 		*++p = '\0';

@@ -80,7 +80,7 @@ void	zbx_db_deinit_basic(void);
 
 void	zbx_db_init_autoincrement_options_basic(void);
 
-int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh);
+int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg);
 void	zbx_db_close_basic(void);
 
 int	zbx_db_begin_basic(void);
