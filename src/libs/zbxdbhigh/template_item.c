@@ -959,8 +959,6 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 	zbx_db_insert_t		db_insert_items, db_insert_irtdata;
 	zbx_template_item_t	*item;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), items num: %d", __func__, items->values_num);
-
 	if (0 == items->values_num)
 		return;
 
