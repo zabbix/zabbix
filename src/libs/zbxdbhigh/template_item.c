@@ -791,6 +791,10 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		char		*str_esc;
 		const char	*d = "";
 
+		/* even if there are no upd_flags for an item , we still may need to create audit entry for it */
+		/* to accomodate tags changes */
+		zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name, item->flags);
+
 		if (0 == item->upd_flags)
 			goto dependent;
 
@@ -849,7 +853,6 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					item->field##_orig, item->field);					\
 		}
 
-		zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name, item->flags);
 		PREPARE_UPDATE_ID(INTERFACEID, interfaceid)
 		PREPARE_UPDATE_STR(NAME, name)
 		PREPARE_UPDATE_UC(TYPE, type)
@@ -918,7 +921,6 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->verify_peer, item->verify_host, item->allow_traps, item->discover);
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
-
 		zbx_audit_item_create_entry(AUDIT_ACTION_ADD, *itemid, item->name, item->flags);
 		zbx_audit_item_update_json_add_data(*itemid, item, hostid);
 
@@ -956,6 +958,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 	zbx_uint64_t		itemid = 0;
 	zbx_db_insert_t		db_insert_items, db_insert_irtdata;
 	zbx_template_item_t	*item;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), items num: %d", __func__, items->values_num);
 
 	if (0 == items->values_num)
 		return;
