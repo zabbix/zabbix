@@ -3909,7 +3909,7 @@ char	*zbx_db_get_schema_esc(void)
 
 void	zbx_tsdb_recalc_time_period(int *ts_from, int table_group)
 {
-	int		least_ts, hk_period;
+	int		least_ts;
 	zbx_config_t	cfg;
 
 	if (0 >= zbx_tsdb_get_version())
@@ -3922,17 +3922,16 @@ void	zbx_tsdb_recalc_time_period(int *ts_from, int table_group)
 		if (1 != cfg.hk.history_global)
 			return;
 
-		hk_period = cfg.hk.history;
+		least_ts = (int)time(NULL) - cfg.hk.history;
 	}
 	else if (ZBX_TSDB_RECALC_TIME_PERIOD_TRENDS == table_group)
 	{
 		if (1 != cfg.hk.trends_global)
 			return;
 
-		hk_period = cfg.hk.trends;
+		least_ts = (int)time(NULL) - cfg.hk.trends + 1;
 	}
 
-	least_ts = (int)time(NULL) - hk_period + 1;
 
 	if (least_ts > *ts_from)
 		*ts_from = least_ts;
