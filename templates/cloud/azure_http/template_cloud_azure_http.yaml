@@ -921,7 +921,7 @@ zabbix_export:
                     getMetricsData: function() {
                         var 
                         data = {'metrics':{}};
-                        metrics = ['BlobCapacity,BlobCount,ContainerCount,IndexCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability'],
+                        metrics = 'BlobCapacity,BlobCount,ContainerCount,IndexCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability',
                         metrics_data = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id + '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=' 
                             + metrics + '&interval=PT1H&api-version=2021-05-01');
                         if (!metrics_data.hasOwnProperty('value')) {
