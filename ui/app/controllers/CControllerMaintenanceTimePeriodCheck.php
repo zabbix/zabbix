@@ -170,7 +170,7 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 			case TIMEPERIOD_TYPE_DAILY:
 				$timeperiod['every'] = $this->getInput('every_day');
 				$timeperiod['start_time'] = (int) $this->getInput('hour') * SEC_PER_HOUR
-					+ (int) $this->getInput('hour') * SEC_PER_MIN;
+					+ (int) $this->getInput('minute') * SEC_PER_MIN;
 
 				break;
 
@@ -178,7 +178,7 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 				$timeperiod['every'] = $this->getInput('every_week');
 				$timeperiod['dayofweek'] = array_sum($this->getInput('weekly_days', []));
 				$timeperiod['start_time'] = (int) $this->getInput('hour') * SEC_PER_HOUR
-					+ (int) $this->getInput('hour') * SEC_PER_MIN;
+					+ (int) $this->getInput('minute') * SEC_PER_MIN;
 
 				break;
 
@@ -197,7 +197,7 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 				}
 
 				$timeperiod['start_time'] = (int) $this->getInput('hour') * SEC_PER_HOUR
-					+ (int) $this->getInput('hour') * SEC_PER_MIN;
+					+ (int) $this->getInput('minute') * SEC_PER_MIN;
 
 				break;
 		}
