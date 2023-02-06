@@ -26,7 +26,6 @@
 #include "zbxtasks.h"
 #include "zbxdiscovery.h"
 #include "zbxalgo.h"
-#include "preproc.h"
 #include "zbxcrypto.h"
 #include "zbxlld.h"
 #include "events.h"
@@ -40,6 +39,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxcachehistory.h"
+#include "zbxpreproc.h"
 
 extern char	*CONFIG_SERVER;
 

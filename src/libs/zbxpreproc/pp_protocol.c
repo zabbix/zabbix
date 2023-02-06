@@ -1,4 +1,4 @@
-/*
+/*;
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
 **
@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "preprocessing.h"
+#include "pp_protocol.h"
 #include "zbxpreproc.h"
 
 #include "log.h"

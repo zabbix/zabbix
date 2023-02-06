@@ -21,7 +21,6 @@
 #define ZABBIX_ITEM_PREPROC_H
 
 #include "zbxcacheconfig.h"
-#include "preproc.h"
 #include "zbxembed.h"
 
 #define ZBX_PREPROC_MAX_PACKET_SIZE	(ZBX_MEBIBYTE * 128)

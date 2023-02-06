@@ -4,6 +4,7 @@ SUBDIRS = \
 	diag \
 	housekeeper \
 	proxyconfig \
+	preproc \
 	datasender \
 	rtc \
 	stats \
@@ -40,7 +41,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_server/odbc/libzbxodbc.a \
 	datasender/libzbxdatasender.a \
 	proxyconfigwrite/libzbxproxyconfigwrite.a \
-	$(top_builddir)/src/zabbix_server/preprocessor/libpreprocessor.a \
+	preproc/libpreproc_proxy.a \
 	$(top_builddir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \

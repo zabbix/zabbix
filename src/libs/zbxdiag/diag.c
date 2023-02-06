@@ -23,7 +23,6 @@
 #include "zbxalgo.h"
 #include "zbxshmem.h"
 #include "zbxcachehistory.h"
-#include "preproc.h"
 #include "zbxconnector.h"
 #include "log.h"
 #include "zbxmutexs.h"

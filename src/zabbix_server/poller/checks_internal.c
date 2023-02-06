@@ -22,7 +22,6 @@
 
 #include "checks_java.h"
 #include "zbxself.h"
-#include "preproc.h"
 #include "zbxtrends.h"
 #include "../vmware/vmware.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"

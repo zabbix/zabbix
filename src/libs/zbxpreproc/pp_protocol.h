@@ -20,7 +20,6 @@
 #ifndef ZABBIX_PREPROCESSING_H
 #define ZABBIX_PREPROCESSING_H
 
-#include "preproc.h"
 #include "zbxpreproc.h"
 #include "zbxipcservice.h"
 
