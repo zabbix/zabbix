@@ -226,7 +226,7 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 			curlauth = CURLAUTH_DIGEST;
 			break;
 		case HTTPTEST_AUTH_BEARER:
-#if LIBCURL_VERSION_NUM >= 0x076100
+#if defined(CURLAUTH_BEARER)
 			curlauth = CURLAUTH_BEARER;
 #else
 			ZBX_UNUSED(token);
@@ -249,7 +249,7 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 
 	switch (authtype)
 	{
-#if LIBCURL_VERSION_NUM >= 0x076100
+#if defined(CURLAUTH_BEARER)
 		case HTTPTEST_AUTH_BEARER:
 			if (NULL == token || '\0' == *token)
 			{
