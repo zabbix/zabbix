@@ -313,7 +313,7 @@ class User extends ScimApiService {
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'userName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
 			'active' =>		['type' => API_BOOLEAN, 'flags' => API_NOT_EMPTY],
-			'groups' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
+			'groups' =>		['type' => API_OBJECTS, 'fields' => [
 				'value' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 				'display' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 			]]
