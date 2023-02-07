@@ -25,7 +25,6 @@
 
 // Create form.
 $expression_form = (new CForm())
-	->cleanItems()
 	->setName('expression')
 	->addVar('action', 'popup.triggerexpr')
 	->addVar('dstfrm', $data['dstfrm'])

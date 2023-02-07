@@ -217,26 +217,6 @@ class testUserRolesPermissions extends CWebTest {
 					'check_links' => ['zabbix.php?action=dashboard.view&new=1']
 				]
 			],
-			// Maintenance creation/edit.
-			[
-				[
-					'maintenance' => true,
-					'page_buttons' => [
-						'Create maintenance period',
-						'Delete'
-					],
-					'form_button' => [
-						'Update',
-						'Clone',
-						'Delete',
-						'Cancel'
-					],
-					'list_link' => 'maintenance.php',
-					'action_link' => 'maintenance.php?form=update&maintenanceid=5',
-					'action' => 'Create and edit maintenance',
-					'check_links' => ['maintenance.php?form=create']
-				]
-			],
 			// Manage scheduled reports.
 			[
 				[
@@ -263,7 +243,7 @@ class testUserRolesPermissions extends CWebTest {
 	}
 
 	/**
-	 * Check creation/edit for dashboard, map, reports, maintenance.
+	 * Check creation/edit for dashboard, map, reports.
 	 *
 	 * @dataProvider getPageActionsData
 	 */
@@ -291,6 +271,44 @@ class testUserRolesPermissions extends CWebTest {
 		}
 
 		$this->checkLinks($data['check_links']);
+	}
+
+	/**
+	 * Check creation/edit for maintenance.
+	 */
+	public function testUserRolesPermissions_MaintenanceActions() {
+		$form_button = [ 'Update', 'Clone', 'Delete', 'Cancel'];
+		$headers = ['', 'Name', 'Type', 'Active since', 'Active till', 'State', 'Description'];
+		$this->page->userLogin('user_for_role', 'zabbixzabbix');
+
+		foreach ([true, false] as $action_status) {
+			$this->page->open('zabbix.php?action=maintenance.list')->waitUntilReady();
+			$this->assertTrue($this->query('button', 'Create maintenance period')->one()->isEnabled($action_status));
+
+			$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
+			if ($action_status) {
+				$table->getRow(0)->select();
+				$this->assertTrue($this->query('button', 'Delete')->one()->isEnabled());
+			}
+			else {
+				// Checkboxes and the Delete button are not visible.
+				$this->assertFalse($this->query('button', 'Delete')->one(false)->isValid());
+				$this->assertFalse($this->query('id:maintenanceids_1')->one(false)->isValid());
+				array_shift($headers);
+			}
+			$this->assertEquals($headers, $table->getHeadersText());
+
+			$table->getRow(0)->getColumn('Name')->query('tag:a')->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			foreach ($form_button as $text) {
+				$this->assertTrue($dialog->getFooter()->query('button', $text)->one()->isEnabled(($text === 'Cancel') ? true : $action_status));
+			}
+			$dialog->close();
+
+			if ($action_status) {
+				$this->changeRoleRule(['Create and edit maintenance' => false]);
+			}
+		}
 	}
 
 	public static function getProblemActionsData() {
@@ -763,7 +781,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Event correlation',
 						'Discovery'
 					],
-					'link' => ['maintenance.php']
+					'link' => ['zabbix.php?action=maintenance.list']
 				]
 			],
 			[

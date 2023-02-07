@@ -75,7 +75,6 @@ else {
 $html_page
 	->addItem(
 		(new CForm())
-			->cleanItems()
 			->setName('host_view')
 			->addClass('is-loading')
 	)

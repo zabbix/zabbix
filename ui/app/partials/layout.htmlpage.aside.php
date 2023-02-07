@@ -74,7 +74,6 @@ if (getRequest('search', '') === '') {
 }
 
 $search = (new CForm('get', 'zabbix.php'))
-	->cleanItems()
 	->addClass(ZBX_STYLE_FORM_SEARCH)
 	->setAttribute('role', 'search')
 	->addItem([

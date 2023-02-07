@@ -26,6 +26,7 @@
 
 // create form
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('copy')))->removeId())
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 switch ($data['element_type']) {

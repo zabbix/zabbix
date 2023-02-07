@@ -289,6 +289,22 @@ class testProxyConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '0'
 			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
 		]
 	];
 
@@ -642,6 +658,28 @@ class testProxyConfSync extends CIntegrationTest
 				"delete" =>
 				"0"
 			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'0',
+				'delete' =>
+				'0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'0',
+				'delete' =>
+				'0'
+			]
 		]
 	];
 
@@ -988,6 +1026,22 @@ class testProxyConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '3'
 			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
 		]
 	];
 
@@ -1319,72 +1373,56 @@ class testProxyConfSync extends CIntegrationTest
 		]);
 	}
 
-	private function importTemplateForUpdate($filename)
-	{
-		$xml = file_get_contents('integration/data/' . $filename);
+	private function importTemplateForUpdate($filename) {
+		$xml = file_get_contents('integration/data/'.$filename);
 
 		$response = $this->call('configuration.import', [
 			'format' => 'xml',
 			'source' => $xml,
 			'rules' => [
-				'template_groups' =>
-				[
+				'template_groups' => [
 					'updateExisting' => true,
 					'createMissing' => false
 				],
-				'host_groups' =>
-				[
+				'host_groups' => [
 					'updateExisting' => true,
 					'createMissing' => false
 				],
-				'templates' =>
-				[
+				'templates' => [
 					'updateExisting' => true,
 					'createMissing' => false
 				],
-				'valueMaps' =>
-				[
+				'valueMaps' => [
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
-				'templateDashboards' =>
-				[
+				'templateDashboards' => [
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
-				'templateLinkage' =>
-				[
-					'createMissing' => false,
-					'deleteMissing' => false
-				],
-				'items' =>
-				[
+				'items' => [
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
-				'discoveryRules' =>
-				[
+				'discoveryRules' => [
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
-				'triggers' =>
-				[
+				'triggers' => [
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
-				'graphs' =>
-				[
+				'graphs' => [
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
-				'httptests' =>
-				[
+				'httptests' => [
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
@@ -1438,58 +1476,48 @@ class testProxyConfSync extends CIntegrationTest
 			'format' => 'xml',
 			'source' => $xml,
 			'rules' => [
-				'host_groups' =>
-				[
-				'updateExisting' => true,
-				'createMissing' => true
+				'host_groups' => [
+					'updateExisting' => true,
+					'createMissing' => true
 				],
-				'hosts' =>
-				[
-				'updateExisting' => true,
-				'createMissing' => true
+				'hosts' => [
+					'updateExisting' => true,
+					'createMissing' => true
 				],
-				'valueMaps' =>
-				[
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
+				'valueMaps' => [
+					'updateExisting' => true,
+					'createMissing' => true,
+					'deleteMissing' => false
 				],
-				'templateLinkage' =>
-				[
-				'createMissing' => true,
-				'deleteMissing' => false
+				'templateLinkage' => [
+					'createMissing' => true,
+					'deleteMissing' => false
 				],
-				'items' =>
-				[
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
+				'items' => [
+					'updateExisting' => true,
+					'createMissing' => true,
+					'deleteMissing' => false
 				],
-				'discoveryRules' =>
-				[
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
+				'discoveryRules' => [
+					'updateExisting' => true,
+					'createMissing' => true,
+					'deleteMissing' => false
 				],
-				'triggers' =>
-				[
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
+				'triggers' => [
+					'updateExisting' => true,
+					'createMissing' => true,
+					'deleteMissing' => false
 				],
-				'graphs' =>
-				[
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
+				'graphs' => [
+					'updateExisting' => true,
+					'createMissing' => true,
+					'deleteMissing' => false
 				],
-				'httptests' =>
-				[
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
+				'httptests' => [
+					'updateExisting' => true,
+					'createMissing' => true,
+					'deleteMissing' => false
 				]
-
 			]
 		]);
 	}

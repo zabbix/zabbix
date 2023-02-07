@@ -80,7 +80,7 @@
 				}
 			});
 
-			redirect(url.getUrl(), 'post', 'action', undefined, false, true);
+			redirect(url.getUrl(), 'post', 'action', undefined, true);
 		});
 
 		var iconMapTable = $('#iconMapTable'),

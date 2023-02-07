@@ -30,7 +30,7 @@ use Widgets\NavTree\Widget;
 class NavTreeItemEdit extends CController {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {

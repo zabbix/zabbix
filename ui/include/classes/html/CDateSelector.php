@@ -29,6 +29,13 @@ class CDateSelector extends CTag {
 	const ZBX_STYLE_CLASS = 'calendar-control';
 
 	/**
+	 * Input name.
+	 *
+	 * @var string
+	 */
+	private $name = '';
+
+	/**
 	 * Default date format.
 	 *
 	 * @var string
@@ -85,7 +92,7 @@ class CDateSelector extends CTag {
 	 *
 	 * @return CDateSelector
 	 */
-	public function __construct($name = 'calendar', $value = null) {
+	public function __construct(string $name = 'calendar', $value = null) {
 		parent::__construct('div', true);
 
 		$this->name = $name;

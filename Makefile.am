@@ -155,12 +155,12 @@ icons: icons_build css icons_cleanup
 if ZBXCMOCKA
 WRAP_DB_FUNCS = \
 	-Wl,--wrap=zbx_db_vselect \
-	-Wl,--wrap=zbx_db_select_n \
-	-Wl,--wrap=zbx_db_fetch \
-	-Wl,--wrap=__zbx_DBexecute \
-	-Wl,--wrap=DBbegin \
-	-Wl,--wrap=DBcommit \
-	-Wl,--wrap=DBexecute_multiple_query \
+	-Wl,--wrap=zbx_db_select_n_basic \
+	-Wl,--wrap=zbx_db_fetch_basic \
+	-Wl,--wrap=__zbx_db_execute \
+	-Wl,--wrap=zbx_db_begin \
+	-Wl,--wrap=zbx_db_commit \
+	-Wl,--wrap=zbx_db_execute_multiple_query \
 	-Wl,--wrap=zbx_db_free_result
 
 WRAP_IO_FUNCS = \

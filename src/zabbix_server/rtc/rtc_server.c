@@ -269,7 +269,8 @@ static int	rtc_process_diaginfo(const char *data, char **result)
 
 	if (0 == strcmp(buf, "all"))
 	{
-		scope = (1 << ZBX_DIAGINFO_VALUECACHE) | (1 << ZBX_DIAGINFO_LLD) | (1 << ZBX_DIAGINFO_ALERTING);
+		scope = (1 << ZBX_DIAGINFO_VALUECACHE) | (1 << ZBX_DIAGINFO_LLD) | (1 << ZBX_DIAGINFO_ALERTING) |
+				(1 << ZBX_DIAGINFO_CONNECTOR);
 	}
 	else if (0 == strcmp(buf, ZBX_DIAG_VALUECACHE))
 	{

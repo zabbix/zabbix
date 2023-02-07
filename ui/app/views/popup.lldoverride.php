@@ -30,7 +30,6 @@ $output = [
 $options = $data['options'];
 
 $overrides_popup_form = (new CForm())
-	->cleanItems()
 	->setId('lldoverride_form')
 	->addItem((new CVar('no', $options['no']))->removeId())
 	->addItem((new CVar('templated', $options['templated']))->removeId())

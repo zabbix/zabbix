@@ -65,6 +65,8 @@ zbx_shmem_stats_t;
 
 int	zbx_shmem_create(zbx_shmem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
 		int allow_oom, char **error);
+int	zbx_shmem_create_min(zbx_shmem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
+		int allow_oom, char **error);
 void	zbx_shmem_destroy(zbx_shmem_info_t *info);
 
 #define	zbx_shmem_malloc(info, old, size) __zbx_shmem_malloc(__FILE__, __LINE__, info, old, size)

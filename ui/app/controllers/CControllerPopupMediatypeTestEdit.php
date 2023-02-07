@@ -21,6 +21,10 @@
 
 class CControllerPopupMediatypeTestEdit extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'mediatypeid' => 'fatal|required|db media_type.mediatypeid'
