@@ -29,8 +29,6 @@ if ($data['uncheck']) {
 	uncheckTableRows('user');
 }
 
-sdii(API::Authentication()->update(['ldap_auth_enabled' => 1]));
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('Users'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USER_LIST))
