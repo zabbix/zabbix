@@ -75,7 +75,7 @@ struct zbx_db_result
 #elif defined(HAVE_ORACLE)
 	OCIStmt		*stmthp;	/* the statement handle for select operations */
 	int		ncolumn;
-	DB_ROW		values;
+	zbx_db_row_t	values;
 	ub4		*values_alloc;
 	OCILobLocator	**clobs;
 #elif defined(HAVE_POSTGRESQL)
@@ -83,13 +83,13 @@ struct zbx_db_result
 	int		row_num;
 	int		fld_num;
 	int		cursor;
-	DB_ROW		values;
+	zbx_db_row_t	values;
 #elif defined(HAVE_SQLITE3)
 	int		curow;
 	char		**data;
 	int		nrow;
 	int		ncolumn;
-	DB_ROW		values;
+	zbx_db_row_t	values;
 #endif
 };
 
@@ -142,8 +142,8 @@ static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
 #if defined(HAVE_ORACLE)
-static void	OCI_DBclean_result_handle(DB_RESULT result);
-static void	OCI_DBclean_result(DB_RESULT result);
+static void	OCI_DBclean_result_handle(zbx_db_result_t result);
+static void	OCI_DBclean_result(zbx_db_result_t result);
 #endif
 
 static zbx_err_codes_t last_db_errcode;
@@ -331,10 +331,10 @@ static int	zbx_db_execute_basic(const char *fmt, ...)
 }
 
 __zbx_attr_format_printf(1, 2)
-static DB_RESULT	zbx_db_select_basic(const char *fmt, ...)
+static zbx_db_result_t	zbx_db_select_basic(const char *fmt, ...)
 {
 	va_list		args;
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 
 	va_start(args, fmt);
 	result = zbx_db_vselect(fmt, args);
@@ -427,8 +427,8 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 
 	int		rc;
 	char		*cport = NULL;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	const char	*keywords[ZBX_DB_MAX_PARAMS + 1];
 	const char	*values[ZBX_DB_MAX_PARAMS + 1];
 	unsigned int	i = 0;
@@ -822,7 +822,7 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 
 	result = zbx_db_select_basic("select oid from pg_type where typname='bytea'");
 
-	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
 	{
 		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
 		goto out;
@@ -848,7 +848,7 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 
 	result = zbx_db_select_basic("show standard_conforming_strings");
 
-	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
 	{
 		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
 		goto out;
@@ -1615,10 +1615,10 @@ clean:
  * Return value: data, NULL (on error) or (DB_RESULT)ZBX_DB_DOWN              *
  *                                                                            *
  ******************************************************************************/
-DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
+zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 {
 	char		*sql = NULL;
-	DB_RESULT	result = NULL;
+	zbx_db_result_t	result = NULL;
 	double		sec = 0;
 #if defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
@@ -1646,7 +1646,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
 #if defined(HAVE_MYSQL)
-	result = (DB_RESULT)zbx_malloc(NULL, sizeof(struct zbx_db_result));
+	result = (zbx_db_result_t)zbx_malloc(NULL, sizeof(struct zbx_db_result));
 	result->result = NULL;
 
 	if (NULL == conn)
@@ -1666,7 +1666,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 			zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
 			zbx_db_free_result(result);
-			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (DB_RESULT)ZBX_DB_DOWN : NULL);
+			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (zbx_db_result_t)ZBX_DB_DOWN : NULL);
 		}
 	}
 #elif defined(HAVE_ORACLE)
@@ -1825,7 +1825,7 @@ error:
 		server_status = OCI_handle_sql_error(ERR_Z3005, err, sql);
 		zbx_db_free_result(result);
 
-		result = (ZBX_DB_DOWN == server_status ? (DB_RESULT)(intptr_t)server_status : NULL);
+		result = (ZBX_DB_DOWN == server_status ? (zbx_db_result_t)(intptr_t)server_status : NULL);
 	}
 #elif defined(HAVE_POSTGRESQL)
 	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
@@ -1846,7 +1846,7 @@ error:
 		if (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result))
 		{
 			zbx_db_free_result(result);
-			result = (DB_RESULT)ZBX_DB_DOWN;
+			result = (zbx_db_result_t)ZBX_DB_DOWN;
 		}
 		else
 		{
@@ -1883,7 +1883,7 @@ lbl_get_table:
 				result = NULL;
 				break;
 			default:
-				result = (DB_RESULT)ZBX_DB_DOWN;
+				result = (zbx_db_result_t)ZBX_DB_DOWN;
 				break;
 		}
 	}
@@ -1912,7 +1912,7 @@ clean:
 /*
  * Execute SQL statement. For select statements only.
  */
-DB_RESULT	zbx_db_select_n_basic(const char *query, int n)
+zbx_db_result_t	zbx_db_select_n_basic(const char *query, int n)
 {
 #if defined(HAVE_ORACLE)
 	return zbx_db_select_basic("select * from (%s) where rownum<=%d", query, n);
@@ -1982,7 +1982,7 @@ static void	db_set_fetch_error(int dberr)
 }
 #endif
 
-DB_ROW	zbx_db_fetch_basic(DB_RESULT result)
+zbx_db_row_t	zbx_db_fetch_basic(zbx_db_result_t result)
 {
 #if defined(HAVE_ORACLE)
 	int		i;
@@ -1998,7 +1998,7 @@ DB_ROW	zbx_db_fetch_basic(DB_RESULT result)
 	if (NULL == result->result)
 		return NULL;
 
-	return (DB_ROW)mysql_fetch_row(result->result);
+	return (zbx_db_row_t)mysql_fetch_row(result->result);
 #elif defined(HAVE_ORACLE)
 	if (NULL == result->stmthp)
 		return NULL;
@@ -2154,7 +2154,7 @@ int	zbx_db_is_null_basic(const char *field)
 }
 
 #ifdef HAVE_ORACLE
-static void	OCI_DBclean_result_handle(DB_RESULT result)
+static void	OCI_DBclean_result_handle(zbx_db_result_t result)
 {
 	if (NULL != result->values)
 	{
@@ -2177,7 +2177,7 @@ static void	OCI_DBclean_result_handle(DB_RESULT result)
 		result->stmthp = NULL;
 	}
 }
-static void	OCI_DBclean_result(DB_RESULT result)
+static void	OCI_DBclean_result(zbx_db_result_t result)
 {
 	if (NULL == result)
 		return;
@@ -2198,7 +2198,7 @@ static void	OCI_DBclean_result(DB_RESULT result)
 }
 #endif
 
-void	zbx_db_free_result(DB_RESULT result)
+void	zbx_db_free_result(zbx_db_result_t result)
 {
 #if defined(HAVE_MYSQL)
 	if (NULL == result)
@@ -2877,7 +2877,7 @@ out:
 #ifdef HAVE_POSTGRESQL
 static int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 	int		ret;
 
 	if (1 == ZBX_DB_TSDB_V1) {
@@ -2890,7 +2890,7 @@ static int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
 				" where hypertable_name in (%s) and is_compressed='t'", table_names);
 	}
 
-	if ((DB_RESULT)ZBX_DB_DOWN == result)
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result)
 	{
 		ret = FAIL;
 		goto out;
@@ -2942,13 +2942,13 @@ void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *versi
  ******************************************************************************/
 static char	*zbx_tsdb_get_license(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*tsdb_lic = NULL;
 
 	result = zbx_db_select_basic("show timescaledb.license");
 
-	if ((DB_RESULT)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch_basic(result)))
+	if ((zbx_db_result_t)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch_basic(result)))
 	{
 		tsdb_lic = zbx_strdup(NULL, row[0]);
 	}
@@ -3012,8 +3012,8 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 int	zbx_tsdb_get_version(void)
 {
 	int		ver, major, minor, patch;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	if (-1 == ZBX_TSDB_VERSION)
 	{
@@ -3027,7 +3027,7 @@ int	zbx_tsdb_get_version(void)
 		result = zbx_db_select_basic("select extversion from pg_extension where extname = 'timescaledb'");
 
 		/* database down, can re-query in the next call */
-		if ((DB_RESULT)ZBX_DB_DOWN == result)
+		if ((zbx_db_result_t)ZBX_DB_DOWN == result)
 		{
 			ver = 0;
 			goto out;

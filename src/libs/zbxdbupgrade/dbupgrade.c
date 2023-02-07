@@ -882,8 +882,8 @@ static zbx_db_version_t dbversions[] = {
 
 static void	DBget_version(int *mandatory, int *optional)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	*mandatory = -1;
 	*optional = -1;
@@ -1092,8 +1092,8 @@ out:
 
 int	DBcheck_double_type(zbx_config_dbhigh_t *config_dbhigh)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*sql = NULL;
 	const int	total_dbl_cols = 4;
 	int		ret = FAIL;
@@ -1475,12 +1475,12 @@ char	*zbx_dbpatch_make_trigger_function(const char *name, const char *tpl, const
 	return func;
 }
 
-int	zbx_compose_trigger_expression(DB_ROW row, zbx_uint64_t rules, char **composed_expr)
+int	zbx_compose_trigger_expression(zbx_db_row_t row, zbx_uint64_t rules, char **composed_expr)
 {
 	char		*trigger_expr;
 	int		i;
-	DB_ROW		row2;
-	DB_RESULT	result2;
+	zbx_db_row_t	row2;
+	zbx_db_result_t	result2;
 
 	for (i = 0; i < 2; i++)
 	{

@@ -555,8 +555,8 @@ out:
 
 static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zbx_uint64_t *lastid)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() field:'%s.%s'", __func__, table_name, lastidfield);
 
@@ -574,7 +574,7 @@ static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zb
 
 static void	proxy_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s.%s:" ZBX_FS_UI64 "]", __func__, table_name, lastidfield, lastid);
 
@@ -613,8 +613,8 @@ void	zbx_proxy_set_areg_lastid(const zbx_uint64_t lastid)
 
 int	zbx_proxy_get_delay(const zbx_uint64_t lastid)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*sql = NULL;
 	int		ts = 0;
 
@@ -647,8 +647,8 @@ static void	proxy_get_history_data_simple(struct zbx_json *j, const char *proto_
 	size_t		offset = 0;
 	int		f, records_num_last = *records_num, retries = 1;
 	char		sql[MAX_STRING_LEN];
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	struct timespec	t_sleep = { 0, 100000000L }, t_rem;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __func__, ht->table);
@@ -764,8 +764,8 @@ zbx_history_data_t;
 static int	proxy_get_history_data(zbx_uint64_t lastid, zbx_history_data_t **data, size_t *data_alloc,
 		char **string_buffer, size_t *string_buffer_alloc, int *more)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0, data_num = 0;
 	size_t			string_buffer_offset = 0;
@@ -2293,8 +2293,8 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 
 	if (0 == *processed_num && 0 == ip_idx)
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
 		zbx_uint64_t	dcheckid;
 
 		result = zbx_db_select(
@@ -2411,8 +2411,8 @@ fail:
  ******************************************************************************/
 static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char **error)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_uint64_t		dcheckid, druleid;
 	struct zbx_json_parse	jp_row;
 	int			status, ret = SUCCEED, i, j;
@@ -2749,8 +2749,8 @@ out:
  ******************************************************************************/
 int	zbx_proxy_get_history_count(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	id;
 	int		count = 0;
 

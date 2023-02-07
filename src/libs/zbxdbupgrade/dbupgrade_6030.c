@@ -33,8 +33,8 @@
 
 static int	DBpatch_6030000(void)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_db_insert_t		db_insert;
 	int			ret = SUCCEED;
 
@@ -479,8 +479,8 @@ static int DBpatch_6030061(void)
 
 static int	DBpatch_6030062(void)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql;
 	size_t			sql_alloc = 4096, sql_offset = 0;
 	int			ret = SUCCEED;
@@ -1141,13 +1141,13 @@ static int	DBpatch_6030123(void)
 
 static int	migrate_ldap_data(void)
 {
-	DB_RESULT	result = zbx_db_select("select userdirectoryid,host,port,base_dn,bind_dn,bind_password,"
+	zbx_db_result_t	result = zbx_db_select("select userdirectoryid,host,port,base_dn,bind_dn,bind_password,"
 					"search_attribute,start_tls,search_filter"
 					" from userdirectory");
 	if (NULL == result)
 		return FAIL;
 
-	DB_ROW	row;
+	zbx_db_row_t	row;
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1201,7 +1201,7 @@ static int	DBpatch_6030124(void)
 
 static int	migrate_saml_data(void)
 {
-	DB_RESULT	result = zbx_db_select("select saml_idp_entityid,saml_sso_url,saml_slo_url,saml_username_attribute,"
+	zbx_db_result_t	result = zbx_db_select("select saml_idp_entityid,saml_sso_url,saml_slo_url,saml_username_attribute,"
 					"saml_sp_entityid,saml_nameid_format,saml_sign_messages,saml_sign_assertions,"
 					"saml_sign_authn_requests,saml_sign_logout_requests,saml_sign_logout_responses,"
 					"saml_encrypt_nameid,saml_encrypt_assertions"
@@ -1209,7 +1209,7 @@ static int	migrate_saml_data(void)
 	if (NULL == result)
 		return FAIL;
 
-	DB_ROW	row = zbx_db_fetch(result);
+	zbx_db_row_t	row = zbx_db_fetch(result);
 
 	if (NULL == row)
 	{
@@ -1687,8 +1687,8 @@ ZBX_PTR_VECTOR_IMPL(child_valuemap_ptr, zbx_child_valuemap_t *)
 
 static int	DBpatch_propogate_valuemap(zbx_db_valuemap_t *valuemap, uint64_t valuemapid)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	uint64_t		itemid, child_templateid;
 
 	child_templateid = valuemap->child_templateid;
@@ -1764,8 +1764,8 @@ static void	child_valuemap_free(zbx_child_valuemap_t *valuemap)
 
 static void	select_pure_parents(zbx_vector_uint64_t *ids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	result = zbx_db_select("select distinct ht.templateid from hosts_templates ht,hosts h"
 			" where ht.hostid=h.hostid and h.status=%d and ht.templateid not in "
@@ -1828,8 +1828,8 @@ static void	zbx_vector_valuemap_ptr_uniq2(zbx_vector_valuemap_ptr_t *vector, zbx
 static void	collect_valuemaps(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64_t *child_templateids,
 		zbx_vector_valuemap_ptr_t *valuemaps, int *mappings_num)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	loc_child_templateids;
@@ -1948,8 +1948,8 @@ static int	DBpatch_6030175(void)
 	zbx_vector_valuemap_ptr_t		valuemaps;
 	zbx_vector_child_valuemap_ptr_t		child_valuemaps;
 	zbx_vector_uint64_t			parent_ids, child_templateids;
-	DB_RESULT				result;
-	DB_ROW					row;
+	zbx_db_result_t				result;
+	zbx_db_row_t				row;
 	int					iterations, changed, i, j, mappings_num = 0, ret = SUCCEED,
 						long_name_collisions = MAX_LONG_NAME_COLLISIONS;
 	char					*sql = NULL;
@@ -2255,8 +2255,8 @@ static void	zbx_vector_hostmacro_ptr_uniq2(zbx_vector_hostmacro_ptr_t *vector, z
 static void	collect_hostmacros(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64_t *child_templateids,
 		zbx_vector_hostmacro_ptr_t *hostmacros)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	loc_child_templateids;
@@ -2342,8 +2342,8 @@ static int	DBpatch_6030176(void)
 	zbx_vector_hostmacro_ptr_t		hostmacros;
 	zbx_vector_child_hostmacro_ptr_t	child_hostmacros;
 	zbx_vector_uint64_t			parent_ids, child_templateids;
-	DB_RESULT				result;
-	DB_ROW					row;
+	zbx_db_result_t				result;
+	zbx_db_row_t				row;
 	int					i, j;
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
@@ -2532,8 +2532,8 @@ static int	consolidate_tags(zbx_vector_tag_ptr_t *tags)
 static void	DBpatch_propogate_tag(zbx_vector_tag_ptr_t *tags, zbx_db_patch_tag_t *tag, zbx_uint64_t hostid,
 		zbx_uint64_t itemid, zbx_vector_uint64_t *child_itemids)
 {
-	DB_RESULT	result, result2;
-	DB_ROW		row, row2;
+	zbx_db_result_t	result, result2;
+	zbx_db_row_t	row, row2;
 
 	result = zbx_db_select("select h.hostid,i.itemid,h.status from hosts h,items i,hosts_templates ht"
 			" where h.hostid=ht.hostid and ht.templateid=" ZBX_FS_UI64" and i.hostid=h.hostid and"
@@ -2583,8 +2583,8 @@ static int	DBpatch_6030177(void)
 	zbx_vector_tag_ptr_t		tags;
 	zbx_vector_child_tag_ptr_t	child_tags;
 	zbx_vector_uint64_t		child_itemids;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	int				i, j, k, new_tags = 0, ret = SUCCEED;
 	zbx_db_patch_tag_t		*tag;
 	zbx_uint64_t			itemtagid;
@@ -2714,8 +2714,8 @@ out:
 static void	DBpatch_propogate_tag_web(zbx_vector_tag_ptr_t *tags, zbx_db_patch_tag_t *tag, zbx_uint64_t hostid,
 		zbx_uint64_t httptestid, zbx_vector_uint64_t *child_httptestids)
 {
-	DB_RESULT	result, result2;
-	DB_ROW		row, row2;
+	zbx_db_result_t	result, result2;
+	zbx_db_row_t	row, row2;
 
 	result = zbx_db_select("select h.hostid,htt.httptestid,h.status from hosts h,httptest htt,hosts_templates ht"
 			" where h.hostid=ht.hostid and ht.templateid=" ZBX_FS_UI64" and htt.hostid=h.hostid and"
@@ -2765,8 +2765,8 @@ static int	DBpatch_6030178(void)
 	zbx_vector_tag_ptr_t		tags;
 	zbx_vector_child_tag_ptr_t	child_tags;
 	zbx_vector_uint64_t		child_httptestids;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	int				i, j, k, new_tags = 0, ret = SUCCEED;
 	zbx_db_patch_tag_t		*tag;
 	zbx_uint64_t			httptesttagid;
@@ -2976,8 +2976,8 @@ ZBX_PTR_VECTOR_IMPL(child_dashboard_ptr, zbx_child_dashboard_t *)
 static int	DBpatch_propogate_widget(zbx_db_widget_t *widget, uint64_t widgetid,
 		zbx_vector_uint64_t *value_itemids, zbx_vector_uint64_t *value_graphids)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 
 	result = zbx_db_select("select widget_fieldid,type,name,value_int,value_str,value_groupid,value_hostid,value_itemid,"
 			"value_graphid,value_sysmapid,value_serviceid,value_slaid,value_userid,value_actionid,"
@@ -3061,8 +3061,8 @@ static int	DBpatch_propogate_widget_copy(zbx_db_widget_t *widget, zbx_db_widget_
 static int	DBpatch_propogate_page(zbx_db_dashboard_page_t *page, uint64_t pageid, int *fields_num,
 		zbx_vector_uint64_t *value_itemids, zbx_vector_uint64_t *value_graphids)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 
 	result = zbx_db_select("select widgetid,type,name,x,y,width,height,view_mode from widget"
 			" where dashboard_pageid=" ZBX_FS_UI64, pageid);
@@ -3120,8 +3120,8 @@ static int	DBpatch_propogate_page_copy(zbx_db_dashboard_page_t *page, zbx_db_das
 static int	DBpatch_propogate_dashboard(zbx_db_dashboard_t *dashboard, uint64_t dashboardid, int *widgets_num,
 		int *fields_num, zbx_vector_uint64_t *value_itemids, zbx_vector_uint64_t *value_graphids)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 
 	result = zbx_db_select("select dashboard_pageid,name,display_period,sortorder from dashboard_page"
 			" where dashboardid=" ZBX_FS_UI64, dashboardid);
@@ -3218,8 +3218,8 @@ static void	change_item_ids(zbx_db_dashboard_t *dashboard, zbx_vector_uint64_t *
 	zbx_vector_uint64_pair_t	itemid_pairs;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_uint64_pair_t		pair;
 	int				i, j, k;
 
@@ -3289,8 +3289,8 @@ static void	change_graph_ids(zbx_db_dashboard_t *dashboard, zbx_vector_uint64_t 
 	zbx_vector_uint64_pair_t	graphid_pairs;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_uint64_pair_t		pair;
 	int				i, j, k;
 
@@ -3397,8 +3397,8 @@ static void	zbx_vector_dashboard_ptr_uniq2(zbx_vector_dashboard_ptr_t *vector, z
 static void	collect_dashboards(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64_t *child_templateids,
 		zbx_vector_dashboard_ptr_t *dashboards, int *pages_num, int *widgets_num, int *fields_num)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	loc_child_templateids, value_itemids, value_graphids;
@@ -3509,8 +3509,8 @@ static int	DBpatch_6030179(void)
 	zbx_vector_dashboard_ptr_t		dashboards;
 	zbx_vector_child_dashboard_ptr_t	child_dashboards;
 	zbx_vector_uint64_t			parent_ids, child_templateids;
-	DB_RESULT				result;
-	DB_ROW					row;
+	zbx_db_result_t				result;
+	zbx_db_row_t				row;
 	int					iterations, changed, i, j, k, l, pages_num = 0, widgets_num = 0,
 						fields_num = 0, ret = SUCCEED,
 						long_name_collisions = MAX_LONG_NAME_COLLISIONS;
@@ -3748,8 +3748,8 @@ static int	DBpatch_6030181(void)
 {
 	zbx_vector_uint64_t	itemids;
 	zbx_vector_str_t	uuids;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	int			ret = SUCCEED;
@@ -3824,8 +3824,8 @@ static int	DBpatch_6030182(void)
 	int		ret = SUCCEED;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
@@ -3886,8 +3886,8 @@ static int	DBpatch_6030183(void)
 	int		ret = SUCCEED;
 	char		*host_name, *uuid, *sql = NULL, *seed = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
@@ -3903,8 +3903,8 @@ static int	DBpatch_6030183(void)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		DB_ROW		row2;
-		DB_RESULT	result2;
+		zbx_db_row_t	row2;
+		zbx_db_result_t	result2;
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", row[1]);
 
@@ -3954,8 +3954,8 @@ static int	DBpatch_6030184(void)
 	int		ret = SUCCEED;
 	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
@@ -4003,8 +4003,8 @@ static int	DBpatch_6030185(void)
 	int		ret = SUCCEED;
 	char		*name_tmpl, *uuid, *seed = NULL, *sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
@@ -4077,8 +4077,8 @@ static int	DBpatch_6030188(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	DB_RESULT	result = zbx_db_select("select mediatypeid,exec_params from media_type where type=1");
-	DB_ROW		row;
+	zbx_db_result_t	result = zbx_db_select("select mediatypeid,exec_params from media_type where type=1");
+	zbx_db_row_t	row;
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, "media_type_param", "mediatype_paramid", "mediatypeid", "name", "value",
@@ -4141,8 +4141,8 @@ static void	substitute_macro(const char *in, const char *macro, const char *macr
 static void	get_mediatype_params(zbx_uint64_t mediatypeid, const char *sendto, const char *subject,
 		const char *message, char **params)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	struct zbx_json		json;
 	char			*value = NULL;
 	size_t			value_alloc = 0;
@@ -4191,7 +4191,7 @@ static int	DBpatch_6030189(void)
 		return SUCCEED;
 
 	/* select alerts of Script Mediatype that aren't sent */
-	DB_RESULT	result = zbx_db_select(
+	zbx_db_result_t	result = zbx_db_select(
 			"select a.alertid,m.mediatypeid,a.sendto,a.subject,a.message"
 			" from alerts a,media_type m"
 			" where a.mediatypeid=m.mediatypeid"
@@ -4199,7 +4199,7 @@ static int	DBpatch_6030189(void)
 				" and m.type=1"
 			" order by a.mediatypeid");
 
-	DB_ROW		row;
+	zbx_db_row_t	row;
 
 	/* set their parameters according to how we now store them */
 	while (NULL != (row = zbx_db_fetch(result)))

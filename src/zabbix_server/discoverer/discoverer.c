@@ -686,8 +686,8 @@ next:
  ******************************************************************************/
 static void	discovery_clean_services(zbx_uint64_t druleid)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*iprange = NULL;
 	zbx_vector_uint64_t	keep_dhostids, del_dhostids, del_dserviceids;
 	zbx_uint64_t		dhostid, dserviceid;

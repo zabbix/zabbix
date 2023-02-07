@@ -255,8 +255,8 @@ static int	DBpatch_3010021_trigger_events_compare_func(const void *d1, const voi
  ******************************************************************************/
 static int	DBpatch_3010021_update_event_recovery(zbx_hashset_t *events, zbx_uint64_t *eventid)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	char			*sql = NULL;
 	size_t			sql_alloc = 4096, sql_offset = 0;
 	int			i, value, ret = FAIL;
@@ -396,8 +396,8 @@ static int	DBpatch_3010022(void)
 static int	DBpatch_3010023(void)
 {
 	zbx_db_insert_t	db_insert, db_insert_msg;
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	int		ret, actions_num;
 	zbx_uint64_t	actionid, operationid;
 
@@ -461,8 +461,8 @@ out:
  ******************************************************************************/
 static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsource, int evaltype, int recovery_msg)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	int		conditiontype, ret = ZBX_3010024_ACTION_DISABLE, value;
 
 	/* evaltype: 0 - ZBX_CONDITION_EVAL_TYPE_AND_OR, 1 - ZBX_CONDITION_EVAL_TYPE_AND */
@@ -567,8 +567,8 @@ static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsourc
 
 static int	DBpatch_3010024(void)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	zbx_vector_uint64_t	actionids_disable, actionids_convert;
 	int			ret, evaltype, eventsource, recovery_msg;
 	zbx_uint64_t		actionid;
@@ -685,8 +685,8 @@ static int	DBpatch_3010025(void)
 static void	DBpatch_3010026_get_conditionids(zbx_uint64_t actionid, const char *name, int eventsource,
 		zbx_vector_uint64_t *conditionids)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_uint64_t	conditionid;
 	char		*condition = NULL;
 	size_t		condition_alloc = 0, condition_offset = 0;
@@ -1020,8 +1020,8 @@ static int	DBpatch_3010026_expression_remove_values(char *expression, const zbx_
 
 static int	DBpatch_3010026(void)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	zbx_vector_uint64_t	conditionids, actionids;
 	int			ret = FAIL, evaltype, index, i, eventsource;
 	zbx_uint64_t		actionid;
@@ -1581,8 +1581,8 @@ static int	DBpatch_3010078(void)
 
 static int	DBpatch_3010079(void)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	int			ret = FAIL;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
