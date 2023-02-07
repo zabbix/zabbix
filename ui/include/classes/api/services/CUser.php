@@ -550,7 +550,6 @@ class CUser extends CApiService {
 		}
 		$this->checkLanguages(zbx_objectValues($users, 'lang'));
 
-		unset($check_roleids[0]);
 		if ($check_roleids) {
 			$this->checkRoles($check_roleids);
 		}
