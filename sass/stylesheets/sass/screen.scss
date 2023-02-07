@@ -2500,31 +2500,6 @@ $trigger-expression-tree-icons: (
 		padding: 8px 10px;
 	}
 
-	//&:not(.modal) {
-	//	.btn-overlay-close {
-	//		position: absolute;
-	//		top: 1px;
-	//		right: 1px;
-	//		z-index: 1000;
-
-	//		&::before {
-	//			font-size: $btn-icon-small-size * .75;
-	//		}
-	//	}
-	//}
-
-	.dashboard-widget-head .btn-icon,
-	.dashboard-widget-head a.btn-icon,
-	.btn-overlay-close {
-		width: 18px;
-		height: 18px;
-		min-height: 18px;
-
-		&::before {
-			font-size: $btn-icon-small-size;
-		}
-	}
-
 	&.modal {
 		position: fixed;
 		overflow: hidden;
@@ -2533,11 +2508,19 @@ $trigger-expression-tree-icons: (
 		.dashboard-widget-head {
 			margin-bottom: 12px;
 
-			.btn-icon,
 			a.btn-icon,
+			.btn-icon,
 			.btn-overlay-close {
+				position: initial;
+				width: 18px;
+				height: 18px;
+				min-height: 18px;
 				margin-top: -9px;
 				margin-left: 4px;
+
+				&::before {
+					font-size: $btn-icon-small-size;
+				}
 
 				&:last-child {
 					margin-right: -6px;

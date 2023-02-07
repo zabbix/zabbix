@@ -42,7 +42,7 @@ svg *:focus {
 @font-face {
   font-family: "zabbix-icons";
   src: url("../fonts/zabbix-icons.woff2?t=1675758509683") format("woff2"), url("../fonts/zabbix-icons.woff?t=1675758509683") format("woff"), url("../fonts/zabbix-icons.ttf?t=1675758509683") format("truetype"), url("../fonts/zabbix-icons.svg?t=1675758509683#zabbix-icons") format("svg"); }
-[class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close {
+[class^="zi-"]::before, [class*=" zi-"]::before, button.btn-overlay-close, a.btn-overlay-close.btn-icon {
   font-family: 'zabbix-icons' !important;
   font-size: 16px;
   font-style: normal;
@@ -1068,7 +1068,7 @@ footer {
     .form-grid .table-forms-separator td {
       padding: 5px 5px 5px 0; }
 
-.btn-remove, .subfilter-disable-btn, .filter-container.tabfilter-container nav .zi-chevron-left,
+.filter-container.tabfilter-container nav .zi-chevron-left,
 .filter-container.tabfilter-container nav .zi-chevron-right,
 .filter-container.tabfilter-container nav .zi-chevron-down {
   display: inline-block;
@@ -1085,11 +1085,11 @@ footer {
   border-radius: 2px;
   opacity: .5;
   transition: opacity .2s ease-out; }
-  .btn-remove:hover, .subfilter-disable-btn:hover, .filter-container.tabfilter-container nav .zi-chevron-left:hover,
+  .filter-container.tabfilter-container nav .zi-chevron-left:hover,
   .filter-container.tabfilter-container nav .zi-chevron-right:hover,
-  .filter-container.tabfilter-container nav .zi-chevron-down:hover, .btn-remove:focus, .subfilter-disable-btn:focus, .filter-container.tabfilter-container nav .zi-chevron-left:focus,
+  .filter-container.tabfilter-container nav .zi-chevron-down:hover, .filter-container.tabfilter-container nav .zi-chevron-left:focus,
   .filter-container.tabfilter-container nav .zi-chevron-right:focus,
-  .filter-container.tabfilter-container nav .zi-chevron-down:focus, .btn-remove:active, .subfilter-disable-btn:active, .filter-container.tabfilter-container nav .zi-chevron-left:active,
+  .filter-container.tabfilter-container nav .zi-chevron-down:focus, .filter-container.tabfilter-container nav .zi-chevron-left:active,
   .filter-container.tabfilter-container nav .zi-chevron-right:active,
   .filter-container.tabfilter-container nav .zi-chevron-down:active {
     text-decoration: none;
@@ -1097,11 +1097,11 @@ footer {
     outline: none;
     opacity: 1; }
 
-button[class^="zi-"], a[class^="zi-"].btn-icon, button[class*=" zi-"], a[class*=" zi-"].btn-icon, .btn-overlay-close {
+button[class^="zi-"], a[class^="zi-"].btn-icon, button[class*=" zi-"], a[class*=" zi-"].btn-icon, button.btn-overlay-close, a.btn-overlay-close.btn-icon {
   display: inline-flex;
   align-items: center;
   vertical-align: top; }
-  button[class^="zi-"]:empty, a[class^="zi-"].btn-icon:empty, button[class*=" zi-"]:empty, a[class*=" zi-"].btn-icon:empty, .btn-overlay-close:empty {
+  button[class^="zi-"]:empty, a[class^="zi-"].btn-icon:empty, button[class*=" zi-"]:empty, a[class*=" zi-"].btn-icon:empty, button.btn-overlay-close:empty, a.btn-overlay-close.btn-icon:empty {
     justify-content: center; }
 
 button, a.btn-icon {
@@ -1162,81 +1162,66 @@ button, a.btn-icon {
   .btn-grey:focus, .btn-grey:active {
     border-color: #000000; }
 
-.btn-icon,
 a.btn-icon,
+.btn-icon,
 .btn-overlay-close {
   background: transparent;
   border: none; }
-  .btn-icon::before,
   a.btn-icon::before,
+  .btn-icon::before,
   .btn-overlay-close::before {
     color: #bfcacf; }
-  .btn-icon:hover, .btn-icon:focus, .btn-icon:active,
-  a.btn-icon:hover,
-  a.btn-icon:focus,
-  a.btn-icon:active,
+  a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:active,
+  .btn-icon:hover,
+  .btn-icon:focus,
+  .btn-icon:active,
   .btn-overlay-close:hover,
   .btn-overlay-close:focus,
   .btn-overlay-close:active {
     background: transparent; }
-    .btn-icon:hover::before, .btn-icon:focus::before, .btn-icon:active::before,
-    a.btn-icon:hover::before,
-    a.btn-icon:focus::before,
-    a.btn-icon:active::before,
+    a.btn-icon:hover::before, a.btn-icon:focus::before, a.btn-icon:active::before,
+    .btn-icon:hover::before,
+    .btn-icon:focus::before,
+    .btn-icon:active::before,
     .btn-overlay-close:hover::before,
     .btn-overlay-close:focus::before,
     .btn-overlay-close:active::before {
       color: #768d99; }
-  .btn-icon[disabled],
   a.btn-icon[disabled],
+  .btn-icon[disabled],
   .btn-overlay-close[disabled] {
     cursor: default; }
-    .btn-icon[disabled], .btn-icon[disabled]:hover, .btn-icon[disabled]:focus, .btn-icon[disabled]:active,
-    a.btn-icon[disabled],
-    a.btn-icon[disabled]:hover,
-    a.btn-icon[disabled]:focus,
-    a.btn-icon[disabled]:active,
+    a.btn-icon[disabled], a.btn-icon[disabled]:hover, a.btn-icon[disabled]:focus, a.btn-icon[disabled]:active,
+    .btn-icon[disabled],
+    .btn-icon[disabled]:hover,
+    .btn-icon[disabled]:focus,
+    .btn-icon[disabled]:active,
     .btn-overlay-close[disabled],
     .btn-overlay-close[disabled]:hover,
     .btn-overlay-close[disabled]:focus,
     .btn-overlay-close[disabled]:active {
       background: transparent; }
-      .btn-icon[disabled]::before, .btn-icon[disabled]:hover::before, .btn-icon[disabled]:focus::before, .btn-icon[disabled]:active::before,
-      a.btn-icon[disabled]::before,
-      a.btn-icon[disabled]:hover::before,
-      a.btn-icon[disabled]:focus::before,
-      a.btn-icon[disabled]:active::before,
+      a.btn-icon[disabled]::before, a.btn-icon[disabled]:hover::before, a.btn-icon[disabled]:focus::before, a.btn-icon[disabled]:active::before,
+      .btn-icon[disabled]::before,
+      .btn-icon[disabled]:hover::before,
+      .btn-icon[disabled]:focus::before,
+      .btn-icon[disabled]:active::before,
       .btn-overlay-close[disabled]::before,
       .btn-overlay-close[disabled]:hover::before,
       .btn-overlay-close[disabled]:focus::before,
       .btn-overlay-close[disabled]:active::before {
         color: #dce2e5; }
 
-.btn-overlay-close {
+button.btn-overlay-close, a.btn-overlay-close.btn-icon {
   position: absolute;
   top: 1px;
   right: 1px;
-  z-index: 1000; }
-  .btn-overlay-close::before {
+  z-index: 1000;
+  width: 18px;
+  min-height: 18px; }
+  button.btn-overlay-close::before, a.btn-overlay-close.btn-icon::before {
     content: "";
-    font-size: 12px; }
-
-.btn-remove:not(:first-child) {
-  margin-left: 5px; }
-
-.btn-remove[disabled], .btn-remove[disabled]:hover {
-  background-color: transparent;
-  opacity: .25; }
-
-.subfilter-disable-btn {
-  margin: 0;
-  color: #ffffff;
-  background-color: #333333;
-  opacity: 1; }
-  .subfilter-disable-btn:hover {
-    color: #f2f2f2; }
-  .subfilter-disable-btn:focus, .subfilter-disable-btn:active {
-    color: #e6e6e6; }
+    font-size: 10.2px; }
 
 .checkbox-list {
   display: grid;
@@ -5561,29 +5546,27 @@ z-select .zi-chevron-down,
   .overlay-dialogue .dashboard-widget-head {
     margin: -8px -10px 6px -10px;
     padding: 8px 10px; }
-  .overlay-dialogue .dashboard-widget-head .btn-icon,
-  .overlay-dialogue .dashboard-widget-head a.btn-icon,
-  .overlay-dialogue .btn-overlay-close {
-    width: 18px;
-    height: 18px;
-    min-height: 18px; }
-    .overlay-dialogue .dashboard-widget-head .btn-icon::before,
-    .overlay-dialogue .dashboard-widget-head a.btn-icon::before,
-    .overlay-dialogue .btn-overlay-close::before {
-      font-size: 12px; }
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
     margin: 0 10px; }
     .overlay-dialogue.modal .dashboard-widget-head {
       margin-bottom: 12px; }
-      .overlay-dialogue.modal .dashboard-widget-head .btn-icon,
       .overlay-dialogue.modal .dashboard-widget-head a.btn-icon,
+      .overlay-dialogue.modal .dashboard-widget-head .btn-icon,
       .overlay-dialogue.modal .dashboard-widget-head .btn-overlay-close {
+        position: initial;
+        width: 18px;
+        height: 18px;
+        min-height: 18px;
         margin-top: -9px;
         margin-left: 4px; }
-        .overlay-dialogue.modal .dashboard-widget-head .btn-icon:last-child,
+        .overlay-dialogue.modal .dashboard-widget-head a.btn-icon::before,
+        .overlay-dialogue.modal .dashboard-widget-head .btn-icon::before,
+        .overlay-dialogue.modal .dashboard-widget-head .btn-overlay-close::before {
+          font-size: 12px; }
         .overlay-dialogue.modal .dashboard-widget-head a.btn-icon:last-child,
+        .overlay-dialogue.modal .dashboard-widget-head .btn-icon:last-child,
         .overlay-dialogue.modal .dashboard-widget-head .btn-overlay-close:last-child {
           margin-right: -6px; }
     .overlay-dialogue.modal .overlay-dialogue-body {

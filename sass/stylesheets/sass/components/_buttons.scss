@@ -162,8 +162,8 @@ a.btn-icon {
 	@extend button;
 }
 
-.btn-icon,
 a.btn-icon,
+.btn-icon,
 .btn-overlay-close {
 	background: transparent;
 	border: none;
@@ -198,7 +198,7 @@ a.btn-icon,
 	}
 }
 
-.btn-overlay-close {
+button.btn-overlay-close {
 	@extend %btn-icon-position;
 	@extend %icons-font;
 
@@ -206,44 +206,46 @@ a.btn-icon,
 	top: 1px;
 	right: 1px;
 	z-index: 1000;
+	width: 18px;
+	min-height: 18px;
 
 	&::before {
 		content: $zi-remove;
-		font-size: $btn-icon-small-size;
+		font-size: $btn-icon-small-size *.85;
 	}
 }
 
 .btn-remove { // TODO - AS: should be removed
-	@extend %btn-icon;
+	//@extend %btn-icon;
 	//@extend %btn-remove-icon;
 
-	&:not(:first-child) {
-		margin-left: 5px;
-	}
+	//&:not(:first-child) {
+	//	margin-left: 5px;
+	//}
 }
 
 .btn-remove { // TODO - AS: should be removed
-	&[disabled],
-	&[disabled]:hover {
-		background-color: transparent;
-		opacity: .25;
-	}
+	//&[disabled],
+	//&[disabled]:hover {
+	//	background-color: transparent;
+	//	opacity: .25;
+	//}
 }
 
 .subfilter-disable-btn { // TODO - AS: should be removed
-	@extend %btn-icon;
+	//@extend %btn-icon;
 	//@extend %btn-remove-icon;
-	margin: 0;
-	color: $font-selected-color;
-	background-color: $ui-bg-selected-color;
-	opacity: 1;
+	//margin: 0;
+	//color: $font-selected-color;
+	//background-color: $ui-bg-selected-color;
+	//opacity: 1;
 
-	&:hover {
-		color: darken($font-selected-color, 5%);
-	}
+	//&:hover {
+	//	color: darken($font-selected-color, 5%);
+	//}
 
-	&:focus,
-	&:active {
-		color: darken($font-selected-color, 10%);
-	}
+	//&:focus,
+	//&:active {
+	//	color: darken($font-selected-color, 10%);
+	//}
 }
