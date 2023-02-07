@@ -695,28 +695,6 @@ static int	DBpatch_6030073(void)
 	return zbx_dbupgrade_attach_trigger_with_function_on_update("items", "name", "name_upper", "upper", "itemid");
 }
 
-static int	DBpatch_6030074(void)
-{
-	int		i;
-	const char	*values[] = {
-			"web.auditacts.filter.from", "web.actionlog.filter.from",
-			"web.auditacts.filter.to", "web.actionlog.filter.to",
-			"web.auditacts.filter.active", "web.actionlog.filter.active",
-			"web.auditacts.filter.userids", "web.actionlog.filter.userids"
-		};
-
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	for (i = 0; i < (int)ARRSIZE(values); i += 2)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 static int	DBpatch_6030075(void)
 {
 	const ZBX_FIELD	field = {"value_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
@@ -1475,29 +1453,6 @@ static int	DBpatch_6030157(void)
 static int	DBpatch_6030158(void)
 {
 	return DBcreate_index("event_symptom", "event_symptom_1", "cause_eventid", 0);
-}
-
-static int	DBpatch_6030159(void)
-{
-	int		i;
-	const char	*values[] = {
-			"web.actionconf.php.sort", "web.action.list.sort",
-			"web.actionconf.php.sortorder", "web.action.list.sortorder",
-			"web.actionconf.filter_name", "web.action.list.filter_name",
-			"web.actionconf.filter_status", "web.action.list.filter_status",
-			"web.actionconf.filter.active", "web.action.list.filter.active"
-		};
-
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	for (i = 0; i < (int)ARRSIZE(values); i += 2)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
-			return FAIL;
-	}
-
-	return SUCCEED;
 }
 
 static int	DBpatch_6030160(void)
@@ -4236,6 +4191,35 @@ static int	DBpatch_6030190(void)
 {
 	return DBdrop_field("media_type", "exec_params");
 }
+
+static int	DBpatch_6030191(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.auditacts.filter.from", "web.actionlog.filter.from",
+			"web.auditacts.filter.to", "web.actionlog.filter.to",
+			"web.auditacts.filter.active", "web.actionlog.filter.active",
+			"web.auditacts.filter.userids", "web.actionlog.filter.userids",
+			"web.actionconf.php.sort", "web.action.list.sort",
+			"web.actionconf.php.sortorder", "web.action.list.sortorder",
+			"web.actionconf.filter_name", "web.action.list.filter_name",
+			"web.actionconf.filter_status", "web.action.list.filter_status",
+			"web.actionconf.filter.active", "web.action.list.filter.active",
+			"web.maintenance.php.sortorder", "web.maintenance.list.sortorder",
+			"web.maintenance.php.sort", "web.maintenance.list.sort"
+		};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6030)
@@ -4316,7 +4300,6 @@ DBPATCH_ADD(6030070, 0, 1)
 DBPATCH_ADD(6030071, 0, 1)
 DBPATCH_ADD(6030072, 0, 1)
 DBPATCH_ADD(6030073, 0, 1)
-DBPATCH_ADD(6030074, 0, 1)
 DBPATCH_ADD(6030075, 0, 1)
 DBPATCH_ADD(6030076, 0, 1)
 DBPATCH_ADD(6030077, 0, 1)
@@ -4401,7 +4384,6 @@ DBPATCH_ADD(6030155, 0, 1)
 DBPATCH_ADD(6030156, 0, 1)
 DBPATCH_ADD(6030157, 0, 1)
 DBPATCH_ADD(6030158, 0, 1)
-DBPATCH_ADD(6030159, 0, 1)
 DBPATCH_ADD(6030160, 0, 1)
 DBPATCH_ADD(6030161, 0, 1)
 DBPATCH_ADD(6030162, 0, 1)
@@ -4433,5 +4415,6 @@ DBPATCH_ADD(6030187, 0, 1)
 DBPATCH_ADD(6030188, 0, 1)
 DBPATCH_ADD(6030189, 0, 1)
 DBPATCH_ADD(6030190, 0, 1)
+DBPATCH_ADD(6030191, 0, 1)
 
 DBPATCH_END()

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-13 11:39+0000\n"
+"PO-Revision-Date: 2023-02-07 06:52+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -1054,7 +1054,7 @@ msgstr "高级标签"
 
 #: app/views/popup.import.php:175
 msgid "Advanced options"
-msgstr ""
+msgstr " 高级选项"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -1783,7 +1783,7 @@ msgstr ""
 
 #: app/views/connector.edit.php:156
 msgid "Bearer token"
-msgstr ""
+msgstr "不记名令牌"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
@@ -2323,7 +2323,7 @@ msgstr "无法创建循环依赖关系。"
 #: app/controllers/CControllerConnectorCreate.php:89
 #: app/controllers/CControllerConnectorCreate.php:164
 msgid "Cannot create connector"
-msgstr ""
+msgstr "无法创建连接器"
 
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
@@ -2341,6 +2341,11 @@ msgstr "无法创建自动发现规则"
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "无法创建图标映射"
+
+#: app/controllers/CControllerMaintenanceCreate.php:72
+#: app/controllers/CControllerMaintenanceCreate.php:150
+msgid "Cannot create maintenance period"
+msgstr ""
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2397,7 +2402,7 @@ msgstr "无法删除已分配的用户角色\"%1$s\"。"
 #: app/controllers/CControllerConnectorDelete.php:68
 msgid "Cannot delete connector"
 msgid_plural "Cannot delete connectors"
-msgstr[0] ""
+msgstr[0] "无法删除连接器"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2515,6 +2520,11 @@ msgstr "无法删除监控项"
 #: maintenance.php:224
 msgid "Cannot delete maintenance"
 msgstr "无法删除维护"
+
+#: app/controllers/CControllerMaintenanceDelete.php:71
+msgid "Cannot delete maintenance period"
+msgid_plural "Cannot delete maintenance periods"
+msgstr[0] ""
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -2682,7 +2692,7 @@ msgstr[0] "无法禁用动作"
 #: app/controllers/CControllerConnectorDisable.php:77
 msgid "Cannot disable connector"
 msgid_plural "Cannot disable connectors"
-msgstr[0] ""
+msgstr[0] "无法禁用连接器"
 
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
@@ -2759,7 +2769,7 @@ msgstr[0] "无法启用动作"
 #: app/controllers/CControllerConnectorEnable.php:77
 msgid "Cannot enable connector"
 msgid_plural "Cannot enable connectors"
-msgstr[0] ""
+msgstr[0] "无法启用连接器"
 
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
@@ -3648,7 +3658,7 @@ msgstr "无法更新配置"
 #: app/controllers/CControllerConnectorUpdate.php:90
 #: app/controllers/CControllerConnectorUpdate.php:173
 msgid "Cannot update connector"
-msgstr ""
+msgstr "无法更新连接器"
 
 #: app/controllers/CControllerCorrelationCreate.php:47
 #: app/controllers/CControllerCorrelationUpdate.php:48
@@ -3755,6 +3765,11 @@ msgstr "无法更新宏"
 #: maintenance.php:119
 msgid "Cannot update maintenance"
 msgstr "无法更新维护"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:73
+#: app/controllers/CControllerMaintenanceUpdate.php:152
+msgid "Cannot update maintenance period"
+msgstr ""
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -4704,41 +4719,41 @@ msgstr "连接Proxy"
 #: app/controllers/CControllerAuditLogList.php:212
 #: app/views/connector.edit.php:283 app/views/connector.edit.php:297
 msgid "Connector"
-msgstr ""
+msgstr "连接器"
 
 #: include/classes/api/services/CConnector.php:446
 #, c-format
 msgid "Connector \"%1$s\" already exists."
-msgstr ""
+msgstr "连接器 \"%1$s\" 已存在."
 
 #: app/controllers/CControllerConnectorCreate.php:156
 msgid "Connector created"
-msgstr ""
+msgstr "连接器已创建"
 
 #: app/controllers/CControllerConnectorDelete.php:60
 msgid "Connector deleted"
 msgid_plural "Connectors deleted"
-msgstr[0] ""
+msgstr[0] "连接器已删除"
 
 #: app/controllers/CControllerConnectorDisable.php:69
 msgid "Connector disabled"
 msgid_plural "Connectors disabled"
-msgstr[0] ""
+msgstr[0] "连接器已禁用"
 
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
 msgid_plural "Connectors enabled"
-msgstr[0] ""
+msgstr[0] "连接器已启用"
 
 #: app/controllers/CControllerConnectorUpdate.php:165
 msgid "Connector updated"
-msgstr ""
+msgstr "连接器已更新"
 
 #: app/controllers/CControllerConnectorList.php:104
 #: app/views/connector.list.php:132 include/classes/helpers/CMenuHelper.php:360
 #: include/html.inc.php:891
 msgid "Connectors"
-msgstr ""
+msgstr "连接器"
 
 #: include/views/monitoring.sysmap.list.php:85
 #: include/views/monitoring.sysmap.list.php:86
@@ -4868,19 +4883,19 @@ msgstr "复制"
 #, c-format
 msgid "Copy %1$s graph"
 msgid_plural "Copy %1$s graphs"
-msgstr[0] ""
+msgstr[0] "复制图表 %1$s "
 
 #: app/views/copy.edit.php:36
 #, c-format
 msgid "Copy %1$s item"
 msgid_plural "Copy %1$s items"
-msgstr[0] ""
+msgstr[0] "复制监控项 %1$s "
 
 #: app/views/copy.edit.php:43
 #, c-format
 msgid "Copy %1$s trigger"
 msgid_plural "Copy %1$s triggers"
-msgstr[0] ""
+msgstr[0] "复制触发器 %1$s "
 
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
@@ -4947,15 +4962,15 @@ msgstr "监控日志文件行数统计。返回 整数"
 
 #: include/classes/data/CItemData.php:1802
 msgid "Count of values enqueued in the connector queue."
-msgstr ""
+msgstr "在连接器队列中排队的值的个数。"
 
 #: include/classes/data/CItemData.php:1638
 msgid "Count of values enqueued in the low-level discovery processing queue."
-msgstr "在LLD处理队列中排队的值的计数。"
+msgstr "在LLD处理队列中排队的值个数。"
 
 #: include/classes/data/CItemData.php:1642
 msgid "Count of values enqueued in the preprocessing queue."
-msgstr "在预处理队列中排队的值的计数。"
+msgstr "在预处理队列中排队的值个数。"
 
 #: app/views/administration.token.list.php:106
 #: app/views/administration.user.token.list.php:72
@@ -4988,7 +5003,7 @@ msgstr "创建背景"
 
 #: app/views/connector.list.php:139
 msgid "Create connector"
-msgstr ""
+msgstr "创建连接器"
 
 #: app/views/configuration.correlation.list.php:37
 msgid "Create correlation"
@@ -5489,7 +5504,7 @@ msgstr "数据存储期"
 
 #: app/views/connector.edit.php:54 app/views/connector.list.php:73
 msgid "Data type"
-msgstr ""
+msgstr "数据类型"
 
 #: include/classes/setup/CSetupWizard.php:565
 #: include/classes/setup/CSetupWizard.php:717
@@ -5918,11 +5933,11 @@ msgstr "删除选定的动作?"
 
 #: app/views/connector.edit.php:332 app/views/js/connector.list.js.php:129
 msgid "Delete selected connector?"
-msgstr ""
+msgstr "删除所选的连接器?"
 
 #: app/views/js/connector.list.js.php:128
 msgid "Delete selected connectors?"
-msgstr ""
+msgstr "删除所选的连接器?"
 
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
@@ -5996,6 +6011,10 @@ msgstr "删除所选定的监控项原型?"
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
 msgstr "删除所选的监控项?"
+
+#: app/views/js/maintenance.list.js.php:88
+msgid "Delete selected maintenance period?"
+msgstr ""
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -6357,11 +6376,11 @@ msgstr "禁用所选的动作?"
 
 #: app/views/js/connector.list.js.php:114
 msgid "Disable selected connector?"
-msgstr ""
+msgstr "禁用所选的连接器?"
 
 #: app/views/js/connector.list.js.php:113
 msgid "Disable selected connectors?"
-msgstr ""
+msgstr "禁用所选的连接器?"
 
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
@@ -7162,11 +7181,11 @@ msgstr "启用所选的动作?"
 
 #: app/views/js/connector.list.js.php:99
 msgid "Enable selected connector?"
-msgstr ""
+msgstr "启用所选的连接器?"
 
 #: app/views/js/connector.list.js.php:98
 msgid "Enable selected connectors?"
-msgstr ""
+msgstr "启用所选的连接器?"
 
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
@@ -7455,7 +7474,7 @@ msgstr[0] "事件更新"
 
 #: app/views/connector.edit.php:58 app/views/connector.list.php:99
 msgid "Events"
-msgstr ""
+msgstr "事件"
 
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
@@ -11955,7 +11974,7 @@ msgstr "位于给定键的 Windows 注册表值或键的列表。返回 JSON。"
 
 #: include/classes/data/CItemData.php:1831
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
-msgstr "Zabbix 代理列表，包括名称、模式、加密、压缩、版本、上次看到、主机数、项目数、每秒所需值 (vps) 和兼容性（当前/过期/不支持）。返回 JSON。"
+msgstr "Zabbix proxy列表，包括名称、模式、加密、压缩、版本、上次看到、主机数、项目数、每秒所需值 (vps) 和兼容性（当前/过期/不支持）。返回 JSON。"
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
@@ -12236,9 +12255,22 @@ msgstr "维护已删除"
 msgid "Maintenance period"
 msgstr "维护周期"
 
+#: app/controllers/CControllerMaintenanceCreate.php:142
+msgid "Maintenance period created"
+msgstr ""
+
+#: app/controllers/CControllerMaintenanceDelete.php:61
+msgid "Maintenance period deleted"
+msgid_plural "Maintenance periods deleted"
+msgstr[0] ""
+
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
 msgstr "维护期间长度"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:144
+msgid "Maintenance period updated"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -13402,7 +13434,7 @@ msgstr "新的触发条件"
 
 #: app/views/connector.edit.php:312 app/views/connector.edit.php:341
 msgid "New connector"
-msgstr ""
+msgstr "新连接器"
 
 #: app/controllers/CControllerDashboardView.php:154
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
@@ -13439,6 +13471,11 @@ msgstr "添加主机"
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
 msgstr "新建主机组"
+
+#: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
+#: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
+msgid "New maintenance period"
+msgstr ""
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
@@ -14456,7 +14493,7 @@ msgstr "一次性"
 
 #: include/classes/api/services/CDRule.php:488
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
-msgstr "只有Zabbix代理, SNMPv1,SNMPv2 和 SNMPv3检查才是独特的."
+msgstr "仅Zabbix agent, SNMPv1,SNMPv2 和 SNMPv3检查是独立的."
 
 #: include/classes/api/services/CMap.php:666
 #: include/classes/api/services/CMap.php:1120
@@ -15088,7 +15125,7 @@ msgstr "参数“esc_step_from”和“esc_step_to”必须一起设置。"
 
 #: include/views/configuration.host.discovery.edit.php:68
 msgid "Parent discovery rule"
-msgstr ""
+msgstr "父自动发现规则"
 
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.prototype.edit.php:64
@@ -15097,11 +15134,11 @@ msgstr "上层探索规则"
 
 #: include/views/configuration.graph.edit.php:88
 msgid "Parent graph"
-msgstr ""
+msgstr "父图表"
 
 #: include/views/configuration.graph.edit.php:91
 msgid "Parent graph prototype"
-msgstr ""
+msgstr "父图表原型"
 
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
@@ -15109,7 +15146,7 @@ msgstr "父图表"
 
 #: include/views/configuration.host.prototype.edit.php:81
 msgid "Parent host prototype"
-msgstr ""
+msgstr "父主机原型"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
@@ -15117,11 +15154,11 @@ msgstr "父主机值"
 
 #: include/views/configuration.item.edit.php:71
 msgid "Parent item"
-msgstr ""
+msgstr "父监控项"
 
 #: include/views/configuration.item.prototype.edit.php:70
 msgid "Parent item prototype"
-msgstr ""
+msgstr "父监控项原型"
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -15135,7 +15172,7 @@ msgstr "父服务"
 
 #: app/partials/configuration.tags.tab.php:38
 msgid "Parent template"
-msgstr ""
+msgstr "父模板"
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Parent templates"
@@ -15143,11 +15180,11 @@ msgstr "父模板"
 
 #: include/views/configuration.triggers.edit.php:104
 msgid "Parent trigger"
-msgstr ""
+msgstr "父触发器"
 
 #: include/views/configuration.trigger.prototype.edit.php:95
 msgid "Parent trigger prototype"
-msgstr ""
+msgstr "父触发器原型"
 
 #: include/views/configuration.trigger.prototype.edit.php:69
 #: include/views/configuration.triggers.edit.php:80
@@ -15156,7 +15193,7 @@ msgstr "上层触发器"
 
 #: include/views/configuration.httpconf.edit.php:76
 msgid "Parent web scenario"
-msgstr ""
+msgstr "父 web 场景"
 
 #: include/views/configuration.httpconf.edit.php:59
 msgid "Parent web scenarios"
@@ -15752,7 +15789,7 @@ msgstr "属性"
 
 #: app/views/connector.edit.php:47
 msgid "Protocol"
-msgstr ""
+msgstr "协议"
 
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
@@ -17318,7 +17355,7 @@ msgstr[0] "脚本已删除"
 
 #: app/views/popup.mediatypetest.edit.php:60
 msgid "Script does not have parameters."
-msgstr ""
+msgstr "脚本没有参数"
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
@@ -20607,7 +20644,7 @@ msgstr "已更新主机 \"%1$s\" 的状态。"
 
 #: include/events.inc.php:346
 msgid "Updating"
-msgstr ""
+msgstr "更新中"
 
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
@@ -21644,7 +21681,7 @@ msgstr "提供者"
 
 #: include/views/configuration.template.edit.php:93
 msgid "Vendor and version"
-msgstr ""
+msgstr "供应商及版本"
 
 #: include/items.inc.php:43
 msgid "Verbose"
@@ -22288,7 +22325,7 @@ msgstr "Zabbix 集成"
 
 #: app/views/connector.edit.php:49
 msgid "Zabbix Streaming Protocol v1.0"
-msgstr ""
+msgstr "Zabbix 流协议v1.0"
 
 #: include/classes/helpers/CMenuHelper.php:356
 msgid "Zabbix Technical Support"
@@ -22775,7 +22812,7 @@ msgstr "用户名和密码都应该存在或为空"
 
 #: include/classes/api/services/CTemplate.php:522
 msgid "both vendor_name and vendor_version should be either present or empty"
-msgstr ""
+msgstr "供应商名称和版本都应该存在或为空"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
