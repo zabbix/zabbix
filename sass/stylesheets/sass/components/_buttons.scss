@@ -25,22 +25,32 @@
 }
 
 %btn-remove-icon { // TODO - AS: should be checked and removed
-	font-size: 20px;
-	color: $font-alt-color;
-	text-align: center;
-	cursor: pointer;
+	//font-size: 20px;
+	//color: $font-alt-color;
+	//text-align: center;
+	//cursor: pointer;
 
-	&::before {
-		display: block;
-		content: '+';
-		transform: rotate(45deg);
-	}
+	//&::before {
+	//	display: block;
+	//	content: '+';
+	//	transform: rotate(45deg);
+	//}
 
-	&:hover,
-	&:focus,
-	&:active {
-		color: $font-alt-color;
-		outline: none;
+	//&:hover,
+	//&:focus,
+	//&:active {
+	//	color: $font-alt-color;
+	//	outline: none;
+	//}
+}
+
+%btn-icon-position {
+	display: inline-flex;
+	align-items: center;
+	vertical-align: top;
+
+	&:empty {
+		justify-content: center;
 	}
 }
 
@@ -79,17 +89,14 @@ button {
 		vertical-align: middle;
 	}
 
+	&:empty {
+		width: 24px;
+		padding: 0;
+	}
+
 	&[class^="zi-"],
 	&[class*=" zi-"] {
-		display: inline-flex;
-		align-items: center;
-		vertical-align: top;
-
-		&:empty {
-			justify-content: center;
-			width: 24px;
-			padding: 0;
-		}
+		@extend %btn-icon-position;
 
 		&:not(:empty) {
 			&::before {
@@ -156,7 +163,8 @@ a.btn-icon {
 }
 
 .btn-icon,
-a.btn-icon {
+a.btn-icon,
+.btn-overlay-close {
 	background: transparent;
 	border: none;
 
@@ -190,9 +198,24 @@ a.btn-icon {
 	}
 }
 
+.btn-overlay-close {
+	@extend %btn-icon-position;
+	@extend %icons-font;
+
+	position: absolute;
+	top: 1px;
+	right: 1px;
+	z-index: 1000;
+
+	&::before {
+		content: $zi-remove;
+		font-size: $btn-icon-small-size;
+	}
+}
+
 .btn-remove { // TODO - AS: should be removed
 	@extend %btn-icon;
-	@extend %btn-remove-icon;
+	//@extend %btn-remove-icon;
 
 	&:not(:first-child) {
 		margin-left: 5px;
@@ -207,9 +230,9 @@ a.btn-icon {
 	}
 }
 
-.subfilter-disable-btn {
+.subfilter-disable-btn { // TODO - AS: should be removed
 	@extend %btn-icon;
-	@extend %btn-remove-icon;
+	//@extend %btn-remove-icon;
 	margin: 0;
 	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;

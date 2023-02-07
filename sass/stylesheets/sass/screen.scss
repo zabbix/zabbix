@@ -2498,28 +2498,30 @@ $trigger-expression-tree-icons: (
 	.dashboard-widget-head {
 		margin: -8px -10px 6px -10px;
 		padding: 8px 10px;
+	}
 
-		.btn-icon,
-		a.btn-icon {
-			width: 18px;
-			height: 18px;
-			min-height: 18px;
-			margin-top: -9px;
-			margin-left: 4px;
+	//&:not(.modal) {
+	//	.btn-overlay-close {
+	//		position: absolute;
+	//		top: 1px;
+	//		right: 1px;
+	//		z-index: 1000;
 
-			&::before {
-				font-size: $btn-icon-small-size;
-			}
+	//		&::before {
+	//			font-size: $btn-icon-small-size * .75;
+	//		}
+	//	}
+	//}
 
-			&:last-child {
-				margin-right: -6px;
-			}
-		}
+	.dashboard-widget-head .btn-icon,
+	.dashboard-widget-head a.btn-icon,
+	.btn-overlay-close {
+		width: 18px;
+		height: 18px;
+		min-height: 18px;
 
-		.zi-remove {
-			&::before {
-				font-size: $btn-icon-size;
-			}
+		&::before {
+			font-size: $btn-icon-small-size;
 		}
 	}
 
@@ -2530,6 +2532,17 @@ $trigger-expression-tree-icons: (
 
 		.dashboard-widget-head {
 			margin-bottom: 12px;
+
+			.btn-icon,
+			a.btn-icon,
+			.btn-overlay-close {
+				margin-top: -9px;
+				margin-left: 4px;
+
+				&:last-child {
+					margin-right: -6px;
+				}
+			}
 		}
 
 		.overlay-dialogue-body {

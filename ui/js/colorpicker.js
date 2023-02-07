@@ -161,7 +161,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 
 				const $close = $('<button>', {
 					type: 'button',
-					class: 'btn-icon '+ ZBX_ICON_REMOVE,
+					class: 'btn-overlay-close',
 					title: t('S_CLOSE')
 				})
 					.on('click', (e) => {

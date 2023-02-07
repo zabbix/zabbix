@@ -49,7 +49,7 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.$header = jQuery('<h4>', {id: this.headerid});
 
 	const $close_btn = jQuery('<button>', {
-		class: 'btn-icon '+ ZBX_ICON_REMOVE,
+		class: 'btn-overlay-close',
 		title: t('S_CLOSE')
 	}).click(function(e) {
 		overlayDialogueDestroy(this.dialogueid);
@@ -413,7 +413,7 @@ Overlay.prototype.unsetProperty = function(key) {
 			break;
 
 		case 'doc_url':
-			const doc_link = this.$dialogue.$head[0].querySelector(ZBX_ICON_HELP);
+			const doc_link = this.$dialogue.$head[0].querySelector('.' + ZBX_ICON_HELP);
 			if (doc_link !== null) {
 				doc_link.remove();
 			}

@@ -111,17 +111,17 @@ $zi-z: "\ea69";
 
 @font-face {
 	font-family: "zabbix-icons";
-	src: url("#{$icons-path}zabbix-icons.woff2?t=1675092480310") format("woff2"),
-	url("#{$icons-path}zabbix-icons.woff?t=1675092480310") format("woff"),
-	url('#{$icons-path}zabbix-icons.ttf?t=1675092480310') format('truetype'),
-	url('#{$icons-path}zabbix-icons.svg?t=1675092480310#zabbix-icons') format('svg');
+	src: url("#{$icons-path}zabbix-icons.woff2?t=1675758509683") format("woff2"),
+	url("#{$icons-path}zabbix-icons.woff?t=1675758509683") format("woff"),
+	url('#{$icons-path}zabbix-icons.ttf?t=1675758509683') format('truetype'),
+	url('#{$icons-path}zabbix-icons.svg?t=1675758509683#zabbix-icons') format('svg');
 }
 
 %icons-font {
 	font-family: 'zabbix-icons' !important;
 	font-size: 16px;
 	font-style: normal;
-	line-height: 0;
+	line-height: 1;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }

@@ -1021,7 +1021,7 @@ class testUsersPasswordComplexity extends CWebTest {
 			$user_form->query('xpath://label[text()="Password"]//a')->one()->click();
 			$hint = $user_form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
 			$this->assertEquals($data['hint'], $hint->one()->getText());
-			$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+			$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 			$hint->waitUntilNotPresent();
 		}
 		else {

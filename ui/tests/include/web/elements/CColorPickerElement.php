@@ -54,7 +54,7 @@ class CColorPickerElement extends CElement {
 			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
 		}
 
-		$overlay->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible(); // TODO check
+		$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible(); // TODO check
 
 		return $this;
 	}
@@ -89,7 +89,7 @@ class CColorPickerElement extends CElement {
 	 * @return $this
 	 */
 	public function close() {
-		$this->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible();
+		$this->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 	}
 
 	/**

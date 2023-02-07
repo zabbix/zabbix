@@ -318,7 +318,7 @@ class testFormUpdateProblem extends CWebTest {
 				$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']/a')->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
 				$this->assertEquals($text, $hint->getText());
-				$hint->query('class:overlay-close-btn')->waitUntilClickable()->one()->click();
+				$hint->query('class:btn-overlay-close')->waitUntilClickable()->one()->click();
 			}
 		}
 

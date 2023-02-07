@@ -131,7 +131,7 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 	this.btn_close = document.createElement('button');
 	this.btn_close.setAttribute('title', locale['S_CLOSE']);
 	this.btn_close.setAttribute('type', 'button');
-	this.btn_close.className = 'overlay-close-btn';
+	this.btn_close.className = 'btn-overlay-close';
 
 	header.className = 'dashboard-widget-head cursor-move';
 	this.node.appendChild(header);

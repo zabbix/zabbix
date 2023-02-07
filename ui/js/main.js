@@ -482,7 +482,7 @@ var hintBox = {
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
 			var close_link = jQuery('<button>', {
-					'class': 'btn-icon '+ ZBX_ICON_REMOVE,
+					'class': 'btn-overlay-close',
 					'title': t('S_CLOSE')
 				}
 			)

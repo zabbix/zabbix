@@ -259,7 +259,7 @@ class testFormServicesServices extends CWebTest {
 		$this->assertEquals($hintbox, $hint->one()->getText());
 
 		// Close the hint-box.
-		$hint->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
 		// Check layout at Tags tab.

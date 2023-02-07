@@ -307,7 +307,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						"\nUser macros", $hint->one()->getText());
 
 				// Close the hint-box.
-				$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+				$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 				$hint->waitUntilNotPresent();
 
 				// Check default values with Advanced configuration = true.
@@ -1302,7 +1302,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			$this->assertEquals('This setting applies only to numeric data.', $hint->getText());
 
 			// Close the hint-box.
-			$hint->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click()->waitUntilNotVisible();
+			$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotVisible();
 		}
 		else {
 			// Check that warning item is not displayed.

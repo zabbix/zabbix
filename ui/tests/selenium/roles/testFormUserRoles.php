@@ -1433,7 +1433,7 @@ class testFormUserRoles extends CWebTest {
 										->one(false)->isValid()
 								);
 							}
-							$popup->query('class:overlay-close-btn')->one()->click();
+							$popup->query('class:btn-overlay-close')->one()->click();
 
 							// Leave only 3 tags in array as it is the maximal number of tags displayed in table per row.
 							array_splice($tags, 3);
