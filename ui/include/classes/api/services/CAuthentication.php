@@ -135,6 +135,17 @@ class CAuthentication extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		if (array_key_exists('ldap_auth_enabled', $auth) && $auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED) {
+			$ldap_servers_count = API::UserDirectory()->get([
+				'countOutput' => true,
+				'filter' => ['idp_type' => IDP_TYPE_LDAP]
+			]);
+
+			if (!$ldap_servers_count) {
+				static::exception(ZBX_API_ERROR_PARAMETERS, _('At least one LDAP server must exist.'));
+			}
+		}
+
 		if (array_key_exists('ldap_userdirectoryid', $auth) && $auth['ldap_userdirectoryid'] != 0) {
 			$exists = API::UserDirectory()->get([
 				'countOutput' => true,
