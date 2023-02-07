@@ -533,9 +533,24 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_tab
 			&(local_audit_entry_x));				\
 	if (NULL == found_audit_entry)						\
 	{									\
-		THIS_SHOULD_NEVER_HAPPEN;					\
-		exit(EXIT_FAILURE);						\
-	}									\
+		zbx_hashset_iter_t	iter;					\
+		zbx_audit_entry_t	**log_audit_entry;			\
+										\
+		zbx_hashset_iter_reset(&zbx_audit, &iter);			\
+		zabbix_log(LOG_LEVEL_INFORMATION, "Failed to find audit entry: " ZBX_FS_UI64 ", id_table: %d, "	\
+				"key: %s", id, id_table, key);							\
+		zabbix_log(LOG_LEVEL_INFORMATION, "Audit entries: ");						\
+														\
+		while (NULL != (log_audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))		\
+		{												\
+														\
+			zabbix_log(LOG_LEVEL_INFORMATION, "Audit entry existing id: " ZBX_FS_UI64  ", "		\
+					"id_table: %d",	(*log_audit_entry)->id, (*log_audit_entry)->id_table );	\
+		}												\
+														\
+		THIS_SHOULD_NEVER_HAPPEN;									\
+		exit(EXIT_FAILURE);										\
+	}													\
 
 void	zbx_audit_update_json_append_no_value(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key)

@@ -386,7 +386,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'maintenance.php',
+				'url' => 'zabbix.php?action=maintenance.list',
 				'title' =>	'Configuration of maintenance periods',
 				'header' => 'Maintenance periods',
 				'users' => [

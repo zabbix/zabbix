@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-10-27T14:24:41Z'
   template_groups:
     -
       uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
@@ -21,6 +20,9 @@ zabbix_export:
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420730-discussion-thread-for-official-zabbix-template-apc-ups
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Power

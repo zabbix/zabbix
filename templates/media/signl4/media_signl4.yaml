@@ -1,6 +1,5 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-10-16T09:33:51Z'
   media_types:
     -
       name: SIGNL4

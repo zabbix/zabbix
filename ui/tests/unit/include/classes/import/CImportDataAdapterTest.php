@@ -1900,7 +1900,6 @@ class CImportDataAdapterTest extends TestCase {
 		$adapter = $this->getAdapter($this->getMediaTypeXml());
 
 		$defaults = DB::getDefaults('media_type') + ['message_templates' => []];
-		unset($defaults['exec_params']);
 
 		$this->assertEquals($adapter->getMediaTypes(), [
 			[
@@ -1917,15 +1916,19 @@ class CImportDataAdapterTest extends TestCase {
 				'name' => 'Script without parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SCRIPT,
 				'exec_path' => 'script.sh',
-				'exec_params' => '',
-				'status' => MEDIA_TYPE_STATUS_ACTIVE
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'parameters' => []
 			] + $defaults,
 			[
 				'name' => 'Script with parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SCRIPT,
 				'exec_path' => 'script.sh',
-				'exec_params' => "100\n200\n300\n",
-				'status' => MEDIA_TYPE_STATUS_ACTIVE
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'parameters' => [
+					['sortorder' => '0', 'value' => 100],
+					['sortorder' => '1', 'value' => 200],
+					['sortorder' => '2', 'value' => 300]
+				]
 			] + $defaults,
 			[
 				'name' => 'SMS',

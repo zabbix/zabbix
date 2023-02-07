@@ -2382,7 +2382,10 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 			case CXmlConstantName::SCRIPT:
 			case CXmlConstantValue::MEDIA_TYPE_SCRIPT:
 				return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-					'parameter' => ['type' => XML_STRING]
+					'parameter' => ['type' => XML_ARRAY, 'rules' => [
+						'sortorder' => ['type' => XML_STRING | XML_REQUIRED],
+						'value' => ['type' => XML_STRING, 'default' => '']
+					]]
 				]];
 
 			case CXmlConstantName::WEBHOOK:

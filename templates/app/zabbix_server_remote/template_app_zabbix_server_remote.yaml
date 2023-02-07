@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2023-02-01T09:10:22Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -16,6 +15,9 @@ zabbix_export:
         Specify the address of the remote Zabbix server by changing {$ADDRESS} and {$PORT} macros. Don't forget to adjust the "StatsAllowedIP" parameter in the remote server's configuration file to allow the collection of statistics.
         
         Template tooling version used: 0.43
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications
