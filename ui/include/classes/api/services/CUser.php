@@ -321,6 +321,14 @@ class CUser extends CApiService {
 		}
 
 		foreach ($users as $i => &$user) {
+			if (array_key_exists('userdirectoryid', $user) && $user['userdirectoryid'] != 0) {
+				if (array_key_exists('passwd', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Not allowed to update field "%1$s" for provisioned user.', 'passwd')
+					);
+				}
+			}
+
 			$user = $this->checkLoginOptions($user);
 
 			if (array_key_exists('passwd', $user)) {
