@@ -22,6 +22,7 @@ Bug fixes:
 .........T [ZBX-21597] optimized Remote Zabbix server health template to spread load across workers and updated descriptions (drasikhov)
 .........T [ZBX-21602] optimized Zabbix server health template to spread load across workers and updated descriptions (drasikhov)
 .......PS. [ZBX-22032] added a cookie engine to HTTP checks (askolmeisters)
+..F....... [ZBX-22222] fixed applying item value maps on already converted values (averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta6
