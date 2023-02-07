@@ -88,6 +88,17 @@ struct zbx_timekeeper
 	zbx_mem_free_func_t	mem_free_func;
 };
 
+static clock_t	zbx_times(void)
+{
+#if !defined(TIMES_NULL_ARG)
+	struct tms	buf;
+
+	return times(&buf);
+#else
+	return times(NULL);
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize timekeeper sync object                                 *
@@ -267,14 +278,13 @@ void	zbx_timekeeper_update(zbx_timekeeper_t *timekeeper, int index, unsigned cha
 {
 	zbx_timekeeper_unit_t	*unit;
 	clock_t			ticks;
-	struct tms		buf;
 
 	if (0 > index || index >= timekeeper->units_num)
 		return;
 
 	unit = timekeeper->units + index;
 
-	if (-1 == (ticks = times(&buf)))
+	if (-1 == (ticks = zbx_times()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get process times: %s", zbx_strerror(errno));
 		unit->cache.state = state;
@@ -338,12 +348,11 @@ void	zbx_timekeeper_collect(zbx_timekeeper_t *timekeeper)
 {
 	zbx_timekeeper_unit_t	*unit;
 	clock_t			ticks, ticks_done;
-	struct tms		buf;
 	int			i, index, last;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (-1 == (ticks = times(&buf)))
+	if (-1 == (ticks = zbx_times()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get process times: %s", zbx_strerror(errno));
 		goto out;
