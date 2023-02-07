@@ -437,6 +437,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() param:%s", __func__, param);
 
 	zbx_timespec(&es->env->start_time);
+	es->env->http_req_objects = 0;
 
 	if (NULL != es->env->json)
 	{
