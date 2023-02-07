@@ -182,7 +182,8 @@ class testDashboardURLWidget extends CWebTest {
 
 	public function testDashboardURLWidget_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
+		$dashboard = CDashboardElement::find()->one();
+		$dialog = $dashboard->edit()->addWidget();
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form = $dialog->asForm();
 
@@ -223,17 +224,16 @@ class testDashboardURLWidget extends CWebTest {
 
 		// Check if buttons present and clickable.
 		$this->assertEquals(2, $dialog->query('button', ['Add', 'Cancel'])->all()
-			->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
-		COverlayDialogElement::find()->one()->close();
-		COverlayDialogElement::ensureNotPresent();
-		CDashboardElement::find()->one()->save();
+		$dialog->close();
+		$dashboard->save();
 
 		// Check parameter 'Dynamic item' true/false state.
 		$dashboard = CDashboardElement::find()->one();
 		$this->assertTrue($dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one()->isVisible());
 		$this->assertEquals('No host selected.', $dashboard->getWidget(self::$default_widget)
-			->query('class:nothing-to-show')->one()->getText());
+				->query('class:nothing-to-show')->one()->getText());
 		$dashboard->getWidget(self::$default_widget)->edit();
 		$this->assertEquals('Edit widget', $dialog->getTitle());
 		$form->fill(['Dynamic item' => false])->submit();
@@ -588,7 +588,7 @@ class testDashboardURLWidget extends CWebTest {
 		// Confirm that widget is not present on dashboard.
 		$this->assertFalse($dashboard->getWidget(self::$delete_widget, false)->isValid());
 		$widget_sql = 'SELECT NULL FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
-			' WHERE w.name='.zbx_dbstr(self::$delete_widget);
+				' WHERE w.name='.zbx_dbstr(self::$delete_widget);
 		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
 	}
 
