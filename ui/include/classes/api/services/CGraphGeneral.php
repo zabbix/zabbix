@@ -121,7 +121,9 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		$this->validateUpdate($graphs, $db_graphs);
+		if ($graphs) {
+			$this->validateUpdate($graphs, $db_graphs);
+		}
 
 		foreach ($graphs as &$graph) {
 			unset($graph['templateid']);
@@ -150,8 +152,10 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		$this->updateReal($graphs);
-		$this->inherit($graphs);
+		if ($graphs) {
+			$this->updateReal($graphs);
+			$this->inherit($graphs);
+		}
 
 		$resource = ($this instanceof CGraph) ? CAudit::RESOURCE_GRAPH : CAudit::RESOURCE_GRAPH_PROTOTYPE;
 		$this->addAuditBulk(CAudit::ACTION_UPDATE, $resource, $graphs, $db_graphs);
