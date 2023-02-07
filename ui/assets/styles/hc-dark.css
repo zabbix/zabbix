@@ -2088,7 +2088,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .msg-bad button,
   .msg-good button,
   .msg-warning button {
-    background-color: #000000 !important; }
+    background-color: transparent; }
   .msg-bad::before,
   .msg-good::before,
   .msg-warning::before {
@@ -2122,7 +2122,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .msg-bad ul {
     border-top-color: #ff3a3a; }
   .msg-bad button {
-    color: #ff3a3a;
+    color: #ffffff;
     border-color: #ff3a3a; }
   .msg-bad::before {
     background-color: #ff3a3a; }
