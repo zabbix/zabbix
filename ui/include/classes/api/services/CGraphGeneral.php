@@ -116,7 +116,9 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		$this->validateUpdate($graphs, $dbGraphs);
+		if ($graphs) {
+			$this->validateUpdate($graphs, $dbGraphs);
+		}
 
 		foreach ($graphs as &$graph) {
 			unset($graph['templateid']);
