@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-31T15:38:06Z'
+  date: '2023-02-07T06:19:25Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -259,7 +259,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..act.first()
+                    - $.act
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -285,7 +285,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..bck.first()
+                    - $.bck
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -313,7 +313,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..bin.first()
+                    - $.bin
                 -
                   type: MULTIPLIER
                   parameters:
@@ -345,7 +345,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..bout.first()
+                    - $.bout
                 -
                   type: MULTIPLIER
                   parameters:
@@ -376,7 +376,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..dresp.first()
+                    - $.dresp
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -403,7 +403,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..econ.first()
+                    - $.econ
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -430,7 +430,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..eresp.first()
+                    - $.eresp
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -469,7 +469,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_1xx.first()
+                    - $.hrsp_1xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -496,7 +496,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_2xx.first()
+                    - $.hrsp_2xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -523,7 +523,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_3xx.first()
+                    - $.hrsp_3xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -550,7 +550,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_4xx.first()
+                    - $.hrsp_4xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -577,7 +577,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_5xx.first()
+                    - $.hrsp_5xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -603,7 +603,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..qcur.first()
+                    - $.qcur
               master_item:
                 key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
@@ -639,7 +639,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..qtime.first()
+                    - $.qtime
                 -
                   type: MULTIPLIER
                   parameters:
@@ -679,7 +679,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')]'
+                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].first()'
               master_item:
                 key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
               tags:
@@ -703,7 +703,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..rtime.first()
+                    - $.rtime
                 -
                   type: MULTIPLIER
                   parameters:
@@ -750,7 +750,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..status.first()
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -789,7 +789,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..stot.first()
+                    - $.stot
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -815,7 +815,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..weight.first()
+                    - $.weight
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -842,7 +842,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..wredis.first()
+                    - $.wredis
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -869,7 +869,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..wretr.first()
+                    - $.wretr
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1012,7 +1012,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..bin.first()
+                    - $.bin
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1044,7 +1044,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..bout.first()
+                    - $.bout
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1075,7 +1075,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..dreq.first()
+                    - $.dreq
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1114,7 +1114,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..ereq.first()
+                    - $.ereq
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1153,7 +1153,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_1xx.first()
+                    - $.hrsp_1xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1180,7 +1180,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_2xx.first()
+                    - $.hrsp_2xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1207,7 +1207,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_3xx.first()
+                    - $.hrsp_3xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1234,7 +1234,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_4xx.first()
+                    - $.hrsp_4xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1261,7 +1261,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_5xx.first()
+                    - $.hrsp_5xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1287,7 +1287,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..rate.first()
+                    - $.rate
               master_item:
                 key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
@@ -1311,7 +1311,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')]'
+                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].first()'
               master_item:
                 key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
               tags:
@@ -1333,7 +1333,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..req_rate.first()
+                    - $.req_rate
               master_item:
                 key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
@@ -1355,7 +1355,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..scur.first()
+                    - $.scur
               master_item:
                 key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
@@ -1377,7 +1377,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..slim.first()
+                    - $.slim
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1407,7 +1407,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..status.first()
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1595,7 +1595,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..act.first()
+                    - $.act
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1626,7 +1626,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..bck.first()
+                    - $.bck
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1657,7 +1657,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..bin.first()
+                    - $.bin
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1692,7 +1692,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..bout.first()
+                    - $.bout
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1743,7 +1743,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..check_status.first()
+                    - $.check_status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1789,7 +1789,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..dresp.first()
+                    - $.dresp
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1819,7 +1819,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..econ.first()
+                    - $.econ
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1849,7 +1849,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..eresp.first()
+                    - $.eresp
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1891,7 +1891,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_1xx.first()
+                    - $.hrsp_1xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1921,7 +1921,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_2xx.first()
+                    - $.hrsp_2xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1951,7 +1951,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_3xx.first()
+                    - $.hrsp_3xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1981,7 +1981,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_4xx.first()
+                    - $.hrsp_4xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -2011,7 +2011,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..hrsp_5xx.first()
+                    - $.hrsp_5xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -2041,7 +2041,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..lbtot.first()
+                    - $.lbtot
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -2070,7 +2070,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..qcur.first()
+                    - $.qcur
               master_item:
                 key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
@@ -2107,7 +2107,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..qlimit.first()
+                    - $.qlimit
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2144,7 +2144,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..qtime.first()
+                    - $.qtime
                 -
                   type: MULTIPLIER
                   parameters:
@@ -2187,7 +2187,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')]'
+                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].first()'
               master_item:
                 key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
               tags:
@@ -2214,7 +2214,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..rtime.first()
+                    - $.rtime
                 -
                   type: MULTIPLIER
                   parameters:
@@ -2256,7 +2256,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..status.first()
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2298,7 +2298,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..stot.first()
+                    - $.stot
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -2327,7 +2327,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..weight.first()
+                    - $.weight
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2357,7 +2357,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..wredis.first()
+                    - $.wredis
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -2387,7 +2387,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..wretr.first()
+                    - $.wretr
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
