@@ -1612,7 +1612,7 @@ clean:
  *                                                                            *
  * Purpose: execute a select statement                                        *
  *                                                                            *
- * Return value: data, NULL (on error) or (DB_RESULT)ZBX_DB_DOWN              *
+ * Return value: data, NULL (on error) or (zbx_db_result_t)ZBX_DB_DOWN        *
  *                                                                            *
  ******************************************************************************/
 zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
