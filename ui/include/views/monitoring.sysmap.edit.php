@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,12 +31,14 @@ $html_page = (new CHtmlPage())
 
 $tabs = new CTabView();
 
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
 // Create sysmap form.
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sysmaps.php')))->removeId())
 	->setId('sysmap-form')
 	->setName('map.edit.php')
 	->addVar('form', getRequest('form', 1))
@@ -422,7 +424,9 @@ if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !
 		[
 			new	CButton('clone', _('Clone')),
 			new CButton('full_clone', _('Full clone')),
-			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid'])),
+			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid']).'&'.
+				CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('sysmaps.php')
+			),
 			new CButtonCancel()
 		]
 	));

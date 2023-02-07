@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,8 +45,10 @@
 #define ZBX_DBSYNC_OBJ_HTTPSTEP		14
 #define ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD	15
 #define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM	16
+#define ZBX_DBSYNC_OBJ_CONNECTOR	17
+#define ZBX_DBSYNC_OBJ_CONNECTOR_TAG	18
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		16
+#define ZBX_DBSYNC_OBJ_COUNT		18
 
 #define ZBX_DBSYNC_JOURNAL(X)		(X - 1)
 
@@ -355,19 +357,19 @@ static void	dbsync_prune_changelog(void)
 	last_prune_time = now;
 
 #ifndef HAVE_ORACLE
-	result = DBselect("select %s", ZBX_DB_TIMESTAMP());
+	result = zbx_db_select("select %s", ZBX_DB_TIMESTAMP());
 #else
-	result = DBselect("select %s from dual", ZBX_DB_TIMESTAMP());
+	result = zbx_db_select("select %s from dual", ZBX_DB_TIMESTAMP());
 #endif
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		int	changelog_num;
 
 		changelog_num = dbsync_env.changelog.num_data;
 		now = atoi(row[0]);
 
-		if (ZBX_DB_OK <= DBexecute("delete from changelog where clock<%d", now - ZBX_DBSYNC_CHANGELOG_MAX_AGE))
+		if (ZBX_DB_OK <= zbx_db_execute("delete from changelog where clock<%d", now - ZBX_DBSYNC_CHANGELOG_MAX_AGE))
 		{
 			zbx_hashset_iter_t	iter;
 
@@ -383,7 +385,7 @@ static void	dbsync_prune_changelog(void)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 /******************************************************************************
@@ -450,9 +452,9 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 
 	if (ZBX_DBSYNC_INIT == mode)
 	{
-		result = DBselect("select changelogid,clock from changelog");
+		result = zbx_db_select("select changelogid,clock from changelog");
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			ZBX_DBROW2UINT64(changelog_local.changelogid, row[0]);
 			changelog_local.clock = atoi(row[1]);
@@ -462,9 +464,9 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 	}
 	else
 	{
-		result = DBselect("select changelogid,object,objectid,operation,clock from changelog");
+		result = zbx_db_select("select changelogid,object,objectid,operation,clock from changelog");
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			int				operation;
 			zbx_dbsync_journal_t		*journal;
@@ -498,7 +500,7 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 			changelog_num++;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
 	{
@@ -615,16 +617,16 @@ static int	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, si
 	for (batch = ids->values; batch < ids->values + ids->values_num; batch += ZBX_DBSYNC_BATCH_SIZE)
 	{
 		batch_size = MIN(ZBX_DBSYNC_BATCH_SIZE, ids->values + ids->values_num - batch);
-		DBadd_condition_alloc(sql, sql_alloc, sql_offset, field, batch, batch_size);
+		zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, field, batch, batch_size);
 		if (NULL != order_field)
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " order by %s", order_field);
 
-		if (NULL == (result = DBselect("%s", *sql)))
+		if (NULL == (result = zbx_db_select("%s", *sql)))
 			return FAIL;
 
 		*sql_offset = sql_offset_reset;
 
-		while (NULL != (dbrow = DBfetch(result)))
+		while (NULL != (dbrow = zbx_db_fetch(result)))
 		{
 			ZBX_STR2UINT64(rowid, dbrow[0]);
 			if (NULL != (row = dbsync_preproc_row(sync, dbrow)))
@@ -632,7 +634,7 @@ static int	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, si
 
 			zbx_vector_uint64_append(&read_ids, rowid);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_sort(&read_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -758,7 +760,7 @@ void	zbx_dbsync_clear(zbx_dbsync_t *sync)
 	}
 	else
 	{
-		DBfree_result(sync->dbresult);
+		zbx_db_free_result(sync->dbresult);
 		sync->dbresult = NULL;
 	}
 }
@@ -796,7 +798,7 @@ int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsign
 	{
 		char	**dbrow;
 
-		if (NULL == (dbrow = DBfetch(sync->dbresult)))
+		if (NULL == (dbrow = zbx_db_fetch(sync->dbresult)))
 		{
 			*row = NULL;
 			return FAIL;
@@ -850,9 +852,9 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 {
 	DB_RESULT	result;
 
-#define SELECTED_CONFIG_FIELD_COUNT	33	/* number of columns in the following DBselect() */
+#define SELECTED_CONFIG_FIELD_COUNT	33	/* number of columns in the following zbx_db_select() */
 
-	if (NULL == (result = DBselect("select discovery_groupid,snmptrap_logging,"
+	if (NULL == (result = zbx_db_select("select discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5,"
 				"hk_events_mode,hk_events_trigger,hk_events_internal,"
@@ -863,7 +865,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 				"compression_status,compress_older,instanceid,default_timezone,hk_events_service,"
 				"auditlog_enabled"
 			" from config"
-			" order by configid")))	/* if you change number of columns in DBselect(), */
+			" order by configid")))	/* if you change number of columns in zbx_db_select(), */
 						/* adjust SELECTED_CONFIG_FIELD_COUNT */
 	{
 		return FAIL;
@@ -877,7 +879,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* global configuration will be always synchronized directly with database */
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -900,8 +902,8 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
  *     On success this function produces a changeset with 0 or 1 record       *
  *     because 'config_autoreg_tls' table can have no more than 1 record.     *
  *     If in future you want to support multiple autoregistration PSKs and/or *
- *     select more columns in DBselect() then do not forget to sync changes   *
- *     with DCsync_autoreg_config() !!!                                       *
+ *     select more columns in zbx_db_select() then do not forget to sync      *
+ *     changes with DCsync_autoreg_config() !!!                               *
  *                                                                            *
  ******************************************************************************/
 int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
@@ -910,11 +912,11 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 	DB_ROW		dbrow;
 	int		num_records = 0;
 
-#define CONFIG_AUTOREG_TLS_FIELD_COUNT	2	/* number of columns in the following DBselect() */
+#define CONFIG_AUTOREG_TLS_FIELD_COUNT	2	/* number of columns in the following zbx_db_select() */
 
-	if (NULL == (result = DBselect("select tls_psk_identity,tls_psk"
+	if (NULL == (result = zbx_db_select("select tls_psk_identity,tls_psk"
 			" from config_autoreg_tls"
-			" order by autoreg_tlsid")))	/* if you change number of columns in DBselect(), */
+			" order by autoreg_tlsid")))	/* if you change number of columns in zbx_db_select(), */
 							/* adjust CONFIG_AUTOREG_TLS_FIELD_COUNT */
 	{
 		return FAIL;
@@ -930,7 +932,7 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 
 	/* 0 or 1 records are expected */
 
-	if (NULL != (dbrow = DBfetch(result)))
+	if (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -948,10 +950,10 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 	else if ('\0' != dbsync_env.cache->autoreg_psk_identity[0])
 			dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, NULL);
 
-	if (1 == num_records && NULL != DBfetch(result))
+	if (1 == num_records && NULL != zbx_db_fetch(result))
 		zabbix_log(LOG_LEVEL_ERR, "table 'config_autoreg_tls' has multiple records");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 #undef CONFIG_AUTOREG_TLS_FIELD_COUNT
@@ -973,7 +975,7 @@ int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT != sync->mode)
 		return SUCCEED;
 
-	if (NULL == (sync->dbresult = DBselect(
+	if (NULL == (sync->dbresult = zbx_db_select(
 			"select host,listen_ip,listen_dns,host_metadata,flags,listen_port"
 			" from autoreg_host"
 			" where proxy_hostid is null")))
@@ -1035,7 +1037,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -1109,7 +1111,7 @@ int	zbx_dbsync_compare_host_inventory(zbx_dbsync_t *sync)
 			"poc_2_cell,poc_2_screen,poc_2_notes"
 			" from host_inventory";
 
-	if (NULL == (result = DBselect("%s", sql)))
+	if (NULL == (result = zbx_db_select("%s", sql)))
 		return FAIL;
 
 	dbsync_prepare(sync, 72, NULL);
@@ -1123,7 +1125,7 @@ int	zbx_dbsync_compare_host_inventory(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->host_inventories.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -1151,7 +1153,7 @@ int	zbx_dbsync_compare_host_inventory(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1178,7 +1180,7 @@ int	zbx_dbsync_compare_host_templates(zbx_dbsync_t *sync)
 	char			hostid_s[MAX_ID_LEN + 1], templateid_s[MAX_ID_LEN + 1];
 	char			*del_row[2] = {hostid_s, templateid_s};
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select hostid,templateid"
 			" from hosts_templates"
 			" order by hostid")))
@@ -1210,7 +1212,7 @@ int	zbx_dbsync_compare_host_templates(zbx_dbsync_t *sync)
 	}
 
 	/* add new rows, remove existing rows from index */
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(ht_local.first, dbrow[0]);
 		ZBX_STR2UINT64(ht_local.second, dbrow[1]);
@@ -1230,7 +1232,7 @@ int	zbx_dbsync_compare_host_templates(zbx_dbsync_t *sync)
 		dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, del_row);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_hashset_destroy(&htmpls);
 
 	return SUCCEED;
@@ -1312,7 +1314,7 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid, *prowid = &rowid;
 	zbx_um_macro_t		**pmacro;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select globalmacroid,macro,value,type"
 			" from globalmacro")))
 	{
@@ -1330,7 +1332,7 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->gmacros.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -1354,7 +1356,7 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1438,7 +1440,7 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid, *prowid = &rowid;
 	zbx_um_macro_t		**pmacro;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select m.hostmacroid,m.hostid,m.macro,m.value,m.type"
 			" from hostmacro m"
 			" inner join hosts h on m.hostid=h.hostid"
@@ -1458,7 +1460,7 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->hmacros.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -1482,7 +1484,7 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1550,7 +1552,7 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const DB_
 
 	if (INTERFACE_TYPE_SNMP == interface->type)
 	{
-		if (NULL == snmp || SUCCEED == DBis_null(dbrow[12]))	/* should never happen */
+		if (NULL == snmp || SUCCEED == zbx_db_is_null(dbrow[12]))	/* should never happen */
 			return FAIL;
 
 		if (FAIL == dbsync_compare_uchar(dbrow[12], snmp->version))
@@ -1611,7 +1613,7 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	ZBX_DC_INTERFACE	*interface;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select i.interfaceid,i.hostid,i.type,i.main,i.useip,i.ip,i.dns,i.port,"
 			"i.available,i.disable_until,i.error,i.errors_from,"
 			"s.version,s.bulk,s.community,s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,"
@@ -1633,7 +1635,7 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->interfaces.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -1657,7 +1659,7 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1734,7 +1736,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -1771,7 +1773,7 @@ int	zbx_dbsync_compare_item_discovery(zbx_dbsync_t *sync)
 	ZBX_DC_ITEM_DISCOVERY	*item_discovery;
 	char			**row;
 
-	if (NULL == (result = DBselect("select itemid,parent_itemid from item_discovery")))
+	if (NULL == (result = zbx_db_select("select itemid,parent_itemid from item_discovery")))
 		return FAIL;
 
 	dbsync_prepare(sync, 2, NULL);
@@ -1785,7 +1787,7 @@ int	zbx_dbsync_compare_item_discovery(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->item_discovery.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -1814,7 +1816,7 @@ int	zbx_dbsync_compare_item_discovery(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1848,7 +1850,7 @@ int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync)
 	ZBX_DC_TEMPLATE_ITEM	*item;
 	char			**row;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select i.itemid,i.hostid,i.templateid from items i inner join hosts h on i.hostid=h.hostid"
 			" where h.status=%d", HOST_STATUS_TEMPLATE)))
 	{
@@ -1866,7 +1868,7 @@ int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->template_items.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -1895,7 +1897,7 @@ int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -1922,7 +1924,7 @@ int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -2034,7 +2036,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -2069,7 +2071,7 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
 	char			*del_row[2] = {down_s, up_s};
 	int			i;
 
-	if (NULL == (result = DBselect("select triggerid_down,triggerid_up from trigger_depends")))
+	if (NULL == (result = zbx_db_select("select triggerid_down,triggerid_up from trigger_depends")))
 		return FAIL;
 
 	dbsync_prepare(sync, 2, NULL);
@@ -2097,7 +2099,7 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
 	}
 
 	/* add new rows, remove existing rows from index */
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(dep_local.first, dbrow[0]);
 		ZBX_STR2UINT64(dep_local.second, dbrow[1]);
@@ -2117,7 +2119,7 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
 		dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, del_row);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_hashset_destroy(&deps);
 
 	return SUCCEED;
@@ -2173,7 +2175,7 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -2237,7 +2239,7 @@ int	zbx_dbsync_compare_expressions(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	ZBX_DC_EXPRESSION	*expression;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select r.name,e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 			" from regexps r,expressions e"
 			" where r.regexpid=e.regexpid")))
@@ -2256,7 +2258,7 @@ int	zbx_dbsync_compare_expressions(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->expressions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -2283,7 +2285,7 @@ int	zbx_dbsync_compare_expressions(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -2333,7 +2335,7 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_action_t		*action;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select actionid,eventsource,evaltype,formula"
 			" from actions"
 			" where eventsource<>%d"
@@ -2354,7 +2356,7 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->actions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -2378,7 +2380,7 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -2430,7 +2432,7 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid, actionid = 0;
 	unsigned char		opflags = ZBX_ACTION_OPCLASS_NONE;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select a.actionid,o.recovery"
 			" from actions a"
 			" left join operations o"
@@ -2445,7 +2447,7 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 
 	dbsync_prepare(sync, 2, NULL);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 
@@ -2456,7 +2458,7 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 			opflags = ZBX_ACTION_OPCLASS_NONE;
 		}
 
-		if (SUCCEED == DBis_null(dbrow[1]))
+		if (SUCCEED == zbx_db_is_null(dbrow[1]))
 			continue;
 
 		switch (atoi(dbrow[1]))
@@ -2475,7 +2477,7 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 
 	dbsync_compare_action_op(sync, actionid, opflags);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -2527,7 +2529,7 @@ int	zbx_dbsync_compare_action_conditions(zbx_dbsync_t *sync)
 	zbx_uint64_t			rowid;
 	zbx_dc_action_condition_t	*condition;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select c.conditionid,c.actionid,c.conditiontype,c.operator,c.value,c.value2"
 			" from conditions c,actions a"
 			" where c.actionid=a.actionid"
@@ -2548,7 +2550,7 @@ int	zbx_dbsync_compare_action_conditions(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->action_conditions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -2575,7 +2577,7 @@ int	zbx_dbsync_compare_action_conditions(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -2602,7 +2604,7 @@ int	zbx_dbsync_compare_trigger_tags(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -2637,7 +2639,7 @@ int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -2672,7 +2674,7 @@ int	zbx_dbsync_compare_host_tags(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -2729,7 +2731,7 @@ int	zbx_dbsync_compare_correlations(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_correlation_t	*correlation;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select correlationid,name,evaltype,formula"
 			" from correlation"
 			" where status=%d",
@@ -2749,7 +2751,7 @@ int	zbx_dbsync_compare_correlations(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->correlations.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -2776,7 +2778,7 @@ int	zbx_dbsync_compare_correlations(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -2855,7 +2857,7 @@ int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_corr_condition_t	*corr_condition;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select cc.corr_conditionid,cc.correlationid,cc.type,cct.tag,cctv.tag,cctv.value,cctv.operator,"
 				" ccg.groupid,ccg.operator,cctp.oldtag,cctp.newtag"
 			" from correlation c,corr_condition cc"
@@ -2885,7 +2887,7 @@ int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->corr_conditions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -2912,7 +2914,7 @@ int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -2960,7 +2962,7 @@ int	zbx_dbsync_compare_corr_operations(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_corr_operation_t	*corr_operation;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select co.corr_operationid,co.correlationid,co.type"
 			" from correlation c,corr_operation co"
 			" where c.correlationid=co.correlationid"
@@ -2981,7 +2983,7 @@ int	zbx_dbsync_compare_corr_operations(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->corr_operations.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -3008,7 +3010,7 @@ int	zbx_dbsync_compare_corr_operations(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3051,7 +3053,7 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_hostgroup_t	*group;
 
-	if (NULL == (result = DBselect("select groupid,name from hstgrp")))
+	if (NULL == (result = zbx_db_select("select groupid,name from hstgrp")))
 		return FAIL;
 
 	dbsync_prepare(sync, 2, NULL);
@@ -3065,7 +3067,7 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->hostgroups.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -3089,7 +3091,7 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3118,7 +3120,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -3205,7 +3207,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 	zbx_dc_scriptitem_param_t	*itemscript_params;
 	char				**row;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select p.item_parameterid,p.itemid,p.name,p.value,i.hostid"
 			" from item_parameter p,items i,hosts h"
 			" where p.itemid=i.itemid"
@@ -3230,7 +3232,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->itemscript_params.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -3262,7 +3264,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3286,7 +3288,7 @@ int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_maintenance_t	*maintenance;
 
-	if (NULL == (result = DBselect("select maintenanceid,maintenance_type,active_since,active_till,tags_evaltype"
+	if (NULL == (result = zbx_db_select("select maintenanceid,maintenance_type,active_since,active_till,tags_evaltype"
 						" from maintenances")))
 	{
 		return FAIL;
@@ -3303,7 +3305,7 @@ int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->maintenances.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -3329,7 +3331,7 @@ int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3378,7 +3380,7 @@ int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync)
 	zbx_uint64_t			rowid;
 	zbx_dc_maintenance_tag_t	*maintenance_tag;
 
-	if (NULL == (result = DBselect("select maintenancetagid,maintenanceid,operator,tag,value"
+	if (NULL == (result = zbx_db_select("select maintenancetagid,maintenanceid,operator,tag,value"
 						" from maintenance_tag")))
 	{
 		return FAIL;
@@ -3395,7 +3397,7 @@ int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->maintenance_tags.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -3422,7 +3424,7 @@ int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3487,7 +3489,7 @@ int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync)
 	zbx_uint64_t			rowid;
 	zbx_dc_maintenance_period_t	*period;
 
-	if (NULL == (result = DBselect("select t.timeperiodid,t.timeperiod_type,t.every,t.month,t.dayofweek,t.day,"
+	if (NULL == (result = zbx_db_select("select t.timeperiodid,t.timeperiod_type,t.every,t.month,t.dayofweek,t.day,"
 						"t.start_time,t.period,t.start_date,m.maintenanceid"
 					" from maintenances_windows m,timeperiods t"
 					" where t.timeperiodid=m.timeperiodid")))
@@ -3506,7 +3508,7 @@ int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync)
 	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->maintenance_periods.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
@@ -3533,7 +3535,7 @@ int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return SUCCEED;
 }
@@ -3560,7 +3562,7 @@ int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync)
 	char			maintenanceid_s[MAX_ID_LEN + 1], groupid_s[MAX_ID_LEN + 1];
 	char			*del_row[2] = {maintenanceid_s, groupid_s};
 
-	if (NULL == (result = DBselect("select maintenanceid,groupid from maintenances_groups order by maintenanceid")))
+	if (NULL == (result = zbx_db_select("select maintenanceid,groupid from maintenances_groups order by maintenanceid")))
 		return FAIL;
 
 	dbsync_prepare(sync, 2, NULL);
@@ -3587,7 +3589,7 @@ int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync)
 	}
 
 	/* add new rows, remove existing rows from index */
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(mg_local.first, dbrow[0]);
 		ZBX_STR2UINT64(mg_local.second, dbrow[1]);
@@ -3607,7 +3609,7 @@ int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync)
 		dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, del_row);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_hashset_destroy(&mgroups);
 
 	return SUCCEED;
@@ -3635,7 +3637,7 @@ int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync)
 	char			maintenanceid_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1];
 	char			*del_row[2] = {maintenanceid_s, hostid_s};
 
-	if (NULL == (result = DBselect("select maintenanceid,hostid from maintenances_hosts order by maintenanceid")))
+	if (NULL == (result = zbx_db_select("select maintenanceid,hostid from maintenances_hosts order by maintenanceid")))
 		return FAIL;
 
 	dbsync_prepare(sync, 2, NULL);
@@ -3662,7 +3664,7 @@ int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync)
 	}
 
 	/* add new rows, remove existing rows from index */
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(mh_local.first, dbrow[0]);
 		ZBX_STR2UINT64(mh_local.second, dbrow[1]);
@@ -3682,7 +3684,7 @@ int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync)
 		dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, del_row);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_hashset_destroy(&mhosts);
 
 	return SUCCEED;
@@ -3710,7 +3712,7 @@ int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
 	char			groupid_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1];
 	char			*del_row[2] = {groupid_s, hostid_s};
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select hg.groupid,hg.hostid"
 			" from hosts_groups hg,hosts h"
 			" where hg.hostid=h.hostid"
@@ -3747,7 +3749,7 @@ int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
 	}
 
 	/* add new rows, remove existing rows from index */
-	while (NULL != (dbrow = DBfetch(result)))
+	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(gh_local.first, dbrow[0]);
 		ZBX_STR2UINT64(gh_local.second, dbrow[1]);
@@ -3767,7 +3769,7 @@ int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
 		dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, del_row);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_hashset_destroy(&groups);
 
 	return SUCCEED;
@@ -3789,14 +3791,16 @@ int	zbx_dbsync_prepare_drules(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select druleid,proxy_hostid,delay,status from drules");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select druleid,proxy_hostid,delay,name,iprange,status from drules");
 
-	dbsync_prepare(sync, 4, NULL);
+	dbsync_prepare(sync, 6, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
+
 		goto out;
 	}
 
@@ -3824,13 +3828,17 @@ int	zbx_dbsync_prepare_dchecks(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select dcheckid,druleid from dchecks");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select dcheckid,druleid,type,key_,snmp_community,ports,snmpv3_securityname,"
+				"snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,uniq,"
+				"snmpv3_authprotocol,snmpv3_privprotocol,snmpv3_contextname"
+			" from dchecks");
 
-	dbsync_prepare(sync, 2, NULL);
+	dbsync_prepare(sync, 14, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -3865,7 +3873,7 @@ int	zbx_dbsync_prepare_httptests(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -3900,7 +3908,7 @@ int	zbx_dbsync_prepare_httptest_fields(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -3934,7 +3942,7 @@ int	zbx_dbsync_prepare_httpsteps(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -3968,7 +3976,7 @@ int	zbx_dbsync_prepare_httpstep_fields(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
@@ -3989,4 +3997,60 @@ out:
 void	zbx_dbsync_clear_user_macros(void)
 {
 	um_cache_remove_hosts(config->um_cache, &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)].deletes);
+}
+
+int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select connectorid,protocol,data_type,url,max_records,"
+			"max_senders,timeout,max_attempts,token,http_proxy,authtype,username,password,verify_peer,"
+			"verify_host,ssl_cert_file,ssl_key_file,ssl_key_password,status,"
+			"tags_evaltype"
+		" from connector");
+
+	dbsync_prepare(sync, 20, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "connectorid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CONNECTOR)]);
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
+
+int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select connector_tagid,connectorid,operator,tag,value"
+			" from connector_tag");
+
+	dbsync_prepare(sync, 5, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "connector_tagid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CONNECTOR_TAG)]);
+out:
+	zbx_free(sql);
+
+	return ret;
 }

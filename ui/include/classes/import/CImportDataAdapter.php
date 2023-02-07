@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,10 +79,17 @@ class CImportDataAdapter {
 			foreach ($this->data['templates'] as $template) {
 				$template = CArrayHelper::renameKeys($template, ['template' => 'host']);
 
-				$templates[] = CArrayHelper::getByKeys($template, [
-					'uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags',
-					'valuemaps'
-				]);
+				if ($template['vendor']) {
+					$template['vendor_name'] = $template['vendor']['name'];
+					$template['vendor_version'] = $template['vendor']['version'];
+				}
+				else {
+					$template += array_fill_keys(['vendor_name', 'vendor_version'], '');
+				}
+
+				$templates[] = array_intersect_key($template, array_flip(['uuid', 'host', 'name', 'description',
+					'vendor_name', 'vendor_version', 'groups', 'tags', 'macros'
+				]));
 			}
 		}
 
@@ -107,15 +114,47 @@ class CImportDataAdapter {
 					}
 				}
 
-				$hosts[] = CArrayHelper::getByKeys($host, [
-					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
-					'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name',
-					'inventory_mode', 'tags', 'valuemaps'
-				]);
+				$hosts[] = array_intersect_key($host,
+					array_flip(['inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
+						'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name',
+						'inventory_mode', 'tags'
+					])
+				);
 			}
 		}
 
 		return $hosts;
+	}
+
+	/**
+	 * Get value maps from the imported data.
+	 *
+	 * @return array
+	 */
+	public function getValueMaps(): array {
+		$valuemaps = [];
+
+		if (array_key_exists('hosts', $this->data)) {
+			foreach ($this->data['hosts'] as $host) {
+				if (array_key_exists('valuemaps', $host)) {
+					foreach ($host['valuemaps'] as $valuemap) {
+						$valuemaps[$host['host']][$valuemap['name']] = $valuemap;
+					}
+				}
+			}
+		}
+
+		if (array_key_exists('templates', $this->data)) {
+			foreach ($this->data['templates'] as $template) {
+				if (array_key_exists('valuemaps', $template)) {
+					foreach ($template['valuemaps'] as $valuemap) {
+						$valuemaps[$template['template']][$valuemap['name']] = $valuemap;
+					}
+				}
+			}
+		}
+
+		return $valuemaps;
 	}
 
 	/**
@@ -392,13 +431,6 @@ class CImportDataAdapter {
 						$message_template = CArrayHelper::renameKeys($message_template, $message_template_keys);
 					}
 					unset($message_template);
-				}
-
-				if ($media_type['type'] == MEDIA_TYPE_EXEC && array_key_exists('parameters', $media_type)) {
-					$media_type['exec_params'] = $media_type['parameters']
-						? implode("\n", $media_type['parameters'])."\n"
-						: '';
-					unset($media_type['parameters']);
 				}
 
 				$media_types[] = CArrayHelper::renameKeys($media_type, $keys);

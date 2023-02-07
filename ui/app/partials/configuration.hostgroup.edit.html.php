@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('hostgroup')))->removeId())
 	->setId('hostgroupForm')
 	->setName('hostgroupForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)

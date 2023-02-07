@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -226,7 +226,7 @@ static int	zbx_sql_add_interface_availability(const zbx_interface_availability_t
 	{
 		char	*error_esc;
 
-		error_esc = DBdyn_escape_field("interface", "error", ia->agent.error);
+		error_esc = zbx_db_dyn_escape_field("interface", "error", ia->agent.error);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cerror='%s'", delim, error_esc);
 		zbx_free(error_esc);
 		delim = ',';
@@ -266,8 +266,8 @@ void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t 
 	{
 		size_t	sql_offset = 0;
 
-		DBbegin();
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin();
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < interface_availabilities->values_num; i++)
 		{
@@ -278,15 +278,15 @@ void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t 
 			}
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 
-		txn_error = DBcommit();
+		txn_error = zbx_db_commit();
 	}
 	while (ZBX_DB_DOWN == txn_error);
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
@@ -76,17 +77,19 @@ if (!empty($data['hostid'])) {
 }
 
 // create table
+$object_label = null;
+
+if ($data['hostid'] == 0) {
+	$object_label = $data['context'] === 'host' ? _('Host') : _('Template');
+}
+
 $itemTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		'',
-		($data['hostid'] == 0)
-			? ($data['context'] === 'host')
-				? _('Host')
-				: _('Template')
-			: null,
+		$object_label,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Triggers'),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
@@ -101,20 +104,36 @@ $itemTable = (new CTableInfo())
 
 $current_time = time();
 
-$data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['itemTriggers'], [
+$data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
 	'html' => true,
 	'sources' => ['expression', 'recovery_expression'],
 	'context' => $data['context']
 ]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+$csrf_token = CCsrfTokenHelper::get('items.php');
 
 foreach ($data['items'] as $item) {
 	// description
 	$description = [];
-	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
-		$data['allowed_ui_conf_templates']
-	);
+
+	if (array_key_exists($item['templateid'], $data['parent_items'])) {
+		$parent_item = $data['parent_items'][$item['templateid']];
+
+		if ($parent_item['editable']) {
+			$parent_template_name = (new CLink(CHtml::encode($parent_item['template_name']),
+				(new CUrl('items.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$parent_item['templateid']])
+					->setArgument('context', 'template')
+			))->addClass(ZBX_STYLE_LINK_ALT);
+		}
+		else {
+			$parent_template_name = new CSpan(CHtml::encode($parent_item['template_name']));
+		}
+
+		$description[] = [$parent_template_name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
+	}
 
 	if (!empty($item['discoveryRule'])) {
 		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
@@ -166,9 +185,9 @@ foreach ($data['items'] as $item) {
 				)
 				->setArgument('context', $data['context'])
 				->setArgument('checkbox_hash', $data['checkbox_hash'])
-				->setArgumentSID()
 				->getUrl()
 		))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(itemIndicatorStyle($item['status'], $item['state']))
 	);
@@ -181,12 +200,39 @@ foreach ($data['items'] as $item) {
 		->getUrl();
 
 	foreach ($item['triggers'] as $num => &$trigger) {
-		$trigger = $data['itemTriggers'][$trigger['triggerid']];
+		$trigger = $data['triggers'][$trigger['triggerid']];
 
 		$trigger_description = [];
-		$trigger_description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates'],
-			ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
-		);
+
+		if (array_key_exists($trigger['templateid'], $data['parent_triggers'])) {
+			$parent_trigger = $data['parent_triggers'][$trigger['templateid']];
+
+			$parent_template_names = [];
+
+			foreach ($parent_trigger['template_names'] as $templateid => $template_name) {
+				if ($parent_template_names) {
+					$parent_template_names[] = ', ';
+				}
+
+				if ($parent_trigger['editable']) {
+					$parent_template_names[] = (new CLink(CHtml::encode($template_name),
+						(new CUrl('triggers.php'))
+							->setArgument('filter_hostids', [$templateid])
+							->setArgument('filter_set', 1)
+							->setArgument('context', 'template')
+					))
+						->addClass(ZBX_STYLE_LINK_ALT)
+						->addClass(ZBX_STYLE_GREY);
+				}
+				else {
+					$parent_template_names[] = (new CSpan(CHtml::encode($template_name)))->addClass(ZBX_STYLE_GREY);
+				}
+			}
+
+			$parent_template_names[] = NAME_DELIMITER;
+
+			$trigger_description[] = $parent_template_names;
+		}
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
@@ -296,14 +342,17 @@ foreach ($data['items'] as $item) {
 }
 
 $button_list = [
-	'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
-	'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?')]
+	'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?'), 'csrf_token' => $csrf_token],
+	'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 if ($data['context'] === 'host') {
 	$massclearhistory = [
 		'name' => _('Clear history'),
-		'confirm' => _('Delete history of selected items?')
+		'confirm' => _('Delete history of selected items?'),
+		'csrf_token' => $csrf_token
 	];
 
 	if ($data['config']['compression_status']) {
@@ -313,9 +362,8 @@ if ($data['context'] === 'host') {
 	$button_list += [
 		'item.masscheck_now' => [
 			'content' => (new CSimpleButton(_('Execute now')))
-				->onClick('view.massCheckNow(this);')
+				->addClass('js-execute-now')
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('no-chkbxrange')
 				->setAttribute('data-required', 'execute')
 		],
 		'item.massclearhistory' => $massclearhistory
@@ -323,11 +371,18 @@ if ($data['context'] === 'host') {
 }
 
 $button_list += [
-	'item.masscopyto' => ['name' => _('Copy')],
+	'item.masscopyto' => [
+		'content' => (new CSimpleButton(_('Copy')))
+			->addClass('js-copy')
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->removeId()
+	],
 	'popup.massupdate.item' => [
 		'content' => (new CButton('', _('Mass update')))
 			->onClick(
-				"openMassupdatePopup('popup.massupdate.item', {}, {
+				"openMassupdatePopup('popup.massupdate.item', {".
+					CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('item').
+				"'}, {
 					dialogue_class: 'modal-popup-preprocessing',
 					trigger_element: this
 				});"
@@ -335,13 +390,14 @@ $button_list += [
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->removeAttribute('id')
 	],
-	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
+	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?'), 'csrf_token' => $csrf_token]
 ];
 
 // Append table to form.
-$itemForm->addItem([$itemTable, $data['paging'], new CActionButtonList('action', 'group_itemid', $button_list,
-	$data['checkbox_hash']
-)]);
+$itemForm->addItem([
+	$itemTable, $data['paging'],
+	new CActionButtonList('action', 'group_itemid', $button_list, $data['checkbox_hash'])
+]);
 
 $html_page
 	->addItem($itemForm)

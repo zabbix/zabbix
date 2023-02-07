@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -529,7 +529,7 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 	}
 
 	if (0 != ids_num)
-		taskid = DBget_maxid_num("task", ids_num);
+		taskid = zbx_db_get_maxid_num("task", ids_num);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -660,8 +660,8 @@ void	zbx_tm_update_task_status(zbx_vector_tm_task_t *tasks, int status)
 	zbx_vector_uint64_sort(&taskids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where", status);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids.values, taskids.values_num);
-	DBexecute("%s", sql);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids.values, taskids.values_num);
+	zbx_db_execute("%s", sql);
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&taskids);
@@ -1160,18 +1160,18 @@ static zbx_uint64_t	zbx_create_task_data(const char *data, size_t len, zbx_uint6
 	zbx_tm_task_t	*task;
 	zbx_uint64_t	taskid;
 
-	taskid = DBget_maxid("task");
+	taskid = zbx_db_get_maxid("task");
 
 	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, time(NULL), ZBX_DATA_TTL, proxy_hostid);
 
 	task->data = zbx_tm_data_create(task->taskid, data, len, ZBX_TM_DATA_TYPE_TEST_ITEM);
 
-	DBbegin();
+	zbx_db_begin();
 
 	if (FAIL == zbx_tm_save_task(task))
 		taskid = 0;
 
-	DBcommit();
+	zbx_db_commit();
 
 	zbx_tm_task_free(task);
 
@@ -1197,23 +1197,23 @@ static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
 
 	for (time_start = time(NULL); ZBX_DATA_TTL > time(NULL) - time_start; sleep(1))
 	{
-		result = DBselect("select status,info"
+		result = zbx_db_select("select status,info"
 				" from task_result"
 				" where parent_taskid=" ZBX_FS_UI64,
 				taskid);
 
-		if (NULL != (row = DBfetch(result)))
+		if (NULL != (row = zbx_db_fetch(result)))
 		{
 			*info = zbx_strdup(NULL, row[1]);
 
 			if (SUCCEED != (ret = atoi(row[0])))
 				ret = FAIL;
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return ret;
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	*info = zbx_strdup(NULL, "Timeout while waiting for result.");

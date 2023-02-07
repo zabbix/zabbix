@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #include "zbxdbhigh.h"
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
-		int clock, int ns, int value, int severity, const zbx_vector_ptr_t *tags)
+		int clock, int ns, int value, int severity, const zbx_vector_tags_t *tags)
 {
 	zbx_uint32_t	data_len = 0, *len = NULL;
 	int		i;
@@ -42,7 +42,7 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 		len = (zbx_uint32_t *)zbx_malloc(NULL, sizeof(zbx_uint32_t) * 2 * (size_t)tags->values_num);
 		for (i = 0; i < tags->values_num; i++)
 		{
-			zbx_tag_t	*tag = (zbx_tag_t *)tags->values[i];
+			zbx_tag_t	*tag = tags->values[i];
 
 			zbx_serialize_prepare_str_len(data_len, tag->tag, len[i * 2]);
 			zbx_serialize_prepare_str_len(data_len, tag->value, len[i * 2 + 1]);
@@ -72,7 +72,7 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 
 	for (i = 0; i < tags->values_num; i++)
 	{
-		zbx_tag_t	*tag = (zbx_tag_t *)tags->values[i];
+		zbx_tag_t	*tag = tags->values[i];
 
 		ptr += zbx_serialize_str(ptr, tag->tag, len[i * 2]);
 		ptr += zbx_serialize_str(ptr, tag->value, len[i * 2 + 1]);
@@ -135,7 +135,7 @@ void	zbx_service_serialize_problem_tags(unsigned char **data, size_t *data_alloc
 		len = (zbx_uint32_t *)zbx_malloc(NULL, sizeof(zbx_uint32_t) * 2 * (size_t)tags->values_num);
 		for (i = 0; i < tags->values_num; i++)
 		{
-			zbx_tag_t	*tag = (zbx_tag_t *)tags->values[i];
+			zbx_tag_t	*tag = tags->values[i];
 
 			zbx_serialize_prepare_str_len(data_len, tag->tag, len[i * 2]);
 			zbx_serialize_prepare_str_len(data_len, tag->value, len[i * 2 + 1]);
@@ -161,7 +161,7 @@ void	zbx_service_serialize_problem_tags(unsigned char **data, size_t *data_alloc
 
 	for (i = 0; i < tags->values_num; i++)
 	{
-		zbx_tag_t	*tag = (zbx_tag_t *)tags->values[i];
+		zbx_tag_t	*tag = tags->values[i];
 
 		ptr += zbx_serialize_str(ptr, tag->tag, len[i * 2]);
 		ptr += zbx_serialize_str(ptr, tag->value, len[i * 2 + 1]);
@@ -283,7 +283,7 @@ void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t s
 
 	while (data < end)
 	{
-		ZBX_DB_SERVICE	*service, service_local;
+		zbx_db_service	*service, service_local;
 		int		values_num, i;
 
 		data += zbx_deserialize_value(data, &service_local.serviceid);

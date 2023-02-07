@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,3 +175,31 @@ function timer($timer = null) {
 function sdex($ex = 'My exception') {
 	throw new APIException(ZBX_API_ERROR_INTERNAL, $ex);
 }
+
+if (!function_exists('sdfjson')) {
+	function sdfjson() {
+		static $at;
+
+		if ($at === null) {
+			$at = microtime(true);
+		}
+
+		$prefix = (new DateTime('NOW'))->format('r.u')."\t".number_format(microtime(true) - $at, 3)."\n";
+		$file_handle = @fopen('/tmp/php_errors.log', 'a');
+
+		foreach(func_get_args() as $msg) {
+			fwrite($file_handle,
+				$prefix.
+				json_encode(
+					$msg,
+					JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES
+				)."\n\n"
+			);
+		}
+
+		fclose($file_handle);
+
+		$at = microtime(true);
+	}
+}
+

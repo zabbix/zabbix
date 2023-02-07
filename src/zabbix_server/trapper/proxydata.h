@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
 void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, int config_timeout);
-void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *zbx_config_comms);
-void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *zbx_config_comms);
+void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms);
+void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms);
 
 int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info, int status,
 		int upload_status);
