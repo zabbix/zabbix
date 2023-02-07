@@ -1,6 +1,5 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-11-06T13:56:32Z'
   media_types:
     -
       name: iTop

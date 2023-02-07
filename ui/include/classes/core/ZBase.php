@@ -159,7 +159,6 @@ class ZBase {
 		require_once 'include/httptest.inc.php';
 		require_once 'include/images.inc.php';
 		require_once 'include/items.inc.php';
-		require_once 'include/maintenances.inc.php';
 		require_once 'include/maps.inc.php';
 		require_once 'include/sounds.inc.php';
 		require_once 'include/triggers.inc.php';
@@ -734,7 +733,7 @@ class ZBase {
 
 	private static function denyPageAccess(CRouter $router): void {
 		$request_url = (new CUrl(array_key_exists('request', $_REQUEST) ? $_REQUEST['request'] : ''))
-			->removeArgument('sid')
+			->removeArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME)
 			->toString();
 
 		if (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP

@@ -24,7 +24,6 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setId('subscription-form')
 	->setName('subscription-form')
 	->addVar('action', $data['action'])

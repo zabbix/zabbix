@@ -408,10 +408,25 @@ void	zbx_db_init_autoincrement_options_basic(void)
  *               ZBX_DB_FAIL - failed to connect                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_connect_basic(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket,
-		int port, char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13)
+int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
+	const char	*host, *user, *password, *dbname, *dbschema, *dbsocket, *tls_connect, *cert, *key, *ca, *cipher,
+			*cipher_13;
+	const int	port = config_dbhigh->config_dbport;
+
+	host = config_dbhigh->config_dbhost;
+	user = config_dbhigh->config_dbuser;
+	password = config_dbhigh->config_dbpassword;
+	dbname = config_dbhigh->config_dbname;
+	dbschema = config_dbhigh->config_dbschema;
+	dbsocket = config_dbhigh->config_dbsocket;
+	tls_connect = config_dbhigh->config_db_tls_connect;
+	cert = config_dbhigh->config_db_tls_cert_file;
+	key = config_dbhigh->config_db_tls_key_file;
+	ca = config_dbhigh->config_db_tls_ca_file;
+	cipher = config_dbhigh->config_db_tls_cipher;
+	cipher_13 = config_dbhigh->config_db_tls_cipher_13;
 #if defined(HAVE_MYSQL)
 #if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
 	bool		mysql_reconnect = 1;

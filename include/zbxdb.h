@@ -44,6 +44,24 @@ typedef union
 }
 zbx_db_value_t;
 
+typedef struct
+{
+	char	*config_dbhost;
+	char	*config_dbname;
+	char	*config_dbschema;
+	char	*config_dbuser;
+	char	*config_dbpassword;
+	char	*config_dbsocket;
+	char	*config_db_tls_connect;
+	char	*config_db_tls_cert_file;
+	char	*config_db_tls_key_file;
+	char	*config_db_tls_ca_file;
+	char	*config_db_tls_cipher;
+	char	*config_db_tls_cipher_13;
+	int	config_dbport;
+}
+zbx_config_dbhigh_t;
+
 #ifdef HAVE_SQLITE3
 	/* we have to put double % here for sprintf */
 #	define ZBX_SQL_MOD(x, y) #x "%%" #y
@@ -62,8 +80,7 @@ void	zbx_db_deinit_basic(void);
 
 void	zbx_db_init_autoincrement_options_basic(void);
 
-int	zbx_db_connect_basic(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket,
-		int port, char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13);
+int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh);
 void	zbx_db_close_basic(void);
 
 int	zbx_db_begin_basic(void);

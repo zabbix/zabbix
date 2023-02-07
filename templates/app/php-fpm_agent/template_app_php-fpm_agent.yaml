@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-11-17T13:11:39Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -14,6 +13,9 @@ zabbix_export:
         Get PHP-FPM metrics using Zabbix agent running on Linux.
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications

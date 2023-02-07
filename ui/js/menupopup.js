@@ -28,7 +28,7 @@
  */
 function getMenuPopupHistory(options) {
 	var items = [],
-		url = new Curl('history.php', false);
+		url = new Curl('history.php');
 
 	if (!options.allowed_ui_latest_data) {
 		return [];
@@ -79,6 +79,7 @@ function getMenuPopupHistory(options) {
  *
  * @param {string} options['hostid']                  Host ID.
  * @param {array}  options['scripts']                 Host scripts (optional).
+ * @param {string} options['csrf_token']              CSRF token.
  * @param {string} options[]['name']                  Script name.
  * @param {string} options[]['scriptid']              Script ID.
  * @param {string} options[]['confirmation']          Confirmation text.
@@ -116,7 +117,7 @@ function getMenuPopupHost(options, trigger_element) {
 	if (options.hasGoTo) {
 		// dashboard
 		if (options.allowed_ui_hosts) {
-			url = new Curl('zabbix.php', false);
+			url = new Curl('zabbix.php');
 			url.setArgument('action', 'host.dashboard.view')
 			url.setArgument('hostid', options.hostid)
 
@@ -129,7 +130,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// problems
 		if (options.allowed_ui_problems) {
-			url = new Curl('zabbix.php', false);
+			url = new Curl('zabbix.php');
 			url.setArgument('action', 'problem.view');
 			url.setArgument('filter_name', '');
 			url.setArgument('hostids[]', options.hostid);
@@ -156,7 +157,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// latest data
 		if (options.allowed_ui_latest_data) {
-			url = new Curl('zabbix.php', false);
+			url = new Curl('zabbix.php');
 			url.setArgument('action', 'latest.view');
 
 			if ('tags' in options) {
@@ -175,7 +176,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// graphs
 		if (options.allowed_ui_hosts) {
-			url = new Curl('zabbix.php', false);
+			url = new Curl('zabbix.php');
 			url.setArgument('action', 'charts.view')
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('filter_set', '1');
@@ -189,7 +190,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// web
 		if (options.allowed_ui_hosts) {
-			url = new Curl('zabbix.php', false);
+			url = new Curl('zabbix.php');
 			url.setArgument('action', 'web.view');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('filter_set', '1');
@@ -203,7 +204,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// inventory link
 		if (options.allowed_ui_inventory) {
-			url = new Curl('hostinventories.php', false);
+			url = new Curl('hostinventories.php');
 			url.setArgument('hostid', options.hostid);
 
 			items.push({
@@ -222,7 +223,7 @@ function getMenuPopupHost(options, trigger_element) {
 		// Configuration
 		if (options.allowed_ui_conf_hosts) {
 			// host
-			url = new Curl('zabbix.php', false);
+			url = new Curl('zabbix.php');
 			url.setArgument('action', 'host.edit');
 			url.setArgument('hostid', options.hostid);
 
@@ -239,7 +240,7 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// items
-			url = new Curl('items.php', false);
+			url = new Curl('items.php');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -251,7 +252,7 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// triggers
-			url = new Curl('triggers.php', false);
+			url = new Curl('triggers.php');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -263,7 +264,7 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// graphs
-			url = new Curl('graphs.php', false);
+			url = new Curl('graphs.php');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -275,7 +276,7 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// discovery
-			url = new Curl('host_discovery.php', false);
+			url = new Curl('host_discovery.php');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -287,7 +288,7 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// web scenario
-			url = new Curl('httpconf.php', false);
+			url = new Curl('httpconf.php');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -317,7 +318,8 @@ function getMenuPopupHost(options, trigger_element) {
 	if ('scripts' in options) {
 		sections.push({
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, trigger_element, options.hostid)
+			items: getMenuPopupScriptData(options.scripts, trigger_element, options.hostid, options.eventid,
+				options.csrf_token)
 		});
 	}
 
@@ -356,7 +358,7 @@ function getMenuPopupMapElementSubmap(options) {
 			return [];
 		}
 
-		const submap_url = new Curl('zabbix.php', false);
+		const submap_url = new Curl('zabbix.php');
 		submap_url.setArgument('action', 'map.view');
 		submap_url.setArgument('sysmapid', options.sysmapid);
 		if (typeof options.severity_min !== 'undefined') {
@@ -404,7 +406,7 @@ function getMenuPopupMapElementGroup(options) {
 	}
 
 	var sections = [],
-		problems_url = new Curl('zabbix.php', false);
+		problems_url = new Curl('zabbix.php');
 
 	problems_url.setArgument('action', 'problem.view');
 	problems_url.setArgument('filter_name', '');
@@ -457,7 +459,7 @@ function getMenuPopupMapElementTrigger(options) {
 	let url;
 
 	if (options.allowed_ui_problems) {
-		url = new Curl('zabbix.php', false);
+		url = new Curl('zabbix.php');
 		url.setArgument('action', 'problem.view');
 		url.setArgument('filter_name', '');
 		url.setArgument('triggerids', options.triggers.map((value) => value.triggerid));
@@ -482,7 +484,7 @@ function getMenuPopupMapElementTrigger(options) {
 		const history = [];
 
 		for (const item of options.items) {
-			url = new Curl('history.php', false);
+			url = new Curl('history.php');
 			url.setArgument('action', item.params.action);
 			url.setArgument('itemids[]', item.params.itemid);
 
@@ -512,7 +514,7 @@ function getMenuPopupMapElementTrigger(options) {
 		const item_urls = [];
 
 		for (const value of options.triggers) {
-			url = new Curl('triggers.php', false);
+			url = new Curl('triggers.php');
 			url.setArgument('form', 'update');
 			url.setArgument('triggerid', value.triggerid);
 			url.setArgument('context', 'host');
@@ -530,7 +532,7 @@ function getMenuPopupMapElementTrigger(options) {
 
 		if (options.items.length) {
 			for (const item of options.items) {
-				url = new Curl('items.php', false);
+				url = new Curl('items.php');
 				url.setArgument('form', 'update');
 				url.setArgument('itemid', item.params.itemid);
 				url.setArgument('context', 'host');
@@ -595,6 +597,7 @@ function getMenuPopupMapElementImage(options) {
  * @param {bool}   options['can_edit_dashboards']
  * @param {bool}   options['can_view_reports']
  * @param {bool}   options['can_create_reports']
+ * @param {string} options['csrf_token']
  * @param {object} trigger_element                   UI element which triggered opening of overlay dialogue.
  *
  * @return array
@@ -605,18 +608,19 @@ function getMenuPopupDashboard(options, trigger_element) {
 
 	// Dashboard actions.
 	if (options.can_edit_dashboards) {
-		const url_create = new Curl('zabbix.php', false);
+		const url_create = new Curl('zabbix.php');
 		url_create.setArgument('action', 'dashboard.view');
 		url_create.setArgument('new', '1');
 
-		const url_clone = new Curl('zabbix.php', false);
+		const url_clone = new Curl('zabbix.php');
 		url_clone.setArgument('action', 'dashboard.view');
 		url_clone.setArgument('dashboardid', options.dashboardid);
 		url_clone.setArgument('clone', '1');
 
-		const url_delete = new Curl('zabbix.php', false);
+		const url_delete = new Curl('zabbix.php');
 		url_delete.setArgument('action', 'dashboard.delete');
 		url_delete.setArgument('dashboardids', [options.dashboardid]);
+		url_delete.setArgument('_csrf_token', options.csrf_token);
 
 		sections.push({
 			label: t('Actions'),
@@ -651,7 +655,7 @@ function getMenuPopupDashboard(options, trigger_element) {
 							return false;
 						}
 
-						redirect(url_delete.getUrl(), 'post', 'sid', true, true);
+						redirect(url_delete.getUrl(), 'post', '_csrf_token', true);
 					},
 					disabled: !options.editable
 				}
@@ -707,6 +711,7 @@ function getMenuPopupDashboard(options, trigger_element) {
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
  * @param {string} options['url']                     Trigger URL link (optional).
  * @param {object} trigger_element                    UI element which triggered opening of overlay dialogue.
+ * @param {string} options[csrf_token]                CSRF token for script execution.
  *
  * @return array
  */
@@ -717,7 +722,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 	if (options.allowed_ui_problems) {
 		// events
-		url = new Curl('zabbix.php', false);
+		url = new Curl('zabbix.php');
 		url.setArgument('action', 'problem.view');
 		url.setArgument('filter_name', '');
 		url.setArgument('triggerids[]', options.triggerid);
@@ -745,7 +750,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		const history = [];
 
 		for (const item of options.items) {
-			url = new Curl('history.php', false);
+			url = new Curl('history.php');
 			url.setArgument('action', item.params.action);
 			url.setArgument('itemids[]', item.params.itemid);
 
@@ -773,7 +778,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		const config_urls = [];
 		const item_urls = [];
 
-		url = new Curl('triggers.php', false);
+		url = new Curl('triggers.php');
 		url.setArgument('form', 'update');
 		url.setArgument('triggerid', options.triggerid);
 		url.setArgument('context', 'host');
@@ -785,7 +790,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 		if (options.items.length) {
 			for (const item of options.items) {
-				url = new Curl('items.php', false);
+				url = new Curl('items.php');
 				url.setArgument('form', 'update');
 				url.setArgument('itemid', item.params.itemid);
 				url.setArgument('context', 'host');
@@ -937,7 +942,9 @@ function getMenuPopupTrigger(options, trigger_element) {
 	if ('scripts' in options) {
 		sections.push({
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, trigger_element, null, options.eventid)
+			items: getMenuPopupScriptData(options.scripts, trigger_element, null, options.eventid,
+				options.csrf_token
+			)
 		});
 	}
 
@@ -965,7 +972,7 @@ function getMenuPopupItem(options) {
 
 	// latest data link
 	if (options.allowed_ui_latest_data) {
-		url = new Curl('zabbix.php', false);
+		url = new Curl('zabbix.php');
 		url.setArgument('action', 'latest.view');
 		url.setArgument('hostids[]', options.hostid);
 		url.setArgument('name', options.name);
@@ -977,7 +984,7 @@ function getMenuPopupItem(options) {
 		});
 	}
 
-	url = new Curl('history.php', false);
+	url = new Curl('history.php');
 	url.setArgument('action', 'showgraph');
 	url.setArgument('itemids[]', options.itemid);
 
@@ -987,7 +994,7 @@ function getMenuPopupItem(options) {
 		disabled: !options.showGraph
 	});
 
-	url = new Curl('history.php', false);
+	url = new Curl('history.php');
 	url.setArgument('action', 'showvalues');
 	url.setArgument('itemids[]', options.itemid);
 
@@ -997,7 +1004,7 @@ function getMenuPopupItem(options) {
 		disabled: !options.history && !options.trends
 	});
 
-	url = new Curl('history.php', false);
+	url = new Curl('history.php');
 	url.setArgument('action', 'showlatest');
 	url.setArgument('itemids[]', options.itemid);
 
@@ -1020,7 +1027,7 @@ function getMenuPopupItem(options) {
 		};
 
 		if (options.isWriteable) {
-			url = new Curl('items.php', false);
+			url = new Curl('items.php');
 			url.setArgument('form', 'update');
 			url.setArgument('hostid', options.hostid);
 			url.setArgument('itemid', options.itemid);
@@ -1037,7 +1044,7 @@ function getMenuPopupItem(options) {
 			const trigger_items = [];
 
 			for (const value of options.triggers) {
-				url = new Curl('triggers.php', false);
+				url = new Curl('triggers.php');
 				url.setArgument('form', 'update');
 				url.setArgument('triggerid', value.triggerid);
 				url.setArgument('backurl', options.backurl);
@@ -1054,7 +1061,7 @@ function getMenuPopupItem(options) {
 
 		config_urls.push(config_triggers);
 
-		url = new Curl('triggers.php', false);
+		url = new Curl('triggers.php');
 		url.setArgument('form', 'create');
 		url.setArgument('hostid', options.hostid);
 		url.setArgument('description', options.name);
@@ -1067,7 +1074,7 @@ function getMenuPopupItem(options) {
 			url: url.getUrl()
 		});
 
-		url = new Curl('items.php', false);
+		url = new Curl('items.php');
 		url.setArgument('form', 'create');
 		url.setArgument('hostid', options.hostid);
 		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
@@ -1081,7 +1088,7 @@ function getMenuPopupItem(options) {
 			disabled: options.isDiscovery
 		});
 
-		url = new Curl('host_discovery.php', false);
+		url = new Curl('host_discovery.php');
 		url.setArgument('form', 'create');
 		url.setArgument('hostid', options.hostid);
 		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
@@ -1150,7 +1157,7 @@ function getMenuPopupItemPrototype(options) {
 
 	let url;
 
-	url = new Curl('disc_prototypes.php', false);
+	url = new Curl('disc_prototypes.php');
 	url.setArgument('form', 'update');
 	url.setArgument('parent_discoveryid', options.parent_discoveryid);
 	url.setArgument('itemid', options.itemid);
@@ -1165,7 +1172,7 @@ function getMenuPopupItemPrototype(options) {
 		const trigger_prototypes = [];
 
 		for (const value of options.trigger_prototypes) {
-			url = new Curl('trigger_prototypes.php', false);
+			url = new Curl('trigger_prototypes.php');
 			url.setArgument('form', 'update');
 			url.setArgument('parent_discoveryid', options.parent_discoveryid);
 			url.setArgument('triggerid', value.triggerid)
@@ -1185,7 +1192,7 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push(config_triggers);
 
-	url = new Curl('trigger_prototypes.php', false);
+	url = new Curl('trigger_prototypes.php');
 	url.setArgument('parent_discoveryid', options.parent_discoveryid);
 	url.setArgument('form', 'create');
 	url.setArgument('description', options.name);
@@ -1198,7 +1205,7 @@ function getMenuPopupItemPrototype(options) {
 		url: url.getUrl()
 	});
 
-	url = new Curl('disc_prototypes.php', false);
+	url = new Curl('disc_prototypes.php');
 	url.setArgument('form', 'create');
 	url.setArgument('parent_discoveryid', options.parent_discoveryid);
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
@@ -1362,14 +1369,15 @@ function getMenuPopupTriggerMacro(options) {
 /**
  * Build script menu tree.
  *
- * @param {array} scripts          Script names and nenu paths.
- * @param {Node}  trigger_element  UI element which triggered opening of overlay dialogue.
- * @param {array} hostid           Host ID.
- * @param {array} eventid          Event ID.
+ * @param {array}  scripts            Script names and nenu paths.
+ * @param {Node}   trigger_element    UI element which triggered opening of overlay dialogue.
+ * @param {array}  hostid             Host ID.
+ * @param {array}  eventid            Event ID.
+ * @param {string} csrf_token         CSRF token for script execution.
  *
  * @return {array}
  */
-function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid) {
+function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid, csrf_token) {
 	let tree = {};
 
 	// Parse scripts and create tree.
@@ -1388,7 +1396,7 @@ function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid) {
 		}
 	}
 
-	return getMenuPopupScriptItems(tree, trigger_element);
+	return getMenuPopupScriptItems(tree, trigger_element, csrf_token);
 }
 
 /**
@@ -1492,12 +1500,13 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 /**
  * Build script menu items from tree.
  *
- * @param {object} tree        Menu tree object to where menu items are.
- * @param {Node}   trigger_elm UI element which triggered opening of overlay dialogue.
+ * @param {object} tree              Menu tree object to where menu items are.
+ * @param {Node}   trigger_elm       UI element which triggered opening of overlay dialogue.
+ * @param {string} csrf_token        CSRF token for script execution.
  *
  * @return {array}
  */
-function getMenuPopupScriptItems(tree, trigger_elm) {
+function getMenuPopupScriptItems(tree, trigger_elm, csrf_token) {
 	let items = [];
 
 	if (objectSize(tree) > 0) {
@@ -1505,7 +1514,7 @@ function getMenuPopupScriptItems(tree, trigger_elm) {
 			const item = {label: data.name};
 
 			if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
-				item.items = getMenuPopupScriptItems(data.items, trigger_elm);
+				item.items = getMenuPopupScriptItems(data.items, trigger_elm, csrf_token);
 			}
 
 			if (typeof data.params !== 'undefined' && typeof data.params.scriptid !== 'undefined') {
@@ -1514,7 +1523,7 @@ function getMenuPopupScriptItems(tree, trigger_elm) {
 						.closest('.menu-popup-top')
 						.menuPopup('close', trigger_elm, false);
 					executeScript(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
-						data.params.eventid
+						data.params.eventid, csrf_token
 					);
 					cancelEvent(e);
 				};

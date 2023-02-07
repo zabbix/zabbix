@@ -110,7 +110,6 @@ $output = [
 	'body' => (new CDiv([
 		$data['messages'],
 		(new CForm())
-			->cleanItems()
 			->setId('expression_testing_from')
 			->addItem((new CVar('expression', $data['expression']))->removeId())
 			->addItem((new CVar('test_expression', 1))->removeId())

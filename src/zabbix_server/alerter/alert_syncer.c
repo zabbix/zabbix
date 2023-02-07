@@ -250,9 +250,9 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 		int type, const char *smtp_server, const char *smtp_helo, const char *smtp_email,
 		const char *exec_path, const char *gsm_modem, const char *username, const char *passwd,
 		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
-		unsigned char smtp_verify_host, unsigned char smtp_authentication, const char *exec_params,
-		int maxsessions, int maxattempts, const char *attempt_interval, unsigned char content_type,
-		const char *script, const char *timeout, int process_tags)
+		unsigned char smtp_verify_host, unsigned char smtp_authentication, int maxsessions, int maxattempts,
+		const char *attempt_interval, unsigned char content_type, const char *script, const char *timeout,
+		int process_tags)
 {
 	zbx_am_db_mediatype_t	*mediatype;
 	int			ret = FAIL;
@@ -274,7 +274,6 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 	ZBX_UPDATE_STR(mediatype->smtp_helo, smtp_helo, ret);
 	ZBX_UPDATE_STR(mediatype->smtp_email, smtp_email, ret);
 	ZBX_UPDATE_STR(mediatype->exec_path, exec_path, ret);
-	ZBX_UPDATE_STR(mediatype->exec_params, exec_params, ret);
 	ZBX_UPDATE_STR(mediatype->gsm_modem, gsm_modem, ret);
 	ZBX_UPDATE_STR(mediatype->username, username, ret);
 	ZBX_UPDATE_STR(mediatype->passwd, passwd, ret);
@@ -326,8 +325,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select mediatypeid,type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
 				"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,"
-				"exec_params,maxsessions,maxattempts,attempt_interval,content_type,script,timeout,"
-				"process_tags"
+				"maxsessions,maxattempts,attempt_interval,content_type,script,timeout,process_tags"
 			" from media_type"
 			" where");
 
@@ -351,14 +349,14 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 		ZBX_STR2UCHAR(smtp_verify_peer, row[11]);
 		ZBX_STR2UCHAR(smtp_verify_host, row[12]);
 		ZBX_STR2UCHAR(smtp_authentication, row[13]);
-		maxsessions = atoi(row[15]);
-		maxattempts = atoi(row[16]);
-		ZBX_STR2UCHAR(content_type, row[18]);
+		maxsessions = atoi(row[14]);
+		maxattempts = atoi(row[15]);
+		ZBX_STR2UCHAR(content_type, row[17]);
 
 		mediatype = am_db_update_mediatype(amdb, now, mediatypeid, type,row[2], row[3], row[4], row[5],
 				row[6], row[7], row[8], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
-				smtp_authentication, row[14], maxsessions, maxattempts, row[17], content_type,
-				row[19], row[20], atoi(row[21]));
+				smtp_authentication, maxsessions, maxattempts, row[16], content_type, row[18], row[19],
+				atoi(row[20]));
 
 		if (NULL != mediatype)
 			zbx_vector_ptr_append(mediatypes, mediatype);
@@ -437,25 +435,6 @@ out:
 	return alerts_num;
 }
 
-static int	am_db_compare_tags(const void *d1, const void *d2)
-{
-	zbx_tag_t	*tag1 = *(zbx_tag_t **)d1;
-	zbx_tag_t	*tag2 = *(zbx_tag_t **)d2;
-	int		ret;
-
-	if (0 != (ret = strcmp(tag1->tag, tag2->tag)))
-		return ret;
-
-	return strcmp(tag1->value, tag2->value);
-}
-
-static void	tag_free(zbx_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
-}
-
 typedef struct
 {
 	zbx_uint64_t		eventid;
@@ -479,7 +458,7 @@ static int	zbx_event_tags_compare_func(const void *d1, const void *d2)
 
 static void	event_tags_free(zbx_event_tags_t *event_tags)
 {
-	zbx_vector_tags_clear_ext(&event_tags->tags, tag_free);
+	zbx_vector_tags_clear_ext(&event_tags->tags, zbx_free_tag);
 	zbx_vector_tags_destroy(&event_tags->tags);
 	zbx_free(event_tags);
 }
@@ -568,7 +547,7 @@ static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params, zb
 		zbx_rtrim(key, ZBX_WHITESPACE);
 		zbx_rtrim(value, ZBX_WHITESPACE);
 
-		if (FAIL == zbx_vector_tags_search(&(event_tags->tags), &tag_local, am_db_compare_tags))
+		if (FAIL == zbx_vector_tags_search(&(event_tags->tags), &tag_local, zbx_compare_tags_and_values))
 		{
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, key);
@@ -620,7 +599,7 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 				tag_local.value = row[1];
 
 				if (FAIL != (index = zbx_vector_tags_search(&(local_event_tags->tags), &tag_local,
-						am_db_compare_tags)))
+						zbx_compare_tags_and_values)))
 				{
 					zbx_free_tag(local_event_tags->tags.values[index]);
 					zbx_vector_tags_remove_noorder(&(local_event_tags->tags), index);

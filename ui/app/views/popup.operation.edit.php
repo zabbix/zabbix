@@ -25,7 +25,6 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setId('popup-operation')
 	->setName('popup_operation')
 	->addVar('operation[eventsource]', $data['eventsource'])

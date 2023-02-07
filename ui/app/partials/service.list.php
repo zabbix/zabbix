@@ -25,7 +25,6 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setId('service-list')
 	->setName('service_list');
 
