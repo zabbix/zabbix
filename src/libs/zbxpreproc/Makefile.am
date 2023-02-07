@@ -26,8 +26,6 @@ libzbxpreproc_a_SOURCES = \
 	pp_task.h \
 	pp_worker.c \
 	pp_worker.h \
-	preproc_snmp.c \
-	preproc_snmp.h \
 	pp_protocol.c \
 	pp_protocol.h
 
