@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-05 00:15+0000\n"
+"PO-Revision-Date: 2023-02-06 19:44+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -1824,11 +1824,11 @@ msgstr "Základní"
 
 #: app/views/connector.edit.php:136
 msgid "Bearer"
-msgstr ""
+msgstr "Bearer"
 
 #: app/views/connector.edit.php:156
 msgid "Bearer token"
-msgstr ""
+msgstr "Bearer token"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
@@ -2395,6 +2395,11 @@ msgstr "Nelze vytvořit pravidlo nálezu"
 msgid "Cannot create icon map"
 msgstr "Nelze vytvořit mapu ikon"
 
+#: app/controllers/CControllerMaintenanceCreate.php:72
+#: app/controllers/CControllerMaintenanceCreate.php:150
+msgid "Cannot create maintenance period"
+msgstr ""
+
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
 msgstr "Nelze vytvořit požadavek"
@@ -2588,6 +2593,13 @@ msgstr "Nelze smazat položky"
 #: maintenance.php:224
 msgid "Cannot delete maintenance"
 msgstr "Nelze smazat servisní okno"
+
+#: app/controllers/CControllerMaintenanceDelete.php:71
+msgid "Cannot delete maintenance period"
+msgid_plural "Cannot delete maintenance periods"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -3917,6 +3929,11 @@ msgstr "Nelze upravit makra"
 msgid "Cannot update maintenance"
 msgstr "Nelze upravit servisní okno"
 
+#: app/controllers/CControllerMaintenanceUpdate.php:73
+#: app/controllers/CControllerMaintenanceUpdate.php:152
+msgid "Cannot update maintenance period"
+msgstr ""
+
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
@@ -4080,7 +4097,7 @@ msgstr "Všechny zachycené SNMP trapy, které nebyly chyceny z snmptrap[] items
 #: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
 #: include/events.inc.php:256
 msgid "Cause"
-msgstr ""
+msgstr "Příčina"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
@@ -4869,7 +4886,7 @@ msgstr "Připojení k proxy"
 #: app/controllers/CControllerAuditLogList.php:212
 #: app/views/connector.edit.php:283 app/views/connector.edit.php:297
 msgid "Connector"
-msgstr ""
+msgstr "Konektor"
 
 #: include/classes/api/services/CConnector.php:446
 #, c-format
@@ -6181,6 +6198,10 @@ msgstr "Smazat označené prototypy položek?"
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
 msgstr "Smazat vybrané položky?"
+
+#: app/views/js/maintenance.list.js.php:88
+msgid "Delete selected maintenance period?"
+msgstr ""
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -7648,7 +7669,7 @@ msgstr[2] "Události aktualizovány"
 
 #: app/views/connector.edit.php:58 app/views/connector.list.php:99
 msgid "Events"
-msgstr ""
+msgstr "Události"
 
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
@@ -12466,9 +12487,24 @@ msgstr "Servisní okno bylo smazáno"
 msgid "Maintenance period"
 msgstr "Perioda údržby"
 
+#: app/controllers/CControllerMaintenanceCreate.php:142
+msgid "Maintenance period created"
+msgstr ""
+
+#: app/controllers/CControllerMaintenanceDelete.php:61
+msgid "Maintenance period deleted"
+msgid_plural "Maintenance periods deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
 msgstr "Délka servisního okna"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:144
+msgid "Maintenance period updated"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -13687,6 +13723,11 @@ msgstr "Nové zařízení"
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
 msgstr "Nová skupina zařízení"
+
+#: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
+#: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
+msgid "New maintenance period"
+msgstr ""
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"

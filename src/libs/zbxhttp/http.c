@@ -226,7 +226,14 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 			curlauth = CURLAUTH_DIGEST;
 			break;
 		case HTTPTEST_AUTH_BEARER:
+#if LIBCURL_VERSION_NUM >= 0x073300
 			curlauth = CURLAUTH_BEARER;
+#else
+			ZBX_UNUSED(token);
+			*error = zbx_strdup(*error, "cannot set bearer token: cURL library support >= 7.33.0 is"
+					" required");
+			return FAIL;
+#endif
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -242,6 +249,7 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 
 	switch (authtype)
 	{
+#if LIBCURL_VERSION_NUM >= 0x073300
 		case HTTPTEST_AUTH_BEARER:
 			if (NULL == token || '\0' == *token)
 			{
@@ -255,6 +263,7 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 				return FAIL;
 			}
 			break;
+#endif
 		default:
 			zbx_snprintf(auth, sizeof(auth), "%s:%s", username, password);
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))

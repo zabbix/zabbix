@@ -738,9 +738,9 @@ class testSID extends CWebTest {
 
 			// #107 Popup maintenance period.
 			[[
-				'link' => 'zabbix.php?index=1&action=popup.maintenance.period',
-				'json_result' => '{"header":"Maintenance period","body":"&lt;div&gt;&lt;form method=\"post\" action=\"zabbix.'.
-						'php\" accept-charset=\"utf-8\" spellcheck=\"false\"'
+				'link' => 'zabbix.php?row_index=0&action=maintenance.timeperiod.edit',
+				'json_result' => '{"header":"New maintenance period","body":"&lt;form method=\"post\" action=\"zabbix.'.
+						'php\" accept-charset=\"utf-8\"'
 			]],
 
 			// #108 Popup massupdate host.
@@ -1128,7 +1128,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM maintenances',
-					'link' => 'maintenance.php?form=create'
+					'access_denied' => true,
+					'link' => 'zabbix.php?action=maintenance.list',
+					'case' => 'popup create'
 				]
 			],
 
@@ -1136,7 +1138,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM maintenances',
-					'link' => 'maintenance.php?form=update&maintenanceid=3'
+					'access_denied' => true,
+					'link' => 'zabbix.php?action=maintenance.list',
+					'case' => 'popup update'
 				]
 			],
 
@@ -1146,7 +1150,7 @@ class testSID extends CWebTest {
 					'db' => 'SELECT * FROM actions',
 					'access_denied' => true,
 					'link' => 'zabbix.php?action=action.list&eventsource=0',
-					'case' => 'action create'
+					'case' => 'popup create'
 				]
 			],
 
@@ -1156,7 +1160,7 @@ class testSID extends CWebTest {
 					'db' => 'SELECT * FROM actions',
 					'access_denied' => true,
 					'link' => 'zabbix.php?action=action.list&eventsource=0',
-					'case' => 'action update'
+					'case' => 'popup update'
 				]
 			],
 
@@ -1528,13 +1532,13 @@ class testSID extends CWebTest {
 					$dialog->asForm()->fill(['Proxy name' => 'test remove sid']);
 					break;
 
-				case 'action create':
-					$this->query('button:Create action')->one()->click()->waitUntilReady();
+				case 'popup create':
+					$this->query('xpath://div[@class="header-controls"]//button')->one()->waitUntilClickable()->click();
 					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 					break;
 
-				case 'action update':
-					$this->query('xpath://a[text()="Report problems to Zabbix administrators"]')->one()->click()->waitUntilReady();
+				case 'popup update':
+					$this->query('xpath://table[@class="list-table"]//tr[1]/td[2]/a')->one()->waitUntilClickable()->click();
 					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 					break;
 			}
