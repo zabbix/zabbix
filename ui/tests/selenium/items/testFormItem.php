@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -701,7 +701,7 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Value mapping');
 			$valuemap_field = $this->query('name:itemForm')->asForm()->one()->getField('Value mapping');
 			if (!isset($templateid)) {
-				$this->assertEquals([], $valuemap_field->getValue());
+				$this->assertEquals('', $valuemap_field->getValue());
 
 				$db_valuemap = [];
 				$valuemap_result = DBselect('SELECT name FROM valuemap WHERE hostid='.$host_info['hostid']);

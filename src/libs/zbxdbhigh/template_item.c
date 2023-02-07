@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -791,6 +791,10 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		char		*str_esc;
 		const char	*d = "";
 
+		/* Even if there are no updates for an item, we must create audit entry for it */
+		/* to accommodate other entities changes that depend on an item (like tags).   */
+		zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name, item->flags);
+
 		if (0 == item->upd_flags)
 			goto dependent;
 
@@ -849,7 +853,6 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					item->field##_orig, item->field);					\
 		}
 
-		zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name, item->flags);
 		PREPARE_UPDATE_ID(INTERFACEID, interfaceid)
 		PREPARE_UPDATE_STR(NAME, name)
 		PREPARE_UPDATE_UC(TYPE, type)
@@ -918,7 +921,6 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->verify_peer, item->verify_host, item->allow_traps, item->discover);
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
-
 		zbx_audit_item_create_entry(AUDIT_ACTION_ADD, *itemid, item->name, item->flags);
 		zbx_audit_item_update_json_add_data(*itemid, item, hostid);
 
@@ -1677,7 +1679,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 
 		for (j = 0; j < item->item_tags.values_num; j++)
 		{
-			tag = (zbx_db_tag_t *)item->item_tags.values[j];
+			tag = item->item_tags.values[j];
 
 			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_REMOVE))
 			{
@@ -1716,7 +1718,8 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 		{
 			const char	*d = "";
 
-			tag = (zbx_db_tag_t *)item->item_tags.values[j];
+			tag = item->item_tags.values[j];
+
 			if (0 == tag->tagid)
 			{
 				zbx_db_insert_add_values(&db_insert, new_tagid, item->itemid, tag->tag, tag->value);
@@ -1829,7 +1832,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 
 		for (j = 0; j < item->item_params.values_num; j++)
 		{
-			param = (zbx_item_param_t *)item->item_params.values[j];
+			param = item->item_params.values[j];
 
 			if (0 != (param->flags & ZBX_FLAG_ITEM_PARAM_DELETE))
 			{
@@ -1869,7 +1872,8 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 		{
 			const char	*d = "";
 
-			param = (zbx_item_param_t *)item->item_params.values[j];
+			param = item->item_params.values[j];
+
 			if (0 == param->item_parameterid)
 			{
 				zbx_db_insert_add_values(&db_insert, item_parameter_id, item->itemid, param->name,

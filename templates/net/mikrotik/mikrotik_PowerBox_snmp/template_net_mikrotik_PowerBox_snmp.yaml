@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-16T02:25:03Z'
+  date: '2022-10-27T12:56:31Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 0c7b3c03a5854f868b56f3ab63e2d3f7
-      template: 'MikroTik PowerBox SNMP'
-      name: 'MikroTik PowerBox SNMP'
+      template: 'MikroTik PowerBox by SNMP'
+      name: 'MikroTik PowerBox by SNMP'
       description: |
         The template for monitoring Ethernet router MikroTik PowerBox.
         650MHz CPU, 64MB RAM, 5xEthernet with PoE output for four ports, RouterOS L4, outdoor case, PSU
@@ -43,7 +43,7 @@ zabbix_export:
           triggers:
             -
               uuid: b1a43fa0251248fa897994575b8a27ac
-              expression: 'max(/MikroTik PowerBox SNMP/icmpping,#3)=0'
+              expression: 'max(/MikroTik PowerBox by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -69,14 +69,14 @@ zabbix_export:
           triggers:
             -
               uuid: 740b195a7246457ea28635c4b8ef0f83
-              expression: 'min(/MikroTik PowerBox SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik PowerBox SNMP/icmppingloss,5m)<100'
+              expression: 'min(/MikroTik PowerBox by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik PowerBox by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/MikroTik PowerBox SNMP/icmpping,#3)=0'
+                  expression: 'max(/MikroTik PowerBox by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -102,17 +102,17 @@ zabbix_export:
           triggers:
             -
               uuid: d85b8d94139d44c69349898d2149e7bd
-              expression: 'avg(/MikroTik PowerBox SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/MikroTik PowerBox by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/MikroTik PowerBox SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik PowerBox SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/MikroTik PowerBox by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik PowerBox by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/MikroTik PowerBox SNMP/icmpping,#3)=0'
+                  expression: 'max(/MikroTik PowerBox by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -206,7 +206,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2deae9223199442b895df43cb2b0904c
-              expression: 'last(/MikroTik PowerBox SNMP/system.hw.firmware,#1)<>last(/MikroTik PowerBox SNMP/system.hw.firmware,#2) and length(last(/MikroTik PowerBox SNMP/system.hw.firmware))>0'
+              expression: 'last(/MikroTik PowerBox by SNMP/system.hw.firmware,#1)<>last(/MikroTik PowerBox by SNMP/system.hw.firmware,#2) and length(last(/MikroTik PowerBox by SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -262,7 +262,7 @@ zabbix_export:
           triggers:
             -
               uuid: ae8533bd4fa84d8f8e8969498d5530ed
-              expression: 'last(/MikroTik PowerBox SNMP/system.hw.serialnumber,#1)<>last(/MikroTik PowerBox SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik PowerBox SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/MikroTik PowerBox by SNMP/system.hw.serialnumber,#1)<>last(/MikroTik PowerBox by SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik PowerBox by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -349,7 +349,7 @@ zabbix_export:
           triggers:
             -
               uuid: 90a6f09f02ba4a36b019c6624ad13812
-              expression: 'last(/MikroTik PowerBox SNMP/system.name,#1)<>last(/MikroTik PowerBox SNMP/system.name,#2) and length(last(/MikroTik PowerBox SNMP/system.name))>0'
+              expression: 'last(/MikroTik PowerBox by SNMP/system.name,#1)<>last(/MikroTik PowerBox by SNMP/system.name,#2) and length(last(/MikroTik PowerBox by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -432,7 +432,7 @@ zabbix_export:
           triggers:
             -
               uuid: b0b935a8197e4188962b7d859d2b412b
-              expression: 'last(/MikroTik PowerBox SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/MikroTik PowerBox SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/MikroTik PowerBox SNMP/system.sw.os[mtxrLicVersion.0]))>0'
+              expression: 'last(/MikroTik PowerBox by SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/MikroTik PowerBox by SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/MikroTik PowerBox by SNMP/system.sw.os[mtxrLicVersion.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -440,7 +440,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'last(/MikroTik PowerBox SNMP/system.name,#1)<>last(/MikroTik PowerBox SNMP/system.name,#2) and length(last(/MikroTik PowerBox SNMP/system.name))>0'
+                  expression: 'last(/MikroTik PowerBox by SNMP/system.name,#1)<>last(/MikroTik PowerBox by SNMP/system.name,#2) and length(last(/MikroTik PowerBox by SNMP/system.name))>0'
               tags:
                 -
                   tag: scope
@@ -510,7 +510,7 @@ zabbix_export:
           triggers:
             -
               uuid: f9d7f4390619408eb5a20baa5e4ebbfe
-              expression: 'min(/MikroTik PowerBox SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/MikroTik PowerBox by SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization'
               event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -546,7 +546,7 @@ zabbix_export:
           triggers:
             -
               uuid: 36ee677a31184b738cd02b91aee5ff78
-              expression: 'max(/MikroTik PowerBox SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/MikroTik PowerBox by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -554,7 +554,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/MikroTik PowerBox SNMP/icmpping,#3)=0'
+                  expression: 'max(/MikroTik PowerBox by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -588,7 +588,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: acf19a5a27674b8db8b4913257534506
-                  expression: 'min(/MikroTik PowerBox SNMP/system.cpu.util[hrProcessorLoad.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/MikroTik PowerBox by SNMP/system.cpu.util[hrProcessorLoad.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPINDEX}: High CPU utilization'
                   event_name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -609,7 +609,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]'
         -
           uuid: 2376b53a6f4045fcacbd6d6c0d78d0bc
@@ -647,9 +647,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 93deb16896994ddf8509332b293f078a
-                  expression: 'avg(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
+                  expression: 'avg(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                  recovery_expression: 'max(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                   name: 'CPU: Temperature is above critical threshold'
                   event_name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -664,9 +664,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: bbe383abfe5a48ad8a0b4a9c943cfd11
-                  expression: 'avg(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
+                  expression: 'avg(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
+                  recovery_expression: 'max(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
                   name: 'CPU: Temperature is above warning threshold'
                   event_name: 'CPU: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -675,8 +675,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'CPU: Temperature is above critical threshold'
-                      expression: 'avg(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
-                      recovery_expression: 'max(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                      expression: 'avg(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
+                      recovery_expression: 'max(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                   tags:
                     -
                       tag: scope
@@ -686,9 +686,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 915d9a838c0945d0bad74aa2fb79da79
-                  expression: 'avg(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
+                  expression: 'avg(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
+                  recovery_expression: 'min(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
                   name: 'CPU: Temperature is too low'
                   event_name: 'CPU: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -738,9 +738,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9b3e19c885d34128b47b87d071d959f1
-                  expression: 'avg(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
+                  expression: 'avg(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                  recovery_expression: 'max(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
                   name: 'Device: Temperature is above critical threshold'
                   event_name: 'Device: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -755,9 +755,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 921ad5dc74e44e139a523ef11dd2743e
-                  expression: 'avg(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Device"}'
+                  expression: 'avg(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Device"}-3'
+                  recovery_expression: 'max(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Device"}-3'
                   name: 'Device: Temperature is above warning threshold'
                   event_name: 'Device: Temperature is above warning threshold: >{$TEMP_WARN:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -766,8 +766,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Device: Temperature is above critical threshold'
-                      expression: 'avg(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
-                      recovery_expression: 'max(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                      expression: 'avg(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
+                      recovery_expression: 'max(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
                   tags:
                     -
                       tag: scope
@@ -777,9 +777,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 0501798bf83342c5ac1f960649163a58
-                  expression: 'avg(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Device"}'
+                  expression: 'avg(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/MikroTik PowerBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Device"}+3'
+                  recovery_expression: 'min(/MikroTik PowerBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Device"}+3'
                   name: 'Device: Temperature is too low'
                   event_name: 'Device: Temperature is too low: <{$TEMP_CRIT_LOW:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -836,7 +836,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c5709dbe38eb40e1ae8ae0cc564543b4
-                  expression: 'max(/MikroTik PowerBox SNMP/lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRP.MIN.WARN}'
+                  expression: 'max(/MikroTik PowerBox by SNMP/lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRP.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low (below {$LTEMODEM.RSRP.MIN.WARN}dbm for 5m)'
                   priority: WARNING
@@ -872,7 +872,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 96e644aa6f2c4399853ab05a7ada5afa
-                  expression: 'max(/MikroTik PowerBox SNMP/lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRQ.MIN.WARN}'
+                  expression: 'max(/MikroTik PowerBox by SNMP/lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRQ.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low (below {$LTEMODEM.RSRQ.MIN.WARN}db for 5m)'
                   priority: WARNING
@@ -908,7 +908,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d4e38db917ca40da8ebd3da22442696e
-                  expression: 'max(/MikroTik PowerBox SNMP/lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}],5m) < {$LTEMODEM.RSSI.MIN.WARN}'
+                  expression: 'max(/MikroTik PowerBox by SNMP/lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}],5m) < {$LTEMODEM.RSSI.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low (below {$LTEMODEM.RSSI.MIN.WARN}dbm for 5m)'
                   priority: WARNING
@@ -944,7 +944,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 5837ae05e1694017ad026d215af06683
-                  expression: 'max(/MikroTik PowerBox SNMP/lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}],5m) < {$LTEMODEM.SINR.MIN.WARN}'
+                  expression: 'max(/MikroTik PowerBox by SNMP/lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}],5m) < {$LTEMODEM.SINR.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low (below {$LTEMODEM.SINR.MIN.WARN}db for 5m)'
                   priority: WARNING
@@ -963,25 +963,25 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]'
         -
           uuid: ce069decd92a49b1b9e119214db8b454
@@ -1240,7 +1240,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 722a78d3b55d4a66be1dba0b705704d8
-                  expression: 'last(/MikroTik PowerBox SNMP/ssid.state[mtxrWlCMState.{#SNMPINDEX}])<>"running-ap"'
+                  expression: 'last(/MikroTik PowerBox by SNMP/ssid.state[mtxrWlCMState.{#SNMPINDEX}])<>"running-ap"'
                   name: 'Interface {#IFNAME}({#IFALIAS}): AP interface {#IFNAME}({#IFALIAS}) is not running'
                   priority: WARNING
                   description: 'Access point interface can be not running by different reasons - disabled interface, power off, network link down.'
@@ -1555,9 +1555,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 018a5f1c3af44b64a6d31e095fce0dfc
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1608,21 +1608,21 @@ zabbix_export:
             -
               uuid: 6ca7d0731b294e1081e95cb6cf2a122d
               expression: |
-                change(/MikroTik PowerBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/MikroTik PowerBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/MikroTik PowerBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/MikroTik PowerBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/MikroTik PowerBox SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/MikroTik PowerBox SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/MikroTik PowerBox SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/MikroTik PowerBox SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/MikroTik PowerBox SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/MikroTik PowerBox SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/MikroTik PowerBox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/MikroTik PowerBox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/MikroTik PowerBox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/MikroTik PowerBox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/MikroTik PowerBox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/MikroTik PowerBox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/MikroTik PowerBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/MikroTik PowerBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/MikroTik PowerBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/MikroTik PowerBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1631,8 +1631,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1640,13 +1640,13 @@ zabbix_export:
             -
               uuid: 4d7141f9e9e34656a89b011b20453494
               expression: |
-                (avg(/MikroTik PowerBox SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik PowerBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/MikroTik PowerBox SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik PowerBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/MikroTik PowerBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/MikroTik PowerBox by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik PowerBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/MikroTik PowerBox by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik PowerBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/MikroTik PowerBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/MikroTik PowerBox SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik PowerBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/MikroTik PowerBox SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik PowerBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/MikroTik PowerBox by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik PowerBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/MikroTik PowerBox by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik PowerBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1656,8 +1656,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1665,12 +1665,12 @@ zabbix_export:
             -
               uuid: 01d85d1674674c7b9fc0fbaf96814160
               expression: |
-                min(/MikroTik PowerBox SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/MikroTik PowerBox SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/MikroTik PowerBox by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/MikroTik PowerBox by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/MikroTik PowerBox SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/MikroTik PowerBox SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/MikroTik PowerBox by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/MikroTik PowerBox by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1680,8 +1680,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/MikroTik PowerBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/MikroTik PowerBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1698,42 +1698,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 008a264a38134966870cf3834e5843c0
@@ -1830,8 +1830,8 @@ zabbix_export:
             -
               uuid: 3e812901cab94bbc9d5f15e8b70da4a0
               expression: |
-                last(/MikroTik PowerBox SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
-                ((last(/MikroTik PowerBox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik PowerBox SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik PowerBox SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                last(/MikroTik PowerBox by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
+                ((last(/MikroTik PowerBox by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik PowerBox by SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik PowerBox by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               name: 'Disk-{#SNMPINDEX}: Disk space is critically low'
               event_name: 'Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1852,8 +1852,8 @@ zabbix_export:
             -
               uuid: bee86ff10a084f76b4b266aa5e20df22
               expression: |
-                last(/MikroTik PowerBox SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and
-                ((last(/MikroTik PowerBox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik PowerBox SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik PowerBox SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                last(/MikroTik PowerBox by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and
+                ((last(/MikroTik PowerBox by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik PowerBox by SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik PowerBox by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               name: 'Disk-{#SNMPINDEX}: Disk space is low'
               event_name: 'Disk-{#SNMPINDEX}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1868,8 +1868,8 @@ zabbix_export:
                 -
                   name: 'Disk-{#SNMPINDEX}: Disk space is critically low'
                   expression: |
-                    last(/MikroTik PowerBox SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
-                    ((last(/MikroTik PowerBox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik PowerBox SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik PowerBox SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                    last(/MikroTik PowerBox by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
+                    ((last(/MikroTik PowerBox by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik PowerBox by SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik PowerBox by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -1891,14 +1891,14 @@ zabbix_export:
                   calc_fnc: LAST
                   type: GRAPH_SUM
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: C80000
                   calc_fnc: LAST
                   item:
-                    host: 'MikroTik PowerBox SNMP'
+                    host: 'MikroTik PowerBox by SNMP'
                     key: 'vfs.fs.used[hrStorageSize.{#SNMPINDEX}]'
       tags:
         -
@@ -2048,7 +2048,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'MikroTik PowerBox SNMP'
+                        host: 'MikroTik PowerBox by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2961,7 +2961,7 @@ zabbix_export:
   triggers:
     -
       uuid: 2d0d281a078546959a644e758ede97d6
-      expression: '(last(/MikroTik PowerBox SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/MikroTik PowerBox SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/MikroTik PowerBox SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/MikroTik PowerBox SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/MikroTik PowerBox by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/MikroTik PowerBox by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/MikroTik PowerBox by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/MikroTik PowerBox by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2970,7 +2970,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/MikroTik PowerBox SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/MikroTik PowerBox by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2986,5 +2986,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'MikroTik PowerBox SNMP'
+            host: 'MikroTik PowerBox by SNMP'
             key: 'vm.memory.util[memoryUsedPercentage.Memory]'

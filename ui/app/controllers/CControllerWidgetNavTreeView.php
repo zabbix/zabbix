@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -311,7 +311,10 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 				);
 				foreach ($uncounted_problem_triggers as $triggerid => $var) {
 					$problems_counted[$triggerid] = true;
-					$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
+
+					if (array_key_exists($triggerid, $problems_per_trigger)) {
+						$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
+					}
 				}
 				unset($uncounted_problem_triggers);
 				break;

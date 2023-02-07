@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -206,7 +206,7 @@ class CRouter {
 		'popup.valuemap.update'						=> ['CControllerPopupValueMapUpdate',					'layout.json',			null],
 		'popup.tophosts.column.edit'				=> ['CControllerPopupTopHostsColumnEdit',				'layout.json',			'popup.tophosts.column.edit'],
 		'problem.view'								=> ['CControllerProblemView',							'layout.htmlpage',		'monitoring.problem.view'],
-		'problem.view.refresh'						=> ['CControllerProblemViewRefresh',					'layout.json',			null],
+		'problem.view.refresh'						=> ['CControllerProblemViewRefresh',					'layout.json',			'monitoring.problem.view.refresh'],
 		'problem.view.csv'							=> ['CControllerProblemView',							'layout.csv',			'monitoring.problem.view'],
 		'profile.update'							=> ['CControllerProfileUpdate',							'layout.json',			null],
 		'proxy.create'								=> ['CControllerProxyCreate',							null,					null],

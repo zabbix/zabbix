@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -158,7 +158,8 @@ static void	get_item_tags_by_expression(const DB_TRIGGER *trigger, zbx_vector_pt
 
 	zbx_vector_uint64_create(&functionids);
 	zbx_db_trigger_get_functionids(trigger, &functionids);
-	zbx_dc_get_item_tags_by_functionids(functionids.values, functionids.values_num, item_tags);
+	zbx_dc_config_history_sync_get_item_tags_by_functionids(functionids.values, (size_t)functionids.values_num,
+			item_tags);
 	zbx_vector_uint64_destroy(&functionids);
 }
 

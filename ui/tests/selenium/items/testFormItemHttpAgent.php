@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 		foreach ($rows as $field_name => $value) {
 			$field_xpath = '//label[text()="'.$field_name.'"]/../..//*[@id]';
-			$tag = $this->webDriver->findElement(WebDriverBy::xpath($field_xpath))->getTagName();
+			$tag = $this->query('xpath', $field_xpath)->one()->getTagName();
 			$field_id = $this->zbxTestGetAttributeValue($field_xpath, 'id');
 
 			if ($tag === 'input' || $tag === 'textarea') {
@@ -244,6 +244,17 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => '{ITEM.ID}', 'value' => '{ITEM.KEY}']
 					],
 					'parsed_url' => $url
+				]
+			],
+			// Call to Prometheus API.
+			[
+				[
+					'step_name' => 'Step call to Prometheus API',
+					'url' => 'http://localhost:9090/api/v1/query?query=irate(node_network_transmit_bytes_total\{device!="lo",instance="192.168.150.101"}[1m])',
+					'parsed_query' => [
+						['name' => 'query', 'value' => 'irate(node_network_transmit_bytes_total\{device!="lo",instance="192.168.150.101"}[1m])']
+					],
+					'parsed_url' => 'http://localhost:9090/api/v1/query'
 				]
 			],
 			// URL parse failed.

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:33:50Z'
+  date: '2022-10-27T13:38:20Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 3598da1effdf4ed48074608f1422e3fd
-      template: 'EtherLike-MIB SNMP'
-      name: 'EtherLike-MIB SNMP'
+      template: 'EtherLike-MIB by SNMP'
+      name: 'EtherLike-MIB by SNMP'
       description: |
         Template EtherLike-MIB (duplex control only)
         
@@ -89,7 +89,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e6ae9fc7d4454d389d066450af3a3066
-                  expression: 'last(/EtherLike-MIB SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
+                  expression: 'last(/EtherLike-MIB by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'

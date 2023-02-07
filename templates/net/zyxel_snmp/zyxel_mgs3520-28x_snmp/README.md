@@ -1,9 +1,9 @@
 
-# ZYXEL MGS3520-28x SNMP
+# ZYXEL MGS3520-28x by SNMP
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 https://service-provider.zyxel.com/emea/en/products/carrier-and-access-switches/access-switches/mgs3520-series
 
 This template was tested on:
@@ -48,7 +48,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Fan discovery |<p>An entry in fanRpmTable.</p> |SNMP |zyxel.3520_28.fan.discovery |
-|Interface discovery |<p>-</p> |SNMP |zyxel.3520_28.net.if.discovery<p>**Filter**:</p>AND <p>- {#ZYXEL.IF.NAME} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}`</p><p>- {#ZYXEL.IF.NAME} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}`</p><p>- {#ZYXEL.IF.LINKUPTYPE} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}`</p><p>- {#ZYXEL.IF.LINKUPTYPE} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Don't create triggers for matching interface<br> - {#ZYXEL.IF.NAME} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}`<br>  - TRIGGER_PROTOTYPE REGEXP `.*` - NO_DISCOVER</p> |
+|Interface discovery |<p>-</p> |SNMP |zyxel.3520_28.net.if.discovery<p>**Filter**:</p>AND <p>- {#ZYXEL.IF.NAME} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}`</p><p>- {#ZYXEL.IF.NAME} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}`</p><p>- {#ZYXEL.IF.LINKUPTYPE} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}`</p><p>- {#ZYXEL.IF.LINKUPTYPE} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Don't create triggers for matching interface<br> - {#ZYXEL.IF.NAME} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}`<br>  - TRIGGER_PROTOTYPE REGEXP `.*`<br>  - NO_DISCOVER</p> |
 |SFP with DDM discovery |<p>SFP DDM module discovery.</p> |SNMP |zyxel.3520_28.sfp.ddm.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>**Filter**:</p>AND <p>- {#ZYXEL.SFP.DESCRIPTION} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}`</p><p>- {#ZYXEL.SFP.DESCRIPTION} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}`</p> |
 |SFP without DDM discovery |<p>SFP module discovery.</p> |SNMP |zyxel.3520_28.sfp.discovery<p>**Filter**:</p>AND <p>- {#ZYXEL.SFP.STATUS} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}`</p><p>- {#ZYXEL.SFP.STATUS} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}`</p> |
 |Temperature discovery |<p>An entry in tempTable.</p> |SNMP |zyxel.3520_28.temp.discovery |
@@ -103,26 +103,26 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|ZYXEL MGS3520-28x: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.cpuusage,5m)>{$CPU.UTIL.CRIT}` |WARNING | |
-|ZYXEL MGS3520-28x: {#ZYXEL.FAN.DESCRIPTION} is in critical state |<p>Please check the fan unit</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}` |AVERAGE | |
-|ZYXEL MGS3520-28x: Template does not match hardware |<p>This template is for Zyxel MGS3520-28x series, but connected to {ITEM.VALUE}</p> |`not(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.model)="MGS3520-28" or last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.model)="MGS3520-28F")` |INFO | |
-|ZYXEL MGS3520-28x: Firmware has changed |<p>Firmware version has changed. Ack to close</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fwversion,#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fwversion,#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.fwversion))>0` |INFO |<p>Manual close: YES</p> |
-|ZYXEL MGS3520-28x: Device has been replaced |<p>Device serial number has changed. Ack to close</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber,#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber,#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber))>0` |INFO |<p>Manual close: YES</p> |
-|ZYXEL MGS3520-28x: High memory utilization |<p>The system is running out of free memory.</p> |`min(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.memusage,5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
-|ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#2)`<p>Recovery expression:</p>`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])<>2` |AVERAGE |<p>Manual close: YES</p> |
-|ZYXEL MGS3520-28x: SFP {#SNMPINDEX} has been replaced |<p>SFP {#SNMPINDEX} serial number has changed. Ack to close</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}]))>0` |INFO |<p>Manual close: YES</p> |
-|ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} |<p>The upper threshold value of the parameter is exceeded</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}` |WARNING | |
-|ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} |<p>The parameter values are less than the lower threshold</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}` |WARNING | |
-|ZYXEL MGS3520-28x: Voltage {#ZYXEL.DESCRIPTION} is in critical state |<p>Please check the power supply</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}` |AVERAGE | |
-|ZYXEL MGS3520-28x: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/ZYXEL MGS3520-28x SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|ZYXEL MGS3520-28x: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.hw.uptime)>0 and last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.hw.uptime)<10m) or (last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.hw.uptime)=0 and last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.net.uptime)<10m)` |INFO |<p>Manual close: YES</p> |
-|ZYXEL MGS3520-28x: Temperature {#ZYXEL.TEMPDESCRIPTION} is in critical state |<p>Please check the temperature</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}` |AVERAGE | |
+|ZYXEL MGS3520-28x: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.cpuusage,5m)>{$CPU.UTIL.CRIT}` |WARNING | |
+|ZYXEL MGS3520-28x: {#ZYXEL.FAN.DESCRIPTION} is in critical state |<p>Please check the fan unit</p> |`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}` |AVERAGE | |
+|ZYXEL MGS3520-28x: Template does not match hardware |<p>This template is for Zyxel MGS3520-28x series, but connected to {ITEM.VALUE}</p> |`not(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.model)="MGS3520-28" or last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.model)="MGS3520-28F")` |INFO | |
+|ZYXEL MGS3520-28x: Firmware has changed |<p>Firmware version has changed. Ack to close</p> |`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fwversion,#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fwversion,#2) and length(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fwversion))>0` |INFO |<p>Manual close: YES</p> |
+|ZYXEL MGS3520-28x: Device has been replaced |<p>Device serial number has changed. Ack to close</p> |`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.serialnumber,#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.serialnumber,#2) and length(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.serialnumber))>0` |INFO |<p>Manual close: YES</p> |
+|ZYXEL MGS3520-28x: High memory utilization |<p>The system is running out of free memory.</p> |`min(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.memusage,5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
+|ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#2)`<p>Recovery expression:</p>`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])<>2` |AVERAGE |<p>Manual close: YES</p> |
+|ZYXEL MGS3520-28x: SFP {#SNMPINDEX} has been replaced |<p>SFP {#SNMPINDEX} serial number has changed. Ack to close</p> |`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}]))>0` |INFO |<p>Manual close: YES</p> |
+|ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} |<p>The upper threshold value of the parameter is exceeded</p> |`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}` |WARNING | |
+|ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} |<p>The parameter values are less than the lower threshold</p> |`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}` |WARNING | |
+|ZYXEL MGS3520-28x: Voltage {#ZYXEL.DESCRIPTION} is in critical state |<p>Please check the power supply</p> |`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}` |AVERAGE | |
+|ZYXEL MGS3520-28x: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/ZYXEL MGS3520-28x by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
+|ZYXEL MGS3520-28x: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.hw.uptime)>0 and last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.hw.uptime)<10m) or (last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.hw.uptime)=0 and last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.uptime)<10m)` |INFO |<p>Manual close: YES</p> |
+|ZYXEL MGS3520-28x: Temperature {#ZYXEL.TEMPDESCRIPTION} is in critical state |<p>Please check the temperature</p> |`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}` |AVERAGE | |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel).
 
 ## Known Issues
 

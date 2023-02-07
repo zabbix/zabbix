@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -513,7 +512,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
 		if ($update) {
 			if ($host_type === 'host') {
-				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 				$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
 				$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
@@ -531,7 +530,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 		else {
 			if ($host_type === 'host') {
-				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}

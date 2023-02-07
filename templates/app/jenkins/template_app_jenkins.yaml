@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:48Z'
+  date: '2022-12-09T01:28:54Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -60,13 +60,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''vm.file.descriptor.ratio''].value'
+                - '$.[''vm.file.descriptor.ratio''].value'
             -
               type: MULTIPLIER
               parameters:
                 - '100'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -149,13 +149,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.executor.count.value''].value'
+                - '$.[''jenkins.executor.count.value''].value'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -172,9 +172,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.executor.free.value''].value'
+                - '$.[''jenkins.executor.free.value''].value'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -191,13 +191,34 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.executor.in-use.value''].value'
+                - '$.[''jenkins.executor.in-use.value''].value'
+          master_item:
+            key: jenkins.gauges.raw
+          tags:
+            -
+              tag: component
+              value: executors
+        -
+          uuid: 035f0609b9ba4231a31f3310ca8151b8
+          name: 'Jenkins: Get gauges'
+          type: DEPENDENT
+          key: jenkins.gauges.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Raw items for gauges metrics.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.gauges
           master_item:
             key: jenkins.get_metrics
           tags:
             -
               tag: component
-              value: executors
+              value: raw
         -
           uuid: db4c0de52dca4c8a853edf918b35bbe4
           name: 'Jenkins: Get service metrics'
@@ -273,13 +294,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.meters.[''http.responseCodes.badRequest''].count'
+                - '$.[''http.responseCodes.badRequest''].count'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.meters.raw
           tags:
             -
               tag: component
@@ -301,13 +322,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.meters.[''http.responseCodes.created''].count'
+                - '$.[''http.responseCodes.created''].count'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.meters.raw
           tags:
             -
               tag: component
@@ -329,13 +350,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.meters.[''http.responseCodes.forbidden''].count'
+                - '$.[''http.responseCodes.forbidden''].count'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.meters.raw
           tags:
             -
               tag: component
@@ -357,13 +378,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.meters.[''http.responseCodes.notFound''].count'
+                - '$.[''http.responseCodes.notFound''].count'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.meters.raw
           tags:
             -
               tag: component
@@ -385,13 +406,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.meters.[''http.responseCodes.notModified''].count'
+                - '$.[''http.responseCodes.notModified''].count'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.meters.raw
           tags:
             -
               tag: component
@@ -413,13 +434,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.meters.[''http.responseCodes.noContent''].count'
+                - '$.[''http.responseCodes.noContent''].count'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.meters.raw
           tags:
             -
               tag: component
@@ -441,13 +462,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.meters.[''http.responseCodes.ok''].count'
+                - '$.[''http.responseCodes.ok''].count'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.meters.raw
           tags:
             -
               tag: component
@@ -469,13 +490,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.meters.[''http.responseCodes.other''].count'
+                - '$.[''http.responseCodes.other''].count'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.meters.raw
           tags:
             -
               tag: component
@@ -497,13 +518,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''http.requests''].count'
+                - '$.[''http.requests''].count'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -522,9 +543,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''http.requests''].p50'
+                - '$.[''http.requests''].p50'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -543,9 +564,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''http.requests''].p95'
+                - '$.[''http.requests''].p95'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -564,13 +585,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.meters.[''http.responseCodes.serverError''].count'
+                - '$.[''http.responseCodes.serverError''].count'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.meters.raw
           tags:
             -
               tag: component
@@ -592,13 +613,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.meters.[''http.responseCodes.serviceUnavailable''].count'
+                - '$.[''http.responseCodes.serviceUnavailable''].count'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.meters.raw
           tags:
             -
               tag: component
@@ -620,9 +641,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.blocked.duration''].p50'
+                - '$.[''jenkins.job.blocked.duration''].p50'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -641,9 +662,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.blocked.duration''].p95'
+                - '$.[''jenkins.job.blocked.duration''].p95'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -661,9 +682,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.blocked.duration''].m1_rate'
+                - '$.[''jenkins.job.blocked.duration''].m1_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -681,9 +702,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.blocked.duration''].m5_rate'
+                - '$.[''jenkins.job.blocked.duration''].m5_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -702,9 +723,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.buildable.duration''].p50'
+                - '$.[''jenkins.job.buildable.duration''].p50'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -723,9 +744,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.buildable.duration''].p95'
+                - '$.[''jenkins.job.buildable.duration''].p95'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -743,9 +764,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.buildable.duration''].m1_rate'
+                - '$.[''jenkins.job.buildable.duration''].m1_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -763,9 +784,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.buildable.duration''].m5_rate'
+                - '$.[''jenkins.job.buildable.duration''].m5_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -784,9 +805,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.building.duration''].p50'
+                - '$.[''jenkins.job.building.duration''].p50'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -805,9 +826,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.building.duration''].p95'
+                - '$.[''jenkins.job.building.duration''].p95'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -825,9 +846,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.building.duration''].m1_rate'
+                - '$.[''jenkins.job.building.duration''].m1_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -845,9 +866,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.building.duration''].m5_rate'
+                - '$.[''jenkins.job.building.duration''].m5_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -864,13 +885,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.job.count.value''].value'
+                - '$.[''jenkins.job.count.value''].value'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -889,9 +910,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.queuing.duration''].p50'
+                - '$.[''jenkins.job.queuing.duration''].p50'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -910,9 +931,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.queuing.duration''].p95'
+                - '$.[''jenkins.job.queuing.duration''].p95'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -930,9 +951,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.queuing.duration''].m1_rate'
+                - '$.[''jenkins.job.queuing.duration''].m1_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -950,9 +971,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.queuing.duration''].m5_rate'
+                - '$.[''jenkins.job.queuing.duration''].m5_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -970,9 +991,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.meters.[''jenkins.job.scheduled''].m1_rate'
+                - '$.[''jenkins.job.scheduled''].m1_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.meters.raw
           tags:
             -
               tag: component
@@ -990,9 +1011,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.meters.[''jenkins.job.scheduled''].m5_rate'
+                - '$.[''jenkins.job.scheduled''].m5_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.meters.raw
           tags:
             -
               tag: component
@@ -1011,9 +1032,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.total.duration''].p50'
+                - '$.[''jenkins.job.total.duration''].p50'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -1032,9 +1053,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.total.duration''].p95'
+                - '$.[''jenkins.job.total.duration''].p95'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -1052,9 +1073,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.total.duration''].m1_rate'
+                - '$.[''jenkins.job.total.duration''].m1_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -1072,9 +1093,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.total.duration''].m5_rate'
+                - '$.[''jenkins.job.total.duration''].m5_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -1093,9 +1114,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.waiting.duration''].p50'
+                - '$.[''jenkins.job.waiting.duration''].p50'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -1114,9 +1135,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.waiting.duration''].p95'
+                - '$.[''jenkins.job.waiting.duration''].p95'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -1134,9 +1155,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.waiting.duration''].m1_rate'
+                - '$.[''jenkins.job.waiting.duration''].m1_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -1154,9 +1175,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.timers.[''jenkins.job.waiting.duration''].m5_rate'
+                - '$.[''jenkins.job.waiting.duration''].m5_rate'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.timers.raw
           tags:
             -
               tag: component
@@ -1191,6 +1212,27 @@ zabbix_export:
               tag: component
               value: raw
         -
+          uuid: dd8237e43a0d494394da664bc58a5fec
+          name: 'Jenkins: Get meters'
+          type: DEPENDENT
+          key: jenkins.meters.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Raw items for meters metrics.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.meters
+          master_item:
+            key: jenkins.get_metrics
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: 930fa76b32484155ae3ec8964e3952a1
           name: 'Jenkins: Nodes count'
           type: DEPENDENT
@@ -1202,13 +1244,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.node.count.value''].value'
+                - '$.[''jenkins.node.count.value''].value'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1225,13 +1267,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.node.offline.value''].value'
+                - '$.[''jenkins.node.offline.value''].value'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1248,13 +1290,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.node.online.value''].value'
+                - '$.[''jenkins.node.online.value''].value'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1352,13 +1394,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.plugins.active''].value'
+                - '$.[''jenkins.plugins.active''].value'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1375,13 +1417,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.plugins.failed''].value'
+                - '$.[''jenkins.plugins.failed''].value'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1398,13 +1440,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.plugins.inactive''].value'
+                - '$.[''jenkins.plugins.inactive''].value'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1447,13 +1489,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.plugins.withUpdate''].value'
+                - '$.[''jenkins.plugins.withUpdate''].value'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1470,13 +1512,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.project.count.value''].value'
+                - '$.[''jenkins.project.count.value''].value'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1493,9 +1535,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.queue.blocked.value''].value'
+                - '$.[''jenkins.queue.blocked.value''].value'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1512,9 +1554,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.queue.buildable.value''].value'
+                - '$.[''jenkins.queue.buildable.value''].value'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1531,9 +1573,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.queue.pending.value''].value'
+                - '$.[''jenkins.queue.pending.value''].value'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1550,9 +1592,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.queue.size.value''].value'
+                - '$.[''jenkins.queue.size.value''].value'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1569,9 +1611,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.queue.stuck.value''].value'
+                - '$.[''jenkins.queue.stuck.value''].value'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1589,9 +1631,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''system.cpu.load''].value'
+                - '$.[''system.cpu.load''].value'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1609,13 +1651,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''vm.uptime.milliseconds''].value'
+                - '$.[''vm.uptime.milliseconds''].value'
             -
               type: MULTIPLIER
               parameters:
                 - '0.001'
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1624,10 +1666,10 @@ zabbix_export:
             -
               uuid: 7d20942598a648ebb2e03f9acdb3e5e3
               expression: 'last(/Jenkins by HTTP/jenkins.system.uptime)<10m'
-              name: 'Jenkins: has been restarted'
-              event_name: 'Jenkins: has been restarted (uptime < 10m)'
+              name: 'Jenkins: Host has been restarted'
+              event_name: 'Jenkins: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1744,6 +1786,27 @@ zabbix_export:
               tag: component
               value: system
         -
+          uuid: b988986e794d44c79629f865cc6f77e7
+          name: 'Jenkins: Get timers'
+          type: DEPENDENT
+          key: jenkins.timers.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Raw items for timers metrics.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.timers
+          master_item:
+            key: jenkins.get_metrics
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: ae836e5439cf494a9ed0681836da854e
           name: 'Jenkins: Version'
           type: DEPENDENT
@@ -1757,13 +1820,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.gauges.[''jenkins.versions.core''].value'
+                - '$.[''jenkins.versions.core''].value'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
           master_item:
-            key: jenkins.get_metrics
+            key: jenkins.gauges.raw
           tags:
             -
               tag: component
@@ -1775,7 +1838,7 @@ zabbix_export:
               name: 'Jenkins: Version has changed'
               event_name: 'Jenkins: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Jenkins version has changed. Ack to close.'
+              description: 'The Jenkins version has changed. Perform Ack to close.'
               manual_close: 'YES'
               tags:
                 -
@@ -1805,10 +1868,10 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.SwapSpaceMonitor''].availablePhysicalMemory.first()'
+                    - '$.monitorData[''hudson.node_monitors.SwapSpaceMonitor''].availablePhysicalMemory'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: jenkins.computer_info
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               tags:
                 -
                   tag: component
@@ -1832,10 +1895,10 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.SwapSpaceMonitor''].availableSwapSpace.first()'
+                    - '$.monitorData[''hudson.node_monitors.SwapSpaceMonitor''].availableSwapSpace'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: jenkins.computer_info
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               tags:
                 -
                   tag: component
@@ -1860,14 +1923,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.ClockMonitor''].diff.first()'
+                    - '$.monitorData[''hudson.node_monitors.ClockMonitor''].diff'
                   error_handler: DISCARD_VALUE
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               master_item:
-                key: jenkins.computer_info
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               tags:
                 -
                   tag: component
@@ -1888,8 +1951,40 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.DiskSpaceMonitor''].size.first()'
+                    - '$.monitorData[''hudson.node_monitors.DiskSpaceMonitor''].size'
                   error_handler: DISCARD_VALUE
+              master_item:
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: computers
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
+            -
+              uuid: fad90db95f69491da5f9af0967995021
+              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Get computer'
+              type: DEPENDENT
+              key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Raw data for a computer.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: jenkins.computer_info
               tags:
@@ -1898,7 +1993,7 @@ zabbix_export:
                   value: computers
                 -
                   tag: component
-                  value: disk
+                  value: raw
                 -
                   tag: computer
                   value: '{#DISPLAY_NAME}'
@@ -1916,7 +2011,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].idle.first()'
+                    - $.idle
                 -
                   type: BOOL_TO_DECIMAL
                   parameters:
@@ -1926,7 +2021,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: jenkins.computer_info
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               tags:
                 -
                   tag: component
@@ -1946,10 +2041,10 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].numExecutors.first()'
+                    - $.numExecutors
                   error_handler: DISCARD_VALUE
               master_item:
-                key: jenkins.computer_info
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               tags:
                 -
                   tag: component
@@ -1971,13 +2066,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].offlineCauseReason.first()'
+                    - $.offlineCauseReason
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: jenkins.computer_info
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               tags:
                 -
                   tag: component
@@ -1998,14 +2093,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.ResponseTimeMonitor''].average.first()'
+                    - '$.monitorData[''hudson.node_monitors.ResponseTimeMonitor''].average'
                   error_handler: DISCARD_VALUE
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               master_item:
-                key: jenkins.computer_info
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               tags:
                 -
                   tag: component
@@ -2029,7 +2124,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].offline.first()'
+                    - $.offline
                 -
                   type: BOOL_TO_DECIMAL
                   parameters:
@@ -2039,7 +2134,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: jenkins.computer_info
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               tags:
                 -
                   tag: component
@@ -2061,7 +2156,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].temporarilyOffline.first()'
+                    - $.temporarilyOffline
                 -
                   type: BOOL_TO_DECIMAL
                   parameters:
@@ -2071,7 +2166,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: jenkins.computer_info
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               tags:
                 -
                   tag: component
@@ -2092,10 +2187,10 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.TemporarySpaceMonitor''].size.first()'
+                    - '$.monitorData[''hudson.node_monitors.TemporarySpaceMonitor''].size'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: jenkins.computer_info
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               tags:
                 -
                   tag: component
@@ -2119,10 +2214,10 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.SwapSpaceMonitor''].totalPhysicalMemory.first()'
+                    - '$.monitorData[''hudson.node_monitors.SwapSpaceMonitor''].totalPhysicalMemory'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: jenkins.computer_info
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               tags:
                 -
                   tag: component
@@ -2146,10 +2241,10 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData[''hudson.node_monitors.SwapSpaceMonitor''].totalSwapSpace.first()'
+                    - '$.monitorData[''hudson.node_monitors.SwapSpaceMonitor''].totalSwapSpace'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: jenkins.computer_info
+                key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               tags:
                 -
                   tag: component
@@ -2262,14 +2357,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.jobs.[?(@.name == "{#NAME}")].healthReport..score.first()'
+                    - $.healthReport..score.first()
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 30m
               master_item:
-                key: jenkins.job_info
+                key: 'jenkins.job.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2292,6 +2387,41 @@ zabbix_export:
                       tag: scope
                       value: performance
             -
+              uuid: c82a3a59d2974e24bfa2489bd02fb10a
+              name: 'Jenkins job [{#NAME}]: Get job'
+              type: DEPENDENT
+              key: 'jenkins.job.get[{#NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Raw data for a job.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.jobs.[?(@.name == "{#NAME}")].first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 30m
+              master_item:
+                key: jenkins.job_info
+              tags:
+                -
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: jobs
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: job
+                  value: '{#NAME}'
+            -
               uuid: a0fa8864c536408895f13758eacb486f
               name: 'Jenkins job [{#NAME}]: Last Build duration'
               type: DEPENDENT
@@ -2304,7 +2434,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.jobs.[?(@.name == "{#NAME}")].lastBuild.duration.first()'
+                    - $.lastBuild.duration
                   error_handler: DISCARD_VALUE
                 -
                   type: MULTIPLIER
@@ -2315,7 +2445,7 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: jenkins.job_info
+                key: 'jenkins.job.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2335,14 +2465,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.jobs.[?(@.name == "{#NAME}")].lastBuild.number.first()'
+                    - $.lastBuild.number
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 30m
               master_item:
-                key: jenkins.job_info
+                key: 'jenkins.job.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2363,14 +2493,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.jobs.[?(@.name == "{#NAME}")].lastBuild.result.first()'
+                    - $.lastBuild.result
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 30m
               master_item:
-                key: jenkins.job_info
+                key: 'jenkins.job.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2390,7 +2520,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.jobs.[?(@.name == "{#NAME}")].lastBuild.timestamp.first()'
+                    - $.lastBuild.timestamp
                   error_handler: DISCARD_VALUE
                 -
                   type: MULTIPLIER
@@ -2401,7 +2531,7 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: jenkins.job_info
+                key: 'jenkins.job.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2422,7 +2552,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.jobs.[?(@.name == "{#NAME}")].lastFailedBuild.duration.first()'
+                    - $.lastFailedBuild.duration
                   error_handler: DISCARD_VALUE
                 -
                   type: MULTIPLIER
@@ -2433,7 +2563,7 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: jenkins.job_info
+                key: 'jenkins.job.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2453,14 +2583,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.jobs.[?(@.name == "{#NAME}")].lastFailedBuild.number.first()'
+                    - $.lastFailedBuild.number
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 30m
               master_item:
-                key: jenkins.job_info
+                key: 'jenkins.job.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2480,7 +2610,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.jobs.[?(@.name == "{#NAME}")].lastFailedBuild.timestamp.first()'
+                    - $.lastFailedBuild.timestamp
                   error_handler: DISCARD_VALUE
                 -
                   type: MULTIPLIER
@@ -2491,7 +2621,7 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: jenkins.job_info
+                key: 'jenkins.job.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2512,7 +2642,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.jobs.[?(@.name == "{#NAME}")].lastSuccessfulBuild.duration.first()'
+                    - $.lastSuccessfulBuild.duration
                   error_handler: DISCARD_VALUE
                 -
                   type: MULTIPLIER
@@ -2523,7 +2653,7 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: jenkins.job_info
+                key: 'jenkins.job.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2543,14 +2673,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.jobs.[?(@.name == "{#NAME}")].lastSuccessfulBuild.number.first()'
+                    - $.lastSuccessfulBuild.number
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 30m
               master_item:
-                key: jenkins.job_info
+                key: 'jenkins.job.get[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2570,7 +2700,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.jobs.[?(@.name == "{#NAME}")].lastSuccessfulBuild.timestamp.first()'
+                    - $.lastSuccessfulBuild.timestamp
                   error_handler: DISCARD_VALUE
                 -
                   type: MULTIPLIER
@@ -2581,7 +2711,7 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: jenkins.job_info
+                key: 'jenkins.job.get[{#NAME}]'
               tags:
                 -
                   tag: component

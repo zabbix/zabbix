@@ -1,14 +1,17 @@
 
-# PFSense SNMP
+# PFSense by SNMP
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
 Template for monitoring pfSense by SNMP
 
-This template was tested on:
+This template has been tested on:
 
 - pfSense, version 2.5.0, 2.5.1, 2.5.2
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
@@ -20,7 +23,7 @@ This template was tested on:
 4. Link template to the host
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -37,8 +40,7 @@ No specific Zabbix configuration is required.
 |{$NET.IF.IFALIAS.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$NET.IF.IFDESCR.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`.*` |
 |{$NET.IF.IFDESCR.NOT_MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$NET.IF.IFNAME.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`^em[0-9]+$` |
-|{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`^$` |
+|{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`(^pflog[0-9.]*$|^pfsync[0-9.]*$)` |
 |{$NET.IF.IFOPERSTATUS.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`^.*$` |
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES} |<p>Ignore notPresent(6)</p> |`^6$` |
 |{$NET.IF.IFTYPE.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`.*` |
@@ -47,17 +49,17 @@ No specific Zabbix configuration is required.
 |{$SOURCE.TRACKING.TABLE.UTIL.MAX} |<p>Threshold of source tracking table utilization trigger in %.</p> |`90` |
 |{$STATE.TABLE.UTIL.MAX} |<p>Threshold of state table utilization trigger in %.</p> |`90` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Network interfaces discovery |<p>Discovering interfaces from IF-MIB.</p> |SNMP |pfsense.net.if.discovery<p>**Filter**:</p>AND <p>- {#IFADMINSTATUS} MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.MATCHES}`</p><p>- {#IFADMINSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.NOT_MATCHES}`</p><p>- {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p><p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p><p>- {#IFTYPE} MATCHES_REGEX `{$NET.IF.IFTYPE.MATCHES}`</p><p>- {#IFTYPE} NOT_MATCHES_REGEX `{$NET.IF.IFTYPE.NOT_MATCHES}`</p> |
+|Network interfaces discovery |<p>Discovering interfaces from IF-MIB.</p> |SNMP |pfsense.net.if.discovery<p>**Filter**:</p>AND <p>- {#IFADMINSTATUS} MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.MATCHES}`</p><p>- {#IFADMINSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.NOT_MATCHES}`</p><p>- {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p><p>- {#IFNAME} MATCHES_REGEX `@Network interfaces for discovery`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p><p>- {#IFTYPE} MATCHES_REGEX `{$NET.IF.IFTYPE.MATCHES}`</p><p>- {#IFTYPE} NOT_MATCHES_REGEX `{$NET.IF.IFTYPE.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -106,25 +108,25 @@ There are no template links in this template.
 |pfSense |PFSense: Firewall rules count |<p>MIB: BEGEMOT-PF-MIB</p><p>The number of labeled filter rules on this system.</p> |SNMP |pfsense.rules.count |
 |Status |PFSense: SNMP agent availability |<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p> |INTERNAL |zabbix[host,snmp,available] |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|PFSense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p> |`min(/PFSense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/PFSense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>**Depends on**:</p><p>- PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|PFSense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/PFSense SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])) and last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0 `<p>Recovery expression:</p>`avg(/PFSense SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])` |WARNING |<p>**Depends on**:</p><p>- PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|PFSense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p> |`min(/PFSense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/PFSense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>**Depends on**:</p><p>- PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|PFSense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/PFSense SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])) and last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0 `<p>Recovery expression:</p>`avg(/PFSense SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])` |WARNING |<p>**Depends on**:</p><p>- PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|PFSense: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`change(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0 and ( last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=6 or last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=7 or last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=11 or last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=62 or last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=69 or last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=117 ) and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])<>2) `<p>Recovery expression:</p>`(change(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2) ` |INFO |<p>**Depends on**:</p><p>- PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p> |`{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)` |AVERAGE | |
-|PFSense: Packet filter is not running |<p>Please check PF status.</p> |`last(/PFSense SNMP/pfsense.pf.status)<>1` |HIGH | |
-|PFSense: State table usage is high |<p>Please check the number of connections https://docs.netgate.com/pfsense/en/latest/config/advanced-firewall-nat.html#config-advanced-firewall-maxstates</p> |`min(/PFSense SNMP/pfsense.state.table.pused,#3)>{$STATE.TABLE.UTIL.MAX}` |WARNING | |
-|PFSense: Source tracking table usage is high |<p>Please check the number of sticky connections https://docs.netgate.com/pfsense/en/latest/monitoring/status/firewall-states-sources.html</p> |`min(/PFSense SNMP/pfsense.source.tracking.table.pused,#3)>{$SOURCE.TRACKING.TABLE.UTIL.MAX}` |WARNING | |
-|PFSense: DHCP server is not running |<p>Please check DHCP server settings https://docs.netgate.com/pfsense/en/latest/services/dhcp/index.html</p> |`last(/PFSense SNMP/pfsense.dhcpd.status)=0` |AVERAGE | |
-|PFSense: DNS server is not running |<p>Please check DNS server settings https://docs.netgate.com/pfsense/en/latest/services/dns/index.html</p> |`last(/PFSense SNMP/pfsense.dns.status)=0` |AVERAGE | |
-|PFSense: Web server is not running |<p>Please check nginx service status.</p> |`last(/PFSense SNMP/pfsense.nginx.status)=0` |AVERAGE | |
-|PFSense: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/PFSense SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
+|PFSense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p> |`min(/PFSense by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/PFSense by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>**Depends on**:</p><p>- PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|PFSense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/PFSense by SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])>0 `<p>Recovery expression:</p>`avg(/PFSense by SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])` |WARNING |<p>**Depends on**:</p><p>- PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|PFSense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p> |`min(/PFSense by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/PFSense by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>**Depends on**:</p><p>- PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|PFSense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/PFSense by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])>0 `<p>Recovery expression:</p>`avg(/PFSense by SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])` |WARNING |<p>**Depends on**:</p><p>- PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|PFSense: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`change(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])>0 and ( last(/PFSense by SNMP/net.if.type[{#SNMPINDEX}])=6 or last(/PFSense by SNMP/net.if.type[{#SNMPINDEX}])=7 or last(/PFSense by SNMP/net.if.type[{#SNMPINDEX}])=11 or last(/PFSense by SNMP/net.if.type[{#SNMPINDEX}])=62 or last(/PFSense by SNMP/net.if.type[{#SNMPINDEX}])=69 or last(/PFSense by SNMP/net.if.type[{#SNMPINDEX}])=117 ) and (last(/PFSense by SNMP/net.if.status[{#SNMPINDEX}])<>2) `<p>Recovery expression:</p>`(change(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or (last(/PFSense by SNMP/net.if.status[{#SNMPINDEX}])=2) ` |INFO |<p>**Depends on**:</p><p>- PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p> |`{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense by SNMP/net.if.status[{#SNMPINDEX}])=2)` |AVERAGE | |
+|PFSense: Packet filter is not running |<p>Please check PF status.</p> |`last(/PFSense by SNMP/pfsense.pf.status)<>1` |HIGH | |
+|PFSense: State table usage is high |<p>Please check the number of connections https://docs.netgate.com/pfsense/en/latest/config/advanced-firewall-nat.html#config-advanced-firewall-maxstates</p> |`min(/PFSense by SNMP/pfsense.state.table.pused,#3)>{$STATE.TABLE.UTIL.MAX}` |WARNING | |
+|PFSense: Source tracking table usage is high |<p>Please check the number of sticky connections https://docs.netgate.com/pfsense/en/latest/monitoring/status/firewall-states-sources.html</p> |`min(/PFSense by SNMP/pfsense.source.tracking.table.pused,#3)>{$SOURCE.TRACKING.TABLE.UTIL.MAX}` |WARNING | |
+|PFSense: DHCP server is not running |<p>Please check DHCP server settings https://docs.netgate.com/pfsense/en/latest/services/dhcp/index.html</p> |`last(/PFSense by SNMP/pfsense.dhcpd.status)=0` |AVERAGE | |
+|PFSense: DNS server is not running |<p>Please check DNS server settings https://docs.netgate.com/pfsense/en/latest/services/dns/index.html</p> |`last(/PFSense by SNMP/pfsense.dns.status)=0` |AVERAGE | |
+|PFSense: Web server is not running |<p>Please check nginx service status.</p> |`last(/PFSense by SNMP/pfsense.nginx.status)=0` |AVERAGE | |
+|PFSense: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/PFSense by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 

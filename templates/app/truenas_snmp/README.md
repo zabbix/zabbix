@@ -1,14 +1,17 @@
 
-# TrueNAS SNMP
+# TrueNAS by SNMP
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
 Template for monitoring TrueNAS by SNMP
 
-This template was tested on:
+This template has been tested on:
 
 - TrueNAS Core, version 12.0-U8
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
@@ -19,7 +22,7 @@ This template was tested on:
 3. Link template to the host
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -48,8 +51,7 @@ No specific Zabbix configuration is required.
 |{$NET.IF.IFALIAS.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$NET.IF.IFDESCR.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`.*` |
 |{$NET.IF.IFDESCR.NOT_MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$NET.IF.IFNAME.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`^em[0-9]+$` |
-|{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`^$` |
+|{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$NET.IF.IFOPERSTATUS.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`^.*$` |
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES} |<p>Ignore notPresent(6)</p> |`^6$` |
 |{$NET.IF.IFTYPE.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`.*` |
@@ -65,23 +67,23 @@ No specific Zabbix configuration is required.
 |{$ZPOOL.PUSED.MAX.CRIT} |<p>Threshold of used pool space for average severity trigger in %.</p> |`90` |
 |{$ZPOOL.PUSED.MAX.WARN} |<p>Threshold of used pool space for warning trigger in %.</p> |`80` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Block devices discovery |<p>Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable).</p> |SNMP |vfs.dev.discovery<p>**Filter**:</p>AND <p>- {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
 |CPU discovery |<p>This discovery will create set of per core CPU metrics from UCD-SNMP-MIB, using {#CPU.COUNT} in preprocessing. That's the only reason why LLD is used.</p> |DEPENDENT |cpu.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Disks temperature discovery |<p>Disks temperature discovery from FREENAS-MIB.</p> |SNMP |truenas.disk.temp.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Network interfaces discovery |<p>Discovering interfaces from IF-MIB.</p> |SNMP |net.if.discovery<p>**Filter**:</p>AND <p>- {#IFADMINSTATUS} MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.MATCHES}`</p><p>- {#IFADMINSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.NOT_MATCHES}`</p><p>- {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p><p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p><p>- {#IFTYPE} MATCHES_REGEX `{$NET.IF.IFTYPE.MATCHES}`</p><p>- {#IFTYPE} NOT_MATCHES_REGEX `{$NET.IF.IFTYPE.NOT_MATCHES}`</p> |
+|Network interfaces discovery |<p>Discovering interfaces from IF-MIB.</p> |SNMP |net.if.discovery<p>**Filter**:</p>AND <p>- {#IFADMINSTATUS} MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.MATCHES}`</p><p>- {#IFADMINSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.NOT_MATCHES}`</p><p>- {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p><p>- {#IFNAME} MATCHES_REGEX `@Network interfaces for discovery`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p><p>- {#IFTYPE} MATCHES_REGEX `{$NET.IF.IFTYPE.MATCHES}`</p><p>- {#IFTYPE} NOT_MATCHES_REGEX `{$NET.IF.IFTYPE.NOT_MATCHES}`</p> |
 |ZFS datasets discovery |<p>ZFS datasets discovery from FREENAS-MIB.</p> |SNMP |truenas.zfs.dataset.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#DATASET_NAME} MATCHES_REGEX `{$DATASET.NAME.MATCHES}`</p><p>- {#DATASET_NAME} NOT_MATCHES_REGEX `{$DATASET.NAME.NOT_MATCHES}`</p> |
 |ZFS pools discovery |<p>ZFS pools discovery from FREENAS-MIB.</p> |SNMP |truenas.zfs.pools.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |ZFS volumes discovery |<p>ZFS volumes discovery from FREENAS-MIB.</p> |SNMP |truenas.zfs.zvols.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -164,36 +166,36 @@ There are no template links in this template.
 |TrueNAS |TrueNAS: ZFS volume [{#ZVOL_NAME}]: Available space |<p>MIB: FREENAS-MIB</p><p>The available of the ZFS volume in bytes.</p> |SNMP |truenas.zvol.avail[{#ZVOL_NAME}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `{#ZVOL_ALLOC_UNITS}`</p> |
 |TrueNAS |TrueNAS: Disk [{#DISK_NAME}]: Temperature |<p>MIB: FREENAS-MIB</p><p>The temperature of this HDD in mC.</p> |SNMP |truenas.disk.temp[{#DISK_NAME}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|TrueNAS: Load average is too high |<p>Per CPU load average is too high. Your system may be slow to respond.</p> |`min(/TrueNAS SNMP/system.cpu.load.avg1,5m)/last(/TrueNAS SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN} and last(/TrueNAS SNMP/system.cpu.load.avg5)>0 and last(/TrueNAS SNMP/system.cpu.load.avg15)>0 ` |AVERAGE | |
-|TrueNAS: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/TrueNAS SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Load average is too high</p> |
-|TrueNAS: System name has changed |<p>System name has changed. Ack to close.</p> |`last(/TrueNAS SNMP/system.name,#1)<>last(/TrueNAS SNMP/system.name,#2) and length(last(/TrueNAS SNMP/system.name))>0` |INFO |<p>Manual close: YES</p> |
-|TrueNAS: Lack of available memory |<p>The system is running out of memory.</p> |`min(/TrueNAS SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/TrueNAS SNMP/vm.memory.total)>0` |AVERAGE | |
-|TrueNAS: High memory utilization |<p>The system is running out of free memory.</p> |`min(/TrueNAS SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}` |AVERAGE |<p>**Depends on**:</p><p>- TrueNAS: Lack of available memory</p> |
-|TrueNAS: High swap space usage |<p>This trigger is ignored, if there is no swap configured.</p> |`min(/TrueNAS SNMP/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/TrueNAS SNMP/system.swap.total)>0` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: High memory utilization</p><p>- TrueNAS: Lack of available memory</p> |
-|TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High input error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p> |`min(/TrueNAS SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/TrueNAS SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/TrueNAS SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])) and last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])>0 `<p>Recovery expression:</p>`avg(/TrueNAS SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High output error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p> |`min(/TrueNAS SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/TrueNAS SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/TrueNAS SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])) and last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])>0 `<p>Recovery expression:</p>`avg(/TrueNAS SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`change(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])>0 and ( last(/TrueNAS SNMP/net.if.type[{#SNMPINDEX}])=6 or last(/TrueNAS SNMP/net.if.type[{#SNMPINDEX}])=7 or last(/TrueNAS SNMP/net.if.type[{#SNMPINDEX}])=11 or last(/TrueNAS SNMP/net.if.type[{#SNMPINDEX}])=62 or last(/TrueNAS SNMP/net.if.type[{#SNMPINDEX}])=69 or last(/TrueNAS SNMP/net.if.type[{#SNMPINDEX}])=117 ) and (last(/TrueNAS SNMP/net.if.status[{#SNMPINDEX}])<>2) `<p>Recovery expression:</p>`(change(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/TrueNAS SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or (last(/TrueNAS SNMP/net.if.status[{#SNMPINDEX}])=2) ` |INFO |<p>**Depends on**:</p><p>- TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
-|TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p> |`{$IFCONTROL:"{#IFNAME}"}=1 and (last(/TrueNAS SNMP/net.if.status[{#SNMPINDEX}])=2)` |AVERAGE | |
-|TrueNAS: Unavailable by ICMP ping |<p>Last three attempts returned timeout.  Please check device connectivity.</p> |`max(/TrueNAS SNMP/icmpping,#3)=0` |HIGH | |
-|TrueNAS: High ICMP ping loss |<p>ICMP packets loss detected.</p> |`min(/TrueNAS SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/TrueNAS SNMP/icmppingloss,5m)<100` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Unavailable by ICMP ping</p> |
-|TrueNAS: High ICMP ping response time |<p>Average ICMP response time is too big.</p> |`avg(/TrueNAS SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Unavailable by ICMP ping</p> |
-|TrueNAS: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/TrueNAS SNMP/system.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|TrueNAS: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/TrueNAS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Unavailable by ICMP ping</p> |
-|TrueNAS: Pool [{#POOLNAME}]: Very high space usage |<p>Two conditions should match: First, space utilization should be above {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"}%.</p><p>Second condition: The pool free space is less than {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}.</p> |`min(/TrueNAS SNMP/truenas.zpool.pused[{#POOLNAME}],5m) > {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"} and last(/TrueNAS SNMP/truenas.zpool.avail[{#POOLNAME}]) < {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}` |AVERAGE | |
-|TrueNAS: Pool [{#POOLNAME}]: High space usage |<p>Two conditions should match: First, space utilization should be above {$ZPOOL.PUSED.MAX.WARN:"{#POOLNAME}"}%.</p><p>Second condition: The pool free space is less than {$ZPOOL.FREE.MIN.WARN:"{#POOLNAME}"}.</p> |`min(/TrueNAS SNMP/truenas.zpool.pused[{#POOLNAME}],5m) > {$ZPOOL.PUSED.MAX.WARN:"{#POOLNAME}"} and last(/TrueNAS SNMP/truenas.zpool.avail[{#POOLNAME}]) < {$ZPOOL.FREE.MIN.WARN:"{#POOLNAME}"}` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Pool [{#POOLNAME}]: Very high space usage</p> |
-|TrueNAS: Pool [{#POOLNAME}]: Status is not online |<p>Please check pool status.</p> |`last(/TrueNAS SNMP/truenas.zpool.health[{#POOLNAME}]) <> 0` |AVERAGE | |
-|TrueNAS: Dataset [{#DATASET_NAME}]: Very high space usage |<p>Two conditions should match: First, space utilization should be above {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"}%.</p><p>Second condition: The dataset free space is less than {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}.</p> |`min(/TrueNAS SNMP/truenas.dataset.pused[{#DATASET_NAME}],5m) > {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"} and last(/TrueNAS SNMP/truenas.dataset.avail[{#DATASET_NAME}]) < {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}` |AVERAGE | |
-|TrueNAS: Dataset [{#DATASET_NAME}]: High space usage |<p>Two conditions should match: First, space utilization should be above {$DATASET.PUSED.MAX.WARN:"{#DATASET_NAME}"}%.</p><p>Second condition: The dataset free space is less than {$DATASET.FREE.MIN.WARN:"{#POOLNAME}"}.</p> |`min(/TrueNAS SNMP/truenas.dataset.pused[{#DATASET_NAME}],5m) > {$DATASET.PUSED.MAX.WARN:"{#DATASET_NAME}"} and last(/TrueNAS SNMP/truenas.dataset.avail[{#DATASET_NAME}]) < {$DATASET.FREE.MIN.WARN:"{#POOLNAME}"}` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Dataset [{#DATASET_NAME}]: Very high space usage</p> |
-|TrueNAS: Disk [{#DISK_NAME}]: Average disk temperature is too high |<p>Disk temperature is high.</p> |`avg(/TrueNAS SNMP/truenas.disk.temp[{#DISK_NAME}],5m) > {$TEMPERATURE.MAX.CRIT:"{#DISK_NAME}"}` |AVERAGE | |
-|TrueNAS: Disk [{#DISK_NAME}]: Average disk temperature is too high |<p>Disk temperature is high.</p> |`avg(/TrueNAS SNMP/truenas.disk.temp[{#DISK_NAME}],5m) > {$TEMPERATURE.MAX.WARN:"{#DISK_NAME}"}` |WARNING | |
+|TrueNAS: Load average is too high |<p>Per CPU load average is too high. Your system may be slow to respond.</p> |`min(/TrueNAS by SNMP/system.cpu.load.avg1,5m)/last(/TrueNAS by SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN} and last(/TrueNAS by SNMP/system.cpu.load.avg5)>0 and last(/TrueNAS by SNMP/system.cpu.load.avg15)>0 ` |AVERAGE | |
+|TrueNAS: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/TrueNAS by SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Load average is too high</p> |
+|TrueNAS: System name has changed |<p>System name has changed. Ack to close.</p> |`last(/TrueNAS by SNMP/system.name,#1)<>last(/TrueNAS by SNMP/system.name,#2) and length(last(/TrueNAS by SNMP/system.name))>0` |INFO |<p>Manual close: YES</p> |
+|TrueNAS: Lack of available memory |<p>The system is running out of memory.</p> |`min(/TrueNAS by SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/TrueNAS by SNMP/vm.memory.total)>0` |AVERAGE | |
+|TrueNAS: High memory utilization |<p>The system is running out of free memory.</p> |`min(/TrueNAS by SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}` |AVERAGE |<p>**Depends on**:</p><p>- TrueNAS: Lack of available memory</p> |
+|TrueNAS: High swap space usage |<p>This trigger is ignored, if there is no swap configured.</p> |`min(/TrueNAS by SNMP/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/TrueNAS by SNMP/system.swap.total)>0` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: High memory utilization</p><p>- TrueNAS: Lack of available memory</p> |
+|TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High input error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p> |`min(/TrueNAS by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/TrueNAS by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/TrueNAS by SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/TrueNAS by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/TrueNAS by SNMP/net.if.speed[{#SNMPINDEX}])>0 `<p>Recovery expression:</p>`avg(/TrueNAS by SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/TrueNAS by SNMP/net.if.speed[{#SNMPINDEX}])` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High output error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p> |`min(/TrueNAS by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/TrueNAS by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/TrueNAS by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/TrueNAS by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/TrueNAS by SNMP/net.if.speed[{#SNMPINDEX}])>0 `<p>Recovery expression:</p>`avg(/TrueNAS by SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/TrueNAS by SNMP/net.if.speed[{#SNMPINDEX}])` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`change(/TrueNAS by SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/TrueNAS by SNMP/net.if.speed[{#SNMPINDEX}])>0 and ( last(/TrueNAS by SNMP/net.if.type[{#SNMPINDEX}])=6 or last(/TrueNAS by SNMP/net.if.type[{#SNMPINDEX}])=7 or last(/TrueNAS by SNMP/net.if.type[{#SNMPINDEX}])=11 or last(/TrueNAS by SNMP/net.if.type[{#SNMPINDEX}])=62 or last(/TrueNAS by SNMP/net.if.type[{#SNMPINDEX}])=69 or last(/TrueNAS by SNMP/net.if.type[{#SNMPINDEX}])=117 ) and (last(/TrueNAS by SNMP/net.if.status[{#SNMPINDEX}])<>2) `<p>Recovery expression:</p>`(change(/TrueNAS by SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/TrueNAS by SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or (last(/TrueNAS by SNMP/net.if.status[{#SNMPINDEX}])=2) ` |INFO |<p>**Depends on**:</p><p>- TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down</p> |
+|TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p> |`{$IFCONTROL:"{#IFNAME}"}=1 and (last(/TrueNAS by SNMP/net.if.status[{#SNMPINDEX}])=2)` |AVERAGE | |
+|TrueNAS: Unavailable by ICMP ping |<p>Last three attempts returned timeout.  Please check device connectivity.</p> |`max(/TrueNAS by SNMP/icmpping,#3)=0` |HIGH | |
+|TrueNAS: High ICMP ping loss |<p>ICMP packets loss detected.</p> |`min(/TrueNAS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/TrueNAS by SNMP/icmppingloss,5m)<100` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Unavailable by ICMP ping</p> |
+|TrueNAS: High ICMP ping response time |<p>Average ICMP response time is too big.</p> |`avg(/TrueNAS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Unavailable by ICMP ping</p> |
+|TrueNAS: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/TrueNAS by SNMP/system.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|TrueNAS: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/TrueNAS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Unavailable by ICMP ping</p> |
+|TrueNAS: Pool [{#POOLNAME}]: Very high space usage |<p>Two conditions should match: First, space utilization should be above {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"}%.</p><p>Second condition: The pool free space is less than {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}.</p> |`min(/TrueNAS by SNMP/truenas.zpool.pused[{#POOLNAME}],5m) > {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"} and last(/TrueNAS by SNMP/truenas.zpool.avail[{#POOLNAME}]) < {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}` |AVERAGE | |
+|TrueNAS: Pool [{#POOLNAME}]: High space usage |<p>Two conditions should match: First, space utilization should be above {$ZPOOL.PUSED.MAX.WARN:"{#POOLNAME}"}%.</p><p>Second condition: The pool free space is less than {$ZPOOL.FREE.MIN.WARN:"{#POOLNAME}"}.</p> |`min(/TrueNAS by SNMP/truenas.zpool.pused[{#POOLNAME}],5m) > {$ZPOOL.PUSED.MAX.WARN:"{#POOLNAME}"} and last(/TrueNAS by SNMP/truenas.zpool.avail[{#POOLNAME}]) < {$ZPOOL.FREE.MIN.WARN:"{#POOLNAME}"}` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Pool [{#POOLNAME}]: Very high space usage</p> |
+|TrueNAS: Pool [{#POOLNAME}]: Status is not online |<p>Please check pool status.</p> |`last(/TrueNAS by SNMP/truenas.zpool.health[{#POOLNAME}]) <> 0` |AVERAGE | |
+|TrueNAS: Dataset [{#DATASET_NAME}]: Very high space usage |<p>Two conditions should match: First, space utilization should be above {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"}%.</p><p>Second condition: The dataset free space is less than {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}.</p> |`min(/TrueNAS by SNMP/truenas.dataset.pused[{#DATASET_NAME}],5m) > {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"} and last(/TrueNAS by SNMP/truenas.dataset.avail[{#DATASET_NAME}]) < {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}` |AVERAGE | |
+|TrueNAS: Dataset [{#DATASET_NAME}]: High space usage |<p>Two conditions should match: First, space utilization should be above {$DATASET.PUSED.MAX.WARN:"{#DATASET_NAME}"}%.</p><p>Second condition: The dataset free space is less than {$DATASET.FREE.MIN.WARN:"{#POOLNAME}"}.</p> |`min(/TrueNAS by SNMP/truenas.dataset.pused[{#DATASET_NAME}],5m) > {$DATASET.PUSED.MAX.WARN:"{#DATASET_NAME}"} and last(/TrueNAS by SNMP/truenas.dataset.avail[{#DATASET_NAME}]) < {$DATASET.FREE.MIN.WARN:"{#POOLNAME}"}` |WARNING |<p>**Depends on**:</p><p>- TrueNAS: Dataset [{#DATASET_NAME}]: Very high space usage</p> |
+|TrueNAS: Disk [{#DISK_NAME}]: Average disk temperature is too high |<p>Disk temperature is high.</p> |`avg(/TrueNAS by SNMP/truenas.disk.temp[{#DISK_NAME}],5m) > {$TEMPERATURE.MAX.CRIT:"{#DISK_NAME}"}` |AVERAGE | |
+|TrueNAS: Disk [{#DISK_NAME}]: Average disk temperature is too high |<p>Disk temperature is high.</p> |`avg(/TrueNAS by SNMP/truenas.disk.temp[{#DISK_NAME}],5m) > {$TEMPERATURE.MAX.WARN:"{#DISK_NAME}"}` |WARNING | |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 

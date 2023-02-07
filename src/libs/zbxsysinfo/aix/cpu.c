@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -210,6 +210,8 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 #ifdef HAVE_LIBPERFSTAT
 	perfstat_cpu_total_t	ps_cpu_total;
 
+	ZBX_UNUSED(request);
+
 	if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
@@ -220,6 +222,8 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return SYSINFO_RET_OK;
 #else
+	ZBX_UNUSED(request);
+
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
 	return SYSINFO_RET_FAIL;
 #endif
@@ -227,6 +231,7 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	ZBX_UNUSED(request);
 #ifdef HAVE_LIBPERFSTAT
 	perfstat_cpu_total_t	ps_cpu_total;
 

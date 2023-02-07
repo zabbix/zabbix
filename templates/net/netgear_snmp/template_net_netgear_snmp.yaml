@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-16T02:58:51Z'
+  date: '2022-10-27T12:59:00Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 5920713da492452889adabc25e259caa
-      template: 'Netgear Fastpath SNMP'
-      name: 'Netgear Fastpath SNMP'
+      template: 'Netgear Fastpath by SNMP'
+      name: 'Netgear Fastpath by SNMP'
       description: |
         Template Net Netgear Fastpath
         
@@ -43,7 +43,7 @@ zabbix_export:
           triggers:
             -
               uuid: 424d07aafe9f4e8c8f647db6a43363d0
-              expression: 'max(/Netgear Fastpath SNMP/icmpping,#3)=0'
+              expression: 'max(/Netgear Fastpath by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -69,14 +69,14 @@ zabbix_export:
           triggers:
             -
               uuid: 9d2efd0614ba4e16b3479ed515d3a9a2
-              expression: 'min(/Netgear Fastpath SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Netgear Fastpath SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Netgear Fastpath by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Netgear Fastpath by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Netgear Fastpath SNMP/icmpping,#3)=0'
+                  expression: 'max(/Netgear Fastpath by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -102,17 +102,17 @@ zabbix_export:
           triggers:
             -
               uuid: 99888c77fc084d43b742a1f156d87832
-              expression: 'avg(/Netgear Fastpath SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Netgear Fastpath by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Netgear Fastpath SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Netgear Fastpath SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Netgear Fastpath by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Netgear Fastpath by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Netgear Fastpath SNMP/icmpping,#3)=0'
+                  expression: 'max(/Netgear Fastpath by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -182,7 +182,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1e47f984c5514205aad2be5db1157fd2
-              expression: 'min(/Netgear Fastpath SNMP/system.cpu.util[agentSwitchCpuProcessTotalUtilization.0],5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Netgear Fastpath by SNMP/system.cpu.util[agentSwitchCpuProcessTotalUtilization.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization'
               event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -263,7 +263,7 @@ zabbix_export:
           triggers:
             -
               uuid: eba057a7ef5743ecb2c037476c97fc38
-              expression: 'last(/Netgear Fastpath SNMP/system.hw.serialnumber,#1)<>last(/Netgear Fastpath SNMP/system.hw.serialnumber,#2) and length(last(/Netgear Fastpath SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Netgear Fastpath by SNMP/system.hw.serialnumber,#1)<>last(/Netgear Fastpath by SNMP/system.hw.serialnumber,#2) and length(last(/Netgear Fastpath by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -350,7 +350,7 @@ zabbix_export:
           triggers:
             -
               uuid: 61e82ab169374a51a1ebd876cc7813a8
-              expression: 'last(/Netgear Fastpath SNMP/system.name,#1)<>last(/Netgear Fastpath SNMP/system.name,#2) and length(last(/Netgear Fastpath SNMP/system.name))>0'
+              expression: 'last(/Netgear Fastpath by SNMP/system.name,#1)<>last(/Netgear Fastpath by SNMP/system.name,#2) and length(last(/Netgear Fastpath by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -433,7 +433,7 @@ zabbix_export:
           triggers:
             -
               uuid: bf0a6ff122a14f4c9baa640d27c8f982
-              expression: 'last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0],#1)<>last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0],#2) and length(last(/Netgear Fastpath SNMP/system.sw.os[agentInventoryOperatingSystem.0]))>0'
+              expression: 'last(/Netgear Fastpath by SNMP/system.sw.os[agentInventoryOperatingSystem.0],#1)<>last(/Netgear Fastpath by SNMP/system.sw.os[agentInventoryOperatingSystem.0],#2) and length(last(/Netgear Fastpath by SNMP/system.sw.os[agentInventoryOperatingSystem.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -441,7 +441,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'last(/Netgear Fastpath SNMP/system.name,#1)<>last(/Netgear Fastpath SNMP/system.name,#2) and length(last(/Netgear Fastpath SNMP/system.name))>0'
+                  expression: 'last(/Netgear Fastpath by SNMP/system.name,#1)<>last(/Netgear Fastpath by SNMP/system.name,#2) and length(last(/Netgear Fastpath by SNMP/system.name))>0'
               tags:
                 -
                   tag: scope
@@ -493,7 +493,7 @@ zabbix_export:
           triggers:
             -
               uuid: 21c1a017dcc14148a9020207a6fd7488
-              expression: 'min(/Netgear Fastpath SNMP/vm.memory.util[memoryUsedPercentage.0],5m)>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/Netgear Fastpath by SNMP/vm.memory.util[memoryUsedPercentage.0],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization'
               event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -529,7 +529,7 @@ zabbix_export:
           triggers:
             -
               uuid: cc91cb171901433bbb35752127e54ad0
-              expression: 'max(/Netgear Fastpath SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Netgear Fastpath by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -537,7 +537,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Netgear Fastpath SNMP/icmpping,#3)=0'
+                  expression: 'max(/Netgear Fastpath by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -573,7 +573,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ce48c2b0a07d4528b95668c853b6b4e0
-                  expression: 'count(/Netgear Fastpath SNMP/sensor.fan.status[boxServicesFanItemState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"failed\"}")=1'
+                  expression: 'count(/Netgear Fastpath by SNMP/sensor.fan.status[boxServicesFanItemState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"failed\"}")=1'
                   name: '#{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -889,9 +889,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8e06e74957de4467bb127e6f16cdd84c
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -942,21 +942,21 @@ zabbix_export:
             -
               uuid: 443260352dec4467b6eafdd4c6a8ba9c
               expression: |
-                change(/Netgear Fastpath SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Netgear Fastpath SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/Netgear Fastpath by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Netgear Fastpath by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Netgear Fastpath SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Netgear Fastpath SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Netgear Fastpath SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Netgear Fastpath SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Netgear Fastpath SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Netgear Fastpath SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Netgear Fastpath by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Netgear Fastpath by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Netgear Fastpath by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Netgear Fastpath by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Netgear Fastpath by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Netgear Fastpath by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Netgear Fastpath SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Netgear Fastpath SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Netgear Fastpath by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Netgear Fastpath by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -965,8 +965,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -974,13 +974,13 @@ zabbix_export:
             -
               uuid: 8b33b079505846558c6ee4f0afb05c5d
               expression: |
-                (avg(/Netgear Fastpath SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Netgear Fastpath SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/Netgear Fastpath SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Netgear Fastpath SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/Netgear Fastpath SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/Netgear Fastpath by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Netgear Fastpath by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Netgear Fastpath by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Netgear Fastpath by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Netgear Fastpath by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Netgear Fastpath SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Netgear Fastpath SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/Netgear Fastpath SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Netgear Fastpath SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/Netgear Fastpath by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Netgear Fastpath by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Netgear Fastpath by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Netgear Fastpath by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -990,8 +990,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -999,12 +999,12 @@ zabbix_export:
             -
               uuid: bfc9aaa24f17487184a8b88d4bf310a5
               expression: |
-                min(/Netgear Fastpath SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Netgear Fastpath SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Netgear Fastpath by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Netgear Fastpath by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Netgear Fastpath SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Netgear Fastpath SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Netgear Fastpath by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Netgear Fastpath by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1014,8 +1014,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Netgear Fastpath SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Netgear Fastpath by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1032,42 +1032,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Netgear Fastpath SNMP'
+                    host: 'Netgear Fastpath by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Netgear Fastpath SNMP'
+                    host: 'Netgear Fastpath by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Netgear Fastpath SNMP'
+                    host: 'Netgear Fastpath by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Netgear Fastpath SNMP'
+                    host: 'Netgear Fastpath by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Netgear Fastpath SNMP'
+                    host: 'Netgear Fastpath by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Netgear Fastpath SNMP'
+                    host: 'Netgear Fastpath by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 251d90e9c6ae4dad92328b677f6d6edf
@@ -1099,7 +1099,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 78d4bcad8d7d4694ad492b37003fa0b0
-                  expression: 'count(/Netgear Fastpath SNMP/sensor.psu.status[boxServicesPowSupplyItemState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"failed\"}")=1'
+                  expression: 'count(/Netgear Fastpath by SNMP/sensor.psu.status[boxServicesPowSupplyItemState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"failed\"}")=1'
                   name: '#{#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1157,9 +1157,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 222b4523c61144d1a91bb1b5cbd63caf
-                  expression: 'avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Netgear Fastpath by SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
+                  recovery_expression: 'min(/Netgear Fastpath by SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
                   name: '#{#SNMPVALUE}: Temperature is too low'
                   event_name: '#{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1175,11 +1175,11 @@ zabbix_export:
             -
               uuid: bead54e2d2f34d45bafb41600e84ac2d
               expression: |
-                avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
+                avg(/Netgear Fastpath by SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
                 or
-                last(/Netgear Fastpath SNMP/sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
+                last(/Netgear Fastpath by SNMP/sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+              recovery_expression: 'max(/Netgear Fastpath by SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
               name: '#{#SNMPVALUE}: Temperature is above critical threshold'
               event_name: '#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1195,11 +1195,11 @@ zabbix_export:
             -
               uuid: f3444dbde8344a1782449ec4260972d1
               expression: |
-                avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}
+                avg(/Netgear Fastpath by SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}
                 or
-                last(/Netgear Fastpath SNMP/sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
+                last(/Netgear Fastpath by SNMP/sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
+              recovery_expression: 'max(/Netgear Fastpath by SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
               name: '#{#SNMPVALUE}: Temperature is above warning threshold'
               event_name: '#{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1209,10 +1209,10 @@ zabbix_export:
                 -
                   name: '#{#SNMPVALUE}: Temperature is above critical threshold'
                   expression: |
-                    avg(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
+                    avg(/Netgear Fastpath by SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
                     or
-                    last(/Netgear Fastpath SNMP/sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
-                  recovery_expression: 'max(/Netgear Fastpath SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                    last(/Netgear Fastpath by SNMP/sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
+                  recovery_expression: 'max(/Netgear Fastpath by SNMP/sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
               tags:
                 -
                   tag: scope
@@ -1344,7 +1344,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Netgear Fastpath SNMP'
+                        host: 'Netgear Fastpath by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2317,7 +2317,7 @@ zabbix_export:
   triggers:
     -
       uuid: d68e4595fd4c4e5a9307b268cfe06b3e
-      expression: '(last(/Netgear Fastpath SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Netgear Fastpath SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Netgear Fastpath SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Netgear Fastpath SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Netgear Fastpath by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Netgear Fastpath by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Netgear Fastpath by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Netgear Fastpath by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2326,7 +2326,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Netgear Fastpath SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Netgear Fastpath by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2342,7 +2342,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Netgear Fastpath SNMP'
+            host: 'Netgear Fastpath by SNMP'
             key: 'system.cpu.util[agentSwitchCpuProcessTotalUtilization.0]'
     -
       uuid: 1cb7d7036dfe4999b0489cc8bfa254aa
@@ -2353,14 +2353,14 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'Netgear Fastpath SNMP'
+            host: 'Netgear Fastpath by SNMP'
             key: 'vm.memory.total[agentSwitchCpuProcessMemAvailable.0]'
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Netgear Fastpath SNMP'
+            host: 'Netgear Fastpath by SNMP'
             key: 'vm.memory.available[agentSwitchCpuProcessMemFree.0]'
     -
       uuid: 88124449b8984ee6bca46269d1d3f1ae
@@ -2372,5 +2372,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Netgear Fastpath SNMP'
+            host: 'Netgear Fastpath by SNMP'
             key: 'vm.memory.util[memoryUsedPercentage.0]'

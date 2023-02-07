@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,31 @@
  * Controller class to maintain server-side notification generation tasks.
  */
 class CControllerNotificationsGet extends CController {
+
+	/**
+	 * @var array
+	 */
+	private $notifications = [];
+
+	/**
+	 * @var array
+	 */
+	private $settings = [];
+
+	/**
+	 * @var int
+	 */
+	private $timeout_time = 0;
+
+	/**
+	 * @var int
+	 */
+	private $time_from = 0;
+
+	/**
+	 * @var array
+	 */
+	private $known_eventids = [];
 
 	protected function init() {
 		parent::init();

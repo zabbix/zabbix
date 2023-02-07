@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1567,6 +1567,9 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 	for (i = 0; i < services_downtimes.values_num; i++)
 	{
 		services_times_t	*service_downtime = &services_downtimes.values[i];
+
+		if (service_downtime->from > service_downtime->to)
+			continue;
 
 		for (j = 0; j < services_times->values_num; j++)
 		{

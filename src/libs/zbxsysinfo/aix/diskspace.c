@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,6 +236,8 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct vmount	*vms = NULL, *vm;
 	struct zbx_json	j;
 
+	ZBX_UNUSED(request);
+
 	/* check how many bytes to allocate for the mounted filesystems */
 	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
 	{
@@ -295,6 +297,8 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
 	char 			*mpoint;
+
+	ZBX_UNUSED(request);
 
 	/* check how many bytes to allocate for the mounted filesystems */
 	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
@@ -410,5 +414,4 @@ out:
 int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
-
 }

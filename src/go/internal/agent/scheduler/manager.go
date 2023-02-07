@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -527,6 +527,7 @@ func (m *Manager) init() {
 
 			if metric.Plugin.IsExternal() {
 				ext := metric.Plugin.(*external.Plugin)
+				metric.Plugin.SetCapacity(1)
 				log.Infof("using plugin '%s' (%s) providing following interfaces: %s", metric.Plugin.Name(),
 					ext.Path, interfaces)
 			} else {
@@ -539,7 +540,7 @@ func (m *Manager) init() {
 }
 
 func (m *Manager) Start() {
-	log.Infof("%s", comms.GetPluginVersionMessage())
+	log.Infof("Plugin communication protocol version is %s", comms.ProtocolVersion)
 
 	monitor.Register(monitor.Scheduler)
 	go m.run()

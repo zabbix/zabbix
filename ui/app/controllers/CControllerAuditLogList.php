@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,30 +36,6 @@ class CControllerAuditLogList extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			$fields = [];
-
-			if ($this->getInput('filter_resourceid', '') !== '') {
-				$fields['filter_resourceid'] = 'id';
-			}
-
-			if ($this->getInput('filter_recordsetid', '') !== '') {
-				$fields['filter_recordsetid'] = 'cuid';
-			}
-
-			if ($fields) {
-				$validator = new CNewValidator($this->getInputAll(), $fields);
-
-				foreach ($validator->getAllErrors() as $error) {
-					info($error);
-				}
-
-				if ($validator->isErrorFatal() || $validator->isError()) {
-					$ret = false;
-				}
-			}
-		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-16T05:30:44Z'
+  date: '2022-10-27T13:33:03Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 379aaf7e87574debb4f5c3947a22ec68
-      template: 'HPE ProLiant DL380 SNMP'
-      name: 'HPE ProLiant DL380 SNMP'
+      template: 'HPE ProLiant DL380 by SNMP'
+      name: 'HPE ProLiant DL380 by SNMP'
       description: |
         Template for HPE ProLiant DL380 servers with HP iLO version 4 and later.
         
@@ -120,7 +120,7 @@ zabbix_export:
           triggers:
             -
               uuid: bd81b8c420904f0bafa4fbf90d195967
-              expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant DL380 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2) and length(last(/HPE ProLiant DL380 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0'
+              expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant DL380 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2) and length(last(/HPE ProLiant DL380 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -206,7 +206,7 @@ zabbix_export:
           triggers:
             -
               uuid: 168b1742abc340558631a577a1a3c4d9
-              expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant DL380 SNMP/hp.server.name[sysName],#2) and length(last(/HPE ProLiant DL380 SNMP/hp.server.name[sysName]))>0'
+              expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant DL380 by SNMP/hp.server.name[sysName],#2) and length(last(/HPE ProLiant DL380 by SNMP/hp.server.name[sysName]))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -314,7 +314,7 @@ zabbix_export:
           triggers:
             -
               uuid: e9bf032edb2e45f0b64cb904bf8d8403
-              expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
+              expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
               name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -325,7 +325,7 @@ zabbix_export:
                   value: available
             -
               uuid: 537c411a3d454a8b9dc64378e0e9a6cd
-              expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.WARN}'
+              expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.WARN}'
               name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -333,7 +333,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System status is in critical state'
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
               tags:
                 -
                   tag: scope
@@ -375,7 +375,7 @@ zabbix_export:
           triggers:
             -
               uuid: 97c3665497ae46eb91d81c14c5f4ac06
-              expression: 'max(/HPE ProLiant DL380 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/HPE ProLiant DL380 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -441,7 +441,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 4eb29401f4c7400ca87bb2449eb0f8e2
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -452,7 +452,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 0378b7339a3d482ea92f523f3d84c498
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN:"degraded"}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN:"degraded"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -460,7 +460,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state'
-                      expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}'
+                      expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}'
                   tags:
                     -
                       tag: scope
@@ -522,7 +522,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 26955f1b216a493c9faa95b95359aa79
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -533,7 +533,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: fc24efc3b41f410e9b0e806692f3dcf6
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -541,14 +541,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
-                      expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
+                      expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
                   tags:
                     -
                       tag: scope
                       value: available
                 -
                   uuid: d5a1edb8f9ea46f08344a07a84bd8865
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.OK:"enabled"} and last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.WARN:"invalid"}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.OK:"enabled"} and last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.WARN:"invalid"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -556,10 +556,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
-                      expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
+                      expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
-                      expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}'
+                      expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}'
                   tags:
                     -
                       tag: scope
@@ -632,7 +632,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0e57c741a6d248b69cdc70b75fc63a0f
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
                   name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -643,7 +643,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 4a66354e25c949d4aaaad02114f09e44
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}'
                   name: '{#CNTLR_LOCATION}: Disk array controller is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -651,7 +651,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
-                      expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
+                      expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
                   tags:
                     -
                       tag: scope
@@ -700,7 +700,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: f246a5184ea94ae3a793efec27998d5f
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.CRIT}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.CRIT}'
                   name: 'Fan {#SNMPINDEX}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -711,7 +711,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: ba7f63e795764d77aae0b7ce62a19514
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.WARN}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.WARN}'
                   name: 'Fan {#SNMPINDEX}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -719,7 +719,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Fan {#SNMPINDEX}: Fan is in critical state'
-                      expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.CRIT}'
+                      expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.CRIT}'
                   tags:
                     -
                       tag: scope
@@ -770,7 +770,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 917ab8f90c3e43b887eb7fd851cf3b25
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=3'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=3'
                   name: '{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -781,7 +781,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 51bb602b67624c5d932109a5e04068d3
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=4'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=4'
                   name: '{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has lost link'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -789,7 +789,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has failed'
-                      expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=3'
+                      expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=3'
                   tags:
                     -
                       tag: scope
@@ -893,7 +893,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 2b173fa3eec941e3b3d73c732740e210
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HPE ProLiant DL380 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HPE ProLiant DL380 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#DISK_LOCATION}: Disk has been replaced'
                   event_name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
@@ -968,7 +968,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 531875c8a5f54ca8ad2dabfa8a47b36b
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/HPE ProLiant DL380 SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
                   name: '{#DISK_LOCATION}: Physical disk S.M.A.R.T. failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -976,7 +976,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISK_LOCATION}: Physical disk failed'
-                      expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
+                      expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
                   tags:
                     -
                       tag: scope
@@ -1014,7 +1014,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 12eac58ddff14f7dbbdba48eca464a5f
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
                   name: '{#DISK_LOCATION}: Physical disk failed'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -1025,7 +1025,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 977a4d4fb6604877a0f02bb2455691c4
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN}'
                   name: '{#DISK_LOCATION}: Physical disk is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1033,7 +1033,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISK_LOCATION}: Physical disk failed'
-                      expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
+                      expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
                   tags:
                     -
                       tag: scope
@@ -1081,7 +1081,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b42e415d5eb941989daaed3d1ac2e762
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.CRIT}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.CRIT}'
                   name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1092,7 +1092,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: d5b8b12a72934bcfb7ad6675a68a5297
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.WARN}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.WARN}'
                   name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1100,7 +1100,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
-                      expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.CRIT}'
+                      expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.CRIT}'
                   tags:
                     -
                       tag: scope
@@ -1166,7 +1166,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1af0ddbc9ffd43b2b6800d634d8186bb
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 1'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 1'
                   name: 'Ambient: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1177,7 +1177,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: c49e51ac10c941798213d0f086e0631f
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 4'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 4'
                   name: 'Ambient: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1187,7 +1187,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: b1cfbc1702f54670b3f486da26c4887b
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 3'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 3'
                   name: 'Ambient: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1276,7 +1276,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 039ab34804f446e580b779d1ab25ed4f
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 1'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 1'
                   name: 'CPU-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1287,7 +1287,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 2cf8b917076440aa8209938cec69b905
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 4'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 4'
                   name: 'CPU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1297,7 +1297,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: cf69b02334e541b7a912a14c182dd56a
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 3'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 3'
                   name: 'CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1386,7 +1386,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6d7eb6bd348b43a2b584ceb1694c8bce
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 1'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 1'
                   name: '{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1397,7 +1397,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 43911269576b435db928e83901a16c5a
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 4'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 4'
                   name: '{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1407,7 +1407,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: b26842b776c545449354ccafb809d115
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 3'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 3'
                   name: '{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1514,7 +1514,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c8f2ef7311804357bff65d2d5c7f5d90
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 1'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 1'
                   name: 'I/O-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1525,7 +1525,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: dda9f8bf4a094b69bb30affb26e23dd3
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 4'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 4'
                   name: 'I/O-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1535,7 +1535,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: a0220dea091d4aca8d68a21a3d976496
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 3'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 3'
                   name: 'I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1624,7 +1624,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: eca9c54385084934b88f4dc9d914b2e2
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 1'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 1'
                   name: 'Memory-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1635,7 +1635,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 70b139e0c8c644918c7f01cd09604078
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 4'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 4'
                   name: 'Memory-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1645,7 +1645,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 89aab6bad94e4d188475d6e36084593e
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 3'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 3'
                   name: 'Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1737,7 +1737,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e792b530014d45b6ac7fc819db776c37
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 1'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 1'
                   name: 'PSU-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1748,7 +1748,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 803317e9eaf04b519e63b7d1b9bfd610
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 4'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 4'
                   name: 'PSU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1758,7 +1758,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 98616a3bae174922a0108b7c90339f08
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 3'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 3'
                   name: 'PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1847,7 +1847,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 2a0503b359904c71b355cb9e3da1b8fa
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 1'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 1'
                   name: 'System-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1858,7 +1858,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 09287730b82a47c4b365c09047d0b8e2
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 4'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 4'
                   name: 'System-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1868,7 +1868,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 5c7097cb91184a619fee33bd4faa296b
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 3'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 3'
                   name: 'System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1992,7 +1992,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a59f9e473b7a4afd900edce47b11443d
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])={$VDISK.STATUS.CRIT}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])={$VDISK.STATUS.CRIT}'
                   name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -2003,7 +2003,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 776bff7fb02e4948be7d81347c0c8624
-                  expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])<>{$VDISK.STATUS.OK}'
+                  expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])<>{$VDISK.STATUS.OK}'
                   name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk is not in OK state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -2011,7 +2011,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
-                      expression: 'last(/HPE ProLiant DL380 SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])={$VDISK.STATUS.CRIT}'
+                      expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])={$VDISK.STATUS.CRIT}'
                   tags:
                     -
                       tag: scope
@@ -2767,7 +2767,7 @@ zabbix_export:
   triggers:
     -
       uuid: 9612f37005e5420582d499d7cb84a24e
-      expression: '(last(/HPE ProLiant DL380 SNMP/hp.server.hw.uptime[hrSystemUptime])>0 and last(/HPE ProLiant DL380 SNMP/hp.server.hw.uptime[hrSystemUptime])<10m) or (last(/HPE ProLiant DL380 SNMP/hp.server.hw.uptime[hrSystemUptime])=0 and last(/HPE ProLiant DL380 SNMP/hp.server.net.uptime[sysUpTime])<10m)'
+      expression: '(last(/HPE ProLiant DL380 by SNMP/hp.server.hw.uptime[hrSystemUptime])>0 and last(/HPE ProLiant DL380 by SNMP/hp.server.hw.uptime[hrSystemUptime])<10m) or (last(/HPE ProLiant DL380 by SNMP/hp.server.hw.uptime[hrSystemUptime])=0 and last(/HPE ProLiant DL380 by SNMP/hp.server.net.uptime[sysUpTime])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING

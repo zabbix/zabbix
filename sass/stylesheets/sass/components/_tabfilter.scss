@@ -104,17 +104,12 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 	// Tab filter label li element.
 	.tabfilter-item-label {
-		&:hover {
-			color: $tab-label-hover-color;
-			background-color: darken($tab-label-hover-bg-color, 5%);
-		}
-
 		display: inline-block;
-		background-color: $tab-label-bg-color;
 		border-radius: 2px;
 		border: 1px solid transparent;
 		color: $tab-label-color;
-		margin-right: 3px;
+		margin-right: 2px;
+		margin-left: 2px;
 
 		&.unsaved .tabfilter-item-link {
 			font-style: italic;
@@ -133,8 +128,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			background-color: $tab-label-expanded-bg-color;
 			border: 1px solid $tab-label-expanded-border-color;
 			border-bottom: 0;
-			padding-bottom: 8px;
-			margin-top: -1px;
+			padding-bottom: 7px;
 			vertical-align: baseline;
 
 			.tabfilter-item-link {
@@ -144,18 +138,10 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			&:hover {
 				background: $tab-label-focus-bg-color;
 			}
-
-			.icon-edit {
-				background: url($sprite-path) no-repeat -42px -621px;
-			}
 		}
 
 		&.selected {
-			background-color: darken($tab-label-selected-bg-color, 5%);
-
-			.tabfilter-item-link {
-				color: $tab-label-selected-color;
-			}
+			background-color: $tab-label-expanded-bg-color;
 
 			.tabfilter-item-link[data-counter]::after {
 				display: none;
@@ -174,26 +160,52 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		.icon-filter.tabfilter-item-link[data-counter]::after {
 			display: none;
 		}
+
+		&.ui-sortable-helper {
+			background-color: $tab-label-expanded-bg-color;
+		}
 	}
 
 	// Tab filter label li clickable a element.
 	.tabfilter-item-link {
+		position: relative;
 		display: inline-block;
-		color: $tab-label-color;
+		color: $tab-label-expanded-color;
 		border: 1px transparent;
 		line-height: 22px;
 		vertical-align: middle;
-		padding: 0 8px;
+		padding: 0 8px 7px 8px;
+		margin-bottom: -7px;
+	}
+
+	.ui-sortable-container {
+		// Tab sortable handle left border is visible when handle is not selected, do not have selected sibling before and is not dragged.
+		.tabfilter-item-label.ui-sortable-helper,
+		.tabfilter-item-label:not(.selected) {
+			& + .tabfilter-item-label.ui-sortable-handle:not(.selected,.ui-sortable-helper) {
+				.tabfilter-item-link::before {
+					content: ' ';
+					position: absolute;
+					top: 1px;
+					left: -3px;
+					display: inline-block;
+					height: 20px;
+					border-left: 1px solid $ui-tabfilter-item-border-color;
+				}
+			}
+		}
 	}
 
 	.icon-edit {
 		@extend %btn-widget-defaults;
 		width: 24px;
 		height: 22px;
-		background: url($sprite-path) no-repeat -354px -621px;
+		background: url($sprite-path) no-repeat -42px -621px;
 
 		cursor: pointer;
 		margin: 0;
+		padding-bottom: 7px !important;
+		margin-bottom: -7px;
 		vertical-align: middle;
 		display: inline-block;
 		opacity: 0;
@@ -211,9 +223,9 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 	margin-left: .4em;
 	padding: 0.1em 0.4em;
 	font-size: $font-h3-size;
-	background-color: $tab-label-counter-bg-color;
+	background-color: $ui-bg-selected-color;
 	border-radius: 2px;
-	color: $tab-label-counter-color;
+	color: $white;
 	content: attr(data-counter);
 }
 
@@ -236,15 +248,11 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 }
 
 .icon-filter::before {
-	display: block;
+	vertical-align: middle;
+	display: inline-block;
 	width: 24px;
 	height: 24px;
 	content: '';
-	// white icon
-	background: url($sprite-path) no-repeat -87px -547px;
-}
-
-.selected.expanded .icon-filter::before {
 	// grey icon
-	background-position: -246px -547px;
+	background: url($sprite-path) no-repeat -246px -547px;
 }

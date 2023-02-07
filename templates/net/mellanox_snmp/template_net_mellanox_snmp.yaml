@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-15T17:34:06Z'
+  date: '2022-10-27T12:58:46Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: a60798c651604d93a062bec0f8a89751
-      template: 'Mellanox SNMP'
-      name: 'Mellanox SNMP'
+      template: 'Mellanox by SNMP'
+      name: 'Mellanox by SNMP'
       description: |
         The updated template for monitoring the Mellanox network switches over SNMP agent. All items collected in one template without any linked templates.
         
@@ -44,7 +44,7 @@ zabbix_export:
           triggers:
             -
               uuid: fe4c81a386814dfa80ffc76e1b7da9a1
-              expression: 'max(/Mellanox SNMP/icmpping,#3)=0'
+              expression: 'max(/Mellanox by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -70,14 +70,14 @@ zabbix_export:
           triggers:
             -
               uuid: 52b307324c37481693d419df236cbbd7
-              expression: 'min(/Mellanox SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Mellanox SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Mellanox by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Mellanox by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Mellanox SNMP/icmpping,#3)=0'
+                  expression: 'max(/Mellanox by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -103,17 +103,17 @@ zabbix_export:
           triggers:
             -
               uuid: 39a9cff305074e1a8b7c6ed0c526fda9
-              expression: 'avg(/Mellanox SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Mellanox by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Mellanox SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Mellanox SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Mellanox by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Mellanox by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Mellanox SNMP/icmpping,#3)=0'
+                  expression: 'max(/Mellanox by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -183,7 +183,7 @@ zabbix_export:
           triggers:
             -
               uuid: 26913093ab414fe69ff157102ae54796
-              expression: 'min(/Mellanox SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Mellanox by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization'
               event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -294,7 +294,7 @@ zabbix_export:
           triggers:
             -
               uuid: ff7ad0676a774cf49a4568e752dd916b
-              expression: 'last(/Mellanox SNMP/system.name,#1)<>last(/Mellanox SNMP/system.name,#2) and length(last(/Mellanox SNMP/system.name))>0'
+              expression: 'last(/Mellanox by SNMP/system.name,#1)<>last(/Mellanox by SNMP/system.name,#2) and length(last(/Mellanox by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -375,7 +375,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6e476399963a414a847c4c514055bf43
-              expression: 'max(/Mellanox SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Mellanox by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -383,7 +383,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Mellanox SNMP/icmpping,#3)=0'
+                  expression: 'max(/Mellanox by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -446,7 +446,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 585db2b2a42b4eb09770ca2241a557d0
-                  expression: 'last(/Mellanox SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Mellanox SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Mellanox by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Mellanox by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Mellanox by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced'
                   event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
@@ -514,7 +514,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: de81ef4f2c3f4f44a745a1fa1f179784
-                  expression: 'count(/Mellanox SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  expression: 'count(/Mellanox by SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '{#SENSOR_INFO}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -844,9 +844,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 46918cfc713a4b1da7eed32cead0070b
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -897,21 +897,21 @@ zabbix_export:
             -
               uuid: 2dc62fe3cd624e2ba99caa9ff94273f6
               expression: |
-                change(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/Mellanox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Mellanox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Mellanox SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Mellanox SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Mellanox SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Mellanox SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Mellanox SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Mellanox SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Mellanox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Mellanox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Mellanox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Mellanox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Mellanox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Mellanox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Mellanox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Mellanox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -920,8 +920,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -929,13 +929,13 @@ zabbix_export:
             -
               uuid: 20e8f28ebc304ba185d475dbba51c4b8
               expression: |
-                (avg(/Mellanox SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/Mellanox SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/Mellanox by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Mellanox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Mellanox by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Mellanox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Mellanox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Mellanox SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/Mellanox SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/Mellanox by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Mellanox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Mellanox by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Mellanox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -945,8 +945,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -954,12 +954,12 @@ zabbix_export:
             -
               uuid: 6740479821cd49c199c345dd736a11f7
               expression: |
-                min(/Mellanox SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Mellanox SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Mellanox by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Mellanox by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Mellanox SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Mellanox SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Mellanox by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Mellanox by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -969,8 +969,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Mellanox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -987,42 +987,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Mellanox SNMP'
+                    host: 'Mellanox by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Mellanox SNMP'
+                    host: 'Mellanox by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Mellanox SNMP'
+                    host: 'Mellanox by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Mellanox SNMP'
+                    host: 'Mellanox by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Mellanox SNMP'
+                    host: 'Mellanox by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Mellanox SNMP'
+                    host: 'Mellanox by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1062,7 +1062,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 5d2d688ad68343ff8884c11e9d233b98
-                  expression: 'count(/Mellanox SNMP/sensor.psu.status[entStateOper.{#SNMPINDEX}],#1,"eq","{$PSU.STATUS.CRIT}")=1'
+                  expression: 'count(/Mellanox by SNMP/sensor.psu.status[entStateOper.{#SNMPINDEX}],#1,"eq","{$PSU.STATUS.CRIT}")=1'
                   name: '{#ENT_NAME}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1146,9 +1146,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7259bdafbe7f4227999d7365a99e536d
-                  expression: 'avg(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
+                  expression: 'avg(/Mellanox by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}-3'
+                  recovery_expression: 'max(/Mellanox by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}-3'
                   name: '{#SENSOR_INFO}: Temperature is above critical threshold'
                   event_name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1163,9 +1163,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 7bfa2bd0177940f4aff8dc95867ceb44
-                  expression: 'avg(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}'
+                  expression: 'avg(/Mellanox by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}+3'
+                  recovery_expression: 'min(/Mellanox by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}+3'
                   name: '{#SENSOR_INFO}: Temperature is too low'
                   event_name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1181,11 +1181,11 @@ zabbix_export:
             -
               uuid: 352650536eef4858be1437a720712932
               expression: |
-                avg(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}
+                avg(/Mellanox by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}
                 or
-                last(/Mellanox SNMP/sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}])={$TEMP.STATUS.WARN}
+                last(/Mellanox by SNMP/sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}])={$TEMP.STATUS.WARN}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}-3'
+              recovery_expression: 'max(/Mellanox by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}-3'
               name: '{#SENSOR_INFO}: Temperature is above warning threshold'
               event_name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1194,8 +1194,8 @@ zabbix_export:
               dependencies:
                 -
                   name: '{#SENSOR_INFO}: Temperature is above critical threshold'
-                  expression: 'avg(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
-                  recovery_expression: 'max(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}-3'
+                  expression: 'avg(/Mellanox by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
+                  recovery_expression: 'max(/Mellanox by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}-3'
               tags:
                 -
                   tag: scope
@@ -1316,8 +1316,8 @@ zabbix_export:
             -
               uuid: f1eb2ddb27d24cd99d8aba4485dfeeb9
               expression: |
-                last(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Mellanox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mellanox SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                last(/Mellanox by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                ((last(/Mellanox by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mellanox by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Mellanox by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               name: '{#FSNAME}: Disk space is critically low'
               event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1338,8 +1338,8 @@ zabbix_export:
             -
               uuid: b2e084f280434a3a8291e5dc691dfd7b
               expression: |
-                last(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Mellanox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mellanox SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                last(/Mellanox by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
+                ((last(/Mellanox by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mellanox by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Mellanox by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               name: '{#FSNAME}: Disk space is low'
               event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1354,8 +1354,8 @@ zabbix_export:
                 -
                   name: '{#FSNAME}: Disk space is critically low'
                   expression: |
-                    last(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Mellanox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mellanox SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                    last(/Mellanox by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                    ((last(/Mellanox by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mellanox by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Mellanox by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -1377,14 +1377,14 @@ zabbix_export:
                   calc_fnc: LAST
                   type: GRAPH_SUM
                   item:
-                    host: 'Mellanox SNMP'
+                    host: 'Mellanox by SNMP'
                     key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: C80000
                   calc_fnc: LAST
                   item:
-                    host: 'Mellanox SNMP'
+                    host: 'Mellanox by SNMP'
                     key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1480,7 +1480,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 912430a103414c6eb9c8e55c45246f48
-                  expression: 'min(/Mellanox SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Mellanox by SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#MEMNAME}: High memory utilization'
                   event_name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -1503,7 +1503,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Mellanox SNMP'
+                    host: 'Mellanox by SNMP'
                     key: 'vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1688,7 +1688,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Mellanox SNMP'
+                        host: 'Mellanox by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
         -
           uuid: e41382f2a3394e52b885bb6a70df35ff
@@ -1709,7 +1709,7 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Mellanox SNMP'
+                        host: 'Mellanox by SNMP'
                         name: 'CPU utilization'
                 -
                   type: GRAPH_PROTOTYPE
@@ -1733,7 +1733,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Mellanox SNMP'
+                        host: 'Mellanox by SNMP'
                         name: '{#MEMNAME}: Memory utilization'
                 -
                   type: GRAPH_PROTOTYPE
@@ -1757,7 +1757,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Mellanox SNMP'
+                        host: 'Mellanox by SNMP'
                         name: '{#FSNAME}: Disk space usage'
       valuemaps:
         -
@@ -2702,7 +2702,7 @@ zabbix_export:
   triggers:
     -
       uuid: 667856dcaad04a108cb0a5150e825a50
-      expression: '(last(/Mellanox SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Mellanox SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Mellanox SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Mellanox SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Mellanox by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2711,7 +2711,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Mellanox SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Mellanox by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2727,5 +2727,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Mellanox SNMP'
+            host: 'Mellanox by SNMP'
             key: system.cpu.util

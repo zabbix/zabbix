@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,10 @@ package udp
 import (
 	"errors"
 	"net"
+	"os"
 	"strconv"
 
-	"github.com/cakturk/go-netstat/netstat"
+	"github.com/sokurenko/go-netstat/netstat"
 )
 
 // exportNetUdpSocketCount - returns number of UDP sockets that match parameters.
@@ -157,7 +158,7 @@ func netStatUdpCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP,
 
 		return true
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return 0, err
 	}
 

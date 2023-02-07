@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,8 +41,8 @@ static int	check_procstate(struct procentry64 *procentry, int zbx_proc_stat)
 
 static int	check_procargs(struct procentry64 *procentry, const char *proccomm)
 {
-	int	i;
-	char	procargs[MAX_BUFFER_LEN];
+	unsigned int	i;
+	char		procargs[MAX_BUFFER_LEN];
 
 	if (0 != getargs(procentry, (int)sizeof(*procentry), procargs, (int)sizeof(procargs)))
 		return FAIL;

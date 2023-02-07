@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,8 +49,6 @@ void	zbx_audit_host_update_json_update_inventory_mode(zbx_uint64_t hostid, int i
 		int inventory_mode_new);
 void	zbx_audit_host_update_json_update_host_status(zbx_uint64_t hostid, int host_status_old,
 		int host_status_new);
-void	zbx_audit_host_prototype_update_json_update_interface_details_create_entry(zbx_uint64_t hostid,
-		zbx_uint64_t interfaceid);
 
 #define PREPARE_AUDIT_HOST_INTERFACE_H(funcname, interface_resource, type1)					\
 void	zbx_audit_##funcname##_update_json_update_interface_##interface_resource(zbx_uint64_t hostid,		\

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -189,6 +189,34 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 		$info_table->addRow(
 			(new CRow([$dbversion['database'], $dbversion['current_version'], $error]))->addClass(ZBX_STYLE_RED)
 		);
+	}
+
+	if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $data['system_info'])) {
+		$info_table->addRow((new CRow([
+			_('Housekeeping'),
+			_('Override item history period'),
+			(new CCol([
+				_('This setting should be enabled, because history tables contain compressed chunks.'),
+				' ',
+				new CLink(_('Configuration').'&hellip;',
+					(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
+				)
+			]))->addClass(ZBX_STYLE_RED)
+		])));
+	}
+
+	if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS, $data['system_info'])) {
+		$info_table->addRow((new CRow([
+			_('Housekeeping'),
+			_('Override item trend period'),
+			(new CCol([
+				_('This setting should be enabled, because trend tables contain compressed chunks.'),
+				' ',
+				new CLink(_('Configuration').'&hellip;',
+					(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
+				)
+			]))->addClass(ZBX_STYLE_RED)
+		])));
 	}
 
 	if ($data['system_info']['ha_cluster_enabled']) {

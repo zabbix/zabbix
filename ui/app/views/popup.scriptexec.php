@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ if ($data['success']) {
 	if ($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
 		$row_decription[] = new CVar('debug', json_encode($data['debug']));
 		$row_decription[] = new CDiv(
-			(new CLinkAction('Open log'))
+			(new CLinkAction(_('Open log')))
 				->setId('script_execution_log')
 				->addClass($data['debug'] ? '' : ZBX_STYLE_DISABLED)
 		);
@@ -49,7 +49,9 @@ if ($data['success']) {
 	);
 }
 
-$form = (new CForm())->addItem($form_items);
+$form = (new CForm())
+	->cleanItems()
+	->addItem($form_items);
 
 $output = [
 	'header' => $data['title'],

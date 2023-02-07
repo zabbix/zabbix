@@ -3715,6 +3715,10 @@ msgstr "Ausdrucksgenerator schließen"
 msgid "Close new event"
 msgstr "Schließe neues Ereignis"
 
+#: app/views/configuration.correlation.edit.php:154
+msgid "Close new events"
+msgstr ""
+
 #: app/views/configuration.correlation.edit.php:149
 #: include/classes/helpers/CCorrelationHelper.php:70
 msgid "Close old events"
@@ -4028,6 +4032,10 @@ msgstr "Konfiguration geändert"
 #: include/classes/setup/CSetupWizard.php:601
 msgid "Configure DB connection"
 msgstr "Konfiguration Datenbankverbindung"
+
+#: app/views/js/administration.authentication.edit.js.php:56
+msgid "Confirm changes"
+msgstr ""
 
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
@@ -6278,6 +6286,10 @@ msgstr "Aktiviere"
 msgid "Enable HTTP authentication"
 msgstr "Aktiviere HTTP Authentifizierung"
 
+#: app/views/js/administration.authentication.edit.js.php:59
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "Aktiviere LDAP Authentifizierung"
@@ -6991,6 +7003,11 @@ msgstr "Im Feld \"%1$s\" fehlt ein Wert für die Karte \"%2$s\"."
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "Das Feld \"%1$s\" ist nicht korrekt: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
 
 #: include/validate.inc.php:167
 #, c-format
@@ -8500,6 +8517,10 @@ msgstr "Identischer Namespace (%1$s) wird von Modulen verwendet, die sich unter 
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
 msgstr "Identifikation des Systems. Rückgabewert Zeichenfolge"
+
+#: app/views/administration.authentication.edit.php:113
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -13307,6 +13328,10 @@ msgstr "Nur Superadmins können den Berichtseigentümer festlegen."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Nur Auslöser, die mit aktiven Hosts und aktiven Datenpunkten verbunden sind, werden gezählt"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 # Der Browser
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -17721,6 +17746,16 @@ msgstr "Dieser Monat bis jetzt"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Diese Einstellung gilt nur für numerische Daten. Nicht numerische Daten werden immer aus der Historie entnommen."
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -20471,6 +20506,10 @@ msgstr "ein boolescher Wert wird erwartet"
 msgid "a character string is expected"
 msgstr "Zeichenfolge erwartet"
 
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "ein Datum im Format JJJJ-MM-TT wird erwartet"
@@ -21410,6 +21449,10 @@ msgstr "ungültige Aggregationsmethode"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "ungültigen Byte-Sequenz in UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
 msgid "invalid delay"

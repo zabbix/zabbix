@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,5 +127,18 @@ class CSettingsHelper extends CConfigGeneralHelper {
 		self::loadParams($name, true);
 
 		return array_key_exists($name, self::$params) ? self::$params[$name] : null;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getDbVersionStatus(): array {
+		$dbversion_status = json_decode((string) self::getGlobal(self::DBVERSION_STATUS), true);
+
+		if (!is_array($dbversion_status)) {
+			return [];
+		}
+
+		return $dbversion_status;
 	}
 }

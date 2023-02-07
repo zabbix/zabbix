@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,10 +236,6 @@ abstract class CControllerLatest extends CController {
 	 * @return array
 	 */
 	protected function cleanInput(array $input): array {
-		if (array_key_exists('filter_reset', $input) && $input['filter_reset']) {
-			return array_intersect_key(['filter_name' => ''], $input);
-		}
-
 		if (array_key_exists('tags', $input) && $input['tags']) {
 			$input['tags'] = array_filter($input['tags'], function ($tag) {
 				return !($tag['tag'] === '' && $tag['value'] === '');

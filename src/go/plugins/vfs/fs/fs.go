@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,7 +125,6 @@ func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)
 	}
 
 	fsCaller := p.newFSCaller(getStats, 1)
-	defer fsCaller.close()
 
 	var stats *FsStats
 	if stats, err = fsCaller.run(params[0]); err != nil {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -193,6 +193,18 @@ class ZBase {
 
 				$router = $this->component_registry->get('router');
 				$router->addActions($this->module_manager->getActions());
+
+				$validator = new CNewValidator(['action' => $action_name], ['action' => 'fatal|required|string']);
+				$errors = $validator->getAllErrors();
+
+				if ($errors) {
+					CCookieHelper::set('system-message-details', base64_encode(json_encode(
+						['type' => 'error', 'messages' => $errors]
+					)));
+
+					redirect('zabbix.php?action=system.warning');
+				}
+
 				$router->setAction($action_name);
 
 				$this->component_registry->get('menu.main')

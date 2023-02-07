@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,11 +23,13 @@ require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
+ * @backup profiles
+ *
  * @dataSource TagFilter
  */
 class testPageTemplates extends CLegacyWebTest {
 
-	public $templateName = 'Huawei OceanStor 5300 V5 SNMP';
+	public $templateName = 'Huawei OceanStor 5300 V5 by SNMP';
 
 	use TagTrait;
 	use TableTrait;
