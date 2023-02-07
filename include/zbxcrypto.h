@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 #ifndef ZABBIX_ZBXCRYPTO_H
 #define ZABBIX_ZBXCRYPTO_H
+
+#include "sysinc.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
@@ -41,4 +43,17 @@ void	zbx_tls_version(void);
 
 #endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 
-#endif /* ZABBIX_DISK_H */
+int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
+int	zbx_bin2hex(const unsigned char *bin, size_t bin_len, char *out, size_t out_len);
+
+typedef enum
+{
+	ZBX_HASH_MD5,
+	ZBX_HASH_SHA256
+}
+zbx_crypto_hash_t;
+
+int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const char *text, size_t text_len,
+		char **out);
+
+#endif /* ZABBIX_CRYPTO_H */

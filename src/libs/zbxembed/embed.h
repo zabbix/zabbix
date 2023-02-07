@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,9 @@ struct zbx_es_env
 	struct zbx_json	*json;
 
 	jmp_buf		loc;
+
+	int		http_req_objects;
+	size_t		log_size;
 };
 
 zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);

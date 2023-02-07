@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ require_once dirname(__FILE__).'/js/configuration.maintenance.edit.js.php';
 $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 $maintenance_form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('maintenance-form')
 	->setName('maintenanceForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)

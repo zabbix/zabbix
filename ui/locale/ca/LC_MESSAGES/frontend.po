@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-11-13 20:36+0000\n"
+"PO-Revision-Date: 2023-01-08 15:52+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1562,7 +1562,7 @@ msgstr "Accions d'autoregistre"
 
 #: app/views/administration.housekeeping.edit.php:86
 msgid "Autoregistration data storage period"
-msgstr "Període d'emmagatzematge de lesdades d'autoregistre"
+msgstr "Període d'emmagatzematge de les dades d'autoregistre"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:195
@@ -4028,6 +4028,10 @@ msgstr "Configuració actualitzada"
 msgid "Configure DB connection"
 msgstr "Configura la connexió de base de dades"
 
+#: app/views/js/administration.authentication.edit.js.php:56
+msgid "Confirm changes"
+msgstr "Confirmar canvis"
+
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
 msgstr "Text de confirmació"
@@ -6268,6 +6272,10 @@ msgstr "Activar"
 msgid "Enable HTTP authentication"
 msgstr "Activa l'autenticació HTTP"
 
+#: app/views/js/administration.authentication.edit.js.php:59
+msgid "Enable HTTP authentication for all users."
+msgstr "Activar l'autenticació HTTP per a tots els usuaris."
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "Activa l'autenticació LDAP"
@@ -6980,6 +6988,11 @@ msgstr "Al camp \"%1$s\" falta un valor per al mapa \"%2$s\"."
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "El camp \"%1$s\" no és correcte: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr "El camp \"%1$s\" no és correcte: %2$s."
 
 #: include/validate.inc.php:167
 #, c-format
@@ -8484,6 +8497,10 @@ msgstr "Els mòduls situats a %2$s utilitzen un espai de noms idèntic (%1$s)."
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
 msgstr "Identificació del sistema. Retorna una cadena"
+
+#: app/views/administration.authentication.edit.php:113
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr "Si s'activa l'autenticació HTTP, tots els usuaris (tot i que l'accés s'hagi establert com a LDAP/Intern) s'autenticaran pel servidor Web, no pas pel Zabbix."
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -21391,6 +21408,10 @@ msgstr "mètode d'afegir no vàlid"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "seqüència d'octets no vàlida en UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr "tipus de dades no vàlid"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
 msgid "invalid delay"

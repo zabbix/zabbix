@@ -107,7 +107,7 @@ in:
 out:
   stack:
   - type: ZBX_EVAL_TOKEN_VAR_STR
-    token: '"xyz"'
+    token: 'xyz'
     opt: 0
   result: SUCCEED
 ---
@@ -125,7 +125,7 @@ in:
 out:
   stack:
   - type: ZBX_EVAL_TOKEN_VAR_STR
-    token: '"x\\\"y\"z/"'
+    token: 'x\"y"z/'
     opt: 0
   result: SUCCEED
 ---
@@ -143,7 +143,7 @@ in:
 out:
   stack:
   - type: ZBX_EVAL_TOKEN_VAR_STR
-    token: '""'
+    token: ''
     opt: 0
   result: SUCCEED
 ---
@@ -366,7 +366,7 @@ in:
 out:
   stack:
   - type: ZBX_EVAL_TOKEN_VAR_LLDMACRO
-    token: '{{#LLD}.function()}}'
+    token: '{{#LLD}.function()}'
     opt: 0
   result: SUCCEED
 ---
@@ -377,7 +377,7 @@ in:
 out:
   stack:
   - type: ZBX_EVAL_TOKEN_VAR_NUM
-    token: '1{{#LLD}.function()}}'
+    token: '1{{#LLD}.function()}'
     opt: 0
   result: SUCCEED
 ---
@@ -388,7 +388,7 @@ in:
 out:
   stack:
   - type: ZBX_EVAL_TOKEN_VAR_NUM
-    token: '.{{#LLD}.function()}}'
+    token: '.{{#LLD}.function()}'
     opt: 0
   result: SUCCEED
 ---
@@ -399,7 +399,7 @@ in:
 out:
   stack:
   - type: ZBX_EVAL_TOKEN_VAR_NUM
-    token: '{{#LLD}.function()}.{{#LLD}.function()}}'
+    token: '{{#LLD}.function()}.{{#LLD}.function()}'
     opt: 0
   result: SUCCEED
 ---
@@ -410,7 +410,7 @@ in:
 out:
   stack:
   - type: ZBX_EVAL_TOKEN_VAR_NUM
-    token: '{{#LLD}.function()}e{{#LLD}.function()}}'
+    token: '{{#LLD}.function()}e{{#LLD}.function()}'
     opt: 0
   result: SUCCEED
 ---
@@ -1300,7 +1300,7 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '1', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"xyz"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'xyz', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'min', opt: 2}
   result: SUCCEED
 ---
@@ -1579,7 +1579,7 @@ out:
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
   result: SUCCEED
 ---
-test case: Succeed 'count(//trap[1],#5,,0) + count(/Trapper/trap[1] ,5m ,"1h ","1 ")'
+test case: Succeed 'count(//trap[1],#5,,0) + count(/Trapper/trap[1] ,5m ,"1h","1")'
 in:
   rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR]
   expression: 'count(//trap[1],#5,,0) + count(/Trapper/trap[1] ,5m ,"1h","1")'
@@ -1592,8 +1592,8 @@ out:
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
   - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '/Trapper/trap[1]', opt: 0}
   - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '5m', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"1h"', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"1"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '1h', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '1', opt: 0}
   - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
   - {type: ZBX_EVAL_TOKEN_OP_ADD, token: '+', opt: 0}
   result: SUCCEED
@@ -1666,10 +1666,10 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_PROP_TAG, token: 'tag', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"xyz"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'xyz', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
   - {type: ZBX_EVAL_TOKEN_PROP_GROUP, token: 'group', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"abc"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'abc', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_NE, token: '<>', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
   result: SUCCEED
@@ -1694,7 +1694,7 @@ in:
   expression: '"xyz"=tag'
 out:
   stack:
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"xyz"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'xyz', opt: 0}
   - {type: ZBX_EVAL_TOKEN_PROP_TAG, token: 'tag', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
   result: SUCCEED
@@ -1706,7 +1706,7 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_PROP_TAG, token: 'tag', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"xyz"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'xyz', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
   result: SUCCEED
 ---
@@ -1731,10 +1731,10 @@ in:
 out:
   stack:
   - {type: ZBX_EVAL_TOKEN_PROP_TAG, token: 'tag', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"xyz"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'xyz', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
   - {type: ZBX_EVAL_TOKEN_PROP_GROUP, token: 'group', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"abc"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'abc', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_NE, token: '<>', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
   result: SUCCEED
@@ -1792,4 +1792,41 @@ in:
   expression: '1 < 2'
 out:
   result: FAIL
+---
+test case: Succeed 'count(//trap[1],#5,,"\x")'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'count(//trap[1],#5,,"\x")'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '\x', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  result: SUCCEED
+---
+test case: Succeed 'count(//trap[1],#5,,"\\"")'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'count(//trap[1],#5,,"\\"")'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_NULL, token: '', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '\"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  result: SUCCEED
+---
+test case: Succeed 'concat("\\", "x")'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'concat("\\", "x")'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '\', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'x', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'concat', opt: 2}
+  result: SUCCEED
 ...
