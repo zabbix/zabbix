@@ -791,6 +791,10 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		char		*str_esc;
 		const char	*d = "";
 
+		/* Even if there are no updates for an item, we must create audit entry for it */
+		/* to accommodate other entities changes that depend on an item (like tags).   */
+		zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name, item->flags);
+
 		if (0 == item->upd_flags)
 			goto dependent;
 
@@ -849,7 +853,6 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					item->field##_orig, item->field);					\
 		}
 
-		zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name, item->flags);
 		PREPARE_UPDATE_ID(INTERFACEID, interfaceid)
 		PREPARE_UPDATE_STR(NAME, name)
 		PREPARE_UPDATE_UC(TYPE, type)
@@ -918,7 +921,6 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->verify_peer, item->verify_host, item->allow_traps, item->discover);
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
-
 		zbx_audit_item_create_entry(AUDIT_ACTION_ADD, *itemid, item->name, item->flags);
 		zbx_audit_item_update_json_add_data(*itemid, item, hostid);
 
