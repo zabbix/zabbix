@@ -556,7 +556,7 @@ class CSvgGraphHelper {
 
 			if (!array_key_exists($dataset_num, $dataset_metrics)) {
 				$metric = array_merge($metric, [
-					'name' => graph_item_aggr_fnc2str($metric['options']['aggregate_function']).'('.$name.')',
+					'name' => $name,
 					'items' => [],
 					'points' => []
 				]);
