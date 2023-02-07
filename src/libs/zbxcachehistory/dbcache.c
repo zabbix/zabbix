@@ -2103,6 +2103,11 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 			hdata->value.str = value->data.str;
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_TEXT_VALUE_LEN)] = '\0';
 			break;
+		case ITEM_VALUE_TYPE_BIN:
+			dc_history_clean_value(hdata);
+			hdata->value.str = value->data.str;
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_TEXT_VALUE_LEN)] = '\0';
+			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (ITEM_VALUE_TYPE_LOG != hdata->value_type)
 			{
@@ -2113,9 +2118,6 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 			hdata->value.log->value = value->data.str;
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 			break;
-		case ITEM_VALUE_TYPE_BIN:
-			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
 	}
 
 	hdata->value_type = value_type;

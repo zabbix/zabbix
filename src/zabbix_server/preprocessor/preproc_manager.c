@@ -157,6 +157,16 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
 		zbx_variant_set_str(var, value->result->text);
 		value->result->text = NULL;
 	}
+	else if (ZBX_ISSET_TEXT(value->result))
+	{
+		zbx_variant_set_str(var, value->result->text);
+		value->result->text = NULL;
+	}
+	else if (ZBX_ISSET_BIN(value->result))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
 	else
 		zbx_variant_set_none(var);
 

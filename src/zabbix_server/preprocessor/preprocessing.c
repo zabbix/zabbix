@@ -868,6 +868,12 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 				value_len = len;
 		}
 
+		if (0 != ZBX_ISSET_BIN(result))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
 		if (ZBX_MAX_RECV_DATA_SIZE < value_len)
 		{
 			value.result = NULL;
