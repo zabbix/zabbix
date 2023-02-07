@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,7 +107,12 @@ $auth_tab = (new CFormList('list_auth'))
 
 // HTTP authentication fields.
 $http_tab = (new CFormList('list_http'))
-	->addRow(new CLabel(_('Enable HTTP authentication'), 'http_auth_enabled'),
+	->addRow(
+		new CLabel([_('Enable HTTP authentication'),
+			makeHelpIcon(
+				_("If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix.")
+			)
+		], 'http_auth_enabled'),
 		(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
 			->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
 			->setUncheckedValue(ZBX_AUTH_HTTP_DISABLED)
@@ -325,10 +330,11 @@ $saml_tab = (new CFormList('list_saml'))
 			->setEnabled($data['saml_enabled'])
 	);
 
-$selected_tab = $data['form_refresh'] ? CCookieHelper::get('tab') : 0;
+$selected_tab = $data['form_refresh'] != 0 ? CCookieHelper::get('tab') : 0;
 (new CWidget())
 	->setTitle(_('Authentication'))
 	->addItem((new CForm())
+		->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 		->addVar('action', 'authentication.update')
 		->addVar('change_bind_password', $data['change_bind_password'])
 		->addVar('db_authentication_type', $data['db_authentication_type'])

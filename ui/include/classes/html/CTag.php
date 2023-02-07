@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,16 +46,36 @@ class CTag extends CObject {
 	protected $attrEncStrategy = self::ENC_ALL;
 
 	/**
+	 * The list of tag attributes.
+	 *
+	 * @var array
+	 */
+	protected $attributes = [];
+
+	/**
+	 * The name of the tag.
+	 *
+	 * @var string
+	 */
+	protected $tagname = '';
+
+	/**
+	 * The type of tag.
+	 *
+	 * @var bool
+	 */
+	private $paired = false;
+
+	/**
 	 * Hint element for the current CTag.
 	 *
 	 * @var CSpan
 	 */
 	protected $hint = null;
 
-	public function __construct($tagname, $paired = false, $body = null) {
+	public function __construct(string $tagname, bool $paired = false, $body = null) {
 		parent::__construct();
 
-		$this->attributes = [];
 		$this->tagname = $tagname;
 		$this->paired = $paired;
 
@@ -281,12 +301,6 @@ class CTag extends CObject {
 	public function error($value) {
 		error('class('.get_class($this).') - '.$value);
 		return 1;
-	}
-
-	public function getForm($method = 'post', $action = null, $enctype = null) {
-		$form = (new CForm($method, $action, $enctype))
-			->addItem($this);
-		return $form;
 	}
 
 	public function setTitle($value) {

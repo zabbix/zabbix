@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:33:38Z'
+  date: '2022-11-08T11:58:11Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -519,6 +519,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.queue_totals.messages
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
           tags:
@@ -538,6 +540,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.queue_totals.messages_ready
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
           tags:
@@ -557,6 +561,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.queue_totals.messages_unacknowledged
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           master_item:
             key: rabbitmq.get_overview
           tags:
@@ -597,11 +603,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.ack_details.rate.first()'
+                    - $.message_stats.ack_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -627,11 +633,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.ack.first()'
+                    - $.message_stats.ack
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -658,11 +664,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.confirm_details.rate.first()'
+                    - $.message_stats.confirm_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -688,11 +694,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.confirm.first()'
+                    - $.message_stats.confirm
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -719,11 +725,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.deliver_get_details.rate.first()'
+                    - $.message_stats.deliver_get_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -749,11 +755,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.deliver_get.first()'
+                    - $.message_stats.deliver_get
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -780,11 +786,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.publish_details.rate.first()'
+                    - $.message_stats.publish_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -810,11 +816,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.publish.first()'
+                    - $.message_stats.publish
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -841,11 +847,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.publish_in_details.rate.first()'
+                    - $.message_stats.publish_in_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -871,11 +877,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.publish_in.first()'
+                    - $.message_stats.publish_in
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -902,11 +908,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.publish_out_details.rate.first()'
+                    - $.message_stats.publish_out_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -932,11 +938,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.publish_out.first()'
+                    - $.message_stats.publish_out
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -963,11 +969,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.redeliver_details.rate.first()'
+                    - $.message_stats.redeliver_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -993,11 +999,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.redeliver.first()'
+                    - $.message_stats.redeliver
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -1024,11 +1030,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.return_unroutable_details.rate.first()'
+                    - $.message_stats.return_unroutable_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -1054,11 +1060,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.return_unroutable.first()'
+                    - $.message_stats.return_unroutable
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_exchanges
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               tags:
                 -
                   tag: component
@@ -1072,6 +1078,27 @@ zabbix_export:
                 -
                   tag: vhost
                   value: '{#VHOST}'
+            -
+              uuid: 54ec0943af1b4c0c807bcc222f5d70c7
+              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Get data'
+              type: DEPENDENT
+              key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The HTTP API endpoint that returns [{#VHOST}][{#EXCHANGE}][{#TYPE}] exchanges metrics'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].first()'
+              master_item:
+                key: rabbitmq.get_exchanges
+              tags:
+                -
+                  tag: component
+                  value: raw
           master_item:
             key: rabbitmq.get_exchanges
           lld_macro_paths:
@@ -1209,8 +1236,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'RabbitMQ cluster by HTTP'
                         name: 'RabbitMQ: Messages'
-                        host: 'RabbitMQ cluster by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1225,8 +1252,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'RabbitMQ cluster by HTTP'
                         name: 'RabbitMQ: Connections'
-                        host: 'RabbitMQ cluster by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -1241,8 +1268,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'RabbitMQ: Messages status'
                         host: 'RabbitMQ cluster by HTTP'
+                        name: 'RabbitMQ: Messages status'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1258,8 +1285,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'RabbitMQ: Queues'
                         host: 'RabbitMQ cluster by HTTP'
+                        name: 'RabbitMQ: Queues'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -1274,8 +1301,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'RabbitMQ: Messages per second'
                         host: 'RabbitMQ cluster by HTTP'
+                        name: 'RabbitMQ: Messages per second'
       valuemaps:
         -
           uuid: 3380e05a15774dad92e77c983448698b
@@ -1663,7 +1690,7 @@ zabbix_export:
               name: 'RabbitMQ: Version has changed'
               event_name: 'RabbitMQ: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'RabbitMQ version has changed. Ack to close.'
+              description: 'The RabbitMQ version has changed. Perform Ack to close.'
               manual_close: 'YES'
               tags:
                 -
@@ -1832,10 +1859,10 @@ zabbix_export:
             -
               uuid: 6edfa365704f480da4b35b51b6ed84f4
               expression: 'last(/RabbitMQ node by HTTP/rabbitmq.node.uptime)<10m'
-              name: 'RabbitMQ: has been restarted'
-              event_name: 'RabbitMQ: has been restarted (uptime < 10m)'
+              name: 'RabbitMQ: Host has been restarted'
+              event_name: 'RabbitMQ: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -2216,6 +2243,27 @@ zabbix_export:
           description: 'Individual queue metrics'
           item_prototypes:
             -
+              uuid: 335ed3ef31e2471b9cdb25537cee4fe8
+              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Get data'
+              type: DEPENDENT
+              key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The HTTP API endpoint that returns [{#VHOST}][{#QUEUE}] queue metrics'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].first()'
+              master_item:
+                key: rabbitmq.get_queues
+              tags:
+                -
+                  tag: component
+                  value: raw
+            -
               uuid: be1c1c6b727a45cca039f0f00f184943
               name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Consumers'
               type: DEPENDENT
@@ -2227,9 +2275,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].consumers.first()'
+                    - $.consumers
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2253,9 +2301,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].memory.first()'
+                    - $.memory
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2279,11 +2327,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.ack_details.rate.first()'
+                    - $.message_stats.ack_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2306,11 +2354,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.ack.first()'
+                    - $.message_stats.ack
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2334,11 +2382,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.deliver_details.rate.first()'
+                    - $.message_stats.deliver_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2361,11 +2409,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.deliver.first()'
+                    - $.message_stats.deliver
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2389,11 +2437,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.deliver_get_details.rate.first()'
+                    - $.message_stats.deliver_get_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2416,11 +2464,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.deliver_get.first()'
+                    - $.message_stats.deliver_get
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2444,11 +2492,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.publish_details.rate.first()'
+                    - $.message_stats.publish_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2471,11 +2519,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.publish.first()'
+                    - $.message_stats.publish
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2499,9 +2547,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_details.rate.first()'
+                    - $.messages_details.rate
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2525,11 +2573,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.redeliver_details.rate.first()'
+                    - $.message_stats.redeliver_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2552,11 +2600,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.redeliver.first()'
+                    - $.message_stats.redeliver
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2579,9 +2627,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages.first()'
+                    - $.messages
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2617,9 +2665,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_ready_details.rate.first()'
+                    - $.messages_ready_details.rate
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2642,9 +2690,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_ready.first()'
+                    - $.messages_ready
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2668,9 +2716,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_unacknowledged_details.rate.first()'
+                    - $.messages_unacknowledged_details.rate
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2693,9 +2741,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_unacknowledged.first()'
+                    - $.messages_unacknowledged
               master_item:
-                key: rabbitmq.get_queues
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2813,14 +2861,14 @@ zabbix_export:
             key: rabbitmq.get_queues
           lld_macro_paths:
             -
+              lld_macro: '{#NODE}'
+              path: $.node
+            -
               lld_macro: '{#QUEUE}'
               path: $.name
             -
               lld_macro: '{#VHOST}'
               path: $.vhost
-            -
-              lld_macro: '{#NODE}'
-              path: $.node
       tags:
         -
           tag: class
@@ -2883,8 +2931,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'RabbitMQ node by HTTP'
                         name: 'RabbitMQ: Node status'
-                        host: 'RabbitMQ node by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2899,8 +2947,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'RabbitMQ node by HTTP'
                         name: 'RabbitMQ: Uptime'
-                        host: 'RabbitMQ node by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2915,8 +2963,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'RabbitMQ node by HTTP'
                         name: 'RabbitMQ: Disk free'
-                        host: 'RabbitMQ node by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2932,8 +2980,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'RabbitMQ: Memory used'
                         host: 'RabbitMQ node by HTTP'
+                        name: 'RabbitMQ: Memory used'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -2948,8 +2996,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'RabbitMQ: File descriptors'
                         host: 'RabbitMQ node by HTTP'
+                        name: 'RabbitMQ: File descriptors'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2965,8 +3013,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'RabbitMQ: Sockets'
                         host: 'RabbitMQ node by HTTP'
+                        name: 'RabbitMQ: Sockets'
       valuemaps:
         -
           uuid: e65c3d3e8ea443a281b37c51ca461c26

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -281,7 +281,7 @@ $form->addItem([
 	new CActionButtonList('graphtype', 'itemids', [
 		GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph')],
 		GRAPH_TYPE_NORMAL => ['name' => _('Display graph')]
-	])
+	], 'latest')
 ]);
 
 echo $form;

@@ -965,7 +965,7 @@ in:
 out:
   return: SUCCEED
   value: |-
-    {"b":[1, 2, 3]}
+    {"b":[1,2,3]}
 ---
 test case: jsonpath5
 in:
@@ -980,7 +980,7 @@ in:
 out:
   return: SUCCEED
   value: |-
-    [1, 2, 3]
+    [1,2,3]
 ---
 test case: jsonpath6
 in:
@@ -1008,7 +1008,7 @@ in:
     params: $.a['b c']
 out:
   return: SUCCEED
-  value: '["one", "two", "three"]'
+  value: '["one","two","three"]'
 ---
 test case: jsonpath8
 in:

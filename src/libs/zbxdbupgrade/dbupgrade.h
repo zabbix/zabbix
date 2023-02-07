@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,6 +68,13 @@ int	DBrename_index(const char *table_name, const char *old_name, const char *new
 		int unique);
 int	DBadd_foreign_key(const char *table_name, int id, const ZBX_FIELD *field);
 int	DBdrop_foreign_key(const char *table_name, int id);
+
+int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
+		const char *original_column_name, const char *indexed_column_name, const char *function,
+		const char *idname);
+int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
+		const char *original_column_name, const char *indexed_column_name, const char *function,
+		const char *idname);
 
 #endif
 
