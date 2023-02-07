@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2023-02-06T14:47:40Z'
+  date: '2023-02-07T01:27:43Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1384,7 +1384,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..active.first()
+                    - $.active
               master_item:
                 key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
@@ -1409,7 +1409,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..fails.first()
+                    - $.fails
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1439,7 +1439,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..header_time.first()
+                    - $.header_time
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
@@ -1465,7 +1465,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..health_checks.checks.first()
+                    - $.health_checks.checks
               master_item:
                 key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
@@ -1490,7 +1490,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..health_checks.fails.first()
+                    - $.health_checks.fails
               master_item:
                 key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
@@ -1515,7 +1515,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..health_checks.unhealthy.first()
+                    - $.health_checks.unhealthy
               master_item:
                 key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
@@ -1542,7 +1542,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')]'
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].first()'
               master_item:
                 key: nginx.http.upstreams
               tags:
@@ -1570,7 +1570,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..received.first()
+                    - $.received
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1599,7 +1599,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..requests.first()
+                    - $.requests
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1628,7 +1628,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..responses.1xx.first()
+                    - $.responses.1xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1657,7 +1657,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..responses.2xx.first()
+                    - $.responses.2xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1686,7 +1686,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..responses.3xx.first()
+                    - $.responses.3xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1715,7 +1715,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..responses.4xx.first()
+                    - $.responses.4xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1744,7 +1744,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..responses.5xx.first()
+                    - $.responses.5xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1773,7 +1773,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..responses.total.first()
+                    - $.responses.total
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1803,7 +1803,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..response_time.first()
+                    - $.response_time
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
@@ -1829,7 +1829,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..sent.first()
+                    - $.sent
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1860,7 +1860,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..state.first()
+                    - $.state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1900,7 +1900,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..unavail.first()
+                    - $.unavail
               master_item:
                 key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
@@ -2938,7 +2938,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..active.first()
+                    - $.active
               master_item:
                 key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
@@ -2963,7 +2963,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..connections.first()
+                    - $.connections
               master_item:
                 key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
@@ -2989,7 +2989,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..connect_time.first()
+                    - $.connect_time
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
@@ -3015,7 +3015,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..fails.first()
+                    - $.fails
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -3045,7 +3045,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..first_byte_time.first()
+                    - $.first_byte_time
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
@@ -3071,7 +3071,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..health_checks.checks.first()
+                    - $.health_checks.checks
               master_item:
                 key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
@@ -3096,7 +3096,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..health_checks.fails.first()
+                    - $.health_checks.fails
               master_item:
                 key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
@@ -3121,7 +3121,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..health_checks.unhealthy.first()
+                    - $.health_checks.unhealthy
               master_item:
                 key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
@@ -3148,7 +3148,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')]'
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].first()'
               master_item:
                 key: nginx.stream.upstreams
               tags:
@@ -3176,7 +3176,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..received.first()
+                    - $.received
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -3206,7 +3206,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..response_time.first()
+                    - $.response_time
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
@@ -3232,7 +3232,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..sent.first()
+                    - $.sent
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -3263,7 +3263,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..state.first()
+                    - $.state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3303,7 +3303,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..unavail.first()
+                    - $.unavail
               master_item:
                 key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
