@@ -624,10 +624,8 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	zbx_vector_pp_task_ptr_destroy(&tasks);
 	zbx_pp_manager_free(manager);
 
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
-
 	zbx_ipc_service_close(&service);
 
+	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

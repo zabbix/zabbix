@@ -1587,6 +1587,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(taskmanager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &preproc_man_args;
 				zbx_thread_start(preprocessing_manager_thread, &thread_args, &threads[i]);
 				break;
