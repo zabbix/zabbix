@@ -465,7 +465,10 @@ static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *ma
 		pp_task_queue_notify(&manager->queue);
 	}
 	else
+	{
 		pp_task_queue_remove_sequence(&manager->queue, task_seq->itemid);
+		pp_task_free(task_seq);
+	}
 
 	return task;
 }
