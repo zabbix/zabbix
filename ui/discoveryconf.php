@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,8 +43,8 @@ $fields = [
 	'uniqueness_criteria' => [T_ZBX_STR, O_OPT, null, null,	'isset({add}) || isset({update})', _('Device uniqueness criteria')],
 	'host_source' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
 	'name_source' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
-	'g_druleid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'dchecks' =>		[null, O_OPT, null,		null,		null],
+	'g_druleid' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'dchecks' =>		[null, O_OPT, P_ONLY_TD_ARRAY,		null,		null],
 	// actions
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 							IN('"drule.massdelete","drule.massdisable","drule.massenable"'),
@@ -55,7 +55,7 @@ $fields = [
 	'delete' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'output' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'ajaxaction' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'ajaxdata' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],

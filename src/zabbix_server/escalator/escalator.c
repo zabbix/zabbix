@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2695,8 +2695,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 					"acknowledgeid"
 				" from escalations"
 				" where %s and nextcheck<=%d"
-				" order by actionid,triggerid,itemid,escalationid", filter,
-				now + CONFIG_ESCALATOR_FREQUENCY);
+				" order by actionid,triggerid,itemid," ZBX_SQL_SORT_ASC("r_eventid") ",escalationid",
+				filter, now + CONFIG_ESCALATOR_FREQUENCY);
 	zbx_free(filter);
 
 	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())

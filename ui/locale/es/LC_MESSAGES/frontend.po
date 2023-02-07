@@ -6376,6 +6376,11 @@ msgstr "Falta el valor del campo \"%1$s\" para la pantalla \"%2$s\"."
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "El campo \"%1$s\" es incorrecto: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -20117,6 +20122,10 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:279
 msgid "invalid byte sequence in UTF-8"
 msgstr "secuencia de octetos en UTF-8 incorrecta"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"

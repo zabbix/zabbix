@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.0 and higher  
+For Zabbix version: 5.0 and higher.  
 
 ## Setup
 
@@ -58,13 +58,13 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Template Module Linux filesystems by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0 and higher  
+For Zabbix version: 5.0 and higher.  
 
 ## Setup
 
@@ -97,7 +97,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |ZABBIX_PASSIVE |vfs.fs.discovery<p>**Filter**:</p>AND <p>- A: {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- B: {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- C: {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- D: {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p> |
+|Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |ZABBIX_PASSIVE |vfs.fs.discovery<p>**Filter**:</p>AND <p>- A: {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- B: {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- C: {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- D: {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Skip metadata collection for dynamic FS<br> - {#FSTYPE} MATCHES_REGEX `^(btrfs|zfs)$`<br>  - ITEM_PROTOTYPE LIKE `inode` - NO_DISCOVER</p> |
 
 ## Items collected
 
@@ -119,13 +119,13 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Template Module Linux memory by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0 and higher  
+For Zabbix version: 5.0 and higher.  
 
 ## Setup
 
@@ -172,13 +172,13 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Template Module Linux block devices by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0 and higher  
+For Zabbix version: 5.0 and higher.  
 
 ## Setup
 
@@ -229,13 +229,13 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Template Module Linux network interfaces by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0 and higher  
+For Zabbix version: 5.0 and higher.  
 
 ## Setup
 
@@ -290,13 +290,13 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Template Module Linux generic by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0 and higher  
+For Zabbix version: 5.0 and higher.  
 
 ## Setup
 
@@ -355,13 +355,13 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Template OS Linux by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0 and higher  
+For Zabbix version: 5.0 and higher.  
 New official Linux template. Requires agent of Zabbix 3.0.14, 3.4.5 and 4.0.0 or newer.
 
 ## Setup
@@ -400,9 +400,9 @@ No specific Zabbix configuration is required.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux).
 
 ## Known Issues
 

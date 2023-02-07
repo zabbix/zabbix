@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-09-12T10:57:39Z</date>
+   <date>2023-01-12T06:03:18Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -879,6 +879,30 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      </graph_items>
                   </graph_prototype>
                </graph_prototypes>
+               <overrides>
+                  <override>
+                     <name>Skip metadata collection for dynamic FS</name>
+                     <step>1</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#FSTYPE}</macro>
+                              <value>^(btrfs|zfs)$</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>inode</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+               </overrides>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -2358,14 +2382,6 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <item>
                   <host>Template Module Linux generic by Zabbix agent active</host>
                   <key>proc.num[,,run]</key>
-               </item>
-            </graph_item>
-            <graph_item>
-               <sortorder>2</sortorder>
-               <color>F63100</color>
-               <item>
-                  <host>Template Module Linux generic by Zabbix agent active</host>
-                  <key>kernel.maxproc</key>
                </item>
             </graph_item>
          </graph_items>

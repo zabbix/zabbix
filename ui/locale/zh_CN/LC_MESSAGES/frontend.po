@@ -6309,6 +6309,11 @@ msgstr "字段 \"%1$s\" 缺少聚合图形 \"%2$s\" 的值。"
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "字段 \"%1$s\" 设置错误: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -20011,6 +20016,10 @@ msgstr "无效地址范围 \"%1$s\""
 #: include/classes/validators/CApiInputValidator.php:279
 msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8中无效的字节排序"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"
