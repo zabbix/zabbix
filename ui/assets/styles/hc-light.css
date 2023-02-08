@@ -50,6 +50,9 @@ svg *:focus {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
+[class^="zi-"]::before, [class*=" zi-"]::before {
+  transition: color 0.3s ease-out; }
+
 .zi-alert-check:before {
   content: "\ea01"; }
 
@@ -2897,8 +2900,6 @@ div.dashboard-widget-tophosts z-bar-gauge {
       background: #e6e6e6;
       border-left-color: transparent;
       color: #000000; }
-      .menu-main > li > a:hover::before, .menu-main > li > a:focus::before {
-        background-position-x: -570px; }
 .menu-main .has-submenu > a::after {
   display: inline-block;
   float: right;
@@ -2907,9 +2908,14 @@ div.dashboard-widget-tophosts z-bar-gauge {
   font-style: normal;
   content: "\ea22";
   transform: rotate(0deg);
-  transition: transform 0.3s, opacity 0.3s; }
+  transition: transform 0.3s; }
 .menu-main .has-submenu.is-expanded > a::after {
   transform: rotate(-180deg); }
+.menu-main [class^="zi-"]::before, .menu-main [class*=" zi-"]::before {
+  margin-right: 10px;
+  color: #8cb2ca;
+  font-size: 24px;
+  line-height: 0; }
 .menu-main a {
   position: relative;
   display: block;
@@ -2921,6 +2927,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
   transition: color 0.3s, border-color 0.3s, background-color 0.3s; }
   .menu-main a:active, .menu-main a:hover, .menu-main a:link, .menu-main a:visited {
     border-bottom: 0; }
+  .menu-main a:hover[class^="zi-"]::before, .menu-main a:hover[class*=" zi-"]::before, .menu-main a:focus[class^="zi-"]::before, .menu-main a:focus[class*=" zi-"]::before {
+    color: inherit; }
 .menu-main .submenu {
   position: relative;
   padding-left: 24px;
@@ -2939,6 +2947,10 @@ div.dashboard-widget-tophosts z-bar-gauge {
         color: #000000; }
     .menu-main .submenu > li:not(:last-child) {
       border-bottom: 1px solid #0d0d0d; }
+  .menu-main .submenu [class^="zi-"]::before, .menu-main .submenu [class*=" zi-"]::before {
+    margin-right: 8px;
+    font-size: 16px;
+    color: inherit; }
   .menu-main .submenu a {
     padding: 8px 20px;
     font-size: 12px;
@@ -2986,43 +2998,15 @@ div.dashboard-widget-tophosts z-bar-gauge {
     transform: rotate(-90deg); }
   .menu-main .submenu .has-submenu:not(.is-expanded) .submenu {
     left: -9999px !important; }
-.menu-main .zi-dashboard::before,
-.menu-main .zi-hierarchy::before,
-.menu-main .zi-list::before,
-.menu-main .zi-report::before,
-.menu-main .zi-download::before,
-.menu-main .zi-envelope::before,
-.menu-main .zi-users::before,
-.menu-main .zi-cog::before,
-.menu-main .zi-eye-alt::before {
-  vertical-align: middle;
-  padding-right: 11px;
-  font-size: 24px;
-  color: #b7d6ea;
-  opacity: 1; }
-.menu-main .zi-dashboard:hover::before, .menu-main .zi-dashboard:focus::before,
-.menu-main .zi-hierarchy:hover::before,
-.menu-main .zi-hierarchy:focus::before,
-.menu-main .zi-list:hover::before,
-.menu-main .zi-list:focus::before,
-.menu-main .zi-report:hover::before,
-.menu-main .zi-report:focus::before,
-.menu-main .zi-download:hover::before,
-.menu-main .zi-download:focus::before,
-.menu-main .zi-envelope:hover::before,
-.menu-main .zi-envelope:focus::before,
-.menu-main .zi-users:hover::before,
-.menu-main .zi-users:focus::before,
-.menu-main .zi-cog:hover::before,
-.menu-main .zi-cog:focus::before,
-.menu-main .zi-eye-alt:hover::before,
-.menu-main .zi-eye-alt:focus::before {
-  color: #ffffff; }
 
 .menu-user {
   padding: 12px 0; }
   .menu-user li {
     line-height: 16px; }
+  .menu-user [class^="zi-"]::before, .menu-user [class*=" zi-"]::before {
+    margin-right: 16px;
+    font-size: 16px;
+    line-height: 0; }
   .menu-user a,
   .menu-user span {
     position: relative;
@@ -3031,17 +3015,11 @@ div.dashboard-widget-tophosts z-bar-gauge {
     font-size: 12px;
     white-space: nowrap;
     transition: color 0.3s ease-out; }
-    .menu-user a::before,
-    .menu-user span::before {
-      opacity: .75;
-      transition: opacity 0.3s ease-out; }
   .menu-user a {
     color: #cedae1; }
     .menu-user a:hover, .menu-user a:focus {
       border-bottom: 0;
       color: #ffffff; }
-      .menu-user a:hover::before, .menu-user a:focus::before {
-        opacity: 1; }
   .menu-user span {
     color: #9f9f9f; }
   .menu-user > li.is-selected > a {
@@ -3062,15 +3040,9 @@ div.dashboard-widget-tophosts z-bar-gauge {
     font-style: normal;
     content: "\ea22";
     transform: rotate(0deg);
-    opacity: 0.75;
-    transition: transform 0.3s, opacity 0.3s; }
-  .menu-user .has-submenu > a:hover::after, .menu-user .has-submenu > a:focus::after {
-    opacity: 1; }
+    transition: transform 0.3s; }
   .menu-user .has-submenu.is-expanded > a::after {
-    -webkit-transform: rotate(-180deg);
-    -moz-transform: rotate(-180deg); }
-  .menu-user .has-submenu.is-expanded > a::before, .menu-user .has-submenu.is-expanded > a::after {
-    opacity: 1; }
+    transform: rotate(-180deg); }
   .menu-user .submenu {
     position: relative;
     padding-left: 24px;
@@ -3089,6 +3061,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
           color: #000000; }
       .menu-user .submenu > li:not(:last-child) {
         border-bottom: 1px solid #0d0d0d; }
+    .menu-user .submenu [class^="zi-"]::before, .menu-user .submenu [class*=" zi-"]::before {
+      margin-right: 8px; }
     .menu-user .submenu a {
       padding: 8px 20px;
       background: #333333;
@@ -3135,28 +3109,6 @@ div.dashboard-widget-tophosts z-bar-gauge {
       transform: rotate(-90deg); }
     .menu-user .submenu .has-submenu:not(.is-expanded) .submenu {
       left: -9999px !important; }
-  .menu-user .zi-support::before,
-  .menu-user .zi-help::before,
-  .menu-user .zi-user-filled::before,
-  .menu-user .zi-signout::before,
-  .menu-user .zi-z::before {
-    vertical-align: middle;
-    width: 16px;
-    height: 16px;
-    padding-right: 17px;
-    font-size: 16px;
-    color: #ffffff;
-    opacity: 1; }
-  .menu-user .zi-support:hover::before, .menu-user .zi-support:focus::before,
-  .menu-user .zi-help:hover::before,
-  .menu-user .zi-help:focus::before,
-  .menu-user .zi-user-filled:hover::before,
-  .menu-user .zi-user-filled:focus::before,
-  .menu-user .zi-signout:hover::before,
-  .menu-user .zi-signout:focus::before,
-  .menu-user .zi-z:hover::before,
-  .menu-user .zi-z:focus::before {
-    color: #ffffff; }
 
 .zi-circle-info-filled,
 .zi-circle-check-filled {

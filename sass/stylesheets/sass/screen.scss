@@ -1,5 +1,12 @@
 $theme-name: 'blue' !default;
 
+$btn-icon-size: 18px;
+$btn-icon-small-size: 12px;
+
+$main-menu-icon-size: 24px;
+$main-menu-submenu-icon-size: 16px;
+$user-menu-icon-size: 16px;
+
 $ui-transitions: true !default;
 
 // Sync with JavaScript variable: UI_TRANSITION_DURATION.
@@ -4922,31 +4929,11 @@ a.icon-count {
 			font-size: 7px;
 
 			transform: rotate(0deg) translateX(0) translateY(0);
-
-			@if $menu-main-icons-opacity < 1 {
-				opacity: $menu-main-icons-opacity;
-			}
-		}
-
-		&:hover,
-		&:focus {
-			&::after {
-				@if $menu-main-icons-opacity < 1 {
-					opacity: 1;
-				}
-			}
 		}
 
 		&[aria-expanded="true"] {
 			&::after {
 				transform: rotate(-180deg) translateX(-3px) translateY(1px);
-			}
-
-			@if $menu-main-icons-opacity < 1 {
-				&::before,
-				&::after {
-					opacity: 1;
-				}
 			}
 		}
 	}

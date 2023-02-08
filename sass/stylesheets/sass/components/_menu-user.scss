@@ -1,10 +1,16 @@
-$menu-user-icons-opacity: .75 !default;
-
 .menu-user {
 	padding: 12px 0;
 
 	li {
 		line-height: 16px;
+	}
+
+	[class^="zi-"], [class*=" zi-"] {
+		&::before {
+			margin-right: 16px;
+			font-size: $user-menu-icon-size;
+			line-height: 0;
+		}
 	}
 
 	a,
@@ -18,14 +24,6 @@ $menu-user-icons-opacity: .75 !default;
 		@if $ui-transitions {
 			transition: color $ui-transition-duration ease-out;
 		}
-
-		&::before {
-			opacity: .75;
-
-			@if $ui-transitions {
-				transition: opacity $ui-transition-duration ease-out;
-			}
-		}
 	}
 
 	a {
@@ -35,10 +33,6 @@ $menu-user-icons-opacity: .75 !default;
 		&:focus {
 			border-bottom: 0;
 			color: $menu-user-hover-color;
-
-			&::before {
-				opacity: 1;
-			}
 		}
 	}
 
@@ -84,22 +78,9 @@ $menu-user-icons-opacity: .75 !default;
 				content: "\ea22";
 
 				transform: rotate(0deg);
-				@if $menu-user-icons-opacity < 1 {
-					opacity: $menu-user-icons-opacity;
-				}
 
 				@if $ui-transitions {
-					transition: transform $ui-transition-duration,
-					opacity $ui-transition-duration;
-				}
-			}
-
-			&:hover,
-			&:focus {
-				&::after {
-					@if $menu-user-icons-opacity < 1 {
-						opacity: 1;
-					}
+					transition: transform $ui-transition-duration;
 				}
 			}
 		}
@@ -107,15 +88,7 @@ $menu-user-icons-opacity: .75 !default;
 		&.is-expanded {
 			& > a {
 				&::after {
-					-webkit-transform: rotate(-180deg);
-					-moz-transform: rotate(-180deg);
-				}
-
-				@if $menu-user-icons-opacity < 1 {
-					&::before,
-					&::after {
-						opacity: 1;
-					}
+					transform: rotate(-180deg);
 				}
 			}
 		}
@@ -146,6 +119,12 @@ $menu-user-icons-opacity: .75 !default;
 
 			&:not(:last-child) {
 				border-bottom: 1px solid $menu-user-submenu-border-color;
+			}
+		}
+
+		[class^="zi-"], [class*=" zi-"] {
+			&::before {
+				margin-right: 8px;
 			}
 		}
 
@@ -238,33 +217,6 @@ $menu-user-icons-opacity: .75 !default;
 
 				.submenu {
 					left: -9999px !important;
-				}
-			}
-		}
-	}
-
-	.zi-support,
-	.zi-help,
-	.zi-user-filled,
-	.zi-signout,
-	.zi-z {
-		&::before {
-			vertical-align: middle;
-			width: 16px;
-			height: 16px;
-			padding-right: 17px;
-			font-size: 16px;
-			color: $menu-user-icon-color;
-			opacity: $menu-main-icons-opacity;
-		}
-
-		&:hover,
-		&:focus {
-			&::before {
-				color: $menu-icon-color-hover-focus;
-
-				@if $menu-main-icons-opacity < 1 {
-					opacity: 1;
 				}
 			}
 		}
