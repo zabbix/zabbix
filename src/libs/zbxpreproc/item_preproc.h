@@ -26,7 +26,6 @@
 int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
 		unsigned char value_type, char **errmsg);
 
-
 int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, char **errmsg);
 
 int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant_t *value, const char *params,

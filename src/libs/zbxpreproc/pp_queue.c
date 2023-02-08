@@ -49,8 +49,8 @@ static void	pp_item_task_sequence_clear(void *d)
  *                                                                            *
  * Purpose: initialize task queue                                             *
  *                                                                            *
- * Parameters: queue      - [IN] task queue                                   *
- *             error      - [OUT]                                             *
+ * Parameters: queue - [IN] task queue                                        *
+ *             error - [OUT]                                                  *
  *                                                                            *
  * Return value: SUCCEED - the task queue was initialized successfully        *
  *               FAIL    - otherwise                                          *

@@ -71,9 +71,7 @@ void	zbx_pp_step_free(zbx_pp_step_t *step)
  ******************************************************************************/
 static void	pp_item_preproc_free(zbx_pp_item_preproc_t *preproc)
 {
-	int	i;
-
-	for (i = 0; i < preproc->steps_num; i++)
+	for (int i = 0; i < preproc->steps_num; i++)
 	{
 		zbx_free(preproc->steps[i].params);
 		zbx_free(preproc->steps[i].error_handler_params);

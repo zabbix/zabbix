@@ -65,7 +65,7 @@ static int	pp_execute_multiply(unsigned char value_type, zbx_variant_t *value, c
 	else
 	{
 		error = zbx_dsprintf(NULL, "cannot apply multiplier \"%s\" to value of type \"%s\": %s",
-			params, zbx_variant_type_desc(value), errmsg);
+				params, zbx_variant_type_desc(value), errmsg);
 		zbx_free(errmsg);
 	}
 
@@ -181,8 +181,8 @@ static int	pp_execute_delta(int type, unsigned char value_type, zbx_variant_t *v
 		return SUCCEED;
 
 	zbx_variant_clear(value);
-	zbx_variant_set_error(value, zbx_dsprintf(NULL,  "cannot calculate delta (%s) for value of type"
-				" \"%s\": %s", pp_delta_desc(type), zbx_variant_type_desc(value), errmsg));
+	zbx_variant_set_error(value, zbx_dsprintf(NULL,  "cannot calculate delta (%s) for value of type \"%s\": %s",
+			pp_delta_desc(type), zbx_variant_type_desc(value), errmsg));
 	zbx_free(errmsg);
 
 	return FAIL;
@@ -214,8 +214,7 @@ static int	pp_execute_regsub(zbx_variant_t *value, const char *params)
 
 	zbx_variant_clear(value);
 	zbx_variant_set_error(value, zbx_dsprintf(NULL, "cannot perform regular expression \"%.*s\""
-			" match for value of type \"%s\": %s",
-			len, params, zbx_variant_type_desc(value), errmsg));
+			" match for value of type \"%s\": %s", len, params, zbx_variant_type_desc(value), errmsg));
 
 	zbx_free(errmsg);
 
@@ -235,7 +234,8 @@ static int	pp_execute_regsub(zbx_variant_t *value, const char *params)
  *               FAIL    - otherwise.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params, char **errmsg)
+static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params,
+		char **errmsg)
 {
 	char	*data = NULL;
 
@@ -353,9 +353,9 @@ static const char	*pp_2dec_desc(int type)
  *                                                                            *
  * Purpose: execute '?2dec' step                                              *
  *                                                                            *
- * Parameters: type   - [IN] preprocessing step type -                        *
- *                           (boolean|octal|hexadecimal)2dec                  *
- *             value  - [IN/OUT] input/output value                           *
+ * Parameters: type  - [IN] preprocessing step type -                         *
+ *                          (boolean|octal|hexadecimal)2dec                   *
+ *             value - [IN/OUT] input/output value                            *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -460,8 +460,8 @@ static int	pp_validate_range(unsigned char value_type, zbx_variant_t *value, con
  *                                                                            *
  * Purpose: execute 'validate regex' step                                     *
  *                                                                            *
- * Parameters: value      - [IN/OUT] value to process                         *
- *             params     - [IN] step parameters                              *
+ * Parameters: value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -484,8 +484,8 @@ static int	pp_validate_regex(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'validate not regex' step                                 *
  *                                                                            *
- * Parameters: value      - [IN/OUT] value to process                         *
- *             params     - [IN] step parameters                              *
+ * Parameters: value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -508,8 +508,8 @@ static int	pp_validate_not_regex(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'error from json' step                                    *
  *                                                                            *
- * Parameters: value      - [IN/OUT] value to process                         *
- *             params     - [IN] step parameters                              *
+ * Parameters: value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -536,8 +536,8 @@ static int	pp_error_from_json(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'error from xml' step                                     *
  *                                                                            *
- * Parameters: value      - [IN/OUT] value to process                         *
- *             params     - [IN] step parameters                              *
+ * Parameters: value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -564,8 +564,8 @@ static int	pp_error_from_xml(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'error from regex' step                                   *
  *                                                                            *
- * Parameters: value      - [IN/OUT] value to process                         *
- *             params     - [IN] step parameters                              *
+ * Parameters: value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *

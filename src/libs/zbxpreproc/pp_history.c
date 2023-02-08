@@ -111,9 +111,7 @@ void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, 
 {
 	if (NULL != history)
 	{
-		int	i;
-
-		for (i = 0; i < history->step_history.values_num; i++)
+		for (int i = 0; i < history->step_history.values_num; i++)
 		{
 			if (history->step_history.values[i].index == index)
 			{

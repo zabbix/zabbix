@@ -172,7 +172,7 @@ static void	*pp_worker_entry(void *arg)
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
 
-	return (void *)0;
+	return NULL;
 }
 
 /******************************************************************************

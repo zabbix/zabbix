@@ -30,6 +30,8 @@
 #include "zbxtime.h"
 #include "zbxipcservice.h"
 
+#define PP_TASK_DATA(x)		(&x->data)
+
 typedef struct
 {
 	zbx_variant_t		value;
@@ -70,8 +72,6 @@ typedef struct
 	zbx_list_t	tasks;
 }
 zbx_pp_task_sequence_t;
-
-#define PP_TASK_DATA(x)		(&x->data)
 
 void	pp_task_free(zbx_pp_task_t *task);
 

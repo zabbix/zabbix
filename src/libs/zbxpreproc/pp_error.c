@@ -23,6 +23,15 @@
 #include "zbxstr.h"
 #include "zbxvariant.h"
 
+/* mock field to estimate how much data can be stored in characters, bytes or both, */
+/* depending on database backend                                                    */
+typedef struct
+{
+	int	bytes_num;
+	int	chars_num;
+}
+zbx_db_mock_field_t;
+
 ZBX_PTR_VECTOR_IMPL(pp_result_ptr, zbx_pp_result_t *)
 
 /******************************************************************************
@@ -62,16 +71,6 @@ void	pp_free_results(zbx_pp_result_t *results, int results_num)
 
 	zbx_free(results);
 }
-
-/* mock field to estimate how much data can be stored in characters, bytes or both, */
-/* depending on database backend                                                    */
-
-typedef struct
-{
-	int	bytes_num;
-	int	chars_num;
-}
-zbx_db_mock_field_t;
 
 /******************************************************************************
  *                                                                            *

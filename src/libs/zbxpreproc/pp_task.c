@@ -30,8 +30,6 @@
 
 ZBX_PTR_VECTOR_IMPL(pp_task_ptr, zbx_pp_task_t *)
 
-void	pp_task_free(zbx_pp_task_t *task);
-
 /******************************************************************************
  *                                                                            *
  * Purpose: create task                                                       *
@@ -43,11 +41,7 @@ void	pp_task_free(zbx_pp_task_t *task);
  ******************************************************************************/
 static zbx_pp_task_t	*pp_task_create(size_t size)
 {
-	zbx_pp_task_t	*task;
-
-	task = (zbx_pp_task_t *)zbx_malloc(NULL, offsetof(zbx_pp_task_t, data) + size);
-
-	return task;
+	return (zbx_pp_task_t *)zbx_malloc(NULL, offsetof(zbx_pp_task_t, data) + size);
 }
 
 /******************************************************************************

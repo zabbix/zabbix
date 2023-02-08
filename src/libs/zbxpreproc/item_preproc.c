@@ -264,7 +264,7 @@ static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t 
 int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
 		int op_type, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **errmsg)
 {
-	zbx_variant_t			value_num;
+	zbx_variant_t	value_num;
 
 	if (FAIL == zbx_item_preproc_convert_value_to_numeric(&value_num, value, value_type, errmsg))
 		return FAIL;
@@ -273,7 +273,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 
 	if (ZBX_VARIANT_NONE != history_value->type)
 	{
-		int				ret;
+		int	ret;
 
 		zbx_variant_copy(value, &value_num);
 
@@ -507,8 +507,8 @@ static int	is_uhex(const char *str)
  ******************************************************************************/
 int	item_preproc_2dec(zbx_variant_t *value, int op_type, char **errmsg)
 {
-#define OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
-#define HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
+#define OCT2UINT64(uint, string)	sscanf(string, ZBX_FS_UO64, &uint)
+#define HEX2UINT64(uint, string)	sscanf(string, ZBX_FS_UX64, &uint)
 
 	zbx_uint64_t	value_ui64;
 
@@ -880,7 +880,9 @@ int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const char *para
 	ZBX_UNUSED(value);
 	ZBX_UNUSED(params);
 	ZBX_UNUSED(error);
+
 	*error = zbx_dsprintf(*error, "Zabbix was compiled without libxml2 support");
+
 	return FAIL;
 #else
 	zbx_variant_t		value_str;
@@ -963,7 +965,7 @@ out:
  *                                                                            *
  * Purpose: checks for presence of error pattern matching regular expression  *
  *                                                                            *
- * Parameters: value  - [IN/OUT] value to process                             *
+ * Parameters: value  - [IN] value to process                                 *
  *             params - [IN] operation parameters                             *
  *             error  - [OUT]                                                 *
  *                                                                            *

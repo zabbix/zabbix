@@ -40,8 +40,6 @@
 #	include <libxml/xpath.h>
 #endif
 
-#define PP_FINISHED_TASK_BATCH_SIZE	100
-
 static zbx_flush_value_func_t flush_value_func_cb = NULL;
 
 /******************************************************************************
@@ -134,7 +132,8 @@ zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, char **error)
 
 	for (i = 0; i < workers_num; i++)
 	{
-		if (SUCCEED != pp_worker_init(&manager->workers[i], i + 1, &manager->queue, manager->timekeeper, error))
+		if (SUCCEED != pp_worker_init(&manager->workers[i], i + 1, &manager->queue, manager->timekeeper,
+				error))
 			goto out;
 	}
 
@@ -233,9 +232,8 @@ void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
 void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
 		zbx_timespec_t ts, zbx_ipc_client_t *client)
 {
-	zbx_pp_task_t	*task;
+	zbx_pp_task_t	*task = pp_task_test_create(preproc, value, ts, client);
 
-	task = pp_task_test_create(preproc, value, ts, client);
 	pp_task_queue_lock(&manager->queue);
 	pp_task_queue_push_test(&manager->queue, task);
 	pp_task_queue_notify(&manager->queue);
@@ -499,6 +497,8 @@ static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *ma
 void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks,
 		zbx_uint64_t *pending_num, zbx_uint64_t *finished_num)
 {
+#define PP_FINISHED_TASK_BATCH_SIZE	100
+
 	zbx_pp_task_t	*task;
 	static time_t	timekeeper_clock = 0;
 	time_t		now;
@@ -548,6 +548,8 @@ void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() values_num:%d", __func__, tasks->values_num);
+
+#undef PP_FINISHED_TASK_BATCH_SIZE
 }
 
 /******************************************************************************
@@ -563,6 +565,7 @@ void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager)
 	zbx_pp_item_t		*item;
 
 	zbx_hashset_iter_reset(&manager->items, &iter);
+
 	while (NULL != (item = (zbx_pp_item_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64
