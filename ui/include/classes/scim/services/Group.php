@@ -48,7 +48,7 @@ class Group extends ScimApiService {
 	];
 
 	protected array $patch_op = ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'];
-	protected array $patch_path = ['members'];
+	protected array $patch_path = ['members', 'externalId'];
 
 	/**
 	 * Returns information on specific group or all groups if no specific information is requested.
@@ -316,7 +316,7 @@ class Group extends ScimApiService {
 	 *                                                             not supported, only 'members' path is supported.
 	 * @param array  $options['Operations'][]['value']             Array of values on which operation should be
 	 *                                                             performed. If operation is 'remove' this can be
-	 *                                                             ommited, in this case all members should be removed.
+	 *                                                             omitted, in this case all members should be removed.
 	 * @param string $options['Operations'][]['value'][]['value']  User id on which operation should be performed.
 	 *
 	 * @return array  Returns array with data necessary for SCIM response.
@@ -339,6 +339,16 @@ class Group extends ScimApiService {
 		}
 
 		foreach ($operations as $operation) {
+			// Azure AD sends PATCH Groups request with its own 'externalId' that we do not store.
+			// We just return it back with 200 response code, but do not store it.
+			if ($operation['path'] === 'externalId') {
+				$this->data['externalId'] = $operation['path'];
+				$this->data['value'] = $operation['value'];
+				$this->data['id'] = $options['id'];
+
+				return $this->data;
+			}
+
 			$db_users = [];
 			$scim_users = [];
 			switch ($operation['op']) {
@@ -403,12 +413,15 @@ class Group extends ScimApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'Operations' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+			'Operations' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
 				'op' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $this->patch_op)],
 				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $this->patch_path)],
-				'value' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
-					'value' =>		['type' => API_ID, 'flags' => API_REQUIRED]
-				]]
+				'value' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'path', 'in' => 'members'], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
+										'value' =>		['type' => API_ID]
+									]],
+									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+				]],
 			]]
 		]];
 
