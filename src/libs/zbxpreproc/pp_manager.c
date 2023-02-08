@@ -34,6 +34,7 @@
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
 #include "zbxnix.h"
+#include "zbxvariant.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>

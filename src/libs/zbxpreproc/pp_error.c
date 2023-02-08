@@ -18,9 +18,10 @@
 **/
 
 #include "pp_error.h"
-#include "pp_item.h"
+
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
+#include "zbxvariant.h"
 
 ZBX_PTR_VECTOR_IMPL(pp_result_ptr, zbx_pp_result_t *)
 

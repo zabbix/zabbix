@@ -23,6 +23,8 @@
 #include "log.h"
 #include "zbxembed.h"
 #include "zbxprometheus.h"
+#include "zbxvariant.h"
+#include "zbxtime.h"
 
 #include "zbxxml.h"
 #ifdef HAVE_LIBXML2

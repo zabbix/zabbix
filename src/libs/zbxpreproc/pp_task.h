@@ -20,6 +20,7 @@
 #ifndef ZABBIX_PP_TASK_H
 #define ZABBIX_PP_TASK_H
 
+#include "zbxpreproc.h"
 #include "pp_item.h"
 #include "pp_cache.h"
 

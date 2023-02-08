@@ -20,7 +20,6 @@
 #include "pp_task.h"
 #include "pp_error.h"
 #include "zbxcommon.h"
-#include "log.h"
 #include "zbxalgo.h"
 #include "zbxsysinc.h"
 #include "zbxipcservice.h"

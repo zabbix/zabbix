@@ -22,6 +22,7 @@
 
 #include "zbxpreproc.h"
 #include "zbxipcservice.h"
+#include "zbxtime.h"
 
 #define ZBX_IPC_SERVICE_PREPROCESSING	"preprocessing"
 

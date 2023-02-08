@@ -18,8 +18,9 @@
 **/
 
 #include "pp_item.h"
+
 #include "pp_history.h"
-#include "zbxvariant.h"
+#include "zbxalgo.h"
 
 ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
 

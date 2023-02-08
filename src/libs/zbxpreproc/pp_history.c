@@ -19,6 +19,9 @@
 
 #include "pp_history.h"
 
+#include "zbxvariant.h"
+#include "zbxtime.h"
+
 ZBX_VECTOR_IMPL(pp_step_history, zbx_pp_step_history_t)
 
 /******************************************************************************

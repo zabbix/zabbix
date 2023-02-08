@@ -26,6 +26,8 @@
 #include "zbxxml.h"
 #include "preproc_snmp.h"
 #include "pp_worker.h"
+#include "zbxvariant.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_LIBXML2
 #	ifndef LIBXML_THREAD_ENABLED
