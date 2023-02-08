@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -4959,6 +4959,12 @@ static int	DBpatch_5030166(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	/* When upgrading from version 5.0 or less trigger_queue will be created later. */
+	/* Only when upgrading from version 5.2 there will be trigger queue table which */
+	/* must be updated.                                                             */
+	if (SUCCEED != DBtable_exists("trigger_queue"))
+		return SUCCEED;
+
 	if (ZBX_DB_OK > DBexecute("update trigger_queue set type=4 where type=3"))
 		return FAIL;
 
@@ -5417,7 +5423,12 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 
 		if (SUCCEED == dbpatch_is_composite_constant(request->params[3]))
 		{
-			dbpatch_strcpy_alloc_quoted(str, str_alloc, str_offset, request->params[3]);
+			char	quoted[FUNCTION_PARAM_LEN * 5 + 1];
+
+			zbx_escape_string(quoted, sizeof(quoted), request->params[3], "\"\\");
+			zbx_chrcpy_alloc(str, str_alloc, str_offset, '"');
+			zbx_strcpy_alloc(str, str_alloc, str_offset, quoted);
+			zbx_chrcpy_alloc(str, str_alloc, str_offset, '"');
 		}
 		else
 		{
@@ -5514,6 +5525,17 @@ static int	DBpatch_5030170(void)
 
 static int	DBpatch_5030171(void)
 {
+	/* When upgrading from version 5.0 or less the trigger_queue table will be created */
+	/* later (DBpatch_5030172).                                                        */
+	/* Only when upgrading from version 5.2 there will be existing trigger_queue table */
+	/* to which primary key must be added. This is done by following steps:            */
+	/*   1) rename existing table (DBpatch_5030171)                                    */
+	/*   2) create new table with the primary key (DBpatch_5030172)                    */
+	/*   2) copy data from old table into new table (DBpatch_5030173)                  */
+	/*   2) delete the old (renamed) table (DBpatch_5030174)                           */
+	if (SUCCEED != DBtable_exists("trigger_queue"))
+		return SUCCEED;
+
 	return DBrename_table("trigger_queue", "trigger_queue_tmp");
 }
 
@@ -5543,6 +5565,9 @@ static int	DBpatch_5030173(void)
 	zbx_uint64_t	objectid, type, clock, ns;
 	int		ret;
 
+	if (SUCCEED != DBtable_exists("trigger_queue_tmp"))
+		return SUCCEED;
+
 	zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns", NULL);
 
 	result = DBselect("select objectid,type,clock,ns from trigger_queue_tmp");
@@ -5567,6 +5592,9 @@ static int	DBpatch_5030173(void)
 
 static int	DBpatch_5030174(void)
 {
+	if (SUCCEED != DBtable_exists("trigger_queue_tmp"))
+		return SUCCEED;
+
 	return DBdrop_table("trigger_queue_tmp");
 }
 

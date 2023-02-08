@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,6 +61,22 @@
 		$('#compression_status').change(function() {
 			$('#compress_older').prop('disabled', !this.checked);
 		});
+
+		$('#hk_history_mode, #hk_history_global')
+			.change(function() {
+				$('.js-hk-history-warning').toggle(document.getElementById('hk_history_mode').checked
+					&& !document.getElementById('hk_history_global').checked
+				)
+			})
+			.trigger('change');
+
+		$('#hk_trends_mode, #hk_trends_global')
+			.change(function() {
+				$('.js-hk-trends-warning').toggle(document.getElementById('hk_trends_mode').checked
+					&& !document.getElementById('hk_trends_global').checked
+				)
+			})
+			.trigger('change');
 
 		$("#resetDefaults").click(function() {
 			overlayDialogue({

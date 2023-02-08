@@ -1,9 +1,9 @@
 
-# Cisco ASAv SNMP
+# Cisco ASAv by SNMP
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 Secure Firewall ASA Virtual is the virtualized option of popular Secure Firewall ASA solution and offers security in traditional physical data centers and private and public clouds.
 Learn more about Cisco ASAv: https://www.cisco.com/c/en/us/products/collateral/security/adaptive-security-virtual-appliance-asav/adapt-security-virtual-appliance-ds.html
 
@@ -46,7 +46,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |CPU discovery |<p>Discovery of cpmCPUTotalTable, a table of CPU monitoring entries.</p> |SNMP |cisco.asav.cpu.discovery |
-|Interface discovery |<p>Network interfaces discovery</p> |SNMP |cisco.asav.net.if.discovery<p>**Filter**:</p>AND <p>- {#CISCO.IF.NAME} MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.NAME.MATCHES}`</p><p>- {#CISCO.IF.NAME} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.NAME.NOT_MATCHES}`</p><p>- {#CISCO.IF.STATUS.ADMIN} MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.ADMIN.MATCHES}`</p><p>- {#CISCO.IF.STATUS.ADMIN} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.ADMIN.NOT_MATCHES}`</p><p>- {#CISCO.IF.DESC} MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.DESC.MATCHES}`</p><p>- {#CISCO.IF.DESC} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.DESC.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Don't create triggers for matching interface<br> - {#CISCO.IF.NAME} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.CONTROL.MATCHES}`<br>  - TRIGGER_PROTOTYPE REGEXP `.*` - NO_DISCOVER</p> |
+|Interface discovery |<p>Network interfaces discovery</p> |SNMP |cisco.asav.net.if.discovery<p>**Filter**:</p>AND <p>- {#CISCO.IF.NAME} MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.NAME.MATCHES}`</p><p>- {#CISCO.IF.NAME} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.NAME.NOT_MATCHES}`</p><p>- {#CISCO.IF.STATUS.ADMIN} MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.ADMIN.MATCHES}`</p><p>- {#CISCO.IF.STATUS.ADMIN} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.ADMIN.NOT_MATCHES}`</p><p>- {#CISCO.IF.DESC} MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.DESC.MATCHES}`</p><p>- {#CISCO.IF.DESC} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.DESC.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Don't create triggers for matching interface<br> - {#CISCO.IF.NAME} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.CONTROL.MATCHES}`<br>  - TRIGGER_PROTOTYPE REGEXP `.*`<br>  - NO_DISCOVER</p> |
 |Memory discovery |<p>Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.</p> |SNMP |cisco.asav.memory.discovery |
 |Physical entry discovery |<p>Information about a particular physical entity.</p> |SNMP |cisco.asav.physical.entry.discovery |
 |Session discovery |<p>Remote access session discovery</p> |SNMP |cisco.asav.session.discovery |
@@ -70,7 +70,7 @@ There are no template links in this template.
 |Inventory |Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} Model name |<p>MIB: ENTITY-MIB</p><p>The vendor-specific model name identifier string associated</p><p>with this physical component.  The preferred value is the</p><p>customer-visible part number, which may be printed on the</p><p>component itself.</p><p>If the model name string associated with the physical</p><p>component is unknown to the agent, then this object will</p><p>contain a zero-length string.</p> |SNMP |cisco.asav.phys.model[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Memory |Cisco ASAv: {#SNMPVALUE} Used memory |<p>MIB: CISCO-MEMORY-POOL-MIB</p><p>Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.</p><p>Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</p> |SNMP |cisco.asav.memory.used[{#SNMPINDEX}] |
 |Memory |Cisco ASAv: {#SNMPVALUE} Free memory |<p>MIB: CISCO-MEMORY-POOL-MIB</p><p>Indicates the number of bytes from the memory pool that are currently unused on the managed device. Note that the sum of ciscoMemoryPoolUsed and ciscoMemoryPoolFree is the total amount of memory in the pool</p><p>Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html</p> |SNMP |cisco.asav.memory.free[{#SNMPINDEX}] |
-|Memory |Cisco ASAv: {#SNMPVALUE} Memory utilization |<p>Memory utilization in %</p> |CALCULATED |cisco.asav.memory.util[{#SNMPINDEX}]<p>**Expression**:</p>`last(//cisco.asav.memory.used[{#SNMPINDEX}])/(last(//cisco.asav.memory.free[{#SNMPINDEX}])+last(//cisco.asav.memory.used[{#SNMPINDEX}]))*100` |
+|Memory |Cisco ASAv: {#SNMPVALUE} Memory utilization |<p>Memory utilization in %.</p> |CALCULATED |cisco.asav.memory.util[{#SNMPINDEX}]<p>**Expression**:</p>`last(//cisco.asav.memory.used[{#SNMPINDEX}])/(last(//cisco.asav.memory.free[{#SNMPINDEX}])+last(//cisco.asav.memory.used[{#SNMPINDEX}]))*100` |
 |Network interfaces |Cisco ASAv: {#CISCO.IF.NAME} Interface name |<p>MIB: CISCO-PORT-MIB</p><p>Descriptive name that identifies this port.</p> |SNMP |cisco.asav.net.if.name[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Network interfaces |Cisco ASAv: {#CISCO.IF.NAME} Interface description |<p>MIB: IF-MIB</p><p>A textual string containing information about the interface</p> |SNMP |cisco.asav.net.if.descr[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Network interfaces |Cisco ASAv: {#CISCO.IF.NAME} Operational status |<p>MIB: IF-MIB</p><p>The current operational state of the interface.</p><p>The testing(3) state indicates that no operational</p><p>packets can be passed.</p> |SNMP |cisco.asav.net.if.operstatus[{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
@@ -103,16 +103,16 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Cisco ASAv: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Cisco ASAv SNMP/cisco.asav.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
-|Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced |<p>{#CISCO.ASAV.PHYS.NAME} serial number has changed. Ack to close</p> |`last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#1)<>last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#2) and length(last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}]))>0` |INFO |<p>Manual close: YES</p> |
-|Cisco ASAv: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Cisco ASAv SNMP/cisco.asav.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
-|Cisco ASAv: {#CISCO.IF.NAME} Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`last(/Cisco ASAv SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])=2 and last(/Cisco ASAv SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/Cisco ASAv SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#2)`<p>Recovery expression:</p>`last(/Cisco ASAv SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])<>2` |AVERAGE |<p>Manual close: YES</p> |
-|Cisco ASAv: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Cisco ASAv SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|Cisco ASAv: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Cisco ASAv SNMP/cisco.asav.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Cisco ASAv: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Cisco ASAv by SNMP/cisco.asav.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
+|Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced |<p>{#CISCO.ASAV.PHYS.NAME} serial number has changed. Ack to close</p> |`last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#2) and length(last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}]))>0` |INFO |<p>Manual close: YES</p> |
+|Cisco ASAv: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Cisco ASAv by SNMP/cisco.asav.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
+|Cisco ASAv: {#CISCO.IF.NAME} Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])=2 and last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#2)`<p>Recovery expression:</p>`last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])<>2` |AVERAGE |<p>Manual close: YES</p> |
+|Cisco ASAv: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Cisco ASAv by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
+|Cisco ASAv: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Cisco ASAv by SNMP/cisco.asav.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco).
 

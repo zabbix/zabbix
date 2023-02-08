@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,7 +147,7 @@ class CSeverityHelper {
 
 		foreach (range($min, $max) as $severity) {
 			$severities[] = [
-				'name' => self::getName($severity),
+				'label' => self::getName($severity),
 				'value' => $severity,
 				'style' => self::getStyle($severity)
 			];

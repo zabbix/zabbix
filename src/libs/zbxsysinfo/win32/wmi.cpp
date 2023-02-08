@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,7 +137,6 @@ extern "C" static void	get_error_code_text(HRESULT hres, char **error)
 			zabbix_log(LOG_LEVEL_DEBUG, "GetErrorCodeText() failed with code:" ZBX_FS_I64 " when retrieving error"
 					" code for " ZBX_FS_I64, sc, hres);
 		}
-		pStatus->Release();
 	}
 	else
 	{

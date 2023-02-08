@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-16T02:58:58Z'
+  date: '2022-10-27T12:58:39Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 2b9039885edf45b8bdd39f16dd069133
-      template: 'TP-LINK SNMP'
-      name: 'TP-LINK SNMP'
+      template: 'TP-LINK by SNMP'
+      name: 'TP-LINK by SNMP'
       description: |
         Template Net TP-LINK
         
@@ -53,7 +53,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5b86c558f99d4ff5a8abca830df6e86e
-              expression: 'max(/TP-LINK SNMP/icmpping,#3)=0'
+              expression: 'max(/TP-LINK by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -79,14 +79,14 @@ zabbix_export:
           triggers:
             -
               uuid: 421d12d2c2a0405ba31c869c4d481b70
-              expression: 'min(/TP-LINK SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/TP-LINK SNMP/icmppingloss,5m)<100'
+              expression: 'min(/TP-LINK by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/TP-LINK by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/TP-LINK SNMP/icmpping,#3)=0'
+                  expression: 'max(/TP-LINK by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -112,17 +112,17 @@ zabbix_export:
           triggers:
             -
               uuid: 4d1df00b9476483fa77e6064708abf58
-              expression: 'avg(/TP-LINK SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/TP-LINK by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/TP-LINK SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/TP-LINK SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/TP-LINK by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/TP-LINK by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/TP-LINK SNMP/icmpping,#3)=0'
+                  expression: 'max(/TP-LINK by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -216,7 +216,7 @@ zabbix_export:
           triggers:
             -
               uuid: ee797ebfc568468d8a3e9a8b388afb6d
-              expression: 'last(/TP-LINK SNMP/system.hw.firmware,#1)<>last(/TP-LINK SNMP/system.hw.firmware,#2) and length(last(/TP-LINK SNMP/system.hw.firmware))>0'
+              expression: 'last(/TP-LINK by SNMP/system.hw.firmware,#1)<>last(/TP-LINK by SNMP/system.hw.firmware,#2) and length(last(/TP-LINK by SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -275,7 +275,7 @@ zabbix_export:
           triggers:
             -
               uuid: 57a906ac8f994ebaa2543a5eb4949db7
-              expression: 'last(/TP-LINK SNMP/system.hw.serialnumber,#1)<>last(/TP-LINK SNMP/system.hw.serialnumber,#2) and length(last(/TP-LINK SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/TP-LINK by SNMP/system.hw.serialnumber,#1)<>last(/TP-LINK by SNMP/system.hw.serialnumber,#2) and length(last(/TP-LINK by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -384,7 +384,7 @@ zabbix_export:
           triggers:
             -
               uuid: 367bce2d38fe4ecbbe23c34bc7ec6226
-              expression: 'last(/TP-LINK SNMP/system.name,#1)<>last(/TP-LINK SNMP/system.name,#2) and length(last(/TP-LINK SNMP/system.name))>0'
+              expression: 'last(/TP-LINK by SNMP/system.name,#1)<>last(/TP-LINK by SNMP/system.name,#2) and length(last(/TP-LINK by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -465,7 +465,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7b533ce3df8c4405a04f90dd1e850a32
-              expression: 'max(/TP-LINK SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/TP-LINK by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -473,7 +473,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/TP-LINK SNMP/icmpping,#3)=0'
+                  expression: 'max(/TP-LINK by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -508,7 +508,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 667a09c4f1c04a1a84c7c79adb9cbc70
-                  expression: 'min(/TP-LINK SNMP/system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/TP-LINK by SNMP/system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPVALUE}: High CPU utilization'
                   event_name: '#{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -529,7 +529,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'TP-LINK SNMP'
+                    host: 'TP-LINK by SNMP'
                     key: 'system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}]'
         -
           uuid: 7a3144453fc644b3bd42dec4ba843bef
@@ -560,7 +560,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3bd3af786eb34b5e9a05f3113fce8007
-                  expression: 'min(/TP-LINK SNMP/vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/TP-LINK by SNMP/vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '#{#SNMPVALUE}: High memory utilization'
                   event_name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -583,7 +583,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'TP-LINK SNMP'
+                    host: 'TP-LINK by SNMP'
                     key: 'vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}]'
         -
           uuid: eec7aaed43e14fbca8c07cdc68d8b683
@@ -876,9 +876,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ce16733da6d24beb9cea97d61368e21b
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFDESCR}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -929,21 +929,21 @@ zabbix_export:
             -
               uuid: ebcdfd6d8c974c06810375d98e7d76c7
               expression: |
-                change(/TP-LINK SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/TP-LINK SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
+                change(/TP-LINK by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/TP-LINK by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/TP-LINK SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/TP-LINK SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/TP-LINK SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/TP-LINK SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/TP-LINK SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/TP-LINK SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/TP-LINK by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/TP-LINK by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/TP-LINK by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/TP-LINK by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/TP-LINK by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/TP-LINK by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/TP-LINK SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and last(/TP-LINK SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/TP-LINK by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and last(/TP-LINK by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFDESCR}: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -952,8 +952,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFDESCR}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -961,13 +961,13 @@ zabbix_export:
             -
               uuid: ae472f99d7ab480c947293f09c4b9dbb
               expression: |
-                (avg(/TP-LINK SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/TP-LINK SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or
-                avg(/TP-LINK SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/TP-LINK SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and
-                last(/TP-LINK SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
+                (avg(/TP-LINK by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/TP-LINK by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or
+                avg(/TP-LINK by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/TP-LINK by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and
+                last(/TP-LINK by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/TP-LINK SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/TP-LINK SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
-                avg(/TP-LINK SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/TP-LINK SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
+                avg(/TP-LINK by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/TP-LINK by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
+                avg(/TP-LINK by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/TP-LINK by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFDESCR}: High bandwidth usage'
               event_name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -977,8 +977,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFDESCR}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -986,12 +986,12 @@ zabbix_export:
             -
               uuid: ec28cbfaaf6245a194fe001555d05e5c
               expression: |
-                min(/TP-LINK SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/TP-LINK SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/TP-LINK by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/TP-LINK by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/TP-LINK SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/TP-LINK SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/TP-LINK by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/TP-LINK by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFDESCR}: High error rate'
               event_name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1001,8 +1001,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFDESCR}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/TP-LINK SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/TP-LINK by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1016,42 +1016,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'TP-LINK SNMP'
+                    host: 'TP-LINK by SNMP'
                     key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'TP-LINK SNMP'
+                    host: 'TP-LINK by SNMP'
                     key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'TP-LINK SNMP'
+                    host: 'TP-LINK by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'TP-LINK SNMP'
+                    host: 'TP-LINK by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'TP-LINK SNMP'
+                    host: 'TP-LINK by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'TP-LINK SNMP'
+                    host: 'TP-LINK by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
       tags:
         -
@@ -1147,7 +1147,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'TP-LINK SNMP'
+                        host: 'TP-LINK by SNMP'
                         name: 'Interface {#IFDESCR}: Network traffic'
       valuemaps:
         -
@@ -2060,7 +2060,7 @@ zabbix_export:
   triggers:
     -
       uuid: 63b45803131d4391abfa313a222339e5
-      expression: '(last(/TP-LINK SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/TP-LINK SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/TP-LINK SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/TP-LINK SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/TP-LINK by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/TP-LINK by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/TP-LINK by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/TP-LINK by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2069,7 +2069,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/TP-LINK SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/TP-LINK by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope

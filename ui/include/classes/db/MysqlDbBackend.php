@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -209,5 +209,16 @@ class MysqlDbBackend extends DbBackend {
 		}
 
 		DBexecute('SET NAMES utf8');
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function dbFieldExists(string $table_name, string $field_name): bool {
+		return (bool) DBFetch(DBselect(
+			'SHOW COLUMNS'.
+			' FROM '.$table_name.
+			' LIKE '.zbx_dbstr($field_name)
+		));
 	}
 }

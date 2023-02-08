@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:51Z'
+  date: '2022-10-21T11:57:50Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -649,7 +649,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: c569ce73bfb44098be3ceb8d016e3d24
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s'
+              name: 'Kubernetes: Host [{#HOST}] Request method [{#METHOD}] Code:[{#CODE}]'
               type: DEPENDENT
               key: 'kube.kubelet.rest.requests["{#CODE}", "{#HOST}", "{#METHOD}"]'
               delay: '0'
@@ -923,7 +923,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
             -
               name: 'total item'
@@ -939,7 +938,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: NOT_LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
       tags:
         -

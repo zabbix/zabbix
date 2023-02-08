@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,27 +84,28 @@ static duk_ret_t	es_log_message(duk_context *ctx, int level)
 	else
 		msg_output = zbx_strdup(msg_output, "undefined");
 
-	zabbix_log(level, "%s", msg_output);
-
 	duk_get_memory_functions(ctx, &out_funcs);
 	env = (zbx_es_env_t *)out_funcs.udata;
 
-	if (NULL == env->json)
-		goto out;
-
-	if (ZBX_ES_LOG_MEMORY_LIMIT < env->json->buffer_size)	/* approximate limit */
+	if (ZBX_ES_LOG_MEMORY_LIMIT < env->log_size)
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "log exceeds the maximum size of "
 				ZBX_FS_UI64 " bytes.", ZBX_ES_LOG_MEMORY_LIMIT);
 		goto out;
 	}
 
-	zbx_json_addobject(env->json, NULL);
-	zbx_json_adduint64(env->json, "level", (zbx_uint64_t)level);
-	zbx_json_adduint64(env->json, "ms", zbx_get_duration_ms(&env->start_time));
-	zbx_json_addstring(env->json, "message", msg_output, ZBX_JSON_TYPE_STRING);
-	zbx_json_close(env->json);
+	zabbix_log(level, "%s", msg_output);
+
+	if (NULL != env->json)
+	{
+		zbx_json_addobject(env->json, NULL);
+		zbx_json_adduint64(env->json, "level", (zbx_uint64_t)level);
+		zbx_json_adduint64(env->json, "ms", zbx_get_duration_ms(&env->start_time));
+		zbx_json_addstring(env->json, "message", msg_output, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(env->json);
+	}
 out:
+	env->log_size += strlen(msg_output);
 	zbx_free(msg_output);
 
 	if (-1 != err_index)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,13 +93,15 @@
 				url.setArgument('action', 'problem.view.csv');
 				$('#export_csv').attr('data-url', url.getUrl());
 
+				this.refresh_url.setArgument('page', '1');
+
 				this.refreshResults();
 				this.refreshCounters();
+				chkbxRange.clearSelectedOnFilterChange();
 
 				if (this.active_filter !== this.filter._active_item) {
 					this.active_filter = this.filter._active_item;
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
-					chkbxRange.clearSelectedOnFilterChange();
 				}
 			});
 

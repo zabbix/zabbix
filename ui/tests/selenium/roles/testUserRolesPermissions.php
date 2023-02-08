@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,6 +115,10 @@ class testUserRolesPermissions extends CWebTest {
 	}
 
 	public function prepareServiceData() {
+		// Remove all unnecessary services before proceeding with execution.
+		DBExecute('DELETE FROM services');
+
+		// Create services for Service permission checks.
 		CDataHelper::call('service.create', [
 			[
 				'name' => 'Parent 1',
@@ -473,9 +477,6 @@ class testUserRolesPermissions extends CWebTest {
 			'Configuration',
 			'Detect operating system',
 			'Ping',
-			'Script for Clone',
-			'Script for Delete',
-			'Script for Update',
 			'Traceroute'
 		];
 		$context_after = [
