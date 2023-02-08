@@ -1,11 +1,13 @@
 $theme-name: 'blue' !default;
 
+$icon-default-size: 16px;
+
 $btn-icon-size: 18px;
 $btn-icon-small-size: 12px;
 
 $main-menu-icon-size: 24px;
-$main-menu-submenu-icon-size: 16px;
-$user-menu-icon-size: 16px;
+$main-menu-submenu-icon-size: $icon-default-size;
+$user-menu-icon-size: $icon-default-size;
 
 $ui-transitions: true !default;
 

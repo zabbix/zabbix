@@ -3,8 +3,6 @@ $sidebar-max-width: 480px;
 $sidebar-compact-width: 48px;
 $sidebar-padding: 12px;
 
-$sidebar-toggle-bg-position: -540px -592px !default;
-
 .sidebar {
 	position: relative;
 	z-index: 998;
@@ -29,27 +27,16 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		width: 48px;
 		justify-content: flex-end;
 
-		.zi-chevron-double-left,
-		.zi-collapse,
-		.zi-expand,
-		.zi-chevron-double-right {
-			@extend %btn-reset;
-
-			padding: 0;
-			width: 24px;
-			height: 24px;
-			font-size: 0;
-
+		.btn-icon {
 			&::before {
-				vertical-align: middle;
-				font-size: 16px;
-				opacity: .75;
+				font-size: $icon-default-size;
+				color: $sidebar-mode-icon-color;
 			}
 
 			&:hover,
 			&:focus {
 				&::before {
-					opacity: 1;
+					color: $sidebar-mode-icon-hover-color;
 				}
 			}
 		}
@@ -259,32 +246,20 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 	flex-shrink: 0;
 	margin-right: 10px;
 
-	.zi-menu {
-		@extend %btn-reset;
-
-		padding: 0 2px;
-		width: 24px;
-		height: 24px;
-
-		font-size: 0;
-		opacity: .75;
-
-		&::before {
-			font-size: 18px;
-			color: $icon-menu-toggle-color;
-			text-indent: unset;
-		}
-
-		&:hover {
-			opacity: 1;
-		}
-
-		@if $ui-transitions {
-			transition: opacity $ui-transition-duration ease-out;
-		}
-	}
-
 	& + div {
 		flex-shrink: 1;
+	}
+
+	.zi-menu {
+		&::before {
+			color: $main-menu-toggle-color;
+		}
+
+		&:hover,
+		&:focus {
+			&::before {
+				color: $main-menu-toggle-hover-color;
+			}
+		}
 	}
 }
