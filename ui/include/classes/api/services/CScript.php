@@ -1375,32 +1375,32 @@ class CScript extends CApiService {
 			}
 		}
 
-		$scripts_db = DB::select('scripts', [
+		$scripts_ex = DB::select('scripts', [
 			'output' => ['scriptid', 'name', 'menu_path'],
 			'filter' => ['name' => array_column($scripts, 'name')]
 		]);
 
-		if (!$scripts_db) {
+		if (!$scripts_ex) {
 			return;
 		}
 
-		$names_db = [];
+		$db_scriptids = [];
 
-		foreach ($scripts_db as $script_db) {
-			$name_db = self::getScriptNameAndPath($script_db);
-			$names_db[$name_db] = $script_db['scriptid'];
+		foreach ($scripts_ex as $script) {
+			$name = self::getScriptNameAndPath($script);
+			$db_scriptids[$name] = $script['scriptid'];
 		}
 
 		foreach ($scripts as $script) {
 			$name = self::getScriptNameAndPath($script);
 
 			if ($db_scripts === null) {
-				if (array_key_exists($name, $names_db)) {
+				if (array_key_exists($name, $db_scriptids)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
 				}
 			}
 			else {
-				if (array_key_exists($name, $names_db) && bccomp($script['scriptid'], $names_db[$name]) != 0) {
+				if (array_key_exists($name, $db_scriptids) && bccomp($script['scriptid'], $db_scriptids[$name]) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
 				}
 			}
