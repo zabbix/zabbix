@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-05 16:12+0000\n"
+"PO-Revision-Date: 2023-02-07 11:49+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2369,7 +2369,7 @@ msgstr "No es pot pas crear un mapa d'icones"
 #: app/controllers/CControllerMaintenanceCreate.php:72
 #: app/controllers/CControllerMaintenanceCreate.php:150
 msgid "Cannot create maintenance period"
-msgstr ""
+msgstr "No es pot pas crear el període de manteniment"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2558,8 +2558,8 @@ msgstr "No es pot pas esborrar el manteniment"
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
 msgid_plural "Cannot delete maintenance periods"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar el període de manteniment"
+msgstr[1] "No es poden pas esborrar els períodes de manteniment"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -3848,7 +3848,7 @@ msgstr "No es pot pas actualitzar el manteniment"
 #: app/controllers/CControllerMaintenanceUpdate.php:73
 #: app/controllers/CControllerMaintenanceUpdate.php:152
 msgid "Cannot update maintenance period"
-msgstr ""
+msgstr "No es pot pas actualitzar el període de manteniment"
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -6105,7 +6105,7 @@ msgstr "Vols esborrar els elements triats?"
 
 #: app/views/js/maintenance.list.js.php:88
 msgid "Delete selected maintenance period?"
-msgstr ""
+msgstr "Vols esborrar el període de manteniment?"
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -12370,13 +12370,13 @@ msgstr "Període de manteniment"
 
 #: app/controllers/CControllerMaintenanceCreate.php:142
 msgid "Maintenance period created"
-msgstr ""
+msgstr "Període de manteniment creat"
 
 #: app/controllers/CControllerMaintenanceDelete.php:61
 msgid "Maintenance period deleted"
 msgid_plural "Maintenance periods deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Període de manteniment esborrat"
+msgstr[1] "Períodes de manteniment esborrats"
 
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
@@ -12384,7 +12384,7 @@ msgstr "Durada del període de manteniment"
 
 #: app/controllers/CControllerMaintenanceUpdate.php:144
 msgid "Maintenance period updated"
-msgstr ""
+msgstr "Període de manteniment actualitzat"
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -13598,7 +13598,7 @@ msgstr "Nou grup d'equips"
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
 msgid "New maintenance period"
-msgstr ""
+msgstr "Nou període de manteniment"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
