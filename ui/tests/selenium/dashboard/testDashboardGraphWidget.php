@@ -141,7 +141,7 @@ class testDashboardGraphWidget extends CWebTest {
 			case 'Data set':
 				// Remove data set.
 				if (CTestArrayHelper::get($data, 'remove_data_set', false)) {
-					$form->query('xpath://button[@class="btn-remove"]')->one()->click();
+					$form->query('xpath://button[contains(@class, "zi-remove")]')->one()->click();
 				}
 				break;
 
@@ -151,7 +151,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 				// Remove all override options.
 				if (CTestArrayHelper::get($data, 'remove_override_options', false)) {
-					$form->query('xpath://button[@class="subfilter-disable-btn"]')->all()->click();
+					$form->query('xpath://button[contains(@class, "zi-remove")]')->all()->click();
 				}
 
 				break;

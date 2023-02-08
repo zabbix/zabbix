@@ -116,7 +116,6 @@ foreach ($data['services'] as $serviceid => $service) {
 		(new CCol([
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_STYLE_BTN_ADD) // TODO - AS: check if needed
 				->addClass(ZBX_ICON_PLUS)
 				->addClass('js-add-child-service')
 				->setAttribute('data-serviceid', $serviceid)
@@ -124,7 +123,6 @@ foreach ($data['services'] as $serviceid => $service) {
 				->setEnabled(!$service['readonly'] && $service['problem_tags'] == 0),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_STYLE_BTN_EDIT) // TODO - AS: check if needed
 				->addClass(ZBX_ICON_PENCIL)
 				->addClass('js-edit-service')
 				->setAttribute('data-serviceid', $serviceid)

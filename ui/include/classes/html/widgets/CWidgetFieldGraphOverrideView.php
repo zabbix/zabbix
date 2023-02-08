@@ -78,7 +78,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 				.dynamicRows({
 					template: "#overrides-row",
 					beforeRow: ".overrides-foot",
-					remove: ".'.ZBX_STYLE_BTN_REMOVE.'",
+					remove: ".'.ZBX_ICON_REMOVE.'",
 					add: "#override-add",
 					row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"
 				})
@@ -336,7 +336,8 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 			(new CDiv(
 				(new CButton())
 					->setAttribute('title', _('Delete'))
-					->addClass(ZBX_STYLE_BTN_REMOVE)
+					->addClass(ZBX_STYLE_BTN_ICON)
+					->addClass(ZBX_ICON_REMOVE)
 					->removeId()
 			))->addClass('dataset-actions'),
 			(new CList($inputs))

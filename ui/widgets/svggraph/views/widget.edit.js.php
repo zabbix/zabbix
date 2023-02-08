@@ -182,7 +182,7 @@ window.widget_svggraph_form = new class {
 				this._removeSingleItem(e.target);
 			}
 
-			if (e.target.classList.contains('btn-remove')) {
+			if (e.target.classList.contains('zi-remove')) {
 				this._removeDataSet(e.target);
 			}
 		});

@@ -42,7 +42,7 @@ svg *:focus {
 @font-face {
   font-family: "zabbix-icons";
   src: url("../fonts/zabbix-icons.woff2?t=1675758509683") format("woff2"), url("../fonts/zabbix-icons.woff?t=1675758509683") format("woff"), url("../fonts/zabbix-icons.ttf?t=1675758509683") format("truetype"), url("../fonts/zabbix-icons.svg?t=1675758509683#zabbix-icons") format("svg"); }
-[class^="zi-"]::before, [class*=" zi-"]::before, button.btn-overlay-close, a.btn-overlay-close.btn-icon {
+[class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close {
   font-family: 'zabbix-icons' !important;
   font-size: 16px;
   font-style: normal;
@@ -1097,11 +1097,11 @@ footer {
     outline: none;
     opacity: 1; }
 
-button[class^="zi-"], a[class^="zi-"].btn-icon, button[class*=" zi-"], a[class*=" zi-"].btn-icon, button.btn-overlay-close, a.btn-overlay-close.btn-icon {
+button[class^="zi-"], a[class^="zi-"].btn-icon, button[class*=" zi-"], a[class*=" zi-"].btn-icon, .btn-overlay-close, .multiselect .multiselect-list .btn-icon.zi-remove {
   display: inline-flex;
   align-items: center;
   vertical-align: top; }
-  button[class^="zi-"]:empty, a[class^="zi-"].btn-icon:empty, button[class*=" zi-"]:empty, a[class*=" zi-"].btn-icon:empty, button.btn-overlay-close:empty, a.btn-overlay-close.btn-icon:empty {
+  button[class^="zi-"]:empty, a[class^="zi-"].btn-icon:empty, button[class*=" zi-"]:empty, a[class*=" zi-"].btn-icon:empty, .btn-overlay-close:empty, .multiselect .multiselect-list .btn-icon.zi-remove:empty {
     justify-content: center; }
 
 button, a.btn-icon {
@@ -1212,16 +1212,23 @@ a.btn-icon,
       .btn-overlay-close[disabled]:active::before {
         color: #dce2e5; }
 
-button.btn-overlay-close, a.btn-overlay-close.btn-icon {
+button.btn-overlay-close, a.btn-overlay-close.btn-icon, button.zi-remove, a.zi-remove.btn-icon {
+  width: 18px;
+  height: 18px;
+  min-height: 18px; }
+  button.btn-overlay-close:before, a.btn-overlay-close.btn-icon:before, button.zi-remove:before, a.zi-remove.btn-icon:before {
+    font-size: 10.2px; }
+
+.btn-alt.zi-plus::before {
+  font-size: 12px; }
+
+.btn-overlay-close {
   position: absolute;
   top: 1px;
   right: 1px;
-  z-index: 1000;
-  width: 18px;
-  min-height: 18px; }
-  button.btn-overlay-close::before, a.btn-overlay-close.btn-icon::before {
-    content: "";
-    font-size: 10.2px; }
+  z-index: 1000; }
+  .btn-overlay-close::before {
+    content: ""; }
 
 .checkbox-list {
   display: grid;
@@ -1238,7 +1245,7 @@ button.btn-overlay-close, a.btn-overlay-close.btn-icon {
 .color-picker .color-picker-preview,
 .color-picker-dialogue .color-picker-preview {
   position: relative;
-  background: url("../img/icon-sprite.svg?20220722") no-repeat -323px -411px;
+  background: linear-gradient(to top left, #fff calc(50% - 2px), #d40000, #fff calc(50% + 2px));
   border: 1px solid #666666;
   color: #ffffff; }
 .color-picker .use-default,
@@ -1259,7 +1266,6 @@ button.btn-overlay-close, a.btn-overlay-close.btn-icon {
   line-height: 24px; }
   .color-picker .color-picker-preview {
     padding: 0;
-    background-position: -321px -409px;
     width: 24px;
     vertical-align: top; }
   .color-picker input:disabled + button, .color-picker input:disabled + a.btn-icon {
@@ -2205,10 +2211,6 @@ form.dashboard-widget-svggraph .dataset-body .form-grid {
     grid-column-start: 4; }
 form.dashboard-widget-svggraph .dataset-actions {
   text-align: right; }
-  form.dashboard-widget-svggraph .dataset-actions .btn-remove {
-    top: 0;
-    right: 0;
-    vertical-align: baseline; }
 form.dashboard-widget-svggraph .items-list {
   grid-column: 3 / span 3; }
 form.dashboard-widget-svggraph .list-vertical-accordion {
@@ -2292,10 +2294,6 @@ form.dashboard-widget-svggraph .overrides-list-item {
     margin-bottom: -5px; }
   form.dashboard-widget-svggraph .overrides-list-item .multiselect {
     width: 100%; }
-  form.dashboard-widget-svggraph .overrides-list-item .btn-remove {
-    right: 0;
-    top: 0;
-    vertical-align: baseline; }
 form.dashboard-widget-svggraph .overrides-foot {
   padding: 5px 0; }
 form.dashboard-widget-svggraph .overrides-options-list {
@@ -2303,55 +2301,39 @@ form.dashboard-widget-svggraph .overrides-options-list {
   padding: 0 24px 8px 0;
   border-bottom: 1px solid #333333;
   white-space: normal; }
-  form.dashboard-widget-svggraph .overrides-options-list > li {
+  form.dashboard-widget-svggraph .overrides-options-list li {
     display: inline-block;
-    margin-right: 5px;
     margin-bottom: 2px;
-    line-height: 22px;
+    vertical-align: middle;
     white-space: nowrap; }
-    form.dashboard-widget-svggraph .overrides-options-list > li .color-picker {
-      line-height: 22px; }
-    form.dashboard-widget-svggraph .overrides-options-list > li > div {
-      position: relative;
-      padding: 1px 18px 1px 1px;
+    form.dashboard-widget-svggraph .overrides-options-list li > div {
+      padding: 1px;
       background-color: #dddddd;
-      border-radius: 2px; }
-      form.dashboard-widget-svggraph .overrides-options-list > li > div > span {
-        color: white;
+      border-radius: 2px;
+      line-height: 22px; }
+      form.dashboard-widget-svggraph .overrides-options-list li > div span {
         padding-left: 8px;
-        line-height: 22px; }
-      form.dashboard-widget-svggraph .overrides-options-list > li > div > input[type=text] {
-        border-style: none;
-        line-height: 22px;
+        color: #fff; }
+      form.dashboard-widget-svggraph .overrides-options-list li > div input[type=text] {
+        width: 85px;
         min-height: 22px;
-        width: 85px; }
-      form.dashboard-widget-svggraph .overrides-options-list > li > div > .subfilter-disable-btn {
-        position: absolute;
-        right: 0;
-        top: 0;
-        min-height: 24px; }
-  form.dashboard-widget-svggraph .overrides-options-list .btn-alt .plus-icon {
-    margin-right: 0; }
+        border-style: none; }
+    form.dashboard-widget-svggraph .overrides-options-list li:not(:last-child) {
+      margin-right: 5px; }
+  form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove {
+    height: 22px; }
+    form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove::before {
+      color: #fff; }
+    form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove:hover::before, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove:focus::before {
+      color: #dfe4e7; }
   form.dashboard-widget-svggraph .overrides-options-list .color-picker .color-picker-preview {
-    margin: 1px;
     width: 20px;
     min-height: 20px;
-    background-position: -323px -411px; }
+    margin: 1px 0 1px 1px; }
 form.dashboard-widget-svggraph .no-items-message {
   display: none;
   line-height: 24px;
   color: #cacaca; }
-
-[theme="hc-dark"] form.dashboard-widget-svggraph .overrides-options-list > li > div {
-  border: 1px solid #ffffff;
-  background-color: transparent !important; }
-  [theme="hc-dark"] form.dashboard-widget-svggraph .overrides-options-list > li > div > .subfilter-disable-btn {
-    border: none !important;
-    top: 0; }
-
-[theme="hc-light"] form.dashboard-widget-svggraph .overrides-options-list > li > div > .subfilter-disable-btn {
-  border: none !important;
-  top: 0; }
 
 form.dashboard-widget-tophosts #list_columns .text {
   max-width: 250px; }
@@ -2749,8 +2731,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
     white-space: nowrap; }
     .list-table .list-table-actions .btn-icon {
       width: 18px;
-      min-height: 18px;
-      vertical-align: top; }
+      min-height: 18px; }
       .list-table .list-table-actions .btn-icon:not(:first-of-type) {
         margin-left: 5px; }
   .list-table.sticky-header thead {
@@ -3541,22 +3522,6 @@ section {
     font-size: 1.5em; }
   .service-info .service-actions {
     justify-self: end; }
-    .service-info .service-actions .zi-pencil {
-      width: 18px;
-      height: 18px;
-      min-height: 18px;
-      margin-left: 5px;
-      padding: 0 2px;
-      vertical-align: middle;
-      color: #768d99; }
-      .service-info .service-actions .zi-pencil::before {
-        top: -1px;
-        right: 2px;
-        vertical-align: middle;
-        font-size: 18px;
-        opacity: 0.5; }
-      .service-info .service-actions .zi-pencil:hover::before, .service-info .service-actions .zi-pencil:focus::before, .service-info .service-actions .zi-pencil:active::before {
-        opacity: 1; }
   .service-info .service-status {
     display: inline-block;
     padding: 0 4px;
@@ -4061,12 +4026,6 @@ z-select,
   background-color: transparent; }
   .disabled .subfilter-enabled {
     color: #848484; }
-  .disabled .subfilter-disable-btn {
-    cursor: default;
-    color: #9d9d9d;
-    background-color: #dddddd; }
-    .disabled .subfilter-disable-btn:hover, .disabled .subfilter-disable-btn:focus, .disabled .subfilter-disable-btn:active {
-      color: #9d9d9d; }
   .disabled .disabled,
   .disabled [disabled] {
     opacity: 1 !important; }
@@ -4537,29 +4496,37 @@ form.is-loading {
       overflow: hidden;
       white-space: nowrap;
       cursor: default; }
-      .multiselect .multiselect-list li .subfilter-enabled {
-        display: flex;
-        flex-direction: row;
-        padding: 0 3px 0 4px;
-        line-height: 18px; }
-        .multiselect .multiselect-list li .subfilter-enabled > span:first-child {
-          overflow: hidden;
-          text-overflow: ellipsis; }
-        .multiselect .multiselect-list li .subfilter-enabled > .subfilter-disable-btn {
-          position: relative;
-          left: 3px;
-          flex-shrink: 0; }
-      .multiselect .multiselect-list li.selected .subfilter-enabled,
-      .multiselect .multiselect-list li.selected .subfilter-disable-btn,
-      .multiselect .multiselect-list li.selected .subfilter-disable-btn:active {
+      .multiselect .multiselect-list li.selected .subfilter-enabled {
         background-color: #222222; }
+    .multiselect .multiselect-list .subfilter-enabled {
+      padding-right: 0;
+      display: flex;
+      flex-direction: row;
+      line-height: 18px; }
+      .multiselect .multiselect-list .subfilter-enabled > span:first-child {
+        overflow: hidden;
+        text-overflow: ellipsis; }
+    .multiselect .multiselect-list .btn-icon.zi-remove {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      min-height: 18px;
+      cursor: pointer; }
+      .multiselect .multiselect-list .btn-icon.zi-remove::before {
+        font-size: 10.2px;
+        color: #fff; }
+      .multiselect .multiselect-list .btn-icon.zi-remove:hover::before, .multiselect .multiselect-list .btn-icon.zi-remove:focus::before {
+        color: #dfe4e7; }
   .multiselect .disabled {
     background-color: #000000;
     opacity: 1; }
-    .multiselect .disabled .subfilter-enabled,
-    .multiselect .disabled .subfilter-disable-btn {
+    .multiselect .disabled .subfilter-enabled {
       background-color: #383838;
       color: #b5b5b5; }
+    .multiselect .disabled .btn-icon.zi-remove {
+      cursor: default; }
+      .multiselect .disabled .btn-icon.zi-remove::before, .multiselect .disabled .btn-icon.zi-remove:hover::before {
+        color: #b5b5b5; }
   .multiselect div[aria-live] {
     overflow: hidden;
     position: absolute;
@@ -5234,7 +5201,7 @@ z-select .zi-chevron-down,
 .list-table button.zi-arrow-up,
 .list-table button.zi-arrow-down,
 .list-table button.zi-arrows-top-bottom,
-.list-table button.zi-alert, .list-table .zi-more, section .zi-chevron-up, .service-info .service-actions .zi-pencil, z-select .zi-chevron-down button, z-select .zi-chevron-down a.btn-icon,
+.list-table button.zi-alert, .list-table .zi-more, section .zi-chevron-up, z-select .zi-chevron-down button, z-select .zi-chevron-down a.btn-icon,
 .z-select .zi-chevron-down button,
 .z-select .zi-chevron-down a.btn-icon, .zi-bell,
 .zi-bell-off,
@@ -5698,10 +5665,6 @@ z-select .zi-chevron-down,
     cursor: default; }
   .multilineinput-control.multilineinput-disabled button::after, .multilineinput-control.multilineinput-disabled a.btn-icon::after {
     opacity: .5; }
-  .multilineinput-control .zi-pencil {
-    padding: 0 2px; }
-    .multilineinput-control .zi-pencil::before {
-      color: #768d99; }
 
 .multilineinput-modal {
   min-width: 960px; }
@@ -6690,10 +6653,6 @@ svg {
     .list-vertical-accordion .zi-chevron-up::before {
       font-size: 16px;
       color: #768d99; }
-  .list-vertical-accordion .list-accordion-item .btn-remove {
-    position: relative;
-    right: -10px;
-    top: 3px; }
   .list-vertical-accordion .list-accordion-item-head,
   .list-vertical-accordion .list-accordion-item-body {
     padding-bottom: 2px; }
@@ -6912,11 +6871,9 @@ svg {
       margin-right: 10px;
       display: flex;
       width: 85px; }
-      .navtree .tree .tree-item > .tree-row > .tools .btn-remove:focus {
-        box-shadow: none; }
     .navtree .tree .tree-item > .tree-row > .content {
       display: flex;
-      height: 20px;
+      height: 18px;
       align-items: center; }
       .navtree .tree .tree-item > .tree-row > .content > .arrow {
         flex: 0 0 15px;
@@ -6929,8 +6886,13 @@ svg {
         white-space: nowrap;
         overflow: hidden;
         margin-right: 5px;
-        text-overflow: ellipsis;
-        line-height: 1.5; }
+        text-overflow: ellipsis; }
+  .navtree .tree .tree-item .tools .btn-icon {
+    width: 18px;
+    min-width: 18px;
+    min-height: 18px; }
+    .navtree .tree .tree-item .tools .btn-icon:not(:first-of-type) {
+      margin-left: 5px; }
   .navtree .tree .tree-item .zi-drag-handle {
     position: relative;
     top: 3px;
@@ -7184,8 +7146,7 @@ a.icon-count {
         border-bottom-left-radius: 0; }
     .btn-split li:only-child button, .btn-split li:only-child a.btn-icon {
       border-radius: 2px; }
-    .btn-split li .zi-chevron-down::before,
-    .btn-split li .zi-plus::before {
+    .btn-split li .zi-chevron-down::before {
       font-size: 12px; }
 
 .checkbox-block {
@@ -7743,10 +7704,6 @@ a.link-action {
 .filter-trigger .arrow-down {
   border-top-color: #000000 !important; }
 
-.subfilter-enabled,
-.subfilter-disable-btn {
-  background-color: #000000; }
-
 .tag, .btn-tag {
   color: #000000; }
   .tag.green-bg, .green-bg.btn-tag, .tag.yellow-bg, .yellow-bg.btn-tag {
@@ -7765,10 +7722,6 @@ a.icon-count {
   transition: box-shadow .2s ease-out; }
 .multiselect input[type="text"]:focus {
   box-shadow: none; }
-.multiselect .multiselect-list li.selected .subfilter-enabled,
-.multiselect .multiselect-list li.selected .subfilter-disable-btn,
-.multiselect .multiselect-list li.selected .subfilter-disable-btn:active {
-  box-shadow: 0 0 0 1px #ffffff; }
 
 .checkbox-radio:focus + label span {
   box-shadow: 0 0 0 1px #ffffff;

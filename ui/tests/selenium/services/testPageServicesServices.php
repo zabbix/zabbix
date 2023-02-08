@@ -221,7 +221,7 @@ class testPageServicesServices extends CWebTest {
 			);
 		}
 
-		$edit_button = $info_card->query('xpath://button['.CXPathHelper::fromClass('btn-edit').']');
+		$edit_button = $info_card->query('xpath://button['.CXPathHelper::fromClass('js-edit-service').']');
 		$this->assertEquals($edit, $edit_button->one(false)->isClickable());
 		$table->invalidate();
 		$this->assertTableStats(1);
@@ -747,7 +747,7 @@ class testPageServicesServices extends CWebTest {
 			$this->query('button:Delete')->one()->click();
 		}
 		else {
-			$table->findRow('Name', $name)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
+			$table->findRow('Name', $name)->query('xpath:.//button[contains(@class, "zi-remove")]')->one()
 				->waitUntilClickable()->click();
 		}
 
@@ -772,7 +772,7 @@ class testPageServicesServices extends CWebTest {
 		$this->assertTableStats($before_rows_count);
 
 		// Delete service pressing cross button.
-		$table->findRow('Name', $name)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
+		$table->findRow('Name', $name)->query('xpath:.//button[contains(@class, "zi-remove")]')->one()
 				->waitUntilClickable()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
@@ -799,7 +799,7 @@ class testPageServicesServices extends CWebTest {
 
 		// Delete child service pressing cross button.
 		$table->invalidate();
-		$table->findRow('Name', $name)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
+		$table->findRow('Name', $name)->query('xpath:.//button[contains(@class, "zi-remove")]')->one()
 				->waitUntilClickable()->click();
 
 		$this->page->acceptAlert();
@@ -833,7 +833,7 @@ class testPageServicesServices extends CWebTest {
 		$this->assertFalse($table->query("xpath://td/a[text()=".CXPathHelper::escapeQuotes($child)."]")->exists());
 
 		// Delete parent service.
-		$table->findRow('Name', $name, true)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
+		$table->findRow('Name', $name, true)->query('xpath:.//button[contains(@class, "zi-remove")]')->one()
 				->waitUntilClickable()->click();
 
 		$this->page->acceptAlert();

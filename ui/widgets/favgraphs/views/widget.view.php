@@ -40,7 +40,8 @@ foreach ($data['graphs'] as $graph) {
 		(new CButton())
 			->setAttribute('data-itemid', $graph['itemid'])
 			->onClick('rm4favorites("itemid", this.dataset.itemid);')
-			->addClass(ZBX_STYLE_BTN_REMOVE)
+			->addClass(ZBX_STYLE_BTN_ICON)
+			->addClass(ZBX_ICON_REMOVE)
 			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $graph['label']))
 			->removeId()
 	]);

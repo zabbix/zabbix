@@ -24,26 +24,6 @@
 	}
 }
 
-%btn-remove-icon { // TODO - AS: should be checked and removed
-	//font-size: 20px;
-	//color: $font-alt-color;
-	//text-align: center;
-	//cursor: pointer;
-
-	//&::before {
-	//	display: block;
-	//	content: '+';
-	//	transform: rotate(45deg);
-	//}
-
-	//&:hover,
-	//&:focus,
-	//&:active {
-	//	color: $font-alt-color;
-	//	outline: none;
-	//}
-}
-
 %btn-icon-position {
 	display: inline-flex;
 	align-items: center;
@@ -198,7 +178,28 @@ a.btn-icon,
 	}
 }
 
-button.btn-overlay-close {
+button {
+	&.btn-overlay-close,
+	&.zi-remove {
+		width: 18px;
+		height: 18px;
+		min-height: 18px;
+
+		&:before {
+			font-size: $btn-icon-small-size *.85;
+		}
+	}
+}
+
+.btn-alt {
+	&.zi-plus {
+		&::before {
+			font-size: $btn-icon-small-size;
+		}
+	}
+}
+
+.btn-overlay-close {
 	@extend %btn-icon-position;
 	@extend %icons-font;
 
@@ -206,46 +207,8 @@ button.btn-overlay-close {
 	top: 1px;
 	right: 1px;
 	z-index: 1000;
-	width: 18px;
-	min-height: 18px;
 
 	&::before {
 		content: $zi-remove;
-		font-size: $btn-icon-small-size *.85;
 	}
-}
-
-.btn-remove { // TODO - AS: should be removed
-	//@extend %btn-icon;
-	//@extend %btn-remove-icon;
-
-	//&:not(:first-child) {
-	//	margin-left: 5px;
-	//}
-}
-
-.btn-remove { // TODO - AS: should be removed
-	//&[disabled],
-	//&[disabled]:hover {
-	//	background-color: transparent;
-	//	opacity: .25;
-	//}
-}
-
-.subfilter-disable-btn { // TODO - AS: should be removed
-	//@extend %btn-icon;
-	//@extend %btn-remove-icon;
-	//margin: 0;
-	//color: $font-selected-color;
-	//background-color: $ui-bg-selected-color;
-	//opacity: 1;
-
-	//&:hover {
-	//	color: darken($font-selected-color, 5%);
-	//}
-
-	//&:focus,
-	//&:active {
-	//	color: darken($font-selected-color, 10%);
-	//}
 }

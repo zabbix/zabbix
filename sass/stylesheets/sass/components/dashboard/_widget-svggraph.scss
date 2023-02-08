@@ -69,12 +69,6 @@ form.dashboard-widget-svggraph {
 
 	.dataset-actions {
 		text-align: right;
-
-		.btn-remove {
-			top: 0;
-			right: 0;
-			vertical-align: baseline;
-		}
 	}
 
 	.items-list {
@@ -210,12 +204,6 @@ form.dashboard-widget-svggraph {
 		.multiselect {
 			width: 100%;
 		}
-
-		.btn-remove {
-			right: 0;
-			top: 0;
-			vertical-align: baseline;
-		}
 	}
 
 	.overrides-foot {
@@ -228,57 +216,55 @@ form.dashboard-widget-svggraph {
 		border-bottom: 1px solid $table-border-color;
 		white-space: normal;
 
-		> li {
+		li {
 			display: inline-block;
-			margin-right: 5px;
 			margin-bottom: 2px;
-			line-height: 22px;
+			vertical-align: middle;
 			white-space: nowrap;
 
-			.color-picker {
-				line-height: 22px;
-			}
-
 			> div {
-				position: relative;
-				padding: 1px 18px 1px 1px;
+				padding: 1px;
 				background-color: $ui-bg-selected-color;
 				border-radius: 2px;
+				line-height: 22px;
 
-				> span {
-					color: lighten($ui-bg-selected-color, 100%);
+				span {
 					padding-left: 8px;
-					line-height: 22px;
+					color: $ui-selected-color;
 				}
 
-				> input[type=text] {
-					border-style: none;
-					line-height: 22px;
-					min-height: 22px;
+				input[type=text] {
 					width: 85px;
+					min-height: 22px;
+					border-style: none;
 				}
+			}
 
-				> .subfilter-disable-btn {
-					position: absolute;
-					right: 0;
-					top: 0;
-					min-height: 24px;
-				}
+			&:not(:last-child) {
+				margin-right: 5px;
 			}
 		}
 
-		.btn-alt {
-			.plus-icon { // TODO - AS: should be checked and removed
-				margin-right: 0;
+		.btn-icon.zi-remove {
+			height: 22px;
+
+			&::before {
+				color: $ui-selected-color;
+			}
+
+			&:hover,
+			&:focus {
+				&::before {
+					color: $ui-selected-hover-color;
+				}
 			}
 		}
 
 		.color-picker {
 			.color-picker-preview {
-				margin: 1px;
 				width: 20px;
 				min-height: 20px;
-				background-position: -323px -411px; // TODO - AS: need to check
+				margin: 1px 0 1px 1px;
 			}
 		}
 	}
@@ -293,12 +279,12 @@ form.dashboard-widget-svggraph {
 [theme="hc-dark"] form.dashboard-widget-svggraph {
 	.overrides-options-list {
 		> li > div {
-			border: 1px solid $ui-tab-bg-selected-color;
-			background-color: transparent !important;
+			//border: 1px solid $ui-tab-bg-selected-color; // TODO - AS: theme fix
+			//background-color: transparent !important;
 
 			> .subfilter-disable-btn {
-				border: none !important;
-				top: 0;
+				//border: none !important;
+				//top: 0;
 			}
 		}
 	}
@@ -308,8 +294,8 @@ form.dashboard-widget-svggraph {
 	.overrides-options-list {
 		> li > div {
 			> .subfilter-disable-btn {
-				border: none !important;
-				top: 0;
+				//border: none !important; // TODO - AS: theme fix
+				//top: 0;
 			}
 		}
 	}

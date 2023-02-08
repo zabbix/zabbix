@@ -98,7 +98,7 @@ if (array_key_exists('slas', $data)) {
 			(new CDiv(
 				$data['is_editable']
 					? (new CButton(null))
-						->addClass(ZBX_STYLE_BTN_EDIT)
+						->addClass(ZBX_STYLE_BTN_ICON)
 						->addClass(ZBX_ICON_PENCIL)
 						->addClass('js-edit-service')
 						->setAttribute('data-serviceid', $data['service']['serviceid'])

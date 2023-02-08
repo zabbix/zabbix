@@ -32,7 +32,7 @@ jQuery(function ($) {
 					e.stopPropagation();
 					e.preventDefault();
 				})
-				.addClass('subfilter-disable-btn'),
+				.addClass(['btn-icon', ZBX_ICON_REMOVE]),
 			opt = $override.data('options'),
 			field_name = opt.makeName(option, opt.getId($override));
 

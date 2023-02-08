@@ -40,34 +40,6 @@
 
 	.service-actions {
 		justify-self: end;
-
-		.zi-pencil {
-			@extend %btn-reset;
-
-			width: 18px;
-			height: 18px;
-			min-height: 18px;
-			margin-left: 5px;
-			padding: 0 2px;
-			vertical-align: middle;
-			color: $icon-color;
-
-			&::before {
-				top: -1px;
-				right: 2px;
-				vertical-align: middle;
-				font-size: 18px;
-				opacity: 0.5;
-			}
-
-			&:hover,
-			&:focus,
-			&:active {
-				&::before {
-					opacity: 1;
-				}
-			}
-		}
 	}
 
 	.service-status {

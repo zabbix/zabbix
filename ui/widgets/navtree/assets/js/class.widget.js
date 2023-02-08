@@ -293,19 +293,19 @@ class CWidgetNavTree extends CWidget {
 	_activateContentsEvents() {
 		if (this._state === WIDGET_STATE_ACTIVE && this._has_contents) {
 			if (this._is_edit_mode) {
-				for (const button of this._target.querySelectorAll('.js-button-add-child')) {
+				for (const button of this._target.querySelectorAll('.js-add-child')) {
 					button.addEventListener('click', this._events.addChild);
 				}
 
-				for (const button of this._target.querySelectorAll('.js-button-add-maps')) {
+				for (const button of this._target.querySelectorAll('.js-add-maps')) {
 					button.addEventListener('click', this._events.addMaps);
 				}
 
-				for (const button of this._target.querySelectorAll('.js-button-edit')) {
+				for (const button of this._target.querySelectorAll('.js-edit')) {
 					button.addEventListener('click', this._events.editItem);
 				}
 
-				for (const button of this._target.querySelectorAll('.js-button-remove')) {
+				for (const button of this._target.querySelectorAll('.js-remove')) {
 					button.addEventListener('click', this._events.removeItem);
 				}
 			}
@@ -326,19 +326,19 @@ class CWidgetNavTree extends CWidget {
 	_deactivateContentsEvents() {
 		if (this._has_contents) {
 			if (this._is_edit_mode) {
-				for (const button of this._target.querySelectorAll('.js-button-add-child')) {
+				for (const button of this._target.querySelectorAll('.js-add-child')) {
 					button.removeEventListener('click', this._events.addChild);
 				}
 
-				for (const button of this._target.querySelectorAll('.js-button-add-maps')) {
+				for (const button of this._target.querySelectorAll('.js-add-maps')) {
 					button.removeEventListener('click', this._events.addMaps);
 				}
 
-				for (const button of this._target.querySelectorAll('.js-button-edit')) {
+				for (const button of this._target.querySelectorAll('.js-edit')) {
 					button.removeEventListener('click', this._events.editItem);
 				}
 
-				for (const button of this._target.querySelectorAll('.js-button-remove')) {
+				for (const button of this._target.querySelectorAll('.js-remove')) {
 					button.removeEventListener('click', this._events.removeItem);
 				}
 			}
@@ -545,7 +545,7 @@ class CWidgetNavTree extends CWidget {
 
 			button_add_child.type = 'button';
 			button_add_child.title = t('Add child element');
-			button_add_child.classList.add('btn-add', 'js-button-add-child', ZBX_ICON_PLUS);
+			button_add_child.classList.add('btn-icon', ZBX_ICON_PLUS, 'js-add-child');
 			button_add_child.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_child);
 
@@ -553,7 +553,7 @@ class CWidgetNavTree extends CWidget {
 
 			button_add_maps.type = 'button';
 			button_add_maps.title = t('Add multiple maps');
-			button_add_maps.classList.add('btn-import', 'js-button-add-maps', ZBX_ICON_COPY);
+			button_add_maps.classList.add('btn-icon', ZBX_ICON_COPY, 'js-add-maps');
 			button_add_maps.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_maps);
 
@@ -562,7 +562,7 @@ class CWidgetNavTree extends CWidget {
 
 				button_edit.type = 'button';
 				button_edit.title = t('Edit');
-				button_edit.classList.add('btn-edit', 'js-button-edit', ZBX_ICON_PENCIL);
+				button_edit.classList.add('btn-icon', ZBX_ICON_PENCIL, 'js-edit');
 				button_edit.setAttribute('data-id', item.id);
 				tools.appendChild(button_edit);
 
@@ -570,7 +570,7 @@ class CWidgetNavTree extends CWidget {
 
 				button_remove.type = 'button';
 				button_remove.title = t('Remove');
-				button_remove.classList.add('btn-remove', 'js-button-remove');
+				button_remove.classList.add('btn-icon', ZBX_ICON_REMOVE, 'js-remove');
 				button_remove.setAttribute('data-id', item.id);
 				tools.appendChild(button_remove);
 			}
@@ -697,16 +697,16 @@ class CWidgetNavTree extends CWidget {
 			jQuery('.tree-list', jQuery(this._target)).filter(function() {
 				return jQuery(this).attr('data-depth') >= this._max_depth;
 			}).each(function() {
-				jQuery('.js-button-add-maps', jQuery(this)).css('visibility', 'hidden');
-				jQuery('.js-button-add-child', jQuery(this)).css('visibility', 'hidden');
+				jQuery('.js-add-maps', jQuery(this)).css('visibility', 'hidden');
+				jQuery('.js-add-child', jQuery(this)).css('visibility', 'hidden');
 			});
 
 			// Show/hide buttons in deepest levels.
 			jQuery('.tree-list', jQuery(this._target)).filter(function() {
 				return this._max_depth > jQuery(this).attr('data-depth');
 			}).each(function() {
-				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-maps', jQuery(this)).css('visibility', 'visible');
-				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-child', jQuery(this)).css('visibility', 'visible');
+				jQuery('> .tree-item > .tree-row > .tools > .js-add-maps', jQuery(this)).css('visibility', 'visible');
+				jQuery('> .tree-item > .tree-row > .tools > .js-add-child', jQuery(this)).css('visibility', 'visible');
 			});
 		});
 
