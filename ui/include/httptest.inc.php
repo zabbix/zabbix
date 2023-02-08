@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,11 +24,11 @@ require_once dirname(__FILE__).'/items.inc.php';
 
 function httptest_authentications($type = null) {
 	$authentication_types = [
-		HTTPTEST_AUTH_NONE => _('None'),
-		HTTPTEST_AUTH_BASIC => _('Basic'),
-		HTTPTEST_AUTH_NTLM => _('NTLM'),
-		HTTPTEST_AUTH_KERBEROS => _('Kerberos'),
-		HTTPTEST_AUTH_DIGEST => _('Digest')
+		ZBX_HTTP_AUTH_NONE => _('None'),
+		ZBX_HTTP_AUTH_BASIC => _('Basic'),
+		ZBX_HTTP_AUTH_NTLM => _('NTLM'),
+		ZBX_HTTP_AUTH_KERBEROS => _('Kerberos'),
+		ZBX_HTTP_AUTH_DIGEST => _('Digest')
 	];
 
 	if (is_null($type)) {
@@ -124,176 +124,60 @@ function get_httptests_by_hostid($hostids) {
 }
 
 /**
- * Get parent templates for each given web scenario.
+ * Get data for displaying parent web scenario of given web scenarios.
  *
- * @param array  $httptests                  An array of web scenarios.
- * @param string $httptests[]['httptestid']  ID of a web scenario.
- * @param string $httptests[]['templateid']  ID of parent template web scenario.
+ * @param array $httptests
+ * @param bool  $allowed_ui_conf_templates
  *
  * @return array
  */
-function getHttpTestParentTemplates(array $httptests) {
-	$parent_httptestids = [];
-	$data = [
-		'links' => [],
-		'templates' => []
-	];
+function getParentHttpTests(array $httptests, bool $allowed_ui_conf_templates) {
+	$parent_httptests = [];
 
 	foreach ($httptests as $httptest) {
 		if ($httptest['templateid'] != 0) {
-			$parent_httptestids[$httptest['templateid']] = true;
-			$data['links'][$httptest['httptestid']] = ['httptestid' => $httptest['templateid']];
+			$parent_httptests[$httptest['templateid']] = true;
 		}
 	}
 
-	if (!$parent_httptestids) {
-		return $data;
+	if (!$parent_httptests) {
+		return [];
 	}
 
-	$all_parent_httptestids = [];
-	$hostids = [];
+	$db_httptests = API::HttpTest()->get([
+		'output' => [],
+		'selectHosts' => ['name', 'hostid'],
+		'httptestids' => array_keys($parent_httptests),
+		'preservekeys' => true
+	]);
 
-	do {
-		$db_httptests = API::HttpTest()->get([
-			'output' => ['httptestid', 'hostid', 'templateid'],
-			'httptestids' => array_keys($parent_httptestids)
+	if ($allowed_ui_conf_templates && $db_httptests) {
+		$editable_httptests = API::HttpTest()->get([
+			'output' => [],
+			'httptestids' => array_keys($parent_httptests),
+			'editable' => true,
+			'preservekeys' => true
 		]);
-
-		$all_parent_httptestids += $parent_httptestids;
-		$parent_httptestids = [];
-
-		foreach ($db_httptests as $db_httptest) {
-			$data['templates'][$db_httptest['hostid']] = [];
-			$hostids[$db_httptest['httptestid']] = $db_httptest['hostid'];
-
-			if ($db_httptest['templateid'] != 0) {
-				if (!array_key_exists($db_httptest['templateid'], $all_parent_httptestids)) {
-					$parent_httptestids[$db_httptest['templateid']] = true;
-				}
-
-				$data['links'][$db_httptest['httptestid']] = ['httptestid' => $db_httptest['templateid']];
-			}
-		}
 	}
-	while ($parent_httptestids);
 
-	foreach ($data['links'] as &$parent_httptest) {
-		$parent_httptest['hostid'] = array_key_exists($parent_httptest['httptestid'], $hostids)
-			? $hostids[$parent_httptest['httptestid']]
-			: 0;
+	foreach ($parent_httptests as $httptestid => &$parent_httptest) {
+		if (array_key_exists($httptestid, $db_httptests)) {
+			$parent_httptest = [
+				'editable' => $allowed_ui_conf_templates && array_key_exists($httptestid, $editable_httptests),
+				'template_name' => $db_httptests[$httptestid]['hosts'][0]['name'],
+				'templateid' => $db_httptests[$httptestid]['hosts'][0]['hostid']
+			];
+		}
+		else {
+			$parent_httptest = [
+				'editable' => false,
+				'template_name' => _('Inaccessible template')
+			];
+		}
 	}
 	unset($parent_httptest);
 
-	$db_templates = $data['templates']
-		? API::Template()->get([
-			'output' => ['name'],
-			'templateids' => array_keys($data['templates']),
-			'preservekeys' => true
-		])
-		: [];
-
-	$rw_templates = $db_templates
-		? API::Template()->get([
-			'output' => [],
-			'templateids' => array_keys($db_templates),
-			'editable' => true,
-			'preservekeys' => true
-		])
-		: [];
-
-	$data['templates'][0] = [];
-
-	foreach ($data['templates'] as $hostid => &$template) {
-		$template = array_key_exists($hostid, $db_templates)
-			? [
-				'hostid' => $hostid,
-				'name' => $db_templates[$hostid]['name'],
-				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
-			]
-			: [
-				'hostid' => $hostid,
-				'name' => _('Inaccessible template'),
-				'permission' => PERM_DENY
-			];
-	}
-	unset($template);
-
-	return $data;
-}
-
-/**
- * Returns a template prefix for selected web scenario.
- *
- * @param string $httptestid
- * @param array  $parent_templates  The list of the templates, prepared by getHttpTestParentTemplates() function.
- * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- *
- * @return array|null
- */
-function makeHttpTestTemplatePrefix($httptestid, array $parent_templates, bool $provide_links) {
-	if (!array_key_exists($httptestid, $parent_templates['links'])) {
-		return null;
-	}
-
-	while (array_key_exists($parent_templates['links'][$httptestid]['httptestid'], $parent_templates['links'])) {
-		$httptestid = $parent_templates['links'][$httptestid]['httptestid'];
-	}
-
-	$template = $parent_templates['templates'][$parent_templates['links'][$httptestid]['hostid']];
-
-	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-		$name = (new CLink(CHtml::encode($template['name']),
-			(new CUrl('httpconf.php'))
-				->setArgument('filter_set', '1')
-				->setArgument('filter_hostids', [$template['hostid']])
-				->setArgument('context', 'template')
-		))->addClass(ZBX_STYLE_LINK_ALT);
-	}
-	else {
-		$name = new CSpan(CHtml::encode($template['name']));
-	}
-
-	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
-}
-
-/**
- * Returns a list of web scenario templates.
- *
- * @param string $httptestid
- * @param array  $parent_templates  The list of the templates, prepared by getHttpTestParentTemplates() function.
- * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- *
- * @return array
- */
-function makeHttpTestTemplatesHtml($httptestid, array $parent_templates, bool $provide_links) {
-	$list = [];
-
-	while (array_key_exists($httptestid, $parent_templates['links'])) {
-		$template = $parent_templates['templates'][$parent_templates['links'][$httptestid]['hostid']];
-
-		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-			$name = new CLink(CHtml::encode($template['name']),
-				(new CUrl('httpconf.php'))
-					->setArgument('form', 'update')
-					->setArgument('hostid', $template['hostid'])
-					->setArgument('httptestid', $parent_templates['links'][$httptestid]['httptestid'])
-					->setArgument('context', 'template')
-			);
-		}
-		else {
-			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
-		}
-
-		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
-
-		$httptestid = $parent_templates['links'][$httptestid]['httptestid'];
-	}
-
-	if ($list) {
-		array_pop($list);
-	}
-
-	return $list;
+	return $parent_httptests;
 }
 
 /**
@@ -429,91 +313,4 @@ function userAgents() {
 			'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' => 'Googlebot 2.1'
 		]
 	];
-}
-
-/**
- * Get direct or inherited tags for web scenario edit form.
- *
- * @param array  $data
- * @param string $data['templates'][<templateid>]['hostid']
- * @param string $data['templates'][<templateid>]['name']
- * @param int    $data['templates'][<templateid>]['permission']
- * @param string $data['hostid']
- * @param array  $data['tags']
- * @param string $data['tags'][]['tag']
- * @param string $data['tags'][]['value']
- * @param int    $data['show_inherited_tags']
- *
- * @return array
- */
-function getHttpTestTags(array $data): array {
-	$tags = array_key_exists('tags', $data) ? $data['tags'] : [];
-
-	if ($data['show_inherited_tags']) {
-		$db_templates = $data['templates']
-			? API::Template()->get([
-				'output' => ['templateid'],
-				'selectTags' => ['tag', 'value'],
-				'templateids' => array_keys($data['templates']),
-				'preservekeys' => true
-			])
-			: [];
-
-		$inherited_tags = [];
-
-		// Make list of template tags.
-		foreach ($data['templates'] as $templateid => $template) {
-			if (array_key_exists($templateid, $db_templates)) {
-				foreach ($db_templates[$templateid]['tags'] as $tag) {
-					if (array_key_exists($tag['tag'], $inherited_tags)
-							&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-						$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
-							$templateid => $template
-						];
-					}
-					else {
-						$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
-							'parent_templates' => [$templateid => $template],
-							'type' => ZBX_PROPERTY_INHERITED
-						];
-					}
-				}
-			}
-		}
-
-		$db_hosts = API::Host()->get([
-			'output' => ['hostid', 'name'],
-			'selectTags' => ['tag', 'value'],
-			'hostids' => $data['hostid'],
-			'templated_hosts' => true
-		]);
-
-		// Overwrite and attach host level tags.
-		if ($db_hosts) {
-			foreach ($db_hosts[0]['tags'] as $tag) {
-				$inherited_tags[$tag['tag']][$tag['value']] = $tag;
-				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
-			}
-		}
-
-		// Overwrite and attach http test's own tags.
-		foreach ($data['tags'] as $tag) {
-			if (array_key_exists($tag['tag'], $inherited_tags)
-					&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
-			}
-			else {
-				$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
-			}
-		}
-
-		$tags = [];
-		foreach ($inherited_tags as $tag) {
-			foreach ($tag as $value) {
-				$tags[] = $value;
-			}
-		}
-	}
-
-	return $tags;
 }

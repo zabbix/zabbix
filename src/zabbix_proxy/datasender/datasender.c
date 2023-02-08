@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -109,22 +109,22 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	if (SUCCEED == upload_state && CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp &&
 			ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state)
 	{
-		if (SUCCEED == get_interface_availability_data(&j, &availability_ts))
+		if (SUCCEED == zbx_get_interface_availability_data(&j, &availability_ts))
 			flags |= ZBX_DATASENDER_AVAILABILITY;
 
-		history_records = proxy_get_hist_data(&j, &history_lastid, &more_history);
+		history_records = zbx_proxy_get_hist_data(&j, &history_lastid, &more_history);
 		if (0 != history_lastid)
 			flags |= ZBX_DATASENDER_HISTORY;
 
-		discovery_records = proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
+		discovery_records = zbx_proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
 		if (0 != discovery_records)
 			flags |= ZBX_DATASENDER_DISCOVERY;
 
-		areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg);
+		areg_records = zbx_proxy_get_areg_data(&j, &areg_lastid, &more_areg);
 		if (0 != areg_records)
 			flags |= ZBX_DATASENDER_AUTOREGISTRATION;
 
-		host_avail_records = proxy_get_host_active_availability(&j);
+		host_avail_records = zbx_proxy_get_host_active_availability(&j);
 
 		if (ZBX_PROXY_DATA_MORE != more_history && ZBX_PROXY_DATA_MORE != more_discovery &&
 						ZBX_PROXY_DATA_MORE != more_areg)
@@ -170,7 +170,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts.sec);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts.ns);
 
-		if (0 != (flags & ZBX_DATASENDER_HISTORY) && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
+		if (0 != (flags & ZBX_DATASENDER_HISTORY) && 0 != (proxy_delay = zbx_proxy_get_delay(history_lastid)))
 			zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
 		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
@@ -221,7 +221,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 
 			if (0 != (flags & ZBX_DATASENDER_DB_UPDATE))
 			{
-				DBbegin();
+				zbx_db_begin();
 
 				if (0 != (flags & ZBX_DATASENDER_TASKS))
 				{
@@ -241,26 +241,26 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 					DB_RESULT	result;
 					DB_ROW		row;
 
-					result = DBselect("select max(id) from proxy_history");
+					result = zbx_db_select("select max(id) from proxy_history");
 
-					if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+					if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
 						history_maxid = history_lastid;
 					else
 						ZBX_STR2UINT64(history_maxid, row[0]);
 
-					DBfree_result(result);
+					zbx_db_free_result(result);
 
 					reset_proxy_history_count(history_maxid - history_lastid);
-					proxy_set_hist_lastid(history_lastid);
+					zbx_proxy_set_hist_lastid(history_lastid);
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_DISCOVERY))
-					proxy_set_dhis_lastid(discovery_lastid);
+					zbx_proxy_set_dhis_lastid(discovery_lastid);
 
 				if (0 != (flags & ZBX_DATASENDER_AUTOREGISTRATION))
-					proxy_set_areg_lastid(areg_lastid);
+					zbx_proxy_set_areg_lastid(areg_lastid);
 
-				DBcommit();
+				zbx_db_commit();
 			}
 		}
 
@@ -305,7 +305,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	while (ZBX_IS_RUNNING())
 	{

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "zbxha.h"
 #include "zbxjson.h"
 #include "zbxtime.h"
+#include "zbxconnector.h"
 
 #include "checks_internal.h"
 
@@ -206,6 +207,25 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		}
 
 		if (FAIL == zbx_lld_get_queue_size(&value, &error))
+		{
+			SET_MSG_RESULT(result, error);
+			goto out;
+		}
+
+		SET_UI64_RESULT(result, value);
+	}
+	else if (0 == strcmp(param1, "connector_queue"))
+	{
+		zbx_uint64_t	value;
+		char		*error = NULL;
+
+		if (1 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		if (FAIL == zbx_connector_get_queue_size(&value, &error))
 		{
 			SET_MSG_RESULT(result, error);
 			goto out;

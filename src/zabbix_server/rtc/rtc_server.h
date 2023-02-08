@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "zbxrtc.h"
 #include "zbxipcservice.h"
 
-int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);
+int	rtc_process_request_ex_server(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);
 int	rtc_process(const char *option, int config_timeout, char **error);
 void	rtc_reset(zbx_rtc_t *rtc);
 int	rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error);

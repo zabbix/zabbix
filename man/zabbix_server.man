@@ -147,7 +147,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (alerter, alert\ manager, configuration\ syncer, discoverer, escalator, ha\ manager, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, lld\ manager, lld\ worker, poller, preprocessing\ manager, preprocessing\ worker, proxy\ poller, self\-monitoring, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, service\ manager, odbc\ poller)
+All processes of specified type (alerter, alert\ manager, configuration\ syncer, discoverer, escalator, ha\ manager, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, lld\ manager, lld\ worker, poller, preprocessing\ manager, preprocessing\ worker, proxy\ poller, self\-monitoring, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, service\ manager, odbc\ poller, connector\ manager, connector\ worker)
 .RE
 .RS 4
 .TP 4
@@ -166,7 +166,7 @@ Profiling control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (alerter, alert\ manager, configuration\ syncer, discoverer, escalator, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, lld\ manager, lld\ worker, poller, preprocessing\ manager, preprocessing\ worker, proxy\ poller, self\-monitoring, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, service\ manager, odbc\ poller)
+All processes of specified type (alerter, alert\ manager, configuration\ syncer, discoverer, escalator, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, lld\ manager, lld\ worker, poller, preprocessing\ manager, preprocessing\ worker, proxy\ poller, self\-monitoring, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, service\ manager, odbc\ poller connector\ manager, connector\ worker)
 .RE
 .RS 4
 .TP 4

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 
 // Create form.
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('template')))->removeId())
 	->setId('massupdate-form')
 	->addVar('action', 'popup.massupdate.template')
 	->addVar('update', '1')
@@ -35,49 +36,7 @@ $form = (new CForm())
 /*
  * Template tab
  */
-$template_tab = new CFormList('template-form-list');
-
-$link_templates = (new CTable())
-	->addRow(
-		(new CRadioButtonList('mass_action_tpls', ZBX_ACTION_ADD))
-			->addValue(_('Link'), ZBX_ACTION_ADD)
-			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
-			->addValue(_('Unlink'), ZBX_ACTION_REMOVE)
-			->setModern(true)
-	)
-	->addRow([
-		(new CMultiSelect([
-			'name' => 'linked_templates[]',
-			'object_name' => 'templates',
-			'data' => [],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'templates',
-					'srcfld1' => 'hostid',
-					'srcfld2' => 'host',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'linked_templates_'
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	])
-	->addRow([
-		(new CList())
-			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
-			->addItem((new CCheckBox('mass_clear_tpls'))
-				->setLabel(_('Clear when unlinking'))
-			)
-	]);
-
-$template_tab->addRow(
-	(new CVisibilityBox('visible[linked_templates]', 'linked-templates-div', _('Original')))
-		->setLabel(_('Link templates')),
-	(new CDiv($link_templates))
-		->setId('linked-templates-div')
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
-
-$template_tab
+$template_tab = (new CFormList('template-form-list'))
 	->addRow(
 		(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
 			->setLabel(_('Template groups'))

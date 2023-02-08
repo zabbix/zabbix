@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,22 +34,25 @@ class HostMacrosManager {
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
 
-	constructor({readonly, parent_hostid}) {
+	constructor({readonly, parent_hostid} = {}) {
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
 		this.$container = $('#macros_container .table-forms-td-right');
 	}
 
-	load(show_inherited_macros, templateids) {
+	load(show_inherited_macros, templateids = null) {
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'hostmacros.list');
 
 		const post_data = {
 			macros: this.getMacros(),
 			show_inherited_macros: show_inherited_macros ? 1 : 0,
-			templateids: templateids,
 			readonly: this.readonly ? 1 : 0
 		};
+
+		if (templateids !== null) {
+			post_data.templateids = templateids;
+		}
 
 		if (this.parent_hostid !== null) {
 			post_data.parent_hostid = this.parent_hostid;
