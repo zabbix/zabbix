@@ -37,9 +37,9 @@
  *                                                                            *
  * Purpose: execute 'multiply by' step                                        *
  *                                                                            *
- * Parameters: value_type - [IN] the item value type                          *
- *             value      - [IN/OUT] the input/output value                   *
- *             params     - [IN] the preprocessing parameters                 *
+ * Parameters: value_type - [IN] item value type                              *
+ *             value      - [IN/OUT] input/output value                       *
+ *             params     - [IN] preprocessing parameters                     *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -95,9 +95,9 @@ static const char	*pp_trim_desc(int type)
  *                                                                            *
  * Purpose: execute 'trim ?' step                                             *
  *                                                                            *
- * Parameters: type   - [IN] the preprocessing step type - (left|right)trim   *
- *             value  - [IN/OUT] the input/output value                       *
- *             params - [IN] the preprocessing parameters                     *
+ * Parameters: type   - [IN] preprocessing step type - (left|right)trim       *
+ *             value  - [IN/OUT] input/output value                           *
+ *             params - [IN] preprocessing parameters                         *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -124,8 +124,6 @@ static int	pp_execute_trim(int type, zbx_variant_t *value, const char *params)
 /******************************************************************************
  *                                                                            *
  * Purpose: execute 'check for unsupported' step                              *
- *                                                                            *
- * Parameters: value      - [IN] the input                                    *
  *                                                                            *
  * Result value: SUCCEED - the input value does not have an error             *
  *               FAIL    - otherwise.                                         *
@@ -161,13 +159,12 @@ static const char	*pp_delta_desc(int type)
  *                                                                            *
  * Purpose: execute 'delta ?' step                                            *
  *                                                                            *
- * Parameters: type          - [IN] the preprocessing step type -             *
- *                                  (change|speed)                            *
- *             value_type    - [IN] the item value type                       *
- *             value         - [IN/OUT] the input/output value                *
- *             ts            - [IN] the value timestamp                       *
- *             history_value - [IN/OUT] the last value                        *
- *             history_ts    - [IN/OUT] the last value timestamp              *
+ * Parameters: type          - [IN] preprocessing step type - (change|speed)  *
+ *             value_type    - [IN] item value type                           *
+ *             value         - [IN/OUT] input/output value                    *
+ *             ts            - [IN] value timestamp                           *
+ *             history_value - [IN/OUT] last value                            *
+ *             history_ts    - [IN/OUT] last value timestamp                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -193,8 +190,8 @@ static int	pp_execute_delta(int type, unsigned char value_type, zbx_variant_t *v
  *                                                                            *
  * Purpose: execute 'regsub' step                                             *
  *                                                                            *
- * Parameters: value  - [IN/OUT] the input/output value                       *
- *             params - [IN] the preprocessing parameters                     *
+ * Parameters: value  - [IN/OUT] input/output value                           *
+ *             params - [IN] preprocessing parameters                         *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -227,10 +224,10 @@ static int	pp_execute_regsub(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute jsonpath query                                            *
  *                                                                            *
- * Parameters: cache  - [IN] the preprocessing cache                          *
- *             value  - [IN/OUT] the value to process                         *
- *             params - [IN] the step parameters                              *
- *             errmsg - [OUT] error message                                   *
+ * Parameters: cache  - [IN] preprocessing cache                              *
+ *             value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
+ *             errmsg - [OUT]                                                 *
  *                                                                            *
  * Result value: SUCCEED - the query was executed successfully.               *
  *               FAIL    - otherwise.                                         *
@@ -306,9 +303,9 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
  *                                                                            *
  * Purpose: execute 'jsonpath' step                                           *
  *                                                                            *
- * Parameters: cache  - [IN] the preprocessing cache                          *
- *             value  - [IN/OUT] the value to process                         *
- *             params - [IN] the step parameters                              *
+ * Parameters: cache  - [IN] preprocessing cache                              *
+ *             value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -354,9 +351,9 @@ static const char	*pp_2dec_desc(int type)
  *                                                                            *
  * Purpose: execute '?2dec' step                                              *
  *                                                                            *
- * Parameters: type   - [IN] the preprocessing step type -                    *
+ * Parameters: type   - [IN] preprocessing step type -                        *
  *                           (boolean|octal|hexadecimal)2dec                  *
- *             value  - [IN/OUT] the input/output value                       *
+ *             value  - [IN/OUT] input/output value                           *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -384,9 +381,9 @@ static int	pp_execute_2dec(int type, zbx_variant_t *value)
  *                                                                            *
  * Purpose: execute xpath query                                               *
  *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
- *             params - [IN] the step parameters                              *
- *             error  - [OUT] the error message                               *
+ * Parameters: value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
+ *             error  - [OUT]                                                 *
  *                                                                            *
  * Result value: SUCCEED - the query was executed successfully.               *
  *               FAIL    - otherwise.                                         *
@@ -412,8 +409,8 @@ static int	pp_execute_xpath_query(zbx_variant_t *value, const char *params, char
  *                                                                            *
  * Purpose: execute 'xpath' step                                              *
  *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
- *             params - [IN] the step parameters                              *
+ * Parameters: value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -436,9 +433,9 @@ static int	pp_execute_xpath(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'validate range' step                                     *
  *                                                                            *
- * Parameters: value_type - [IN] the item value type                          *
- *             value      - [IN/OUT] the value to process                     *
- *             params     - [IN] the step parameters                          *
+ * Parameters: value_type - [IN] item value type                              *
+ *             value      - [IN/OUT] value to process                         *
+ *             params     - [IN] step parameters                              *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -461,8 +458,8 @@ static int	pp_validate_range(unsigned char value_type, zbx_variant_t *value, con
  *                                                                            *
  * Purpose: execute 'validate regex' step                                     *
  *                                                                            *
- * Parameters: value      - [IN/OUT] the value to process                     *
- *             params     - [IN] the step parameters                          *
+ * Parameters: value      - [IN/OUT] value to process                         *
+ *             params     - [IN] step parameters                              *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -485,8 +482,8 @@ static int	pp_validate_regex(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'validate not regex' step                                 *
  *                                                                            *
- * Parameters: value      - [IN/OUT] the value to process                     *
- *             params     - [IN] the step parameters                          *
+ * Parameters: value      - [IN/OUT] value to process                         *
+ *             params     - [IN] step parameters                              *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -509,8 +506,8 @@ static int	pp_validate_not_regex(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'error from json' step                                    *
  *                                                                            *
- * Parameters: value      - [IN/OUT] the value to process                     *
- *             params     - [IN] the step parameters                          *
+ * Parameters: value      - [IN/OUT] value to process                         *
+ *             params     - [IN] step parameters                              *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -537,8 +534,8 @@ static int	pp_error_from_json(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'error from xml' step                                     *
  *                                                                            *
- * Parameters: value      - [IN/OUT] the value to process                     *
- *             params     - [IN] the step parameters                          *
+ * Parameters: value      - [IN/OUT] value to process                         *
+ *             params     - [IN] step parameters                              *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -565,8 +562,8 @@ static int	pp_error_from_xml(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'error from regex' step                                   *
  *                                                                            *
- * Parameters: value      - [IN/OUT] the value to process                     *
- *             params     - [IN] the step parameters                          *
+ * Parameters: value      - [IN/OUT] value to process                         *
+ *             params     - [IN] step parameters                              *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -593,11 +590,11 @@ static int	pp_error_from_regex(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'throttle timed value' step                               *
  *                                                                            *
- * Parameters: value         - [IN/OUT] the input/output value                *
- *             ts            - [IN] the value timestamp                       *
- *             params        - [IN] the step parameters                       *
- *             history_value - [IN/OUT] the last value                        *
- *             history_ts    - [IN/OUT] the last value timestamp              *
+ * Parameters: value         - [IN/OUT] input/output value                    *
+ *             ts            - [IN] value timestamp                           *
+ *             params        - [IN] step parameters                           *
+ *             history_value - [IN/OUT] last value                            *
+ *             history_ts    - [IN/OUT] last value timestamp                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -621,9 +618,10 @@ static int	pp_throttle_timed_value(zbx_variant_t *value, zbx_timespec_t ts, cons
  *                                                                            *
  * Purpose: execute 'script' step                                             *
  *                                                                            *
- * Parameters: value         - [IN/OUT] the input/output value                *
- *             params        - [IN] the step parameters                       *
- *             history_value - [IN/OUT] the script bytecode                   *
+ * Parameters: ctx           - [IN] worker specific execution context         *
+ *             value         - [IN/OUT] input/output value                    *
+ *             params        - [IN] step parameters                           *
+ *             history_value - [IN/OUT] script bytecode                       *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -647,10 +645,10 @@ static int	pp_execute_script(zbx_pp_context_t *ctx, zbx_variant_t *value, const 
  *                                                                            *
  * Purpose: execute prometheus pattern query                                  *
  *                                                                            *
- * Parameters: cache  - [IN] the preprocessing cache                          *
- *             value  - [IN/OUT] the value to process                         *
- *             params - [IN] the step parameters                              *
- *             errmsg - [OUT] error message                                   *
+ * Parameters: cache  - [IN] preprocessing cache                              *
+ *             value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
+ *             errmsg - [OUT]                                                 *
  *                                                                            *
  * Return value: SUCCEED - the query was performed successfully               *
  *               FAIL - otherwise                                             *
@@ -726,9 +724,9 @@ out:
  *                                                                            *
  * Purpose: execute 'prometheus pattern' step                                 *
  *                                                                            *
- * Parameters: cache  - [IN] the preprocessing cache                          *
- *             value  - [IN/OUT] the value to process                         *
- *             params - [IN] the step parameters                              *
+ * Parameters: cache  - [IN] preprocessing cache                              *
+ *             value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -751,8 +749,8 @@ static int	pp_execute_prometheus_pattern(zbx_pp_cache_t *cache, zbx_variant_t *v
  *                                                                            *
  * Purpose: execute 'prometheus to json' step                                 *
  *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
- *             params - [IN] the step parameters                              *
+ * Parameters: value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -775,8 +773,8 @@ static int	pp_execute_prometheus_to_json(zbx_variant_t *value, const char *param
  *                                                                            *
  * Purpose: execute 'csv to json' step                                        *
  *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
- *             params - [IN] the step parameters                              *
+ * Parameters: value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -799,8 +797,8 @@ static int	pp_execute_csv_to_json(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'xml to json' step                                        *
  *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
- *             params - [IN] the step parameters                              *
+ * Parameters: value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -823,8 +821,8 @@ static int	pp_execute_xml_to_json(zbx_variant_t *value)
  *                                                                            *
  * Purpose: execute 'str replace' step                                        *
  *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
- *             params - [IN] the step parameters                              *
+ * Parameters: value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -847,9 +845,9 @@ static int	pp_execute_str_replace(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'snmp to value' step                                      *
  *                                                                            *
- * Parameters: cache  - [IN/OUT] the preprocessing cache                      *
- *             value  - [IN/OUT] the value to process                         *
- *             params - [IN] the step parameters                              *
+ * Parameters: cache  - [IN/OUT] preprocessing cache                          *
+ *             value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -872,8 +870,8 @@ static int	pp_execute_snmp_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value,
  *                                                                            *
  * Purpose: execute 'snmp to json' step                                       *
  *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
- *             params - [IN] the step parameters                              *
+ * Parameters: value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -896,14 +894,14 @@ static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute preprocessing step                                        *
  *                                                                            *
- * Parameters: ctx           - [IN] the worker specific execution context     *
- *             cache         - [IN] the preprocessing cache                   *
- *             value_type    - [IN] the item value type                       *
- *             value         - [IN/OUT] the input/output value                *
- *             ts            - [IN] the value timestamp                       *
- *             step          - [IN] the step to execute                       *
- *             history_value - [IN/OUT] the last value                        *
- *             history_ts    - [IN/OUT] the last value timestamp              *
+ * Parameters: ctx           - [IN] worker specific execution context         *
+ *             cache         - [IN] preprocessing cache                       *
+ *             value_type    - [IN] item value type                           *
+ *             value         - [IN/OUT] input/output value                    *
+ *             ts            - [IN] value timestamp                           *
+ *             step          - [IN] step to execute                           *
+ *             history_value - [IN/OUT] last value                            *
+ *             history_ts    - [IN/OUT] last value timestamp                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -1015,14 +1013,14 @@ out:
  *                                                                            *
  * Purpose: execute preprocessing steps                                       *
  *                                                                            *
- * Parameters: ctx             - [IN] the worker specific execution context   *
- *             preproc         - [IN] the item preprocessing data             *
- *             cache           - [IN] the preprocessing cache                 *
- *             value_in        - [IN] the input value                         *
- *             ts              - [IN] the value timestamp                     *
- *             value_out       - [OUT] the output value                       *
- *             results_out     - [OUT] the results for each step (optional)   *
- *             results_num_out - [OUT] the number of results (optional)       *
+ * Parameters: ctx             - [IN] worker specific execution context       *
+ *             preproc         - [IN] item preprocessing data                 *
+ *             cache           - [IN] preprocessing cache                     *
+ *             value_in        - [IN] input value                             *
+ *             ts              - [IN] value timestamp                         *
+ *             value_out       - [OUT] output value                           *
+ *             results_out     - [OUT] results for each step (optional)       *
+ *             results_num_out - [OUT] number of results (optional)           *
  *                                                                            *
  ******************************************************************************/
 void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_cache_t *cache,

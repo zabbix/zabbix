@@ -220,12 +220,12 @@ void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
  *                                                                            *
  * Purpose: queue value for preprocessing test                                *
  *                                                                            *
- * Parameters: manager   - [IN] the manager                                   *
- *             preproc   - [IN] the item preprocessing data                   *
- *             value     - [IN] the value to preprocess, its contents will be *
+ * Parameters: manager   - [IN] manager                                       *
+ *             preproc   - [IN] item preprocessing data                       *
+ *             value     - [IN] value to preprocess, its contents will be     *
  *                              directly copied over and cleared by the task  *
- *             ts        - [IN] the value timestamp                           *
- *             client    - [IN] the request source                            *
+ *             ts        - [IN] value timestamp                               *
+ *             client    - [IN] request source                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
@@ -264,12 +264,12 @@ void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp
  *                                                                            *
  * Purpose: create preprocessing task from request                            *
  *                                                                            *
- * Parameters: manager   - [IN] the manager                                   *
- *             itemid    - [IN] the item identifier                           *
- *             value     - [IN] the value to preprocess, its contents will be *
+ * Parameters: manager   - [IN] manager                                       *
+ *             itemid    - [IN] item identifier                               *
+ *             value     - [IN] value to preprocess, its contents will be     *
  *                              directly copied over and cleared by the task  *
- *             ts        - [IN] the value timestamp                           *
- *             value_opt - [IN] the optional value data (optional)            *
+ *             ts        - [IN] value timestamp                               *
+ *             value_opt - [IN] optional value data (optional)                *
  *                                                                            *
  * Return value: The created task or NULL if the data can be flushed directly.*
  *                                                                            *
@@ -298,9 +298,9 @@ zbx_pp_task_t	*zbx_pp_manager_create_task(zbx_pp_manager_t *manager, zbx_uint64_
  *                                                                            *
  * Purpose: get first dependent item with preprocessing that can be cached    *
  *                                                                            *
- * Parameters: manager     - [IN] the manager                                 *
- *             itemids     - [IN] the dependent itemids                       *
- *             itemids_num - [IN] the number of dependent itemids             *
+ * Parameters: manager     - [IN] manager                                     *
+ *             itemids     - [IN] dependent itemids                           *
+ *             itemids_num - [IN] number of dependent itemids                 *
  *                                                                            *
  * Return value: The first dependent item with cacheable preprocessing data   *
  *               or NULL.                                                     *
@@ -327,11 +327,12 @@ static zbx_pp_item_t	*pp_manager_get_cacheable_dependent_item(zbx_pp_manager_t *
  *                                                                            *
  * Purpose: create and queue tasks for dependent items                        *
  *                                                                            *
- * Parameters: manager        - [IN] the manager                              *
- *             preproc        - [IN] the master item preprocessing data       *
- *             exclude_itemid - [IN] the dependent itemid to exclude, can be 0*
- *             ts             - [IN] the value timestamp                      *
- *             cache          - [IN] the preprocessing cache                  *
+ * Parameters: manager        - [IN] manager                                  *
+ *             preproc        - [IN] master item preprocessing data           *
+ *             exclude_itemid - [IN] dependent itemid to exclude, can be 0    *
+ *             value          - [IN] value                                    *
+ *             ts             - [IN] value timestamp                          *
+ *             cache          - [IN] preprocessing cache                      *
  *                                   (optional, can be NULL)                  *
  *                                                                            *
  * Comments: This function called within task queue lock.                     *
@@ -383,8 +384,8 @@ static void	pp_manager_queue_dependents(zbx_pp_manager_t *manager, zbx_pp_item_p
  *                                                                            *
  * Purpose: queue new tasks in response to finished value task                *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             task    - [IN] the finished value task                         *
+ * Parameters: manager - [IN] manager                                         *
+ *             task    - [IN] finished value task                             *
  *                                                                            *
  * Comments: This function called within task queue lock.                     *
  *                                                                            *
@@ -419,8 +420,8 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
  *                                                                            *
  * Purpose: queue new tasks in response to finished dependent task            *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             task    - [IN] the finished dependent task                     *
+ * Parameters: manager - [IN] manager                                         *
+ *             task    - [IN] finished dependent task                         *
  *                                                                            *
  * Comments: This function called within task queue lock.                     *
  *                                                                            *
@@ -444,8 +445,8 @@ static zbx_pp_task_t	*pp_manager_queue_dependent_task_result(zbx_pp_manager_t *m
  *                                                                            *
  * Purpose: requeue sequence task                                             *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             task    - [IN] the finished sequence task                      *
+ * Parameters: manager  - [IN] manager                                        *
+ *             task_seq - [IN] finished sequence task                         *
  *                                                                            *
  * Comments: This function called within task queue lock.                     *
  *                                                                            *
@@ -489,7 +490,10 @@ static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *ma
  *                                                                            *
  * Purpose: process finished tasks                                            *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
+ * Parameters: manager      - [IN] manager                                    *
+ *             tasks        - [OUT] finished tasks                            *
+ *             pending_num  - [OUT] remaining pending tasks                   *
+ *             finished_num - [OUT] finished tasks                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks,
@@ -550,7 +554,7 @@ void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_ta
  *                                                                            *
  * Purpose: dump cached item information into log                             *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
+ * Parameters: manager - [IN] manager                                         *
  *                                                                            *
  ******************************************************************************/
 void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager)
@@ -661,7 +665,7 @@ void	zbx_pp_manager_get_worker_usage(zbx_pp_manager_t *manager, zbx_vector_dbl_t
  *                                                                            *
  * Purpose: synchronize preprocessing manager with configuration cache data   *
  *                                                                            *
- * Parameters: manager - [IN] the manager to be synchronized                  *
+ * Parameters: manager - [IN] manager to be synchronized                      *
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_sync_configuration(zbx_pp_manager_t *manager)
@@ -706,9 +710,9 @@ static void	preproc_item_value_clear(zbx_preproc_item_value_t *value)
  *          item value.                                                       *
  *                                                                            *
  * Parameters: value - [IN] preprocessing item value                          *
- *             var   - [OUT] the extracted value (including error message)    *
- *             ts    - [OUT] the extracted timestamp                          *
- *             opt   - [OUT] the extracted optional data                      *
+ *             var   - [OUT] extracted value (including error message)        *
+ *             ts    - [OUT] extracted timestamp                              *
+ *             opt   - [OUT] extracted optional data                          *
  *                                                                            *
  ******************************************************************************/
 static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx_variant_t *var, zbx_timespec_t *ts,
@@ -795,13 +799,13 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
  *                                                                            *
  * Purpose: flush preprocessed value                                          *
  *                                                                            *
- * Parameters: manager    - [IN] the preprocessing manager                    *
- *             itemid     - [IN] the item identifier                          *
- *             value_type - [IN] the item value type                          *
- *             flags      - [IN] the item flags                               *
+ * Parameters: manager    - [IN] preprocessing manager                        *
+ *             itemid     - [IN] item identifier                              *
+ *             value_type - [IN] item value type                              *
+ *             flags      - [IN] item flags                                   *
  *             value      - [IN] preprocessed item value                      *
- *             ts         - [IN] the value timestamp                          *
- *             value_opt  - [IN] the optional value data                      *
+ *             ts         - [IN] value timestamp                              *
+ *             value_opt  - [IN] optional value data                          *
  *                                                                            *
  ******************************************************************************/
 static void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
@@ -873,6 +877,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
  * Purpose: handle new preprocessing test request                             *
  *                                                                            *
  * Parameters: manager - [IN] preprocessing manager                           *
+ *             client  - [IN] request source                                  *
  *             message - [IN] packed preprocessing request                    *
  *                                                                            *
  ******************************************************************************/
@@ -905,7 +910,7 @@ static void	preprocessor_reply_queue_size(zbx_pp_manager_t *manager, zbx_ipc_cli
  * Purpose: flush processed value task                                        *
  *                                                                            *
  * Parameters: manager - [IN] preprocessing manager                           *
- *             tasks   - [IN] the processed tasks                             *
+ *             tasks   - [IN] processed tasks                                 *
  *                                                                            *
  ******************************************************************************/
 static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_task_t *task)
@@ -923,8 +928,7 @@ static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_t
  *                                                                            *
  * Purpose: send back result of processed test task                           *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
- *             tasks   - [IN] the processed tasks                             *
+ * Parameters: tasks - [IN] processed tasks                                   *
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_reply_test_result(zbx_pp_task_t *task)
@@ -950,7 +954,7 @@ static void	preprocessor_reply_test_result(zbx_pp_task_t *task)
  * Purpose: flush processed tasks                                             *
  *                                                                            *
  * Parameters: manager - [IN] preprocessing manager                           *
- *             tasks   - [IN] the processed tasks                             *
+ *             tasks   - [IN] processed tasks                                 *
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks)
@@ -978,7 +982,7 @@ static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_ta
  * Purpose: respond to diagnostic information request                         *
  *                                                                            *
  * Parameters: manager - [IN] preprocessing manager                           *
- *             client  - [IN] the request source                              *
+ *             client  - [IN] request source                                  *
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_client_t *client)
@@ -1009,8 +1013,8 @@ static int	preprocessor_compare_sequence_stats(const void *d1, const void *d2)
  * Purpose: respond to top sequences request                                  *
  *                                                                            *
  * Parameters: manager - [IN] preprocessing manager                           *
- *             client  - [IN] the request source                              *
- *             message - [IN] the request message                             *
+ *             client  - [IN] request source                                  *
+ *             message - [IN] request message                                 *
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_reply_top_sequences(zbx_pp_manager_t *manager, zbx_ipc_client_t *client,
@@ -1046,7 +1050,7 @@ static void	preprocessor_reply_top_sequences(zbx_pp_manager_t *manager, zbx_ipc_
  * Purpose: respond to worker usage statistics request                        *
  *                                                                            *
  * Parameters: manager - [IN] preprocessing manager                           *
- *             client  - [IN] the request source                              *
+ *             client  - [IN] request source                                  *
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_reply_usage_stats(zbx_pp_manager_t *manager, zbx_ipc_client_t *client)

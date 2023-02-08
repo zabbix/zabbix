@@ -49,8 +49,8 @@ static void	pp_item_task_sequence_clear(void *d)
  *                                                                            *
  * Purpose: initialize task queue                                             *
  *                                                                            *
- * Parameters: queue      - [IN] the task queue                               *
- *             error      - [OUT] the error message                           *
+ * Parameters: queue      - [IN] task queue                                   *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - the task queue was initialized successfully        *
  *               FAIL    - otherwise                                          *
@@ -177,8 +177,8 @@ void	pp_task_queue_deregister_worker(zbx_pp_queue_t *queue)
  *                                                                            *
  * Purpose: add task to an existing sequence or create/append to a new one    *
  *                                                                            *
- * Parameters: queue - [IN] the task queue                                    *
- *             task  - [IN] the task to add                                   *
+ * Parameters: queue - [IN] task queue                                        *
+ *             task  - [IN] task to add                                       *
  *                                                                            *
  * Return value: The created sequence task or NULL if task was added to an    *
  *               existing sequence.                                           *
@@ -213,8 +213,8 @@ static zbx_pp_task_t	*pp_task_queue_add_sequence(zbx_pp_queue_t *queue, zbx_pp_t
  *                                                                            *
  * Purpose: queue task to be processed before normal tasks                    *
  *                                                                            *
- * Parameters: queue - [IN] the task queue                                    *
- *             task  - [IN] the task to push                                  *
+ * Parameters: queue - [IN] task queue                                        *
+ *             task  - [IN] task to push                                      *
  *                                                                            *
  ******************************************************************************/
 void	pp_task_queue_push_immediate(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
@@ -243,8 +243,8 @@ void	pp_task_queue_push_immediate(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
  *                                                                            *
  * Purpose: remove task sequence                                              *
  *                                                                            *
- * Parameters: queue  - [IN] the task queue                                   *
- *             itemid - [IN] the task sequence itemid                         *
+ * Parameters: queue  - [IN] task queue                                       *
+ *             itemid - [IN] task sequence itemid                             *
  *                                                                            *
  ******************************************************************************/
 void	pp_task_queue_remove_sequence(zbx_pp_queue_t *queue, zbx_uint64_t itemid)
@@ -256,8 +256,8 @@ void	pp_task_queue_remove_sequence(zbx_pp_queue_t *queue, zbx_uint64_t itemid)
  *                                                                            *
  * Purpose: queue test task to be processed                                   *
  *                                                                            *
- * Parameters: queue - [IN] the task queue                                    *
- *             task  - [IN] the task                                          *
+ * Parameters: queue - [IN] task queue                                        *
+ *             task  - [IN] task                                              *
  *                                                                            *
  ******************************************************************************/
 void	pp_task_queue_push_test(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
@@ -270,8 +270,8 @@ void	pp_task_queue_push_test(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
  *                                                                            *
  * Purpose: queue normal task to be processed                                 *
  *                                                                            *
- * Parameters: queue - [IN] the task queue                                    *
- *             task  - [IN] the task                                          *
+ * Parameters: queue - [IN] task queue                                        *
+ *             task  - [IN] task                                              *
  *                                                                            *
  * Comments: This function is used to push tasks created by new preprocessing *
  *           or testing requests.                                             *
@@ -304,7 +304,7 @@ void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
  *                                                                            *
  * Purpose: pop task from task queue                                          *
  *                                                                            *
- * Parameters: queue - [IN] the task queue                                    *
+ * Parameters: queue - [IN] task queue                                        *
  *                                                                            *
  * Return value: The popped task or NULL if there are no tasks to be          *
  *               processed.                                                   *
@@ -351,8 +351,8 @@ zbx_pp_task_t	*pp_task_queue_pop_new(zbx_pp_queue_t *queue)
  *                                                                            *
  * Purpose: push finished task into queue                                     *
  *                                                                            *
- * Parameters: queue - [IN] the task queue                                    *
- *             task  - [IN] the task                                          *
+ * Parameters: queue - [IN] task queue                                        *
+ *             task  - [IN] task                                              *
  *                                                                            *
  ******************************************************************************/
 void	pp_task_queue_push_finished(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
@@ -365,7 +365,7 @@ void	pp_task_queue_push_finished(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
  *                                                                            *
  * Purpose: pop finished task from queue                                      *
  *                                                                            *
- * Parameters: queue - [IN] the task queue                                    *
+ * Parameters: queue - [IN] task queue                                        *
  *                                                                            *
  * Return value: The popped task or NULL if there are no finished tasks.      *
  *                                                                            *
@@ -387,8 +387,8 @@ zbx_pp_task_t	*pp_task_queue_pop_finished(zbx_pp_queue_t *queue)
  *                                                                            *
  * Purpose: wait for queue notifications                                      *
  *                                                                            *
- * Parameters: queue - [IN] the task queue                                    *
- *             error - [IN] the error message                                 *
+ * Parameters: queue - [IN] task queue                                        *
+ *             error - [IN]                                                   *
  *                                                                            *
  * Return value: SUCCEED - the wait succeeded                                 *
  *               FAIL    - an error has occurred                              *
@@ -413,7 +413,7 @@ int	pp_task_queue_wait(zbx_pp_queue_t *queue, char **error)
  *                                                                            *
  * Purpose: notify one worker                                                 *
  *                                                                            *
- * Parameters: queue - [IN] the task queue                                    *
+ * Parameters: queue - [IN] task queue                                        *
  *                                                                            *
  * Comments: This function is used by manager to notify a worker when a new   *
  *           task has been queued.                                            *
@@ -433,7 +433,7 @@ void	pp_task_queue_notify(zbx_pp_queue_t *queue)
  *                                                                            *
  * Purpose: notify all workers                                                *
  *                                                                            *
- * Parameters: queue - [IN] the task queue                                    *
+ * Parameters: queue - [IN] task queue                                        *
  *                                                                            *
  * Comments: This function is used by manager to notify workers when either   *
  *           multiple tasks have been pushed or when stopping workers.        *
@@ -454,8 +454,8 @@ void	pp_task_queue_notify_all(zbx_pp_queue_t *queue)
  * Purpose: get registered task sequence statistics sorted by number of tasks *
  *          in descending order                                               *
  *                                                                            *
- * Parameters: queue - [IN] the task queue                                    *
- *             stats - [IN] the sequence statistics                           *
+ * Parameters: queue - [IN] task queue                                        *
+ *             stats - [IN] sequence statistics                               *
  *                                                                            *
  ******************************************************************************/
 void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_sequence_stats_ptr_t *stats)
