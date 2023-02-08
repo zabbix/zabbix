@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-01-13 10:40+0000\n"
+"PO-Revision-Date: 2023-01-26 14:57+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -16191,7 +16191,7 @@ msgstr "Odeslat uživatelům"
 #: include/actions.inc.php:2128
 #: include/views/administration.auditacts.list.php:77
 msgid "Sent"
-msgstr "Poslat"
+msgstr "Posláno"
 
 #: include/func.inc.php:244
 msgid "Sep"
@@ -21165,7 +21165,7 @@ msgstr "zacyklená provázanost položek není povolena"
 
 #: jsLoader.php:304
 msgid "color"
-msgstr ""
+msgstr "barva"
 
 #: app/controllers/CControllerSlaCreateUpdate.php:62
 msgid "comma separated list of time periods is expected for scheduled week days"
@@ -21206,7 +21206,7 @@ msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:129 include/graphs.inc.php:82
 msgid "count"
-msgstr ""
+msgstr "počet"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:559
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
@@ -21277,7 +21277,7 @@ msgstr "klesající"
 #: include/views/js/common.template.edit.js.php:66
 #: include/views/js/common.template.edit.js.php:88
 msgid "description"
-msgstr ""
+msgstr "popis"
 
 #: include/classes/validators/CApiInputValidator.php:1707
 msgid "directory cannot be empty"
@@ -21317,7 +21317,7 @@ msgstr "nerovná se"
 #: include/views/js/configuration.host.discovery.edit.js.php:51
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:83
 msgid "does not exist"
-msgstr ""
+msgstr "neexistuje"
 
 #: app/views/popup.lldoperation.php:69 app/views/popup.lldoverride.php:118
 #: include/actions.inc.php:35
@@ -21348,7 +21348,7 @@ msgstr "chybová zpráva"
 #: include/views/js/configuration.host.discovery.edit.js.php:50
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:82
 msgid "exists"
-msgstr ""
+msgstr "existuje"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:603
 msgid "exp() - Euler's number at a power of a value"
@@ -21464,7 +21464,7 @@ msgstr "v"
 
 #: app/views/popup.valuemap.edit.php:81
 msgid "in range"
-msgstr ""
+msgstr "v rozsahu"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:652
 msgid "in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)"
@@ -21550,7 +21550,7 @@ msgstr "neplatná bytová sekvence v UTF-8"
 
 #: include/validate.inc.php:190
 msgid "invalid data type"
-msgstr ""
+msgstr "Neplatný datový typ"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
 msgid "invalid delay"
@@ -21596,7 +21596,7 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:1042
 #: include/classes/validators/CApiInputValidator.php:2608
 msgid "invalid range expression"
-msgstr ""
+msgstr "neplatný výraz rozsahu"
 
 #: app/controllers/CControllerPopupValueMapUpdate.php:105
 #: include/classes/validators/CApiInputValidator.php:1882
@@ -21666,7 +21666,7 @@ msgstr ""
 
 #: include/forms.inc.php:1394 include/views/js/item.preprocessing.js.php:119
 msgid "label"
-msgstr ""
+msgstr "označení"
 
 #: app/views/popup.tophosts.column.edit.php:132
 #: include/classes/graphdraw/CLineGraphDraw.php:1367
@@ -22055,7 +22055,7 @@ msgstr "je povolená pouze hodnota času"
 
 #: include/views/general.login.php:41
 msgid "or"
-msgstr ""
+msgstr "nebo"
 
 #: include/views/configuration.httpconf.edit.php:88
 msgid "other"
@@ -22144,7 +22144,7 @@ msgstr "obnovované každých %1$s sek."
 #: app/views/js/popup.valuemap.edit.js.php:33
 #: app/views/popup.valuemap.edit.php:82
 msgid "regexp"
-msgstr ""
+msgstr "regulární výraz"
 
 #: app/views/popup.lldoverride.php:150
 #: include/views/configuration.host.discovery.edit.php:817
@@ -22163,7 +22163,7 @@ msgstr ""
 
 #: include/forms.inc.php:1442 include/views/js/item.preprocessing.js.php:247
 msgid "replacement"
-msgstr ""
+msgstr "nahrazení"
 
 #: app/views/administration.geomaps.edit.php:48
 msgid "represent tile coordinates;"
@@ -22232,7 +22232,7 @@ msgstr "vybrané"
 
 #: include/events.inc.php:38 include/events.inc.php:66
 msgid "service"
-msgstr ""
+msgstr "služba"
 
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
@@ -22276,7 +22276,7 @@ msgstr "zobrazit mapování ikon"
 
 #: include/views/general.login.php:41
 msgid "sign in as guest"
-msgstr ""
+msgstr "přihlásit se jako host"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:963
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
@@ -22312,7 +22312,7 @@ msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:130 include/graphs.inc.php:84
 msgid "sum"
-msgstr ""
+msgstr "součet"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1012
 msgid "sum() - Sum of values of a period T"
@@ -22494,7 +22494,7 @@ msgstr "pište zde pro vyhledávání"
 
 #: include/classes/validators/CApiInputValidator.php:2215
 msgid "unacceptable URL"
-msgstr ""
+msgstr "nepřijatelná URL dresa "
 
 #: include/classes/import/validators/C44XmlValidator.php:2182
 #: include/classes/import/validators/C50XmlValidator.php:2332
@@ -22502,7 +22502,7 @@ msgstr ""
 #: include/classes/import/validators/CXmlValidatorGeneral.php:298
 #, c-format
 msgid "unexpected constant \"%1$s\""
-msgstr ""
+msgstr "neočekávaná konstanta \"%1$s\""
 
 #: include/classes/export/CConfigurationExportBuilder.php:119
 #: include/classes/import/converters/CConstantImportConverter.php:60
@@ -22513,7 +22513,7 @@ msgstr ""
 #: include/classes/import/validators/C60XmlValidator.php:2512
 #, c-format
 msgid "unexpected constant value \"%1$s\""
-msgstr ""
+msgstr "neočekávaná hodnota konstanty \"%1$s\""
 
 #: include/classes/parsers/CExpressionMacroParser.php:108
 msgid "unexpected end of expression macro"
@@ -22722,7 +22722,7 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:589
 msgid "value must be empty"
-msgstr ""
+msgstr "hodnota musí být prázdná"
 
 #: include/classes/validators/CApiInputValidator.php:584
 #, c-format
@@ -22770,7 +22770,7 @@ msgstr "hodnota musí být jedna z %1$s"
 #: include/classes/validators/CApiInputValidator.php:947
 #, c-format
 msgid "value must be within the range of %1$s"
-msgstr ""
+msgstr "hodnota musí být v rozsahu %1$s"
 
 #: include/classes/api/services/CItemGeneral.php:1606
 msgid "value of first parameter is too long"

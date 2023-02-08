@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ class testPageHostGraph extends CLegacyWebTest {
 
 		// Check table headers on page.
 		$xpath = '//form[@name="graphForm"]//thead/tr/th[not(@class)]';
-		$get_headers = $this->webDriver->findElements(WebDriverBy::xpath($xpath));
+		$get_headers = $this->query('xpath', $xpath)->all();
 		foreach ($get_headers as $row) {
 			$table_headers[] = $row->getText();
 		}
@@ -101,24 +101,21 @@ class testPageHostGraph extends CLegacyWebTest {
 
 		foreach (CDBHelper::getAll($sql) as $graph) {
 			// Get graph row in table.
-			$element = $this->webDriver->findElement(
-					WebDriverBy::xpath('//table[@class="list-table"]/tbody//input[@value="'.$graph['graphid'].'"]/../..')
-			);
+			$element = $this->query('xpath://table[@class="list-table"]/tbody//input[@value="'.
+					$graph['graphid'].'"]/../..')->one();
 
 			// Check name value.
 			$this->assertEquals($graph['name'],
-					$element->findElement(WebDriverBy::xpath('./td/a[@href="graphs.php?form=update&graphid='.
-							$graph['graphid'].'&context=host&filter_hostids%5B0%5D='.$hostid.'"]'))->getText()
+					$element->query('xpath:./td/a[@href="graphs.php?form=update&graphid='.
+							$graph['graphid'].'&context=host&filter_hostids%5B0%5D='.$hostid.'"]')->one()->getText()
 			);
 
 			// Check width value.
-			$this->assertEquals($graph['width'], $element->findElement(WebDriverBy::xpath('./td[3]'))->getText());
+			$this->assertEquals($graph['width'], $element->query('xpath:./td[3]')->one()->getText());
 			// Check height value.
-			$this->assertEquals($graph['height'], $element->findElement(WebDriverBy::xpath('./td[4]'))->getText());
+			$this->assertEquals($graph['height'], $element->query('xpath:./td[4]')->one()->getText());
 			// Check graph type value.
-			$this->assertEquals($types[$graph['graphtype']],
-					$element->findElement(WebDriverBy::xpath('./td[5]'))->getText()
-			);
+			$this->assertEquals($types[$graph['graphtype']], $element->query('xpath:./td[5]')->one()->getText());
 		}
 
 		// Check table footer.
