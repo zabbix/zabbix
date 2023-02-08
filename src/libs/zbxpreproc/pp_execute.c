@@ -800,7 +800,6 @@ static int	pp_execute_csv_to_json(zbx_variant_t *value, const char *params)
  * Purpose: execute 'xml to json' step                                        *
  *                                                                            *
  * Parameters: value  - [IN/OUT] value to process                             *
- *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *

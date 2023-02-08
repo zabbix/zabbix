@@ -696,8 +696,7 @@ out:
  *                                                                            *
  * Purpose: validates value to match regular expression                       *
  *                                                                            *
- * Parameters: value_type - [IN] item type                                    *
- *             value      - [IN/OUT] value to process                         *
+ * Parameters: value      - [IN/OUT] value to process                         *
  *             params     - [IN] operation parameters                         *
  *             error      - [OUT]                                             *
  *                                                                            *
