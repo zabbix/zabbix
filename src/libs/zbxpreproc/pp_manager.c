@@ -487,7 +487,7 @@ static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *ma
  *                                                                            *
  ******************************************************************************/
 void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks,
-		zbx_uint64_t *pending_num, zbx_uint64_t *finished_num)
+		zbx_uint64_t *pending_num, zbx_uint64_t *processing_num, zbx_uint64_t *finished_num)
 {
 	zbx_pp_task_t	*task;
 	static time_t	timekeeper_clock = 0;
@@ -527,6 +527,7 @@ void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 
 	*pending_num = manager->queue.pending_num;
 	*finished_num = manager->queue.finished_num;
+	*processing_num = manager->queue.processing_num;
 
 	pp_task_queue_unlock(&manager->queue);
 	zbx_prof_end();

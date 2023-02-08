@@ -33,6 +33,7 @@ typedef struct
 	int		workers_num;
 	zbx_uint64_t	pending_num;
 	zbx_uint64_t	finished_num;
+	zbx_uint64_t	processing_num;
 
 	zbx_hashset_t	sequences;
 

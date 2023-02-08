@@ -502,7 +502,8 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	const zbx_thread_preprocessing_manager_args	*pp_args = ((zbx_thread_args_t *)args)->args;
 	zbx_pp_manager_t		*manager;
 	zbx_vector_pp_task_ptr_t	tasks;
-	zbx_uint64_t			pending_num, finished_num, processed_num = 0, queued_num = 0;
+	zbx_uint64_t			pending_num, finished_num, processed_num = 0, queued_num = 0,
+					processing_num = 0;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -592,7 +593,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
-		zbx_pp_manager_process_finished(manager, &tasks, &pending_num, &finished_num);
+		zbx_pp_manager_process_finished(manager, &tasks, &pending_num, &processing_num, &finished_num);
 
 		if (0 < tasks.values_num)
 		{
@@ -612,7 +613,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			timeout.ns = PP_MANAGER_DELAY_NS;
 		}
 
-		if (0 == pending_num || 1 < sec - time_flush)
+		if (0 == pending_num + processing_num || 1 < sec - time_flush)
 		{
 			dc_flush_history();
 			time_flush = time_now;

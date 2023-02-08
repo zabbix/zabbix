@@ -56,6 +56,7 @@ int	pp_task_queue_init(zbx_pp_queue_t *queue, char **error)
 	queue->workers_num = 0;
 	queue->pending_num = 0;
 	queue->finished_num = 0;
+	queue->processing_num = 0;
 	zbx_list_create(&queue->pending);
 	zbx_list_create(&queue->immediate);
 	zbx_list_create(&queue->finished);
@@ -314,6 +315,7 @@ zbx_pp_task_t	*pp_task_queue_pop_new(zbx_pp_queue_t *queue)
 		/* while sequence tasks do not affect statistics, the first task in sequence */
 		/* does, so the statistics can be updated for all tasks                      */
 		queue->pending_num--;
+		queue->processing_num++;
 
 		return (zbx_pp_task_t *)task;
 	}
@@ -330,6 +332,7 @@ zbx_pp_task_t	*pp_task_queue_pop_new(zbx_pp_queue_t *queue)
 		if (NULL != task)
 		{
 			queue->pending_num--;
+			queue->processing_num++;
 
 			return task;
 		}
@@ -349,6 +352,7 @@ zbx_pp_task_t	*pp_task_queue_pop_new(zbx_pp_queue_t *queue)
 void	pp_task_queue_push_finished(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 {
 	queue->finished_num++;
+	queue->processing_num--;
 	zbx_list_append(&queue->finished, task, NULL);
 }
 
