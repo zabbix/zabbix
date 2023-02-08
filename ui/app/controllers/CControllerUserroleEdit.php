@@ -143,21 +143,21 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		if ($this->hasInput('super_admin_role_clone')) {
 			$data = [
 				'roleid' => null,
-				'name' => $this->getInput('name'),
-				'type' => $this->getInput('type'),
+				'name' => $this->getInput('name', ''),
+				'type' => $this->getInput('type', USER_TYPE_SUPER_ADMIN),
 				'readonly' => (bool) $db_defaults['readonly'],
 				'is_own_role' => false,
 				'rules' => array_merge(
-					$this->getRulesDefaults((int) $this->getInput('type')),
+					$this->getRulesDefaults((int) $this->getInput('type', USER_TYPE_SUPER_ADMIN)),
 					$this->getRulesByRoleid(USER_TYPE_SUPER_ADMIN)
 				)
 			];
 		}
 		elseif ($this->role === null) {
 			$data = [
-					'roleid' => null,
-					'readonly' => (bool) $db_defaults['readonly'],
-					'is_own_role' => false
+				'roleid' => null,
+				'readonly' => (bool) $db_defaults['readonly'],
+				'is_own_role' => false
 			];
 
 			if (!$this->hasInput('form_refresh')) {
@@ -169,11 +169,11 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 			else {
 				$data += [
-					'name' => $this->getInput('name') === '' ? $db_defaults['name'] : $this->getInput('name'),
-					'type' => $this->getInput('type'),
+					'name' => $this->getInput('name', $db_defaults['name']),
+					'type' => $this->getInput('type', USER_TYPE_ZABBIX_USER),
 					'rules' => array_merge(
-						$this->getRulesDefaults((int) $this->getInput('type')),
-						$this->getRules($this->getRulesInput($this->getInput('type')))
+						$this->getRulesDefaults((int) $this->getInput('type', USER_TYPE_ZABBIX_USER)),
+						$this->getRules($this->getRulesInput($this->getInput('type', USER_TYPE_ZABBIX_USER)))
 					)
 				];
 			}
@@ -197,11 +197,11 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 			else {
 				$data += [
-					'name' => $this->getInput('name') === '' ? $this->role['name'] : $this->getInput('name'),
-					'type' => $this->getInput('type'),
+					'name' => $this->getInput('name', $db_defaults['name']),
+					'type' => $this->getInput('type', $this->role['type']),
 					'rules' => array_merge(
-						$this->getRulesDefaults((int) $this->getInput('type')),
-						$this->getRules($this->getRulesInput($this->getInput('type')))
+						$this->getRulesDefaults((int) $this->getInput('type', $this->role['type'])),
+						$this->getRules($this->getRulesInput($this->getInput('type', $this->role['type'])))
 					)
 				];
 			}
