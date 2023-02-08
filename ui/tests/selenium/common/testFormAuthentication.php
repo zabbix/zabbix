@@ -28,6 +28,15 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 class testFormAuthentication extends CWebTest {
 
 	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
+	/**
 	 * Open specific Authentication form tab and check basic common fields.
 	 *
 	 * @param string    $auth_type    LDAP or SAML
@@ -39,9 +48,9 @@ class testFormAuthentication extends CWebTest {
 		$this->page->assertHeader('Authentication');
 		$this->page->assertTitle('Configuration of authentication');
 
-		$enable_saml_checkbox = $form->getField('Enable '.$auth_type.' authentication');
-		$this->assertTrue($enable_saml_checkbox->isEnabled());
-		$this->assertTrue($enable_saml_checkbox->isVisible());
+		$enable_auth_checkbox = $form->getField('Enable '.$auth_type.' authentication');
+		$this->assertTrue($enable_auth_checkbox->isEnabled());
+		$this->assertTrue($enable_auth_checkbox->isVisible());
 		$form->checkValue(['Enable '.$auth_type.' authentication' => false]);
 
 		// Check that Update button is clickable and no other buttons present.

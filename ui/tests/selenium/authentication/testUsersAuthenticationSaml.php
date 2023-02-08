@@ -19,7 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
 
 /**
@@ -31,15 +30,6 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		if (!defined('PHPUNIT_SAML_TESTS_ENABLED') || !PHPUNIT_SAML_TESTS_ENABLED) {
 			self::markTestSuiteSkipped();
 		}
-	}
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
 	}
 
 	public function testUsersAuthenticationSaml_Layout() {

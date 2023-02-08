@@ -19,7 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
@@ -32,15 +31,6 @@ require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
 class testUsersAuthenticationLdap extends testFormAuthentication {
 
 	use TableTrait;
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
-	}
 
 	public function testUsersAuthenticationLdap_Layout() {
 		$ldap_form = $this->openFormAndCheckBasics('LDAP');
@@ -73,12 +63,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		];
 
 		$this->checkTablesHeaders($server_table, $ldap_form);
-
-		foreach ($server_table as $name => $attributes) {
-			$this->assertEquals($attributes['headers'], $ldap_form->getFieldContainer($name)
-					->query('id', $attributes['id'])->asTable()->waitUntilVisible()->one()->getHeadersText()
-			);
-		}
 
 		// Check 'Provisioning period' field's editability.
 		foreach ([false, true] as $jit_status) {
@@ -189,7 +173,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 		// Check Advanced fields.
 		$server_form->fill(['Advanced configuration' => true]);
-		$server_form->query('xpath:.//label[text()="StartTLS"]')->waitUntilVisible()->one();
+		$server_form->query('xpath:.//label[text()="StartTLS"]')->waitUntilVisible();
 		$this->assertTrue($server_form->getField('Search filter')->isVisible());
 
 		$hintboxes = [
