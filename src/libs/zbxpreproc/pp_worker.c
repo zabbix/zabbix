@@ -31,7 +31,7 @@
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
 
-ZBX_THREAD_LOCAL int	__zbxthread__;
+ZBX_THREAD_LOCAL int	pp_worker_id;
 
 /******************************************************************************
  *                                                                            *
@@ -110,7 +110,7 @@ static void	*pp_worker_entry(void *arg)
 	zbx_pp_task_t	*in;
 	char		*error = NULL;
 
-	__zbxthread__ = worker->id;
+	pp_worker_id = worker->id;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
@@ -129,7 +129,7 @@ static void	*pp_worker_entry(void *arg)
 
 			zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_BUSY);
 
-			zabbix_log(LOG_LEVEL_TRACE, "[%d] %s() process task type:%u itemid:" ZBX_FS_UI64, __zbxthread__,
+			zabbix_log(LOG_LEVEL_TRACE, "[%d] %s() process task type:%u itemid:" ZBX_FS_UI64, pp_worker_id,
 					__func__, in->type, in->itemid);
 
 			switch (in->type)
