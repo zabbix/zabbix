@@ -166,6 +166,15 @@ $form-disabled-border-color: #ccd5d9 !default;
 
 $input-placeholder-color: #9d9d9d !default;
 
+$form-search-color: #ffffff !default;
+$form-search-icon-color: #8cb2ca !default;
+$form-search-icon-hover-color: #ffffff !default;
+$form-search-bg-color: #092637 !default;
+$form-search-border-color: #010a0f !default;
+$form-search-focused-color: $form-search-color !default;
+$form-search-focused-bg-color: $form-search-bg-color !default;
+$form-search-focused-border-color: lighten($sidebar-bg-color, 20%) !default;
+
 // Error messages
 $msg-bad-color: #dc3545 !default;
 $msg-bad-border-color: #dc3545 !default;

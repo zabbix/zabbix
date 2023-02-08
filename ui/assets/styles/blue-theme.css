@@ -2398,29 +2398,18 @@ div.dashboard-widget-tophosts z-bar-gauge {
       color: #ffffff;
       background: #092637;
       border-color: #1384c7; }
-      .form-search .search:focus ~ .search-icon {
-        background-position: -540px -616px;
-        opacity: 0.75; }
-        .form-search .search:focus ~ .search-icon:hover:not(:disabled) {
-          background-position: -570px -616px;
-          opacity: 1; }
-  .form-search .zi-search {
-    float: right;
-    padding: 0;
-    background-color: transparent !important;
-    border: 0;
-    opacity: 0.75;
-    transform: scale(0.8); }
-    .form-search .zi-search::before {
-      vertical-align: middle;
-      font-size: 24px;
-      color: #B7D6EA;
-      transition: opacity 0.3s ease-out; }
-    .form-search .zi-search:focus {
-      opacity: 1;
-      box-shadow: 0 0 0 2px #1384c7; }
-    .form-search .zi-search:hover:not(:disabled)::before {
+  .form-search .btn-icon {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 20px;
+    min-height: 20px; }
+    .form-search .btn-icon:hover::before, .form-search .btn-icon:focus::before {
       color: #ffffff; }
+    .form-search .btn-icon:focus {
+      box-shadow: 0 0 0 1.5px #1384c7; }
+    .form-search .btn-icon::before, .form-search .btn-icon[disabled]::before {
+      color: #8cb2ca; }
 
 .search-suggest {
   position: absolute;
