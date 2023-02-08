@@ -1542,6 +1542,6 @@ class CScript extends CApiService {
 
 		$menu_path = trim($menu_path, '/');
 
-		return $menu_path === '' ? $script['name'] : $menu_path . '/' . $script['name'];
+		return $menu_path === '' ? $script['name'] : $menu_path.'/'.$script['name'];
 	}
 }

@@ -176,15 +176,11 @@ foreach ($data['scripts'] as $script) {
 		$execute_on = '';
 	}
 
-	$trim_menu_path = trim($script['menu_path'], "/");
-	$trim_name = trim($script['name'], "/");
-	$link = new CLink($trim_name, 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']);
+	$link = new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']);
 
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
-		(new CCol(
-			($script['menu_path'] != null) ? [$trim_menu_path.'/', $link] : $link,
-		))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))->addClass(ZBX_STYLE_NOWRAP),
 		$scope,
 		$actions,
 		$type,
