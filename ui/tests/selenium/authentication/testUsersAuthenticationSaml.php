@@ -446,20 +446,20 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 				[
 					'trim' => true,
 					'fields' => [
-						'IdP entity ID' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-						'SSO service URL' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-						'SLO service URL' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-						'Username attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-						'SP entity ID' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-						'SP name ID format' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+						'IdP entity ID' => STRING_1024,
+						'SSO service URL' => STRING_2048,
+						'SLO service URL' => STRING_2048,
+						'Username attribute' => STRING_128,
+						'SP entity ID' => STRING_1024,
+						'SP name ID format' => STRING_2048,
 						'Configure JIT provisioning' => true,
-						'Group name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-						'User name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-						'User last name attribute'=> 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va'
+						'Group name attribute' => STRING_255,
+						'User name attribute' => STRING_255,
+						'User last name attribute'=> STRING_255
 					],
 					'User group mapping' => [
 						[
-							'SAML group pattern' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+							'SAML group pattern' => STRING_255,
 							'User groups' => 'Test timezone',
 							'User role' => 'User role'
 						]
@@ -469,26 +469,26 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 							// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
 							'Name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
 							'Media type' => 'Discord',
-							'Attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va'
+							'Attribute' => STRING_255
 						]
 					],
 					'db_check' => [
 						'userdirectory_saml' => [
 							[
-								'idp_entityid' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-								'sso_url' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-								'slo_url' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-								'username_attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-								'sp_entityid' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-								'nameid_format' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-								'group_name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-								'user_username' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-								'user_lastname' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va'
+								'idp_entityid' => STRING_1024,
+								'sso_url' => STRING_2048,
+								'slo_url' => STRING_2048,
+								'username_attribute' => STRING_128,
+								'sp_entityid' => STRING_1024,
+								'nameid_format' => STRING_2048,
+								'group_name' => STRING_255,
+								'user_username' => STRING_255,
+								'user_lastname' => STRING_255
 							]
 						],
 						'userdirectory_idpgroup' => [
 							[
-								'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
+								'name' => STRING_255,
 								'roleid' => 1
 							]
 						],
@@ -501,7 +501,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 							[
 								'name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
 								'mediatypeid' => 10,
-								'attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va'
+								'attribute' => STRING_255
 							]
 						]
 					]

@@ -1659,30 +1659,30 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'servers_settings' => [
 						[
 							'fields' => [
-								'Name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'Host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'Name' => STRING_128,
+								'Host' => STRING_255,
 								'Port' => 65535,
-								'Base DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'Search attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'Bind password' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-								'Bind DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'Description' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_vlong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_vlong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'Base DN' => STRING_255,
+								'Search attribute' => STRING_255,
+								'Bind password' => STRING_128,
+								'Bind DN' => STRING_255,
+								'Description' => STRING_6000,
 								'Configure JIT provisioning' => true,
 								'Group configuration' => 'groupOfNames',
-								'Group base DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'Group name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'Group member attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'Reference attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'Group filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'User name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'User last name attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'Group base DN' => STRING_255,
+								'Group name attribute' => STRING_255,
+								'Group member attribute' => STRING_255,
+								'Reference attribute' => STRING_255,
+								'Group filter' => STRING_255,
+								'User name attribute' => STRING_255,
+								'User last name attribute' => STRING_255,
 								'Advanced configuration' => true,
 								'StartTLS' => true,
-								'Search filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
-								],
+								'Search filter' => STRING_255
+							],
 							'User group mapping' => [
 								[
-									'LDAP group pattern' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+									'LDAP group pattern' => STRING_255,
 									'User groups' => 'Test timezone',
 									'User role' => 'User role'
 								]
@@ -1692,13 +1692,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 									// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
 									'Name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
 									'Media type' => 'Discord',
-									'Attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
+									'Attribute' => STRING_255
 								],
 								[
 									// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
 									'Name' => '2ong_value_long_value_long_value_long_value_long_value_lon',
 									'Media type' => 'iLert',
-									'Attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
+									'Attribute' => STRING_255
 								]
 							]
 						]
@@ -1707,33 +1707,33 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'userdirectory' => [
 							['name' => '', 'description' => '', 'provision_status' => 0],
 							[
-								'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-								'description' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_vlong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_vlong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'name' => STRING_128,
+								'description' => STRING_6000,
 								'provision_status' => 1
 							]
 						],
 						'userdirectory_ldap' => [
 							[
-								'host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'host' => STRING_255,
 								'port' => 65535,
-								'base_dn' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'bind_dn' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'bind_password' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-								'search_attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_va',
-								'group_basedn' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'group_name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'group_member' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'user_ref_attr' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'group_filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'user_username' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-								'user_lastname' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'base_dn' => STRING_255,
+								'bind_dn' => STRING_255,
+								'bind_password' => STRING_128,
+								'search_attribute' => STRING_128,
+								'group_basedn' => STRING_255,
+								'group_name' => STRING_255,
+								'group_member' => STRING_255,
+								'user_ref_attr' => STRING_255,
+								'group_filter' => STRING_255,
+								'user_username' => STRING_255,
+								'user_lastname' => STRING_255,
 								'start_tls' => 1,
-								'search_filter' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
-								]
+								'search_filter' => STRING_255
+							]
 						],
 						'userdirectory_idpgroup' => [
 							[
-								'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+								'name' => STRING_255,
 								'roleid' => 1
 							]
 						],
@@ -1747,13 +1747,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
 								'name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
 								'mediatypeid' => 10,
-								'attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
+								'attribute' => STRING_255
 							],
 							[
 								// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
 								'name' => '2ong_value_long_value_long_value_long_value_long_value_lon',
 								'mediatypeid' => 22,
-								'attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v'
+								'attribute' => STRING_255
 							]
 						]
 					]
