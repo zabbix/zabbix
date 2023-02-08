@@ -35,6 +35,7 @@ $url = (new CUrl('host_discovery.php'))
 	->getUrl();
 
 $form = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('host-discovery-form')
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
@@ -872,7 +873,7 @@ if (!$lld_macro_paths) {
 		'path' => ''
 	]];
 }
-elseif (!hasRequest('form_refresh')) {
+elseif ($data['form_refresh'] == 0) {
 	CArrayHelper::sort($lld_macro_paths, ['lld_macro']);
 }
 
@@ -969,7 +970,7 @@ $tab = (new CTabView())
 			->addItem([
 				new CLabel(_('Preprocessing steps')),
 				new CFormField(
-					getItemPreprocessing($form, $data['preprocessing'], $data['limited'], $data['preprocessing_types'])
+					getItemPreprocessing($data['preprocessing'], $data['limited'], $data['preprocessing_types'])
 				)
 			]),
 		TAB_INDICATOR_PREPROCESSING
@@ -978,7 +979,7 @@ $tab = (new CTabView())
 	->addTab('macroTab', _('Filters'), $condition_tab, TAB_INDICATOR_FILTERS)
 	->addTab('overridesTab', _('Overrides'), $overrides_tab, TAB_INDICATOR_OVERRIDES);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tab->setSelected(0);
 }
 

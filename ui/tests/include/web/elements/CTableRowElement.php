@@ -142,4 +142,27 @@ class CTableRowElement extends CElement {
 	public function isSelected($selected = true) {
 		return $this->query('xpath:.//input[@type="checkbox"]')->one()->isSelected($selected);
 	}
+
+	/**
+	 * Check text of defined columns.
+	 *
+	 * @param mixed   $expected		values to be checked in column
+	 *
+	 * @throws Exception
+	 */
+	public function assertValues($expected) {
+		if (!is_array($expected)) {
+			$expected = [$expected];
+		}
+
+		foreach ($expected as $column => $value) {
+			$column_value = $this->getColumn($column)->getText();
+
+			if ($value !== $column_value) {
+				throw new \Exception('Column "'.$column.'" value "'.$column_value.
+						'" is not equal to "'.$value.'".'
+				);
+			}
+		}
+	}
 }

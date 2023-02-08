@@ -24,7 +24,9 @@
  * @var array $data
  */
 
-$form = (new CForm())->setName('host_view');
+$form = (new CForm())
+	->cleanItems()
+	->setName('host_view');
 
 $table = (new CTableInfo());
 

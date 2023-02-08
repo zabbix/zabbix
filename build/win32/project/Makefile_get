@@ -44,6 +44,7 @@ OBJS = \
 	..\..\..\src\libs\zbxconf\cfg.o \
 	..\..\..\src\libs\zbxcrypto\base64.o \
 	..\..\..\src\libs\zbxcrypto\md5.o \
+	..\..\..\src\libs\zbxcrypto\crypto.o \
 	..\..\..\src\libs\zbxjson\json.o \
 	..\..\..\src\libs\zbxjson\json_parser.o \
 	..\..\..\src\libs\zbxjson\jsonpath.o \

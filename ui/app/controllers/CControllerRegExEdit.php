@@ -33,7 +33,7 @@ class CControllerRegExEdit extends CController {
 			'test_string'  => 'db regexps.test_string',
 			'regexid'      => 'db regexps.regexpid',
 			'expressions'  => 'array',
-			'form_refresh' => ''
+			'form_refresh' => 'int32'
 		];
 
 		$ret = $this->validateInput($fields);

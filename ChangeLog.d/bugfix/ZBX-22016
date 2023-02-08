@@ -1,1 +1,0 @@
-A......... [ZBX-22016] fixed host.get API method not returning any results for hosts with no interfaces when filtering by "hostid" (Ivo)

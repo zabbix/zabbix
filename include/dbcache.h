@@ -755,6 +755,7 @@ void	zbx_dc_config_history_sync_get_functions_by_functionids(DC_FUNCTION *functi
 void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
 void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int *errcodes, size_t num);
+void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *itemids);
 
 void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items, const zbx_host_key_t *keys,
 		int *errcodes, size_t num);
@@ -770,6 +771,7 @@ void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zb
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_all_triggers(void);
 int	DCconfig_trigger_exists(zbx_uint64_t triggerid);
+
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);
 int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);

@@ -22,6 +22,8 @@
 
 #include "zbxjson.h"
 
+#define ZBX_ES_TIMEOUT	10
+
 typedef struct zbx_es_env zbx_es_env_t;
 
 typedef struct

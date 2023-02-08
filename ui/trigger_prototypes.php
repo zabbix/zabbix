@@ -53,10 +53,10 @@ $fields = [
 	'expr_target_single' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Target')],
 	'recovery_expr_temp' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add_recovery_expression}) || isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Recovery expression')],
 	'recovery_expr_target_single' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Target')],
-	'dependencies' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
-	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
+	'dependencies' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'new_dependency' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
+	'g_triggerid' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'tags' =>									[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
 	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
 													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -73,7 +73,7 @@ $fields = [
 													),
 													null
 												],
-	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
+	'visible' =>								[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
 	'toggle_expression_constructor' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'toggle_recovery_expression_constructor' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_expression' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -98,7 +98,7 @@ $fields = [
 	'delete' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>							[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>							[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'backurl' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>									[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status","discover"'),		null],
@@ -496,7 +496,7 @@ elseif (getRequest('action') && hasRequest('g_triggerid')
 if (isset($_REQUEST['form'])) {
 	$data = getTriggerFormData([
 		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'dependencies' => getRequest('dependencies', []),
 		'db_dependencies' => [],

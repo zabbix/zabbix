@@ -28,6 +28,7 @@ require_once dirname(__FILE__).'/js/configuration.maintenance.edit.js.php';
 $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 $maintenance_form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('maintenance-form')
 	->setName('maintenanceForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)

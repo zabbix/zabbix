@@ -24,9 +24,6 @@ require_once dirname(__FILE__).'/common/testMassUpdateItems.php';
  * Test the mass update of item prototypes.
  *
  * @backup items, interface
- *
- * TODO: This annotation should be removed after ZBX-19257 is fixed.
- * @ignoreBrowserErrors
  */
 class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 

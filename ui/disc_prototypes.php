@@ -59,7 +59,7 @@ $fields = [
 													' && isset({key}) && strncmp({key}, "mqtt.get", 8) === 0)',
 										_('Update interval')
 									],
-	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
+	'delay_flex' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'status' =>						[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]), null],
 	'discover' =>					[T_ZBX_INT, O_OPT, null,	IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
 	'type' =>						[T_ZBX_INT, O_OPT, null,
@@ -122,8 +122,8 @@ $fields = [
 										'(isset({add}) || isset({update})) && isset({value_type})'.
 											' && {value_type} == '.ITEM_VALUE_TYPE_LOG
 									],
-	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
-	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'preprocessing' =>				[null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'group_itemid' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,				DB_ID,	null],
 	'history_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
 	'history' =>					[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update}))'.
@@ -151,10 +151,10 @@ $fields = [
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
 										_('URL')
 									],
-	'query_fields' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'parameters' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'posts' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'status_codes' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'query_fields' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'parameters' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'posts' =>						[T_ZBX_STR, O_OPT, null,			null,	null],
+	'status_codes' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
 	'follow_redirects' =>			[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
 										null
@@ -163,8 +163,8 @@ $fields = [
 										IN([ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 										null
 									],
-	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'headers' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
+	'headers' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'retrieve_mode' =>				[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
 											HTTPTEST_STEP_RETRIEVE_MODE_BOTH
@@ -217,9 +217,9 @@ $fields = [
 											')',
 										_('Password')
 									],
-	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'visible' =>					[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
 	'context' =>					[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
-	'tags' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'tags' =>						[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'show_inherited_tags' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -235,7 +235,7 @@ $fields = [
 	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>				[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	// filter
 	'filter_set' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	// sort and sortorder
@@ -755,6 +755,7 @@ else {
 	CProfile::update($prefix.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	$data = [
+		'form_refresh' => getRequest('form_refresh', 0),
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'hostid' => $discoveryRule['hostid'],

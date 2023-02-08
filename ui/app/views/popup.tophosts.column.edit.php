@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm())
+	->cleanItems()
 	->setName('tophosts_column')
 	->addStyle('display: none;')
 	->addVar('action', $data['action'])

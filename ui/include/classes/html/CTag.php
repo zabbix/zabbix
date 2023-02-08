@@ -283,12 +283,6 @@ class CTag extends CObject {
 		return 1;
 	}
 
-	public function getForm($method = 'post', $action = null, $enctype = null) {
-		$form = (new CForm($method, $action, $enctype))
-			->addItem($this);
-		return $form;
-	}
-
 	public function setTitle($value) {
 		$this->setAttribute('title', $value);
 		return $this;

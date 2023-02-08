@@ -851,7 +851,7 @@ void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	if (NULL == (result = DBselect("select db_extension from config")))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = DBfetch(result)) || '\0' == *row[0])
 		goto clean;
 
 	version_info->extension = zbx_strdup(NULL, row[0]);

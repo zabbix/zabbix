@@ -46,6 +46,13 @@ class CFormElement extends CElement {
 	protected $filter = null;
 
 	/**
+	 * Class for required label.
+	 *
+	 * @var string
+	 */
+	protected $required_label = 'form-label-asterisk';
+
+	/**
 	 * @inheritdoc
 	 */
 	public static function createInstance(RemoteWebElement $element, $options = []) {
@@ -73,14 +80,44 @@ class CFormElement extends CElement {
 	/**
 	 * Set filter conditions.
 	 *
-	 * @param mixed $filter		conditions to be filtered by
+	 * @param mixed $filter				conditions to be filtered by
+	 * @param array	$filter_params		filter parameters
 	 *
 	 * @return $this
 	 */
-	public function setFilter($filter) {
-		$this->filter = $filter;
+	public function setFilter($filter, $filter_params = []) {
+		if ($filter === null) {
+			$this->filter = null;
+		}
+		elseif ($filter instanceof CElementFilter) {
+			$this->filter = $filter;
+		}
+		else {
+			$this->filter = new CElementFilter($filter, $filter_params);
+		}
 
 		return $this;
+	}
+
+	/**
+	 * Set filter for element collection.
+	 *
+	 * @param CElementCollection $elements		collection of elements
+	 * @param CElementFilter	 $filter		condition to be filtered
+	 * @param array				 $filter_params	filter parameters
+	 *
+	 * @return CElementCollection
+	 */
+	protected function filterCollection($elements, $filter, $filter_params = []) {
+		if ($this->filter !== null) {
+			$elements = $elements->filter($this->filter);
+		}
+
+		if ($filter !== null) {
+			$elements = $elements->filter($filter, $filter_params);
+		}
+
+		return $elements;
 	}
 
 	/**
@@ -114,9 +151,12 @@ class CFormElement extends CElement {
 	/**
 	 * Get collection of form label elements.
 	 *
+	 * @param CElementFilter $filter        condition to be filtered
+	 * @param array          $filter_params filter parameters
+	 *
 	 * @return CElementCollection
 	 */
-	public function getLabels() {
+	public function getLabels($filter = null, $filter_params = []) {
 		$labels = $this->query('xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT.'/label')->all();
 
 		foreach ($labels as $key => $label) {
@@ -128,11 +168,7 @@ class CFormElement extends CElement {
 			}
 		}
 
-		if ($this->filter !== null) {
-			return $labels->filter($this->filter);
-		}
-
-		return $labels;
+		return $this->filterCollection($labels, $filter, $filter_params);
 	}
 
 	/**
@@ -205,23 +241,23 @@ class CFormElement extends CElement {
 	/**
 	 * Get collection of element fields indexed by label name.
 	 *
+	 * @param CElementFilter $filter            condition to be filtered by
+	 * @param array          $filter_params     condition parameters to be set
+	 *
 	 * @return CElementCollection
 	 */
-	public function getFields() {
+	public function getFields($filter = null, $filter_params = []) {
 		$fields = [];
 
-		foreach ($this->getLabels() as $label) {
+		foreach ($this->getLabels() as $key => $label) {
 			$element = $this->getFieldByLabelElement($label);
-			if ($this->filter !== null && !$this->filter->match($element)) {
-				$element = new CNullElement();
-			}
 
 			if ($element->isValid()) {
 				$fields[$label->getText()] = $element;
 			}
 		}
 
-		$this->fields = new CElementCollection($fields);
+		$this->fields = $this->filterCollection(new CElementCollection($fields), $filter, $filter_params);
 
 		return $this->fields;
 	}
@@ -438,8 +474,8 @@ class CFormElement extends CElement {
 	}
 
 	/**
-	* @inheritdoc
-	*/
+	 * @inheritdoc
+	 */
 	public function checkValue($expected, $raise_exception = true) {
 		if ($expected && is_array($expected)) {
 			foreach ($expected as $field => $value) {
@@ -529,6 +565,16 @@ class CFormElement extends CElement {
 	}
 
 	/**
+	 * Get the mandatory labels marked with an asterisk.
+	 *
+	 * @return array
+	 */
+	public function getRequiredLabels() {
+		return $this->getLabels(CElementFilter::CLASSES_PRESENT, [$this->required_label])
+				->filter(CElementFilter::VISIBLE)->asText();
+	}
+
+	/**
 	 * Check if field is marked as required in form.
 	 *
 	 * @param string $label    field label text
@@ -536,6 +582,18 @@ class CFormElement extends CElement {
 	 * @return boolean
 	 */
 	public function isRequired($label) {
-		return $this->getLabel($label)->hasClass('form-label-asterisk');
+		return $this->getLabel($label)->hasClass($this->required_label);
+	}
+
+	/**
+	 * Get form fields values.
+	 *
+	 * @param CElementFilter $filter			condition to be filtered by
+	 * @param array			 $filter_params		condition parameters to be set
+	 *
+	 * @return array
+	 */
+	public function getValues($filter = null, $filter_params = []) {
+		return $this->getFields($filter, $filter_params)->asValues();
 	}
 }

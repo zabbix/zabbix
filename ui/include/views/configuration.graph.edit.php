@@ -43,6 +43,7 @@ $url = (new CUrl('graphs.php'))
 
 // Create form.
 $graphForm = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setName('graphForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
@@ -473,7 +474,7 @@ if ($data['parent_discoveryid']) {
 $graphTab = (new CTabView())
 	->addTab('graphTab', ($data['parent_discoveryid'] === null) ? _('Graph') : _('Graph prototype'), $graphFormList);
 
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$graphTab->setSelected(0);
 }
 

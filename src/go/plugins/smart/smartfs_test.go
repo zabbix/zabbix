@@ -79,8 +79,10 @@ func Test_deviceParser_checkErr(t *testing.T) {
 		wantMsg string
 	}{
 		{"+no_err", fields{smartctlField{Messages: nil, ExitStatus: 0}}, false, ""},
-		{"+warning", fields{smartctlField{Messages: []message{{"barfoo"}}, ExitStatus: 1}}, false, ""},
-		{"-one_err", fields{smartctlField{Messages: []message{{"foobar"}}, ExitStatus: 2}}, true, "foobar"},
+		{"+no_err", fields{smartctlField{Messages: nil, ExitStatus: 4}}, false, ""},
+		{"+warning", fields{smartctlField{Messages: []message{{"barfoo"}}, ExitStatus: 3}}, true, "barfoo"},
+		{"-error_status_one", fields{smartctlField{Messages: []message{{"barfoo"}}, ExitStatus: 1}}, true, "barfoo"},
+		{"-error_status_two", fields{smartctlField{Messages: []message{{"foobar"}}, ExitStatus: 2}}, true, "foobar"},
 		{"-two_err", fields{smartctlField{Messages: []message{{"foobar"}, {"barfoo"}}, ExitStatus: 2}}, true, "foobar, barfoo"},
 		{"-unknown_err/no message", fields{smartctlField{Messages: []message{}, ExitStatus: 2}}, true, "unknown error from smartctl"},
 	}

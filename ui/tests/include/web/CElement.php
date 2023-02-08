@@ -488,6 +488,17 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getClassesPresentCondition($classes) {
+		$target = $this;
+
+		return function () use ($target, $classes) {
+			return $target->hasClass($classes);
+		};
+	}
+
+	/**
 	 * Check if element is ready.
 	 *
 	 * @return boolean

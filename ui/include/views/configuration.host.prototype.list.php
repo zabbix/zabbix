@@ -143,18 +143,19 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$status = (new CLink(
 		($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
 		(new CUrl('host_prototypes.php'))
-			->setArgument('group_hostid', $hostPrototype['hostid'])
+			->setArgument('group_hostid[]', $hostPrototype['hostid'])
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 			->setArgument('action', ($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
 				? 'hostprototype.massenable'
 				: 'hostprototype.massdisable'
 			)
 			->setArgument('context', $data['context'])
+			->setArgumentSID()
 			->getUrl()
 	))
+		->addSID()
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(itemIndicatorStyle($hostPrototype['status']))
-		->addSID();
+		->addClass(itemIndicatorStyle($hostPrototype['status']));
 
 	$nodiscover = ($hostPrototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),

@@ -32,7 +32,7 @@ class CControllerAuthenticationEdit extends CController {
 	 */
 	protected function checkInput() {
 		$fields = [
-			'form_refresh' =>				'string',
+			'form_refresh' =>				'int32',
 			'ldap_test_user' =>				'string',
 			'ldap_test_password' =>			'string',
 			'change_bind_password' =>		'in 0,1',

@@ -471,11 +471,13 @@ class testPageHostInterfaces extends CWebTest {
 			// Check every interface row.
 			foreach ($interface_table->getRows() as $i => $row) {
 				$interface_details  = $data['interfaces'][$interface_name]['rows'][$i];
-				$this->assertEquals($interface_details['Interface'], $row->getColumn('Interface')->getText());
-				$this->assertEquals($interface_details['Status']['text'], $row->getColumn('Status')->getText());
+				$row->assertValues([
+					'Interface' => $interface_details['Interface'],
+					'Status' => $interface_details['Status']['text'],
+					'Error' => $interface_details['Error']
+				]);
 				$this->assertEquals($interface_details['Status']['color'], $row->getColumn('Status')
 						->query('xpath:.//span[contains(@class, "status")]')->one()->getCSSValue('background-color'));
-				$this->assertEquals($interface_details['Error'], $row->getColumn('Error')->getText());
 			}
 
 			$overlay->close();

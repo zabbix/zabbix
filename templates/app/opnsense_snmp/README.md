@@ -3,12 +3,15 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher.  
 Template for monitoring OPNsense by SNMP
 
-This template was tested on:
+This template has been tested on:
 
 - OPNsense, version 22.1.9
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
@@ -25,7 +28,7 @@ begemotSnmpdModulePath."pf"     = "/usr/lib/snmp_pf.so"
 5. Link the template to a host.
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -42,8 +45,7 @@ No specific Zabbix configuration is required.
 |{$NET.IF.IFALIAS.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$NET.IF.IFDESCR.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`.*` |
 |{$NET.IF.IFDESCR.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$NET.IF.IFNAME.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`^em[0-9]+$` |
-|{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`^$` |
+|{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`(^pflog[0-9.]*$|^pfsync[0-9.]*$)` |
 |{$NET.IF.IFOPERSTATUS.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`^.*$` |
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES} |<p>Ignore notPresent(6).</p> |`^6$` |
 |{$NET.IF.IFTYPE.MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`.*` |
@@ -52,17 +54,17 @@ No specific Zabbix configuration is required.
 |{$SOURCE.TRACKING.TABLE.UTIL.MAX} |<p>Threshold of source tracking table utilization trigger in %.</p> |`90` |
 |{$STATE.TABLE.UTIL.MAX} |<p>Threshold of state table utilization trigger in %.</p> |`90` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Network interfaces discovery |<p>Discovering interfaces from IF-MIB.</p> |SNMP |opnsense.net.if.discovery<p>**Filter**:</p>AND <p>- {#IFADMINSTATUS} MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.MATCHES}`</p><p>- {#IFADMINSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.NOT_MATCHES}`</p><p>- {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p><p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p><p>- {#IFTYPE} MATCHES_REGEX `{$NET.IF.IFTYPE.MATCHES}`</p><p>- {#IFTYPE} NOT_MATCHES_REGEX `{$NET.IF.IFTYPE.NOT_MATCHES}`</p> |
+|Network interfaces discovery |<p>Discovering interfaces from IF-MIB.</p> |SNMP |opnsense.net.if.discovery<p>**Filter**:</p>AND <p>- {#IFADMINSTATUS} MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.MATCHES}`</p><p>- {#IFADMINSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.NOT_MATCHES}`</p><p>- {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p><p>- {#IFNAME} MATCHES_REGEX `@Network interfaces for discovery`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p><p>- {#IFTYPE} MATCHES_REGEX `{$NET.IF.IFTYPE.MATCHES}`</p><p>- {#IFTYPE} NOT_MATCHES_REGEX `{$NET.IF.IFTYPE.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -111,7 +113,7 @@ There are no template links in this template.
 |OPNsense |OPNsense: Firewall rules count |<p>MIB: BEGEMOT-PF-MIB</p><p>The number of labeled filter rules on this system.</p> |SNMP |opnsense.rules.count |
 |Status |OPNsense: SNMP agent availability |<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p> |INTERNAL |zabbix[host,snmp,available] |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|

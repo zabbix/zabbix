@@ -32,11 +32,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hostids' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'groupids' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'hostids' =>							[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
+	'groupids' =>							[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
 	// maintenance
 	'maintenanceid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
-	'maintenanceids' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 		null],
+	'maintenanceids' =>						[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
 	'mname' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
 	'maintenance_type' =>					[T_ZBX_INT, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'description' =>						[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
@@ -46,9 +46,9 @@ $fields = [
 	'active_till' =>						[T_ZBX_ABS_TIME, O_OPT, null, NOT_EMPTY,
 												'isset({add}) || isset({update})', _('Active till')
 											],
-	'timeperiods' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'tags_evaltype' =>						[T_ZBX_INT, O_OPT, null,	null,		null],
-	'tags' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
+	'timeperiods' =>						[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'tags_evaltype' =>						[T_ZBX_INT, O_OPT, null,			null,	null],
+	'tags' =>								[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	// actions
 	'action' =>								[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"maintenance.massdelete"'), null],
 	'add' =>								[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -58,13 +58,13 @@ $fields = [
 	'cancel' =>								[T_ZBX_STR, O_OPT, P_SYS,		 null,	null],
 	// form
 	'form' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>						[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>						[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	// filter
 	'filter_set' =>							[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst' =>							[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_name' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_status' =>						[T_ZBX_INT, O_OPT, null,	IN([-1, MAINTENANCE_STATUS_ACTIVE, MAINTENANCE_STATUS_APPROACH, MAINTENANCE_STATUS_EXPIRED]), null],
-	'filter_groups' =>						[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_groups' =>						[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	// sort and sortorder
 	'sort' =>								[T_ZBX_STR, O_OPT, P_SYS,
 												IN('"active_since","active_till","maintenance_type","name"'),

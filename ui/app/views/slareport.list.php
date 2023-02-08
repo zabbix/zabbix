@@ -95,6 +95,7 @@ $widget = (new CWidget())
 $report = new CTableInfo();
 
 $form = (new CForm())
+	->cleanItems()
 	->setId('slareport-list')
 	->setName('slareport_list');
 

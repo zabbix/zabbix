@@ -51,6 +51,7 @@ if ($data['form_refresh'] == 0) {
 
 // Create form.
 $user_form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('user-form')
 	->setName('user_form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)

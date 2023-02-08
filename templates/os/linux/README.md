@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 New official Linux template. Requires agent of Zabbix 3.0.14, 3.4.5 and 4.0.0 or newer.
 
 ## Setup
@@ -56,7 +56,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Block devices discovery |<p>-</p> |ZABBIX_PASSIVE |vfs.dev.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#DEVTYPE} MATCHES_REGEX `disk`</p><p>- {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
-|Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |ZABBIX_PASSIVE |vfs.fs.discovery<p>**Filter**:</p>AND <p>- {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p> |
+|Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |ZABBIX_PASSIVE |vfs.fs.discovery<p>**Filter**:</p>AND <p>- {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Skip metadata collection for dynamic FS<br> - {#FSTYPE} MATCHES_REGEX `^(btrfs|zfs)$`<br>  - ITEM_PROTOTYPE LIKE `inode`<br>  - NO_DISCOVER</p> |
 |Network interface discovery |<p>Discovery of network interfaces.</p> |ZABBIX_PASSIVE |net.if.discovery<p>**Filter**:</p>AND <p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p> |
 
 ## Items collected
@@ -117,7 +117,7 @@ There are no template links in this template.
 |Network interfaces |Interface {#IFNAME}: Speed |<p>Indicates the interface latest or current speed value. Value is an integer representing the link speed in bits/sec.</p><p>This attribute is only valid for interfaces that implement the ethtool get_link_ksettings method (mostly Ethernet).</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_PASSIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1000000`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Security |Checksum of /etc/passwd |<p>-</p> |ZABBIX_PASSIVE |vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |System uptime |<p>System uptime in 'N days, hh:mm:ss' format.</p> |ZABBIX_PASSIVE |system.uptime |
-|Status |Zabbix agent availability |<p>Monitoring agent availability status</p> |INTERNAL |zabbix[host,agent,available] |
+|Status |Zabbix agent availability |<p>Monitoring the availability status of the agent.</p> |INTERNAL |zabbix[host,agent,available] |
 |Storage |{#DEVNAME}: Disk read rate |<p>r/s. The number (after merges) of read requests completed per second for the device.</p> |DEPENDENT |vfs.dev.read.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[0]`</p><p>- CHANGE_PER_SECOND</p> |
 |Storage |{#DEVNAME}: Disk write rate |<p>w/s. The number (after merges) of write requests completed per second for the device.</p> |DEPENDENT |vfs.dev.write.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[4]`</p><p>- CHANGE_PER_SECOND</p> |
 |Storage |{#DEVNAME}: Disk read request avg waiting time (r_await) |<p>This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.</p> |CALCULATED |vfs.dev.read.await[{#DEVNAME}]<p>**Expression**:</p>`(last(//vfs.dev.read.time.rate[{#DEVNAME}])/(last(//vfs.dev.read.rate[{#DEVNAME}])+(last(//vfs.dev.read.rate[{#DEVNAME}])=0)))*1000*(last(//vfs.dev.read.rate[{#DEVNAME}]) > 0)` |
@@ -158,9 +158,9 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux).
 
 ## Known Issues
 

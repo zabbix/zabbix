@@ -146,6 +146,13 @@ class CNullElement {
 	/**
 	 * @inheritdoc
 	 */
+	public function getClassesPresentCondition($classes) {
+		return self::getFailCondition();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getReadyCondition() {
 		return self::getFailCondition();
 	}

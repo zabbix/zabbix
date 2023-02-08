@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-24T16:57:27Z'
+  date: '2022-12-19T09:46:21Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -523,6 +523,22 @@ zabbix_export:
                   item:
                     host: 'HP-UX by Zabbix agent'
                     key: 'vfs.fs.size[{#FSNAME},free]'
+          overrides:
+            -
+              name: 'Skip metadata collection for dynamic FS'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: inode
+                  discover: NO_DISCOVER
       tags:
         -
           tag: class
@@ -555,8 +571,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU load'
                         host: 'HP-UX by Zabbix agent'
+                        name: 'CPU load'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -571,8 +587,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU utilization'
                         host: 'HP-UX by Zabbix agent'
+                        name: 'CPU utilization'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -587,8 +603,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory usage'
                         host: 'HP-UX by Zabbix agent'
+                        name: 'Memory usage'
       valuemaps:
         -
           uuid: 663bea44626447b5a72a71238dfda919

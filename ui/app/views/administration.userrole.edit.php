@@ -28,6 +28,7 @@ $this->includeJsFile('administration.userrole.edit.js.php');
 $widget = (new CWidget())->setTitle(_('User roles'));
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('userrole-form')
 	->setName('user_role_form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);

@@ -32,6 +32,7 @@ $this->includeJsFile('reports.scheduledreport.edit.js.php', [
 $widget = (new CWidget())->setTitle(_('Scheduled reports'));
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('scheduledreport-form')
 	->setName('scheduledreport-form')
 	->setAction(

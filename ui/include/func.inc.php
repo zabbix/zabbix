@@ -901,6 +901,10 @@ function zbx_empty($value) {
 }
 
 function zbx_is_int($var) {
+	if (is_array($var)) {
+		return false;
+	}
+
 	if (is_int($var)) {
 		return true;
 	}

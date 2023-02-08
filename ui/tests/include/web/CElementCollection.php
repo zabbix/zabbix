@@ -329,14 +329,19 @@ class CElementCollection implements Iterator {
 	 * Filter element collection based on a specified condition and parameters.
 	 *
 	 * @param CElementFilter $filter    condition to be filtered by
+	 * @param array          $params    filter parameters
 	 *
 	 * @return CElementCollection
 	 * @throws Exception
 	 */
-	public function filter($filter) {
+	public function filter($filter, $params = []) {
+		if (!($filter instanceof CElementFilter)) {
+			$filter = new CElementFilter($filter, $params);
+		}
+
 		$elements = [];
 		foreach ($this->elements as $key => $element) {
-			if ($filter->match($element)) {
+			if ($filter->match($element, $key)) {
 				$elements[$key] = $element;
 			}
 		}
