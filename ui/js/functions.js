@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -552,8 +552,9 @@ function overlayDialogue(params, trigger_elmnt) {
  * @param {Node} trigger_element	UI element that was clicked to open overlay dialogue.
  * @param string hostid				Host ID.
  * @param string eventid			Event ID.
+ * @param string csrf_token			CSRF token.
  */
-function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null) {
+function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null, csrf_token) {
 	var execute = function() {
 		var popup_options = {scriptid: scriptid};
 
@@ -566,6 +567,8 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 		}
 
 		if (Object.keys(popup_options).length === 2) {
+			popup_options._csrf_token = csrf_token;
+
 			PopUp('popup.scriptexec', popup_options, {dialogue_class: 'modal-popup-medium', trigger_element});
 		}
 	};

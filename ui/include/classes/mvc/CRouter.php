@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,15 @@ class CRouter {
 		'autoreg.update'							=> ['CControllerAutoregUpdate',							null,					null],
 		'charts.view'								=> ['CControllerChartsView',							'layout.htmlpage',		'monitoring.charts.view'],
 		'charts.view.json'							=> ['CControllerChartsViewJson',						'layout.json',			'monitoring.charts.view.json'],
-		'correlation.condition.add'					=> ['CControllerCorrelationConditionAdd',				null,					null],
+		'connector.create'							=> ['CControllerConnectorCreate',						'layout.json',			null],
+		'connector.delete'							=> ['CControllerConnectorDelete',						'layout.json',			null],
+		'connector.disable'							=> ['CControllerConnectorDisable',						'layout.json',			null],
+		'connector.edit'							=> ['CControllerConnectorEdit',							'layout.json',			'connector.edit'],
+		'connector.enable'							=> ['CControllerConnectorEnable',						'layout.json',			null],
+		'connector.list'							=> ['CControllerConnectorList',							'layout.htmlpage',		'connector.list'],
+		'connector.update'							=> ['CControllerConnectorUpdate',						'layout.json',			null],
+		'copy.create'								=> ['CControllerCopyCreate',							'layout.json',			null],
+		'copy.edit'									=> ['CControllerCopyEdit',								'layout.json',			'copy.edit'],
 		'correlation.create'						=> ['CControllerCorrelationCreate',						null,					null],
 		'correlation.delete'						=> ['CControllerCorrelationDelete',						null,					null],
 		'correlation.disable'						=> ['CControllerCorrelationDisable',					null,					null],
@@ -140,6 +148,13 @@ class CRouter {
 		'latest.view.refresh'						=> ['CControllerLatestViewRefresh',						'layout.json',			'monitoring.latest.view.refresh'],
 		'macros.edit'								=> ['CControllerMacrosEdit',							'layout.htmlpage',		'administration.macros.edit'],
 		'macros.update'								=> ['CControllerMacrosUpdate',							null,					null],
+		'maintenance.create'						=> ['CControllerMaintenanceCreate',						'layout.json',			null],
+		'maintenance.delete'						=> ['CControllerMaintenanceDelete',						'layout.json',			null],
+		'maintenance.edit'							=> ['CControllerMaintenanceEdit',						'layout.json',			'maintenance.edit'],
+		'maintenance.list'							=> ['CControllerMaintenanceList',						'layout.htmlpage',		'maintenance.list'],
+		'maintenance.timeperiod.edit'				=> ['CControllerMaintenanceTimePeriodEdit',				'layout.json',			'maintenance.timeperiod.edit'],
+		'maintenance.timeperiod.check'				=> ['CControllerMaintenanceTimePeriodCheck',			'layout.json',			null],
+		'maintenance.update'						=> ['CControllerMaintenanceUpdate',						'layout.json',			null],
 		'map.view'									=> ['CControllerMapView',								'layout.htmlpage',		'monitoring.map.view'],
 		'mediatype.create'							=> ['CControllerMediatypeCreate',						null,					null],
 		'mediatype.delete'							=> ['CControllerMediatypeDelete',						null,					null],
@@ -187,7 +202,6 @@ class CRouter {
 		'popup.ldap.test.send'						=> ['CControllerPopupLdapTestSend',						'layout.json',			null],
 		'popup.lldoperation'						=> ['CControllerPopupLldOperation',						'layout.json',			'popup.lldoperation'],
 		'popup.lldoverride'							=> ['CControllerPopupLldOverride',						'layout.json',			'popup.lldoverride'],
-		'popup.maintenance.period'					=> ['CControllerPopupMaintenancePeriod',				'layout.json',			'popup.maintenance.period'],
 		'popup.massupdate.host'						=> ['CControllerPopupMassupdateHost',					'layout.json',			'popup.massupdate.host'],
 		'popup.massupdate.item'						=> ['CControllerPopupMassupdateItem',					'layout.json',			'popup.massupdate.item'],
 		'popup.massupdate.itemprototype'			=> ['CControllerPopupMassupdateItem',					'layout.json',			'popup.massupdate.item'],
@@ -346,7 +360,6 @@ class CRouter {
 		'index_sso.php'					=> ['CLegacyAction', null, null],
 		'items.php'						=> ['CLegacyAction', null, null],
 		'jsrpc.php'						=> ['CLegacyAction', null, null],
-		'maintenance.php'				=> ['CLegacyAction', null, null],
 		'map.php'						=> ['CLegacyAction', null, null],
 		'report2.php'					=> ['CLegacyAction', null, null],
 		'report4.php'					=> ['CLegacyAction', null, null],

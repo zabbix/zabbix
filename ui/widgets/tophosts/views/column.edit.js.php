@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,6 +91,7 @@ window.tophosts_column_edit_form = new class {
 		$('[name="display"],[name="history"]', this._$widget_form).attr('disabled', !data_item_value);
 		$('[name="text"]', this._$widget_form).attr('disabled', !data_text);
 		$('[name="min"],[name="max"]', this._$widget_form).attr('disabled', display_as_is || !data_item_value);
+		$('[name="decimal_places"]', this._$widget_form).attr('disabled', !data_item_value);
 		this._$thresholds_table.toggleClass('disabled', !data_item_value);
 
 		// Toggle warning icons for non-numeric items settings.

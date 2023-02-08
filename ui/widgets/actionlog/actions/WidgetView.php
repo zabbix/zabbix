@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,8 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CArrayHelper,
-	CRangeTimeParser;
+	CRangeTimeParser,
+	CSettingsHelper;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -110,27 +111,36 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$range_time_parser->parse($this->getInput('to'));
 		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+		$alerts = [];
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
-		$alerts = API::Alert()->get([
-			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
-				'mediatypeid', 'alerttype'
-			],
-			'selectMediatypes' => ['name', 'maxattempts'],
-			'userids' => $userids ?: null,
-			'actionids' => $actionids ?: null,
-			'mediatypeids' => $mediatypeids ?: null,
-			'filter' => ['status' => $data['statuses']],
-			'search' => [
-				'subject' => $search_strings,
-				'message' => $search_strings
-			],
-			'searchByAny' => true,
-			'time_from' => $time_from - 1,
-			'time_till' => $time_to + 1,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => $this->fields_values['show_lines']
-		]);
+		foreach (eventSourceObjects() as $eventSource) {
+			$alerts = array_merge($alerts, API::Alert()->get([
+				'output' => ['actionid', 'userid', 'clock', 'mediatypeid', 'sendto', 'subject', 'message', 'status',
+					'retries', 'error', 'alerttype'
+				],
+				'selectMediatypes' => ['name', 'maxattempts'],
+				'eventsource' => $eventSource['source'],
+				'eventobject' => $eventSource['object'],
+				'userids' => $userids ?: null,
+				'actionids' => $actionids ?: null,
+				'mediatypeids' => $mediatypeids ?: null,
+				'filter' => ['status' => $data['statuses']],
+				'search' => [
+					'subject' => $search_strings,
+					'message' => $search_strings
+				],
+				'searchByAny' => true,
+				'time_from' => $time_from - 1,
+				'time_till' => $time_to + 1,
+				'sortfield' => 'alertid',
+				'sortorder' => ZBX_SORT_DOWN,
+				'limit' => $limit
+			]));
+		}
+
+		CArrayHelper::sort($alerts, [['field' => $sortfield, 'order' => $sortorder]]);
+		$alerts = array_slice($alerts, 0, $this->fields_values['show_lines'], true);
 
 		foreach ($alerts as &$alert) {
 			$alert['description'] = '';

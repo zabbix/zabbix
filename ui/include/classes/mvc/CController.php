@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,11 +71,11 @@ abstract class CController {
 	protected $input = [];
 
 	/**
-	 * SID validation flag, if true SID must be validated.
+	 * Validate CSRF token flag, if true CSRF token must be validated.
 	 *
 	 * @var bool
 	 */
-	private $validate_sid = true;
+	private bool $validate_csrf_token = true;
 
 	public function __construct() {
 		$this->init();
@@ -172,18 +172,12 @@ abstract class CController {
 	}
 
 	/**
-	 * Return user SID, first 16 bytes of session ID.
+	 * Disables CSRF token validation.
 	 *
-	 * @return string
+	 * @return void
 	 */
-	protected function getUserSID() {
-		$sessionid = CSessionHelper::getId();
-
-		if ($sessionid === null || strlen($sessionid) < 16) {
-			return null;
-		}
-
-		return substr($sessionid, 16, 16);
+	protected function disableCsrfValidation(): void {
+		$this->validate_csrf_token = false;
 	}
 
 	/**
@@ -407,29 +401,29 @@ abstract class CController {
 	abstract protected function checkInput();
 
 	/**
-	 * Validate session ID (SID).
-	 */
-	protected function disableSIDvalidation() {
-		$this->validate_sid = false;
-	}
-
-	/**
-	 * Validate session ID (SID).
+	 * Checks if CSRF token in the request is valid.
 	 *
 	 * @return bool
 	 */
-	private function checkSID(): bool {
-		$sessionid = $this->getUserSID();
-
-		if ($sessionid === null) {
+	private function checkCsrfToken(): bool {
+		if (!is_array($this->raw_input) || !array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $this->raw_input)) {
 			return false;
 		}
 
-		if (!is_array($this->raw_input) || !array_key_exists('sid', $this->raw_input)) {
+		$skip = ['popup', 'massupdate'];
+		$csrf_token_form = $this->raw_input[CCsrfTokenHelper::CSRF_TOKEN_NAME];
+
+		if (!is_string($csrf_token_form)) {
 			return false;
 		}
 
-		return $this->raw_input['sid'] === $sessionid;
+		foreach (explode('.', $this->action) as $segment) {
+			if (!in_array($segment, $skip, true)) {
+				return CCsrfTokenHelper::check($csrf_token_form, $segment);
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -462,7 +456,7 @@ abstract class CController {
 	 * @return CControllerResponse|null
 	 */
 	final public function run(): ?CControllerResponse {
-		if ($this->validate_sid && !$this->checkSID()) {
+		if ($this->validate_csrf_token && (!CWebUser::isLoggedIn() || !$this->checkCsrfToken())) {
 			throw new CAccessDeniedException();
 		}
 

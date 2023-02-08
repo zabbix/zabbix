@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #define ZABBIX_DISCOVERY_H
 
 #include "zbxdbhigh.h"
+#include "zbxcacheconfig.h"
 
 typedef struct
 {
@@ -31,9 +32,9 @@ typedef struct
 	int		status;
 	time_t		itemtime;
 }
-zbx_service_t;
+zbx_dservice_t;
 
-void	zbx_discovery_update_host(ZBX_DB_DHOST *dhost, int status, int now);
-void	zbx_discovery_update_service(const ZBX_DB_DRULE *drule, zbx_uint64_t dcheckid, ZBX_DB_DHOST *dhost,
-		const char *ip, const char *dns, int port, int status, const char *value, int now);
+void	zbx_discovery_update_host(zbx_db_dhost *dhost, int status, int now);
+void	zbx_discovery_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, zbx_uint64_t unique_dcheckid,
+		zbx_db_dhost *dhost, const char *ip, const char *dns, int port, int status, const char *value, int now);
 #endif

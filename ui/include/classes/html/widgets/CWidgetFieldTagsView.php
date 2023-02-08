@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 		$tags_table = (new CTable())
 			->setId('tags_table_'.$this->field->getName())
 			->addClass('table-tags')
-			->addClass('table-initial-width');
+			->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH);
 
 		$i = 0;
 

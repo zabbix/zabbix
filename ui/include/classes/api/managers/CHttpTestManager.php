@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,7 +93,7 @@ class CHttpTestManager {
 				' WHERE '.dbConditionInt('hs.httpstepid', array_keys($httpSteps))
 			);
 			while ($dbStep = DBfetch($dbCursor)) {
-				if ($httpSteps[$dbStep['httpstepid']] != $dbStep['name']) {
+				if ($httpSteps[$dbStep['httpstepid']] !== $dbStep['name']) {
 					$result[$dbStep['httptestid']][$httpSteps[$dbStep['httpstepid']]] = $dbStep['name'];
 				}
 			}
@@ -190,7 +190,7 @@ class CHttpTestManager {
 		foreach ($httptests as $httptest) {
 			$db_httptest = $db_httptests[$httptest['httptestid']];
 
-			$name_updated = $httptest['name'] != $db_httptest['name'];
+			$name_updated = $httptest['name'] !== $db_httptest['name'];
 			$status_updated = array_key_exists('status', $httptest) && $httptest['status'] != $db_httptest['status'];
 			$delay_updated = array_key_exists('delay', $httptest) && $httptest['delay'] !== $db_httptest['delay'];
 			$templateid_updated = array_key_exists('templateid', $httptest)
@@ -311,7 +311,7 @@ class CHttpTestManager {
 		$httptestids = [];
 
 		foreach ($httptests as $httptest) {
-			$name_updated = $httptest['name'] != $db_httptests[$httptest['httptestid']]['name'];
+			$name_updated = $httptest['name'] !== $db_httptests[$httptest['httptestid']]['name'];
 
 			if (array_key_exists('steps', $httptest) || $name_updated) {
 				$httptestids[] = $httptest['httptestid'];
@@ -348,9 +348,9 @@ class CHttpTestManager {
 		foreach ($httptests as $httptest) {
 			$db_httptest = $db_httptests[$httptest['httptestid']];
 
-			$name_updated = $httptest['name'] != $db_httptest['name'];
+			$name_updated = $httptest['name'] !== $db_httptest['name'];
 			$status_updated = array_key_exists('status', $httptest) && $httptest['status'] != $db_httptest['status'];
-			$delay_updated = array_key_exists('delay', $httptest) && $httptest['delay'] != $db_httptest['delay'];
+			$delay_updated = array_key_exists('delay', $httptest) && $httptest['delay'] !== $db_httptest['delay'];
 			$templateid_updated = array_key_exists('templateid', $httptest)
 				&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0;
 
@@ -641,7 +641,7 @@ class CHttpTestManager {
 			foreach ($db_httptest['items'] as $db_item) {
 				$item = [];
 
-				if ($httptest['name'] != $db_httptest['name']) {
+				if ($httptest['name'] !== $db_httptest['name']) {
 					$item += [
 						'name' => self::getTestName($db_item['test_type'], $httptest['name']),
 						'key_' => self::getTestKey($db_item['test_type'], $httptest['name'])
@@ -684,7 +684,7 @@ class CHttpTestManager {
 				foreach ($db_step['items'] as $db_item) {
 					$item = [];
 
-					if ($httptest['name'] != $db_httptest['name']) {
+					if ($httptest['name'] !== $db_httptest['name']) {
 						$item += [
 							'name' => self::getStepName($db_item['test_type'], $httptest['name'], $db_step['name']),
 							'key_' => self::getStepKey($db_item['test_type'], $httptest['name'], $db_step['name'])
@@ -966,7 +966,7 @@ class CHttpTestManager {
 				foreach ($db_step['items'] as $db_item) {
 					$item = [];
 
-					if ($httptest['name'] != $db_httptest['name'] || $step['name'] !== $db_step['name']) {
+					if ($httptest['name'] !== $db_httptest['name'] || $step['name'] !== $db_step['name']) {
 						$item += [
 							'name' => self::getStepName($db_item['test_type'], $httptest['name'], $step['name']),
 							'key_' => self::getStepKey($db_item['test_type'], $httptest['name'], $step['name'])
@@ -1340,7 +1340,7 @@ class CHttpTestManager {
 	 * where $httptests belong.
 	 *
 	 * @param array $httptests
-	 * @param array $hostIds
+	 * @param array $hostids
 	 *
 	 * @return bool
 	 */
@@ -1359,8 +1359,7 @@ class CHttpTestManager {
 
 		self::$parent_itemids = self::getItemIds($httptests);
 		$preparedHttpTests = $this->prepareInheritedHttpTests($httptests, $template_hosts);
-		$inheritedHttpTests = $this->save($preparedHttpTests);
-		$this->inherit($inheritedHttpTests);
+		$this->save($preparedHttpTests);
 
 		return true;
 	}

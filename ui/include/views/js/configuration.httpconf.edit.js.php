@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,7 +120,7 @@
 		},
 
 		refresh() {
-			const url = new Curl('', false);
+			const url = new Curl('');
 			const form = document.getElementsByName(this.form_name)[0].cloneNode(true);
 
 			form.append(httpconf.scenario.toFragment());
@@ -157,7 +157,7 @@
 					}
 				}
 
-				const curl = new Curl('zabbix.php', false);
+				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'host.list');
 
 				location.href = curl.getUrl();
@@ -171,7 +171,7 @@
 			ZBX_STYLE_DRAG_ICON:                 <?= zbx_jsvalue(ZBX_STYLE_DRAG_ICON) ?>,
 			ZBX_STYLE_TD_DRAG_ICON:              <?= zbx_jsvalue(ZBX_STYLE_TD_DRAG_ICON) ?>,
 			ZBX_STYLE_DISABLED:                  <?= zbx_jsvalue(ZBX_STYLE_DISABLED) ?>,
-			HTTPTEST_AUTH_NONE:                  <?= HTTPTEST_AUTH_NONE ?>,
+			ZBX_HTTP_AUTH_NONE:                  <?= ZBX_HTTP_AUTH_NONE ?>,
 			ZBX_POSTTYPE_FORM:                   <?= ZBX_POSTTYPE_FORM ?>,
 			HTTPTEST_STEP_RETRIEVE_MODE_HEADERS: <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>,
 			ZBX_POSTTYPE_RAW:                    <?= ZBX_POSTTYPE_RAW ?>,
@@ -563,7 +563,7 @@
 		this.$password = jQuery('#http_password', $tab);
 
 		this.$type_select.on('change', function(e) {
-			var http_fields_disabled = (e.target.value == httpconf.HTTPTEST_AUTH_NONE);
+			var http_fields_disabled = e.target.value == httpconf.ZBX_HTTP_AUTH_NONE;
 			this.$user.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
 			this.$password.prop('disabled', http_fields_disabled).closest('li').toggle(!http_fields_disabled);
 		}.bind(this));

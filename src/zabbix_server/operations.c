@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ zbx_dcheck_source_t;
  * Return value: hostid - existing hostid, 0 - if not found                   *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	select_discovered_host(const ZBX_DB_EVENT *event, char **hostname)
+static zbx_uint64_t	select_discovered_host(const zbx_db_event *event, char **hostname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -60,7 +60,7 @@ static zbx_uint64_t	select_discovered_host(const ZBX_DB_EVENT *event, char **hos
 	{
 		case EVENT_OBJECT_DHOST:
 		case EVENT_OBJECT_DSERVICE:
-			result = DBselect(
+			result = zbx_db_select(
 					"select dr.proxy_hostid,ds.ip"
 					" from drules dr,dchecks dc,dservices ds"
 					" where dc.druleid=dr.druleid"
@@ -69,15 +69,15 @@ static zbx_uint64_t	select_discovered_host(const ZBX_DB_EVENT *event, char **hos
 					EVENT_OBJECT_DSERVICE == event->object ? "dserviceid" : "dhostid",
 					event->objectid);
 
-			if (NULL == (row = DBfetch(result)))
+			if (NULL == (row = zbx_db_fetch(result)))
 			{
-				DBfree_result(result);
+				zbx_db_free_result(result);
 				goto exit;
 			}
 
 			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
-			ip_esc = DBdyn_escape_string(row[1]);
-			DBfree_result(result);
+			ip_esc = zbx_db_dyn_escape_string(row[1]);
+			zbx_db_free_result(result);
 
 			sql = zbx_dsprintf(sql,
 					"select h.hostid,h.name"
@@ -90,7 +90,7 @@ static zbx_uint64_t	select_discovered_host(const ZBX_DB_EVENT *event, char **hos
 					" order by i.hostid",
 					ip_esc,
 					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-					DBsql_id_cmp(proxy_hostid));
+					zbx_db_sql_id_cmp(proxy_hostid));
 
 			zbx_free(ip_esc);
 			break;
@@ -108,18 +108,18 @@ static zbx_uint64_t	select_discovered_host(const ZBX_DB_EVENT *event, char **hos
 			goto exit;
 	}
 
-	result = DBselectN(sql, 1);
+	result = zbx_db_select_n(sql, 1);
 
 	zbx_free(sql);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		size_t	out_alloc = 0, out_offset = 0;
 
 		ZBX_STR2UINT64(hostid, row[0]);
 		zbx_strcpy_alloc(hostname, &out_alloc, &out_offset, row[1]);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __func__, hostid);
 
@@ -153,13 +153,13 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 			" where hostid=" ZBX_FS_UI64
 				" and",
 			hostid);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
 	zbx_free(sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
 
@@ -171,14 +171,14 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 
 		zbx_vector_uint64_remove_noorder(groupids, i);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != groupids->values_num)
 	{
 		zbx_uint64_t	hostgroupid;
 		zbx_db_insert_t	db_insert;
 
-		hostgroupid = DBget_maxid_num("hosts_groups", groupids->values_num);
+		hostgroupid = zbx_db_get_maxid_num("hosts_groups", groupids->values_num);
 
 		zbx_db_insert_prepare(&db_insert, "hosts_groups", "hostgroupid", "hostid", "groupid", NULL);
 
@@ -209,7 +209,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
  * Return value: hostid - new/existing hostid                                 *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, zbx_config_t *cfg)
+static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, zbx_config_t *cfg)
 {
 	DB_RESULT		result;
 	DB_RESULT		result2;
@@ -238,7 +238,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 	{
 		if (EVENT_OBJECT_DHOST == event->object)
 		{
-			result = DBselect(
+			result = zbx_db_select(
 					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type,"
 						"dc.host_source,dc.name_source,dr.druleid,"
 						"dc.snmp_community,dc.snmpv3_securityname,dc.snmpv3_securitylevel,"
@@ -253,7 +253,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 		}
 		else
 		{
-			result = DBselect(
+			result = zbx_db_select(
 					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.dns,ds.port,dc.type,"
 						"dc.host_source,dc.name_source,dr.druleid,"
 						"dc.snmp_community,dc.snmpv3_securityname,dc.snmpv3_securitylevel,"
@@ -268,7 +268,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 					event->objectid);
 		}
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			zbx_uint64_t	interfaceid;
 
@@ -296,7 +296,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 
 			if (0 == hostid)
 			{
-				result2 = DBselect(
+				result2 = zbx_db_select(
 						"select distinct h.hostid,h.name,h.status"
 						" from hosts h,interface i,dservices ds"
 						" where h.hostid=i.hostid"
@@ -308,16 +308,16 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 						" order by h.hostid",
 						HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 						ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						DBsql_id_cmp(proxy_hostid), dhostid);
+						zbx_db_sql_id_cmp(proxy_hostid), dhostid);
 
-				if (NULL != (row2 = DBfetch(result2)))
+				if (NULL != (row2 = zbx_db_fetch(result2)))
 				{
 					ZBX_STR2UINT64(hostid, row2[0]);
 					hostname = zbx_strdup(NULL, row2[1]);
 					*status = atoi(row2[2]);
 				}
 
-				DBfree_result(result2);
+				zbx_db_free_result(result2);
 			}
 
 			if (0 == hostid)
@@ -339,11 +339,11 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 						" order by ds.dserviceid",
 							dhostid, druleid, ZBX_DISCOVERY_VALUE);
 
-				result3 = DBselectN(sql, 1);
+				result3 = zbx_db_select_n(sql, 1);
 
-				if (NULL != (row3 = DBfetch(result3)))
+				if (NULL != (row3 = zbx_db_fetch(result3)))
 				{
-					if (SUCCEED == zbx_db_is_null(row3[0]) || '\0' == *row3[0])
+					if (SUCCEED == zbx_db_is_null_basic(row3[0]) || '\0' == *row3[0])
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
 								" host name on \"%s\"", row[2]);
@@ -369,11 +369,11 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 				else
 					host = zbx_strdup(NULL, row[3]);
 
-				DBfree_result(result3);
+				zbx_db_free_result(result3);
 
 				/* for host uniqueness purposes */
 				zbx_make_hostname(host);	/* replace not-allowed symbols */
-				host_unique = DBget_unique_hostname_by_sample(host, "host");
+				host_unique = zbx_db_get_unique_hostname_by_sample(host, "host");
 				zbx_free(host);
 
 				sql_offset = 0;
@@ -390,11 +390,11 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 							dhostid, druleid, ZBX_DISCOVERY_UNSPEC, ZBX_DISCOVERY_DNS,
 							ZBX_DISCOVERY_IP, ZBX_DISCOVERY_VALUE, ZBX_DISCOVERY_VALUE);
 
-				result3 = DBselectN(sql, 1);
+				result3 = zbx_db_select_n(sql, 1);
 
-				if (NULL != (row3 = DBfetch(result3)))
+				if (NULL != (row3 = zbx_db_fetch(result3)))
 				{
-					if (SUCCEED == zbx_db_is_null(row3[0]) || '\0' == *row3[0])
+					if (SUCCEED == zbx_db_is_null_basic(row3[0]) || '\0' == *row3[0])
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
 								" host visible name on \"%s\"", row[2]);
@@ -423,17 +423,17 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 				else
 					host_visible = zbx_strdup(NULL, host_unique);
 
-				DBfree_result(result3);
+				zbx_db_free_result(result3);
 				zbx_free(sql);
 
 				zbx_make_hostname(host_visible);	/* replace not-allowed symbols */
 				zbx_free(hostname);
-				hostname = DBget_unique_hostname_by_sample(host_visible, "name");
+				hostname = zbx_db_get_unique_hostname_by_sample(host_visible, "name");
 				zbx_free(host_visible);
 
 				*status = HOST_STATUS_MONITORED;
 
-				hostid = DBget_maxid("hosts");
+				hostid = zbx_db_get_maxid("hosts");
 
 				zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid", "host", "name",
 						NULL);
@@ -452,12 +452,12 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, hostid, hostname);
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
-					DBadd_host_inventory(hostid, cfg->default_inventory_mode);
+					zbx_db_add_host_inventory(hostid, cfg->default_inventory_mode);
 
 				zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(hostid,
 						proxy_hostid, host_unique, cfg->default_inventory_mode);
 
-				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
+				interfaceid = zbx_db_add_interface(hostid, interface_type, 1, row[2], row[3], port,
 						ZBX_CONN_DEFAULT);
 
 				zbx_free(host_unique);
@@ -467,7 +467,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 			else
 			{
 				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
-				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
+				interfaceid = zbx_db_add_interface(hostid, interface_type, 1, row[2], row[3], port,
 						ZBX_CONN_DEFAULT);
 			}
 
@@ -485,22 +485,22 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 				else if (SVC_SNMPv3 == svc_type)
 					version = ZBX_IF_SNMP_VERSION_3;
 
-				DBadd_interface_snmp(interfaceid, version, SNMP_BULK_ENABLED, row[9], row[10],
+				zbx_db_add_interface_snmp(interfaceid, version, SNMP_BULK_ENABLED, row[9], row[10],
 						securitylevel, row[12], row[13], authprotocol, privprotocol, row[16],
 						hostid);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 	else if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
 	{
-		result = DBselect(
+		result = zbx_db_select(
 				"select proxy_hostid,host,listen_ip,listen_dns,listen_port,flags,tls_accepted"
 				" from autoreg_host"
 				" where autoreg_hostid=" ZBX_FS_UI64,
 				event->objectid);
 
-		if (NULL != (row = DBfetch(result)))
+		if (NULL != (row = zbx_db_fetch(result)))
 		{
 			char			*sql = NULL;
 			zbx_uint64_t		host_proxy_hostid;
@@ -509,7 +509,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 			unsigned char		useip = 1;
 
 			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
-			host_esc = DBdyn_escape_field("hosts", "host", row[1]);
+			host_esc = zbx_db_dyn_escape_field("hosts", "host", row[1]);
 			port = (unsigned short)atoi(row[4]);
 			flags_int = atoi(row[5]);
 
@@ -531,21 +531,21 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 
 			tls_accepted = atoi(row[6]);
 
-			result2 = DBselect(
+			result2 = zbx_db_select(
 					"select null"
 					" from hosts"
 					" where host='%s'"
 						" and status=%d",
 					host_esc, HOST_STATUS_TEMPLATE);
 
-			if (NULL != DBfetch(result2))
+			if (NULL != zbx_db_fetch(result2))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot add discovered host \"%s\":"
 						" template with the same name already exists", row[1]);
-				DBfree_result(result2);
+				zbx_db_free_result(result2);
 				goto out;
 			}
-			DBfree_result(result2);
+			zbx_db_free_result(result2);
 
 			sql = zbx_dsprintf(sql,
 					"select hostid,proxy_hostid,name,status"
@@ -557,13 +557,13 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 					host_esc, ZBX_FLAG_DISCOVERY_PROTOTYPE,
 					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
-			result2 = DBselectN(sql, 1);
+			result2 = zbx_db_select_n(sql, 1);
 
 			zbx_free(sql);
 
-			if (NULL == (row2 = DBfetch(result2)))
+			if (NULL == (row2 = zbx_db_fetch(result2)))
 			{
-				hostid = DBget_maxid("hosts");
+				hostid = zbx_db_get_maxid("hosts");
 				hostname = zbx_strdup(hostname, row[1]);
 				*status = HOST_STATUS_MONITORED;
 
@@ -605,12 +605,12 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 				zbx_db_insert_clean(&db_insert_host_rtdata);
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
-					DBadd_host_inventory(hostid, cfg->default_inventory_mode);
+					zbx_db_add_host_inventory(hostid, cfg->default_inventory_mode);
 
 				zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(hostid,
 						proxy_hostid, hostname, cfg->default_inventory_mode);
 
-				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
+				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 
 				add_discovered_host_groups(hostid, &groupids);
 			}
@@ -625,22 +625,22 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 
 				if (host_proxy_hostid != proxy_hostid)
 				{
-					DBexecute("update hosts"
+					zbx_db_execute("update hosts"
 							" set proxy_hostid=%s"
 							" where hostid=" ZBX_FS_UI64,
-							DBsql_id_ins(proxy_hostid), hostid);
+							zbx_db_sql_id_ins(proxy_hostid), hostid);
 
 					zbx_audit_host_update_json_update_proxy_hostid(hostid, host_proxy_hostid,
 							proxy_hostid);
 				}
 
-				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
+				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 			}
-			DBfree_result(result2);
+			zbx_db_free_result(result2);
 out:
 			zbx_free(host_esc);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 clean:
 	zbx_config_clean(cfg);
@@ -662,7 +662,7 @@ clean:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	is_discovery_or_autoregistration(const ZBX_DB_EVENT *event)
+static int	is_discovery_or_autoregistration(const zbx_db_event *event)
 {
 	if (event->source == EVENT_SOURCE_DISCOVERY && (event->object == EVENT_OBJECT_DHOST ||
 			event->object == EVENT_OBJECT_DSERVICE))
@@ -684,7 +684,7 @@ static int	is_discovery_or_autoregistration(const ZBX_DB_EVENT *event)
  *             cfg            - [IN] the global configuration data            *
  *                                                                            *
  ******************************************************************************/
-void	op_host_add(const ZBX_DB_EVENT *event, zbx_config_t *cfg)
+void	op_host_add(const zbx_db_event *event, zbx_config_t *cfg)
 {
 	int	status;
 
@@ -705,7 +705,7 @@ out:
  * Parameters: event          - [IN] source event data                        *
  *                                                                            *
  ******************************************************************************/
-void	op_host_del(const ZBX_DB_EVENT *event)
+void	op_host_del(const zbx_db_event *event)
 {
 	zbx_vector_uint64_t	hostids;
 	zbx_vector_str_t	hostnames;
@@ -725,7 +725,7 @@ void	op_host_del(const ZBX_DB_EVENT *event)
 	zbx_vector_str_create(&hostnames);
 	zbx_vector_str_append(&hostnames, zbx_strdup(NULL, hostname));
 
-	DBdelete_hosts_with_prototypes(&hostids, &hostnames);
+	zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames);
 
 	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
@@ -745,7 +745,7 @@ out:
  *             cfg            - [IN] the global configuration data            *
  *                                                                            *
  ******************************************************************************/
-void	op_host_enable(const ZBX_DB_EVENT *event, zbx_config_t *cfg)
+void	op_host_enable(const zbx_db_event *event, zbx_config_t *cfg)
 {
 	zbx_uint64_t	hostid;
 	int		status;
@@ -760,7 +760,7 @@ void	op_host_enable(const ZBX_DB_EVENT *event, zbx_config_t *cfg)
 
 	if (HOST_STATUS_MONITORED != status)
 	{
-		DBexecute("update hosts"
+		zbx_db_execute("update hosts"
 				" set status=%d"
 				" where hostid=" ZBX_FS_UI64,
 				HOST_STATUS_MONITORED, hostid);
@@ -779,7 +779,7 @@ out:
  *             cfg            - [IN] the global configuration data            *
  *                                                                            *
  ******************************************************************************/
-void	op_host_disable(const ZBX_DB_EVENT *event, zbx_config_t *cfg)
+void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg)
 {
 	zbx_uint64_t	hostid;
 	int		status;
@@ -794,7 +794,7 @@ void	op_host_disable(const ZBX_DB_EVENT *event, zbx_config_t *cfg)
 
 	if (HOST_STATUS_NOT_MONITORED != status)
 	{
-		DBexecute(
+		zbx_db_execute(
 				"update hosts"
 				" set status=%d"
 				" where hostid=" ZBX_FS_UI64,
@@ -818,7 +818,7 @@ out:
  *           setting manual or automatic host inventory mode is supported.    *
  *                                                                            *
  ******************************************************************************/
-void	op_host_inventory_mode(const ZBX_DB_EVENT *event, zbx_config_t *cfg, int inventory_mode)
+void	op_host_inventory_mode(const zbx_db_event *event, zbx_config_t *cfg, int inventory_mode)
 {
 	zbx_uint64_t	hostid;
 	int		status;
@@ -831,7 +831,7 @@ void	op_host_inventory_mode(const ZBX_DB_EVENT *event, zbx_config_t *cfg, int in
 	if (0 == (hostid = add_discovered_host(event, &status, cfg)))
 		goto out;
 
-	DBset_host_inventory(hostid, inventory_mode);
+	zbx_db_set_host_inventory(hostid, inventory_mode);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -845,7 +845,7 @@ out:
  *             groupids - [IN] IDs of groups to add                           *
  *                                                                            *
  ******************************************************************************/
-void	op_groups_add(const ZBX_DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *groupids)
+void	op_groups_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *groupids)
 {
 	zbx_uint64_t	hostid;
 	int		status;
@@ -871,7 +871,7 @@ out:
  *             groupids - [IN] IDs of groups to delete                        *
  *                                                                            *
  ******************************************************************************/
-void	op_groups_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *groupids)
+void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 {
 	DB_RESULT	result;
 	zbx_uint64_t	hostid;
@@ -895,13 +895,13 @@ void	op_groups_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *groupids)
 			" where hostid=" ZBX_FS_UI64
 				" and not",
 			hostid);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 
-	result = DBselectN(sql, 1);
+	result = zbx_db_select_n(sql, 1);
 
-	if (NULL == DBfetch(result))
+	if (NULL == zbx_db_fetch(result))
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove host \"%s\" from all host groups:"
 				" it must belong to at least one", zbx_host_string(hostid));
@@ -912,7 +912,7 @@ void	op_groups_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *groupids)
 		DB_RESULT		result2;
 		DB_ROW			row;
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_vector_uint64_create(&hostgroupids);
 		zbx_vector_uint64_create(&found_groupids);
@@ -924,11 +924,11 @@ void	op_groups_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *groupids)
 				" where hostid=" ZBX_FS_UI64
 					" and",
 				hostid);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 
-		result2 = DBselect("%s", sql);
+		result2 = zbx_db_select("%s", sql);
 
-		while (NULL != (row = DBfetch(result2)))
+		while (NULL != (row = zbx_db_fetch(result2)))
 		{
 			zbx_uint64_t	hostgroupid, groupid;
 
@@ -939,7 +939,7 @@ void	op_groups_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *groupids)
 			zbx_vector_uint64_append(&found_groupids, groupid);
 		}
 
-		DBfree_result(result2);
+		zbx_db_free_result(result2);
 
 		if (0 != hostgroupids.values_num)
 		{
@@ -949,10 +949,10 @@ void	op_groups_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *groupids)
 					" where hostid=" ZBX_FS_UI64
 						" and",
 					hostid);
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values,
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values,
 					groupids->values_num);
 
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 
 			zbx_audit_host_hostgroup_delete(hostid, hostname, &hostgroupids, &found_groupids);
 		}
@@ -976,7 +976,7 @@ out:
  *             lnk_templateids - [IN] array of template IDs                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_add(const ZBX_DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids)
+void	op_template_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids)
 {
 	zbx_uint64_t	hostid;
 	char		*error = NULL;
@@ -990,7 +990,7 @@ void	op_template_add(const ZBX_DB_EVENT *event, zbx_config_t *cfg, zbx_vector_ui
 	if (0 == (hostid = add_discovered_host(event, &status, cfg)))
 		goto out;
 
-	if (SUCCEED != DBcopy_template_elements(hostid, lnk_templateids, ZBX_TEMPLATE_LINK_MANUAL, &error))
+	if (SUCCEED != zbx_db_copy_template_elements(hostid, lnk_templateids, ZBX_TEMPLATE_LINK_MANUAL, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s", error);
 		zbx_free(error);
@@ -1007,7 +1007,7 @@ out:
  *             del_templateids - [IN] array of template IDs                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *del_templateids)
+void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templateids)
 {
 	zbx_uint64_t	hostid;
 	char		*error, *hostname = NULL;
@@ -1020,7 +1020,7 @@ void	op_template_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *del_templat
 	if (0 == (hostid = select_discovered_host(event, &hostname)))
 		goto out;
 
-	if (SUCCEED != DBdelete_template_elements(hostid, hostname, del_templateids, &error))
+	if (SUCCEED != zbx_db_delete_template_elements(hostid, hostname, del_templateids, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot unlink template: %s", error);
 		zbx_free(error);
