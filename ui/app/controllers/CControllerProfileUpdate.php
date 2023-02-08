@@ -39,6 +39,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.auditlog.filter.active':
 				case 'web.avail_report.filter.active':
 				case 'web.charts.filter.active':
+				case 'web.connector.filter.active':
 				case 'web.correlation.filter.active':
 				case 'web.dashboard.filter.active':
 				case 'web.dashboard.hostid':

@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-10-06T13:46:30Z'
   media_types:
     -
       name: 'MS Teams'

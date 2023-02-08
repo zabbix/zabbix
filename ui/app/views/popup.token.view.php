@@ -25,7 +25,6 @@
  */
 
 $token_form = (new CForm())
-	->cleanItems()
 	->setId('token_form')
 	->setName('token')
 	->addItem(makeMessageBox(ZBX_STYLE_MSG_GOOD, [], $data['message']));

@@ -45,7 +45,7 @@ int	check_perm2system(zbx_uint64_t userid)
 	DB_ROW		row;
 	int		res = SUCCEED;
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select count(*)"
 			" from usrgrp g,users_groups ug"
 			" where ug.userid=" ZBX_FS_UI64
@@ -53,7 +53,7 @@ int	check_perm2system(zbx_uint64_t userid)
 				" and g.users_status=%d",
 			userid, GROUP_STATUS_DISABLED);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]) && atoi(row[0]) > 0)
+	if (NULL != (row = zbx_db_fetch(result)) && SUCCEED != zbx_db_is_null(row[0]) && atoi(row[0]) > 0)
 		res = FAIL;
 
 	zbx_db_free_result(result);
@@ -67,9 +67,9 @@ char	*get_user_timezone(zbx_uint64_t userid)
 	DB_ROW		row;
 	char		*user_timezone;
 
-	result = DBselect("select timezone from users where userid=" ZBX_FS_UI64, userid);
+	result = zbx_db_select("select timezone from users where userid=" ZBX_FS_UI64, userid);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 		user_timezone = zbx_strdup(NULL, row[0]);
 	else
 		user_timezone = NULL;
@@ -105,11 +105,11 @@ int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, co
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
 
-	result = DBselect("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
+	result = zbx_db_select("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
 			" and (name='%s' or name='%s')", user->roleid, role_rule,
 			role_rule_default);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (0 == strcmp(role_rule, row[1]))
 		{

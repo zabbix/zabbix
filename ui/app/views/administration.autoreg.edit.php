@@ -31,6 +31,7 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTOREG_EDIT));
 
 $autoreg_form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('autoreg')))->removeId())
 	->setId('autoreg-form')
 	->setName('autoreg-form')
 	->setAction((new CUrl('zabbix.php'))

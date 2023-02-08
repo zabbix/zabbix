@@ -24,6 +24,7 @@
  */
 
 $form = (new CForm('post'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('dashboard')))->removeId())
 	->setId('dashboard-share-form')
 	->setName('dashboard_share_form')
 	->addItem(getMessages());

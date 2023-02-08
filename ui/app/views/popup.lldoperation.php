@@ -31,7 +31,6 @@ $options = $data['options'];
 $field_values = $data['field_values'];
 
 $operations_popup_form = (new CForm())
-	->cleanItems()
 	->setId('lldoperation_form')
 	->addVar('no', $options['no'])
 	->addItem((new CVar('templated', $options['templated']))->removeId())

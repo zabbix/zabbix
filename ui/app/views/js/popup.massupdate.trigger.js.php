@@ -43,14 +43,14 @@
 
 			let curl;
 			if (list.object === 'deptrigger_prototype') {
-				curl = new Curl('trigger_prototypes.php', false);
+				curl = new Curl('trigger_prototypes.php');
 				curl.setArgument('form', 'update');
 				curl.setArgument('parent_discoveryid', '<?= $data['parent_discoveryid'] ?>');
 				curl.setArgument('triggerid', value.triggerid);
 				curl.setArgument('context', '<?= $data['context'] ?>');
 			}
 			else {
-				curl = new Curl('triggers.php', false);
+				curl = new Curl('triggers.php');
 				curl.setArgument('form', 'update');
 				curl.setArgument('triggerid', value.triggerid);
 				curl.setArgument('context', '<?= $data['context'] ?>');

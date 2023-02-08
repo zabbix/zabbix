@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-07-22T09:08:46Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -14,6 +13,9 @@ zabbix_export:
         Get node metrics from ClickHouse HTTP interface using HTTP agent.
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Databases

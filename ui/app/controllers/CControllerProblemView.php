@@ -25,7 +25,7 @@
 class CControllerProblemView extends CControllerProblem {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -126,6 +126,7 @@ class CControllerProblemView extends CControllerProblem {
 				'support_custom_time' => 1,
 				'expanded' => $profile->expanded,
 				'page' => $filter['page'],
+				'csrf_token' => CCsrfTokenHelper::get('tabfilter'),
 				'timeselector' => [
 					'from' => $profile->from,
 					'to' => $profile->to,

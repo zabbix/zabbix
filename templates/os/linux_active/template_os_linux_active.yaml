@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2023-01-16T07:04:36Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -20,6 +19,9 @@ zabbix_export:
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux
         
         Template tooling version used: 0.43
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: 'Templates/Operating systems'

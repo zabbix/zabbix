@@ -297,11 +297,11 @@ class CHttpTest extends CApiService {
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'value')]
 			]],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED])],
-			'authentication' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])],
+			'authentication' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])],
 			'http_user' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_user')],
 			'http_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_password')],
-			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
-			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
+			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
+			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_key_password')],
@@ -439,11 +439,11 @@ class CHttpTest extends CApiService {
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'value')]
 			]],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED])],
-			'authentication' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])],
+			'authentication' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])],
 			'http_user' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_user')],
 			'http_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_password')],
-			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
-			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
+			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
+			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_key_password')],
@@ -649,25 +649,15 @@ class CHttpTest extends CApiService {
 	 * @param array $db_httptests
 	 */
 	private static function addInheritedHttptests(array &$db_httptests): void {
-		$templateids = array_keys($db_httptests);
+		$options = [
+			'output' => ['httptestid', 'name'],
+			'filter' => ['templateid' => array_keys($db_httptests)]
+		];
+		$result = DBselect(DB::makeSql('httptest', $options));
 
-		do {
-			$options = [
-				'output' => ['httptestid', 'name'],
-				'filter' => ['templateid' => $templateids]
-			];
-			$result = DBselect(DB::makeSql('httptest', $options));
-
-			$templateids = [];
-
-			while ($row = DBfetch($result)) {
-				if (!array_key_exists($row['httptestid'], $db_httptests)) {
-					$templateids[] = $row['httptestid'];
-
-					$db_httptests[$row['httptestid']] = $row;
-				}
-			}
-		} while ($templateids);
+		while ($row = DBfetch($result)) {
+			$db_httptests[$row['httptestid']] = $row;
+		}
 	}
 
 	/**
@@ -1062,10 +1052,10 @@ class CHttpTest extends CApiService {
 				$httptest += [
 					'authentication' => ($method === 'validateUpdate')
 						? $db_httptests[$httptest['httptestid']]['authentication']
-						: HTTPTEST_AUTH_NONE
+						: ZBX_HTTP_AUTH_NONE
 				];
 
-				if ($httptest['authentication'] == HTTPTEST_AUTH_NONE) {
+				if ($httptest['authentication'] == ZBX_HTTP_AUTH_NONE) {
 					foreach (['http_user', 'http_password'] as $field_name) {
 						$httptest += [$field_name => ''];
 
@@ -1186,10 +1176,9 @@ class CHttpTest extends CApiService {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('hht.hostid', $hostids) : '';
 
 		$result = DBselect(
-			'SELECT hht.httptestid,hht.name,h.status AS host_status'.
-			' FROM httptest ht,httptest hht,hosts h'.
+			'SELECT hht.httptestid,hht.name'.
+			' FROM httptest ht,httptest hht'.
 			' WHERE ht.httptestid=hht.templateid'.
-				' AND hht.hostid=h.hostid'.
 				' AND '.dbConditionId('ht.hostid', $templateids).
 				$hostids_condition
 		);
@@ -1197,17 +1186,11 @@ class CHttpTest extends CApiService {
 		$httptests = [];
 
 		while ($row = DBfetch($result)) {
-			$httptest = [
+			$httptests[] = [
 				'httptestid' => $row['httptestid'],
 				'name' => $row['name'],
 				'templateid' => 0
 			];
-
-			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
-				$httptest += ['uuid' => generateUuidV4()];
-			}
-
-			$httptests[] = $httptest;
 		}
 
 		if ($httptests) {

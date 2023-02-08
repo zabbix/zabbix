@@ -24,7 +24,7 @@ class CControllerMapView extends CController {
 	private $sysmapid;
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {

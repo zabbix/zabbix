@@ -211,13 +211,13 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Web monitoring');
 
 		if (isset($data['templatedHost'])) {
-			$this->zbxTestTextPresent('Parent web scenarios');
+			$this->zbxTestTextPresent('Parent web scenario');
 			if (isset($data['hostTemplate'])) {
 				$this->zbxTestAssertElementPresentXpath("//a[text()='".$data['hostTemplate']."']");
 			}
 		}
 		else {
-			$this->zbxTestTextNotPresent('Parent web scenarios');
+			$this->zbxTestTextNotPresent('Parent web scenario');
 		}
 
 		if (isset($data['agent'])) {

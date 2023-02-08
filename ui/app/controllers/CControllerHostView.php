@@ -23,7 +23,7 @@
 class CControllerHostView extends CControllerHost {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -122,7 +122,8 @@ class CControllerHostView extends CControllerHost {
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
-				'page' => $filter['page']
+				'page' => $filter['page'],
+				'csrf_token' => CCsrfTokenHelper::get('tabfilter')
 			]
 		] + $this->getData($filter);
 

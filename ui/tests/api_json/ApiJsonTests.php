@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/testJSONRPC.php';
 require_once dirname(__FILE__).'/testAPIInfo.php';
 require_once dirname(__FILE__).'/testAction.php';
 require_once dirname(__FILE__).'/testConfiguration.php';
+require_once dirname(__FILE__).'/testConnector.php';
 require_once dirname(__FILE__).'/testCorrelation.php';
 require_once dirname(__FILE__).'/testDRule.php';
 require_once dirname(__FILE__).'/testGraphPrototype.php';
@@ -83,6 +84,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testAction');
 		$suite->addTestSuite('testConfiguration');
 		// $suite->addTestSuite('testDependentItems');
+		$suite->addTestSuite('testConnector');
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
 		$suite->addTestSuite('testGraphPrototype');

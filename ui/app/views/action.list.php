@@ -103,6 +103,7 @@ $filter = (new CFilter())
 $current_url->removeArgument('filter_rst');
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('action')))->removeId())
 	->setId('action-list')
 	->setName('action_list');
 

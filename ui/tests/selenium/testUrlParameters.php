@@ -328,64 +328,6 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Configuration of maintenance periods',
-				'check_server_name' => true,
-				'server_name_on_page' => true,
-				'test_cases' => [
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid=1',
-						'text_present' => 'Maintenance periods'
-					],
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid=9999999',
-						'text_not_present' => 'Maintenance periods',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
-					],
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid=abc',
-						'text_not_present' => 'Maintenance periods',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "maintenanceid" is not integer.'
-						]
-					],
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid=',
-						'text_not_present' => 'Maintenance periods',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "maintenanceid" is not integer.'
-						]
-					],
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid=-1',
-						'text_not_present' => 'Maintenance periods',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "maintenanceid" field.'
-						]
-					],
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid[]=1',
-						'text_not_present' => 'Maintenance periods',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "maintenanceid" is not correct: invalid data type.'
-						]
-					],
-					[
-						'url' => 'maintenance.php?form=update',
-						'text_not_present' => 'Maintenance periods',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "maintenanceid" is mandatory.'
-						]
-					]
-				]
-			],
-			[
 				'title' => 'Fatal error, please report to the Zabbix team',
 				'check_server_name' => true,
 				'server_name_on_page' => false,

@@ -22,7 +22,7 @@
 class CControllerPopupHttpStep extends CController {
 
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
