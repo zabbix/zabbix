@@ -249,7 +249,7 @@ class testDashboardURLWidget extends CWebTest {
 					'fields' => [
 						'URL' => ''
 					],
-					'error' => ['Invalid parameter "URL": cannot be empty.']
+					'error' => 'Invalid parameter "URL": cannot be empty.'
 				]
 			],
 			[
@@ -258,7 +258,7 @@ class testDashboardURLWidget extends CWebTest {
 					'fields' => [
 						'URL' => '?'
 					],
-					'error' => ['Invalid parameter "URL": unacceptable URL.']
+					'error' => 'Invalid parameter "URL": unacceptable URL.'
 				]
 			],
 			[
@@ -267,7 +267,7 @@ class testDashboardURLWidget extends CWebTest {
 					'fields' => [
 						'URL' => 'dns://zabbix.com'
 					],
-					'error' => ['Invalid parameter "URL": unacceptable URL.']
+					'error' => 'Invalid parameter "URL": unacceptable URL.'
 				]
 			],
 			[
