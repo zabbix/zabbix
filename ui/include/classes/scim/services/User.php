@@ -423,6 +423,8 @@ class User extends ScimApiService {
 					'userid' => $options['id']
 				]);
 			}
+
+			$user_data['active'] = false;
 		}
 
 		$new_user_data = $provisioning->getUserAttributes($user_data);
@@ -590,9 +592,10 @@ class User extends ScimApiService {
 			'schemas'	=> [self::SCIM_USER_SCHEMA],
 			'id' 		=> $user['userid'],
 			'userName'	=> $user['username'],
-			'active'	=> true,
 			'name' => array_key_exists('name', $options) ? $options['name'] : ['givenName' => [], 'familyName' => []]
 		];
+
+		$data['active'] = array_key_exists('active', $options) ? $options['active'] : true;
 
 		$provisioning = CProvisioning::forUserDirectoryId($user['userdirectoryid']);
 		$user_attributes = $provisioning->getUserAttributes($options);
