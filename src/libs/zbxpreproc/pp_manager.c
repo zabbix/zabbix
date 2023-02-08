@@ -30,6 +30,7 @@
 #include "zbxself.h"
 #include "zbxstr.h"
 #include "zbxcachehistory.h"
+#include "zbxprof.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
@@ -234,7 +235,9 @@ void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t 
  ******************************************************************************/
 void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks)
 {
+	zbx_prof_start(__func__, ZBX_PROF_MUTEX);
 	pp_task_queue_lock(&manager->queue);
+	zbx_prof_end_wait();
 
 	for (int i = 0; i < tasks->values_num; i++)
 		pp_task_queue_push(&manager->queue, tasks->values[i]);
@@ -245,6 +248,7 @@ void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp
 		pp_task_queue_notify_all(&manager->queue);
 
 	pp_task_queue_unlock(&manager->queue);
+	zbx_prof_end();
 }
 
 /******************************************************************************
@@ -492,9 +496,9 @@ void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_pp_task_ptr_reserve(tasks, PP_FINISHED_TASK_BATCH_SIZE);
-
+	zbx_prof_start(__func__, ZBX_PROF_MUTEX);
 	pp_task_queue_lock(&manager->queue);
-
+	zbx_prof_end_wait();
 	while (PP_FINISHED_TASK_BATCH_SIZE > tasks->values_num)
 	{
 		if (NULL != (task = pp_task_queue_pop_finished(&manager->queue)))
@@ -525,7 +529,7 @@ void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 	*finished_num = manager->queue.finished_num;
 
 	pp_task_queue_unlock(&manager->queue);
-
+	zbx_prof_end();
 	now = time(NULL);
 	if (now != timekeeper_clock)
 	{
