@@ -275,6 +275,7 @@ zabbix_export:
                             throw 'Required param is not set: ' + field + '.';
                         }
                     });
+
                     Azure.params = params;
                 },
 
@@ -285,6 +286,7 @@ zabbix_export:
                         'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) + '/oauth2/token',
                         'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
                     );
+
                     if (login.getStatus() !== 200) {
                         throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
                     }
@@ -297,17 +299,20 @@ zabbix_export:
                     catch (error) {
                         throw 'Authentication response does not contain access token.';
                     }
+
                     Azure.token = response['access_token'];
                 },
 
                 request: function (url) {
                     var response, request = new HttpRequest();
+
                     if (!Azure.token) {
-                        throw 'Failed authentication token for the request session.';
+                        throw 'Request does not contain access token.'; 
                     }
                     request.addHeader('Accept: application/json');
                     request.addHeader('Authorization: Bearer ' + Azure.token);
                     response = request.get(url);
+
                     if (request.getStatus() !== 200) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
@@ -326,15 +331,17 @@ zabbix_export:
                         if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                             throw 'Required field was not found: ' + path;
                         }
+
                         data = data[step];
                     }
+
                     return data;
                 },
 
                 getMetricsData: function () {
-                    var metric = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id)
-                        + '/providers/' + 'Microsoft.Storage/storageAccounts?api-version=2021-05-01');
-                    data = [];
+                    var metric = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.Storage/storageAccounts?api-version=2021-05-01');
+                        data = [];
+
                     if (!metric.hasOwnProperty('value')) {
                         throw 'Failed getting required field. Check debug log for more information.';
                     }
@@ -353,6 +360,7 @@ zabbix_export:
                             'token': Azure.token
                         });
                     }
+
                     return data;
                 }
             };
@@ -365,7 +373,7 @@ zabbix_export:
             catch (error) {
                 error += (String(error).endsWith('.')) ? '' : '.';
                 Zabbix.log(3, '[ Azure ] ERROR: ' + error);
-                return JSON.stringify({ 'error': error });
+                return JSON.stringify({'error': error});
             }
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
@@ -889,15 +897,16 @@ zabbix_export:
                                 throw 'Required param is not set: ' + field + '.';
                             }
                         });
+
                         AzureStorage.params = params;
                     },
 
                     request: function (url) {
                         var response, request = new HttpRequest();
-                        request.addHeader('Accept: application/json');
-                        request.addHeader('Authorization: Bearer ' + AzureStorage.params.token);
-                        Zabbix.log(4, '[ Azure ] Sending request: ' + url);
-                        response = request.get(url);
+                            request.addHeader('Accept: application/json');
+                            request.addHeader('Authorization: Bearer ' + AzureStorage.params.token);
+                            Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+                            response = request.get(url);
                         if (request.getStatus() !== 200) {
                             throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                         }
@@ -916,17 +925,16 @@ zabbix_export:
                             if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                                 throw 'Required field was not found: ' + path;
                             }
+
                             data = data[step];
                         }
+
                         return data;
                     },
 
                     getMetricsData: function () {
-                        var
-                            data = { 'metrics': {} };
-                        metrics_data = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id
-                            + '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=BlobCapacity,BlobCount,ContainerCount,IndexCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability'
-                            + '&interval=PT1H&api-version=2021-05-01');
+                        var data = {'metrics': {}};
+                            metrics_data = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id + '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=BlobCapacity,BlobCount,ContainerCount,IndexCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&interval=PT1H&api-version=2021-05-01');
                         if (!metrics_data.hasOwnProperty('value')) {
                             throw 'Failed getting required field. Check debug log for more information.';
                         }
@@ -934,6 +942,7 @@ zabbix_export:
                             key = AzureStorage.getField(metrics_data.value[k], 'name.value')
                             data.metrics[key] = AzureStorage.getField(metrics_data.value[k], 'timeseries.0.data.0');
                         }
+
                         return data;
                     }
                 };
@@ -945,7 +954,7 @@ zabbix_export:
                 catch (error) {
                     error += (String(error).endsWith('.')) ? '' : '.';
                     Zabbix.log(3, '[ Azure ] ERROR: ' + error);
-                    return JSON.stringify({ 'error': error });
+                    return JSON.stringify({'error': error});
                 }
               description: 'The HTTP API endpoint that returns storage metrics with the name `[{#NAME}]`.'
               parameters:
