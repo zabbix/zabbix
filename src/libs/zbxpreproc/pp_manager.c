@@ -40,10 +40,7 @@
 #	include <libxml/xpath.h>
 #endif
 
-#define PP_STARTUP_TIMEOUT	10
-
-#define PP_MANAGER_DELAY_SEC	0
-#define PP_MANAGER_DELAY_NS	5e8
+#define PP_FINISHED_TASK_BATCH_SIZE	100
 
 static zbx_flush_value_func_t flush_value_func_cb = NULL;
 
@@ -148,6 +145,8 @@ zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, char **error)
 	/* wait for threads to start */
 	time_start = time(NULL);
 
+#define PP_STARTUP_TIMEOUT	10
+
 	while (started_num != workers_num)
 	{
 		if (time_start + PP_STARTUP_TIMEOUT < time(NULL))
@@ -162,6 +161,8 @@ zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, char **error)
 
 		nanosleep(&poll_delay, NULL);
 	}
+
+#undef PP_STARTUP_TIMEOUT
 
 	ret = SUCCEED;
 out:
@@ -484,8 +485,6 @@ static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *ma
 
 	return task;
 }
-
-#define PP_FINISHED_TASK_BATCH_SIZE	100
 
 /******************************************************************************
  *                                                                            *
@@ -1073,6 +1072,11 @@ static void	preprocessor_reply_usage_stats(zbx_pp_manager_t *manager, zbx_ipc_cl
 
 ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 {
+#define STAT_INTERVAL		5	/* if process is busy and does not sleep then update status not faster than */
+					/* once in STAT_INTERVAL seconds */
+#define PP_MANAGER_DELAY_SEC	0
+#define PP_MANAGER_DELAY_NS	5e8
+
 	zbx_ipc_service_t		service;
 	char				*error = NULL;
 	zbx_ipc_client_t		*client;
@@ -1088,9 +1092,6 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	zbx_pp_manager_t		*manager;
 	zbx_vector_pp_task_ptr_t	tasks;
 	zbx_uint64_t			pending_num, finished_num, processed_num = 0, queued_num = 0;
-
-#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
-				/* once in STAT_INTERVAL seconds */
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -1215,5 +1216,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	zbx_ipc_service_close(&service);
 
 #undef STAT_INTERVAL
+#undef PP_MANAGER_DELAY_SEC
+#undef PP_MANAGER_DELAY_NS
 }
 

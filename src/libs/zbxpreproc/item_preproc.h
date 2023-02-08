@@ -23,8 +23,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxembed.h"
 
-#define ZBX_PREPROC_MAX_PACKET_SIZE	(ZBX_MEBIBYTE * 128)
-
 int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
 		unsigned char value_type, char **errmsg);
 

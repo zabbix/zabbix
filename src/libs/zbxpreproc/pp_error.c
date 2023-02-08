@@ -143,8 +143,6 @@ static int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text
 	return SUCCEED;
 }
 
-#define ZBX_PP_VALUE_PREVIEW_LEN		100
-
 /******************************************************************************
  *                                                                            *
  * Purpose: format value in text format                                       *
@@ -160,6 +158,8 @@ static void	pp_error_format_value(const zbx_variant_t *value, char **value_str)
 {
 	const char	*value_desc;
 	size_t		i, len;
+
+#define ZBX_PP_VALUE_PREVIEW_LEN	100
 
 	value_desc = zbx_variant_value_desc(value);
 
@@ -183,6 +183,8 @@ static void	pp_error_format_value(const zbx_variant_t *value, char **value_str)
 		if (0 != iscntrl((*value_str)[i]))
 			(*value_str)[i] = '.';
 	}
+
+#undef ZBX_PP_VALUE_PREVIEW_LEN
 }
 
 /******************************************************************************
