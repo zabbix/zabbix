@@ -2187,7 +2187,7 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, ZBX_DC_HIS
  *                                                                            *
  * Purpose: calculates what item fields must be updated                       *
  *                                                                            *
- * Parameters: item         - [IN]                                            *
+ * Parameters: item         - [IN/OUT]                                        *
  *             h            - [IN]                                            *
  *             add_event_cb - [IN]                                            *
  *                                                                            *
@@ -3607,26 +3607,17 @@ static void	sync_server_history(int *values_num, int *triggers_num,
 						zbx_db_save_trigger_changes(&trigger_diff);
 
 					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
-					{
 						DCconfig_triggers_apply_changes(&trigger_diff);
-					}
-					else
-					{
-						if (NULL != events_cbs.clean_events_cb)
-						{
-							events_cbs.clean_events_cb();
-						}
-					}
+					else if (NULL != events_cbs.clean_events_cb)
+						events_cbs.clean_events_cb();
 
-					zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
+					zbx_vector_ptr_clear_ext(&trigger_diff,
+							(zbx_clean_func_t)zbx_trigger_diff_free);
 				}
 				while (ZBX_DB_DOWN == txn_error);
 
-				if (ZBX_DB_OK == txn_error)
-				{
-					if (NULL != events_cbs.events_update_itservices_cb)
-						events_cbs.events_update_itservices_cb();
-				}
+				if (ZBX_DB_OK == txn_error && NULL != events_cbs.events_update_itservices_cb)
+					events_cbs.events_update_itservices_cb();
 			}
 		}
 

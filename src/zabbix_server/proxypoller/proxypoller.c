@@ -614,7 +614,8 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 					if (FAIL == zbx_hc_check_proxy(proxy.hostid))
 						break;
 
-					if (SUCCEED != (ret = proxy_get_data(&proxy, config_timeout, events_cbs, &more)))
+					if (SUCCEED != (ret = proxy_get_data(&proxy, config_timeout, events_cbs,
+							&more)))
 					{
 						goto error;
 					}

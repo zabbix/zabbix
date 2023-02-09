@@ -712,7 +712,7 @@ static int	correlation_match_event_hostgroup(const zbx_db_event *event, zbx_uint
  *                                                                            *
  * Return value: "1"            - correlation rule match event                *
  *               "0"            - correlation rule doesn't match event        *
- *               "ZBX_UNKNOWN0" - correlation rule might match                *
+ *               "ZBX_UNKNOWN " - correlation rule might match                *
  *                                depending on old events                     *
  *                                                                            *
  ******************************************************************************/

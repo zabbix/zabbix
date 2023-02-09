@@ -20,9 +20,7 @@
 #include "zbxdbwrap.h"
 
 #include "zbxdbhigh.h"
-#include "log.h"
 #include "zbxserver.h"
-#include "zbxnum.h"
 
 /* temporary cache of trigger related data */
 typedef struct

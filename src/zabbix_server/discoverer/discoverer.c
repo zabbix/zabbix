@@ -1097,7 +1097,7 @@ static int	discoverer_workers_init(zbx_discoverer_worker_t *worker, zbx_discover
 
 	if (0 != (err = pthread_create(&worker->thread, NULL, func, (void *)worker)))
 	{
-		*error = zbx_dsprintf(NULL, "cannot craete thread: %s", zbx_strerror(err));
+		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
 		return FAIL;
 	}
 
