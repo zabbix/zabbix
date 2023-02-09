@@ -21,6 +21,7 @@
 
 #include "log.h"
 #include "zbxthreads.h"
+#include "cfg.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
