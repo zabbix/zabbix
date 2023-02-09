@@ -136,6 +136,7 @@ class testScripts extends CAPITest {
 			'delete_multi_2' => null,
 			'delete_action' => null,
 			'update_ipmi' => null,
+			'update_ipmi_host' => null,
 			'update_ssh_pwd' => null,
 			'update_ssh_key' => null,
 			'update_telnet' => null,
@@ -143,14 +144,27 @@ class testScripts extends CAPITest {
 			'update_webhook_params' => null,
 			'update_custom' => null,
 			'update_url' => null,
+			'update_action' => null,
+			'update_existing_name_one_fail' => null,
+			'update_existing_name_two_fail' => null,
+			'update_existing_menu_path_one_fail' => null,
+			'update_existing_menu_path_two_fail' => null,
+			'update_existing_both_one_fail' => null,
+			'update_existing_both_two_fail' => null,
+			'update_existing_both_one_success' => null,
+			'update_existing_both_two_success' => null,
 			'get_hosts_url' => null,
 			'get_hosts_ipmi' => null,
 			'get_hosts_webhook' => null,
+			'get_hosts_ssh' => null,
 			'get_events_url' => null,
 			'get_events_ipmi' => null,
 			'get_events_webhook' => null,
 			'get_events_ssh' => null,
-			'get_events_url_cause' => null
+			'get_events_url_cause' => null,
+			'create_existing_default_fail' => null,
+			'create_existing_custom_fail' => null,
+			'create_existing_custom_success' => null
 		],
 		'actionids' => [
 			'update' => null,
@@ -984,7 +998,7 @@ class testScripts extends CAPITest {
 				'command' => 'reboot server'
 			],
 
-			// script.update to test type change, scope change, name and params change.
+			// script.update to test type, scope, name, menu_path and params changes.
 			[
 				'name' => 'API test script.update - IPMI',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
@@ -1063,6 +1077,60 @@ class testScripts extends CAPITest {
 				'name' => 'API test script.update action',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'command' => 'reboot server'
+			],
+			[
+				'name' => 'API test script.update name - A, default path (fail)',
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'command' => 'reboot server'
+			],
+			[
+				'name' => 'API test script.update name - B, default path (fail)',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			[
+				'name' => 'API test script.update menu_path, custom path (fail)',
+				'menu_path' => 'folder1/folder2',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			[
+				'name' => 'API test script.update menu_path, custom path (fail)',
+				'menu_path' => 'folder3/folder4',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			[
+				'name' => 'API test script.update both - A, custom path (fail)',
+				'menu_path' => 'folder1/folder2',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			[
+				'name' => 'API test script.update both - B, custom path (fail)',
+				'menu_path' => 'folder3/folder4',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			[
+				'name' => 'API test script.update both - C, custom path (success)',
+				'menu_path' => 'folder1/folder2',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			[
+				'name' => 'API test script.update both - D, custom path (success)',
+				'menu_path' => 'folder3/folder4',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
 				'command' => 'reboot server'
 			],
 
@@ -1152,6 +1220,28 @@ class testScripts extends CAPITest {
 				'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
 				'confirmation' => 'Confirmation macros: {EVENT.CAUSE.ID}, {EVENT.CAUSE.NAME}, {EVENT.CAUSE.NSEVERITY},'.
 					' {EVENT.CAUSE.SEVERITY}, {EVENT.CAUSE.STATUS}, {EVENT.CAUSE.VALUE}'
+			],
+
+			// script.create - to check existing names and menu paths.
+			[
+				'name' => 'API test script.create - A, default path (fail)',
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'command' => 'reboot server'
+			],
+			[
+				'name' => 'API test script.create - B, custom path (fail)',
+				'menu_path' => 'folder1/folder2',
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'command' => 'reboot server'
+			],
+			[
+				'name' => 'API test script.create - C, custom path (success)',
+				'menu_path' => 'folder1/folder2',
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'command' => 'reboot server'
 			]
 		];
 		$scripts = CDataHelper::call('script.create', $scripts_data);
@@ -1181,15 +1271,26 @@ class testScripts extends CAPITest {
 		self::$data['scriptids']['update_custom'] = $scripts['scriptids'][22];
 		self::$data['scriptids']['update_url'] = $scripts['scriptids'][23];
 		self::$data['scriptids']['update_action'] = $scripts['scriptids'][24];
-		self::$data['scriptids']['get_hosts_url'] = $scripts['scriptids'][25];
-		self::$data['scriptids']['get_hosts_ipmi'] = $scripts['scriptids'][26];
-		self::$data['scriptids']['get_hosts_webhook'] = $scripts['scriptids'][27];
-		self::$data['scriptids']['get_hosts_ssh'] = $scripts['scriptids'][28];
-		self::$data['scriptids']['get_events_url'] = $scripts['scriptids'][29];
-		self::$data['scriptids']['get_events_ipmi'] = $scripts['scriptids'][30];
-		self::$data['scriptids']['get_events_webhook'] = $scripts['scriptids'][31];
-		self::$data['scriptids']['get_events_ssh'] = $scripts['scriptids'][32];
-		self::$data['scriptids']['get_events_url_cause'] = $scripts['scriptids'][33];
+		self::$data['scriptids']['update_existing_name_one_fail'] = $scripts['scriptids'][25];
+		self::$data['scriptids']['update_existing_name_two_fail'] = $scripts['scriptids'][26];
+		self::$data['scriptids']['update_existing_menu_path_one_fail'] = $scripts['scriptids'][27];
+		self::$data['scriptids']['update_existing_menu_path_two_fail'] = $scripts['scriptids'][28];
+		self::$data['scriptids']['update_existing_both_one_fail'] = $scripts['scriptids'][29];
+		self::$data['scriptids']['update_existing_both_two_fail'] = $scripts['scriptids'][30];
+		self::$data['scriptids']['update_existing_both_one_success'] = $scripts['scriptids'][31];
+		self::$data['scriptids']['update_existing_both_two_success'] = $scripts['scriptids'][32];
+		self::$data['scriptids']['get_hosts_url'] = $scripts['scriptids'][33];
+		self::$data['scriptids']['get_hosts_ipmi'] = $scripts['scriptids'][34];
+		self::$data['scriptids']['get_hosts_webhook'] = $scripts['scriptids'][35];
+		self::$data['scriptids']['get_hosts_ssh'] = $scripts['scriptids'][36];
+		self::$data['scriptids']['get_events_url'] = $scripts['scriptids'][37];
+		self::$data['scriptids']['get_events_ipmi'] = $scripts['scriptids'][38];
+		self::$data['scriptids']['get_events_webhook'] = $scripts['scriptids'][39];
+		self::$data['scriptids']['get_events_ssh'] = $scripts['scriptids'][40];
+		self::$data['scriptids']['get_events_url_cause'] = $scripts['scriptids'][41];
+		self::$data['scriptids']['create_existing_default_fail'] = $scripts['scriptids'][42];
+		self::$data['scriptids']['create_existing_custom_fail'] = $scripts['scriptids'][43];
+		self::$data['scriptids']['create_existing_custom_success'] = $scripts['scriptids'][44];
 
 		// Create actions that use scripts to test script.delete.
 		$actions_data = [
@@ -1522,31 +1623,151 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
-			'Test script.create existing name' => [
+
+			// Check existing names in DB.
+			'Test script.create existing name in default menu_path' => [
 				'script' => [
-					'name' => 'Ping',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'name' => 'API test script.create - A, default path (fail)',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'command' => 'reboot server'
 				],
-				'expected_error' => 'Script "Ping" already exists.'
+				'expected_error' => 'Script "API test script.create - A, default path (fail)" already exists.'
 			],
-			'Test script.create duplicate name' => [
+			'Test script.create existing name in identical menu_path (fail)' => [
+				'script' => [
+					'name' => 'API test script.create - B, custom path (fail)',
+					'menu_path' => 'folder1/folder2',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Script "API test script.create - B, custom path (fail)" already exists.'
+			],
+			'Test script.create existing name in custom menu_path with leading slash' => [
+				'script' => [
+					'name' => 'API test script.create - B, custom path (fail)',
+					'menu_path' => '/folder1/folder2',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Script "API test script.create - B, custom path (fail)" already exists.'
+			],
+			'Test script.create existing name in custom menu_path with trailing slash' => [
+				'script' => [
+					'name' => 'API test script.create - B, custom path (fail)',
+					'menu_path' => 'folder1/folder2/',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Script "API test script.create - B, custom path (fail)" already exists.'
+			],
+			'Test script.create existing name in custom menu_path with both leading and trailing slashes' => [
+				'script' => [
+					'name' => 'API test script.create - B, custom path (fail)',
+					'menu_path' => '/folder1/folder2/',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Script "API test script.create - B, custom path (fail)" already exists.'
+			],
+
+			// Check duplicate names in input.
+			'Test script.create duplicate name with default menu_path in input' => [
 				'script' => [
 					[
-						'name' => 'Scripts with the same name',
+						'name' => 'Script with same name',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 						'command' => 'reboot server'
 					],
 					[
-						'name' => 'Scripts with the same name',
+						'name' => 'Script with same name',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 						'command' => 'reboot server'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Scripts with the same name) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, ) already exists.'
+			],
+			'Test script.create duplicate name with custom identical menu_path in input' => [
+				'script' => [
+					[
+						'name' => 'Script with same name',
+						'menu_path' => 'folder1/folder2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					],
+					[
+						'name' => 'Script with same name',
+						'menu_path' => 'folder1/folder2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+			],
+			'Test script.create duplicate name with custom same menu_path in input with leading slash' => [
+				'script' => [
+					[
+						'name' => 'Script with same name',
+						'menu_path' => 'folder1/folder2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					],
+					[
+						'name' => 'Script with same name',
+						'menu_path' => '/folder1/folder2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+			],
+			'Test script.create duplicate name with custom same menu_path in input with trailing slash' => [
+				'script' => [
+					[
+						'name' => 'Script with same name',
+						'menu_path' => 'folder1/folder2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					],
+					[
+						'name' => 'Script with same name',
+						'menu_path' => 'folder1/folder2/',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+			],
+			'Test script.create duplicate name with custom same menu_path in input with both leading and trailing slashes' => [
+				'script' => [
+					[
+						'name' => 'Script with same name',
+						'menu_path' => 'folder1/folder2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					],
+					[
+						'name' => 'Script with same name',
+						'menu_path' => '/folder1/folder2/',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
 			],
 
 			// Check script menu path.
@@ -2937,6 +3158,20 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+
+			// Check name and menu_path create.
+			'Test script.create successful script with existing name in different menu_path' => [
+				'script' => [
+					[
+						'name' => 'API test script.create - C, custom path (success)',
+						'menu_path' => 'folder3/folder4',
+						'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -4273,7 +4508,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptUpdateInvalid() {
+	public static function getScriptUpdateDataInvalid() {
 		return [
 			// Check script ID.
 			'Test script.update empty request' => [
@@ -4312,28 +4547,149 @@ class testScripts extends CAPITest {
 				]],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
-			'Test script.update existing name' => [
+
+			// Check existing names in DB.
+			'Test script.update existing name in default menu_path' => [
 				'script' => [[
-					'scriptid' => 'update_telnet',
-					'name' => 'API test script.update - IPMI',
-					'type' => ZBX_SCRIPT_TYPE_IPMI,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server'
+					'scriptid' => 'update_existing_name_two_fail',
+					'name' => 'API test script.update name - A, default path (fail)'
 				]],
-				'expected_error' => 'Script "API test script.update - IPMI" already exists.'
+				'expected_error' => 'Script "API test script.update name - A, default path (fail)" already exists.'
 			],
-			'Test script.update same name' => [
+			'Test script.update existing name in identical menu_path' => [
+				'script' => [
+					'scriptid' => 'update_existing_menu_path_two_fail',
+					'menu_path' => 'folder1/folder2'
+				],
+				'expected_error' => 'Script "API test script.update menu_path, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name in custom menu_path with leading slash' => [
+				'script' => [
+					'scriptid' => 'update_existing_menu_path_two_fail',
+					'menu_path' => '/folder1/folder2'
+				],
+				'expected_error' => 'Script "API test script.update menu_path, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name in custom menu_path with trailing slash' => [
+				'script' => [
+					'scriptid' => 'update_existing_menu_path_two_fail',
+					'menu_path' => 'folder1/folder2/'
+				],
+				'expected_error' => 'Script "API test script.update menu_path, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name in custom menu_path with both leading and trailing slashes' => [
+				'script' => [
+					'scriptid' => 'update_existing_menu_path_two_fail',
+					'menu_path' => '/folder1/folder2/'
+				],
+				'expected_error' => 'Script "API test script.update menu_path, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name and menu_path' => [
+				'script' => [
+					'scriptid' => 'update_existing_both_two_fail',
+					'name' => 'API test script.update both - A, custom path (fail)',
+					'menu_path' => 'folder1/folder2'
+				],
+				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name and menu_path with leading slash' => [
+				'script' => [
+					'scriptid' => 'update_existing_both_two_fail',
+					'name' => 'API test script.update both - A, custom path (fail)',
+					'menu_path' => '/folder1/folder2'
+				],
+				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name and menu_path with trailing slash' => [
+				'script' => [
+					'scriptid' => 'update_existing_both_two_fail',
+					'name' => 'API test script.update both - A, custom path (fail)',
+					'menu_path' => 'folder1/folder2/'
+				],
+				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name and menu_path with both leading and traling slashes' => [
+				'script' => [
+					'scriptid' => 'update_existing_both_two_fail',
+					'name' => 'API test script.update both - A, custom path (fail)',
+					'menu_path' => '/folder1/folder2/'
+				],
+				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
+			],
+
+			// Check duplicate names in input.
+			'Test script.update duplicate name with default menu_path in input' => [
 				'script' => [
 					[
 						'scriptid' => 'update_ipmi',
-						'name' => 'Scripts with the same name'
+						'name' => 'Script with same name'
 					],
 					[
 						'scriptid' => 'update_telnet',
-						'name' => 'Scripts with the same name'
+						'name' => 'Script with same name'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Scripts with the same name) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, ) already exists.'
+			],
+			'Test script.update duplicate name with custom identical menu_path in input' => [
+				'script' => [
+					[
+						'scriptid' => 'update_ipmi',
+						'menu_path' => 'folder1/folder2',
+						'name' => 'Script with same name'
+					],
+					[
+						'scriptid' => 'update_telnet',
+						'menu_path' => 'folder1/folder2',
+						'name' => 'Script with same name'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+			],
+			'Test script.update duplicate name with custom same menu_path in input with leading slash' => [
+				'script' => [
+					[
+						'scriptid' => 'update_ipmi',
+						'menu_path' => 'folder1/folder2',
+						'name' => 'Script with same name'
+					],
+					[
+						'scriptid' => 'update_telnet',
+						'menu_path' => '/folder1/folder2',
+						'name' => 'Script with same name'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+			],
+			'Test script.update duplicate name with custom same menu_path in input with trailing slash' => [
+				'script' => [
+					[
+						'scriptid' => 'update_ipmi',
+						'menu_path' => 'folder1/folder2',
+						'name' => 'Script with same name'
+					],
+					[
+						'scriptid' => 'update_telnet',
+						'menu_path' => 'folder1/folder2/',
+						'name' => 'Script with same name'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+			],
+			'Test script.update duplicate name with custom same menu_path in input with both leading and trailing slashes' => [
+				'script' => [
+					[
+						'scriptid' => 'update_ipmi',
+						'menu_path' => 'folder1/folder2',
+						'name' => 'Script with same name'
+					],
+					[
+						'scriptid' => 'update_telnet',
+						'menu_path' => '/folder1/folder2/',
+						'name' => 'Script with same name'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
 			],
 
 			// Check script command.
@@ -5174,7 +5530,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptUpdateValid() {
+	public static function getScriptUpdateDataValid() {
 		return [
 			'Test script.update successful custom script update without changes' => [
 				'script' => [
@@ -6034,6 +6390,18 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+
+			// Check name and menu_path update.
+			'Test script.update successful script with existing name in different menu_path' => [
+				'script' => [
+					[
+						'scriptid' => 'update_existing_both_two_success',
+						'name' => 'API test script.update both - C, custom path (success)',
+						'menu_path' => 'folder5/folder6'
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -6041,8 +6409,8 @@ class testScripts extends CAPITest {
 	/**
 	 * Test script.update method.
 	 *
-	 * @dataProvider getScriptUpdateInvalid
-	 * @dataProvider getScriptUpdateValid
+	 * @dataProvider getScriptUpdateDataInvalid
+	 * @dataProvider getScriptUpdateDataValid
 	 */
 	public function testScript_Update($scripts, $expected_error) {
 		// Accept single and multiple scripts just like API method. Work with multi-dimensional array in result.
