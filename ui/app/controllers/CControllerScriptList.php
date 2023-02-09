@@ -97,31 +97,20 @@ class CControllerScriptList extends CController {
 			'preservekeys' => true
 		]);
 
-		// Data sort and pager.
-		$name_path = [];
-
-		foreach ($data['scripts'] as $script) {
-			$trim_menu_path = trim($script['menu_path'], "/");
-			$trim_name = trim($script['name'], "/");
-
-			if ($script['menu_path'] != null) {
-				$script['name_path'] = ('/'.$trim_menu_path.'/'.$trim_name);
-			}
-			else {
-				$script['name_path'] = ($trim_name);
-			}
-			$name_path[] = $script;
+		// Data sort and pager. Trim down menu path and combine with name.
+		foreach ($data['scripts'] as &$script) {
+			$script['menu_path'] = trimPath($script['menu_path']);
+			$script['menu_path'] = trim($script['menu_path'], '/');
+			$script['name_full'] = $script['menu_path'] === ''
+				? $script['name']
+				: $script['menu_path'].'/'.$script['name'];
 		}
 		unset($script);
 
-		$data['scripts'] = $name_path;
-
-		if ($sortField != 'name') {
-			order_result($data['scripts'], $sortField, $sortOrder);
-		}
-		else {
-			order_result($data['scripts'], 'name_path', $sortOrder);
-		}
+		CArrayHelper::sort($data['scripts'], [[
+			'field' => $sortField === 'name' ? 'name_full' : $sortField,
+			'order' => $sortOrder
+		]]);
 
 		$page_num = getRequest('page', 1);
 		CPagerHelper::savePage('script.list', $page_num);
