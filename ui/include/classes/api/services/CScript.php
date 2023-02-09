@@ -1098,7 +1098,7 @@ class CScript extends CApiService {
 				'publickey', 'privatekey', 'menu_path', 'url', 'new_window'
 			],
 			'hostids' => $hostids,
-			'sortfield' => ['name', 'menu_path'],
+			'sortfield' => 'name',
 			'preservekeys' => true
 		]);
 
