@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-10-18T08:56:29Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +12,10 @@ zabbix_export:
       description: |
         Get Etcd metrics by HTTP agent.
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications
@@ -27,7 +29,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Version of the Etcd cluster.'
+          description: 'The version of the `etcd cluster`.'
           preprocessing:
             -
               type: JSONPATH
@@ -50,7 +52,7 @@ zabbix_export:
               name: 'Etcd: Cluster version has changed'
               event_name: 'Etcd: Cluster version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Etcd version has changed. Ack to close.'
+              description: 'The Etcd version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -65,7 +67,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Total user and system CPU time spent in seconds.'
+          description: 'The total user and system CPU time spent in seconds.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -92,12 +94,12 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Total size of the underlying database.'
+          description: 'The total size of the underlying database.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
               parameters:
-                - etcd_debugging_mvcc_db_total_size_in_bytes
+                - etcd_mvcc_db_total_size_in_bytes
                 - value
                 - ''
           master_item:
@@ -120,7 +122,7 @@ zabbix_export:
             -
               type: PROMETHEUS_PATTERN
               parameters:
-                - etcd_debugging_mvcc_delete_total
+                - etcd_mvcc_delete_total
                 - value
                 - ''
             -
@@ -140,7 +142,7 @@ zabbix_export:
           key: etcd.events.sent.rate
           delay: '0'
           history: 7d
-          description: 'Total number of pending events to be sent.'
+          description: 'The total number of pending events to be sent.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -289,7 +291,10 @@ zabbix_export:
           key: etcd.has.leader
           delay: '0'
           history: 7d
-          description: 'Whether or not a leader exists. 1 is existence, 0 is not.'
+          description: |
+            It defines - whether or not a leader exists:
+            1 - it exists;
+            0 - it does not.
           valuemap:
             name: 'Etcd leader'
           preprocessing:
@@ -358,7 +363,7 @@ zabbix_export:
               name: 'Etcd: Node healthcheck failed'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'https://etcd.io/docs/v3.4.0/op-guide/monitoring/#health-check'
+              description: 'See more details on https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check.'
               dependencies:
                 -
                   name: 'Etcd: Service is unavailable'
@@ -376,7 +381,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'Number of handle failures of requests (non-watches), by method (GET/PUT etc.), and code 4XX.'
+          description: 'The number of handled failures of requests (non-watches), by the method (`GET/PUT` etc.), and the code `4XX`.'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -412,7 +417,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'Number of handle failures of requests (non-watches), by method (GET/PUT etc.), and code 5XX.'
+          description: 'The number of handled failures of requests (non-watches), by the method (`GET/PUT` etc.), and the code `5XX`.'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -446,7 +451,7 @@ zabbix_export:
               name: 'Etcd: Too many HTTP requests failures'
               event_name: 'Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'Too many requests failed on etcd instance with 5xx HTTP code.'
+              description: 'Too many requests failed on `etcd` instance with the `5xx HTTP code`.'
               tags:
                 -
                   tag: scope
@@ -460,7 +465,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'Number of requests received into the system (successfully parsed and authd).'
+          description: 'The number of requests received into the system (successfully parsed and `authd`).'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -491,7 +496,10 @@ zabbix_export:
           key: etcd.is.leader
           delay: '0'
           history: 7d
-          description: 'Whether or not this member is a leader. 1 if is, 0 otherwise.'
+          description: |
+            It defines - whether or not this member is a leader:
+            1 - it is;
+            0 - otherwise.
           valuemap:
             name: 'Etcd leader'
           preprocessing:
@@ -591,7 +599,7 @@ zabbix_export:
           key: etcd.keys.total
           delay: '0'
           history: 7d
-          description: 'Total number of keys.'
+          description: 'The total number of keys.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -633,7 +641,7 @@ zabbix_export:
               name: 'Etcd: Instance has seen too many leader changes'
               event_name: 'Etcd: Instance has seen too many leader changes (over {$ETCD.LEADER.CHANGES.MAX.WARN} for 15m)'''
               priority: WARNING
-              description: 'Rapid leadership changes impact the performance of etcd significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the etcd cluster.'
+              description: 'Rapid leadership changes impact the performance of `etcd` significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the `etcd cluster`.'
               tags:
                 -
                   tag: scope
@@ -669,7 +677,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The number of bytes received from grpc clients per second.'
+          description: 'The number of bytes received from gRPC clients per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -696,7 +704,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The number of bytes sent from grpc clients per second.'
+          description: 'The number of bytes sent from gRPC clients per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -722,7 +730,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of open file descriptors.'
+          description: 'The number of open file descriptors.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -854,7 +862,7 @@ zabbix_export:
               name: 'Etcd: Too many proposals are queued to commit'
               event_name: 'Etcd: Too many proposals are queued to commit (over {$ETCD.PROPOSAL.PENDING.MAX.WARN} for 5m)'''
               priority: WARNING
-              description: 'Rising pending proposals suggests there is a high client load or the member cannot commit proposals.'
+              description: 'Rising pending proposals suggests there is a high client load, or the member cannot commit proposals.'
               tags:
                 -
                   tag: scope
@@ -873,7 +881,7 @@ zabbix_export:
             -
               type: PROMETHEUS_PATTERN
               parameters:
-                - etcd_debugging_mvcc_put_total
+                - etcd_mvcc_put_total
                 - value
                 - ''
             -
@@ -922,7 +930,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'Number of reads action by (get/getRecursive), local to this member.'
+          description: 'The number of read actions by `get/getRecursive`, local to this member.'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -956,7 +964,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Resident memory size in bytes.'
+          description: 'The size of resident memory expressed in bytes.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -979,7 +987,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Version of the Etcd server.'
+          description: 'The version of the `etcd server`.'
           preprocessing:
             -
               type: JSONPATH
@@ -1002,7 +1010,7 @@ zabbix_export:
               name: 'Etcd: Server version has changed'
               event_name: 'Etcd: Server version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Etcd version has changed. Ack to close.'
+              description: 'The Etcd version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1044,7 +1052,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Etcd server uptime.'
+          description: '`Etcd` server uptime.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1071,7 +1079,7 @@ zabbix_export:
               name: 'Etcd: Host has been restarted'
               event_name: 'Etcd: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: 'The host uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1086,7 +1094,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Virtual memory size in bytes.'
+          description: 'The size of virtual memory expressed in bytes.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1109,7 +1117,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'Number of writes (e.g. set/compareAndDelete) seen by this member.'
+          description: 'The number of writes (e.g., `set/compareAndDelete`) seen by this member.'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -1290,7 +1298,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Bps
-              description: 'The number of bytes received from peer with ID {#ETCD.PEER}.'
+              description: 'The number of bytes received from a peer with the ID `{#ETCD.PEER}`.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1325,7 +1333,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Bps
-              description: 'The number of bytes sent to peer with ID {#ETCD.PEER}.'
+              description: 'The number of bytes sent to a peer with the ID `{#ETCD.PEER}`.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1360,7 +1368,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: rps
-              description: 'The number of receive failures from the peer with ID {#ETCD.PEER}.'
+              description: 'The number of received failures from a peer with the ID `{#ETCD.PEER}`.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1395,7 +1403,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: rps
-              description: 'The number of send failures from peer with ID {#ETCD.PEER}.'
+              description: 'The number of sent failures from a peer with the ID `{#ETCD.PEER}`.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1443,49 +1451,49 @@ zabbix_export:
         -
           macro: '{$ETCD.GRPC.ERRORS.MAX.WARN}'
           value: '1'
-          description: 'Maximum number of gRPC requests failures.'
+          description: 'The maximum number of gRPC request failures.'
         -
           macro: '{$ETCD.GRPC_CODE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.'
+          description: 'The filter of discoverable gRPC codes. See more details on https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.'
         -
           macro: '{$ETCD.GRPC_CODE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.'
+          description: 'The filter to exclude discovered gRPC codes. See more details on https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.'
         -
           macro: '{$ETCD.GRPC_CODE.TRIGGER.MATCHES}'
           value: Aborted|Unavailable
-          description: 'Filter of discoverable gRPC codes which will create triggers.'
+          description: 'The filter of discoverable gRPC codes, which will create triggers.'
         -
           macro: '{$ETCD.HTTP.FAIL.MAX.WARN}'
           value: '2'
-          description: 'Maximum number of HTTP requests failures.'
+          description: 'The maximum number of HTTP request failures.'
         -
           macro: '{$ETCD.LEADER.CHANGES.MAX.WARN}'
           value: '5'
-          description: 'Maximum number of leader changes.'
+          description: 'The maximum number of leader changes.'
         -
           macro: '{$ETCD.OPEN.FDS.MAX.WARN}'
           value: '90'
-          description: 'Maximum percentage of used file descriptors.'
+          description: 'The maximum percentage of used file descriptors.'
         -
           macro: '{$ETCD.PASSWORD}'
         -
           macro: '{$ETCD.PORT}'
           value: '2379'
-          description: 'The port of Etcd API endpoint.'
+          description: 'The port of `etcd` API endpoint.'
         -
           macro: '{$ETCD.PROPOSAL.FAIL.MAX.WARN}'
           value: '2'
-          description: 'Maximum number of proposal failures.'
+          description: 'The maximum number of proposal failures.'
         -
           macro: '{$ETCD.PROPOSAL.PENDING.MAX.WARN}'
           value: '5'
-          description: 'Maximum number of proposals in queue.'
+          description: 'The maximum number of proposals in queue.'
         -
           macro: '{$ETCD.SCHEME}'
           value: http
-          description: 'Request scheme which may be http or https.'
+          description: 'The request scheme which may be `http` or `https`.'
         -
           macro: '{$ETCD.USER}'
       valuemaps:
@@ -1527,8 +1535,8 @@ zabbix_export:
       event_name: 'Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
       description: |
-        Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.
-        If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files.
+        Heavy usage of a file descriptor (i.e., near the limit of the process's file descriptor) indicates a potential file descriptor exhaustion issue.
+        If the file descriptors are exhausted, `etcd` may panic because it cannot create new WAL files.
       tags:
         -
           tag: scope

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ $fields = [
 	'delete' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' => [T_ZBX_INT, O_OPT, null,	null,		null],
 	// ajax
 	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'favid' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],

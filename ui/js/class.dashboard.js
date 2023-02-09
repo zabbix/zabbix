@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,8 @@ class CDashboard extends CBaseComponent {
 		can_edit_dashboards,
 		is_kiosk_mode,
 		time_period,
-		dynamic_hostid
+		dynamic_hostid,
+		csrf_token = null
 	}) {
 		super(target);
 
@@ -97,6 +98,7 @@ class CDashboard extends CBaseComponent {
 		this._is_kiosk_mode = is_kiosk_mode;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
+		this._csrf_token = csrf_token;
 
 		this._init();
 		this._registerEvents();
@@ -526,6 +528,7 @@ class CDashboard extends CBaseComponent {
 			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid,
+			csrf_token: this._csrf_token,
 			unique_id: this._createUniqueId()
 		});
 

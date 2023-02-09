@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-09-23T08:01:59Z'
   media_types:
     -
       name: Opsgenie

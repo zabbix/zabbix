@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -397,7 +397,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * @param {URLSearchParams} search_params  Filter field values to be set in URL.
 	 */
 	setBrowserLocation(search_params) {
-		let url = new Curl('', false);
+		let url = new Curl('');
 
 		search_params.set('action', url.getArgument('action'));
 		url.query = search_params.toString();

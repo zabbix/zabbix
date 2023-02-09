@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -206,6 +206,14 @@ $form_grid->addItem([
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder', _('calculated'))
 	)
+]);
+
+// Decimal places.
+$form_grid->addItem([
+	new CLabel(_('Decimal places'), 'decimal_places'),
+	(new CFormField(
+		(new CNumericBox('decimal_places', $data['decimal_places'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	))
 ]);
 
 // Thresholds table.

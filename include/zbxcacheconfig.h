@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "zbxversion.h"
 #include "zbxvault.h"
 #include "zbxregexp.h"
+#include "zbxtagfilter.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -589,6 +590,45 @@ typedef struct
 }
 zbx_preproc_item_t;
 
+typedef struct
+{
+	zbx_uint64_t		connectorid;
+	zbx_uint64_t		revision;
+	unsigned char		protocol;
+	unsigned char		data_type;
+	char			*url_orig, *url;
+	int			max_records;
+	int			max_senders;
+	char			*timeout_orig, *timeout;
+	unsigned char		max_attempts;
+	char			*token_orig, *token;
+	char			*http_proxy_orig, *http_proxy;
+	unsigned char		authtype;
+	char			*username_orig, *username;
+	char			*password_orig, *password;
+	unsigned char		verify_peer;
+	unsigned char		verify_host;
+	char			*ssl_cert_file_orig,*ssl_cert_file;
+	char			*ssl_key_file_orig, *ssl_key_file;
+	char			*ssl_key_password_orig, *ssl_key_password;
+
+	zbx_hashset_t		data_point_links;
+	zbx_list_t		data_point_link_queue;
+	int			time_flush;
+	int			senders;
+}
+zbx_connector_t;
+
+typedef struct
+{
+	zbx_uint64_t		connectorid;
+	int			tags_evaltype;
+	zbx_vector_match_tags_t	connector_tags;
+}
+zbx_connector_filter_t;
+
+ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
+
 /* the configuration cache statistics */
 typedef struct
 {
@@ -599,13 +639,46 @@ typedef struct
 }
 zbx_config_cache_info_t;
 
+typedef struct
+{
+	zbx_uint64_t	dcheckid;
+	zbx_uint64_t	druleid;
+	unsigned char	type;
+	char		*key_;
+	char		*snmp_community;
+	char		*ports;
+	char		*snmpv3_securityname;
+	unsigned char	snmpv3_securitylevel;
+	char		*snmpv3_authpassphrase;
+	char		*snmpv3_privpassphrase;
+	unsigned char	uniq;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
+	char		*snmpv3_contextname;
+}
+DC_DCHECK;
+
+typedef struct
+{
+	zbx_uint64_t		druleid;
+	zbx_uint64_t		proxy_hostid;
+	time_t			nextcheck;
+	int			delay;
+	char			*delay_str;
+	char			*iprange;
+	unsigned char		status;
+	unsigned char		location;
+	zbx_uint64_t		revision;
+	char			*name;
+	zbx_uint64_t		unique_dcheckid;
+	zbx_vector_ptr_t	dchecks;
+}
+DC_DRULE;
+
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	zbx_is_counted_in_item_queue(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
-void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
-		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
-void	dc_flush_history(void);
 
 #define ZBX_SYNC_NONE	0
 #define ZBX_SYNC_ALL	1
@@ -624,7 +697,6 @@ typedef enum
 	ZBX_SYNCED_NEW_CONFIG_YES
 }
 zbx_synced_new_config_t;
-
 
 #define ZBX_ITEM_GET_INTERFACE		0x0001
 #define ZBX_ITEM_GET_HOST		0x0002
@@ -668,6 +740,12 @@ void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items
 		int *errcodes, size_t num);
 void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *items, const zbx_uint64_t *itemids,
 		int *errcodes, size_t num, unsigned int mode);
+void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filter_t *connector_filters_history,
+		zbx_vector_connector_filter_t *connector_filters_events);
+void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,
+		zbx_uint64_t *config_revision, zbx_uint64_t *connector_revision,
+		zbx_clean_func_t data_point_link_clean);
+void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter);
 
 int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid);
 void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, int *errcodes, size_t num);
@@ -764,8 +842,8 @@ void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_
 int	DCinterface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
 		zbx_agent_availability_t *out);
 
-int	DCinterface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
-		zbx_agent_availability_t *out, const char *error_msg);
+int	DCinterface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, int unavailable_delay,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error_msg);
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
@@ -917,6 +995,7 @@ typedef struct
 	zbx_uint64_t	autoreg_tls;	/* autoregistration tls revision */
 	zbx_uint64_t	upstream;	/* configuration revision received from server */
 	zbx_uint64_t	config_table;	/* the global configuration revision (config table) */
+	zbx_uint64_t	connector;
 }
 zbx_dc_revision_t;
 
@@ -954,7 +1033,7 @@ typedef struct
 	zbx_uint64_t			r_eventid;		/* [-] recovery eventid */
 	zbx_uint64_t			triggerid;		/* [-] triggerid */
 	zbx_vector_uint64_t		functionids;		/* [IN] associated functionids */
-	zbx_vector_ptr_t		tags;			/* [IN] event tags */
+	zbx_vector_tags_t		tags;			/* [IN] event tags */
 	zbx_vector_uint64_pair_t	maintenances;		/* [OUT] actual maintenance data for the event in */
 								/* (maintenanceid, suppress_until) pairs */
 }
@@ -1082,8 +1161,9 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 /* special item key used for ICMP ping loss packages */
 #define ZBX_SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 
-int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck);
-void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
+DC_DRULE	*zbx_dc_drule_next(time_t now, time_t *nextcheck);
+void		zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
+void		zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions);
 
 int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck);
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);

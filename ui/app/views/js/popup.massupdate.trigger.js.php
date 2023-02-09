@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,14 +43,14 @@
 
 			let curl;
 			if (list.object === 'deptrigger_prototype') {
-				curl = new Curl('trigger_prototypes.php', false);
+				curl = new Curl('trigger_prototypes.php');
 				curl.setArgument('form', 'update');
 				curl.setArgument('parent_discoveryid', '<?= $data['parent_discoveryid'] ?>');
 				curl.setArgument('triggerid', value.triggerid);
 				curl.setArgument('context', '<?= $data['context'] ?>');
 			}
 			else {
-				curl = new Curl('triggers.php', false);
+				curl = new Curl('triggers.php');
 				curl.setArgument('form', 'update');
 				curl.setArgument('triggerid', value.triggerid);
 				curl.setArgument('context', '<?= $data['context'] ?>');

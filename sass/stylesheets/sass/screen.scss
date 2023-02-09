@@ -6,7 +6,7 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20221026';
+$sprite-path: '../img/icon-sprite.svg?20230110';
 $browser-sprite-path: '../img/browser-sprite.png?20221026';
 
 @import "utils/mixins";
@@ -550,7 +550,9 @@ form {
 					line-height: 14px;
 					top: 0;
 				}
+			}
 
+			button[class*='icon-'] {
 				&:last-of-type {
 					margin-right: 0;
 				}
@@ -5338,6 +5340,7 @@ a.icon-count {
 .icon-action-message,
 .icon-action-ack,
 .icon-action-unack,
+.icon-action-ack-green,
 .icon-action-suppress,
 .icon-action-unsuppress,
 .icon-action-cause,
@@ -5464,6 +5467,10 @@ button {
 
 .icon-action-unack::before {
 	background-position: -173px -245px;
+}
+
+.icon-action-ack-green::before {
+	background-position: -348px -356px;
 }
 
 .icon-action-suppress::before {
