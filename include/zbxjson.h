@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,6 +82,7 @@
 #define ZBX_PROTO_TAG_ALERTID			"alertid"
 #define ZBX_PROTO_TAG_JMX_ENDPOINT		"jmx_endpoint"
 #define ZBX_PROTO_TAG_EVENTID			"eventid"
+#define ZBX_PROTO_TAG_CAUSE_EVENTID		"cause_eventid"
 #define ZBX_PROTO_TAG_NAME			"name"
 #define ZBX_PROTO_TAG_SEVERITY			"severity"
 #define ZBX_PROTO_TAG_HOSTS			"hosts"
@@ -203,6 +204,7 @@
 #define ZBX_PROTO_TAG_MACRO_SECRETS		"macro.secrets"
 #define ZBX_PROTO_TAG_REMOVED_HOSTIDS		"del_hostids"
 #define ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS	"del_macro_hostids"
+#define ZBX_PROTO_TAG_ACKNOWLEDGEID		"acknowledgeid"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -298,6 +300,7 @@ void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value
 void	zbx_json_addint64(struct zbx_json *j, const char *name, zbx_int64_t value);
 void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *data);
 void	zbx_json_addfloat(struct zbx_json *j, const char *name, double value);
+void	zbx_json_adddouble(struct zbx_json *j, const char *name, double value);
 int	zbx_json_close(struct zbx_json *j);
 
 int		zbx_json_open(const char *buffer, struct zbx_json_parse *jp);
@@ -362,7 +365,9 @@ struct zbx_jsonobj
 {
 	zbx_json_type_t		type;
 	zbx_jsonobj_data_t	data;
+
 	zbx_jsonobj_index_t	*index;
+	int			index_num;	/* used by root object - number of indexed children */
 };
 
 typedef struct

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,20 +91,20 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 
 	do
 	{
-		DBbegin();
+		zbx_db_begin();
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
-			DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata,
+			zbx_db_register_host(0, host, p_ip, p_dns, port, connection_type, host_metadata,
 					(unsigned short)flag, now);
 		}
 		else
 		{
-			DBproxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata,
+			zbx_db_proxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata,
 					(unsigned short)flag, now);
 		}
 	}
-	while (ZBX_DB_DOWN == DBcommit());
+	while (ZBX_DB_DOWN == zbx_db_commit());
 }
 
 static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, unsigned short port,

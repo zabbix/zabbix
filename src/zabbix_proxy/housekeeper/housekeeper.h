@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ extern int	CONFIG_PROXY_OFFLINE_BUFFER;
 
 typedef struct
 {
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
 }
 zbx_thread_proxy_housekeeper_args;

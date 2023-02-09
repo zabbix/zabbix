@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -304,7 +304,7 @@ class CProvisioning {
 			return $user;
 		}
 
-		$user['usrgrps'] = $user_groups;
+		$user['usrgrps'] = array_values(array_column($user_groups, null, 'usrgrpid'));
 		$roles = array_intersect_key($this->mapping_roles, $roleids);
 
 		if ($roles) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,8 +69,8 @@ $fields = [
 	'retry' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
 	'finish' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
-	'next' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
-	'back' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null]
+	'next' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_ARRAY,	null,	null],
+	'back' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_ARRAY,	null,	null]
 ];
 
 $check_fields_result = check_fields($fields, false);

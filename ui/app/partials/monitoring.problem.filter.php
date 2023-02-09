@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,6 +125,24 @@ $left_column
 		$filter_age,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		_('days')
+	])
+	->addRow(_('Show symptoms'), [
+		(new CCheckBox('show_symptoms'))
+			->setChecked($data['show_symptoms'] == 1)
+			->setUncheckedValue(0)
+			->setId('show_symptoms_#{uniqid}')
+	])
+	->addRow(_('Show suppressed problems'), [
+		(new CCheckBox('show_suppressed'))
+			->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+			->setUncheckedValue(0)
+			->setId('show_suppressed_#{uniqid}')
+	])
+	->addRow(_('Show unacknowledged only'), [
+		(new CCheckBox('unacknowledged'))
+			->setChecked($data['unacknowledged'] == 1)
+			->setUncheckedValue(0)
+			->setId('unacknowledged_#{uniqid}')
 	]);
 
 $filter_inventory_table = new CTable();
@@ -249,20 +267,7 @@ $right_column = (new CFormList())
 			->setEnabled($data['compact_view'] == 0)
 			->removeId()
 	])
-	->addRow(_('Show suppressed problems'), [
-		(new CCheckBox('show_suppressed'))
-			->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
-			->setUncheckedValue(0)
-			->setId('show_suppressed_#{uniqid}'),
-		(new CDiv([
-			(new CLabel(_('Show unacknowledged only'), 'unacknowledged_#{uniqid}'))
-				->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
-			(new CCheckBox('unacknowledged'))
-				->setChecked($data['unacknowledged'] == 1)
-				->setUncheckedValue(0)
-				->setId('unacknowledged_#{uniqid}')
-		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
-	])
+
 	->addRow(_('Compact view'), [
 		(new CCheckBox('compact_view'))
 			->setChecked($data['compact_view'] == 1)
@@ -303,7 +308,6 @@ $template = (new CDiv())
 		(new CDiv($right_column))->addClass(ZBX_STYLE_CELL)
 	]);
 $template = (new CForm('get'))
-	->cleanItems()
 	->setName('zbx_filter')
 	->addItem([
 		$template,
@@ -392,9 +396,9 @@ if (array_key_exists('render_html', $data)) {
 		$('[name="filter_new"],[name="filter_update"]').hide()
 			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 
-		let fields = ['show', 'name', 'tag_priority', 'show_opdata', 'show_suppressed', 'show_tags', 'unacknowledged',
-				'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age', 'tag_name_format',
-				'evaltype'
+		let fields = ['show', 'name', 'tag_priority', 'show_opdata', 'show_symptoms', 'show_suppressed', 'show_tags',
+				'unacknowledged', 'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age',
+				'tag_name_format', 'evaltype'
 			],
 			eventHandler = {
 				show: () => {

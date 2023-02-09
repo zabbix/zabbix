@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ int	zbx_get_week_number(const struct tm *tm);
 int	zbx_is_time_suffix(const char *str, int *value, int length);
 int	zbx_calculate_sleeptime(int nextcheck, int max_sleeptime);
 
-char	*zbx_age2str(int age);
+char	*zbx_age2str(time_t age);
 char	*zbx_date2str(time_t date, const char *tz);
 char	*zbx_time2str(time_t time, const char *tz);
 int	zbx_iso8601_utc(const char *str, time_t *time);

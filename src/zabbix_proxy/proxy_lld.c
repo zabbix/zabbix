@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,25 @@
 
 #include "module.h"
 
-void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result, zbx_timespec_t *ts, char *error)
+void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result, zbx_timespec_t *ts,
+		char *error)
 {
 	ZBX_UNUSED(itemid);
 	ZBX_UNUSED(hostid);
 	ZBX_UNUSED(result);
 	ZBX_UNUSED(ts);
+	ZBX_UNUSED(error);
+}
+
+void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
+		unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error)
+{
+	ZBX_UNUSED(itemid);
+	ZBX_UNUSED(hostid);
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(ts);
+	ZBX_UNUSED(meta);
+	ZBX_UNUSED(lastlogsize);
+	ZBX_UNUSED(mtime);
 	ZBX_UNUSED(error);
 }

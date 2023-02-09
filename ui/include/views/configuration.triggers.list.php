@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -195,6 +195,12 @@ $triggers_form = (new CForm('post', $url))
 	->addVar('context', $data['context'], 'form_context');
 
 // create table
+$object_label = null;
+
+if ($data['single_selected_hostid'] == 0) {
+	$object_label = $data['context'] === 'host' ? _('Host') : _('Template');
+}
+
 $triggers_table = (new CTableInfo())->setHeader([
 	(new CColHeader(
 		(new CCheckBox('all_triggers'))
@@ -202,11 +208,7 @@ $triggers_table = (new CTableInfo())->setHeader([
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
 	$data['show_value_column'] ? _('Value') : null,
-	($data['single_selected_hostid'] == 0)
-		? ($data['context'] === 'host')
-			? _('Host')
-			: _('Template')
-		: null,
+	$object_label,
 	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
 	_('Operational data'),
 	_('Expression'),
@@ -221,14 +223,43 @@ $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['trig
 	'context' => $data['context']
 ]);
 
+$csrf_token = CCsrfTokenHelper::get('triggers.php');
+
 foreach ($data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
 
 	// description
 	$description = [];
-	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
-		ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
-	);
+
+	if (array_key_exists($trigger['templateid'], $data['parent_triggers'])) {
+		$parent_trigger = $data['parent_triggers'][$trigger['templateid']];
+
+		$parent_template_names = [];
+
+		foreach ($parent_trigger['template_names'] as $templateid => $template_name) {
+			if ($parent_template_names) {
+				$parent_template_names[] = ',';
+			}
+
+			if ($parent_trigger['editable']) {
+				$parent_template_names[] = (new CLink(CHtml::encode($template_name),
+					(new CUrl('triggers.php'))
+						->setArgument('filter_hostids', [$templateid])
+						->setArgument('filter_set', 1)
+						->setArgument('context', 'template')
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREY);
+			}
+			else {
+				$parent_template_names[] = (new CSpan(CHtml::encode($template_name)))->addClass(ZBX_STYLE_GREY);
+			}
+		}
+
+		$parent_template_names[] = NAME_DELIMITER;
+
+		$description[] = $parent_template_names;
+	}
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
@@ -296,17 +327,17 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	$status = (new CLink(
 		triggerIndicator($trigger['status'], $trigger['state']),
 		(new CUrl('triggers.php'))
-			->setArgument('g_triggerid', $triggerid)
 			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
 				? 'trigger.massenable'
 				: 'trigger.massdisable'
 			)
+			->setArgument('g_triggerid[]', $triggerid)
 			->setArgument('context', $data['context'])
 			->getUrl()
 		))
+		->addCsrfToken($csrf_token)
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
-		->addSID();
+		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']));
 
 	// hosts
 	$hosts = null;
@@ -356,13 +387,24 @@ $triggers_form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
-			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?')],
-			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?')],
-			'trigger.masscopyto' => ['name' => _('Copy')],
+			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?'),
+				'csrf_token' => $csrf_token
+			],
+			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?'),
+				'csrf_token' => $csrf_token
+			],
+			'trigger.masscopyto' => [
+				'content' => (new CSimpleButton(_('Copy')))
+					->addClass('js-copy')
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeId()
+			],
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"openMassupdatePopup('popup.massupdate.trigger', {}, {
+						"openMassupdatePopup('popup.massupdate.trigger', {".
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('trigger').
+						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
 						});"
@@ -370,7 +412,9 @@ $triggers_form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?')]
+			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?'),
+				'csrf_token' => $csrf_token
+			]
 		],
 		$data['checkbox_hash']
 	)
@@ -380,6 +424,11 @@ $html_page
 	->addItem($triggers_form)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['checkbox_hash'],
+		'checkbox_object' => 'g_triggerid'
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

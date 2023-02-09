@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "zbxcomms.h"
 
 int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
-		int connect_timeout, int retry_interval, int level, const zbx_config_tls_t *zbx_config_tls);
+		int connect_timeout, int retry_interval, int level, const zbx_config_tls_t *config_tls);
 void	zbx_disconnect_from_server(zbx_socket_t *sock);
 
 int	zbx_get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);

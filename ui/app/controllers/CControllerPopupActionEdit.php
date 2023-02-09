@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,15 @@
 
 
 class CControllerPopupActionEdit extends CController {
+
+	/**
+	 * @var mixed
+	 */
+	private $action;
+
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput(): bool {
 		$fields = [
@@ -76,7 +85,7 @@ class CControllerPopupActionEdit extends CController {
 
 			$db_actions = API::Action()->get([
 				'output' => ['actionid', 'name', 'esc_period', 'eventsource', 'status', 'pause_suppressed',
-					'notify_if_canceled'
+					'notify_if_canceled', 'pause_symptoms'
 				],
 				'actionids' => $this->getInput('actionid'),
 				'selectOperations' => ['operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype',
@@ -122,6 +131,7 @@ class CControllerPopupActionEdit extends CController {
 					'recovery_operations' => $this->action['recovery_operations'],
 					'update_operations' => $this->action['update_operations'],
 					'filter' => $this->action['filter'],
+					'pause_symptoms' => $this->action['pause_symptoms'],
 					'pause_suppressed' => $this->action['pause_suppressed'],
 					'notify_if_canceled' => $this->action['notify_if_canceled']
 				],
@@ -188,6 +198,7 @@ class CControllerPopupActionEdit extends CController {
 						'conditions' => [],
 						'evaltype' => ''
 					],
+					'pause_symptoms' => ACTION_PAUSE_SYMPTOMS_TRUE,
 					'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE,
 					'notify_if_canceled' => ACTION_NOTIFY_IF_CANCELED_TRUE
 				],

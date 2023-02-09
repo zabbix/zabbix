@@ -1,6 +1,5 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-07-21T15:15:32Z'
   media_types:
     -
       name: Slack

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>6.4</version>
+    <template_groups>
+        <template_group>
+            <uuid>7df96b18c230490a9a0a9e2307226338</uuid>
+            <name>Templates</name>
+        </template_group>
+    </template_groups>
+    <templates>
+        <template>
+            <uuid>0c45e5ed44ea494dabfa4136f420aa65</uuid>
+            <template>vendor test</template>
+            <name>vendor test</name>
+            <vendor>
+                <name>Zabbix</name>
+                <version>6.4-0</version>
+            </vendor>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+        </template>
+    </templates>
+</zabbix_export>

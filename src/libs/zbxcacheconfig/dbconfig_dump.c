@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -299,7 +299,7 @@ static void	DCdump_host_inventories(void)
 
 		for (j = 0; j < HOST_INVENTORY_FIELD_COUNT; j++)
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "  %s: '%s'", DBget_inventory_field(j + 1),
+			zabbix_log(LOG_LEVEL_TRACE, "  %s: '%s'", zbx_db_get_inventory_field(j + 1),
 					host_inventory->values[j]);
 		}
 	}
@@ -1196,8 +1196,8 @@ static void	DCdump_maintenance_hosts(zbx_dc_maintenance_t *maintenance)
 
 static int	maintenance_tag_compare(const void *v1, const void *v2)
 {
-	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t **)v1;
-	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t **)v2;
+	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t * const *)v1;
+	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t * const *)v2;
 	int				ret;
 
 	if (0 != (ret = (strcmp(tag1->tag, tag2->tag))))
@@ -1337,12 +1337,12 @@ static void	DCdump_strpool()
 static void	DCdump_drules(void)
 {
 	zbx_hashset_iter_t	iter;
-	zbx_dc_drule_t		*drule;
+	DC_DRULE		*drule;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
 	zbx_hashset_iter_reset(&config->drules, &iter);
-	while (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (drule = (DC_DRULE *)zbx_hashset_iter_next(&iter)))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "druleid:" ZBX_FS_UI64 " proxy_hostid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64,
 				drule->druleid, drule->proxy_hostid, drule->revision);
@@ -1356,12 +1356,12 @@ static void	DCdump_drules(void)
 static void	DCdump_dchecks(void)
 {
 	zbx_hashset_iter_t	iter;
-	zbx_dc_dcheck_t		*dcheck;
+	DC_DCHECK		*dcheck;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
 	zbx_hashset_iter_reset(&config->dchecks, &iter);
-	while (NULL != (dcheck = (zbx_dc_dcheck_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (dcheck = (DC_DCHECK *)zbx_hashset_iter_next(&iter)))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "dcheckid:" ZBX_FS_UI64 " druleid:" ZBX_FS_UI64,
 				dcheck->dcheckid, dcheck->druleid);
@@ -1440,6 +1440,98 @@ static void	DCdump_httpstep_fields(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
+static int	connector_tag_compare(const void *v1, const void *v2)
+{
+	const zbx_dc_connector_tag_t	*tag1 = *(const zbx_dc_connector_tag_t * const *)v1;
+	const zbx_dc_connector_tag_t	*tag2 = *(const zbx_dc_connector_tag_t * const *)v2;
+	int				ret;
+
+	if (0 != (ret = (strcmp(tag1->tag, tag2->tag))))
+		return ret;
+
+	if (0 != (ret = (strcmp(tag1->value, tag2->value))))
+		return ret;
+
+	ZBX_RETURN_IF_NOT_EQUAL(tag1->op, tag2->op);
+
+	return 0;
+}
+
+static void	DCdump_connector_tags(zbx_dc_connector_t *connector)
+{
+	int				i;
+	zbx_vector_dc_connector_tag_t	index;
+
+	zbx_vector_dc_connector_tag_create(&index);
+
+	if (0 != connector->tags.values_num)
+	{
+		zbx_vector_dc_connector_tag_append_array(&index, connector->tags.values, connector->tags.values_num);
+		zbx_vector_dc_connector_tag_sort(&index, connector_tag_compare);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "  tags:");
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		zbx_dc_connector_tag_t	*tag = index.values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "    connectortagid:" ZBX_FS_UI64 " operator:%u tag:'%s' value:'%s'",
+				tag->connectortagid, tag->op, tag->tag, tag->value);
+	}
+
+	zbx_vector_dc_connector_tag_destroy(&index);
+}
+
+static void	DCdump_connectors(void)
+{
+	zbx_dc_connector_t	*connector;
+	zbx_hashset_iter_t	iter;
+	int			i;
+	zbx_vector_ptr_t	index;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_vector_ptr_create(&index);
+	zbx_hashset_iter_reset(&config->connectors, &iter);
+
+	while (NULL != (connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_ptr_append(&index, connector);
+
+	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		connector = (zbx_dc_connector_t *)index.values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "connectorid:" ZBX_FS_UI64" url:'%s'",
+				connector->connectorid, connector->url);
+		zabbix_log(LOG_LEVEL_TRACE, "  protocol:%u data_type:%u", connector->protocol, connector->data_type);
+		zabbix_log(LOG_LEVEL_TRACE, "  max_records:%d", connector->max_records);
+		zabbix_log(LOG_LEVEL_TRACE, "  max_senders:%d", connector->max_senders);
+		zabbix_log(LOG_LEVEL_TRACE, "  timeout:'%s'", connector->timeout);
+		zabbix_log(LOG_LEVEL_TRACE, "  max_attempts:%d", connector->max_attempts);
+		zabbix_log(LOG_LEVEL_TRACE, "  token:'%s'", connector->token);
+		zabbix_log(LOG_LEVEL_TRACE, "  http_proxy:'%s'", connector->http_proxy);
+		zabbix_log(LOG_LEVEL_TRACE, "  authtype:%u", connector->authtype);
+		zabbix_log(LOG_LEVEL_TRACE, "  username:'%s'", connector->username);
+		zabbix_log(LOG_LEVEL_TRACE, "  password:'%s'", connector->password);
+		zabbix_log(LOG_LEVEL_TRACE, "  verify_peer:%u", connector->verify_peer);
+		zabbix_log(LOG_LEVEL_TRACE, "  verify_host:%u", connector->verify_host);
+		zabbix_log(LOG_LEVEL_TRACE, "  ssl_cert_file:'%s'", connector->ssl_cert_file);
+		zabbix_log(LOG_LEVEL_TRACE, "  ssl_key_file:'%s'", connector->ssl_key_file);
+		zabbix_log(LOG_LEVEL_TRACE, "  ssl_key_password:'%s'", connector->ssl_key_password);
+		zabbix_log(LOG_LEVEL_TRACE, "  status:%d", connector->status);
+		zabbix_log(LOG_LEVEL_TRACE, "  tags_evaltype:%d", connector->tags_evaltype);
+
+		DCdump_connector_tags(connector);
+	}
+
+	zbx_vector_ptr_destroy(&index);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
 void	DCdump_configuration(void)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:" ZBX_FS_UI64 ") ===",
@@ -1477,6 +1569,7 @@ void	DCdump_configuration(void)
 	DCdump_httpsteps();
 	DCdump_httpstep_fields();
 	DCdump_autoreg_hosts();
+	DCdump_connectors();
 #ifdef HAVE_TESTS
 	DCdump_strpool();
 #endif

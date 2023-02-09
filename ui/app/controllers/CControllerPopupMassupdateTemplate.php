@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 			'groups' => 'array',
 			'tags' => 'array',
 			'macros' => 'array',
-			'linked_templates' => 'array',
 			'valuemaps' => 'array',
 			'valuemap_remove' => 'array',
 			'valuemap_remove_except' => 'in 1',
@@ -39,8 +38,6 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 			'valuemap_rename' => 'array',
 			'valuemap_update_existing' => 'in 1',
 			'valuemap_add_missing' => 'in 1',
-			'mass_action_tpls' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
-			'mass_clear_tpls' => 'in 0,1',
 			'mass_update_groups' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_macros' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
@@ -107,12 +104,6 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 
 				if (array_key_exists('groups', $visible)) {
 					$options['selectTemplateGroups'] = ['groupid'];
-				}
-
-				if (array_key_exists('linked_templates', $visible)
-						&& !($this->getInput('mass_action_tpls') == ZBX_ACTION_REPLACE
-							&& !$this->hasInput('mass_clear_tpls'))) {
-					$options['selectParentTemplates'] = ['templateid'];
 				}
 
 				if (array_key_exists('tags', $visible)) {
@@ -199,48 +190,6 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 							$template['groups'] = zbx_toObject(array_diff($current_groupids, $remove_groupids), 'groupid');
 						}
 						unset($template['templategroups']);
-					}
-
-					if (array_key_exists('linked_templates', $visible)) {
-						$parent_templateids = array_key_exists('parentTemplates', $template)
-							? array_column($template['parentTemplates'], 'templateid')
-							: [];
-
-						switch ($this->getInput('mass_action_tpls')) {
-							case ZBX_ACTION_ADD:
-								$template['templates'] = zbx_toObject(
-									array_unique(
-										array_merge($parent_templateids, $this->getInput('linked_templates', []))
-									),
-									'templateid'
-								);
-								break;
-
-							case ZBX_ACTION_REPLACE:
-								$template['templates'] = zbx_toObject($this->getInput('linked_templates', []),
-									'templateid'
-								);
-
-								if ($this->getInput('mass_clear_tpls', 0)) {
-									$template['templates_clear'] = zbx_toObject(
-										array_diff($parent_templateids, $this->getInput('linked_templates', [])),
-										'templateid'
-									);
-								}
-								break;
-
-							case ZBX_ACTION_REMOVE:
-								$template['templates'] = zbx_toObject(
-									array_diff($parent_templateids, $this->getInput('linked_templates', [])),
-									'templateid'
-								);
-
-								if ($this->getInput('mass_clear_tpls', 0)) {
-									$template['templates_clear'] =
-										zbx_toObject($this->getInput('linked_templates', []), 'templateid');
-								}
-								break;
-						}
 					}
 
 					if (array_key_exists('tags', $visible)) {
@@ -330,8 +279,6 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 
 						$template['macros'] = array_values($template['macros']);
 					}
-
-					unset($template['parentTemplates']);
 
 					$template = $new_values + $template;
 				}

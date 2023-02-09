@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,10 @@
 
 
 class CControllerMenuPopup extends CController {
+
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput() {
 		$fields = [
@@ -82,7 +86,10 @@ class CControllerMenuPopup extends CController {
 				$rules = [
 					'triggerid' => 'required|db triggers.triggerid',
 					'eventid' => 'db events.eventid',
-					'acknowledge' => 'in 0,1'
+					'update_problem' => 'in 0,1',
+					'show_rank_change_cause' => 'in 0,1',
+					'show_rank_change_symptom' => 'in 0,1',
+					'ids' => 'array_db events.eventid'
 				];
 				break;
 
@@ -227,7 +234,8 @@ class CControllerMenuPopup extends CController {
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
 				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 				'allowed_ui_hosts' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS),
-				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+				'csrf_token' => CCsrfTokenHelper::get('scriptexec')
 			];
 
 			if ($has_goto) {
@@ -659,8 +667,9 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['triggerid']
-	 * @param string $data['eventid']      (optional) Mandatory for Acknowledge menu.
-	 * @param bool   $data['acknowledge']  (optional) Whether to show Acknowledge menu.
+	 * @param string $data['eventid']         (optional) Mandatory for "Update problem" menu and event rank change.
+	 * @param array  $data['ids']             (optional) Event IDs that are used in event rank change to symptom.
+	 * @param bool   $data['update_problem']  (optional) Whether to show "Update problem" menu.
 	 *
 	 * @return mixed
 	 */
@@ -731,7 +740,9 @@ class CControllerMenuPopup extends CController {
 				'showEvents' => $show_events,
 				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
+				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
+				'allowed_actions_change_problem_ranking' =>
+					CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
 			];
 
 			$can_be_closed = ($db_trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
@@ -743,7 +754,7 @@ class CControllerMenuPopup extends CController {
 				$menu_data['eventid'] = $data['eventid'];
 
 				$events = API::Event()->get([
-					'output' => ['eventid', 'r_eventid', 'urls'],
+					'output' => ['eventid', 'r_eventid', 'urls', 'cause_eventid'],
 					'select_acknowledges' => ['action'],
 					'eventids' => $data['eventid']
 				]);
@@ -754,11 +765,31 @@ class CControllerMenuPopup extends CController {
 					if ($can_be_closed) {
 						$can_be_closed = !isEventClosed($event);
 					}
+
+					if (CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)) {
+						// Can change rank to cause if event is not already cause.
+						$menu_data['mark_as_cause'] = ($event['cause_eventid'] != 0);
+
+						// Check if selected events can change rank to symptom for given cause.
+						$menu_data['mark_selected_as_symptoms'] = array_key_exists('ids', $data) && $data['ids']
+							? (bool) validateEventRankChangeToSymptom($data['ids'], $data['eventid'])
+							: false;
+
+						$menu_data['eventids'] = array_key_exists('ids', $data) ? $data['ids'] : [];
+
+						// Show individual menus depending on location.
+						$menu_data['show_rank_change_cause'] = array_key_exists('show_rank_change_cause', $data)
+							? $data['show_rank_change_cause']
+							: false;
+						$menu_data['show_rank_change_symptom'] = array_key_exists('show_rank_change_symptom', $data)
+							? $data['show_rank_change_symptom']
+							: false;
+					}
 				}
 			}
 
-			if (array_key_exists('acknowledge', $data)) {
-				$menu_data['acknowledge'] = ((bool) $data['acknowledge']
+			if (array_key_exists('update_problem', $data)) {
+				$menu_data['update_problem'] = ((bool) $data['update_problem']
 						&& (CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
 							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
 							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
@@ -834,6 +865,10 @@ class CControllerMenuPopup extends CController {
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation']
 				];
+			}
+
+			if ($scripts) {
+				$menu_data['csrf_token'] = CCsrfTokenHelper::get('scriptexec');
 			}
 
 			foreach (array_values($urls) as $url) {

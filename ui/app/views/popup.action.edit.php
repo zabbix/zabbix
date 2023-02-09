@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('action')))->removeId())
 	->setName('action.edit')
 	->setId('action-form')
 	->addVar('actionid', $data['actionid'] ?: 0)
@@ -223,6 +224,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$operations_tab
+		->addItem([
+			new CLabel(_('Pause operations for symptom problems'), 'pause_symptoms'),
+			new CFormField((new CCheckBox('pause_symptoms', ACTION_PAUSE_SYMPTOMS_TRUE))
+				->setChecked($data['action']['pause_symptoms'] == ACTION_PAUSE_SYMPTOMS_TRUE)
+			)
+		])
 		->addItem([
 			new CLabel(_('Pause operations for suppressed problems'), 'pause_suppressed'),
 			new CFormField((new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))

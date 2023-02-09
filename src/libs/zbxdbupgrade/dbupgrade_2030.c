@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@
  */
 
 #ifndef HAVE_SQLITE3
-
-extern unsigned char program_type;
 
 static int	DBpatch_2030000(void)
 {
@@ -61,7 +59,7 @@ static int	DBpatch_2030002(void)
 
 static int	DBpatch_2030003(void)
 {
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"insert into trigger_discovery_tmp (select triggerid,parent_triggerid from trigger_discovery)"))
 	{
 		return SUCCEED;
@@ -111,7 +109,7 @@ static int	DBpatch_2030008(void)
 
 static int	DBpatch_2030009(void)
 {
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"insert into trigger_discovery (select triggerid,parent_triggerid from trigger_discovery_tmp)"))
 	{
 		return SUCCEED;
@@ -149,7 +147,7 @@ static int	DBpatch_2030012(void)
 
 static int	DBpatch_2030013(void)
 {
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"insert into graph_discovery_tmp (select graphid,parent_graphid from graph_discovery)"))
 	{
 		return SUCCEED;
@@ -199,7 +197,7 @@ static int	DBpatch_2030018(void)
 
 static int	DBpatch_2030019(void)
 {
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"insert into graph_discovery (select graphid,parent_graphid from graph_discovery_tmp)"))
 	{
 		return SUCCEED;
@@ -251,20 +249,20 @@ static int	DBpatch_2030024(void)
 	int		ret = FAIL, rc;
 
 	/* 1 - ZBX_FLAG_DISCOVERY_RULE*/
-	if (NULL == (result = DBselect("select itemid,filter from items where filter<>'' and flags=1")))
+	if (NULL == (result = zbx_db_select("select itemid,filter from items where filter<>'' and flags=1")))
 		return FAIL;
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (NULL == (value = strchr(row[1], ':')) || 0 == strcmp(row[1], ":"))
 			continue;
 
 		*value++ = '\0';
 
-		macro_esc = DBdyn_escape_string(row[1]);
-		value_esc = DBdyn_escape_string(value);
+		macro_esc = zbx_db_dyn_escape_string(row[1]);
+		value_esc = zbx_db_dyn_escape_string(value);
 
-		rc = DBexecute("insert into item_condition"
+		rc = zbx_db_execute("insert into item_condition"
 				" (item_conditionid,itemid,macro,value)"
 				" values (%s,%s,'%s','%s')",
 				row[0], row[0],  macro_esc, value_esc);
@@ -278,7 +276,7 @@ static int	DBpatch_2030024(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -304,7 +302,7 @@ static int	DBpatch_2030027(void)
 
 static int	DBpatch_2030028(void)
 {
-	if (ZBX_DB_OK > DBexecute("update items set formula='' where flags=%d", ZBX_FLAG_DISCOVERY_RULE))
+	if (ZBX_DB_OK > zbx_db_execute("update items set formula='' where flags=%d", ZBX_FLAG_DISCOVERY_RULE))
 		return FAIL;
 
 	return SUCCEED;
@@ -314,7 +312,7 @@ static int	DBpatch_2030029(void)
 {
 	/* 7 - SCREEN_SORT_TRIGGERS_STATUS_ASC */
 	/* 9 - SCREEN_SORT_TRIGGERS_RETRIES_LEFT_ASC (no more supported) */
-	if (ZBX_DB_OK > DBexecute("update screens_items set sort_triggers=7 where sort_triggers=9"))
+	if (ZBX_DB_OK > zbx_db_execute("update screens_items set sort_triggers=7 where sort_triggers=9"))
 		return FAIL;
 
 	return SUCCEED;
@@ -324,7 +322,7 @@ static int	DBpatch_2030030(void)
 {
 	/* 8 - SCREEN_SORT_TRIGGERS_STATUS_DESC */
 	/* 10 - SCREEN_SORT_TRIGGERS_RETRIES_LEFT_DESC (no more supported) */
-	if (ZBX_DB_OK > DBexecute("update screens_items set sort_triggers=8 where sort_triggers=10"))
+	if (ZBX_DB_OK > zbx_db_execute("update screens_items set sort_triggers=8 where sort_triggers=10"))
 		return FAIL;
 
 	return SUCCEED;
@@ -333,7 +331,7 @@ static int	DBpatch_2030030(void)
 static int	DBpatch_2030031(void)
 {
 	/* 16 - ZBX_CONDITION_TYPE_MAINTENANCE */
-	if (ZBX_DB_OK > DBexecute("update conditions set value='' where conditiontype=16"))
+	if (ZBX_DB_OK > zbx_db_execute("update conditions set value='' where conditiontype=16"))
 		return FAIL;
 
 	return SUCCEED;
@@ -379,7 +377,7 @@ static int	DBpatch_2030037(void)
 				NULL
 			};
 
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	return DBcreate_table(&table);
@@ -387,10 +385,10 @@ static int	DBpatch_2030037(void)
 
 static int	DBpatch_2030038(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"insert into ids_tmp ("
 				"select table_name,field_name,nextid"
 				" from ids"
@@ -431,10 +429,10 @@ static int	DBpatch_2030040(void)
 
 static int	DBpatch_2030041(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"insert into ids (select table_name,field_name,nextid from ids_tmp)"))
 	{
 		return SUCCEED;
@@ -445,7 +443,7 @@ static int	DBpatch_2030041(void)
 
 static int	DBpatch_2030042(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	return DBdrop_table("ids_tmp");
@@ -460,7 +458,7 @@ static int	DBpatch_2030043(void)
 				"'web.nodes.selected','web.popup_right.nodeid.last'"
 			")";
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		return SUCCEED;
 
 	return FAIL;
@@ -471,7 +469,7 @@ static int	DBpatch_2030044(void)
 	/* 21 - AUDIT_RESOURCE_NODE */
 	const char	*sql = "delete from auditlog where resourcetype=21";
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		return SUCCEED;
 
 	return FAIL;
@@ -482,7 +480,7 @@ static int	DBpatch_2030045(void)
 	/* 17 - ZBX_CONDITION_TYPE_NODE */
 	const char	*sql = "delete from conditions where conditiontype=17";
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		return SUCCEED;
 
 	return FAIL;
@@ -499,12 +497,12 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 	size_t		name_alloc = 0, name_offset;
 
 	/* 1 - ZBX_NODE_LOCAL */
-	if (NULL == (result = DBselect("select nodeid from nodes where nodetype=1")))
+	if (NULL == (result = zbx_db_select("select nodeid from nodes where nodetype=1")))
 		return FAIL;
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 		local_nodeid = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == local_nodeid)
 		return SUCCEED;
@@ -514,7 +512,7 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 	min = local_nodeid * __UINT64_C(100000000000000);
 	max = min + __UINT64_C(100000000000000) - 1;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select " ZBX_FS_SQL_NAME "," ZBX_FS_SQL_NAME
 			" from " ZBX_FS_SQL_NAME
 			" where not " ZBX_FS_SQL_NAME " between " ZBX_FS_UI64 " and " ZBX_FS_UI64
@@ -524,7 +522,7 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 		return FAIL;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(id, row[0]);
 		nodeid = (int)(id / __UINT64_C(100000000000000));
@@ -536,9 +534,9 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 		else
 			zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "{$N%d_%s", nodeid, row[1] + 2);
 
-		name_esc = DBdyn_escape_string_len(name, field_length);
+		name_esc = zbx_db_dyn_escape_string_len(name, field_length);
 
-		if (ZBX_DB_OK > DBexecute("update " ZBX_FS_SQL_NAME " set " ZBX_FS_SQL_NAME "='%s'"
+		if (ZBX_DB_OK > zbx_db_execute("update " ZBX_FS_SQL_NAME " set " ZBX_FS_SQL_NAME "='%s'"
 				" where " ZBX_FS_SQL_NAME "=" ZBX_FS_UI64,
 				table_name, field_name, name_esc, key_name, id))
 		{
@@ -548,7 +546,7 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 
 		zbx_free(name_esc);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(name);
 
@@ -561,19 +559,19 @@ static int	check_data_uniqueness(const char *table_name, const char *field_name)
 	DB_ROW		row;
 	int		ret = SUCCEED;
 
-	if (NULL == (result = DBselect("select %s from %s group by %s having count(*)>1",
+	if (NULL == (result = zbx_db_select("select %s from %s group by %s having count(*)>1",
 			field_name, table_name, field_name)))
 	{
 		return FAIL;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Duplicate data \"%s\" for field \"%s\" is found in table \"%s\"."
 				" Remove it manually and restart the process.", row[0], field_name, table_name);
 		ret = FAIL;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -681,12 +679,12 @@ static int	DBpatch_2030065(void)
 	zbx_uint64_t	min, max;
 
 	/* 1 - ZBX_NODE_LOCAL */
-	if (NULL == (result = DBselect("select nodeid from nodes where nodetype=1")))
+	if (NULL == (result = zbx_db_select("select nodeid from nodes where nodetype=1")))
 		return FAIL;
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 		local_nodeid = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 == local_nodeid)
 		return SUCCEED;
@@ -694,7 +692,7 @@ static int	DBpatch_2030065(void)
 	min = local_nodeid * __UINT64_C(100000000000000);
 	max = min + __UINT64_C(100000000000000) - 1;
 
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"delete from config where not configid between " ZBX_FS_UI64 " and " ZBX_FS_UI64, min, max))
 	{
 		return SUCCEED;
@@ -718,11 +716,11 @@ static int	DBpatch_2030067(void)
 
 static int	DBpatch_2030068(void)
 {
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 	{
 		/* "name" is empty on proxy side, because it is not synchronized between server and proxy */
 		/* in 2.2, and should therefore be filled with unique values to create a unique index.    */
-		if (ZBX_DB_OK > DBexecute("update drules set name=druleid"))
+		if (ZBX_DB_OK > zbx_db_execute("update drules set name=druleid"))
 			return FAIL;
 	}
 
@@ -903,9 +901,9 @@ static int	DBpatch_2030094(void)
 	char		*p, *expr = NULL, *expr_esc;
 	size_t		expr_alloc = 0, expr_offset;
 
-	result = DBselect("select triggerid,expression from triggers");
+	result = zbx_db_select("select triggerid,expression from triggers");
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		expr_offset = 0;
 		zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, "");
@@ -953,9 +951,9 @@ static int	DBpatch_2030094(void)
 		}
 		else if (0 != strcmp(row[1], expr))
 		{
-			expr_esc = DBdyn_escape_string(expr);
+			expr_esc = zbx_db_dyn_escape_string(expr);
 
-			if (ZBX_DB_OK > DBexecute("update triggers set expression='%s' where triggerid=%s",
+			if (ZBX_DB_OK > zbx_db_execute("update triggers set expression='%s' where triggerid=%s",
 					expr_esc, row[0]))
 			{
 				ret = FAIL;
@@ -964,7 +962,7 @@ static int	DBpatch_2030094(void)
 			zbx_free(expr_esc);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(expr);
 
@@ -1114,9 +1112,9 @@ static int	DBpatch_2030095(void)
 	char		*p, *q, *params = NULL, *params_esc;
 	size_t		params_alloc = 0, params_offset;
 
-	result = DBselect("select itemid,params from items where type=%d", 15 /* ITEM_TYPE_CALCULATED */);
+	result = zbx_db_select("select itemid,params from items where type=%d", 15 /* ITEM_TYPE_CALCULATED */);
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		params_offset = 0;
 
@@ -1190,15 +1188,15 @@ static int	DBpatch_2030095(void)
 		}
 		else if ( 0 != strcmp(row[1], params))
 		{
-			params_esc = DBdyn_escape_string(params);
+			params_esc = zbx_db_dyn_escape_string(params);
 
-			if (ZBX_DB_OK > DBexecute("update items set params='%s' where itemid=%s", params_esc, row[0]))
+			if (ZBX_DB_OK > zbx_db_execute("update items set params='%s' where itemid=%s", params_esc, row[0]))
 				ret = FAIL;
 
 			zbx_free(params_esc);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(params);
 
@@ -1291,7 +1289,7 @@ static int	DBpatch_2030107(void)
 
 static int	DBpatch_2030108(void)
 {
-	if (ZBX_DB_OK <= DBexecute("update screens_items set colspan=1 where colspan=0"))
+	if (ZBX_DB_OK <= zbx_db_execute("update screens_items set colspan=1 where colspan=0"))
 		return SUCCEED;
 
 	return FAIL;
@@ -1299,7 +1297,7 @@ static int	DBpatch_2030108(void)
 
 static int	DBpatch_2030109(void)
 {
-	if (ZBX_DB_OK <= DBexecute("update screens_items set rowspan=1 where rowspan=0"))
+	if (ZBX_DB_OK <= zbx_db_execute("update screens_items set rowspan=1 where rowspan=0"))
 		return SUCCEED;
 
 	return FAIL;
@@ -1307,7 +1305,7 @@ static int	DBpatch_2030109(void)
 
 static int	DBpatch_2030110(void)
 {
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.view.application'"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.view.application'"))
 		return FAIL;
 
 	return SUCCEED;
@@ -1329,7 +1327,7 @@ static int	DBpatch_2030112(void)
 
 static int	DBpatch_2030113(void)
 {
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ('web.latest.php.sort', 'web.httpmon.php.sort')"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx in ('web.latest.php.sort', 'web.httpmon.php.sort')"))
 		return FAIL;
 
 	return SUCCEED;
@@ -1337,7 +1335,7 @@ static int	DBpatch_2030113(void)
 
 static int	DBpatch_2030114(void)
 {
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.httpconf.php.sort' and value_str='h.hostid'"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.httpconf.php.sort' and value_str='h.hostid'"))
 		return FAIL;
 
 	return SUCCEED;
@@ -1345,7 +1343,7 @@ static int	DBpatch_2030114(void)
 
 static int	DBpatch_2030115(void)
 {
-	if (ZBX_DB_OK > DBexecute(
+	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from profiles where idx='web.hostinventories.php.sort' and value_str='hostid'"))
 	{
 		return FAIL;

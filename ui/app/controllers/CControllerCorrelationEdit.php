@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ class CControllerCorrelationEdit extends CController {
 	private $correlation = [];
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -89,11 +89,12 @@ class CControllerCorrelationEdit extends CController {
 			'correlationid' => $this->getInput('correlationid', 0),
 			'op_close_new' => false,
 			'op_close_old' => false,
-			'conditions' => []
+			'conditions' => [],
+			'form_refresh' => 0
 		];
 
 		$this->getInputs($data, ['correlationid', 'name', 'description', 'status', 'op_close_new', 'op_close_old',
-			'evaltype', 'formula', 'conditions'
+			'evaltype', 'formula', 'conditions', 'form_refresh'
 		]);
 
 		foreach ($data['conditions'] as $row_index => &$condition) {

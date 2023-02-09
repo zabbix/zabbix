@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ ZBX_PTR_VECTOR_IMPL(um_host, zbx_um_host_t *)
 
 #define ZBX_MACRO_NO_KVS_VALUE	"*UNKNOWN*"
 
-extern char	*CONFIG_VAULTDBPATH;
 extern unsigned char	program_type;
 
 typedef enum
@@ -455,7 +454,8 @@ static void	um_macro_kv_remove(zbx_um_macro_t *macro, zbx_dc_macro_kv_t *mkv)
  * Purpose: register vault macro in key value storage                            *
  *                                                                               *
  *********************************************************************************/
-static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location)
+static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location,
+		const zbx_config_vault_t *config_vault)
 {
 	zbx_dc_kvs_path_t	*kvs_path, kvs_path_local;
 	zbx_dc_kv_t		*kv, kv_local;
@@ -475,8 +475,8 @@ static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location)
 		goto out;
 	}
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && NULL != CONFIG_VAULTDBPATH &&
-			0 == strcasecmp(CONFIG_VAULTDBPATH, path) &&
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && NULL != config_vault->db_path &&
+			0 == strcasecmp(config_vault->db_path, path) &&
 			(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
 					|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
 	{
@@ -610,13 +610,15 @@ out:
  *                                                                               *
  * Purpose: sync global/host user macros                                         *
  *                                                                               *
- * Parameters: cache  - [IN] the user macro cache                                *
- *             sync   - [IN] the synchronization object containing inserted,     *
+ * Parameters: cache        - [IN] user macro cache                              *
+ *             sync         - [IN] synchronization object containing inserted,   *
  *                            updated and deleted rows                           *
- *             offset - [IN] macro column offset in the row                      *
+ *             offset       - [IN] macro column offset in row                    *
+ *             config_vault - [IN]                                               *
  *                                                                               *
  *********************************************************************************/
-static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int offset)
+static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int offset,
+		const zbx_config_vault_t *config_vault)
 {
 	unsigned char		tag;
 	int			ret, i;
@@ -732,7 +734,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 		(*pmacro)->context_op = context_op;
 
 		if (ZBX_MACRO_VALUE_VAULT == type)
-			um_macro_register_kvs(*pmacro, row[offset + 1]);
+			um_macro_register_kvs(*pmacro, row[offset + 1], config_vault);
 		else
 			(*pmacro)->value = dc_value;
 
@@ -851,7 +853,7 @@ static void	um_cache_sync_hosts(zbx_um_cache_t *cache, zbx_dbsync_t *sync)
  *                                                                               *
  *********************************************************************************/
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_dbsync_t *gmacros,
-		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls)
+		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault)
 {
 	if (ZBX_DBSYNC_INIT != gmacros->mode && ZBX_DBSYNC_INIT != hmacros->mode && ZBX_DBSYNC_INIT != htmpls->mode &&
 			0 == gmacros->rows.values_num && 0 == hmacros->rows.values_num && 0 == htmpls->rows.values_num)
@@ -867,8 +869,8 @@ zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_
 
 	cache->revision = revision;
 
-	um_cache_sync_macros(cache, gmacros, 1);
-	um_cache_sync_macros(cache, hmacros, 2);
+	um_cache_sync_macros(cache, gmacros, 1, config_vault);
+	um_cache_sync_macros(cache, hmacros, 2, config_vault);
 	um_cache_sync_hosts(cache, htmpls);
 
 	return cache;

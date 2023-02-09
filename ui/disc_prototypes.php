@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ $fields = [
 													' && isset({key}) && strncmp({key}, "mqtt.get", 8) === 0)',
 										_('Update interval')
 									],
-	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
+	'delay_flex' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'status' =>						[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]), null],
 	'discover' =>					[T_ZBX_INT, O_OPT, null,	IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
 	'type' =>						[T_ZBX_INT, O_OPT, null,
@@ -122,8 +122,8 @@ $fields = [
 										'(isset({add}) || isset({update})) && isset({value_type})'.
 											' && {value_type} == '.ITEM_VALUE_TYPE_LOG
 									],
-	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
-	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'preprocessing' =>				[null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'group_itemid' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,				DB_ID,	null],
 	'history_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
 	'history' =>					[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update}))'.
@@ -151,10 +151,10 @@ $fields = [
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
 										_('URL')
 									],
-	'query_fields' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'parameters' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'posts' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'status_codes' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'query_fields' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'parameters' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'posts' =>						[T_ZBX_STR, O_OPT, null,			null,	null],
+	'status_codes' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
 	'follow_redirects' =>			[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
 										null
@@ -163,8 +163,8 @@ $fields = [
 										IN([ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 										null
 									],
-	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'headers' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
+	'headers' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'retrieve_mode' =>				[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
 											HTTPTEST_STEP_RETRIEVE_MODE_BOTH
@@ -186,40 +186,40 @@ $fields = [
 	'ssl_key_file' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_password' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'verify_peer' =>				[T_ZBX_INT, O_OPT, null,
-										IN([HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]),
+										IN([ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]),
 										null
 									],
 	'verify_host' =>				[T_ZBX_INT, O_OPT, null,
-										IN([HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]),
+										IN([ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]),
 										null
 									],
 	'http_authtype' =>				[T_ZBX_INT, O_OPT, null,
-										IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
-											HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST
+										IN([ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM,
+											ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST
 										]),
 										null
 									],
 	'http_username' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
-											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
-												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+											' && ({http_authtype} == '.ZBX_HTTP_AUTH_BASIC.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_NTLM.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_KERBEROS.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_DIGEST.
 											')',
 										_('Username')
 									],
 	'http_password' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
-											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
-												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+											' && ({http_authtype} == '.ZBX_HTTP_AUTH_BASIC.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_NTLM.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_KERBEROS.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_DIGEST.
 											')',
 										_('Password')
 									],
-	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'visible' =>					[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
 	'context' =>					[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
-	'tags' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'tags' =>						[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'show_inherited_tags' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -235,7 +235,7 @@ $fields = [
 	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>				[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	// filter
 	'filter_set' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	// sort and sortorder
@@ -510,11 +510,11 @@ elseif (hasRequest('action') && hasRequest('group_itemid')
  * Display
  */
 if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
-	$itemPrototype = [];
+	$item = [];
 	$has_errors = false;
 
 	if (hasRequest('itemid') && !hasRequest('clone')) {
-		$itemPrototype = API::ItemPrototype()->get([
+		$items = API::ItemPrototype()->get([
 			'itemids' => getRequest('itemid'),
 			'output' => [
 				'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
@@ -529,10 +529,12 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value']
 		]);
-		$itemPrototype = reset($itemPrototype);
+		$item = reset($items);
+
+		$item['hosts'] = $lld_rules[0]['hosts'];
 
 		$i = 0;
-		foreach ($itemPrototype['preprocessing'] as &$step) {
+		foreach ($item['preprocessing'] as &$step) {
 			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
 				$step['params'] = [$step['params'], ''];
 			}
@@ -543,24 +545,24 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 		}
 		unset($step);
 
-		if ($itemPrototype['type'] != ITEM_TYPE_JMX) {
-			$itemPrototype['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+		if ($item['type'] != ITEM_TYPE_JMX) {
+			$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
-		if (getRequest('type', $itemPrototype['type']) == ITEM_TYPE_DEPENDENT) {
+		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT) {
 			$master_prototypes = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'itemids' => [getRequest('master_itemid', $itemPrototype['master_itemid'])],
-				'hostids' => [$itemPrototype['hostid']],
+				'itemids' => [getRequest('master_itemid', $item['master_itemid'])],
+				'hostids' => [$item['hostid']],
 				'webitems' => true
 			])
 			+ API::ItemPrototype()->get([
 				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'itemids' => getRequest('master_itemid', $itemPrototype['master_itemid'])
+				'itemids' => getRequest('master_itemid', $item['master_itemid'])
 			]);
 
 			if ($master_prototypes) {
-				$itemPrototype['master_item'] = reset($master_prototypes);
+				$item['master_item'] = reset($master_prototypes);
 			}
 		}
 	}
@@ -576,7 +578,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 		]);
 
 		if ($master_prototypes) {
-			$itemPrototype['master_item'] = reset($master_prototypes);
+			$item['master_item'] = reset($master_prototypes);
 		}
 		else {
 			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
@@ -585,7 +587,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 	}
 
 	$form_action = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
-	$data = getItemFormData($itemPrototype, ['form' => $form_action]);
+	$data = getItemFormData($item, ['form' => $form_action]);
 	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
 	$data['preprocessing_types'] = CItemPrototype::SUPPORTED_PREPROCESSING_TYPES;
@@ -634,6 +636,7 @@ else {
 	CProfile::update($prefix.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	$data = [
+		'form_refresh' => getRequest('form_refresh', 0),
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'hostid' => $lld_rules[0]['hostid'],
@@ -690,8 +693,9 @@ else {
 			->setArgument('context', $data['context'])
 	);
 
-	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
-	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	$data['parent_items'] = getParentItemPrototypes($data['items'],
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+	);
 
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT);
 

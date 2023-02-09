@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -221,7 +221,7 @@ class CControllerItemMassCheckNow extends CController {
 
 			foreach ($itemids as $itemid) {
 				$create_tasks[] = [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => $itemid
 					]
@@ -238,7 +238,7 @@ class CControllerItemMassCheckNow extends CController {
 				];
 			}
 			else {
-				// If task API failed, return will full error message from API.
+				// If task API failed, return with full error message from API.
 				$output['error'] = [
 					'title' => _('Cannot execute operation'),
 					'messages' => array_column(get_and_clear_messages(), 'message')

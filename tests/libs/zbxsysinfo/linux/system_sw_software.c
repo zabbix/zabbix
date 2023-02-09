@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,10 +25,15 @@
 #include "zbxsysinfo.h"
 #include "../../../../src/libs/zbxsysinfo/sysinfo.h"
 
+FILE	*custom_fopen_mock(const char *__filename, const char *__modes);
+int	__wrap_uname(struct utsname *buf);
+
 FILE	*custom_fopen_mock(const char *__filename, const char *__modes)
 {
 	const char	*str;
 	size_t		f_size;
+
+	ZBX_UNUSED(__modes);
 
 	if (0 == strcmp(__filename, "/proc/version"))
 		str = zbx_mock_get_parameter_string("in.proc_version");
@@ -48,7 +53,6 @@ FILE	*custom_fopen_mock(const char *__filename, const char *__modes)
 
 int	__wrap_uname(struct utsname *buf)
 {
-	const char	*str;
 	const char	*release, *machine;
 	int		ret;
 
@@ -60,14 +64,14 @@ int	__wrap_uname(struct utsname *buf)
 		buf->machine[0] = '\0';
 
 		if (sizeof(buf->release) < strlen(release) * sizeof(char))
-			fail_msg("Uname release string is too large, maximum length is: %s bytes", sizeof(buf->release));
+			fail_msg("Uname release string is too large, maximum length is: %lu bytes", sizeof(buf->release));
 		else
 			strcat(buf->release, release);
 
 		machine = zbx_mock_get_parameter_string("in.uname.machine");
 
 		if (sizeof(buf->machine) < strlen(machine) * sizeof(char))
-			fail_msg("Uname machine string is too large, maximum length is: %s bytes", sizeof(buf->release));
+			fail_msg("Uname machine string is too large, maximum length is: %lu bytes", sizeof(buf->release));
 		else
 			strcat(buf->machine, machine);
 	}

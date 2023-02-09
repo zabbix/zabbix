@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>6.4</version>
-    <date>2022-09-12T13:32:57Z</date>
     <template_groups>
         <template_group>
             <uuid>bb17447fffe04b7784ddbd77b209c05a</uuid>
@@ -13,11 +12,6 @@
             <uuid>17ecce4a1f2b4d739586ad1d6e717812</uuid>
             <template>bbbtmpl</template>
             <name>bbbtmpl</name>
-            <templates>
-                <template>
-                    <name>SampleTemplate</name>
-                </template>
-            </templates>
             <groups>
                 <group>
                     <name>TmplTests</name>
@@ -675,6 +669,15 @@
                     <name>Zabbix internal1</name>
                     <type>INTERNAL</type>
                     <key>zabbix[boottime]</key>
+                </item>
+                <item>
+                    <uuid>5a7addc891c4413f8a83809eceb869e2</uuid>
+                    <name>walk1</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>walk[.1.1.6.1.2.1.1.9.1.3]</snmp_oid>
+                    <key>walk1</key>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
                 </item>
             </items>
         </template>

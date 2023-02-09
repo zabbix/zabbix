@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 <script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_NORMAL ?>">
 	<tr id="items_#{number}" class="sortable">
 		<!-- icon + hidden -->
-		<?php if ($readonly): ?>
+		<?php if ($data['readonly']): ?>
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
@@ -51,7 +51,7 @@
 
 		<!-- name -->
 		<td>
-			<?php if ($readonly): ?>
+			<?php if ($data['readonly']): ?>
 				<span id="items_#{number}_name">#{name}</span>
 			<?php else: ?>
 				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
@@ -96,7 +96,7 @@
 			?>
 		</td>
 
-		<?php if (!$readonly): ?>
+		<?php if (!$data['readonly']): ?>
 			<td class="<?= ZBX_STYLE_NOWRAP ?>">
 				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="view.removeItem(this);"><?= _('Remove') ?></button>
 			</td>
@@ -107,7 +107,7 @@
 <script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_STACKED ?>">
 	<tr id="items_#{number}" class="sortable">
 		<!-- icon + hidden -->
-		<?php if ($readonly): ?>
+		<?php if ($data['readonly']): ?>
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
@@ -131,7 +131,7 @@
 
 		<!-- name -->
 		<td>
-			<?php if ($readonly): ?>
+			<?php if ($data['readonly']): ?>
 				<span id="items_#{number}_name">#{name}</span>
 			<?php else: ?>
 				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
@@ -167,7 +167,7 @@
 			?>
 		</td>
 
-		<?php if (!$readonly): ?>
+		<?php if (!$data['readonly']): ?>
 			<td class="<?= ZBX_STYLE_NOWRAP ?>">
 				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="view.removeItem(this);"><?= _('Remove') ?></button>
 			</td>
@@ -178,7 +178,7 @@
 <script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_PIE ?>">
 	<tr id="items_#{number}" class="sortable">
 		<!-- icon + hidden -->
-		<?php if ($readonly): ?>
+		<?php if ($data['readonly']): ?>
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
@@ -202,7 +202,7 @@
 
 		<!-- name -->
 		<td>
-			<?php if ($readonly): ?>
+			<?php if ($data['readonly']): ?>
 				<span id="items_#{number}_name">#{name}</span>
 			<?php else: ?>
 				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
@@ -239,7 +239,7 @@
 			?>
 		</td>
 
-		<?php if (!$readonly): ?>
+		<?php if (!$data['readonly']): ?>
 			<td class="<?= ZBX_STYLE_NOWRAP ?>">
 				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="view.removeItem(this);"><?= _('Remove') ?></button>
 			</td>
@@ -250,7 +250,7 @@
 <script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_EXPLODED ?>">
 	<tr id="items_#{number}" class="sortable">
 		<!-- icon + hidden -->
-		<?php if ($readonly): ?>
+		<?php if ($data['readonly']): ?>
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
@@ -274,7 +274,7 @@
 
 		<!-- name -->
 		<td>
-			<?php if ($readonly): ?>
+			<?php if ($data['readonly']): ?>
 				<span id="items_#{number}_name">#{name}</span>
 			<?php else: ?>
 				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
@@ -311,7 +311,7 @@
 			?>
 		</td>
 
-		<?php if (!$readonly): ?>
+		<?php if (!$data['readonly']): ?>
 			<td class="<?= ZBX_STYLE_NOWRAP ?>">
 				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="view.removeItem(this);"><?= _('Remove') ?></button>
 			</td>
@@ -718,7 +718,7 @@
 		},
 
 		refresh() {
-			const url = new Curl('', false);
+			const url = new Curl('');
 			const form = document.getElementsByName(this.form_name)[0];
 			const fields = getFormFields(form);
 
@@ -751,7 +751,7 @@
 					}
 				}
 
-				const curl = new Curl('zabbix.php', false);
+				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'host.list');
 
 				location.href = curl.getUrl();

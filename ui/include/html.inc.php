@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -869,6 +869,10 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'module.list')
 		->getUrl();
 
+	$connectors_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'connector.list')
+		->getUrl();
+
 	$miscconfig_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
@@ -884,6 +888,7 @@ function getAdministrationGeneralSubmenu() {
 				$trigdisplay_url    => _('Trigger displaying options'),
 				$geomap_url			=> _('Geographical maps'),
 				$modules_url        => _('Modules'),
+				$connectors_url     => _('Connectors'),
 				$miscconfig_url     => _('Other')
 			])
 		]
@@ -1001,7 +1006,6 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false) {
  * @return CTag  Returns CSpan or CButton depending on boolean $icon_data['button'] parameter
  */
 function makeActionIcon(array $icon_data): CTag {
-
 	if (array_key_exists('button', $icon_data) && $icon_data['button']) {
 		$icon = (new CButton(null))->addClass($icon_data['icon']);
 	}
@@ -1023,6 +1027,10 @@ function makeActionIcon(array $icon_data): CTag {
 	}
 	elseif (array_key_exists('title', $icon_data)) {
 		$icon->setTitle($icon_data['title']);
+	}
+
+	if (array_key_exists('style', $icon_data)) {
+		$icon->addStyle($icon_data['style']);
 	}
 
 	if (array_key_exists('aria-label', $icon_data)) {

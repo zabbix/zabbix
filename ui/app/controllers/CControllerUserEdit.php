@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'surname' =>			'db users.surname',
 			'user_groups' =>		'array_id',
 			'change_password' =>	'in 1',
+			'current_password' =>	'string',
 			'password1' =>			'string',
 			'password2' =>			'string',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
@@ -98,6 +99,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'username' => '',
 			'name' => '',
 			'surname' => '',
+			'current_password' => '',
 			'password1' => '',
 			'password2' => '',
 			'lang' => $db_defaults['lang'],
@@ -115,7 +117,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'role' => [],
 			'modules_rules' => [],
 			'user_type' => '',
-			'sid' => $this->getUserSID(),
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
 			'db_user' => ['username' => ''],
@@ -130,6 +131,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['surname'] = $this->user['surname'];
 			$user_groups = array_column($this->user['usrgrps'], 'usrgrpid');
 			$data['change_password'] = $this->hasInput('change_password') || $this->hasInput('password1');
+			$data['current_password'] = '';
 			$data['password1'] = '';
 			$data['password2'] = '';
 			$data['lang'] = $this->user['lang'];
@@ -154,8 +156,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		}
 
 		// Overwrite with input variables.
-		$this->getInputs($data, ['username', 'name', 'surname', 'password1', 'password2', 'lang', 'timezone', 'theme',
-			'autologin', 'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'roleid'
+		$this->getInputs($data, ['username', 'name', 'surname', 'change_password', 'password1', 'password2', 'lang',
+			'timezone', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'roleid'
 		]);
 		if ($data['form_refresh'] != 0) {
 			$user_groups = $this->getInput('user_groups', []);
@@ -285,6 +287,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'output' => ['status'],
 			'preservekeys' => true
 		]);
+
+		$data['internal_authentication'] = CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));

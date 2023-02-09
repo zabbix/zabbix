@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,6 +108,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	hsteps, hstep;
 	zbx_mock_error_t	err;
 	int			i, j;
+	zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 	ZBX_UNUSED(state);
 
@@ -140,7 +141,7 @@ void	zbx_mock_test_entry(void **state)
 		zbx_dbsync_init(&htmpls, ZBX_DBSYNC_UPDATE);
 
 		um_mock_cache_diff(mock_cache, &steps.values[i]->mock_cache, &gmacros, &hmacros, &htmpls);
-		umc = steps.values[i]->cache = um_cache_sync(umc, 0, &gmacros, &hmacros, &htmpls);
+		umc = steps.values[i]->cache = um_cache_sync(umc, 0, &gmacros, &hmacros, &htmpls, &config_vault);
 		umc->refcount += steps.values[i]->refs;
 
 		mock_dbsync_clear(&gmacros);
