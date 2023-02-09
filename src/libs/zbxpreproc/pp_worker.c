@@ -31,8 +31,6 @@
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
 
-ZBX_THREAD_LOCAL int	__zbxthread__;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: process preprocessing testing task                                *
@@ -108,9 +106,10 @@ static void	*pp_worker_entry(void *arg)
 	zbx_pp_worker_t	*worker = (zbx_pp_worker_t *)arg;
 	zbx_pp_queue_t	*queue = worker->queue;
 	zbx_pp_task_t	*in;
-	char		*error = NULL;
+	char		*error = NULL, component[MAX_ID_LEN + 1];
 
-	__zbxthread__ = worker->id;
+	zbx_snprintf(component, sizeof(component), "%d", worker->id);
+	zbx_set_log_component(component);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
@@ -129,8 +128,8 @@ static void	*pp_worker_entry(void *arg)
 
 			zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_BUSY);
 
-			zabbix_log(LOG_LEVEL_TRACE, "[%d] %s() process task type:%u itemid:" ZBX_FS_UI64, __zbxthread__,
-					__func__, in->type, in->itemid);
+			zabbix_log(LOG_LEVEL_TRACE, "%s() process task type:%u itemid:" ZBX_FS_UI64, __func__,
+					in->type, in->itemid);
 
 			switch (in->type)
 			{

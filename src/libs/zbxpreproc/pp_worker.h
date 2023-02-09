@@ -27,7 +27,7 @@
 
 typedef struct
 {
-	int			id;	/* TODO: for debug logging, remove */
+	int			id;
 
 	zbx_uint32_t		init_flags;
 	int			stop;
