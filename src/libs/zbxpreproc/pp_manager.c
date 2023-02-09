@@ -90,14 +90,18 @@ static void	pp_curl_destroy(void)
  *                                                                            *
  * Purpose: create preprocessing manager                                      *
  *                                                                            *
- * Parameters: program_type - [IN] the component type (server/proxy)          *
- *             workers_num  - [IN] the number of workers to create            *
- *             error        - [OUT] the error message                         *
+ * Parameters: program_type  - [IN] the component type (server/proxy)         *
+ *             workers_num   - [IN] the number of workers to create           *
+ *             finished_cb   - [IN] a callback to call after finishing        *
+ *                                  task (optional)                           *
+ *             finished_data - [IN] the callback data (optional)              *
+ *             error         - [OUT] the error message                        *
  *                                                                            *
  * Return value: The created manager or NULL on error.                        *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, char **error)
+zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
+		void *finished_data, char **error)
 {
 	int			i, ret = FAIL, started_num = 0;
 	time_t			time_start;
@@ -126,6 +130,8 @@ zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, char **error)
 	{
 		if (SUCCEED != pp_worker_init(&manager->workers[i], i + 1, &manager->queue, manager->timekeeper, error))
 			goto out;
+
+		pp_worker_set_finished_cb(&manager->workers[i], finished_cb, finished_data);
 	}
 
 	zbx_hashset_create_ext(&manager->items, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,

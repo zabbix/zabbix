@@ -32,8 +32,8 @@
 
 extern unsigned char	program_type;
 
-#define PP_MANAGER_DELAY_SEC	0
-#define PP_MANAGER_DELAY_NS	5e8
+#define PP_MANAGER_DELAY_SEC 	1
+#define PP_MANAGER_DELAY_NS	0
 
 /******************************************************************************
  *                                                                            *
@@ -487,6 +487,11 @@ static void	preprocessor_reply_usage_stats(zbx_pp_manager_t *manager, zbx_ipc_cl
 	zbx_vector_dbl_destroy(&usage);
 }
 
+static void	preprocessor_finished_task_cb(void *data)
+{
+	zbx_ipc_service_alert((zbx_ipc_service_t *)data);
+}
+
 ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 {
 	zbx_ipc_service_t		service;
@@ -523,7 +528,8 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, &error)))
+	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, preprocessor_finished_task_cb,
+			(void *)&service, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize preprocessing manager: %s", error);
 		zbx_free(error);

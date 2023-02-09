@@ -26,6 +26,8 @@
 #include "zbxtimekeeper.h"
 #include "zbxipcservice.h"
 
+typedef void (*zbx_pp_notify_cb_t)(void *data);
+
 /* one preprocessing step history */
 typedef struct
 {
@@ -165,7 +167,8 @@ int	zbx_pp_preproc_has_history(int type);
 
 typedef struct zbx_pp_manager zbx_pp_manager_t;
 
-zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, char **error);
+zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
+		void *finished_data, char **error);
 void	zbx_pp_manager_free(zbx_pp_manager_t *manager);
 zbx_pp_task_t	*zbx_pp_manager_create_task(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value,
 		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);

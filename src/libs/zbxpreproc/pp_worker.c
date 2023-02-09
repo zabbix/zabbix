@@ -154,6 +154,9 @@ static void	*pp_worker_entry(void *arg)
 			pp_task_queue_lock(queue);
 			pp_task_queue_push_finished(queue, in);
 
+			if (NULL != worker->finished_cb)
+				worker->finished_cb(worker->finished_data);
+
 			continue;
 		}
 
@@ -184,8 +187,8 @@ static void	*pp_worker_entry(void *arg)
  * Parameters: worker     - [IN] the preprocessing worker                     *
  *             id         - [IN] the worker id (index)                        *
  *             queue      - [IN] the task queue                               *
- *             timekeeper - [IN] the timekeeper object for busy/idle worker   *
- *                               state reporting                              *
+ *             timekeeper - [IN] the timekeeper object for busy/idle          *
+ *                               worker state reporting                       *
  *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - the worker was initialized and started             *
@@ -244,4 +247,20 @@ void	pp_worker_destroy(zbx_pp_worker_t *worker)
 	pp_context_destroy(&worker->execute_ctx);
 
 	worker->init_flags = PP_WORKER_INIT_NONE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set callback to call after task is processed                      *
+ *                                                                            *
+ * Parameters: worker         - [IN] the preprocessing worker                 *
+ *             finished_cb   - [IN] a callback to call after finishing        *
+ *                                     task                                   *
+ *             finished_data - [IN] the callback data                         *
+ *                                                                            *
+ ******************************************************************************/
+void	pp_worker_set_finished_cb(zbx_pp_worker_t *worker, zbx_pp_notify_cb_t finished_cb, void *finished_data)
+{
+	worker->finished_cb = finished_cb;
+	worker->finished_data = finished_data;
 }
