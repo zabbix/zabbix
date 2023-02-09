@@ -979,7 +979,7 @@ class CScript extends CApiService {
 		$scripts = $this->get([
 			'output' => API_OUTPUT_EXTEND,
 			'hostids' => $hostids,
-			'sortfield' => ['name', 'menu_path'],
+			'sortfield' => 'name',
 			'preservekeys' => true
 		]);
 
