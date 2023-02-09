@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -901,6 +901,10 @@ function zbx_empty($value) {
 }
 
 function zbx_is_int($var) {
+	if (is_array($var)) {
+		return false;
+	}
+
 	if (is_int($var)) {
 		return true;
 	}

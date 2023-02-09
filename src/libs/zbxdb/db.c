@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1782,9 +1782,16 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 					}
 					else
 					{
+#define ZBX_MIN_OCI_NUMBER_WIDTH	22
 						/* retrieve the column width in bytes */
 						err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
 								(ub4 *)NULL, (ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
+
+						if (ZBX_MIN_OCI_NUMBER_WIDTH > col_width && SQLT_NUM == data_type)
+						{
+							col_width = ZBX_MIN_OCI_NUMBER_WIDTH;
+						}
+#undef ZBX_MIN_OCI_NUMBER_WIDTH
 					}
 				}
 				col_width++;	/* add 1 byte for terminating '\0' */
