@@ -385,11 +385,11 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 				[
 					'expected' => TEST_GOOD,
 					'servers_settings' => [
-						'Host' => 'dc-ad-srv.zabbix.sandbox',
+						'Host' => PHPUNIT_LDAP_HOST,
 						'Base DN' => 'DC=zbx,DC=local',
 						'Search attribute' => 'sAMAccountName',
 						'Bind DN' => 'CN=Admin,OU=Users,OU=Zabbix,DC=zbx,DC=local',
-						'Bind password' => 'zabbix#33',
+						'Bind password' =>PHPUNIT_LDAP_BIND_PASSWORD,
 						'Configure JIT provisioning' => true,
 						'Group configuration' => 'memberOf',
 						'Group name attribute' => 'CN',
@@ -416,8 +416,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						]
 					],
 					'test_settings' => [
-						'Login' => 'user1',
-						'User password' => 'zabbix#33'
+						'Login' => PHPUNIT_LDAP_USERNAME,
+						'User password' => PHPUNIT_LDAP_USER_PASSWORD
 					],
 					'check_provisioning' => [
 						'role' => 'Super admin role',
