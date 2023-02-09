@@ -75,6 +75,26 @@ class Group extends ScimApiService {
 
 			$this->setData($options['id'], $db_scim_group[0]['name'], $users[$options['id']]);
 		}
+		elseif (array_key_exists('displayName', $options)) {
+			$db_scim_group = DB::select('scim_group', [
+				'output' => ['name', 'scim_groupid'],
+				'filter' => ['name' => $options['displayName']]
+			]);
+
+			if (!$db_scim_group) {
+				$this->data = [
+					'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
+					'Resources' => []
+				];
+			}
+			else {
+				$users = $this->getUsersByGroupIds([$db_scim_group[0]['scim_groupid']]);
+
+				$this->setData($db_scim_group[0]['scim_groupid'], $db_scim_group[0]['name'],
+					$users[$db_scim_group[0]['scim_groupid']]
+				);
+			}
+		}
 		else {
 			$db_scim_groups = DB::select('scim_group', [
 				'output' => ['name'],
