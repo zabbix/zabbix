@@ -1614,7 +1614,7 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
  ******************************************************************************/
 void	zbx_db_register_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now, zbx_events_funcs_t *events_cbs)
+		int now, const zbx_events_funcs_t *events_cbs)
 {
 	zbx_vector_ptr_t	autoreg_hosts;
 
@@ -1807,7 +1807,7 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 	return 0;
 }
 
-void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid, zbx_events_funcs_t
+void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid, const zbx_events_funcs_t
 		*events_cbs)
 {
 	zbx_autoreg_host_t	*autoreg_host;

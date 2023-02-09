@@ -25,7 +25,7 @@
 
 typedef struct
 {
-	zbx_events_funcs_t events_cbs;
+	const zbx_events_funcs_t	*events_cbs;
 }
 zbx_thread_dbsyncer_args;
 

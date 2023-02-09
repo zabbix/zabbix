@@ -414,7 +414,7 @@ static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
 
-static	zbx_events_funcs_t	events_cbs = {
+static	const zbx_events_funcs_t	events_cbs = {
 	.add_event_cb			= zbx_add_event,
 	.process_events_cb		= zbx_process_events,
 	.clean_events_cb		= zbx_clean_events,
@@ -1119,7 +1119,7 @@ static void	zbx_on_exit(int ret)
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
 		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-		free_database_cache(ZBX_SYNC_ALL, events_cbs);
+		free_database_cache(ZBX_SYNC_ALL, &events_cbs);
 		zbx_db_close();
 	}
 
@@ -1441,7 +1441,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
 
-	zbx_thread_dbsyncer_args	dbsyncer_args = {events_cbs};
+	zbx_thread_dbsyncer_args	dbsyncer_args = {&events_cbs};
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1795,7 +1795,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_vmware_destroy();
 	zbx_free_selfmon_collector();
 	free_configuration_cache();
-	free_database_cache(ZBX_SYNC_NONE, events_cbs);
+	free_database_cache(ZBX_SYNC_NONE, &events_cbs);
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();

@@ -792,7 +792,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_results(zbx_discoverer_manager_t *manager, zbx_events_funcs_t *events_cbs)
+static void	process_results(zbx_discoverer_manager_t *manager, const zbx_events_funcs_t *events_cbs)
 {
 	int	i;
 

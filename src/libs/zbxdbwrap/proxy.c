@@ -2228,9 +2228,9 @@ static void	zbx_drule_free(zbx_drule_t *drule)
  * Purpose: process services discovered on IP address                         *
  *                                                                            *
  ******************************************************************************/
-static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zbx_events_funcs_t *events_cbs,
-		zbx_uint64_t druleid, zbx_vector_uint64_t *dcheckids, zbx_uint64_t unique_dcheckid, int *processed_num,
-		int ip_idx)
+static int	process_services(const zbx_vector_ptr_t *services, const char *ip,
+		const zbx_events_funcs_t *events_cbs, zbx_uint64_t druleid, zbx_vector_uint64_t *dcheckids,
+		zbx_uint64_t unique_dcheckid, int *processed_num, int ip_idx)
 {
 	zbx_db_dhost		dhost;
 	zbx_dservice_t		*service;
@@ -2409,7 +2409,7 @@ fail:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_events_funcs_t *events_cbs,
+static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const zbx_events_funcs_t *events_cbs,
 		char **error)
 {
 	DB_RESULT		result;
@@ -2604,7 +2604,7 @@ json_parse_return:
  *                                                                            *
  ******************************************************************************/
 static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid,
-		zbx_events_funcs_t *events_cbs, char **error)
+		const zbx_events_funcs_t *events_cbs, char **error)
 {
 	struct zbx_json_parse	jp_row;
 	int			ret = SUCCEED;
@@ -2901,7 +2901,7 @@ static void	check_proxy_nodata_empty(zbx_timespec_t *ts, unsigned char proxy_sta
  *                                                                            *
  ******************************************************************************/
 int	zbx_process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		unsigned char proxy_status, zbx_events_funcs_t *events_cbs, int *more, char **error)
+		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;
 	int			ret = SUCCEED, flags_old;

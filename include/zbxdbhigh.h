@@ -625,14 +625,14 @@ int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, cha
 
 void	zbx_db_register_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now, zbx_events_funcs_t *events_cbs);
+		int now, const zbx_events_funcs_t *events_cbs);
 
 void	zbx_db_register_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
 		int now);
 
 void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid,
-		zbx_events_funcs_t *events_cbs);
+		const zbx_events_funcs_t *events_cbs);
 
 void	zbx_db_register_host_clean(zbx_vector_ptr_t *autoreg_hosts);
 

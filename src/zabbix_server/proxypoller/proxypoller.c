@@ -391,7 +391,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_timespec_t *ts,
-		zbx_events_funcs_t *events_cbs, int *more)
+		const zbx_events_funcs_t *events_cbs, int *more)
 {
 	struct zbx_json_parse	jp;
 	char			*error = NULL, *version_str = NULL;
@@ -458,7 +458,7 @@ out:
  *           properties.                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_data(DC_PROXY *proxy, int config_timeout, zbx_events_funcs_t *events_cbs, int *more)
+static int	proxy_get_data(DC_PROXY *proxy, int config_timeout, const zbx_events_funcs_t *events_cbs, int *more)
 {
 	char		*answer = NULL;
 	int		ret;
@@ -506,7 +506,7 @@ out:
  *           properties.                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_tasks(DC_PROXY *proxy, int config_timeout, zbx_events_funcs_t *events_cbs)
+static int	proxy_get_tasks(DC_PROXY *proxy, int config_timeout, const zbx_events_funcs_t *events_cbs)
 {
 	char		*answer = NULL;
 	int		ret = FAIL, more;
@@ -543,7 +543,8 @@ out:
  * Purpose: retrieve values of metrics from monitored hosts                   *
  *                                                                            *
  ******************************************************************************/
-static int	process_proxy(const zbx_config_vault_t *config_vault, int config_timeout, zbx_events_funcs_t *events_cbs)
+static int	process_proxy(const zbx_config_vault_t *config_vault, int config_timeout,
+		const zbx_events_funcs_t *events_cbs)
 {
 	DC_PROXY		proxy, proxy_old;
 	int			num, i;
@@ -636,7 +637,8 @@ error:
 				proxy_old.auto_compress != proxy.auto_compress ||
 				proxy_old.lastaccess != proxy.lastaccess)
 		{
-			zbx_update_proxy_data(&proxy_old, proxy.version_str, proxy.version_int, proxy.lastaccess, proxy.auto_compress, 0);
+			zbx_update_proxy_data(&proxy_old, proxy.version_str, proxy.version_int, proxy.lastaccess,
+					proxy.auto_compress, 0);
 		}
 
 		DCrequeue_proxy(proxy.hostid, update_nextcheck, ret);
