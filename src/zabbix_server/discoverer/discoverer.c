@@ -61,8 +61,8 @@ zbx_discoverer_worker_t;
 typedef struct
 {
 	zbx_uint64_t	druleid;
-	DC_DRULE	*drule;
-	DC_DCHECK	*dcheck;
+	zbx_dc_drule_t	*drule;
+	zbx_dc_dcheck_t	*dcheck;
 	char		*ip;
 	char		*dns;
 	unsigned short	port;
@@ -74,7 +74,7 @@ zbx_discoverer_net_check_job_t;
 typedef struct
 {
 	zbx_vector_ptr_t	services;
-	DC_DRULE		*drule;
+	zbx_dc_drule_t		*drule;
 	char			*ip;
 	char			*dns;
 	int			now;
@@ -175,7 +175,7 @@ static int	results_compare(const void *d1, const void *d2)
  * Return value: SUCCEED - service is UP, FAIL - service not discovered       *
  *                                                                            *
  ******************************************************************************/
-static int	discover_service(const DC_DCHECK *dcheck, char *ip, int port, int config_timeout, char **value,
+static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, int config_timeout, char **value,
 		size_t *value_alloc)
 {
 	int		ret = SUCCEED;
@@ -242,7 +242,7 @@ static int	discover_service(const DC_DCHECK *dcheck, char *ip, int port, int con
 		char		**pvalue;
 		size_t		value_offset = 0;
 		ZBX_FPING_HOST	host;
-		DC_ITEM		item;
+		zbx_dc_item_t	item;
 		char		key[MAX_STRING_LEN], error[ZBX_ITEM_ERROR_LEN_MAX];
 
 		switch (dcheck->type)
@@ -272,7 +272,7 @@ static int	discover_service(const DC_DCHECK *dcheck, char *ip, int port, int con
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
 			case SVC_SNMPv3:
-				memset(&item, 0, sizeof(DC_ITEM));
+				memset(&item, 0, sizeof(zbx_dc_item_t));
 
 				zbx_strscpy(item.key_orig, dcheck->key_);
 				item.key = item.key_orig;
@@ -403,7 +403,7 @@ static int	discover_service(const DC_DCHECK *dcheck, char *ip, int port, int con
 	return ret;
 }
 
-static void	drule_copy(const DC_DRULE *src, DC_DRULE *dst)
+static void	drule_copy(const zbx_dc_drule_t *src, zbx_dc_drule_t *dst)
 {
 	dst->druleid = src->druleid;
 	dst->proxy_hostid = src->proxy_hostid;
@@ -418,7 +418,7 @@ static void	drule_copy(const DC_DRULE *src, DC_DRULE *dst)
 	dst->unique_dcheckid = src->unique_dcheckid;
 }
 
-static void	dcheck_copy(const DC_DCHECK *src, DC_DCHECK *dst)
+static void	dcheck_copy(const zbx_dc_dcheck_t *src, zbx_dc_dcheck_t *dst)
 {
 	dst->dcheckid = src->dcheckid;
 	dst->druleid = src->druleid;
@@ -436,7 +436,7 @@ static void	dcheck_copy(const DC_DCHECK *src, DC_DCHECK *dst)
 	dst->snmpv3_contextname = zbx_strdup(NULL, src->snmpv3_contextname);
 }
 
-static void	dcheck_free(DC_DCHECK *dcheck)
+static void	dcheck_free(zbx_dc_dcheck_t *dcheck)
 {
 	zbx_free(dcheck->key_);
 	zbx_free(dcheck->snmp_community);
@@ -448,7 +448,7 @@ static void	dcheck_free(DC_DCHECK *dcheck)
 	zbx_free(dcheck);
 }
 
-static void	drule_free(DC_DRULE *drule)
+static void	drule_free(zbx_dc_drule_t *drule)
 {
 	zbx_free(drule->delay_str);
 	zbx_free(drule->iprange);
@@ -474,7 +474,7 @@ static void	discoverer_job_net_check_push(zbx_discoverer_jobs_queue_t *queue,
 	zbx_list_append(&queue->jobs, net_check, NULL);
 }
 
-static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *ip, char *dns, int now,
+static void	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dcheck_t *dcheck, char *ip, char *dns, int now,
 		int config_timeout)
 {
 	const char	*start;
@@ -513,11 +513,11 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 					sizeof(zbx_discoverer_net_check_job_t));
 			net_check->druleid = drule->druleid;
 
-			net_check->drule = (DC_DRULE*)zbx_malloc(NULL, sizeof(DC_DRULE));
+			net_check->drule = (zbx_dc_drule_t*)zbx_malloc(NULL, sizeof(zbx_dc_drule_t));
 			drule_copy(drule, net_check->drule);
 			zbx_vector_ptr_create(&net_check->drule->dchecks);
 
-			net_check->dcheck = (DC_DCHECK*)zbx_malloc(NULL, sizeof(DC_DCHECK));
+			net_check->dcheck = (zbx_dc_dcheck_t*)zbx_malloc(NULL, sizeof(zbx_dc_dcheck_t));
 			dcheck_copy(dcheck, net_check->dcheck);
 
 			net_check->ip = zbx_strdup(NULL, ip);
@@ -544,13 +544,13 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_checks(const DC_DRULE *drule, char *ip, char *dns, int unique, int now, int config_timeout)
+static void	process_checks(const zbx_dc_drule_t *drule, char *ip, char *dns, int unique, int now, int config_timeout)
 {
 	int		i;
 
 	for (i = 0; i < drule->dchecks.values_num; i++)
 	{
-		DC_DCHECK	*dcheck = (DC_DCHECK*)drule->dchecks.values[i];
+		zbx_dc_dcheck_t	*dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
 
 		if (0 != drule->unique_dcheckid &&
 				((1 == unique && drule->unique_dcheckid != dcheck->dcheckid) ||
@@ -563,7 +563,7 @@ static void	process_checks(const DC_DRULE *drule, char *ip, char *dns, int uniqu
 	}
 }
 
-static void	process_services(const DC_DRULE *drule, zbx_db_dhost *dhost, const char *ip, const char *dns,
+static void	process_services(const zbx_dc_drule_t *drule, zbx_db_dhost *dhost, const char *ip, const char *dns,
 		int now, const zbx_vector_ptr_t *services)
 {
 	int	i;
@@ -594,7 +594,7 @@ static void	process_services(const DC_DRULE *drule, zbx_db_dhost *dhost, const c
  * Purpose: process single discovery rule                                     *
  *                                                                            *
  ******************************************************************************/
-static void	process_rule(DC_DRULE *drule, int config_timeout)
+static void	process_rule(zbx_dc_drule_t *drule, int config_timeout)
 {
 	char			ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma, dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	int			ipaddress[8], now;
@@ -844,7 +844,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout)
 	char			*delay_str = NULL;
 	zbx_dc_um_handle_t	*um_handle;
 	time_t			now;
-	DC_DRULE		*drule;
+	zbx_dc_drule_t		*drule;
 
 	now = time(NULL);
 
@@ -856,7 +856,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout)
 
 		for (i = 0; i < drule->dchecks.values_num; i++)
 		{
-			DC_DCHECK	*dcheck = (DC_DCHECK*)drule->dchecks.values[i];
+			zbx_dc_dcheck_t	*dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
 
 			if (0 != dcheck->uniq)
 			{
@@ -931,7 +931,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 			zbx_uint64_pair_t	revision, *revision_updated;
 			zbx_dservice_t		*service = NULL;
 			zbx_discovery_results_t	*result = NULL, result_cmp;
-			DC_DRULE		drule_cmp;
+			zbx_dc_drule_t		drule_cmp;
 
 			pthread_mutex_unlock(&dmanager.queue.lock);
 

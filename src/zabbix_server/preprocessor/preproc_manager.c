@@ -49,7 +49,7 @@ static void	preprocessor_sync_configuration(zbx_pp_manager_t *manager)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	old_revision = revision = zbx_pp_manager_get_revision(manager);
-	DCconfig_get_preprocessable_items(zbx_pp_manager_items(manager), &revision);
+	zbx_dc_config_get_preprocessable_items(zbx_pp_manager_items(manager), &revision);
 	zbx_pp_manager_set_revision(manager, revision);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE) && revision != old_revision)
@@ -189,7 +189,7 @@ static void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t it
 
 	if (0 == (flags & ZBX_FLAG_DISCOVERY_RULE) || 0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
-		dc_add_history_variant(itemid, value_type, flags, value, ts, value_opt);
+		zbx_dc_add_history_variant(itemid, value_type, flags, value, ts, value_opt);
 	}
 	else
 	{
@@ -614,7 +614,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 
 		if (0 == pending_num || 1 < sec - time_flush)
 		{
-			dc_flush_history();
+			zbx_dc_flush_history();
 			time_flush = time_now;
 		}
 	}

@@ -66,7 +66,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 	int		ret = FAIL;
 	zbx_script_t	script;
 	char		*info = NULL, error[MAX_STRING_LEN];
-	DC_HOST		host;
+	zbx_dc_host_t	host;
 
 	result = zbx_db_select("select command_type,execute_on,port,authtype,username,password,publickey,privatekey,"
 					"command,parent_taskid,hostid,alertid"
@@ -89,7 +89,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 	}
 
 	ZBX_STR2UINT64(hostid, row[10]);
-	if (FAIL == DCget_host_by_hostid(&host, hostid))
+	if (FAIL == zbx_dc_get_host_by_hostid(&host, hostid))
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL, "Unknown host.");
 		goto finish;

@@ -1297,7 +1297,7 @@ static void	proxyconfig_check_interface_availability(zbx_table_data_t *td)
 	}
 
 	if (0 != interfaceids.values_num)
-		DCtouch_interfaces_availability(&interfaceids);
+		zbx_dc_touch_interfaces_availability(&interfaceids);
 
 	zbx_vector_uint64_destroy(&interfaceids);
 }
@@ -2117,7 +2117,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
 		{
 			if (SUCCEED == zbx_json_brackets_by_name(&jp_config, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
-				DCsync_kvs_paths(&jp_kvs_paths, config_vault);
+				zbx_dc_sync_kvs_paths(&jp_kvs_paths, config_vault);
 		}
 		else
 		{

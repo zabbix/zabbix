@@ -2513,7 +2513,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 {
 	zbx_vc_item_t		*item;
 	int			i;
-	ZBX_DC_HISTORY		*h;
+	zbx_dc_history_t	*h;
 
 	if (SUCCEED != zbx_history_add_values(history, ret_flush))
 		return FAIL;
@@ -2525,7 +2525,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		h = (ZBX_DC_HISTORY *)history->values[i];
+		h = (zbx_dc_history_t *)history->values[i];
 
 		if (NULL != (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid)))
 		{

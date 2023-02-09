@@ -250,7 +250,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 
 					zbx_db_free_result(result);
 
-					reset_proxy_history_count(history_maxid - history_lastid);
+					zbx_reset_proxy_history_count(history_maxid - history_lastid);
 					zbx_proxy_set_hist_lastid(history_lastid);
 				}
 

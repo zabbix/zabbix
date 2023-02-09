@@ -2734,27 +2734,27 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 
 		switch (operationtype)
 		{
-			case OPERATION_TYPE_HOST_ADD:
+			case ZBX_OPERATION_TYPE_HOST_ADD:
 				op_host_add(event, &cfg);
 				break;
-			case OPERATION_TYPE_HOST_REMOVE:
+			case ZBX_OPERATION_TYPE_HOST_REMOVE:
 				op_host_del(event);
 				break;
-			case OPERATION_TYPE_HOST_ENABLE:
+			case ZBX_OPERATION_TYPE_HOST_ENABLE:
 				op_host_enable(event, &cfg);
 				break;
-			case OPERATION_TYPE_HOST_DISABLE:
+			case ZBX_OPERATION_TYPE_HOST_DISABLE:
 				op_host_disable(event, &cfg);
 				break;
-			case OPERATION_TYPE_GROUP_ADD:
+			case ZBX_OPERATION_TYPE_GROUP_ADD:
 				if (0 != groupid)
 					zbx_vector_uint64_append(&new_groupids, groupid);
 				break;
-			case OPERATION_TYPE_GROUP_REMOVE:
+			case ZBX_OPERATION_TYPE_GROUP_REMOVE:
 				if (0 != groupid)
 					zbx_vector_uint64_append(&del_groupids, groupid);
 				break;
-			case OPERATION_TYPE_TEMPLATE_ADD:
+			case ZBX_OPERATION_TYPE_TEMPLATE_ADD:
 				if (0 != templateid)
 				{
 					if (FAIL != (i = zbx_vector_uint64_search(&del_templateids, templateid,
@@ -2766,7 +2766,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 					zbx_vector_uint64_append(&lnk_templateids, templateid);
 				}
 				break;
-			case OPERATION_TYPE_TEMPLATE_REMOVE:
+			case ZBX_OPERATION_TYPE_TEMPLATE_REMOVE:
 				if (0 != templateid)
 				{
 					if (FAIL != (i = zbx_vector_uint64_search(&lnk_templateids, templateid,
@@ -2778,7 +2778,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 					zbx_vector_uint64_append(&del_templateids, templateid);
 				}
 				break;
-			case OPERATION_TYPE_HOST_INVENTORY:
+			case ZBX_OPERATION_TYPE_HOST_INVENTORY:
 				op_host_inventory_mode(event, &cfg, inventory_mode);
 				break;
 			default:

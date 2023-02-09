@@ -572,7 +572,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 			unsigned char	type;
 
 			ZBX_STR2UCHAR(type, row[fld_type]);
-			if (SUCCEED == is_item_processed_by_server(type, row[fld_key]))
+			if (SUCCEED == zbx_is_item_processed_by_server(type, row[fld_key]))
 					continue;
 
 			ZBX_DBROW2UINT64(itemid, row[0]);
@@ -712,7 +712,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	proxyconfig_get_drules_data(const DC_PROXY *proxy, struct zbx_json *j, char **error)
+static int	proxyconfig_get_drules_data(const zbx_dc_proxy_t *proxy, struct zbx_json *j, char **error)
 {
 	zbx_vector_uint64_t	druleids;
 	zbx_vector_uint64_t	proxy_hostids;
@@ -833,7 +833,7 @@ out:
 	return ret;
 }
 
-static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_config_revision,
+static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_config_revision,
 		const zbx_dc_revision_t *dc_revision, struct zbx_json *j, zbx_proxyconfig_status_t *status,
 		const zbx_config_vault_t *config_vault, char **error)
 {
@@ -1037,7 +1037,7 @@ out:
  * Purpose: prepare proxy configuration data                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
+int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
 		zbx_proxyconfig_status_t *status, const zbx_config_vault_t *config_vault, char **error)
 {
 	int			ret = FAIL;
@@ -1112,7 +1112,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 {
 	char				*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json			j;
-	DC_PROXY			proxy;
+	zbx_dc_proxy_t			proxy;
 	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel, version_int;
 	size_t				buffer_size, reserved = 0;
 	zbx_proxyconfig_status_t	status;

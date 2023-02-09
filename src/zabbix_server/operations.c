@@ -571,7 +571,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				{
 					char	psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX], psk[HOST_TLS_PSK_LEN_MAX];
 
-					DCget_autoregistration_psk(psk_identity, sizeof(psk_identity),
+					zbx_dc_get_autoregistration_psk(psk_identity, sizeof(psk_identity),
 							(unsigned char *)psk, sizeof(psk));
 
 					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid",

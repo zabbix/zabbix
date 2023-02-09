@@ -69,7 +69,7 @@ COMMON_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 SERVICE_WRAP_FUNCS = \
-	-Wl,--wrap=DCget_nextid \
+	-Wl,--wrap=zbx_dc_get_nextid \
 	-Wl,--wrap=zbx_add_event \
 	-Wl,--wrap=zbx_process_events \
 	-Wl,--wrap=zbx_clean_events \

@@ -2340,7 +2340,7 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 			" from actions"
 			" where eventsource<>%d"
 				" and status=%d",
-			EVENT_SOURCE_SERVICE, ACTION_STATUS_ACTIVE)))
+			EVENT_SOURCE_SERVICE, ZBX_ACTION_STATUS_ACTIVE)))
 	{
 		return FAIL;
 	}
@@ -2440,7 +2440,7 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 			" where a.status=%d"
 			" group by a.actionid,o.recovery"
 			" order by a.actionid",
-			ACTION_STATUS_ACTIVE)))
+			ZBX_ACTION_STATUS_ACTIVE)))
 	{
 		return FAIL;
 	}
@@ -2534,7 +2534,7 @@ int	zbx_dbsync_compare_action_conditions(zbx_dbsync_t *sync)
 			" from conditions c,actions a"
 			" where c.actionid=a.actionid"
 				" and a.status=%d",
-			ACTION_STATUS_ACTIVE)))
+			ZBX_ACTION_STATUS_ACTIVE)))
 	{
 		return FAIL;
 	}

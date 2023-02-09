@@ -38,7 +38,7 @@
  *                FAIL    - an error occurred                                 *
  *                                                                            *
  ******************************************************************************/
-static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host, char **info, char *error,
+static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t *host, char **info, char *error,
 		size_t max_error_len)
 {
 	int		time_start;
@@ -241,7 +241,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		const char *clientip, int config_timeout, char **result, char **debug)
 {
 	int			ret = FAIL, scope = 0, i, macro_type;
-	DC_HOST			host;
+	zbx_dc_host_t		host;
 	zbx_script_t		script;
 	zbx_uint64_t		usrgrpid, groupid;
 	zbx_vector_uint64_t	eventids;
@@ -294,7 +294,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 	if (0 != hostid)
 	{
-		if (SUCCEED != DCget_host_by_hostid(&host, hostid))
+		if (SUCCEED != zbx_dc_get_host_by_hostid(&host, hostid))
 		{
 			zbx_strlcpy(error, "Unknown host identifier.", sizeof(error));
 			goto fail;

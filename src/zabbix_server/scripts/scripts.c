@@ -35,13 +35,13 @@
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
-static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command, char **result,
+static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *command, char **result,
 		int config_timeout, char *error, size_t max_error_len)
 {
 	int		ret;
 	AGENT_RESULT	agent_result;
 	char		*param = NULL, *port = NULL;
-	DC_ITEM		item;
+	zbx_dc_item_t	item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -49,7 +49,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 	memset(&item, 0, sizeof(item));
 	memcpy(&item.host, host, sizeof(item.host));
 
-	if (SUCCEED != (ret = DCconfig_get_interface_by_type(&item.interface, host->hostid, INTERFACE_TYPE_AGENT)))
+	if (SUCCEED != (ret = zbx_dc_config_get_interface_by_type(&item.interface, host->hostid, INTERFACE_TYPE_AGENT)))
 	{
 		zbx_snprintf(error, max_error_len, "Zabbix agent interface is not defined for host [%s]", host->host);
 		goto fail;
@@ -102,13 +102,13 @@ fail:
 	return ret;
 }
 
-static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_t *script, char **result,
+static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
 		int config_timeout, char *error, size_t max_error_len)
 {
 	int		ret = FAIL, i;
 	AGENT_RESULT	agent_result;
-	DC_ITEM		item;
-	int             (*function)(DC_ITEM *, AGENT_RESULT *);
+	zbx_dc_item_t	item;
+	int             (*function)(zbx_dc_item_t *, AGENT_RESULT *);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
@@ -124,7 +124,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 
 	for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
 	{
-		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item.interface, host->hostid,
+		if (SUCCEED == (ret = zbx_dc_config_get_interface_by_type(&item.interface, host->hostid,
 				INTERFACE_TYPE_PRIORITY[i])))
 		{
 			break;
@@ -442,7 +442,7 @@ out:
  *                TIMEOUT_ERROR - a timeout occurred                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const char *params, int config_timeout,
+int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params, int config_timeout,
 		char **result, char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
@@ -524,7 +524,8 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
  *                error                                                       *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *host, zbx_uint64_t alertid, int now)
+zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const zbx_dc_host_t *host, zbx_uint64_t alertid,
+		int now)
 {
 	zbx_tm_task_t	*task;
 	unsigned short	port;
