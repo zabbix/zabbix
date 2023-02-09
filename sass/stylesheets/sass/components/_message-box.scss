@@ -1,7 +1,8 @@
-.zi-circle-info-filled,
-.zi-circle-check-filled {
+.msg-bad,
+.msg-good,
+.msg-warning {
 	position: relative;
-	padding: 9px 10px 9px 75px;
+	padding: 12px 10px 12px 59px;
 	margin: 10px;
 	font-size: $font-top-nav-size;
 	color: $font-color;
@@ -10,10 +11,6 @@
 	background-color: $ui-bg-color;
 	border: 2px solid;
 	border-radius: 2px;
-
-	.zi-remove {
-		color: $font-alt-color;
-	}
 
 	.link-action {
 		margin-right: 10px;
@@ -32,25 +29,26 @@
 		background-color: $white;
 	}
 
-	&::before {
+	&::after {
 		content: '';
 		position: absolute;
 		top: 0;
 		bottom: 0;
 		left: 0;
-		width: 48px;
+		width: 45px;
 	}
+}
 
-	&::after {
-		top: 7px;
-		left: -3px;
-		width: 27px;
-		height: 25px;
-		margin-top: 2px;
-		margin-left: 11px;
+.zi-circle-check-filled,
+.zi-circle-info-filled {
+	&::before {
 		position: absolute;
-		font-size: 30px;
-		color: $white;
+		top: 7px;
+		left: 0;
+		z-index: 1000;
+		padding-left: 9px;
+		font-size: 26px;
+		color: #fff;
 		text-shadow: 0 0 5px rgba(0, 0, 0, 0.9);
 		opacity: 0.9;
 	}
@@ -80,7 +78,7 @@
 		border-color: $msg-bad-border-color;
 	}
 
-	&::before {
+	&::after {
 		background-color: $msg-bad-border-color;
 	}
 }
@@ -109,7 +107,7 @@
 		border-color: $msg-good-border-color;
 	}
 
-	&::before {
+	&::after {
 		background-color: $msg-good-border-color;
 	}
 }
@@ -138,7 +136,7 @@
 		border-color: $msg-warning-border-color;
 	}
 
-	&::before {
+	&::after {
 		background-color: $msg-warning-border-color;
 	}
 }
