@@ -38,6 +38,7 @@ class testScripts extends CAPITest {
 		'eventids' => [],
 		'usermacroid' => null,
 		'usrgrpids' => [],
+		'roleids' => [],
 		'userids' => [],
 		'scriptids' => [],
 		'actionids' => [],
@@ -619,26 +620,29 @@ class testScripts extends CAPITest {
 		);
 		self::$data['usrgrpids'] = array_combine(array_keys($usergroups_data), $usergroups['usrgrpids']);
 
-		// Get first available role one for each type that should exist on new install and create users.
-		$admin_roleid = CDBHelper::getAll(
-			'SELECT r.roleid'.
-			' FROM role r'.
-			' WHERE '.dbConditionInt('r.type', [USER_TYPE_ZABBIX_ADMIN])
-		)[0]['roleid'];
+		// Create user roles with defaults.
+		$roles_data = [
+			'admin' => [
+				'name' => 'API test role admin',
+				'type' => USER_TYPE_ZABBIX_ADMIN
+			],
+			'user' => [
+				'name' => 'API test role user',
+				'type' => USER_TYPE_ZABBIX_USER
+			]
+		];
+		$roles = CDataHelper::call('role.create', array_values($roles_data));
+		$this->assertArrayHasKey('roleids', $roles, 'prepareScriptsData() failed: Could not create user roles.');
+		self::$data['roleids'] = array_combine(array_keys($roles_data), $roles['roleids']);
 
-		$user_roleid = CDBHelper::getAll(
-			'SELECT r.roleid'.
-			' FROM role r'.
-			' WHERE '.dbConditionInt('r.type', [USER_TYPE_ZABBIX_USER])
-		)[0]['roleid'];
-
+		// Create users.
 		$users_data = [
 			'admin' => [
 				'username' => 'api_test_admin',
 				'name' => 'API One',
 				'surname' => 'Tester One',
 				'passwd' => '4P1T3$tEr',
-				'roleid' => $admin_roleid,
+				'roleid' => self::$data['roleids']['admin'],
 				'usrgrps' => [
 					[
 						'usrgrpid' => self::$data['usrgrpids']['admin']
@@ -650,7 +654,7 @@ class testScripts extends CAPITest {
 				'name' => 'API Two',
 				'surname' => 'Tester Two',
 				'passwd' => '4P1T3$tEr',
-				'roleid' => $user_roleid,
+				'roleid' => self::$data['roleids']['user'],
 				'usrgrps' => [
 					[
 						'usrgrpid' => self::$data['usrgrpids']['user']
@@ -10146,6 +10150,9 @@ class testScripts extends CAPITest {
 
 		// Delete user groups.
 		CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
+
+		// Delete user roles.
+		CDataHelper::call('role.delete', self::$data['roleids']);
 
 		// Delete global macro.
 		CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
