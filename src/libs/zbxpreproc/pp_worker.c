@@ -163,6 +163,9 @@ static void	*pp_worker_entry(void *arg)
 			zbx_free(error);
 			worker->stop = 1;
 		}
+
+		if (1 < queue->pending_num)
+			pp_task_queue_notify(queue);
 	}
 
 	pp_task_queue_deregister_worker(queue);

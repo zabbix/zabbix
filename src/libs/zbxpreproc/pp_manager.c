@@ -242,10 +242,7 @@ void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp
 	for (int i = 0; i < tasks->values_num; i++)
 		pp_task_queue_push(&manager->queue, tasks->values[i]);
 
-	if (1 == tasks->values_num)
-		pp_task_queue_notify(&manager->queue);
-	else
-		pp_task_queue_notify_all(&manager->queue);
+	pp_task_queue_notify(&manager->queue);
 
 	pp_task_queue_unlock(&manager->queue);
 	zbx_prof_end();
@@ -364,7 +361,7 @@ static void	pp_manager_queue_dependents(zbx_pp_manager_t *manager, zbx_pp_item_p
 	}
 
 	if (0 < queued_num)
-		pp_task_queue_notify_all(&manager->queue);
+		pp_task_queue_notify(&manager->queue);
 
 	pp_cache_release(cache);
 }

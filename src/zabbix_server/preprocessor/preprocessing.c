@@ -19,6 +19,7 @@
 
 #include "preprocessing.h"
 #include "zbxpreproc.h"
+#include "preproc.h"
 
 #include "log.h"
 #include "zbxserialize.h"
@@ -28,7 +29,6 @@
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
-#define MAX_VALUES_LOCAL	256
 
 #define PACKED_FIELD(value, size)	\
 		(zbx_packed_field_t){(value), (size), (0 == (size) ? PACKED_FIELD_STRING : PACKED_FIELD_RAW)};
@@ -880,7 +880,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 		preprocessor_pack_value(&cached_message, &value);
 	}
 
-	if (MAX_VALUES_LOCAL < ++cached_values)
+	if (ZBX_PREPROCESSING_BATCH_SIZE < ++cached_values)
 		zbx_preprocessor_flush();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

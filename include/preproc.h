@@ -25,6 +25,8 @@
 #include "zbxpreproc.h"
 #include "zbxstats.h"
 
+#define ZBX_PREPROCESSING_BATCH_SIZE	256
+
 /* the following functions are implemented differently for server and proxy */
 
 void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
