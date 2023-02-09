@@ -48,8 +48,8 @@ class testScripts extends CAPITest {
 	];
 
 	/**
-	 * Prepare data for tests. Create host groups, hosts, items, triggers, events, user groups, users, global macros,
-	 * scripts and actions.
+	 * Prepare data for tests. Create host groups, hosts, items, triggers, events, user groups, roles, users,
+	 * global macros, scripts and actions.
 	 */
 	public function prepareScriptsData(): void {
 		// Create host groups.
