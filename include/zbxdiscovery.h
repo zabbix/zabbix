@@ -34,7 +34,22 @@ typedef struct
 }
 zbx_dservice_t;
 
+typedef struct
+{
+	zbx_uint64_t	druleid;
+	DC_DRULE	*drule;
+	DC_DCHECK	*dcheck;
+	char		*ip;
+	char		*dns;
+	unsigned short	port;
+	int		now;
+	int		config_timeout;
+}
+zbx_discoverer_net_check_job_t;
+
 void	zbx_discovery_update_host(zbx_db_dhost *dhost, int status, int now);
 void	zbx_discovery_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, zbx_uint64_t unique_dcheckid,
 		zbx_db_dhost *dhost, const char *ip, const char *dns, int port, int status, const char *value, int now);
+void	zbx_discovery_dcheck_free(DC_DCHECK *dcheck);
+void	zbx_discovery_drule_free(DC_DRULE *drule);
 #endif

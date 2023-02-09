@@ -34,42 +34,21 @@
 #include "zbxip.h"
 #include "zbxsysinfo.h"
 #include "zbx_rtc_constants.h"
+#include "discoverer_queue.h"
+#include "discoverer_job.h"
 
-#define DISCOVERER_JOB_QUEUE_INIT_NONE		0x00
-#define DISCOVERER_JOB_QUEUE_INIT_LOCK		0x01
-#define DISCOVERER_JOB_QUEUE_INIT_EVENT		0x02
-
-typedef struct
-{
-	int		workers_num;
-	zbx_list_t	jobs;
-	pthread_mutex_t	lock;
-	pthread_cond_t	event;
-	int		flags;
-}
-zbx_discoverer_jobs_queue_t;
+#define DISCOVERER_WORKER_INIT_NONE	0x00
+#define DISCOVERER_WORKER_INIT_THREAD	0x01
 
 typedef struct
 {
-	zbx_discoverer_jobs_queue_t	*queue;
-	pthread_t			thread;
-	int				worker_id;
-	int				stop;
+	zbx_discoverer_queue_t	*queue;
+	pthread_t		thread;
+	int			worker_id;
+	int			stop;
+	int			flags;
 }
 zbx_discoverer_worker_t;
-
-typedef struct
-{
-	zbx_uint64_t	druleid;
-	DC_DRULE	*drule;
-	DC_DCHECK	*dcheck;
-	char		*ip;
-	char		*dns;
-	unsigned short	port;
-	int		now;
-	int		config_timeout;
-}
-zbx_discoverer_net_check_job_t;
 
 typedef struct
 {
@@ -85,7 +64,7 @@ typedef struct
 {
 	int				workers_num;
 	zbx_discoverer_worker_t		*workers;
-	zbx_discoverer_jobs_queue_t	queue;
+	zbx_discoverer_queue_t		queue;
 
 	zbx_vector_ptr_t		results;
 	pthread_rwlock_t		results_rwlock;
@@ -436,42 +415,14 @@ static void	dcheck_copy(const DC_DCHECK *src, DC_DCHECK *dst)
 	dst->snmpv3_contextname = zbx_strdup(NULL, src->snmpv3_contextname);
 }
 
-static void	dcheck_free(DC_DCHECK *dcheck)
-{
-	zbx_free(dcheck->key_);
-	zbx_free(dcheck->snmp_community);
-	zbx_free(dcheck->snmpv3_securityname);
-	zbx_free(dcheck->ports);
-	zbx_free(dcheck->snmpv3_authpassphrase);
-	zbx_free(dcheck->snmpv3_privpassphrase);
-	zbx_free(dcheck->snmpv3_contextname);
-	zbx_free(dcheck);
-}
-
-static void	drule_free(DC_DRULE *drule)
-{
-	zbx_free(drule->delay_str);
-	zbx_free(drule->iprange);
-	zbx_free(drule->name);
-	zbx_vector_ptr_clear_ext(&drule->dchecks, (zbx_clean_func_t)dcheck_free);
-	zbx_vector_ptr_destroy(&drule->dchecks);
-	zbx_free(drule);
-}
-
 static void	results_free(zbx_discovery_results_t *result)
 {
-	drule_free(result->drule);
+	zbx_discovery_drule_free(result->drule);
 	zbx_free(result->ip);
 	zbx_free(result->dns);
 	zbx_vector_ptr_clear_ext(&result->services, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&result->services);
 	zbx_free(result);
-}
-
-static void	discoverer_job_net_check_push(zbx_discoverer_jobs_queue_t *queue,
-		zbx_discoverer_net_check_job_t *net_check)
-{
-	zbx_list_append(&queue->jobs, net_check, NULL);
 }
 
 static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *ip, char *dns, int now,
@@ -503,7 +454,7 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 		else
 			first = last = atoi(start);
 
-		pthread_mutex_lock(&dmanager.queue.lock);
+		discoverer_queue_lock(&dmanager.queue);
 
 		for (port = first; port <= last; port++)
 		{
@@ -526,10 +477,10 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 			net_check->config_timeout = config_timeout;
 			net_check->now = now;
 
-			discoverer_job_net_check_push(&dmanager.queue, net_check);
+			discoverer_queue_push(&dmanager.queue, net_check);
 		}
 
-		pthread_mutex_unlock(&dmanager.queue.lock);
+		discoverer_queue_unlock(&dmanager.queue);
 
 		if (NULL != comma)
 		{
@@ -795,13 +746,19 @@ out:
 
 static void	process_results(zbx_discoverer_manager_t *manager)
 {
-	int	i;
+	int			i;
+	zbx_vector_ptr_t	results;
+
+	zbx_vector_ptr_create(&results);
 
 	pthread_rwlock_wrlock(&manager->results_rwlock);
+	zbx_vector_ptr_append_array(&results, manager->results.values, manager->results.values_num);
+	zbx_vector_ptr_clear(&manager->results);
+	pthread_rwlock_unlock(&manager->results_rwlock);
 
-	for (i = 0; i < manager->results.values_num; i++)
+	for (i = 0; i < results.values_num; i++)
 	{
-		zbx_discovery_results_t	*result = manager->results.values[i];
+		zbx_discovery_results_t	*result = results.values[i];
 		zbx_db_dhost		dhost;
 		int			host_status = -1, k;
 
@@ -834,8 +791,8 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 		}
 	}
 
-	zbx_vector_ptr_clear_ext(&manager->results, (zbx_clean_func_t)results_free);
-	pthread_rwlock_unlock(&manager->results_rwlock);
+	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)results_free);
+	zbx_vector_ptr_destroy(&results);
 }
 
 static int	process_discovery(time_t *nextcheck, int config_timeout)
@@ -888,7 +845,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout)
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			discovery_clean_services(drule->druleid);
 
-		drule_free(drule);
+		zbx_discovery_drule_free(drule);
 
 		now = time(NULL);
 	}
@@ -898,34 +855,28 @@ static int	process_discovery(time_t *nextcheck, int config_timeout)
 	return rule_count;	/* performance metric */
 }
 
-static zbx_discoverer_net_check_job_t	*discoverer_job_net_check_pop(zbx_discoverer_jobs_queue_t *queue)
-{
-	void	*job;
-
-	if (SUCCEED == zbx_list_pop(&queue->jobs, &job))
-		return (zbx_discoverer_net_check_job_t*)job;
-
-	return NULL;
-}
-
 static void	*discoverer_net_check(void *net_check_worker)
 {
 	char				*value = NULL;
-	int				err;
 	size_t				value_alloc = 128;
 	zbx_discoverer_worker_t		*worker = (zbx_discoverer_worker_t*)net_check_worker;
 	zbx_discoverer_net_check_job_t	*job;
 
-	worker->queue->workers_num++;
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
+			get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
+
 	worker->stop = 0;
 
 	value = (char *)zbx_malloc(value, value_alloc);
 
-	pthread_mutex_lock(&dmanager.queue.lock);
+	discoverer_queue_lock(&dmanager.queue);
+	discoverer_queue_register_worker(&dmanager.queue);
 
 	while (0 == worker->stop)
 	{
-		if (NULL != (job = discoverer_job_net_check_pop(worker->queue)))
+		char	*error;
+
+		if (NULL != (job = discoverer_queue_pop(worker->queue)))
 		{
 			int			index, skip = 1;
 			zbx_uint64_pair_t	revision, *revision_updated;
@@ -933,7 +884,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 			zbx_discovery_results_t	*result = NULL, result_cmp;
 			DC_DRULE		drule_cmp;
 
-			pthread_mutex_unlock(&dmanager.queue.lock);
+			discoverer_queue_unlock(&dmanager.queue);
 
 			/* check if drule was updated or deleted */
 
@@ -953,7 +904,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 
 			if (0 != skip)
 			{
-				pthread_mutex_lock(&dmanager.queue.lock);
+				discoverer_queue_lock(&dmanager.queue);
 				continue;
 			}
 
@@ -988,7 +939,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 			}
 			else
 			{
-				drule_free(job->drule);
+				zbx_discovery_drule_free(job->drule);
 				zbx_free(job->ip);
 				zbx_free(job->dns);
 				result = (zbx_discovery_results_t *)dmanager.results.values[index];
@@ -998,104 +949,48 @@ static void	*discoverer_net_check(void *net_check_worker)
 
 			pthread_rwlock_unlock(&dmanager.results_rwlock);
 
-			dcheck_free(job->dcheck);
+			zbx_discovery_dcheck_free(job->dcheck);
 			zbx_free(job);
 
-			pthread_mutex_lock(&dmanager.queue.lock);
+			discoverer_queue_lock(&dmanager.queue);
 			continue;
 		}
 
-		if (0 != (err = pthread_cond_wait(&dmanager.queue.event, &dmanager.queue.lock)))
+		if (SUCCEED != discoverer_queue_wait(&dmanager.queue, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "[%d] cannot wait for conditional variable : %s",
-					worker->worker_id, zbx_strerror(err));
+			zabbix_log(LOG_LEVEL_WARNING, "[%d] %s", worker->worker_id, error);
+			zbx_free(error);
 			worker->stop = 1;
 		}
 	}
 
+	discoverer_queue_deregister_worker(&dmanager.queue);
+	discoverer_queue_unlock(&dmanager.queue);
+
 	zbx_free(value);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped [%s #%d]",
+			get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
 
 	return (void*)0;
 }
 
-static void	discoverer_job_net_check_free(zbx_discoverer_net_check_job_t *job)
-{
-	drule_free(job->drule);
-	dcheck_free(job->dcheck);
-	zbx_free(job->ip);
-	zbx_free(job->dns);
-
-	zbx_free(job);
-}
-
-static void	discoverer_jobs_queue_clear(zbx_list_t *jobs)
-{
-	zbx_discoverer_net_check_job_t	*job = NULL;
-
-	while (SUCCEED == zbx_list_pop(jobs, (void **)&job))
-		discoverer_job_net_check_free(job);
-}
-
-static void	discoverer_jobs_queue_destroy(zbx_discoverer_jobs_queue_t *queue)
-{
-	if (0 != (queue->flags & DISCOVERER_JOB_QUEUE_INIT_LOCK))
-		pthread_mutex_destroy(&queue->lock);
-
-	if (0 != (queue->flags & DISCOVERER_JOB_QUEUE_INIT_EVENT))
-		pthread_cond_destroy(&queue->event);
-
-	discoverer_jobs_queue_clear(&queue->jobs);
-	zbx_list_destroy(&queue->jobs);
-
-	queue->flags = DISCOVERER_JOB_QUEUE_INIT_NONE;
-}
-
-static int	discoverer_jobs_queue_init(zbx_discoverer_jobs_queue_t *queue, char **error)
-{
-	int	err, ret = FAIL;
-
-	queue->workers_num = 0;
-	queue->flags = DISCOVERER_JOB_QUEUE_INIT_NONE;
-
-	zbx_list_create(&queue->jobs);
-
-	if (0 != (err = pthread_mutex_init(&queue->lock, NULL)))
-	{
-		*error = zbx_dsprintf(NULL, "cannot initialize queue mutex: %s", zbx_strerror(err));
-		goto out;
-	}
-
-	queue->flags |= DISCOVERER_JOB_QUEUE_INIT_LOCK;
-
-	if (0 != (err = pthread_cond_init(&queue->event, NULL)))
-	{
-		*error = zbx_dsprintf(NULL, "cannot initialize conditional variable: %s", zbx_strerror(err));
-		goto out;
-	}
-
-	queue->flags |= DISCOVERER_JOB_QUEUE_INIT_EVENT;
-
-	ret = SUCCEED;
-out:
-	if (FAIL == ret)
-		discoverer_jobs_queue_destroy(queue);
-
-	return ret;
-}
-
-static int	discoverer_workers_init(zbx_discoverer_worker_t *worker, zbx_discoverer_jobs_queue_t *queue,
+static int	discoverer_worker_init(zbx_discoverer_worker_t *worker, zbx_discoverer_queue_t *queue,
 		void *func(void *), char **error)
 {
 	int	err;
 
+	worker->flags = DISCOVERER_WORKER_INIT_NONE;
 	worker->queue = queue;
 	worker->stop = 1;
 
 	if (0 != (err = pthread_create(&worker->thread, NULL, func, (void *)worker)))
 	{
-		*error = zbx_dsprintf(NULL, "cannot craete thread: %s", zbx_strerror(err));
+		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
 		return FAIL;
 	}
+
+	worker->flags |= DISCOVERER_WORKER_INIT_THREAD;
 
 	return SUCCEED;
 }
@@ -1118,7 +1013,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 		return FAIL;
 	}
 
-	if (SUCCEED != discoverer_jobs_queue_init(&manager->queue, error))
+	if (SUCCEED != discoverer_queue_init(&manager->queue, error))
 		return FAIL;
 
 	manager->workers_num = workers_num;
@@ -1127,7 +1022,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 
 	for (i = 0; i < workers_num; i++)
 	{
-		if (SUCCEED != discoverer_workers_init(&manager->workers[i], &manager->queue, discoverer_net_check,
+		if (SUCCEED != discoverer_worker_init(&manager->workers[i], &manager->queue, discoverer_net_check,
 				error))
 		{
 			return FAIL;
@@ -1147,14 +1042,52 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 			return FAIL;
 		}
 
-		pthread_mutex_lock(&manager->queue.lock);
+		discoverer_queue_lock(&manager->queue);
 		started_num = manager->queue.workers_num;
-		pthread_mutex_unlock(&manager->queue.lock);
+		discoverer_queue_unlock(&manager->queue);
 
 		nanosleep(&poll_delay, NULL);
 	}
 
 	return SUCCEED;
+}
+
+static void	discoverer_worker_destroy(zbx_discoverer_worker_t *worker)
+{
+	if (0 != (worker->flags & DISCOVERER_WORKER_INIT_THREAD))
+	{
+		void	*dummy;
+
+		pthread_join(worker->thread, &dummy);
+	}
+
+	worker->flags = DISCOVERER_WORKER_INIT_NONE;
+}
+
+static void	discoverer_worker_stop(zbx_discoverer_worker_t *worker)
+{
+	if (0 != (worker->flags & DISCOVERER_WORKER_INIT_THREAD))
+		worker->stop = 1;
+}
+
+static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
+{
+	int	i;
+
+	discoverer_queue_lock(&manager->queue);
+
+	for (i = 0; i < manager->workers_num; i++)
+		discoverer_worker_stop(&manager->workers[i]);
+
+	discoverer_queue_notify_all(&manager->queue);
+	discoverer_queue_unlock(&manager->queue);
+
+	for (i = 0; i < manager->workers_num; i++)
+		discoverer_worker_destroy(&manager->workers[i]);
+
+	zbx_free(manager->workers);
+
+	discoverer_queue_destroy(&manager->queue);
 }
 
 /******************************************************************************
@@ -1239,9 +1172,9 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 			if (0 < rule_count)
 			{
-				pthread_mutex_lock(&dmanager.queue.lock);
-				pthread_cond_broadcast(&dmanager.queue.event);
-				pthread_mutex_unlock(&dmanager.queue.lock);
+				discoverer_queue_lock(&dmanager.queue);
+				discoverer_queue_notify_all(&dmanager.queue);
+				discoverer_queue_unlock(&dmanager.queue);
 			}
 		}
 
@@ -1285,6 +1218,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	}
 out:
+	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
+	discoverer_manager_free(&dmanager);
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
