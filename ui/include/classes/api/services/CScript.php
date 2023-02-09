@@ -1314,7 +1314,7 @@ class CScript extends CApiService {
 		$api_input_rules['uniq'] = [['name', 'menu_path']];
 
 		if ($method === 'update') {
-			$scripts = array_filter($scripts, function ($script) {
+			$scripts = array_filter($scripts, static function ($script) {
 				return (array_key_exists('name', $script) || array_key_exists('menu_path', $script));
 			});
 
@@ -1365,7 +1365,7 @@ class CScript extends CApiService {
 			$scripts = $this->extendFromObjects(zbx_toHash($scripts, 'scriptid'), $db_scripts, ['name', 'menu_path']);
 
 			// Remove unchanged scripts and only continue validation on for scripts that have changed name or menu path.
-			$scripts = array_filter($scripts, function ($script) use ($db_scripts) {
+			$scripts = array_filter($scripts, static function ($script) use ($db_scripts) {
 				return ($script['name'] !== $db_scripts[$script['scriptid']]['name']
 					|| $script['menu_path'] !== $db_scripts[$script['scriptid']]['menu_path']);
 			});
