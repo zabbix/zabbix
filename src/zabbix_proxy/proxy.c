@@ -351,7 +351,7 @@ static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 zbx_vector_ptr_t	zbx_addrs;
 
 /* proxy has no any events processing */
-static  const zbx_events_funcs_t	events_cbs = {
+static const zbx_events_funcs_t	events_cbs = {
 	.add_event_cb			= NULL,
 	.process_events_cb		= NULL,
 	.clean_events_cb		= NULL,
