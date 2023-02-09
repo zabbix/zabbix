@@ -593,7 +593,7 @@ static void	process_services(const DC_DRULE *drule, zbx_db_dhost *dhost, const c
  * Purpose: process single discovery rule                                     *
  *                                                                            *
  ******************************************************************************/
-static void	process_rule(DC_DRULE *drule, zbx_events_funcs_t *events_cbs, int config_timeout)
+static void	process_rule(DC_DRULE *drule, int config_timeout)
 {
 	char			ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma, dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	int			ipaddress[8], now;
@@ -792,7 +792,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_results(zbx_discoverer_manager_t *manager)
+static void	process_results(zbx_discoverer_manager_t *manager, zbx_events_funcs_t *events_cbs)
 {
 	int	i;
 
@@ -819,13 +819,18 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 
 		memset(&dhost, 0, sizeof(zbx_db_dhost));
 
-		process_services(result->drule, &dhost, result->ip, result->dns, result->now, &result->services);
+		process_services(result->drule, &dhost, result->ip, result->dns, result->now, &result->services,
+				events_cbs->add_event_cb);
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
-			zbx_discovery_update_host(&dhost, host_status, result->now);
-			zbx_process_events(NULL, NULL);
-			zbx_clean_events();
+			zbx_discovery_update_host(&dhost, host_status, result->now, events_cbs->add_event_cb);
+
+			if (NULL != events_cbs->process_events_cb)
+				events_cbs->process_events_cb(NULL, NULL);
+
+			if (NULL != events_cbs->clean_events_cb)
+				events_cbs->clean_events_cb();
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		{
@@ -1222,7 +1227,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		if ((int)sec >= nextresult)
 		{
-			process_results(&dmanager);
+			process_results(&dmanager, discoverer_args_in->events_cbs);
 			nextresult = time(NULL) + DISCOVERER_DELAY;
 		}
 
@@ -1230,8 +1235,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		if ((int)sec >= nextcheck)
 		{
-			rule_count += process_discovery(&nextcheck, discoverer_args_in->events_cbs,
-							discoverer_args_in->config_timeout);
+			rule_count += process_discovery(&nextcheck, discoverer_args_in->config_timeout);
 			total_sec += zbx_time() - sec;
 
 			if (0 == nextcheck)

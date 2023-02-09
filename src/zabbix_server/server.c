@@ -1413,15 +1413,15 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
 							config_startup_time, config_unavailable_delay};
 
-	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type, listen_sock,
-							config_startup_time, &events_cbs};
+	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type, &events_cbs,
+							listen_sock, config_startup_time};
 
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, config_timeout};
 
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
-							config_timeout, &events_cbs};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, config_timeout, &events_cbs,
-							CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]};
+							&events_cbs, config_timeout,};
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, &events_cbs,
+							config_timeout,	CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP};
 	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, config_timeout};

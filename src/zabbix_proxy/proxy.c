@@ -1295,7 +1295,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_timeout, CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]};
 
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
-								&events_cb, s&listen_sock, config_startup_time};
+								&events_cbs, &listen_sock, config_startup_time};
 
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {config_timeout};
 	zbx_thread_pinger_args			pinger_args = {config_timeout};

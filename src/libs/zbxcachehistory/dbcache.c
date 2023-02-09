@@ -3742,10 +3742,10 @@ static void	sync_server_history(int *values_num, int *triggers_num,
 				data_offset = 0;
 
 				if (NULL != events_cbs.export_events_cb)
-					events_cbs.export_events_cb();
-
-				events_cbs.export_events_CB(event_export_enabled, &connector_filters_events, &data,
-						&data_alloc, &data_offset);
+				{
+					events_cbs.export_events_cb(event_export_enabled, &connector_filters_events,
+							&data, &data_alloc, &data_offset);
+				}
 
 				if (0 != data_offset)
 				{

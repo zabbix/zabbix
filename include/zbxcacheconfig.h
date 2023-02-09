@@ -619,15 +619,6 @@ typedef struct
 }
 zbx_connector_t;
 
-typedef struct
-{
-	zbx_uint64_t		connectorid;
-	int			tags_evaltype;
-	zbx_vector_match_tags_t	connector_tags;
-}
-zbx_connector_filter_t;
-
-ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
 
 /* the configuration cache statistics */
 typedef struct

@@ -28,6 +28,8 @@
 #include "zbxversion.h"
 #include "zbxtime.h"
 
+#include "zbxtagfilter.h"
+
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1
 #define ZBX_DB_CONNECT_ONCE	2
@@ -582,8 +584,18 @@ const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_user_string(zbx_uint64_t userid);
 
+typedef struct
+{
+	zbx_uint64_t		connectorid;
+	int			tags_evaltype;
+	zbx_vector_match_tags_t	connector_tags;
+}
+zbx_connector_filter_t;
+
+ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
+
 /* events callbacks */
-typedef ZBX_DB_EVENT	*(*zbx_add_event_func_t)(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+typedef zbx_db_event	*(*zbx_add_event_func_t)(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
@@ -593,7 +605,8 @@ typedef ZBX_DB_EVENT	*(*zbx_add_event_func_t)(unsigned char source, unsigned cha
 typedef int	(*zbx_process_events_func_t)(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
 typedef void	(*zbx_clean_events_func_t)(void);
 typedef void	(*zbx_reset_event_recovery_func_t)(void);
-typedef void	(*zbx_export_events_func_t)(void);
+typedef void	(*zbx_export_events_func_t)(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,
+		unsigned char **data, size_t *data_alloc, size_t *data_offset);
 typedef void	(*zbx_events_update_itservices_func_t)(void);
 
 typedef struct
