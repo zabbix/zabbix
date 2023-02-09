@@ -552,50 +552,50 @@ function get_dbid($table, $field) {
 	return $ret2;
 }
 
-function zbx_db_search($table, $options, &$sql_parts) {
+/*
+* @param string $table_as   Table name and alias, f.e. 'hosts h'.
+* @param array  $options
+* @param array  $sql_parts
+*
+* @return bool
+*/
+function zbx_db_search(string $table_as, array $options, array &$sql_parts): bool {
 	global $DB;
-	list($table, $tableShort) = explode(' ', $table);
+	static $textual_field_types = [DB::FIELD_TYPE_CHAR, DB::FIELD_TYPE_NCLOB, DB::FIELD_TYPE_TEXT, DB::FIELD_TYPE_CUID];
 
-	$tableSchema = DB::getSchema($table);
-	if (!$tableSchema) {
+	list($table, $table_alias) = explode(' ', $table_as);
+	$schema = DB::getSchema($table);
+
+	if (!$schema) {
 		info(_s('Error in search request for table "%1$s".', $table));
+
+		return false;
 	}
 
 	$start = $options['startSearch'] ? '' : '%';
-	$exclude = $options['excludeSearch'] ? ' NOT' : '';
 	$glue = $options['searchByAny'] ? ' OR ' : ' AND ';
-
 	$search = [];
+
 	foreach ($options['search'] as $field => $patterns) {
-		if (!isset($tableSchema['fields'][$field]) || $patterns === null) {
+		if ($patterns === null || !array_key_exists($field, $schema['fields'])
+				|| !in_array($schema['fields'][$field]['type'], $textual_field_types)) {
 			continue;
 		}
 
-		$patterns = array_filter((array)$patterns, function($pattern) {
-			return ($pattern !== '');
-		});
+		$patterns = array_filter((array) $patterns);
 
 		if (!$patterns) {
 			continue;
 		}
 
-		if ($tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_CHAR
-				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_NCLOB
-				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_TEXT
-				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_CUID) {
-			continue;
-		}
+		$conditions = [];
 
-		$fieldSearch = [];
 		foreach ($patterns as $pattern) {
-			// escaping parameter that is about to be used in LIKE statement
+			// Escaping parameter to be used in LIKE statement.
 			$pattern = mb_strtoupper(strtr($pattern, ['!' => '!!', '%' => '!%', '_' => '!_']));
+			$pattern = $options['searchWildcardsEnabled'] ? str_replace('*', '%', $pattern)	: $start.$pattern.'%';
 
-			$pattern = !$options['searchWildcardsEnabled']
-				? $start.$pattern.'%'
-				: str_replace('*', '%', $pattern);
-
-			if ($DB['TYPE'] == ZBX_DB_ORACLE && $tableSchema['fields'][$field]['type'] === DB::FIELD_TYPE_NCLOB
+			if ($DB['TYPE'] == ZBX_DB_ORACLE && $schema['fields'][$field]['type'] === DB::FIELD_TYPE_NCLOB
 					&& strlen($pattern) > ORACLE_MAX_STRING_SIZE) {
 				$chunks = zbx_dbstr(DB::chunkMultibyteStr($pattern, ORACLE_MAX_STRING_SIZE));
 				$pattern = 'TO_NCLOB('.implode(') || TO_NCLOB(', $chunks).')';
@@ -604,22 +604,23 @@ function zbx_db_search($table, $options, &$sql_parts) {
 				$pattern = zbx_dbstr($pattern);
 			}
 
-			$fieldSearch[] = DB::uppercaseField($field, $table, $tableShort).' LIKE '.$pattern." ESCAPE '!'";
+			$conditions[] = DB::uppercaseField($field, $table, $table_alias).' LIKE '.$pattern." ESCAPE '!'";
 		}
 
-		$search[$field] = '('.implode($glue, $fieldSearch).')';
+		$search[$field] = '('.implode($glue, $conditions).')';
 	}
 
-	if ($search) {
-		if (isset($sql_parts['where']['search'])) {
-			$search[] = $sql_parts['where']['search'];
-		}
-
-		$sql_parts['where']['search'] = '('.implode($glue, $search).')';
-		return true;
+	if (!$search) {
+		return false;
 	}
 
-	return false;
+	if (array_key_exists('search', $sql_parts['where'])) {
+		$search[] = $sql_parts['where']['search'];
+	}
+
+	$sql_parts['where']['search'] = '('.implode($glue, $search).')';
+
+	return true;
 }
 
 /**
