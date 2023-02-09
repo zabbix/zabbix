@@ -132,7 +132,11 @@ $item_type_options = CSelect::createOptionsFromArray([
 	ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 	ITEM_VALUE_TYPE_STR => _('Character'),
 	ITEM_VALUE_TYPE_LOG => _('Log'),
-	ITEM_VALUE_TYPE_TEXT => _('Text')
+	ITEM_VALUE_TYPE_TEXT => _('Text'),
+	ITEM_VALUE_TYPE_BINARY => [
+		'label' => _('Binary'),
+		'disabled' => $data['type'] != ITEM_TYPE_DEPENDENT
+	]
 ]);
 $type_mismatch_hint = (new CSpan(makeWarningIcon(_('This type of information may not match the key.'))))
 	->setId('js-item-type-hint')

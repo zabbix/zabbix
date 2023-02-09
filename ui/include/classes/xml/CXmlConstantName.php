@@ -243,6 +243,7 @@ class CXmlConstantName {
 	const LOG = 'LOG';
 	const UNSIGNED = 'UNSIGNED';
 	const TEXT = 'TEXT';
+	const BINARY = 'BINARY';
 
 	const ORIGINAL_ERROR = 'ORIGINAL_ERROR';
 	const DISCARD_VALUE = 'DISCARD_VALUE';

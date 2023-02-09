@@ -119,7 +119,11 @@ $item_type_options = CSelect::createOptionsFromArray([
 	ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 	ITEM_VALUE_TYPE_STR => _('Character'),
 	ITEM_VALUE_TYPE_LOG => _('Log'),
-	ITEM_VALUE_TYPE_TEXT => _('Text')
+	ITEM_VALUE_TYPE_TEXT => _('Text'),
+	ITEM_VALUE_TYPE_BINARY => [
+		'label' => _('Binary'),
+		'disabled' => $data['type'] != ITEM_TYPE_DEPENDENT
+	]
 ]);
 $type_mismatch_hint = (new CSpan(makeWarningIcon(_('This type of information may not match the key.'))))
 	->setId('js-item-type-hint')
@@ -573,7 +577,14 @@ if (!$readonly) {
 				dstfld2: "master_itemname",
 				only_hostid: this.dataset.hostid,
 				excludeids: [this.dataset.itemid],
-				normal_only: 1
+				normal_only: 1,
+				value_types: '.json_encode([
+					ITEM_VALUE_TYPE_FLOAT,
+					ITEM_VALUE_TYPE_STR,
+					ITEM_VALUE_TYPE_LOG,
+					ITEM_VALUE_TYPE_UINT64,
+					ITEM_VALUE_TYPE_TEXT
+				]).'
 			}, {dialogue_class: "modal-popup-generic"});
 		');
 
@@ -592,7 +603,14 @@ if (!$readonly) {
 				dstfld1: "master_itemid",
 				dstfld2: "master_itemname",
 				parent_discoveryid: this.dataset.discoveryid,
-				excludeids: [this.dataset.itemid]
+				excludeids: [this.dataset.itemid],
+				value_types: '.json_encode([
+					ITEM_VALUE_TYPE_FLOAT,
+					ITEM_VALUE_TYPE_STR,
+					ITEM_VALUE_TYPE_LOG,
+					ITEM_VALUE_TYPE_UINT64,
+					ITEM_VALUE_TYPE_TEXT
+				]).'
 			}, {dialogue_class: "modal-popup-generic"});
 		');
 }

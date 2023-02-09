@@ -1020,10 +1020,12 @@ function getMenuPopupItem(options) {
 	});
 
 	if (options.allowed_ui_conf_hosts) {
+		options.allowed_triggers = !options.hasOwnProperty('allowed_triggers') || options.allowed_triggers;
+
 		const config_urls = [];
 		const config_triggers = {
 			label: t('Triggers'),
-			disabled: options.triggers.length === 0
+			disabled: !options.allowed_triggers || options.triggers.length === 0
 		};
 
 		if (options.isWriteable) {
@@ -1040,7 +1042,7 @@ function getMenuPopupItem(options) {
 			});
 		}
 
-		if (options.triggers.length) {
+		if (!config_triggers.disabled) {
 			const trigger_items = [];
 
 			for (const value of options.triggers) {
@@ -1071,7 +1073,8 @@ function getMenuPopupItem(options) {
 
 		config_urls.push({
 			label: t('Create trigger'),
-			url: url.getUrl()
+			url: url.getUrl(),
+			disabled: !options.allowed_triggers
 		});
 
 		url = new Curl('items.php');

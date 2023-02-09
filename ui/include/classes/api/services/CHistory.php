@@ -86,7 +86,7 @@ class CHistory extends CApiService {
 	 */
 	public function get($options = []) {
 		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-			ITEM_VALUE_TYPE_TEXT
+			ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
 		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -175,7 +175,7 @@ class CHistory extends CApiService {
 
 		// itemids
 		if ($options['itemids'] !== null) {
-			$sql_parts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids']);
+			$sql_parts['where']['itemid'] = dbConditionId('h.itemid', $options['itemids']);
 		}
 
 		// time_from
@@ -210,6 +210,15 @@ class CHistory extends CApiService {
 			else {
 				$result[] = $data;
 			}
+		}
+
+		if (!$options['countOutput'] && $this->tableName() === 'history_binary') {
+			foreach ($result as &$row) {
+				if (array_key_exists('value', $row)) {
+					$row['value'] = base64_encode($row['value']);
+				}
+			}
+			unset($row);
 		}
 
 		return $result;

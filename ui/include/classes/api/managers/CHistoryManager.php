@@ -30,6 +30,11 @@ class CHistoryManager {
 	private $primary_keys_enabled = false;
 
 	/**
+	 * @var string
+	 */
+	private static $binary_value = '*UNKNOWN*';
+
+	/**
 	 * Whether to enable optimizations that make use of PRIMARY KEY (itemid, clock, ns) on the history tables.
 	 *
 	 * @param bool $enabled
@@ -259,23 +264,32 @@ class CHistoryManager {
 				$max_clock_per_item = DBselect(
 					'SELECT h.itemid, MAX(h.clock) AS clock'.
 					' FROM '.$history_table.' h'.
-					' WHERE '.dbConditionId('h.itemid', array_column($items, 'itemid')).
+					' WHERE '.dbConditionId('h.itemid', array_column($items, 'itemid', 'itemid')).
 						($period !== null ? ' AND h.clock>'.$period : '').
 					' GROUP BY h.itemid'
 				);
 
 				while ($itemid_clock = DBfetch($max_clock_per_item, false)) {
-					$db_value = DBfetchArray(DBselect(
-						'SELECT *'.
+					$output = $value_type == ITEM_VALUE_TYPE_BINARY ? 'h.itemid,h.clock,NULL AS value,h.ns' : '*';
+
+					$db_values = DBfetchArray(DBselect(
+						'SELECT '.$output.
 						' FROM '.$history_table.' h'.
-						' WHERE h.itemid='.zbx_dbstr($itemid_clock['itemid']).
+						' WHERE '.dbConditionId('h.itemid', [$itemid_clock['itemid']]).
 							' AND h.clock='.zbx_dbstr($itemid_clock['clock']).
 						' ORDER BY h.ns DESC',
 						$limit
 					));
 
-					if ($db_value) {
-						$results[$itemid_clock['itemid']] = $db_value;
+					if ($db_values) {
+						if ($value_type == ITEM_VALUE_TYPE_BINARY) {
+							foreach ($db_values as &$db_value) {
+								$db_value['value'] = self::$binary_value;
+							}
+							unset($db_value);
+						}
+
+						$results[$itemid_clock['itemid']] = $db_values;
 					}
 				}
 			}
@@ -283,11 +297,13 @@ class CHistoryManager {
 		else {
 			foreach ($items_by_type as $value_type => $items) {
 				$history_table = self::getTableName($value_type);
+				$output = $value_type == ITEM_VALUE_TYPE_BINARY ? 'h.itemid,h.clock,NULL AS value,h.ns' : '*';
 
 				foreach ($items as $item) {
-					$db_values = DBselect('SELECT *'.
+					$db_values = DBselect(
+						'SELECT '.$output.
 						' FROM '.$history_table.' h'.
-						' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+						' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
 							($period !== null ? ' AND h.clock>'.$period : '').
 						' ORDER BY h.clock DESC, h.ns DESC',
 						$limit
@@ -300,6 +316,13 @@ class CHistoryManager {
 					}
 
 					if ($values) {
+						if ($value_type == ITEM_VALUE_TYPE_BINARY) {
+							foreach ($values as &$value) {
+								$value['value'] = self::$binary_value;
+							}
+							unset($value);
+						}
+
 						$results[$item['itemid']] = $values;
 					}
 				}
@@ -333,7 +356,7 @@ class CHistoryManager {
 				$clock_max = DBfetch(DBselect(
 					'SELECT MAX(h.clock)'.
 					' FROM '.self::getTableName($item['value_type']).' h'.
-					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+					' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
 						($period !== null ? ' AND h.clock>'.$period : '')
 				), false);
 
@@ -341,16 +364,27 @@ class CHistoryManager {
 					$clock_max = reset($clock_max);
 
 					if ($clock_max !== null) {
+						$output = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+							? 'h.itemid,h.clock,NULL AS value,h.ns'
+							: '*';
+
 						$values = DBfetchArray(DBselect(
-							'SELECT *'.
+							'SELECT '.$output.
 							' FROM '.self::getTableName($item['value_type']).' h'.
-							' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+							' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
 								' AND h.clock='.zbx_dbstr($clock_max).
 							' ORDER BY h.ns DESC',
 							$limit
 						));
 
 						if ($values) {
+							if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+								foreach ($values as &$value) {
+									$value['value'] = self::$binary_value;
+								}
+								unset($value);
+							}
+
 							$results[$item['itemid']] = $values;
 						}
 					}
@@ -359,11 +393,13 @@ class CHistoryManager {
 		}
 		else {
 			foreach ($items as $item) {
+				$output = $item['value_type'] == ITEM_VALUE_TYPE_BINARY ? 'h.itemid,h.clock,NULL AS value,h.ns' : '*';
+
 				// Cannot order by h.ns directly here due to performance issues.
 				$values = DBfetchArray(DBselect(
-					'SELECT *'.
+					'SELECT '.$output.
 					' FROM '.self::getTableName($item['value_type']).' h'.
-					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+					' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
 						($period !== null ? ' AND h.clock>'.$period : '').
 					' ORDER BY h.clock DESC',
 					$limit + 1
@@ -384,9 +420,9 @@ class CHistoryManager {
 						} while ($values && $values[$count - 1]['clock'] == $clock);
 
 						$db_values = DBselect(
-							'SELECT *'.
+							'SELECT '.$output.
 							' FROM '.self::getTableName($item['value_type']).' h'.
-							' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+							' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
 								' AND h.clock='.$clock.
 							' ORDER BY h.ns DESC',
 							$limit - $count
@@ -407,6 +443,13 @@ class CHistoryManager {
 
 					while ($count > $limit) {
 						unset($values[--$count]);
+					}
+
+					if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+						foreach ($values as &$value) {
+							$value['value'] = self::$binary_value;
+						}
+						unset($value);
 					}
 
 					$results[$item['itemid']] = $values;
@@ -532,15 +575,20 @@ class CHistoryManager {
 		}
 
 		$history_table = self::getTableName($item['value_type']);
+		$output = $item['value_type'] == ITEM_VALUE_TYPE_BINARY ? 'h.itemid,h.clock,NULL AS value,h.ns' : '*';
 
-		$sql = 'SELECT *'.
-			' FROM '.$history_table.
-			' WHERE itemid='.zbx_dbstr($item['itemid']).
-				' AND clock='.zbx_dbstr($clock).
-				' AND ns<='.zbx_dbstr($ns).
-			' ORDER BY ns DESC';
+		$sql = 'SELECT '.$output.
+			' FROM '.$history_table.' h'.
+			' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
+				' AND h.clock='.zbx_dbstr($clock).
+				' AND h.ns<='.zbx_dbstr($ns).
+			' ORDER BY h.ns DESC';
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
+			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+				$row['value'] = self::$binary_value;
+			}
+
 			return $row;
 		}
 
@@ -550,14 +598,18 @@ class CHistoryManager {
 			$time_from = max($time_from, time() - $hk_history + 1);
 		}
 
-		$sql = 'SELECT *'.
-			' FROM '.$history_table.
-			' WHERE itemid='.zbx_dbstr($item['itemid']).
-				' AND clock<'.zbx_dbstr($clock).
-				' AND clock>='.zbx_dbstr($time_from).
-			' ORDER BY clock DESC, ns DESC';
+		$sql = 'SELECT '.$output.
+			' FROM '.$history_table.' h'.
+			' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
+				' AND h.clock<'.zbx_dbstr($clock).
+				' AND h.clock>='.zbx_dbstr($time_from).
+			' ORDER BY h.clock DESC, h.ns DESC';
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
+			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+				$row['value'] = self::$binary_value;
+			}
+
 			return $row;
 		}
 
@@ -579,25 +631,30 @@ class CHistoryManager {
 
 		$result = null;
 		$table = self::getTableName($item['value_type']);
+		$output = $item['value_type'] == ITEM_VALUE_TYPE_BINARY ? 'h.itemid,h.clock,NULL AS value,h.ns' : '*';
 
-		$sql = 'SELECT *'.
-				' FROM '.$table.
-				' WHERE itemid='.zbx_dbstr($item['itemid']).
-					' AND clock='.zbx_dbstr($clock).
-					' AND ns='.zbx_dbstr($ns);
+		$sql = 'SELECT '.$output.
+				' FROM '.$table.' h'.
+				' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
+					' AND h.clock='.zbx_dbstr($clock).
+					' AND h.ns='.zbx_dbstr($ns);
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
 			$result = $row;
 		}
 
 		if ($result !== null) {
+			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+				$result['value'] = self::$binary_value;
+			}
+
 			return $result;
 		}
 
 		$max_clock = 0;
 		$sql = 'SELECT DISTINCT clock'.
 				' FROM '.$table.
-				' WHERE itemid='.zbx_dbstr($item['itemid']).
+				' WHERE '.dbConditionId('itemid', [$item['itemid']]).
 					' AND clock='.zbx_dbstr($clock).
 					' AND ns<'.zbx_dbstr($ns);
 
@@ -627,23 +684,25 @@ class CHistoryManager {
 			return $result;
 		}
 
-		if ($clock == $max_clock) {
-			$sql = 'SELECT *'.
-					' FROM '.$table.
-					' WHERE itemid='.zbx_dbstr($item['itemid']).
-						' AND clock='.zbx_dbstr($clock).
-						' AND ns<'.zbx_dbstr($ns);
-		}
-		else {
-			$sql = 'SELECT *'.
-					' FROM '.$table.
-					' WHERE itemid='.zbx_dbstr($item['itemid']).
-						' AND clock='.zbx_dbstr($max_clock).
-					' ORDER BY itemid,clock desc,ns desc';
-		}
+		$sql = $clock == $max_clock
+			? 'SELECT '.$output.
+					' FROM '.$table.' h'.
+					' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
+						' AND h.clock='.zbx_dbstr($clock).
+						' AND h.ns<'.zbx_dbstr($ns).
+					' ORDER h.ns DESC'
+			: 'SELECT '.$output.
+					' FROM '.$table.' h'.
+					' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
+						' AND h.clock='.zbx_dbstr($max_clock).
+					' ORDER BY h.ns DESC';
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
 			$result = $row;
+		}
+
+		if ($result !== null && $item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+			$result['value'] = self::$binary_value;
 		}
 
 		return $result;
@@ -1353,7 +1412,7 @@ class CHistoryManager {
 		foreach ($item_tables as $table_name) {
 			$itemids = array_keys(array_intersect($items, [(string) $table_names[$table_name]]));
 
-			if (!DBexecute('DELETE FROM '.$table_name.' WHERE '.dbConditionInt('itemid', $itemids))) {
+			if (!DBexecute('DELETE FROM '.$table_name.' WHERE '.dbConditionId('itemid', $itemids))) {
 				return false;
 			}
 		}
@@ -1374,7 +1433,8 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_STR => 'str',
 			ITEM_VALUE_TYPE_LOG => 'log',
 			ITEM_VALUE_TYPE_UINT64 => 'uint',
-			ITEM_VALUE_TYPE_TEXT => 'text'
+			ITEM_VALUE_TYPE_TEXT => 'text',
+			ITEM_VALUE_TYPE_BINARY => 'binary'
 		];
 
 		if (array_key_exists($value_type, $mapping)) {
@@ -1398,7 +1458,8 @@ class CHistoryManager {
 			'str' => ITEM_VALUE_TYPE_STR,
 			'log' => ITEM_VALUE_TYPE_LOG,
 			'uint' => ITEM_VALUE_TYPE_UINT64,
-			'text' => ITEM_VALUE_TYPE_TEXT
+			'text' => ITEM_VALUE_TYPE_TEXT,
+			'binary' => ITEM_VALUE_TYPE_BINARY
 		];
 
 		if (array_key_exists($type_name, $mapping)) {
@@ -1519,7 +1580,8 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_TEXT => 'history_text',
 			ITEM_VALUE_TYPE_STR => 'history_str',
 			ITEM_VALUE_TYPE_FLOAT => 'history',
-			ITEM_VALUE_TYPE_UINT64 => 'history_uint'
+			ITEM_VALUE_TYPE_UINT64 => 'history_uint',
+			ITEM_VALUE_TYPE_BINARY => 'history_binary'
 		];
 
 		return ($value_type === null) ? $tables : $tables[$value_type];

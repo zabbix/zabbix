@@ -92,7 +92,14 @@ $item_select = (new CPatternSelect([
 			'srcfld1' => 'itemid',
 			'real_hosts' => 1,
 			'dstfrm' => $form->getName(),
-			'dstfld1' => 'item'
+			'dstfld1' => 'item',
+			'value_types' => [
+				ITEM_VALUE_TYPE_FLOAT,
+				ITEM_VALUE_TYPE_STR,
+				ITEM_VALUE_TYPE_LOG,
+				ITEM_VALUE_TYPE_UINT64,
+				ITEM_VALUE_TYPE_TEXT
+			]
 		]
 	],
 	'add_post_js' => false

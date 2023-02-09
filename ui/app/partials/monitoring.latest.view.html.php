@@ -118,18 +118,21 @@ foreach ($data['items'] as $itemid => $item) {
 
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
+	$popup_parameters = CMenuPopupHelper::getItem([
+		'itemid' => $itemid,
+		'context' => 'host',
+		'backurl' => (new CUrl('zabbix.php'))
+			->setArgument('action', 'latest.view')
+			->setArgument('context','host')
+			->getUrl()
+	]);
+
+	if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+		$popup_parameters['data']['triggers'] = 0;
+	}
+
 	$item_name = (new CDiv([
-		(new CLinkAction($item['name']))
-			->setMenuPopup(
-				CMenuPopupHelper::getItem([
-					'itemid' => $itemid,
-					'context' => 'host',
-					'backurl' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'latest.view')
-						->setArgument('context','host')
-						->getUrl()
-				])
-			),
+		(new CLinkAction($item['name']))->setMenuPopup($popup_parameters),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
 	]))->addClass(ZBX_STYLE_ACTION_CONTAINER);
 
@@ -145,12 +148,18 @@ foreach ($data['items'] as $itemid => $item) {
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']), '', true, '', 0);
 
-		$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
-			->addClass(ZBX_STYLE_CURSOR_POINTER)
-			->setHint(
-				(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
-				'', true, '', 0
-			);
+		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+			$last_value = new CSpan(_('binary data'));
+		}
+		else {
+			$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
+				->addClass(ZBX_STYLE_CURSOR_POINTER)
+				->setHint(
+					(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
+						->addClass(ZBX_STYLE_HINTBOX_WRAP),
+					'', true, '', 0
+				);
+		}
 
 		$change = '';
 

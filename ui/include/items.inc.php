@@ -111,14 +111,14 @@ function item_type2str($type = null) {
 }
 
 /**
- * Returns human readable an item value type
+ * Returns label for value type.
  *
- * @param int $valueType
+ * @param int $value_type
  *
  * @return string
  */
-function itemValueTypeString($valueType) {
-	switch ($valueType) {
+function itemValueTypeString($value_type): string {
+	switch ($value_type) {
 		case ITEM_VALUE_TYPE_UINT64:
 			return _('Numeric (unsigned)');
 		case ITEM_VALUE_TYPE_FLOAT:
@@ -129,7 +129,10 @@ function itemValueTypeString($valueType) {
 			return _('Log');
 		case ITEM_VALUE_TYPE_TEXT:
 			return _('Text');
+		case ITEM_VALUE_TYPE_BINARY:
+			return _('Binary');
 	}
+
 	return _('Unknown');
 }
 

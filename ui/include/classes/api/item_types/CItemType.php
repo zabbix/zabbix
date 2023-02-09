@@ -284,6 +284,9 @@ abstract class CItemType {
 							['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'delay')]
 						]];
 
+					case ITEM_TYPE_DEPENDENT:
+						return ['type' => API_ITEM_DELAY, 'in' => DB::getDefault('items', 'delay')];
+
 					default:
 						return ['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')];
 				}

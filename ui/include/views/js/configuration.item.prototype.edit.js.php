@@ -38,21 +38,15 @@ include dirname(__FILE__).'/itemtest.js.php';
 			// Field switchers.
 			new CViewSwitcher('value_type', 'change', item_form.field_switches.for_value_type);
 
-			$('#type')
-				.change(this.typeChangeHandler)
-				.trigger('change');
-
-			// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.
 			$('#value_type')
 				.change(function() {
-					const new_value = $(this).val();
-					const old_value = $(this).data('old-value');
-					const trends = $('#trends');
+					// If non-numeric type is changed to numeric, set the default value for trends.
+					if ((this.value == <?= ITEM_VALUE_TYPE_FLOAT ?> || this.value == <?= ITEM_VALUE_TYPE_UINT64 ?>)
+							&& <?= json_encode([
+								ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
+							]) ?>.includes($(this).data('old-value'))) {
+						const trends = $('#trends');
 
-					if ((old_value == <?= ITEM_VALUE_TYPE_STR ?> || old_value == <?= ITEM_VALUE_TYPE_LOG ?>
-							|| old_value == <?= ITEM_VALUE_TYPE_TEXT ?>)
-							&& (new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
-							|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)) {
 						if (trends.val() == 0) {
 							trends.val(trends_default);
 						}
@@ -61,9 +55,13 @@ include dirname(__FILE__).'/itemtest.js.php';
 					}
 
 					$('#trends_mode').trigger('change');
-					$(this).data('old-value', new_value);
+					$(this).data('old-value', this.value);
 				})
 				.data('old-value', $('#value_type').val());
+
+			$('#type')
+				.change(this.typeChangeHandler)
+				.trigger('change');
 
 			$('#history_mode')
 				.change(function() {
@@ -106,6 +104,8 @@ include dirname(__FILE__).'/itemtest.js.php';
 				jQuery('label[for=username]').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 				jQuery('input[name=username]').removeAttr('aria-required');
 			}
+
+			jQuery('z-select[name="value_type"]').trigger('change');
 		},
 
 		editHost(e, hostid) {
