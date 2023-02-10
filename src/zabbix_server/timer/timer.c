@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < updates->values_num; i++)
 	{
@@ -144,17 +144,17 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64 ";\n", diff->hostid);
 
-		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+		if (SUCCEED != zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			break;
 
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 			log_host_maintenance_update(diff);
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 
 	zbx_free(sql);
 }
@@ -166,9 +166,9 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
  ******************************************************************************/
 static void	db_remove_expired_event_suppress_data(int now)
 {
-	DBbegin();
-	DBexecute("delete from event_suppress where suppress_until<%d and suppress_until<>0", now);
-	DBcommit();
+	zbx_db_begin();
+	zbx_db_execute("delete from event_suppress where suppress_until<%d and suppress_until<>0", now);
+	zbx_db_commit();
 }
 
 /******************************************************************************
@@ -193,7 +193,7 @@ static void	event_queries_fetch(DB_RESULT result, zbx_vector_ptr_t *event_querie
 	zbx_uint64_t			eventid;
 	zbx_event_suppress_query_t	*query = NULL;
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(eventid, row[0]);
 
@@ -205,19 +205,19 @@ static void	event_queries_fetch(DB_RESULT result, zbx_vector_ptr_t *event_querie
 			ZBX_STR2UINT64(query->triggerid, row[1]);
 			ZBX_DBROW2UINT64(query->r_eventid, row[2]);
 			zbx_vector_uint64_create(&query->functionids);
-			zbx_vector_ptr_create(&query->tags);
+			zbx_vector_tags_create(&query->tags);
 			zbx_vector_uint64_pair_create(&query->maintenances);
 			zbx_vector_ptr_append(event_queries, query);
 		}
 
-		if (FAIL == DBis_null(row[3]))
+		if (FAIL == zbx_db_is_null(row[3]))
 		{
 			zbx_tag_t	*tag;
 
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, row[3]);
 			tag->value = zbx_strdup(NULL, row[4]);
-			zbx_vector_ptr_append(&query->tags, tag);
+			zbx_vector_tags_append(&query->tags, tag);
 
 		}
 	}
@@ -252,7 +252,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 	}
 
 	/* get open or recently closed problems */
-	result = DBselect("select p.eventid,p.objectid,p.r_eventid,%s"
+	result = zbx_db_select("select p.eventid,p.objectid,p.r_eventid,%s"
 			" from problem p"
 			"%s"
 			" where p.source=%d"
@@ -264,19 +264,19 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 			process_num - 1);
 
 	event_queries_fetch(result, event_queries);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* get event suppress data */
 
 	zbx_vector_uint64_create(&eventids);
 
-	result = DBselect("select eventid,maintenanceid,suppress_until"
+	result = zbx_db_select("select eventid,maintenanceid,suppress_until"
 			" from event_suppress"
 			" where " ZBX_SQL_MOD(eventid, %d) "=%d"
 			" order by eventid",
 			CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER], process_num - 1);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(eventid, row[0]);
 
@@ -295,7 +295,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 		pair.second = atoi(row[2]);
 		zbx_vector_uint64_pair_append(&data->maintenances, pair);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* get missing event data */
 
@@ -324,15 +324,15 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 					"%s"
 					" where",
 					tag_fields, tag_join);
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid",
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid",
 					eventids.values + i, MIN(eventids.values_num - i, ZBX_EVENT_BATCH_SIZE));
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by e.eventid");
 
-			result = DBselect("%s", sql);
+			result = zbx_db_select("%s", sql);
 			zbx_free(sql);
 
 			event_queries_fetch(result, event_queries);
-			DBfree_result(result);
+			zbx_db_free_result(result);
 		}
 
 		zbx_vector_ptr_sort(event_queries, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -378,14 +378,14 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num)
 
 		zbx_dc_get_running_maintenanceids(&maintenanceids);
 
-		DBbegin();
+		zbx_db_begin();
 
 		if (0 != maintenanceids.values_num && SUCCEED == zbx_db_lock_maintenanceids(&maintenanceids))
 			zbx_dc_get_event_maintenances(&event_queries, &maintenanceids);
 
 		zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "maintenanceid",
 				"suppress_until", NULL);
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < event_queries.values_num; i++)
 		{
@@ -441,7 +441,7 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num)
 									query->eventid,
 									query->maintenances.values[k].first);
 
-						if (FAIL == DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+						if (FAIL == zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 							goto cleanup;
 					}
 					j++;
@@ -478,22 +478,22 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num)
 						del_event_maintenances.values[i].first,
 						del_event_maintenances.values[i].second);
 
-			if (FAIL == DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			if (FAIL == zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 				goto cleanup;
 		}
 
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)
 		{
-			if (ZBX_DB_OK > DBexecute("%s", sql))
+			if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 				goto cleanup;
 		}
 
 		zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
 		zbx_db_insert_execute(&db_insert);
 cleanup:
-		DBcommit();
+		zbx_db_commit();
 
 		zbx_db_insert_clean(&db_insert);
 		zbx_free(sql);
@@ -527,7 +527,7 @@ static int	update_host_maintenances(void)
 
 	do
 	{
-		DBbegin();
+		zbx_db_begin();
 
 		if (SUCCEED == zbx_dc_get_running_maintenanceids(&maintenanceids))
 			zbx_db_lock_maintenanceids(&maintenanceids);
@@ -539,7 +539,7 @@ static int	update_host_maintenances(void)
 		if (0 != updates.values_num)
 			db_update_host_maintenances(&updates);
 
-		if (ZBX_DB_OK == (tnx_error = DBcommit()) && 0 != (hosts_num = updates.values_num))
+		if (ZBX_DB_OK == (tnx_error = zbx_db_commit()) && 0 != (hosts_num = updates.values_num))
 			zbx_dc_flush_host_maintenance_updates(&updates);
 
 		zbx_vector_ptr_clear_ext(&updates, (zbx_clean_func_t)zbx_ptr_free);
@@ -578,7 +578,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	zbx_strcpy_alloc(&info, &info_alloc, &info_offset, "started");
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	while (ZBX_IS_RUNNING())
 	{

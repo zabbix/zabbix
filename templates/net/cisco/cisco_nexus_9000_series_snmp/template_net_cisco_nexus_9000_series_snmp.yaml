@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-11-28T08:35:59Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -28,6 +27,9 @@ zabbix_export:
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: 'Templates/Network devices'

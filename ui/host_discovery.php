@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -159,34 +159,34 @@ $fields = [
 	'ssl_key_file' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_password' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'verify_peer' =>			[T_ZBX_INT, O_OPT, null,
-									IN([HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]),
+									IN([ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]),
 									null
 								],
 	'verify_host' =>			[T_ZBX_INT, O_OPT, null,
-									IN([HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]),
+									IN([ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]),
 									null
 								],
 	'http_authtype' =>			[T_ZBX_INT, O_OPT, null,
-									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
-										HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST
+									IN([ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM,
+										ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST
 									]),
 									null
 								],
 	'http_username' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
-										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
-											' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+										' && ({http_authtype} == '.ZBX_HTTP_AUTH_BASIC.
+											' || {http_authtype} == '.ZBX_HTTP_AUTH_NTLM.
+											' || {http_authtype} == '.ZBX_HTTP_AUTH_KERBEROS.
+											' || {http_authtype} == '.ZBX_HTTP_AUTH_DIGEST.
 										')',
 									_('Username')
 								],
 	'http_password' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
-										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
-											' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+										' && ({http_authtype} == '.ZBX_HTTP_AUTH_BASIC.
+											' || {http_authtype} == '.ZBX_HTTP_AUTH_NTLM.
+											' || {http_authtype} == '.ZBX_HTTP_AUTH_KERBEROS.
+											' || {http_authtype} == '.ZBX_HTTP_AUTH_DIGEST.
 										')',
 									_('Password')
 								],
@@ -522,7 +522,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'ssl_key_password' => getRequest('ssl_key_password'),
 				'verify_peer' => (int) getRequest('verify_peer'),
 				'verify_host' => (int) getRequest('verify_host'),
-				'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
+				'authtype' => getRequest('http_authtype', ZBX_HTTP_AUTH_NONE),
 				'username' => getRequest('http_username', ''),
 				'password' => getRequest('http_password', '')
 			];
@@ -918,22 +918,22 @@ else {
 		$options['filter']['state'] = $filter['state'];
 	}
 
-	$data['discoveries'] = API::DiscoveryRule()->get($options);
+	$data['items'] = API::DiscoveryRule()->get($options);
 
 	switch ($sort_field) {
 		case 'delay':
-			orderItemsByDelay($data['discoveries'], $sort_order, ['usermacros' => true]);
+			orderItemsByDelay($data['items'], $sort_order, ['usermacros' => true]);
 			break;
 
 		case 'status':
-			orderItemsByStatus($data['discoveries'], $sort_order);
+			orderItemsByStatus($data['items'], $sort_order);
 			break;
 
 		default:
-			order_result($data['discoveries'], $sort_field, $sort_order);
+			order_result($data['items'], $sort_field, $sort_order);
 	}
 
-	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
+	$data['items'] = expandItemNamesWithMasterItems($data['items'], 'items');
 
 	// pager
 	if (hasRequest('page')) {
@@ -948,12 +948,13 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $data['discoveries'], $sort_order,
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['items'], $sort_order,
 		(new CUrl('host_discovery.php'))->setArgument('context', $data['context'])
 	);
 
-	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
-	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	$data['parent_items'] = getParentLldRules($data['items'],
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+	);
 
 	// render view
 	echo (new CView('configuration.host.discovery.list', $data))->getOutput();

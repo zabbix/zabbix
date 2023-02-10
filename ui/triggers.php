@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,13 +34,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'hostid' =>									[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'triggerid' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'(isset({form}) && ({form} == "update"))'],
-	'copy_type' =>								[T_ZBX_INT, O_OPT, P_SYS,
-													IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP,
-														COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE
-													]),
-													'isset({copy})'
-												],
-	'copy_mode' =>								[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),		null],
 	'type' =>									[T_ZBX_INT, O_OPT, null,	IN('0,1'),		null],
 	'description' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'event_name' =>								[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
@@ -64,7 +57,6 @@ $fields = [
 	'dependencies' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
 	'new_dependency' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID.'{}>0',	'isset({add_dependency})'],
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
-	'copy_targetids' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
 	'visible' =>								[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,			null],
 	'tags' =>									[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),		null],
@@ -107,7 +99,7 @@ $fields = [
 	'filter_tags' =>							[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	// Action related fields.
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-													IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
+													IN('"trigger.massdelete","trigger.massdisable",'.
 														'"trigger.massenable"'
 													),
 													null
@@ -129,7 +121,6 @@ $fields = [
 	'group_enable' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'group_disable' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'group_delete' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'copy' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'clone' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -502,50 +493,6 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('copy')
-		&& hasRequest('g_triggerid')) {
-	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hostids = getRequest('copy_targetids');
-		}
-		elseif (getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE_GROUP) {
-			$hostids = array_keys(API::Template()->get([
-				'output' => [],
-				'groupids' => getRequest('copy_targetids'),
-				'editable' => true,
-				'preservekeys' => true
-			]));
-		}
-		else {
-			$hostids = array_keys(API::Host()->get([
-				'output' => [],
-				'groupids' => getRequest('copy_targetids'),
-				'editable' => true,
-				'preservekeys' => true
-			]));
-		}
-
-		DBstart();
-
-		$result = copyTriggersToHosts($hostids, getRequest('hostid'), getRequest('g_triggerid'));
-		$result = DBend($result);
-
-		$triggers_count = count(getRequest('g_triggerid'));
-
-		if ($result) {
-			uncheckTableRows(getRequest('checkbox_hash'));
-			unset($_REQUEST['g_triggerid']);
-		}
-
-		show_messages($result,
-			_n('Trigger copied', 'Triggers copied', $triggers_count),
-			_n('Cannot copy trigger', 'Cannot copy triggers', $triggers_count)
-		);
-	}
-	else {
-		show_error_message(_('No target selected'));
-	}
-}
 elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' && hasRequest('g_triggerid')) {
 	$result = API::Trigger()->delete(getRequest('g_triggerid'));
 
@@ -585,7 +532,6 @@ if (isset($_REQUEST['form'])) {
 		'recovery_expression_constructor' => getRequest('recovery_expression_constructor', IM_ESTABLISHED),
 		'limited' => false,
 		'templates' => [],
-		'parent_templates' => [],
 		'hostid' => getRequest('hostid', 0),
 		'expression_action' => $expression_action,
 		'recovery_expression_action' => $recovery_expression_action,
@@ -600,13 +546,6 @@ if (isset($_REQUEST['form'])) {
 
 	// render view
 	echo (new CView('configuration.triggers.edit', getTriggerFormData($data)))->getOutput();
-}
-elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('g_triggerid')) {
-	$data = getCopyElementsFormData('g_triggerid', _('Triggers'));
-	$data['action'] = 'trigger.masscopyto';
-
-	// render view
-	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 else {
 	$data = [
@@ -979,11 +918,12 @@ else {
 		'show_info_column' => $show_info_column,
 		'show_value_column' => $show_value_column,
 		'single_selected_hostid' => $single_selected_hostid,
-		'parent_templates' => getTriggerParentTemplates($triggers, ZBX_FLAG_DISCOVERY_NORMAL),
+		'parent_triggers' => getParentTriggers($triggers,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		),
 		'paging' => $paging,
 		'dep_triggers' => $dep_triggers,
-		'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags),
-		'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags)
 	];
 
 	// render view

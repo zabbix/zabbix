@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host
 
 	for (time_start = time(NULL); SEC_PER_MIN > time(NULL) - time_start; sleep(1))
 	{
-		result = DBselect(
+		result = zbx_db_select(
 				"select tr.status,tr.info"
 				" from task t"
 				" left join task_remote_command_result tr"
@@ -62,7 +62,7 @@ static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host
 				" where tr.parent_taskid=" ZBX_FS_UI64,
 				taskid);
 
-		if (NULL != (row = DBfetch(result)))
+		if (NULL != (row = zbx_db_fetch(result)))
 		{
 			int	ret;
 
@@ -71,11 +71,11 @@ static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host
 			else
 				zbx_strlcpy(error, row[1], max_error_len);
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return ret;
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_snprintf(error, max_error_len, "Timeout while waiting for remote command result.");
@@ -91,7 +91,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 	DB_ROW		row;
 	zbx_uint64_t	usrgrpid_l, groupid_l;
 
-	db_result = DBselect("select command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
+	db_result = zbx_db_select("select command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
 			",username,password,publickey,privatekey"
 			" from scripts"
 			" where scriptid=" ZBX_FS_UI64, scriptid);
@@ -102,7 +102,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 		return FAIL;
 	}
 
-	if (NULL == (row = DBfetch(db_result)))
+	if (NULL == (row = zbx_db_fetch(db_result)))
 	{
 		zbx_strlcpy(error, "Script not found.", error_len);
 		goto fail;
@@ -150,7 +150,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 
 	ret = SUCCEED;
 fail:
-	DBfree_result(db_result);
+	zbx_db_free_result(db_result);
 
 	return ret;
 }
@@ -160,7 +160,7 @@ static int	is_user_in_allowed_group(zbx_uint64_t userid, zbx_uint64_t usrgrpid, 
 	DB_RESULT	result;
 	int		ret = FAIL;
 
-	result = DBselect("select null"
+	result = zbx_db_select("select null"
 			" from users_groups"
 			" where usrgrpid=" ZBX_FS_UI64
 			" and userid=" ZBX_FS_UI64,
@@ -172,12 +172,12 @@ static int	is_user_in_allowed_group(zbx_uint64_t userid, zbx_uint64_t usrgrpid, 
 		goto fail;
 	}
 
-	if (NULL == DBfetch(result))
+	if (NULL == zbx_db_fetch(result))
 		zbx_strlcpy(error, "User has no rights to execute this script.", error_len);
 	else
 		ret = SUCCEED;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 fail:
 	return ret;
 }
@@ -202,18 +202,18 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 	DB_RESULT	db_result;
 	DB_ROW		row;
 
-	if (NULL == (db_result = DBselect("select r_eventid from event_recovery where eventid="ZBX_FS_UI64, eventid)))
+	if (NULL == (db_result = zbx_db_select("select r_eventid from event_recovery where eventid="ZBX_FS_UI64, eventid)))
 	{
 		zbx_strlcpy(error, "Database error, cannot read from 'events' and 'event_recovery' tables.", error_len);
 		return FAIL;
 	}
 
-	if (NULL == (row = DBfetch(db_result)))
+	if (NULL == (row = zbx_db_fetch(db_result)))
 		*r_eventid = 0;
 	else
 		ZBX_DBROW2UINT64(*r_eventid, row[0]);
 
-	DBfree_result(db_result);
+	zbx_db_free_result(db_result);
 
 	return SUCCEED;
 }
@@ -248,7 +248,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_vector_ptr_t	events;
 	zbx_vector_ptr_pair_t	webhook_params;
 	char			*user_timezone = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
-	ZBX_DB_EVENT		*problem_event = NULL, *recovery_event = NULL;
+	zbx_db_event		*problem_event = NULL, *recovery_event = NULL;
 	zbx_dc_um_handle_t	*um_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
@@ -326,7 +326,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		switch (events.values_num)
 		{
 			case 1:
-				if (eventid == ((ZBX_DB_EVENT *)(events.values[0]))->eventid)
+				if (eventid == ((zbx_db_event *)(events.values[0]))->eventid)
 				{
 					problem_event = events.values[0];
 				}
@@ -337,7 +337,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				}
 				break;
 			case 2:
-				if (r_eventid == ((ZBX_DB_EVENT *)(events.values[0]))->eventid)
+				if (r_eventid == ((zbx_db_event *)(events.values[0]))->eventid)
 				{
 					problem_event = events.values[1];
 					recovery_event = events.values[0];

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -157,7 +157,7 @@ DBclose();
 /*
  * Setup wizard
  */
-$setup_wizard = (new CSetupWizard())->cleanItems();
+$setup_wizard = new CSetupWizard();
 
 // page title
 $page_header = (new CHtmlPageHeader(_('Installation'), substr($default_lang, 0, strpos($default_lang, '_'))));

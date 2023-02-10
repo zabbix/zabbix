@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
 			}
 
-			if (array_key_exists(Widget::SHOW_VALUE, $show) && $this->fields_values['units_show'] == 1) {
+			if ($this->fields_values['units_show'] == 1 && $this->fields_values['units'] === '') {
 				$options['output'][] = 'units';
 			}
 		}
@@ -141,15 +141,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if ($items) {
-			// Selecting data from history does not depend on "Show" checkboxes.
-			$history = Manager::History()->getLastValues($items, 2, $history_period);
-			$value_type = $items[$itemid]['value_type'];
+			$item = $items[$itemid];
+
+			$history_limit = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) ? 2 : 1;
+			$history = Manager::History()->getLastValues($items, $history_limit, $history_period);
+
+			$value_type = $item['value_type'];
 
 			if ($history) {
-				// Get values regardless of show status, since change indicator can be shown independently.
 				$last_value = $history[$itemid][0]['value'];
+				$prev_value = array_key_exists(1, $history[$itemid]) ? $history[$itemid][1]['value'] : null;
 
-				// Time can be shown independently.
 				if (array_key_exists(Widget::SHOW_TIME, $show)) {
 					$time = date(ZBX_FULL_DATE_TIME, (int) $history[$itemid][0]['clock']);
 				}
@@ -157,71 +159,42 @@ class WidgetView extends CControllerDashboardWidgetView {
 				switch ($value_type) {
 					case ITEM_VALUE_TYPE_FLOAT:
 					case ITEM_VALUE_TYPE_UINT64:
-						// Override item units if needed.
-						if (array_key_exists(Widget::SHOW_VALUE, $show) && $this->fields_values['units_show'] == 1) {
-							$units = $this->fields_values['units'] === ''
-								? $items[$itemid]['units']
-								: $this->fields_values['units'];
-						}
-
-						// Apply unit conversion always because it will also convert values to scientific notation.
-						$raw_units = convertUnitsRaw([
-							'value' => $last_value,
-							'units' => $units,
-							'decimals' => $this->fields_values['decimal_places']
-						]);
-						// Get the converted value (this is not the final value).
-						$value = $raw_units['value'];
-
-						/*
-						 * Get the converted units. If resulting units are empty, this could also mean value was
-						 * converted to time.
-						 */
-						$units = $raw_units['units'];
-
-						/*
-						 * In case there is a numeric value, for example 0.001234 and decimal places are set to 2,
-						 * convertUnitsRaw would return 0.0012, however in this widget we need to show the exact
-						 * number. So we convert the value again which results in 0.00. In case decimal places are set
-						 * to 10 (maximum), the value will be converted to 0.0012340000.
-						 */
-						if ($raw_units['is_numeric']) {
-							$value = self::convertNumeric($value, $this->fields_values['decimal_places'], $value_type);
-						}
-
-						/*
-						 * Regardless of unit conversion, separate the decimals from value. In case of scientific
-						 * notation, use the whole string after decimal separator.
-						 */
-						$numeric_formatting = localeconv();
-						$pos = strrpos($value, $numeric_formatting['decimal_point']);
-
-						if ($pos !== false) {
-							// Include the dot as part of decimal, so it can be shown in different font size.
-							$decimals = substr($value, $pos);
-							$value = substr($value, 0, $pos);
-						}
-
-						if ($items[$itemid]['valuemap']) {
-							// Apply value mapping if it is set in item configuration.
-							$value = CValueMapHelper::applyValueMap($value_type, $value,
-								$items[$itemid]['valuemap']
-							);
-
-							// Show of hide change indicator for mapped value.
-							if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show)) {
-								$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
+						if ($this->fields_values['units_show'] == 1) {
+							if ($this->fields_values['units'] !== '') {
+								$item['units'] = $this->fields_values['units'];
 							}
 						}
-						elseif (array_key_exists(1, $history[$itemid])
-								&& array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show)) {
-							/*
-							 * If there is no value mapping and there is more than one value, add up or down change
-							 * indicator. Do not show change indicator if value is the same.
-							 */
-							$prev_value = $history[$itemid][1]['value'];
+						else {
+							$item['units'] = '';
+						}
 
-							if ($last_value > $prev_value) {
+						$formatted_value = formatHistoryValueRaw($last_value, $item, false, [
+							'decimals' => $this->fields_values['decimal_places'],
+							'decimals_exact' => true,
+							'small_scientific' => false,
+							'zero_as_zero' => false
+						]);
+
+						$value = $formatted_value['value'];
+						$units = $formatted_value['units'];
+
+						if (!$formatted_value['is_mapped']) {
+							$numeric_formatting = getNumericFormatting();
+							$decimal_pos = strrpos($value, $numeric_formatting['decimal_point']);
+
+							if ($decimal_pos !== false) {
+								$decimals = substr($value, $decimal_pos);
+								$value = substr($value, 0, $decimal_pos);
+							}
+						}
+
+						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null) {
+							if ($formatted_value['is_mapped']) {
+								if ($last_value != $prev_value) {
+									$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
+								}
+							}
+							elseif ($last_value > $prev_value) {
 								$change_indicator = Widget::CHANGE_INDICATOR_UP;
 							}
 							elseif ($last_value < $prev_value) {
@@ -233,31 +206,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 					case ITEM_VALUE_TYPE_STR:
 					case ITEM_VALUE_TYPE_TEXT:
 					case ITEM_VALUE_TYPE_LOG:
-						$value = $last_value;
+						$value = formatHistoryValue($last_value, $items[$itemid], false);
 
-						// Apply value mapping to string type values (same as in Latest Data).
-						$mapping = CValueMapHelper::getMappedValue($value_type, $value,
-							$items[$itemid]['valuemap']
-						);
-
-						if ($mapping !== false) {
-							// Currently, it is same as in the latest data with original value in parentheses.
-							$value = $mapping.' ('.$value.')';
-						}
-
-						/*
-						 * Even though \n does not affect HTML and would be shown in one line anyway, it is still
-						 * better to process this and convert to empty space.
-						 */
-						$value = str_replace("\n", " ", $value);
-
-						if (array_key_exists(1, $history[$itemid])
-								&& array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show)) {
-							$prev_value = $history[$itemid][1]['value'];
-
-							if ($last_value !== $prev_value) {
-								$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
-							}
+						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
+								&& $last_value !== $prev_value) {
+							$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
 						}
 						break;
 				}
@@ -347,31 +300,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'debug_mode' => $this->getDebugMode()
 			]
 		]));
-	}
-
-	/**
-	 * Convert numeric value using precise decimal points.
-	 *
-	 * @param string $value       Value to convert.
-	 * @param int    $decimals    Number of decimal places.
-	 * @param string $value_type  Item value type.
-	 *
-	 * @return string
-	 */
-	private static function convertNumeric(string $value, int $decimals, string $value_type): string {
-		if ($value >= (10 ** ZBX_FLOAT_DIG)) {
-			return sprintf('%.'.ZBX_FLOAT_DIG.'E', $value);
-		}
-
-		if ($value_type == ITEM_VALUE_TYPE_FLOAT) {
-			$numeric_formatting = localeconv();
-
-			return number_format((float) $value, $decimals, $numeric_formatting['decimal_point'],
-				$numeric_formatting['thousands_sep']
-			);
-		}
-
-		return $value;
 	}
 
 	/**

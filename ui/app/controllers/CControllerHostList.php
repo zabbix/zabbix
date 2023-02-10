@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 class CControllerHostList extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -36,6 +36,7 @@ class CControllerHostList extends CController {
 			'filter_ip'           => 'string',
 			'filter_dns'          => 'string',
 			'filter_port'         => 'string',
+			'filter_status'       => 'in -1,'.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED,
 			'filter_monitored_by' => 'in '.ZBX_MONITORED_BY_ANY.','.ZBX_MONITORED_BY_SERVER.','.ZBX_MONITORED_BY_PROXY,
 			'filter_proxyids'     => 'array_db hosts.proxy_hostid',
 			'filter_evaltype'     => 'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
@@ -64,6 +65,7 @@ class CControllerHostList extends CController {
 			CProfile::update('web.hosts.filter_dns', $this->getInput('filter_dns', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.hosts.filter_host', $this->getInput('filter_host', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.hosts.filter_port', $this->getInput('filter_port', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.hosts.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
 			CProfile::update('web.hosts.filter_monitored_by',
 				$this->getInput('filter_monitored_by', ZBX_MONITORED_BY_ANY), PROFILE_TYPE_INT
 			);
@@ -98,6 +100,7 @@ class CControllerHostList extends CController {
 			CProfile::delete('web.hosts.filter_dns');
 			CProfile::delete('web.hosts.filter_host');
 			CProfile::delete('web.hosts.filter_port');
+			CProfile::delete('web.hosts.filter_status');
 			CProfile::delete('web.hosts.filter_monitored_by');
 			CProfile::deleteIdx('web.hosts.filter_templates');
 			CProfile::deleteIdx('web.hosts.filter_groups');
@@ -115,6 +118,7 @@ class CControllerHostList extends CController {
 			'templates' => CProfile::getArray('web.hosts.filter_templates', []),
 			'groups' => CProfile::getArray('web.hosts.filter_groups', []),
 			'port' => CProfile::get('web.hosts.filter_port', ''),
+			'status' => CProfile::get('web.hosts.filter_status', -1),
 			'monitored_by' => CProfile::get('web.hosts.filter_monitored_by', ZBX_MONITORED_BY_ANY),
 			'proxyids' => CProfile::getArray('web.hosts.filter_proxyids', []),
 			'evaltype' => CProfile::get('web.hosts.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
@@ -193,12 +197,13 @@ class CControllerHostList extends CController {
 			'sortfield' => $sort_field,
 			'limit' => $limit,
 			'search' => [
-				'name' => ($filter['host'] === '') ? null : $filter['host'],
-				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
-				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
+				'name' => $filter['host'] === '' ? null : $filter['host'],
+				'ip' => $filter['ip'] === '' ? null : $filter['ip'],
+				'dns' => $filter['dns'] === '' ? null : $filter['dns']
 			],
 			'filter' => [
-				'port' => ($filter['port'] === '') ? null : $filter['port']
+				'port' => $filter['port'] === '' ? null : $filter['port'],
+				'status' => $filter['status'] == -1 ? null : $filter['status']
 			],
 			'proxyids' => $proxyids
 		]);
@@ -267,35 +272,26 @@ class CControllerHostList extends CController {
 			$item_active_by_hostid[$value['hostid']] = $value['rowscount'];
 		}
 
-		// Selecting linked templates to templates linked to hosts.
-		$templateids = [];
+		// Get the writable templates among the templates linked to the hosts.
+		$editable_templates = [];
 
-		foreach ($hosts as $host) {
-			$templateids = array_merge($templateids, array_column($host['parentTemplates'], 'templateid'));
-		}
+		if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
+			$templateids = [];
 
-		$templateids = array_keys(array_flip($templateids));
-
-		$templates = API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'selectParentTemplates' => ['templateid', 'name'],
-			'templateids' => $templateids,
-			'preservekeys' => true
-		]);
-
-		$writable_templates = [];
-
-		if ($templateids) {
-			foreach ($templates as $template) {
-				$templateids = array_merge($templateids, array_column($template['parentTemplates'], 'templateid'));
+			foreach ($hosts as $host) {
+				foreach ($host['parentTemplates'] as $template) {
+					$templateids[$template['templateid']] = true;
+				}
 			}
 
-			$writable_templates = API::Template()->get([
-				'output' => ['templateid'],
-				'templateids' => array_keys(array_flip($templateids)),
-				'editable' => true,
-				'preservekeys' => true
-			]);
+			if ($templateids) {
+				$editable_templates = API::Template()->get([
+					'output' => [],
+					'templateids' => array_keys($templateids),
+					'editable' => true,
+					'preservekeys' => true
+				]);
+			}
 		}
 
 		// Get proxy host IDs that are not 0 and maintenance IDs.
@@ -374,9 +370,8 @@ class CControllerHostList extends CController {
 			'filter' => $filter,
 			'sortField' => $sort_field,
 			'sortOrder' => $sort_order,
-			'templates' => $templates,
 			'maintenances' => $db_maintenances,
-			'writable_templates' => $writable_templates,
+			'editable_templates' => $editable_templates,
 			'proxies' => $proxies,
 			'proxies_ms' => $proxies_ms,
 			'profileIdx' => 'web.hosts.filter',
@@ -385,7 +380,6 @@ class CControllerHostList extends CController {
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],
-			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'uncheck' => ($this->getInput('uncheck', 0) == 1)
 		];
 

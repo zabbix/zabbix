@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -510,7 +510,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Updates children of triggers on the given hosts and propagates the inheritance to all child hosts.
+	 * Updates children of triggers on the given hosts.
 	 * All of the child triggers that became obsolete will be deleted if the given triggers were assigned to a different
 	 * template or host.
 	 *
@@ -531,10 +531,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 		if ($upd_triggers) {
 			$this->updateReal($upd_triggers, $db_triggers, true);
-		}
-
-		if ($ins_triggers || $upd_triggers) {
-			$this->inherit(array_merge($ins_triggers + $upd_triggers));
 		}
 	}
 
@@ -1010,6 +1006,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 */
 	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['description', 'expression']], 'fields' => [
+			'uuid' => 					['type' => API_UUID],
 			'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'description' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'description')],
 			'expression' =>				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_NOT_EMPTY | API_ALLOW_LLD_MACRO],
@@ -1034,6 +1031,7 @@ abstract class CTriggerGeneral extends CApiService {
 				'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
+
 		if ($this instanceof CTriggerPrototype) {
 			$api_input_rules['fields']['discover'] = ['type' => API_INT32, 'in' => implode(',', [TRIGGER_DISCOVER, TRIGGER_NO_DISCOVER])];
 		}
@@ -2169,17 +2167,13 @@ abstract class CTriggerGeneral extends CApiService {
 		$templates = API::Template()->get([
 			'output' => [],
 			'selectHosts' => ['hostid'],
-			'selectTemplates' => ['templateid'],
 			'templateids' => array_keys($templateids),
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 
 		foreach ($templates as &$template) {
-			$template = array_merge(
-				zbx_objectValues($template['hosts'], 'hostid'),
-				zbx_objectValues($template['templates'], 'templateid')
-			);
+			$template = array_column($template['hosts'], 'hostid');
 		}
 		unset($template);
 

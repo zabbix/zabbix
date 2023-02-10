@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,16 +25,10 @@
 #if defined(_WINDOWS)
 #	define ZBX_THREAD_LOCAL __declspec(thread)
 #else
-/* for non windows build thread local storage is required only for agent2 */
-#	if defined(ZBX_BUILD_AGENT2)
-#		if defined(HAVE_THREAD_LOCAL) && (defined(__GNUC__) || defined(__clang__) || defined(__MINGW32__))
-#			define ZBX_THREAD_LOCAL __thread
-#		else
-#			error "C compiler is not compatible with agent2 assembly"
-#		endif
-#	endif
-#	if !defined(ZBX_THREAD_LOCAL)
-#		define ZBX_THREAD_LOCAL
+#	if defined(HAVE_THREAD_LOCAL) && (defined(__GNUC__) || defined(__clang__) || defined(__MINGW32__))
+#		define ZBX_THREAD_LOCAL __thread
+#	else
+#		error "C compiler is not compatible with agent2 assembly"
 #	endif
 #endif
 

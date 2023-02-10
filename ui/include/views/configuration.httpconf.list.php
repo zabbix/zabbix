@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -153,21 +153,44 @@ $httpTable = (new CTableInfo())
 $httpTestsLastData = $this->data['httpTestsLastData'];
 $http_tests = $data['http_tests'];
 
-foreach ($http_tests as $httpTestId => $httpTest) {
+$csrf_token = CCsrfTokenHelper::get('httpconf.php');
+
+foreach ($http_tests as $httptestid => $http_test) {
 	$name = [];
-	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates'], $data['allowed_ui_conf_templates']);
-	$name[] = new CLink(CHtml::encode($httpTest['name']),
+
+	if ($http_test['templateid'] != 0) {
+		$parent_httptest = $data['parent_httptests'][$http_test['templateid']];
+
+		if ($parent_httptest['editable']) {
+			$name[] = (new CLink(CHtml::encode($parent_httptest['template_name']),
+				(new CUrl('httpconf.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$parent_httptest['templateid']])
+					->setArgument('context', 'template')
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$name[] = (new CSpan(CHtml::encode($parent_httptest['template_name'])))->addClass(ZBX_STYLE_GREY);
+		}
+
+		$name[] = NAME_DELIMITER;
+	}
+
+	$name[] = new CLink(CHtml::encode($http_test['name']),
 		(new CUrl('httpconf.php'))
 			->setArgument('form', 'update')
-			->setArgument('hostid', $httpTest['hostid'])
-			->setArgument('httptestid', $httpTestId)
+			->setArgument('hostid', $http_test['hostid'])
+			->setArgument('httptestid', $httptestid)
 			->setArgument('context', $data['context'])
 	);
 
 	if ($data['context'] === 'host') {
 		$info_icons = [];
-		if($httpTest['status'] == HTTPTEST_STATUS_ACTIVE && isset($httpTestsLastData[$httpTestId]) && $httpTestsLastData[$httpTestId]['lastfailedstep']) {
-			$lastData = $httpTestsLastData[$httpTestId];
+		if ($http_test['status'] == HTTPTEST_STATUS_ACTIVE && isset($httpTestsLastData[$httptestid])
+				&& $httpTestsLastData[$httptestid]['lastfailedstep']) {
+			$lastData = $httpTestsLastData[$httptestid];
 
 			$failedStep = $lastData['failedstep'];
 
@@ -176,7 +199,7 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 					'Step "%1$s" [%2$s of %3$s] failed: %4$s',
 					$failedStep['name'],
 					$failedStep['no'],
-					$httpTest['stepscnt'],
+					$http_test['stepscnt'],
 					($lastData['error'] === null) ? _('Unknown error') : $lastData['error']
 				)
 				: _s('Unknown step failed: %1$s', $lastData['error']);
@@ -186,50 +209,57 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 	}
 
 	$httpTable->addRow([
-		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', $httpTest['httptestid']),
-		($this->data['hostid'] > 0) ? null : $httpTest['hostname'],
+		new CCheckBox('group_httptestid['.$http_test['httptestid'].']', $http_test['httptestid']),
+		($this->data['hostid'] > 0) ? null : $http_test['hostname'],
 		$name,
-		$httpTest['stepscnt'],
-		$httpTest['delay'],
-		$httpTest['retries'],
-		httptest_authentications($httpTest['authentication']),
-		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),
+		$http_test['stepscnt'],
+		$http_test['delay'],
+		$http_test['retries'],
+		httptest_authentications($http_test['authentication']),
+		($http_test['http_proxy'] !== '') ? _('Yes') : _('No'),
 		(new CLink(
-			httptest_status2str($httpTest['status']),
+			httptest_status2str($http_test['status']),
 			(new CUrl('httpconf.php'))
-				->setArgument('group_httptestid[]', $httpTest['httptestid'])
-				->setArgument('hostid', $httpTest['hostid'])
-				->setArgument('action', ($httpTest['status'] == HTTPTEST_STATUS_DISABLED)
+				->setArgument('group_httptestid[]', $http_test['httptestid'])
+				->setArgument('hostid', $http_test['hostid'])
+				->setArgument('action', ($http_test['status'] == HTTPTEST_STATUS_DISABLED)
 					? 'httptest.massenable'
 					: 'httptest.massdisable'
 				)
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(httptest_status2style($httpTest['status']))
-			->addSID(),
-		$data['tags'][$httpTest['httptestid']],
+			->addClass(httptest_status2style($http_test['status'])),
+		$data['tags'][$http_test['httptestid']],
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }
 
 $button_list = [
-	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')],
-	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')]
+	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?'),
+		'csrf_token' => $csrf_token
+	],
+	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 if ($data['context'] === 'host') {
 	$button_list += [
 		'httptest.massclearhistory' => [
 			'name' => _('Clear history'),
-			'confirm' => _('Delete history of selected web scenarios?')
+			'confirm' => _('Delete history of selected web scenarios?'),
+			'csrf_token' => $csrf_token
 		]
 	];
 }
 
 $button_list += [
-	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?')]
+	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?'),
+			'csrf_token' => $csrf_token
+	]
 ];
 
 // Append table to form.

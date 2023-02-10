@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,13 +36,6 @@ $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 $fields = [
 	'hostid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
 	'interfaceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
-	'copy_type' =>					[T_ZBX_INT, O_OPT, P_SYS,
-										IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
-											COPY_TYPE_TO_TEMPLATE
-										]),
-										'isset({copy})'
-									],
-	'copy_mode' =>					[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
 	'itemid' =>						[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'name' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})',
 										_('Name')
@@ -115,7 +108,8 @@ $fields = [
 										getParamFieldLabelByType(getRequest('type', 0))
 									],
 	'inventory_link' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),
-										'(isset({add}) || isset({update})) && {value_type} != '.ITEM_VALUE_TYPE_LOG
+										'(isset({add}) || isset({update})) && isset({value_type})'.
+											' && {value_type} != '.ITEM_VALUE_TYPE_LOG
 									],
 	'snmp_oid' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
@@ -139,9 +133,8 @@ $fields = [
 										'(isset({add}) || isset({update})) && isset({value_type})'.
 											' && {value_type} == '.ITEM_VALUE_TYPE_LOG
 									],
-	'preprocessing' =>				[null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'preprocessing' =>				[null,		O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
 	'group_itemid' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,				DB_ID,	null],
-	'copy_targetids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,				DB_ID,	null],
 	'visible' =>					[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,				null,	null],
 	'del_history' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
@@ -190,40 +183,40 @@ $fields = [
 	'ssl_cert_file' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_file' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_password' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'verify_peer' =>				[T_ZBX_INT, O_OPT, null, IN([HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]),
+	'verify_peer' =>				[T_ZBX_INT, O_OPT, null, IN([ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]),
 										null
 									],
-	'verify_host' =>				[T_ZBX_INT, O_OPT, null, IN([HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]),
+	'verify_host' =>				[T_ZBX_INT, O_OPT, null, IN([ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]),
 										null
 									],
 	'http_authtype' =>				[T_ZBX_INT, O_OPT, null,
-										IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
-											HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST
+										IN([ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM,
+											ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST
 										]),
 										null
 									],
 	'http_username' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
-											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
-												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+											' && ({http_authtype} == '.ZBX_HTTP_AUTH_BASIC.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_NTLM.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_KERBEROS.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_DIGEST.
 											')',
 										_('Username')
 									],
 	'http_password' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
-											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
-												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+											' && ({http_authtype} == '.ZBX_HTTP_AUTH_BASIC.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_NTLM.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_KERBEROS.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_DIGEST.
 											')',
 										_('Password')
 									],
 	'context' =>					[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-										IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
+										IN('"item.massclearhistory","item.massdelete",'.
 											'"item.massdisable","item.massenable"'
 										),
 										null
@@ -231,7 +224,6 @@ $fields = [
 	'add' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'clone' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'copy' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -479,7 +471,7 @@ $ms_groups = [];
 $filter_groupids = getSubGroups(getRequest('filter_groupids', []), $ms_groups, ['editable' => true],
 	getRequest('context')
 );
-$filter_hostids = getRequest('filter_hostids');
+$filter_hostids = getRequest('filter_hostids', []);
 if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
 		$host = API::Host()->get([
@@ -704,60 +696,6 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
-		&& hasRequest('group_itemid')) {
-	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-		if (in_array(getRequest('copy_type'), [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])) {
-			$options = getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE
-				? ['templateids' => getRequest('copy_targetids')]
-				: ['groupids' => getRequest('copy_targetids')];
-
-			$hostids = array_keys(API::Template()->get([
-				'output' => [],
-				'editable' => true,
-				'preservekeys' => true
-			] + $options));
-
-			$dst_is_template = true;
-		}
-
-		if (in_array(getRequest('copy_type'), [COPY_TYPE_TO_HOST, COPY_TYPE_TO_HOST_GROUP])) {
-			$options = getRequest('copy_type') == COPY_TYPE_TO_HOST
-				? ['hostids' => getRequest('copy_targetids')]
-				: ['groupids' => getRequest('copy_targetids')];
-
-			$hostids = array_keys(API::Host()->get([
-				'output' => [],
-				'editable' => true,
-				'preservekeys' => true
-			] + $options));
-
-			$dst_is_template = false;
-		}
-
-		$result = true;
-
-		if ($hostids) {
-			DBstart();
-			$result = copyItemsToHosts('itemids', getRequest('group_itemid'), $dst_is_template, $hostids);
-			DBend($result);
-		}
-
-		$items_count = count(getRequest('group_itemid'));
-
-		show_messages($result, _n('Item copied', 'Items copied', $items_count),
-			_n('Cannot copy item', 'Cannot copy items', $items_count)
-		);
-
-		if ($result) {
-			uncheckTableRows(getRequest('checkbox_hash'));
-			unset($_REQUEST['group_itemid']);
-		}
-	}
-	else {
-		show_error_message(_('No target selected.'));
-	}
-}
 // clean history for selected items
 elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory' && hasRequest('group_itemid')) {
 	$result = (bool) API::History()->clear(getRequest('group_itemid'));
@@ -924,13 +862,6 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 		echo (new CView('configuration.item.edit', $data))->getOutput();
 	}
 }
-elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('group_itemid')) {
-	$data = getCopyElementsFormData('group_itemid', _('Items'));
-	$data['action'] = 'item.masscopyto';
-
-	// render view
-	echo (new CView('configuration.copy.elements', $data))->getOutput();
-}
 // list of items
 else {
 	$sortField = getRequest('sort', CProfile::get($prefix.$page['file'].'.sort', 'name'));
@@ -1018,7 +949,11 @@ else {
 		$options['filter']['value_type'] = $_REQUEST['filter_value_type'];
 	}
 	if (array_key_exists('hostids', $options) && $_REQUEST['filter_valuemapids']) {
-		$hostids = CTemplateHelper::getParentTemplatesRecursive($filter_hostids, $data['context']);
+		$hostids = $options['hostids'];
+
+		if ($data['context'] === 'host') {
+			addParentTemplateIds($hostids);
+		}
 
 		$valuemap_names = array_unique(array_column(API::ValueMap()->get([
 			'output' => ['name'],
@@ -1099,7 +1034,6 @@ else {
 	}
 
 	$data['items'] = API::Item()->get($options);
-	$data['parent_templates'] = [];
 
 	// Unset unexisting subfilter tags (subfilter tags stored in profiles may contain tags already deleted).
 	if ($subfilter_tags) {
@@ -1348,22 +1282,27 @@ else {
 		(new CUrl('items.php'))->setArgument('context', $data['context'])
 	);
 
-	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL);
+	$triggerids = [];
 
-	$itemTriggerIds = [];
 	foreach ($data['items'] as $item) {
-		$itemTriggerIds = array_merge($itemTriggerIds, zbx_objectValues($item['triggers'], 'triggerid'));
+		foreach ($item['triggers'] as $trigger) {
+			$triggerids[$trigger['triggerid']] = true;
+		}
 	}
-	$data['itemTriggers'] = API::Trigger()->get([
-		'triggerids' => $itemTriggerIds,
+
+	$data['triggers'] = API::Trigger()->get([
 		'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'priority',
 			'status', 'state', 'error', 'templateid', 'flags'
 		],
 		'selectHosts' => ['hostid', 'name', 'host'],
+		'triggerids' => array_keys($triggerids),
 		'preservekeys' => true
 	]);
 
-	$data['trigger_parent_templates'] = getTriggerParentTemplates($data['itemTriggers'], ZBX_FLAG_DISCOVERY_NORMAL);
+	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
+	$data['parent_items'] = getParentItems($data['items'], $allowed_ui_conf_templates);
+	$data['parent_triggers'] = getParentTriggers($data['triggers'], $allowed_ui_conf_templates);
 
 	sort($filter_hostids);
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));
@@ -1371,8 +1310,6 @@ else {
 	$data['config'] = [
 		'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
 	];
-
-	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter_tags);
 

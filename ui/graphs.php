@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,13 +34,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'parent_discoveryid' =>	[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
-	'copy_type' =>			[T_ZBX_INT, O_OPT, P_SYS,
-								IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
-									COPY_TYPE_TO_TEMPLATE
-								]),
-								'isset({copy})'
-							],
-	'copy_mode' =>			[T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null],
 	'graphid' =>			[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({form}) && {form} == "update"'],
 	'name' =>				[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'width' =>				[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({add}) || isset({update})', _('Width')],
@@ -62,15 +55,14 @@ $fields = [
 	'show_work_period' =>	[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	'group_graphid' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
-	'copy_targetids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'context' =>			[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	'readonly' =>			[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
+	'checkbox_hash' =>		[T_ZBX_STR, O_OPT, null,		null,			null],
 	// actions
-	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete","graph.updatediscover"'),	null],
+	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.massdelete","graph.updatediscover"'),	null],
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
-	'copy' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
@@ -339,54 +331,6 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}
 }
-elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('copy')
-		&& hasRequest('group_graphid')) {
-	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-		$result = true;
-
-		$options = [
-			'output' => ['hostid'],
-			'editable' => true,
-			'templated_hosts' => true
-		];
-
-		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$options['hostids'] = getRequest('copy_targetids');
-		}
-		else {
-			$options['groupids'] = getRequest('copy_targetids');
-		}
-
-		$dbHosts = API::Host()->get($options);
-
-		DBstart();
-		foreach (getRequest('group_graphid') as $graphid) {
-			foreach ($dbHosts as $host) {
-				if (!copyGraphToHost($graphid, $host['hostid'])) {
-					$result = false;
-				}
-			}
-		}
-		$result = DBend($result);
-
-		$graphs_count = count(getRequest('group_graphid'));
-
-		if ($result) {
-			uncheckTableRows(
-				(getRequest('parent_discoveryid') == 0) ? $hostid : getRequest('parent_discoveryid')
-			);
-			unset($_REQUEST['group_graphid']);
-		}
-		show_messages($result,
-			_n('Graph copied', 'Graphs copied', $graphs_count),
-			_n('Cannot copy graph', 'Cannot copy graphs', $graphs_count)
-		);
-	}
-	else {
-		error(_('No target selected.'));
-	}
-	show_messages();
-}
 
 $prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
 
@@ -452,14 +396,7 @@ if ($hostid == 0 && count($filter['hosts']) == 1) {
 	$hostid = reset($filter['hosts'])['id'];
 }
 
-if (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('group_graphid')) {
-	$data = getCopyElementsFormData('group_graphid', _('Graphs'));
-	$data['action'] = 'graph.masscopyto';
-
-	// render view
-	echo (new CView('configuration.copy.elements', $data))->getOutput();
-}
-elseif (isset($_REQUEST['form'])) {
+if (isset($_REQUEST['form'])) {
 	$data = [
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
@@ -469,7 +406,7 @@ elseif (isset($_REQUEST['form'])) {
 		'hostid' => $hostid,
 		'normal_only' => getRequest('normal_only'),
 		'context' => getRequest('context'),
-		'readonly' => getRequest('readonly', 0)
+		'readonly' => hasRequest('graphid') && getRequest('readonly', 0) == 1
 	];
 
 	if ($data['graphid'] != 0 && ($data['readonly'] || !$data['form_refresh'])) {
@@ -509,12 +446,16 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_left'] = $graph['percent_left'];
 		$data['percent_right'] = $graph['percent_right'];
 		$data['templateid'] = $graph['templateid'];
-		$data['templates'] = [];
+		$data['readonly'] = $graph['templateid'] != 0;
 
 		if ($data['parent_discoveryid'] === null) {
 			$data['flags'] = $graph['flags'];
 			$data['discoveryRule'] = $graph['discoveryRule'];
 			$data['graphDiscovery'] = $graph['graphDiscovery'];
+
+			if ($graph['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				$data['readonly'] = true;
+			}
 		}
 		else {
 			$data['discover'] = $graph['discover'];
@@ -526,11 +467,15 @@ elseif (isset($_REQUEST['form'])) {
 			$data['hostid'] = $host['hostid'];
 		}
 
-		// templates
-		$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
-		$data['templates'] = makeGraphTemplatesHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
-			$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
+		if ($graph['templateid'] != 0) {
+			$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
+			$parent_graphs = $data['parent_discoveryid'] === null
+				? getParentGraphs([$graph], $allowed_ui_conf_templates)
+				: getParentGraphPrototypes([$graph], $allowed_ui_conf_templates);
+
+			$data['parent_graph'] = reset($parent_graphs);
+		}
 
 		// items
 		$data['items'] = API::GraphItem()->get([
@@ -569,7 +514,6 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_right'] = 0;
 		$data['items'] = $gitems;
 		$data['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
-		$data['templates'] = [];
 
 		if (isset($data['visible']['percent_left'])) {
 			$data['percent_left'] = getRequest('percent_left', 0);
@@ -797,14 +741,12 @@ else {
 
 	order_result($data['graphs'], $sort_field, $sort_order);
 
-	$data['parent_templates'] = getGraphParentTemplates($data['graphs'], ($data['parent_discoveryid'] === null)
-		? ZBX_FLAG_DISCOVERY_NORMAL
-		: ZBX_FLAG_DISCOVERY_PROTOTYPE
-	);
+	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
-	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	$data['parent_graphs'] = $data['parent_discoveryid'] === null
+		? getParentGraphs($data['graphs'], $allowed_ui_conf_templates)
+		: getParentGraphPrototypes($data['graphs'], $allowed_ui_conf_templates);
 
-	// render view
 	echo (new CView('configuration.graph.list', $data))->getOutput();
 }
 

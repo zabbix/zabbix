@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -787,6 +787,7 @@ abstract class CGraphGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
 		}
 
+		$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
 		$read_only_fields = ['templateid', 'flags'];
 
 		foreach ($graphs as $key => $graph) {
@@ -796,12 +797,6 @@ abstract class CGraphGeneral extends CApiService {
 
 			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($key + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-
-			if (array_key_exists('uuid', $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/' . ($key + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
 			}
 
 			$templatedGraph = false;
@@ -983,7 +978,7 @@ abstract class CGraphGeneral extends CApiService {
 	}
 
 	/**
-	 * Updates the children of the graph on the given hosts and propagates the inheritance to the child hosts.
+	 * Updates the children of the graph on the given hosts.
 	 *
 	 * @param array      $graphs   An array of graphs to inherit. Each graph must contain all graph properties including
 	 *                             "gitems" property.
@@ -1310,8 +1305,6 @@ abstract class CGraphGeneral extends CApiService {
 		if ($upd_graphs) {
 			$this->updateReal($upd_graphs);
 		}
-
-		$this->inherit(array_merge($ins_graphs + $upd_graphs));
 	}
 
 	/**

@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-07-01T06:44:50Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -14,6 +13,9 @@ zabbix_export:
         The template to monitor Cloudflare to see your web traffic and DNS metrics. It works without any external scripts and uses Script item.
         
         Template tooling version used: 0.41
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -412,7 +412,7 @@ class CDiscoveryRule extends CItemGeneralOld {
 	 *
 	 * @return array
 	 */
-	public function update($items) {
+	public function update(array $items) {
 		$items = zbx_toArray($items);
 
 		$db_items = $this->get([
@@ -482,8 +482,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 			}
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				// Clean username and password when authtype is set to HTTPTEST_AUTH_NONE.
-				if ($item['authtype'] == HTTPTEST_AUTH_NONE) {
+				// Clean username and password when authtype is set to ZBX_HTTP_AUTH_NONE.
+				if ($item['authtype'] == ZBX_HTTP_AUTH_NONE) {
 					$item['username'] = '';
 					$item['password'] = '';
 				}
@@ -721,10 +721,9 @@ class CDiscoveryRule extends CItemGeneralOld {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$result = DBselect(
-			'SELECT ii.itemid,h.status AS host_status'.
-			' FROM items i,items ii,hosts h'.
+			'SELECT ii.itemid'.
+			' FROM items i,items ii'.
 			' WHERE i.itemid=ii.templateid'.
-				' AND ii.hostid=h.hostid'.
 				' AND '.dbConditionId('i.hostid', $templateids).
 				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE]).
 				$hostids_condition
@@ -734,17 +733,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 		$ruleids = [];
 
 		while ($row = DBfetch($result)) {
-			$upd_item = [
-				'templateid' => 0,
-				'valuemapid' => 0
-			];
-
-			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
-				$upd_item += ['uuid' => generateUuidV4()];
-			}
-
 			$upd_items[] = [
-				'values' => $upd_item,
+				'values' => ['templateid' => 0],
 				'where' => ['itemid' => $row['itemid']]
 			];
 
