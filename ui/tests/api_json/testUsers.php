@@ -251,7 +251,6 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'username' => 'API user with non-existing userdirectory',
-						'passwd' => 'Z@bb1x1234',
 						'userdirectoryid' => 1234
 					]
 				],
