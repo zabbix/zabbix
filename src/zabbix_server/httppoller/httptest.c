@@ -38,6 +38,8 @@
 #define ZBX_HTTPITEM_TYPE_LASTSTEP	3
 #define ZBX_HTTPITEM_TYPE_LASTERROR	4
 
+#ifdef HAVE_LIBCURL
+
 typedef struct
 {
 	long					rspcode;
@@ -45,8 +47,6 @@ typedef struct
 	ZBX_CURLINFO_SPEED_DOWNLOAD_TYPE	speed_download;
 }
 zbx_httpstat_t;
-
-#ifdef HAVE_LIBCURL
 
 typedef struct
 {
