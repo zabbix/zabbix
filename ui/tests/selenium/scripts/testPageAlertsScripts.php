@@ -45,10 +45,6 @@ class testPageAlertsScripts extends CWebTest {
 
 	private static $script_sql = 'SELECT * FROM scripts ORDER BY scriptid';
 
-	public static function allScripts() {
-		return CDBHelper::getDataProvider('SELECT scriptid,name FROM scripts');
-	}
-
 	public function prepareScriptData()
 	{
 		$response = CDataHelper::call('script.create', [
@@ -232,40 +228,8 @@ class testPageAlertsScripts extends CWebTest {
 			}
 		}
 
-		// Check Script table contents.
+		// Check Script table content.
 		$this->assertTableData($data['fields']);
-	}
-
-	/**
-	 * @backup scripts
-	 */
-	public function testPageAlertsScripts_MassDeleteAll() {
-		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('id:all_scripts')->asCheckbox()->one()->set(true);
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-		$this->page->assertTitle('Configuration of scripts');
-		$this->assertMessage(TEST_BAD, 'Cannot delete scripts');
-	}
-
-	/**
-	 * @dataProvider allScripts
-	 * @backupOnce scripts
-	 */
-	public function testPageAlertsScripts_MassDelete($script) {
-		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('id:scriptids_'.$script['scriptid'])->one()->click();
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-		$this->page->assertTitle('Configuration of scripts');
-		if ($script['scriptid'] === '4') {
-			$this->assertMessage(TEST_BAD, 'Cannot delete script', 'Cannot delete scripts. Script "Reboot" is used in action operation "Trigger action 4".');
-			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
-		}
-		else {
-			$this->assertMessage(TEST_GOOD, 'Script deleted');
-			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid'])));
-		}
 	}
 
 	public function getFilterData()
@@ -524,5 +488,50 @@ class testPageAlertsScripts extends CWebTest {
 			$header->click();
 			$this->assertTableDataColumn($expected, $data['sort_field']);
 		}
+	}
+
+	public function testPageAlertsScripts_Delete() {
+		$this->page->login()->open('zabbix.php?action=script.list');
+
+		foreach (['Detect operating system', 'Manual event action for filter check',
+						'Ping', 'Reboot', 'Script для фильтра - $¢Řĩ₱₮', 'Selenium script', 'Traceroute'] as $scripts) {
+			$this->selectTableRows($scripts);
+			$this->query('button:Delete')->one()->waitUntilClickable()->click();
+			$this->page->acceptAlert();
+			$this->page->waitUntilReady();
+
+			if ($scripts === 'Reboot') {
+				// Verify that selected script which is linked to an action can't be deleted.
+				$this->assertMessage(TEST_BAD, 'Cannot delete script', 'Cannot delete scripts. Script "Reboot" is used in action operation "Trigger action 4".');
+				$this->assertEquals(1, CDBHelper::getCount('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($scripts)));
+
+				// Verify that that there is no possibility to delete all selected scripts if at least one of them contains linked action.
+				$this->query('id:all_scripts')->asCheckbox()->one()->set(true);
+				$this->query('button:Delete')->one()->click();
+				$this->page->acceptAlert();
+				$this->assertMessage(TEST_BAD, 'Cannot delete scripts');
+				$this->assertEquals(4, CDBHelper::getCount('SELECT scriptid FROM scripts'));
+
+				// Uncheck selected scripts due to not influence further tests.
+				$this->query('button:Reset')->one()->click();
+			}
+			else {
+				$this->assertMessage(TEST_GOOD, 'Script deleted');
+				$this->assertEquals(0, CDBHelper::getCount('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($scripts)));
+			}
+		}
+	}
+
+	/**
+	 * Verify that there is possibility to open 'action' modal popup via link located in 'Used in actions' tab.
+	 */
+	public function testPageAlertsScripts_ActionLinks() {
+		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->query('link:Trigger action 4')->one()->waitUntilClickable()->click();
+		$dialog = COverlayDialogElement::find()->asForm()->one();
+		$this->assertEquals('Trigger action 4', $dialog->getField('Name')->getValue());
+		$dialog->submit();
+		COverlayDialogElement::ensureNotPresent();
+		$this->page->assertHeader('Scripts');
 	}
 }
