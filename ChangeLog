@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
+..F....... [ZBX-21764] fixed misplaced error messages in host group and template group edit forms (dpetra)
 A......... [ZBX-19202] fixed template dashboard availability to users without permissions to the templates (averza)
 ........S. [ZBX-22189] fixed Zabbix server crash appearing when only item tags change between LLD runs (arimdjonoks)
 .........T [ZBX-21591] optimized Nginx Plus by HTTP template to spread the load across the workers (igorbach)
