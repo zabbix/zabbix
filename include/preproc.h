@@ -43,7 +43,7 @@ int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pen
 
 int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_sequence_stats_ptr_t *sequences, char **error);
 
-int	zbx_preprocessor_get_usage_stats(zbx_vector_dbl_t *usage, char **error);
+int	zbx_preprocessor_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **error);
 void	zbx_preprocessor_get_worker_info(zbx_process_info_t *info);
 
 #endif /* ZABBIX_PREPROC_H */
