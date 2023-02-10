@@ -2397,7 +2397,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad .overlay-close-btn,
   .msg-good .overlay-close-btn,
   .msg-warning .overlay-close-btn {
-    color: #cacaca; }
+    color: #cacaca;
+    background-color: transparent; }
   .msg-bad .link-action,
   .msg-good .link-action,
   .msg-warning .link-action {
@@ -2414,7 +2415,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad button,
   .msg-good button,
   .msg-warning button {
-    background-color: #000000 !important; }
+    background-color: transparent; }
   .msg-bad::before,
   .msg-good::before,
   .msg-warning::before {
@@ -2448,7 +2449,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad ul {
     border-top-color: #ff3a3a; }
   .msg-bad button {
-    color: #ff3a3a;
+    color: #ffffff;
     border-color: #ff3a3a; }
   .msg-bad::before {
     background-color: #ff3a3a; }
