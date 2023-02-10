@@ -169,9 +169,12 @@ $form_grid->addItem([
 $form_grid->addItem([
 	new CLabel([
 		_('History data'),
-		makeHelpIcon(
-			_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
-		)
+		(new CSpan([
+			'&nbsp;',
+			makeWarningIcon(
+				_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
+			)
+		]))->setId('tophosts-column-history-data-warning')
 	], 'history'),
 	new CFormField(
 		(new CRadioButtonList('history', (int) $data['history']))
