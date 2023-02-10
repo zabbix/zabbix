@@ -78,8 +78,15 @@ class testScripts extends CAPITest {
 				'name' => 'API test host group inherit, A, read-write/API test host group inherit, B, read/API test host group inherit, C, read-write/API test host group inherit, D, read-write'
 			]
 		];
-		$hostgroups = CDataHelper::call('hostgroup.create', array_values($hostgroups_data));
-		$this->assertArrayHasKey('groupids', $hostgroups, 'prepareScriptsData() failed: Could not create host groups.');
+
+		// Try to create host groups. In case of failure, print the exception message.
+		try {
+			$hostgroups = CDataHelper::call('hostgroup.create', array_values($hostgroups_data));
+		}
+		catch (Exception $e) {
+			$this->assertTrue(false, $e->getMessage());
+		}
+
 		self::$data['groupids'] = array_combine(array_keys($hostgroups_data), $hostgroups['groupids']);
 
 		// Create hosts.
@@ -290,8 +297,17 @@ class testScripts extends CAPITest {
 				]
 			]
 		];
-		$hosts = CDataHelper::call('host.create', array_values($hosts_data));
-		$this->assertArrayHasKey('hostids', $hosts, 'prepareScriptsData() failed: Could not create hosts.');
+
+		// Try to create hosts. In case of failure, print the exception message and revert changes.
+		try {
+			$hosts = CDataHelper::call('host.create', array_values($hosts_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
 		self::$data['hostids'] = array_combine(array_keys($hosts_data), $hosts['hostids']);
 
 		/*
@@ -384,8 +400,18 @@ class testScripts extends CAPITest {
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			]
 		];
-		$items = CDataHelper::call('item.create', array_values($items_data));
-		$this->assertArrayHasKey('itemids', $items, 'prepareScriptsData() failed: Could not create items.');
+
+		// Try to create items. In case of failure, print the exception message and revert changes.
+		try {
+			$items = CDataHelper::call('item.create', array_values($items_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
 		self::$data['itemids'] = array_combine(array_keys($items_data), $items['itemids']);
 
 		/*
@@ -466,25 +492,23 @@ class testScripts extends CAPITest {
 				'priority' => TRIGGER_SEVERITY_HIGH
 			]
 		];
-		$triggers = CDataHelper::call('trigger.create', array_values($triggers_data));
-		$this->assertArrayHasKey('triggerids', $triggers, 'prepareScriptsData() failed: Could not create triggers.');
+
+		// Try to create triggers. In case of failure, print the exception message and revert changes.
+		try {
+			$triggers = CDataHelper::call('trigger.create', array_values($triggers_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
 		self::$data['triggerids'] = array_combine(array_keys($triggers_data), $triggers['triggerids']);
 
-		// Generate events for all triggers. History is not used. Problems table is also not required.
-		$nextid = CDBHelper::getAll(
-			'SELECT i.nextid'.
-			' FROM ids i'.
-			' WHERE i.table_name='.zbx_dbstr('events').
-				' AND i.field_name='.zbx_dbstr('eventid').
-			' FOR UPDATE'
-		);
-
-		if ($nextid) {
-			$nextid = bcadd($nextid[0]['nextid'], 1, 0);
-		}
-		else {
-			DB::refreshIds('events', 0);
-
+		// Try to create events. In case of failure, print the exception message and revert changes.
+		try {
+			// Generate events for all triggers. History is not used. Problems table is also not required.
 			$nextid = CDBHelper::getAll(
 				'SELECT i.nextid'.
 				' FROM ids i'.
@@ -493,29 +517,51 @@ class testScripts extends CAPITest {
 				' FOR UPDATE'
 			);
 
-			$nextid = bcadd($nextid[0]['nextid'], 1, 0);
+			if ($nextid) {
+				$nextid = bcadd($nextid[0]['nextid'], 1, 0);
+			}
+			else {
+				DB::refreshIds('events', 0);
+
+				$nextid = CDBHelper::getAll(
+					'SELECT i.nextid'.
+					' FROM ids i'.
+					' WHERE i.table_name='.zbx_dbstr('events').
+						' AND i.field_name='.zbx_dbstr('eventid').
+					' FOR UPDATE'
+				);
+
+				$nextid = bcadd($nextid[0]['nextid'], 1, 0);
+			}
+
+			// Remember that order of $triggers_data is important here.
+			$events_data = [];
+			$num = 0;
+
+			foreach (self::$data['triggerids'] as $triggerid) {
+				$events_data[] = [
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER,
+					'objectid' => $triggerid,
+					'clock' => time(),
+					'value' => TRIGGER_VALUE_TRUE,
+					'acknowledged' => EVENT_NOT_ACKNOWLEDGED,
+					'ns' => 0,
+					'name' => array_values($triggers_data)[$num]['description'],
+					'severity' => array_values($triggers_data)[$num]['priority']
+				];
+				$num++;
+			}
+
+			$eventids = DB::insertBatch('events', $events_data);
+		}
+		catch (Exception $e) {
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
 		}
 
-		// Remember that order of $triggers_data is important here.
-		$events_data = [];
-		$num = 0;
-		foreach (self::$data['triggerids'] as $triggerid) {
-			$events_data[] = [
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER,
-				'objectid' => $triggerid,
-				'clock' => time(),
-				'value' => TRIGGER_VALUE_TRUE,
-				'acknowledged' => EVENT_NOT_ACKNOWLEDGED,
-				'ns' => 0,
-				'name' => array_values($triggers_data)[$num]['description'],
-				'severity' => array_values($triggers_data)[$num]['priority']
-			];
-			$num++;
-		}
-		$eventids = DB::insertBatch('events', $events_data);
-		$newids = array_fill($nextid, count($events_data), true);
-		$this->assertEquals(array_keys($newids), $eventids, 'prepareScriptsData() failed: Could not create events.');
 		// Each trigger will generate one event so event ID array key is equal to trigger array key.
 		self::$data['eventids'] = array_combine(array_keys($triggers_data), $eventids);
 
@@ -527,7 +573,18 @@ class testScripts extends CAPITest {
 			'eventid' => self::$data['eventids']['macros_rw_symptom'],
 			'cause_eventid' => self::$data['eventids']['macros_d_cause']
 		]];
-		DB::insertBatch('event_symptom', $event_symptom_data, false);
+
+		// Try to create symptom events. In case of failure, print the exception message and revert changes.
+		try {
+			DB::insertBatch('event_symptom', $event_symptom_data, false);
+		}
+		catch (Exception $e) {
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
 
 		// Create global macro to later use it in scripts.
 		$usermacros_data = [
@@ -536,10 +593,23 @@ class testScripts extends CAPITest {
 				'value' => 'Global Macro Value'
 			]
 		];
-		$usermacros = CDataHelper::call('usermacro.createglobal', array_values($usermacros_data));
-		$this->assertArrayHasKey('globalmacroids', $usermacros,
-			'prepareScriptsData() failed: Could not create global macros.'
-		);
+
+		/*
+		 * Try to create global macros. In case of failure, print the exception message and revert changes. Since
+		 * global macro (only one) was not created, there is nothing to revert in that table.
+		 */
+		try {
+			$usermacros = CDataHelper::call('usermacro.createglobal', array_values($usermacros_data));
+		}
+		catch (Exception $e) {
+			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
 		self::$data['usermacroid'] = $usermacros['globalmacroids'][0];
 
 		/*
@@ -614,10 +684,21 @@ class testScripts extends CAPITest {
 				]
 			]
 		];
-		$usergroups = CDataHelper::call('usergroup.create', array_values($usergroups_data));
-		$this->assertArrayHasKey('usrgrpids', $usergroups,
-			'prepareScriptsData() failed: Could not create user groups.'
-		);
+
+		// Try to create user groups. In case of failure, print the exception message and revert changes.
+		try {
+			$usergroups = CDataHelper::call('usergroup.create', array_values($usergroups_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
 		self::$data['usrgrpids'] = array_combine(array_keys($usergroups_data), $usergroups['usrgrpids']);
 
 		// Create user roles with defaults.
@@ -631,8 +712,22 @@ class testScripts extends CAPITest {
 				'type' => USER_TYPE_ZABBIX_USER
 			]
 		];
-		$roles = CDataHelper::call('role.create', array_values($roles_data));
-		$this->assertArrayHasKey('roleids', $roles, 'prepareScriptsData() failed: Could not create user roles.');
+
+		// Try to create user roles. In case of failure, print the exception message and revert changes.
+		try {
+			$roles = CDataHelper::call('role.create', array_values($roles_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
+			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
 		self::$data['roleids'] = array_combine(array_keys($roles_data), $roles['roleids']);
 
 		// Create users.
@@ -662,8 +757,23 @@ class testScripts extends CAPITest {
 				]
 			]
 		];
-		$users = CDataHelper::call('user.create', array_values($users_data));
-		$this->assertArrayHasKey('userids', $users, 'prepareScriptsData() failed: Could not create users.');
+
+		// Try to create users. In case of failure, print the exception message and revert changes.
+		try {
+			$users = CDataHelper::call('user.create', array_values($users_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
+			CDataHelper::call('role.delete', self::$data['roleids']);
+			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
 		self::$data['userids'] = array_combine(array_keys($users_data), $users['userids']);
 
 		// Create scripts.
@@ -1065,8 +1175,24 @@ class testScripts extends CAPITest {
 				'command' => 'reboot server'
 			]
 		];
-		$scripts = CDataHelper::call('script.create', array_values($scripts_data));
-		$this->assertArrayHasKey('scriptids', $scripts, 'prepareScriptsData() failed: Could not create scripts.');
+
+		// Try to create scripts. In case of failure, print the exception message and revert changes.
+		try {
+			$scripts = CDataHelper::call('script.create', array_values($scripts_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('user.delete', self::$data['userids']);
+			CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
+			CDataHelper::call('role.delete', self::$data['roleids']);
+			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
 		self::$data['scriptids'] = array_combine(array_keys($scripts_data), $scripts['scriptids']);
 
 		// Create actions that use scripts to test script.delete.
@@ -1114,8 +1240,25 @@ class testScripts extends CAPITest {
 				]
 			]
 		];
-		$actions = CDataHelper::call('action.create', array_values($actions_data));
-		$this->assertArrayHasKey('actionids', $actions, 'prepareScriptsData() failed: Could not create actions.');
+
+		// Try to create actions. In case of failure, print the exception message and revert changes.
+		try {
+			$actions = CDataHelper::call('action.create', array_values($actions_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('script.delete', self::$data['scriptids']);
+			CDataHelper::call('user.delete', self::$data['userids']);
+			CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
+			CDataHelper::call('role.delete', self::$data['roleids']);
+			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
 		self::$data['actionids'] = array_combine(array_keys($actions_data), $actions['actionids']);
 	}
 
