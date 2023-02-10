@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-13 11:35+0000\n"
+"PO-Revision-Date: 2023-02-07 06:53+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -4471,11 +4471,11 @@ msgstr "监控日志文件行数统计。返回 整数"
 
 #: include/classes/data/CItemData.php:1638
 msgid "Count of values enqueued in the low-level discovery processing queue."
-msgstr "在LLD处理队列中排队的值的计数。"
+msgstr "在LLD处理队列中排队的值个数。"
 
 #: include/classes/data/CItemData.php:1642
 msgid "Count of values enqueued in the preprocessing queue."
-msgstr "在预处理队列中排队的值的计数。"
+msgstr "在预处理队列中排队的值个数。"
 
 #: app/views/administration.token.list.php:106
 #: app/views/administration.user.token.list.php:72
