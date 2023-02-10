@@ -1253,8 +1253,6 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 
 	assert(result);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, zbx_set_agent_result_type: %d", value_type);
-
 	switch (value_type)
 	{
 		double	dbl_tmp;
@@ -1722,8 +1720,6 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, data));
 		return agent_ret;
 	}
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, deserialize_agent_result, type: %c", type);
 
 	switch (type)
 	{

@@ -662,8 +662,6 @@ static void	DCupdate_item_queue(ZBX_DC_ITEM *item, unsigned char old_poller_type
 {
 	zbx_binary_heap_elem_t	elem;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "DCupdate_item_queue, item: %lu", item->itemid);
-
 	if (ZBX_LOC_POLLER == item->location)
 		return;
 
@@ -682,18 +680,13 @@ static void	DCupdate_item_queue(ZBX_DC_ITEM *item, unsigned char old_poller_type
 	elem.key = item->itemid;
 	elem.data = (const void *)item;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "DCupdate_item_queue before final, item: %lu", item->itemid);
-
 	if (ZBX_LOC_QUEUE != item->location)
 	{
 		item->location = ZBX_LOC_QUEUE;
 		zbx_binary_heap_insert(&config->queues[item->poller_type], &elem);
-		zabbix_log(LOG_LEVEL_INFORMATION, "DCupdate_item_queue heap insert, item: %lu", item->itemid);
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "DCupdate_item_queue update direct, item: %lu", item->itemid);
-
 		zbx_binary_heap_update_direct(&config->queues[item->poller_type], &elem);
 	}
 }
@@ -11030,20 +11023,14 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 	ZBX_DC_HOST		*dc_host;
 	ZBX_DC_INTERFACE	*dc_interface;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_requeue_items, num: %lu", num);
-
 	for (i = 0; i < num; i++)
 	{
 		if (FAIL == errcodes[i])
 			continue;
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_requeue_items, itemid: %lu", itemids[i]);
-
 		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])))
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_requeue_items hashset_search, itemid: %lu", itemids[i]);
 			continue;
-		}
+
 		if (ZBX_LOC_POLLER == dc_item->location)
 			dc_item->location = ZBX_LOC_NOWHERE;
 
@@ -11061,7 +11048,6 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 
 		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_requeue_items, before errcodes,  itemid: %lu", itemids[i]);
 		switch (errcodes[i])
 		{
 			case SUCCEED:
@@ -11099,8 +11085,6 @@ void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck)
 {
 	WRLOCK_CACHE;
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, DCpoller_requeue_items, num: %lu", num);
 
 	dc_requeue_items(itemids, lastclocks, errcodes, num);
 	*nextcheck = dc_config_get_queue_nextcheck(&config->queues[poller_type]);

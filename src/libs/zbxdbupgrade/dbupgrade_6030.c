@@ -4237,7 +4237,6 @@ static int	DBpatch_6030192(void)
 
 	return DBcreate_table(&table);
 }
-
 #endif
 
 DBPATCH_START(6030)

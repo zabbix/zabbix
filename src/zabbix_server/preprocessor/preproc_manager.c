@@ -550,11 +550,8 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	{
 		time_now = zbx_time();
 
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 0");
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 1");
 			zbx_setproctitle("%s #%d [queued " ZBX_FS_UI64 ", processed " ZBX_FS_UI64 " values, idle "
 					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
 					get_process_type_string(process_type), process_num,
@@ -566,24 +563,18 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			queued_num = 0;
 		}
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 2");
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 3");
 		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 4");
 		if (NULL != message)
 		{
-
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 44, message not null: %u", message->code);
 			switch (message->code)
 			{
 				case ZBX_IPC_PREPROCESSOR_REQUEST:
@@ -608,8 +599,6 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 
 			zbx_ipc_message_free(message);
 		}
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 6");
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
@@ -636,16 +625,11 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 
 		if (0 == pending_num || 1 < sec - time_flush)
 		{
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 7");
 			dc_flush_history();
 			time_flush = time_now;
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 8");
 		}
 	}
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, BMW 9");
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	zbx_vector_pp_task_ptr_destroy(&tasks);

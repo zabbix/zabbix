@@ -1399,7 +1399,7 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 
 			for (i = 0; i < rows_num; i++)
 			{
-				char	*chunk, *dst = NULL;
+				char	*dst = NULL;
 				int	data_len, src_len;
 
 				src_len = strlen(rows[i][position].str) * 3 / 4 ;

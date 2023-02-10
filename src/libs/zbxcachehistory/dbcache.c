@@ -223,8 +223,6 @@ void	*DCget_stats(int request)
 	static double		value_double;
 	void			*ret;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, DCget_stats");
-
 	LOCK_CACHE;
 
 	switch (request)
@@ -2074,9 +2072,6 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 {
 	char	*errmsg = NULL;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_history_set_value");
-
-
 	if (FAIL == zbx_variant_to_value_type(value, value_type, CONFIG_DOUBLE_PRECISION, &errmsg))
 	{
 		dc_history_set_error(hdata, errmsg);
@@ -3404,8 +3399,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	size_t				data_alloc = 0, data_offset = 0;
 	zbx_vector_connector_filter_t	connector_filters_history, connector_filters_events;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, sync_server_history");
-
 	if (NULL == history_float && NULL != history_float_cbs)
 	{
 		module_enabled = SUCCEED;
@@ -3429,7 +3422,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 	if (NULL == history_text && NULL != history_text_cbs)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, sync_server_history history_text");
 		module_enabled = SUCCEED;
 		history_text = (ZBX_HISTORY_TEXT *)zbx_malloc(history_text,
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_TEXT));
@@ -3478,7 +3470,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		*more = ZBX_SYNC_DONE;
 
 		LOCK_CACHE;
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, before hc_pop_items, queue size: %d", hc_queue_get_size());
 		hc_pop_items(&history_items);		/* select and take items out of history cache */
 		UNLOCK_CACHE;
 
@@ -3683,9 +3674,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 							&history_log_num);
 
 					DCmodule_sync_history(history_float_num, history_integer_num, history_string_num,
-							history_text_num, history_log_num,
-							history_float, history_integer, history_string, history_text,
-							history_log);
+							history_text_num, history_log_num, history_float,
+							history_integer, history_string, history_text, history_log);
 				}
 
 				if (SUCCEED == (history_export_enabled =
@@ -4221,8 +4211,6 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 {
 	unsigned char	value_flags;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, KIA dc_add_history");
-
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
 		zbx_uint64_t	lastlogsize;
@@ -4242,8 +4230,6 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		}
 		dc_local_add_history_notsupported(itemid, ts, error, lastlogsize, mtime, value_flags);
 
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, KIA 2");
 		return;
 	}
 
@@ -4254,7 +4240,6 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 	if (!ZBX_ISSET_VALUE(result) && !ZBX_ISSET_META(result) && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, KIA 3");
 	value_flags = 0;
 
 	if (!ZBX_ISSET_VALUE(result))
@@ -4269,9 +4254,6 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 
 	if (0 == (value_flags & ZBX_DC_FLAG_NOVALUE))
 	{
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, KIA 4");
-
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_flags))
 		{
 			if (NULL == ZBX_GET_TEXT_RESULT(result))
@@ -4291,11 +4273,9 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		}
 		else if (ZBX_ISSET_UI64(result))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA KIA dc_add_history ISSET_UINT");
 			dc_local_add_history_uint(itemid, item_value_type, ts, result->ui64, result->lastlogsize,
 					result->mtime, value_flags);
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA KIA dc_add_history ISSET_UINT END");
 		}
 		else if (ZBX_ISSET_DBL(result))
 		{
@@ -4309,20 +4289,13 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		}
 		else if (ZBX_ISSET_TEXT(result))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA KIA dc_add_history ISSET_TEXT");
 			dc_local_add_history_text(itemid, item_value_type, ts, result->text, result->lastlogsize,
 					result->mtime, value_flags);
-
-			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA KIA dc_add_history ISSET_TEXT END");
 		}
 		else if (ZBX_ISSET_BIN(result))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA KIA dc_add_history ISSET_BIN");
-
 			dc_local_add_history_bin(itemid, item_value_type, ts, result->bin, result->lastlogsize,
 					result->mtime, value_flags);
-
-			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA KIA dc_add_history ISSET_BIN END");
 		}
 		else
 		{
@@ -4331,8 +4304,6 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 	}
 	else
 	{
-
-			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA KIA 8");
 		if (0 != (value_flags & ZBX_DC_FLAG_META))
 		{
 			dc_local_add_history_log(itemid, item_value_type, ts, NULL, result->lastlogsize, result->mtime,
@@ -4341,9 +4312,6 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		else
 			dc_local_add_history_empty(itemid, item_value_type, ts, value_flags);
 	}
-
-
-			zabbix_log(LOG_LEVEL_INFORMATION, "STRATA KIA FINAL");
 }
 
 /******************************************************************************
@@ -4464,8 +4432,6 @@ void	dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsig
 
 void	dc_flush_history(void)
 {
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_flush_history, item_values_num: %lu", item_values_num);
-
 	if (0 == item_values_num)
 		return;
 
@@ -4958,16 +4924,10 @@ static void	hc_pop_items(zbx_vector_ptr_t *history_items)
 	zbx_binary_heap_elem_t	*elem;
 	zbx_hc_item_t		*item;
 
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, hc_pop_items, ZBX_HC_SYNC_MAX: %d, hsitory_items->values_num: %d ", ZBX_HC_SYNC_MAX, history_items->values_num);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, hc_pop_items, zbx_binary_heap_empty(&cache->history_queue): %d", zbx_binary_heap_empty(&cache->history_queue));
-
 	while (ZBX_HC_SYNC_MAX > history_items->values_num && FAIL == zbx_binary_heap_empty(&cache->history_queue))
 	{
 		elem = zbx_binary_heap_find_min(&cache->history_queue);
 		item = (zbx_hc_item_t *)elem->data;
-		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, hc_pop_items, itemid: %lu", item->itemid);
 		zbx_vector_ptr_append(history_items, item);
 
 		zbx_binary_heap_remove_min(&cache->history_queue);
@@ -5017,8 +4977,6 @@ void	hc_push_items(zbx_vector_ptr_t *history_items)
 	int		i;
 	zbx_hc_item_t	*item;
 	zbx_hc_data_t	*data_free;
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "hc_push_items");
 
 	for (i = 0; i < history_items->values_num; i++)
 	{

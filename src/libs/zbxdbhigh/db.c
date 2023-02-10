@@ -2777,7 +2777,7 @@ static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t *valu
 		}
 	}
 
-return str;
+	return str;
 }
 #endif
 
@@ -3131,7 +3131,6 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 		field = (ZBX_FIELD *)self->fields.values[i];
 
 		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[0 == i]);
-		zabbix_log(LOG_LEVEL_INFORMATION, "SSS: %s", field->name);
 		zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, field->name);
 	}
 #ifdef HAVE_MYSQL
@@ -3257,7 +3256,7 @@ retry_oracle:
 				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-					/* Oracle convert base64 to binary when it formats prepared statement */
+					/* Oracle converts base64 to binary when it formats prepared statement */
 					format_binary_value_for_sql(&(value->str));
 #endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
@@ -3321,8 +3320,6 @@ out:
 #else
 	zbx_free(contexts);
 #endif
-						zabbix_log(LOG_LEVEL_INFORMATION, "AGS_STRATA_666");
-
 	return ret;
 }
 
