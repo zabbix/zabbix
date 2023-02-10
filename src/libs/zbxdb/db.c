@@ -22,6 +22,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "log.h"
+#include "base64.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
@@ -1302,6 +1303,7 @@ static sb4 db_bind_dynamic_cb(dvoid *ctxp, OCIBind *bindp, ub4 iter, ub4 index, 
 		case ZBX_TYPE_SHORTTEXT:
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_CUID:
+		case ZBX_TYPE_BLOB:
 			*bufpp = context->rows[iter][context->position].str;
 			*alenp = ((size_t *)context->data)[iter];
 			break;
@@ -1390,6 +1392,33 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 
 			context->data = sizes;
 			data_type = SQLT_LNG;
+			break;
+		case ZBX_TYPE_BLOB:
+			sizes = (size_t *)zbx_malloc(NULL, sizeof(size_t) * rows_num);
+			context->size_max = 0;
+
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "badger rows_num: %d", rows_num);
+
+			for (i = 0; i < rows_num; i++)
+			{
+				char	*chunk, *dst = NULL;
+				int	data_len, src_len;
+
+				src_len = strlen(rows[i][position].str) * 3 / 4 ;
+				dst = (char*)zbx_malloc(NULL, src_len);
+				str_base64_decode(rows[i][position].str, (char *)dst, src_len, &data_len);
+				sizes[i] = data_len;
+				zbx_free(rows[i][position].str);
+				rows[i][position].str = dst;
+				zabbix_log(LOG_LEVEL_INFORMATION, "badger len: %d", data_len);
+
+				if (sizes[i] > context->size_max)
+				context->size_max = sizes[i];
+			}
+
+			context->data = sizes;
+			data_type = SQLT_BIN;
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;

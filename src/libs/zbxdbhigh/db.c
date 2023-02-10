@@ -2777,7 +2777,7 @@ static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t *valu
 		}
 	}
 
-	return str;
+return str;
 }
 #endif
 
@@ -2969,21 +2969,40 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values
 				break;
 			case ZBX_TYPE_BLOB:
 			{
+#if defined (HAVE_MYSQL)
+
 				char	*chunk, *dst = NULL;
 				int	data_len, src_len;
 
 				src_len = strlen(value->str) * 3 / 4 ;
 				dst = (char*)zbx_malloc(NULL, src_len);
 				str_base64_decode(value->str, (char *)dst, src_len, &data_len);
-#ifdef HAVE_MYSQL
+
 				chunk = (char*)zbx_malloc(NULL, 2 * data_len);
 				badger_escape((char*)dst, chunk, data_len);
-#else
-				badger_escape((char*)dst, &chunk, data_len);
-#endif
+
 				zbx_free(dst);
 				row[i].str = chunk;
 
+#elif defined (HAVE_POSTGRESQL)
+				char	*chunk, *dst = NULL;
+				int	data_len, src_len;
+
+				src_len = strlen(value->str) * 3 / 4 ;
+				dst = (char*)zbx_malloc(NULL, src_len);
+				str_base64_decode(value->str, (char *)dst, src_len, &data_len);
+
+				badger_escape((char*)dst, &chunk, data_len);
+
+
+				zbx_free(dst);
+				row[i].str = chunk;
+
+#elif defined (HAVE_ORACLE)
+				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_OFF);
+#else
+#error "badger"
+#endif
 				break;
 			}
 			default:
