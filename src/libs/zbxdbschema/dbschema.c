@@ -18,7 +18,7 @@
 **/
 
 #include "zbxdbschema.h"
-#include "zbxcommon.h"
+#include "common.h"
 
 const ZBX_TABLE	tables[] = {
 
