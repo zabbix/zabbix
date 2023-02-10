@@ -3044,10 +3044,12 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 	zbx_vector_ptr_destroy(&values);
 }
 
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 static void	format_binary_value_for_sql(char **in)
 {
 	char	*chunk, *dst = NULL;
 	int	data_len, src_len;
+
 	src_len = strlen(*in) * 3 / 4 ;
 	dst = (char*)zbx_malloc(NULL, src_len);
 	str_base64_decode(*in, (char *)dst, src_len, &data_len);
@@ -3063,6 +3065,7 @@ static void	format_binary_value_for_sql(char **in)
 	zbx_free(*in);
 	*in = chunk;
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -3253,11 +3256,12 @@ retry_oracle:
 					break;
 				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
-
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+					/* Oracle convert base64 to binary when it formats prepared statement */
 					format_binary_value_for_sql(&(value->str));
+#endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
-
-				zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
 				case ZBX_TYPE_INT:
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%d", value->i32);
