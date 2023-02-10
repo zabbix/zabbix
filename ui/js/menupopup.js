@@ -700,18 +700,20 @@ function getMenuPopupDashboard(options, trigger_element) {
 /**
  * Get menu popup trigger section data.
  *
- * @param {string} options['triggerid']               Trigger ID.
- * @param {string} options['eventid']                 (optional) Required for "Update problem" section and event
- *                                                    rank change.
- * @param {object} options['items']                   Link to trigger item history page (optional).
- * @param {string} options['items'][]['name']         Item name.
- * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
- * @param {bool}   options['update_problem']          (optional) Whether to show "Update problem" section.
- * @param {object} options['configuration']           Link to trigger configuration page (optional).
- * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
- * @param {string} options['url']                     Trigger URL link (optional).
- * @param {object} trigger_element                    UI element which triggered opening of overlay dialogue.
- * @param {string} options[csrf_token]                CSRF token for script execution.
+ * @param {string} options['triggerid']                   Trigger ID.
+ * @param {string} options['eventid']                     (optional) Required for "Update problem" section and event
+ *                                                        rank change.
+ * @param {object} options['items']                       Link to trigger item history page (optional).
+ * @param {string} options['items'][]['name']             Item name.
+ * @param {object} options['items'][]['params']           Item URL parameters ("name" => "value").
+ * @param {bool}   options['update_problem']              (optional) Whether to show "Update problem" section.
+ * @param {object} options['configuration']               Link to trigger configuration page (optional).
+ * @param {bool}   options['showEvents']                  Show Problems item enabled. Default: false.
+ * @param {string} options['url']                         Trigger URL link (optional).
+ * @param {object} trigger_element                        UI element which triggered opening of overlay dialogue.
+ * @param {array} options[csrf_tokens][]                  CSRF tokens for script execution and for acknowledge action.
+ * @param {string} options[csrf_tokens][]['scriptexec']   CSRF tokens for script execution and for acknowledge action.
+ * @param {string} options[csrf_tokens][]['acknowledge']  CSRF tokens for script execution and for acknowledge action.
  *
  * @return array
  */
@@ -822,6 +824,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'popup.acknowledge.create');
+		curl.setArgument('_csrf_token', options.csrf_tokens['acknowledge']);
 
 		/*
 		 * Some widgets cannot show symptoms. So it is not possible to convert to symptoms cause if only cause evets are
@@ -943,7 +946,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		sections.push({
 			label: t('Scripts'),
 			items: getMenuPopupScriptData(options.scripts, trigger_element, null, options.eventid,
-				options.csrf_token
+				options.csrf_tokens['scriptexec']
 			)
 		});
 	}
