@@ -872,9 +872,9 @@ class CScreenProblem extends CScreenBase {
 							'preservekeys' => true
 						]);
 
-						$symptom_events = array_filter($symptom_events, function ($event) use ($enabled_triggers) {
-							return array_key_exists($event['objectid'], $enabled_triggers);
-						});
+						$symptom_events = array_filter($symptom_events,
+							static fn($event) => array_key_exists($event['objectid'], $enabled_triggers)
+						);
 						$problem['symptom_count'] = count($symptom_events);
 					}
 
