@@ -40,9 +40,9 @@
 
 typedef struct
 {
-	long	rspcode;
-	double	total_time;
-	double	speed_download;
+	long					rspcode;
+	double					total_time;
+	ZBX_CURLINFO_SPEED_DOWNLOAD_TYPE	speed_download;
 }
 zbx_httpstat_t;
 
@@ -896,7 +896,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest, int *delay
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 
-			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD,
+			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, ZBX_CURLINFO_SPEED_DOWNLOAD,
 					&stat.speed_download)) && NULL == err_str)
 			{
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
