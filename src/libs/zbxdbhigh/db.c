@@ -2954,6 +2954,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 #ifdef HAVE_ORACLE
 				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_OFF);
 #else
@@ -2967,44 +2968,6 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values
 			case ZBX_TYPE_SERIAL:
 				row[i] = *value;
 				break;
-			case ZBX_TYPE_BLOB:
-			{
-#if defined (HAVE_MYSQL)
-
-				char	*chunk, *dst = NULL;
-				int	data_len, src_len;
-
-				src_len = strlen(value->str) * 3 / 4 ;
-				dst = (char*)zbx_malloc(NULL, src_len);
-				str_base64_decode(value->str, (char *)dst, src_len, &data_len);
-
-				chunk = (char*)zbx_malloc(NULL, 2 * data_len);
-				badger_escape((char*)dst, chunk, data_len);
-
-				zbx_free(dst);
-				row[i].str = chunk;
-
-#elif defined (HAVE_POSTGRESQL)
-				char	*chunk, *dst = NULL;
-				int	data_len, src_len;
-
-				src_len = strlen(value->str) * 3 / 4 ;
-				dst = (char*)zbx_malloc(NULL, src_len);
-				str_base64_decode(value->str, (char *)dst, src_len, &data_len);
-
-				badger_escape((char*)dst, &chunk, data_len);
-
-
-				zbx_free(dst);
-				row[i].str = chunk;
-
-#elif defined (HAVE_ORACLE)
-				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_OFF);
-#else
-#error "badger"
-#endif
-				break;
-			}
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				exit(EXIT_FAILURE);
@@ -3081,6 +3044,26 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 	zbx_vector_ptr_destroy(&values);
 }
 
+static void	format_binary_value_for_sql(char **in)
+{
+	char	*chunk, *dst = NULL;
+	int	data_len, src_len;
+	src_len = strlen(*in) * 3 / 4 ;
+	dst = (char*)zbx_malloc(NULL, src_len);
+	str_base64_decode(*in, (char *)dst, src_len, &data_len);
+#if defined (HAVE_MYSQL)
+	chunk = (char*)zbx_malloc(NULL, 2 * data_len);
+	zbx_mysql_escape_bin((char*)dst, chunk, data_len);
+#elif defined (HAVE_POSTGRESQL)
+	zbx_postgresql_escape_bin((char*)dst, &chunk, data_len);
+#else
+#error "Unsupported db during blob insert"
+#endif
+	zbx_free(dst);
+	zbx_free(*in);
+	*in = chunk;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: executes the prepared database bulk insert operation              *
@@ -3145,6 +3128,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 		field = (ZBX_FIELD *)self->fields.values[i];
 
 		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[0 == i]);
+		zabbix_log(LOG_LEVEL_INFORMATION, "SSS: %s", field->name);
 		zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, field->name);
 	}
 #ifdef HAVE_MYSQL
@@ -3250,7 +3234,7 @@ retry_oracle:
 #	endif
 		for (j = 0; j < self->fields.values_num; j++)
 		{
-			const zbx_db_value_t	*value = &values[j];
+			zbx_db_value_t	*value = &values[j];
 
 			field = (const ZBX_FIELD *)self->fields.values[j];
 
@@ -3263,10 +3247,17 @@ retry_oracle:
 				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
-				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					break;
+				case ZBX_TYPE_BLOB:
+					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+
+					format_binary_value_for_sql(&(value->str));
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
+
+				zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
 				case ZBX_TYPE_INT:
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%d", value->i32);
@@ -3326,6 +3317,8 @@ out:
 #else
 	zbx_free(contexts);
 #endif
+						zabbix_log(LOG_LEVEL_INFORMATION, "AGS_STRATA_666");
+
 	return ret;
 }
 

@@ -4224,7 +4224,7 @@ static int	DBpatch_6030191(void)
 static int	DBpatch_6030192(void)
 {
 	const ZBX_TABLE	table =
-		{"history_binary", "itemid,clock,ns", 0,
+		{"history_bin", "itemid,clock,ns", 0,
 			{
 				{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},

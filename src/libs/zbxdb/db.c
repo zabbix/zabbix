@@ -1397,9 +1397,6 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 			sizes = (size_t *)zbx_malloc(NULL, sizeof(size_t) * rows_num);
 			context->size_max = 0;
 
-
-			zabbix_log(LOG_LEVEL_INFORMATION, "badger rows_num: %d", rows_num);
-
 			for (i = 0; i < rows_num; i++)
 			{
 				char	*chunk, *dst = NULL;
@@ -1411,10 +1408,9 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 				sizes[i] = data_len;
 				zbx_free(rows[i][position].str);
 				rows[i][position].str = dst;
-				zabbix_log(LOG_LEVEL_INFORMATION, "badger len: %d", data_len);
 
 				if (sizes[i] > context->size_max)
-				context->size_max = sizes[i];
+					context->size_max = sizes[i];
 			}
 
 			context->data = sizes;
@@ -1498,18 +1494,18 @@ out:
 #endif
 
 #ifdef HAVE_MYSQL
-void	badger_escape(char* dst, char chunk[], size_t size)
+void	zbx_mysql_escape_bin(char* dst, char chunk[], size_t size)
 {
 	mysql_real_escape_string(conn, chunk, dst, size);
 }
 #endif
 
 #ifdef HAVE_POSTGRESQL
-void	badger_escape(char* dst, char **chunk, size_t size)
+void	zbx_postgresql_escape_bin(char* dst, char **chunk, size_t size)
 {
 	size_t	l;
 
-	*chunk = PQescapeByteaConn(conn, dst, size, &l);
+	*chunk = (char*)PQescapeByteaConn(conn, (unsigned char*)dst, size, &l);
 }
 #endif
 

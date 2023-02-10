@@ -137,9 +137,9 @@ int		zbx_db_statement_execute(int iters);
 #endif
 
 #ifdef HAVE_MYSQL
-void    badger_escape(char* dst, char chunk[], size_t size);
+void	zbx_mysql_escape_bin(char* dst, char chunk[], size_t size);
 #else
-void    badger_escape(char* dst, char **chunk, size_t size);
+void	zbx_postgresql_escape_bin(char* dst, char **chunk, size_t size);
 #endif
 
 int		zbx_db_vexecute(const char *fmt, va_list args);

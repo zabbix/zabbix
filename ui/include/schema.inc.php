@@ -4701,7 +4701,7 @@ return [
 			]
 		]
 	],
-	'history_binary' => [
+	'history_bin' => [
 		'key' => 'itemid,clock,ns',
 		'fields' => [
 			'itemid' => [

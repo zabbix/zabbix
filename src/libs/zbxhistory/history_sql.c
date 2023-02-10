@@ -87,7 +87,7 @@ static zbx_vc_history_table_t	vc_history_tables[] = {
 	{"history_log", "timestamp,logeventid,severity,source,value", row2value_log},
 	{"history_uint", "value", row2value_ui64},
 	{"history_text", "value", row2value_str},
-	{"history_binary", "value", row2value_str}
+	{"history_bin", "value", row2value_str}
 };
 
 /******************************************************************************************************************
@@ -313,10 +313,8 @@ static void	add_history_bin(const zbx_vector_ptr_t *history)
 	int		i;
 	zbx_db_insert_t	*db_insert;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, add_history_bin");
-
 	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
-	zbx_db_insert_prepare(db_insert, "history_binary", "itemid", "clock", "ns", "value", NULL);
+	zbx_db_insert_prepare(db_insert, "history_bin", "itemid", "clock", "ns", "value", NULL);
 
 	for (i = 0; i < history->values_num; i++)
 	{
