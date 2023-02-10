@@ -686,9 +686,7 @@ static void	DCupdate_item_queue(ZBX_DC_ITEM *item, unsigned char old_poller_type
 		zbx_binary_heap_insert(&config->queues[item->poller_type], &elem);
 	}
 	else
-	{
 		zbx_binary_heap_update_direct(&config->queues[item->poller_type], &elem);
-	}
 }
 
 static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
@@ -10616,8 +10614,6 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, co
 {
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_requeue_item<-, itemid: %lu", dc_item->itemid);
 
 	old_nextcheck = dc_item->nextcheck;
 	DCitem_nextcheck_update(dc_item, dc_interface, flags, lastclock, NULL);

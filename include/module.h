@@ -154,7 +154,6 @@ ZBX_METRIC;
 	(res)->log = (zbx_log_t *)(val)		\
 )
 
-
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_MSG_RESULT(res, val)		\
 (						\

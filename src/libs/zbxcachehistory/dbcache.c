@@ -3945,8 +3945,6 @@ static void	dc_string_buffer_realloc(size_t len)
 
 static dc_item_value_t	*dc_local_get_history_slot(void)
 {
-	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA, dc_local_get_history_slot");
-
 	if (ZBX_MAX_VALUES_LOCAL == item_values_num)
 		dc_flush_history();
 
@@ -4275,7 +4273,6 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		{
 			dc_local_add_history_uint(itemid, item_value_type, ts, result->ui64, result->lastlogsize,
 					result->mtime, value_flags);
-
 		}
 		else if (ZBX_ISSET_DBL(result))
 		{
@@ -4787,8 +4784,6 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 	dc_item_value_t	*item_value;
 	int		i;
 	zbx_hc_item_t	*item;
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "hc_add_item_value: %d", values_num);
 
 	for (i = 0; i < values_num; i++)
 	{
