@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -205,7 +206,7 @@ class testDashboardProblemsWidget extends CWebTest {
 							]
 						],
 						[
-							'type' => 'problem',
+							'type' => 'problems',
 							'name' => 'Problem widget for delete',
 							'x' => 11,
 							'y' => 0,
@@ -339,6 +340,50 @@ class testDashboardProblemsWidget extends CWebTest {
 		return [
 			[
 				[
+					'fields' => [],
+				]
+			]
+		];
+	}
+
+	public static function getUpdateData() {
+		return [
+			[
+				[
+					'fields' => [
+						'Name' => '',
+						'Refresh interval' => 'Default (1 minute)',
+						'Show' => 'Recent problems',
+						'Host groups' => '',
+						'Exclude host groups' => '',
+						'Hosts' => '',
+						'Problem' => '',
+						'id:severities_0' => false,
+						'id:severities_1' => false,
+						'id:severities_2' => false,
+						'id:severities_3' => false,
+						'id:severities_4' => false,
+						'id:severities_5' => false,
+						'Tag display priority' => '',
+						'Tag name' => 'Full',
+						'Show tags' => 'None',
+						'Show operational data' => 'None',
+						'Show suppressed problems' => false,
+						'Show unacknowledged only' => false,
+						'Sort entries by' => 'Time (descending)',
+						'Show timeline' => false,
+						'Show lines' => 1
+					],
+					'Tags' => []
+				]
+			]
+		];
+	}
+
+	public static function getCommonData() {
+		return [
+			[
+				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Show lines' => ''
@@ -353,14 +398,14 @@ class testDashboardProblemsWidget extends CWebTest {
 	 * @backupOnce widget
 	 *
 	 * @dataProvider getCreateData
-	 * @ dataProvider getCommonData
+	 * @dataProvider getCommonData
 	 */
 	public function testDashboardProblemsWidget_Create($data) {
 		$this->checkFormProblemsWidget($data);
 	}
 
 	/**
-	 * @ dataProvider getCommonData
+	 * @dataProvider getCommonData
 	 * @dataProvider getUpdateData
 	 */
 	public function testDashboardProblemsWidget_Update($data) {
@@ -370,7 +415,7 @@ class testDashboardProblemsWidget extends CWebTest {
 	/**
 	 * Function for checking Problems widget form.
 	 *
-	 * @param array      $data      data provider
+	 * @param array         $data        data provider
 	 * @param boolean    $update    true if update scenario, false if create
 	 */
 	public function checkFormProblemsWidget($data, $update = false) {
@@ -410,7 +455,7 @@ class testDashboardProblemsWidget extends CWebTest {
 			}
 		}
 
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD)) {
+		if (!CTestArrayHelper::get($data, 'expected')) {
 			$values = $form->getFields()->asValues();
 		}
 
@@ -458,14 +503,13 @@ class testDashboardProblemsWidget extends CWebTest {
 			}
 
 			// Check that widget is saved in DB.
-			$this->assertEquals(1,
-					CDBHelper::getCount('SELECT * FROM widget w'.
-						' WHERE EXISTS ('.
-							'SELECT NULL'.
-							' FROM dashboard_page dp'.
-							' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-								' AND dp.dashboardid='.self::$dashboardid.
-								' AND w.name ='.zbx_dbstr(CTestArrayHelper::get($data['fields'], 'Name', '')).')'
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM widget w'.
+					' WHERE EXISTS ('.
+						'SELECT NULL'.
+						' FROM dashboard_page dp'.
+						' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+							' AND dp.dashboardid='.self::$dashboardid.
+							' AND w.name ='.zbx_dbstr(CTestArrayHelper::get($data['fields'], 'Name', '')).')'
 			));
 
 			// Write new name to updated widget name.
@@ -473,5 +517,164 @@ class testDashboardProblemsWidget extends CWebTest {
 				self::$update_widget = $header;
 			}
 		}
+	}
+
+	public function testDashboardProblemsWidget_SimpleUpdate() {
+		$this->checkNoChanges();
+	}
+
+	public static function getCancelData() {
+		return [
+			// Cancel creating widget with saving the dashboard.
+			[
+				[
+					'cancel_form' => true,
+					'create_widget' => true,
+					'save_dashboard' => true
+				]
+			],
+			// Cancel updating widget with saving the dashboard.
+			[
+				[
+					'cancel_form' => true,
+					'create_widget' => false,
+					'save_dashboard' => true
+				]
+			],
+			// Create widget without saving the dashboard.
+			[
+				[
+					'cancel_form' => false,
+					'create_widget' => false,
+					'save_dashboard' => false
+				]
+			],
+			// Update widget without saving the dashboard.
+			[
+				[
+					'cancel_form' => false,
+					'create_widget' => false,
+					'save_dashboard' => false
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCancelData
+	 */
+	public function testDashboardProblemsWidget_Cancel($data) {
+		$this->checkNoChanges($data['cancel_form'], $data['create_widget'], $data['save_dashboard']);
+	}
+
+	/**
+	 * Function for checking canceling form or submitting without any changes.
+	 *
+	 * @param boolean $cancel                    true if cancel scenario, false if form is submitted
+	 * @param boolean $create                     true if create scenario, false if update
+	 * @param boolean $save_dashboard    true if dashboard will be saved, false if not
+	 */
+	private function checkNoChanges($cancel = false, $create = false, $save_dashboard = true) {
+		$old_hash = CDBHelper::getHash($this->sql);
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$old_widget_count = $dashboard->getWidgets()->count();
+
+		$form = $create
+			? $dashboard->edit()->addWidget()->asForm()
+			: $dashboard->getWidget(self::$update_widget)->edit();
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+
+		if (!$create) {
+			$values = $form->getFields()->asValues();
+		}
+		else {
+			$form->fill(['Type' => 'Problems']);
+		}
+
+		if ($cancel || !$save_dashboard) {
+			$form->fill([
+					'Name' => 'new name',
+					'Refresh interval' => '10 minutes',
+					'Host groups' => 'Empty group',
+					'Show' => 'Problems',
+					'Exclude host groups' => 'Group to copy graph',
+					'Hosts' => 'Available host',
+					'Problem' => 'Test problem',
+					'id:severities_3' => true,
+					'Show tags' => 2,
+					'Tag name' => 'None',
+					'Tag display priority' => 'one, two, four',
+					'Show operational data' => 'With problem name',
+					'Show suppressed problems' => true,
+					'Sort entries by' => 'Time (descending)',
+					'Show timeline' => false,
+					'Show lines' => 99
+			]);
+
+			$form->getField('id:evaltype')->fill('Or');
+			$form->getField('id:tags_table_tags')->asMultifieldTable()->fill([
+					[
+						'action' => USER_ACTION_UPDATE,
+						'index' => 0,
+						'tag' => 'new tag',
+						'operator' => 'Does not equal',
+						'value' => 'new value'
+					]
+			]);
+		}
+
+		if ($cancel) {
+			$dialog->query('button:Cancel')->one()->click();
+		}
+		else {
+			$form->submit();
+		}
+
+		COverlayDialogElement::ensureNotPresent();
+
+		if (!$cancel) {
+			$dashboard->getWidget(!$save_dashboard ? 'new name' : self::$update_widget)->waitUntilReady();
+		}
+
+		if ($save_dashboard) {
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		}
+		else {
+			$dashboard->cancelEditing();
+		}
+
+		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+
+		// Check that updating widget form values did not change in frontend.
+		if (!$create && !$save_dashboard) {
+			$this->assertEquals($values, $dashboard->getWidget(self::$update_widget)->edit()->getFields()->asValues());
+		}
+
+		// Check that DB hash is not changed.
+		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+	}
+
+	public function testDashboardProblemsWidget_Delete() {
+		$name = 'Problem widget for delete';
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$this->assertTrue($dashboard->edit()->getWidget($name)->isEditable());
+		$dashboard->deleteWidget($name);
+		$dashboard->save();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		// Check that widget is not present on dashboard and in DB.
+		$this->assertFalse($dashboard->getWidget($name, false)->isValid());
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
+				' LEFT JOIN widget w'.
+					' ON w.widgetid=wf.widgetid'.
+					' WHERE w.name='.zbx_dbstr($name)
+		));
 	}
 }
