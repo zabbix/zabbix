@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -368,6 +368,10 @@ class testItemRate extends CIntegrationTest {
 			]);
 			$this->assertArrayHasKey('itemids', $response['result']);
 			$this->assertEquals(1, count($response['result']['itemids']));
+
+			if ($scenario['api_request'] === false) {
+				$scenario['api_request'] = ['itemids' => []];
+			}
 			$scenario['api_request']['itemids'][] = $response['result']['itemids'][0];
 			$scenario['api_request']['time_from'] = self::$items[$scenario['item']['item_num']]['time_from'];
 			$scenario['api_request']['time_till'] = self::$items[$scenario['item']['item_num']]['time_till'];

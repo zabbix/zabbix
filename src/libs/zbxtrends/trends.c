@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,10 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
+
+#if defined(HAVE_POSTGRESQL)
+#include "zbxdb.h"
+#endif
 
 static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
 		"unknown error",
@@ -433,6 +437,12 @@ static zbx_trend_state_t	trends_eval(const char *table, zbx_uint64_t itemid, int
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_trend_state_t	state;
+#if defined(HAVE_POSTGRESQL)
+	zbx_tsdb_recalc_time_period(&start, ZBX_TSDB_RECALC_TIME_PERIOD_TRENDS);
+
+	if (start > end)
+		return ZBX_TREND_STATE_NODATA;
+#endif
 
 	if (start != end)
 	{
@@ -492,11 +502,20 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_trend_state_t	state;
 	double			avg, num, num2, avg2;
+#if defined(HAVE_POSTGRESQL)
+	zbx_tsdb_recalc_time_period(&start, ZBX_TSDB_RECALC_TIME_PERIOD_TRENDS);
+
+	if (start > end)
+		return ZBX_TREND_STATE_NODATA;
+#endif
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select value_avg,num from %s where itemid=" ZBX_FS_UI64,
 			table, itemid);
+
 	if (start != end)
+	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>=%d and clock<=%d", start, end);
+	}
 	else
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", start);
 
@@ -550,11 +569,20 @@ static zbx_trend_state_t	trends_eval_sum(const char *table, zbx_uint64_t itemid,
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 	double		sum = 0;
+#if defined(HAVE_POSTGRESQL)
+	zbx_tsdb_recalc_time_period(&start, ZBX_TSDB_RECALC_TIME_PERIOD_TRENDS);
+
+	if (start > end)
+		return ZBX_TREND_STATE_NODATA;
+#endif
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select value_avg,num from %s where itemid=" ZBX_FS_UI64,
 			table, itemid);
+
 	if (start != end)
+	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>=%d and clock<=%d", start, end);
+	}
 	else
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", start);
 
