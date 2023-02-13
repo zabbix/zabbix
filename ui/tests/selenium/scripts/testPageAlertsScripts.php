@@ -44,21 +44,58 @@ class testPageAlertsScripts extends CWebTest {
 	}
 
 	private static $script_sql = 'SELECT * FROM scripts ORDER BY scriptid';
+	private static $custom_script = 'Custom script with linked action';
+	private static $script_for_filter = 'Script для фильтра - $¢Řĩ₱₮';
+	private static $script_scope_event = 'Manual event action for filter check';
+	private static $custom_action = 'Trigger action for Scripts page testing';
 
 	public function prepareScriptData()
 	{
 		$response = CDataHelper::call('script.create', [
 			[
-				'name' => 'Manual event action for filter check',
+				'name' => self::$script_scope_event,
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
 				'command' => 'test'
 			],
 			[
-				'name' => 'Script для фильтра - $¢Řĩ₱₮',
+				'name' => self::$script_for_filter,
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
 				'command' => '/sbin/run'
+			],
+			[
+				'name' => self::$custom_script,
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'command' => '/sbin/zabbix_server --runtime-control config_cache_reload',
+				'groupid' => '4',
+				'description' => 'This command reload cache.'
+			]
+		]);
+		$scriptids = CDataHelper::getIds('name');
+
+		// Create trigger action
+		CDataHelper::call('action.create', [
+			'esc_period' => '1m',
+			'eventsource' => EVENT_SOURCE_TRIGGERS,
+			'status' => ACTION_STATUS_ENABLED,
+			'name' =>  self::$custom_action,
+			'operations' => [
+				[
+					'esc_period' => '0',
+					'esc_step_from' => '1',
+					'esc_step_to' => '1',
+					'operationtype' => OPERATION_TYPE_COMMAND,
+					'opcommand' => [
+						'scriptid' => $scriptids[self::$custom_script]
+					],
+					'opcommand_hst' => [
+						[
+							'hostid'=> '0'
+						]
+					]
+				]
 			]
 		]);
 	}
@@ -68,6 +105,17 @@ class testPageAlertsScripts extends CWebTest {
 			[
 				[
 					'fields' => [
+						[
+							'Name' => self::$custom_script,
+							'Scope' => 'Action operation',
+							'Used in actions' => self::$custom_action,
+							'Type' => 'Script',
+							'Execute on' => 'Server (proxy)',
+							'Commands' => '/sbin/zabbix_server --runtime-control config_cache_reload',
+							'User group' => 'All',
+							'Host group' => 'Zabbix servers',
+							'Host access' => 'Read'
+						],
 						[
 							'Name' => 'Detect operating system',
 							'Scope' => 'Manual host action',
@@ -80,7 +128,7 @@ class testPageAlertsScripts extends CWebTest {
 							'Host access' => 'Read'
 						],
 						[
-							'Name' => 'Manual event action for filter check',
+							'Name' => self::$script_scope_event,
 							'Scope' => 'Manual event action',
 							'Used in actions' => '',
 							'Type' => 'Script',
@@ -113,7 +161,7 @@ class testPageAlertsScripts extends CWebTest {
 							'Host access' => 'Write'
 						],
 						[
-							'Name' => 'Script для фильтра - $¢Řĩ₱₮',
+							'Name' => self::$script_for_filter,
 							'Scope' => 'Manual event action',
 							'Used in actions' => '',
 							'Type' => 'Script',
@@ -242,7 +290,7 @@ class testPageAlertsScripts extends CWebTest {
 						'Name' => '$¢Řĩ₱₮'
 					],
 					'expected' => [
-						'Script для фильтра - $¢Řĩ₱₮'
+						self::$script_for_filter
 					]
 				]
 			],
@@ -275,9 +323,10 @@ class testPageAlertsScripts extends CWebTest {
 						'Name' => ' '
 					],
 					'expected' => [
+						self::$custom_script,
 						'Detect operating system',
-						'Manual event action for filter check',
-						'Script для фильтра - $¢Řĩ₱₮',
+						self::$script_scope_event,
+						self::$script_for_filter,
 						'Selenium script'
 					]
 				]
@@ -289,6 +338,7 @@ class testPageAlertsScripts extends CWebTest {
 						'Name' => 'm s'
 					],
 					'expected' => [
+						self::$custom_script,
 						'Selenium script'
 					]
 				]
@@ -330,6 +380,7 @@ class testPageAlertsScripts extends CWebTest {
 						'Scope' => 'Action operation'
 					],
 					'expected' => [
+						self::$custom_script,
 						'Reboot',
 						'Selenium script'
 					]
@@ -380,8 +431,8 @@ class testPageAlertsScripts extends CWebTest {
 						'Scope' => 'Manual event action'
 					],
 					'expected' => [
-						'Manual event action for filter check',
-						'Script для фильтра - $¢Řĩ₱₮'
+						self::$script_scope_event,
+						self::$script_for_filter
 					]
 				]
 			],
@@ -393,7 +444,7 @@ class testPageAlertsScripts extends CWebTest {
 						'Scope' => 'Manual event action'
 					],
 					'expected' => [
-						'Manual event action for filter check'
+						self::$script_scope_event
 					]
 				]
 			],
@@ -404,11 +455,12 @@ class testPageAlertsScripts extends CWebTest {
 						'Scope' => 'Any'
 					],
 					'expected' => [
+						self::$custom_script,
 						'Detect operating system',
-						'Manual event action for filter check',
+						self::$script_scope_event,
 						'Ping',
 						'Reboot',
-						'Script для фильтра - $¢Řĩ₱₮',
+						self::$script_for_filter,
 						'Selenium script',
 						'Traceroute'
 					]
@@ -450,11 +502,12 @@ class testPageAlertsScripts extends CWebTest {
 					'expected' => [
 						'Traceroute',
 						'Selenium script',
-						'Script для фильтра - $¢Řĩ₱₮',
+						self::$script_for_filter,
 						'Reboot',
 						'Ping',
-						'Manual event action for filter check',
-						'Detect operating system'
+						self::$script_scope_event,
+						'Detect operating system',
+						self::$custom_script
 					]
 				]
 			],
@@ -464,6 +517,7 @@ class testPageAlertsScripts extends CWebTest {
 					'expected' => [
 						'/sbin/run',
 						'/sbin/shutdown -r',
+						'/sbin/zabbix_server --runtime-control config_cache_reload',
 						'/usr/bin/traceroute {HOST.CONN}',
 						'ping -c 3 {HOST.CONN}; case $? in [01]) true;; *) false;; esac',
 						'sudo /usr/bin/nmap -O {HOST.CONN}',
@@ -493,16 +547,16 @@ class testPageAlertsScripts extends CWebTest {
 	public function testPageAlertsScripts_Delete() {
 		$this->page->login()->open('zabbix.php?action=script.list');
 
-		foreach (['Detect operating system', 'Manual event action for filter check',
-						'Ping', 'Reboot', 'Script для фильтра - $¢Řĩ₱₮', 'Selenium script', 'Traceroute'] as $scripts) {
+		foreach ([self::$custom_script, self::$script_scope_event, self::$script_for_filter] as $scripts) {
 			$this->selectTableRows($scripts);
 			$this->query('button:Delete')->one()->waitUntilClickable()->click();
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();
 
-			if ($scripts === 'Reboot') {
+			if ($scripts === self::$custom_script) {
 				// Verify that selected script which is linked to an action can't be deleted.
-				$this->assertMessage(TEST_BAD, 'Cannot delete script', 'Cannot delete scripts. Script "Reboot" is used in action operation "Trigger action 4".');
+				$this->assertMessage(TEST_BAD, 'Cannot delete script', 'Cannot delete scripts. Script "'
+						.$scripts.'" is used in action operation "'.self::$custom_action);
 				$this->assertEquals(1, CDBHelper::getCount('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($scripts)));
 
 				// Verify that that there is no possibility to delete all selected scripts if at least one of them contains linked action.
@@ -510,7 +564,7 @@ class testPageAlertsScripts extends CWebTest {
 				$this->query('button:Delete')->one()->click();
 				$this->page->acceptAlert();
 				$this->assertMessage(TEST_BAD, 'Cannot delete scripts');
-				$this->assertEquals(4, CDBHelper::getCount('SELECT scriptid FROM scripts'));
+				$this->assertEquals(8, CDBHelper::getCount('SELECT scriptid FROM scripts'));
 
 				// Uncheck selected scripts due to not influence further tests.
 				$this->query('button:Reset')->one()->click();
@@ -527,9 +581,9 @@ class testPageAlertsScripts extends CWebTest {
 	 */
 	public function testPageAlertsScripts_ActionLinks() {
 		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('link:Trigger action 4')->one()->waitUntilClickable()->click();
+		$this->query('link:'.self::$custom_action)->one()->waitUntilClickable()->click();
 		$dialog = COverlayDialogElement::find()->asForm()->one();
-		$this->assertEquals('Trigger action 4', $dialog->getField('Name')->getValue());
+		$this->assertEquals(self::$custom_action, $dialog->getField('Name')->getValue());
 		$dialog->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$this->page->assertHeader('Scripts');
