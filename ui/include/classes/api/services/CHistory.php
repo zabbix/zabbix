@@ -212,7 +212,7 @@ class CHistory extends CApiService {
 			}
 		}
 
-		if (!$options['countOutput'] && $this->tableName() === 'history_binary') {
+		if (!$options['countOutput'] && $this->tableName() === 'history_bin') {
 			foreach ($result as &$row) {
 				if (array_key_exists('value', $row)) {
 					$row['value'] = base64_encode($row['value']);

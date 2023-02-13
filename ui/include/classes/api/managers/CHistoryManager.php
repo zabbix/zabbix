@@ -1581,7 +1581,7 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_STR => 'history_str',
 			ITEM_VALUE_TYPE_FLOAT => 'history',
 			ITEM_VALUE_TYPE_UINT64 => 'history_uint',
-			ITEM_VALUE_TYPE_BINARY => 'history_binary'
+			ITEM_VALUE_TYPE_BINARY => 'history_bin'
 		];
 
 		return ($value_type === null) ? $tables : $tables[$value_type];
