@@ -333,24 +333,191 @@ class testDashboardProblemsWidget extends CWebTest {
 			$this->assertTrue($form->getField('Tag display priority')->isEnabled($status));
 		}
 
+		// Check Show timeline checkbox editability.
+		$sort_timeline_statuses = [
+			'Time (descending)' => true,
+			'Time (ascending)' => true,
+			'Severity (descending)' => false,
+			'Severity (ascending)' => false,
+			'Problem (descending)' => false,
+			'Problem (ascending)' => false,
+			'Host (descending)' => false,
+			'Host (ascending)' => false
+		];
+
+		foreach ($sort_timeline_statuses as $entry => $timeline_status) {
+			$form->getField('Sort entries by')->asDropdown()->select($entry);
+			$timeline_field = $form->getField('Show timeline');
+			$this->assertTrue($timeline_field->isEnabled($timeline_status));
+			$this->assertTrue($timeline_field->isChecked($timeline_status));
+		}
+
 		$dialog->close();
 	}
 
-	public static function getCreateData() {
+	public static function getCommonData() {
 		return [
+			// 0.
 			[
 				[
-					'fields' => [],
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Show lines' => ''
+					],
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
-			]
-		];
-	}
-
-	public static function getUpdateData() {
-		return [
+			],
+			// 1.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Show lines' => 0
+					],
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+				]
+			],
+			// 2.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Show lines' => 999
+					],
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+				]
+			],
+			// 3.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Show lines' => 'test'
+					],
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+				]
+			],
+			// 4.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Show lines' => '-1'
+					],
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+				]
+			],
+			// 5.
 			[
 				[
 					'fields' => [
+						'id:show_header' => true,
+						'Name' => 'Test All fields filled',
+						'Refresh interval' => '10 seconds',
+						'Show' => 'Problems',
+						'Host groups' =>  'Another group to check Overview',
+						'Exclude host groups' => 'Group to copy graph',
+						'Hosts' =>  'ЗАББИКС Сервер',
+						'Problem' => 'New problem for testing',
+						'id:severities_0' => true,
+						'id:severities_1' => true,
+						'id:severities_2' => true,
+						'id:severities_3' => true,
+						'id:severities_4' => true,
+						'id:severities_5' => true,
+						'Show tags' => 1,
+						'Tag name' => 'Shortened',
+						'Tag display priority' => 'tag, tag2, tag4',
+						'Show operational data' => 'Separately',
+						'Show suppressed problems' => true,
+						'Show unacknowledged only' => true,
+						'Sort entries by' => 'Severity (ascending)'
+					],
+					'Tags' => [
+						'evaluation' => 'Or',
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag' => '!@#$%^&*()_+<>,.\/',
+								'operator' => 'Equals',
+								'value' => '!@#$%^&*()_+<>,.\/'
+							],
+							[
+								'tag' => 'tag1',
+								'operator' => 'Contains',
+								'value' => 'value1'
+							],
+							[
+								'tag' => 'tag2',
+								'operator' => 'Exists'
+							],
+							[
+								'tag' => 'tag3',
+								'operator' => 'Does not exist'
+							],
+							[
+								'tag' => '{$MACRO:A}',
+								'operator' => 'Does not equal',
+								'value' => '{$MACRO:A}'
+							],
+							[
+								'tag' => '{$MACRO}',
+								'operator' => 'Does not contain',
+								'value' => '{$MACRO}'
+							],
+							[
+								'tag' => 'Таг',
+								'value' => 'Значение'
+							]
+						]
+					]
+				]
+			],
+			// 6.
+			[
+				[
+					'fields' => [
+						'Name' => 'Other Settings Options',
+						'Refresh interval' => 'No refresh',
+						'Show' => 'History',
+						'id:severities_0' => true,
+						'id:severities_1' => false,
+						'id:severities_2' => true,
+						'id:severities_3' => false,
+						'id:severities_4' => true,
+						'id:severities_5' => false,
+						'Show tags' => 2,
+						'Tag name' => 'None',
+						'Show operational data' => 'With problem name',
+						'Show suppressed problems' => true,
+						'Show unacknowledged only' => true,
+						'Sort entries by' => 'Problem (ascending)'
+					]
+				]
+			],
+			// 7.
+			[
+				[
+					'fields' => [
+						'Name' => 'Random Severities',
+						'Show tags' => 3,
+						'id:severities_0' => false,
+						'id:severities_1' => true,
+						'id:severities_2' => false,
+						'id:severities_3' => true,
+						'id:severities_4' => true,
+						'id:severities_5' => false,
+						'Sort entries by' => 'Host (ascending)'
+					]
+				]
+			],
+			// 8.
+			[
+				[
+					'clear_tag_priority' => true,
+					'fields' => [
+						'id:show_header' => false,
 						'Name' => '',
 						'Refresh interval' => 'Default (1 minute)',
 						'Show' => 'Recent problems',
@@ -364,7 +531,6 @@ class testDashboardProblemsWidget extends CWebTest {
 						'id:severities_3' => false,
 						'id:severities_4' => false,
 						'id:severities_5' => false,
-						'Tag display priority' => '',
 						'Tag name' => 'Full',
 						'Show tags' => 'None',
 						'Show operational data' => 'None',
@@ -376,19 +542,37 @@ class testDashboardProblemsWidget extends CWebTest {
 					],
 					'Tags' => []
 				]
-			]
+			],
+			// 9.
+			[
+				[
+					'fields' => [
+						'Name' => 'кириллица, !@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+						'Problem' => 'кириллица, !@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ',
+						'Show tags' => 3,
+						'Tag display priority' => 'кириллица, !@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ'
+					]
+				]
+			],
+			// 10.
+			[
+				[
+					'fields' => [
+						'Name' => 'Array of groups',
+						'Host groups' => [ 'Group to check Overview',  'Zabbix servers'],
+						'Exclude host groups' => ['Group to copy all graph', 'Inheritance test'],
+						'Hosts' => [ 'Host_1 with proxy', 'Host for triggers filtering']
+					]
+				]
+			],
 		];
 	}
 
-	public static function getCommonData() {
+	public static function getCreateEmptyData() {
 		return [
 			[
 				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Show lines' => ''
-					],
-					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'fields' => [],
 				]
 			]
 		];
@@ -397,7 +581,15 @@ class testDashboardProblemsWidget extends CWebTest {
 	/**
 	 * @backupOnce widget
 	 *
-	 * @dataProvider getCreateData
+	 * @dataProvider getCreateEmptyData
+	 */
+	public function testDashboardProblemsWidget_CreateEmpty($data) {
+		$this->checkFormProblemsWidget($data);
+	}
+
+	/**
+	 * @backupOnce widget
+	 *
 	 * @dataProvider getCommonData
 	 */
 	public function testDashboardProblemsWidget_Create($data) {
@@ -406,7 +598,6 @@ class testDashboardProblemsWidget extends CWebTest {
 
 	/**
 	 * @dataProvider getCommonData
-	 * @dataProvider getUpdateData
 	 */
 	public function testDashboardProblemsWidget_Update($data) {
 		$this->checkFormProblemsWidget($data, true);
@@ -415,7 +606,7 @@ class testDashboardProblemsWidget extends CWebTest {
 	/**
 	 * Function for checking Problems widget form.
 	 *
-	 * @param array         $data        data provider
+	 * @param array        $data       data provider
 	 * @param boolean    $update    true if update scenario, false if create
 	 */
 	public function checkFormProblemsWidget($data, $update = false) {
@@ -435,6 +626,11 @@ class testDashboardProblemsWidget extends CWebTest {
 
 		if (!$update) {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Problems')]);
+		}
+		else {
+			if  (CTestArrayHelper::get($data, 'clear_tag_priority', false)) {
+				$form->fill(['Show tags' => 1, 'Tag display priority' => '']);
+			}
 		}
 
 		$form->fill($data['fields']);
@@ -570,9 +766,9 @@ class testDashboardProblemsWidget extends CWebTest {
 	/**
 	 * Function for checking canceling form or submitting without any changes.
 	 *
-	 * @param boolean $cancel                    true if cancel scenario, false if form is submitted
-	 * @param boolean $create                     true if create scenario, false if update
-	 * @param boolean $save_dashboard    true if dashboard will be saved, false if not
+	 * @param boolean $cancel			true if cancel scenario, false if form is submitted
+	 * @param boolean $create			true if create scenario, false if update
+	 * @param boolean $save_dashboard	true if dashboard will be saved, false if not
 	 */
 	private function checkNoChanges($cancel = false, $create = false, $save_dashboard = true) {
 		$old_hash = CDBHelper::getHash($this->sql);
