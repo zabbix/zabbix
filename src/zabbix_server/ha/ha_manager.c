@@ -112,16 +112,15 @@ static int is_ha_cluster(const char *ha_node_name)
  *                                                                            *
  * Purpose: connect, send message and receive response in a given timeout     *
  *                                                                            *
- * Parameters: service_name - [IN] the IPC service name                       *
- *             code         - [IN] the message code                           *
- *             timeout      - [IN] time allowed to be spent on receive, note  *
+ * Parameters: code         - [IN] message code                               *
+ *             timeout      - [IN] time allowed to be spent on receive. Note  *
  *                                 that this does not include open, send and  *
- *                                 flush that have their own timeouts         *
- *             data         - [IN] the data                                   *
- *             size         - [IN] the data size                              *
- *             out          - [OUT] the received message or NULL on error     *
- *                                  The message must be freed by zbx_free()   *
- *             error        - [OUT] the error message                         *
+ *                                 flush that have their own timeouts.        *
+ *             data         - [IN] data                                       *
+ *             size         - [IN] data size                                  *
+ *             out          - [OUT] received message or NULL on error.        *
+ *                                  The message must be freed by zbx_free().  *
+ *             error        - [OUT]                                           *
  *                                                                            *
  * Return value: SUCCEED - successfully sent message and received response    *
  *                         or timeout occurred while waiting for response     *
@@ -359,7 +358,6 @@ static DB_RESULT	ha_db_select(zbx_ha_info_t *info, const char *sql, ...)
  *          connection status                                                 *
  *                                                                            *
  ******************************************************************************/
-
 static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...)
 {
 	va_list	args;
@@ -545,9 +543,7 @@ static int	ha_is_available(const zbx_ha_info_t *info, int lastaccess, int db_tim
  ******************************************************************************/
 static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time)
 {
-	int	i;
-
-	for (i = 0; i < nodes->values_num; i++)
+	for (int i = 0; i < nodes->values_num; i++)
 	{
 		if ('\0' == *nodes->values[i]->name)
 			continue;
@@ -568,9 +564,9 @@ static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t 
  *                                                                            *
  * Purpose: check if server can be started in cluster configuration           *
  *                                                                            *
- * Parameters: info     - [IN] - the HA node information                      *
- *             nodes    - [IN] - the cluster nodes                            *
- *             db_time  - [IN] - the current database timestamp               *
+ * Parameters: info     - [IN] HA node information                            *
+ *             nodes    - [IN] cluster nodes                                  *
+ *             db_time  - [IN] current database timestamp                     *
  *             activate - [OUT] SUCCEED - start in active mode                *
  *                              FAIL    - start in standby mode               *
  *                                                                            *
@@ -582,11 +578,9 @@ static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t 
  ******************************************************************************/
 static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time, int *activate)
 {
-	int	i;
-
 	*activate = SUCCEED;
 
-	for (i = 0; i < nodes->values_num; i++)
+	for (int i = 0; i < nodes->values_num; i++)
 	{
 		if (ZBX_NODE_STATUS_STOPPED == nodes->values[i]->status ||
 				SUCCEED != ha_is_available(info, nodes->values[i]->lastaccess, db_time))
@@ -757,13 +751,12 @@ finish:
  ******************************************************************************/
 static int	ha_db_check_unavailable_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time)
 {
-	int	i, ret = SUCCEED;
-
+	int			ret = SUCCEED;
 	zbx_vector_str_t	unavailable_nodes;
 
 	zbx_vector_str_create(&unavailable_nodes);
 
-	for (i = 0; i < nodes->values_num; i++)
+	for (int i = 0; i < nodes->values_num; i++)
 	{
 		if (SUCCEED == zbx_cuid_compare(nodes->values[i]->ha_nodeid, info->ha_nodeid))
 			continue;
@@ -1155,7 +1148,7 @@ out:
 static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **error, zbx_ha_config_t *ha_config)
 {
 	zbx_vector_ha_node_t	nodes;
-	int			i, db_time, ret = FAIL;
+	int			db_time, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1182,7 +1175,7 @@ static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **e
 
 		zbx_json_initarray(&j, 1024);
 
-		for (i = 0; i < nodes.values_num; i++)
+		for (int i = 0; i < nodes.values_num; i++)
 		{
 			zbx_snprintf(address, sizeof(address), "%s:%hu", nodes.values[i]->address,
 					nodes.values[i]->port);
