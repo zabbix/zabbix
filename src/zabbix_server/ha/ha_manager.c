@@ -38,6 +38,10 @@
 
 #define ZBX_HA_NODE_LOCK	1
 
+#define zbx_cuid_empty(a)	('\0' == *(a).str ? SUCCEED : FAIL)
+#define zbx_cuid_compare(a, b)	(0 == memcmp((a).str, (b).str, CUID_LEN) ? SUCCEED : FAIL)
+#define zbx_cuid_clear(a)	memset((a).str, 0, CUID_LEN)
+
 static pid_t		ha_pid = ZBX_THREAD_ERROR;
 static zbx_cuid_t	ha_sessionid;
 
@@ -1769,16 +1773,6 @@ void	zbx_ha_kill(void)
 		zbx_thread_wait(ha_pid);
 		ha_pid = ZBX_THREAD_ERROR;
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if the pid is HA manager pid                                *
- *                                                                            *
- ******************************************************************************/
-int	zbx_ha_check_pid(pid_t pid)
-{
-	return pid == ha_pid ? SUCCEED : FAIL;
 }
 
 /*

@@ -69,10 +69,6 @@ typedef struct
 }
 zbx_ha_config_t;
 
-#define zbx_cuid_empty(a)	('\0' == *(a).str ? SUCCEED : FAIL)
-#define zbx_cuid_compare(a, b)	(0 == memcmp((a).str, (b).str, CUID_LEN) ? SUCCEED : FAIL)
-#define zbx_cuid_clear(a)	memset((a).str, 0, CUID_LEN)
-
 void	zbx_init_library_ha(void);
 
 int	zbx_ha_start(zbx_rtc_t *rtc, zbx_ha_config_t *ha_config, char **error);
@@ -82,8 +78,6 @@ void	zbx_ha_kill(void);
 int	zbx_ha_get_status(const char *ha_node_name, int *ha_status, int *ha_failover_delay, char **error);
 int	zbx_ha_dispatch_message(const char *ha_node_name, zbx_ipc_message_t *message, int *ha_status,
 		int *ha_failover_delay, char **error);
-
-int	zbx_ha_check_pid(pid_t pid);
 
 int	zbx_ha_get_nodes(char **nodes, char **error);
 int	zbx_ha_remove_node(const char *node, char **result, char **error);
