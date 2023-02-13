@@ -356,12 +356,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		else {
 			$media_name = new CDiv([
 				$media['name'],
-				(new CSpan([
-					' ',
-					makeWarningIcon(
-						_('Media type disabled by Administration.')
-					)
-				]))
+				new CSpan(makeWarningIcon(_('Media type disabled by Administration.')))
 			]);
 
 			$status = (new CDiv(_('Disabled')))->addClass(ZBX_STYLE_RED);

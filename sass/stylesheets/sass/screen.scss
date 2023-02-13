@@ -1510,6 +1510,10 @@ form {
 			display: block;
 			height: 24px;
 			line-height: 24px;
+
+			.icon-info {
+				margin-left: 5px;
+			}
 		}
 	}
 
@@ -1546,6 +1550,10 @@ form {
 
 			&:last-child {
 				padding-right: 0;
+			}
+
+			.icon-info {
+				margin-left: 5px;
 			}
 		}
 

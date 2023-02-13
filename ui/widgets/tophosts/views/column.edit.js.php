@@ -30,9 +30,7 @@ window.tophosts_column_edit_form = new class {
 		this._$thresholds_table = this._$widget_form.find('#thresholds_table');
 
 		$('[name="data"], [name="aggregate_function"], [name="display"], [name="history"]', this._$widget_form)
-			.on('change', () => {
-				this._update();
-			});
+			.on('change', () => this._update());
 
 		colorPalette.setThemeColors(thresholds_colors);
 

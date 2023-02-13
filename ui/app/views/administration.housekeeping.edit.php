@@ -125,20 +125,19 @@ $house_keeper_tab = (new CFormList())
 		(new CCheckBox('hk_history_mode'))->setChecked($data['hk_history_mode'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Override item history period'), 'hk_history_global'),
-		[
-			(new CCheckBox('hk_history_global'))->setChecked($data['hk_history_global'] == 1),
+		new CLabel([
+			_('Override item history period'),
 			array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $data)
-				? new CSpan([
-					' ',
+				? new CSpan(
 					makeWarningIcon(
 						_('This setting should be enabled, because history tables contain compressed chunks.')
 					)
 						->addStyle('display:none;')
 						->addClass('js-hk-history-warning')
-				])
+				)
 				: null
-		]
+		], 'hk_history_global'),
+		(new CCheckBox('hk_history_global'))->setChecked($data['hk_history_global'] == 1),
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_history'))
@@ -154,20 +153,19 @@ $house_keeper_tab = (new CFormList())
 		(new CCheckBox('hk_trends_mode'))->setChecked($data['hk_trends_mode'] == 1)
 	)
 	->addRow(
-		new CLabel(_('Override item trend period'), 'hk_trends_global'),
-		[
-			(new CCheckBox('hk_trends_global'))->setChecked($data['hk_trends_global'] == 1),
+		new CLabel([
+			_('Override item trend period'),
 			array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS, $data)
-				? new CSpan([
-					' ',
+				? new CSpan(
 					makeWarningIcon(
 						_('This setting should be enabled, because trend tables contain compressed chunks.')
 					)
 						->addStyle('display:none;')
 						->addClass('js-hk-trends-warning')
-				])
+				)
 				: null
-		]
+		], 'hk_trends_global'),
+		(new CCheckBox('hk_trends_global'))->setChecked($data['hk_trends_global'] == 1)
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_trends'))

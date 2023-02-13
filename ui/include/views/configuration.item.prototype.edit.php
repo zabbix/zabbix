@@ -123,7 +123,6 @@ $item_type_options = CSelect::createOptionsFromArray([
 ]);
 $type_mismatch_hint = (new CSpan(makeWarningIcon(_('This type of information may not match the key.'))))
 	->setId('js-item-type-hint')
-	->addStyle('margin: 5px 0 0 5px;')
 	->addClass(ZBX_STYLE_DISPLAY_NONE);
 
 $item_tab
@@ -133,15 +132,14 @@ $item_tab
 		(new CFormField($key_controls))
 	])
 	->addItem([
-		new CLabel(_('Type of information'), 'label-value-type'),
+		new CLabel([_('Type of information'), $type_mismatch_hint], 'label-value-type'),
 		new CFormField([
 			(new CSelect('value_type'))
 				->setFocusableElementId('label-value-type')
 				->setId('value_type')
 				->setValue($data['value_type'])
 				->addOptions($item_type_options)
-				->setReadonly($readonly),
-			$type_mismatch_hint
+				->setReadonly($readonly)
 		])
 	])
 	// Append ITEM_TYPE_HTTPAGENT URL field to form list.
