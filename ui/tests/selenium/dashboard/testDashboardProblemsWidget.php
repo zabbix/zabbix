@@ -551,6 +551,18 @@ class testDashboardProblemsWidget extends CWebTest {
 			// 10.
 			[
 				[
+					'trim' => true,
+					'fields' => [
+						'Name' => '                     leading.trailing                ',
+						'Problem' => '               leading.trailing                ',
+						'Show tags' => 3,
+						'Tag display priority' => '            leading.trailing                   '
+					]
+				]
+			],
+			// 11.
+			[
+				[
 					'fields' => [
 						'Name' => 'Array of groups',
 						'Host groups' => [ 'Group to check Overview',  'Zabbix servers'],
@@ -650,6 +662,10 @@ class testDashboardProblemsWidget extends CWebTest {
 		}
 
 		$form->submit();
+
+		if (CTestArrayHelper::get($data, 'trim', false)) {
+			$data['fields'] = array_map('trim', $data['fields']);
+		}
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
