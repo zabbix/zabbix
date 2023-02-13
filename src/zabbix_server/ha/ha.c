@@ -20,8 +20,8 @@
 #include "zbxcommon.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
-#include "zbxha.h"
 #include "log.h"
+#include "ha.h"
 
 /******************************************************************************
  *                                                                            *

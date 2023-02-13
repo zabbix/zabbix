@@ -73,7 +73,6 @@
 #include "ha/ha.h"
 #include "zbxrtc.h"
 #include "rtc/rtc_server.h"
-#include "zbxha.h"
 #include "zbxstats.h"
 #include "stats/zabbix_stats.h"
 #include "zbxdiag.h"
@@ -86,6 +85,7 @@
 #include "zbxipcservice.h"
 #include "preprocessor/preproc_stats.h"
 #include "preproc.h"
+#include "ha/ha.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"

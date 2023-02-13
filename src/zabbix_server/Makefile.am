@@ -147,7 +147,6 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxdiag/libzbxdiag.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
-	$(top_builddir)/src/libs/zbxha/libzbxha.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	rtc/libzbxrtc_server.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc.a \

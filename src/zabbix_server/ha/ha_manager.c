@@ -18,7 +18,6 @@
 **/
 
 #include "ha.h"
-#include "zbxha.h"
 
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
@@ -33,6 +32,7 @@
 #include "zbxip.h"
 #include "zbxcomms.h"
 #include "../rtc/rtc_server.h"
+#include "zbx_rtc_constants.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
