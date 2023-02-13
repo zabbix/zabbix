@@ -564,7 +564,7 @@ class testDashboardProblemsWidget extends CWebTest {
 						'Hosts' => [ 'Host_1 with proxy', 'Host for triggers filtering']
 					]
 				]
-			],
+			]
 		];
 	}
 
@@ -572,7 +572,7 @@ class testDashboardProblemsWidget extends CWebTest {
 		return [
 			[
 				[
-					'fields' => [],
+					'fields' => []
 				]
 			]
 		];
