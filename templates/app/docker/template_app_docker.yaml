@@ -14,7 +14,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/435429-discussion-thread-for-official-zabbix-template-docker
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -991,7 +991,7 @@ zabbix_export:
               name: 'Docker: Version has changed'
               event_name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Docker version has changed. Ack to close.'
+              description: 'The Docker version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
