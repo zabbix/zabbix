@@ -59,7 +59,6 @@
 #include "housekeeper/trigger_housekeeper.h"
 #include "lld/lld_manager.h"
 #include "lld/lld_worker.h"
-#include "connector/connector_manager.h"
 #include "reporter/report_manager.h"
 #include "reporter/report_writer.h"
 #include "events.h"

@@ -37,6 +37,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
+#include "zbxtagfilter.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;
