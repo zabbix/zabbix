@@ -211,7 +211,6 @@ static int	*threads_flags;
 
 static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
-zbx_cuid_t	ha_sessionid;
 static char	*CONFIG_PID_FILE = NULL;
 
 static zbx_export_file_t	*problems_export = NULL;
@@ -1880,7 +1879,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_new_cuid(ha_sessionid.str);
+	zbx_init_library_ha();
 
 #ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS	"YES"

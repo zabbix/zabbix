@@ -38,9 +38,8 @@
 
 #define ZBX_HA_NODE_LOCK	1
 
-static pid_t			ha_pid = ZBX_THREAD_ERROR;
-
-extern zbx_cuid_t	ha_sessionid;
+static pid_t		ha_pid = ZBX_THREAD_ERROR;
+static zbx_cuid_t	ha_sessionid;
 
 typedef struct
 {
@@ -1499,6 +1498,11 @@ out:
 /*
  * public API
  */
+
+void	zbx_init_library_ha(void)
+{
+	zbx_new_cuid(ha_sessionid.str);
+}
 
 /******************************************************************************
  *                                                                            *

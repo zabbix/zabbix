@@ -73,6 +73,8 @@ zbx_ha_config_t;
 #define zbx_cuid_compare(a, b)	(0 == memcmp((a).str, (b).str, CUID_LEN) ? SUCCEED : FAIL)
 #define zbx_cuid_clear(a)	memset((a).str, 0, CUID_LEN)
 
+void	zbx_init_library_ha(void);
+
 int	zbx_ha_start(zbx_rtc_t *rtc, zbx_ha_config_t *ha_config, char **error);
 int	zbx_ha_pause(char **error);
 int	zbx_ha_stop(char **error);
