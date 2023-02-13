@@ -52,6 +52,9 @@ class CControllerWebScenarioStepCheck extends CController {
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
+						'title' => $this->getInput('old_name', '') === ''
+							? _('Cannot create web scenario step')
+							: _('Cannot update web scenario step'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])]))->disableView()
