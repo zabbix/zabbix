@@ -50,22 +50,43 @@ abstract class CGraphGeneral extends CApiService {
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'graphids' => $graphIds,
 			'editable' => true,
-			'preservekeys' => true,
-			'inherited' => false
+			'preservekeys' => true
 		]);
 
 		$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
 			'messageAllowed' => _('Cannot update a discovered graph.')
 		]);
 
-		foreach ($graphs as &$graph) {
+		foreach ($graphs as $key => &$graph) {
 			// check permissions
 			if (!isset($dbGraphs[$graph['graphid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
+			// Cannot update templated graph.
+			if ($dbGraphs[$graph['graphid']]['templateid'] != 0
+					&& $dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update a templated graph "%1$s".',
+					$graph['name']
+				));
+			}
+
 			// cannot update discovered graphs
 			$this->checkPartialValidator($graph, $updateDiscoveredValidator, $dbGraphs[$graph['graphid']]);
+
+			// Allow for template inherited graphs to update discover parameter.
+			if ($dbGraphs[$graph['graphid']]['templateid'] != 0) {
+				if ($dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+						&& array_key_exists('discover', $graph)) {
+					$graph = ['discover' => $graph['discover']] + $dbGraphs[$graph['graphid']];
+					unset($graph['templateid'], $graph['flags'], $graph['uuid']);
+				}
+				else {
+					unset($graphs[$key]);
+				}
+
+				continue;
+			}
 
 			// validate items on set or pass existing items from DB
 			if (isset($graph['gitems'])) {
@@ -95,9 +116,11 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		$this->validateUpdate($graphs, $dbGraphs);
+		if ($graphs) {
+			$this->validateUpdate($graphs, $dbGraphs);
+		}
 
-		foreach ($graphs as $graph) {
+		foreach ($graphs as &$graph) {
 			unset($graph['templateid']);
 
 			$graph['gitems'] = isset($graph['gitems']) ? $graph['gitems'] : $dbGraphs[$graph['graphid']]['gitems'];
@@ -428,7 +451,7 @@ abstract class CGraphGeneral extends CApiService {
 
 	/**
 	 * Validate graph name and graph items including Y axis item ID's and graph item fields on Create method
-	 * and return valid item ID's on success or trow an error on failure.
+	 * and return valid item ID's on success or throw an error on failure.
 	 *
 	 * @param array $graphs
 	 *
@@ -578,7 +601,7 @@ abstract class CGraphGeneral extends CApiService {
 
 	/**
 	 * Validate graph items including valid Y axis item ID's on Update method
-	 * and return valid item ID's on success or trow an error on failure.
+	 * and return valid item ID's on success or throw an error on failure.
 	 *
 	 * @param array $graphs
 	 * @param array $db_graphs
@@ -638,7 +661,7 @@ abstract class CGraphGeneral extends CApiService {
 
 	/**
 	 * Validate graph general data on Update method.
-	 * When updating graph check to what host graph belongs to and trow an error if new items added from other hosts.
+	 * When updating graph check to what host graph belongs to and throw an error if new items added from other hosts.
 	 * Includes Y axis validation and if graph already exists somewhere in DB.
 	 *
 	 * @param array $graphs
