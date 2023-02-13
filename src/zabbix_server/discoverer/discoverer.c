@@ -55,7 +55,6 @@ typedef struct
 	zbx_vector_ptr_t	services;
 	DC_DRULE		*drule;
 	char			*ip;
-	char			*dns;
 	int			now;
 }
 zbx_discovery_results_t;
@@ -419,14 +418,12 @@ static void	results_free(zbx_discovery_results_t *result)
 {
 	zbx_discovery_drule_free(result->drule);
 	zbx_free(result->ip);
-	zbx_free(result->dns);
 	zbx_vector_ptr_clear_ext(&result->services, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&result->services);
 	zbx_free(result);
 }
 
-static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *ip, char *dns, int now,
-		int config_timeout)
+static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *ip, int now, int config_timeout)
 {
 	const char		*start;
 	char			*value = NULL;
@@ -472,7 +469,6 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 			dcheck_copy(dcheck, net_check->dcheck);
 
 			net_check->ip = zbx_strdup(NULL, ip);
-			net_check->dns = zbx_strdup(NULL, dns);
 			net_check->port = (unsigned short)port;
 			net_check->config_timeout = config_timeout;
 			net_check->now = now;
@@ -495,7 +491,7 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_checks(const DC_DRULE *drule, char *ip, char *dns, int unique, int now, int config_timeout)
+static void	process_checks(const DC_DRULE *drule, char *ip, int unique, int now, int config_timeout)
 {
 	int		i;
 
@@ -510,7 +506,7 @@ static void	process_checks(const DC_DRULE *drule, char *ip, char *dns, int uniqu
 			continue;
 		}
 
-		process_check(drule, dcheck, ip, dns, now, config_timeout);
+		process_check(drule, dcheck, ip, now, config_timeout);
 	}
 }
 
@@ -552,7 +548,7 @@ static int	process_services(const DC_DRULE *drule, zbx_db_dhost *dhost, const ch
  ******************************************************************************/
 static void	process_rule(DC_DRULE *drule, int config_timeout)
 {
-	char			ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma, dns[ZBX_INTERFACE_DNS_LEN_MAX];
+	char			ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma;
 	int			ipaddress[8], now;
 	zbx_iprange_t		iprange;
 
@@ -612,14 +608,10 @@ static void	process_rule(DC_DRULE *drule, int config_timeout)
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() ip:'%s'", __func__, ip);
 
-			zbx_alarm_on(config_timeout);
-			zbx_gethost_by_ip(ip, dns, sizeof(dns));
-			zbx_alarm_off();
-
 			if (0 != drule->unique_dcheckid)
-				process_checks(drule, ip, dns, 1, now, config_timeout);
+				process_checks(drule, ip, 1, now, config_timeout);
 
-			process_checks(drule, ip, dns, 0, now, config_timeout);
+			process_checks(drule, ip, 0, now, config_timeout);
 		}
 		while (SUCCEED == zbx_iprange_next(&iprange, ipaddress));
 next:
@@ -749,7 +741,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_results(zbx_discoverer_manager_t *manager)
+static void	process_results(zbx_discoverer_manager_t *manager, int config_timeout)
 {
 	int			i;
 	zbx_vector_ptr_t	results;
@@ -766,11 +758,15 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 		zbx_discovery_results_t	*result = results.values[i];
 		zbx_db_dhost		dhost;
 		int			host_status;
+		char			dns[ZBX_INTERFACE_DNS_LEN_MAX];
 
 		memset(&dhost, 0, sizeof(zbx_db_dhost));
 
-		host_status = process_services(result->drule, &dhost, result->ip, result->dns, result->now,
-				&result->services);
+		zbx_alarm_on(config_timeout);
+		zbx_gethost_by_ip(result->ip, dns, sizeof(dns));
+		zbx_alarm_off();
+
+		host_status = process_services(result->drule, &dhost, result->ip, dns, result->now, &result->services);
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
@@ -780,7 +776,7 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		{
-			proxy_update_host(result->drule->druleid, result->ip, result->dns, host_status, result->now);
+			proxy_update_host(result->drule->druleid, result->ip, dns, host_status, result->now);
 		}
 	}
 
@@ -926,7 +922,6 @@ static void	*discoverer_net_check(void *net_check_worker)
 				zbx_vector_ptr_create(&result->services);
 				result->drule = job->drule;
 				result->ip = job->ip;
-				result->dns = job->dns;
 				result->now = job->now;
 				zbx_vector_ptr_append(&dmanager.results, result);
 			}
@@ -934,7 +929,6 @@ static void	*discoverer_net_check(void *net_check_worker)
 			{
 				zbx_discovery_drule_free(job->drule);
 				zbx_free(job->ip);
-				zbx_free(job->dns);
 				result = (zbx_discovery_results_t *)dmanager.results.values[index];
 			}
 
@@ -1149,7 +1143,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		if ((int)sec >= nextresult)
 		{
-			process_results(&dmanager);
+			process_results(&dmanager, discoverer_args_in->config_timeout);
 			nextresult = time(NULL) + DISCOVERER_DELAY;
 		}
 

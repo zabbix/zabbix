@@ -40,7 +40,6 @@ typedef struct
 	DC_DRULE	*drule;
 	DC_DCHECK	*dcheck;
 	char		*ip;
-	char		*dns;
 	unsigned short	port;
 	int		now;
 	int		config_timeout;
