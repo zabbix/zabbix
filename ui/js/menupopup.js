@@ -712,8 +712,8 @@ function getMenuPopupDashboard(options, trigger_element) {
  * @param {string} options['url']                         Trigger URL link (optional).
  * @param {object} trigger_element                        UI element which triggered opening of overlay dialogue.
  * @param {array} options[csrf_tokens][]
- * @param {string} options[csrf_tokens][]['scriptexec']   CSRF tokens for script execution.
- * @param {string} options[csrf_tokens][]['acknowledge']  CSRF tokens for acknowledge action.
+ * @param {string} options[csrf_tokens][]['scriptexec']   CSRF token for script execution.
+ * @param {string} options[csrf_tokens][]['acknowledge']  CSRF token for acknowledge action.
  *
  * @return array
  */
