@@ -711,9 +711,9 @@ function getMenuPopupDashboard(options, trigger_element) {
  * @param {bool}   options['showEvents']                  Show Problems item enabled. Default: false.
  * @param {string} options['url']                         Trigger URL link (optional).
  * @param {object} trigger_element                        UI element which triggered opening of overlay dialogue.
- * @param {array} options[csrf_tokens][]                  CSRF tokens for script execution and for acknowledge action.
- * @param {string} options[csrf_tokens][]['scriptexec']   CSRF tokens for script execution and for acknowledge action.
- * @param {string} options[csrf_tokens][]['acknowledge']  CSRF tokens for script execution and for acknowledge action.
+ * @param {array} options[csrf_tokens][]
+ * @param {string} options[csrf_tokens][]['scriptexec']   CSRF tokens for script execution.
+ * @param {string} options[csrf_tokens][]['acknowledge']  CSRF tokens for acknowledge action.
  *
  * @return array
  */
@@ -824,7 +824,6 @@ function getMenuPopupTrigger(options, trigger_element) {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'popup.acknowledge.create');
-		curl.setArgument('_csrf_token', options.csrf_tokens['acknowledge']);
 
 		/*
 		 * Some widgets cannot show symptoms. So it is not possible to convert to symptoms cause if only cause evets are
@@ -844,7 +843,8 @@ function getMenuPopupTrigger(options, trigger_element) {
 						headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 						body: urlEncodeData({
 							eventids: [options.eventid],
-							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE,
+							_csrf_token: options.csrf_tokens['acknowledge']
 						})
 					})
 						.then((response) => response.json())
@@ -891,7 +891,8 @@ function getMenuPopupTrigger(options, trigger_element) {
 						body: urlEncodeData({
 							eventids: options.eventids,
 							cause_eventid: options.eventid,
-							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
+							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
+							_csrf_token: options.csrf_tokens['acknowledge']
 						})
 					})
 						.then((response) => response.json())
