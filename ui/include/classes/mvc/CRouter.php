@@ -190,7 +190,6 @@ class CRouter {
 		'popup.generic'								=> ['CControllerPopupGeneric',							'layout.json',			'popup.generic'],
 		'popup.host.edit'							=> ['CControllerHostEdit',								'layout.json',			'popup.host.edit'],
 		'popup.hostgroup.edit'						=> ['CControllerHostGroupEdit',							'layout.json',			'popup.hostgroup.edit'],
-		'popup.httpstep'							=> ['CControllerPopupHttpStep',							'layout.json',			'popup.httpstep'],
 		'popup.import'								=> ['CControllerPopupImport',							'layout.json',			'popup.import'],
 		'popup.import.compare'						=> ['CControllerPopupImportCompare',					'layout.json',			'popup.import.compare'],
 		'popup.itemtest.edit'						=> ['CControllerPopupItemTestEdit',						'layout.json',			'popup.itemtestedit.view'],
@@ -334,6 +333,8 @@ class CRouter {
 		'userrole.list'								=> ['CControllerUserroleList',							'layout.htmlpage',		'administration.userrole.list'],
 		'userrole.update'							=> ['CControllerUserroleUpdate',						null,					null],
 		'web.view'									=> ['CControllerWebView',								'layout.htmlpage',		'monitoring.web.view'],
+		'webscenario.step.check'					=> ['CControllerWebScenarioStepCheck',					'layout.json',			null],
+		'webscenario.step.edit'						=> ['CControllerWebScenarioStepEdit',					'layout.json',			'webscenario.step.edit'],
 
 		// legacy actions
 		'auditacts.php'					=> ['CLegacyAction', null, null],

@@ -67,7 +67,7 @@ class TabIndicators {
 		const TRIGGER_PROTOTYPE = document.querySelector('#triggers-prototype-form');
 		const USER = document.querySelector('#user-form');
 		const USER_GROUP = document.querySelector('#user-group-form');
-		const WEB_SCENARIO = document.querySelector('#http-form');
+		const WEB_SCENARIO = document.querySelector('#webscenario-form');
 
 		switch (true) {
 			case !!ACTION:
@@ -786,12 +786,12 @@ class StepsTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('.httpconf-steps-dynamic-row [data-index]')
+			.querySelectorAll('#steps tbody [data-row_index]')
 			.length;
 	}
 
 	initObserver() {
-		const target_node = document.querySelector('.httpconf-steps-dynamic-row tbody');
+		const target_node = document.querySelector('#steps tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {

@@ -21,43 +21,43 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$this->includeJsFile('configuration.httpconf.edit.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Web monitoring'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HTTPCONF_EDIT));
 
-// append host summary to widget header
-if (!empty($this->data['hostid'])) {
-	$html_page->setNavigation(getHostNavigation('web', $this->data['hostid']));
+// Append host summary to widget header.
+if ($data['hostid'] != 0) {
+	$html_page->setNavigation(getHostNavigation('web', $data['hostid']));
 }
 
 $url = (new CUrl('httpconf.php'))
 	->setArgument('context', $data['context'])
 	->getUrl();
 
-// create form
-$http_form = (new CForm('post', $url))
+$form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('httpconf.php')))->removeId())
-	->setId('http-form')
-	->setName('httpForm')
+	->setId('webscenario-form')
+	->setName('webscenario_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('form', $this->data['form'])
-	->addVar('hostid', $this->data['hostid'])
-	->addVar('templated', $this->data['templated']);
+	->addVar('form', $data['form'])
+	->addVar('hostid', $data['hostid'])
+	->addVar('templated', $data['templated']);
 
-if (!empty($this->data['httptestid'])) {
-	$http_form->addVar('httptestid', $this->data['httptestid']);
+if ($data['httptestid'] != 0) {
+	$form->addVar('httptestid', $data['httptestid']);
 }
 
-/*
- * Scenario tab
- */
-$http_form_list = new CFormList();
+// Scenario tab.
+$scenario_tab = new CFormGrid();
 
-if (array_key_exists('parent_httptest', $this->data)) {
-	$parent_httptest = $this->data['parent_httptest'];
+if (array_key_exists('parent_httptest', $data)) {
+	$parent_httptest = $data['parent_httptest'];
 
 	if ($parent_httptest['editable']) {
 		$parent_template_name = new CLink(CHtml::encode($parent_httptest['template_name']),
@@ -73,35 +73,46 @@ if (array_key_exists('parent_httptest', $this->data)) {
 			->addClass(ZBX_STYLE_GREY);
 	}
 
-	$http_form_list->addRow(_('Parent web scenario'), $parent_template_name);
+	$scenario_tab->addItem([
+		new CLabel(_('Parent web scenario')),
+		new CFormField($parent_template_name)
+	]);
 }
 
-// Name
-$name_text_box = (new CTextBox('name', $this->data['name'], $this->data['templated'], 64))
+$name_text_box = (new CTextBox('name', $data['name'], $data['templated'], DB::getFieldLength('httptest', 'name')))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAriaRequired();
-if (!$this->data['templated']) {
+
+if (!$data['templated']) {
 	$name_text_box->setAttribute('autofocus', 'autofocus');
 }
 
-$http_form_list
-	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(), $name_text_box)
-	->addRow((new CLabel(_('Update interval'), 'delay'))->setAsteriskMark(),
-		(new CTextBox('delay', $data['delay']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow(
+$scenario_tab
+	->addItem([
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+		new CFormField($name_text_box)
+	])
+	->addItem([
+		(new CLabel(_('Update interval'), 'delay'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('delay', $data['delay'], false, DB::getFieldLength('httptest', 'delay')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
 		(new CLabel(_('Attempts'), 'retries'))->setAsteriskMark(),
-		(new CNumericBox('retries', $this->data['retries'], 2))
-			->setAriaRequired()
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-	);
+		new CFormField(
+			(new CNumericBox('retries', $data['retries'], 2))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+				->setAriaRequired()
+		)
+	]);
 
 $agent_select = (new CSelect('agent'))
 	->setId('agent')
-	->setFocusableElementId('label-agent')
-	->setValue($this->data['agent']);
+	->setFocusableElementId('agent-focusable')
+	->setValue($data['agent']);
 
 $user_agents_all = userAgents();
 $user_agents_all[_('Others')][ZBX_AGENT_OTHER] = _('other').' ...';
@@ -112,147 +123,292 @@ foreach ($user_agents_all as $user_agent_group => $user_agents) {
 	);
 }
 
-$http_form_list->addRow(new CLabel(_('Agent'), $agent_select->getFocusableElementId()), $agent_select);
-
-$http_form_list->addRow(_('User agent string'),
-	(new CTextBox('agent_other', $this->data['agent_other']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	'row_agent_other'
-);
-
-// append HTTP proxy to form list
-$http_form_list
-	->addRow(_('HTTP proxy'),
-		(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
-			->disableAutocomplete()
-	);
-
-$http_form_list->addRow(_('Variables'), (new CDiv(
-	(new CTable())
-		->addClass('httpconf-dynamic-row')
-		->setAttribute('data-type', 'variables')
-		->setAttribute('style', 'width: 100%;')
-		->setHeader(['', _('Name'), '', _('Value'), ''])
-		->addRow((new CRow([
-			(new CCol(
-				(new CButton(null, _('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-add')
-			))->setColSpan(5)
-		])))
-))
-	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
-);
-
-$http_form_list->addRow(_('Headers'), (new CDiv(
-	(new CTable())
-		->addClass('httpconf-dynamic-row')
-		->setAttribute('data-type', 'headers')
-		->setAttribute('style', 'width: 100%;')
-		->setHeader(['', _('Name'), '', _('Value'), ''])
-		->addRow((new CRow([
-			(new CCol(
-				(new CButton(null, _('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-add')
-			))->setColSpan(5)
-		])))
-))
-	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
-);
-
-$http_form_list->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
-
-/*
- * Authentication tab
- */
-$http_authentication_form_list = new CFormList();
-
-// Authentication type
-$http_authentication_form_list->addRow(new CLabel(_('HTTP authentication'), 'label-authentication'),
-	(new CSelect('authentication'))
-		->setId('authentication')
-		->setFocusableElementId('label-authentication')
-		->setValue($this->data['authentication'])
-		->addOptions(CSelect::createOptionsFromArray(httptest_authentications()))
-);
-
-$http_authentication_form_list
-	->addRow(new CLabel(_('User'), 'http_user'),
-		(new CTextBox('http_user', $this->data['http_user'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->disableAutocomplete()
-	)
-	->addRow(new CLabel(_('Password'), 'http_password'),
-		(new CTextBox('http_password', $this->data['http_password'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->disableAutocomplete()
-	)
-	->addRow(_('SSL verify peer'),
-		(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
-	)
-	->addRow(_('SSL verify host'),
-		(new CCheckBox('verify_host'))->setChecked($this->data['verify_host'] == 1)
-	)
-	->addRow(_('SSL certificate file'),
-		(new CTextBox('ssl_cert_file', $this->data['ssl_cert_file'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(_('SSL key file'),
-		(new CTextBox('ssl_key_file', $this->data['ssl_key_file'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(_('SSL key password'),
-		(new CTextBox('ssl_key_password', $this->data['ssl_key_password'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->disableAutocomplete()
-	);
-
-/*
- * Step tab
- */
-$http_step_form_list = new CFormList();
-$steps_table = (new CTable())
-	->addClass('httpconf-steps-dynamic-row')
-	->setHeader([
-		(new CColHeader())->setWidth('15'),
-		(new CColHeader())->setWidth('15'),
-		(new CColHeader(_('Name')))->setWidth('150'),
-		(new CColHeader(_('Timeout')))->setWidth('50'),
-		(new CColHeader(_('URL')))->setWidth('200'),
-		(new CColHeader(_('Required')))->setWidth('75'),
-		(new CColHeader(_('Status codes')))
-			->addClass(ZBX_STYLE_NOWRAP)
-			->setWidth('90'),
-		(new CColHeader(_('Action')))->setWidth('50')
+$scenario_tab
+	->addItem([
+		new CLabel(_('Agent'), $agent_select->getFocusableElementId()),
+		new CFormField($agent_select)
+	])
+	->addItem([
+		(new CLabel(_('User agent string'), 'agent_other'))->addClass('js-field-agent-other'),
+		(new CFormField(
+			(new CTextBox('agent_other', $data['agent_other'], false, DB::getFieldLength('httptest', 'agent')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->addClass('js-field-agent-other')
+	])
+	->addItem([
+		new CLabel(_('HTTP proxy'), 'http_proxy'),
+		new CFormField(
+			(new CTextBox('http_proxy', $data['http_proxy'], false, DB::getFieldLength('httptest', 'http_proxy')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+				->disableAutocomplete()
+		)
+	])
+	->addItem([
+		new CLabel(_('Variables')),
+		new CFormField(
+			(new CDiv([
+				(new CTable())
+					->setId('variables')
+					->setHeader(['', _('Name'), '', _('Value'), ''])
+					->setFooter(
+						(new CCol(
+							(new CSimpleButton(_('Add')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('element-table-add')
+						))->setColSpan(5)
+					),
+				(new CTemplateTag('variable-row-tmpl'))->addItem(
+					(new CRow([
+						(new CCol())
+							->addStyle('width: 6px;')
+							->addClass(ZBX_STYLE_TOP),
+						(new CCol(
+							(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
+								->removeId()
+								->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
+								->setAttribute('placeholder', _('name'))
+						))->addClass(ZBX_STYLE_TOP),
+						(new CCol('&rArr;'))->addClass(ZBX_STYLE_TOP),
+						(new CCol(
+							(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
+								->removeId()
+								->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
+								->setMaxlength(2000)
+								->setAttribute('placeholder', _('value'))
+						))->addClass(ZBX_STYLE_TOP),
+						(new CCol(
+							(new CSimpleButton(_('Remove')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('element-table-remove')
+						))
+							->addClass(ZBX_STYLE_NOWRAP)
+							->addClass(ZBX_STYLE_TOP)
+					]))->addClass('form_row')
+				)
+			]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		)
+	])
+	->addItem([
+		new CLabel(_('Headers')),
+		new CFormField(
+			(new CDiv([
+				(new CTable())
+					->setId('headers')
+					->setHeader(['', _('Name'), '', _('Value'), ''])
+					->setFooter(
+						(new CCol(
+							(new CSimpleButton(_('Add')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('element-table-add')
+						))->setColSpan(5)
+					),
+				(new CTemplateTag('header-row-tmpl'))->addItem(
+					(new CRow([
+						(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))
+							->addClass(ZBX_STYLE_TD_DRAG_ICON)
+							->addClass(ZBX_STYLE_TOP),
+						(new CCol(
+							(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
+								->removeId()
+								->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
+								->setAttribute('placeholder', _('name'))
+						))->addClass(ZBX_STYLE_TOP),
+						(new CCol('&rArr;'))->addClass(ZBX_STYLE_TOP),
+						(new CCol(
+							(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
+								->removeId()
+								->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
+								->setMaxlength(2000)
+								->setAttribute('placeholder', _('value')),
+						))->addClass(ZBX_STYLE_TOP),
+						(new CCol(
+							(new CSimpleButton(_('Remove')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('element-table-remove')
+						))
+							->addClass(ZBX_STYLE_NOWRAP)
+							->addClass(ZBX_STYLE_TOP)
+					]))
+						->addClass('form_row')
+						->addClass('sortable')
+				)
+			]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		)
+	])
+	->addItem([
+		new CLabel(_('Enabled'), 'status'),
+		new CFormField(
+			(new CCheckBox('status', HTTPTEST_STATUS_ACTIVE))->setChecked($data['status'] == HTTPTEST_STATUS_ACTIVE)
+		)
 	]);
 
-if (!$this->data['templated']) {
-	$steps_table->addRow(
-		(new CCol(
-			(new CButton(null, _('Add')))
-				->addClass('element-table-add')
-				->addClass(ZBX_STYLE_BTN_LINK)
-		))->setColSpan(8)
-	);
-}
-else {
-	$steps_table->addRow(
-		(new CCol(null))->setColSpan(8)->addClass('element-table-add')
-	);
-}
+// Steps tab.
+$steps_tab = (new CFormGrid())->addItem([
+	(new CLabel(_('Steps')))->setAsteriskMark(),
+	(new CFormField(
+		(new CDiv([
+			(new CTable())
+				->setId('steps')
+				->addClass('list-numbered')
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+				->setHeader([
+					(new CColHeader())->setWidth('15'),
+					(new CColHeader())->setWidth('15'),
+					(new CColHeader(_('Name')))->setWidth('150'),
+					(new CColHeader(_('Timeout')))->setWidth('50'),
+					(new CColHeader(_('URL')))->setWidth('200'),
+					(new CColHeader(_('Required')))->setWidth('75'),
+					(new CColHeader(_('Status codes')))
+						->addClass(ZBX_STYLE_NOWRAP)
+						->setWidth('90'),
+					(new CColHeader(_('Action')))->setWidth('50')
+				])
+				->addItem(
+					(new CTag('tfoot', true))->addItem(
+						(new CCol(!$data['templated']
+							? (new CSimpleButton(_('Add')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('js-add-step')
+							: null
+						))->setColSpan(8)
+					)
+				),
+			$data['templated']
+				? (new CTemplateTag('step-row-templated-tmpl'))->addItem(
+					(new CRow([
+						new CCol([
+							(new CInput('hidden', 'steps[#{row_index}][httpstepid]', '#{httpstepid}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][name]', '#{name}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][url]', '#{url}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][timeout]', '#{timeout}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][posts]', '#{posts}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][required]', '#{required}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][status_codes]', '#{status_codes}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][follow_redirects]', '#{follow_redirects}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][retrieve_mode]', '#{retrieve_mode}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][post_type]', '#{post_type}'))->removeId()
+						]),
+						(new CSpan(':'))->addClass('list-numbered-item'),
+						(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step'),
+						'#{timeout}',
+						'#{url}',
+						'#{required}',
+						'#{status_codes}',
+						''
+					]))->setAttribute('data-row_index', '#{row_index}')
+				)
+				: (new CTemplateTag('step-row-tmpl'))->addItem(
+					(new CRow([
+						(new CCol([
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+							(new CInput('hidden', 'steps[#{row_index}][httpstepid]', '#{httpstepid}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][name]', '#{name}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][url]', '#{url}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][timeout]', '#{timeout}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][posts]', '#{posts}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][required]', '#{required}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][status_codes]', '#{status_codes}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][follow_redirects]', '#{follow_redirects}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][retrieve_mode]', '#{retrieve_mode}'))->removeId(),
+							(new CInput('hidden', 'steps[#{row_index}][post_type]', '#{post_type}'))->removeId()
+						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CSpan(':'))->addClass('list-numbered-item'),
+						(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step'),
+						'#{timeout}',
+						'#{url}',
+						'#{required}',
+						'#{status_codes}',
+						(new CCol(
+							(new CSimpleButton(_('Remove')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('js-remove-step')
+						))->addClass(ZBX_STYLE_NOWRAP)
+					]))
+						->setAttribute('data-row_index', '#{row_index}')
+						->addClass('sortable')
+				)
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setWidth('695')
+	))->setAriaRequired()
+]);
 
-$http_step_form_list->addRow((new CLabel(_('Steps'), $steps_table->getId()))->setAsteriskMark(),
-	(new CDiv($steps_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAriaRequired()
-);
+// Authentication tab.
+$authentication_tab = (new CFormGrid())
+	->addItem([
+		new CLabel(_('HTTP authentication'), 'authentication-focusable'),
+		new CFormField(
+			(new CSelect('authentication'))
+				->setId('authentication')
+				->setFocusableElementId('authentication-focusable')
+				->setValue($data['authentication'])
+				->addOptions(CSelect::createOptionsFromArray(httptest_authentications()))
+		)
+	])
+	->addItem([
+		(new CLabel(_('User'), 'http_user'))->addClass('js-field-http-user'),
+		(new CFormField(
+			(new CTextBox('http_user', $data['http_user'], false, DB::getFieldLength('httptest', 'http_user')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->disableAutocomplete()
+		))->addClass('js-field-http-user')
+	])
+	->addItem([
+		(new CLabel(_('Password'), 'http_password'))->addClass('js-field-http-password'),
+		(new CFormField(
+			(new CTextBox('http_password', $data['http_password'], false,
+				DB::getFieldLength('httptest', 'http_password')
+			))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->disableAutocomplete()
+		))->addClass('js-field-http-password')
+	])
+	->addItem([
+		new CLabel(_('SSL verify peer'), 'verify_peer'),
+		new CFormField(
+			(new CCheckBox('verify_peer'))->setChecked($data['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
+		)
+	])
+	->addItem([
+		new CLabel(_('SSL verify host'), 'verify_host'),
+		new CFormField(
+			(new CCheckBox('verify_host'))->setChecked($data['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
+		)
+	])
+	->addItem([
+		new CLabel(_('SSL certificate file'), 'ssl_cert_file'),
+		new CFormField(
+			(new CTextBox('ssl_cert_file', $data['ssl_cert_file'], false,
+				DB::getFieldLength('httptest', 'ssl_cert_file')
+			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+	])
+	->addItem([
+		new CLabel(_('SSL key file'), 'ssl_key_file'),
+		new CFormField(
+			(new CTextBox('ssl_key_file', $data['ssl_key_file'], false, DB::getFieldLength('httptest', 'ssl_key_file')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+	])
+	->addItem([
+		new CLabel(_('SSL key password'), 'ssl_key_password'),
+		new CFormField(
+			(new CTextBox('ssl_key_password', $data['ssl_key_password'], false,
+				DB::getFieldLength('httptest', 'ssl_key_password')
+			))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->disableAutocomplete()
+		)
+	]);
 
-// append tabs to form
-$http_tab = (new CTabView())
-	->addTab('scenarioTab', _('Scenario'), $http_form_list)
-	->addTab('stepTab', _('Steps'), $http_step_form_list, TAB_INDICATOR_STEPS)
+$webscenario_tabs = (new CTabView())
+	->addTab('scenario-tab', _('Scenario'), $scenario_tab)
+	->addTab('steps-tab', _('Steps'), $steps_tab, TAB_INDICATOR_STEPS)
 	->addTab('tags-tab', _('Tags'),
 		new CPartial('configuration.tags.tab', [
 			'source' => 'httptest',
@@ -265,18 +421,17 @@ $http_tab = (new CTabView())
 		]),
 		TAB_INDICATOR_TAGS
 	)
-	->addTab('authenticationTab', _('Authentication'), $http_authentication_form_list, TAB_INDICATOR_HTTP_AUTH);
-if ($this->data['form_refresh'] == 0) {
-	$http_tab->setSelected(0);
+	->addTab('authentication-tab', _('Authentication'), $authentication_tab, TAB_INDICATOR_HTTP_AUTH);
+
+if ($data['form_refresh'] == 0) {
+	$webscenario_tabs->setSelected(0);
 }
 
-// append buttons to form
-if (!empty($this->data['httptestid'])) {
+// Append buttons to form.
+if ($data['httptestid'] != 0) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
-	if ($this->data['host']['status'] == HOST_STATUS_MONITORED
-			|| $this->data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
-
+	if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
 		$buttons[] = new CButtonQMessage(
 			'del_history',
 			_('Clear history and trends'),
@@ -290,40 +445,27 @@ if (!empty($this->data['httptestid'])) {
 	))->setEnabled(!$data['templated']);
 	$buttons[] = new CButtonCancel(url_param('context'));
 
-	$http_tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$webscenario_tabs->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
-	$http_tab->setFooter(makeFormFooter(
+	$webscenario_tabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel(url_param('context'))]
 	));
 }
 
-$http_form->addItem($http_tab);
-$html_page->addItem($http_form);
+$form->addItem($webscenario_tabs);
 
-$this->data['scenario_tab_data'] = [
-	'agent_visibility' => [],
-	'pairs' => [
-		'variables' => [],
-		'headers' => []
-	]
-];
-
-foreach ($data['pairs'] as $field) {
-	zbx_subarray_push($this->data['scenario_tab_data']['pairs'], $field['type'], $field);
-}
-
-zbx_subarray_push($this->data['scenario_tab_data']['agent_visibility'], ZBX_AGENT_OTHER, 'agent_other');
-zbx_subarray_push($this->data['scenario_tab_data']['agent_visibility'], ZBX_AGENT_OTHER, 'row_agent_other');
-
-require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
-
-$html_page->show();
+$html_page
+	->addItem($form)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'form_name' => $http_form->getName()
+		'is_templated' => (int) $data['templated'],
+		'variables' => $data['variables'],
+		'headers' => $data['headers'],
+		'steps' => $data['steps']
 	]).');
 '))
 	->setOnDocumentReady()

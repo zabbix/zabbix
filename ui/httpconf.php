@@ -47,7 +47,8 @@ $fields = [
 	'agent_other'     => [T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({agent}) && {agent} == '.ZBX_AGENT_OTHER
 	],
-	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'variables'			=> [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'headers'			=> [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
 	'steps'           => [null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	'isset({add}) || isset({update})', _('Steps')],
 	'authentication'  => [T_ZBX_INT, O_OPT, null,
 								IN([ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
@@ -202,42 +203,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		DBstart();
 
 		$steps = getRequest('steps', []);
-		$field_names = ['headers', 'variables', 'post_fields', 'query_fields'];
-		$i = 1;
 
+		$i = 1;
 		foreach ($steps as &$step) {
 			$step['no'] = $i++;
-			$step['follow_redirects'] = $step['follow_redirects']
-				? HTTPTEST_STEP_FOLLOW_REDIRECTS_ON
-				: HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF;
-
-			foreach ($field_names as $field_name) {
-				$step[$field_name] = [];
-			}
-
-			if (array_key_exists('pairs', $step)) {
-				foreach ($field_names as $field_name) {
-					foreach ($step['pairs'] as $pair) {
-						if (array_key_exists('type', $pair) && $field_name === $pair['type'] &&
-							((array_key_exists('name', $pair) && $pair['name'] !== '') ||
-							(array_key_exists('value', $pair) && $pair['value'] !== ''))) {
-							$step[$field_name][] = [
-								'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
-								'value' => (array_key_exists('value', $pair) ? $pair['value'] : '')
-							];
-						}
-					}
-				}
-				unset($step['pairs']);
-			}
-
-			foreach ($step['variables'] as &$variable) {
-				$variable['name'] = trim($variable['name']);
-			}
-			unset($variable);
 
 			if ($step['post_type'] == ZBX_POSTTYPE_FORM) {
-				$step['posts'] = $step['post_fields'];
+				$step['posts'] = array_key_exists('post_fields', $step) ? $step['post_fields'] : [];
 			}
 			unset($step['post_fields'], $step['post_type']);
 		}
@@ -250,7 +222,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'delay' => getRequest('delay', DB::getDefault('httptest', 'delay')),
 			'retries' => $_REQUEST['retries'],
 			'status' => hasRequest('status') ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED,
-			'agent' => hasRequest('agent_other') ? getRequest('agent_other') : getRequest('agent'),
+			'agent' => getRequest('agent') == ZBX_AGENT_OTHER ? getRequest('agent_other') : getRequest('agent'),
 			'variables' => [],
 			'http_proxy' => $_REQUEST['http_proxy'],
 			'steps' => $steps,
@@ -265,22 +237,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'tags' => $tags
 		];
 
-		foreach (getRequest('pairs', []) as $pair) {
-			if (array_key_exists('type', $pair) && in_array($pair['type'], ['variables', 'headers']) &&
-				((array_key_exists('name', $pair) && $pair['name'] !== '') ||
-				(array_key_exists('value', $pair) && $pair['value'] !== ''))) {
+		foreach (['variables', 'headers'] as $pair_type) {
+			foreach (getRequest($pair_type, []) as $pair) {
+				if ($pair['name'] === '' && $pair['value'] === '') {
+					continue;
+				}
 
-				$httpTest[$pair['type']][] = [
-					'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
-					'value' => (array_key_exists('value', $pair) ? $pair['value'] : '')
-				];
+				$httpTest[$pair_type][] = $pair;
 			}
 		}
-
-		foreach ($httpTest['variables'] as &$variable) {
-			$variable['name'] = trim($variable['name']);
-		}
-		unset($variable);
 
 		if (isset($_REQUEST['httptestid'])) {
 			// unset fields that did not change
@@ -475,9 +440,9 @@ if (isset($_REQUEST['form'])) {
 
 	if (hasRequest('httptestid')) {
 		$db_httptests = API::HttpTest()->get([
-			'output' => ['name', 'delay', 'retries', 'status', 'agent', 'authentication',
-				'http_user', 'http_password', 'http_proxy', 'templateid', 'verify_peer', 'verify_host', 'ssl_cert_file',
-				'ssl_key_file', 'ssl_key_password', 'headers', 'variables'
+			'output' => ['httptestid', 'name', 'delay', 'status', 'agent', 'authentication', 'http_user',
+				'http_password', 'templateid', 'http_proxy', 'retries', 'ssl_cert_file', 'ssl_key_file',
+				'ssl_key_password', 'verify_peer', 'verify_host', 'headers', 'variables'
 			],
 			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
 				'follow_redirects', 'retrieve_mode', 'headers', 'variables', 'query_fields', 'post_type'
@@ -508,28 +473,6 @@ if (isset($_REQUEST['form'])) {
 			}
 		}
 
-		// Used for both, Scenario and Steps pairs.
-		$id = 1;
-		$data['pairs'] = [];
-
-		$fields = [
-			'headers' => 'headers',
-			'variables' => 'variables'
-		];
-
-		CArrayHelper::sort($db_httptest['variables'], ['name']);
-
-		foreach ($fields as $type => $field_name) {
-			foreach ($db_httptest[$field_name] as $pair) {
-				$data['pairs'][] = [
-					'id' => $id++,
-					'type' => $type,
-					'name' => $pair['name'],
-					'value' => $pair['value']
-				];
-			}
-		}
-
 		$data['authentication'] = $db_httptest['authentication'];
 		$data['http_user'] = $db_httptest['http_user'];
 		$data['http_password'] = $db_httptest['http_password'];
@@ -541,40 +484,21 @@ if (isset($_REQUEST['form'])) {
 		$data['ssl_cert_file'] = $db_httptest['ssl_cert_file'];
 		$data['ssl_key_file'] = $db_httptest['ssl_key_file'];
 		$data['ssl_key_password'] = $db_httptest['ssl_key_password'];
-		$data['steps'] = $db_httptest['steps'];
-		CArrayHelper::sort($data['steps'], ['no']);
 
-		$fields = [
-			'headers' => 'headers',
-			'variables' => 'variables',
-			'query_fields' => 'query_fields',
-			'post_fields' => 'posts'
-		];
+		$data['variables'] = $db_httptest['variables'];
+		$data['headers'] = $db_httptest['headers'];
+
+		CArrayHelper::sort($db_httptest['steps'], ['no']);
+		$data['steps'] = array_values($db_httptest['steps']);
 
 		foreach ($data['steps'] as &$step) {
-			$step['pairs'] = [];
+			if ($step['post_type'] == ZBX_POSTTYPE_FORM) {
+				$step['post_fields'] = $step['posts'];
+				$step['posts'] = '';
+			}
 
 			CArrayHelper::sort($step['variables'], ['name']);
-
-			foreach ($fields as $type => $field_name) {
-				if ($field_name !== 'posts' || $step['post_type'] == ZBX_POSTTYPE_FORM) {
-					foreach ($step[$field_name] as $pair) {
-						$step['pairs'][] = [
-							'id' => $id++,
-							'type' => $type,
-							'name' => $pair['name'],
-							'value' => $pair['value']
-						];
-					}
-
-					if ($field_name === 'posts') {
-						$step['posts'] = '';
-					}
-					else {
-						unset($step[$field_name]);
-					}
-				}
-			}
+			$step['variables'] = array_values($step['variables']);
 		}
 		unset($step);
 
@@ -615,25 +539,9 @@ if (isset($_REQUEST['form'])) {
 		$data['ssl_cert_file'] = getRequest('ssl_cert_file');
 		$data['ssl_key_file'] = getRequest('ssl_key_file');
 		$data['ssl_key_password'] = getRequest('ssl_key_password');
-		$data['pairs'] = array_values(getRequest('pairs', []));
-	}
-
-	$i = 1;
-	foreach ($data['steps'] as $stepid => $step) {
-		$pairs_grouped = [
-			'query_fields' => [],
-			'post_fields' => [],
-			'variables' => [],
-			'headers' => []
-		];
-
-		if (array_key_exists('pairs', $step)) {
-			foreach ($step['pairs'] as $field) {
-				$pairs_grouped[$field['type']][] = $field;
-			}
-			$data['steps'][$stepid]['pairs'] = $pairs_grouped;
-		}
-		$data['steps'][$stepid]['no'] = $i++;
+		$data['variables'] = getRequest('variables', []);
+		$data['headers'] = array_values(getRequest('headers', []));
+		$data['steps'] = array_values(getRequest('steps', []));
 	}
 
 	if ($db_httptest && $db_httptest['templateid'] != 0) {
@@ -649,6 +557,18 @@ if (isset($_REQUEST['form'])) {
 		CTagHelper::addInheritedTags($tags, $data['context'], [$data['hostid']],
 			array_key_exists('parent_httptest', $data) ? $data['parent_httptest'] : []
 		);
+	}
+
+	if ($data['variables']) {
+		CArrayHelper::sort($data['variables'], ['name']);
+		$data['variables'] = array_values($data['variables']);
+	}
+	else {
+		$data['variables'] = [['name' => '', 'value' => '']];
+	}
+
+	if (!$data['headers']) {
+		$data['headers'] = [['name' => '', 'value' => '']];
 	}
 
 	if ($tags) {

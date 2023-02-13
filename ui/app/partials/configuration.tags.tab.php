@@ -163,7 +163,7 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 
 		case 'httptest':
 			$btn_labels = [_('Scenario tags'), _('Inherited and scenario tags')];
-			$on_change = 'window.httpconf.$form.submit()';
+			$on_change = 'this.form.submit()';
 			break;
 
 		case 'item':
