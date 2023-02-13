@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,50 +44,35 @@ class testDashboardClockWidget extends CWebTest {
 	 * because it can change.
 	 */
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-	' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y, w.width, w.height'.
-	' FROM widget_field wf'.
-	' INNER JOIN widget w'.
-	' ON w.widgetid=wf.widgetid'.
-	' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid, wf.value_itemid, wf.value_graphid';
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y, w.width, w.height'.
+			' FROM widget_field wf'.
+			' INNER JOIN widget w'.
+			' ON w.widgetid=wf.widgetid'.
+			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid, wf.value_itemid, wf.value_graphid';
 
 	/**
 	 * Check clock widgets layout.
 	 */
-	public function testDashboardClockWidget_CheckLayout() {
+	public function testDashboardClockWidget_Layout() {
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.Dashboard for creating clock widgets');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget('LayoutClock')->edit();
-
-		// Check edit forms header.
+		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$this->assertEquals('Edit widget', $dialog->getTitle());
-
-		// Check if widget type is selected as "Clock".
-		$form->checkValue(['Type' => 'Clock']);
+		$this->assertEquals('Add widget', $dialog->getTitle());
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Clock')]);
 
 		// Check "Name" field max length.
 		$this->assertEquals('255', $form->query('id:name')->one()->getAttribute('maxlength'));
 
-		// Check fields "Refresh interval" values.
-		$refresh_interval = [
-			'Default (15 minutes)',
-			'No refresh',
-			'10 seconds',
-			'30 seconds',
-			'1 minute',
-			'2 minutes',
-			'10 minutes',
-			'15 minutes'
+		// Check fields "Refresh interval" and "Time type" values.
+		$dropdowns =[
+			'Refresh interval' => ['Default (15 minutes)',  'No refresh', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '15 minutes'],
+			'Time type' => ['Local time', 'Server time', 'Host time']
 		];
 
-		$this->assertEquals($refresh_interval,
-			$form->query('name', 'rf_rate')->asDropdown()->one()->getOptions()->asText()
-		);
-
-		// Check fields "Time type" values.
-		$this->assertEquals(['Local time', 'Server time', 'Host time'],
-			$form->query('name', 'time_type')->asDropdown()->one()->getOptions()->asText());
+		foreach ($dropdowns as $field => $options) {
+			$this->assertEquals($options, $form->getField($field)->asDropdown()->getOptions()->asText());
+		}
 
 		// Check that it's possible to select host items, when time type is "Host Time".
 		$fields = ['Type', 'Name', 'Refresh interval', 'Time type'];
@@ -97,6 +82,8 @@ class testDashboardClockWidget extends CWebTest {
 
 			if ($type === 'Host time') {
 				array_splice($fields, 4, 0, ['Item']);
+				$form->checkValue(['Item' => '']);
+				$form->isRequired('Item');
 			}
 
 			$this->assertEquals($fields, $form->getLabels()->filter(new CElementFilter(CElementFilter::VISIBLE))->asText());
@@ -105,14 +92,11 @@ class testDashboardClockWidget extends CWebTest {
 		// Check that it's possible to change the status of "Show header" checkbox.
 		$form->checkValue(['id:show_header' => true]);
 
-		// Check if Apply and Cancel button are clickable and there's two of them.
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$this->assertEquals(2, $dialog->getFooter()->query('button', ['Apply', 'Cancel'])->all()
-			->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
-
-		// Check if asterisk for "Item" field is present.
-		$form->query('xpath:.//label[text()="Item"]')->waitUntilVisible()->one();
-		$this->assertStringContainsString('form-label-asterisk', $form->getLabel('Item')->getAttribute('class'));
+		// Check if Apply and Cancel button are clickable and there are two of them.
+		$dialog->invalidate();
+		$this->assertEquals(2, $dialog->getFooter()->query('button', ['Add', 'Cancel'])->all()
+					->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+		);
 	}
 
 	/**
@@ -135,6 +119,7 @@ class testDashboardClockWidget extends CWebTest {
 		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		$dashboard->save();
+		$this->assertEquals('LayoutClock', $dashboard->getWidget('LayoutClock')->getHeaderText());
 	}
 
 	public static function getClockWidgetCommonData() {
@@ -278,7 +263,7 @@ class testDashboardClockWidget extends CWebTest {
 					]
 				]
 			],
-			// #12
+			// #12.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -292,7 +277,7 @@ class testDashboardClockWidget extends CWebTest {
 					]
 				]
 			],
-			// #13
+			// #13.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -345,8 +330,8 @@ class testDashboardClockWidget extends CWebTest {
 						['Item' => 'Host for clock widget: Item for clock widget']);
 				}
 			}
-			// Scenario where data is for updating widget.
 			else {
+				// Scenario where data is for updating widget.
 				if (array_key_exists('Item', $data['fields'])) {
 					$item_name = ($data['fields']['Item'] === 'Item for clock widget')
 						? 'Host for clock widget: Item for clock widget'
@@ -359,10 +344,10 @@ class testDashboardClockWidget extends CWebTest {
 			$dashboard->getWidgets()->last()->edit()->checkValue($data['fields']);
 
 			// Check that widget is saved in DB.
-			$this->assertEquals(1,
-				CDBHelper::getCount('SELECT * FROM widget
-				WHERE w.dashboardid='.$dashboardid.'
-				AND w.name ='.zbx_dbstr(CTestArrayHelper::get($data['fields'], 'Name', ''))
+			$this->assertEquals(1, CDBHelper::getCount('SELECT *'.
+					' FROM widget w'.
+					' WHERE w.dashboardid='.$dashboardid.''.
+					' AND w.name ='.zbx_dbstr(CTestArrayHelper::get($data['fields'], 'Name', ''))
 				));
 		}
 		else {
@@ -426,7 +411,8 @@ class testDashboardClockWidget extends CWebTest {
 
 		// Check that widget is not present on dashboard and in DB.
 		$this->assertFalse($dashboard->getWidget('DeleteClock', false)->isValid());
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
+		$this->assertEquals(0, CDBHelper::getCount('SELECT *'.
+			' FROM widget_field wf'.
 			' LEFT JOIN widget w'.
 			' ON w.widgetid=wf.widgetid'.
 			' WHERE w.name='.zbx_dbstr('DeleteClock')
