@@ -171,11 +171,10 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, struct zbx_
  *                         default loglevel command handler                   *
  *                                                                            *
  ******************************************************************************/
-static int	rtc_process_option(int direction, const char *data, char **result)
+static int	rtc_process_server_loglevel_option(int direction, const char *data, char **result)
 {
-	struct zbx_json_parse	jp;
-	char			buf[MAX_STRING_LEN];
-	int			process_num = 0;
+	int	proc_num, proc_type, scope;
+	pid_t	pid;
 
 	if (NULL == data)
 	{
@@ -183,25 +182,14 @@ static int	rtc_process_option(int direction, const char *data, char **result)
 		return FAIL;
 	}
 
-	if (FAIL == zbx_json_open(data, &jp))
-	{
-		*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
+	if (SUCCEED != zbx_rtc_get_signal_target(data, &pid, &proc_type, &proc_num, &scope, result))
 		return SUCCEED;
-	}
 
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NUM, buf, sizeof(buf), NULL))
-		process_num = atoi(buf);
-
-	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NAME, buf, sizeof(buf), NULL))
+	if (ZBX_PROCESS_TYPE_HA_MANAGER == proc_type)
 	{
-		return FAIL;
-	}
-
-	if (0 == strcmp(buf, "ha manager"))
-	{
-		if (0 != process_num && 1 != process_num)
+		if (0 != proc_num && 1 != proc_num)
 		{
-			*result = zbx_dsprintf(NULL, "Invalid option parameter \"%d\"\n", process_num);
+			*result = zbx_dsprintf(NULL, "Invalid option parameter \"%d\"\n", proc_num);
 		}
 		else
 		{
@@ -465,9 +453,9 @@ int	rtc_process_request_ex_server(zbx_rtc_t *rtc, int code, const unsigned char 
 	{
 #if defined(HAVE_SIGQUEUE)
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
-			return rtc_process_option(1, (const char *)data, result);
+			return rtc_process_server_loglevel_option(1, (const char *)data, result);
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
-			return rtc_process_option(-1, (const char *)data, result);
+			return rtc_process_server_loglevel_option(-1, (const char *)data, result);
 #endif
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
 			zbx_service_reload_cache();

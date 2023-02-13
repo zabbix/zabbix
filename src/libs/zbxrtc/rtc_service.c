@@ -70,18 +70,64 @@ static void	rtc_change_service_loglevel(int code)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process runtime control option                                    *
- *                                                                            *
- * Parameters: code   - [IN] the runtime control request code                 *
- *             data   - [IN] the runtime control parameter (optional)         *
- *             result - [OUT] the runtime control result                      *
+ * Purpose: get runtime control option targets                                *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_process_option(int code, const char *data, char **result)
+int	zbx_rtc_get_signal_target(const char *data, pid_t *pid, int *proc_type, int *proc_num, int *scope,
+		char **result)
 {
 	struct zbx_json_parse	jp;
 	char			buf[MAX_STRING_LEN];
-	int			process_num = 0, process_type, scope = 0;
+
+	if (FAIL == zbx_json_open(data, &jp))
+	{
+		*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
+		return FAIL;
+	}
+
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SCOPE, buf, sizeof(buf), NULL))
+		*scope = atoi(buf);
+	else
+		*scope =ZBX_PROF_UNKNOWN;
+
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PID, buf, sizeof(buf), NULL))
+	{
+		zbx_uint64_t	pid_ui64;
+
+		if (SUCCEED != zbx_is_uint64(buf, &pid_ui64) || 0 == pid_ui64)
+		{
+			*result = zbx_dsprintf(NULL, "Invalid pid value \"%s\"\n", buf);
+			return FAIL;
+		}
+
+		*pid = (pid_t)pid_ui64;
+	}
+	else
+		*pid = 0;
+
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NUM, buf, sizeof(buf), NULL))
+		*proc_num = atoi(buf);
+	else
+		*proc_num = 0;
+
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NAME, buf, sizeof(buf), NULL))
+	{
+		if (ZBX_PROCESS_TYPE_UNKNOWN == (*proc_type = get_process_type_by_name(buf)))
+		{
+			*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
+			return FAIL;
+		}
+	}
+	else
+		*proc_type = ZBX_PROCESS_TYPE_UNKNOWN;
+
+	return SUCCEED;
+}
+
+static void	rtc_process_loglevel_option(int code, const char *data, char **result)
+{
+	pid_t	pid;
+	int	proc_type, proc_num, scope;
 
 	if (NULL == data)
 	{
@@ -90,58 +136,51 @@ static void	rtc_process_option(int code, const char *data, char **result)
 		return;
 	}
 
-	if (FAIL == zbx_json_open(data, &jp))
+	if (SUCCEED != zbx_rtc_get_signal_target(data, &pid, &proc_type, &proc_num, &scope, result))
+		return;
+
+	if (0 != pid)
 	{
-		*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
+		if (pid == getpid())
+		{
+			rtc_change_service_loglevel(code);
+			/* temporary message, the signal forwarding command output will be changed later */
+			*result = zbx_strdup(NULL, "Changed log level for the main process\n");
+		}
+		else
+			zbx_signal_process_by_pid((int)pid, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+
 		return;
 	}
 
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SCOPE, buf, sizeof(buf), NULL))
-		scope = atoi(buf);
+	zbx_signal_process_by_type(proc_type, proc_num, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+}
 
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PID, buf, sizeof(buf), NULL))
+static void	rtc_process_profiler_option(int code, const char *data, char **result)
+{
+	pid_t	pid;
+	int	proc_type, proc_num, scope;
+
+	if (NULL == data)
 	{
-		zbx_uint64_t	pid;
+		zbx_signal_process_by_pid(0, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+		return;
+	}
 
-		if (SUCCEED != zbx_is_uint64(buf, &pid) || 0 == pid)
-		{
-			*result = zbx_dsprintf(NULL, "Invalid pid value \"%s\"\n", buf);
-			return;
-		}
+	if (SUCCEED != zbx_rtc_get_signal_target(data, &pid, &proc_type, &proc_num, &scope, result))
+		return;
 
-		if ((pid_t)pid == getpid())
-		{
-			if (ZBX_RTC_LOG_LEVEL_INCREASE == code || ZBX_RTC_LOG_LEVEL_DECREASE == code)
-			{
-				rtc_change_service_loglevel(code);
-				/* temporary message, the signal forwarding command output will be changed later */
-				*result = zbx_strdup(NULL, "Changed log level for the main process\n");
-			}
-			else
-				*result = zbx_dsprintf(NULL, "Cannot use pid value for runtime command \"%s\"\n", buf);
-		}
+	if (0 != pid)
+	{
+		if (pid == getpid())
+			*result = zbx_strdup(NULL, "Cannot use profiler with main process\n");
 		else
 			zbx_signal_process_by_pid((int)pid, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
 
 		return;
 	}
 
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NUM, buf, sizeof(buf), NULL))
-		process_num = atoi(buf);
-
-	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NAME, buf, sizeof(buf), NULL))
-	{
-		zbx_signal_process_by_pid(0, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
-		return;
-	}
-
-	if (ZBX_PROCESS_TYPE_UNKNOWN == (process_type = get_process_type_by_name(buf)))
-	{
-		*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
-		return;
-	}
-
-	zbx_signal_process_by_type(process_type, process_num, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
+	zbx_signal_process_by_type(proc_type, proc_num, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
 }
 #endif
 
@@ -250,9 +289,11 @@ static void	rtc_process_request(zbx_rtc_t *rtc, int code, const unsigned char *d
 #if defined(HAVE_SIGQUEUE)
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
+			rtc_process_loglevel_option(code, (const char *)data, result);
+			return;
 		case ZBX_RTC_PROF_ENABLE:
 		case ZBX_RTC_PROF_DISABLE:
-			rtc_process_option(code, (const char *)data, result);
+			rtc_process_profiler_option(code, (const char *)data, result);
 			return;
 #endif
 		case ZBX_RTC_HOUSEKEEPER_EXECUTE:
