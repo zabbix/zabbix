@@ -428,9 +428,9 @@ static void	results_free(zbx_discovery_results_t *result)
 static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *ip, char *dns, int now,
 		int config_timeout)
 {
-	const char	*start;
-	char		*value = NULL;
-	size_t		value_alloc = 128;
+	const char		*start;
+	char			*value = NULL;
+	size_t			value_alloc = 128;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -514,16 +514,19 @@ static void	process_checks(const DC_DRULE *drule, char *ip, char *dns, int uniqu
 	}
 }
 
-static void	process_services(const DC_DRULE *drule, zbx_db_dhost *dhost, const char *ip, const char *dns,
+static int	process_services(const DC_DRULE *drule, zbx_db_dhost *dhost, const char *ip, const char *dns,
 		int now, const zbx_vector_ptr_t *services)
 {
-	int	i;
+	int	host_status = -1, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < services->values_num; i++)
 	{
 		zbx_dservice_t	*service = (zbx_dservice_t *)services->values[i];
+
+		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
+			host_status = service->status;
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
@@ -538,6 +541,8 @@ static void	process_services(const DC_DRULE *drule, zbx_db_dhost *dhost, const c
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return host_status;
 }
 
 /******************************************************************************
@@ -760,24 +765,12 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 	{
 		zbx_discovery_results_t	*result = results.values[i];
 		zbx_db_dhost		dhost;
-		int			host_status = -1, k;
-
-		for (k = 0; k < result->services.values_num; k++)
-		{
-			zbx_dservice_t	*service = result->services.values[k];
-
-			if (-1 == host_status || DOBJECT_STATUS_UP == service->status)
-			{
-				host_status = service->status;
-
-				if (DOBJECT_STATUS_UP == service->status)
-					break;
-			}
-		}
+		int			host_status;
 
 		memset(&dhost, 0, sizeof(zbx_db_dhost));
 
-		process_services(result->drule, &dhost, result->ip, result->dns, result->now, &result->services);
+		host_status = process_services(result->drule, &dhost, result->ip, result->dns, result->now,
+				&result->services);
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{

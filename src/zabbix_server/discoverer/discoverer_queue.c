@@ -18,7 +18,6 @@
 **/
 
 #include "log.h"
-//#include "discoverer.h"
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
 
