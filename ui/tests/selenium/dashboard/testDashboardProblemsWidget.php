@@ -30,13 +30,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardProblemsWidget extends CWebTest {
 
-	/**
-	 * Id of the dashboard where Problem widget is created and updated.
-	 *
-	 * @var integer
-	 */
-	protected static $dashboardid;
-
+	private static $dashboardid;
 	private static $update_widget = 'Problem widget for updating';
 
 	/**
