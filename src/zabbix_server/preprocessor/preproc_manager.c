@@ -1290,6 +1290,7 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	if (FAIL == preprocessor_set_variant_result(request, &value, error))
 	{
 		preprocessor_update_history(manager, request->value.itemid, NULL);
+		zbx_vector_ptr_clear_ext(&history, (zbx_clean_func_t)zbx_preproc_op_history_free);
 	}
 	else
 	{
