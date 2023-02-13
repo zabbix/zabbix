@@ -28,7 +28,7 @@
 #include "zbxjson.h"
 #include "zbxtime.h"
 
-static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
+static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, struct zbx_json *j, char **error)
 {
 	const char	*param;
 
@@ -62,14 +62,8 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
 
 		if ('=' == *param)
 		{
-			struct zbx_json	j;
-
 			*code = ZBX_RTC_HA_REMOVE_NODE;
-
-			zbx_json_init(&j, 1024);
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_NODE, param + 1, ZBX_JSON_TYPE_STRING);
-			*data = zbx_strdup(NULL, j.buffer);
-			zbx_json_clean(&j);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_NODE, param + 1, ZBX_JSON_TYPE_STRING);
 
 			return SUCCEED;
 		}
@@ -93,8 +87,6 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
 		{
 			if (SUCCEED == zbx_is_time_suffix(param + 1, &delay, ZBX_LENGTH_UNLIMITED))
 			{
-				struct zbx_json	j;
-
 				if (delay < 10 || delay > 15 * SEC_PER_MIN)
 				{
 					*error = zbx_strdup(NULL, "failover delay must be in range from 10s to 15m");
@@ -102,11 +94,7 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
 				}
 
 				*code = ZBX_RTC_HA_SET_FAILOVER_DELAY;
-
-				zbx_json_init(&j, 1024);
-				zbx_json_addint64(&j, ZBX_PROTO_TAG_FAILOVER_DELAY, delay);
-				*data = zbx_strdup(NULL, j.buffer);
-				zbx_json_clean(&j);
+				zbx_json_addint64(j, ZBX_PROTO_TAG_FAILOVER_DELAY, delay);
 
 				return SUCCEED;
 			}
@@ -126,10 +114,7 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
 
 	if (0 == strncmp(opt, ZBX_PROXY_CONFIG_CACHE_RELOAD, ZBX_CONST_STRLEN(ZBX_PROXY_CONFIG_CACHE_RELOAD)))
 	{
-		struct zbx_json	j;
 		param = opt + ZBX_CONST_STRLEN(ZBX_PROXY_CONFIG_CACHE_RELOAD);
-
-		zbx_json_init(&j, 1024);
 
 		if ('=' == *param)
 		{
@@ -138,25 +123,20 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
 			if ('\0' == *(param + 1))
 			{
 				*error = zbx_strdup(NULL, "missing proxy name(s)");
-				zbx_json_free(&j);
 				return FAIL;
 			}
 
+			zbx_json_addarray(j, ZBX_PROTO_TAG_PROXY_NAMES);
+
 			p = zbx_strdup(NULL, param + 1);
-
-			zbx_json_addarray(&j, ZBX_PROTO_TAG_PROXY_NAMES);
-
 			token = strtok(p, ",");
 
 			while (NULL != token)
 			{
-				zbx_json_addstring(&j, NULL, token, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(j, NULL, token, ZBX_JSON_TYPE_STRING);
 				token = strtok(NULL, ",");
 			}
 
-			zbx_json_close(&j);
-			*data = zbx_strdup(NULL, j.buffer);
-			zbx_json_free(&j);
 			zbx_free(p);
 
 			*code = ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD;
@@ -166,10 +146,6 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
 
 		if ('\0' == *param)
 		{
-			zbx_json_close(&j);
-			*data = zbx_strdup(NULL, j.buffer);
-			zbx_json_free(&j);
-
 			*code = ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD;
 
 			return SUCCEED;
@@ -544,24 +520,33 @@ int	rtc_process_request_ex_server(zbx_rtc_t *rtc, int code, const unsigned char 
 int	rtc_process(const char *option, int config_timeout, char **error)
 {
 	zbx_uint32_t	code = ZBX_RTC_UNKNOWN;
-	char		*data = NULL;
+	char		*data;
+	int		ret = FAIL;
+	struct zbx_json	j;
 
-	if (SUCCEED != zbx_rtc_parse_options(option, &code, &data, error))
-		return FAIL;
+	zbx_json_init(&j, 1024);
+
+	if (SUCCEED != zbx_rtc_parse_options(option, &code, &j, error))
+		goto out;
 
 	if (ZBX_RTC_UNKNOWN == code)
 	{
-		if (SUCCEED != rtc_parse_options_ex(option, &code, &data, error))
-			return FAIL;
+		if (SUCCEED != rtc_parse_options_ex(option, &code, &j, error))
+			goto out;
 
 		if (ZBX_RTC_UNKNOWN == code)
 		{
 			*error = zbx_dsprintf(NULL, "unknown option \"%s\"", option);
-			return FAIL;
+			goto out;
 		}
 	}
 
-	return zbx_rtc_async_exchange(&data, code, config_timeout, error);
+	data = (2 < j.buffer_size ? zbx_strdup(NULL, j.buffer) : NULL);
+	ret = zbx_rtc_async_exchange(&data, code, config_timeout, error);
+out:
+	zbx_json_free(&j);
+
+	return ret;
 }
 
 /******************************************************************************
