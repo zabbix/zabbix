@@ -744,7 +744,8 @@ class CTabFilter extends CBaseComponent {
 				}
 			},
 			axis: 'x',
-			containment: 'parent'
+			containment: 'parent',
+			helper : 'clone'
 		});
 
 		const container = this._target.querySelector('.ui-sortable-container').parentNode;
