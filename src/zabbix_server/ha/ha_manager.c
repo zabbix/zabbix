@@ -32,7 +32,12 @@
 #include "zbxip.h"
 #include "zbxcomms.h"
 #include "../rtc/rtc_server.h"
-#include "zbx_rtc_constants.h"
+#include "zbxstr.h"
+#include "zbxrtc.h"
+#include "zbxjson.h"
+#include "zbxdb.h"
+#include "zbxalgo.h"
+#include "log.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 

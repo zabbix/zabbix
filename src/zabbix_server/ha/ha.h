@@ -22,6 +22,7 @@
 
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
+#include "zbxipcservice.h"
 
 #define ZBX_IPC_SERVICE_HA			"haservice"
 
