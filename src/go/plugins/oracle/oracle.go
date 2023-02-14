@@ -44,9 +44,9 @@ const (
 	sysasmExtension  = " as sysoper"
 	sysoperExtension = " as sysasm"
 
-	sysdbaPrivelage  = "sysdba"
-	sysasmPrivelage  = "sysoper"
-	sysoperPrivelage = "sysasm"
+	sysdbaPrivelege  = "sysdba"
+	sysasmPrivelege  = "sysoper"
+	sysoperPrivelege = "sysasm"
 )
 
 // Plugin inherits plugin.Base and store plugin-specific data.
@@ -143,13 +143,13 @@ func splitUserPrivilege(params map[string]string) (user, privilege string, err e
 
 	switch true {
 	case strings.HasSuffix(strings.ToLower(user), sysdbaExtension):
-		privilege = sysdbaPrivelage
+		privilege = sysdbaPrivelege
 		extension = sysdbaExtension
 	case strings.HasSuffix(strings.ToLower(user), sysoperExtension):
-		privilege = sysoperPrivelage
+		privilege = sysoperPrivelege
 		extension = sysoperExtension
 	case strings.HasSuffix(strings.ToLower(user), sysasmExtension):
-		privilege = sysasmPrivelage
+		privilege = sysasmPrivelege
 		extension = sysasmExtension
 	}
 
