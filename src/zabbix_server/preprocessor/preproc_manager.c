@@ -29,6 +29,8 @@
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
 #include "zbxcachehistory.h"
+#include "zbx_rtc_constants.h"
+#include "zbxrtc.h"
 
 extern unsigned char	program_type;
 
@@ -503,6 +505,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	zbx_pp_manager_t		*manager;
 	zbx_vector_pp_task_ptr_t	tasks;
 	zbx_uint64_t			pending_num, finished_num, processed_num = 0, queued_num = 0;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -527,6 +530,9 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_PREPROCESSOR, 0, rtc_msgs, ARRSIZE(rtc_msgs),
+			pp_args->config_timeout, ZBX_IPC_SERVICE_PREPROCESSING);
 
 	zbx_vector_pp_task_ptr_create(&tasks);
 
@@ -584,6 +590,13 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 				case ZBX_IPC_PREPROCESSOR_USAGE_STATS:
 					preprocessor_reply_usage_stats(manager, client);
 					break;
+				case ZBX_RTC_LOG_LEVEL_INCREASE:
+				case ZBX_RTC_LOG_LEVEL_DECREASE:
+					/* TODO: process log level messages for workers */
+					break;
+				case ZBX_RTC_SHUTDOWN:
+					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
+					goto out;
 			}
 
 			zbx_ipc_message_free(message);
@@ -618,7 +631,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			time_flush = time_now;
 		}
 	}
-
+out:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	zbx_vector_pp_task_ptr_destroy(&tasks);

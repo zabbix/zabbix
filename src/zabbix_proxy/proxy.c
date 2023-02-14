@@ -1285,8 +1285,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args		ipmimanager_args = {config_timeout, config_unavailable_delay};
 #endif
-	zbx_thread_preprocessing_manager_args	preproc_man_args =
-						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
+	zbx_thread_preprocessing_manager_args	preproc_man_args = {
+							.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
+							.config_timeout = config_timeout};
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
 

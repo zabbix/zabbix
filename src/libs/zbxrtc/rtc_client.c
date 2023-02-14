@@ -259,14 +259,18 @@ void	zbx_rtc_notify_config_sync(int config_timeout, zbx_ipc_async_socket_t *rtc)
  * Parameters:                                                                *
  *      proc_type      - [IN]                                                 *
  *      proc_num       - [IN]                                                 *
+ *      msgs            - [IN] the RTC notifications to subscribe for         *
+ *      msgs_num        - [IN] the number of RTC notifications                *
  *      config_timeout - [IN]                                                 *
  *      rtc            - [OUT] the RTC notification subscription socket       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, int config_timeout, zbx_ipc_async_socket_t *rtc)
+void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num, int config_timeout,
+		zbx_ipc_async_socket_t *rtc)
 {
-	unsigned char		data[sizeof(int) + sizeof(unsigned char)];
-	const zbx_uint32_t	size = (zbx_uint32_t)(sizeof(int) + sizeof(unsigned char));
+	const zbx_uint32_t	size = (zbx_uint32_t)(sizeof(int) + sizeof(unsigned char) +
+				sizeof(zbx_uint32_t) * msgs_num + sizeof(int));
+	unsigned char		data[size], *ptr = data;
 	char			*error = NULL;
 
 	if (FAIL == zbx_ipc_async_socket_open(rtc, ZBX_IPC_SERVICE_RTC, config_timeout, &error))
@@ -276,8 +280,12 @@ void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, int config_timeout
 		exit(EXIT_FAILURE);
 	}
 
-	(void)zbx_serialize_value(data, proc_type);
-	(void)zbx_serialize_value(data + sizeof(proc_type), proc_num);
+	ptr += zbx_serialize_value(ptr, proc_type);
+	ptr += zbx_serialize_value(ptr, proc_num);
+	ptr += zbx_serialize_value(ptr, msgs_num);
+
+	for (int i = 0; i < msgs_num; i++)
+		ptr += zbx_serialize_value(ptr, msgs[i]);
 
 	if (FAIL == zbx_ipc_async_socket_send(rtc, ZBX_RTC_SUBSCRIBE, data, size))
 	{
@@ -290,6 +298,64 @@ void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, int config_timeout
 		zabbix_log(LOG_LEVEL_CRIT, "cannot flush RTC notification subscribe request");
 		exit(EXIT_FAILURE);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: subscribe process for RTC notifications                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      proc_type      - [IN]                                                 *
+ *      proc_num       - [IN]                                                 *
+ *      msgs           - [IN] the RTC notifications to subscribe for          *
+ *      msgs_num       - [IN] the number of RTC notifications                 *
+ *      config_timeout - [IN]                                                 *
+ *      service        - [IN] the subscriber IPC service                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtc_subscribe_service(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num,
+		int config_timeout, const char *service)
+{
+	unsigned char		*data, *ptr;
+	zbx_uint32_t		data_len = 0, service_len;
+	char			*error = NULL;
+	zbx_ipc_socket_t	sock;
+
+	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_RTC, config_timeout, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to RTC service: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_serialize_prepare_value(data_len, proc_type);
+	zbx_serialize_prepare_value(data_len, proc_num);
+	zbx_serialize_prepare_value(data_len, msgs_num);
+
+	for (int i = 0; i < msgs_num; i++)
+		zbx_serialize_prepare_value(data_len, msgs[i]);
+
+	zbx_serialize_prepare_str_len(data_len, service, service_len);
+
+	ptr = data = (unsigned char *)zbx_malloc(NULL, (size_t)data_len);
+
+	ptr += zbx_serialize_value(ptr, proc_type);
+	ptr += zbx_serialize_value(ptr, proc_num);
+	ptr += zbx_serialize_value(ptr, msgs_num);
+
+	for (int i = 0; i < msgs_num; i++)
+		ptr += zbx_serialize_value(ptr, msgs[i]);
+
+	(void)zbx_serialize_str(ptr, service, service_len);
+
+	if (FAIL == zbx_ipc_socket_write(&sock, ZBX_RTC_SUBSCRIBE_SERVICE, data, data_len))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send RTC notification service subscribe request");
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_free(data);
+	zbx_ipc_socket_close(&sock);
 }
 
 /******************************************************************************

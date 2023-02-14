@@ -547,12 +547,7 @@ void	rtc_reset(zbx_rtc_t *rtc)
 {
 	int	i;
 
-	for (i = 0; i < rtc->subs.values_num; i++)
-	{
-		zbx_ipc_client_close(rtc->subs.values[i]->client);
-		zbx_free(rtc->subs.values[i]);
-	}
-	zbx_vector_rtc_sub_clear(&rtc->subs);
+	zbx_vector_rtc_sub_clear_ext(&rtc->subs, zbx_rtc_sub_free);
 
 	for (i = 0; i < rtc->hooks.values_num; i++)
 		zbx_free(rtc->hooks.values[i]);
