@@ -155,6 +155,7 @@
 
 		$('#type')
 			.change(function() {
+				console.log(document.querySelector('#trends_mode_1'));
 				updateItemFormElements();
 				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt(this.value, 10));
 
@@ -265,7 +266,7 @@
 				this.updateHintDisplay();
 
 				// 'Do not keep trends' for Calculated with string-types of information is forced on Item save.
-				if (this.item_type.value == <?=ITEM_TYPE_CALCULATED ?>) {
+				if (this.item_type.value == <?=ITEM_TYPE_CALCULATED ?> && !this.item_type.hasAttribute('readonly')) {
 					if (e.target.value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 							|| e.target.value == <?= ITEM_VALUE_TYPE_UINT64 ?>) {
 						this.form.querySelector('#trends_mode_1').disabled = false;
