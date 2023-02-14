@@ -515,7 +515,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 			zbx_timespec(&ts);
 
 			ping_result = zbx_ping(hosts, hosts_count,
-						items[i].count, items[i].interval, items[i].size, items[i].timeout,
+						items[i].count, items[i].interval, items[i].size, items[i].timeout, 0,
 						error, sizeof(error));
 
 			if (FAIL != ping_result)

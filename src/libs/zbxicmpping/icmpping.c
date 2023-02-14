@@ -266,8 +266,56 @@ static int	get_ipv6_support(const char *fping, const char *dst)
 }
 #endif	/* HAVE_IPV6 */
 
+static int	check_hostip_response(char *resp, ZBX_FPING_HOST *hosts, const int hosts_count, const int rdns,
+		int *dnsname_len, ZBX_FPING_HOST **host)
+{
+	int	i, ret = FAIL;
+	char	*c, *tmp = resp;
+
+	if (NULL == (c = strchr(tmp, ' ')))
+		return FAIL;
+
+	*c = '\0';
+
+	/* when rdns is used, there are also lines like */
+	/* Lab-u22 (192.168.6.51) : [0], 64 bytes, 0.024 ms (0.024 avg, 0% loss) */
+
+	if (0 != rdns)
+	{
+		*dnsname_len = zbx_strlen_utf8(tmp);
+		*c = ' ';
+
+		if (ZBX_MAX_DNSNAME_LEN < *dnsname_len)
+			return FAIL;
+
+		if (NULL == (c = strchr(tmp, '(')))
+			return FAIL;
+
+		tmp = c + 1;
+
+		if (NULL == (c = strchr(tmp, ')')))
+			return FAIL;
+
+		*c = '\0';
+	}
+
+	for (i = 0; i < hosts_count; i++)
+	{
+		if (0 == strcmp(tmp, hosts[i].addr))
+		{
+			*host = &hosts[i];
+			ret = SUCCEED;
+			break;
+		}
+	}
+
+	*c = (0 == rdns) ? ' ' : ')';
+
+	return ret;
+}
+
 static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout,
-		char *error, size_t max_error_len)
+		int rdns, char *error, size_t max_error_len)
 {
 	const int	response_time_chars_max = 20;
 	FILE		*f;
@@ -361,6 +409,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -b%d", size);
 	if (0 != timeout)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -t%d", timeout);
+	if (0 != rdns)
+		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -dA");
 
 #ifdef HAVE_IPV6
 	zbx_strscpy(params6, params);
@@ -585,27 +635,13 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		{
 			ZBX_FPING_HOST	*host = NULL;
 			char		*c;
+			int		dnsname_len;
 
 			zbx_rtrim(tmp, "\n");
 			zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", tmp);
 
-			if (NULL != (c = strchr(tmp, ' ')))
-			{
-				*c = '\0';
 
-				for (i = 0; i < hosts_count; i++)
-				{
-					if (0 == strcmp(tmp, hosts[i].addr))
-					{
-						host = &hosts[i];
-						break;
-					}
-				}
-
-				*c = ' ';
-			}
-
-			if (NULL == host)
+			if (FAIL == check_hostip_response(tmp, hosts, hosts_count, rdns, &dnsname_len, &host))
 				continue;
 
 			if (NULL == (c = strstr(tmp, " : ")))
@@ -690,6 +726,11 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				memset(host->status, 0, (size_t)count);	/* reset response statuses for IPv6 */
 			}
 #endif
+			if (0 != rdns)
+			{
+				host->dnsname = zbx_dsprintf(NULL, "%.*s", dnsname_len, tmp);
+			}
+
 			ret = SUCCEED;
 		}
 		while (NULL != zbx_fgets(tmp, (int)tmp_size, f));
@@ -742,6 +783,8 @@ void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config)
  *             timeout       - [IN]  individual target initial timeout except *
  *                                   when count > 1, where it's the -p period *
  *                                   (fping option -t)                        *
+ *             rdns          - [IN]  flag required rdns option                *
+ *                                   (fping option -dA)                       *
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN]  length of error buffer                   *
  *                                                                            *
@@ -751,14 +794,14 @@ void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config)
  * Comments: use external binary 'fping' to avoid superuser privileges        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int period, int size, int timeout,
+int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int period, int size, int timeout, int rdns,
 		char *error, size_t max_error_len)
 {
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __func__, hosts_count);
 
-	if (NOTSUPPORTED == (ret = process_ping(hosts, hosts_count, count, period, size, timeout, error,
+	if (NOTSUPPORTED == (ret = process_ping(hosts, hosts_count, count, period, size, timeout, rdns, error,
 			max_error_len)))
 		zabbix_log(LOG_LEVEL_ERR, "%s", error);
 
