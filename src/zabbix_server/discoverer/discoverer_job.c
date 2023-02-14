@@ -26,5 +26,12 @@ void	zbx_discoverer_job_net_check_free(zbx_discoverer_net_check_job_t *job)
 	zbx_vector_discoverer_net_check_destroy(&job->dchecks);
 	zbx_free(job->ip);
 
+	if (NULL != job->ips)
+	{
+		zbx_vector_str_clear_ext(job->ips, zbx_str_free);
+		zbx_vector_str_destroy(job->ips);
+		zbx_free(job->ips);
+	}
+
 	zbx_free(job);
 }

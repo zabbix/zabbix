@@ -42,6 +42,7 @@ typedef struct
 	DC_DRULE				*drule;
 	zbx_vector_discoverer_net_check_t	dchecks;
 	char					*ip;
+	zbx_vector_str_t			*ips;
 	unsigned short				port;
 	int					now;
 	int					config_timeout;

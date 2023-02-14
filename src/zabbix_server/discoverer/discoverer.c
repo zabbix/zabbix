@@ -55,6 +55,7 @@ typedef struct
 	zbx_vector_ptr_t	services;
 	DC_DRULE		*drule;
 	char			*ip;
+	char			*dnsname;
 	int			now;
 }
 zbx_discovery_results_t;
@@ -65,7 +66,7 @@ typedef struct
 	zbx_discoverer_worker_t		*workers;
 	zbx_discoverer_queue_t		queue;
 
-	zbx_vector_ptr_t		results;
+	zbx_hashset_t			results;
 	pthread_rwlock_t		results_rwlock;
 
 	zbx_vector_uint64_pair_t	revisions;
@@ -103,6 +104,27 @@ static int	discoverer_net_check_compare(const void *d1, const void *d2)
 	ZBX_RETURN_IF_NOT_EQUAL(net_check1->port, net_check2->port);
 
 	return strcmp(net_check1->ip, net_check2->ip);
+}
+
+static zbx_hash_t	discoverer_result_hash(const void *data)
+{
+	const zbx_discovery_results_t	*result = (const zbx_discovery_results_t *)data;
+	zbx_hash_t			hash;
+
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&result->drule->druleid);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO(result->ip, strlen(result->ip), hash);
+
+	return hash;
+}
+
+static int	discoverer_result_compare(const void *d1, const void *d2)
+{
+	const zbx_discovery_results_t	*r1 = (const zbx_discovery_results_t *)d1;
+	const zbx_discovery_results_t	*r2 = (const zbx_discovery_results_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(r1->drule->druleid, r2->drule->druleid);
+
+	return strcmp(r1->ip, r2->ip);
 }
 
 /******************************************************************************
@@ -154,14 +176,12 @@ static void	proxy_update_host(zbx_uint64_t druleid, const char *ip, const char *
 
 static int	results_compare(const void *d1, const void *d2)
 {
-	int				ret;
 	const zbx_discovery_results_t	*r1 = *((const zbx_discovery_results_t * const *)d1);
 	const zbx_discovery_results_t	*r2 = *((const zbx_discovery_results_t * const *)d2);
 
-	if (0 == (ret = (int)r1->drule->druleid - (int)r2->drule->druleid))
-		ret = strcmp(r1->ip, r2->ip);
+	ZBX_RETURN_IF_NOT_EQUAL(r1->drule->druleid, r2->drule->druleid);
 
-	return ret;
+	return strcmp(r1->ip, r2->ip);
 }
 
 /******************************************************************************
@@ -233,7 +253,6 @@ static int	discover_service(const DC_DCHECK *dcheck, char *ip, int port, int con
 		case SVC_SNMPv1:
 		case SVC_SNMPv2c:
 		case SVC_SNMPv3:
-		case SVC_ICMPPING:
 			break;
 		default:
 			ret = FAIL;
@@ -244,9 +263,8 @@ static int	discover_service(const DC_DCHECK *dcheck, char *ip, int port, int con
 	{
 		char		**pvalue;
 		size_t		value_offset = 0;
-		ZBX_FPING_HOST	host;
 		DC_ITEM		item;
-		char		key[MAX_STRING_LEN], error[ZBX_ITEM_ERROR_LEN_MAX];
+		char		key[MAX_STRING_LEN];
 
 		switch (dcheck->type)
 		{
@@ -386,15 +404,6 @@ static int	discover_service(const DC_DCHECK *dcheck, char *ip, int port, int con
 							item.key, result.msg);
 				}
 				break;
-			case SVC_ICMPPING:
-				memset(&host, 0, sizeof(host));
-				host.addr = strdup(ip);
-
-				if (SUCCEED != zbx_ping(&host, 1, 3, 0, 0, 0, 0, error, sizeof(error)) || 0 == host.rcv)
-					ret = FAIL;
-
-				zbx_free(host.addr);
-				break;
 			default:
 				break;
 		}
@@ -439,12 +448,20 @@ static void	dcheck_copy(const DC_DCHECK *src, DC_DCHECK *dst)
 	dst->snmpv3_contextname = zbx_strdup(NULL, src->snmpv3_contextname);
 }
 
-static void	results_free(zbx_discovery_results_t *result)
+static void	results_clear(zbx_discovery_results_t *result)
 {
-	zbx_discovery_drule_free(result->drule);
+	if (NULL != result->drule)
+		zbx_discovery_drule_free(result->drule);
+
 	zbx_free(result->ip);
+	zbx_free(result->dnsname);
 	zbx_vector_ptr_clear_ext(&result->services, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&result->services);
+}
+
+static void	results_free(zbx_discovery_results_t *result)
+{
+	results_clear(result);
 	zbx_free(result);
 }
 
@@ -475,33 +492,48 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 
 		for (port = first; port <= last; port++)
 		{
-			zbx_discoverer_net_check_job_t	net_check, *job;
-			DC_DCHECK			*dcheck_local;
+			zbx_discoverer_net_check_job_t	job_local, *job;
+			DC_DCHECK			*dcheck_ptr;
 
-			net_check.druleid = drule->druleid;
-			net_check.ip = zbx_strdup(NULL, ip);
-			net_check.port = (unsigned short)port;
+			job_local.druleid = drule->druleid;
+			job_local.ip = zbx_strdup(NULL, SVC_ICMPPING == dcheck->type ? "" : ip);
+			job_local.port = (unsigned short)port;
 
-			dcheck_local = (DC_DCHECK*)zbx_malloc(NULL, sizeof(DC_DCHECK));
-			dcheck_copy(dcheck, dcheck_local);
+			dcheck_ptr = (DC_DCHECK*)zbx_malloc(NULL, sizeof(DC_DCHECK));
+			dcheck_copy(dcheck, dcheck_ptr);
 
-			if (NULL != (job = zbx_hashset_search(jobs, &net_check)))
+			if (NULL != (job = zbx_hashset_search(jobs, &job_local)))
 			{
-				zbx_free(net_check.ip);
+				zbx_free(job_local.ip);
 
-				zbx_vector_discoverer_net_check_append(&job->dchecks, dcheck_local);
+				if (SVC_ICMPPING == dcheck->type)
+				{
+					zbx_vector_str_append(job->ips, zbx_strdup(NULL, ip));
+					zbx_discovery_dcheck_free(dcheck_ptr);
+				}
+				else
+					zbx_vector_discoverer_net_check_append(&job->dchecks, dcheck_ptr);
 			}
 			else
 			{
-				net_check.drule = (DC_DRULE*)zbx_malloc(NULL, sizeof(DC_DRULE));
-				drule_copy(drule, net_check.drule);
+				job_local.drule = (DC_DRULE*)zbx_malloc(NULL, sizeof(DC_DRULE));
+				drule_copy(drule, job_local.drule);
 
-				net_check.config_timeout = config_timeout;
-				net_check.now = now;
+				job_local.config_timeout = config_timeout;
+				job_local.now = now;
 
-				zbx_vector_discoverer_net_check_create(&net_check.dchecks);
-				zbx_vector_discoverer_net_check_append(&net_check.dchecks, dcheck_local);
-				zbx_hashset_insert(jobs, &net_check, sizeof(zbx_discoverer_net_check_job_t));
+				if (SVC_ICMPPING == dcheck->type)
+				{
+					job_local.ips = (zbx_vector_str_t *)zbx_malloc(NULL, sizeof(zbx_vector_str_t));
+					zbx_vector_str_create(job_local.ips);
+					zbx_vector_str_append(job_local.ips, zbx_strdup(NULL, ip));
+				}
+				else
+					job_local.ips = NULL;
+
+				zbx_vector_discoverer_net_check_create(&job_local.dchecks);
+				zbx_vector_discoverer_net_check_append(&job_local.dchecks, dcheck_ptr);
+				zbx_hashset_insert(jobs, &job_local, sizeof(zbx_discoverer_net_check_job_t));
 			}
 		}
 
@@ -772,21 +804,34 @@ static void	process_results(zbx_discoverer_manager_t *manager, int config_timeou
 {
 	int			i;
 	zbx_vector_ptr_t	results;
+	zbx_discovery_results_t	*result;
+	zbx_hashset_iter_t	iter;
+
 
 	zbx_vector_ptr_create(&results);
 
 	pthread_rwlock_wrlock(&manager->results_rwlock);
-	zbx_vector_ptr_append_array(&results, manager->results.values, manager->results.values_num);
-	zbx_vector_ptr_clear(&manager->results);
+	zbx_hashset_iter_reset(&manager->results, &iter);
+
+	while (NULL != (result = (zbx_discovery_results_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_discovery_results_t	*result_tmp;
+
+		result_tmp = (zbx_discovery_results_t*)zbx_malloc(NULL, sizeof(zbx_discovery_results_t));
+		memcpy(result_tmp, result, sizeof(zbx_discovery_results_t));
+		zbx_vector_ptr_append(&results, result_tmp);
+	}
+
+	zbx_hashset_clear(&manager->results);
 	pthread_rwlock_unlock(&manager->results_rwlock);
 
 	for (i = 0; i < results.values_num; i++)
 	{
-		zbx_discovery_results_t	*result = results.values[i];
 		zbx_db_dhost		dhost;
 		int			host_status;
 		char			dns[ZBX_INTERFACE_DNS_LEN_MAX];
 
+		result = results.values[i];
 		memset(&dhost, 0, sizeof(zbx_db_dhost));
 
 		zbx_alarm_on(config_timeout);
@@ -872,6 +917,133 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 
 	return rule_count;	/* performance metric */
 }
+static zbx_dservice_t	*result_dservice_create(const zbx_discoverer_net_check_job_t *job, const DC_DCHECK *dcheck)
+{
+	zbx_dservice_t	*service;
+
+	service = (zbx_dservice_t *)zbx_malloc(NULL, sizeof(zbx_dservice_t));
+	service->dcheckid = dcheck->dcheckid;
+	service->itemtime = (time_t)job->now;
+	service->port = job->port;
+
+	return service;
+}
+
+static zbx_discovery_results_t	*rdiscovery_result_create(const zbx_discoverer_net_check_job_t *job)
+{
+	zbx_discovery_results_t	*result;
+
+	result = (zbx_discovery_results_t *)zbx_malloc(NULL, sizeof(zbx_discovery_results_t));
+	result->drule = (DC_DRULE *)zbx_malloc(NULL, sizeof(DC_DRULE));
+	drule_copy(job->drule, result->drule);
+
+	zbx_vector_ptr_create(&result->services);
+
+	result->ip = zbx_strdup(NULL, job->ip);
+	result->dnsname = NULL;
+	result->now = job->now;
+
+	return result;
+}
+
+ZBX_PTR_VECTOR_DECL(fping_host, ZBX_FPING_HOST)
+ZBX_PTR_VECTOR_IMPL(fping_host, ZBX_FPING_HOST)
+
+static void	discover_icmp(const zbx_discoverer_net_check_job_t *job, const DC_DCHECK *dcheck,
+		zbx_vector_ptr_t *results)
+{
+	zbx_vector_fping_host_t	hosts;
+	char			error[ZBX_ITEM_ERROR_LEN_MAX];
+	int			i;
+
+
+	zbx_vector_fping_host_create(&hosts);
+
+	for (i = 0; i < job->ips->values_num; i++)
+	{
+		ZBX_FPING_HOST		host;
+		zbx_discovery_results_t	*result;
+		zbx_dservice_t		*service;
+
+		memset(&host, 0, sizeof(host));
+		host.addr = job->ips->values[i];
+		zbx_vector_fping_host_append(&hosts, host);
+
+		service = result_dservice_create(job, dcheck);
+		service->status = FAIL;
+		*service->value = '\0';
+		result = rdiscovery_result_create(job);
+		zbx_vector_ptr_append(&result->services, service);
+		zbx_vector_ptr_append(results, result);
+	}
+
+	if (SUCCEED != zbx_ping(hosts.values, hosts.values_num, 3, 0, 0, 0, 1, error, sizeof(error)))
+		return;
+
+	zbx_vector_ptr_sort(results, results_compare);
+
+	for (i = 0; i < hosts.values_num; i++)
+	{
+		int			index;
+		zbx_discovery_results_t	result_cmp, *result;
+		ZBX_FPING_HOST		*h = &hosts.values[i];
+
+		result_cmp.ip = h->addr;
+		result_cmp.drule = job->drule;
+
+		if (FAIL == (index = zbx_vector_ptr_search(results, &result_cmp, results_compare)))
+		{
+			zbx_str_free(h->dnsname);
+			continue;
+		}
+
+		result = results->values[index];
+		result->dnsname = h->dnsname;
+		h->dnsname = NULL;
+
+		if (0 != h->rcv)
+			((zbx_dservice_t*)result->services.values[0])->status = SUCCEED;
+	}
+
+	zbx_vector_fping_host_clear(&hosts);
+	zbx_vector_fping_host_destroy(&hosts);
+}
+
+static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_ptr_t *vr_src)
+{
+	int	i;
+
+	for (i = 0; i < vr_src->values_num; i++)
+	{
+		zbx_discovery_results_t	*dst, *src = vr_src->values[i];
+
+		if (NULL == (dst = zbx_hashset_search(hr_dst, src)))
+		{
+			zbx_discovery_results_t	tmp;
+
+			tmp.dnsname = src->dnsname;
+			tmp.drule = src->drule;
+			tmp.ip = src->ip;
+			tmp.now = src->now;
+			zbx_vector_ptr_create(&tmp.services);
+
+			dst = zbx_hashset_insert(hr_dst, &tmp, sizeof(zbx_discovery_results_t));
+
+			src->dnsname = NULL;
+			src->drule = NULL;
+			src->ip = NULL;
+		}
+		else if (NULL == dst->dnsname)
+		{
+			dst->dnsname = src->dnsname;
+			src->dnsname = NULL;
+		}
+
+		zbx_vector_ptr_append_array(&dst->services, src->services.values, src->services.values_num);
+		zbx_vector_ptr_clear(&src->services);
+		results_clear(src);
+	}
+}
 
 static void	*discoverer_net_check(void *net_check_worker)
 {
@@ -928,19 +1100,31 @@ static void	*discoverer_net_check(void *net_check_worker)
 			for (i = 0; i < job->dchecks.values_num; i++)
 			{
 				DC_DCHECK		*dcheck = (DC_DCHECK*)job->dchecks.values[i];
-				zbx_dservice_t		*service = NULL;
-				zbx_discovery_results_t	*result = NULL, result_cmp;
+				zbx_dservice_t		*service;
+				zbx_discovery_results_t	*result, result_cmp;
 				DC_DRULE		drule_cmp;
 
-				service = (zbx_dservice_t *)zbx_malloc(service, sizeof(zbx_dservice_t));
+				if (SVC_ICMPPING == dcheck->type)
+				{
+					zbx_vector_ptr_t	results;
+
+					zbx_vector_ptr_create(&results);
+					discover_icmp(job, dcheck, &results);
+
+					pthread_rwlock_wrlock(&dmanager.results_rwlock);
+					discover_results_merge(&dmanager.results, &results);
+					pthread_rwlock_unlock(&dmanager.results_rwlock);
+
+					zbx_vector_ptr_clear_ext(&results, zbx_ptr_free);
+					zbx_vector_ptr_destroy(&results);
+					continue;
+				}
+
+				service = result_dservice_create(job, dcheck);
 
 				service->status = (SUCCEED == discover_service(dcheck, job->ip, job->port,
 						job->config_timeout, &value, &value_alloc)) ? DOBJECT_STATUS_UP :
 						DOBJECT_STATUS_DOWN;
-
-				service->dcheckid = dcheck->dcheckid;
-				service->itemtime = (time_t)job->now;
-				service->port = job->port;
 				zbx_strlcpy_utf8(service->value, value, ZBX_MAX_DISCOVERED_VALUE_SIZE);
 
 				drule_cmp.druleid = job->druleid;
@@ -949,24 +1133,15 @@ static void	*discoverer_net_check(void *net_check_worker)
 
 				pthread_rwlock_wrlock(&dmanager.results_rwlock);
 
-				if (FAIL == (index = zbx_vector_ptr_search(&dmanager.results, &result_cmp,
-						results_compare)))
+				if (NULL == (result = zbx_hashset_search(&dmanager.results, &result_cmp)))
 				{
-					result = (zbx_discovery_results_t *)zbx_malloc(result,
+					zbx_discovery_results_t	*r;
+
+					r = rdiscovery_result_create(job);
+					result = zbx_hashset_insert(&dmanager.results, r,
 							sizeof(zbx_discovery_results_t));
-
-					result->drule = (DC_DRULE *)zbx_malloc(NULL, sizeof(DC_DRULE));
-					drule_copy(job->drule, result->drule);
-
-					zbx_vector_ptr_create(&result->services);
-
-					result->ip = zbx_strdup(NULL, job->ip);
-					result->now = job->now;
-
-					zbx_vector_ptr_append(&dmanager.results, result);
+					zbx_free(r);
 				}
-				else
-					result = (zbx_discovery_results_t *)dmanager.results.values[index];
 
 				zbx_vector_ptr_append(&result->services, service);
 
@@ -1025,7 +1200,8 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 
 	memset(manager, 0, sizeof(zbx_discoverer_manager_t));
 
-	zbx_vector_ptr_create(&manager->results);
+	zbx_hashset_create(&manager->results, 1, discoverer_result_hash, discoverer_result_compare);
+
 	zbx_vector_uint64_pair_create(&manager->revisions);
 
 	if (0 != (err = pthread_rwlock_init(&manager->revisions_rwlock, NULL)) ||
@@ -1094,7 +1270,9 @@ static void	discoverer_worker_stop(zbx_discoverer_worker_t *worker)
 
 static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 {
-	int	i;
+	int			i;
+	zbx_hashset_iter_t	iter;
+	zbx_discovery_results_t *result;
 
 	discoverer_queue_lock(&manager->queue);
 
@@ -1110,6 +1288,17 @@ static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 	zbx_free(manager->workers);
 
 	discoverer_queue_destroy(&manager->queue);
+
+	zbx_vector_uint64_pair_clear(&manager->revisions);
+
+	zbx_hashset_iter_reset(&manager->results, &iter);
+
+	while (NULL != (result = (zbx_discovery_results_t *)zbx_hashset_iter_next(&iter)))
+	{
+		results_clear(result);
+	}
+
+	zbx_hashset_destroy(&manager->results);
 }
 
 /******************************************************************************
