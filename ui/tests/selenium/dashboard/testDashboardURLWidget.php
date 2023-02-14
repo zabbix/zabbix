@@ -53,12 +53,12 @@ class testDashboardURLWidget extends CWebTest {
 	 * because it can change.
 	 */
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-	' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-	' w.width, w.height'.
-	' FROM widget_field wf'.
-	' INNER JOIN widget w'.
-	' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-	' wf.value_itemid, wf.value_graphid';
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
+			' w.width, w.height'.
+			' FROM widget_field wf'.
+			' INNER JOIN widget w'.
+			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
+			' wf.value_itemid, wf.value_graphid';
 
 	public static function prepareData() {
 		$response = CDataHelper::call('dashboard.create', [
@@ -220,7 +220,7 @@ class testDashboardURLWidget extends CWebTest {
 		}
 
 		$refresh_interval = ['Default (No refresh)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
-			'2 minutes', '10 minutes', '15 minutes'];
+				'2 minutes', '10 minutes', '15 minutes'];
 		$this->assertEquals($refresh_interval, $form->getField('Refresh interval')->getOptions()->asText());
 
 		// Check if buttons present and clickable.
