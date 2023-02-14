@@ -34,15 +34,17 @@ typedef struct
 }
 zbx_dservice_t;
 
+ZBX_PTR_VECTOR_DECL(discoverer_net_check, DC_DCHECK *)
+
 typedef struct
 {
-	zbx_uint64_t	druleid;
-	DC_DRULE	*drule;
-	DC_DCHECK	*dcheck;
-	char		*ip;
-	unsigned short	port;
-	int		now;
-	int		config_timeout;
+	zbx_uint64_t				druleid;
+	DC_DRULE				*drule;
+	zbx_vector_discoverer_net_check_t	dchecks;
+	char					*ip;
+	unsigned short				port;
+	int					now;
+	int					config_timeout;
 }
 zbx_discoverer_net_check_job_t;
 

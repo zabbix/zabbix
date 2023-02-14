@@ -22,7 +22,8 @@
 void	zbx_discoverer_job_net_check_free(zbx_discoverer_net_check_job_t *job)
 {
 	zbx_discovery_drule_free(job->drule);
-	zbx_discovery_dcheck_free(job->dcheck);
+	zbx_vector_discoverer_net_check_clear_ext(&job->dchecks, zbx_discovery_dcheck_free);
+	zbx_vector_discoverer_net_check_destroy(&job->dchecks);
 	zbx_free(job->ip);
 
 	zbx_free(job);
