@@ -88,8 +88,8 @@ static zbx_hash_t	discoverer_net_check_hash(const void *data)
 	zbx_hash_t				hash;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&net_check->druleid);
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO(&net_check->ip, strlen(net_check->ip), hash);
 	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&net_check->port, sizeof(net_check->port), hash);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO(net_check->ip, strlen(net_check->ip), hash);
 
 	return hash;
 }
