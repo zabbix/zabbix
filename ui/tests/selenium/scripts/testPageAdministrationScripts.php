@@ -547,7 +547,7 @@ class testPageAdministrationScripts extends CWebTest {
 	public function testPageAdministrationScripts_Delete() {
 		$this->page->login()->open('zabbix.php?action=script.list');
 
-		foreach ([self::$custom_script, self::$script_scope_event, self::$script_for_filter] as $scripts) {
+		foreach ([self::$script_scope_event, self::$custom_script, self::$script_for_filter] as $scripts) {
 			$this->selectTableRows($scripts);
 			$this->query('button:Delete')->one()->waitUntilClickable()->click();
 			$this->page->acceptAlert();
@@ -555,16 +555,17 @@ class testPageAdministrationScripts extends CWebTest {
 
 			if ($scripts === self::$custom_script) {
 				// Verify that selected script which is linked to an action can't be deleted.
+				$count = CDBHelper::getCount('SELECT scriptid FROM scripts');
 				$this->assertMessage(TEST_BAD, 'Cannot delete script', 'Cannot delete scripts. Script "'
 					.$scripts.'" is used in action operation "'.self::$custom_action);
 				$this->assertEquals(1, CDBHelper::getCount('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($scripts)));
 
-				// Verify that that there is no possibility to delete all selected scripts if at least one of them contains linked action.
+				// Verify that there is no possibility to delete all selected scripts if at least one of them contains linked action.
 				$this->query('id:all_scripts')->asCheckbox()->one()->set(true);
 				$this->query('button:Delete')->one()->click();
 				$this->page->acceptAlert();
 				$this->assertMessage(TEST_BAD, 'Cannot delete scripts');
-				$this->assertEquals(8, CDBHelper::getCount('SELECT scriptid FROM scripts'));
+				$this->assertEquals($count, CDBHelper::getCount('SELECT scriptid FROM scripts'));
 
 				// Uncheck selected scripts due to not influence further tests.
 				$this->query('button:Reset')->one()->click();
