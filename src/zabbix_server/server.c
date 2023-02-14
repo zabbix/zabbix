@@ -145,7 +145,7 @@ const char	*help_message[] = {
 	"                                  housekeeper, http poller, icmp pinger,",
 	"                                  ipmi manager, ipmi poller, java poller,",
 	"                                  poller, preprocessing manager,",
-	"                                  proxy poller, self-monitoring, snmp trapper,"
+	"                                  proxy poller, self-monitoring, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller,",
 	"                                  vmware collector, history poller,",
 	"                                  availability manager, service manager, odbc poller,",
