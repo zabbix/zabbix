@@ -519,7 +519,6 @@ void	zbx_discovery_drule_free(DC_DRULE *drule)
 	zbx_free(drule->delay_str);
 	zbx_free(drule->iprange);
 	zbx_free(drule->name);
-	zbx_vector_ptr_clear_ext(&drule->dchecks, (zbx_clean_func_t)zbx_discovery_dcheck_free);
-	zbx_vector_ptr_destroy(&drule->dchecks);
+
 	zbx_free(drule);
 }

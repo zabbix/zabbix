@@ -452,12 +452,8 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 		zbx_hashset_t *jobs)
 {
 	const char		*start;
-	char			*value = NULL;
-	size_t			value_alloc = 128;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	value = (char *)zbx_malloc(value, value_alloc);
 
 	for (start = dcheck->ports; '\0' != *start;)
 	{
@@ -479,39 +475,34 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 
 		for (port = first; port <= last; port++)
 		{
-			zbx_discoverer_net_check_job_t	*net_check, *job;
+			zbx_discoverer_net_check_job_t	net_check, *job;
 			DC_DCHECK			*dcheck_local;
 
-			net_check = (zbx_discoverer_net_check_job_t*)zbx_malloc(NULL,
-					sizeof(zbx_discoverer_net_check_job_t));
-
-			net_check->druleid = drule->druleid;
-			net_check->ip = zbx_strdup(NULL, ip);
-			net_check->port = (unsigned short)port;
-
-			if (NULL != (job = zbx_hashset_search(jobs, net_check)))
-			{
-				zbx_free(net_check->ip);
-				zbx_free(net_check);
-
-				net_check = job;
-			}
-			else
-			{
-				net_check->drule = (DC_DRULE*)zbx_malloc(NULL, sizeof(DC_DRULE));
-				drule_copy(drule, net_check->drule);
-
-				net_check->config_timeout = config_timeout;
-				net_check->now = now;
-
-				zbx_vector_discoverer_net_check_create(&net_check->dchecks);
-			}
+			net_check.druleid = drule->druleid;
+			net_check.ip = zbx_strdup(NULL, ip);
+			net_check.port = (unsigned short)port;
 
 			dcheck_local = (DC_DCHECK*)zbx_malloc(NULL, sizeof(DC_DCHECK));
 			dcheck_copy(dcheck, dcheck_local);
-			zbx_vector_discoverer_net_check_append(&net_check->dchecks, dcheck_local);
 
-			zbx_hashset_insert(jobs, net_check, sizeof(zbx_discoverer_net_check_job_t));
+			if (NULL != (job = zbx_hashset_search(jobs, &net_check)))
+			{
+				zbx_free(net_check.ip);
+
+				zbx_vector_discoverer_net_check_append(&job->dchecks, dcheck_local);
+			}
+			else
+			{
+				net_check.drule = (DC_DRULE*)zbx_malloc(NULL, sizeof(DC_DRULE));
+				drule_copy(drule, net_check.drule);
+
+				net_check.config_timeout = config_timeout;
+				net_check.now = now;
+
+				zbx_vector_discoverer_net_check_create(&net_check.dchecks);
+				zbx_vector_discoverer_net_check_append(&net_check.dchecks, dcheck_local);
+				zbx_hashset_insert(jobs, &net_check, sizeof(zbx_discoverer_net_check_job_t));
+			}
 		}
 
 		if (NULL != comma)
@@ -522,7 +513,6 @@ static void	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *
 		else
 			break;
 	}
-	zbx_free(value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -871,6 +861,8 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			discovery_clean_services(drule->druleid);
 
+		zbx_vector_ptr_clear_ext(&drule->dchecks, (zbx_clean_func_t)zbx_discovery_dcheck_free);
+		zbx_vector_ptr_destroy(&drule->dchecks);
 		zbx_discovery_drule_free(drule);
 
 		now = time(NULL);
@@ -1214,7 +1206,15 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 				discoverer_queue_lock(&dmanager.queue);
 
 				while (NULL != (job = (zbx_discoverer_net_check_job_t *)zbx_hashset_iter_next(&iter)))
-					discoverer_queue_push(&dmanager.queue, job);
+				{
+					zbx_discoverer_net_check_job_t	*job_tmp;
+
+					job_tmp = (zbx_discoverer_net_check_job_t*)zbx_malloc(NULL,
+							sizeof(zbx_discoverer_net_check_job_t));
+					memcpy(job_tmp, job, sizeof(zbx_discoverer_net_check_job_t));
+
+					discoverer_queue_push(&dmanager.queue, job_tmp);
+				}
 
 				discoverer_queue_notify_all(&dmanager.queue);
 				discoverer_queue_unlock(&dmanager.queue);
