@@ -1636,10 +1636,6 @@ class CScript extends CApiService {
 	 * @throws APIException if script names within menu paths are not unique.
 	 */
 	private function checkUniqueness(array $scripts, string $method = 'create'): void {
-		// In order to validate name and menu path uniqueness combination, must use basic validation rules as well.
-		$api_input_rules = $this->getValidationRules($method);
-		$api_input_rules['uniq'] = [['name', 'menu_path']];
-
 		if ($method === 'update') {
 			$scripts = array_filter($scripts,
 				static fn($script) => array_key_exists('name', $script) || array_key_exists('menu_path', $script)
@@ -1662,6 +1658,11 @@ class CScript extends CApiService {
 			$script['menu_path'] = $menu_path;
 		}
 		unset($script);
+
+		$api_input_rules = $this->getValidationRules($method);
+		$api_input_rules['uniq'] = [['name', 'menu_path']];
+		$api_input_rules['fields'] = array_intersect_key($api_input_rules['fields'], array_flip(['name', 'menu_path']));
+		$api_input_rules['flags'] |= API_ALLOW_UNEXPECTED;
 
 		if (!CApiInputValidator::validate($api_input_rules, $scripts, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -1721,15 +1722,11 @@ class CScript extends CApiService {
 		foreach ($scripts as $script) {
 			$name = self::getScriptNameAndPath($script);
 
-			if ($db_scripts === null) {
-				if (array_key_exists($name, $db_scriptids)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
-				}
+			if ($db_scripts === null && array_key_exists($name, $db_scriptids)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
 			}
-			else {
-				if (array_key_exists($name, $db_scriptids) && bccomp($script['scriptid'], $db_scriptids[$name]) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
-				}
+			elseif (array_key_exists($name, $db_scriptids) && bccomp($script['scriptid'], $db_scriptids[$name]) != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
 			}
 		}
 	}
