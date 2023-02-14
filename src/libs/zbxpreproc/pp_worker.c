@@ -109,11 +109,22 @@ static void	*pp_worker_entry(void *arg)
 	zbx_pp_queue_t	*queue = worker->queue;
 	zbx_pp_task_t	*in;
 	char		*error = NULL;
+	sigset_t	mask;
+	int		err;
 
 	__zbxthread__ = worker->id;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+
+	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
 	worker->stop = 0;
 
