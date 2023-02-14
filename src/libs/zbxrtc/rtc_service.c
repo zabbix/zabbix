@@ -88,7 +88,7 @@ int	zbx_rtc_get_signal_target(const char *data, pid_t *pid, int *proc_type, int 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SCOPE, buf, sizeof(buf), NULL))
 		*scope = atoi(buf);
 	else
-		*scope =ZBX_PROF_UNKNOWN;
+		*scope = ZBX_PROF_UNKNOWN;
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PID, buf, sizeof(buf), NULL))
 	{
@@ -124,20 +124,26 @@ int	zbx_rtc_get_signal_target(const char *data, pid_t *pid, int *proc_type, int 
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: dispatch log level change runtime control option                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	rtc_process_loglevel_option(int code, const char *data, char **result)
 {
 	pid_t	pid;
 	int	proc_type, proc_num, scope;
 
-	if (NULL == data)
+	if (SUCCEED != zbx_rtc_get_signal_target(data, &pid, &proc_type, &proc_num, &scope, result))
+		return;
+
+	/* all processes */
+	if (0 == pid && ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
 	{
 		rtc_change_service_loglevel(code);
 		zbx_signal_process_by_pid(0, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
 		return;
 	}
-
-	if (SUCCEED != zbx_rtc_get_signal_target(data, &pid, &proc_type, &proc_num, &scope, result))
-		return;
 
 	if (0 != pid)
 	{
@@ -156,19 +162,25 @@ static void	rtc_process_loglevel_option(int code, const char *data, char **resul
 	zbx_signal_process_by_type(proc_type, proc_num, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: dispatch profiler runtime control option                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	rtc_process_profiler_option(int code, const char *data, char **result)
 {
 	pid_t	pid;
 	int	proc_type, proc_num, scope;
 
-	if (NULL == data)
+	if (SUCCEED != zbx_rtc_get_signal_target(data, &pid, &proc_type, &proc_num, &scope, result))
+		return;
+
+	/* all processes */
+	if (0 == pid && ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
 	{
 		zbx_signal_process_by_pid(0, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
 		return;
 	}
-
-	if (SUCCEED != zbx_rtc_get_signal_target(data, &pid, &proc_type, &proc_num, &scope, result))
-		return;
 
 	if (0 != pid)
 	{

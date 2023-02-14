@@ -67,7 +67,7 @@ int	rtc_process(const char *option, int config_timeout, char **error)
 		goto out;
 	}
 
-	data = (2 < j.buffer_size ? zbx_strdup(NULL, j.buffer) : NULL);
+	data = zbx_strdup(NULL, j.buffer);
 	ret = zbx_rtc_async_exchange(&data, code, config_timeout, error);
 out:
 	zbx_json_free(&j);

@@ -28,7 +28,7 @@
 #include "zbxjson.h"
 #include "zbxtime.h"
 
-static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, struct zbx_json *j, char **error)
+static int	rtc_parse_options_server(const char *opt, zbx_uint32_t *code, struct zbx_json *j, char **error)
 {
 	const char	*param;
 
@@ -176,14 +176,15 @@ static int	rtc_process_server_loglevel_option(int direction, const char *data, c
 	int	proc_num, proc_type, scope;
 	pid_t	pid;
 
-	if (NULL == data)
+	if (SUCCEED != zbx_rtc_get_signal_target(data, &pid, &proc_type, &proc_num, &scope, result))
+		return SUCCEED;
+
+	/* change loglevel for all processes */
+	if (0 == pid && ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
 	{
 		(void)zbx_ha_change_loglevel(direction, result);
 		return FAIL;
 	}
-
-	if (SUCCEED != zbx_rtc_get_signal_target(data, &pid, &proc_type, &proc_num, &scope, result))
-		return SUCCEED;
 
 	if (ZBX_PROCESS_TYPE_HA_MANAGER == proc_type)
 	{
@@ -519,7 +520,7 @@ int	rtc_process(const char *option, int config_timeout, char **error)
 
 	if (ZBX_RTC_UNKNOWN == code)
 	{
-		if (SUCCEED != rtc_parse_options_ex(option, &code, &j, error))
+		if (SUCCEED != rtc_parse_options_server(option, &code, &j, error))
 			goto out;
 
 		if (ZBX_RTC_UNKNOWN == code)
@@ -529,7 +530,7 @@ int	rtc_process(const char *option, int config_timeout, char **error)
 		}
 	}
 
-	data = (2 < j.buffer_size ? zbx_strdup(NULL, j.buffer) : NULL);
+	data = zbx_strdup(NULL, j.buffer);
 	ret = zbx_rtc_async_exchange(&data, code, config_timeout, error);
 out:
 	zbx_json_free(&j);
