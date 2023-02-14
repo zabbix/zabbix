@@ -55,19 +55,16 @@ class testPageAdministrationScripts extends CWebTest {
 			[
 				'name' => self::$script_scope_event,
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
 				'command' => 'test'
 			],
 			[
 				'name' => self::$script_for_filter,
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
 				'command' => '/sbin/run'
 			],
 			[
 				'name' => self::$custom_script,
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'command' => '/sbin/zabbix_server --runtime-control config_cache_reload',
 				'groupid' => '4',
 				'description' => 'This command reload cache.'
@@ -88,6 +85,7 @@ class testPageAdministrationScripts extends CWebTest {
 					'esc_step_to' => '1',
 					'operationtype' => OPERATION_TYPE_COMMAND,
 					'opcommand' => [
+						'type'=> 4,
 						'scriptid' => $scriptids[self::$custom_script]
 					],
 					'opcommand_hst' => [
@@ -107,8 +105,6 @@ class testPageAdministrationScripts extends CWebTest {
 					'fields' => [
 						[
 							'Name' => self::$custom_script,
-							'Scope' => 'Action operation',
-							'Used in actions' => self::$custom_action,
 							'Type' => 'Script',
 							'Execute on' => 'Server (proxy)',
 							'Commands' => '/sbin/zabbix_server --runtime-control config_cache_reload',
@@ -118,8 +114,6 @@ class testPageAdministrationScripts extends CWebTest {
 						],
 						[
 							'Name' => 'Detect operating system',
-							'Scope' => 'Manual host action',
-							'Used in actions' => '',
 							'Type' => 'Script',
 							'Execute on' => 'Server (proxy)',
 							'Commands' => 'sudo /usr/bin/nmap -O {HOST.CONN}',
@@ -129,8 +123,6 @@ class testPageAdministrationScripts extends CWebTest {
 						],
 						[
 							'Name' => self::$script_scope_event,
-							'Scope' => 'Manual event action',
-							'Used in actions' => '',
 							'Type' => 'Script',
 							'Execute on' => 'Server (proxy)',
 							'Commands' => 'test',
@@ -140,8 +132,6 @@ class testPageAdministrationScripts extends CWebTest {
 						],
 						[
 							'Name' => 'Ping',
-							'Scope' => 'Manual host action',
-							'Used in actions' => '',
 							'Type' => 'Script',
 							'Execute on' => 'Server (proxy)',
 							'Commands' => 'ping -c 3 {HOST.CONN}; case $? in [01]) true;; *) false;; esac',
@@ -151,8 +141,6 @@ class testPageAdministrationScripts extends CWebTest {
 						],
 						[
 							'Name' => 'Reboot',
-							'Scope' => 'Action operation',
-							'Used in actions' => 'Autoregistration action 1, Autoregistration action 2, Trigger action 4',
 							'Type' => 'Script',
 							'Execute on' => 'Server (proxy)',
 							'Commands' => '/sbin/shutdown -r',
@@ -162,8 +150,6 @@ class testPageAdministrationScripts extends CWebTest {
 						],
 						[
 							'Name' => self::$script_for_filter,
-							'Scope' => 'Manual event action',
-							'Used in actions' => '',
 							'Type' => 'Script',
 							'Execute on' => 'Server (proxy)',
 							'Commands' => '/sbin/run',
@@ -173,8 +159,6 @@ class testPageAdministrationScripts extends CWebTest {
 						],
 						[
 							'Name' => 'Selenium script',
-							'Scope' => 'Action operation',
-							'Used in actions' => '',
 							'Type' => 'Script',
 							'Execute on' => 'Server (proxy)',
 							'Commands' => 'test',
@@ -184,8 +168,6 @@ class testPageAdministrationScripts extends CWebTest {
 						],
 						[
 							'Name' => 'Traceroute',
-							'Scope' => 'Manual host action',
-							'Used in actions' => '',
 							'Type' => 'Script',
 							'Execute on' => 'Server (proxy)',
 							'Commands' => '/usr/bin/traceroute {HOST.CONN}',
@@ -231,7 +213,7 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->assertTrue($filter->isDisplayed());
 
 		// Check that all filter fields are present.
-		$this->assertEquals(['Name', 'Scope'], $filter_form->getLabels()->asText());
+		$this->assertEquals(['Name'], $filter_form->getLabels()->asText());
 
 		// Check the count of returned Scripts and the count of selected Scripts.
 		$this->assertTableStats($scripts_count);
@@ -254,8 +236,6 @@ class testPageAdministrationScripts extends CWebTest {
 
 		$reference_headers = [
 			'Name' => true,
-			'Scope' => false,
-			'Used in actions' => false,
 			'Type' => false,
 			'Execute on' => false,
 			'Commands' => true,
@@ -372,99 +352,6 @@ class testPageAdministrationScripts extends CWebTest {
 						'Name' => 'No data should be returned'
 					]
 				]
-			],
-			// Search by Action operation.
-			[
-				[
-					'filter' => [
-						'Scope' => 'Action operation'
-					],
-					'expected' => [
-						self::$custom_script,
-						'Reboot',
-						'Selenium script'
-					]
-				]
-			],
-			// Search by Action operation and Name.
-			[
-				[
-					'filter' => [
-						'Name' => 'Reboot',
-						'Scope' => 'Action operation'
-					],
-					'expected' => [
-						'Reboot'
-					]
-				]
-			],
-			// Search by Manual host action.
-			[
-				[
-					'filter' => [
-						'Scope' => 'Manual host action'
-					],
-					'expected' => [
-						'Detect operating system',
-						'Ping',
-						'Traceroute'
-					]
-				]
-			],
-			// Search by Manual host action and Partial name match.
-			[
-				[
-					'filter' => [
-						'Name' => 'ing',
-						'Scope' => 'Manual host action'
-					],
-					'expected' => [
-						'Detect operating system',
-						'Ping'
-					]
-				]
-			],
-			// Search by Manual event action.
-			[
-				[
-					'filter' => [
-						'Scope' => 'Manual event action'
-					],
-					'expected' => [
-						self::$script_scope_event,
-						self::$script_for_filter
-					]
-				]
-			],
-			// Search by Manual event action and Partial name match.
-			[
-				[
-					'filter' => [
-						'Name' => 'Manual event',
-						'Scope' => 'Manual event action'
-					],
-					'expected' => [
-						self::$script_scope_event
-					]
-				]
-			],
-			// Search Any scripts.
-			[
-				[
-					'filter' => [
-						'Scope' => 'Any'
-					],
-					'expected' => [
-						self::$custom_script,
-						'Detect operating system',
-						self::$script_scope_event,
-						'Ping',
-						'Reboot',
-						self::$script_for_filter,
-						'Selenium script',
-						'Traceroute'
-					]
-				]
 			]
 		];
 	}
@@ -575,17 +462,5 @@ class testPageAdministrationScripts extends CWebTest {
 				$this->assertEquals(0, CDBHelper::getCount('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($scripts)));
 			}
 		}
-	}
-
-	/**
-	 * Verify that there is possibility to open 'action' modal popup via link located in 'Used in actions' tab.
-	 */
-	public function testPageAdministrationScripts_ActionLinks() {
-		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('link:'.self::$custom_action)->one()->waitUntilClickable()->click();
-		$form = $this->query('id:action-form')->asForm()->waitUntilVisible()->one();
-		$this->assertEquals(self::$custom_action, $form->getField('Name')->getValue());
-		$form->query('button:Cancel')->one()->click();
-		$this->page->assertHeader('Trigger actions');
 	}
 }
