@@ -155,7 +155,6 @@
 
 		$('#type')
 			.change(function() {
-				console.log(document.querySelector('#trends_mode_1'));
 				updateItemFormElements();
 				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt(this.value, 10));
 
