@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-01-08 15:52+0000\n"
-"Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
+"PO-Revision-Date: 2023-02-08 15:52+0000\n"
+"Last-Translator: Jose Carlos <jcarlesmarino@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -64,11 +64,11 @@ msgstr "S'espera la parella \"amfitrió:clau\"."
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr "\"hostid\" de l'Item dependent i l'Item principal han de coincidir"
+msgstr "\"hostid\" de l'element depenent i l'element mestre haurien de coincidir"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr "\"ruleid\" de l'Item dependent i l'Item principal han de coincidir"
+msgstr "\"ruleid\" de l'element depenent i l'element mestre haurien de coincidir"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:900

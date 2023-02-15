@@ -100,6 +100,14 @@ void	__wrap_zbx_clean_events(void)
 {
 }
 
+#ifdef HAVE_POSTGRESQL
+void	__wrap_zbx_config_get(void *cfg, int flags)
+{
+	ZBX_UNUSED(cfg);
+	ZBX_UNUSED(flags);
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Purpose: dumps history record vector contents to standard output           *

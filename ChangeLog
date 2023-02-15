@@ -1,3 +1,23 @@
+Changes for 6.0.14rc1
+
+New features:
+A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
+
+Bug fixes:
+..F....... [ZBX-21748] fixed background of close button in message box for dark theme (dpetra)
+A......... [ZBX-19202] fixed template dashboard availability to users without permissions to the templates (averza)
+........S. [ZBX-22189] fixed Zabbix server crash appearing when only item tags change between LLD runs (arimdjonoks)
+.........T [ZBX-21591] optimized Nginx Plus by HTTP template to spread the load across the workers (igorbach)
+.......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
+.........T [ZBX-21597] optimized Remote Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
+.........T [ZBX-21602] optimized Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.13
+
+6.0.13rc1 was released as 6.0.13 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.13rc1
 
 New features:
@@ -2341,6 +2361,14 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.32rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.31
