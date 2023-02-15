@@ -197,7 +197,7 @@ class testPageWeb extends CWebTest {
 
 		$titles = [
 			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Web', 'Configuration', 'Detect operating system',
-			'Ping', 'Script for Clone', 'Script for Delete', 'Script for Update', 'Traceroute'
+			'Ping', 'Traceroute'
 		];
 
 		foreach (['WebData Host', 'Simple form test host'] as $name) {
