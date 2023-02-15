@@ -280,8 +280,7 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->assertTableData($data['fields']);
 	}
 
-	public function getFilterData()
-	{
+	public function getFilterData() {
 		return [
 			// Name with special symbols.
 			[
@@ -482,7 +481,7 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if (array_key_exists('expected', $data)) {
-			// Using column Name check that only the expected Hosts are returned in the list.
+			// Using column Name check that only the expected Scripts are returned in the list.
 			$this->assertTableDataColumn($data['expected']);
 		}
 		else {
