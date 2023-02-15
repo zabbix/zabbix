@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ class CControllerScriptCreate extends CController {
 		$fields = [
 			'name' =>					'required|db scripts.name|not_empty',
 			'scope' =>					'db scripts.scope| in '.implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]),
-			'type' =>					'required|db scripts.type|in '.implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK]),
+			'type' =>					'required|db scripts.type|in '.implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL]),
 			'execute_on' =>				'db scripts.execute_on|in '.implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY]),
 			'menu_path' =>				'db scripts.menu_path',
 			'authtype' =>				'db scripts.authtype|in '.implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
@@ -40,6 +40,8 @@ class CControllerScriptCreate extends CController {
 			'parameters' =>				'array',
 			'script' => 				'db scripts.command|flags '.P_CRLF,
 			'timeout' => 				'db scripts.timeout|time_unit '.implode(':', [1, SEC_PER_MIN]),
+			'url' => 					'db scripts.url',
+			'new_window' => 			'db scripts.new_window|in '.implode(',', [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]),
 			'description' =>			'db scripts.description',
 			'host_access' =>			'db scripts.host_access|in '.implode(',', [PERM_READ, PERM_READ_WRITE]),
 			'groupid' =>				'db scripts.groupid',
@@ -132,6 +134,11 @@ class CControllerScriptCreate extends CController {
 						}, $parameters['name'], $parameters['value']
 					);
 				}
+				break;
+
+			case ZBX_SCRIPT_TYPE_URL:
+				$script['url'] = $this->getInput('url', '');
+				$script['new_window'] = $this->getInput('new_window', ZBX_SCRIPT_URL_NEW_WINDOW_YES);
 				break;
 		}
 

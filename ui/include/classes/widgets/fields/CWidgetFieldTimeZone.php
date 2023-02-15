@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,62 +19,33 @@
 **/
 
 
-class CWidgetFieldTimeZone extends CWidgetField {
+namespace Zabbix\Widgets\Fields;
 
-	private $values;
+use CTimezoneHelper;
 
-	/**
-	 * CSelect widget field.
-	 *
-	 * @param string $name    Field name in form
-	 * @param string $label   Label for the field in form
-	 * @param array  $values  Key/value pairs of select option values. Key - saved in DB. Value - visible to user.
-	 */
-	public function __construct($name, $label, $values = null) {
-		parent::__construct($name, $label);
+class CWidgetFieldTimeZone extends CWidgetFieldSelect {
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+	public const DEFAULT_VALUE = '';
 
-		if ($values === null) {
-			$this->values = $this->generateValues();
-		}
+	public function __construct(string $name, string $label = null, array $values = null) {
+		parent::__construct($name, $label, $values === null
+			? [
+				ZBX_DEFAULT_TIMEZONE => CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(),
+					_('System default')
+				),
+				TIMEZONE_DEFAULT_LOCAL => _('Local default')
+			] + CTimezoneHelper::getList()
+			: null
+		);
 
-		$this->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
-	public function setValue($value) {
-		return parent::setValue($value);
-	}
+	public function setValue($value): self {
+		$this->value = $value;
 
-	public function getValues() {
-		return $this->values;
-	}
-
-	private function generateValues() {
-		return [
-			ZBX_DEFAULT_TIMEZONE => CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(),
-				_('System default')
-			),
-			TIMEZONE_DEFAULT_LOCAL => _('Local default')
-		] + CTimezoneHelper::getList();
-	}
-
-	public function getJavascript() {
-		return '
-			var timezone_select =  document.getElementById("'.$this->getName().'");
-			var local_time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-			var timezone_from_list = timezone_select.getOptionByValue(local_time_zone);
-			var local_list_item = timezone_select.getOptionByValue("'.TIMEZONE_DEFAULT_LOCAL.'");
-
-			if (timezone_from_list && local_list_item) {
-				const title = local_list_item.label + ": " + timezone_from_list.label;
-				local_list_item.label = title;
-				local_list_item._node.innerText = title;
-
-				if (timezone_select.selectedIndex === local_list_item._index) {
-					timezone_select._preselect(timezone_select.selectedIndex);
-				}
-			}
-		';
+		return $this;
 	}
 }

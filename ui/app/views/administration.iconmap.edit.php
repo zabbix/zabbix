@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 $this->includeJsFile('administration.iconmap.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Icon mapping'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ICONMAP_EDIT));
@@ -40,13 +40,16 @@ $name = (new CTextBox('iconmap[name]', $data['iconmap']['name']))
 
 $form_list->addRow((new CLabel(_('Name'), 'iconmap[name]'))->setAsteriskMark(), $name);
 
+$csrf_token = CCsrfTokenHelper::get('iconmap');
+
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('iconmap')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', ($data['iconmapid'] != 0) ? 'iconmap.update' : 'iconmap.create')
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', 1);
 
 if ($data['iconmapid'] != 0) {
@@ -140,7 +143,7 @@ if ($data['iconmapid'] != 0) {
 			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'iconmap.delete')
 					->setArgument('iconmapid', $data['iconmapid'])
-					->setArgumentSID(),
+					->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 				_('Delete icon map?')
 			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
@@ -162,4 +165,4 @@ else {
 
 $form->addItem($tab);
 
-$widget->addItem($form)->show();
+$html_page->addItem($form)->show();

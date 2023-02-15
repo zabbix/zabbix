@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,10 @@
 
 class CControllerAuditLogList extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'page' =>					'ge 1',
@@ -37,30 +41,6 @@ class CControllerAuditLogList extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret) {
-			$fields = [];
-
-			if ($this->getInput('filter_resourceid', '') !== '') {
-				$fields['filter_resourceid'] = 'id';
-			}
-
-			if ($this->getInput('filter_recordsetid', '') !== '') {
-				$fields['filter_recordsetid'] = 'cuid';
-			}
-
-			if ($fields) {
-				$validator = new CNewValidator($this->getInputAll(), $fields);
-
-				foreach ($validator->getAllErrors() as $error) {
-					info($error);
-				}
-
-				if ($validator->isErrorFatal() || $validator->isError()) {
-					$ret = false;
-				}
-			}
-		}
-
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
@@ -73,10 +53,10 @@ class CControllerAuditLogList extends CController {
 	}
 
 	protected function doAction(): void {
-		if ($this->getInput('filter_set', 0)) {
+		if ($this->hasInput('filter_set')) {
 			$this->updateProfiles();
 		}
-		elseif ($this->getInput('filter_rst', 0)) {
+		elseif ($this->hasInput('filter_rst')) {
 			$this->deleteProfiles();
 		}
 
@@ -199,10 +179,6 @@ class CControllerAuditLogList extends CController {
 		$this->setResponse($response);
 	}
 
-	protected function init(): void {
-		$this->disableSIDValidation();
-	}
-
 	/**
 	 * Return associated list of available actions and labels.
 	 *
@@ -233,6 +209,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_AUTH_TOKEN => _('API token'),
 			CAudit::RESOURCE_AUTHENTICATION => _('Authentication'),
 			CAudit::RESOURCE_AUTOREGISTRATION  => _('Autoregistration'),
+			CAudit::RESOURCE_CONNECTOR => _('Connector'),
 			CAudit::RESOURCE_CORRELATION => _('Event correlation'),
 			CAudit::RESOURCE_DASHBOARD => _('Dashboard'),
 			CAudit::RESOURCE_DISCOVERY_RULE => _('Discovery rule'),

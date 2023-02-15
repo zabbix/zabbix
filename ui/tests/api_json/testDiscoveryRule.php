@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -696,7 +696,7 @@ class testDiscoveryRule extends CAPITest {
 					'preprocessing' => [
 						[
 							'type' => null,
-							'params' => null,
+							'params' => '',
 							'error_handler' => null,
 							'error_handler_params' => null
 						]
@@ -709,7 +709,7 @@ class testDiscoveryRule extends CAPITest {
 					'preprocessing' => [
 						[
 							'type' => false,
-							'params' => null,
+							'params' => '',
 							'error_handler' => null,
 							'error_handler_params' => null
 						]
@@ -722,7 +722,7 @@ class testDiscoveryRule extends CAPITest {
 					'preprocessing' => [
 						[
 							'type' => '',
-							'params' => null,
+							'params' => '',
 							'error_handler' => null,
 							'error_handler_params' => null
 						]
@@ -735,7 +735,7 @@ class testDiscoveryRule extends CAPITest {
 					'preprocessing' => [
 						[
 							'type' => [],
-							'params' => null,
+							'params' => '',
 							'error_handler' => null,
 							'error_handler_params' => null
 						]
@@ -781,19 +781,6 @@ class testDiscoveryRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Incorrect value for field "type": unexpected value "'.ZBX_PREPROC_OCT2DEC.'".'
-			],
-			'Test valid type but empty preprocessing params (null)' => [
-				'discoveryrule' => [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_REGSUB,
-							'params' => null,
-							'error_handler' => '',
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "params": cannot be empty.'
 			],
 			'Test valid type but empty preprocessing params (bool)' => [
 				'discoveryrule' => [
@@ -1203,19 +1190,6 @@ class testDiscoveryRule extends CAPITest {
 						[
 							'type' => ZBX_PREPROC_CSV_TO_JSON,
 							'params' => '',
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "params": cannot be empty.'
-			],
-			'Test invalid (null) preprocessing parameters for ZBX_PREPROC_CSV_TO_JSON type' => [
-				'discoveryrule' => [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_CSV_TO_JSON,
-							'params' => null,
 							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 							'error_handler_params' => ''
 						]
@@ -5479,10 +5453,10 @@ class testDiscoveryRule extends CAPITest {
 		);
 		CTestArrayHelper::usort($db_lld_overrides, ['lld_overrideid']);
 
-		// Operation that had only optamplate is deleted.
+		// Operation that had only optemplate is deleted.
 		unset($request_lld_overrides[0]['operations']);
 
-		// Operation that had not only optamplate is not deleted.
+		// Operation that had not only optemplate is not deleted.
 		unset($request_lld_overrides[1]['operations'][0]['optemplate']);
 
 		foreach ($request_lld_overrides as $override_num => $request_lld_override) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "log.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t itemid, zbx_uint64_t hostid,
 		const char *value, const zbx_timespec_t *ts, unsigned char meta, zbx_uint64_t lastlogsize, int mtime,
@@ -231,10 +231,10 @@ void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGEN
 
 	if (NULL != result)
 	{
-		if (NULL != GET_TEXT_RESULT(result))
-			value = *(GET_TEXT_RESULT(result));
+		if (NULL != ZBX_GET_TEXT_RESULT(result))
+			value = *(ZBX_GET_TEXT_RESULT(result));
 
-		if (0 != ISSET_META(result))
+		if (0 != ZBX_ISSET_META(result))
 		{
 			meta = 1;
 			lastlogsize = result->lastlogsize;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,15 +21,16 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('administration.mediatype.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Media types'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MEDIATYPE_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_EDIT));
 
 $tabs = new CTabView();
 
@@ -37,14 +38,18 @@ if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
+$csrf_token = CCsrfTokenHelper::get('mediatype');
+
 // create form
 $mediaTypeForm = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('media-type-form')
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->disablePasswordAutofill()
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 // Create form list.
 $mediatype_formlist = (new CFormList())
@@ -57,8 +62,14 @@ $mediatype_formlist = (new CFormList())
 	->addRow(new CLabel(_('Type'), 'label-type'), (new CSelect('type'))
 		->setId('type')
 		->setFocusableElementId('label-type')
-		->addOptions(CSelect::createOptionsFromArray(media_type2str()))
+		->addOptions(CSelect::createOptionsFromArray(CMediatypeHelper::getMediaTypes()))
 		->setValue($data['type'])
+	)
+	->addRow(new CLabel(_('Email provider'), 'label-provider'), (new CSelect('provider'))
+		->setId('provider')
+		->setFocusableElementId('label-provider')
+		->addOptions(CSelect::createOptionsFromArray(CMediatypeHelper::getAllEmailProvidersNames()))
+		->setValue($data['provider'])
 	)
 	->addRow((new CLabel(_('SMTP server'), 'smtp_server'))->setAsteriskMark(),
 		(new CTextBox('smtp_server', $data['smtp_server']))
@@ -68,15 +79,14 @@ $mediatype_formlist = (new CFormList())
 	->addRow(_('SMTP server port'),
 		(new CNumericBox('smtp_port', $data['smtp_port'], 5, false, false, false))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	)
-	->addRow((new CLabel(_('SMTP helo'), 'smtp_helo'))->setAsteriskMark(),
-		(new CTextBox('smtp_helo', $data['smtp_helo']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('SMTP email'), 'smtp_email'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Email'), 'smtp_email'))->setAsteriskMark(),
 		(new CTextBox('smtp_email', $data['smtp_email']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+	)
+	->addRow((new CLabel(_('SMTP helo'), 'smtp_helo')),
+		(new CTextBox('smtp_helo', $data['smtp_helo']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('Connection security'), 'smtp_security'),
 		(new CRadioButtonList('smtp_security', (int) $data['smtp_security']))
@@ -100,27 +110,35 @@ $mediatype_formlist = (new CFormList())
 			->setAriaRequired()
 	);
 
-$exec_params_table = (new CTable())
+// MEDIA_TYPE_EXEC
+$parameters_exec_table = (new CTable())
 	->setId('exec_params_table')
-	->setHeader([_('Parameter'), _('Action')])
+	->setHeader([
+		(new CColHeader(_('Value')))->setWidth('100%'),
+		_('Action')
+	])
 	->setAttribute('style', 'width: 100%;');
 
-foreach ($data['exec_params'] as $i => $exec_param) {
-	$exec_params_table->addRow([
-		(new CTextBox('exec_params['.$i.'][exec_param]', $exec_param['exec_param'], false, 255))
+foreach ($data['parameters_exec'] as $sortorder => $parameter) {
+	$parameters_exec_table->addRow([
+		(new CTextBox('parameters_exec['.$parameter['sortorder'].'][value]', $parameter['value'], false, 255))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CButton('exec_params['.$i.'][remove]', _('Remove')))
+		(new CButton('parameters_exec['.$parameter['sortorder'].'][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
-		], 'form_row');
+	], 'form_row');
 }
 
-$exec_params_table->addRow([(new CButton('exec_param_add', _('Add')))
+$parameters_exec_table->addRow([(new CButton('exec_param_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
-$mediatype_formlist->addRow(_('Script parameters'),
-	(new CDiv($exec_params_table))
+$mediatype_formlist->addRow(
+	new CLabel([
+		_('Script parameters'),
+		makeHelpIcon(_('These parameters will be passed to the script as command-line arguments in the specified order.'))
+	]),
+	(new CDiv($parameters_exec_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 	'row_exec_params'
@@ -158,12 +176,12 @@ $parameters_table = (new CTable())
 	])
 	->setAttribute('style', 'width: 100%;');
 
-foreach ($data['parameters'] as $parameter) {
+foreach ($data['parameters_webhook'] as $parameter) {
 	$parameters_table->addRow([
-		(new CTextBox('parameters[name][]', $parameter['name'], false, DB::getFieldLength('media_type_param', 'name')))
+		(new CTextBox('parameters_webhook[name][]', $parameter['name'], false, DB::getFieldLength('media_type_param', 'name')))
 			->setAttribute('style', 'width: 100%;')
 			->removeId(),
-		(new CTextBox('parameters[value][]', $parameter['value'], false,
+		(new CTextBox('parameters_webhook[value][]', $parameter['value'], false,
 			DB::getFieldLength('media_type_param', 'value')
 		))
 			->setAttribute('style', 'width: 100%;')
@@ -181,10 +199,10 @@ $row_template = (new CTag('script', true))
 	->setAttribute('type', 'text/x-jquery-tmpl')
 	->addItem(
 		(new CRow([
-			(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
+			(new CTextBox('parameters_webhook[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
 				->setAttribute('style', 'width: 100%;')
 				->removeId(),
-			(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
+			(new CTextBox('parameters_webhook[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
 				->setAttribute('style', 'width: 100%;')
 				->removeId(),
 			(new CButton('', _('Remove')))
@@ -195,7 +213,7 @@ $row_template = (new CTag('script', true))
 		]))->addClass('form_row')
 	);
 
-$widget->addItem($row_template);
+$html_page->addItem($row_template);
 
 $parameters_table->addRow([(new CButton('parameter_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
@@ -344,6 +362,7 @@ $mediaOptionsForm = (new CFormList('options'))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	);
+
 $tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm, TAB_INDICATOR_MEDIATYPE_OPTIONS);
 
 // append buttons to form
@@ -363,8 +382,10 @@ if ($data['mediatypeid'] == 0) {
 else {
 	$updateButton = (new CSubmitButton(_('Update'), 'action', 'mediatype.update'))->setId('update');
 	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
-	$deleteButton = (new CRedirectButton(_('Delete'),
-		'zabbix.php?action=mediatype.delete&sid='.$data['sid'].'&mediatypeids[]='.$data['mediatypeid'],
+	$deleteButton = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'mediatype.delete')
+			->setArgument('mediatypeids', [$data['mediatypeid']])
+			->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 		_('Delete media type?')
 	))
 		->setId('delete');
@@ -383,4 +404,4 @@ else {
 $mediaTypeForm->addItem($tabs);
 
 // append form to widget
-$widget->addItem($mediaTypeForm)->show();
+$html_page->addItem($mediaTypeForm)->show();

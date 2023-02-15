@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 $this->includeJsFile('configuration.templategroup.list.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Template groups'))
 	->setControls((new CTag('nav', true, (new CList())
 		->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
@@ -148,7 +148,7 @@ $form->addItem([
 	], 'templategroup')
 ]);
 
-$widget
+$html_page
 	->addItem($filter)
 	->addItem($form)
 	->show();
@@ -156,7 +156,7 @@ $widget
 (new CScriptTag('view.init('.json_encode([
 	'delete_url' => (new CUrl('zabbix.php'))
 		->setArgument('action', 'templategroup.delete')
-		->setArgumentSID()
+		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('templategroup'))
 		->getUrl()
 ]).');'))
 	->setOnDocumentReady()

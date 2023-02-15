@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,12 +26,6 @@
 
 #define MAX_ERR_LEN 256
 
-int	CONFIG_ALERTDB_FORKS		= 1;
-int	CONFIG_LLDWORKER_FORKS		= 2;
-int	CONFIG_LLDMANAGER_FORKS		= 1;
-int	CONFIG_REPORTMANAGER_FORKS	= 0;
-int	CONFIG_REPORTWRITER_FORKS	= 0;
-
 void	zbx_mock_test_entry(void **state)
 {
 	icmpping_t		icmpping;
@@ -47,7 +41,7 @@ void	zbx_mock_test_entry(void **state)
 	interface = zbx_mock_get_parameter_string("in.interface");
 	key =  zbx_mock_get_parameter_string("in.key");
 
-	ret = parse_key_params(key, interface, &icmpping, &returned_addr, &count,
+	ret = zbx_parse_key_params(key, interface, &icmpping, &returned_addr, &count,
 			&interval, &size, &timeout, &type, error, MAX_ERR_LEN);
 	if (SUCCEED != ret)
 		printf("zbx_pinger_test error: %s\n", error);

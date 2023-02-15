@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -630,7 +630,7 @@ var hintBox = {
 			delete target.hintBoxItem;
 
 			if (target.isStatic) {
-				if (jQuery(target).data('return-control') !== 'undefined') {
+				if (jQuery(target).data('return-control') !== undefined) {
 					jQuery(target).data('return-control').focus();
 				}
 				delete target.isStatic;
@@ -655,71 +655,47 @@ var hintBox = {
 };
 
 /**
- * Add object to the list of favourites.
- */
-function add2favorites(object, objectid) {
-	sendAjaxData('zabbix.php?action=favourite.create', {
-		data: {
-			object: object,
-			objectid: objectid
-		}
-	});
-}
-
-/**
- * Remove object from the list of favourites. Remove all favourites if objectid==0.
- */
-function rm4favorites(object, objectid) {
-	sendAjaxData('zabbix.php?action=favourite.delete', {
-		data: {
-			object: object,
-			objectid: objectid
-		}
-	});
-}
-
-/**
- * Toggles filter state and updates title and icons accordingly.
+ * Perform JSON-RPC Zabbix API call.
  *
- * @param {string} 	idx					User profile index
- * @param {string} 	value				Value
- * @param {object} 	idx2				An array of IDs
- * @param {integer} profile_type		Profile type
+ * @param {string} method
+ * @param {object} params
+ * @param {int}    id
+ *
+ * @returns {Promise<any>}
  */
-function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT) {
-	const value_fields = {
-		[PROFILE_TYPE_INT]: 'value_int',
-		[PROFILE_TYPE_STR]: 'value_str'
-	};
-
-	return sendAjaxData('zabbix.php?action=profile.update', {
-		data: {
-			idx: idx,
-			[value_fields[profile_type]]: value,
-			idx2: idx2
-		}
-	});
+function ApiCall(method, params, id = 1) {
+	return fetch(new Curl('api_jsonrpc.php').getUrl(), {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		credentials: 'same-origin',
+		body: JSON.stringify({
+			jsonrpc: '2.0',
+			method,
+			params,
+			id
+		}),
+	}).then((response) => response.json());
 }
 
-function changeWidgetState(obj, widgetId, idx) {
-	var widgetObj = jQuery('#' + widgetId + '_widget'),
-		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
-		state = 0;
+/**
+ * Section collapse toggle.
+ *
+ * @param {string}      id
+ * @param {string|null} profile_idx  If not null, stores state in profile.
+ */
+function toggleSection(id, profile_idx) {
+	const section = document.getElementById(id);
+	const toggle = section.querySelector('.section-toggle');
 
-	if (css === 'btn-widget-expand') {
-		jQuery('.body', widgetObj).slideUp(50);
-		jQuery('.dashboard-widget-foot', widgetObj).slideUp(50);
-	}
-	else {
-		jQuery('.body', widgetObj).slideDown(50);
-		jQuery('.dashboard-widget-foot', widgetObj).slideDown(50);
+	let is_collapsed = section.classList.contains('section-collapsed');
 
-		state = 1;
-	}
+	section.classList.toggle('section-collapsed', !is_collapsed);
+	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 
-	obj.title = (state == 1) ? t('S_COLLAPSE') : t('S_EXPAND');
-	if (idx !== '' && typeof idx !== 'undefined') {
-		updateUserProfile(idx, state, []);
+	if (profile_idx !== '') {
+		updateUserProfile(profile_idx, is_collapsed ? '1' : '0', []);
 	}
 }
 

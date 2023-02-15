@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../CElement.php';
 
@@ -28,6 +29,7 @@ class CInputGroupElement extends CElement {
 
 	const TYPE_SECRET = 'Secret text';
 	const TYPE_TEXT = 'Text';
+	const TYPE_VAULT = 'Vault';
 
 	/**
 	 * Get value of InputGroup element.
@@ -77,10 +79,18 @@ class CInputGroupElement extends CElement {
 	 * @return string
 	 */
 	public function getInputType() {
-		$xpath = 'xpath:.//button['.CXPathHelper::fromClass('icon-text').']';
-		$type = ($this->query($xpath)->exists()) ? self::TYPE_TEXT : self::TYPE_SECRET;
+		$xpath_vault = 'xpath:./../div[contains(@class, "macro-value-vault")]';
+		$xpath_secret = 'xpath:.//div[@class="input-secret"]/..//button[contains(@id, "type_button")]';
 
-		return $type;
+		if ($this->query($xpath_secret)->exists()) {
+			return self::TYPE_SECRET;
+		}
+
+		if ($this->query($xpath_vault)->exists()) {
+			return self::TYPE_VAULT;
+		}
+
+		return self::TYPE_TEXT;
 	}
 
 	/**

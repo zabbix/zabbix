@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,24 +48,14 @@ class CHostPrototype extends CHostBase {
 			// filter
 			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'discoveryids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'hostid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
-				'templateid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'inventory_mode' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
-			]],
-			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['host', 'name']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => 'inventory_mode,'.implode(',', $output_fields), 'default' => $output_fields],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => $output_fields],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'groupCount' =>				['type' => API_FLAG, 'default' => false],
 			'selectGroupLinks' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['groupid']), 'default' => null],
@@ -388,7 +378,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT '.implode(',', $output).
 			' FROM group_prototype gp'.
 			' WHERE '.dbConditionId('gp.hostid', array_keys($result)).
-				' AND '.dbConditionId('gp.groupid', [0], true)
+				' AND gp.groupid IS NOT NULL'
 		);
 
 		while ($db_group_prototype = DBfetch($db_group_prototypes)) {
@@ -430,7 +420,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT '.implode(',', $output).
 			' FROM group_prototype gp'.
 			' WHERE '.dbConditionId('gp.hostid', array_keys($result)).
-				' AND '.dbConditionString('gp.name', [''], true)
+				' AND gp.groupid IS NULL'
 		);
 
 		while ($db_group_prototype = DBfetch($db_group_prototypes)) {
@@ -451,7 +441,7 @@ class CHostPrototype extends CHostBase {
 		$this->validateCreate($host_prototypes);
 
 		$this->createForce($host_prototypes);
-		[$tpl_host_prototypes] = $this->getTemplatedObjects($host_prototypes);
+		[$tpl_host_prototypes] = self::getTemplatedObjects($host_prototypes);
 
 		if ($tpl_host_prototypes) {
 			$this->inherit($tpl_host_prototypes);
@@ -509,7 +499,7 @@ class CHostPrototype extends CHostBase {
 		self::checkDuplicates($host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
 		self::checkGroupLinks($host_prototypes);
-		$this->checkTemplates($host_prototypes);
+		self::checkTemplates($host_prototypes);
 	}
 
 	/**
@@ -530,7 +520,7 @@ class CHostPrototype extends CHostBase {
 		unset($host_prototype);
 
 		if (!$inherited) {
-			$this->checkTemplatesLinks($host_prototypes);
+			self::checkTemplatesLinks($host_prototypes);
 		}
 
 		self::createHostDiscoveries($host_prototypes);
@@ -538,7 +528,7 @@ class CHostPrototype extends CHostBase {
 		self::updateInterfaces($host_prototypes);
 		self::updateGroupLinks($host_prototypes);
 		self::updateGroupPrototypes($host_prototypes);
-		$this->updateTemplates($host_prototypes);
+		self::updateTemplates($host_prototypes);
 		$this->updateTags($host_prototypes);
 		$this->updateMacros($host_prototypes);
 		self::updateHostInventories($host_prototypes);
@@ -557,7 +547,7 @@ class CHostPrototype extends CHostBase {
 		$this->updateForce($host_prototypes, $db_host_prototypes);
 
 		[$tpl_host_prototypes, $tpl_db_host_prototypes] =
-			$this->getTemplatedObjects($host_prototypes, $db_host_prototypes);
+			self::getTemplatedObjects($host_prototypes, $db_host_prototypes);
 
 		if ($tpl_host_prototypes) {
 			$this->inherit($tpl_host_prototypes, $tpl_db_host_prototypes);
@@ -574,6 +564,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function validateUpdate(array &$host_prototypes, array &$db_host_prototypes = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
+			'uuid' =>	['type' => API_UUID],
 			'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'ruleid' => ['type' => API_UNEXPECTED]
 		]];
@@ -634,14 +625,14 @@ class CHostPrototype extends CHostBase {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->addAffectedObjects($host_prototypes, $db_host_prototypes);
+		self::addAffectedObjects($host_prototypes, $db_host_prototypes);
 
 		self::checkDuplicates($host_prototypes, $db_host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
 		self::checkGroupLinks($host_prototypes, $db_host_prototypes);
-		$this->checkTemplates($host_prototypes, $db_host_prototypes);
-		$this->checkTemplatesLinks($host_prototypes, $db_host_prototypes);
-		$host_prototypes = parent::validateHostMacros($host_prototypes, $db_host_prototypes);
+		self::checkTemplates($host_prototypes, $db_host_prototypes);
+		self::checkTemplatesLinks($host_prototypes, $db_host_prototypes);
+		$host_prototypes = $this->validateHostMacros($host_prototypes, $db_host_prototypes);
 	}
 
 	/**
@@ -649,6 +640,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'fields' => [
+			'uuid' =>				['type' => API_UUID],
 			'hostid' =>				['type' => API_ID],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
@@ -685,6 +677,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'fields' => [
+			'uuid' => 				['type' => API_UUID],
 			'hostid' =>				['type' => API_ID],
 			'host' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'name' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -740,28 +733,28 @@ class CHostPrototype extends CHostBase {
 												['else' => true, 'type' => API_UNEXPECTED]
 						]],
 						'authprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => function (array $data): bool {
+												['if' => static function (array $data): bool {
 													return $data['version'] == SNMP_V3
 														&& in_array($data['securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]);
 												}, 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3AuthProtocols()))],
 												['else' => true, 'type' => API_UNEXPECTED]
 						]],
 						'authpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => function (array $data): bool {
+												['if' => static function (array $data): bool {
 													return $data['version'] == SNMP_V3
 														&& in_array($data['securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]);
 												}, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
 												['else' => true, 'type' => API_UNEXPECTED]
 						]],
 						'privprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => function (array $data): bool {
+												['if' => static function (array $data): bool {
 													return $data['version'] == SNMP_V3
 														&& $data['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV;
 												}, 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3PrivProtocols()))],
 												['else' => true, 'type' => API_UNEXPECTED]
 						]],
 						'privpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => function (array $data): bool {
+												['if' => static function (array $data): bool {
 													return $data['version'] == SNMP_V3
 														&& $data['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV;
 												}, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
@@ -779,7 +772,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array $host_prototypes
 	 * @param array $db_host_prototypes
 	 */
-	protected function updateForce(array &$host_prototypes, array $db_host_prototypes): void {
+	public function updateForce(array &$host_prototypes, array $db_host_prototypes): void {
 		$upd_host_prototypes = [];
 
 		// save the host prototypes
@@ -803,7 +796,7 @@ class CHostPrototype extends CHostBase {
 		self::updateInterfaces($host_prototypes, $db_host_prototypes);
 		self::updateGroupLinks($host_prototypes, $db_host_prototypes);
 		self::updateGroupPrototypes($host_prototypes, $db_host_prototypes);
-		$this->updateTemplates($host_prototypes, $db_host_prototypes);
+		self::updateTemplates($host_prototypes, $db_host_prototypes);
 		$this->updateTags($host_prototypes, $db_host_prototypes);
 		$this->updateMacros($host_prototypes, $db_host_prototypes);
 		self::updateHostInventories($host_prototypes, $db_host_prototypes);
@@ -818,27 +811,28 @@ class CHostPrototype extends CHostBase {
 	 * @param array $db_host_prototypes
 	 */
 	protected function addAffectedObjects(array $host_prototypes, array &$db_host_prototypes): void {
+		parent::addAffectedObjects($host_prototypes, $db_host_prototypes);
 		self::addAffectedInterfaces($host_prototypes, $db_host_prototypes);
 		self::addAffectedGroupLinks($host_prototypes, $db_host_prototypes);
 		self::addAffectedGroupPrototypes($host_prototypes, $db_host_prototypes);
-		parent::addAffectedObjects($host_prototypes, $db_host_prototypes);
+		self::addAffectedTemplates($host_prototypes, $db_host_prototypes);
 	}
 
 	/**
-	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
+	 * @param array $hosts
+	 * @param array $db_hosts
 	 */
-	private static function addAffectedInterfaces(array $host_prototypes, array &$db_host_prototypes): void {
+	private static function addAffectedInterfaces(array $hosts, array &$db_hosts): void {
 		$hostids = [];
 
-		foreach ($host_prototypes as $host_prototype) {
-			$db_custom_interfaces = $db_host_prototypes[$host_prototype['hostid']]['custom_interfaces'];
+		foreach ($hosts as $hosts) {
+			$db_custom_interfaces = $db_hosts[$hosts['hostid']]['custom_interfaces'];
 
-			if (array_key_exists('interfaces', $host_prototype)
-					|| ($host_prototype['custom_interfaces'] != $db_custom_interfaces
+			if (array_key_exists('interfaces', $hosts)
+					|| ($hosts['custom_interfaces'] != $db_custom_interfaces
 						&& $db_custom_interfaces == HOST_PROT_INTERFACES_CUSTOM)) {
-				$hostids[] = $host_prototype['hostid'];
-				$db_host_prototypes[$host_prototype['hostid']]['interfaces'] = [];
+				$hostids[] = $hosts['hostid'];
+				$db_hosts[$hosts['hostid']]['interfaces'] = [];
 			}
 		}
 
@@ -854,7 +848,7 @@ class CHostPrototype extends CHostBase {
 		$db_interfaces = DBselect(DB::makeSql('interface', $options));
 
 		while ($db_interface = DBfetch($db_interfaces)) {
-			$db_host_prototypes[$db_interface['hostid']]['interfaces'][$db_interface['interfaceid']] =
+			$db_hosts[$db_interface['hostid']]['interfaces'][$db_interface['interfaceid']] =
 				array_diff_key($db_interface, array_flip(['hostid']));
 
 			if ($db_interface['type'] == INTERFACE_TYPE_SNMP) {
@@ -873,7 +867,7 @@ class CHostPrototype extends CHostBase {
 
 			while ($db_details = DBfetch($result)) {
 				$hostid = $details_interfaces[$db_details['interfaceid']];
-				$db_host_prototypes[$hostid]['interfaces'][$db_details['interfaceid']]['details'] =
+				$db_hosts[$hostid]['interfaces'][$db_details['interfaceid']]['details'] =
 					array_diff_key($db_details, array_flip(['interfaceid']));
 			}
 		}
@@ -897,11 +891,12 @@ class CHostPrototype extends CHostBase {
 			return;
 		}
 
-		$options = [
-			'output' => ['group_prototypeid', 'hostid', 'groupid', 'templateid'],
-			'filter' => ['hostid' => $hostids, 'name' => '']
-		];
-		$db_links = DBselect(DB::makeSql('group_prototype', $options));
+		$db_links = DBselect(
+			'SELECT gp.group_prototypeid,gp.hostid,gp.groupid,gp.templateid'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionId('gp.hostid', $hostids).
+				' AND gp.groupid IS NOT NULL'
+		);
 
 		while ($db_link = DBfetch($db_links)) {
 			$db_host_prototypes[$db_link['hostid']]['groupLinks'][$db_link['group_prototypeid']] =
@@ -927,13 +922,14 @@ class CHostPrototype extends CHostBase {
 			return;
 		}
 
-		$options = [
-			'output' => ['group_prototypeid', 'hostid', 'name', 'templateid'],
-			'filter' => ['hostid' => $hostids, 'groupid' => '0']
-		];
-		$db_groups = DBselect(DB::makeSql('group_prototype', $options));
+		$db_links = DBselect(
+			'SELECT gp.group_prototypeid,gp.hostid,gp.name,gp.templateid'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionId('gp.hostid', $hostids).
+				' AND gp.groupid IS NULL'
+		);
 
-		while ($db_link = DBfetch($db_groups)) {
+		while ($db_link = DBfetch($db_links)) {
 			$db_host_prototypes[$db_link['hostid']]['groupPrototypes'][$db_link['group_prototypeid']] =
 				array_diff_key($db_link, array_flip(['hostid']));
 		}
@@ -1636,7 +1632,7 @@ class CHostPrototype extends CHostBase {
 			];
 		}
 
-		$this->addAffectedObjects($host_prototypes, $db_host_prototypes);
+		self::addAffectedObjects($host_prototypes, $db_host_prototypes);
 
 		$host_prototypes = array_values($db_host_prototypes);
 
@@ -1657,12 +1653,32 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Updates the children of the host prototypes on the given hosts and propagates the inheritance to the child hosts.
-	 *
+	 * @param array $ruleids
+	 */
+	public static function unlinkTemplateObjects(array $ruleids): void {
+		$options = [
+			'output' => ['hostid'],
+			'filter' => ['parent_itemid' => $ruleids]
+		];
+		$hostids = DBfetchColumn(DBselect(DB::makeSql('host_discovery', $options)), 'hostid');
+
+		if ($hostids) {
+			DB::update('hosts', [
+				'values' => ['templateid' => 0],
+				'where' => ['hostid' => $hostids]
+			]);
+
+			DB::update('group_prototype', [
+				'values' => ['templateid' => 0],
+				'where' => ['hostid' => $hostids]
+			]);
+		}
+	}
+
+	/**
 	 * @param array      $host_prototypes
 	 * @param array      $db_host_prototypes
-	 * @param array|null $hostids            Array of hosts to inherit to; if set to null, the children will be updated
-	 *                                       on all child hosts.
+	 * @param array|null $hostids
 	 */
 	protected function inherit(array $host_prototypes, array $db_host_prototypes = [], array $hostids = null): void {
 		$ins_host_prototypes = [];
@@ -1705,14 +1721,6 @@ class CHostPrototype extends CHostBase {
 
 		if ($ins_host_prototypes) {
 			$this->createForce($ins_host_prototypes, true);
-		}
-
-		[$tpl_host_prototypes, $tpl_db_host_prototypes] = $this->getTemplatedObjects(
-			array_merge($upd_host_prototypes, $ins_host_prototypes), $upd_db_host_prototypes
-		);
-
-		if ($tpl_host_prototypes) {
-			$this->inherit($tpl_host_prototypes, $tpl_db_host_prototypes);
 		}
 	}
 
@@ -1761,7 +1769,7 @@ class CHostPrototype extends CHostBase {
 				$upd_host_prototypes[] = $upd_host_prototype;
 			}
 
-			$this->addAffectedObjects($upd_host_prototypes, $upd_db_host_prototypes);
+			self::addAffectedObjects($upd_host_prototypes, $upd_db_host_prototypes);
 		}
 
 		return $upd_db_host_prototypes;
@@ -1950,7 +1958,7 @@ class CHostPrototype extends CHostBase {
 				$upd_host_prototypes[] = $upd_host_prototype;
 			}
 
-			$this->addAffectedObjects($upd_host_prototypes, $upd_db_host_prototypes);
+			self::addAffectedObjects($upd_host_prototypes, $upd_db_host_prototypes);
 		}
 
 		return $upd_db_host_prototypes;
@@ -2196,20 +2204,13 @@ class CHostPrototype extends CHostBase {
 			' FOR UPDATE'
 		);
 
-		$_db_host_prototypes = $db_host_prototypes;
-
-		do {
-			// Lock also inherited host prototypes before the deletion to prevent server from adding new LLD hosts.
-			$_db_host_prototypes = DBfetchArrayAssoc(DBselect(
-				'SELECT hostid,host'.
-				' FROM hosts h'.
-				' WHERE '.dbConditionId('h.templateid', array_keys($_db_host_prototypes)).
-				' FOR UPDATE'
-			), 'hostid');
-
-			$db_host_prototypes += $_db_host_prototypes;
-		}
-		while ($_db_host_prototypes);
+		// Lock also inherited host prototypes before the deletion to prevent server from adding new LLD hosts.
+		$db_host_prototypes += DBfetchArrayAssoc(DBselect(
+			'SELECT hostid,host'.
+			' FROM hosts h'.
+			' WHERE '.dbConditionId('h.templateid', array_keys($db_host_prototypes)).
+			' FOR UPDATE'
+		), 'hostid');
 
 		$hostids = array_keys($db_host_prototypes);
 

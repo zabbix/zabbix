@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Host inventory'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::INVENTORY_HOST_LIST));
 
@@ -37,7 +37,7 @@ foreach ($data['host_inventories'] as $inventoryField) {
 }
 
 // filter
-$widget->addItem(
+$html_page->addItem(
 	(new CFilter())
 		->setResetUrl(new CUrl('hostinventories.php'))
 		->setProfile($data['profileIdx'])
@@ -112,6 +112,6 @@ foreach ($this->data['hosts'] as $host) {
 	$table->addRow($row);
 }
 
-$widget->addItem([$table, $this->data['paging']]);
-
-$widget->show();
+$html_page
+	->addItem([$table, $this->data['paging']])
+	->show();

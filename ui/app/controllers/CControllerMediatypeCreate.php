@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ class CControllerMediatypeCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(media_type2str())),
+			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
 			'name' =>					'db media_type.name|not_empty',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
@@ -34,11 +34,11 @@ class CControllerMediatypeCreate extends CController {
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
-			'exec_params' =>			'array',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
-			'parameters' =>				'array',
+			'parameters_exec' =>		'array',
+			'parameters_webhook' =>		'array',
 			'script' => 				'db media_type.script',
 			'timeout' => 				'db media_type.timeout',
 			'process_tags' =>			'in '.ZBX_MEDIA_TYPE_TAGS_DISABLED.','.ZBX_MEDIA_TYPE_TAGS_ENABLED,
@@ -52,19 +52,20 @@ class CControllerMediatypeCreate extends CController {
 			'description' =>			'db media_type.description',
 			'form_refresh' =>			'int32',
 			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
-			'message_templates' =>		'array'
+			'message_templates' =>		'array',
+			'provider' =>				'int32|in '.implode(',', array_keys(CMediatypeHelper::getEmailProviders()))
 		];
 
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
 
-		if ($ret && $this->hasInput('exec_params')) {
-			foreach ($this->getInput('exec_params') as $exec_param) {
-				if (count($exec_param) != 1
-						|| !array_key_exists('exec_param', $exec_param) || !is_string($exec_param['exec_param'])) {
-					$ret = false;
-					break;
-				}
+		if ($ret && $this->getInput('type') == MEDIA_TYPE_EMAIL) {
+			$email_validator = new CEmailValidator();
+
+			if (!$email_validator->validate($this->getInput('smtp_email'))) {
+				error($email_validator->getError());
+				$error = self::VALIDATION_ERROR;
+				$ret = false;
 			}
 		}
 
@@ -101,25 +102,44 @@ class CControllerMediatypeCreate extends CController {
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
 				$this->getInputs($mediatype, ['smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
-					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'passwd', 'content_type'
+					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'passwd', 'content_type', 'provider'
 				]);
 
-				if ($this->hasInput('smtp_username')) {
-					$mediatype['username'] = $this->getInput('smtp_username');
+				if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
+					preg_match('/.*<(?<email>.*[^>])>$/i', $this->getInput('smtp_email'), $match);
+					$clean_email = $match ? $match['email'] : $this->getInput('smtp_email');
+
+					$domain = substr($clean_email, strrpos($clean_email, '@') + 1);
+
+					$mediatype['smtp_helo'] = $domain;
+
+					if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
+						$mediatype['username'] = $clean_email;
+					}
+
+					if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
+
+						$formatted_domain = substr_replace($domain, '-', strrpos($domain, '.'), 1);
+						$static_part = CMediatypeHelper::getEmailProviders($mediatype['provider'])['smtp_server'];
+
+						$mediatype['smtp_server'] = $formatted_domain.$static_part;
+					}
 				}
+				else {
+					if ($this->hasInput('smtp_username')) {
+						$mediatype['username'] = $this->getInput('smtp_username');
+					}
+				}
+
 				break;
 
 			case MEDIA_TYPE_EXEC:
+				$mediatype['parameters'] = [];
+
 				$this->getInputs($mediatype, ['exec_path']);
 
-				$mediatype['exec_params'] = '';
-
-				if ($this->hasInput('exec_params')) {
-					$exec_params = zbx_objectValues($this->getInput('exec_params'), 'exec_param');
-
-					foreach ($exec_params as $exec_param) {
-						$mediatype['exec_params'] .= $exec_param."\n";
-					}
+				foreach (array_values($this->getInput('parameters_exec', [])) as $sortorder => $parameter) {
+					$mediatype['parameters'][] = ['sortorder' => $sortorder, 'value' => $parameter['value']];
 				}
 				break;
 
@@ -134,7 +154,7 @@ class CControllerMediatypeCreate extends CController {
 				$this->getInputs($mediatype, ['script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
 					'event_menu_name'
 				]);
-				$parameters = $this->getInput('parameters', []);
+				$parameters = $this->getInput('parameters_webhook', []);
 
 				if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
 					$mediatype['parameters'] = array_map(function ($name, $value) {

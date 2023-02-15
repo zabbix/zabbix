@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,8 +62,9 @@ $left_column = (new CFormGrid())
 					? $filter_view_data['hosts_multiselect']
 					: [],
 				'popup' => [
-					'filter_preselect_fields' => [
-						'hostgroups' => 'groupids_'
+					'filter_preselect' => [
+						'id' => 'groupids_',
+						'submit_as' => 'groupid'
 					],
 					'parameters' => [
 						'srctbl' => 'hosts',
@@ -196,7 +197,6 @@ $filter_template = (new CDiv())
 	]);
 
 $template = (new CForm('get'))
-	->cleanItems()
 	->setName('zbx_filter')
 	->addItem([
 		$filter_template,
@@ -219,12 +219,12 @@ if (array_key_exists('render_html', $data)) {
 	return;
 }
 
-(new CScriptTemplate('filter-monitoring-latest'))
+(new CTemplateTag('filter-monitoring-latest'))
 	->setAttribute('data-template', 'monitoring.latest.filter')
 	->addItem($template)
 	->show();
 
-(new CScriptTemplate('filter-tag-row-tmpl'))
+(new CTemplateTag('filter-tag-row-tmpl'))
 	->addItem(
 		(new CRow([
 			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}'))
@@ -297,8 +297,9 @@ if (array_key_exists('render_html', $data)) {
 			name: 'hostids[]',
 			data: (data.filter_view_data.hosts_multiselect || []),
 			popup: {
-				filter_preselect_fields: {
-					hostgroups: 'groupids_' + data.uniqid
+				filter_preselect: {
+					id: 'groupids_' + data.uniqid,
+					submit_as: 'groupid'
 				},
 				parameters: {
 					multiselect: 1,

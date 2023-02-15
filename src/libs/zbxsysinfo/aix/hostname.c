@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
-#include "log.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #	include <sys/utsname.h>
@@ -26,9 +26,9 @@
 
 ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-	{"system.hostname",     CF_HAVEPARAMS,  SYSTEM_HOSTNAME,        NULL};
+	{"system.hostname",     CF_HAVEPARAMS,  system_hostname,        NULL};
 
-int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct utsname	name;
 	char		*hostname;

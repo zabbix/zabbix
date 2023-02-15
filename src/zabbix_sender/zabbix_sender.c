@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -136,6 +136,8 @@ static unsigned char	get_program_type(void)
 {
 	return program_type;
 }
+
+static int	config_timeout = 3;
 
 static int	CONFIG_SENDER_TIMEOUT = GET_SENDER_TIMEOUT;
 
@@ -273,9 +275,6 @@ const char	*help_message[] = {
 
 static zbx_config_tls_t	*zbx_config_tls = NULL;
 
-int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
-int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
-
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 /* COMMAND LINE OPTIONS */
@@ -330,6 +329,8 @@ static char	*ZABBIX_SERVER_PORT = NULL;
 static char	*ZABBIX_HOSTNAME = NULL;
 static char	*ZABBIX_KEY = NULL;
 static char	*ZABBIX_KEY_VALUE = NULL;
+
+static char	*config_file = NULL;
 
 typedef struct
 {
@@ -700,7 +701,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	}
 #endif
 	if (SUCCEED == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
-			CONFIG_TIMEOUT, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls))
+			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls))
 	{
 		if (1 == sendval_args->sync_timestamp)
 		{
@@ -881,7 +882,7 @@ static void	zbx_fill_from_config_file(char **dst, char *src)
 	}
 }
 
-static void	zbx_load_config(const char *config_file)
+static void	zbx_load_config(const char *config_file_in)
 {
 	char	*cfg_source_ip = NULL, *cfg_active_hosts = NULL, *cfg_hostname = NULL, *cfg_tls_connect = NULL,
 		*cfg_tls_ca_file = NULL, *cfg_tls_crl_file = NULL, *cfg_tls_server_cert_issuer = NULL,
@@ -932,7 +933,7 @@ static void	zbx_load_config(const char *config_file)
 	};
 
 	/* do not complain about unknown parameters in agent configuration file */
-	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_EXIT_FAILURE);
+	parse_cfg_file(config_file_in, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	/* get first hostname only */
 	if (NULL != cfg_hostname)
@@ -1011,8 +1012,8 @@ static void	parse_commandline(int argc, char **argv)
 		switch (ch)
 		{
 			case 'c':
-				if (NULL == CONFIG_FILE)
-					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
+				if (NULL == config_file)
+					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'h':
 				zbx_help();
@@ -1064,7 +1065,7 @@ static void	parse_commandline(int argc, char **argv)
 				REAL_TIME = 1;
 				break;
 			case 't':
-				if (FAIL == is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &CONFIG_SENDER_TIMEOUT,
+				if (FAIL == zbx_is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &CONFIG_SENDER_TIMEOUT,
 						sizeof(CONFIG_SENDER_TIMEOUT), CONFIG_SENDER_TIMEOUT_MIN,
 						CONFIG_SENDER_TIMEOUT_MAX))
 				{
@@ -1152,7 +1153,7 @@ static void	parse_commandline(int argc, char **argv)
 
 		if (NULL != ZABBIX_SERVER_PORT)
 		{
-			if (SUCCEED != is_ushort(ZABBIX_SERVER_PORT, &port) || MIN_ZABBIX_PORT > port)
+			if (SUCCEED != zbx_is_ushort(ZABBIX_SERVER_PORT, &port) || MIN_ZABBIX_PORT > port)
 			{
 				zbx_error("option \"-p\" used with invalid port number \"%s\", valid port numbers are"
 						" %d-%d", ZABBIX_SERVER_PORT, (int)MIN_ZABBIX_PORT,
@@ -1495,15 +1496,18 @@ int	main(int argc, char **argv)
 	char			*error = NULL;
 	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp, ns;
 	zbx_thread_sendval_args	*sendval_args = NULL;
+	zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 0};
 
 	zbx_config_tls = zbx_config_tls_new();
 
 	progname = get_program_name(argv[0]);
 
+	zbx_init_library_cfg(program_type);
+
 	parse_commandline(argc, argv);
 
-	if (NULL != CONFIG_FILE)
-		zbx_load_config(CONFIG_FILE);
+	if (NULL != config_file)
+		zbx_load_config(config_file);
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_locks_create(&error))
 	{
@@ -1512,7 +1516,7 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zabbix_open_log(LOG_TYPE_UNDEFINED, CONFIG_LOG_LEVEL, NULL, &error))
+	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1563,7 +1567,7 @@ int	main(int argc, char **argv)
 			NULL != zbx_config_tls->cipher_cmd)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS, get_program_type);
+		zbx_tls_validate_config(zbx_config_tls, 0, 0, get_program_type);
 
 		if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 		{
@@ -1681,7 +1685,7 @@ int	main(int argc, char **argv)
 					break;
 				}
 
-				if (FAIL == is_uint31(clock, &timestamp))
+				if (FAIL == zbx_is_uint31(clock, &timestamp))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "[line %d] invalid 'Timestamp' value detected",
 							total_count);
@@ -1700,7 +1704,7 @@ int	main(int argc, char **argv)
 						break;
 					}
 
-					if (FAIL == is_uint_n_range(clock, sizeof(clock), &ns, sizeof(ns),
+					if (FAIL == zbx_is_uint_n_range(clock, sizeof(clock), &ns, sizeof(ns),
 							0LL, 999999999LL))
 					{
 						zabbix_log(LOG_LEVEL_WARNING,

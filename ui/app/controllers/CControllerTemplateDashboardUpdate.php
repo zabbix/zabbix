@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,9 @@
 
 class CControllerTemplateDashboardUpdate extends CController {
 
-	private $dashboard_pages;
+	private ?array $db_dashboard = null;
+
+	private ?array $dashboard_pages = null;
 
 	protected function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -71,83 +73,121 @@ class CControllerTemplateDashboardUpdate extends CController {
 		}
 
 		if ($this->hasInput('dashboardid')) {
-			return (bool) API::TemplateDashboard()->get([
-				'output' => [],
-				'dashboardids' => [$this->getInput('dashboardid')],
-				'templateids' => [$this->getInput('templateid')],
+			$db_dashboards = API::TemplateDashboard()->get([
+				'output' => ['dashboardid'],
+				'selectPages' => ['widgets'],
+				'dashboardids' => $this->getInput('dashboardid'),
+				'templateids' => $this->getInput('templateid'),
 				'editable' => true
 			]);
+
+			if (!$db_dashboards) {
+				return false;
+			}
+
+			$this->db_dashboard = $db_dashboards[0];
+
+			return true;
 		}
 		else {
-			return isWritableHostTemplates((array) $this->getInput('templateid'));
+			return isWritableHostTemplates([$this->getInput('templateid')]);
 		}
 	}
 
 	protected function doAction() {
-		$save_dashboard = [
-			'name' => $this->getInput('name'),
-			'display_period' => $this->getInput('display_period'),
-			'auto_start' => $this->getInput('auto_start'),
-			'pages' => []
-		];
-
-		if ($this->hasInput('dashboardid')) {
-			$save_dashboard['dashboardid'] = $this->getInput('dashboardid');
-		}
-		else {
-			$save_dashboard['templateid'] = $this->getInput('templateid');
-		}
-
-		foreach ($this->dashboard_pages as $dashboard_page) {
-			$save_dashboard_page = [
-				'name' => $dashboard_page['name'],
-				'display_period' => $dashboard_page['display_period'],
-				'widgets' => []
-			];
-
-			if (array_key_exists('dashboard_pageid', $dashboard_page)) {
-				$save_dashboard_page['dashboard_pageid'] = $dashboard_page['dashboard_pageid'];
-			}
-
-			foreach ($dashboard_page['widgets'] as $widget) {
-				$save_widget = [
-					'x' => $widget['pos']['x'],
-					'y' => $widget['pos']['y'],
-					'width' => $widget['pos']['width'],
-					'height' => $widget['pos']['height'],
-					'type' => $widget['type'],
-					'name' => $widget['name'],
-					'view_mode' => $widget['view_mode'],
-					'fields' => $widget['form']->fieldsToApi()
-				];
-
-				if (array_key_exists('widgetid', $widget)) {
-					$save_widget['widgetid'] = $widget['widgetid'];
-				}
-
-				$save_dashboard_page['widgets'][] = $save_widget;
-			}
-
-			$save_dashboard['pages'][] = $save_dashboard_page;
-		}
-
-		if ($this->hasInput('dashboardid')) {
-			$result = API::TemplateDashboard()->update($save_dashboard);
-
-			$success_title = _('Dashboard updated');
-			$error_title = _('Failed to update dashboard');
-		}
-		else {
-			$result = API::TemplateDashboard()->create($save_dashboard);
-
-			$success_title = _('Dashboard created');
-			$error_title = _('Failed to create dashboard');
-		}
-
 		$output = [];
 
-		if ($result) {
-			$output['success']['title'] = $success_title;
+		try {
+			$db_widgets = [];
+
+			if ($this->db_dashboard !== null) {
+				foreach ($this->db_dashboard['pages'] as $db_dashboard_page) {
+					foreach ($db_dashboard_page['widgets'] as $db_widget) {
+						$db_widgets[$db_widget['widgetid']] = $db_widget;
+					}
+				}
+			}
+
+			$save_dashboard = [
+				'name' => $this->getInput('name'),
+				'display_period' => $this->getInput('display_period'),
+				'auto_start' => $this->getInput('auto_start'),
+				'pages' => []
+			];
+
+			if ($this->db_dashboard !== null) {
+				$save_dashboard['dashboardid'] = $this->db_dashboard['dashboardid'];
+			}
+			else {
+				$save_dashboard['templateid'] = $this->getInput('templateid');
+			}
+
+			foreach ($this->dashboard_pages as $dashboard_page) {
+				$save_dashboard_page = [
+					'name' => $dashboard_page['name'],
+					'display_period' => $dashboard_page['display_period'],
+					'widgets' => []
+				];
+
+				if (array_key_exists('dashboard_pageid', $dashboard_page)) {
+					$save_dashboard_page['dashboard_pageid'] = $dashboard_page['dashboard_pageid'];
+				}
+
+				foreach ($dashboard_page['widgets'] as $widget) {
+					$save_widget = [
+						'x' => $widget['pos']['x'],
+						'y' => $widget['pos']['y'],
+						'width' => $widget['pos']['width'],
+						'height' => $widget['pos']['height']
+					];
+
+					if ($widget['type'] !== ZBX_WIDGET_INACCESSIBLE) {
+						$save_widget += [
+							'type' => $widget['type'],
+							'name' => $widget['name'],
+							'view_mode' => $widget['view_mode'],
+							'fields' => $widget['form']->fieldsToApi()
+						];
+					}
+					else {
+						if (!array_key_exists('widgetid', $widget)
+							|| !array_key_exists($widget['widgetid'], $db_widgets)) {
+							error(_('No permissions to referred object or it does not exist!'));
+
+							throw new InvalidArgumentException();
+						}
+
+						$db_widget = $db_widgets[$widget['widgetid']];
+
+						$save_widget += [
+							'type' => $db_widget['type'],
+							'name' => $db_widget['name'],
+							'view_mode' => $db_widget['view_mode'],
+							'fields' => $db_widget['fields']
+						];
+					}
+
+					if (array_key_exists('widgetid', $widget)) {
+						$save_widget['widgetid'] = $widget['widgetid'];
+					}
+
+					$save_dashboard_page['widgets'][] = $save_widget;
+				}
+
+				$save_dashboard['pages'][] = $save_dashboard_page;
+			}
+
+			$result = $this->db_dashboard !== null
+				? API::TemplateDashboard()->update($save_dashboard)
+				: API::TemplateDashboard()->create($save_dashboard);
+
+			if (!$result) {
+				throw new InvalidArgumentException();
+			}
+
+			$output['success']['title'] = $this->db_dashboard !== null
+				? _('Dashboard updated')
+				: _('Dashboard created');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -155,9 +195,11 @@ class CControllerTemplateDashboardUpdate extends CController {
 
 			$output['dashboardid'] = $result['dashboardids'][0];
 		}
-		else {
+		catch (InvalidArgumentException $e) {
 			$output['error'] = [
-				'title' => $error_title,
+				'title' => $this->db_dashboard !== null && !$this->hasInput('clone')
+					? _('Failed to update dashboard')
+					: _('Failed to create dashboard'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}

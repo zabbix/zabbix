@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,5 +73,6 @@ $autoloader->addNamespace('', [
 	__DIR__.'/include/classes/import/converters',
 	__DIR__.'/include/classes/include/classes/vaults'
 ]);
-$autoloader->addNamespace('Core', [__DIR__.'/../../include/classes/core']);
+$autoloader->addNamespace('Zabbix\\Core', [__DIR__.'/../../include/classes/core']);
+$autoloader->addNamespace('Zabbix\\Widgets', [__DIR__.'/../../include/classes/widgets']);
 $autoloader->register();

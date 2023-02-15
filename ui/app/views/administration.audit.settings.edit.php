@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,18 +25,19 @@
 
 $this->includeJsFile('administration.audit.settings.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Audit log'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUDIT_SETTINGS_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUDITLOG_EDIT));
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('audit')))->removeId())
 	->setId('audit-settings')
 	->setAction(
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'audit.settings.update')
 			->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $audit_settings_tab = (new CFormGrid())
 	->addItem([
@@ -66,6 +67,6 @@ $form->addItem(
 		))
 );
 
-$widget
+$html_page
 	->addItem($form)
 	->show();

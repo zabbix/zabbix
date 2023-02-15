@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -246,7 +246,7 @@ class testTimezone extends CWebTest {
 		}
 
 		$this->page->open('zabbix.php?action='.$page.'.edit');
-		$form = $this->query('xpath://form[@aria-labeledby="page-title-general"]')->one()->asForm();
+		$form = $this->query('xpath://form[@aria-labelledby="page-title-general"]')->one()->asForm();
 		$timezone = CDateTimeHelper::getTimeZoneFormat($timezone);
 		$form->fill([$field_name => $timezone]);
 		$form->submit();

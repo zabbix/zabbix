@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@
 	?>
 </script>
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-prometheus-pattern">
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-prometheus-pattern-tmpl">
 	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
 			->setAttribute('placeholder', '#{placeholder_0}').
 		(new CSelect('preprocessing[#{rowNum}][params][1]'))
@@ -130,17 +130,131 @@
 	?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-walk-value-tmpl">
+	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', _('OID')).
+		(new CSelect('preprocessing[#{rowNum}][params][1]'))
+			->setValue(ZBX_PREPROC_SNMP_UNCHANGED)
+			->setAdaptiveWidth(202)
+			->addOptions([
+				new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
+				new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+				new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+				new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
+			])
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-walk-to-json-tmpl">
+	<?php
+		echo (new CDiv(
+				(new CTable())
+					->addClass('group-json-mapping')
+					->setHeader(
+						(new CRowHeader([
+							new CColHeader(_('Field name')),
+							new CColHeader(_('OID prefix')),
+							new CColHeader(_('Format')),
+							(new CColHeader(_('Action')))->addClass(ZBX_STYLE_NOWRAP)
+						]))->addClass(ZBX_STYLE_GREY)
+					)
+					->addItem(
+						(new CRow([
+							new CCol(
+								(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
+									->removeId()
+									->setAttribute('placeholder', _('Field name'))
+							),
+							new CCol(
+								(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
+									->removeId()
+									->setAttribute('placeholder', _('OID prefix'))
+							),
+							new CCol(
+								(new CSelect('preprocessing[#{rowNum}][params][]'))
+									->setValue(ZBX_PREPROC_SNMP_UNCHANGED)
+									->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
+									->addOptions([
+										new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
+										new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+										new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+										new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
+									])
+							),
+							(new CCol(
+								(new CSimpleButton(_('Remove')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass('js-group-json-action-delete')
+									->setEnabled(false)
+							))->addClass(ZBX_STYLE_NOWRAP)
+						]))->addClass('group-json-row')
+					)
+					->addItem(
+						(new CTag('tfoot', true))
+							->addItem(
+								(new CCol(
+									(new CSimpleButton(_('Add')))
+										->addClass(ZBX_STYLE_BTN_LINK)
+										->addClass('js-group-json-action-add')
+								))->setColSpan(4)
+							)
+					)
+					->setAttribute('data-index', '#{rowNum}')
+			))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-walk-to-json-row-tmpl">
+	<?php
+		echo (new CRow([
+			new CCol(
+				(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
+					->removeId()
+					->setAttribute('placeholder', _('Field name'))
+			),
+			new CCol(
+				(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
+					->removeId()
+					->setAttribute('placeholder', _('OID prefix'))
+			),
+			new CCol(
+				(new CSelect('preprocessing[#{rowNum}][params][]'))
+					->setValue(ZBX_PREPROC_SNMP_UNCHANGED)
+					->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
+					->addOptions([
+						new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
+						new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+						new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+						new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
+					])
+			),
+			(new CCol(
+				(new CSimpleButton(_('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('js-group-json-action-delete')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))->addClass('group-json-row');
+	?>
+</script>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		function makeParameterInput(index, type) {
-			var preproc_param_single_tmpl = new Template($('#preprocessing-steps-parameters-single-tmpl').html()),
-				preproc_param_double_tmpl = new Template($('#preprocessing-steps-parameters-double-tmpl').html()),
-				preproc_param_custom_width_chkbox_tmpl =
-					new Template($('#preprocessing-steps-parameters-custom-width-chkbox-tmpl').html()),
-				preproc_param_multiline_tmpl = new Template($('#preprocessing-steps-parameters-multiline-tmpl').html()),
-				preproc_param_prometheus_pattern_tmpl = new Template(
-					$('#preprocessing-steps-parameters-custom-prometheus-pattern').html()
-				);
+			const preproc_param_single_tmpl = new Template($('#preprocessing-steps-parameters-single-tmpl').html());
+			const preproc_param_double_tmpl = new Template($('#preprocessing-steps-parameters-double-tmpl').html());
+			const preproc_param_custom_width_chkbox_tmpl =
+				new Template($('#preprocessing-steps-parameters-custom-width-chkbox-tmpl').html());
+			const preproc_param_multiline_tmpl = new Template(
+				$('#preprocessing-steps-parameters-multiline-tmpl').html()
+			);
+			const preproc_param_prometheus_pattern_tmpl = new Template(
+				$('#preprocessing-steps-parameters-custom-prometheus-pattern-tmpl').html()
+			);
+			const preproc_param_snmp_walk_value_tmpl = new Template(
+				$('#preprocessing-steps-parameters-snmp-walk-value-tmpl').html()
+			);
+			const preproc_param_snmp_walk_to_json_tmpl = new Template(
+				$('#preprocessing-steps-parameters-snmp-walk-to-json-tmpl').html()
+			);
 
 			switch (type) {
 				case '<?= ZBX_PREPROC_MULTIPLIER ?>':
@@ -245,6 +359,16 @@
 						rowNum: index,
 						placeholder_0: <?= json_encode(_('search string')) ?>,
 						placeholder_1: <?= json_encode(_('replacement')) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_SNMP_WALK_VALUE ?>':
+					return $(preproc_param_snmp_walk_value_tmpl.evaluate({
+						rowNum: index,
+					}));
+
+				case '<?= ZBX_PREPROC_SNMP_WALK_TO_JSON ?>':
+					return $(preproc_param_snmp_walk_to_json_tmpl.evaluate({
+						rowNum: index
 					}));
 
 				default:
@@ -469,6 +593,39 @@
 			})
 			.on('change', '.js-preproc-param-prometheus-pattern-function', function() {
 				$(this).next('input').prop('disabled', $(this).val() !== '<?= ZBX_PREPROC_PROMETHEUS_LABEL ?>');
+			})
+			.on('click', '.js-group-json-action-delete', function() {
+				const table = this.closest('.group-json-mapping');
+				const row = this.closest('.group-json-row');
+				const count = table.querySelectorAll('.group-json-row').length;
+
+				if (count == 1) {
+					return;
+				}
+
+				row.remove();
+
+				if (count == 2) {
+					table.querySelector('.js-group-json-action-delete').disabled = true;
+				}
+			})
+			.on('click', '.js-group-json-action-add', function() {
+				const template = new Template(
+					document
+						.getElementById('preprocessing-steps-parameters-snmp-walk-to-json-row-tmpl')
+						.innerHTML
+				);
+				const container = this.closest('.group-json-mapping');
+
+				const row_numb = container.dataset.index;
+
+				[...container.querySelectorAll('.js-group-json-action-delete')].map((btn) => {
+					btn.disabled = false;
+				});
+
+				container
+					.querySelector('tbody')
+					.insertAdjacentHTML('beforeend', template.evaluate({rowNum: row_numb}));
 			});
 	});
 </script>

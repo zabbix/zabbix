@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,16 +18,12 @@
 **/
 
 /**
- * WARNING: the class doesn't support parsing query strings with multi-dimentional arrays.
+ * WARNING: the class doesn't support parsing query strings with multi-dimensional arrays.
  *
  * @param url
- * @param add_sid	boolean	Add SID to given URL. Default: true.
  */
-var Curl = function(url, add_sid) {
+var Curl = function(url) {
 	url = url || location.href;
-	if (typeof add_sid === 'undefined') {
-		add_sid = true;
-	}
 
 	this.url = url;
 	this.args = {};
@@ -109,10 +105,6 @@ var Curl = function(url, add_sid) {
 	if (this.query.length > 0) {
 		this.formatArguments();
 	}
-
-	if (add_sid) {
-		this.addSID();
-	}
 };
 
 Curl.prototype = {
@@ -128,22 +120,6 @@ Curl.prototype = {
 	path:		'',
 	query:		'',
 	args:		null,
-
-	addSID: function() {
-		var sid = '';
-		var position = parseInt(location.href.indexOf('sid='));
-
-		if (position > -1) {
-			sid = location.href.substr(position + 4, 16);
-		}
-		else {
-			sid = jQuery('meta[name="csrf-token"]').attr('content');
-		}
-
-		if ((/[0-9a-z]+/i).test(sid)) {
-			this.setArgument('sid', sid);
-		}
-	},
 
 	formatQuery: function() {
 		this.query = jQuery.param(this.args);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ class CUrl {
 	protected $arguments = [];
 
 	/**
-	 * WARNING: the class doesn't support parsing query strings with multi-dimentional arrays.
+	 * WARNING: the class doesn't support parsing query strings with multi-dimensional arrays.
 	 *
 	 * @param string|null $url
 	 */
@@ -119,12 +119,6 @@ class CUrl {
 
 	public function setArgument($key, $value = '') {
 		$this->arguments[$key] = $value;
-
-		return $this;
-	}
-
-	public function setArgumentSID() {
-		$this->arguments['sid'] = substr(CSessionHelper::getId(), 16, 16);
 
 		return $this;
 	}

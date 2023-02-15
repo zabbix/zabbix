@@ -13,5 +13,7 @@ SUBDIRS = \
 	zbxcomms \
 	zbxregexp \
 	zbxserver \
+	zbxtagfilter \
 	zbxtrends \
+	zbxtime \
 	zbxeval

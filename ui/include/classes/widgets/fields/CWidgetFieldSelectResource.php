@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,78 +19,80 @@
 **/
 
 
+namespace Zabbix\Widgets\Fields;
+
+use Zabbix\Widgets\CWidgetField;
+
 class CWidgetFieldSelectResource extends CWidgetField {
 
-	protected $srctbl;
-	protected $srcfld1;
-	protected $srcfld2;
-	protected $dstfld1;
-	protected $dstfld2;
-	protected $resource_type;
+	public const RESOURCE_TYPE_SYSMAP = 1;
+
+	public const DEFAULT_VALUE = '0';
+
+	private string $resource_type;
+
+	private array $popup_options = [
+		'srctbl' => null,
+		'srcfld1' => null,
+		'srcfld2' => null,
+		'dstfld1' => null,
+		'dstfld2' => null,
+		'dstfrm' => null
+	];
 
 	/**
 	 * Select resource type widget field. Will create text box field with select button,
-	 * that will allow to select specified resource.
-	 *
-	 * @param string $name           field name in form
-	 * @param string $label          label for the field in form
-	 * @param int    $resource_type  WIDGET_FIELD_SELECT_RES_ constant.
+	 * that will allow selecting specified resource.
 	 */
-	public function __construct($name, $label, $resource_type) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->resource_type = $resource_type;
+		$this->popup_options = array_merge($this->popup_options, [
+			'dstfld1' => $this->name,
+			'dstfld2' => $this->name.'_caption'
+		]);
 
-		switch ($resource_type) {
-			case WIDGET_FIELD_SELECT_RES_SYSMAP:
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
-				$this->srctbl = 'sysmaps';
-				$this->srcfld1 = 'sysmapid';
-				$this->srcfld2 = 'name';
-				break;
-		}
-
-		$this->dstfld1 = $name;
-		$this->dstfld2 = $this->name.'_caption';
-		$this->setDefault('0');
+		$this->setDefault(self::DEFAULT_VALUE);
 	}
 
-	/**
-	 * Set additional flags, which can be used in configuration form.
-	 *
-	 * @param int $flags
-	 *
-	 * @return $this
-	 */
-	public function setFlags($flags) {
-		parent::setFlags($flags);
+	public function getResourceType(): int {
+		return $this->resource_type;
+	}
 
-		if ($flags & self::FLAG_NOT_EMPTY) {
-			$strict_validation_rules = $this->getValidationRules();
-			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
-			$this->setStrictValidationRules($strict_validation_rules);
-		}
-		else {
-			$this->setStrictValidationRules(null);
+	public function setResourceType(int $resource_type): self {
+		$this->resource_type = $resource_type;
+
+		if ($this->resource_type == self::RESOURCE_TYPE_SYSMAP) {
+			$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
+
+			$this->popup_options = array_merge($this->popup_options, [
+				'srctbl' => 'sysmaps',
+				'srcfld1' => 'sysmapid',
+				'srcfld2' => 'name'
+			]);
 		}
 
 		return $this;
 	}
 
-	public function getResourceType() {
-		return $this->resource_type;
+	public function setFlags(int $flags): self {
+		parent::setFlags($flags);
+
+		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
+			$strict_validation_rules = $this->getValidationRules();
+			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
+			$this->setStrictValidationRules($strict_validation_rules);
+		}
+		else {
+			$this->setStrictValidationRules();
+		}
+
+		return $this;
 	}
 
-	public function getPopupOptions($dstfrm) {
-		$popup_options = [
-			'srctbl' => $this->srctbl,
-			'srcfld1' => $this->srcfld1,
-			'srcfld2' => $this->srcfld2,
-			'dstfld1' => $this->dstfld1,
-			'dstfld2' => $this->dstfld2,
-			'dstfrm' => $dstfrm
-		];
-
-		return $popup_options;
+	public function getPopupOptions(string $form_name): array {
+		return array_merge($this->popup_options, [
+			'dstfrm' => $form_name
+		]);
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,30 @@
 
 
 abstract class CGraphDraw {
+
+	protected $stime;
+	protected $fullSizeX;
+	protected $fullSizeY;
+	protected $m_minY;
+	protected $m_maxY;
+	protected $data;
+	protected $items;
+	private $header;
+	protected $from_time;
+	protected $to_time;
+	private $colors;
+	protected $colorsrgb;
+	protected $im;
+	protected $period;
+	protected $sizeX;
+	protected $sizeY;
+	protected $shiftXleft;
+	protected $shiftXright;
+	protected $num;
+	protected $type;
+	protected $drawLegend;
+	protected $graphtheme;
+	protected $shiftY;
 
 	/**
 	 * Default top padding including header label height and vertical padding.
@@ -51,11 +75,6 @@ abstract class CGraphDraw {
 		$this->m_maxY = null;
 		$this->data = [];
 		$this->items = [];
-		$this->min = null;
-		$this->max = null;
-		$this->avg = null;
-		$this->clock = null;
-		$this->count = null;
 		$this->header = null;
 		$this->from_time = null;
 		$this->to_time = null;
@@ -67,7 +86,6 @@ abstract class CGraphDraw {
 		$this->sizeY = 200; // default graph size Y
 		$this->shiftXleft = 100;
 		$this->shiftXright = 50;
-		$this->shiftXCaption = 0;
 		$this->num = 0;
 		$this->type = $type; // graph type
 		$this->drawLegend = 1;
@@ -253,30 +271,5 @@ abstract class CGraphDraw {
 		}
 
 		return get_color($this->im, $color, $alfa);
-	}
-
-	public function getShadow($color, $alpha = 0) {
-		if (isset($this->colorsrgb[$color])) {
-			$red = $this->colorsrgb[$color][0];
-			$green = $this->colorsrgb[$color][1];
-			$blue = $this->colorsrgb[$color][2];
-		}
-		else {
-			list($red, $green, $blue) = hex2rgb($color);
-		}
-
-		if ($this->sum > 0) {
-			$red = (int) ($red * 0.6);
-			$green = (int) ($green * 0.6);
-			$blue = (int) ($blue * 0.6);
-		}
-
-		$RGB = [$red, $green, $blue];
-
-		if ($alpha != 0) {
-			return imagecolorexactalpha($this->im, $RGB[0], $RGB[1], $RGB[2], $alpha);
-		}
-
-		return imagecolorallocate($this->im, $RGB[0], $RGB[1], $RGB[2]);
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,49 +75,13 @@ class CAuditLog extends CApiService {
 
 		$result = [];
 		$fields = array_keys($this->getTableSchema($this->tableName())['fields']);
-		$actions = [
-			CAudit::ACTION_ADD, CAudit::ACTION_UPDATE, CAudit::ACTION_DELETE, CAudit::ACTION_LOGOUT,
-			CAudit::ACTION_EXECUTE, CAudit::ACTION_LOGIN_SUCCESS, CAudit::ACTION_LOGIN_FAILED,
-			CAudit::ACTION_HISTORY_CLEAR, CAudit::ACTION_CONFIG_REFRESH
-		];
-		$resourcetype = [
-			CAudit::RESOURCE_ACTION, CAudit::RESOURCE_AUTHENTICATION, CAudit::RESOURCE_AUTH_TOKEN,
-			CAudit::RESOURCE_AUTOREGISTRATION, CAudit::RESOURCE_CORRELATION, CAudit::RESOURCE_DASHBOARD,
-			CAudit::RESOURCE_DISCOVERY_RULE, CAudit::RESOURCE_GRAPH, CAudit::RESOURCE_GRAPH_PROTOTYPE,
-			CAudit::RESOURCE_HOST, CAudit::RESOURCE_HOST_GROUP, CAudit::RESOURCE_HOST_PROTOTYPE,
-			CAudit::RESOURCE_HOUSEKEEPING, CAudit::RESOURCE_ICON_MAP, CAudit::RESOURCE_IMAGE,
-			CAudit::RESOURCE_ITEM, CAudit::RESOURCE_ITEM_PROTOTYPE, CAudit::RESOURCE_IT_SERVICE,
-			CAudit::RESOURCE_MACRO, CAudit::RESOURCE_MAINTENANCE, CAudit::RESOURCE_MAP, CAudit::RESOURCE_MEDIA_TYPE,
-			CAudit::RESOURCE_MODULE, CAudit::RESOURCE_PROXY, CAudit::RESOURCE_REGEXP, CAudit::RESOURCE_SCENARIO,
-			CAudit::RESOURCE_SCHEDULED_REPORT, CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SETTINGS, CAudit::RESOURCE_SLA,
-			CAudit::RESOURCE_TEMPLATE, CAudit::RESOURCE_TEMPLATE_GROUP, CAudit::RESOURCE_TEMPLATE_DASHBOARD,
-			CAudit::RESOURCE_TRIGGER, CAudit::RESOURCE_TRIGGER_PROTOTYPE, CAudit::RESOURCE_USER,
-			CAudit::RESOURCE_USER_GROUP, CAudit::RESOURCE_USER_ROLE, CAudit::RESOURCE_VALUE_MAP,
-			CAudit::RESOURCE_HA_NODE, CAudit::RESOURCE_USERDIRECTORY
-		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'auditids' =>				['type' => API_CUIDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'userids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'auditid' =>				['type' => API_CUIDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'userid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'action' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', $actions)],
-				'resourcetype' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', $resourcetype)],
-				'ip' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'resourceid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'resourcename' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'username' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'recordsetid' =>			['type' => API_CUIDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
-			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'username' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'ip' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'resourcename' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'details' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['auditid', 'userid', 'clock', 'action', 'resourcetype', 'ip', 'resourceid', 'resourcename', 'username', 'recordsetid']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['ip', 'resourcename', 'username', 'details']],
 			'time_from' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'time_till' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],

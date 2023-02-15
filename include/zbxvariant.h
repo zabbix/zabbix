@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,5 +86,15 @@ int		zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, i
 				char **errmsg);
 
 ZBX_VECTOR_DECL(var, zbx_variant_t)
+
+typedef union
+{
+	double		dbl;
+	zbx_uint64_t	ui64;
+	char		*str;
+	char		*err;
+	zbx_log_value_t	*log;
+}
+zbx_history_value_t;
 
 #endif

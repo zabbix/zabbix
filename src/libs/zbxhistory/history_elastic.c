@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,14 @@
 
 #include "log.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
+#include "zbxdb.h"
+#include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxvariant.h"
+
+#define ZBX_ELASTIC_MIN_VERSION				70000
+#define ZBX_ELASTIC_SUPPORTED_VERSION_STR		"7.x"
+#define ZBX_ELASTIC_MAX_VERSION				79999
 
 /* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
 #if defined(HAVE_LIBCURL) && LIBCURL_VERSION_NUM >= 0x071c00
@@ -91,9 +97,9 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 	return r_size;
 }
 
-static history_value_t	history_str2value(char *str, unsigned char value_type)
+static zbx_history_value_t	history_str2value(char *str, unsigned char value_type)
 {
-	history_value_t	value;
+	zbx_history_value_t	value;
 
 	switch (value_type)
 	{
@@ -1011,7 +1017,7 @@ void	zbx_elastic_version_extract(struct zbx_json *json, int *result)
 	char				*version_friendly = NULL, errbuf[CURL_ERROR_SIZE];
 	int				major_num, minor_num, increment_num, ret = FAIL;
 	zbx_uint32_t			version;
-	struct zbx_db_version_info_t	db_version_info;
+	struct zbx_db_version_info_t	db_version_info = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1090,8 +1096,8 @@ out:
 
 	db_version_info.database = "ElasticDB";
 	db_version_info.friendly_current_version = version_friendly;
-	db_version_info.friendly_min_version = ZBX_ELASTIC_SUPPORTED_VERSION_FRIENDLY;
-	db_version_info.friendly_max_version = ZBX_ELASTIC_SUPPORTED_VERSION_FRIENDLY;
+	db_version_info.friendly_min_version = ZBX_ELASTIC_SUPPORTED_VERSION_STR;
+	db_version_info.friendly_max_version = ZBX_ELASTIC_SUPPORTED_VERSION_STR;
 	db_version_info.friendly_min_supported_version = NULL;
 
 	db_version_info.flag = zbx_db_version_check(db_version_info.database, version, ZBX_ELASTIC_MIN_VERSION,

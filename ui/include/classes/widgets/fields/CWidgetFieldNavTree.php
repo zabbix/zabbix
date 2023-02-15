@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,41 +19,45 @@
 **/
 
 
+namespace Zabbix\Widgets\Fields;
+
+use Zabbix\Widgets\CWidgetField;
+
 class CWidgetFieldNavTree extends CWidgetField {
 
-	/**
-	 * Create widget field for Tags selection.
-	 *
-	 * @param string $name   Field name in form.
-	 * @param string $label  Label for the field in form.
-	 */
-	public function __construct($name, $label) {
+	public const DEFAULT_VALUE = [];
+
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules(['type' => API_OBJECTS, 'flags' => API_PRESERVE_KEYS, 'fields' => [
-			'name'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
-			'order'		=> ['type' => API_INT32, 'in' => '1:'.ZBX_MAX_INT32, 'default' => 1],
-			'parent'	=> ['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => 0],
-			'sysmapid'	=> ['type' => API_ID, 'default' => '0']
-		]]);
-		$this->setDefault([]);
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
+			->setValidationRules(['type' => API_OBJECTS, 'flags' => API_PRESERVE_KEYS, 'fields' => [
+				'name'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
+				'order'		=> ['type' => API_INT32, 'in' => '1:'.ZBX_MAX_INT32, 'default' => 1],
+				'parent'	=> ['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => 0],
+				'sysmapid'	=> ['type' => API_ID, 'default' => '0']
+			]]);
 	}
 
-	public function setValue($value) {
+	public function setValue($value): self {
 		$this->value = (array) $value;
 
 		return $this;
 	}
 
-	/**
-	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
-	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
-	 * fields it causes significant performance decrease.
-	 *
-	 * @param array $widget_fields   reference to Array of widget fields.
-	 */
-	public function toApi(array &$widget_fields = []) {
+	public function validate(bool $strict = false): array {
+		$errors = parent::validate($strict);
+
+		if (!$errors) {
+			$this->setValue(self::validateNavTree($this->getValue(), $errors));
+		}
+
+		return $errors;
+	}
+
+	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
 		foreach ($value as $index => $val) {
@@ -96,13 +100,8 @@ class CWidgetFieldNavTree extends CWidgetField {
 
 	/**
 	 * Check and fix the tree of the maps.
-	 *
-	 * @param array  $navtree_items
-	 * @param string $navtree_items[<id>]['parent']
-	 *
-	 * @return array
 	 */
-	static private function validateNavTree(array $navtree_items, array &$errors) {
+	private static function validateNavTree(array $navtree_items, array &$errors): array {
 		// Check for incorrect parent IDs.
 		foreach ($navtree_items as $fieldid => &$navtree_item) {
 			if ($navtree_item['parent'] != 0 && !array_key_exists($navtree_item['parent'], $navtree_items)) {
@@ -115,7 +114,7 @@ class CWidgetFieldNavTree extends CWidgetField {
 		unset($navtree_item);
 
 		// Find and fix circular dependencies.
-		foreach ($navtree_items as $fieldid => $navtree_item) {
+		foreach ($navtree_items as $navtree_item) {
 			$parentid = $navtree_item['parent'];
 			$parentids = [$parentid => true];
 
@@ -132,20 +131,5 @@ class CWidgetFieldNavTree extends CWidgetField {
 		}
 
 		return $navtree_items;
-	}
-
-	/**
-	 * @param bool $strict
-	 *
-	 * @return array
-	 */
-	public function validate(bool $strict = false): array {
-		$errors = parent::validate($strict);
-
-		if (!$errors) {
-			$this->setValue(self::validateNavTree($this->getValue(), $errors));
-		}
-
-		return $errors;
 	}
 }

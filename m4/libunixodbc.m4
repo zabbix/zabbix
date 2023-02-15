@@ -21,7 +21,7 @@ AC_DEFUN([LIBUNIXODBC_CHECK_CONFIG],
   AC_ARG_WITH(unixodbc,
      [
 If you want to use unixODBC library:
-AC_HELP_STRING([--with-unixodbc@<:@=ARG@:>@],
+AS_HELP_STRING([--with-unixodbc@<:@=ARG@:>@],
 		[use ODBC driver against unixODBC package @<:@default=no@:>@, optionally specify full path to odbc_config binary.])
     ],[ if test "x$withval" = "xno"; then
             want_unixodbc="no"

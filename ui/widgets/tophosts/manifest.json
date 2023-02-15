@@ -1,0 +1,19 @@
+{
+	"manifest_version": 2.0,
+	"id": "tophosts",
+	"type": "widget",
+	"name": "Top hosts",
+	"namespace": "TopHosts",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"actions": {
+		"widget.tophosts.view": {
+			"class": "WidgetView"
+		},
+		"widget.tophosts.column.edit": {
+			"class": "ColumnEdit",
+			"view": "column.edit",
+			"layout": "layout.json"
+		}
+	}
+}

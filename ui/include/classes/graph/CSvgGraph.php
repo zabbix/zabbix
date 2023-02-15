@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1470,6 +1470,10 @@ class CSvgGraph extends CSvg {
 
 			$x2 = floor($this->canvas_x + $this->canvas_width
 				- $this->canvas_width * ($this->time_till - $time_to) / $time_range);
+
+			if ($this->canvas_x > $x1) {
+				$x1 = $this->canvas_x;
+			}
 
 			// Make problem info.
 			if ($problem['r_clock'] != 0) {

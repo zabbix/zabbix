@@ -1,0 +1,21 @@
+{
+	"manifest_version": 2.0,
+	"id": "plaintext",
+	"type": "widget",
+	"name": "Plain text",
+	"namespace": "PlainText",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"template_support": true,
+		"size": {
+			"width": 6,
+			"height": 3
+		}
+	},
+	"actions": {
+		"widget.plaintext.view": {
+			"class": "WidgetView"
+		}
+	}
+}

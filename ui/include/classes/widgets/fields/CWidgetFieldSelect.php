@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,38 +19,37 @@
 **/
 
 
+namespace Zabbix\Widgets\Fields;
+
+use Zabbix\Widgets\CWidgetField;
+
 class CWidgetFieldSelect extends CWidgetField {
 
-	private $values;
+	public const DEFAULT_VALUE = null;
+
+	private array $values;
 
 	/**
 	 * CSelect widget field. Can use both, string and integer type keys.
 	 *
-	 * @param string $name    Field name in form
-	 * @param string $label   Label for the field in form
 	 * @param array  $values  Key/value pairs of select option values. Key - saved in DB. Value - visible to user.
 	 */
-	public function __construct($name, $label, $values) {
+	public function __construct(string $name, string $label, array $values) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 		$this->values = $values;
-		$this->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
+
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32)
+			->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
 	}
 
-	public function setValue($value) {
+	public function setValue($value): self {
 		return parent::setValue((int) $value);
 	}
 
-	public function getValues() {
+	public function getValues(): array {
 		return $this->values;
-	}
-
-	public function setAction($action) {
-		throw new RuntimeException(sprintf('Method is not implemented: "%s".', __METHOD__));
-	}
-
-	public function getAction() {
-		throw new RuntimeException(sprintf('Method is not implemented: "%s".', __METHOD__));
 	}
 }

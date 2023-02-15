@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,17 +50,36 @@ class CControllerMediatypeEnable extends CController {
 	}
 
 	protected function doAction() {
-		$mediatypes = [];
+		$mediatypeids = $this->getInput('mediatypeids');
 
-		foreach ($this->getInput('mediatypeids') as $mediatypeid) {
+		$email_providers = API::MediaType()->get([
+			'output' => ['name', 'passwd'],
+			'mediatypeids' => $mediatypeids,
+			'filter' => [
+				'type' => MEDIA_TYPE_EMAIL,
+				'provider' => [CMediatypeHelper::EMAIL_PROVIDER_GMAIL, CMediatypeHelper::EMAIL_PROVIDER_OFFICE365],
+				'status' => MEDIA_STATUS_DISABLED
+			],
+			'preservekeys' => true
+		]);
+
+		$mediatypes = [];
+		$incomplete_configurations = [];
+
+		foreach ($mediatypeids as $mediatypeid) {
+			if (array_key_exists($mediatypeid, $email_providers) && $email_providers[$mediatypeid]['passwd'] == '') {
+				$incomplete_configurations[] = $email_providers[$mediatypeid]['name'];
+				continue;
+			}
 			$mediatypes[] = [
 				'mediatypeid' => $mediatypeid,
 				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			];
 		}
-		$result = API::Mediatype()->update($mediatypes);
 
-		$updated = count($mediatypes);
+		$result = $mediatypes ? API::Mediatype()->update($mediatypes) : null;
+
+		$updated = $result ? count($mediatypes) : count($mediatypeids);
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'mediatype.list')
@@ -69,11 +88,28 @@ class CControllerMediatypeEnable extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_n('Media type enabled', 'Media types enabled', $updated));
+
+			if ($incomplete_configurations) {
+				CMessageHelper::setSuccessTitle(_s('%1$s. %2$s: %3$s. %4$s.',
+					_n('Media type enabled', 'Media types enabled', $updated),
+					_('Not enabled'),
+					implode(', ', $incomplete_configurations),
+					_('Incomplete configuration')
+				));
+			}
+			else {
+				CMessageHelper::setSuccessTitle(_n('Media type enabled', 'Media types enabled', $updated));
+			}
 		}
 		else {
 			CMessageHelper::setErrorTitle(_n('Cannot enable media type', 'Cannot enable media types', $updated));
+
+			if ($incomplete_configurations) {
+				info(_s('%1$s: %2$s', _('Incomplete configuration'), implode(',', $incomplete_configurations)));
+			}
 		}
+
 		$this->setResponse($response);
 	}
 }
+

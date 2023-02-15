@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,19 +18,17 @@
 **/
 
 #include "lld_worker.h"
+#include "lld.h"
 
 #include "zbxnix.h"
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "proxy.h"
 #include "../events.h"
 #include "lld_protocol.h"
 #include "zbxtime.h"
-
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
+#include "zbxdbwrap.h"
+#include "zbx_item_constants.h"
 
 /******************************************************************************
  *                                                                            *
@@ -114,7 +112,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		}
 
 		/* with successful LLD processing LLD error will be set to empty string */
-		if (NULL != error && 0 != strcmp(error, item.error))
+		if (NULL != error && 0 != strcmp(error, ZBX_NULL2EMPTY_STR(item.error)))
 		{
 			diff.error = error;
 			diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
@@ -145,11 +143,11 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		diff.itemid = itemid;
 		zbx_vector_ptr_append(&diffs, &diff);
 
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &diffs, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 		if (16 < sql_offset)
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 
 		DCconfig_items_apply_changes(&diffs);
 
@@ -175,12 +173,12 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 	zbx_ipc_message_t	message;
 	double			time_stat, time_idle = 0, time_now, time_read;
 	zbx_uint64_t		processed_num = 0;
+	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
@@ -198,11 +196,11 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 
 	time_stat = zbx_time();
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -219,17 +217,17 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 			processed_num = 0;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		if (SUCCEED != zbx_ipc_socket_read(&lld_socket, &message))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot read LLD manager service request");
 			exit(EXIT_FAILURE);
 		}
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
-		zbx_update_env(time_read);
+		zbx_update_env(get_process_type_string(process_type), time_read);
 
 		switch (message.code)
 		{
@@ -248,7 +246,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 
-	DBclose();
+	zbx_db_close();
 
 	zbx_ipc_socket_close(&lld_socket);
 }

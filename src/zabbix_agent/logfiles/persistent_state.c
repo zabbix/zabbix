@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -806,31 +806,31 @@ int	zbx_restore_file_details(const char *str, struct st_logfile **logfiles, int 
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PERSIST_TAG_DEVICE, tmp, sizeof(tmp), NULL))
 	{
-		if (SUCCEED == is_uint64(tmp, &dev))
+		if (SUCCEED == zbx_is_uint64(tmp, &dev))
 			got_dev = 1;
 	}
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PERSIST_TAG_INODE_LO, tmp, sizeof(tmp), NULL))
 	{
-		if (SUCCEED == is_uint64(tmp, &ino_lo))
+		if (SUCCEED == zbx_is_uint64(tmp, &ino_lo))
 			got_ino_lo = 1;
 	}
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PERSIST_TAG_INODE_HI, tmp, sizeof(tmp), NULL))
 	{
-		if (SUCCEED == is_uint64(tmp, &ino_hi))
+		if (SUCCEED == zbx_is_uint64(tmp, &ino_hi))
 			got_ino_hi = 1;
 	}
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PERSIST_TAG_SIZE, tmp, sizeof(tmp), NULL))
 	{
-		if (SUCCEED == is_uint64(tmp, &size))
+		if (SUCCEED == zbx_is_uint64(tmp, &size))
 			got_size = 1;
 	}
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PERSIST_TAG_PROCESSED_SIZE, tmp, sizeof(tmp), NULL))
 	{
-		if (SUCCEED == is_uint64(tmp, &processed_size_tmp))
+		if (SUCCEED == zbx_is_uint64(tmp, &processed_size_tmp))
 			got_processed_size = 1;
 	}
 
@@ -851,7 +851,7 @@ int	zbx_restore_file_details(const char *str, struct st_logfile **logfiles, int 
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PERSIST_TAG_LAST_BLOCK_OFFSET, tmp, sizeof(tmp), NULL))
 	{
-		if (SUCCEED == is_uint64(tmp, &last_block_offset))
+		if (SUCCEED == zbx_is_uint64(tmp, &last_block_offset))
 			got_last_block_offset = 1;
 	}
 

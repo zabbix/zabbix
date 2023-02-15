@@ -1,7 +1,7 @@
 <?php
 /*
  ** Zabbix
- ** Copyright (C) 2001-2022 Zabbix SIA
+ ** Copyright (C) 2001-2023 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,9 @@ window.popup_generic = {
 		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
 			jQuery(ms).on('change', {overlay: overlay}, function (e) {
 				const groups = jQuery(this).multiSelect('getData').map((item) => item.id);
-				const parameters = groups.length ? {groupid: groups[0]} : {filter_groupid_rst: 1, groupid: []};
+				const parameters = groups.length
+					? {groupid: groups[0]}
+					: {filter_groupid_rst: 1, group: undefined, groupid: undefined};
 
 				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
 					dialogueid: e.data.overlay.dialogueid
@@ -63,7 +65,7 @@ window.popup_generic = {
 				const groups = jQuery(this).multiSelect('getData').map((item) => item.id);
 				const parameters = groups.length
 					? {templategroupid: groups[0]}
-					: {filter_groupid_rst: 1, templategroupid: []};
+					: {filter_groupid_rst: 1, templategroup: undefined, templategroupid: undefined};
 
 				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
 					dialogueid: e.data.overlay.dialogueid
@@ -78,7 +80,9 @@ window.popup_generic = {
 		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
 			jQuery(ms).on('change', {overlay: overlay}, function (e) {
 				const hosts = jQuery(this).multiSelect('getData').map((item) => item.id);
-				const parameters = hosts.length ? {hostid: hosts[0]} : {filter_hostid_rst: 1, hostid: []};
+				const parameters = hosts.length
+					? {hostid: hosts[0]}
+					: {filter_hostid_rst: 1, host: undefined, hostid: undefined, host_pattern: undefined};
 
 				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
 					dialogueid: e.data.overlay.dialogueid
@@ -95,7 +99,7 @@ window.popup_generic = {
 				const templates = jQuery(this).multiSelect('getData').map((item) => item.id);
 				const parameters = templates.length
 					? {templateid: templates[0]}
-					: {filter_templateid_rst: 1, templateid: []};
+					: {filter_templateid_rst: 1, templateid: undefined};
 
 				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
 					dialogueid: e.data.overlay.dialogueid

@@ -1,0 +1,28 @@
+{
+	"manifest_version": 2.0,
+	"id": "graphprototype",
+	"type": "widget",
+	"name": "Graph prototype",
+	"namespace": "GraphPrototype",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"template_support": true,
+		"size": {
+			"width": 16,
+			"height": 5
+		},
+		"js_class": "CWidgetGraphPrototype",
+		"use_time_selector": true
+	},
+	"actions": {
+		"widget.graphprototype.view": {
+			"class": "WidgetView",
+			"layout": "layout.json",
+			"view": null
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

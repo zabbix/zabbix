@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,8 +24,9 @@
 
 #include "zbxnum.h"
 #include "zbxalgo.h"
-#include "zbxdbcache/user_macro.h"
+#include "zbxcacheconfig/user_macro.h"
 #include "um_cache_mock.h"
+#include "zbxshmem.h"
 
 ZBX_PTR_VECTOR_IMPL(um_mock_macro, zbx_um_mock_macro_t *)
 
@@ -113,7 +114,7 @@ static void	um_mock_host_init(zbx_um_mock_host_t *host, zbx_mock_handle_t handle
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(htemplate, &template)))
 			fail_msg("Cannot read templateid: %s", zbx_mock_error_string(err));
 
-		if (SUCCEED != is_uint64(template, &templateid))
+		if (SUCCEED != zbx_is_uint64(template, &templateid))
 			fail_msg("Invalid templateid: %s", template);
 
 		zbx_vector_uint64_append(&host->templateids, templateid);
@@ -735,7 +736,7 @@ void	mock_dbsync_clear(zbx_dbsync_t *sync)
 	}
 	else
 	{
-		DBfree_result(sync->dbresult);
+		zbx_db_free_result(sync->dbresult);
 		sync->dbresult = NULL;
 	}
 }

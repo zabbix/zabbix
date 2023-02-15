@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #ifndef POLLER_GET_VALUE_SSH_TEST_H
 #define POLLER_GET_VALUE_SSH_TEST_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error);

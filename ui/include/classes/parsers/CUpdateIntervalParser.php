@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,6 +76,8 @@ class CUpdateIntervalParser extends CParser {
 
 		// First interval must be simple interval (or macro). Other intervals may be mixed and repeat multiple times.
 		if ($this->simple_interval_parser->parse($source, $p) == self::PARSE_FAIL) {
+			$this->errorPos($source, $p);
+
 			return self::PARSE_FAIL;
 		}
 		$p += $this->simple_interval_parser->getLength();
@@ -111,7 +113,13 @@ class CUpdateIntervalParser extends CParser {
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
 
-		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+		if (!isset($source[$p])) {
+			return self::PARSE_SUCCESS;
+		}
+
+		$this->errorPos($source, $p);
+
+		return self::PARSE_SUCCESS_CONT;
 	}
 
 	/**
@@ -124,26 +132,25 @@ class CUpdateIntervalParser extends CParser {
 	}
 
 	/**
-	 * Get all intervals or specifically flexible or scheduling intervals.
+	 * Get all intervals, or specifically flexible or scheduling ones.
 	 *
-	 * @param int $type			If null get both types, else either ITEM_DELAY_FLEXIBLE or ITEM_DELAY_SCHEDULING
+	 * @param int|null $type  ITEM_DELAY_FLEXIBLE, ITEM_DELAY_SCHEDULING, or null for both.
 	 *
 	 * @return array
 	 */
-	public function getIntervals($type = null) {
+	public function getIntervals(?int $type = null) {
 		if ($type === null) {
 			return $this->intervals;
 		}
-		else {
-			$intervals = [];
 
-			foreach ($this->intervals as $interval) {
-				if ($interval['type'] == $type) {
-					$intervals[] = $interval['interval'];
-				}
+		$intervals = [];
+
+		foreach ($this->intervals as $interval) {
+			if ($interval['type'] == $type) {
+				$intervals[] = $interval['interval'];
 			}
-
-			return $intervals;
 		}
+
+		return $intervals;
 	}
 }

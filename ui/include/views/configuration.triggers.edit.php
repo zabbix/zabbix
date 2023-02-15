@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,13 +25,13 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Triggers'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_TRIGGERS_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TRIGGERS_EDIT));
 
 // Append host summary to widget header.
 if ($data['hostid'] != 0) {
-	$widget->setNavigation(getHostNavigation('triggers', $data['hostid']));
+	$html_page->setNavigation(getHostNavigation('triggers', $data['hostid']));
 }
 
 $url = (new CUrl('triggers.php'))
@@ -40,9 +40,11 @@ $url = (new CUrl('triggers.php'))
 
 // Create form.
 $triggersForm = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('triggers.php')))->removeId())
 	->setid('triggers-form')
 	->setName('triggersForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('expression_constructor', $data['expression_constructor'])
@@ -76,8 +78,30 @@ if ($readonly) {
 
 // Create form list.
 $triggersFormList = new CFormList('triggersFormList');
-if (!empty($data['templates'])) {
-	$triggersFormList->addRow(_('Parent triggers'), $data['templates']);
+
+if (array_key_exists('parent_trigger', $data)) {
+	$parent_template_names = [];
+
+	foreach ($data['parent_trigger']['template_names'] as $templateid => $template_name) {
+		if ($parent_template_names) {
+			$parent_template_names[] = ', ';
+		}
+
+		if ($data['parent_trigger']['editable']) {
+			$parent_template_names[] = new CLink(CHtml::encode($template_name),
+				(new CUrl('triggers.php'))
+					->setArgument('form', 'update')
+					->setArgument('triggerid', $data['templateid'])
+					->setArgument('hostid', $templateid)
+					->setArgument('context', 'template')
+			);
+		}
+		else {
+			$parent_template_names[] = (new CSpan(CHtml::encode($template_name)))->addClass(ZBX_STYLE_GREY);
+		}
+	}
+
+	$triggersFormList->addRow(_('Parent trigger'), $parent_template_names);
 }
 
 if ($discovered_trigger) {
@@ -562,7 +586,7 @@ $triggersFormList
 	);
 
 // Append status to form list.
-if (empty($data['triggerid']) && empty($data['form_refresh'])) {
+if (empty($data['triggerid']) && $data['form_refresh'] == 0) {
 	$status = true;
 }
 else {
@@ -570,7 +594,20 @@ else {
 }
 
 $triggersFormList
-	->addRow(_('URL'), (new CTextBox('url', $data['url'], $discovered_trigger))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(
+		new CLabel([
+			_('Menu entry name'),
+			makeHelpIcon([_('Menu entry name is used as a label for the trigger URL in the event context menu.')])
+		]),
+		(new CTextBox('url_name', $data['url_name'], $discovered_trigger, DB::getFieldLength('triggers', 'url_name')))
+			->setAttribute('placeholder', _('Trigger URL'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(
+		_('Menu entry URL'),
+		(new CTextBox('url', $data['url'], $discovered_trigger, DB::getFieldLength('triggers', 'url')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
 	->addRow(_('Description'),
 		(new CTextArea('comments', $data['comments']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -581,7 +618,7 @@ $triggersFormList
 
 // Append tabs to form.
 $triggersTab = new CTabView();
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$triggersTab->setSelected(0);
 }
 $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
@@ -591,8 +628,10 @@ $triggersTab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab
 		'source' => 'trigger',
 		'tags' => $data['tags'],
 		'show_inherited_tags' => $data['show_inherited_tags'],
+		'context' => $data['context'],
 		'readonly' => $discovered_trigger,
-		'tabs_id' => 'tabs'
+		'tabs_id' => 'tabs',
+		'tags_tab_id' => 'tags-tab'
 	]),
 	TAB_INDICATOR_TAGS
 );
@@ -699,8 +738,8 @@ if (!empty($data['triggerid'])) {
 			new CSubmit('clone', _('Clone')),
 			(new CButtonDelete(
 				_('Delete trigger?'),
-				url_params(['form', 'hostid', 'triggerid', 'context', 'backurl']),
-				'context'
+				url_params(['form', 'hostid', 'triggerid', 'context', 'backurl']).'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.
+				'='.CCsrfTokenHelper::get('triggers.php'), 'context'
 			))->setEnabled(!$data['limited']),
 			$cancelButton
 		]
@@ -716,9 +755,9 @@ else {
 // Append tabs to form.
 $triggersForm->addItem($triggersTab);
 
-$widget->addItem($triggersForm);
-
-$widget->show();
+$html_page
+	->addItem($triggersForm)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

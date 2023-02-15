@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
 	char		*error = NULL, *script_bin = NULL, *output = NULL;
 	int		script_bin_sz, timeout_seconds, ret = NOTSUPPORTED;
 
-	if (FAIL == is_time_suffix(item->timeout, &timeout_seconds, strlen(item->timeout)))
+	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_seconds, strlen(item->timeout)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid timeout: %s", item->timeout));
 		return ret;

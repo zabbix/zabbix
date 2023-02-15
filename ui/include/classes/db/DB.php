@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,16 +78,14 @@ class DB {
 	}
 
 	/**
-	 * Reserve ids for primary key of passed table.
-	 * If record for table does not exist or value is out of range, ids record is created
-	 * using maximum id from table or minimum allowed value.
-	 *
-	 * @throw APIException
-	 *
-	 * @static
+	 * Reserve IDs for primary key of passed table.
+	 * If record for table does not exist or value is out of range, ids record is created using maximum ID from table
+	 * or minimum allowed value.
 	 *
 	 * @param string $table table name
-	 * @param int $count number of ids to reserve
+	 * @param int $count number of IDs to reserve
+	 *
+	 * @throws APIException
 	 *
 	 * @return string
 	 */
@@ -144,19 +142,17 @@ class DB {
 	}
 
 	/**
-	 * Refresh id record for given table.
-	 * Record is deleted and then created again with value of maximum id from table or minimum allowed.
-	 *
-	 * @throw APIException
-	 *
-	 * @static
+	 * Refresh ID record for given table.
+	 * Record is deleted and then created again with value of maximum ID from table or minimum allowed.
 	 *
 	 * @param string $table table name
-	 * @param int    $count number of ids to reserve
+	 * @param int    $count number of IDs to reserve
+	 *
+	 * @throws APIException
 	 *
 	 * @return string
 	 */
-	private static function refreshIds($table, $count) {
+	public static function refreshIds($table, $count) {
 		$tableSchema = self::getSchema($table);
 		$id_name = $tableSchema['key'];
 
@@ -197,11 +193,9 @@ class DB {
 	 * If the $table parameter is passed, the method will return the schema for the given table,
 	 * otherwise - for the whole database.
 	 *
-	 * @static
+	 * @param string $table
 	 *
 	 * @throws APIException if the given table does not exist
-	 *
-	 * @param string $table
 	 *
 	 * @return array
 	 */
@@ -224,8 +218,6 @@ class DB {
 	/**
 	 * Returns the names of the fields that are used as the primary key of the table.
 	 *
-	 * @static
-	 *
 	 * @param string $table_name
 	 *
 	 * @return string
@@ -238,8 +230,6 @@ class DB {
 
 	/**
 	 * Returns true if the table $tableName has the $fieldName field.
-	 *
-	 * @static
 	 *
 	 * @param string $tableName
 	 * @param string $fieldName
@@ -254,8 +244,6 @@ class DB {
 
 	/**
 	 * Returns length of the field.
-	 *
-	 * @static
 	 *
 	 * @param string $table_name
 	 * @param string $field_name
@@ -480,8 +468,6 @@ class DB {
 	/**
 	 * Returns the records that match the given criteria.
 	 *
-	 * @static
-	 *
 	 * @param string $tableName
 	 * @param array $criteria   An associative array of field-value pairs, where value can be either a single value
 	 *                          or an array (IN)
@@ -540,8 +526,6 @@ class DB {
 
 	/**
 	 * Returns the list of mandatory fields with default values for INSERT statements.
-	 *
-	 * @static
 	 *
 	 * @param array $table_schema
 	 *
@@ -709,11 +693,9 @@ class DB {
 	/**
 	 * Updates the values by the given PK.
 	 *
-	 * @static
-	 *
 	 * @param string $tableName
 	 * @param string $pk
-	 * @param array $values
+	 * @param array  $values
 	 *
 	 * @return bool
 	 */
@@ -727,8 +709,6 @@ class DB {
 	/**
 	 * Saves the given records to the database. If the record has the primary key set, it is updated, otherwise - a new
 	 * record is inserted. For new records the newly generated PK is added to the result.
-	 *
-	 * @static
 	 *
 	 * @param $tableName
 	 * @param $data
@@ -770,11 +750,9 @@ class DB {
 	 *
 	 * All of the records must have the primary key defined.
 	 *
-	 * @static
-	 *
-	 * @param $tableName
-	 * @param array $oldRecords
-	 * @param array $newRecords
+	 * @param string $tableName
+	 * @param array  $oldRecords
+	 * @param array  $newRecords
 	 *
 	 * @return array    the new records, that have been passed with the primary keys set for newly inserted records
 	 */
@@ -894,10 +872,9 @@ class DB {
 	/**
 	 * Compares the fields, that are present in both records, and returns true if any of the values differ.
 	 *
-	 * @static
-	 * @param $tableName
-	 * @param array $oldRecord
-	 * @param array $newRecord
+	 * @param string $tableName
+	 * @param array  $oldRecord
+	 * @param array  $newRecord
 	 *
 	 * @return bool
 	 */
@@ -1073,6 +1050,27 @@ class DB {
 	 */
 	private static function fieldId($field_name, $table_alias = null) {
 		return ($table_alias !== null) ? $table_alias.'.'.$field_name : $field_name;
+	}
+
+	/**
+	 * Convert field to uppercase or substitute it with its pre-upcased variant.
+	 *
+	 * @param string      $field_name
+	 * @param string      $table_name
+	 * @param string|null $table_alias
+	 *
+	 * @return string
+	 */
+	public static function uppercaseField(string $field_name, string $table_name, string $table_alias = null): string {
+		if ($table_alias === null) {
+			$table_alias = $table_name;
+		}
+
+		if ($field_name === 'name' && self::hasField($table_name, 'name_upper')) {
+			return $table_alias.'.name_upper';
+		}
+
+		return 'UPPER('.$table_alias.'.'.$field_name.')';
 	}
 
 	/**
@@ -1253,7 +1251,7 @@ class DB {
 					$pattern = zbx_dbstr($pattern);
 				}
 
-				$search[] = 'UPPER('.self::fieldId($field_name, $table_alias).') LIKE '.$pattern." ESCAPE '!'";
+				$search[] = self::uppercaseField($field_name, $table_name, $table_alias).' LIKE '.$pattern." ESCAPE '!'";
 			}
 		}
 

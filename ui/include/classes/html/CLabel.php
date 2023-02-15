@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,12 +21,18 @@
 
 class CLabel extends CTag {
 
-	public function __construct($label, $for = null) {
+	public function __construct($label, $id = null) {
 		parent::__construct('label', true, $label);
 
-		if ($for !== null) {
-			$this->setAttribute('for', zbx_formatDomId($for));
+		$this->setFor($id);
+	}
+
+	public function setFor($id): self {
+		if ($id !== null) {
+			$this->setAttribute('for', zbx_formatDomId($id));
 		}
+
+		return $this;
 	}
 
 	/**

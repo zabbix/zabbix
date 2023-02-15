@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,15 +23,15 @@ class CControllerCorrelationCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name'         => 'db correlation.name|required|not_empty',
-			'description'  => 'db correlation.description',
-			'evaltype'     => 'db correlation.evaltype|required|in '.implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]),
-			'status'       => 'db correlation.status|required|in '.implode(',', [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]),
-			'formula'      => 'db correlation.formula',
-			'op_close_new' => 'in 1',
-			'op_close_old' => 'in 1',
-			'conditions'   => 'array',
-			'form_refresh' => 'int32'
+			'name' =>			'db correlation.name|required|not_empty',
+			'description' =>	'db correlation.description',
+			'evaltype' =>		'db correlation.evaltype|required|in '.implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]),
+			'status' =>			'db correlation.status|required|in '.implode(',', [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]),
+			'formula' =>		'db correlation.formula',
+			'op_close_new' =>	'in 1',
+			'op_close_old' =>	'in 1',
+			'conditions' =>		'array',
+			'form_refresh' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -87,6 +87,11 @@ class CControllerCorrelationCreate extends CController {
 			}
 			unset($condition);
 		}
+
+		foreach ($correlation['filter']['conditions'] as &$condition) {
+			unset($condition['row_index']);
+		}
+		unset($condition);
 
 		if ($this->hasInput('op_close_old')) {
 			$correlation['operations'][] = ['type' => ZBX_CORR_OPERATION_CLOSE_OLD];

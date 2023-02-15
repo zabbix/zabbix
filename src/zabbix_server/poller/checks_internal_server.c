@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,10 +18,13 @@
 **/
 
 #include "zbxcommon.h"
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 #include "zbxlld.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxha.h"
+#include "zbxjson.h"
+#include "zbxtime.h"
+#include "zbxconnector.h"
 
 #include "checks_internal.h"
 
@@ -59,48 +62,75 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		SET_UI64_RESULT(result, DCget_trigger_count());
 	}
 	else if (0 == strcmp(param1, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess" OR "delay"] */
-	{
+	{							/* zabbix["proxy","discovery"]                        */
 		int	value, res;
 		char	*error = NULL;
 
 		/* this item is always processed by server */
 
-		if (3 != nparams)
+		if (2 > nparams || 3 < nparams)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			goto out;
 		}
 
-		param2 = get_rparam(request, 2);
-
-		if (0 == strcmp(param2, "lastaccess"))
+		if (2 == nparams)
 		{
-			res = DCget_proxy_lastaccess_by_name(get_rparam(request, 1), &value, &error);
-		}
-		else if (0 == strcmp(param2, "delay"))
-		{
-			int	lastaccess;
+			param2 = get_rparam(request, 1);
 
-			if (SUCCEED == (res = DCget_proxy_delay_by_name(get_rparam(request, 1), &value, &error)) &&
-					SUCCEED == (res = DCget_proxy_lastaccess_by_name(get_rparam(request, 1),
-					&lastaccess, &error)))
+			if (0 == strcmp(param2, "discovery"))
 			{
-				value += (int)time(NULL) - lastaccess;
+				char	*data;
+
+				if (SUCCEED == (res = zbx_proxy_discovery_get(&data, &error)))
+					SET_STR_RESULT(result, data);
+				else
+					SET_MSG_RESULT(result, error);
+
+				if (SUCCEED != res)
+					goto out;
+			}
+			else
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				goto out;
 			}
 		}
 		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-			goto out;
-		}
+			const char	*param3 = get_rparam(request, 2);
 
-		if (SUCCEED != res)
-		{
-			SET_MSG_RESULT(result, error);
-			goto out;
-		}
+			if (0 == strcmp(param3, "lastaccess"))
+			{
+				res = DCget_proxy_lastaccess_by_name(get_rparam(request, 1), &value, &error);
+			}
+			else if (0 == strcmp(param3, "delay"))
+			{
+				int	lastaccess;
 
-		SET_UI64_RESULT(result, value);
+				param2 = get_rparam(request, 1);
+
+				if (SUCCEED == (res = DCget_proxy_delay_by_name(param2, &value, &error)) &&
+						SUCCEED == (res = DCget_proxy_lastaccess_by_name(param2, &lastaccess,
+						&error)))
+				{
+					value += zbx_time() - lastaccess;
+				}
+			}
+			else
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+				goto out;
+			}
+
+			if (SUCCEED != res)
+			{
+				SET_MSG_RESULT(result, error);
+				goto out;
+			}
+
+			SET_UI64_RESULT(result, value);
+		}
 	}
 	else if (0 == strcmp(param1, "vcache"))
 	{
@@ -177,6 +207,25 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		}
 
 		if (FAIL == zbx_lld_get_queue_size(&value, &error))
+		{
+			SET_MSG_RESULT(result, error);
+			goto out;
+		}
+
+		SET_UI64_RESULT(result, value);
+	}
+	else if (0 == strcmp(param1, "connector_queue"))
+	{
+		zbx_uint64_t	value;
+		char		*error = NULL;
+
+		if (1 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		if (FAIL == zbx_connector_get_queue_size(&value, &error))
 		{
 			SET_MSG_RESULT(result, error);
 			goto out;

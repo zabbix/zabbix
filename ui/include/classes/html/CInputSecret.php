@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,13 @@ class CInputSecret extends CInput {
 			]);
 		}
 		else {
-			$node->addItem(new CPassBox($name, $value, $maxlength));
+			$pass_box = new CPassBox($name, $value, $maxlength);
+
+			if ($this->getAttribute('placeholder')) {
+				$pass_box->setAttribute('placeholder', $this->getAttribute('placeholder'));
+			}
+
+			$node->addItem($pass_box);
 		}
 
 		if ($this->add_post_js) {

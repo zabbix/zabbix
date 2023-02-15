@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,14 @@
 
 extern int	CONFIG_HOUSEKEEPING_FREQUENCY;
 extern int	CONFIG_MAX_HOUSEKEEPER_DELETE;
+
+typedef struct
+{
+	struct zbx_db_version_info_t	*db_version_info;
+	int				config_timeout;
+}
+zbx_thread_housekeeper_args;
+
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args);
 

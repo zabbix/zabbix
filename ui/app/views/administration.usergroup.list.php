@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@ if ($data['uncheck']) {
 	uncheckTableRows('usergroup');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('User groups'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USERGROUP_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERGROUP_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
@@ -80,6 +80,8 @@ $table = (new CTableInfo())
 		_('Status')
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('usergroup');
+
 foreach ($this->data['usergroups'] as $usergroup) {
 	$debug_mode = ($usergroup['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 		? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
@@ -88,18 +90,18 @@ foreach ($this->data['usergroups'] as $usergroup) {
 			->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 			->getUrl()
 		))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_ORANGE)
-			->addSID()
 		: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'usergroup.massupdate')
 			->setArgument('debug_mode', GROUP_DEBUG_MODE_ENABLED)
 			->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 			->getUrl()
 		))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_GREEN)
-			->addSID();
+			->addClass(ZBX_STYLE_GREEN);
 
 	$gui_access = user_auth_type2str($usergroup['gui_access']);
 
@@ -116,8 +118,8 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 				->getUrl()
 			))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addSID();
+			->addCsrfToken($csrf_token)
+			->addClass(ZBX_STYLE_LINK_ACTION);
 
 		$user_status = ($usergroup['users_status'] == GROUP_STATUS_ENABLED)
 			? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
@@ -126,18 +128,18 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 				->getUrl()
 			))
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
-				->addSID()
 			: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_ENABLED)
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 				->getUrl()
 			))
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_RED)
-				->addSID();
+				->addClass(ZBX_STYLE_RED);
 	}
 	else {
 		$gui_access = new CSpan($gui_access);
@@ -216,29 +218,36 @@ $form->addItem([
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_ENABLED)
+				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
 		['name' => _('Disable'), 'confirm' => _('Disable selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_DISABLED)
+				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
 		['name' => _('Enable debug mode'), 'confirm' => _('Enable debug mode in selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('debug_mode', GROUP_DEBUG_MODE_ENABLED)
+				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
 		['name' => _('Disable debug mode'), 'confirm' => _('Disable debug mode in selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('debug_mode', GROUP_DEBUG_MODE_DISABLED)
+				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
-		'usergroup.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected groups?')]
+		'usergroup.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected groups?'),
+			'csrf_token' => $csrf_token
+		]
 	], 'usergroup')
 ]);
 
-$widget->addItem($form);
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

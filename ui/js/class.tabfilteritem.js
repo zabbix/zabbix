@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -347,9 +347,11 @@ class CTabFilterItem extends CBaseComponent {
 	 * Get filter parameters as URLSearchParams object, defining value of unchecked checkboxes equal to
 	 * 'unchecked-value' attribute value.
 	 *
+	 * @param {boolean} preserve_page  Parameter for resetting page.
+	 *
 	 * @return {URLSearchParams}
 	 */
-	getFilterParams() {
+	getFilterParams(preserve_page = true) {
 		let form = this.getForm(),
 			params = null;
 
@@ -380,7 +382,7 @@ class CTabFilterItem extends CBaseComponent {
 				params.set('to', this._data.to);
 			}
 
-			if ('page' in this._data && this._data.page > 1) {
+			if (preserve_page && 'page' in this._data && this._data.page > 1) {
 				params.set('page', this._data.page);
 			}
 		}
@@ -395,7 +397,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * @param {URLSearchParams} search_params  Filter field values to be set in URL.
 	 */
 	setBrowserLocation(search_params) {
-		let url = new Curl('', false);
+		let url = new Curl('');
 
 		search_params.set('action', url.getArgument('action'));
 		url.query = search_params.toString();
@@ -424,8 +426,8 @@ class CTabFilterItem extends CBaseComponent {
 	/**
 	 * Keep filter tab results request parameters.
 	 */
-	updateApplyUrl() {
-		this._apply_url = (this.getFilterParams()).toString();
+	updateApplyUrl(preserve_page = true) {
+		this._apply_url = (this.getFilterParams(preserve_page)).toString();
 	}
 
 	/**
@@ -443,8 +445,8 @@ class CTabFilterItem extends CBaseComponent {
 	 * Checks difference between original form values and to be posted values.
 	 * Updates this._unsaved according to check results
 	 */
-	updateUnsavedState() {
-		let search_params = this.getFilterParams(),
+	updateUnsavedState(preserve_page = true) {
+		let search_params = this.getFilterParams(preserve_page),
 			src_query = new URLSearchParams(this._src_url),
 			ignore_fields = ['filter_name', 'filter_custom_time', 'filter_show_counter', 'from', 'to', 'action', 'page'];
 

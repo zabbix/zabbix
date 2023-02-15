@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,10 +59,7 @@ if ($data['ha_cluster_enabled']) {
 		}
 
 		$nodes_table->addRow([
-			(new CCol($node['name'] === ''
-				? '<'._('standalone server').'>'
-				: $node['name']
-			))->addClass(ZBX_STYLE_NOWRAP),
+			(new CCol($node['name']))->addClass(ZBX_STYLE_NOWRAP),
 			$node['address'].':'.$node['port'],
 			(new CCol(convertUnitsS(time() - $node['lastaccess'])))
 				->setAttribute('title', zbx_date2str(DATE_TIME_FORMAT_SECONDS, $node['lastaccess'])),

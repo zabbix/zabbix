@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,20 +19,28 @@
 **/
 
 
-$widget = (new CWidget())
+/**
+ * @var CView $this
+ * @var array $data
+ */
+
+$html_page = (new CHtmlPage())
 	->setTitle(_('Modules'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MODULE_EDIT))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 // create form
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('module')))
+		->removeId())
 	->setName('module-form')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'module.update')
 		->setArgument('moduleids[]', $data['moduleid'])
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 // create module tab
 $module_tab = (new CFormList())
@@ -52,7 +60,7 @@ $module_tab = (new CFormList())
 $tabs = (new CTabView())
 	->addTab('moduleTab', _('Module'), $module_tab);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
@@ -70,6 +78,6 @@ $tabs->setFooter(makeFormFooter(
 $form->addItem($tabs);
 
 // append form to widget
-$widget->addItem($form);
+$html_page->addItem($form);
 
-$widget->show();
+$html_page->show();

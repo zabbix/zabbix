@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,7 +83,9 @@ final class CItemData {
 			'system.stat[resource,<type>]',
 			'system.sw.arch',
 			'system.sw.os[<info>]',
-			'system.sw.packages[<package>,<manager>,<format>]',
+			'system.sw.os.get',
+			'system.sw.packages[<regexp>,<manager>,<format>]',
+			'system.sw.packages.get[<regexp>,<manager>]',
 			'system.swap.in[<device>,<type>]',
 			'system.swap.out[<device>,<type>]',
 			'system.swap.size[<device>,<type>]',
@@ -185,7 +187,9 @@ final class CItemData {
 			'system.stat[resource,<type>]',
 			'system.sw.arch',
 			'system.sw.os[<info>]',
-			'system.sw.packages[<package>,<manager>,<format>]',
+			'system.sw.os.get',
+			'system.sw.packages[<regexp>,<manager>,<format>]',
+			'system.sw.packages.get[<regexp>,<manager>]',
 			'system.swap.in[<device>,<type>]',
 			'system.swap.out[<device>,<type>]',
 			'system.swap.size[<device>,<type>]',
@@ -240,6 +244,7 @@ final class CItemData {
 			'vmware.datastore.alarms.get[<url>,<uuid>]',
 			'vmware.datastore.discovery[<url>]',
 			'vmware.datastore.hv.list[<url>,<datastore>]',
+			'vmware.datastore.perfcounter[<url>,<uuid>,<path>,<instance>]',
 			'vmware.datastore.property[<url>,<uuid>,<prop>]',
 			'vmware.datastore.read[<url>,<datastore>,<mode>]',
 			'vmware.datastore.size[<url>,<datastore>,<mode>]',
@@ -266,6 +271,7 @@ final class CItemData {
 			'vmware.hv.datastore.size[<url>,<uuid>,<datastore>,<mode>]',
 			'vmware.hv.datastore.write[<url>,<uuid>,<datastore>,<mode>]',
 			'vmware.hv.discovery[<url>]',
+			'vmware.hv.diskinfo.get[<url>,<uuid>]',
 			'vmware.hv.fullname[<url>,<uuid>]',
 			'vmware.hv.hw.cpu.freq[<url>,<uuid>]',
 			'vmware.hv.hw.cpu.model[<url>,<uuid>]',
@@ -354,6 +360,7 @@ final class CItemData {
 		],
 		ITEM_TYPE_INTERNAL => [
 			'zabbix[boottime]',
+			'zabbix[connector_queue]',
 			'zabbix[host,,items]',
 			'zabbix[host,,items_unsupported]',
 			'zabbix[host,,maintenance]',
@@ -367,6 +374,7 @@ final class CItemData {
 			'zabbix[preprocessing_queue]',
 			'zabbix[process,<type>,<mode>,<state>]',
 			'zabbix[proxy,<name>,<param>]',
+			'zabbix[proxy,discovery]',
 			'zabbix[proxy_history]',
 			'zabbix[queue,<from>,<to>]',
 			'zabbix[rcache,<cache>,<mode>]',
@@ -769,25 +777,25 @@ final class CItemData {
 				]
 			],
 			'for_http_auth_type' => [
-				HTTPTEST_AUTH_BASIC => [
+				ZBX_HTTP_AUTH_BASIC => [
 					'js-item-http-username-label',
 					'js-item-http-username-field',
 					'js-item-http-password-label',
 					'js-item-http-password-field'
 				],
-				HTTPTEST_AUTH_NTLM => [
+				ZBX_HTTP_AUTH_NTLM => [
 					'js-item-http-username-label',
 					'js-item-http-username-field',
 					'js-item-http-password-label',
 					'js-item-http-password-field'
 				],
-				HTTPTEST_AUTH_KERBEROS => [
+				ZBX_HTTP_AUTH_KERBEROS => [
 					'js-item-http-username-label',
 					'js-item-http-username-field',
 					'js-item-http-password-label',
 					'js-item-http-password-field'
 				],
-				HTTPTEST_AUTH_DIGEST => [
+				ZBX_HTTP_AUTH_DIGEST => [
 					'js-item-http-username-label',
 					'js-item-http-username-field',
 					'js-item-http-password-label',
@@ -1154,8 +1162,16 @@ final class CItemData {
 				'description' => _('Operating system information. Returns string'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
-			'system.sw.packages[<package>,<manager>,<format>]' => [
+			'system.sw.os.get' => [
+				'description' => _('Operating system version information. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'system.sw.packages[<regexp>,<manager>,<format>]' => [
 				'description' => _('Listing of installed packages. Returns text'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'system.sw.packages.get[<regexp>,<manager>]' => [
+				'description' => _('Detailed listing of installed packages. Returns text in JSON format'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'system.swap.in[<device>,<type>]' => [
@@ -1314,6 +1330,10 @@ final class CItemData {
 				'description' => _('VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
+			'vmware.datastore.perfcounter[<url>,<uuid>,<path>,<instance>]' => [
+				'description' => _('VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance'),
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			],
 			'vmware.datastore.property[<url>,<uuid>,<prop>]' => [
 				'description' => _('VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
@@ -1418,6 +1438,10 @@ final class CItemData {
 				'description' => _('Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
+			'vmware.hv.diskinfo.get[<url>,<uuid>]' => [
+				'description' => _('Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'vmware.hv.fullname[<url>,<uuid>]' => [
 				'description' => _('VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
 				'value_type' => ITEM_VALUE_TYPE_STR
@@ -1492,7 +1516,7 @@ final class CItemData {
 			],
 			'vmware.hv.perfcounter[<url>,<uuid>,<path>,<instance>]' => [
 				'description' => _('VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance'),
-				'value_type' => null
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.hv.power[<url>,<uuid>,<max>]' => [
 				'description' => _('Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage'),
@@ -1664,7 +1688,7 @@ final class CItemData {
 			],
 			'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]' => [
 				'description' => _('VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance'),
-				'value_type' => null
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.vm.powerstate[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
@@ -1774,6 +1798,10 @@ final class CItemData {
 				'description' => _('Startup time of Zabbix server, Unix timestamp.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
+			'zabbix[connector_queue]' => [
+				'description' => _('Count of values enqueued in the connector queue.'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
 			'zabbix[host,,items]' => [
 				'description' => _('Number of enabled items on the host.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
@@ -1825,6 +1853,10 @@ final class CItemData {
 			'zabbix[proxy,<name>,<param>]' => [
 				'description' => _('Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'zabbix[proxy,discovery]' => [
+				'description' => _('List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON.'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'zabbix[proxy_history]' => [
 				'description' => _('Number of items in proxy history that are not yet sent to the server'),

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,6 +101,18 @@ class CConfigurationExport {
 				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
 				'verify_host', 'allow_traps', 'discover', 'uuid'
+			],
+			'trigger_prototype' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments',
+				'type', 'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
+				'manual_close', 'opdata', 'discover', 'event_name', 'uuid'
+			],
+			'httptests' => ['name', 'hostid', 'delay', 'retries', 'agent', 'http_proxy', 'variables', 'headers',
+				'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host', 'ssl_cert_file',
+				'ssl_key_file', 'ssl_key_password', 'uuid'
+			],
+			'trigger' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments', 'type',
+				'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close',
+				'opdata', 'event_name', 'uuid'
 			]
 		];
 	}
@@ -312,9 +324,8 @@ class CConfigurationExport {
 	 */
 	protected function gatherTemplates(array $templateids) {
 		$templates = API::Template()->get([
-			'output' => ['host', 'name', 'description', 'uuid'],
+			'output' => ['host', 'name', 'description', 'uuid', 'vendor_name', 'vendor_version'],
 			'selectTemplateGroups' => ['groupid', 'name', 'uuid'],
-			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectDashboards' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
@@ -619,7 +630,7 @@ class CConfigurationExport {
 			foreach ($host_data['items'] as $item) {
 				$itemids[$item['itemid']] = $item['key_'];
 			}
-		};
+		}
 
 		$discovery_rules = $this->prepareDiscoveryRules($discovery_rules);
 
@@ -824,10 +835,10 @@ class CConfigurationExport {
 
 		// gather graph prototypes
 		$graphs = API::GraphPrototype()->get([
+			'output' => API_OUTPUT_EXTEND,
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'preservekeys' => true
 		]);
@@ -840,10 +851,7 @@ class CConfigurationExport {
 
 		// gather trigger prototypes
 		$triggers = API::TriggerPrototype()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'discover', 'event_name', 'uuid'
-			],
+			'output' => $this->dataFields['trigger_prototype'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectHosts' => ['status'],
@@ -862,8 +870,8 @@ class CConfigurationExport {
 
 		// gather host prototypes
 		$host_prototypes = API::HostPrototype()->get([
-			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => API_OUTPUT_EXTEND,
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
@@ -908,10 +916,7 @@ class CConfigurationExport {
 	 */
 	protected function gatherHttpTests(array $hosts) {
 		$httptests = API::HttpTest()->get([
-			'output' => ['name', 'hostid', 'delay', 'retries', 'agent', 'http_proxy', 'variables',
-				'headers', 'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
-				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'uuid'
-			],
+			'output' => $this->dataFields['httptests'],
 			'selectSteps' => ['no', 'name', 'url', 'query_fields', 'posts', 'variables', 'headers', 'follow_redirects',
 				'retrieve_mode', 'timeout', 'required', 'status_codes'
 			],
@@ -1046,10 +1051,7 @@ class CConfigurationExport {
 		$hostIds = array_merge($hostIds, $templateIds);
 
 		$triggers = API::Trigger()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'event_name', 'uuid'
-			],
+			'output' => $this->dataFields['trigger'],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type', 'templateid'],
 			'selectTags' => ['tag', 'value'],
@@ -1139,9 +1141,9 @@ class CConfigurationExport {
 		$this->data['mediaTypes'] = API::MediaType()->get([
 			'output' => ['name', 'type', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
 				'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'content_type',
-				'exec_path', 'exec_params', 'gsm_modem', 'status', 'maxsessions', 'maxattempts', 'attempt_interval',
-				'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name',
-				'description', 'parameters'
+				'exec_path', 'gsm_modem', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'script',
+				'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name', 'description',
+				'parameters', 'provider'
 			],
 			'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 			'mediatypeids' => $mediatypeids,

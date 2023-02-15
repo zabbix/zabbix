@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,22 +24,23 @@
 #include "trapper_auth.h"
 #include "zbxdbhigh.h"
 #include "../zbxreport.h"
-#include "../alerter/alerter_protocol.h"
+#include "../alerter/alerter.h"
 #include "zbxipcservice.h"
 #include "zbxcommshigh.h"
 #include "zbxnum.h"
+#include "proxyconfigread/proxyconfig_read.h"
 
-extern int	CONFIG_REPORTMANAGER_FORKS;
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
-static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;
 	struct zbx_json		j;
 
-	if (0 == CONFIG_REPORTMANAGER_FORKS)
+	if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTMANAGER])
 	{
-		zbx_send_response(sock, FAIL, "Report manager is disabled.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, FAIL, "Report manager is disabled.", config_timeout);
 		return;
 	}
 
@@ -47,7 +48,7 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
 	{
-		zbx_send_response(sock, FAIL, "Permission denied.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, FAIL, "Permission denied.", config_timeout);
 		goto out;
 	}
 
@@ -56,13 +57,13 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 		char	*error;
 
 		error = zbx_dsprintf(NULL, "cannot find tag: %s", ZBX_PROTO_TAG_DATA);
-		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
+		zbx_send_response(sock, FAIL, error, config_timeout);
 		zbx_free(error);
 		goto out;
 	}
 
 	zbx_report_test(&jp_data, user.userid, &j);
-	zbx_tcp_send_bytes_to(sock, j.buffer, j.buffer_size, CONFIG_TIMEOUT);
+	zbx_tcp_send_bytes_to(sock, j.buffer, j.buffer_size, config_timeout);
 	zbx_json_clean(&j);
 out:
 	zbx_user_free(&user);
@@ -112,7 +113,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_MEDIATYPEID, tmp, sizeof(tmp), NULL) ||
-			SUCCEED != is_uint64(tmp, &mediatypeid))
+			SUCCEED != zbx_is_uint64(tmp, &mediatypeid))
 	{
 		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_MEDIATYPEID);
 		goto fail;
@@ -134,22 +135,23 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 				(size_t)(jp_params.end - jp_params.start + 1));
 	}
 
-	result = DBselect("select type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
-				"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,"
-				"exec_params,maxsessions,maxattempts,attempt_interval,content_type,script,timeout"
+	result = zbx_db_select(
+			"select type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,passwd,smtp_port"
+				",smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,maxsessions"
+				",maxattempts,attempt_interval,content_type,script,timeout"
 			" from media_type"
 			" where mediatypeid=" ZBX_FS_UI64, mediatypeid);
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = zbx_db_fetch(result)))
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		error = zbx_dsprintf(NULL, "Cannot find the specified media type.");
 		goto fail;
 	}
 
-	if (FAIL == is_ushort(row[8], &smtp_port))
+	if (FAIL == zbx_is_ushort(row[8], &smtp_port))
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		error = zbx_dsprintf(NULL, "Invalid port value.");
 		goto fail;
 	}
@@ -158,15 +160,15 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	ZBX_STR2UCHAR(smtp_verify_peer, row[10]);
 	ZBX_STR2UCHAR(smtp_verify_host, row[11]);
 	ZBX_STR2UCHAR(smtp_authentication, row[12]);
-	ZBX_STR2UCHAR(content_type, row[17]);
+	ZBX_STR2UCHAR(content_type, row[16]);
 	ZBX_STR2UCHAR(type, row[0]);
 
-	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[1], row[2], row[3], row[4],
-			row[5], row[6], row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
-			smtp_authentication, row[13], atoi(row[14]), atoi(row[15]), row[16], content_type, row[18],
-			row[19], sendto, subject, message, params);
+	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[1], row[2], row[3], row[4], row[5], row[6],
+			row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication,
+			atoi(row[13]), atoi(row[14]), row[15], content_type, row[17], row[18], sendto, subject, message,
+			params);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_SEND_ALERT, SEC_PER_MIN, data,
 			size, &response, &error))
@@ -214,16 +216,26 @@ fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
-int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp)
+int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
+		const zbx_config_tls_t *config_tls, const zbx_config_vault_t *config_vault,
+		zbx_get_program_type_f get_program_type_cb, int config_timeout)
 {
+	ZBX_UNUSED(config_tls);
+	ZBX_UNUSED(get_program_type_cb);
+
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
 	{
-		trapper_process_report_test(sock, jp);
+		trapper_process_report_test(sock, jp, config_timeout);
 		return SUCCEED;
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
 	{
 		trapper_process_alert_send(sock, jp);
+		return SUCCEED;
+	}
+	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
+	{
+		zbx_send_proxyconfig(sock, jp, config_vault, config_timeout);
 		return SUCCEED;
 	}
 

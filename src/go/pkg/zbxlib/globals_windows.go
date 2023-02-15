@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ package zbxlib
 
 /*
 #include "zbxstr.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxcomms.h"
-#include "perfmon.h"
+#include "zbxwin32.h"
 #include "../src/zabbix_agent/metrics.h"
 
 #cgo LDFLAGS: -Wl,--start-group
@@ -34,9 +34,13 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/interval.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/common_str.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/components_strings_representations.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/libc_wrappers.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/time.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/expr.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/function.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/host.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/macro.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/token.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/fatal.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/disk.o
@@ -46,6 +50,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/md5.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/vector.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/hashset.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/zbxregexp.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/algodefs.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/persistent_state.o
@@ -53,6 +58,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/json.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/json_parser.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/jsonpath.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/jsonobj.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sha256crypt.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/variant.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_system.o
@@ -68,7 +74,6 @@ package zbxlib
 #cgo openssl LDFLAGS: -lssl -lcrypto
 #cgo LDFLAGS: -Wl,--end-group
 
-int CONFIG_TIMEOUT = 3;
 int CONFIG_MAX_LINES_PER_SECOND = 20;
 int CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = 20;
 char ZBX_THREAD_LOCAL *CONFIG_HOSTNAME = NULL;
@@ -112,18 +117,18 @@ char	*strerror_from_system(unsigned long error)
 	return utf8_string;
 }
 
-int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported."));
 	return SYSINFO_RET_FAIL;
 }
 
-DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
+DWORD	zbx_get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
 {
 	return 0;
 }
 
-DWORD	get_builtin_object_index(zbx_builtin_counter_ref_t object_ref)
+DWORD	zbx_get_builtin_object_index(zbx_builtin_counter_ref_t object_ref)
 {
 	return 0;
 }

@@ -42,10 +42,14 @@ OBJS = \
 	..\..\..\src\libs\zbxstr\str.o \
 	..\..\..\src\libs\zbxcommon\common_str.o \
 	..\..\..\src\libs\zbxparam\param.o \
-	..\..\..\src\libs\zbxexpr\token.o \
 	..\..\..\src\libs\zbxcommon\components_strings_representations.o \
+	..\..\..\src\libs\zbxcommon\libc_wrappers.o \
 	..\..\..\src\libs\zbxtime\time.o \
 	..\..\..\src\libs\zbxexpr\expr.o \
+	..\..\..\src\libs\zbxexpr\function.o \
+	..\..\..\src\libs\zbxexpr\host.o \
+	..\..\..\src\libs\zbxexpr\macro.o \
+	..\..\..\src\libs\zbxexpr\token.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
@@ -57,6 +61,7 @@ OBJS = \
 	..\..\..\src\libs\zbxjson\json.o \
 	..\..\..\src\libs\zbxjson\json_parser.o \
 	..\..\..\src\libs\zbxjson\jsonpath.o \
+	..\..\..\src\libs\zbxjson\jsonobj.o \
 	..\..\..\src\libs\zbxlog\log.o \
 	..\..\..\src\libs\zbxmutexs\mutexs.o \
 	..\..\..\src\libs\zbxsymbols\symbols.o \
@@ -65,6 +70,7 @@ OBJS = \
 	..\..\..\src\libs\zbxwin32\fatal.o \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
+	..\..\..\src\libs\zbxalgo\hashset.o \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \
 	..\..\..\src\libs\zbxversion\version.o \
 	..\..\..\src\libs\zbxxml\xml.o \

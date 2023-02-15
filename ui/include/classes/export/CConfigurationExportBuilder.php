@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ class CConfigurationExportBuilder {
 	 */
 	public function __construct() {
 		$this->data['version'] = ZABBIX_EXPORT_VERSION;
-		$this->data['date'] = date(DATE_TIME_FORMAT_SECONDS_XML, time() - date('Z'));
 	}
 
 	/**
@@ -87,7 +86,7 @@ class CConfigurationExportBuilder {
 
 		$value = $has_data ? $row[$tag] : $default_value;
 
-		if (!$is_required && $has_data && $default_value == $value) {
+		if (!$is_required && $default_value == $value) {
 			return null;
 		}
 
@@ -284,17 +283,26 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($templates, ['host']);
 
 		foreach ($templates as $template) {
+			$vendor = [];
+
+			if ($template['vendor_name'] !== '' && $template['vendor_version'] !== '') {
+				$vendor = [
+					'name' => $template['vendor_name'],
+					'version' => $template['vendor_version']
+				];
+			}
+
 			$result[] = [
 				'uuid' => $template['uuid'],
 				'template' => $template['host'],
 				'name' => $template['name'],
 				'description' => $template['description'],
+				'vendor' => $vendor,
 				'groups' => $this->formatGroups($template['templategroups']),
 				'items' => $this->formatItems($template['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
 				'httptests' => $this->formatHttpTests($template['httptests']),
 				'macros' => $this->formatMacros($template['macros']),
-				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
 				'dashboards' => $this->formatDashboards($template['dashboards']),
 				'tags' => $this->formatTags($template['tags']),
 				'valuemaps' => $this->formatValueMaps($template['valuemaps'])
@@ -425,8 +433,8 @@ class CConfigurationExportBuilder {
 
 		CArrayHelper::sort($media_types, ['name']);
 
-		foreach ($media_types as $media_type) {
-			$result[] = [
+		foreach ($media_types as $i => $media_type) {
+			$result[$i] = [
 				'name' => $media_type['name'],
 				'type' => $media_type['type'],
 				'smtp_server' => $media_type['smtp_server'],
@@ -456,6 +464,10 @@ class CConfigurationExportBuilder {
 				'description' => $media_type['description'],
 				'message_templates' => self::formatMediaTypeMessageTemplates($media_type['message_templates'])
 			];
+
+			if ($media_type['type'] == MEDIA_TYPE_EMAIL) {
+				$result[$i] += ['provider' => $media_type['provider']];
+			}
 		}
 
 		return $result;
@@ -473,7 +485,9 @@ class CConfigurationExportBuilder {
 	private static function formatMediaTypeParameters(array $media_type) {
 		switch ($media_type['type']) {
 			case MEDIA_TYPE_EXEC:
-				return explode("\n", substr($media_type['exec_params'], 0, -1));
+				CArrayHelper::sort($media_type['parameters'], ['sortorder']);
+
+				return array_values($media_type['parameters']);
 
 			case MEDIA_TYPE_WEBHOOK:
 				CArrayHelper::sort($media_type['parameters'], ['name']);
@@ -956,6 +970,7 @@ class CConfigurationExportBuilder {
 				'opdata' => $trigger['opdata'],
 				'correlation_mode' => $trigger['correlation_mode'],
 				'correlation_tag' => $trigger['correlation_tag'],
+				'url_name' => $trigger['url_name'],
 				'url' => $trigger['url'],
 				'status' => $trigger['status'],
 				'priority' => $trigger['priority'],

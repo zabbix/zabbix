@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "../sysinfo.h"
 #include "net.h"
 
 #include "zbxcomms.h"
@@ -76,7 +77,7 @@ out:
 	return SYSINFO_RET_OK;
 }
 
-int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	unsigned short	port;
 	int		value_int, ret;
@@ -92,17 +93,17 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	port_str = get_rparam(request, 1);
 
 	if (NULL == ip_str || '\0' == *ip_str)
-		strscpy(ip, "127.0.0.1");
+		zbx_strscpy(ip, "127.0.0.1");
 	else
-		strscpy(ip, ip_str);
+		zbx_strscpy(ip, ip_str);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int)))
+	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, NULL, NULL, &value_int)))
 		SET_UI64_RESULT(result, value_int);
 
 	return ret;

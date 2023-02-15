@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 class CControllerScriptEdit extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -30,7 +30,7 @@ class CControllerScriptEdit extends CController {
 			'scriptid' =>				'db scripts.scriptid',
 			'name' =>					'db scripts.name',
 			'scope' =>					'db scripts.scope| in '.implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]),
-			'type' =>					'db scripts.type|in '.implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK]),
+			'type' =>					'db scripts.type|in '.implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL]),
 			'execute_on' =>				'db scripts.execute_on|in '.implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY]),
 			'menu_path' =>				'db scripts.menu_path',
 			'authtype' =>				'db scripts.authtype|in '.implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
@@ -45,6 +45,8 @@ class CControllerScriptEdit extends CController {
 			'parameters' =>				'array',
 			'script' => 				'db scripts.command',
 			'timeout' => 				'db media_type.timeout',
+			'url' => 					'db scripts.url',
+			'new_window' => 			'db scripts.new_window',
 			'description' =>			'db scripts.description',
 			'host_access' =>			'db scripts.host_access|in '.implode(',', [PERM_READ, PERM_READ_WRITE]),
 			'groupid' =>				'db scripts.groupid',
@@ -83,7 +85,7 @@ class CControllerScriptEdit extends CController {
 	protected function doAction() {
 		// Default values.
 		$data = [
-			'sid' => $this->getUserSID(),
+			'form_refresh' => $this->getInput('form_refresh', 0),
 			'scriptid' => 0,
 			'name' => '',
 			'scope' => ZBX_SCRIPT_SCOPE_ACTION,
@@ -102,6 +104,8 @@ class CControllerScriptEdit extends CController {
 			'parameters' => [],
 			'script' => '',
 			'timeout' => DB::getDefault('scripts', 'timeout'),
+			'url' => '',
+			'new_window' => ZBX_SCRIPT_URL_NEW_WINDOW_YES,
 			'description' => '',
 			'usrgrpid' => 0,
 			'groupid' => 0,
@@ -117,7 +121,7 @@ class CControllerScriptEdit extends CController {
 			$scripts = API::Script()->get([
 				'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
 					'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username',
-					'password', 'publickey', 'privatekey', 'menu_path', 'parameters'
+					'password', 'publickey', 'privatekey', 'menu_path', 'parameters', 'url', 'new_window'
 				],
 				'scriptids' => $this->getInput('scriptid'),
 				'selectActions' => []
@@ -135,6 +139,8 @@ class CControllerScriptEdit extends CController {
 					: '';
 				$data['commandipmi'] = ($script['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $script['command'] : '';
 				$data['script'] = ($script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) ? $script['command'] : '';
+				$data['url'] = $script['url'];
+				$data['new_window'] = $script['new_window'];
 				$data['host_access'] = $script['host_access'];
 				$data['usrgrpid'] = $script['usrgrpid'];
 				$data['hgstype'] = ($script['groupid'] != 0) ? 1 : 0;
@@ -167,7 +173,7 @@ class CControllerScriptEdit extends CController {
 		$this->getInputs($data, ['name', 'command', 'commandipmi', 'script', 'host_access', 'usrgrpid', 'hgstype',
 			'groupid', 'description', 'enable_confirmation', 'confirmation', 'type', 'execute_on', 'timeout', 'scope',
 			'port', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'passphrase', 'menu_path',
-			'parameters'
+			'parameters', 'url', 'new_window'
 		]);
 
 		if ($this->hasInput('form_refresh') && array_key_exists('name', $data['parameters'])

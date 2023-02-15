@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('regex');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Regular expressions'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_REGEX_LIST))
@@ -78,8 +78,10 @@ foreach($data['regexs'] as $regexid => $regex) {
 $form->addItem([
 	$table,
 	new CActionButtonList('action', 'regexids', [
-		'regex.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?')]
+		'regex.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?'),
+			'csrf_token' => CCsrfTokenHelper::get('regex')
+		]
 	], 'regex')
 ]);
 
-$widget->addItem($form)->show();
+$html_page->addItem($form)->show();

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-31 04:13+0000\n"
+"PO-Revision-Date: 2023-02-05 06:50+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -147,6 +147,11 @@ msgid "%1$s event"
 msgid_plural "%1$s events"
 msgstr[0] "%1$sイベント"
 
+#: app/views/popup.usergroupmapping.edit.php:90
+#, c-format
+msgid "%1$s group pattern"
+msgstr "%1$s グループのパターン"
+
 #: include/maps.inc.php:410
 #, c-format
 msgid "%1$s host in maintenance"
@@ -251,6 +256,21 @@ msgstr "%1$sは読み込み専用です"
 msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s件選択済"
+
+#: app/controllers/CControllerMediatypeEnable.php:93
+#, c-format
+msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr "%1$s. %2$s: %3$s. %4$s."
+
+#: include/classes/core/CModuleManager.php:153
+#, c-format
+msgid "%1$s.php class must extend %2$s for module located at %3$s."
+msgstr "%1$s.phpクラスは、%3$sにあるモジュールの%2$sを拡張してください。"
+
+#: app/controllers/CControllerMediatypeEnable.php:108
+#, c-format
+msgid "%1$s: %2$s"
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
@@ -504,7 +524,7 @@ msgstr "確認済"
 #: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr ""
+msgstr "確認済"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
@@ -602,7 +622,7 @@ msgstr "アクション"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "アクション"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -654,6 +674,11 @@ msgstr "アクション処理"
 msgid "Action updated"
 msgstr "アクションを更新しました"
 
+#: include/classes/api/services/CDashboardGeneral.php:672
+#, c-format
+msgid "Action with ID \"%1$s\" is not available."
+msgstr "ID\"%1$s\"のアクションは使用できません。"
+
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
 #: app/views/monitoring.dashboard.view.php:122
@@ -674,7 +699,7 @@ msgstr "アクション"
 #: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "アクション"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -866,6 +891,10 @@ msgstr "新しいウィジェットを追加"
 msgid "Add child element"
 msgstr "子の要素を追加"
 
+#: widgets/navtree/Widget.php:39
+msgid "Add child elements"
+msgstr "子の要素を追加"
+
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
 msgstr "子サービスの追加"
@@ -877,6 +906,14 @@ msgstr "子サービスの追加"
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
 msgstr "他から追加"
+
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr "ホストから追加"
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr "テンプレートから追加"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -1012,6 +1049,10 @@ msgstr "高度な設定"
 msgid "Advanced labels"
 msgstr "拡張ラベル"
 
+#: app/views/popup.import.php:175
+msgid "Advanced options"
+msgstr "高度なオプション"
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
 msgstr "値の後"
@@ -1079,7 +1120,7 @@ msgstr "通知メッセージ"
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:338
 msgid "Alerts"
-msgstr ""
+msgstr "通知"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -1181,6 +1222,10 @@ msgstr "許可されたホスト"
 msgid "Allowed methods"
 msgstr "許可されたメソッド"
 
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr "集約されたデータセットの凡例ラベルとしても使用されます。"
+
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
 msgstr "代わりに、手動でインストールすることができます:"
@@ -1192,6 +1237,36 @@ msgstr "スワップ領域にスワップアウトされるゲストの物理メ
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "ゲストの物理メモリページをバックアップするために消費されたホストの物理メモリ量、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
+
+#: include/classes/api/services/CItemGeneral.php:1544
+#, c-format
+msgid "An LLD rule with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr "キー\"%1$s\"のLLDルールは、ホスト\"%2$s\"にすでに存在します。"
+
+#: include/classes/api/services/CItemGeneral.php:1543
+#, c-format
+msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr "キー\"%1$s\"のLLDルールは、テンプレート\"%2$s\"にすでに存在します。"
+
+#: include/classes/api/services/CItemGeneral.php:1538
+#, c-format
+msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr "キー\"%1$s\"のアイテムのプロトタイプは、ホスト\"%2$s\"にすでに存在します。"
+
+#: include/classes/api/services/CItemGeneral.php:1537
+#, c-format
+msgid "An item prototype with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr "キー\"%1$s\"のアイテムのプロトタイプは、テンプレート\"%2$s\"にすでに存在します。"
+
+#: include/classes/api/services/CItemGeneral.php:1532
+#, c-format
+msgid "An item with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr "キー\"%1$s\"のアイテムは、ホスト\"%2$s\"にすでに存在します。"
+
+#: include/classes/api/services/CItemGeneral.php:1531
+#, c-format
+msgid "An item with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr "キー\"%1$s\"のアイテムは、テンプレート\"%2$s\"にすでに存在します。"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
@@ -1456,6 +1531,12 @@ msgstr "試行間隔"
 msgid "Attempts"
 msgstr "試行回数"
 
+#: app/views/administration.authentication.edit.php:520
+#: app/views/popup.ldap.edit.php:265
+#: app/views/popup.mediatypemapping.edit.php:59
+msgid "Attribute"
+msgstr "属性"
+
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
 msgstr "帰属表示"
@@ -1630,7 +1711,7 @@ msgstr "利用可能"
 #: app/views/monitoring.widget.hostavail.view.php:37
 msgctxt "compact table header"
 msgid "Available"
-msgstr ""
+msgstr "利用可能"
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -1692,6 +1773,14 @@ msgstr "基本色"
 #: include/httptest.inc.php:28
 msgid "Basic"
 msgstr "Basic"
+
+#: app/views/connector.edit.php:136
+msgid "Bearer"
+msgstr "Bearer"
+
+#: app/views/connector.edit.php:156
+msgid "Bearer token"
+msgstr "Bearerトークン"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
@@ -2092,9 +2181,28 @@ msgstr "ユーザーグループを追加できません"
 msgid "Cannot add web scenario"
 msgstr "Webシナリオを追加できません"
 
+#: jsLoader.php:129
+msgid "Cannot add widget: no widgets available."
+msgstr "ウィジェットを追加できません: 使用できるウィジェットがありません。"
+
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
 msgstr "ウィジェットが追加できません: ダッシュボードの空き領域が足りません。"
+
+#: include/classes/api/services/CItem.php:1532
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of host \"%3$s\", because it is already populated by the item with key \"%4$s\"."
+msgstr "キー\"%4$s\"のアイテムによってすでに取り込まれているため、インベントリフィールド\"%1$s\"をホスト\"%3$s\"のキー\"%2$s\"のアイテムに割り当てることができません。"
+
+#: include/classes/api/services/CItem.php:1531
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\""
+msgstr "キー\"%4$s\"のアイテムによってすでに取り込まれているため、インベントリフィールド\"%1$s\"をテンプレート\"%3$s\"のキー\"%2$s\"のアイテムに割り当てることができません。"
+
+#: include/classes/api/services/CItem.php:1531
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
+msgstr "キー\"%4$s\"のアイテムによってすでに取り込まれているため、インベントリフィールド\"%1$s\"をテンプレート\"%3$s\"のキー\"%2$s\"のアイテムに割り当てることができません。"
 
 #: jsLoader.php:343
 msgctxt "screen reader"
@@ -2165,6 +2273,16 @@ msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
 msgstr[0] "アイテムをコピーできません"
 
+#: include/classes/api/services/CDiscoveryRule.php:2475
+#, c-format
+msgid "Cannot copy item prototype with key \"%1$s\" without its master item with key \"%2$s\"."
+msgstr "キー\"%2$s\"のマスターアイテムなしでキー\"%1$s\"のアイテムのプロトタイプをコピーできません。"
+
+#: include/items.inc.php:590
+#, c-format
+msgid "Cannot copy item with key \"%1$s\" without its master item with key \"%2$s\"."
+msgstr "キー\"%2$s\"のマスターアイテムなしでキー\"%1$s\"のアイテムをコピーできません。"
+
 #: triggers.php:538
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
@@ -2199,6 +2317,11 @@ msgstr "データベースへのコネクションを作成できません。"
 msgid "Cannot create circular dependencies."
 msgstr "循環する依存関係は作成できません。"
 
+#: app/controllers/CControllerConnectorCreate.php:89
+#: app/controllers/CControllerConnectorCreate.php:164
+msgid "Cannot create connector"
+msgstr "コネクタを作成できません"
+
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
 msgstr "自身に対する依存関係は作成できません。"
@@ -2215,6 +2338,11 @@ msgstr "ディスカバリルールを作成できません"
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "アイコンのマッピングを作成できません"
+
+#: app/controllers/CControllerMaintenanceCreate.php:72
+#: app/controllers/CControllerMaintenanceCreate.php:150
+msgid "Cannot create maintenance period"
+msgstr ""
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2267,6 +2395,11 @@ msgstr "アクションを削除できません"
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
 msgstr "割り当てられたユーザーの役割\"%1$s\"が削除できません。"
+
+#: app/controllers/CControllerConnectorDelete.php:68
+msgid "Cannot delete connector"
+msgid_plural "Cannot delete connectors"
+msgstr[0] "コネクタを削除できません"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2384,6 +2517,11 @@ msgstr "アイテムを削除できません"
 #: maintenance.php:224
 msgid "Cannot delete maintenance"
 msgstr "メンテナンスを削除できません"
+
+#: app/controllers/CControllerMaintenanceDelete.php:71
+msgid "Cannot delete maintenance period"
+msgid_plural "Cannot delete maintenance periods"
+msgstr[0] ""
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -2548,6 +2686,11 @@ msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "アクションを無効にできません"
 
+#: app/controllers/CControllerConnectorDisable.php:77
+msgid "Cannot disable connector"
+msgid_plural "Cannot disable connectors"
+msgstr[0] "コネクタを無効にできません"
+
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
@@ -2620,6 +2763,11 @@ msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "アクションを有効にできません"
 
+#: app/controllers/CControllerConnectorEnable.php:77
+msgid "Cannot enable connector"
+msgid_plural "Cannot enable connectors"
+msgstr[0] "コネクタを有効にできません"
+
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
 msgid_plural "Cannot enable correlations"
@@ -2671,6 +2819,10 @@ msgstr[0] "Webシナリオを有効にできません"
 msgid "Cannot evaluate expression"
 msgstr "条件式を評価できません"
 
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr "URLタイプのスクリプトを実行できません。"
+
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
 msgid "Cannot execute operation"
@@ -2720,7 +2872,17 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロ�
 #: include/items.inc.php:701
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr "アイテムのキー\"%2$s\"のインターフェースは\"%1$s\"に存在しません。"
+msgstr "アイテムキー\"%2$s\"のホストインターフェースは\"%1$s\"に存在しません。"
+
+#: include/classes/api/services/CDiscoveryRule.php:2517
+#, c-format
+msgid "Cannot find host interface on \"%1$s\" for item prototype with key \"%2$s\"."
+msgstr "キー\"%2$s\"のアイテムのプロトタイプのホストインターフェースは\"%1$s\"に存在しません。"
+
+#: include/items.inc.php:640
+#, c-format
+msgid "Cannot find host interface on \"%1$s\" for item with key \"%2$s\"."
+msgstr "キー\"%2$s\"のアイテムのホストインターフェースは\"%1$s\"に存在しません。"
 
 #: include/classes/import/importers/CMapImporter.php:207
 #, c-format
@@ -2837,6 +2999,205 @@ msgstr "ユーサーの役割\"%1$s\"のルール\"%2$s\"内に空のタグが�
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "テンプレート\"%1$s\"をインポートできません。リンクされているテンプレート\"%2$s\"が存在しません。"
+
+#: include/classes/api/services/CItemGeneral.php:588
+#, c-format
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "キーはホスト\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のLLDルールを継承できません。"
+
+#: include/classes/api/services/CItemGeneral.php:589
+#, c-format
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "キーはテンプレート\"%4$s\"上でユニークでなければならないので、\"%2$s\"と\"%3$s\"の両方のテンプレートのキー\"%1$s\"のLLDルールを継承できません。"
+
+#: include/classes/api/services/CItemGeneral.php:704
+#: include/classes/api/services/CItemGeneral.php:716
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
+msgstr "同じキーの検出されたアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
+
+#: include/classes/api/services/CItemGeneral.php:1030
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr "タイプが\"%4$s\"のホストインターフェースが必要なため、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
+
+#: include/classes/api/services/CItemGeneral.php:710
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
+msgstr "同じアイテムキーのアイテムのプロトタイプがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
+
+#: include/classes/api/services/CItemGeneral.php:704
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr "同じアイテムキーのアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
+
+#: include/classes/api/services/CItemGeneral.php:769
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr "同じアイテムキーのアイテムをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
+
+#: include/classes/api/services/CItemGeneral.php:705
+#: include/classes/api/services/CItemGeneral.php:717
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr "同じキーの検出されたアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
+
+#: include/classes/api/services/CItemGeneral.php:711
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr "同じアイテムキーのアイテムのプロトタイプがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
+
+#: include/classes/api/services/CItemGeneral.php:705
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
+msgstr "同じアイテムキーのアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
+
+#: include/classes/api/services/CItemGeneral.php:770
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr "同じアイテムキーのアイテムをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
+
+#: include/classes/api/services/CItemPrototype.php:1230
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemPrototype.php:1231
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:725
+#: include/classes/api/services/CItemGeneral.php:737
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1034
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:731
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:725
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:775
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:726
+#: include/classes/api/services/CItemGeneral.php:738
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:732
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:726
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:776
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:582
+#, c-format
+msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:583
+#, c-format
+msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1455
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to host \"%5$s\", because they would populate the same inventory field \"%6$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1454
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to template \"%5$s\", because they would populate the same inventory field \"%6$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:695
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1026
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:683
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:689
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:763
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1509
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:696
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr "同じキーを持つ検出されたアイテムが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをテンプレート \"%3$s\" に継承できません。"
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr "同じキーを持つLLDルールが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムをテンプレート \"%3$s\" に継承できません。"
+
+#: include/classes/api/services/CItemGeneral.php:690
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:764
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1508
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:576
+#, c-format
+msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:577
+#, c-format
+msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1581
 msgid "Cannot insert trigger expression"
@@ -2973,6 +3334,10 @@ msgstr "ホストの表示名を一括更新できません。"
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
 msgstr "テンプレートIDの重複のためリンク%1$sを作成できません。"
 
+#: jsLoader.php:130
+msgid "Cannot paste inaccessible widget."
+msgstr "アクセスできないウィジェットを貼り付けることはできません。"
+
 #: include/classes/db/DB.php:958
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
@@ -2987,6 +3352,11 @@ msgstr "値がないため\"%1$s\"テーブルにupdate文を実行できませ�
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "where句がないため\"%1$s\"テーブルにupdate文を実行できません。"
+
+#: app/controllers/CControllerUserProvision.php:69
+msgid "Cannot provision user"
+msgid_plural "Cannot provision users"
+msgstr[0] "ユーザーをプロビジョニングできません"
 
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
@@ -3058,6 +3428,46 @@ msgstr "グラフのプロトタイプ\"%2$s\"に\"%1$s\"を設定できませ�
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "アイテム\"%2$s\"に\"%1$s\"を設定できません。"
+
+#: include/classes/api/services/CItemGeneral.php:2237
+#, c-format
+msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2236
+#, c-format
+msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2231
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2230
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2226
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2225
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2220
+#, c-format
+msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2219
+#, c-format
+msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
 
 #: include/classes/api/services/CHost.php:1037
 #: include/classes/api/services/CHost.php:2015
@@ -3242,6 +3652,11 @@ msgstr "認証の設定を更新できません"
 msgid "Cannot update configuration"
 msgstr "設定を更新できません"
 
+#: app/controllers/CControllerConnectorUpdate.php:90
+#: app/controllers/CControllerConnectorUpdate.php:173
+msgid "Cannot update connector"
+msgstr "コネクタを更新できません"
+
 #: app/controllers/CControllerCorrelationCreate.php:47
 #: app/controllers/CControllerCorrelationUpdate.php:48
 #: app/controllers/CControllerCorrelationUpdate.php:125
@@ -3263,6 +3678,10 @@ msgstr "ディスカバリのルールを更新できません"
 msgid "Cannot update event"
 msgid_plural "Cannot update events"
 msgstr[0] "イベントを更新できません"
+
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr "イベントを更新できません"
 
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
@@ -3343,6 +3762,11 @@ msgstr "マクロを更新できません"
 #: maintenance.php:119
 msgid "Cannot update maintenance"
 msgstr "メンテナンスを更新できません"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:73
+#: app/controllers/CControllerMaintenanceUpdate.php:152
+msgid "Cannot update maintenance period"
+msgstr ""
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -3500,6 +3924,11 @@ msgstr "正規表現に一致するすべてのSNMPトラップをキャッチ�
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "snmptrap[]アイテムでキャッチされていないすべてのSNMPトラップをキャッチする。"
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr "原因"
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -3556,6 +3985,10 @@ msgstr "パスワード変更"
 #: include/items.inc.php:1844
 msgid "Change per second"
 msgstr "1秒あたりの差分"
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
+msgstr "障害の順位の変更"
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -3901,7 +4334,7 @@ msgstr "圧縮"
 #: app/views/administration.housekeeping.edit.php:174
 #: app/views/administration.housekeeping.edit.php:184
 msgid "Compression is not supported."
-msgstr ""
+msgstr "圧縮はサポートされていません。"
 
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
@@ -4127,6 +4560,15 @@ msgstr "設定を更新しました"
 msgid "Configure DB connection"
 msgstr "データベース接続設定"
 
+#: app/views/administration.authentication.edit.php:417
+#: app/views/popup.ldap.edit.php:115
+msgid "Configure JIT provisioning"
+msgstr "JITプロビジョニングの設定"
+
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr "変更の確認"
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "確認テキスト"
@@ -4165,6 +4607,17 @@ msgstr "接続タイムアウト"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Zabbixサーバー\"%2$s\"への接続中に%1$s秒を超える接続タイムアウトが発生しました。"
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+"Zabbixサーバー\"%1$s\"への接続に失敗しました。以下の原因が考えられます：\n"
+"1. \"zabbix_server.conf\"内の\"NodeAddress\"か\"ListenPort\"が正しくないか、\"zabbix.conf.php\"内のIP/DNSで上書きされている。\n"
+"2. DNSサーバーの設定が正しくない。\n"
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4175,6 +4628,21 @@ msgstr ""
 "Zabbixサーバー\"%1$s\"への接続に失敗しました。以下の原因が考えられます：\n"
 "1. \"zabbix.conf.php\"に設定されたサーバーのIP/DNSが正しくない。\n"
 "2. DNSサーバーの設定が正しくない。\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
+"Zabbixサーバー\"%1$s\"への接続が拒否されました。以下の原因が考えられます：\n"
+"1. \"zabbix_server.conf\"内の\"NodeAddress\"か\"ListenPort\"が正しくないか、\"zabbix.conf.php\"内のIP/DNSで上書きされている。\n"
+"2. セキュリティ設定（例えばSELinux）によって接続がブロックされている。\n"
+"3. Zabbixサーバーデーモンが起動していない。\n"
+"4. FirewallによってTCPでの接続がブロックされている。\n"
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4190,6 +4658,17 @@ msgstr ""
 "2. SELinuxなどのセキュリティ関連の設定で接続がブロックされている。\n"
 "3. Zabbixサーバーのプロセスが起動していない。\n"
 "4. FirewallによってTCPでの接続がブロックされている。\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
+"Zabbixサーバー\"%1$s\"への接続がタイムアウトしました。以下の原因が考えられます：\n"
+"1. \"zabbix_server.conf\"内の\"NodeAddress\"か\"ListenPort\"が正しくないか、\"zabbix.conf.php\"内のIP/DNSで上書きされている。\n"
+"2. FirewallによってTCPでの接続がブロックされている。\n"
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -4233,6 +4712,45 @@ msgstr "ホストへの接続"
 #: app/views/administration.proxy.edit.php:95
 msgid "Connections to proxy"
 msgstr "プロキシへの接続"
+
+#: app/controllers/CControllerAuditLogList.php:212
+#: app/views/connector.edit.php:283 app/views/connector.edit.php:297
+msgid "Connector"
+msgstr "コネクタ"
+
+#: include/classes/api/services/CConnector.php:446
+#, c-format
+msgid "Connector \"%1$s\" already exists."
+msgstr "コネクタ\"%1$s\"はすでに存在しています。"
+
+#: app/controllers/CControllerConnectorCreate.php:156
+msgid "Connector created"
+msgstr "コネクタを作成しました"
+
+#: app/controllers/CControllerConnectorDelete.php:60
+msgid "Connector deleted"
+msgid_plural "Connectors deleted"
+msgstr[0] "コネクタを削除しました"
+
+#: app/controllers/CControllerConnectorDisable.php:69
+msgid "Connector disabled"
+msgid_plural "Connectors disabled"
+msgstr[0] "コネクタを無効にしました"
+
+#: app/controllers/CControllerConnectorEnable.php:69
+msgid "Connector enabled"
+msgid_plural "Connectors enabled"
+msgstr[0] "コネクタを有効にしました"
+
+#: app/controllers/CControllerConnectorUpdate.php:165
+msgid "Connector updated"
+msgstr "コネクタを更新しました"
+
+#: app/controllers/CControllerConnectorList.php:104
+#: app/views/connector.list.php:132 include/classes/helpers/CMenuHelper.php:360
+#: include/html.inc.php:891
+msgid "Connectors"
+msgstr "コネクタ"
 
 #: include/views/monitoring.sysmap.list.php:85
 #: include/views/monitoring.sysmap.list.php:86
@@ -4337,6 +4855,14 @@ msgstr "契約番号"
 msgid "Convert to JSON"
 msgstr "JSONへの変換"
 
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr "原因に変換"
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr "兆候イベントを原因イベントに戻します"
+
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
 msgid "Coordinates"
@@ -4349,6 +4875,24 @@ msgstr "座標"
 #: jsLoader.php:164 jsLoader.php:281
 msgid "Copy"
 msgstr "コピー"
+
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] "%1$sグラフをコピー"
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] "%1$sアイテムをコピー"
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] "%1$sトリガーをコピー"
 
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
@@ -4413,6 +4957,10 @@ msgstr "ログローテーションに対応したログの一致行数。整数
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "ログの一致行数。整数値を返す。"
 
+#: include/classes/data/CItemData.php:1802
+msgid "Count of values enqueued in the connector queue."
+msgstr "コネクタキュー内にキューイングされた値の数。"
+
 #: include/classes/data/CItemData.php:1638
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr "ローレベルディスカバリ処理キュー内にキューイングされた値の数。"
@@ -4449,6 +4997,10 @@ msgstr "マップの作成と変更"
 #: app/views/administration.image.list.php:62
 msgid "Create background"
 msgstr "背景の作成"
+
+#: app/views/connector.list.php:139
+msgid "Create connector"
+msgstr "コネクタの作成"
 
 #: app/views/configuration.correlation.list.php:37
 msgid "Create correlation"
@@ -4683,9 +5235,22 @@ msgstr "作成者"
 msgid "Critical"
 msgstr "クリティカル"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr "現行"
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "現在のホスト"
+
+#: app/controllers/CControllerUserUpdateGeneral.php:85
+#: app/views/administration.user.edit.php:174
+msgid "Current password"
+msgstr "現在のパスワード"
+
+#: include/classes/api/services/CUser.php:474
+msgid "Current password is mandatory."
+msgstr "現在のバスワードは必須です。"
 
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
@@ -4900,7 +5465,7 @@ msgstr "取得データ"
 #: include/classes/helpers/CMenuHelper.php:215
 #: include/classes/helpers/CRoleHelper.php:337
 msgid "Data collection"
-msgstr ""
+msgstr "データ収集"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
@@ -4922,6 +5487,10 @@ msgstr "データの概要"
 msgid "Data set"
 msgstr "データセット"
 
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr "データセットラベル"
+
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
 #: app/views/administration.housekeeping.edit.php:115
@@ -4929,6 +5498,10 @@ msgstr "データセット"
 #: app/views/administration.housekeeping.edit.php:149
 msgid "Data storage period"
 msgstr "データ保存期間"
+
+#: app/views/connector.edit.php:54 app/views/connector.list.php:73
+msgid "Data type"
+msgstr "データのタイプ"
 
 #: include/classes/setup/CSetupWizard.php:565
 #: include/classes/setup/CSetupWizard.php:717
@@ -5049,7 +5622,7 @@ msgstr "日"
 #: include/classes/helpers/CSlaHelper.php:68
 msgctxt "compact table header"
 msgid "Day"
-msgstr ""
+msgstr "日"
 
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
@@ -5347,9 +5920,21 @@ msgstr "選択したSLAを削除しますか？"
 msgid "Delete selected SLAs?"
 msgstr "選択したSLAを削除しますか？"
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr "選択したアクションを削除しますか？"
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "選択したアクションを削除しますか？"
+
+#: app/views/connector.edit.php:332 app/views/js/connector.list.js.php:129
+msgid "Delete selected connector?"
+msgstr "選択したコネクタを削除しますか？"
+
+#: app/views/js/connector.list.js.php:128
+msgid "Delete selected connectors?"
+msgstr "選択したコネクタを削除しますか？"
 
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
@@ -5423,6 +6008,10 @@ msgstr "選択したアイテムのプロトタイプを削除しますか？"
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
 msgstr "選択したアイテムを削除しますか？"
+
+#: app/views/js/maintenance.list.js.php:88
+msgid "Delete selected maintenance period?"
+msgstr ""
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -5601,6 +6190,23 @@ msgstr "廃止予定"
 msgid "Deprecated parameter \"%1$s\" cannot be used with \"%2$s\"."
 msgstr "廃止予定のパラメーター\"%1$s\"は、\"%2$s\"と一緒に使用できません。"
 
+#: app/views/administration.authentication.edit.php:50
+msgid "Deprovisioned users group"
+msgstr "プロビジョニング解除されたユーザーグループ"
+
+#: include/classes/api/services/CUserGroup.php:1011
+msgid "Deprovisioned users group cannot be deleted."
+msgstr "プロビジョニング解除されたユーザーグループが削除できません。"
+
+#: include/classes/api/services/CAuthentication.php:183
+msgid "Deprovisioned users group cannot be empty."
+msgstr "プロビジョニング解除されたユーザーグループを空にできません。"
+
+#: include/classes/api/services/CAuthentication.php:178
+#: include/classes/api/services/CUserGroup.php:321
+msgid "Deprovisioned users group cannot be enabled."
+msgstr "プロビジョニング解除されたユーザーグループを有効にできません。"
+
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
 #: app/partials/hostmacros.list.html.php:37
@@ -5633,6 +6239,10 @@ msgstr "廃止予定のパラメーター\"%1$s\"は、\"%2$s\"と一緒に使�
 msgid "Description"
 msgstr "説明"
 
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr "インストール済みパッケージの詳細リスト。JSONフォーマットのテキストで返す"
+
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
 #: app/views/js/reports.auditlog.list.js.php:153
@@ -5652,7 +6262,7 @@ msgstr "Webシナリオの詳細"
 
 #: app/views/administration.housekeeping.edit.php:195
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "検出されたTimescaleDBのライセンスは、圧縮をサポートしてません。圧縮はTimescaleDBのCommunity Editionでサポートされています。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -5753,9 +6363,21 @@ msgstr "選択したSLAを無効にしますか？"
 msgid "Disable selected SLAs?"
 msgstr "選択したSLAを無効にしますか？"
 
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
+msgstr "選択したアクションを無効にしますか？"
+
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
 msgstr "選択したアクションを無効にしますか？"
+
+#: app/views/js/connector.list.js.php:114
+msgid "Disable selected connector?"
+msgstr "選択したコネクタを無効にしますか？"
+
+#: app/views/js/connector.list.js.php:113
+msgid "Disable selected connectors?"
+msgstr "選択したコネクタを無効にしますか？"
 
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
@@ -5978,7 +6600,7 @@ msgstr "ディスカバリルール"
 #: app/views/monitoring.widget.discovery.view.php:33
 msgctxt "compact table header"
 msgid "Discovery rule"
-msgstr ""
+msgstr "ディスカバリルール"
 
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
@@ -6204,7 +6826,7 @@ msgstr "ダウンタイム"
 #: app/views/monitoring.widget.slareport.view.php:100
 msgctxt "compact table header"
 msgid "Downtime"
-msgstr ""
+msgstr "ダウンタイム"
 
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
@@ -6273,7 +6895,7 @@ msgstr "継続期間"
 #: app/views/monitoring.widget.problems.view.php:80
 msgctxt "compact table header"
 msgid "Duration"
-msgstr ""
+msgstr "継続期間"
 
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
@@ -6379,6 +7001,14 @@ msgstr "楕円"
 msgid "Email"
 msgstr "メール"
 
+#: app/views/js/administration.mediatype.edit.js.php:397
+msgid "Email and password"
+msgstr "メールアドレスとパスワード"
+
+#: app/views/administration.mediatype.edit.php:64
+msgid "Email provider"
+msgstr "メールプロバイダ"
+
 #: app/views/popup.generic.php:50
 msgid "Empty"
 msgstr "空白"
@@ -6446,6 +7076,15 @@ msgstr "有効"
 msgid "Enable HTTP authentication"
 msgstr "HTTP認証の有効化"
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr "すべてのユーザーでHTTP認証を有効にします。"
+
+#: app/views/administration.authentication.edit.php:202
+#: app/views/administration.authentication.edit.php:276
+msgid "Enable JIT provisioning"
+msgstr "JITプロビジョニングの有効化"
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "LDAP認証の有効化"
@@ -6453,6 +7092,10 @@ msgstr "LDAP認証の有効化"
 #: app/views/administration.authentication.edit.php:215
 msgid "Enable SAML authentication"
 msgstr "SAML認証の有効化"
+
+#: app/views/administration.authentication.edit.php:543
+msgid "Enable SCIM provisioning"
+msgstr "SCIMプロビジョニングの有効化"
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
@@ -6477,6 +7120,14 @@ msgstr "選択したグループのデバッグモードを有効にしますか
 #: include/actions.inc.php:694 include/actions.inc.php:1031
 msgid "Enable host"
 msgstr "ホストを有効"
+
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr "ホスト選択を有効"
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -6517,9 +7168,21 @@ msgstr "選択したSLAを有効にしますか？"
 msgid "Enable selected SLAs?"
 msgstr "選択したSLAを有効にしますか？"
 
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
+msgstr "選択したアクションを有効にしますか？"
+
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
 msgstr "選択したアクションを有効にしますか？"
+
+#: app/views/js/connector.list.js.php:99
+msgid "Enable selected connector?"
+msgstr "選択したコネクタを有効にしますか？"
+
+#: app/views/js/connector.list.js.php:98
+msgid "Enable selected connectors?"
+msgstr "選択したコネクタを有効にしますか？"
 
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
@@ -6706,7 +7369,7 @@ msgstr "エラーバジェット"
 #: app/views/monitoring.widget.slareport.view.php:101
 msgctxt "compact table header"
 msgid "Error budget"
-msgstr ""
+msgstr "エラーバジェット"
 
 #: include/db.inc.php:518
 #, c-format
@@ -6727,7 +7390,7 @@ msgstr "エラー！サポートされていないデータベースのバージ
 #: app/partials/administration.system.info.php:159
 #: app/partials/administration.system.info.php:172
 msgid "Error! Unable to start Zabbix server."
-msgstr ""
+msgstr "エラー！Zabbixサーバーを起動できません。"
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -6806,6 +7469,10 @@ msgid "Event updated"
 msgid_plural "Events updated"
 msgstr[0] "イベントを更新しました"
 
+#: app/views/connector.edit.php:58 app/views/connector.list.php:99
+msgid "Events"
+msgstr "イベント"
+
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
 msgstr "イベントとアラート"
@@ -6857,7 +7524,7 @@ msgstr "除外するダウンタイム"
 #: app/views/monitoring.widget.slareport.view.php:102
 msgctxt "compact table header"
 msgid "Excluded downtimes"
-msgstr ""
+msgstr "除外するダウンタイム"
 
 #: app/controllers/CControllerAuditLogList.php:197 jsLoader.php:219
 msgid "Execute"
@@ -7066,7 +7733,7 @@ msgstr "失敗"
 #: app/views/monitoring.widget.web.view.php:34
 msgctxt "compact table header"
 msgid "Failed"
-msgstr ""
+msgstr "失敗"
 
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
@@ -7180,6 +7847,11 @@ msgstr "マップ\"%2$s\"のためのフィールド\"%1$s\"が設定されて�
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "フィールド\"%1$s\"の設定が正しくありません: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr "フィールド\"%1$s\"の設定が正しくありません: %2$s"
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -7194,6 +7866,13 @@ msgstr "フィールド\"%1$s\"は文字列ではありません。"
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "フィールド\"%1$s\"が入力されていません。"
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr "フィールド名"
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -7788,19 +8467,40 @@ msgstr "ホスト\"%2$s\"のグループ\"%1$s\"は存在しません。"
 msgid "Group added"
 msgstr "グループを追加しました"
 
+#: app/views/popup.ldap.edit.php:134
+msgid "Group base DN"
+msgstr "グループのbase DN"
+
+#: app/views/popup.ldap.edit.php:122
+msgid "Group configuration"
+msgstr "グループ設定"
+
 #: hostgroups.php:134 hostgroups.php:155
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "グループを削除しました"
 
+#: app/views/popup.ldap.edit.php:182
+msgid "Group filter"
+msgstr "グループフィルター"
+
 #: app/views/administration.miscconfig.edit.php:40
 msgid "Group for discovered hosts"
 msgstr "ディスカバリで発見されたホストのグループ"
+
+#: app/views/popup.ldap.edit.php:156
+msgid "Group member attribute"
+msgstr "グループメンバーの属性"
 
 #: app/views/administration.usergroup.edit.php:43 hostgroups.php:36
 #: include/views/configuration.hostgroups.edit.php:38
 msgid "Group name"
 msgstr "グループ名"
+
+#: app/views/administration.authentication.edit.php:427
+#: app/views/popup.ldap.edit.php:148
+msgid "Group name attribute"
+msgstr "グループ名の属性"
 
 #: include/classes/api/services/CHostPrototype.php:1165
 #, c-format
@@ -8127,7 +8827,7 @@ msgstr[0] "ホスト"
 #: app/views/monitoring.widget.problems.view.php:67
 msgctxt "compact table header"
 msgid "Host"
-msgstr ""
+msgstr "ホスト"
 
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
@@ -8222,7 +8922,7 @@ msgstr "ホストグループ"
 #: app/views/monitoring.widget.web.view.php:32
 msgctxt "compact table header"
 msgid "Host group"
-msgstr ""
+msgstr "ホストグループ"
 
 #: include/classes/api/services/CHostGroup.php:760
 #, c-format
@@ -8721,6 +9421,10 @@ msgstr "同一のネームスペース(%1$s)は%2$sにあるモジュールで�
 msgid "Identification of the system. Returns string"
 msgstr "システムの識別文字列。文字列値を返す。"
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr "HTTP認証が有効になっている場合、すべてのユーザー(WebインターフェースへのアクセスがLDAPや内部DBに設定されている場合でも)は、ZabbixではなくWebサーバーによって認証されます。"
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -8867,6 +9571,11 @@ msgstr "インポートに成功しました"
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr "インベントリフィールド\"%1$s\"が存在しないためフィルタリングが行えません。"
 
+#: app/views/js/administration.user.edit.js.php:61
+#: app/views/js/administration.userprofile.edit.js.php:69
+msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
+msgstr "パスワードの変更が成功すると、ユーザーはすべてのアクティブなセッションからログアウトされます。 続けますか？"
+
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
 msgstr "メンテナンス中"
@@ -8883,6 +9592,10 @@ msgstr "値の範囲"
 #: app/controllers/CControllerDashboardWidgetEdit.php:363
 msgid "Inaccessible SLA"
 msgstr "アクセスできないSLA"
+
+#: app/controllers/CControllerDashboardWidgetEdit.php:452
+msgid "Inaccessible action"
+msgstr "アクセスできないアクション"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
@@ -8933,6 +9646,10 @@ msgstr "アクセスできないメンテナンス"
 msgid "Inaccessible map"
 msgstr "アクセスできないマップ"
 
+#: app/controllers/CControllerDashboardWidgetEdit.php:453
+msgid "Inaccessible media type"
+msgstr "アクセスできないメディアタイプ"
+
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
 msgstr "アクセスできないサービス"
@@ -8965,6 +9682,25 @@ msgstr "アクセスできないユーザー"
 msgid "Inaccessible user group"
 msgstr "アクセスできないユーザーグループ"
 
+#: jsLoader.php:147 jsLoader.php:175
+msgid "Inaccessible widget"
+msgstr "アクセスできないウィジェット"
+
+#: app/controllers/CControllerDashboardWidgetCheck.php:52
+#: app/controllers/CControllerDashboardWidgetEdit.php:65
+#: include/classes/helpers/CDashboardHelper.php:453
+#: include/classes/helpers/CDashboardHelper.php:461
+msgid "Inaccessible widget type."
+msgstr "アクセスできないウィジェットタイプ"
+
+#: jsLoader.php:138
+msgid "Inaccessible widgets were not copied."
+msgstr "アクセスできないウィジェットはコピーできません。"
+
+#: jsLoader.php:139
+msgid "Inaccessible widgets were not pasted."
+msgstr "アクセスできないウィジェットは貼り付けられません。"
+
 #: app/partials/js/scheduledreport.subscription.js.php:165
 #: app/partials/js/scheduledreport.subscription.js.php:181
 #: app/views/popup.scheduledreport.subscription.php:117
@@ -8988,6 +9724,11 @@ msgstr "ネットワークインターフェースの受信統計。整数値を
 #, c-format
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のための\"propagation_rule\"と\"propagation_value\"は互換性がありません。"
+
+#: app/controllers/CControllerMediatypeEnable.php:97
+#: app/controllers/CControllerMediatypeEnable.php:108
+msgid "Incomplete configuration"
+msgstr "不完全な構成"
 
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
@@ -9206,6 +9947,10 @@ msgstr "ホスト名\"%1$s\"に不正な文字列が使用されています。"
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "ディスカバリルール\"%1$s\"の条件式が正しくありません。"
+
+#: include/classes/api/services/CUser.php:468
+msgid "Incorrect current password."
+msgstr "現在のパスワードが正しくありません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -9812,7 +10557,11 @@ msgstr "情報"
 #: app/views/monitoring.widget.problems.view.php:64
 msgctxt "compact table header"
 msgid "Info"
-msgstr ""
+msgstr "情報"
+
+#: include/classes/data/CItemData.php:1429
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr "vmware.datastore.perfcounterに必要なハイパーバイザーの内部ディスクに関する情報、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -9894,6 +10643,13 @@ msgstr "インストール"
 #: include/hosts.inc.php:259
 msgid "Installer name"
 msgstr "インストーラ名"
+
+#: include/forms.inc.php:1392 include/forms.inc.php:1425
+#: include/views/js/item.preprocessing.js.php:142
+#: include/views/js/item.preprocessing.js.php:180
+#: include/views/js/item.preprocessing.js.php:227
+msgid "Integer from BITS"
+msgstr ""
 
 #: include/classes/helpers/CMenuHelper.php:360
 msgid "Integrations"
@@ -10014,12 +10770,28 @@ msgstr "IPアドレス\"%1$s\"が正しくありません。"
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "JSONデータが正しくありません。JSONテキストのパース中にサーバーでエラーが発生しました。"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:171
+msgid "Invalid LDAP JIT provisioning media type mapping configuration."
+msgstr "LDAP JITプロビジョニングメディアタイプのマッピング構成が正しくありません。"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:164
+msgid "Invalid LDAP JIT provisioning user group mapping configuration."
+msgstr "LDAP JITプロビジョニングユーザーグループのマッピング構成が正しくありません。"
+
 #: app/controllers/CControllerPopupLdapCheck.php:52
 #: app/controllers/CControllerPopupLdapEdit.php:49
 #: app/controllers/CControllerPopupLdapTestEdit.php:44
 #: app/controllers/CControllerPopupLdapTestSend.php:50
 msgid "Invalid LDAP configuration"
 msgstr "LDAPの設定が正しくありません"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:214
+msgid "Invalid SAML JIT provisioning media type mapping configuration."
+msgstr "SAML JITプロビジョニングメディアタイプのマッピング構成が正しくありません。"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:208
+msgid "Invalid SAML JIT provisioning user group mapping configuration."
+msgstr "SAML JITプロビジョニングユーザーグループのマッピング構成が正しくありません。"
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -10082,6 +10854,12 @@ msgstr "\"%3$s\": %4$sのアイテムプロトタイプ\"%2$s\"のキー\"%1$s\"
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "キー\"%1$s\": %2$sが正しくありません。"
+
+#: app/controllers/CControllerPopupLdapCheck.php:67
+#: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
+#: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
+msgid "Invalid media type mapping configuration."
+msgstr "メディアタイプのマッピング構成が正しくありません。"
 
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
@@ -10383,6 +11161,12 @@ msgstr "タグ\"%1$s\"が正しくありません: %2$s。"
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
 msgstr "期間が正しくありません。"
+
+#: app/controllers/CControllerPopupLdapCheck.php:62
+#: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
+#: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
+msgid "Invalid user group mapping configuration."
+msgstr "ユーザーグループのマッピング構成が正しくありません。"
 
 #: include/classes/validators/CApiInputValidator.php:2852
 #, c-format
@@ -10850,6 +11634,10 @@ msgstr "LDAP認証"
 msgid "LDAP authentication is disabled."
 msgstr "LDAP認証が無効です。"
 
+#: app/views/popup.ldap.edit.php:235
+msgid "LDAP group pattern"
+msgstr "LDAPグループのパターン"
+
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
 msgstr "LDAPホスト"
@@ -11180,6 +11968,10 @@ msgstr "OS上の属性情報付きのプロセスのリスト。JSONで返す"
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr "キーで指定されたWindowsのレジストリの値またはキーのリスト。JSONで返す。"
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr "名前、モード、暗号化、圧縮、バージョン、最新確認時刻、ホスト数、アイテム数、求められる1秒あたりの値処理数(vps)、および互換性 (現行/古い/サポートされていない) を含む Zabbixプロキシのリスト。 JSONで返す。"
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
@@ -11370,6 +12162,13 @@ msgstr "MACアドレスA"
 msgid "MAC address B"
 msgstr "MACアドレスB"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr "16進文字列のMACアドレス"
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -11452,9 +12251,22 @@ msgstr "メンテナンスを削除しました"
 msgid "Maintenance period"
 msgstr "メンテナンス期間"
 
+#: app/controllers/CControllerMaintenanceCreate.php:142
+msgid "Maintenance period created"
+msgstr ""
+
+#: app/controllers/CControllerMaintenanceDelete.php:61
+msgid "Maintenance period deleted"
+msgid_plural "Maintenance periods deleted"
+msgstr[0] ""
+
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
 msgstr "メンテナンス期間"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:144
+msgid "Maintenance period updated"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -11607,6 +12419,22 @@ msgstr "マップ図形"
 msgid "Map update failed."
 msgstr "マップの更新に失敗しました。"
 
+#: app/views/popup.ldap.edit.php:257
+msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr "通知を送信するために、ユーザーのLDAPのメディア属性(電子メールなど)をZabbixのユーザーメディアにマッピングします。"
+
+#: app/views/administration.authentication.edit.php:513
+msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr "通知を送信するために、ユーザーのSAMLのメディア属性(電子メールなど)をZabbixのユーザーメディアにマッピングします。"
+
+#: app/views/popup.ldap.edit.php:257
+msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr "通知を送信するために、ユーザーのLDAPのメディア属性(電子メールなど)をZabbixのユーザーメディアにマップします。"
+
+#: app/views/administration.authentication.edit.php:508
+msgid "Map user’s SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr "通知を送信するために、ユーザーのSAMLのメディア属性(電子メールなど)をZabbixのユーザーメディアにマップします。"
+
 #: include/classes/api/services/CDashboardGeneral.php:594
 #, c-format
 msgid "Map with ID \"%1$s\" is not available."
@@ -11643,6 +12471,10 @@ msgstr "3月"
 msgid "March"
 msgstr "3月"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr "原因としてマーク"
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr "トリガーの状態が変化した要素をマーク"
@@ -11654,6 +12486,10 @@ msgstr "その他をマーク"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "選択をマーク"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr "選択したものを兆候としてマーク"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -11728,6 +12564,27 @@ msgstr "概要テーブル内の列と行の最大数"
 msgid "Max period for time selector"
 msgstr "タイムセレクターの最大期間"
 
+#: app/views/connector.edit.php:171
+msgid "Max records per message"
+msgstr "メッセージあたりの最大レコード数"
+
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr "最大繰り返し回数"
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr "最大繰り返し回数は、検出とsnmp.walkにのみ適用されます。"
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and walk only."
+msgstr "最大繰り返し回数は、ディスカバリとwalkにのみ適用されます。"
+
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
 msgstr "最大ズームレベル"
@@ -11783,6 +12640,12 @@ msgstr "メディア"
 msgid "Media type"
 msgstr "メディアタイプ"
 
+#: widgets/actionlog/views/widget.view.php:40
+#: widgets/actionlog/views/widget.view.php:41
+msgctxt "compact table header"
+msgid "Media type"
+msgstr "メディアタイプ"
+
 #: include/classes/api/services/CMediatype.php:408
 #, c-format
 msgid "Media type \"%1$s\" already exists."
@@ -11802,10 +12665,20 @@ msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] "メディアタイプを無効にしました"
 
+#: app/views/administration.user.edit.php:327
+msgid "Media type disabled by Administration."
+msgstr "管理者によってメディアタイプを無効にされました。"
+
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
 msgstr[0] "メディアタイプを有効にしました"
+
+#: app/views/administration.authentication.edit.php:506
+#: app/views/popup.ldap.edit.php:255
+#: app/views/popup.mediatypemapping.edit.php:85
+msgid "Media type mapping"
+msgstr "メディアタイプのマッピング"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -11835,6 +12708,10 @@ msgstr "ID \"%1$s\"のメディアタイプは使用できません。"
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "メディアタイプ"
+
+#: app/views/popup.media.php:75
+msgid "Media types disabled by Administration."
+msgstr "管理者によってメディアタイプを無効にされました。"
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -11871,6 +12748,11 @@ msgstr "メニュー項目URL"
 msgid "Menu entry name"
 msgstr "メニュー項目名"
 
+#: include/views/configuration.trigger.prototype.edit.php:554
+#: include/views/configuration.triggers.edit.php:576
+msgid "Menu entry name is used as a label for the trigger URL in the event context menu."
+msgstr "メニューエントリ名は、イベントコンテキストメニューのトリガーURLのラベルとして使用されます。"
+
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
 msgstr "メニューパス"
@@ -11890,7 +12772,7 @@ msgstr "メッセージ"
 #: app/views/monitoring.widget.actionlog.view.php:44
 msgctxt "compact table header"
 msgid "Message"
-msgstr ""
+msgstr "メッセージ"
 
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
@@ -12158,7 +13040,7 @@ msgstr "月"
 #: include/classes/helpers/CSlaHelper.php:70
 msgctxt "compact table header"
 msgid "Month"
-msgstr ""
+msgstr "月"
 
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
@@ -12190,11 +13072,11 @@ msgstr "ホストに\"%1$s\"の名前を持つグラフが1つ以上存在しま
 
 #: include/classes/helpers/CServiceHelper.php:27
 msgid "Most critical if all children have problems"
-msgstr "すべての子が障害であったときにもっとも重要"
+msgstr "すべての子が障害であったときに最も重要"
 
 #: include/classes/helpers/CServiceHelper.php:26
 msgid "Most critical of child services"
-msgstr "子サービスでもっとも重要"
+msgstr "子サービスで最も重要"
 
 #: include/httptest.inc.php:409
 msgid "Mozilla Firefox"
@@ -12424,7 +13306,7 @@ msgstr "名前"
 #: app/views/monitoring.widget.plaintext.view.php:49
 msgctxt "compact table header"
 msgid "Name"
-msgstr ""
+msgstr "名前"
 
 #: app/controllers/CControllerPopupGeneric.php:218
 #: app/views/administration.user.edit.php:77
@@ -12432,6 +13314,10 @@ msgstr ""
 msgctxt "user first name"
 msgid "Name"
 msgstr "名"
+
+#: app/views/administration.authentication.edit.php:520
+msgid "Name "
+msgstr "名前"
 
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
@@ -12444,6 +13330,10 @@ msgstr "フォームフィールドの名前の長さは255文字までです。
 #: app/views/administration.module.edit.php:43
 msgid "Namespace"
 msgstr "ネームスペース"
+
+#: app/views/popup.usergroupmapping.edit.php:80
+msgid "Naming requirements:"
+msgstr "命名要件："
 
 #: jsLoader.php:189
 msgid "Navigate to default view"
@@ -12519,6 +13409,11 @@ msgstr "新規LDAPサーバー"
 msgid "New SLA"
 msgstr "新規SLA"
 
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
+msgstr "新規アクション"
+
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
 msgstr "新規追加ルール"
@@ -12532,6 +13427,10 @@ msgstr "新規列"
 #: app/controllers/CControllerPopupConditionOperations.php:68
 msgid "New condition"
 msgstr "新規条件"
+
+#: app/views/connector.edit.php:312 app/views/connector.edit.php:341
+msgid "New connector"
+msgstr "新規コネクタ"
 
 #: app/controllers/CControllerDashboardView.php:154
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
@@ -12569,6 +13468,15 @@ msgstr "新しいホストの作成"
 msgid "New host group"
 msgstr "新しいホストグループの作成"
 
+#: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
+#: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
+msgid "New maintenance period"
+msgstr ""
+
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "New media type mapping"
+msgstr "新しいメディアタイプのマッピングの作成"
+
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
 msgstr "実行内容の作成"
@@ -12597,6 +13505,10 @@ msgstr "新しいテンプレートグループの作成"
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
 msgstr "新規トリガー"
+
+#: app/views/popup.usergroupmapping.edit.php:114
+msgid "New user group mapping"
+msgstr "新しいユーザーグループのマッピングの作成"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -13081,7 +13993,7 @@ msgstr "公開鍵ファイルが設定されていません。"
 #: app/controllers/CControllerActionOperationValidate.php:110
 #: include/classes/api/services/CAction.php:2836
 msgid "No recipients specified for action operation message."
-msgstr "アクションメッセージの受信者が指定されていません。"
+msgstr "アクションメッセージの送信先が指定されていません。"
 
 #: include/classes/widgets/CWidgetConfig.php:305 jsLoader.php:167
 msgid "No refresh"
@@ -13209,6 +14121,11 @@ msgstr "ゲストユーザーはパスワードを設定できません。"
 msgid "Not allowed to set theme for user \"guest\"."
 msgstr "\"guest\"ユーザーはテーマを設定できません。"
 
+#: include/classes/api/services/CUser.php:484
+#, c-format
+msgid "Not allowed to update field \"%1$s\" for provisioned user."
+msgstr "プロビジョニングされたユーザーのフィールド\"%1$s\"は更新できせん。"
+
 #: include/classes/api/clients/CLocalApiClient.php:164
 #: include/classes/api/clients/CLocalApiClient.php:192
 #: include/classes/api/clients/CLocalApiClient.php:218
@@ -13225,11 +14142,15 @@ msgstr "利用不可"
 #: app/views/monitoring.widget.hostavail.view.php:38
 msgctxt "compact table header"
 msgid "Not available"
-msgstr ""
+msgstr "利用不可"
 
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
 msgstr "未分類"
+
+#: app/controllers/CControllerMediatypeEnable.php:95
+msgid "Not enabled"
+msgstr "有効になっていません"
 
 #: include/forms.inc.php:315
 msgid "Not inherited items"
@@ -13433,6 +14354,17 @@ msgstr "数値 (整数)"
 msgid "OEM"
 msgstr "OEM"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr "OID"
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr "OID接頭辞"
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -13518,7 +14450,7 @@ msgstr "正常"
 #: app/views/monitoring.widget.web.view.php:33
 msgctxt "compact table header"
 msgid "Ok"
-msgstr ""
+msgstr "正常"
 
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
@@ -13564,6 +14496,10 @@ msgstr "Zabbixエージェント、SNMPv1、SNMPv2、SNMPv3がユニークかど
 msgid "Only administrators can set map owner."
 msgstr "管理者だけがマップの所有者を設定できます。"
 
+#: app/views/administration.authentication.edit.php:51
+msgid "Only disabled group can be set for deprovisioned users."
+msgstr "プロビジョニング解除されたユーザーに対して設定できるのは、無効なグループのみです。"
+
 #: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "有効なホストのアイテムのみカウント"
@@ -13588,6 +14524,11 @@ msgstr "サポートしていない値のチェックは1つだけにしてく�
 #: include/classes/api/services/CItemGeneral.php:1470
 msgid "Only one throttling step is allowed."
 msgstr "1回の絞り込みのみ使用できます。"
+
+#: include/classes/api/services/CUserDirectory.php:519
+#, c-format
+msgid "Only one user directory of type \"%1$s\" can exist."
+msgstr "タイプ\"%1$s\"のユーザーディレクトリは1つだけ存在できます。"
 
 #: app/views/popup.acknowledge.edit.php:58
 msgid "Only selected problem"
@@ -13614,6 +14555,14 @@ msgstr "特権管理者のみがレポートのオーナーを設定できます
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "有効なホストとアイテムのトリガーのみカウント"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr "新しいウィンドウで開く"
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr "ログ表示"
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13621,6 +14570,10 @@ msgstr "Opera"
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
 msgstr "OS情報。文字列値を返す。"
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
+msgstr "OSのバージョン情報。JSONで返す"
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -13666,7 +14619,7 @@ msgstr "運用データ"
 #: app/views/monitoring.widget.problems.view.php:78
 msgctxt "compact table header"
 msgid "Operational data"
-msgstr ""
+msgstr "運用データ"
 
 #: app/views/configuration.correlation.edit.php:145
 #: app/views/configuration.correlation.list.php:78
@@ -13828,6 +14781,10 @@ msgstr "その他のパラメータ"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "その他"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr "古い"
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -14106,6 +15063,10 @@ msgstr "ページ %1$d"
 msgid "Page display period"
 msgstr "ページ表示間隔"
 
+#: include/classes/core/ZBase.php:565
+msgid "Page not found"
+msgstr "ページが見つかりません"
+
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
 #: include/validate.inc.php:435
 msgid "Page received incorrect data"
@@ -14158,17 +15119,41 @@ msgstr "パラメータ"
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr "パラメーター\"esc_step_from\"と\"esc_step_to\"は一緒に設定してください。"
 
+#: include/views/configuration.host.discovery.edit.php:68
+msgid "Parent discovery rule"
+msgstr ""
+
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.prototype.edit.php:64
 msgid "Parent discovery rules"
 msgstr "親ディスカバリルール"
 
+#: include/views/configuration.graph.edit.php:88
+msgid "Parent graph"
+msgstr ""
+
+#: include/views/configuration.graph.edit.php:91
+msgid "Parent graph prototype"
+msgstr ""
+
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "親グラフ"
 
+#: include/views/configuration.host.prototype.edit.php:81
+msgid "Parent host prototype"
+msgstr ""
+
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
+msgstr "親ホストの値"
+
+#: include/views/configuration.item.edit.php:71
+msgid "Parent item"
+msgstr ""
+
+#: include/views/configuration.item.prototype.edit.php:70
+msgid "Parent item prototype"
 msgstr ""
 
 #: include/views/configuration.item.edit.php:57
@@ -14181,14 +15166,30 @@ msgstr "親アイテム"
 msgid "Parent services"
 msgstr "親サービス"
 
+#: app/partials/configuration.tags.tab.php:38
+msgid "Parent template"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:42
 msgid "Parent templates"
 msgstr "親テンプレート"
+
+#: include/views/configuration.triggers.edit.php:104
+msgid "Parent trigger"
+msgstr ""
+
+#: include/views/configuration.trigger.prototype.edit.php:95
+msgid "Parent trigger prototype"
+msgstr ""
 
 #: include/views/configuration.trigger.prototype.edit.php:69
 #: include/views/configuration.triggers.edit.php:80
 msgid "Parent triggers"
 msgstr "親トリガー"
+
+#: include/views/configuration.httpconf.edit.php:76
+msgid "Parent web scenario"
+msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:59
 msgid "Parent web scenarios"
@@ -14248,6 +15249,10 @@ msgstr "パスワード"
 msgid "Password (once again)"
 msgstr "パスワード(確認)"
 
+#: app/views/administration.user.edit.php:199
+msgid "Password can only be changed for users using the internal Zabbix authentication."
+msgstr "パスワードは、Zabbixの内部認証を使用しているユーザーに対してのみ変更できます。"
+
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
 msgstr "パスワードは内部認証タイプ以外には必須ではありません。"
@@ -14291,6 +15296,10 @@ msgstr "パターン"
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
 msgstr "メンテナンス中の場合に実行を保留"
+
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -14488,6 +15497,10 @@ msgstr "位置"
 msgid "Position is ignored for s, uptime and unixtime units."
 msgstr "位置は、単位がs、uptime、unixtimeの時は無視されます。"
 
+#: include/classes/core/ZBase.php:764
+msgid "Possibly the session has expired or the password was changed."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "POSTフィールド"
@@ -14664,7 +15677,7 @@ msgstr "障害"
 #: app/views/monitoring.widget.problems.view.php:71
 msgctxt "compact table header"
 msgid "Problem"
-msgstr ""
+msgstr "障害"
 
 #: include/actions.inc.php:2059
 msgid "Problem created"
@@ -14770,6 +15783,10 @@ msgstr "PrometheusからJSON"
 msgid "Properties"
 msgstr "プロパティ"
 
+#: app/views/connector.edit.php:47
+msgid "Protocol"
+msgstr ""
+
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
 #, c-format
@@ -14799,6 +15816,26 @@ msgstr "指定されたシークレットパス\"%1$s\"は正しくありませ�
 #, c-format
 msgid "Provided secret query string \"%1$s\" is invalid."
 msgstr "指定されたシークレットクエリ文字列\"%1$s\"は正しくありません。"
+
+#: app/views/administration.user.list.php:301
+msgid "Provision now"
+msgstr "プロビジョニングの実行"
+
+#: app/views/administration.user.list.php:303
+msgid "Provision selected LDAP users?"
+msgstr "選択したLDAPユーザーのプロビジョニングをしますか？"
+
+#: app/views/administration.user.list.php:141
+msgid "Provisioned"
+msgstr "プロビジョニング済"
+
+#: app/views/administration.authentication.edit.php:251
+msgid "Provisioning period"
+msgstr "プロビジョニング間隔"
+
+#: app/controllers/CControllerUserProvision.php:65
+msgid "Provisioning successful."
+msgstr "プロビジョニングが成功しました。"
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
@@ -14867,6 +15904,16 @@ msgstr "プロキシ名"
 msgid "Proxy updated"
 msgstr "プロキシを更新しました"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr "プロキシのバージョンはサーバーのバージョン%1$sではサポートされていません。"
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr "プロキシのバージョンが古いので、サーバーのバージョン%1$sではデータの収集とリモートコマンドの実行のみできます。"
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -14895,7 +15942,7 @@ msgstr "四半期"
 #: include/classes/helpers/CSlaHelper.php:71
 msgctxt "compact table header"
 msgid "Quarter"
-msgstr ""
+msgstr "四半期"
 
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
@@ -14951,6 +15998,10 @@ msgstr "解決済"
 #: include/hosts.inc.php:37
 msgid "RMCP+"
 msgstr "RMCP+"
+
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr ""
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -15046,15 +16097,27 @@ msgstr "送信先"
 #: app/views/monitoring.widget.actionlog.view.php:43
 msgctxt "compact table header"
 msgid "Recipient"
-msgstr ""
+msgstr "送信先"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr "送信先がすでに存在しています。"
 
+#: app/views/reports.actionlog.list.csv.php:39
+msgid "Recipient's Zabbix username"
+msgstr "送信先のZabbixユーザー名"
+
+#: app/views/reports.actionlog.list.csv.php:40
+msgid "Recipient's name"
+msgstr "送信先の名"
+
+#: app/views/reports.actionlog.list.csv.php:41
+msgid "Recipient's surname"
+msgstr "送信先の姓"
+
 #: include/views/administration.auditacts.list.php:32
 msgid "Recipients"
-msgstr "受信者"
+msgstr "送信先"
 
 #: app/views/reports.auditlog.list.php:73
 #: app/views/reports.auditlog.list.php:96
@@ -15098,12 +16161,16 @@ msgstr "復旧時刻"
 #: app/views/monitoring.widget.problems.view.php:59
 msgctxt "compact table header"
 msgid "Recovery time"
-msgstr ""
+msgstr "復旧時刻"
 
 #: include/views/js/monitoring.sysmaps.js.php:371
 #: include/views/js/monitoring.sysmaps.js.php:531
 msgid "Rectangle"
 msgstr "長方形"
+
+#: app/views/popup.ldap.edit.php:168
+msgid "Reference attribute"
+msgstr "リファレンスの属性"
 
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
@@ -15520,6 +16587,10 @@ msgstr "要求ステータスコード"
 msgid "Required string"
 msgstr "要求文字列"
 
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr "要求vps"
+
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
 msgid "Reset"
@@ -15826,6 +16897,16 @@ msgctxt "Sunday short"
 msgid "S"
 msgstr "S"
 
+#: app/views/administration.user.list.php:224
+#: app/views/administration.user.list.php:225
+#: app/views/popup.usergroupmapping.edit.php:77
+msgid "SAML"
+msgstr "SAML"
+
+#: app/views/administration.authentication.edit.php:483
+msgid "SAML group pattern"
+msgstr "SAMLグループのパターン"
+
 #: app/views/administration.authentication.edit.php:337
 msgid "SAML settings"
 msgstr "SAML認証の設定"
@@ -15903,7 +16984,7 @@ msgstr "SLI"
 #: app/views/monitoring.widget.slareport.view.php:98
 msgctxt "compact table header"
 msgid "SLI"
-msgstr ""
+msgstr "SLI"
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
@@ -15917,7 +16998,7 @@ msgstr "SLO"
 #: app/views/monitoring.widget.slareport.view.php:97
 msgctxt "compact table header"
 msgid "SLO"
-msgstr ""
+msgstr "SLO"
 
 #: app/views/administration.authentication.edit.php:236
 msgid "SLO service URL"
@@ -15994,6 +17075,14 @@ msgstr "SNMPトラップのキーが正しくありません。"
 #: app/views/popup.itemtestedit.view.php:125
 msgid "SNMP version"
 msgstr "SNMPバージョン"
+
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
+msgstr ""
 
 #: include/items.inc.php:1299
 #, c-format
@@ -16260,6 +17349,10 @@ msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "スクリプトを削除しました"
 
+#: app/views/popup.mediatypetest.edit.php:60
+msgid "Script does not have parameters."
+msgstr ""
+
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
 msgstr "スクリプト実行ログ"
@@ -16309,6 +17402,11 @@ msgstr "検索フィルター"
 #: app/controllers/CControllerSearch.php:73
 msgid "Search pattern is empty"
 msgstr "検索パターンが空白です"
+
+#: app/views/reports.actionlog.list.php:108
+#: widgets/actionlog/includes/WidgetForm.php:61
+msgid "Search string"
+msgstr "検索文字列"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
@@ -16475,6 +17573,11 @@ msgstr "ユーザーに送信"
 msgid "Sent"
 msgstr "送信済"
 
+#: app/controllers/CControllerActionLogList.php:210
+#: widgets/actionlog/includes/WidgetForm.php:56
+msgid "Sent/Executed"
+msgstr "送信/実行"
+
 #: include/func.inc.php:244
 msgid "Sep"
 msgstr "9月"
@@ -16543,7 +17646,7 @@ msgstr "サービス"
 #: app/views/monitoring.widget.slareport.view.php:37
 msgctxt "compact table header"
 msgid "Service"
-msgstr ""
+msgstr "サービス"
 
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
@@ -16747,7 +17850,7 @@ msgstr "深刻度"
 #: app/views/monitoring.widget.problems.view.php:75
 msgctxt "compact table header"
 msgid "Severity"
-msgstr ""
+msgstr "深刻度"
 
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
@@ -16887,6 +17990,11 @@ msgstr "サイドバーを表示"
 #: include/views/monitoring.sysmap.edit.php:273
 msgid "Show suppressed problems"
 msgstr "メンテナンス中の障害を表示"
+
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr ""
 
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
@@ -17303,7 +18411,7 @@ msgstr "ステータス"
 #: app/views/monitoring.widget.problems.view.php:62
 msgctxt "compact table header"
 msgid "Status"
-msgstr ""
+msgstr "ステータス"
 
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
@@ -17507,6 +18615,10 @@ msgstr "特権管理者"
 msgid "Support"
 msgstr "サポート"
 
+#: app/partials/administration.system.info.php:124
+msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
+msgstr ""
+
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
 msgstr "サポートしているフォーマット："
@@ -17556,6 +18668,11 @@ msgstr "スウェーデン語 (sv_SE)"
 #: app/views/js/administration.authentication.edit.js.php:36
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "認証方式の変更を行うと現在のセッション以外はリセットされます実行しますか？"
+
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
+msgstr ""
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -17751,7 +18868,7 @@ msgstr "タグ"
 #: app/views/monitoring.widget.problems.view.php:83
 msgctxt "compact table header"
 msgid "Tags"
-msgstr ""
+msgstr "タグ"
 
 #: include/views/configuration.copy.elements.php:69
 #: include/views/configuration.trigger.prototype.edit.php:202
@@ -18058,6 +19175,11 @@ msgstr "テキスト"
 msgid "Text, supports {INVENTORY.*}, {HOST.*} macros"
 msgstr "テキスト、マクロの{INVENTORY.*}と{HOST.*}をサポート"
 
+#: include/classes/api/clients/CLocalApiClient.php:96
+#, c-format
+msgid "The \"%1$s.%2$s\" method must be called without authorization header."
+msgstr ""
+
 #: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
@@ -18183,6 +19305,11 @@ msgstr "トリガーはディスカバリされなかったので次のディス
 msgid "Theme"
 msgstr "テーマ"
 
+#: app/views/administration.mediatype.edit.php:139
+#: app/views/popup.mediatypetest.edit.php:47
+msgid "These parameters will be passed to the script as command-line arguments in the specified order."
+msgstr ""
+
 #: include/func.inc.php:2468
 msgid "This day last week"
 msgstr "先週の今日"
@@ -18191,6 +19318,10 @@ msgstr "先週の今日"
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr "このフィールドはアイテム\"%1$s\"によって自動的に設定されます。"
+
+#: include/classes/scim/API.php:77
+msgid "This filter is not supported"
+msgstr "このフィルターはサポートされていません"
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:82
 msgid "This is the test message from Zabbix"
@@ -18204,14 +19335,32 @@ msgstr "今月"
 msgid "This month so far"
 msgstr "今月(現在まで)"
 
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr "この設定は数値データにだけ適用されます。"
+
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "この設定は数値データにだけ適用されます。非数値データは常にヒストリから取得されます。"
+
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "ヒストリテーブルには圧縮されたチャンクが含まれているため、この設定を有効にする必要があります。"
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "トレンド テーブルには圧縮されたチャンクが含まれているため、この設定を有効にする必要があります。"
 
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
 msgstr "このデータ型はアイテムキーと合ってません。"
+
+#: app/views/administration.user.edit.php:59
+msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
+msgstr ""
 
 #: include/func.inc.php:2474
 msgid "This week"
@@ -18295,7 +19444,7 @@ msgstr "時間"
 #: app/views/monitoring.widget.problems.view.php:41
 msgctxt "compact table header"
 msgid "Time"
-msgstr ""
+msgstr "時間"
 
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
@@ -18363,7 +19512,7 @@ msgstr "タイムスタンプ"
 #: app/views/monitoring.widget.plaintext.view.php:33
 msgctxt "compact table header"
 msgid "Timestamp"
-msgstr ""
+msgstr "タイムスタンプ"
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
@@ -18426,7 +19575,7 @@ msgstr "合計"
 #: app/views/monitoring.widget.problemhosts.view.php:35
 msgctxt "compact table header"
 msgid "Total"
-msgstr ""
+msgstr "合計"
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -18934,7 +20083,7 @@ msgstr "タイプ"
 #: app/views/monitoring.widget.actionlog.view.php:40
 msgctxt "compact table header"
 msgid "Type"
-msgstr ""
+msgstr "タイプ"
 
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
@@ -18976,6 +20125,10 @@ msgstr "ユーザーの役割\"%1$s\"にはUI要素\"%2$s\"は使用できませ
 #: include/translateDefines.inc.php:25
 msgid "UNKNOWN"
 msgstr "不明"
+
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr ""
 
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
@@ -19038,6 +20191,13 @@ msgstr "マップ\"%1$s\"のURLには\"name\"と\"url\"の両方のフィール�
 msgid "URLs"
 msgstr "URL"
 
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
 msgid "UUIDv4 is expected"
@@ -19061,6 +20221,11 @@ msgstr "設定ファイルが作成できません。"
 #, c-format
 msgid "Unable to determine current Zabbix database version: %1$s."
 msgstr "現在のZabbixデータベースのバージョン：%1$sを判断できません。"
+
+#: include/classes/helpers/CAuthenticationHelper.php:88
+#: include/classes/helpers/CAuthenticationHelper.php:107
+msgid "Unable to find SAML userdirectory."
+msgstr "SAMLユーザーディレクトリが見つかりません。"
 
 #: include/classes/helpers/CAuthenticationHelper.php:75
 msgid "Unable to load authentication API parameters."
@@ -19136,6 +20301,13 @@ msgstr "ブロックを解除"
 msgid "Unblock selected users?"
 msgstr "選択したユーザーのブロックを解除しますか？"
 
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
 msgstr "障害確認の解除"
@@ -19204,7 +20376,7 @@ msgstr "不明"
 #: app/views/monitoring.widget.web.view.php:35
 msgctxt "compact table header"
 msgid "Unknown"
-msgstr ""
+msgstr "不明"
 
 #: app/views/reports.auditlog.list.php:119
 msgid "Unknown action"
@@ -19466,6 +20638,10 @@ msgstr "更新しました"
 msgid "Updated status of host \"%1$s\"."
 msgstr "ホスト\"%1$s\"のステータスを更新しました。"
 
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr ""
+
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
 msgstr "アップロード"
@@ -19484,7 +20660,7 @@ msgstr "アップタイム"
 #: app/views/monitoring.widget.slareport.view.php:99
 msgctxt "compact table header"
 msgid "Uptime"
-msgstr ""
+msgstr "アップタイム"
 
 #: include/classes/data/CItemData.php:1686
 msgid "Uptime of Zabbix server process in seconds."
@@ -19494,9 +20670,17 @@ msgstr "Zabbixサーバープロセスの稼働秒数。"
 msgid "Uptime/Downtime"
 msgstr "アップタイム/ダウンタイム"
 
+#: app/views/popup.ldap.edit.php:169
+msgid "Use %{ref} in group filter to reference value of this user attribute."
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "bulkリクエストを使用"
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
+msgstr "組み合わせたリクエストの使用"
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -19571,6 +20755,11 @@ msgstr "ユーザー\"%1$s\"は\"%2$s\"アクション内で使用されてい�
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr "ユーザー\"%1$s\"は代わりにレポート\"%2$s\"を作成したユーザーです。"
 
+#: app/controllers/CControllerUserProvision.php:61
+#, c-format
+msgid "User \"%1$s\" provisioned."
+msgstr "ユーザー\"%1$s\"をプロビジョニングしました。"
+
 #: app/controllers/CControllerUserUnblock.php:61
 #, c-format
 msgid "User \"%1$s\" unblocked."
@@ -19615,6 +20804,19 @@ msgstr "ユーザーディレクトリ"
 #, c-format
 msgid "User directory \"%1$s\" already exists."
 msgstr "ユーザーディレクトリ\"%1$s\"はすでに存在します。"
+
+#: include/classes/api/services/CUser.php:715
+#, c-format
+msgid "User directory with ID \"%1$s\" is not available."
+msgstr ""
+
+#: app/views/administration.user.list.php:211
+msgid "User does not have user groups."
+msgstr "ユーザーは、ユーザーグループが設定されていません。"
+
+#: app/views/administration.user.list.php:232
+msgid "User does not have user role."
+msgstr "ユーザーは、ユーザーの役割が設定されていません。"
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -19664,6 +20866,16 @@ msgstr[0] "ユーザーグループを削除しました"
 msgid "User group for database down message"
 msgstr "データベース停止メッセージの送信先グループ"
 
+#: app/views/administration.authentication.edit.php:471
+#: app/views/popup.ldap.edit.php:226
+#: app/views/popup.usergroupmapping.edit.php:126
+msgid "User group mapping"
+msgstr "ユーザーグループのマッピング"
+
+#: app/views/popup.ldap.edit.php:196
+msgid "User group membership attribute"
+msgstr "ユーザーグループメンバーシップの属性"
+
 #: include/classes/api/services/CMap.php:784
 #: include/classes/api/services/CMap.php:1252
 #, c-format
@@ -19699,6 +20911,11 @@ msgstr "ユーザーグループ"
 msgid "User is not allowed to delete himself."
 msgstr "自身のユーザーアカウントは削除できません。"
 
+#: app/views/administration.authentication.edit.php:457
+#: app/views/popup.ldap.edit.php:218
+msgid "User last name attribute"
+msgstr "ユーザーの姓の属性"
+
 #: include/classes/widgets/views/widget.item.form.view.php:64
 msgid "User macros"
 msgstr "ユーザーマクロ"
@@ -19717,6 +20934,11 @@ msgstr "ユーザーメニュー"
 #: include/views/configuration.item.prototype.edit.php:655 items.php:94
 msgid "User name"
 msgstr "ユーザー名"
+
+#: app/views/administration.authentication.edit.php:443
+#: app/views/popup.ldap.edit.php:210
+msgid "User name attribute"
+msgstr "ユーザー名の属性"
 
 #: app/views/administration.authentication.edit.php:206
 msgid "User password"
@@ -19878,7 +21100,7 @@ msgstr "VMwareのキャッシュ統計。利用可能なモード：total, free,
 
 #: include/classes/data/CItemData.php:1252
 msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "VMwareクラスターのアラームデータ、JSONで返す、<url> - VMwareサービスURL、<id> - VMwareクラスターid"
 
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
@@ -19886,7 +21108,7 @@ msgstr "VMwareクラスターのパフォーマンスカウンター、 <url> - 
 
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
-msgstr ""
+msgstr "VMwareクラスターのプロパティ、<url> - VMwareサービスURL、<prop> - プロパティのパス"
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
@@ -19894,15 +21116,15 @@ msgstr "VMwareクラスターの状態、<url> - VMwareサービスURL、<name> 
 
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "VMwareクラスターのタグの配列、<url> - VMwareサービスURL、<id> - VMwareクラスターID"
 
 #: include/classes/data/CItemData.php:1296
 msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
-msgstr ""
+msgstr "VMwareデータセンターのアラーム情報、JSONで返す、<url> - VMwareサービスURL、<id> - VMwareデータセンターID"
 
 #: include/classes/data/CItemData.php:1304
 msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
-msgstr ""
+msgstr "VMwareデータセンターのタグの配列、<url> - VMwareサービスURL、<id> - VMwareデータセンターID"
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -19914,7 +21136,7 @@ msgstr "VMwareデータセンターとそのID。JSONを返す"
 
 #: include/classes/data/CItemData.php:1268
 msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
-msgstr ""
+msgstr "VMwareデータストアのアラーム情報、JSONで返す、<url> - VMwareサービスURL、<uuid> - VMwareデータストア名"
 
 #: include/classes/data/CItemData.php:1242
 #: include/classes/data/CItemData.php:1298
@@ -19925,9 +21147,13 @@ msgstr "VMwareデータストアのバイト単位かトータルからのパー
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "VMwareデータストアのハイパーバイザーのリスト、<url> - VMwareサービスURL>、<datastore> - データストア名"
 
+#: include/classes/data/CItemData.php:1321
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr "VMwareデータストアのパフォーマンスカウンター、<url> - VMwareサービスURL、<id> - VMwareデータストアのuuid、<path> - パフォーマンスカンターのパス、<instance> - パフォーマンスカウンターのインスタンス"
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
-msgstr ""
+msgstr "VMwareデータストアのプロパティ、<url> - VMwareサービスURL、<uuid> - データストア名、<prop> - プロパティのパス"
 
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -19935,7 +21161,7 @@ msgstr "VMwareのデータストアの読み込み、<url> - VMwareサービスU
 
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
-msgstr ""
+msgstr "VMwareデータストアのタグの配列、<url> - VMwareサービスURL、<uuid> - VMwareデータストアのuuid、JSONで返す"
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -19955,7 +21181,7 @@ msgstr "VMwareハイパーバイザーHWベンダーの状態センサー、<url
 
 #: include/classes/data/CItemData.php:1324
 msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMwareハイパーバイザーのアラーム情報、JSONで返す、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/classes/data/CItemData.php:1350
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20027,7 +21253,7 @@ msgstr "VMwareハイパーバイザーのプロセッサー利用量(Hz)、<url>
 
 #: include/classes/data/CItemData.php:1472
 msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
-msgstr ""
+msgstr "VMwareハイパーバイザーのプロパティ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、<prop> - プロパティのパス"
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -20043,7 +21269,7 @@ msgstr "VMwareハイパーバイザーのステータス、<url> - VMwareサー�
 
 #: include/classes/data/CItemData.php:1472
 msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーのタグの配列、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、JSONで返す"
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20075,11 +21301,11 @@ msgstr "VMwareサービスバージョン、<url> - VMwareサービスURL"
 
 #: include/classes/data/CItemData.php:1244
 msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
-msgstr ""
+msgstr "VMware virtual centerのアラーム情報、JSONで返す、<url> - VMwareサービスURL"
 
 #: include/classes/data/CItemData.php:1500
 msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
-msgstr ""
+msgstr "VMware仮想マシンのアラーム情報、JSONで返す、<url> - VMwareサービスURL、<uuid> - VMware仮想マシン名"
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20163,7 +21389,7 @@ msgstr "VMware仮想マシンのプロセッサ利用量(Hz)、<url> - VMwareサ
 
 #: include/classes/data/CItemData.php:1644
 msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
-msgstr ""
+msgstr "VMware仮想マシンのプロパティ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<prop> - プロパティのパス"
 
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20183,7 +21409,7 @@ msgstr "VMware仮想マシンのスワップされたメモリサイズ、<url> 
 
 #: include/classes/data/CItemData.php:1664
 msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのタグの配列、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、JSONで返す"
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
@@ -20285,7 +21511,7 @@ msgstr "値"
 #: app/views/monitoring.widget.plaintext.view.php:51
 msgctxt "compact table header"
 msgid "Value"
-msgstr ""
+msgstr "値"
 
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
@@ -20448,6 +21674,10 @@ msgstr "Vaultシークレットクエリ文字列"
 #: include/hosts.inc.php:249
 msgid "Vendor"
 msgstr "ベンダー"
+
+#: include/views/configuration.template.edit.php:93
+msgid "Vendor and version"
+msgstr ""
 
 #: include/items.inc.php:43
 msgid "Verbose"
@@ -20660,7 +21890,7 @@ msgstr "週"
 #: include/classes/helpers/CSlaHelper.php:69
 msgctxt "compact table header"
 msgid "Week"
-msgstr ""
+msgstr "週"
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
@@ -20759,7 +21989,7 @@ msgstr "障害あり"
 #: app/views/monitoring.widget.problemhosts.view.php:34
 msgctxt "compact table header"
 msgid "With problems"
-msgstr ""
+msgstr "障害あり"
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
@@ -20780,7 +22010,7 @@ msgstr "障害なし"
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgctxt "compact table header"
 msgid "Without problems"
-msgstr ""
+msgstr "障害なし"
 
 #: include/forms.inc.php:343
 msgid "Without triggers"
@@ -20794,6 +22024,11 @@ msgstr "ワーキングタイム"
 #: app/views/administration.script.list.php:194
 msgid "Write"
 msgstr "表示/設定"
+
+#: include/classes/core/CModuleManager.php:136
+#, c-format
+msgid "Wrong %1$s.php class name for module located at %2$s."
+msgstr ""
 
 #: include/classes/core/CModuleManager.php:203
 #, c-format
@@ -20976,7 +22211,7 @@ msgstr "年"
 #: include/classes/helpers/CSlaHelper.php:72
 msgctxt "compact table header"
 msgid "Year"
-msgstr ""
+msgstr "年"
 
 #: app/partials/scheduledreport.formgrid.html.php:101
 #: app/partials/scheduledreport.table.html.php:52 report4.php:93
@@ -21084,6 +22319,10 @@ msgstr "Zabbix"
 msgid "Zabbix Integrations"
 msgstr "Zabbixインテグレーション"
 
+#: app/views/connector.edit.php:49
+msgid "Zabbix Streaming Protocol v1.0"
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:356
 msgid "Zabbix Technical Support"
 msgstr "Zabbix技術サポート"
@@ -21118,6 +22357,17 @@ msgstr "Zabbixのログイン画面"
 #: app/views/administration.script.edit.php:127
 msgid "Zabbix server"
 msgstr "Zabbixサーバー"
+
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
+"Zabbixサーバー\"%1$s\"へ到達できません。以下の原因が考えられます：\n"
+"1. \"zabbix_server.conf\"内の\"NodeAddress\"か\"ListenPort\"が正しくないか、\"zabbix.conf.php\"内のIP/DNSで上書きされている。\n"
+"2. ネットワークの設定が正しくない。\n"
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format
@@ -21185,6 +22435,10 @@ msgstr "論理値で指定してください"
 #: include/classes/validators/CNewValidator.php:332
 msgid "a character string is expected"
 msgstr "文字列で指定してください"
+
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr "文字列、整数または浮動小数の値で指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -21327,6 +22581,14 @@ msgstr "すべて"
 msgid "all media"
 msgstr "すべてのメディア"
 
+#: include/classes/api/services/CItemGeneral.php:1877
+msgid "allowed count of dependency levels would be exceeded"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1888
+msgid "allowed count of dependent items would be exceeded"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
 msgstr "IPアドレスを指定してください"
@@ -21395,6 +22657,18 @@ msgstr "識別子は式で定義されていません"
 #: include/classes/validators/CApiInputValidator.php:677
 msgid "an integer is expected"
 msgstr "整数で指定してください"
+
+#: include/classes/api/services/CItemGeneral.php:1806
+#: include/classes/api/services/CItemGeneral.php:1827
+#: include/classes/api/services/CItemGeneral.php:1930
+msgid "an item ID is expected"
+msgstr "アイテム ID が必要です"
+
+#: include/classes/api/services/CItemGeneral.php:1805
+#: include/classes/api/services/CItemGeneral.php:1826
+#: include/classes/api/services/CItemGeneral.php:1929
+msgid "an item/item prototype ID is expected"
+msgstr "アイテム/アイテム プロトタイプ ID が必要です"
 
 #: include/classes/validators/CApiInputValidator.php:716
 #: include/classes/validators/CApiInputValidator.php:2882
@@ -21532,6 +22806,10 @@ msgstr "点滅"
 msgid "both username and password should be either present or empty"
 msgstr "ユーザー名とパスワードの両方を指定するか空である必要があります"
 
+#: include/classes/api/services/CTemplate.php:522
+msgid "both vendor_name and vendor_version should be either present or empty"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
 msgstr "bytelength() - バイト長を返す"
@@ -21548,6 +22826,22 @@ msgstr "計算"
 #: app/views/administration.geomaps.edit.php:52
 msgid "can be used to add \"@2x\" to the URL to load retina tiles."
 msgstr "高精細タイルを読み込むためにURLに\"@2x\"を追加できる。"
+
+#: include/classes/api/services/CItemGeneral.php:2383
+msgid "cannot be a value map ID from another host or template"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1942
+msgid "cannot be an item ID from another host or template"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1956
+msgid "cannot be an item prototype ID from another LLD rule"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1941
+msgid "cannot be an item/item prototype ID from another host or template"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:229
 msgid "cannot be changed"
@@ -21649,6 +22943,10 @@ msgstr "変更できません"
 msgid "cannot be empty"
 msgstr "空白は指定できません"
 
+#: include/classes/validators/CApiInputValidator.php:3560
+msgid "cannot be equal to zero without custom intervals"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2982
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -21660,6 +22958,10 @@ msgstr "パラメーター\"%1$s\"の値以下にすることはできません"
 msgid "cannot be specified the value of parameter \"%1$s\""
 msgstr "パラメーター\"%1$s\"の値を指定できません"
 
+#: include/classes/api/services/CItemGeneral.php:1658
+msgid "cannot be the host interface ID from another host"
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
 msgstr "リンクを削除できません"
@@ -21667,6 +22969,14 @@ msgstr "リンクを削除できません"
 #: include/classes/api/services/CItemGeneral.php:2602
 msgid "cannot convert to JSON, result value too long"
 msgstr "JSONに変換できません、結果の値が長すぎます"
+
+#: include/classes/api/services/CItem.php:899
+msgid "cannot delete inherited item"
+msgstr "継承されたアイテムを削除できません"
+
+#: include/classes/api/services/CItemPrototype.php:810
+msgid "cannot delete inherited item prototype"
+msgstr "継承されたアイテムのプロトタイプを削除できません。"
 
 #: include/classes/api/services/CHostPrototype.php:2167
 msgid "cannot delete templated host prototype"
@@ -21897,6 +23207,11 @@ msgstr "一致しない"
 msgid "e() - Returns Euler's number"
 msgstr "e() - オイラー数を返す"
 
+#: app/views/administration.mediatype.list.php:98
+#: app/views/administration.mediatype.list.php:103
+msgid "email"
+msgstr "メール"
+
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
 #: include/views/inventory.host.list.php:72
@@ -21981,6 +23296,11 @@ msgstr "地理座標(コンマで区切られた緯度と経度の値)を指定�
 msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "データの保存期間設定(全体設定)"
+
+#: app/views/popup.usergroupmapping.edit.php:82
+#, c-format
+msgid "group name must match %1$s group name"
+msgstr ""
 
 #: include/func.inc.php:594 jsLoader.php:224
 msgctxt "hour short"
@@ -22081,6 +23401,12 @@ msgstr "間違った書式が\"%1$s\"付近に見つかりました"
 msgid "incorrect usage of function \"%1$s\""
 msgstr "関数\"%1$s\"の使い方が正しくありません"
 
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert() - 文字列内の指定した開始位置から指定した文字列かスペースを挿入する"
@@ -22089,6 +23415,10 @@ msgstr "insert() - 文字列内の指定した開始位置から指定した文�
 msgctxt "event source"
 msgid "internal"
 msgstr "内部イベント"
+
+#: include/classes/validators/CApiInputValidator.php:4155
+msgid "invalid Prometheus label"
+msgstr "Prometheusラベルが正しくありません"
 
 #: include/classes/api/services/CItemGeneral.php:1535
 #: include/classes/api/services/CItemGeneral.php:1545
@@ -22112,6 +23442,10 @@ msgstr "集計方法が正しくありません"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8のバイトシーケンスが正しくありません"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr "データタイプが正しくありません"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"
@@ -22391,6 +23725,10 @@ msgstr "依存アイテムの数が最大数に達しました"
 msgid "maximum number of dependency levels reached"
 msgstr "依存レベルの数が最大数に達しました\""
 
+#: app/views/popup.ldap.edit.php:123
+msgid "memberOf is a preferable way to configure groups because it is faster. Use groupOfNames if your LDAP server does not support memberOf or group filtering is required."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:784
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr "mid() - 開始位置からN文字の部分文字列を返す"
@@ -22475,6 +23813,14 @@ msgstr "少なくとも英字の小文字1文字と大文字1文字を含める�
 msgid "must contain at least one special character"
 msgstr "少なくとも特殊記号を1文字含めるようにしてください"
 
+#: include/classes/validators/CApiInputValidator.php:3818
+msgid "must have a polling interval not blocked by non-active interval periods"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:3653
+msgid "must have at least one interval greater than 0"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:98
 #: app/views/administration.user.edit.php:150
 #: include/classes/validators/CPasswordComplexityValidator.php:108
@@ -22544,6 +23890,14 @@ msgstr "深刻度の変更の権限がありません"
 msgid "no permissions to close problems"
 msgstr "障害のクローズの権限がありません"
 
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
+msgstr ""
+
 #: include/classes/api/services/CConfiguration.php:168
 msgid "no permissions to create and edit maps"
 msgstr "マップの作成と変更の権限がありません"
@@ -22563,6 +23917,10 @@ msgstr "障害抑制解除の権限がありません"
 #: app/controllers/CControllerPopupTriggerExpr.php:836
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr "nodata() - 期間Tの間取得データなし (1 - 取得データなし、0 - それ以外)、Mode (strict - 送られてきたデータ内のプロキシでの遅延を無視)"
+
+#: include/classes/validators/CApiInputValidator.php:3681
+msgid "non-active intervals cannot fill the entire time"
+msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:113
 #: app/views/popup.tophosts.column.edit.php:125
@@ -22638,6 +23996,11 @@ msgstr "off"
 #: include/classes/setup/CFrontendSetup.php:626
 msgid "on"
 msgstr "on"
+
+#: include/classes/validators/CApiInputValidator.php:2388
+#, c-format
+msgid "only one object can exist within the combinations of %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTestSend.php:182
 msgid "only one time unit is allowed"
@@ -22905,6 +24268,10 @@ msgstr "stddevpop() - 母標準偏差"
 msgid "stddevsamp() - Sample standard deviation"
 msgstr "stddevsamp() - サンプル標準偏差"
 
+#: widgets/actionlog/views/widget.edit.php:49
+msgid "subject or body text"
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:130 include/graphs.inc.php:84
 msgid "sum"
 msgstr "合計"
@@ -22951,6 +24318,18 @@ msgstr "tan() - 値のタンジェント"
 #, c-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "テンプレートID\"%1$s\"が%2$s回使用されています"
+
+#: include/classes/api/services/CItemGeneral.php:1577
+#: include/classes/api/services/CItemGeneral.php:1594
+#: include/classes/api/services/CItemGeneral.php:1612
+#: include/classes/api/services/CItemGeneral.php:1652
+msgid "the host interface ID is expected"
+msgstr "ホスト インターフェイス ID が必要です"
+
+#: include/classes/api/services/CItemGeneral.php:1668
+#, c-format
+msgid "the host interface ID of type \"%1$s\" is expected"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2813
 msgid "the last new line feed is missing"
@@ -23196,6 +24575,11 @@ msgstr "サポートされていない時間の単位です"
 msgid "unsupported version number"
 msgstr "サポートされていないバージョン番号です"
 
+#: include/classes/validators/CApiInputValidator.php:3626
+#, c-format
+msgid "update interval \"%1$s\" is longer than period \"%2$s\""
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:509
 msgid "uppercase identifier expected"
 msgstr "大文字の識別子が必要です"
@@ -23395,6 +24779,15 @@ msgstr "varsamp() - サンプル分散"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "via"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr "w"
+
+#: app/views/popup.usergroupmapping.edit.php:83
+msgid "wildcard patterns with '*' may be used"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

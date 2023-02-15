@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,9 @@
 		},
 
 		replaceSubfilter(subfilter) {
-			document.getElementById('subfilter').outerHTML = subfilter;
+			if (document.getElementById('subfilter') !== null) {
+				document.getElementById('subfilter').outerHTML = subfilter;
+			}
 		},
 
 		setSubfilter(tag, value) {
@@ -143,7 +145,7 @@
 		this.timeline = timeline;
 		this.dimensions = chart.dimensions;
 
-		this.curl = new Curl(chart.src, false);
+		this.curl = new Curl(chart.src);
 
 		if ('graphid' in chart) {
 			this.curl.setArgument('graphid', chart.graphid);

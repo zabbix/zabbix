@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,13 +23,13 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Web monitoring'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HTTPCONF_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HTTPCONF_EDIT));
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
-	$widget->setNavigation(getHostNavigation('web', $this->data['hostid']));
+	$html_page->setNavigation(getHostNavigation('web', $this->data['hostid']));
 }
 
 $url = (new CUrl('httpconf.php'))
@@ -38,9 +38,11 @@ $url = (new CUrl('httpconf.php'))
 
 // create form
 $http_form = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('httpconf.php')))->removeId())
 	->setId('http-form')
 	->setName('httpForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('templated', $this->data['templated']);
@@ -54,9 +56,24 @@ if (!empty($this->data['httptestid'])) {
  */
 $http_form_list = new CFormList();
 
-// Parent http tests
-if (!empty($this->data['templates'])) {
-	$http_form_list->addRow(_('Parent web scenarios'), $this->data['templates']);
+if (array_key_exists('parent_httptest', $this->data)) {
+	$parent_httptest = $this->data['parent_httptest'];
+
+	if ($parent_httptest['editable']) {
+		$parent_template_name = new CLink(CHtml::encode($parent_httptest['template_name']),
+			(new CUrl('httpconf.php'))
+				->setArgument('form', 'update')
+				->setArgument('context', 'template')
+				->setArgument('hostid', $parent_httptest['templateid'])
+				->setArgument('httptestid', $data['templateid'])
+		);
+	}
+	else {
+		$parent_template_name = (new CSpan(CHtml::encode($parent_httptest['template_name'])))
+			->addClass(ZBX_STYLE_GREY);
+	}
+
+	$http_form_list->addRow(_('Parent web scenario'), $parent_template_name);
 }
 
 // Name
@@ -241,13 +258,15 @@ $http_tab = (new CTabView())
 			'source' => 'httptest',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
+			'context' => $data['context'],
 			'readonly' => false,
-			'tabs_id' => 'tabs'
+			'tabs_id' => 'tabs',
+			'tags_tab_id' => 'tags-tab'
 		]),
 		TAB_INDICATOR_TAGS
 	)
 	->addTab('authenticationTab', _('Authentication'), $http_authentication_form_list, TAB_INDICATOR_HTTP_AUTH);
-if (!$this->data['form_refresh']) {
+if ($this->data['form_refresh'] == 0) {
 	$http_tab->setSelected(0);
 }
 
@@ -265,7 +284,8 @@ if (!empty($this->data['httptestid'])) {
 		);
 	}
 
-	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid', 'context']),
+	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid', 'context']).
+		'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('httpconf.php'),
 		'context'
 	))->setEnabled(!$data['templated']);
 	$buttons[] = new CButtonCancel(url_param('context'));
@@ -280,7 +300,7 @@ else {
 }
 
 $http_form->addItem($http_tab);
-$widget->addItem($http_form);
+$html_page->addItem($http_form);
 
 $this->data['scenario_tab_data'] = [
 	'agent_visibility' => [],
@@ -299,7 +319,7 @@ zbx_subarray_push($this->data['scenario_tab_data']['agent_visibility'], ZBX_AGEN
 
 require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

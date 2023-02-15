@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #ifndef ZABBIX_VMSTAT_H
 #define ZABBIX_VMSTAT_H
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #ifdef _AIX
 

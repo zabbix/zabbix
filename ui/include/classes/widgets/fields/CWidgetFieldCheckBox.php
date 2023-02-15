@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,30 +18,35 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+namespace Zabbix\Widgets\Fields;
+
+use Zabbix\Widgets\CWidgetField;
+
 class CWidgetFieldCheckBox extends CWidgetField {
 
-	private $caption;
+	public const DEFAULT_VALUE = 0;
+
+	private ?string $caption;
 
 	/**
-	 * Check box widget field.
-	 *
-	 * @param string $name     Field name in form.
-	 * @param string $label    Label for the field in form.
-	 * @param string $caption  Text after checkbox.
+	 * @param string|null $caption  Text after checkbox.
 	 */
-	public function __construct($name, $label, $caption = null) {
+	public function __construct(string $name, string $label = null, string $caption = null) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
-		$this->setDefault(0);
 		$this->caption = $caption;
+
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 	}
 
-	public function setValue($value) {
+	public function setValue($value): self {
 		return parent::setValue((int) $value);
 	}
 
-	public function getCaption() {
+	public function getCaption(): ?string {
 		return $this->caption;
 	}
 }

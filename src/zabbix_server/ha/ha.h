@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,16 +28,27 @@ typedef struct
 }
 zbx_cuid_t;
 
+typedef struct
+{
+	char	*ha_node_name;
+	char	*ha_node_address;
+	char	*default_node_ip;
+	int	default_node_port;
+	int	ha_status;
+}
+zbx_ha_config_t;
+
 #define zbx_cuid_empty(a)	('\0' == *(a).str ? SUCCEED : FAIL)
 #define zbx_cuid_compare(a, b)	(0 == memcmp((a).str, (b).str, CUID_LEN) ? SUCCEED : FAIL)
 #define zbx_cuid_clear(a)	memset((a).str, 0, CUID_LEN)
 
-int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error);
+int	zbx_ha_start(zbx_rtc_t *rtc, zbx_ha_config_t *ha_config, char **error);
 int	zbx_ha_pause(char **error);
 int	zbx_ha_stop(char **error);
 void	zbx_ha_kill(void);
-int	zbx_ha_get_status(int *ha_status, int *ha_failover_delay, char **error);
-int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_failover_delay, char **error);
+int	zbx_ha_get_status(const char *ha_node_name, int *ha_status, int *ha_failover_delay, char **error);
+int	zbx_ha_dispatch_message(const char *ha_node_name, zbx_ipc_message_t *message, int *ha_status,
+		int *ha_failover_delay, char **error);
 
 int	zbx_ha_check_pid(pid_t pid);
 

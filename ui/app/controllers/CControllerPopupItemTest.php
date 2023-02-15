@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -247,9 +247,9 @@ abstract class CControllerPopupItemTest extends CController {
 	protected $is_item_testable;
 
 	/**
-	 * @var object
+	 * @var string
 	 */
-	protected $preproc_item;
+	protected $test_type;
 
 	/**
 	 * @var array
@@ -329,26 +329,6 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		return $ret;
-	}
-
-	/**
-	 * Function returns instance of item, item prototype or discovery rule class.
-	 *
-	 * @param int $test_type
-	 *
-	 * @return CItem|CItemPrototype|CDiscoveryRule
-	 */
-	protected static function getPreprocessingItemClassInstance($test_type) {
-		switch ($test_type) {
-			case self::ZBX_TEST_TYPE_ITEM:
-				return new CItem;
-
-			case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
-				return new CItemPrototype;
-
-			case self::ZBX_TEST_TYPE_LLD:
-				return new CDiscoveryRule;
-		}
 	}
 
 	/**
@@ -563,7 +543,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'key' => $input['key'],
 					'http_authtype' => array_key_exists('http_authtype', $input)
 						? $input['http_authtype']
-						: HTTPTEST_AUTH_NONE,
+						: ZBX_HTTP_AUTH_NONE,
 					'follow_redirects' => array_key_exists('follow_redirects', $input) ? $input['follow_redirects'] : 0,
 					'headers' => array_key_exists('headers', $input) ? $input['headers'] : [],
 					'http_proxy' => array_key_exists('http_proxy', $input) ? $input['http_proxy'] : null,
@@ -589,7 +569,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'verify_peer' => array_key_exists('verify_peer', $input) ? $input['verify_peer'] : 0
 				];
 
-				if ($data['http_authtype'] != HTTPTEST_AUTH_NONE) {
+				if ($data['http_authtype'] != ZBX_HTTP_AUTH_NONE) {
 					$data += [
 						'http_username' => array_key_exists('http_username', $input) ? $input['http_username'] : null,
 						'http_password' => array_key_exists('http_password', $input) ? $input['http_password'] : null
@@ -719,7 +699,8 @@ abstract class CControllerPopupItemTest extends CController {
 				'privpassphrase' => '',
 				'authprotocol' => ITEM_SNMPV3_AUTHPROTOCOL_MD5,
 				'privprotocol' => ITEM_SNMPV3_PRIVPROTOCOL_DES,
-				'contextname' => ''
+				'contextname' => '',
+				'max_repetitions' => '10'
 			]
 		];
 
@@ -929,7 +910,7 @@ abstract class CControllerPopupItemTest extends CController {
 				'supported_macros' => array_diff_key($this->macros_by_item_props['key'],
 					['support_user_macros' => true, 'support_lld_macros' => true]
 				),
-				'support_lldmacros' => ($this->preproc_item instanceof CItemPrototype),
+				'support_lldmacros' => ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
 				'texts_support_macros' => [$inputs['key']],
 				'texts_support_lld_macros' => [$inputs['key']],
 				'texts_support_user_macros' => [$inputs['key']],
@@ -1025,7 +1006,7 @@ abstract class CControllerPopupItemTest extends CController {
 	protected function resolvePreprocessingStepMacros(array $steps) {
 		// Resolve macros used in parameter fields.
 		$macros_posted = $this->getInput('macros', []);
-		$macros_types = ($this->preproc_item instanceof CItemPrototype)
+		$macros_types = ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE)
 			? ['usermacros' => true, 'lldmacros' => true]
 			: ['usermacros' => true];
 
@@ -1069,7 +1050,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 		$expression_parser = new CExpressionParser([
 			'usermacros' => true,
-			'lldmacros' => ($this->preproc_item instanceof CItemPrototype),
+			'lldmacros' => ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
 			'calculated' => true,
 			'host_macro' => true,
 			'empty_host' => true
@@ -1200,7 +1181,7 @@ abstract class CControllerPopupItemTest extends CController {
 				'macros_n' => []
 			];
 
-			if ($this->preproc_item instanceof CItemPrototype) {
+			if ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE) {
 				$types += ['lldmacros' => true];
 			}
 
@@ -1324,6 +1305,33 @@ abstract class CControllerPopupItemTest extends CController {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('SNMP community'), _('cannot be empty')));
 
 				return false;
+			}
+
+			if ($interface['details']['version'] == SNMP_V2C || $interface['details']['version'] == SNMP_V3) {
+				if (!array_key_exists('max_repetitions', $interface['details'])
+						|| $interface['details']['max_repetitions'] === '') {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Max repetition count'), _('cannot be empty')));
+
+					return false;
+				}
+
+				if (!is_numeric($interface['details']['max_repetitions'])) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Max repetition count'), _('a numeric value is expected')));
+
+					return false;
+				}
+
+				if ($interface['details']['max_repetitions'] < 1) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Max repetition count'), _s('value must be no less than "%1$s"', 1)));
+
+					return false;
+				}
+
+				if ($interface['details']['max_repetitions'] > ZBX_MAX_INT32) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Max repetition count'), _s('value must be no greater than "%1$s"', ZBX_MAX_INT32)));
+
+					return false;
+				}
 			}
 		}
 

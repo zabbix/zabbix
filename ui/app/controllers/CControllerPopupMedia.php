@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ class CControllerPopupMedia extends CController {
 	private $severities = [];
 
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$this->severities[$severity] = CSeverityHelper::getName($severity);
@@ -32,7 +32,7 @@ class CControllerPopupMedia extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dstfrm' =>			'string|fatal',
+			'dstfrm' =>			'required|string',
 			'media' =>			'int32',
 			'mediatypeid' =>	'db media_type.mediatypeid',
 			'sendto' =>			'string',
@@ -82,6 +82,10 @@ class CControllerPopupMedia extends CController {
 		if ($this->hasInput('add')) {
 			$output = [];
 
+			if ($page_options['mediatypeid'] == 0) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'mediatypeid', _('cannot be empty')));
+			}
+
 			$db_mediatypes = API::MediaType()->get([
 				'output' => ['type'],
 				'mediatypeids' => $page_options['mediatypeid']
@@ -89,23 +93,25 @@ class CControllerPopupMedia extends CController {
 
 			$type = $db_mediatypes ? $db_mediatypes[0]['type'] : 0;
 
-			if ($type == MEDIA_TYPE_EMAIL) {
-				$email_validator = new CEmailValidator();
+			if ($db_mediatypes) {
+				if ($type == MEDIA_TYPE_EMAIL) {
+					$email_validator = new CEmailValidator();
 
-				$page_options['sendto_emails'] = array_values(array_filter($page_options['sendto_emails']));
-				if (!$page_options['sendto_emails']) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto_emails', _('cannot be empty')));
-				}
+					$page_options['sendto_emails'] = array_values(array_filter($page_options['sendto_emails']));
+					if (!$page_options['sendto_emails']) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto_emails', _('cannot be empty')));
+					}
 
-				foreach ($page_options['sendto_emails'] as $email) {
-					if (!$email_validator->validate($email)) {
-						error($email_validator->getError());
-						break;
+					foreach ($page_options['sendto_emails'] as $email) {
+						if (!$email_validator->validate($email)) {
+							error($email_validator->getError());
+							break;
+						}
 					}
 				}
-			}
-			elseif ($page_options['sendto'] === '') {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
+				elseif ($page_options['sendto'] === '') {
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
+				}
 			}
 
 			if ($messages = get_and_clear_messages()) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,10 @@
 
 #include "zabbix_sender.h"
 
+#include "zbxstr.h"
 #include "zbxjson.h"
 #include "zbxcomms.h"
+#include "zbxcommshigh.h"
 #include "cfg.h"
 
 const char	*progname = NULL;

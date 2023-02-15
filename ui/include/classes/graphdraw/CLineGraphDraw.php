@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,30 @@ class CLineGraphDraw extends CGraphDraw {
 	const GRAPH_WIDTH_MIN = 20;
 	const GRAPH_HEIGHT_MIN = 20;
 	const LEGEND_OFFSET_Y = 90;
+
+	private $cell_height_min;
+	private $cell_width;
+	private $drawExLegend;
+	private $drawItemsLegend;
+	private $intervals;
+	private $is_binary;
+	private $itemsHost;
+	private $outer;
+	private $oxy;
+	private $percentile;
+	private $power;
+	private $show_triggers;
+	private $show_work_period;
+	private $triggers;
+	private $unit2px;
+	private $yaxis;
+	private $yaxismin;
+	private $yaxismax;
+	private $ymin_itemid;
+	private $ymax_itemid;
+	private $ymin_type;
+	private $ymax_type;
+	private $zero;
 
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		parent::__construct($type);
@@ -733,17 +757,17 @@ class CLineGraphDraw extends CGraphDraw {
 		if ($this->yaxis[GRAPH_YAXIS_SIDE_LEFT]) {
 			zbx_imageline(
 				$this->im,
-				$this->shiftXleft + $this->shiftXCaption,
+				$this->shiftXleft,
 				$this->shiftY - 5,
-				$this->shiftXleft + $this->shiftXCaption,
+				$this->shiftXleft,
 				$this->sizeY + $this->shiftY + 4,
 				$gbColor
 			);
 
 			$points = [
-				$this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
-				$this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
-				$this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10
+				$this->shiftXleft - 3, $this->shiftY - 5,
+				$this->shiftXleft + 3, $this->shiftY - 5,
+				$this->shiftXleft, $this->shiftY - 10
 			];
 			if (PHP_VERSION_ID >= 80100) {
 				imagefilledpolygon($this->im, $points, $this->getColor('White'));
@@ -753,22 +777,19 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			/* draw left axis triangle */
-			zbx_imageline($this->im, $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
-					$this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
+			zbx_imageline($this->im, $this->shiftXleft - 3, $this->shiftY - 5, $this->shiftXleft + 3, $this->shiftY - 5,
 					$gbColor);
-			zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
-					$this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
+			zbx_imagealine($this->im, $this->shiftXleft - 3, $this->shiftY - 5, $this->shiftXleft, $this->shiftY - 10,
 					$gbColor);
-			zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
-					$this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
+			zbx_imagealine($this->im, $this->shiftXleft + 3, $this->shiftY - 5, $this->shiftXleft, $this->shiftY - 10,
 					$gbColor);
 		}
 		else {
 			dashedLine(
 				$this->im,
-				$this->shiftXleft + $this->shiftXCaption,
+				$this->shiftXleft,
 				$this->shiftY,
-				$this->shiftXleft + $this->shiftXCaption,
+				$this->shiftXleft,
 				$this->sizeY + $this->shiftY,
 				$this->getColor($this->graphtheme['gridcolor'], 0)
 			);
@@ -777,17 +798,17 @@ class CLineGraphDraw extends CGraphDraw {
 		if ($this->yaxis[GRAPH_YAXIS_SIDE_RIGHT]) {
 			zbx_imageline(
 				$this->im,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption,
+				$this->sizeX + $this->shiftXleft,
 				$this->shiftY - 5,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption,
+				$this->sizeX + $this->shiftXleft,
 				$this->sizeY + $this->shiftY + 4,
 				$gbColor
 			);
 
 			$points = [
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10
+				$this->sizeX + $this->shiftXleft - 3, $this->shiftY - 5,
+				$this->sizeX + $this->shiftXleft + 3, $this->shiftY - 5,
+				$this->sizeX + $this->shiftXleft, $this->shiftY - 10
 			];
 			if (PHP_VERSION_ID >= 80100) {
 				imagefilledpolygon($this->im, $points, $this->getColor('White'));
@@ -797,22 +818,19 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			/* draw right axis triangle */
-			zbx_imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
-				$gbColor);
-			zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
-				$gbColor);
-			zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
-				$gbColor);
+			zbx_imageline($this->im, $this->sizeX + $this->shiftXleft - 3, $this->shiftY - 5,
+				$this->sizeX + $this->shiftXleft + 3, $this->shiftY - 5, $gbColor);
+			zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + 3, $this->shiftY - 5,
+				$this->sizeX + $this->shiftXleft, $this->shiftY - 10, $gbColor);
+			zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft - 3, $this->shiftY - 5,
+				$this->sizeX + $this->shiftXleft, $this->shiftY - 10, $gbColor);
 		}
 		else {
 			dashedLine(
 				$this->im,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption,
+				$this->sizeX + $this->shiftXleft,
 				$this->shiftY,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption,
+				$this->sizeX + $this->shiftXleft,
 				$this->sizeY + $this->shiftY,
 				$this->getColor($this->graphtheme['gridcolor'], 0)
 			);
@@ -820,17 +838,17 @@ class CLineGraphDraw extends CGraphDraw {
 
 		zbx_imageline(
 			$this->im,
-			$this->shiftXleft + $this->shiftXCaption - 3,
+			$this->shiftXleft - 3,
 			$this->sizeY + $this->shiftY + 1,
-			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5,
+			$this->sizeX + $this->shiftXleft + 5,
 			$this->sizeY + $this->shiftY + 1,
 			$gbColor
 		);
 
 		$points = [
-			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY - 2,
-			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY + 4,
-			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 10, $this->sizeY + $this->shiftY + 1
+			$this->sizeX + $this->shiftXleft + 5, $this->sizeY + $this->shiftY - 2,
+			$this->sizeX + $this->shiftXleft + 5, $this->sizeY + $this->shiftY + 4,
+			$this->sizeX + $this->shiftXleft + 10, $this->sizeY + $this->shiftY + 1
 		];
 		if (PHP_VERSION_ID >= 80100) {
 			imagefilledpolygon($this->im, $points, $this->getColor('White'));
@@ -840,15 +858,12 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		/* draw X axis triangle */
-		zbx_imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY - 2,
-			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY + 4,
-			$gbColor);
-		zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY + 4,
-			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 10, $this->sizeY + $this->shiftY + 1,
-			$gbColor);
-		zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 10, $this->sizeY + $this->shiftY + 1,
-			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY - 2,
-			$gbColor);
+		zbx_imageline($this->im, $this->sizeX + $this->shiftXleft + 5, $this->sizeY + $this->shiftY - 2,
+			$this->sizeX + $this->shiftXleft + 5, $this->sizeY + $this->shiftY + 4, $gbColor);
+		zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + 5, $this->sizeY + $this->shiftY + 4,
+			$this->sizeX + $this->shiftXleft + 10, $this->sizeY + $this->shiftY + 1, $gbColor);
+		zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + 10, $this->sizeY + $this->shiftY + 1,
+			$this->sizeX + $this->shiftXleft + 5, $this->sizeY + $this->shiftY - 2, $gbColor);
 	}
 
 	private function drawTimeGrid() {
@@ -1984,20 +1999,20 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	public function getMinDimensions() {
-		$min_dimentions = [
+		$min_dimensions = [
 			'width' => self::GRAPH_WIDTH_MIN,
 			'height' => self::GRAPH_HEIGHT_MIN
 		];
 
 		if ($this->outer) {
-			$min_dimentions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? 85 : 30;
-			$min_dimentions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? 85 : 30;
-			$min_dimentions['width']++;
+			$min_dimensions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? 85 : 30;
+			$min_dimensions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? 85 : 30;
+			$min_dimensions['width']++;
 
-			$min_dimentions['height'] += $this->shiftY + self::LEGEND_OFFSET_Y;
+			$min_dimensions['height'] += $this->shiftY + self::LEGEND_OFFSET_Y;
 		}
 
-		return $min_dimentions;
+		return $min_dimensions;
 	}
 
 	/**

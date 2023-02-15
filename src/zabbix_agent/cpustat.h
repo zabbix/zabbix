@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,11 @@
 #ifndef ZABBIX_CPUSTAT_H
 #define ZABBIX_CPUSTAT_H
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxalgo.h"
 
 #ifdef _WINDOWS
-#	include "perfmon.h"
+#	include "zbxwin32.h"
 
 typedef struct
 {
@@ -42,10 +42,10 @@ int	get_cpu_perf_counter_value(int cpu_num, int interval, double *value, char **
 
 typedef struct
 {
-	zbx_uint64_t	h_counter[ZBX_CPU_STATE_COUNT][MAX_COLLECTOR_HISTORY];
-	unsigned char	h_status[MAX_COLLECTOR_HISTORY];
-#if (MAX_COLLECTOR_HISTORY % 8) > 0
-	unsigned char	padding0[8 - (MAX_COLLECTOR_HISTORY % 8)];	/* for 8-byte alignment */
+	zbx_uint64_t	h_counter[ZBX_CPU_STATE_COUNT][ZBX_MAX_COLLECTOR_HISTORY];
+	unsigned char	h_status[ZBX_MAX_COLLECTOR_HISTORY];
+#if (ZBX_MAX_COLLECTOR_HISTORY % 8) > 0
+	unsigned char	padding0[8 - (ZBX_MAX_COLLECTOR_HISTORY % 8)];	/* for 8-byte alignment */
 #endif
 	int		h_first;
 	int		h_count;
@@ -77,7 +77,7 @@ ZBX_CPU_UTIL_PCT_AIX;
 typedef struct
 {
 	ZBX_CPU_UTIL_PCT_AIX	*counters;	/* pointer to 2D array with history data */
-	int			row_num;	/* number of rows (MAX_COLLECTOR_HISTORY) */
+	int			row_num;	/* number of rows (ZBX_MAX_COLLECTOR_HISTORY) */
 	int			column_num;	/* number of columns (number of CPUs) */
 	int			h_latest;	/* the index of the most recent entry in the history data */
 	int			h_count;	/* the number of entries in the history data */

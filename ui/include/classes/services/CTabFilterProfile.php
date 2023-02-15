@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -166,7 +166,7 @@ class CTabFilterProfile {
 	 * Update selected tab filter properties from $input array. Active filter selection:
 	 * - If no filter_name passed in input select last opened filter.
 	 * - If filter_name is empty select home filter (is used for hotlinking from other pages to home filter)
-	 * - If filter_name does not exists in stored filters, select home filer
+	 * - If filter_name does not exists in stored filters, select home filter
 	 * - If filter_name exists and is not unique among stored filters, select last opened filter if it name match else
 	 *   select first filter from matched filters list.
 	 *

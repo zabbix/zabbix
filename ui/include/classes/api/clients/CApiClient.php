@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,12 +27,14 @@ abstract class CApiClient {
 	/**
 	 * Call the given API service method and return the response.
 	 *
-	 * @param string 	$api
-	 * @param string 	$method
-	 * @param array 	$params
-	 * @param string	$auth
+	 * @param string $api
+	 * @param string $method
+	 * @param array  $params
+	 * @param array  $auth
+	 * @param int    $auth['type']  CJsonRpc::AUTH_TYPE_PARAM, CJsonRpc::AUTH_TYPE_HEADER, CJsonRpc::AUTH_TYPE_COOKIE
+	 * @param string $auth['auth']
 	 *
 	 * @return CApiClientResponse
 	 */
-	abstract public function callMethod($api, $method, array $params, $auth);
+	abstract public function callMethod(string $api, string $method, array $params, array $auth);
 }

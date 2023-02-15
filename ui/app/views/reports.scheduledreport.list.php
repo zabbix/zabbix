@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('scheduledreport');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Scheduled reports'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_SCHEDULEDREPORT_LIST))
 	->setControls(
@@ -72,6 +72,8 @@ $form = (new CForm())
 	->setId('scheduledreport-form')
 	->setName('scheduledreport-form');
 
+$csrf_token = CCsrfTokenHelper::get('scheduledreport');
+
 $form->addItem([
 		new CPartial('scheduledreport.table.html', [
 			'source' => $form->getName(),
@@ -85,21 +87,24 @@ $form->addItem([
 			'scheduledreport.enable' => [
 				'name' => _('Enable'),
 				'confirm' => _('Enable selected scheduled reports?'),
-				'disabled' => !$data['allowed_edit']
+				'disabled' => !$data['allowed_edit'],
+				'csrf_token' => $csrf_token
 			],
 			'scheduledreport.disable' => [
 				'name' => _('Disable'),
 				'confirm' => _('Disable selected scheduled reports?'),
-				'disabled' => !$data['allowed_edit']
+				'disabled' => !$data['allowed_edit'],
+				'csrf_token' => $csrf_token
 			],
 			'scheduledreport.delete' => [
 				'name' => _('Delete'),
 				'confirm' => _('Delete selected scheduled reports?'),
-				'disabled' => !$data['allowed_edit']
+				'disabled' => !$data['allowed_edit'],
+				'csrf_token' => $csrf_token
 			]
 		], 'scheduledreport')
 	]);
 
-$widget
+$html_page
 	->addItem($form)
 	->show();

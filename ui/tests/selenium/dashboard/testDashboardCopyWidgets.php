@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -202,10 +203,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		}
 
 		if ($new_page) {
-			$this->query('xpath://div[@class="dashboard-navigation-tabs"]//span[text()="'.$new_page_name.'"]')
-					->waitUntilClickable()->one()->click();
-			$this->query('xpath://div[@class="selected-tab"]//span[text()="'.$new_page_name.'"]')
-					->waitUntilVisible()->one();
+			$dashboard->selectPage($new_page_name);
 		}
 
 		$dashboard->edit();

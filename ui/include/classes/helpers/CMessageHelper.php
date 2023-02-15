@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ class CMessageHelper {
 			self::addWarning($message['message']);
 		}
 		else {
-			self::addError($message['message'], $message['source']);
+			self::addError($message['message'], $message['is_technical_error']);
 		}
 	}
 
@@ -82,9 +82,9 @@ class CMessageHelper {
 	 * Add message with type error.
 	 *
 	 * @param string $message
-	 * @param string $source
+	 * @param bool   $is_technical_error
 	 */
-	public static function addError(string $message, string $source = ''): void {
+	public static function addError(string $message, bool $is_technical_error = false): void {
 		if (self::$type === null) {
 			self::$type = self::MESSAGE_TYPE_ERROR;
 		}
@@ -92,7 +92,7 @@ class CMessageHelper {
 		self::$messages[] = [
 			'type' => self::MESSAGE_TYPE_ERROR,
 			'message' => $message,
-			'source' => $source
+			'is_technical_error' => $is_technical_error
 		];
 	}
 
@@ -161,10 +161,9 @@ class CMessageHelper {
 	/**
 	 * Clear messages.
 	 */
-	public static function clear(bool $clear_title = true): void {
-		if ($clear_title) {
-			self::$title = null;
-		}
+	public static function clear(): void {
+		self::$type = null;
+		self::$title = null;
 		self::$messages = [];
 	}
 

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,68 +62,50 @@
 
 // History mode.
 (() => {
-	const history_elem = document.querySelector('#history_div');
+	const history_toggle = document.getElementById('history_mode');
 
-	if (!history_elem) {
+	if (!history_toggle) {
 		return false;
 	}
 
-	let obj = history_elem;
-	if (history_elem.tagName === 'SPAN') {
-		obj = history_elem.originalObject;
-	}
+	history_toggle.addEventListener('change', () => {
+		const history_input = document.getElementById('history');
 
-	obj
-		.querySelector('#history_mode')
-		.addEventListener('change', (event) => {
-			const history_input = obj.querySelector('#history');
-			const state = obj.querySelector('#history_mode_<?= ITEM_STORAGE_OFF ?>').checked;
-			if (state) {
-				history_input.disabled = true;
-				history_input.style.display = 'none';
-			}
-			else {
-				history_input.disabled = false;
-				history_input.style.display = '';
-			}
-		});
+		if (document.getElementById('history_mode_<?= ITEM_STORAGE_OFF ?>').checked) {
+			history_input.style.display = 'none';
+			history_input.disabled = true;
+		}
+		else {
+			history_input.style.display = '';
+			history_input.disabled = false;
+		}
+	});
 
-	obj
-		.querySelector('#history_mode')
-		.dispatchEvent(new CustomEvent('change', {}));
+	history_toggle.dispatchEvent(new CustomEvent('change'));
 })();
 
 // Trends mode.
 (() => {
-	const trends_elem = document.querySelector('#trends_div');
+	const trends_toggle = document.getElementById('trends_mode');
 
-	if (!trends_elem) {
+	if (!trends_toggle) {
 		return false;
 	}
 
-	let obj = trends_elem;
-	if (trends_elem.tagName === 'SPAN') {
-		obj = trends_elem.originalObject;
-	}
+	trends_toggle.addEventListener('change', () => {
+		const trends_input = document.getElementById('trends');
 
-	obj
-		.querySelector('#trends_mode')
-		.addEventListener('change', (event) => {
-			const trends_input = obj.querySelector('#trends');
-			const state = obj.querySelector('#trends_mode_<?= ITEM_STORAGE_OFF ?>').checked;
-			if (state) {
-				trends_input.disabled = true;
-				trends_input.style.display = 'none';
-			}
-			else {
-				trends_input.disabled = false;
-				trends_input.style.display = '';
-			}
-		});
+		if (document.getElementById('trends_mode_<?= ITEM_STORAGE_OFF ?>').checked) {
+			trends_input.disabled = true;
+			trends_input.style.display = 'none';
+		}
+		else {
+			trends_input.disabled = false;
+			trends_input.style.display = '';
+		}
+	});
 
-	obj
-		.querySelector('#trends_mode')
-		.dispatchEvent(new CustomEvent('change', {}));
+	trends_toggle.dispatchEvent(new CustomEvent('change'));
 })();
 
 // Custom intervals.

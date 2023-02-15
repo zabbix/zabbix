@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,11 +27,15 @@ class CControllerPopupConditionOperations extends CControllerPopupConditionCommo
 	protected function getCheckInputs() {
 		return [
 			'type' =>			'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
-			'source' =>			'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]),
+			'source' =>			'required|in '.implode(',', [
+									EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+									EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+								]),
 			'validate' =>		'in 1',
 			'condition_type' =>	'in '.CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 			'operator' =>		'in '.CONDITION_OPERATOR_EQUAL,
-			'value' =>			'in '.implode(',', [EVENT_NOT_ACKNOWLEDGED, EVENT_ACKNOWLEDGED])
+			'value' =>			'in '.implode(',', [EVENT_NOT_ACKNOWLEDGED, EVENT_ACKNOWLEDGED]),
+			'row_index' =>		'int32'
 		];
 	}
 
@@ -69,6 +73,7 @@ class CControllerPopupConditionOperations extends CControllerPopupConditionCommo
 			'command' => '',
 			'message' => '',
 			'errors' => null,
+			'row_index' => $this->getInput('row_index'),
 			'action' => $this->getAction(),
 			'type' => $this->getInput('type'),
 			'last_type' => $this->getConditionLastType(),

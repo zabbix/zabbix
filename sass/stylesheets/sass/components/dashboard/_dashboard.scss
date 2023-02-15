@@ -147,14 +147,6 @@
 			color: $font-selected-color;
 		}
 	}
-
-	.sortable-dragging {
-		.sortable-item {
-			& > div {
-				@extend %cursor-dragging;
-			}
-		}
-	}
 }
 
 .dashboard-navigation-controls {
@@ -977,10 +969,6 @@
 	.msg-good,
 	.msg-warning {
 		margin: 0 10px;
-	}
-
-	&.dashboard-widget-fluid {
-		margin-right: 0;
 	}
 }
 

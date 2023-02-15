@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxexpr.h"
+#include "zbxsysinfo.h"
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -74,7 +74,7 @@ void	zbx_mock_test_entry(void **state)
 
 	key_moving_pointer = key;
 
-	if (expected_result != (actual_result = parse_key(&key_moving_pointer)))
+	if (expected_result != (actual_result = zbx_parse_key(&key_moving_pointer)))
 	{
 		fail_msg("Got %s instead of %s as a result.", zbx_result_string(actual_result),
 				zbx_result_string(expected_result));
@@ -82,11 +82,11 @@ void	zbx_mock_test_entry(void **state)
 
 	/* examine results */
 	if (NULL == key_moving_pointer)
-		fail_msg("parse_key() corrupted the pointer - it was set to NULL");
+		fail_msg("zbx_parse_key() corrupted the pointer - it was set to NULL");
 
 	if (key > key_moving_pointer)
 	{
-		fail_msg("parse_key() corrupted the pointer - it was moved backward from %p to %p",
+		fail_msg("zbx_parse_key() corrupted the pointer - it was moved backward from %p to %p",
 				key, key_moving_pointer);
 	}
 

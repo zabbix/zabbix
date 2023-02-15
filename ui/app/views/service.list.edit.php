@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,9 +119,9 @@ $filter->addFilterTab(_('Filter'), [
 		])
 ]);
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Services'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICE_LIST_EDIT))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SERVICE_EDIT))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,32 +21,14 @@ package oracle
 
 import (
 	"context"
+	"fmt"
 
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 func pdbHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var PDBInfo string
-
-	row, err := conn.QueryRow(ctx, `
-   		SELECT
-			JSON_ARRAYAGG(
-				JSON_OBJECT(NAME VALUE
-					JSON_OBJECT(
-						'open_mode' VALUE 
-							DECODE(OPEN_MODE, 
-								'MOUNTED',              1, 
-								'READ ONLY',            2, 
-								'READ WRITE',           3, 
-								'READ ONLY WITH APPLY', 4, 
-								'MIGRATE',              5, 
-							0)
-					)
-				)
-			)		
-		FROM
-			V$PDBS
-	`)
+	row, err := conn.QueryRow(ctx, getPDBQuery(params["Database"]))
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
@@ -61,4 +43,38 @@ func pdbHandler(ctx context.Context, conn OraClient, params map[string]string, _
 	}
 
 	return PDBInfo, nil
+}
+
+func getPDBQuery(name string) string {
+	var whereStr string
+	if name != "" {
+		whereStr = fmt.Sprintf(`WHERE NAME = '%s'`, name)
+	}
+
+	return fmt.Sprintf(`
+	SELECT
+		JSON_ARRAYAGG(
+			JSON_OBJECT(
+				NAME VALUE JSON_OBJECT(
+					'open_mode' VALUE DECODE(
+						OPEN_MODE,
+						'MOUNTED',
+						1,
+						'READ ONLY',
+						2,
+						'READ WRITE',
+						3,
+						'READ ONLY WITH APPLY',
+						4,
+						'MIGRATE',
+						5,
+						0
+					)
+				)
+			)
+		)
+		FROM
+			V$PDBS
+		%s
+`, whereStr)
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ class testAPIInfo extends CAPITest {
 		$error = [
 			'code' => -32602,
 			'message' => 'Invalid params.',
-			'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
+			'data' => 'The "apiinfo.version" method must be called without authorization header.'
 		];
 
 		$this->call('apiinfo.version', [], $error);

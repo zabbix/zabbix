@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -476,6 +476,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		ticks *= 1e12
 		ticks /= uint64(tail.timestamp.Sub(head.timestamp))
 
+		log.Tracef("Calling C function \"sysconf()\"")
 		return math.Round(float64(ticks)/float64(C.sysconf(C._SC_CLK_TCK))) / 10, nil
 	}
 	stats := &cpuUtilStats{accessed: now, history: make([]cpuUtilData, maxHistory)}

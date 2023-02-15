@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,17 +26,16 @@
 
 #include "zbxthreads.h"
 
-extern ZBX_THREAD_HANDLE	*threads;
+typedef void	(*zbx_on_exit_t)(int);
 
-void	service_start(int flags);
+void	zbx_service_start(int flags);
 
-int	ZabbixCreateService(const char *path, int multiple_agents);
+int	ZabbixCreateService(const char *path, int multiple_agents, const char *config_file);
 int	ZabbixRemoveService(void);
 int	ZabbixStartService(void);
 int	ZabbixStopService(void);
 
-typedef void	(*zbx_on_exit_t)(int);
-void	set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg);
+void	zbx_set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg);
 
 int	ZBX_IS_RUNNING(void);
 void	ZBX_DO_EXIT(void);

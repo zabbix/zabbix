@@ -1,0 +1,26 @@
+{
+	"manifest_version": 2.0,
+	"id": "clock",
+	"type": "widget",
+	"name": "Clock",
+	"namespace": "Clock",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"template_support": true,
+		"size": {
+			"width": 4,
+			"height": 3
+		},
+		"js_class": "CWidgetClock",
+		"refresh_rate": 900
+	},
+	"actions": {
+		"widget.clock.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

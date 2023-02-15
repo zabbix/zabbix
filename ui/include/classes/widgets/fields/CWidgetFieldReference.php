@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,16 @@
 **/
 
 
+namespace Zabbix\Widgets\Fields;
+
+use Zabbix\Widgets\CWidgetField;
+
 class CWidgetFieldReference extends CWidgetField {
 
+	public const DEFAULT_VALUE = '';
+
 	// This field name is reserved by Zabbix for this particular use case. See comments below.
-	const FIELD_NAME = 'reference';
+	public const FIELD_NAME = 'reference';
 
 	/**
 	 * Reference widget field. If added to widget, will generate unique value across the dashboard
@@ -33,20 +39,18 @@ class CWidgetFieldReference extends CWidgetField {
 		 * All reference fields for all widgets on dashboard should share the same name.
 		 * It is needed to make possible search if value is not taken by some other widget in same dashboard.
 		 */
-		parent::__construct(self::FIELD_NAME, null);
+		parent::__construct(self::FIELD_NAME);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
 	/**
-	 * Set field value.
-	 *
 	 * @param string $value  Reference value. Only numeric characters allowed.
-	 *
-	 * @return CWidgetFieldReference
 	 */
-	public function setValue($value) {
-		if ($value === '' || ctype_alnum($value)) {
+	public function setValue($value): self {
+		if ($value === '' || ctype_alnum((string) $value)) {
 			$this->value = $value;
 		}
 

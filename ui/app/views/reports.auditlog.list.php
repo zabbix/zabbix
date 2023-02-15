@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ $filter_actions_options = [];
 
 foreach ($data['actions'] as $value => $name) {
 	$filter_actions_options[] = [
-		'name' => $name,
+		'label' => $name,
 		'value' => $value,
 		'checked' => in_array($value, $data['auditlog_actions'])
 	];
@@ -49,40 +49,10 @@ foreach ($data['actions'] as $value => $name) {
 
 $filter_actions = (new CCheckBoxList('filter_actions'))
 	->setId('filter-actions')
-	->addClass(ZBX_STYLE_COLUMNS)
-	->addClass(ZBX_STYLE_COLUMNS_3)
+	->setColumns(3)
 	->setOptions($filter_actions_options);
 
-$filter_form = (new CFormList())
-	->addRow(new CLabel(_('Users'), 'filter_userids__ms'), [
-		(new CMultiSelect([
-			'name' => 'filter_userids[]',
-			'object_name' => 'users',
-			'data' => $data['userids'],
-			'placeholder' => '',
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'users',
-					'srcfld1' => 'userid',
-					'srcfld2' => 'fullname',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'filter_userids_'
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	])
-	->addRow(new CLabel(_('Resource'), $filter_resourcetype->getFocusableElementId()),
-		$filter_resourcetype
-	)
-	->addRow(_('Resource ID'), (new CTextBox('filter_resourceid', $data['resourceid']))
-		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	)
-	->addRow(_('Recordset ID'), (new CTextBox('filter_recordsetid', $data['recordsetid']))
-		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	)
-	->addRow(_('Actions'), $filter_actions);
-
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Audit log'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_AUDITLOG_LIST))
 	->addItem($filter
@@ -90,8 +60,40 @@ $widget = (new CWidget())
 		->setProfile($data['timeline']['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
-		->addFilterTab(_('Filter'), [$filter_form])
-);
+		->addFilterTab(_('Filter'), [
+			(new CFormList())
+				->addRow(new CLabel(_('Users'), 'filter_userids__ms'), [
+					(new CMultiSelect([
+						'name' => 'filter_userids[]',
+						'object_name' => 'users',
+						'data' => $data['userids'],
+						'placeholder' => '',
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'users',
+								'srcfld1' => 'userid',
+								'srcfld2' => 'fullname',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_userids_'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				])
+				->addRow(_('Actions'), $filter_actions
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				),
+			(new CFormList())
+				->addRow(new CLabel(_('Resource'), $filter_resourcetype->getFocusableElementId()),
+					$filter_resourcetype
+				)
+				->addRow(_('Resource ID'), (new CTextBox('filter_resourceid', $data['resourceid']))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+				->addRow(_('Recordset ID'), (new CTextBox('filter_recordsetid', $data['recordsetid']))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+		])
+	);
 
 $table = (new CTableInfo())
 	->setHeader([
@@ -154,7 +156,7 @@ $obj = [
 	'timeControl.processObjects();')
 )->show();
 
-$widget
+$html_page
 	->addItem(
 		(new CForm('get'))
 			->setName('auditForm')

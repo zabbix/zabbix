@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,82 +19,55 @@
 **/
 
 
+namespace Zabbix\Widgets\Fields;
+
+use Zabbix\Widgets\CWidgetField;
+
 class CWidgetFieldWidgetSelect extends CWidgetField {
 
-	private $search_by_value;
+	public const DEFAULT_VALUE = '';
+
+	private string $search_by_value;
 
 	/**
 	 * Field that creates a selection of widgets in current dashboard, filtered by given key of widget array.
 	 *
-	 * @param string $name         Name of field in config form and widget['fields'] array.
-	 * @param string $label        Field label in config form.
-	 * @param mixed  $search_type  Value that will be searched in widgets.
+	 * @param string $search_by_value  Value that will be searched in widgets.
 	 */
-	public function __construct($name, $label, $search_by_value) {
+	public function __construct(string $name, string $label = null, string $search_by_value = '') {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->search_by_value = $search_by_value;
+
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 	}
 
-	/**
-	 * Set additional flags, which can be used in configuration form.
-	 *
-	 * @param int $flags
-	 *
-	 * @return $this
-	 */
-	public function setFlags($flags) {
+	public function getSearchByValue(): string {
+		return $this->search_by_value;
+	}
+
+	public function setFlags(int $flags): self {
 		parent::setFlags($flags);
 
-		if ($flags & self::FLAG_NOT_EMPTY) {
+		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
 			$strict_validation_rules = $this->getValidationRules();
 			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
 			$this->setStrictValidationRules($strict_validation_rules);
 		}
 		else {
-			$this->setStrictValidationRules(null);
+			$this->setStrictValidationRules();
 		}
 
 		return $this;
 	}
 
-	/**
-	 * JS code, that should be executed, to fill the select element with values and select current one.
-	 *
-	 * @return string
-	 */
-	public function getJavascript() {
-		return '
-			var filter_select = document.getElementById("'.$this->getName().'");
-
-			filter_select.addOption('.json_encode(['label' => _('Select widget'), 'value' => '-1']).');
-			filter_select.selectedIndex = 0;
-
-			ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
-				if (widget.getType() === "'.$this->search_by_value.'") {
-					filter_select.addOption({label: widget.getHeaderName(), value: widget.getFields().reference});
-					if (widget.getFields().reference === "'.$this->getValue().'") {
-						filter_select.value = "'.$this->getValue().'";
-					}
-				}
-			});
-		';
-	}
-
-	public function setValue($value) {
-		if ($value === '' || ctype_alnum($value)) {
+	public function setValue($value): self {
+		if ($value === '' || ctype_alnum((string) $value)) {
 			$this->value = $value;
 		}
 
 		return $this;
-	}
-
-	public function setAction($action) {
-		throw new RuntimeException(sprintf('Method is not implemented: "%s".', __METHOD__));
-	}
-
-	public function getAction() {
-		throw new RuntimeException(sprintf('Method is not implemented: "%s".', __METHOD__));
 	}
 }

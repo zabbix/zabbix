@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,10 @@
 #include "../zbxreport.h"
 #include "report_protocol.h"
 
+#include "../alerter/alerter.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
 #include "zbxserialize.h"
-#include "zbxalert.h"
 
 static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zbx_uint64_t *value, char **error)
 {
@@ -33,7 +35,7 @@ static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zb
 		return FAIL;
 	}
 
-	if (SUCCEED != is_uint64(buf, value))
+	if (SUCCEED != zbx_is_uint64(buf, value))
 	{
 		*error = zbx_dsprintf(*error, "invalid tag %s value: %s", tag, buf);
 		return FAIL;
@@ -128,7 +130,7 @@ void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_
  ******************************************************************************/
 
 zbx_uint32_t	report_serialize_response(unsigned char **data, int status, const char *error,
-		const zbx_vector_ptr_t *results)
+		const zbx_vector_alerter_dispatch_result_t *results)
 {
 	zbx_uint32_t			data_len = 0, error_len, *recipient_len, *info_len;
 	unsigned char			*ptr;
@@ -146,7 +148,7 @@ zbx_uint32_t	report_serialize_response(unsigned char **data, int status, const c
 
 		for (i = 0; i < results->values_num; i++)
 		{
-			result = (zbx_alerter_dispatch_result_t *)results->values[i];
+			result = results->values[i];
 			zbx_serialize_prepare_value(data_len, result->status);
 			zbx_serialize_prepare_str_len(data_len, result->recipient, recipient_len[i]);
 			zbx_serialize_prepare_str_len(data_len, result->info, info_len[i]);
@@ -170,7 +172,7 @@ zbx_uint32_t	report_serialize_response(unsigned char **data, int status, const c
 
 		for (i = 0; i < results->values_num; i++)
 		{
-			result = (zbx_alerter_dispatch_result_t *)results->values[i];
+			result = results->values[i];
 			ptr += zbx_serialize_value(ptr, result->status);
 			ptr += zbx_serialize_str(ptr, result->recipient, recipient_len[i]);
 			ptr += zbx_serialize_str(ptr, result->info, info_len[i]);
@@ -185,7 +187,8 @@ zbx_uint32_t	report_serialize_response(unsigned char **data, int status, const c
 	return data_len;
 }
 
-void	report_deserialize_response(const unsigned char *data, int *status, char **error, zbx_vector_ptr_t *results)
+void	report_deserialize_response(const unsigned char *data, int *status, char **error,
+		zbx_vector_alerter_dispatch_result_t *results)
 {
 	zbx_uint32_t	len;
 
@@ -201,7 +204,7 @@ void	report_deserialize_response(const unsigned char *data, int *status, char **
 
 		if (0 != results_num)
 		{
-			zbx_vector_ptr_reserve(results, (size_t)results_num);
+			zbx_vector_alerter_dispatch_result_reserve(results, (size_t)results_num);
 
 			for (i = 0; i < results_num; i++)
 			{
@@ -209,7 +212,7 @@ void	report_deserialize_response(const unsigned char *data, int *status, char **
 				data += zbx_deserialize_value(data, &result->status);
 				data += zbx_deserialize_str(data, &result->recipient, len);
 				data += zbx_deserialize_str(data, &result->info, len);
-				zbx_vector_ptr_append(results, result);
+				zbx_vector_alerter_dispatch_result_append(results, result);
 			}
 		}
 	}
@@ -294,7 +297,7 @@ void	report_deserialize_begin_report(const unsigned char *data, char **name, cha
  *                                                                            *
  ******************************************************************************/
 
-zbx_uint32_t	report_serialize_send_report(unsigned char **data, const ZBX_DB_MEDIATYPE *mt,
+zbx_uint32_t	report_serialize_send_report(unsigned char **data, const zbx_db_mediatype *mt,
 		const zbx_vector_str_t *emails)
 {
 	zbx_uint32_t	data_len = 0, data_alloc = 1024, data_offset = 0, *params_len;
@@ -329,7 +332,7 @@ zbx_uint32_t	report_serialize_send_report(unsigned char **data, const ZBX_DB_MED
 	return data_offset + data_len;
 }
 
-void	report_deserialize_send_report(const unsigned char *data, ZBX_DB_MEDIATYPE *mt, zbx_vector_str_t *sendtos)
+void	report_deserialize_send_report(const unsigned char *data, zbx_db_mediatype *mt, zbx_vector_str_t *sendtos)
 {
 	zbx_uint32_t	len;
 	int		i, sendto_num;
@@ -372,18 +375,18 @@ void	report_destroy_params(zbx_vector_ptr_pair_t *params)
 
 void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j)
 {
-	zbx_uint64_t		dashboardid, viewer_userid, ui64;
-	int			ret = FAIL, period, report_time;
-	struct zbx_json_parse	jp_params;
-	zbx_vector_ptr_pair_t	params;
-	zbx_vector_ptr_t	results;
-	zbx_uint32_t		size;
-	unsigned char		*data = NULL, *response = NULL;
-	char			*name = NULL, *error = NULL;
-	size_t			name_alloc = 0;
+	zbx_uint64_t				dashboardid, viewer_userid, ui64;
+	int					ret = FAIL, period, report_time;
+	struct zbx_json_parse			jp_params;
+	zbx_vector_ptr_pair_t			params;
+	zbx_vector_alerter_dispatch_result_t	results;
+	zbx_uint32_t				size;
+	unsigned char				*data = NULL, *response = NULL;
+	char					*name = NULL, *error = NULL;
+	size_t					name_alloc = 0;
 
 	zbx_vector_ptr_pair_create(&params);
-	zbx_vector_ptr_create(&results);
+	zbx_vector_alerter_dispatch_result_create(&results);
 
 	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_NAME, &name, &name_alloc, NULL))
 	{
@@ -449,7 +452,7 @@ out:
 		{
 			zbx_json_addobject(j, NULL);
 
-			result = (zbx_alerter_dispatch_result_t *)results.values[i];
+			result = results.values[i];
 			zbx_json_addint64(j, ZBX_PROTO_TAG_STATUS, result->status);
 			zbx_json_addstring(j, ZBX_PROTO_TAG_RECIPIENT, result->recipient, ZBX_JSON_TYPE_STRING);
 			if (NULL != result->info)
@@ -469,7 +472,7 @@ out:
 	zbx_free(data);
 	zbx_free(name);
 
-	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_alerter_dispatch_result_free);
-	zbx_vector_ptr_destroy(&results);
+	zbx_vector_alerter_dispatch_result_clear_ext(&results, zbx_alerter_dispatch_result_free);
+	zbx_vector_alerter_dispatch_result_destroy(&results);
 	report_destroy_params(&params);
 }

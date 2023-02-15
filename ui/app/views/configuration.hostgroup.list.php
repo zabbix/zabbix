@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@
 
 $this->includeJsFile('configuration.hostgroup.list.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Host groups'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOSTGROUPS_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOSTGROUPS_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
@@ -114,21 +114,31 @@ foreach ($data['groups'] as $group) {
 	$host_count = $data['groupCounts'][$group['groupid']]['hosts'];
 
 	$name = [];
-	if ($group['discoveryRule']) {
-		if ($data['allowed_ui_conf_hosts']) {
-			$lld_name = (new CLink($group['discoveryRule']['name'],
-				(new CUrl('host_prototypes.php'))
-					->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
-					->setArgument('context', 'host')
-			));
+
+	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		if ($group['discoveryRule']) {
+			if ($data['allowed_ui_conf_hosts'] && $group['is_discovery_rule_editable']) {
+				$lld_name = (new CLink($group['discoveryRule']['name'],
+					(new CUrl('host_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
+						->setArgument('hostid', $group['hostPrototype']['hostid'])
+						->setArgument('context', 'host')
+				))->addClass(ZBX_STYLE_LINK_ALT);
+			}
+			else {
+				$lld_name = new CSpan($group['discoveryRule']['name']);
+			}
+
+			$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
 		}
 		else {
-			$lld_name = new CSpan($group['discoveryRule']['name']);
+			$name[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
 		}
 
-		$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
 		$name[] = NAME_DELIMITER;
 	}
+
 	$name[] = (new CLink(CHtml::encode($group['name']),
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'hostgroup.edit')
@@ -191,22 +201,24 @@ $form->addItem([
 	], 'hostgroup')
 ]);
 
-$widget
+$html_page
 	->addItem($form)
 	->show();
+
+$csrf_token = CCsrfTokenHelper::get('hostgroup');
 
 (new CScriptTag('view.init('.json_encode([
 	'enable_url' => (new CUrl('zabbix.php'))
 		->setArgument('action', 'hostgroup.enable')
-		->setArgumentSID()
+		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 		->getUrl(),
 	'disable_url' => (new CUrl('zabbix.php'))
 		->setArgument('action', 'hostgroup.disable')
-		->setArgumentSID()
+		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 		->getUrl(),
 	'delete_url' => (new CUrl('zabbix.php'))
 		->setArgument('action', 'hostgroup.delete')
-		->setArgumentSID()
+		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 		->getUrl()
 ]).');'))
 	->setOnDocumentReady()

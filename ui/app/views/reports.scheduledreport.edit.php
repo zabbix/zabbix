@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,11 +29,13 @@ $this->includeJsFile('reports.scheduledreport.edit.js.php', [
 	'dashboard_inaccessible' => $data['dashboard_inaccessible']
 ]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Scheduled reports'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_SCHEDULEDREPORT_EDIT));
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('scheduledreport')))->removeId())
 	->setId('scheduledreport-form')
 	->setName('scheduledreport-form')
 	->setAction(
@@ -41,7 +43,7 @@ $form = (new CForm())
 			->setArgument('action', ($data['reportid'] == 0) ? 'scheduledreport.create' : 'scheduledreport.update')
 			->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['reportid'] != 0) {
 	$form->addVar('reportid', $data['reportid']);
@@ -58,6 +60,6 @@ $form_grid = new CPartial('scheduledreport.formgrid.html', [
 
 $form->addItem((new CTabView())->addTab('scheduledreport_tab', _('Scheduled report'), $form_grid));
 
-$widget
+$html_page
 	->addItem($form)
 	->show();

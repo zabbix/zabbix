@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 #include "module.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 int	check_vcenter_cluster_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
@@ -51,6 +51,8 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 int	check_vcenter_datastore_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_datastore_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_datastore_property(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
@@ -99,6 +101,8 @@ int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username
 int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_diskinfo_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_fullname(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);

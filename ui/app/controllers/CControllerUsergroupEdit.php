@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ class CControllerUsergroupEdit extends CController {
 	private $user_group = [];
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -141,7 +141,8 @@ class CControllerUsergroupEdit extends CController {
 
 		if ($data['can_update_group']) {
 			$userdirectories = API::UserDirectory()->get([
-				'output' => ['userdirectoryid', 'name']
+				'output' => ['userdirectoryid', 'name'],
+				'filter' => ['idp_type' => IDP_TYPE_LDAP]
 			]);
 			CArrayHelper::sort($userdirectories, ['name']);
 			$data['userdirectories'] = array_column($userdirectories, 'name', 'userdirectoryid');

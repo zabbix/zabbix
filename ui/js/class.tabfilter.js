@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ class CTabFilter extends CBaseComponent {
 		this._fetch = {};
 		this._idx_namespace = options.idx;
 		this._timeselector = null;
+		this._csrf_token = this._options.csrf_token;
 
 		this.init(options);
 		this.registerEvents();
@@ -56,7 +57,7 @@ class CTabFilter extends CBaseComponent {
 			options.data[options.selected].expanded = true;
 		}
 
-		for (const template of this._target.querySelectorAll('[type="text/x-jquery-tmpl"][data-template]')) {
+		for (const template of this._target.querySelectorAll('[data-template]')) {
 			this._templates[template.getAttribute('data-template')] = template;
 		}
 
@@ -253,6 +254,7 @@ class CTabFilter extends CBaseComponent {
 		}
 
 		body.idx = this._idx_namespace + '.' + property;
+		body._csrf_token = this._csrf_token;
 
 		if (property !== 'properties') {
 			this._fetch[property] = new AbortController();
@@ -620,14 +622,14 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Update' button press.
 			 */
 			buttonUpdateAction: () => {
-				var params = this._active_item.getFilterParams();
+				var params = this._active_item.getFilterParams(false);
 
 				this.profileUpdate('properties', {
 					idx2: this._active_item._index,
 					value_str: params.toString()
 				})
 				.then(() => {
-					this._active_item.updateApplyUrl();
+					this._active_item.updateApplyUrl(false);
 					this._active_item.setBrowserLocation(params);
 					this._active_item.resetUnsavedState();
 				});
@@ -650,8 +652,8 @@ class CTabFilter extends CBaseComponent {
 			buttonApplyAction: () => {
 				this._active_item.unsetExpandedSubfilters();
 				this._active_item.emptySubfilter();
-				this._active_item.updateUnsavedState();
-				this._active_item.updateApplyUrl();
+				this._active_item.updateUnsavedState(false);
+				this._active_item.updateApplyUrl(false);
 				this._active_item.setBrowserLocationToApplyUrl();
 			},
 
@@ -660,7 +662,7 @@ class CTabFilter extends CBaseComponent {
 			 */
 			buttonResetAction: () => {
 				let current_url = new Curl(),
-					url = new Curl('zabbix.php', false);
+					url = new Curl('zabbix.php');
 
 				url.setArgument('action', current_url.getArgument('action'));
 				url.setArgument('filter_reset', 1);

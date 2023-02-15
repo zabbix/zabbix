@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -604,12 +604,12 @@ class testRole extends CAPITest {
 	* @dataProvider role_update
 	*/
 	public function testRole_Update($role, $expected_error) {
-//		if (isset($role['roleid'])) {
+		if (isset($role['roleid'])) {
 			if (isset($role['roleid']) && $role['roleid'] === 'roleid_3' ||
 				isset($role['roleid']) && $role['roleid'] === 'roleid_4') {
 				$role['roleid'] = (int) self::$data['roleids'][$role['roleid']];
 			}
-//		}
+		}
 
 		$result = $this->call('role.update', $role, $expected_error);
 

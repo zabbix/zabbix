@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,12 @@
 
 class CLdap {
 
+	const BIND_NONE = 0;
+	const BIND_ANONYMOUS = 1;
+	const BIND_CONFIG_CREDENTIALS = 2;
+	const BIND_DNSTRING = 3;
+
+	const ERR_NONE = 0;
 	const ERR_PHP_EXTENSION = 1;
 	const ERR_SERVER_UNAVAILABLE = 2;
 	const ERR_BIND_FAILED = 3;
@@ -30,11 +36,43 @@ class CLdap {
 	const ERR_OPT_TLS_FAILED = 11;
 	const ERR_OPT_REFERRALS_FAILED = 12;
 	const ERR_OPT_DEREF_FAILED = 13;
+	const ERR_BIND_DNSTRING_UNAVAILABLE = 14;
+	const ERR_QUERY_FAILED = 15;
+
+	const DEFAULT_FILTER_USER = '(%{attr}=%{user})';
+	const DEFAULT_FILTER_GROUP = '(%{groupattr}=%{user})';
+	const DEFAULT_MEMBERSHIP_ATTRIBUTE = 'memberOf';
+
+	/**
+	 * Type of binding made to LDAP server. One of static::BIND_ constant value.
+	 *
+	 * @var int
+	 */
+	public $bound;
+
+	/**
+	 * @var int
+	 */
+	public $error;
+
+	/**
+	 * Bind type to use when searching in LDAP tree. One of static::BIND_ constant value.
+	 *
+	 * @var int
+	 */
+	public $bind_type;
+
+	/**
+	 * Bind DN string, may contain placeholders when BIND_TYPE_DNSTRING is detected.
+	 *
+	 * @var string
+	 */
+	protected $bind_dn;
 
 	/**
 	 * @var array $cnf  LDAP connection settings.
 	 */
-	private $cnf = [
+	protected $cnf = [
 		'host'				=> '',
 		'port'				=> '',
 		'bind_dn'			=> '',
@@ -42,36 +80,53 @@ class CLdap {
 		'base_dn'			=> '',
 		'search_attribute'	=> '',
 		'search_filter'		=> '',
-		'groupkey'			=> 'cn',
-		'mapping'			=> [
-			'username' => 'uid',
-			'userid' => 'uidnumbera',
-			'passwd' => 'userpassword'
-		],
+		'group_basedn'		=> '',
+		'group_name'		=> '',
+		'group_member'		=> '',
+		'group_filter'		=> '',
+		'group_membership'	=> '',
 		'referrals'			=> 0,
 		'version'			=> 3,
 		'start_tls'			=> ZBX_AUTH_START_TLS_OFF,
-		'deref' => null
+		'deref'				=> null
 	];
 
 	/**
-	 * @var int
+	 * Placeholders with value used for building bind or search filter query.
+	 * Key is placeholder name, %{attr} and value is placeholder value to replace to.
+	 *
+	 * @var array
 	 */
-	public $error;
+	protected $placeholders = [];
 
-	public function __construct($arg = []) {
+	/**
+	 * Estabilished LDAP connection resource, for PHP8.1.0+ LDAP\Connection class instance.
+	 *
+	 * @var bool|resource|LDAP\Connection
+	 */
+	protected $ds;
+
+	public function __construct(array $config = []) {
 		$this->ds = false;
-		$this->info = [];
+		$this->bound = static::BIND_NONE;
+		$this->error = static::ERR_NONE;
 
-		if (is_array($arg)) {
-			$this->cnf = zbx_array_merge($this->cnf, $arg);
-		}
+		$this->cnf = zbx_array_merge($this->cnf, $config);
 
 		if ($this->cnf['search_filter'] === '') {
-			$this->cnf['search_filter'] = '(%{attr}=%{user})';
+			$this->cnf['search_filter'] = static::DEFAULT_FILTER_USER;
 		}
 
-		$this->error = $this->moduleEnabled() ? 0 : static::ERR_PHP_EXTENSION;
+		if ($this->cnf['group_filter'] === '') {
+			$this->cnf['group_filter'] = static::DEFAULT_FILTER_GROUP;
+		}
+
+		if ($this->cnf['group_membership'] === '') {
+			$this->cnf['group_membership'] = static::DEFAULT_MEMBERSHIP_ATTRIBUTE;
+		}
+
+		$this->initBindAttributes();
+		$this->error = $this->moduleEnabled() ? static::ERR_NONE : static::ERR_PHP_EXTENSION;
 	}
 
 	/**
@@ -79,21 +134,26 @@ class CLdap {
 	 *
 	 * @return bool
 	 */
-	public function moduleEnabled() {
+	public function moduleEnabled(): bool {
 		return function_exists('ldap_connect') && function_exists('ldap_set_option') && function_exists('ldap_bind')
 			&& function_exists('ldap_search') && function_exists('ldap_get_entries')
 			&& function_exists('ldap_free_result') && function_exists('ldap_start_tls');
 	}
 
-	public function connect() {
-		$this->error = 0;
+	/**
+	 * Initialize connection to LDAP server. Set LDAP connection options defined in configuration when required.
+	 * Return true on success.
+	 *
+	 * @return bool
+	 */
+	public function connect(): bool {
+		$this->error = static::ERR_NONE;
 
-		// connection already established
-		if ($this->ds) {
+		if ($this->ds !== false) {
 			return true;
 		}
 
-		$this->bound = 0;
+		$this->bound = static::BIND_NONE;
 
 		if (!$this->ds = @ldap_connect($this->cnf['host'], $this->cnf['port'])) {
 			$this->error = static::ERR_SERVER_UNAVAILABLE;
@@ -106,170 +166,365 @@ class CLdap {
 			if (!@ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, $this->cnf['version'])) {
 				$this->error = static::ERR_OPT_PROTOCOL_FAILED;
 			}
-			else {
-				// use TLS (needs version 3)
+			elseif ($this->cnf['version'] == 3) {
 				if ($this->cnf['start_tls'] && !@ldap_start_tls($this->ds)) {
 					$this->error = static::ERR_OPT_TLS_FAILED;
 				}
 
-				// needs version 3
-				if (!zbx_empty($this->cnf['referrals'])
+				if (!$this->cnf['referrals']
 						&& !@ldap_set_option($this->ds, LDAP_OPT_REFERRALS, $this->cnf['referrals'])) {
 					$this->error = static::ERR_OPT_REFERRALS_FAILED;
 				}
 			}
 		}
 
-		// set deref mode
 		if (isset($this->cnf['deref']) && !@ldap_set_option($this->ds, LDAP_OPT_DEREF, $this->cnf['deref'])) {
 			$this->error = static::ERR_OPT_DEREF_FAILED;
 		}
 
-		return !$this->error;
+		return $this->error == static::ERR_NONE;
 	}
 
-	public function checkPass($user, $pass) {
+	/**
+	 * Bind to LDAP server. Set $this->bound to type of successful binding.
+	 * Arguments $user and $password are required when bind type BIND_DNSTRING is set.
+	 *
+	 * Bind types:
+	 * BIND_CONFIG_CREDENTIALS - Special configuration user is used to bind and search.
+	 * BIND_ANONYMOUS          - Anonymous user is used to bind and search.
+	 * BIND_DNSTRING           - Logging in user is used to bind and search.
+	 *
+	 * Both arguments $user and $password are required for bind type BIND_DNSTRING only.
+	 *
+	 * @param string $user      User name value.
+	 * @param string $password  Password value.
+	 *
+	 * @return bool
+	 */
+	public function bind($user = null, $password = null): bool {
+		$this->bound = static::BIND_NONE;
+
+		if ($this->bind_type == static::BIND_ANONYMOUS) {
+			if (!@ldap_bind($this->ds)) {
+				$this->error = static::ERR_BIND_ANON_FAILED;
+
+				return false;
+			}
+
+			$this->bound = static::BIND_ANONYMOUS;
+
+			return true;
+		}
+
+		$dn = $this->bind_dn;
+		$dn_password = $this->cnf['bind_password'];
+
+		if ($this->bind_type == static::BIND_DNSTRING) {
+			if ($user === null || $password === null) {
+				$this->error = static::ERR_BIND_DNSTRING_UNAVAILABLE;
+
+				return false;
+			}
+
+			$dn = $this->makeFilter($this->bind_dn, ['%{user}' => $user], LDAP_ESCAPE_DN);
+			$dn_password = $password;
+		}
+
+		if (!@ldap_bind($this->ds, $dn, $dn_password)) {
+			$this->error = static::ERR_BIND_FAILED;
+
+			return false;
+		}
+
+		$this->bound = $this->bind_type;
+
+		return true;
+	}
+
+	/**
+	 * Check validity of user credentials. Do not allow to check credentials when password is empty.
+	 *
+	 * @param string $user  User name attribute value.
+	 * @param string $pass  User password attribute value.
+	 *
+	 * @return bool
+	 */
+	public function checkCredentials(string $user, string $pass): bool {
 		if (!$pass) {
 			$this->error = static::ERR_USER_NOT_FOUND;
 
 			return false;
 		}
 
-		if (!$this->connect()) {
+		if (!$this->connect() || !$this->bind($user, $pass)) {
 			return false;
 		}
 
-		$dn = null;
-
-		// indirect user bind
-		if (!empty($this->cnf['bind_dn']) && !empty($this->cnf['bind_password'])) {
-			// use superuser credentials
-			if (!@ldap_bind($this->ds, $this->cnf['bind_dn'], $this->cnf['bind_password'])) {
-				$this->error = static::ERR_BIND_FAILED;
-
-				return false;
+		if (!$this->bind($user, $pass)) {
+			if ($this->bind_type == static::BIND_DNSTRING) {
+				$this->serror = static::ERR_USER_NOT_FOUND;
 			}
 
-			$this->bound = 2;
-		}
-		elseif (!empty($this->cnf['bind_dn']) && !empty($this->cnf['base_dn']) && !empty($this->cnf['search_filter'])) {
-			// special bind string
-			$dn = $this->makeFilter($this->cnf['bind_dn'], ['user' => $user, 'host' => $this->cnf['host']]);
-		}
-		elseif (strpos($this->cnf['base_dn'], '%{user}')) {
-			// direct user bind
-			$dn = $this->makeFilter($this->cnf['base_dn'], ['user' => $user, 'host' => $this->cnf['host']]);
-		}
-		else {
-			// anonymous bind
-			if (!@ldap_bind($this->ds)) {
-				$this->error = static::ERR_BIND_ANON_FAILED;
-
-				return false;
-			}
+			return false;
 		}
 
-		// try to bind to with the dn if we have one.
-		if ($dn) {
-			// user/password bind
-			if (!@ldap_bind($this->ds, $dn, $pass)) {
+		if ($this->bound == static::BIND_ANONYMOUS || $this->bound == static::BIND_CONFIG_CREDENTIALS) {
+			// No need for user default attributes, only 'dn'.
+			$users = $this->search($this->cnf['base_dn'], $this->cnf['search_filter'], ['%{user}' => $user], ['dn']);
+
+			if ($users['count'] != 1) {
+				// Multiple users matched criteria.
 				$this->error = static::ERR_USER_NOT_FOUND;
 
 				return false;
 			}
 
-			$this->bound = 1;
-		}
-		else {
-			// see if we can find the user
-			$this->info = $this->getUserData($user);
-
-			if (empty($this->info['dn'])) {
-				return false;
-			}
-			else {
-				$dn = $this->info['dn'];
-			}
-
-			// try to bind with the dn provided
-			if (!@ldap_bind($this->ds, $dn, $pass)) {
+			if (!array_key_exists('dn', $users[0]) || !@ldap_bind($this->ds, $users[0]['dn'], $pass)) {
 				$this->error = static::ERR_USER_NOT_FOUND;
 
 				return false;
 			}
-
-			$this->bound = 1;
 		}
 
 		return true;
 	}
 
-	private function getUserData($user) {
-		if (!$this->connect()) {
-			return false;
+	/**
+	 * Get array of user groups. Is not available for bind type BIND_DNSTRING if password is not supplied.
+	 *
+	 * @param array  $attributes  Array of group attributes to return for every group.
+	 * @param string $user        User username value.
+	 * @param string $password    User password value, is required only for BIND_DNSTRING.
+	 *
+	 * @return array Array of arrays of matched group.
+	 */
+	public function getGroupAttributes(array $attributes, string $user, $password = null): array {
+		if ($attributes == [] || !$this->connect() || !$this->bind($user, $password)) {
+			return [];
 		}
 
-		// force superuser bind if wanted and not bound as superuser yet
-		if (!empty($this->cnf['bind_dn']) && !empty($this->cnf['bind_password']) && ($this->bound < 2)) {
-			if (!@ldap_bind($this->ds, $this->cnf['bind_dn'], $this->cnf['bind_password'])) {
-				$this->error = static::ERR_BIND_FAILED;
+		$placeholders = [
+			'%{user}'	=> $user,
+			'%{groupattr}'	=> $this->cnf['group_member']
+		];
+		$results = $this->search($this->cnf['group_basedn'], $this->cnf['group_filter'], $placeholders, $attributes);
+		$groups = [];
 
-				return false;
+		if ($results['count'] == 0) {
+			return $groups;
+		}
+
+		$attributes = array_flip(array_map('strtolower', $attributes));
+
+		for ($j = 0; $j < $results['count']; $j++) {
+			$result = $results[$j];
+			$result_attributes = array_intersect_key($result, $attributes);
+
+			if (!$result_attributes) {
+				continue;
 			}
-			$this->bound = 2;
-		}
 
-		// with no superuser creds we continue as user or anonymous here
-		$info['user'] = $user;
-		$info['host'] = $this->cnf['host'];
-
-		// get info for given user
-		$base = $this->makeFilter($this->cnf['base_dn'], $info);
-		$filter = $this->makeFilter($this->cnf['search_filter'], $info);
-		$sr = @ldap_search($this->ds, $base, $filter);
-		$result = $sr !== false ? @ldap_get_entries($this->ds, $sr) : [];
-
-		// don't accept more or less than one response
-		if (!$result || $result['count'] != 1) {
-			$this->error = $result ? static::ERR_USER_NOT_FOUND : static::ERR_BIND_FAILED;
-
-			return false;
-		}
-
-		$user_result = $result[0];
-		ldap_free_result($sr);
-
-		// general user info
-		$info['dn'] = $user_result['dn'];
-		$info['name'] = $user_result['cn'][0];
-		$info['grps'] = [];
-
-		// overwrite if other attributes are specified.
-		if (is_array($this->cnf['mapping'])) {
-			foreach ($this->cnf['mapping'] as $localkey => $key) {
-				$info[$localkey] = isset($user_result[$key])?$user_result[$key][0]:null;
+			foreach ($result_attributes as &$value) {
+				$value = $value[0];
 			}
-		}
-		$user_result = zbx_array_merge($info,$user_result);
+			unset($value);
 
-		return $info;
+			$groups[] = $result_attributes;
+		}
+
+		return $groups;
 	}
 
-	private function makeFilter($filter, $placeholders) {
-		$placeholders['attr'] = $this->cnf['search_attribute'];
-		preg_match_all("/%{([^}]+)/", $filter, $matches, PREG_PATTERN_ORDER);
+	/**
+	 * Get user data with specified attributes. Is not available for bind type BIND_DNSTRING if password is not supplied.
+	 * Mapping attribute names will be set in lower case.
+	 *
+	 * @param array  $attributes  Array of LDAP tree attributes names to be returned.
+	 * @param string $user        User to search attributes for.
+	 * @param string $password    User password, is required only for BIND_DNSTRING.
+	 *
+	 * @param array Associative array of user attributes.
+	 */
+	public function getUserAttributes(array $attributes, string $user, $password = null): array {
+		if ($attributes == [] || !$this->connect() || !$this->bind($user, $password)) {
+			return [];
+		}
 
-		// replace each match
-		foreach ($matches[1] as $match) {
-			// take first element if array
-			if (is_array($placeholders[$match])) {
-				$value = $placeholders[$match][0];
+		$placeholders = ['%{user}' => $user];
+		$results = $this->search($this->cnf['base_dn'], $this->cnf['search_filter'], $placeholders, $attributes);
+		$user = [];
+
+		if ($results['count'] == 0) {
+			return $user;
+		}
+
+		$results = $results[0];
+
+		if ($results['count'] == 0) {
+			return $user;
+		}
+
+		for ($i = 0; $i < $results['count']; $i++) {
+			$key = $results[$i];
+			[$key => $value] = $results;
+
+			if (strtolower($key) === strtolower($this->cnf['group_membership'])) {
+				$groups = [];
+				$regex = '/'.preg_quote($this->cnf['group_name'], '/').'=(?<groupname>[^,]+)/';
+				unset($value['count']);
+
+				/*
+				 * Extract group names from their DN strings.
+				 * For DN string "cn=zabbix-admins,ou=Group,dc=example,dc=org" and "Group name attribute" set to "cn"
+				 * will store string "zabbix-admins" in $groups array.
+				 */
+				foreach ($value as $group_dn) {
+					if (preg_match($regex, $group_dn, $match)) {
+						$groups[] = $match['groupname'];
+					}
+				}
+
+				$user[$this->cnf['group_membership']] = $groups;
 			}
 			else {
-				$value = $placeholders[$match];
+				$user[$key] = $value[0];
 			}
-			$filter = str_replace('%{'.$match.'}', $value, $filter);
 		}
-		return $filter;
+
+		return $user;
+	}
+
+	/**
+	 * Setter for additional placeholders supported in bind or search query.
+	 *
+	 * @param array $placeholders  Associative array where key is placeholder in form %{name}.
+	 */
+	public function setQueryPlaceholders(array $placeholders) {
+		$this->placeholders = $placeholders;
+	}
+
+	/**
+	 * Return user data with medias, groups, roleid and user attributes matched from LDAP user data according
+	 * provisioning options. All attributes are matched in case insensitive way.
+	 *
+	 * @param CProvisioning $provisioning      Provisioning class instance.
+	 * @param string        $username          Username of user to get provisioned data for.
+	 *
+	 * @return array
+	 */
+	public function getProvisionedData(CProvisioning $provisioning, string $username): array {
+		$ldap_groups = [];
+		$user = [
+			'medias' => [],
+			'usrgrps' => [],
+			'roleid' => 0
+		];
+		$config = $provisioning->getIdpConfig();
+		$user_attributes = $provisioning->getUserIdpAttributes();
+		$idp_user = $this->getUserAttributes($user_attributes, $username);
+		$user = $provisioning->getUserAttributes($idp_user, false);
+		$user['medias'] = $provisioning->getUserMedias($idp_user, false);
+
+		if ($config['group_membership'] !== '') {
+			$group_key = strtolower($config['group_membership']);
+
+			if (array_key_exists($group_key, $idp_user) && is_array($idp_user[$group_key])) {
+				$ldap_groups = $idp_user[$group_key];
+			}
+		}
+		else if ($config['group_filter'] !== '') {
+			$user_ref_attr = strtolower($config['user_ref_attr']);
+
+			if ($user_ref_attr !== '' && array_key_exists($user_ref_attr, $idp_user)) {
+				$this->setQueryPlaceholders(['%{ref}' => $idp_user[$user_ref_attr]]);
+			}
+
+			$group_attributes = $provisioning->getGroupIdpAttributes();
+			$ldap_groups = $this->getGroupAttributes($group_attributes, $username);
+			$ldap_groups = array_column($ldap_groups, strtolower($config['group_name']));
+		}
+
+		$user = array_merge($user, $provisioning->getUserGroupsAndRole($ldap_groups));
+
+		return $user;
+	}
+
+	/**
+	 * Setup bind attributes according LDAP configuration.
+	 */
+	protected function initBindAttributes() {
+		$this->bind_type = static::BIND_ANONYMOUS;
+
+		if ($this->cnf['bind_dn'] !== '' && $this->cnf['bind_password'] !== '') {
+			$this->bind_type = static::BIND_CONFIG_CREDENTIALS;
+			$this->bind_dn = $this->cnf['bind_dn'];
+		}
+		elseif ($this->cnf['bind_dn'] !== '' && $this->cnf['search_filter'] !== static::DEFAULT_FILTER_USER) {
+			$this->bind_type = static::BIND_DNSTRING;
+			$this->bind_dn = $this->cnf['bind_dn'];
+		}
+		elseif (strpos($this->cnf['base_dn'], '%{user}') !== false) {
+			$this->bind_type = static::BIND_DNSTRING;
+			$this->bind_dn = $this->cnf['base_dn'];
+		}
+	}
+
+	/**
+	 * Replaces placeholders found in string with their data.
+	 *
+	 * @param string $filter         Filter string where to replace placeholders.
+	 * @param array  $placeholders   Associative array for replacement in $filter string.
+	 *                               Placeholders %{attr}, %{host} will be added by default,
+	 *                               array key should be in form %{placeholder_key_value}.
+	 * @param int    escape_context  Resulting string usage context:
+	 *                                 LDAP_ESCAPE_FILTER - use result string as filter argument of ldap_search.
+	 *                                 LDAP_ESCAPE_DN     - use result string as base dn.
+	 *
+	 * @return string Filter string with replaced placeholders in it.
+	 */
+	protected function makeFilter(string $filter, array $placeholders, $escape_context): string {
+		$replace_pairs = $placeholders + [
+			'%{attr}'	=> $this->cnf['search_attribute'],
+			'%{host}'	=> $this->cnf['host']
+		];
+
+		foreach ($replace_pairs as &$value) {
+			$value = ldap_escape($value, '', $escape_context);
+		}
+		unset($value);
+
+		return strtr($filter, $replace_pairs);
+	}
+
+	/**
+	 * Search for entry in LDAP tree for specified $dn and $filter.
+	 *
+	 * @param string $dn            DN string value, supports placeholders.
+	 * @param string $filter        Filter string, supports placeholders.
+	 * @param array  $placeholders  Associative array of placeholders for creating base and filter for ldap_search.
+	 * @param array  $attributes    List of attributes to be returned.
+	 *
+	 * @return array Array of ldap_get_entries.
+	 */
+	protected function search(string $dn, string $filter, array $placeholders, array $attributes): array {
+		$this->error = static::ERR_NONE;
+		$base = $this->makeFilter($dn, $placeholders, LDAP_ESCAPE_DN);
+		$filter = $this->makeFilter($filter, $placeholders + $this->placeholders, LDAP_ESCAPE_FILTER);
+		$resource = @ldap_search($this->ds, $base, $filter, $attributes);
+		$results = false;
+
+		if ($resource !== false) {
+			// All attributes keys, in result array, will be in lowercase.
+			$results = @ldap_get_entries($this->ds, $resource);
+			ldap_free_result($resource);
+		}
+
+		if ($resource === false || $results === false) {
+			$this->error = static::ERR_QUERY_FAILED;
+
+			return ['count' => 0];
+		}
+
+		return $results;
 	}
 }

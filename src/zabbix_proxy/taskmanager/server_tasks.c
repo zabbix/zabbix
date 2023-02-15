@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,29 +17,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxtasks.h"
-#include "zbxnum.h"
+#include "taskmanager.h"
 #include "zbxdbhigh.h"
+#include "zbxnum.h"
+#include "zbxtasks.h"
+#include "zbxversion.h"
 
 /******************************************************************************
  *                                                                            *
  * Purpose: get tasks scheduled to be executed on the server                  *
  *                                                                            *
- * Parameters: tasks        - [OUT] the tasks to execute                      *
- *             proxy_hostid - [IN] (ignored)                                  *
+ * Parameters: tasks         - [OUT] the tasks to execute                     *
+ *             proxy_hostid  - [IN] (ignored)                                 *
+ *             compatibility - [IN] (ignored)                                 *
  *                                                                            *
  * Comments: This function is used by proxy to get tasks to be sent to the    *
  *           server.                                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
+		zbx_proxy_compatibility_t compatibility)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	ZBX_UNUSED(proxy_hostid);
+	ZBX_UNUSED(compatibility);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select t.taskid,t.type,t.clock,t.ttl,"
 				"r.status,r.parent_taskid,r.info,"
 				"tr.status,tr.parent_taskid,tr.info,"
@@ -57,7 +62,7 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 			ZBX_TM_STATUS_NEW, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_TASK_DATA_RESULT,
 			ZBX_TM_PROXYDATA);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	taskid, parent_taskid;
 		zbx_tm_task_t	*task;
@@ -68,7 +73,7 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 		switch (task->type)
 		{
 			case ZBX_TM_TASK_REMOTE_COMMAND_RESULT:
-				if (SUCCEED == DBis_null(row[4]))
+				if (SUCCEED == zbx_db_is_null(row[4]))
 				{
 					zbx_free(task);
 					continue;
@@ -79,7 +84,7 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 				task->data = zbx_tm_remote_command_result_create(parent_taskid, atoi(row[4]), row[6]);
 				break;
 			case ZBX_TM_TASK_DATA_RESULT:
-				if (SUCCEED == DBis_null(row[7]))
+				if (SUCCEED == zbx_db_is_null(row[7]))
 				{
 					zbx_free(task);
 					continue;
@@ -90,7 +95,7 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 				task->data = zbx_tm_data_result_create(parent_taskid, atoi(row[7]), row[9]);
 				break;
 			case ZBX_TM_PROXYDATA:
-				if (SUCCEED == DBis_null(row[10]))
+				if (SUCCEED == zbx_db_is_null(row[10]))
 				{
 					zbx_free(task);
 					continue;
@@ -101,8 +106,8 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 				break;
 		}
 
-		zbx_vector_ptr_append(tasks, task);
+		zbx_vector_tm_task_append(tasks, task);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }

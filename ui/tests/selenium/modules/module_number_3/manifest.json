@@ -1,5 +1,5 @@
 {
-	"manifest_version": 1.01,
+	"manifest_version": 2.01,
 	"id": "3",
 	"name": "This module should not be loaded",
 	"author": "module author",

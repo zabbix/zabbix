@@ -1,0 +1,34 @@
+{
+	"manifest_version": 2.0,
+	"id": "navtree",
+	"type": "widget",
+	"name": "Map navigation tree",
+	"namespace": "NavTree",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"actions": {
+		"widget.navtree.view": {
+			"class": "WidgetView"
+		},
+		"widget.navtree.item.edit": {
+			"class": "NavTreeItemEdit",
+			"view": "navtreeitem.edit",
+			"layout": "layout.json"
+		},
+		"widget.navtree.item.update": {
+			"class": "NavTreeItemUpdate",
+			"layout": "layout.json"
+		}
+	},
+	"widget": {
+		"size": {
+			"width": 6,
+			"height": 5
+		},
+		"js_class": "CWidgetNavTree",
+		"refresh_rate": 900
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

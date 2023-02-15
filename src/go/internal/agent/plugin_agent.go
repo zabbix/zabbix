@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ func processConfigItem(timeout time.Duration, name, value, item string, length i
 		return "", fmt.Errorf("value is not a UTF-8 string.")
 	}
 
-	if len(value) > length {
+	if utf8.RuneCountInString(value) > length {
 		log.Warningf("the returned value of \"%s\" item specified by \"%sItem\" configuration parameter"+
 			" is too long, using first %d characters.", item, name, length)
 
@@ -105,7 +105,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		return processConfigItem(time.Duration(Options.Timeout)*time.Second, "HostMetadata",
-			Options.HostMetadata, Options.HostMetadataItem, 255, LocalChecksClientID)
+			Options.HostMetadata, Options.HostMetadataItem, HostMetadataLen, LocalChecksClientID)
 	case "agent.ping":
 		return 1, nil
 	case "agent.variant":

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,31 +24,35 @@
 #include "zbxregexp.h"
 #include "zbxcompress.h"
 #include "zbxcrypto.h"
-
 #include "zbxnum.h"
 #include "zbxcomms.h"
 #include "zbxip.h"
+#include "zbxsysinfo.h"
+#include "zbxversion.h"
+#include "zbx_host_constants.h"
+#include "zbx_item_constants.h"
 
 extern unsigned char	program_type;
 
-/******************************************************************************
- *                                                                            *
- * Purpose: perform active agent auto registration                            *
- *                                                                            *
- * Parameters: host          - [IN] name of the host to be added or updated   *
- *             ip            - [IN] IP address of the host                    *
- *             port          - [IN] port of the host                          *
- *             connection_type - [IN] ZBX_TCP_SEC_UNENCRYPTED,                *
- *                             ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT    *
- *             host_metadata - [IN] host metadata                             *
- *             flag          - [IN] flag describing interface type            *
- *             interface     - [IN] interface value if flag is not default    *
- *                                                                            *
- * Comments: helper function for get_hostid_by_host                           *
- *                                                                            *
- ******************************************************************************/
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: perform active agent auto registration                                *
+ *                                                                                *
+ * Parameters: host            - [IN] name of the host to be added or updated     *
+ *             ip              - [IN] IP address of the host                      *
+ *             port            - [IN] port of the host                            *
+ *             connection_type - [IN] ZBX_TCP_SEC_UNENCRYPTED,                    *
+ *                                    ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT *
+ *             host_metadata   - [IN] host metadata                               *
+ *             flag            - [IN] flag describing interface type              *
+ *             interface       - [IN] interface value if flag is not default      *
+ *             config_timeout  - [IN]                                             *
+ *                                                                                *
+ * Comments: helper function for get_hostid_by_host                               *
+ *                                                                                *
+ **********************************************************************************/
 static void	db_register_host(const char *host, const char *ip, unsigned short port, unsigned int connection_type,
-		const char *host_metadata, zbx_conn_flags_t flag, const char *interface)
+		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, int config_timeout)
 {
 	char		dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
@@ -64,10 +68,10 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	else if (ZBX_CONN_IP == flag)
 		p_ip = p = interface;
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
+	zbx_alarm_on(config_timeout);
 	if (ZBX_CONN_DEFAULT == flag || ZBX_CONN_IP == flag)
 	{
-		if (0 == strncmp("::ffff:", p, 7) && SUCCEED == is_ip4(p + 7))
+		if (0 == strncmp("::ffff:", p, 7) && SUCCEED == zbx_is_ip4(p + 7))
 			p += 7;
 
 		zbx_gethost_by_ip(p, dns, sizeof(dns));
@@ -87,20 +91,20 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 
 	do
 	{
-		DBbegin();
+		zbx_db_begin();
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
-			DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata,
+			zbx_db_register_host(0, host, p_ip, p_dns, port, connection_type, host_metadata,
 					(unsigned short)flag, now);
 		}
 		else
 		{
-			DBproxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata,
+			zbx_db_proxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata,
 					(unsigned short)flag, now);
 		}
 	}
-	while (ZBX_DB_DOWN == DBcommit());
+	while (ZBX_DB_DOWN == zbx_db_commit());
 }
 
 static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, unsigned short port,
@@ -151,16 +155,17 @@ out:
  *                                                                            *
  * Purpose: check for host name and return hostid                             *
  *                                                                            *
- * Parameters: sock          - [IN] open socket of server-agent connection    *
- *             host          - [IN] host name                                 *
- *             ip            - [IN] IP address of the host                    *
- *             port          - [IN] port of the host                          *
- *             host_metadata - [IN] host metadata                             *
- *             flag          - [IN] flag describing interface type            *
- *             interface     - [IN] interface value if flag is not default    *
- *             revision      - [OUT] host configuration revision              *
- *             hostid        - [OUT] host ID                                  *
- *             error         - [OUT] error message                            *
+ * Parameters: sock           - [IN] open socket of server-agent connection   *
+ *             host           - [IN] host name                                *
+ *             ip             - [IN] IP address of the host                   *
+ *             port           - [IN] port of the host                         *
+ *             host_metadata  - [IN] host metadata                            *
+ *             flag           - [IN] flag describing interface type           *
+ *             interface      - [IN] interface value if flag is not default   *
+ *             config_timeout - [IN]                                          *
+ *             hostid         - [OUT] host ID                                 *
+ *             revision       - [OUT] host configuration revision             *
+ *             error          - [OUT] error message                           *
  *                                                                            *
  * Return value:  SUCCEED - host is found                                     *
  *                FAIL - an error occurred or host not found                  *
@@ -171,10 +176,10 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
-		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_uint64_t *hostid,
-		zbx_uint32_t *revision, char *error)
+		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, int config_timeout,
+		zbx_uint64_t *hostid, zbx_uint64_t *revision, char *error)
 {
-#define PROXY_AUTO_REGISTRATION_HEARTBEAT	120
+#define AUTO_REGISTRATION_HEARTBEAT	120
 	char	*ch_error;
 	int	ret = FAIL, heartbeat;
 
@@ -195,11 +200,6 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		goto out;
 	}
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		heartbeat = PROXY_AUTO_REGISTRATION_HEARTBEAT;
-	else
-		heartbeat = 0;
-
 	/* if host does not exist then check autoregistration connection permissions */
 	if (0 == *hostid)
 	{
@@ -210,10 +210,10 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
 			{
 				if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface,
-						(int)time(NULL), heartbeat))
+						(int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
 				{
 					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
-							interface);
+							interface, config_timeout);
 				}
 			}
 		}
@@ -221,12 +221,18 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		goto out;
 	}
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		heartbeat = AUTO_REGISTRATION_HEARTBEAT;
+	else
+		heartbeat = 0;
+
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != DCget_auto_registration_action_count())
 	{
 		if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface, (int)time(NULL),
 				heartbeat))
 		{
-			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
+			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface,
+					config_timeout);
 		}
 	}
 
@@ -241,8 +247,9 @@ out:
  *                                                                            *
  * Purpose: send list of active checks to the host (older version agent)      *
  *                                                                            *
- * Parameters: sock - open socket of server-agent connection                  *
- *             request - request buffer                                       *
+ * Parameters: sock           - open socket of server-agent connection        *
+ *             request        - request buffer                                *
+ *             config_timeout - [IN]                                          *
  *                                                                            *
  * Return value:  SUCCEED - list of active checks sent successfully           *
  *                FAIL - an error occurred                                    *
@@ -251,13 +258,12 @@ out:
  *           format of the list: key:delay:last_log_size                      *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
+int	send_list_of_active_checks(zbx_socket_t *sock, char *request, int config_timeout)
 {
 	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
 	size_t			buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
 	int			ret = FAIL, i, num = 0;
-	zbx_uint64_t		hostid;
-	zbx_uint32_t		revision;
+	zbx_uint64_t		hostid, revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -274,8 +280,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 	}
 
 	/* no host metadata in older versions of agent */
-	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",  &hostid, &revision,
-			error))
+	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "", config_timeout,
+			&hostid, &revision, error))
 	{
 		goto out;
 	}
@@ -336,7 +342,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, buffer);
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
+	zbx_alarm_on(config_timeout);
 	if (SUCCEED != zbx_tcp_send_raw(sock, buffer))
 		zbx_strlcpy(error, zbx_socket_strerror(), MAX_STRING_LEN);
 	else
@@ -392,9 +398,9 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 	else
 		return;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if(SUCCEED != parse_item_key(key, &request))
+	if(SUCCEED != zbx_parse_item_key(key, &request))
 		goto out;
 
 	/* "params" parameter */
@@ -416,40 +422,40 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 			zbx_vector_str_append_uniq(regexps, param + 1);
 	}
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: send list of active checks to the host                            *
  *                                                                            *
- * Parameters: sock - open socket of server-agent connection                  *
- *             jp   - request buffer                                          *
+ * Parameters: sock           - open socket of server-agent connection        *
+ *             jp             - request buffer                                *
+ *             config_timeout - [IN]                                          *
  *                                                                            *
  * Return value:  SUCCEED - list of active checks sent successfully           *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp)
+int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp, int config_timeout)
 {
 	char			host[ZBX_HOSTNAME_BUF_LEN], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
 	struct zbx_json		json;
 	int			ret = FAIL, i, version, num = 0;
-	zbx_uint64_t		hostid;
-	zbx_uint32_t		revision, agent_config_revision;
+	zbx_uint64_t		hostid, revision, agent_config_revision;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminated string */
 	size_t			interface_alloc = 1;		/* for at least NUL-terminated string */
 	size_t			buffer_size, reserved = 0;
 	unsigned short		port;
 	zbx_conn_flags_t	flag = ZBX_CONN_DEFAULT;
 	zbx_session_t		*session = NULL;
-	zbx_vector_ptr_t	regexps;
+	zbx_vector_expression_t	regexps;
 	zbx_vector_str_t	names;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&regexps);
+	zbx_vector_expression_create(&regexps);
 	zbx_vector_str_create(&names);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
@@ -472,7 +478,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	{
 		*interface = '\0';
 	}
-	else if (SUCCEED == is_ip(interface))
+	else if (SUCCEED == zbx_is_ip(interface))
 	{
 		flag = ZBX_CONN_IP;
 	}
@@ -487,9 +493,10 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	}
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip), NULL))
-		strscpy(ip, sock->peer);
+		zbx_strscpy(ip, sock->peer);
 
-	if (FAIL == is_ip(ip))	/* check even if 'ip' came from get_ip_by_socket() - it can return not a valid IP */
+	/* check even if 'ip' came from zbx_socket_peer_ip_save() - it can return not a valid IP */
+	if (FAIL == zbx_is_ip(ip))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "\"%s\" is not a valid IP address", ip);
 		goto error;
@@ -499,7 +506,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	{
 		port = ZBX_DEFAULT_AGENT_PORT;
 	}
-	else if (FAIL == is_ushort(tmp, &port))
+	else if (FAIL == zbx_is_ushort(tmp, &port))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "\"%s\" is not a valid port", tmp);
 		goto error;
@@ -509,29 +516,29 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	{
 		agent_config_revision = 0;
 	}
-	else if (FAIL == is_uint32(tmp, &agent_config_revision))
+	else if (FAIL == zbx_is_uint64(tmp, &agent_config_revision))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "\"%s\" is not a valid revision", tmp);
 		goto error;
 	}
 
-	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, &hostid, &revision,
-			error))
+	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, config_timeout, &hostid,
+			&revision, error))
 	{
 		goto error;
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp), NULL) ||
-			FAIL == (version = zbx_get_component_version(tmp)))
+			FAIL == (version = zbx_get_component_version_without_patch(tmp)))
 	{
-		version = ZBX_COMPONENT_VERSION(4, 2);
+		version = ZBX_COMPONENT_VERSION(4, 2, 0);
 	}
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SESSION, tmp, sizeof(tmp), NULL))
 	{
 		size_t	token_len;
 
-		if (zbx_get_token_len() != (token_len = strlen(tmp)))
+		if (ZBX_SESSION_TOKEN_SIZE != (token_len = strlen(tmp)))
 		{
 			zbx_snprintf(error, MAX_STRING_LEN, "invalid session token length %d", (int)token_len);
 			goto error;
@@ -592,7 +599,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, dc_items[i].key, ZBX_JSON_TYPE_STRING);
 
-			if (ZBX_COMPONENT_VERSION(4,4) > version)
+			if (ZBX_COMPONENT_VERSION(4, 4, 0) > version)
 			{
 				if (0 != strcmp(dc_items[i].key, dc_items[i].key_orig))
 				{
@@ -634,7 +641,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	zbx_json_close(&json);
 
-	if (ZBX_COMPONENT_VERSION(4,4) == version || ZBX_COMPONENT_VERSION(5,0) == version)
+	if (ZBX_COMPONENT_VERSION(4, 4, 0) == version || ZBX_COMPONENT_VERSION(5, 0, 0) == version)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, 600);
 
 	DCget_expressions_by_names(&regexps, (const char * const *)names.values, names.values_num);
@@ -647,7 +654,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 		for (i = 0; i < regexps.values_num; i++)
 		{
-			zbx_expression_t	*regexp = (zbx_expression_t *)regexps.values[i];
+			zbx_expression_t	*regexp = regexps.values[i];
 
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, "name", regexp->name, ZBX_JSON_TYPE_STRING);
@@ -682,17 +689,17 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		zbx_json_free(&json);	/* json buffer can be large, free as fast as possible */
 
 		if (SUCCEED != (ret = zbx_tcp_send_ext(sock, buffer, buffer_size, reserved, sock->protocol,
-				CONFIG_TIMEOUT)))
+				config_timeout)))
 		{
-			strscpy(error, zbx_socket_strerror());
+			zbx_strscpy(error, zbx_socket_strerror());
 		}
 	}
 	else
 	{
 		if (SUCCEED != (ret = zbx_tcp_send_ext(sock, json.buffer, json.buffer_size, 0, sock->protocol,
-				CONFIG_TIMEOUT)))
+				config_timeout)))
 		{
-			strscpy(error, zbx_socket_strerror());
+			zbx_strscpy(error, zbx_socket_strerror());
 		}
 	}
 
@@ -725,7 +732,7 @@ out:
 	zbx_vector_str_destroy(&names);
 
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_ptr_destroy(&regexps);
+	zbx_vector_expression_destroy(&regexps);
 
 	zbx_free(host_metadata);
 	zbx_free(interface);

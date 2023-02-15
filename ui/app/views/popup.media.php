@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,14 +60,27 @@ $type_select = (new CSelect('mediatypeid'))
 	->setValue($options['mediatypeid']);
 
 foreach ($data['db_mediatypes'] as $mediatypeid => $value) {
-	$type_select->addOption((new CSelectOption($mediatypeid, $value['name']))
-		->addClass($value['status'] == MEDIA_TYPE_STATUS_DISABLED ? ZBX_STYLE_RED : null)
-	);
+	if ($options['mediatypeid'] == $mediatypeid || $value['status'] != MEDIA_TYPE_STATUS_DISABLED) {
+		$type_select->addOption((new CSelectOption($mediatypeid, $value['name']))
+			->addClass($value['status'] == MEDIA_TYPE_STATUS_DISABLED ? ZBX_STYLE_RED : null)
+		);
+	}
+}
+
+$disabled_media_types_msg = null;
+
+if (!in_array(MEDIA_TYPE_STATUS_ACTIVE, array_column($data['db_mediatypes'], 'status'))) {
+	$type_select->addStyle('display: none;');
+
+	$disabled_media_types_msg = (new CDiv(_('Media types disabled by Administration.')))
+		->setId('media_types_disabled')
+		->addClass(ZBX_STYLE_RED)
+		->addStyle('margin:1px 0 0 5px;');
 }
 
 // Create media form.
 $media_form = (new CFormList(_('Media')))
-	->addRow(new CLabel(_('Type'), $type_select->getFocusableElementId()), $type_select)
+	->addRow(new CLabel(_('Type'), $type_select->getFocusableElementId()), [$type_select, $disabled_media_types_msg])
 	->addRow(
 		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
 		(new CTextBox('sendto', $options['sendto'], false, 1024))
@@ -91,7 +104,6 @@ $media_form = (new CFormList(_('Media')))
 	);
 
 $form = (new CForm())
-	->cleanItems()
 	->setName('media_form')
 	->addVar('action', 'popup.media')
 	->addVar('add', '1')

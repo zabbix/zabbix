@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "modbtype.h"
+#include "../sysinfo.h"
+
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxnum.h"
-
-#include "modbtype.h"
 
 #ifdef HAVE_LIBMODBUS
 #include "zbxmutexs.h"
@@ -410,7 +411,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 		endpoint->protocol = ZBX_MODBUS_PROTOCOL_TCP;
 		ptr = endpoint_str + ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_TCP);
 
-		if (SUCCEED == (ret = parse_serveractive_element(ptr, &tmp, &port, ZBX_MODBUS_TCP_PORT_DEFAULT)))
+		if (SUCCEED == (ret = zbx_parse_serveractive_element(ptr, &tmp, &port, ZBX_MODBUS_TCP_PORT_DEFAULT)))
 		{
 			endpoint->conn_info.tcp.ip = tmp;
 			endpoint->conn_info.tcp.port = zbx_dsprintf(NULL, "%u", port);
@@ -528,12 +529,12 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 	{
 		struct timeval	tv;
 
-		tv.tv_sec = CONFIG_TIMEOUT;
+		tv.tv_sec = sysinfo_get_config_timeout();
 		tv.tv_usec = 0;
 		modbus_set_response_timeout(mdb_ctx, &tv);
 	}
 #else /* HAVE_LIBMODBUS_3_1 at the moment */
-	if (0 !=  modbus_set_response_timeout(mdb_ctx, CONFIG_TIMEOUT, 0))
+	if (0 !=  modbus_set_response_timeout(mdb_ctx, sysinfo_get_config_timeout(), 0))
 	{
 		*error = zbx_dsprintf(*error, "modbus_set_response_timeout() failed: %s", modbus_strerror(errno));
 		goto out;
@@ -607,7 +608,7 @@ out:
 }
 #endif /* HAVE_LIBMODBUS */
 
-int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	modbus_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBMODBUS
 	char			*tmp, *err = NULL;
@@ -642,7 +643,7 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		slaveid = ZBX_MODBUS_PROTOCOL_TCP == endpoint.protocol ? 255 : 1;
 	}
-	else if (FAIL == is_uint_n_range(tmp, ZBX_SIZE_T_MAX, &slaveid, sizeof(unsigned char),
+	else if (FAIL == zbx_is_uint_n_range(tmp, ZBX_SIZE_T_MAX, &slaveid, sizeof(unsigned char),
 			ZBX_MODBUS_PROTOCOL_TCP == endpoint.protocol ? 0 : 1,
 			ZBX_MODBUS_PROTOCOL_TCP == endpoint.protocol ? 255 : 247))
 	{
@@ -655,7 +656,7 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		function = ZBX_MODBUS_FUNCTION_EMPTY;
 	}
-	else if (FAIL == is_uint_n_range(tmp, ZBX_SIZE_T_MAX, &function, sizeof(unsigned char), 1, 4))
+	else if (FAIL == zbx_is_uint_n_range(tmp, ZBX_SIZE_T_MAX, &function, sizeof(unsigned char), 1, 4))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		goto err;
@@ -669,7 +670,7 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (ZBX_MODBUS_FUNCTION_EMPTY == function)
 			function = ZBX_MODBUS_FUNCTION_COIL;
 	}
-	else if (FAIL == is_ushort(tmp, &address))
+	else if (FAIL == zbx_is_ushort(tmp, &address))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		goto err;
@@ -708,7 +709,7 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		count = 1;
 	}
-	else if (FAIL == is_ushort(tmp, &count) || 0 == count)
+	else if (FAIL == zbx_is_ushort(tmp, &count) || 0 == count)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		goto err;
@@ -804,7 +805,7 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		offset = 0;
 	}
-	else if (FAIL == is_ushort(tmp, &offset))
+	else if (FAIL == zbx_is_ushort(tmp, &offset))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid eighth parameter."));
 		goto err;

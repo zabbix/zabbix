@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,12 +42,12 @@
 		checkbox_object: null,
 
 		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object}) {
-			this.refresh_url = new Curl(refresh_url, false);
+			this.refresh_url = new Curl(refresh_url);
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 			this.checkbox_object = checkbox_object;
 
-			const url = new Curl('zabbix.php', false);
+			const url = new Curl('zabbix.php');
 			url.setArgument('action', 'latest.view.refresh');
 			this.refresh_simple_url = url.getUrl();
 
@@ -71,11 +71,11 @@
 
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				this.reloadPartialAndTabCounters();
+				chkbxRange.clearSelectedOnFilterChange();
 
 				if (this.active_filter !== this.filter._active_item) {
 					this.active_filter = this.filter._active_item;
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
-					chkbxRange.clearSelectedOnFilterChange();
 				}
 			});
 
@@ -136,7 +136,7 @@
 		},
 
 		reloadPartialAndTabCounters() {
-			this.refresh_url = new Curl('', false);
+			this.refresh_url = new Curl('');
 
 			this.unscheduleRefresh();
 			this.refresh();
@@ -320,6 +320,9 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.masscheck_now');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
+			);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -360,6 +363,9 @@
 		checkNow(itemid) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.masscheck_now');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
+			);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

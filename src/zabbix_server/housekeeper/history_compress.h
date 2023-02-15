@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #ifndef ZABBIX_HISTORY_COMPRESSION_H
 #define ZABBIX_HISTORY_COMPRESSION_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 void	hk_history_compression_init(void);
 void	hk_history_compression_update(zbx_config_db_t *cfg);

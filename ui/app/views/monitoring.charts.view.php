@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ $this->includeJsFile('monitoring.charts.view.js.php');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Graphs'))
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_CHARTS_VIEW))
@@ -89,24 +89,24 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	new CPartial('monitoring.charts.subfilter', $data['subfilters']));
 }
 
-$widget->addItem($filter);
+$html_page->addItem($filter);
 
 if (!$data['filter_hostids']) {
-	$widget->addItem((new CTableInfo())->setNoDataMessage(_('Specify host to see the graphs.')));
+	$html_page->addItem((new CTableInfo())->setNoDataMessage(_('Specify host to see the graphs.')));
 }
 elseif ($data['charts']) {
 	$table = (new CTable())
 		->setAttribute('style', 'width: 100%;')
 		->setId('charts');
-	$widget
+	$html_page
 		->addItem($table)
 		->addItem($data['paging']);
 }
 else {
-	$widget->addItem(new CTableInfo());
+	$html_page->addItem(new CTableInfo());
 }
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

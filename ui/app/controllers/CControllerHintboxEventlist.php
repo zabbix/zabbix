@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,14 +27,14 @@ class CControllerHintboxEventlist extends CController {
 	protected $trigger;
 
 	protected function init(): void {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
 			'triggerid' =>			'required|db triggers.triggerid',
 			'eventid_till' =>		'required|db events.eventid',
-			'show_timeline' =>		'required|in 0,1',
+			'show_timeline' =>		'required|in '.implode(',', [ZBX_TIMELINE_OFF, ZBX_TIMELINE_ON]),
 			'show_tags' =>			'required|in '.implode(',', [SHOW_TAGS_NONE, SHOW_TAGS_1, SHOW_TAGS_2, SHOW_TAGS_3]),
 			'filter_tags' =>		'array',
 			'tag_name_format' =>	'required|in '.implode(',', [TAG_NAME_FULL, TAG_NAME_SHORTENED, TAG_NAME_NONE]),
@@ -109,8 +109,8 @@ class CControllerHintboxEventlist extends CController {
 		) ? $url : '';
 
 		$options = [
-			'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'acknowledged'],
-			'select_acknowledges' => ['action'],
+			'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'acknowledged', 'cause_eventid'],
+			'select_acknowledges' => ['action', 'taskid'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventid_till' => $this->getInput('eventid_till'),

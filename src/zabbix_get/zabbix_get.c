@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "zbxcomms.h"
 #include "zbxgetopt.h"
 #include "zbxcrypto.h"
+#include "cfg.h"
 
 #ifndef _WINDOWS
 #	include "zbxnix.h"
@@ -160,9 +161,6 @@ const char	*help_message[] = {
 };
 
 static zbx_config_tls_t	*zbx_config_tls = NULL;
-
-int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_get, just for linking with tls.c */
-int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_get, just for linking with tls.c */
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
@@ -313,6 +311,9 @@ int	main(int argc, char **argv)
 
 	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
+
+	zbx_init_library_cfg(program_type);
+
 #if !defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
 	{
@@ -348,7 +349,7 @@ int	main(int argc, char **argv)
 					source_ip = zbx_strdup(NULL, zbx_optarg);
 				break;
 			case 't':
-				if (FAIL == is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &CONFIG_GET_TIMEOUT,
+				if (FAIL == zbx_is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &CONFIG_GET_TIMEOUT,
 						sizeof(CONFIG_GET_TIMEOUT), CONFIG_GET_TIMEOUT_MIN,
 						CONFIG_GET_TIMEOUT_MAX))
 				{
@@ -502,7 +503,7 @@ int	main(int argc, char **argv)
 			NULL != zbx_config_tls->cipher_cmd13 || NULL != zbx_config_tls->cipher_cmd)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS, get_program_type);
+		zbx_tls_validate_config(zbx_config_tls, 0, 0, get_program_type);
 
 		if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 		{

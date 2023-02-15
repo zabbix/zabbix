@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 
 #include "zbxcommon.h"
 #include "zbxmutexs.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "dbconfig.h"
 #include "dc_item_poller_type_update_test.h"
 
@@ -70,17 +70,17 @@ str_map_t;
 
 static void init_test(void)
 {
-	while (0 == CONFIG_PINGER_FORKS)
-		CONFIG_PINGER_FORKS = rand();
+	while (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_PINGER])
+		CONFIG_FORKS[ZBX_PROCESS_TYPE_PINGER] = rand();
 
-	while (0 == CONFIG_POLLER_FORKS)
-		CONFIG_POLLER_FORKS = rand();
+	while (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_POLLER])
+		CONFIG_FORKS[ZBX_PROCESS_TYPE_POLLER] = rand();
 
-	while (0 == CONFIG_IPMIPOLLER_FORKS)
-		CONFIG_IPMIPOLLER_FORKS = rand();
+	while (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
+		CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER] = rand();
 
-	while (0 == CONFIG_JAVAPOLLER_FORKS)
-		CONFIG_JAVAPOLLER_FORKS = rand();
+	while (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER])
+		CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER] = rand();
 }
 
 #define _ZBX_MKMAP(c) { c,#c }

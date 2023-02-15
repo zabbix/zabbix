@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 class CControllerHostGroupList extends CController {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -111,12 +111,20 @@ class CControllerHostGroupList extends CController {
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'selectGroupDiscovery' => ['ts_delete'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectHostPrototype' => ['hostid'],
 			'groupids' => $groupids,
 			'limitSelects' => $limit
 		]);
 		CArrayHelper::sort($data['groups'], [['field' => $sort_field, 'order' => $sort_order]]);
 
 		foreach ($data['groups'] as &$group) {
+			$group['is_discovery_rule_editable'] = $group['discoveryRule']
+				&& API::DiscoveryRule()->get([
+					'output' => [],
+					'itemids' => $group['discoveryRule']['itemid'],
+					'editable' => true
+				]);
+
 			CArrayHelper::sort($group['hosts'], ['name']);
 		}
 		unset($group);

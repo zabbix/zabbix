@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,10 +22,9 @@
 
 #include "config.h"
 #include "module.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 extern char	*CONFIG_SOURCE_IP;
-extern int	CONFIG_TIMEOUT;
 
 #ifdef HAVE_NETSNMP
 
@@ -36,8 +35,9 @@ extern int	CONFIG_TIMEOUT;
 #define ZBX_SNMP_STR_ASCII	5
 #define ZBX_SNMP_STR_UNDEFINED	255
 
-int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type);
-void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type);
+int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout);
+void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type,
+		int config_timeout);
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
 #endif
 

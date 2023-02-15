@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,18 +96,13 @@ include __DIR__.'/itemtest.js.php';
 
 		typeChangeHandler() {
 			// Selected item type.
-			const type = parseInt($('#type').val());
+			const type = parseInt($('#type').val(), 10);
+			const has_key_button = [ <?= ITEM_TYPE_ZABBIX ?>, <?= ITEM_TYPE_ZABBIX_ACTIVE ?>, <?= ITEM_TYPE_SIMPLE ?>,
+				<?= ITEM_TYPE_INTERNAL ?>, <?= ITEM_TYPE_DB_MONITOR ?>, <?= ITEM_TYPE_SNMPTRAP ?>, <?= ITEM_TYPE_JMX ?>,
+				<?= ITEM_TYPE_IPMI ?>
+			];
 
-			$('#keyButton').prop('disabled',
-				type != <?= ITEM_TYPE_ZABBIX ?>
-					&& type != <?= ITEM_TYPE_ZABBIX_ACTIVE ?>
-					&& type != <?= ITEM_TYPE_SIMPLE ?>
-					&& type != <?= ITEM_TYPE_INTERNAL ?>
-					&& type != <?= ITEM_TYPE_DB_MONITOR ?>
-					&& type != <?= ITEM_TYPE_SNMPTRAP ?>
-					&& type != <?= ITEM_TYPE_JMX ?>
-					&& type != <?= ITEM_TYPE_IPMI ?>
-			)
+			$('#keyButton').prop('disabled', !has_key_button.includes(type));
 
 			if (type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>) {
 				$('label[for=username]').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
@@ -124,6 +119,9 @@ include __DIR__.'/itemtest.js.php';
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.masscheck_now');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
+			);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

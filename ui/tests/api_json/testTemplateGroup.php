@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -424,7 +424,7 @@ class testTemplateGroup extends CAPITest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'templategroup' => [
 					'groupid' => '52001',
-					'name' => 'API template group update as zabbix user without peremissions'
+					'name' => 'API template group update as zabbix user without permissions'
 				],
 				'expected_error' => 'No permissions to call "templategroup.update".'
 			],

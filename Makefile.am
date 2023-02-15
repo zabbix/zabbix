@@ -63,18 +63,34 @@ if DBSCHEMA
 dbschema_mysql:
 	cd database/mysql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) schema.sql
+	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
 
 dbschema_oracle:
 	cd database/oracle && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) schema.sql
+	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
+
+export tsdb_wcompr_dir = tsdb_history_pk_upgrade_with_compression
+export tsdb_nocompr_dir = tsdb_history_pk_upgrade_no_compression
 
 dbschema_postgresql:
 	cd database/postgresql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) timescaledb.sql
+	$(MAKE) $(AM_MAKEFLAGS) timescaledb.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk_uint.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk_log.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk_str.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_wcompr_dir)/history_pk_text.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk_uint.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk_log.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk_str.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) $(tsdb_nocompr_dir)/history_pk_text.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
 
 dbschema_sqlite3:
 	cd database/sqlite3 && \
@@ -124,13 +140,13 @@ css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
 if ZBXCMOCKA
 WRAP_DB_FUNCS = \
 	-Wl,--wrap=zbx_db_vselect \
-	-Wl,--wrap=zbx_db_select_n \
-	-Wl,--wrap=zbx_db_fetch \
-	-Wl,--wrap=__zbx_DBexecute \
-	-Wl,--wrap=DBbegin \
-	-Wl,--wrap=DBcommit \
-	-Wl,--wrap=DBexecute_multiple_query \
-	-Wl,--wrap=DBfree_result
+	-Wl,--wrap=zbx_db_select_n_basic \
+	-Wl,--wrap=zbx_db_fetch_basic \
+	-Wl,--wrap=__zbx_db_execute \
+	-Wl,--wrap=zbx_db_begin \
+	-Wl,--wrap=zbx_db_commit \
+	-Wl,--wrap=zbx_db_execute_multiple_query \
+	-Wl,--wrap=zbx_db_free_result
 
 WRAP_IO_FUNCS = \
 	-Wl,--wrap=fopen \

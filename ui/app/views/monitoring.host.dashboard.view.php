@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ if (array_key_exists('error', $data)) {
 }
 
 if (array_key_exists('no_data', $data)) {
-	(new CWidget())
+	(new CHtmlPage())
 		->setTitle(_('Dashboards'))
 		->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_HOST_DASHBOARD_VIEW))
 		->addItem(new CTableInfo())
@@ -44,18 +44,9 @@ $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
 $this->addJsFile('class.widget.js');
+$this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
-$this->addJsFile('class.widget.clock.js');
-$this->addJsFile('class.widget.graph.js');
-$this->addJsFile('class.widget.graph-prototype.js');
-$this->addJsFile('class.widget.item.js');
-$this->addJsFile('class.widget.map.js');
-$this->addJsFile('class.widget.navtree.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
-$this->addJsFile('class.widget.problems.js');
-$this->addJsFile('class.widget.problemsbysv.js');
-$this->addJsFile('class.widget.svggraph.js');
-$this->addJsFile('class.widget.trigerover.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.sortable.js');
 
@@ -64,7 +55,7 @@ $this->includeJsFile('monitoring.host.dashboard.view.js.php');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle($data['dashboard']['name'])
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_HOST_DASHBOARD_VIEW))
@@ -72,7 +63,6 @@ $widget = (new CWidget())
 		(new CList())
 			->addItem(
 				(new CForm('get'))
-					->cleanItems()
 					->addVar('action', 'host.dashboard.view')
 					->addVar('hostid', $data['host']['hostid'])
 					->addItem((new CLabel(_('Dashboard'), 'label-dashboard'))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
@@ -129,7 +119,7 @@ $widget = (new CWidget())
 	])));
 
 if ($data['has_time_selector']) {
-	$widget->addItem(
+	$html_page->addItem(
 		(new CFilter())
 			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
@@ -182,7 +172,7 @@ if (count($data['dashboard']['pages']) > 1
 
 	$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
 
-	$widget
+	$html_page
 		->addItem($dashboard)
 		->show();
 
@@ -191,6 +181,7 @@ if (count($data['dashboard']['pages']) > 1
 			'host' => $data['host'],
 			'dashboard' => $data['dashboard'],
 			'widget_defaults' => $data['widget_defaults'],
+			'configuration_hash' => $data['configuration_hash'],
 			'time_period' => $data['time_period'],
 			'web_layout_mode' => $web_layout_mode
 		]).');
@@ -199,7 +190,7 @@ if (count($data['dashboard']['pages']) > 1
 		->show();
 }
 else {
-	$widget
+	$html_page
 		->addItem(new CTableInfo())
 		->show();
 }

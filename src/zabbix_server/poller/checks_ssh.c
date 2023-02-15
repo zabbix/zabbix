@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,15 +21,18 @@
 #include "ssh_run.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
+
+#include "zbxsysinfo.h"
+
 int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
-	const char	*port, *encoding, *dns;
+	const char	*port, *dns, *encoding, *ssh_options;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
@@ -43,7 +46,7 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 	}
 #undef SSH_RUN_KEY
 
-	if (4 < get_rparams_num(&request))
+	if (5 < get_rparams_num(&request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto out;
@@ -51,7 +54,7 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (NULL != (dns = get_rparam(&request, 1)) && '\0' != *dns)
 	{
-		strscpy(item->interface.dns_orig, dns);
+		zbx_strscpy(item->interface.dns_orig, dns);
 		item->interface.addr = item->interface.dns_orig;
 	}
 
@@ -64,7 +67,7 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (NULL != (port = get_rparam(&request, 2)) && '\0' != *port)
 	{
-		if (FAIL == is_ushort(port, &item->interface.port))
+		if (FAIL == zbx_is_ushort(port, &item->interface.port))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
@@ -74,10 +77,11 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 		item->interface.port = ZBX_DEFAULT_SSH_PORT;
 
 	encoding = get_rparam(&request, 3);
+	ssh_options = get_rparam(&request, 4);
 
-	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding));
+	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding), ZBX_NULL2EMPTY_STR(ssh_options));
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

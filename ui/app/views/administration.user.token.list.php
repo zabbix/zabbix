@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,10 +66,10 @@ $filter = (new CFilter())
 			)
 	]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('API tokens'))
 	->setTitleSubmenu(getUserSettingsSubmenu())
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USER_TOKEN_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USER_TOKEN_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(
@@ -112,6 +112,8 @@ $token_table = (new CTableInfo())
 		)
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('token');
+
 foreach ($data['tokens'] as $token) {
 	$name = (new CLink($token['name'], 'javascript:void(0)'))
 		->addClass('js-edit-token')
@@ -132,18 +134,18 @@ foreach ($data['tokens'] as $token) {
 					->setArgument('tokenids', (array) $token['tokenid'])
 					->getUrl()
 			))
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
-				->addSID()
 			: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
 					->setArgument('action_src', 'user.token.list')
 					->setArgument('action', 'token.enable')
 					->setArgument('tokenids', (array) $token['tokenid'])
 					->getUrl()
 			))
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
-				->addSID()
 	]);
 }
 
@@ -151,8 +153,12 @@ $token_form->addItem([
 	$token_table,
 	$data['paging'],
 	new CActionButtonList('action', 'tokenids', [
-		'token.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected API tokens?')],
-		'token.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected API tokens?')],
+		'token.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected API tokens?'),
+			'csrf_token' => $csrf_token
+		],
+		'token.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected API tokens?'),
+			'csrf_token' => $csrf_token
+		],
 		'token.delete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
@@ -163,7 +169,7 @@ $token_form->addItem([
 	], 'user.token')
 ]);
 
-$widget
+$html_page
 	->addItem($token_form)
 	->show();
 

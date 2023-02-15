@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,20 +36,10 @@ $available_js = [
 	'class.dashboard.js' => '',
 	'class.dashboard.page.js' => '',
 	'class.dashboard.widget.placeholder.js' => '',
-	'class.widget.js' => 'widgets/',
-	'class.widget.iterator.js' => 'widgets/',
-	'class.widget.clock.js' => 'widgets/',
-	'class.widget.geomap.js' => 'widgets/',
-	'class.widget.graph.js' => 'widgets/',
-	'class.widget.graph-prototype.js' => 'widgets/',
-	'class.widget.item.js' => 'widgets/',
-	'class.widget.map.js' => 'widgets/',
-	'class.widget.navtree.js' => 'widgets/',
-	'class.widget.paste-placeholder.js' => 'widgets/',
-	'class.widget.problems.js' => 'widgets/',
-	'class.widget.problemsbysv.js' => 'widgets/',
-	'class.widget.svggraph.js' => 'widgets/',
-	'class.widget.trigerover.js' => 'widgets/',
+	'class.widget.js' => '',
+	'class.widget.inaccessible.js' => '',
+	'class.widget.iterator.js' => '',
+	'class.widget.paste-placeholder.js' => '',
 	'hostinterfacemanager.js' => '',
 	'hostmacrosmanager.js' => '',
 	'menupopup.js' => '',
@@ -120,9 +110,7 @@ $available_js = [
 	'items.js' => 'pages/',
 	'report2.js' => 'pages/',
 	'report4.js' => 'pages/',
-	'setup.js' => 'pages/',
-	'popup.condition.common.js' => 'pages/',
-	'popup.operation.common.js' => 'pages/'
+	'setup.js' => 'pages/'
 ];
 
 $translate_strings = [
@@ -136,6 +124,8 @@ $translate_strings = [
 		'Actions' => _('Actions'),
 		'Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.' => _('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
 		'Cannot add widget: not enough free space on the dashboard.' => _('Cannot add widget: not enough free space on the dashboard.'),
+		'Cannot add widget: no widgets available.' => _('Cannot add widget: no widgets available.'),
+		'Cannot paste inaccessible widget.' => _('Cannot paste inaccessible widget.'),
 		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
 		'Failed to paste dashboard page.' => _('Failed to paste dashboard page.'),
@@ -143,11 +133,16 @@ $translate_strings = [
 		'Failed to update dashboard page properties.' => _('Failed to update dashboard page properties.'),
 		'Failed to update dashboard properties.' => _('Failed to update dashboard properties.'),
 		'Failed to update widget properties.' => _('Failed to update widget properties.'),
+		'Inaccessible widgets were not copied.' => _('Inaccessible widgets were not copied.'),
+		'Inaccessible widgets were not pasted.' => _('Inaccessible widgets were not pasted.'),
 		'Page %1$d' => _('Page %1$d'),
 		'Paste widget' => _('Paste widget'),
 		'Properties' => _('Properties'),
 		'Start slideshow' => _('Start slideshow'),
 		'Stop slideshow' => _('Stop slideshow')
+	],
+	'class.dashboard.page.js' => [
+		'Inaccessible widget' => _('Inaccessible widget')
 	],
 	'class.dashboard.widget.placeholder.js' => [
 		'Add a new widget' => _('Add a new widget'),
@@ -172,50 +167,17 @@ $translate_strings = [
 		'Paste' => _s('Paste'),
 		'Refresh interval' => _s('Refresh interval')
 	],
-	'class.widget.geomap.js' => [
-		'Actions' => _('Actions'),
-		'Set this view as default' => _('Set this view as default'),
-		'Reset to initial view' => _('Reset to initial view'),
-		'No problems' => _('No problems'),
-		'Not classified' => _('Not classified'),
-		'Information' => _('Information'),
-		'Warning' => _('Warning'),
-		'Average' => _('Average'),
-		'High' => _('High'),
-		'Disaster' => _('Disaster'),
-		'Host' => _('Host'),
-		'D' => _x('D', 'abbreviation of severity level'),
-		'H' => _x('H', 'abbreviation of severity level'),
-		'A' => _x('A', 'abbreviation of severity level'),
-		'W' => _x('W', 'abbreviation of severity level'),
-		'I' => _x('I', 'abbreviation of severity level'),
-		'N' => _x('N', 'abbreviation of severity level'),
-		'Navigate to default view' => _('Navigate to default view'),
-		'Navigate to initial view' => _('Navigate to initial view')
+	'class.widget.inaccessible.js' => [
+		'Actions' => _s('Actions'),
+		'Copy' => _s('Copy'),
+		'Inaccessible widget' => _('Inaccessible widget'),
+		'Refresh interval' => _s('Refresh interval')
 	],
 	'class.widget.iterator.js' => [
 		'Next page' => _s('Next page'),
 		'Previous page' => _s('Previous page'),
 		'Widget is too small for the specified number of columns and rows.' =>
 			_s('Widget is too small for the specified number of columns and rows.')
-	],
-	'class.widget.graph.js' => [
-		'Actions' => _s('Actions'),
-		'Download image' => _s('Download image')
-	],
-	'class.widget.navtree.js' => [
-		'Add' => _s('Add'),
-		'Add child element' => _s('Add child element'),
-		'Add multiple maps' => _s('Add multiple maps'),
-		'Apply' => _s('Apply'),
-		'Cancel' => _s('Cancel'),
-		'Edit' => _s('Edit'),
-		'Edit tree element' => _s('Edit tree element'),
-		'Remove' => _s('Remove')
-	],
-	'class.widget.svggraph.js' => [
-		'Actions' => _s('Actions'),
-		'Download image' => _s('Download image')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
@@ -231,6 +193,9 @@ $translate_strings = [
 		'Success message' => _('Success message'),
 		'Error message' => _('Error message'),
 		'Warning message' => _('Warning message')
+	],
+	'inputsecret.js' => [
+		'value' => _('value')
 	],
 	'class.calendar.js' => [
 		'S_CALENDAR' => _('Calendar'),
@@ -328,7 +293,8 @@ $translate_strings = [
 	'hostmacrosmanager.js' => [
 		'Change' => _x('Change', 'verb'),
 		'Remove' => _('Remove'),
-		'Revert' => _('Revert')
+		'Revert' => _('Revert'),
+		'value' => _('value')
 	],
 	'multilineinput.js' => [
 		'S_N_CHAR_COUNT' => _('%1$s characters'),
@@ -356,23 +322,29 @@ $translate_strings = [
 	'menupopup.js' => [
 		'500 latest values' => _('500 latest values'),
 		'Actions' => _('Actions'),
-		'Acknowledge' => _('Acknowledge'),
+		'Update problem' => _('Update problem'),
 		'Configuration' => _('Configuration'),
 		'Clone' => _('Clone'),
 		'Create new' => _('Create new'),
 		'Create trigger' => _('Create trigger'),
+		'Create trigger prototype' => _('Create trigger prototype'),
 		'Create dependent item' => _('Create dependent item'),
 		'Create dependent discovery rule' => _('Create dependent discovery rule'),
 		'Dashboards' => _('Dashboards'),
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
+		'Discovery' => _('Discovery'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Execute now' => _('Execute now'),
 		'Item' => _('Item'),
+		'Items' => _('Items'),
+		'Item prototype' => _('Item prototype'),
 		'Insert expression' => _('Insert expression'),
 		'Sharing' => _('Sharing'),
+		'Triggers' => _('Triggers'),
 		'Trigger status "OK"' => _('Trigger status "OK"'),
 		'Trigger status "Problem"' => _('Trigger status "Problem"'),
+		'Trigger prototypes' => _('Trigger prototypes'),
 		'Go to' => _('Go to'),
 		'Graph' => _('Graph'),
 		'Graphs' => _('Graphs'),
@@ -385,12 +357,15 @@ $translate_strings = [
 		'Last month graph' => _('Last month graph'),
 		'Last week graph' => _('Last week graph'),
 		'Problems' => _('Problems'),
+		'Problem' => _('Problem'),
+		'Mark as cause' => _('Mark as cause'),
+		'Mark selected as symptoms' => _('Mark selected as symptoms'),
 		'Scripts' => _('Scripts'),
 		'Submap' => _('Submap'),
 		'S_TRIGGER' => _('Trigger'),
 		'URL' => _('URL'),
-		'URLs' => _('URLs'),
 		'Values' => _('Values'),
+		'View' => _('View'),
 		'Web' => _('Web'),
 		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
 	],
@@ -414,7 +389,8 @@ $translate_strings = [
 	],
 	'common.js' => [
 		'Cancel' => _('Cancel'),
-		'Ok' => _('Ok')
+		'Ok' => _('Ok'),
+		'Unexpected server error.' => _('Unexpected server error.')
 	],
 	'component.z-select.js' => [
 		'All' => _('All')
@@ -422,9 +398,6 @@ $translate_strings = [
 	'macrovalue.js' => [
 		'Set new value' => _('Set new value'),
 		'value' => _('value')
-	],
-	'popup.condition.common.js' => [
-		'Services' => _('Services')
 	]
 ];
 

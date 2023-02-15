@@ -1,7 +1,7 @@
 # LIBMODBUS_CHECK_CONFIG ([DEFAULT-ACTION])
 #
 # Zabbix
-# Copyright (C) 2001-2022 Zabbix SIA
+# Copyright (C) 2001-2023 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,30 +20,24 @@
 
 AC_DEFUN([LIBMODBUS30_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include "modbus.h"
-],
-[
+]], [[
   modbus_t  *mdb_ctx;
   mdb_ctx = modbus_new_tcp("127.0.0.1", 502);
   modbus_set_response_timeout(mdb_ctx, NULL);
-],
-found_libmodbus="30",)
+]])],[found_libmodbus="30"],[])
 ])dnl
 
 AC_DEFUN([LIBMODBUS31_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include "modbus.h"
-],
-[
+]], [[
   modbus_t  *mdb_ctx;
   mdb_ctx = modbus_new_tcp("127.0.0.1", 502);
   modbus_set_response_timeout(mdb_ctx, 1, 0)
-],
-found_libmodbus="31",)
+]])],[found_libmodbus="31"],[])
 ])dnl
 
 AC_DEFUN([LIBMODBUS_ACCEPT_VERSION],
@@ -71,7 +65,7 @@ AC_DEFUN([LIBMODBUS_CHECK_CONFIG],
 [
   AC_ARG_WITH(libmodbus,[
 If you want to use MODBUS based checks:
-AC_HELP_STRING([--with-libmodbus@<:@=DIR@:>@],[use MODBUS package @<:@default=no@:>@, DIR is the MODBUS library install directory.])],
+AS_HELP_STRING([--with-libmodbus@<:@=DIR@:>@],[use MODBUS package @<:@default=no@:>@, DIR is the MODBUS library install directory.])],
     [
       if test "$withval" = "no"; then
         want_libmodbus="no"

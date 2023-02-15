@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -501,7 +501,7 @@ int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *
 		offset--;
 	buf[offset] = '\0';
 
-	SET_STR_RESULT(result, convert_to_utf8(buf, offset, encoding));
+	SET_STR_RESULT(result, zbx_convert_to_utf8(buf, offset, encoding));
 	ret = SUCCEED;
 fail:
 	zbx_free(command_lf);

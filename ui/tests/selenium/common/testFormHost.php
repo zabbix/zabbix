@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -107,7 +108,7 @@ class testFormHost extends CWebTest {
 			'port' => 161,
 			'SNMP version' => 'SNMPv2',
 			'SNMP community' => '{$SNMP_COMMUNITY}',
-			'Use bulk requests' => true
+			'Use combined requests' => true
 		],
 		'JMX' => [
 			'ip' => '127.0.0.1',
@@ -177,7 +178,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test update functionality in host form and interfaces',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => 20001,
+				'proxy_hostid' => 20000,
 				'status' => HOST_STATUS_MONITORED
 			],
 			[
@@ -185,7 +186,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test clone functionality in host form and interfaces 😀',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => 20001,
+				'proxy_hostid' => 20000,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
 					[
@@ -210,6 +211,18 @@ class testFormHost extends CWebTest {
 						'delay' => '1s',
 						'username' => '',
 						'password' => ''
+					]
+				]
+			],
+			[
+				'host' => 'testFormHost with secret Macro',
+				'groups' => $groups,
+				'macros' => [
+					[
+						'macro' => '{$USER_MACRO}',
+						'value' => 'secret',
+						'description' => 'secret text',
+						'type' => '1'
 					]
 				]
 			]
@@ -265,9 +278,9 @@ class testFormHost extends CWebTest {
 				->asForm(['normalized' => true])->one();
 		$data = [
 			'SNMPv1' => ['SNMP version', 'SNMP community'],
-			'SNMPv2' => ['SNMP version', 'SNMP community'],
-			'SNMPv3' => ['SNMP version', 'Context name', 'Security name', 'Security level'],
-			'authNoPriv' => ['SNMP version', 'Context name', 'Security name', 'Security level',
+			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count'],
+			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level'],
+			'authNoPriv' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level',
 				'Authentication protocol', 'Authentication passphrase'
 			]
 		];
@@ -279,7 +292,7 @@ class testFormHost extends CWebTest {
 			$this->assertEquals($labels, array_values($snmp_form->getLabels()
 					->filter(new CElementFilter(CElementFilter::VISIBLE))->asText())
 			);
-			$this->assertFalse($snmp_form->query('xpath:.//label[text()="Use bulk requests"]')->one()
+			$this->assertFalse($snmp_form->query('xpath:.//label[text()="Use combined requests"]')->one()
 					->asCheckbox()->isChecked()
 			);
 		}
@@ -721,7 +734,7 @@ class testFormHost extends CWebTest {
 						'Visible name' => 'Host with all interfaces visible name',
 						'Host groups' => 'Zabbix servers',
 						'Description' => 'Added description for host with all interfaces',
-						'Monitored by proxy' => 'Active proxy 1',
+						'Monitored by proxy' => 'Proxy for Discovery rule',
 						'Enabled' => false
 					],
 					'interfaces' => [
@@ -748,7 +761,7 @@ class testFormHost extends CWebTest {
 							'Authentication passphrase' => 'ccc',
 							'Privacy protocol' => 'AES128',
 							'Privacy passphrase' => 'ddd',
-							'Use bulk requests' => false
+							'Use combined requests' => false
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -758,7 +771,7 @@ class testFormHost extends CWebTest {
 							'port' => '500',
 							'SNMP version' => 'SNMPv1',
 							'SNMP community' => 'test',
-							'Use bulk requests' => true
+							'Use combined requests' => true
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -1297,7 +1310,8 @@ class testFormHost extends CWebTest {
 							'Security level' => 'authNoPriv',
 							'Authentication protocol' => 'SHA384',
 							'Authentication passphrase' => 'new-test123',
-							'Use bulk requests' => true
+							'Use combined requests' => true,
+							'Max repetition count' => 10
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -1398,7 +1412,8 @@ class testFormHost extends CWebTest {
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'noAuthNoPriv',
-							'Use bulk requests' => true
+							'Use combined requests' => true,
+							'Max repetition count' => 10
 						],
 						[
 							'action' => USER_ACTION_REMOVE,
@@ -1427,7 +1442,7 @@ class testFormHost extends CWebTest {
 				'Visible name' => 'testFormHost_Update Visible name',
 				'Host groups' => 'Zabbix servers',
 				'Description' => 'Created host via API to test update functionality in host form and interfaces',
-				'Monitored by proxy' => 'Active proxy 2',
+				'Monitored by proxy' => 'Proxy for Discovery rule',
 				'Enabled' => true
 			],
 			'interfaces' => [
@@ -1448,7 +1463,7 @@ class testFormHost extends CWebTest {
 						'port' => '122',
 						'SNMP version' => 'SNMPv1',
 						'SNMP community' => '🙃zabbix🙃',
-						'Use bulk requests' => false
+						'Use combined requests' => false
 					]
 				],
 				'JMX' => [
@@ -1615,32 +1630,51 @@ class testFormHost extends CWebTest {
 		return [
 			[
 				[
-					'Host name' => microtime().' clone without interface changes'
-
+					'host' => 'testFormHost with secret Macro',
+					'items' => 0,
+					'fields'  => [
+						'Host name' => microtime().' clone with secret Macros'
+					],
+					'expected' => TEST_ERROR,
+					'error' => 'The cloned host contains user defined macros with type "Secret text".'.
+							' The value and type of these macros were reset.'
 				]
 			],
 			[
 				[
-					'Host name' => microtime().' clone with interface changes',
-					'Visible name' => microtime().'😀😀😀',
-					'Description' => '😀😀😀😀😀😀😀',
-					'Interfaces' => [
-						[
-							'action' => USER_ACTION_ADD,
-							'type' => 'SNMP',
-							'ip' => '127.3.3.3',
-							'dns' => '',
-							'Connect to' => 'IP',
-							'port' => '122',
-							'SNMP version' => 'SNMPv3',
-							'Context name' => 'zabbix',
-							'Security name' => 'selenium',
-							'Security level' => 'authPriv',
-							'Authentication protocol' => 'SHA256',
-							'Authentication passphrase' => 'test123',
-							'Privacy protocol' => 'AES256',
-							'Privacy passphrase' => '456test',
-							'Use bulk requests' => false
+					'host' => 'testFormHost with items',
+					'items' => 3,
+					'fields' => [
+						'Host name' => microtime().' clone without interface changes'
+					]
+				]
+			],
+			[
+				[
+					'host' => 'testFormHost with items',
+					'items' => 3,
+					'fields' => [
+						'Host name' => microtime().' clone with interface changes',
+						'Visible name' => microtime().'😀😀😀',
+						'Description' => '😀😀😀😀😀😀😀',
+						'Interfaces' => [
+							[
+								'action' => USER_ACTION_ADD,
+								'type' => 'SNMP',
+								'ip' => '127.3.3.3',
+								'dns' => '',
+								'Connect to' => 'IP',
+								'port' => '122',
+								'SNMP version' => 'SNMPv3',
+								'Context name' => 'zabbix',
+								'Security name' => 'selenium',
+								'Security level' => 'authPriv',
+								'Authentication protocol' => 'SHA256',
+								'Authentication passphrase' => 'test123',
+								'Privacy protocol' => 'AES256',
+								'Privacy passphrase' => '456test',
+								'Use combined requests' => false
+							]
 						]
 					]
 				]
@@ -1655,13 +1689,12 @@ class testFormHost extends CWebTest {
 	 * @param string    $button        Clone or Full clone
 	 */
 	public function cloneHost($data, $button = 'Clone') {
-		$host = 'testFormHost with items';
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
-		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $host);
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host']));
+		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $data['host']);
 
 		// Get values from form.
-		$form->fill($data);
-		$original = $form->getFields()->asValues();
+		$form->fill($data['fields']);
+		$original = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 
 		// Clone host.
 		$this->query('button', $button)->waitUntilClickable()->one()->click();
@@ -1670,12 +1703,17 @@ class testFormHost extends CWebTest {
 			? COverlayDialogElement::find()->asForm()->waitUntilReady()->one()
 			: $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
 
+		if (CTestArrayHelper::get($data, 'expected')) {
+			$this->assertMessage(TEST_ERROR, null, $data['error']);
+			CMessageElement::find()->one()->close();
+		}
+
 		$cloned_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host added');
 
 		// Check the values of the original host with the cloned host.
-		$this->filterAndSelectHost((CTestArrayHelper::get($data, 'Visible name', $data['Host name'])) )
+		$this->filterAndSelectHost((CTestArrayHelper::get($data['fields'], 'Visible name', $data['fields']['Host name'])))
 				->checkValue($original);
 		COverlayDialogElement::find()->one()->close();
 	}
@@ -1771,7 +1809,7 @@ class testFormHost extends CWebTest {
 				'port' => '500',
 				'SNMP version' => 'SNMPv1',
 				'SNMP community' => 'test',
-				'Use bulk requests' => false
+				'Use combined requests' => false
 			]
 		];
 
@@ -1932,7 +1970,7 @@ class testFormHost extends CWebTest {
 				->query($this->monitoring ? 'tag:a' : "xpath:.//a[@onclick]")->waitUntilClickable();
 
 		if ($this->monitoring) {
-			$host_link->asPopupButton()->one()->select('Configuration');
+			$host_link->asPopupButton()->one()->select('Host');
 		}
 		else {
 			$host_link->one()->click();
@@ -1984,7 +2022,7 @@ class testFormHost extends CWebTest {
 						['name' => 'Host name', 'value' => self::DISCOVERED_HOST, 'maxlength' => 128, 'enabled' => false],
 						['name' => 'Visible name', 'value' => '', 'maxlength' => 128, 'enabled' => false],
 						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
-						['name' => 'Host groups', 'value' => ['Zabbix servers'], 'enabled' => false],
+						['name' => 'Host groups', 'value' => ['Group for discovered host test'], 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' =>  '127.0.0.1',
 								'maxlength' => 64, 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' =>  '',
@@ -2044,22 +2082,30 @@ class testFormHost extends CWebTest {
 					$form->checkValue($ipmi_values);
 
 					foreach (array_keys($ipmi_values) as $label) {
-						$this->assertEquals(255, $form->getField($label)->getAttribute('maxlength'));
 						$this->assertFalse($form->getField($label)->isEnabled());
 					}
+
+					foreach (['Username', 'Password'] as $fields) {
+						$this->assertEquals(255, $form->getField($label)->getAttribute('maxlength'));
+					}
+
 					break;
 
 				case 'Tags':
-					$tags_table = $form->query('id:tags-table')->asMultifieldTable()->one()->waitUntilVisible();
+					$tags_table = $form->query('class:tags-table')->asMultifieldTable()->one()->waitUntilVisible();
 
 					$expected_tags = [
 						[
-							'tag' => 'discovered',
-							'value' => 'true'
+							'tag' => 'action',
+							'value' => 'update'
 						],
 						[
-							'tag' => 'host',
-							'value' => 'no'
+							'tag' => 'tag without value',
+							'value' => ''
+						],
+						[
+							'tag' => 'test',
+							'value' => 'update'
 						]
 					];
 					$tags_table->checkValue($expected_tags);

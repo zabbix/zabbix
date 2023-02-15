@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -264,7 +264,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a widget that shows only unaknowledged problems.
+			// Create a widget that shows only unacknowledged problems.
 			[
 				[
 					'fields' => [
@@ -455,7 +455,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Create a widget that shows only unaknowledged problems.
+			// Totals: Create a widget that shows only unacknowledged problems.
 			[
 				[
 					'fields' => [
@@ -657,7 +657,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update widget to display only unaknowledged problems and to show latest values.
+			// Update widget to display only unacknowledged problems and to show latest values.
 			[
 				[
 					'widget to update' => 'Reference widget 4',
@@ -1174,7 +1174,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update widget to display only unaknowledged problems and to show latest values without timeline.
+			// Update widget to display only unacknowledged problems and to show latest values without timeline.
 			[
 				[
 					'widget to update' => 'Totals reference widget 2',
@@ -1640,7 +1640,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 				'Time' => '2020-10-23 15:33:48',
 				'Host' => 'ЗАББИКС Сервер',
 				'Problem' => 'Test trigger to check tag filter on problem page',
-				'Ack' => 'No'
+				'Update' => 'Update'
 			],
 			'Tags' => ['Database', 'Service: abc', 'service: abcdef'],
 			'rows' => [

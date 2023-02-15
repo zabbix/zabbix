@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,13 +20,11 @@
 #include "listener.h"
 
 #include "zbxconf.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "log.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
+#include "zbx_rtc_constants.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
@@ -38,31 +36,31 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 static volatile sig_atomic_t	need_update_userparam;
 #endif
 
-static void	process_listener(zbx_socket_t *s)
+static void	process_listener(zbx_socket_t *s, int config_timeout)
 {
 	AGENT_RESULT	result;
 	char		**value = NULL;
 	int		ret;
 
-	if (SUCCEED == (ret = zbx_tcp_recv_to(s, CONFIG_TIMEOUT)))
+	if (SUCCEED == (ret = zbx_tcp_recv_to(s, config_timeout)))
 	{
 		zbx_rtrim(s->buffer, "\r\n");
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", s->buffer);
 
-		init_result(&result);
+		zbx_init_agent_result(&result);
 
-		if (SUCCEED == process(s->buffer, PROCESS_WITH_ALIAS, &result))
+		if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result))
 		{
-			if (NULL != (value = GET_TEXT_RESULT(&result)))
+			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
-				ret = zbx_tcp_send_to(s, *value, CONFIG_TIMEOUT);
+				ret = zbx_tcp_send_to(s, *value, config_timeout);
 			}
 		}
 		else
 		{
-			value = GET_MSG_RESULT(&result);
+			value = ZBX_GET_MSG_RESULT(&result);
 
 			if (NULL != value)
 			{
@@ -80,17 +78,17 @@ static void	process_listener(zbx_socket_t *s)
 				buffer_offset++;
 				zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, *value);
 
-				ret = zbx_tcp_send_bytes_to(s, buffer, buffer_offset, CONFIG_TIMEOUT);
+				ret = zbx_tcp_send_bytes_to(s, buffer, buffer_offset, config_timeout);
 			}
 			else
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [" ZBX_NOTSUPPORTED "]");
 
-				ret = zbx_tcp_send_to(s, ZBX_NOTSUPPORTED, CONFIG_TIMEOUT);
+				ret = zbx_tcp_send_to(s, ZBX_NOTSUPPORTED, config_timeout);
 			}
 		}
 
-		free_result(&result);
+		zbx_free_agent_result(&result);
 	}
 
 	if (FAIL == ret)
@@ -113,20 +111,17 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	int				ret;
 	zbx_socket_t			s;
 	zbx_thread_listener_args	*init_child_args_in;
-
-	assert(args);
-	assert(((zbx_thread_args_t *)args)->args);
+	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	init_child_args_in = (zbx_thread_listener_args *)((((zbx_thread_args_t *)args))->args);
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(init_child_args_in->zbx_get_program_type_cb_arg()),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	memcpy(&s, (zbx_socket_t *)(init_child_args_in->listen_sock), sizeof(zbx_socket_t));
+	memcpy(&s, init_child_args_in->listen_sock, sizeof(zbx_socket_t));
 
 	zbx_free(args);
 
@@ -144,14 +139,15 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		if (1 == need_update_userparam)
 		{
 			zbx_setproctitle("listener #%d [reloading user parameters]", process_num);
-			reload_user_parameters(process_type, process_num);
+			reload_user_parameters(process_type, process_num, init_child_args_in->config_file);
 			need_update_userparam = 0;
 		}
 #endif
 
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
-		ret = zbx_tcp_accept(&s, init_child_args_in->zbx_config_tls->accept_modes);
-		zbx_update_env(zbx_time());
+		ret = zbx_tcp_accept(&s, init_child_args_in->zbx_config_tls->accept_modes,
+				init_child_args_in->config_timeout);
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		if (SUCCEED == ret)
 		{
@@ -168,7 +164,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 						&msg)))
 #endif
 				{
-					process_listener(&s);
+					process_listener(&s, init_child_args_in->config_timeout);
 				}
 			}
 

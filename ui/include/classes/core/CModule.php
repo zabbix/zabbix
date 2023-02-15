@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,117 +19,113 @@
 **/
 
 
-namespace Core;
+namespace Zabbix\Core;
 
-use CController as CAction;
+use API,
+	CController as CAction;
 
 /**
  * Base class for user modules. If Module.php is not provided by user module, this class will be instantiated instead.
  */
 class CModule {
 
-	/**
-	 * Module directory path.
-	 *
-	 * @var string
-	 */
-	private $dir;
+	public const TYPE_MODULE = 'module';
+	public const TYPE_WIDGET = 'widget';
 
-	/**
-	 * Module manifest.
-	 *
-	 * @var array
-	 */
-	private $manifest;
+	protected array $manifest;
+	protected string $moduleid;
+	protected string $relative_path;
 
-	/**
-	 * @param string $dir       Module directory path.
-	 * @param array  $manifest  Module manifest.
-	 */
-	public function __construct(string $dir, array $manifest) {
-		$this->dir = $dir;
+	public function __construct(array $manifest, string $moduleid, string $relative_path) {
 		$this->manifest = $manifest;
+		$this->moduleid = $moduleid;
+		$this->relative_path = $relative_path;
 	}
 
-	/**
-	 * Initialize module.
-	 */
 	public function init(): void {
 	}
 
-	/**
-	 * Get module directory path.
-	 *
-	 * @return string
-	 */
-	final public function getDir(): string {
-		return $this->dir;
-	}
-
-	/**
-	 * Get module manifest.
-	 *
-	 * @return array
-	 */
-	final public function getManifest(): array {
+	public function getManifest(): array {
 		return $this->manifest;
 	}
 
-	/**
-	 * Get module id.
-	 *
-	 * @return string
-	 */
-	final public function getId(): string {
+	public function getId(): string {
 		return $this->manifest['id'];
 	}
 
-	/**
-	 * Get module namespace.
-	 *
-	 * @return string
-	 */
-	final public function getNamespace(): string {
+	public function getName(): string {
+		return $this->manifest['name'];
+	}
+
+	public function getNamespace(): string {
 		return $this->manifest['namespace'];
 	}
 
-	/**
-	 * Get module version.
-	 *
-	 * @return string
-	 */
-	final public function getVersion(): string {
+	public function getVersion(): string {
 		return $this->manifest['version'];
 	}
 
-	/**
-	 * Get module actions.
-	 *
-	 * @return array
-	 */
-	final public function getActions(): array {
+	public function getType(): string {
+		return $this->manifest['type'];
+	}
+
+	public function getAuthor(): string {
+		return $this->manifest['author'];
+	}
+
+	public function getUrl(): string {
+		return $this->manifest['url'];
+	}
+
+	public function getDescription(): string {
+		return $this->manifest['description'];
+	}
+
+	public function getActions(): array {
 		return $this->manifest['actions'];
 	}
 
-	/**
-	 * Get module configuration.
-	 *
-	 * @return array
-	 */
-	final public function getConfig(): array {
+	public function getAssets(): array {
+		return $this->manifest['assets'];
+	}
+
+	public function getConfig(): array {
 		return $this->manifest['config'];
+	}
+
+	public function setConfig(array $config): self {
+		$this->manifest['config'] = $config;
+
+		API::Module()->update([[
+			'moduleid' => $this->moduleid,
+			'config' => $config
+		]]);
+
+		return $this;
 	}
 
 	/**
 	 * Get module configuration option.
 	 *
-	 * @param string $name     Option name.
-	 * @param mixed  $default  Default value.
+	 * @param string|null $name     Option name.
+	 * @param mixed       $default  Default value.
 	 *
 	 * @return mixed  Configuration option (if exists) or the $default value.
 	 */
-	final public function getOption(string $name = null, $default = null) {
+	public function getOption(string $name = null, $default = null) {
 		return array_key_exists($name, $this->manifest['config']) ? $this->manifest['config'][$name] : $default;
+	}
+
+	public function getModuleId(): string {
+		return $this->moduleid;
+	}
+
+	public function getRelativePath(): string {
+		return $this->relative_path;
+	}
+
+	public function getTranslationStrings(): array {
+		return [];
 	}
 
 	/**

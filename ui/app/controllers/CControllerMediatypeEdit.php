@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,13 +24,13 @@ class CControllerMediatypeEdit extends CController {
 	private $mediatype = [];
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
 		$fields = [
 			'mediatypeid' =>			'db media_type.mediatypeid',
-			'type' =>					'db media_type.type|in '.implode(',', array_keys(media_type2str())),
+			'type' =>					'db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
 			'name' =>					'db media_type.name',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
@@ -41,11 +41,11 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
-			'exec_params' =>			'array',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
-			'parameters' =>				'array',
+			'parameters_exec' =>		'array',
+			'parameters_webhook' =>		'array',
 			'script' => 				'db media_type.script',
 			'timeout' => 				'db media_type.timeout',
 			'process_tags' =>			'in '.ZBX_MEDIA_TYPE_TAGS_DISABLED.','.ZBX_MEDIA_TYPE_TAGS_ENABLED,
@@ -59,20 +59,11 @@ class CControllerMediatypeEdit extends CController {
 			'description' =>			'db media_type.description',
 			'form_refresh' =>			'int32',
 			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
-			'message_templates' =>		'array'
+			'message_templates' =>		'array',
+			'provider' =>				'int32| in '.implode(',', array_keys(CMediatypeHelper::getEmailProviders()))
 		];
 
 		$ret = $this->validateInput($fields);
-
-		if ($ret && $this->hasInput('exec_params')) {
-			foreach ($this->getInput('exec_params') as $exec_param) {
-				if (count($exec_param) != 1
-						|| !array_key_exists('exec_param', $exec_param) || !is_string($exec_param['exec_param'])) {
-					$ret = false;
-					break;
-				}
-			}
-		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -90,9 +81,9 @@ class CControllerMediatypeEdit extends CController {
 			$mediatypes = API::Mediatype()->get([
 				'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email',
 					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
-					'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
+					'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts',
 					'attempt_interval', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu',
-					'event_menu_url', 'event_menu_name', 'parameters', 'description'
+					'event_menu_url', 'event_menu_name', 'parameters', 'description', 'provider'
 				],
 				'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 				'mediatypeids' => $this->getInput('mediatypeid'),
@@ -112,20 +103,21 @@ class CControllerMediatypeEdit extends CController {
 	protected function doAction() {
 		// default values
 		$db_defaults = DB::getDefaults('media_type');
+		$email_defaults =  CMediatypeHelper::getEmailProviders(CMediatypeHelper::EMAIL_PROVIDER_SMTP);
+
 		$data = [
-			'sid' => $this->getUserSID(),
 			'mediatypeid' => 0,
 			'type' => MEDIA_TYPE_EMAIL,
+			'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
 			'name' => '',
-			'smtp_server' => 'mail.example.com',
-			'smtp_port' => $db_defaults['smtp_port'],
-			'smtp_helo' => 'example.com',
-			'smtp_email' => 'zabbix@example.com',
-			'smtp_security' => $db_defaults['smtp_security'],
-			'smtp_verify_peer' => $db_defaults['smtp_verify_peer'],
-			'smtp_verify_host' => $db_defaults['smtp_verify_host'],
-			'smtp_authentication' => $db_defaults['smtp_authentication'],
-			'exec_params' => [],
+			'smtp_server' => $email_defaults['smtp_server'],
+			'smtp_port' => $email_defaults['smtp_port'],
+			'smtp_helo' => $db_defaults['smtp_helo'],
+			'smtp_email' => $email_defaults['smtp_email'],
+			'smtp_security' => $email_defaults['smtp_security'],
+			'smtp_verify_peer' => $email_defaults['smtp_verify_peer'],
+			'smtp_verify_host' => $email_defaults['smtp_verify_host'],
+			'smtp_authentication' => $email_defaults['smtp_authentication'],
 			'exec_path' => '',
 			'gsm_modem' => '/dev/ttyS0',
 			'smtp_username' => '',
@@ -141,7 +133,8 @@ class CControllerMediatypeEdit extends CController {
 			'show_event_menu' => $db_defaults['show_event_menu'],
 			'event_menu_url' => $db_defaults['event_menu_url'],
 			'event_menu_name' => $db_defaults['event_menu_name'],
-			'parameters' => [
+			'parameters_exec' => [],
+			'parameters_webhook' => [
 				['name' => 'URL', 'value'=> ''],
 				['name' => 'HTTPProxy', 'value'=> ''],
 				['name' => 'To', 'value' => '{ALERT.SENDTO}'],
@@ -150,8 +143,9 @@ class CControllerMediatypeEdit extends CController {
 			],
 			'description' => '',
 			'form_refresh' => 0,
-			'content_type' => $db_defaults['content_type'],
-			'message_templates' => []
+			'content_type' => $email_defaults['content_type'],
+			'message_templates' => [],
+			'providers' => CMediatypeHelper::getEmailProviders()
 		];
 		$message_templates = [];
 
@@ -171,14 +165,8 @@ class CControllerMediatypeEdit extends CController {
 			$data['exec_path'] = $this->mediatype['exec_path'];
 			$data['content_type'] = $this->mediatype['content_type'];
 			$data['description'] = $this->mediatype['description'];
+			$data['provider'] = $this->mediatype['provider'];
 			$message_templates = $this->mediatype['message_templates'];
-
-			$this->mediatype['exec_params'] = explode("\n", $this->mediatype['exec_params']);
-			foreach ($this->mediatype['exec_params'] as $exec_param) {
-				$data['exec_params'][] = ['exec_param' => $exec_param];
-			}
-			// Remove last empty new line param.
-			array_pop($data['exec_params']);
 
 			$data['gsm_modem'] = $this->mediatype['gsm_modem'];
 			$data['passwd'] = $this->mediatype['passwd'];
@@ -192,6 +180,10 @@ class CControllerMediatypeEdit extends CController {
 					$data['smtp_username'] = $this->mediatype['username'];
 					break;
 
+				case MEDIA_TYPE_EXEC:
+					$data['parameters_exec'] = $this->mediatype['parameters'];
+					break;
+
 				case MEDIA_TYPE_SMS:
 					$data['maxsessions'] = 1;
 					break;
@@ -203,8 +195,8 @@ class CControllerMediatypeEdit extends CController {
 					$data['show_event_menu'] = $this->mediatype['show_event_menu'];
 					$data['event_menu_url'] = $this->mediatype['event_menu_url'];
 					$data['event_menu_name'] = $this->mediatype['event_menu_name'];
-					$data['parameters'] = $this->mediatype['parameters'];
-					CArrayHelper::sort($data['parameters'], ['name']);
+					$data['parameters_webhook'] = $this->mediatype['parameters'];
+					CArrayHelper::sort($data['parameters_webhook'], ['name']);
 					break;
 			}
 
@@ -213,21 +205,25 @@ class CControllerMediatypeEdit extends CController {
 
 		// overwrite with input variables
 		$this->getInputs($data, ['type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
-			'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'exec_path', 'gsm_modem',
+			'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_path', 'gsm_modem',
 			'smtp_username', 'passwd', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'maxsessionsType',
 			'form_refresh', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
-			'event_menu_name', 'description'
+			'event_menu_name', 'description', 'provider'
 		]);
-		$data['exec_params'] = array_values($data['exec_params']);
 
 		if ($this->hasInput('form_refresh')) {
-			$data['parameters'] = [];
-			$parameters = $this->getInput('parameters', ['name' => [], 'value' => []]);
+			$data['parameters_exec'] = [];
+			foreach (array_values($this->getInput('parameters_exec', [])) as $sortorder => $parameter) {
+				$data['parameters_exec'][] = ['sortorder' => $sortorder, 'value' => $parameter['value']];
+			}
+
+			$data['parameters_webhook'] = [];
+			$parameters = $this->getInput('parameters_webhook', ['name' => [], 'value' => []]);
 			$name = reset($parameters['name']);
 			$value = reset($parameters['value']);
 
 			while ($name !== false) {
-				$data['parameters'][] = compact('name', 'value');
+				$data['parameters_webhook'][] = compact('name', 'value');
 				$name = next($parameters['name']);
 				$value = next($parameters['value']);
 			}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,12 +23,11 @@
 #include "module.h"
 
 extern char	*CONFIG_SOURCE_IP;
-extern int	CONFIG_TIMEOUT;
 
 int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESULT *result);
 int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,
 		AGENT_RESULT *result);
 
-int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	zabbix_stats(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif /* ZABBIX_SYSINFO_COMMON_ZABBIX_STATS_H_ */

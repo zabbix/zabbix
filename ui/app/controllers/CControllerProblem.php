@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 
 /**
- * Base controller for the "Monitoring->Problems" page.
+ * Base controller for the "Monitoring->Problems" page and the "Problems" asynchronous requests.
  */
 abstract class CControllerProblem extends CController {
 
@@ -41,10 +41,11 @@ abstract class CControllerProblem extends CController {
 		'evaltype' => TAG_EVAL_TYPE_AND_OR,
 		'tags' => [],
 		'show_tags' => SHOW_TAGS_3,
+		'show_symptoms' => 0,
 		'show_suppressed' => 0,
 		'unacknowledged' => 0,
 		'compact_view' => 0,
-		'show_timeline' => 1,
+		'show_timeline' => ZBX_TIMELINE_ON,
 		'details' => 0,
 		'highlight_row' => 0,
 		'show_opdata' => OPERATIONAL_DATA_SHOW_NONE,
@@ -71,21 +72,9 @@ abstract class CControllerProblem extends CController {
 		$range_time_parser->parse($filter['to']);
 		$filter['to'] = $range_time_parser->getDateTime(false)->getTimestamp();
 
-		$data = CScreenProblem::getData($filter);
+		$data = CScreenProblem::getData($filter, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));
 
 		return count($data['problems']);
-	}
-
-	/**
-	 * Get resulting rows for specified filter.
-	 *
-	 * @param array $filter  Filter fields values.
-	 *
-	 * @return array
-	 */
-	protected function getData(array $filter): array {
-		// getData is handled by jsrpc.php 'screen.get' action.
-		return [];
 	}
 
 	/**
@@ -130,6 +119,7 @@ abstract class CControllerProblem extends CController {
 				$trigger['prefix'] = $trigger['hosts'][0]['name'].NAME_DELIMITER;
 				unset($trigger['hosts']);
 			}
+			unset($trigger);
 
 			$data['triggers'] = $triggers;
 		}
@@ -168,5 +158,52 @@ abstract class CControllerProblem extends CController {
 		}
 
 		return $input;
+	}
+
+	/**
+	 * Validate input of filter inventory fields.
+	 *
+	 * @return bool
+	 */
+	protected function validateInventory(): bool {
+		if (!$this->hasInput('inventory')) {
+			return true;
+		}
+
+		$ret = true;
+		foreach ($this->getInput('inventory') as $filter_inventory) {
+			if (count($filter_inventory) != 2
+					|| !array_key_exists('field', $filter_inventory) || !is_string($filter_inventory['field'])
+					|| !array_key_exists('value', $filter_inventory) || !is_string($filter_inventory['value'])) {
+				$ret = false;
+				break;
+			}
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Validate values of filter tags input fields.
+	 *
+	 * @return bool
+	 */
+	protected function validateTags(): bool {
+		if (!$this->hasInput('tags')) {
+			return true;
+		}
+
+		$ret = true;
+		foreach ($this->getInput('tags') as $filter_tag) {
+			if (count($filter_tag) != 3
+					|| !array_key_exists('tag', $filter_tag) || !is_string($filter_tag['tag'])
+					|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])
+					|| !array_key_exists('operator', $filter_tag) || !is_string($filter_tag['operator'])) {
+				$ret = false;
+				break;
+			}
+		}
+
+		return $ret;
 	}
 }

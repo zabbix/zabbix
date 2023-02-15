@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_u
 
 	device->index++;
 
-	if (MAX_COLLECTOR_HISTORY == device->index)
+	if (ZBX_MAX_COLLECTOR_HISTORY == device->index)
 		device->index = 0;
 
 	device->clock[device->index] = now;
@@ -53,7 +53,7 @@ static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_u
 	clock[ZBX_AVG1] = clock[ZBX_AVG5] = clock[ZBX_AVG15] = now + 1;
 	index[ZBX_AVG1] = index[ZBX_AVG5] = index[ZBX_AVG15] = -1;
 
-	for (i = 0; i < MAX_COLLECTOR_HISTORY; i++)
+	for (i = 0; i < ZBX_MAX_COLLECTOR_HISTORY; i++)
 	{
 		if (0 == device->clock[i])
 			continue;
@@ -102,7 +102,7 @@ static void	process_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device)
 	zbx_uint64_t	dstat[ZBX_DSTAT_MAX];
 
 	now = time(NULL);
-	if (FAIL == get_diskstat(device->name, dstat))
+	if (FAIL == zbx_get_diskstat(device->name, dstat))
 		return;
 
 	apply_diskstat(device, now, dstat);

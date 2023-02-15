@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,20 +22,23 @@
 #ifdef HAVE_UNIXODBC
 
 #include "log.h"
+#include "zbxsysinfo.h"
+
 #include "../odbc/odbc.h"
 
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve data from database                                       *
  *                                                                            *
- * Parameters: item   - [IN] item we are interested in                        *
- *             result - [OUT] check result                                    *
+ * Parameters: item           - [IN] item we are interested in                *
+ *             config_timeout - [IN]                                          *
+ *             result         - [OUT] check result                            *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_db(const DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_db(const DC_ITEM *item, int config_timeout, AGENT_RESULT *result)
 {
 	AGENT_REQUEST		request;
 	const char		*dsn, *connection = NULL;
@@ -47,9 +50,9 @@ int	get_value_db(const DC_ITEM *item, AGENT_RESULT *result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' query:'%s'", __func__, item->key_orig, item->params);
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
@@ -92,7 +95,7 @@ int	get_value_db(const DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (NULL != (data_source = zbx_odbc_connect(dsn, connection, item->username, item->password, CONFIG_TIMEOUT,
+	if (NULL != (data_source = zbx_odbc_connect(dsn, connection, item->username, item->password, config_timeout,
 			&error)))
 	{
 		if (NULL != (query_result = zbx_odbc_select(data_source, item->params, &error)))
@@ -114,7 +117,7 @@ int	get_value_db(const DC_ITEM *item, AGENT_RESULT *result)
 	if (SUCCEED != ret)
 		SET_MSG_RESULT(result, error);
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

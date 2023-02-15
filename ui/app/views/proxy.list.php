@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,6 +55,18 @@ $filter = (new CFilter())
 						->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
 						->setModern(true)
 				)
+			]),
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('Version')),
+				new CFormField(
+					(new CRadioButtonList('filter_version', (int) $data['filter']['version']))
+						->addValue(_('Any'), -1)
+						->addValue(_('Current'), ZBX_PROXY_VERSION_CURRENT)
+						->addValue(_('Outdated'), ZBX_PROXY_VERSION_ALL_OUTDATED)
+						->setModern(true)
+				)
 			])
 	]);
 
@@ -62,28 +74,46 @@ $form = (new CForm())
 	->setId('proxy-list')
 	->setName('proxy_list');
 
+$view_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'proxy.list')
+	->getUrl();
+
 $proxy_list = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'proxyids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder'],
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'proxy.list')
-				->getUrl()
-		),
-		_('Mode'),
-		_('Encryption'),
-		_('Compression'),
-		_('Last seen (age)'),
+		make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Mode'), 'status', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Encryption'), 'tls_accept', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Version'), 'version', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Last seen (age)'), 'lastaccess', $data['sort'], $data['sortorder'], $view_url),
 		_('Host count'),
 		_('Item count'),
-		_('Required performance (vps)'),
+		_('Required vps'),
 		_('Hosts')
 	]);
 
 foreach ($data['proxies'] as $proxyid => $proxy) {
 	$hosts = [];
+	$version = $proxy['version'];
+	$compatibility = $proxy['compatibility'];
+
+	// Info icons.
+	$info_icons = [];
+	if ($compatibility == ZBX_PROXY_VERSION_OUTDATED) {
+		$version = (new CSpan($version))->addClass(ZBX_STYLE_RED);
+		$info_icons[] = makeWarningIcon(_s(
+			'Proxy version is outdated, only data collection and remote execution is available with server version %1$s.',
+			$data['server_version']
+		));
+	}
+	elseif ($compatibility == ZBX_PROXY_VERSION_UNSUPPORTED) {
+		$version = (new CSpan($version))->addClass(ZBX_STYLE_RED);
+		$info_icons[] = makeErrorIcon(
+			_s('Proxy version is not supported by server version %1$s.', $data['server_version'])
+		);
+	}
 
 	foreach ($proxy['hosts'] as $host_index => $host) {
 		if ($host_index >= $data['config']['max_in_table']) {
@@ -157,10 +187,8 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$encryption,
-		($proxy['auto_compress'] == HOST_COMPRESSION_ON)
-			? (new CSpan(_('On')))->addClass(ZBX_STYLE_STATUS_GREEN)
-			: (new CSpan(_('Off')))->addClass(ZBX_STYLE_STATUS_GREY),
-		($proxy['lastaccess'] == 0)
+		$info_icons ? [$version, '&nbsp;', makeInformationList($info_icons)] : $version,
+		$proxy['lastaccess'] == 0
 			? (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED)
 			: zbx_date2age($proxy['lastaccess']),
 		array_key_exists('host_count', $proxy) ? $proxy['host_count'] : '',
@@ -201,7 +229,7 @@ $form->addItem(
 	], 'proxy')
 );
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Proxies'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_PROXY_LIST))
 	->setControls(

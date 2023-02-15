@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,22 +34,25 @@ class HostMacrosManager {
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
 
-	constructor({readonly, parent_hostid}) {
+	constructor({readonly, parent_hostid} = {}) {
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
 		this.$container = $('#macros_container .table-forms-td-right');
 	}
 
-	load(show_inherited_macros, templateids) {
+	load(show_inherited_macros, templateids = null) {
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'hostmacros.list');
 
 		const post_data = {
 			macros: this.getMacros(),
 			show_inherited_macros: show_inherited_macros ? 1 : 0,
-			templateids: templateids,
 			readonly: this.readonly ? 1 : 0
 		};
+
+		if (templateids !== null) {
+			post_data.templateids = templateids;
+		}
 
 		if (this.parent_hostid !== null) {
 			post_data.parent_hostid = this.parent_hostid;
@@ -167,18 +170,22 @@ class HostMacrosManager {
 					$('#macros_' + macro_num + '_value')
 						.closest('.macro-input-group')
 						.find('.btn-undo')
-						.hide();
+						.remove();
 					$('#macros_' + macro_num + '_value_btn').prop('disabled', true);
 					$('#macros_' + macro_num + '_change_inheritance').text(t('Change'));
+					$('#macros_' + macro_num + '_allow_revert').remove();
+					$('#macros_' + macro_num + '_hostmacroid').remove();
 				}
 				else {
 					// Switching from ZBX_PROPERTY_INHERITED to ZBX_PROPERTY_BOTH.
 					$('#macros_' + macro_num + '_inherited_type')
 						.val(inherited_type | HostMacrosManager.ZBX_PROPERTY_OWN);
 					$('#macros_' + macro_num + '_value')
+						.prop('disabled', false)
 						.prop('readonly', false)
+						.attr({'placeholder': t('value')})
+						.val('')
 						.focus();
-					$('#macros_' + macro_num + '_value_btn').prop('disabled', false);
 					$('#macros_' + macro_num + '_description').prop('readonly', false);
 					$('#macros_' + macro_num + '_type_button')
 						.prop('disabled', false)
@@ -266,13 +273,6 @@ class HostMacrosManager {
 				.addClass('initialized-field')
 				.textareaFlexible();
 		});
-
-		// Init tab indicator observer.
-		const tab = document.querySelector('#tab_macros-tab, #tab_macroTab');
-
-		if (tab) {
-			new MacrosTabIndicatorItem().initObserver(tab);
-		}
 	}
 
 	getMacroTable() {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,22 +22,36 @@
 class CControllerDashboardView extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
 		$fields = [
 			'dashboardid' =>		'db dashboard.dashboardid',
-			'source_dashboardid' =>	'db dashboard.dashboardid',
 			'hostid' =>				'db hosts.hostid',
 			'new' =>				'in 1',
 			'cancel' =>				'in 1',
+			'clone' =>				'in 1',
 			'from' =>				'range_time',
 			'to' =>					'range_time',
 			'slideshow' =>			'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
+
+		if ($ret && $this->hasInput('clone')) {
+			$validator = new CNewValidator($this->getInputAll(), [
+				'dashboardid' => 'required'
+			]);
+
+			foreach ($validator->getAllErrors() as $error) {
+				info($error);
+			}
+
+			if ($validator->isErrorFatal() || $validator->isError()) {
+				$ret = false;
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -51,7 +65,7 @@ class CControllerDashboardView extends CController {
 			return false;
 		}
 
-		if ($this->hasInput('new') || $this->hasInput('source_dashboardid')) {
+		if ($this->hasInput('new') || $this->hasInput('clone')) {
 			return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 		}
 
@@ -69,6 +83,9 @@ class CControllerDashboardView extends CController {
 		return true;
 	}
 
+	/**
+	 * @throws JsonException
+	 */
 	protected function doAction() {
 		[$dashboard, $error] = $this->getDashboard();
 
@@ -99,18 +116,25 @@ class CControllerDashboardView extends CController {
 
 		$time_selector_options = [
 			'profileIdx' => 'web.dashboard.filter',
-			'profileIdx2' => ($dashboard['dashboardid'] !== null) ? $dashboard['dashboardid'] : 0,
+			'profileIdx2' => $dashboard['dashboardid'] ?? 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
 		];
 
 		updateTimeSelectorPeriod($time_selector_options);
 
+		$widget_defaults = APP::ModuleManager()->getWidgetsDefaults();
+
 		$data = [
 			'dashboard' => $dashboard,
-			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD),
+			'widget_defaults' => $widget_defaults,
+			'widget_last_type' => CDashboardHelper::getWidgetLastType(),
+			'configuration_hash' => $dashboard['dashboardid'] !== null
+				? CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults)
+				: null,
 			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
 			'time_period' => getTimeSelectorPeriod($time_selector_options),
+			'clone' => $this->hasInput('clone'),
 			'active_tab' => CProfile::get('web.dashboard.filter.active', 1)
 		];
 
@@ -143,10 +167,8 @@ class CControllerDashboardView extends CController {
 
 	/**
 	 * Get dashboard data from API.
-	 *
-	 * @return array
 	 */
-	private function getDashboard() {
+	private function getDashboard(): array {
 		$dashboard = null;
 		$error = null;
 
@@ -172,19 +194,18 @@ class CControllerDashboardView extends CController {
 				'has_related_reports' => false
 			];
 		}
-		elseif ($this->hasInput('source_dashboardid')) {
-			// Clone dashboard and show as new.
+		elseif ($this->hasInput('clone')) {
 			$dashboards = API::Dashboard()->get([
-				'output' => ['name', 'private', 'display_period', 'auto_start'],
+				'output' => ['dashboardid', 'name', 'private', 'display_period', 'auto_start'],
 				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'selectUsers' => ['userid', 'permission'],
 				'selectUserGroups' => ['usrgrpid', 'permission'],
-				'dashboardids' => [$this->getInput('source_dashboardid')]
+				'dashboardids' => $this->getInput('dashboardid')
 			]);
 
 			if ($dashboards) {
 				$dashboard = [
-					'dashboardid' => null,
+					'dashboardid' => $dashboards[0]['dashboardid'],
 					'name' => $dashboards[0]['name'],
 					'display_period' => $dashboards[0]['display_period'],
 					'auto_start' => $dashboards[0]['auto_start'],
@@ -231,7 +252,7 @@ class CControllerDashboardView extends CController {
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid', 'name', 'userid', 'display_period', 'auto_start'],
 					'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
-					'dashboardids' => [$dashboardid],
+					'dashboardids' => $dashboardid,
 					'preservekeys' => true
 				]);
 
@@ -266,14 +287,8 @@ class CControllerDashboardView extends CController {
 
 	/**
 	 * Checks, if any of widgets has checked dynamic field.
-	 *
-	 * @param array $grid_pages
-	 *
-	 * @static
-	 *
-	 * @return bool
 	 */
-	private static function hasDynamicWidgets($grid_pages) {
+	private static function hasDynamicWidgets($grid_pages): bool {
 		foreach ($grid_pages as $page) {
 			foreach ($page['widgets'] as $widget) {
 				if (array_key_exists('dynamic', $widget['fields']) && $widget['fields']['dynamic'] == 1) {

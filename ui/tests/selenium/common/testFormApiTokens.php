@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ class testFormApiTokens extends CWebTest {
 
 		// Check the presence of User field and that it is empty by default if it exists.
 		if ($source === 'administration') {
-			$this->assertEquals([], $form->getField('User')->getValue());
+			$this->assertEquals('', $form->getField('User')->getValue());
 		}
 		else {
 			$this->assertFalse($form->query('xpath://label[text()="User"]')->one(false)->isDisplayed());

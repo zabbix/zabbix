@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -192,7 +192,7 @@ function _xn($message, $messagePlural, $num, $context) {
 /**
  * Returns a formatted string.
  *
- * @param string $format		receives already stranlated string with format
+ * @param string $format		receives already translated string with format
  * @param array  $arguments		arguments to replace according to given format
  *
  * @return string

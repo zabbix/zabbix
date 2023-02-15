@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,14 +47,8 @@ class CValueMap extends CApiService {
 			// filter
 			'valuemapids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'valuemapid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'hostid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
-			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['valuemapid', 'hostid', 'name']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -183,6 +177,13 @@ class CValueMap extends CApiService {
 				];
 			}
 
+			if (array_key_exists('uuid', $valuemap) && $valuemap['uuid'] !== $db_valuemap['uuid']) {
+				$upd_valuemaps[] = [
+					'values' => ['uuid' => $valuemap['uuid'], 'name' => $valuemap['name']],
+					'where' => ['valuemapid' => $valuemap['valuemapid']]
+				];
+			}
+
 			if (array_key_exists('mappings', $valuemap)) {
 				$valuemaps_mappings[$valuemapid] = [];
 				$sortorder = 0;
@@ -282,6 +283,7 @@ class CValueMap extends CApiService {
 	 */
 	public function delete(array $valuemapids) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $valuemapids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -293,24 +295,54 @@ class CValueMap extends CApiService {
 			'preservekeys' => true
 		]);
 
-		foreach ($valuemapids as $valuemapid) {
-			if (!array_key_exists($valuemapid, $db_valuemaps)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($db_valuemaps) != count($valuemapids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		DB::update('items', [[
-			'values' => ['valuemapid' => 0],
-			'where' => ['valuemapid' => $valuemapids]
-		]]);
+		self::resetItemValuemaps($valuemapids);
 
 		$this->deleteByIds($valuemapids);
 
 		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_VALUE_MAP, $db_valuemaps);
 
 		return ['valuemapids' => $valuemapids];
+	}
+
+	/**
+	 * Reset the links on the given value maps for items, item prototypes.
+	 *
+	 * @param array $valuemapids
+	 */
+	private static function resetItemValuemaps(array $valuemapids): void {
+		$options = [
+			'output' => ['itemid', 'name', 'flags', 'valuemapid'],
+			'filter' => ['valuemapid' => $valuemapids]
+		];
+		$result = DBselect(DB::makeSql('items', $options));
+
+		$items = [];
+		$db_items = [];
+		$item_prototypes = [];
+		$db_item_prototypes = [];
+
+		while ($row = DBfetch($result)) {
+			if (in_array($row['flags'], [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])) {
+				$items[] = ['itemid' => $row['itemid'], 'valuemapid' => 0];
+				$db_items[$row['itemid']] = $row;
+			}
+			else {
+				$item_prototypes[] = ['itemid' => $row['itemid'], 'valuemapid' => 0];
+				$db_item_prototypes[$row['itemid']] = $row;
+			}
+		}
+
+		if ($items) {
+			CItem::updateForce($items, $db_items);
+		}
+
+		if ($item_prototypes) {
+			CItemPrototype::updateForce($item_prototypes, $db_item_prototypes);
+		}
 	}
 
 	/**
@@ -344,7 +376,7 @@ class CValueMap extends CApiService {
 	 */
 	private function validateCreate(array &$valuemaps) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['hostid', 'name']], 'fields' => [
-			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'uuid' =>		['type' => API_UUID],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
@@ -461,6 +493,7 @@ class CValueMap extends CApiService {
 	 */
 	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['valuemapid']], 'fields' => [
+			'uuid' =>		['type' => API_UUID],
 			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
@@ -496,13 +529,14 @@ class CValueMap extends CApiService {
 				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$this->validateValuemapMappings($valuemaps);
 		$db_valuemaps = $this->get([
-			'output' => ['valuemapid', 'hostid', 'name'],
+			'output' => ['valuemapid', 'hostid', 'name', 'uuid'],
 			'valuemapids' => array_column($valuemaps, 'valuemapid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -548,7 +582,7 @@ class CValueMap extends CApiService {
 	 *
 	 * @param array $valuemaps  Array of valuemaps
 	 *
-	 * @throws Exception when non uniquw
+	 * @throws Exception when non unique
 	 */
 	protected function validateValuemapMappings(array $valuemaps) {
 		$i = 0;

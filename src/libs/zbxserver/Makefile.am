@@ -13,7 +13,6 @@ libzbxserver_a_SOURCES = \
 	expression.h \
 	macrofunc.c \
 	macrofunc.h \
-	zabbix_stats.c \
 	get_host_from_event.c \
 	get_host_from_event.h \
 	zabbix_users.c \
@@ -21,4 +20,4 @@ libzbxserver_a_SOURCES = \
 	calc_checks_eval.c \
 	evaluate_simple.c
 
-libzbxserver_a_CFLAGS = -I$(top_srcdir)/src/libs/zbxdbcache $(LIBXML2_CFLAGS)
+libzbxserver_a_CFLAGS = $(LIBXML2_CFLAGS)

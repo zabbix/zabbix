@@ -1,6 +1,5 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:33:23Z'
+  version: '6.4'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -23,6 +22,9 @@ zabbix_export:
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393527-discussion-thread-for-official-zabbix-template-haproxy
         
         Template tooling version used: 0.41
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications
@@ -2501,7 +2503,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -2524,7 +2526,7 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '24'
                   height: '5'
@@ -2548,7 +2550,7 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: Backend {#PXNAME} Responses by HTTP code'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'
@@ -2578,7 +2580,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -2601,7 +2603,7 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: Frontend {#PXNAME} Requests and sessions per second'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '24'
                   height: '5'
@@ -2625,7 +2627,7 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: Frontend {#PXNAME} Errors and denials per second'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'
@@ -2649,7 +2651,7 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: Frontend {#PXNAME} Responses by HTTP code'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '15'
                   width: '24'
                   height: '5'
@@ -2679,7 +2681,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -2702,7 +2704,7 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '24'
                   height: '5'
@@ -2726,7 +2728,7 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: {#PXNAME} {#SVNAME} Responses by HTTP code'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'

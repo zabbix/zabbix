@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 
 extern "C"
 {
+#	include "../sysinfo.h"
 #	include "zbxstr.h"
-#	include "sysinfo.h"
 #	include "log.h"
 #	include "zbxalgo.h"
 #	include "zbxjson.h"
@@ -133,16 +133,15 @@ extern "C" static void	get_error_code_text(HRESULT hres, char **error)
 		else
 		{
 			*error = zbx_dsprintf(*error, "error code:" ZBX_FS_I64, hres);
-			zabbix_log(LOG_LEVEL_DEBUG, "GetErrorCodeText() failed with code:" ZBX_FS_I64 " when retrieving error"
-					" code for " ZBX_FS_I64, sc, hres);
+			zabbix_log(LOG_LEVEL_DEBUG, "GetErrorCodeText() failed with code:" ZBX_FS_I64
+					" when retrieving error code for " ZBX_FS_I64, sc, hres);
 		}
-		pStatus->Release();
 	}
 	else
 	{
 		*error = zbx_dsprintf(*error, "error code:" ZBX_FS_I64, hres);
-		zabbix_log(LOG_LEVEL_DEBUG, "CoCreateInstance() failed with code:" ZBX_FS_I64 " when retrieving error code"
-				" for:" ZBX_FS_I64, sc, hres);
+		zabbix_log(LOG_LEVEL_DEBUG, "CoCreateInstance() failed with code:" ZBX_FS_I64
+				" when retrieving error code for:" ZBX_FS_I64, sc, hres);
 	}
 
 	if (NULL != pStatus)
@@ -230,7 +229,7 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	zbx_vector_wmi_instance_append(wmi_values, inst_val);
 out1:
 	pclsObj->Release();
-out2:	
+out2:
 	return ret;
 }
 
@@ -480,7 +479,7 @@ out:
  *               SYSINFO_RET_FAIL - retrieving WMI value failed               *
  *                                                                            *
  ******************************************************************************/
-extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+extern "C" int	wmi_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*wmi_namespace, *wmi_query, *error = NULL;
 	VARIANT				*vtProp;
@@ -505,8 +504,8 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_wmi_instance_create(&wmi_values);
 
-	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_first_first, CONFIG_TIMEOUT,
-			&wmi_values, &error))
+	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_first_first,
+			sysinfo_get_config_timeout(), &wmi_values, &error))
 	{
 		goto out;
 	}
@@ -928,6 +927,7 @@ extern "C" int	convert_wmi_json(zbx_vector_wmi_instance_t *wmi_values, char **js
 	}
 
 	zbx_json_free(&j);
+
 	return ret;
 }
 
@@ -942,7 +942,7 @@ extern "C" int	convert_wmi_json(zbx_vector_wmi_instance_t *wmi_values, char **js
  *               SYSINFO_RET_FAIL - retrieving WMI value failed               *
  *                                                                            *
  ******************************************************************************/
-extern "C" int	WMI_GETALL(AGENT_REQUEST *request, AGENT_RESULT *result)
+extern "C" int	wmi_getall(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*wmi_namespace, *wmi_query, *jd = NULL, *error = NULL;
 	int				ret = SYSINFO_RET_FAIL;
@@ -965,8 +965,8 @@ extern "C" int	WMI_GETALL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_wmi_instance_create(&wmi_values);
 
-	if (SYSINFO_RET_OK == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_all, CONFIG_TIMEOUT, &wmi_values,
-			&error))
+	if (SYSINFO_RET_OK == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_all, sysinfo_get_config_timeout(),
+			&wmi_values, &error))
 	{
 		ret = convert_wmi_json(&wmi_values, &jd, &error);
 	}

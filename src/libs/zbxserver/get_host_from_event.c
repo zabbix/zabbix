@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "zbxnum.h"
 #include "log.h"
+#include "zbx_host_constants.h"
 
 #ifdef HAVE_OPENIPMI
 #	define ZBX_IPMI_FIELDS_NUM	4	/* number of selected IPMI-related fields in function */
@@ -29,7 +30,7 @@
 #	define ZBX_IPMI_FIELDS_NUM	0
 #endif
 
-int	get_host_from_event(const ZBX_DB_EVENT *event, DC_HOST *host, char *error, size_t max_error_len)
+int	get_host_from_event(const zbx_db_event *event, DC_HOST *host, char *error, size_t max_error_len)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -99,9 +100,9 @@ int	get_host_from_event(const ZBX_DB_EVENT *event, DC_HOST *host, char *error, s
 
 	host->hostid = 0;
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (0 != host->hostid)
 		{
@@ -120,23 +121,23 @@ int	get_host_from_event(const ZBX_DB_EVENT *event, DC_HOST *host, char *error, s
 
 		ZBX_STR2UINT64(host->hostid, row[0]);
 		ZBX_DBROW2UINT64(host->proxy_hostid, row[1]);
-		strscpy(host->host, row[2]);
+		zbx_strscpy(host->host, row[2]);
 		ZBX_STR2UCHAR(host->tls_connect, row[3]);
 
 #ifdef HAVE_OPENIPMI
 		host->ipmi_authtype = (signed char)atoi(row[4]);
 		host->ipmi_privilege = (unsigned char)atoi(row[5]);
-		strscpy(host->ipmi_username, row[6]);
-		strscpy(host->ipmi_password, row[7]);
+		zbx_strscpy(host->ipmi_username, row[6]);
+		zbx_strscpy(host->ipmi_password, row[7]);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		strscpy(host->tls_issuer, row[4 + ZBX_IPMI_FIELDS_NUM]);
-		strscpy(host->tls_subject, row[5 + ZBX_IPMI_FIELDS_NUM]);
-		strscpy(host->tls_psk_identity, row[6 + ZBX_IPMI_FIELDS_NUM]);
-		strscpy(host->tls_psk, row[7 + ZBX_IPMI_FIELDS_NUM]);
+		zbx_strscpy(host->tls_issuer, row[4 + ZBX_IPMI_FIELDS_NUM]);
+		zbx_strscpy(host->tls_subject, row[5 + ZBX_IPMI_FIELDS_NUM]);
+		zbx_strscpy(host->tls_psk_identity, row[6 + ZBX_IPMI_FIELDS_NUM]);
+		zbx_strscpy(host->tls_psk, row[7 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (FAIL == ret)
 	{

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,13 +33,12 @@ $this->includeJsFile('monitoring.map.view.js.php');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Maps'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_MAP_VIEW))
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([
 		(new CForm('get'))
-			->cleanItems()
 			->setName('map.view')
 			->addVar('action', 'map.view')
 			->addVar('sysmapid', $data['map']['sysmapid'])
@@ -62,7 +61,7 @@ $web_layout_mode = $this->getLayoutMode();
 				))->setEnabled($data['allowed_edit'])
 				: null
 			)
-			->addItem(get_icon('favourite', [
+			->addItem(get_icon('favorite', [
 				'fav' => 'web.favorite.sysmapids',
 				'elname' => 'sysmapid',
 				'elid' => $data['map']['sysmapid']
