@@ -978,7 +978,7 @@ abstract class CGraphGeneral extends CApiService {
 	}
 
 	/**
-	 * Updates the children of the graph on the given hosts.
+	 * Updates the children of the graph on the given hosts and propagates the inheritance to the child hosts.
 	 *
 	 * @param array      $graphs   An array of graphs to inherit. Each graph must contain all graph properties including
 	 *                             "gitems" property.
@@ -1305,6 +1305,8 @@ abstract class CGraphGeneral extends CApiService {
 		if ($upd_graphs) {
 			$this->updateReal($upd_graphs);
 		}
+
+		$this->inherit(array_merge($ins_graphs + $upd_graphs));
 	}
 
 	/**
