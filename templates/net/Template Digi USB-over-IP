@@ -1,0 +1,71 @@
+zabbix_export:
+  version: '6.2'
+  date: '2023-02-15T06:14:41Z'
+  template_groups:
+    -
+      uuid: 7df96b18c230490a9a0a9e2307226338
+      name: Templates
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: 108ba80ec5704c9fa1eef245189ad5d4
+      template: 'Template Digi USB-over-IP'
+      name: 'Template Digi USB-over-IP'
+      groups:
+        -
+          name: Templates
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 6a9f9b84e1c04301b1900d7be00a6f64
+          name: diCpuUtilization
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.332.11.6.1.6.0
+          key: 1.3.6.1.4.1.332.11.6.1.6.0
+          delay: 10s
+          value_type: FLOAT
+          units: '%'
+          description: 'Digi CPU Utilization (%). Current percentag of CPU utilization'
+        -
+          uuid: a491262341904bd89812d70fdb03fd79
+          name: diUpTime
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.332.11.6.1.7.0
+          key: 1.3.6.1.4.1.332.11.6.1.7.0
+          delay: 10s
+          trends: '0'
+          value_type: CHAR
+          description: 'Digi Up Time. Time in hours, minutes, and seconds'
+        -
+          uuid: f50586f3232a4dbeb5b8bb923d8b14e8
+          name: diTotalMemory
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.332.11.6.1.8.0
+          key: 1.3.6.1.4.1.332.11.6.1.8.0
+          delay: 10s
+          value_type: FLOAT
+          units: b
+          description: 'Digi Total Memory (B). Total number of bytes of memory in this device'
+        -
+          uuid: f102c4bdd7a746a0a370134ef0945e42
+          name: diFreeMemory
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.332.11.6.1.9.0
+          key: 1.3.6.1.4.1.332.11.6.1.9.0
+          delay: 10s
+          value_type: FLOAT
+          units: b
+          description: 'Digi Free Memory (B). Total number of bytes of free memory'
+        -
+          uuid: 13039450df3f4d9c9f7d90957cf92c52
+          name: diUsedMemory
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.332.11.6.1.10.0
+          key: 1.3.6.1.4.1.332.11.6.1.10.0
+          delay: 10s
+          value_type: FLOAT
+          units: b
+          description: 'Digi Used Memory (B). Total number of bytes of memory' 
