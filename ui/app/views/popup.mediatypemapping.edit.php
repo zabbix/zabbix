@@ -48,11 +48,10 @@ $form
 		->addItem([
 			(new CLabel(_('Name'), 'media-type-mapping-name'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('name', $data['name'], false,
-					DB::getFieldLength('userdirectory_media', 'name')
-				))
+				(new CTextBox('name', $data['name'], false, DB::getFieldLength('userdirectory_media', 'name')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setId('media-type-mapping-name'))
+					->setId('media-type-mapping-name')
+			)
 		])
 		->addItem([
 			(new CLabel(_('Media type'), $media_type_select->getFocusableElementId()))->setAsteriskMark(),
