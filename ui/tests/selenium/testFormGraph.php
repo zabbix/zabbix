@@ -873,7 +873,7 @@ class testFormGraph extends CLegacyWebTest {
 			if (array_key_exists('screenshot', $data)) {
 				$this->page->removeFocus();
 				$this->assertScreenshot($this->query('id:itemsTable')->one(), 'Graph - Items');
-				}
+			}
 
 		}
 

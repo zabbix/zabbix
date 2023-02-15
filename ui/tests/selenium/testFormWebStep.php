@@ -933,12 +933,6 @@ class testFormWebStep extends CLegacyWebTest {
 			}
 		}
 
-		// Take a screenshot to test draggable object position of query fields.
-		if (array_key_exists('screenshot', $data)) {
-			$this->page->removeFocus();
-			$this->assertScreenshot($this->query('xpath://table[@data-type="query_fields"]')->waitUntilPresent()->one(), 'Step query fields');
-		}
-
 		if (array_key_exists('parse', $data)) {
 			$this->zbxTestClick('parse');
 		}
@@ -988,11 +982,19 @@ class testFormWebStep extends CLegacyWebTest {
 			$this->zbxTestInputType('status_codes',$data['code']);
 		}
 
-		// Take a screenshot to test draggable object position for post and headers fields.
+		// Take a screenshot to test draggable object position for query, post and headers fields.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
-			$this->assertScreenshot($this->query('xpath://table[@data-type="post_fields"]')->waitUntilPresent()->one(), 'Step post fields');
-			$this->assertScreenshot($this->query('xpath://*[@id="http_step"]//table[@data-type="headers"]')->waitUntilPresent()->one(), 'Step headers fields');
+
+			foreach (['Post fields', 'Headers', 'Query fields'] as $field) {
+				$form = $this->query('id:http_step')->asForm()->one();
+
+				if ($field === 'Query fields') {
+					COverlayDialogElement::find()->one()->scrollToTop();
+				}
+
+				$this->assertScreenshot($form->getField($field), $field);
+			}
 		}
 
 		if ($data['expected'] != TEST_ERROR) {
