@@ -956,7 +956,6 @@ static void	discover_icmp(const zbx_discoverer_net_check_job_t *job, const DC_DC
 	char			error[ZBX_ITEM_ERROR_LEN_MAX];
 	int			i;
 
-
 	zbx_vector_fping_host_create(&hosts);
 
 	for (i = 0; i < job->ips->values_num; i++)
@@ -1019,15 +1018,7 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_ptr_t *vr_s
 
 		if (NULL == (dst = zbx_hashset_search(hr_dst, src)))
 		{
-			zbx_discovery_results_t	tmp;
-
-			tmp.dnsname = src->dnsname;
-			tmp.drule = src->drule;
-			tmp.ip = src->ip;
-			tmp.now = src->now;
-			zbx_vector_ptr_create(&tmp.services);
-
-			dst = zbx_hashset_insert(hr_dst, &tmp, sizeof(zbx_discovery_results_t));
+			dst = zbx_hashset_insert(hr_dst, src, sizeof(zbx_discovery_results_t));
 
 			src->dnsname = NULL;
 			src->drule = NULL;
