@@ -77,7 +77,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 			}
 		}
 
-		uasort($thresholds, function (array $threshold_1, array $threshold_2): int {
+		uasort($thresholds, static function (array $threshold_1, array $threshold_2): int {
 			return $threshold_1['threshold_value'] <=> $threshold_2['threshold_value'];
 		});
 
