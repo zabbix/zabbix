@@ -1041,7 +1041,6 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_ptr_t *vr_s
 
 		zbx_vector_ptr_append_array(&dst->services, src->services.values, src->services.values_num);
 		zbx_vector_ptr_clear(&src->services);
-		results_clear(src);
 	}
 }
 
@@ -1115,7 +1114,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 					discover_results_merge(&dmanager.results, &results);
 					pthread_rwlock_unlock(&dmanager.results_rwlock);
 
-					zbx_vector_ptr_clear_ext(&results, zbx_ptr_free);
+					zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)results_free);
 					zbx_vector_ptr_destroy(&results);
 					continue;
 				}
