@@ -2368,6 +2368,11 @@ msgstr "Αδύνατη η δημιουργία κανόνα εντοπισμού
 msgid "Cannot create icon map"
 msgstr "Αδύνατη η δημιουργία αντιστοίχισης εικονιδίου"
 
+#: app/controllers/CControllerMaintenanceCreate.php:72
+#: app/controllers/CControllerMaintenanceCreate.php:150
+msgid "Cannot create maintenance period"
+msgstr ""
+
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
 msgstr ""
@@ -2552,6 +2557,12 @@ msgstr "Αδύνατη η διαγραφή συλλεκτών"
 #: maintenance.php:224
 msgid "Cannot delete maintenance"
 msgstr "Αδύνατη η διαγραφή συντήρησης"
+
+#: app/controllers/CControllerMaintenanceDelete.php:71
+msgid "Cannot delete maintenance period"
+msgid_plural "Cannot delete maintenance periods"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 #, fuzzy
@@ -3842,6 +3853,11 @@ msgstr "Αδύνατη η ενημέρωση μακροεντολών"
 #: maintenance.php:119
 msgid "Cannot update maintenance"
 msgstr "Αδύνατη η ενημέρωση συντήρησης"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:73
+#: app/controllers/CControllerMaintenanceUpdate.php:152
+msgid "Cannot update maintenance period"
+msgstr ""
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -6074,6 +6090,10 @@ msgstr "Διαγραφή επιλεγμένων πρωτότυπων συλλε�
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
 msgstr "Διαγραφή επιλεγμένων συλλεκτών;"
+
+#: app/views/js/maintenance.list.js.php:88
+msgid "Delete selected maintenance period?"
+msgstr ""
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -12340,9 +12360,23 @@ msgstr "Συντήρηση διεγράφη"
 msgid "Maintenance period"
 msgstr "Περίοδος συντήρησης"
 
+#: app/controllers/CControllerMaintenanceCreate.php:142
+msgid "Maintenance period created"
+msgstr ""
+
+#: app/controllers/CControllerMaintenanceDelete.php:61
+msgid "Maintenance period deleted"
+msgid_plural "Maintenance periods deleted"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
 msgstr "Μήκος περιόδου συντήρησης"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:144
+msgid "Maintenance period updated"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -13552,6 +13586,11 @@ msgstr ""
 #: app/views/configuration.hostgroup.edit.php:52
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
+msgstr ""
+
+#: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
+#: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
+msgid "New maintenance period"
 msgstr ""
 
 #: app/views/popup.mediatypemapping.edit.php:73

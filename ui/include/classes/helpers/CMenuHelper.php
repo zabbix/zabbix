@@ -195,7 +195,7 @@ class CMenuHelper {
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
-				? (new CMenuItem(_('Maintenance')))->setUrl(new CUrl('maintenance.php'), 'maintenance.php')
+				? (new CMenuItem(_('Maintenance')))->setAction('maintenance.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
 				? (new CMenuItem(_('Event correlation')))

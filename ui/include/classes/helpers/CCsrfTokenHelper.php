@@ -31,16 +31,10 @@ class CCsrfTokenHelper {
 	 *
 	 * @param string $action  action that controller should perform.
 	 *
-	 * @throws CAccessDeniedException
-	 *
-	 * @return string  Returns CSRF token in string format or null if session id is not set.
+	 * @return string  Returns CSRF token in string format.
 	 */
-	public static function get(string $action): ?string {
-		if (!CWebUser::$data['secret']) {
-			throw new CAccessDeniedException();
-		}
-
-		return CEncryptHelper::sign(CWebUser::$data['secret'] . $action);
+	public static function get(string $action): string {
+		return CEncryptHelper::sign(CWebUser::$data['secret'].$action);
 	}
 
 	/**
@@ -48,8 +42,6 @@ class CCsrfTokenHelper {
 	 *
 	 * @param string $csrf_token_form  CSRF token from submitted form.
 	 * @param string $action           controller action.
-	 *
-	 * @throws CAccessDeniedException
 	 *
 	 * @return bool true if the token is correct.
 	 */

@@ -1432,7 +1432,11 @@ int	main(int argc, char **argv)
 	/* if agent is started as windows service then try to log errors */
 	/* into windows event log while zabbix_log is not ready */
 	if (ZBX_TASK_START == t.task && 0 == (t.flags & ZBX_TASK_FLAG_FOREGROUND))
-		zabbix_open_log(LOG_TYPE_SYSTEM, LOG_LEVEL_WARNING, NULL, NULL);
+	{
+		zbx_config_log_t	log_cfg	= {NULL, NULL, LOG_TYPE_SYSTEM, 1};
+
+		zabbix_open_log(&log_cfg, LOG_LEVEL_WARNING, NULL);
+	}
 #endif
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
