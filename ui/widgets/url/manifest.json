@@ -8,7 +8,6 @@
 	"author": "Zabbix SIA",
 	"widget": {
 		"js_class": "CWidgetUrl",
-		"template_support": true,
 		"refresh_rate": 0
 	},
 	"actions": {

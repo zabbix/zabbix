@@ -93,8 +93,7 @@ class CDashboardHelper {
 				/** @var CWidget $widget */
 				$widget = APP::ModuleManager()->getModule($widget_data['type']);
 
-				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET
-						&& ($templateid === null || $widget->hasTemplateSupport())) {
+				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET) {
 					$grid_page_widget['fields'] = self::convertWidgetFields($widget_data['fields']);
 
 					if ($with_rf_rate) {
@@ -502,12 +501,6 @@ class CDashboardHelper {
 
 				$widget_name = $widget_data['name'] !== '' ? $widget_data['name'] : $widget->getDefaultName();
 
-				if ($templateid !== null && !$widget->hasTemplateSupport()) {
-					$errors[] = _s('Cannot save widget "%1$s".', $widget_name).' '._('Inaccessible widget type.');
-
-					continue;
-				}
-
 				$widget_data['form'] = $widget->getForm($widget_fields, $templateid);
 
 				if ($widget_errors = $widget_data['form']->validate()) {
@@ -618,8 +611,8 @@ class CDashboardHelper {
 		return $dashboards;
 	}
 
-	public static function getWidgetLastType(bool $for_template_dashboard_only = false): ?string {
-		$known_widgets = APP::ModuleManager()->getWidgets($for_template_dashboard_only);
+	public static function getWidgetLastType(): ?string {
+		$known_widgets = APP::ModuleManager()->getWidgets();
 
 		$widget_last_type = CProfile::get('web.dashboard.last_widget_type');
 
