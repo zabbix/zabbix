@@ -1091,7 +1091,7 @@ class CUserDirectory extends CApiService {
 			'provision_media' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
 											'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
-											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
