@@ -77,7 +77,7 @@ zbx_uint32_t	zbx_preprocessor_pack_top_sequences_result(unsigned char **data,
 void	zbx_preprocessor_unpack_top_sequences_result(zbx_vector_pp_sequence_stats_ptr_t *sequences,
 		const unsigned char *data);
 
-zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage);
+zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count);
 
 ZBX_PTR_VECTOR_DECL(ipcmsg, zbx_ipc_message_t *)
 

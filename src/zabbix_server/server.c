@@ -144,9 +144,8 @@ const char	*help_message[] = {
 	"                                  housekeeper, http poller, icmp pinger,",
 	"                                  ipmi manager, ipmi poller, java poller,",
 	"                                  poller, preprocessing manager,",
-	"                                  preprocessing worker, proxy poller,",
-	"                                  self-monitoring, snmp trapper, task manager,",
-	"                                  timer, trapper, unreachable poller,",
+	"                                  proxy poller, self-monitoring, snmp trapper,",
+	"                                  task manager, timer, trapper, unreachable poller,",
 	"                                  vmware collector, history poller,",
 	"                                  availability manager, service manager, odbc poller,",
 	"                                  connector manager, connector worker)",
@@ -160,9 +159,8 @@ const char	*help_message[] = {
 	"                                  housekeeper, http poller, icmp pinger,",
 	"                                  ipmi manager, ipmi poller, java poller,",
 	"                                  poller, preprocessing manager,",
-	"                                  preprocessing worker, proxy poller,",
-	"                                  self-monitoring, snmp trapper, task manager,",
-	"                                  timer, trapper, unreachable poller,",
+	"                                  proxy poller, self-monitoring, snmp trapper, ",
+	"                                  task manager, timer, trapper, unreachable poller,",
 	"                                  vmware collector, history poller,",
 	"                                  availability manager, service manager, odbc poller,",
 	"                                  connector manager, connector worker)",
@@ -1627,6 +1625,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(taskmanager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &preproc_man_args;
 				zbx_thread_start(preprocessing_manager_thread, &thread_args, &threads[i]);
 				break;
