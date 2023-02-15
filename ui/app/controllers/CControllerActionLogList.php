@@ -148,7 +148,6 @@ class CControllerActionLogList extends CController {
 					'message' => $search
 				],
 				'searchByAny' => true,
-				'searchWildcardsEnabled' => true,
 				'time_from' => $data['timeline']['from_ts'] - 1,
 				'time_till' => $data['timeline']['to_ts'] + 1,
 				'eventsource' => $event_source['source'],
