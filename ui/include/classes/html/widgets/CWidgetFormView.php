@@ -157,7 +157,6 @@ class CWidgetFormView {
 			'header' => $this->data['unique_id'] !== null ? _('Edit widget') : _('Add widget'),
 			'body' => implode('', [
 				(new CForm())
-					->cleanItems()
 					->setId('widget-dialogue-form')
 					->setName($this->name)
 					->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FORM)

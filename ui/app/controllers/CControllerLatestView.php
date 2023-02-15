@@ -25,7 +25,7 @@
 class CControllerLatestView extends CControllerLatest {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -192,7 +192,8 @@ class CControllerLatestView extends CControllerLatest {
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
-				'page' => $filter['page']
+				'page' => $filter['page'],
+				'csrf_token' => CCsrfTokenHelper::get('tabfilter')
 			],
 			'filter' => $filter,
 			'subfilters' => $subfilters,

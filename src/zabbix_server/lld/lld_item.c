@@ -1160,7 +1160,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 	int		ret = SUCCEED;
 	zbx_token_t	token;
 	char		err[MAX_STRING_LEN], *errmsg = NULL;
-	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2, *param3;
+	char		param1[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2, *param3;
 	const char	*regexp_err = NULL;
 	zbx_uint64_t	value_ui64;
 	zbx_jsonpath_t	jsonpath;

@@ -21,6 +21,10 @@
 
 class CControllerExport extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'action' =>			'required|string',

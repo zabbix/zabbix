@@ -183,33 +183,33 @@ $fields = [
 	'ssl_cert_file' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_file' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_password' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'verify_peer' =>				[T_ZBX_INT, O_OPT, null, IN([HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]),
+	'verify_peer' =>				[T_ZBX_INT, O_OPT, null, IN([ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]),
 										null
 									],
-	'verify_host' =>				[T_ZBX_INT, O_OPT, null, IN([HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]),
+	'verify_host' =>				[T_ZBX_INT, O_OPT, null, IN([ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]),
 										null
 									],
 	'http_authtype' =>				[T_ZBX_INT, O_OPT, null,
-										IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
-											HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST
+										IN([ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM,
+											ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST
 										]),
 										null
 									],
 	'http_username' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
-											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
-												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+											' && ({http_authtype} == '.ZBX_HTTP_AUTH_BASIC.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_NTLM.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_KERBEROS.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_DIGEST.
 											')',
 										_('Username')
 									],
 	'http_password' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
-											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
-												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+											' && ({http_authtype} == '.ZBX_HTTP_AUTH_BASIC.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_NTLM.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_KERBEROS.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_DIGEST.
 											')',
 										_('Password')
 									],
@@ -471,7 +471,7 @@ $ms_groups = [];
 $filter_groupids = getSubGroups(getRequest('filter_groupids', []), $ms_groups, ['editable' => true],
 	getRequest('context')
 );
-$filter_hostids = getRequest('filter_hostids');
+$filter_hostids = getRequest('filter_hostids', []);
 if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
 		$host = API::Host()->get([
@@ -949,7 +949,11 @@ else {
 		$options['filter']['value_type'] = $_REQUEST['filter_value_type'];
 	}
 	if (array_key_exists('hostids', $options) && $_REQUEST['filter_valuemapids']) {
-		$hostids = CTemplateHelper::getParentTemplatesRecursive($filter_hostids, $data['context']);
+		$hostids = $options['hostids'];
+
+		if ($data['context'] === 'host') {
+			addParentTemplateIds($hostids);
+		}
 
 		$valuemap_names = array_unique(array_column(API::ValueMap()->get([
 			'output' => ['name'],
@@ -1030,7 +1034,6 @@ else {
 	}
 
 	$data['items'] = API::Item()->get($options);
-	$data['parent_templates'] = [];
 
 	// Unset unexisting subfilter tags (subfilter tags stored in profiles may contain tags already deleted).
 	if ($subfilter_tags) {
@@ -1279,22 +1282,27 @@ else {
 		(new CUrl('items.php'))->setArgument('context', $data['context'])
 	);
 
-	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL);
+	$triggerids = [];
 
-	$itemTriggerIds = [];
 	foreach ($data['items'] as $item) {
-		$itemTriggerIds = array_merge($itemTriggerIds, zbx_objectValues($item['triggers'], 'triggerid'));
+		foreach ($item['triggers'] as $trigger) {
+			$triggerids[$trigger['triggerid']] = true;
+		}
 	}
-	$data['itemTriggers'] = API::Trigger()->get([
-		'triggerids' => $itemTriggerIds,
+
+	$data['triggers'] = API::Trigger()->get([
 		'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'priority',
 			'status', 'state', 'error', 'templateid', 'flags'
 		],
 		'selectHosts' => ['hostid', 'name', 'host'],
+		'triggerids' => array_keys($triggerids),
 		'preservekeys' => true
 	]);
 
-	$data['trigger_parent_templates'] = getTriggerParentTemplates($data['itemTriggers'], ZBX_FLAG_DISCOVERY_NORMAL);
+	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
+	$data['parent_items'] = getParentItems($data['items'], $allowed_ui_conf_templates);
+	$data['parent_triggers'] = getParentTriggers($data['triggers'], $allowed_ui_conf_templates);
 
 	sort($filter_hostids);
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));
@@ -1302,8 +1310,6 @@ else {
 	$data['config'] = [
 		'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
 	];
-
-	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter_tags);
 

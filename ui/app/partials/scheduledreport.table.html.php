@@ -107,8 +107,8 @@ foreach ($data['reports'] as $report) {
 			->setArgument('reportids', [$report['reportid']])
 			->getUrl()
 		))
+			->addCsrfToken(CCsrfTokenHelper::get('scheduledreport'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addSID()
 		: new CSpan($status_name);
 	$status->addClass($status_class);
 

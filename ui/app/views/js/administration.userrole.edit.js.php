@@ -277,7 +277,7 @@
 							url.setArgument(element.getAttribute('name'), element.getAttribute('value'));
 						});
 
-					redirect(url.getUrl(), 'post', 'action', undefined, false, true);
+					redirect(url.getUrl(), 'post', 'action', undefined, true);
 				}
 
 				document

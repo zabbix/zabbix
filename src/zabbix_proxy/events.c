@@ -88,8 +88,14 @@ void	zbx_reset_event_recovery(void)
 	THIS_SHOULD_NEVER_HAPPEN;
 }
 
-void	zbx_export_events(void)
+void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,
+		unsigned char **data, size_t *data_alloc, size_t *data_offset)
 {
+	ZBX_UNUSED(events_export_enabled);
+	ZBX_UNUSED(connector_filters);
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(data_alloc);
+	ZBX_UNUSED(data_offset);
 	THIS_SHOULD_NEVER_HAPPEN;
 }
 

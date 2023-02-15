@@ -29,6 +29,7 @@
 typedef struct
 {
 	int			config_timeout;
+	int			config_unavailable_delay;
 }
 zbx_thread_ipmi_manager_args;
 

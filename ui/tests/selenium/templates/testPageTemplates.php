@@ -51,8 +51,8 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->templateName);
 
 		$table = $this->query('class:list-table')->asTable()->one();
-		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web',
-				'Linked templates', 'Linked to templates', 'Tags'
+		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web', 'Vendor',
+			'Version', 'Tags'
 		];
 		$this->assertSame($headers, $table->getHeadersText());
 
@@ -118,20 +118,6 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter->getField('Name')->fill($this->templateName);
 		$filter->submit();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='$this->templateName']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
-	}
-
-	public function testPageTemplates_FilterByLinkedTemplate() {
-		$this->zbxTestLogin('templates.php');
-		$this->query('button:Reset')->one()->click();
-		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->getField('Linked templates')->fill([
-				'values' => 'Template ZBX6663 Second',
-				'context' => 'Templates'
-		]);
-		$filter->submit();
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template ZBX6663 Second']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}
 

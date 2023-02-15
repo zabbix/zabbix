@@ -21,6 +21,10 @@
 
 class CControllerCopyEdit extends CController {
 
+	protected function init(): void {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'itemids' =>	'array_db items.itemid',

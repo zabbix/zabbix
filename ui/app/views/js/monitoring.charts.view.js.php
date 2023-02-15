@@ -145,7 +145,7 @@
 		this.timeline = timeline;
 		this.dimensions = chart.dimensions;
 
-		this.curl = new Curl(chart.src, false);
+		this.curl = new Curl(chart.src);
 
 		if ('graphid' in chart) {
 			this.curl.setArgument('graphid', chart.graphid);

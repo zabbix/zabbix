@@ -553,10 +553,10 @@ static int	db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_type,
 		goto out;
 	}
 
-	/* Drop data from the last second and read the whole second again     */
-	/* to ensure that data is cached by seconds.                          */
-	/* Because the initial select has limit option (DBselectN()) we have  */
-	/* to perform another select to read the last second data.            */
+	/* Drop data from the last second and read the whole second again  */
+	/* to ensure that data is cached by seconds.                       */
+	/* Because the initial select has limit option (zbx_db_select_n()) */
+	/* we have to perform another select to read the last second data. */
 	end_timestamp = values->values[values->values_num - 1].timestamp.sec;
 
 	while (0 < values->values_num && values->values[values->values_num - 1].timestamp.sec == end_timestamp)
