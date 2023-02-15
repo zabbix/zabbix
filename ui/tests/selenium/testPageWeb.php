@@ -22,6 +22,7 @@
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup hosts, httptest
@@ -31,6 +32,15 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 class testPageWeb extends CWebTest {
 
 	use TableTrait;
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	private static $hostid;
 	private static $httptestid;
@@ -229,26 +239,20 @@ class testPageWeb extends CWebTest {
 	 * Function which checks if disabled web services aren't displayed.
 	 */
 	public function testPageWeb_CheckDisabledWebServices() {
-		// Direct link to web services
-		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'].'&context=host');
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
+		$values = $this->getTableResult('Name');
 
-		$expected = [
-			'Web ZBX6663 Second', 'Web ZBX6663', 'testInheritanceWeb4', 'testInheritanceWeb3', 'testInheritanceWeb2',
-			'testInheritanceWeb1',	'testFormWeb4',	'testFormWeb3',	'testFormWeb2',	'testFormWeb1'
-		];
-
-		// Turn off web services
-		$this->query('xpath://input[@id="all_httptests"]')->one()->click();
-		$this->query('xpath://button[normalize-space()="Disable"]')->one()->click();
-		$this->page->acceptAlert();
-		$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
-		$this->assertTableDataColumn($expected);
-
-		// Turn back on disbabled web services.
-		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'].'&context=host');
-		$this->query('xpath://input[@id="all_httptests"]')->one()->click();
-		$this->query('xpath://button[normalize-space()="Enable"]')->one()->click();
-		$this->page->acceptAlert();
+		// Turn off/on web services and check table results.
+		foreach (['Disable', 'Enable'] as $status) {
+			$this->page->open('httpconf.php?context=host&filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'])->waitUntilReady();
+			$this->query('xpath://input[@id="all_httptests"]')->one()->click();
+			$this->query('xpath://button[normalize-space()="'.$status.'"]')->one()->click();
+			$this->page->acceptAlert();
+			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
+			$changed = ($status === 'Disable') ? array_diff($values, ['Web scenario 1 step', 'Web scenario 2 step',
+				'Web scenario 3 step']) : $values;
+			$this->assertTableDataColumn($changed);
+		}
 	}
 
 	/**
@@ -284,18 +288,13 @@ class testPageWeb extends CWebTest {
 	 * Function which checks number of steps for web services displayed.
 	 */
 	public function testPageWeb_CheckWebServiceNumberOfSteps() {
-		$webservices = 'zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC';
-		$webscenario = 'httpconf.php?form=update&hostid='.self::$hostid['WebData Host'].'&httptestid='
-			.self::$httptestid['Web scenario 3 step'].'&context=host';
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Web scenario 3 step');
+		$this->assertEquals('3', $row->getColumn('Number of steps')->getText());
 
-		$this->page->login()->open($webservices);
-		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill(['Hosts' => 'WebData Host'])->submit();
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', 'WebData Host');
-		$count_before = $row->getColumn('Number of steps')->getText();
-		$this->assertEquals('3', $count_before);
-
-		// Directly open API created Web scenario and add few more steps.
-		$this->page->login()->open($webscenario);
+		// Directly open API created Web scenario and add one more step.
+		$this->page->open('httpconf.php?context=host&form=update&hostid='.self::$hostid['WebData Host'].'&httptestid='.
+			self::$httptestid['Web scenario 3 step'])->waitUntilReady();
 		$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
 		$this->query('xpath://button[@class="element-table-add btn-link"]')->one()->click();
 		$this->page->waitUntilReady();
@@ -303,19 +302,13 @@ class testPageWeb extends CWebTest {
 		$form->fill(['Name' => 'Step number 4']);
 		$form->query('id:url')->one()->fill('test.com');
 		$form->submit();
-		$this->query('xpath://button[@id="update"]')->one()->click();
-
-		// Check that successfully step was added without unexpected errors.
-		$message = CMessageElement::find()->waitUntilVisible()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Web scenario updated', $message->getTitle());
+		$this->query('button:Update')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Web scenario updated');
 
 		// Return to the "Web monitoring" and check if the "Number of steps" is correctly displayed.
-		$this->page->open($webservices);
-		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill(['Hosts' => 'WebData Host'])->submit();
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', 'WebData Host');
-		$count_after = $row->getColumn('Number of steps')->getText();
-		$this->assertEquals('4', $count_after);
+		$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
+		$this->assertEquals('4', $row->getColumn('Number of steps')->getText());
 	}
 
 	/**
@@ -324,6 +317,7 @@ class testPageWeb extends CWebTest {
 	public function testPageWeb_CheckSorting() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=ASC');
 		$table = $this->query('class:list-table')->asTable()->one();
+
 		foreach (['Host', 'Name'] as $column_name) {
 			if ($column_name === 'Name') {
 				$table->query('xpath:.//a[text()="'.$column_name.'"]')->one()->click();
@@ -360,6 +354,7 @@ class testPageWeb extends CWebTest {
 				->query('link', 'testFormWeb1')->one()->click();
 		$this->page->waitUntilReady();
 		$this->page->assertHeader('Details of web scenario: testFormWeb1');
+		$this->page->assertTitle('Details of web scenario');
 	}
 
 	public static function getCheckFilterData() {
