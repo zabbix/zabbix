@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-06 19:21+0000\n"
+"PO-Revision-Date: 2023-02-07 17:08+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -12371,13 +12371,13 @@ msgstr "Période de maintenance"
 
 #: app/controllers/CControllerMaintenanceCreate.php:142
 msgid "Maintenance period created"
-msgstr ""
+msgstr "Période de maintenance créée"
 
 #: app/controllers/CControllerMaintenanceDelete.php:61
 msgid "Maintenance period deleted"
 msgid_plural "Maintenance periods deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Période de maintenance supprimée"
+msgstr[1] "Périodes de maintenance supprimées"
 
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
@@ -12385,7 +12385,7 @@ msgstr "Durée de la période de maintenance"
 
 #: app/controllers/CControllerMaintenanceUpdate.php:144
 msgid "Maintenance period updated"
-msgstr ""
+msgstr "Période de maintenance mise à jour"
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -13599,7 +13599,7 @@ msgstr "Nouveau groupe d'hôtes"
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
 msgid "New maintenance period"
-msgstr ""
+msgstr "Nouvelle période de maintenance"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
