@@ -47,11 +47,12 @@ $form
 	->addItem((new CFormGrid())
 		->addItem([
 			(new CLabel(_('Name'), 'media-type-mapping-name'))->setAsteriskMark(),
-			new CFormField((new CTextBox('name', $data['name'], false,
+			new CFormField(
+				(new CTextBox('name', $data['name'], false,
 					DB::getFieldLength('userdirectory_media', 'name')
 				))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setId('media-type-mapping-name'))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setId('media-type-mapping-name'))
 		])
 		->addItem([
 			(new CLabel(_('Media type'), $media_type_select->getFocusableElementId()))->setAsteriskMark(),
@@ -59,11 +60,12 @@ $form
 		])
 		->addItem([
 			(new CLabel(_('Attribute'), 'attribute'))->setAsteriskMark(),
-			new CFormField((new CTextBox('attribute', $data['attribute'], false,
+			new CFormField(
+				(new CTextBox('attribute', $data['attribute'], false,
 					DB::getFieldLength('userdirectory_media', 'attribute')
 				))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setId('attribute')
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setId('attribute')
 			)
 		])
 	)
