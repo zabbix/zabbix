@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_
 	if (ZBX_VARIANT_STR != value_num->type)
 		return FAIL;
 
-	if (SUCCEED != eval_suffixed_number_parse(value_num->data.str, &suffix))
+	if (SUCCEED != zbx_eval_suffixed_number_parse(value_num->data.str, &suffix))
 		return FAIL;
 
 	result = atof(value_num->data.str) * suffix2factor(suffix);
@@ -411,7 +411,7 @@ finish:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	 eval_suffixed_number_parse(const char *value, char *suffix)
+int	 zbx_eval_suffixed_number_parse(const char *value, char *suffix)
 {
 	int	len, num_len;
 

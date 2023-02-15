@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -261,6 +261,14 @@ zbx_graph_item_type;
 						is_uint64(row, &uint)
 
 #define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
+
+#ifdef HAVE_MYSQL
+#	define ZBX_SQL_SORT_ASC(field)	field " asc"
+#	define ZBX_SQL_SORT_DESC(field)	field " desc"
+#else
+#	define ZBX_SQL_SORT_ASC(field)	field " asc nulls first"
+#	define ZBX_SQL_SORT_DESC(field)	field " desc nulls last"
+#endif
 
 typedef struct
 {
@@ -549,6 +557,10 @@ void	zbx_db_flush_version_requirements(const char *version);
 #ifdef HAVE_POSTGRESQL
 int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver);
 char	*zbx_db_get_schema_esc(void);
+
+#define ZBX_TSDB_RECALC_TIME_PERIOD_HISTORY	1
+#define ZBX_TSDB_RECALC_TIME_PERIOD_TRENDS	2
+void	zbx_tsdb_recalc_time_period(int *ts_from, int table_group);
 #endif
 
 /******************************************************************************

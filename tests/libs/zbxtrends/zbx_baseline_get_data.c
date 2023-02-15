@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,6 +49,14 @@ DB_RESULT	__wrap_DBselect(const char *fmt, ...)
 	ZBX_UNUSED(fmt);
 	return NULL;
 }
+
+#ifdef HAVE_POSTGRESQL
+void	__wrap_zbx_tsdb_recalc_time_period(int *tm_start, int table_group)
+{
+	ZBX_UNUSED(tm_start);
+	ZBX_UNUSED(table_group);
+}
+#endif
 
 static	zbx_mock_handle_t	hout;
 static int			iteration;

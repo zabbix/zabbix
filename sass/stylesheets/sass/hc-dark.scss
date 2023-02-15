@@ -166,6 +166,7 @@ $input-placeholder-color: #bbbbbb;
 
 // Error messages
 $msg-bad-color: $light-red;
+$msg-btn-text-color: #ffffff;
 $msg-good-color: $light-green;
 $msg-warning-color: #ffb319;
 $msg-warning-border-color: #ffb319;
@@ -1103,7 +1104,7 @@ td.log-info-bg,
 td.log-warning-bg,
 td.log-high-bg,
 td.log-disaster-bg {
-	padding-left: 42px;
+	padding-left: 42px !important;
 	color: $font-color;
 }
 

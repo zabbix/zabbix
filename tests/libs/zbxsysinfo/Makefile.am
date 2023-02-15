@@ -47,6 +47,7 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -101,6 +102,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \

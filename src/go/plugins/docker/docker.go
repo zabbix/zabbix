@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ package docker
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"git.zabbix.com/ap/plugin-support/zbxerr"
@@ -162,20 +163,9 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		}
 
 	case keyContainerInfo:
-		var data ContainerInfo
-
-		body, err := p.client.Query(fmt.Sprintf(queryPath, params["Container"]))
+		result, err = p.containerInfo(queryPath, params["Container"], params["Info"])
 		if err != nil {
 			return nil, err
-		}
-
-		if err = json.Unmarshal(body, &data); err != nil {
-			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
-		}
-
-		result, err = json.Marshal(data)
-		if err != nil {
-			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 		}
 
 	case keyContainerStats:
@@ -215,4 +205,31 @@ func (s *Stats) setCPUPercentUsage() {
 	systemDelta := s.CPUStats.SystemUsage - s.PreCPUStats.SystemUsage
 	cpuNum := s.CPUStats.OnlineCPUs
 	s.CPUStats.CPUUsage.PercentUsage = (float64(delta) / float64(systemDelta)) * float64(cpuNum) * 100.0
+}
+
+func (p *Plugin) containerInfo(queryPath, container, info string) ([]byte, error) {
+	body, err := p.client.Query(fmt.Sprintf(queryPath, container))
+	if err != nil {
+		return nil, err
+	}
+
+	switch info {
+	case "full":
+		return body, nil
+	case "short":
+		var info ContainerInfo
+
+		if err = json.Unmarshal(body, &info); err != nil {
+			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		}
+
+		result, err := json.Marshal(info)
+		if err != nil {
+			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		}
+
+		return result, nil
+	default:
+		return nil, zbxerr.ErrorInvalidParams.Wrap(errors.New("Info must be either 'full' or 'short'"))
+	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -851,7 +851,7 @@ void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	if (NULL == (result = DBselect("select db_extension from config")))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = DBfetch(result)) || '\0' == *row[0])
 		goto clean;
 
 	version_info->extension = zbx_strdup(NULL, row[0]);
@@ -3905,5 +3905,35 @@ char	*zbx_db_get_schema_esc(void)
 	}
 
 	return name;
+}
+
+void	zbx_tsdb_recalc_time_period(int *ts_from, int table_group)
+{
+	int		least_ts;
+	zbx_config_t	cfg;
+
+	if (0 >= zbx_tsdb_get_version())
+		return;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+
+	if (ZBX_TSDB_RECALC_TIME_PERIOD_HISTORY == table_group)
+	{
+		if (1 != cfg.hk.history_global)
+			return;
+
+		least_ts = (int)time(NULL) - cfg.hk.history;
+	}
+	else if (ZBX_TSDB_RECALC_TIME_PERIOD_TRENDS == table_group)
+	{
+		if (1 != cfg.hk.trends_global)
+			return;
+
+		least_ts = (int)time(NULL) - cfg.hk.trends + 1;
+	}
+
+
+	if (least_ts > *ts_from)
+		*ts_from = least_ts;
 }
 #endif
