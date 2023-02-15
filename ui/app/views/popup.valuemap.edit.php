@@ -29,11 +29,10 @@ $form = (new CForm())
 	->addVar('action', $data['action'])
 	->addVar('update', 1)
 	->addVar('source-name', $data['name'])
-	->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')))
-	->addItem((new CInput('submit', 'submit'))
-		->addStyle('display: none;')
-		->removeId()
-	);
+	->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')));
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 if ($data['valuemapid']) {
 	$form->addVar('valuemapid', $data['valuemapid']);

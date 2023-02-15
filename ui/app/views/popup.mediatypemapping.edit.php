@@ -30,12 +30,10 @@ $form_action = (new CUrl('zabbix.php'))
 
 $form = (new CForm('post', $form_action))
 	->setId('media-type-mapping-edit-form')
-	->setName('media-type-mapping-edit-form')
-	->addItem(
-		(new CInput('submit', 'submit'))
-			->addStyle('display: none;')
-			->removeId()
-	);
+	->setName('media-type-mapping-edit-form');
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $media_type_select = (new CSelect('mediatypeid'))
 	->setId('mediatypeid')

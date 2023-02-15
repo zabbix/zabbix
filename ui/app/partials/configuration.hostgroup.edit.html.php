@@ -29,8 +29,7 @@ $form = (new CForm())
 	->setId('hostgroupForm')
 	->setName('hostgroupForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('groupid', $data['groupid'])
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addVar('groupid', $data['groupid']);
 
 $form_grid = new CFormGrid();
 

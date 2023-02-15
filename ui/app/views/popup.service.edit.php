@@ -31,7 +31,7 @@ $form = (new CForm('post'))
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
-$form->addItem((new CInput('submit'))->addStyle('display: none;'));
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // Service tab.
 

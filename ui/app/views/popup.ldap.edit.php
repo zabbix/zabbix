@@ -30,9 +30,13 @@ $form_action = (new CUrl('zabbix.php'))
 
 $form = (new CForm('post', $form_action))
 	->addItem(getMessages())
-	->addItem((new CInput('submit'))->addStyle('display: none;'))
 	->addVar('row_index', $data['row_index'])
-	->addVar('userdirectoryid', $data['userdirectoryid'])
+	->addVar('userdirectoryid', $data['userdirectoryid']);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
+$form
 	->addItem((new CFormGrid())
 		->addItem([
 			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),

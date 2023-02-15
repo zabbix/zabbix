@@ -34,8 +34,10 @@ $operations_popup_form = (new CForm())
 	->setId('lldoperation_form')
 	->addVar('no', $options['no'])
 	->addItem((new CVar('templated', $options['templated']))->removeId())
-	->addVar('action', 'popup.lldoperation')
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+	->addVar('action', 'popup.lldoperation');
+
+// Enable form submitting on Enter.
+$operations_popup_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $operations_popup_form_list = (new CFormList())
 	->addRow(

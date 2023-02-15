@@ -32,11 +32,10 @@ $expression_form = (new CForm())
 	->addVar('context', $data['context'])
 	->addItem((new CVar('hostid', $data['hostid']))->removeId())
 	->addVar('groupid', $data['groupid'])
-	->addVar('function', $data['function'])
-	->addItem((new CInput('submit', 'submit'))
-		->addStyle('display: none;')
-		->removeId()
-	);
+	->addVar('function', $data['function']);
+
+// Enable form submitting on Enter.
+$expression_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 if ($data['parent_discoveryid'] !== '') {
 	$expression_form->addVar('parent_discoveryid', $data['parent_discoveryid']);

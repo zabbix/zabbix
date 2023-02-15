@@ -33,8 +33,10 @@ $token_form = (new CForm('post', $url))
 	->setId('token_form')
 	->setName('token')
 	->addVar('admin_mode', $data['admin_mode'])
-	->addVar('tokenid', $data['tokenid'])
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addVar('tokenid', $data['tokenid']);
+
+// Enable form submitting on Enter.
+$token_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 if ($data['admin_mode'] === '0') {
 	$token_form->addVar('userid', CWebUser::$data['userid']);
@@ -43,12 +45,7 @@ if ($data['admin_mode'] === '0') {
 $token_from_grid = (new CFormGrid())->addItem([
 	(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 	new CFormField(
-		(new CTextBox(
-			'name',
-			$data['name'],
-			false,
-			DB::getFieldLength('token', 'name'
-			)))
+		(new CTextBox('name', $data['name'], false, DB::getFieldLength('token', 'name')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 			->setAriaRequired()

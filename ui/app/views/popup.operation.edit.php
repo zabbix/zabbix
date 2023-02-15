@@ -29,7 +29,9 @@ $form = (new CForm())
 	->setName('popup_operation')
 	->addVar('operation[eventsource]', $data['eventsource'])
 	->addVar('operation[recovery]', $data['recovery'])
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form_grid = (new CFormGrid());
 $operation = $data['operation'];

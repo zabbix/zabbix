@@ -27,8 +27,8 @@ $form = (new CForm())
 	->setName('dashboard_page_properties_form')
 	->addItem(getMessages());
 
-// Submit button is needed to enable submit event on Enter on inputs.
-$form->addItem((new CInput('submit', 'dashboard_page_properties_submit'))->addStyle('display: none;'));
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form_list = new CFormList();
 

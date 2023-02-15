@@ -32,8 +32,7 @@ $form = (new CForm())
 	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
 	->addVar('row_index', $data['row_index'] ? $data['row_index'] : 0)
-	->addVar('type', $data['type'])
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addVar('type', $data['type']);
 
 if ($data['type'] == ZBX_POPUP_CONDITION_TYPE_ACTION) {
 	$form->addVar('source', $data['eventsource']);
@@ -936,10 +935,7 @@ switch ($data['type']) {
 		break;
 }
 
-$form->addItem([
-	$form_grid,
-	(new CInput('submit', 'submit'))->addStyle('display: none;')
-]);
+$form->addItem($form_grid);
 
 $output = [
 	'header' => $data['title'],

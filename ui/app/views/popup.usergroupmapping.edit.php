@@ -30,12 +30,10 @@ $form_action = (new CUrl('zabbix.php'))
 
 $form = (new CForm('post', $form_action))
 	->setId('user-group-mapping-edit-form')
-	->setName('user-group-mapping-edit-form')
-	->addItem(
-		(new CInput('submit', 'submit'))
-			->addStyle('display: none;')
-			->removeId()
-	);
+	->setName('user-group-mapping-edit-form');
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $usergroup_multiselect = (new CMultiSelect([
 	'name' => 'user_groups[]',

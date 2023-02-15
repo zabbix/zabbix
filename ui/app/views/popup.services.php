@@ -28,7 +28,7 @@ $form = (new CForm())
 	->setName('services_form');
 
 // Enable form submitting on Enter.
-$form->addItem((new CInput('submit', null))->addStyle('display: none;'));
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $controls = (new CForm())
 	->setName('services_filter_form')

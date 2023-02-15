@@ -37,8 +37,10 @@ $http_popup_form = (new CForm())
 	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
 	->addVar('steps_names', $options['steps_names'])
-	->addVar('action', 'popup.httpstep')
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+	->addVar('action', 'popup.httpstep');
+
+// Enable form submitting on Enter.
+$http_popup_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $http_popup_form_list = (new CFormList())
 	->addRow(
