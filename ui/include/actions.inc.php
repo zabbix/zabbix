@@ -1561,7 +1561,9 @@ function makeEventActionsIcons($eventid, $actions, $users, $is_acknowledged) {
 	$action_icons = [];
 
 	if ($is_acknowledged) {
-		$action_icons[] = makeActionIcon(['icon' => ZBX_ICON_CHECK, 'title' => _('Acknowledged')]); // TODO - AS: check constant
+		$action_icons[] = makeActionIcon(
+			['icon' => ZBX_ICON_CHECK.' '.ZBX_STYLE_EVENT_ACKNOWLEDGED, 'title' => _('Acknowledged')]
+		);
 	}
 
 	if ($suppression_icon !== null) {
@@ -1634,7 +1636,9 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CTag {
 	}
 
 	return makeActionIcon([
-		'icon' => array_key_exists('suppress_until', $data['suppress_until'][0]) ? ZBX_ICON_EYE_OFF : ZBX_ICON_EYE,
+		'icon' => array_key_exists('suppress_until', $data['suppress_until'][0])
+			? ZBX_ICON_EYE_OFF.' '.ZBX_STYLE_SUPPRESSIONS_PROBLEM
+			: ZBX_ICON_EYE.' '.ZBX_STYLE_SUPPRESSIONS_PROBLEM,
 		'button' => true,
 		'hint' => [
 			$table,
@@ -1680,7 +1684,7 @@ function makeEventMessagesIcon(array $data, array $users): ?CTag {
 	}
 
 	return makeActionIcon([
-		'icon' => ZBX_ICON_ALERT,
+		'icon' => ZBX_ICON_ALERT.' '.ZBX_STYLE_EVENT_MESSAGES,
 		'button' => true,
 		'hint' => [
 			$table,
@@ -1694,7 +1698,7 @@ function makeEventMessagesIcon(array $data, array $users): ?CTag {
 				: null
 		],
 		'num' => $data['count'],
-		'aria-label' => _xn('%1$s message', '%1$s messages', $data['count'], 'screen reader', $data['count'])
+		// 'aria-label' => _xn('%1$s message', '%1$s messages', $data['count'], 'screen reader', $data['count']) // TODO acikuns check
 	]);
 }
 
@@ -1738,24 +1742,23 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CTag {
 	// select icon
 	if ($data['original_severity'] > $data['current_severity']) {
 		$icon_style = ZBX_ICON_ARROW_DOWN;
-		$color = ZBX_STYLE_ACTION_SEVERETY_DOWN;
-		$aria_label = _x('Severity decreased', 'screen reader');
+		$type = ZBX_STYLE_EVENT_SEVERITY_DOWN;
+		// $aria_label = _x('Severity decreased', 'screen reader'); // TODO acikuns
 	}
 	elseif ($data['original_severity'] < $data['current_severity']) {
 		$icon_style = ZBX_ICON_ARROW_UP;
-		$color = ZBX_STYLE_ACTION_SEVERETY_UP;
-		$aria_label = _x('Severity increased', 'screen reader');
+		$type = ZBX_STYLE_EVENT_SEVERITY_UP;
+		// $aria_label = _x('Severity increased', 'screen reader'); // TODO acikuns
 	}
 	else {
 		$icon_style = ZBX_ICON_ARROWS_TOP_BOTTOM;
-		$color = ZBX_STYLE_ACTION_SEVERETY_CHANGED;
-		$aria_label = _x('Severity changed', 'screen reader');
+		$type = ZBX_STYLE_EVENT_SEVERITY_CHANGED;
+		// $aria_label = _x('Severity changed', 'screen reader'); // TODO acikuns
 	}
 
 	return makeActionIcon([
 		'button' => true,
-		'color' => $color,
-		'icon' => $icon_style,
+		'icon' => $icon_style.' '.$type,
 		'hint' => [
 			$table,
 			($data['count'] > ZBX_WIDGET_ROWS)
@@ -1767,7 +1770,7 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CTag {
 				))->addClass(ZBX_STYLE_TABLE_PAGING)
 				: null
 		],
-		'aria-label' => $aria_label
+		// 'aria-label' => $aria_label // TODO acikuns
 	]);
 }
 
@@ -1841,21 +1844,20 @@ function makeEventActionsIcon(array $data, $eventid): ?CTag {
 	}
 
 	if ($data['has_failed_action']) {
-		$color = ZBX_STYLE_EVENT_ACTION_ICON_RED;
+		$type = ZBX_STYLE_EVENT_ACTION_RED;
 	}
 	elseif ($data['has_uncomplete_action']) {
-		$color = ZBX_STYLE_EVENT_ACTION_ICON_YELLOW;
+		$type = ZBX_STYLE_EVENT_ACTION_YELLOW;
 	}
 	else {
-		$color = ZBX_STYLE_EVENT_ACTION_ICON_GRAY;
+		$type = ZBX_STYLE_EVENT_ACTION_GRAY;
 	}
 
 	return makeActionIcon([
-		'icon' => ZBX_ICON_BULLET_RIGHT,
-		'color' => $color,
+		'icon' => ZBX_ICON_BULLET_RIGHT.' '.$type,
 		'button' => true,
 		'num' => $data['count'],
-		'aria-label' => _xn('%1$s action', '%1$s actions', $data['count'], 'screen reader', $data['count'])
+		// 'aria-label' => _xn('%1$s action', '%1$s actions', $data['count'], 'screen reader', $data['count']) // TODO relocate this to title acikuns
 	])->setAjaxHint([
 		'type' => 'eventactions',
 		'data' => ['eventid' => $eventid]

@@ -19,10 +19,6 @@ z-select,
 		border-radius: unset;
 		text-align: left;
 
-		& button {
-			@extend %btn-reset;
-		}
-
 		&::before {
 			display: none;
 		}

@@ -2725,96 +2725,6 @@ div.dashboard-widget-tophosts z-bar-gauge {
     .list-table.sticky-footer tfoot tr:first-of-type td, .list-table.sticky-footer tfoot tr:first-of-type th {
       border-top: 2px solid #dce2e5;
       border-bottom: 0; }
-  .list-table a.zi-bullet-right, .list-table a.zi-bullet-alt-up, .list-table a.zi-bullet-alt-down, .list-table a.zi-arrow-up, .list-table a.zi-arrow-down, .list-table a.zi-arrows-top-bottom, .list-table a.zi-alert,
-  .list-table button.zi-bullet-right,
-  .list-table a.zi-bullet-right.btn-icon,
-  .list-table button.zi-bullet-alt-up,
-  .list-table a.zi-bullet-alt-up.btn-icon,
-  .list-table button.zi-bullet-alt-down,
-  .list-table a.zi-bullet-alt-down.btn-icon,
-  .list-table button.zi-arrow-up,
-  .list-table a.zi-arrow-up.btn-icon,
-  .list-table button.zi-arrow-down,
-  .list-table a.zi-arrow-down.btn-icon,
-  .list-table button.zi-arrows-top-bottom,
-  .list-table a.zi-arrows-top-bottom.btn-icon,
-  .list-table button.zi-alert,
-  .list-table a.zi-alert.btn-icon {
-    vertical-align: top;
-    width: 18px;
-    height: 18px;
-    min-height: 0;
-    padding: 0;
-    margin-right: 5px; }
-    .list-table a.zi-bullet-right::after, .list-table a.zi-bullet-alt-up::after, .list-table a.zi-bullet-alt-down::after, .list-table a.zi-arrow-up::after, .list-table a.zi-arrow-down::after, .list-table a.zi-arrows-top-bottom::after, .list-table a.zi-alert::after,
-    .list-table button.zi-bullet-right::after,
-    .list-table a.zi-bullet-right.btn-icon::after,
-    .list-table button.zi-bullet-alt-up::after,
-    .list-table a.zi-bullet-alt-up.btn-icon::after,
-    .list-table button.zi-bullet-alt-down::after,
-    .list-table a.zi-bullet-alt-down.btn-icon::after,
-    .list-table button.zi-arrow-up::after,
-    .list-table a.zi-arrow-up.btn-icon::after,
-    .list-table button.zi-arrow-down::after,
-    .list-table a.zi-arrow-down.btn-icon::after,
-    .list-table button.zi-arrows-top-bottom::after,
-    .list-table a.zi-arrows-top-bottom.btn-icon::after,
-    .list-table button.zi-alert::after,
-    .list-table a.zi-alert.btn-icon::after {
-      position: relative;
-      width: 18px;
-      height: 18px;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 9px;
-      font-family: inherit;
-      content: attr(data-count); }
-  .list-table a.zi-alert {
-    display: inline-block;
-    margin-left: 5px; }
-    .list-table a.zi-alert::before {
-      top: 0; }
-    .list-table a.zi-alert::after {
-      top: -2px;
-      right: 13.5px;
-      display: inline;
-      content: '?'; }
-    .list-table a.zi-alert:focus, .list-table a.zi-alert:active {
-      box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
-  .list-table .zi-bullet-right {
-    top: -1px; }
-    .list-table .zi-bullet-right::before {
-      top: 2px;
-      margin-left: -1px;
-      font-size: 20px; }
-    .list-table .zi-bullet-right::after {
-      top: -3px;
-      right: 19px;
-      color: #1f2c33; }
-  .list-table .zi-alert::before {
-    top: -2px;
-    right: 1px;
-    font-size: 20px;
-    color: #768d99; }
-  .list-table .zi-alert::after {
-    top: -1px;
-    right: 19.5px;
-    color: #ffffff; }
-  .list-table .zi-arrow-up::before,
-  .list-table .zi-arrow-down::before,
-  .list-table .zi-arrows-top-bottom::before {
-    font-size: 13px; }
-  .list-table .zi-arrow-up::after,
-  .list-table .zi-arrow-down::after,
-  .list-table .zi-arrows-top-bottom::after {
-    display: none !important; }
-  .list-table .zi-bullet-alt-up::before,
-  .list-table .zi-bullet-alt-down::before {
-    color: #768d99; }
-  .list-table .zi-bullet-alt-up::after,
-  .list-table .zi-bullet-alt-down::after {
-    display: none !important; }
   .list-table .zi-command,
   .list-table .zi-checkbox,
   .list-table .zi-check,
@@ -2824,7 +2734,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .list-table .zi-alert-more,
   .list-table .zi-calendar-warning,
   .list-table .zi-calendar-check,
-  .list-table .zi-envelope-filled {
+  .list-table .zi-envelope-filled,
+  .list-table .zi-arrow-top-right {
     color: #768d99; }
     .list-table .zi-command::before,
     .list-table .zi-checkbox::before,
@@ -2835,7 +2746,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
     .list-table .zi-alert-more::before,
     .list-table .zi-calendar-warning::before,
     .list-table .zi-calendar-check::before,
-    .list-table .zi-envelope-filled::before {
+    .list-table .zi-envelope-filled::before,
+    .list-table .zi-arrow-top-right::before {
       vertical-align: middle; }
   .list-table .zi-wrench-alt {
     cursor: pointer;
@@ -2845,15 +2757,6 @@ div.dashboard-widget-tophosts z-bar-gauge {
       padding-left: 6px;
       font-size: 12px;
       color: #f3a914; }
-  .list-table .zi-more {
-    padding: 0 2px;
-    opacity: .5;
-    transition: opacity 0.3s ease-out; }
-    .list-table .zi-more::before {
-      font-size: 18px;
-      color: #768d99; }
-    .list-table .zi-more:hover, .list-table .zi-more:active, .list-table .zi-more:focus {
-      opacity: 1; }
 
 .menu-main > li {
   line-height: 16px; }
@@ -4605,10 +4508,7 @@ form.is-loading {
   display: inline-block;
   padding: 5px;
   position: relative; }
-  .table-forms-separator .zi-arrow-top-right::before,
-  .table-forms-separator .zi-arrow-right-top::before,
-  .table-forms-separator .zi-check::before,
-  .table-forms-separator .zi-alert-more::before {
+  .table-forms-separator [class^="zi-"]::before, .table-forms-separator [class*="zi-"]::before {
     color: #768d99; }
 
 .border-left {
@@ -5119,24 +5019,6 @@ z-select .zi-chevron-down,
 .btn-dashboard-normal {
   box-shadow: 1px 1px 2px rgba(118, 141, 153, 0.5); }
 
-.dashboard-navigation-tabs .zi-more, .list-table a.zi-bullet-right, .list-table a.zi-bullet-alt-up, .list-table a.zi-bullet-alt-down, .list-table a.zi-arrow-up, .list-table a.zi-arrow-down, .list-table a.zi-arrows-top-bottom, .list-table a.zi-alert,
-.list-table button.zi-bullet-right,
-.list-table button.zi-bullet-alt-up,
-.list-table button.zi-bullet-alt-down,
-.list-table button.zi-arrow-up,
-.list-table button.zi-arrow-down,
-.list-table button.zi-arrows-top-bottom,
-.list-table button.zi-alert, .list-table .zi-more, section .zi-chevron-up, z-select .zi-chevron-down button, z-select .zi-chevron-down a.btn-icon,
-.z-select .zi-chevron-down button,
-.z-select .zi-chevron-down a.btn-icon, .zi-bell,
-.zi-bell-off,
-.zi-speaker,
-.zi-speaker-off,
-.zi-time-period, .list-vertical-accordion .zi-chevron-up, .interfaces .interface-row[data-type="2"] .interface-btn-toggle.zi-chevron-down {
-  background-color: transparent;
-  border: none;
-  border-radius: 2px; }
-
 .filter-container.tabfilter-container .zi-cog-filled {
   border: 0;
   min-height: 0;
@@ -5206,7 +5088,7 @@ z-select .zi-chevron-down,
   .zi-i:focus {
     box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
   .zi-i::before {
-    top: -1px;
+    top: -3px;
     left: -4px;
     width: 14px;
     height: 14px;
@@ -7399,5 +7281,105 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .zi-drag-handle::before {
     font-size: 24px; }
 
-.list-table.problem-list .zi-check::before {
-  color: #009900; }
+.list-table.problem-list a.event-action-red, .list-table.problem-list a.event-action-yellow, .list-table.problem-list a.event-action-gray, .list-table.problem-list a.event-messages, .list-table.problem-list a.event-acknowledged, .list-table.problem-list a.event-severity-down, .list-table.problem-list a.event-severity-up, .list-table.problem-list a.event-severity-changed, .list-table.problem-list a.trigger-description, .list-table.problem-list a.trigger-dependency, .list-table.problem-list a.suppressions-problem,
+.list-table.problem-list button.event-action-red,
+.list-table.problem-list a.event-action-red.btn-icon,
+.list-table.problem-list button.event-action-yellow,
+.list-table.problem-list a.event-action-yellow.btn-icon,
+.list-table.problem-list button.event-action-gray,
+.list-table.problem-list a.event-action-gray.btn-icon,
+.list-table.problem-list button.event-messages,
+.list-table.problem-list a.event-messages.btn-icon,
+.list-table.problem-list button.event-acknowledged,
+.list-table.problem-list a.event-acknowledged.btn-icon,
+.list-table.problem-list button.event-severity-down,
+.list-table.problem-list a.event-severity-down.btn-icon,
+.list-table.problem-list button.event-severity-up,
+.list-table.problem-list a.event-severity-up.btn-icon,
+.list-table.problem-list button.event-severity-changed,
+.list-table.problem-list a.event-severity-changed.btn-icon,
+.list-table.problem-list button.trigger-description,
+.list-table.problem-list a.trigger-description.btn-icon,
+.list-table.problem-list button.trigger-dependency,
+.list-table.problem-list a.trigger-dependency.btn-icon,
+.list-table.problem-list button.suppressions-problem,
+.list-table.problem-list a.suppressions-problem.btn-icon {
+  vertical-align: top;
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  padding: 0;
+  margin-right: 5px; }
+  .list-table.problem-list a.event-action-red::before, .list-table.problem-list a.event-action-yellow::before, .list-table.problem-list a.event-action-gray::before, .list-table.problem-list a.event-messages::before, .list-table.problem-list a.event-acknowledged::before, .list-table.problem-list a.event-severity-down::before, .list-table.problem-list a.event-severity-up::before, .list-table.problem-list a.event-severity-changed::before, .list-table.problem-list a.trigger-description::before, .list-table.problem-list a.trigger-dependency::before, .list-table.problem-list a.suppressions-problem::before,
+  .list-table.problem-list button.event-action-red::before,
+  .list-table.problem-list a.event-action-red.btn-icon::before,
+  .list-table.problem-list button.event-action-yellow::before,
+  .list-table.problem-list a.event-action-yellow.btn-icon::before,
+  .list-table.problem-list button.event-action-gray::before,
+  .list-table.problem-list a.event-action-gray.btn-icon::before,
+  .list-table.problem-list button.event-messages::before,
+  .list-table.problem-list a.event-messages.btn-icon::before,
+  .list-table.problem-list button.event-acknowledged::before,
+  .list-table.problem-list a.event-acknowledged.btn-icon::before,
+  .list-table.problem-list button.event-severity-down::before,
+  .list-table.problem-list a.event-severity-down.btn-icon::before,
+  .list-table.problem-list button.event-severity-up::before,
+  .list-table.problem-list a.event-severity-up.btn-icon::before,
+  .list-table.problem-list button.event-severity-changed::before,
+  .list-table.problem-list a.event-severity-changed.btn-icon::before,
+  .list-table.problem-list button.trigger-description::before,
+  .list-table.problem-list a.trigger-description.btn-icon::before,
+  .list-table.problem-list button.trigger-dependency::before,
+  .list-table.problem-list a.trigger-dependency.btn-icon::before,
+  .list-table.problem-list button.suppressions-problem::before,
+  .list-table.problem-list a.suppressions-problem.btn-icon::before {
+    color: #768d99; }
+.list-table.problem-list [class^="event-action-"]::after, .list-table.problem-list [class*=" event-action-"]::after,
+.list-table.problem-list .event-messages::after,
+.list-table.problem-list .trigger-description::after {
+  position: absolute;
+  top: 4px;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 9px;
+  font-family: inherit; }
+.list-table.problem-list [class^="event-action-"]::after, .list-table.problem-list [class*=" event-action-"]::after,
+.list-table.problem-list .event-messages::after {
+  content: attr(data-count); }
+.list-table.problem-list .trigger-description {
+  margin-left: 5px; }
+  .list-table.problem-list .trigger-description::after {
+    content: '?' !important; }
+.list-table.problem-list .event-messages::before {
+  top: 1px; }
+.list-table.problem-list .event-messages::after {
+  top: 5px;
+  color: #ffffff; }
+.list-table.problem-list [class^="event-action-"]::before, .list-table.problem-list [class*=" event-action-"]::before {
+  position: absolute;
+  top: 12px;
+  color: #e33734 !important; }
+.list-table.problem-list [class^="event-action-"]::after, .list-table.problem-list [class*=" event-action-"]::after {
+  position: absolute;
+  color: #1f2c33; }
+.list-table.problem-list .event-action-red::before {
+  color: #e33734 !important; }
+.list-table.problem-list .event-action-yellow::before {
+  color: #af6b00 !important; }
+.list-table.problem-list .event-action-gray::before {
+  color: #768d99 !important; }
+.list-table.problem-list .event-severity-down::before {
+  font-size: 12px !important;
+  color: #009900 !important; }
+.list-table.problem-list .event-severity-up::before {
+  font-size: 12px !important;
+  color: #e33734 !important; }
+.list-table.problem-list .event-acknowledged {
+  display: inline-block;
+  width: 18px;
+  min-height: 18px; }
+  .list-table.problem-list .event-acknowledged::before {
+    color: #009900 !important; }

@@ -1115,10 +1115,7 @@ form {
 	padding: 5px;
 	position: relative;
 
-	.zi-arrow-top-right,
-	.zi-arrow-right-top,
-	.zi-check,
-	.zi-alert-more {
+	[class^="zi-"], [class*="zi-"] {
 		&::before {
 			color: $icon-color;
 		}
@@ -1693,9 +1690,8 @@ select {
 	width: 24px;
 	height: 24px;
 	padding: 0 4px;
-
 	opacity: .5;
-	@extend %btn-reset;
+
 	&::before {
 		color: $icon-color;
 	}
@@ -2027,12 +2023,6 @@ select {
 	box-shadow: 1px 1px 2px $action-shadow-color;
 }
 
-%btn-reset {
-	background-color: transparent;
-	border: none;
-	border-radius: 2px;
-}
-
 %btn-widget {
 	width: 24px;
 	height: 24px;
@@ -2179,7 +2169,7 @@ $trigger-expression-tree-icons: (
 	}
 
 	&::before {
-		top: -1px;
+		top: -3px;
 		left: -4px;
 		width: 14px;
 		height: 14px;
@@ -2442,7 +2432,7 @@ $trigger-expression-tree-icons: (
 			padding: 0;
 			&::before {
 				padding: 0 4px;
-				top: -2px;
+				top: -2px; // TODO acikuns check
 				font-size: 16px;
 				color: $icon-color;
 			}
@@ -2491,7 +2481,7 @@ $trigger-expression-tree-icons: (
 .menu-popup-item.zi-lock {
 	padding: 0 0 0 5px;
 	&::before {
-		top: -2px;
+		top: -2px; // TODO acikuns check
 		padding-right: 5px;
 		vertical-align: middle;
 
@@ -4175,8 +4165,6 @@ svg {
 		height: 24px;
 		padding: 0;
 
-		@extend %btn-reset;
-
 		opacity: .5;
 		transition: opacity $ui-transition-duration ease-out;
 		&:hover,
@@ -4651,7 +4639,7 @@ a.icon-count {
 
 .zi-circle-question-filled {
 	&::before {
-		top: -2px;
+		top: -2px; // TODO acikuns check
 		color: $icon-color;
 	}
 	&:focus,
@@ -5049,7 +5037,6 @@ a.icon-count {
 
 		&[data-type="2"] {
 			.interface-btn-toggle.zi-chevron-down {
-				@extend %btn-reset;
 
 				display: inline-block;
 				width: 24px;
@@ -5476,11 +5463,130 @@ z-select,
 }
 
 .list-table {
+	// TODO zi acikuns remove cursor-pointer classes!
 	&.problem-list {
-		.zi-check {
+		a,
+		button {
+			&.event-action-red,
+			&.event-action-yellow,
+			&.event-action-gray,
+			&.event-messages,
+			&.event-acknowledged,
+			&.event-severity-down,
+			&.event-severity-up,
+			&.event-severity-changed,
+			&.trigger-description,
+			&.trigger-dependency,
+			&.suppressions-problem {
+				vertical-align: top;
+				width: 18px;
+				height: 18px;
+				min-height: 0;
+				padding: 0;
+				margin-right: 5px;
+
+				&::before {
+					color: $icon-color;
+				}
+			}
+		}
+
+		[class^="event-action-"], [class*=" event-action-"],
+		.event-messages,
+		.trigger-description {
+			&::after {
+				position: absolute;
+				top: 4px;
+				width: 18px;
+				height: 18px;
+				display: inline-flex;
+				justify-content: center;
+				align-items: center;
+				font-size: 9px;
+				font-family: inherit;
+			}
+		}
+
+		[class^="event-action-"], [class*=" event-action-"],
+		.event-messages {
+			&::after {
+				content: attr(data-count);
+			}
+		}
+
+		.trigger-description {
+			margin-left: 5px;
+
+			&::after {
+				content: '?' !important;
+			}
+		}
+
+		.event-messages {
 			&::before {
-				color: $icon-action-severity-down;
+				top: 1px;
+			}
+
+			&::after {
+				top: 5px;
+				color: $white;
+			}
+		}
+
+		[class^="event-action-"], [class*=" event-action-"] {
+			&::before {
+				position: absolute;
+				top: 12px;
+				color: $icon-event-action-red !important;
+			}
+
+			&::after {
+				position: absolute;
+				color: $font-color;
+			}
+		}
+
+		.event-action-red {
+			&::before {
+				color: $icon-event-action-red !important;
+			}
+		}
+
+		.event-action-yellow {
+			&::before {
+				color: $icon-event-action-yellow !important;
+			}
+		}
+
+		.event-action-gray {
+			&::before {
+				color: $icon-event-action-gray !important;
+			}
+		}
+
+		.event-severity-down {
+			&::before {
+				font-size: $btn-icon-small-size !important;
+				color: $icon-action-severity-down !important;
+			}
+		}
+
+		.event-severity-up {
+			&::before {
+				font-size: $btn-icon-small-size !important;
+				color: $icon-action-severety-up !important;
+			}
+		}
+
+		.event-acknowledged {
+			display: inline-block;
+			width: 18px;
+			min-height: 18px;
+
+			&::before {
+				color: $icon-action-check !important;
 			}
 		}
 	}
 }
+

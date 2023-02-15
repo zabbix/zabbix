@@ -1011,13 +1011,11 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false) {
  * @return CTag  Returns CSpan or CButton depending on boolean $icon_data['button'] parameter
  */
 function makeActionIcon(array $icon_data): CTag {
-	$icon = array_key_exists('button', $icon_data) && $icon_data['button'] ? new CButton(null) : new CSpan();
+	$icon = array_key_exists('button', $icon_data) && $icon_data['button']
+		? (new CButton(null))->addClass(ZBX_STYLE_BTN_ICON)
+		: new CSpan();
 
 	$icon->addClass($icon_data['icon']);
-
-	if (array_key_exists('color', $icon_data)) {
-		$icon->addStyle('color: '.$icon_data['color'].';');
-	}
 
 	if (array_key_exists('num', $icon_data)) {
 		if ($icon_data['num'] > 99) {
@@ -1057,7 +1055,9 @@ function makeActionIcon(array $icon_data): CTag {
  */
 function makeDescriptionIcon($description) {
 	return (new CLink())
+		->addClass(ZBX_STYLE_BTN_ICON)
 		->addClass(ZBX_ICON_ALERT)
+		->addClass(ZBX_STYLE_TRIGGER_DESCRIPTION)
 		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
 }
 

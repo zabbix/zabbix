@@ -2278,8 +2278,9 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 			}
 
 			$result[] = (new CButton())
+				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass($type === 'down' ? ZBX_ICON_BULLET_ALT_DOWN : ZBX_ICON_BULLET_ALT_UP)
-				->addClass(ZBX_STYLE_CURSOR_POINTER)
+				->addClass(ZBX_STYLE_TRIGGER_DEPENDENCY)
 				->setHint($table, '', $freeze_on_click);
 		}
 	}

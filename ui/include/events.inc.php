@@ -820,6 +820,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 				}
 
 				$tags[$element[$key]][] = (new CButton(null))
+					->addClass(ZBX_STYLE_BTN_ICON)
 					->addClass(ZBX_ICON_MORE)
 					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP);
 			}

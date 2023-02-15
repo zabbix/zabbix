@@ -1903,11 +1903,18 @@ define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
-
 define('ZBX_STYLE_FONT_COLOR', '#1f2c33;'); // TODO - AS: not good idea. Will be problem with themes
-define('ZBX_STYLE_EVENT_ACTION_ICON_RED', '#e33734'); // TODO - AS: not good idea. Will be problem with themes
-define('ZBX_STYLE_EVENT_ACTION_ICON_YELLOW', '#af6b00'); // TODO - AS: not good idea. Will be problem with themes
-define('ZBX_STYLE_EVENT_ACTION_ICON_GRAY', '#768d99'); // TODO - AS: not good idea. Will be problem with themes
+define('ZBX_STYLE_EVENT_ACTION_RED', 'event-action-red');
+define('ZBX_STYLE_EVENT_ACTION_YELLOW', 'event-action-yellow');
+define('ZBX_STYLE_EVENT_ACTION_GRAY', 'event-action-gray');
+define('ZBX_STYLE_EVENT_SEVERITY_DOWN', 'event-severity-down');
+define('ZBX_STYLE_EVENT_SEVERITY_UP', 'event-severity-up');
+define('ZBX_STYLE_EVENT_SEVERITY_CHANGED', 'event-severity-changed');
+define('ZBX_STYLE_EVENT_ACKNOWLEDGED', 'event-acknowledged');
+define('ZBX_STYLE_EVENT_MESSAGES', 'event-messages');
+define('ZBX_STYLE_TRIGGER_DEPENDENCY', 'trigger-dependency');
+define('ZBX_STYLE_SUPPRESSIONS_PROBLEM', 'suppressions-problem');
+
 define('ZBX_STYLE_ACTION_SEVERETY_CHANGED', '#768d99'); // TODO - AS: not good idea. Will be problem with themes
 define('ZBX_STYLE_ACTION_SEVERETY_DOWN', '#009900'); // TODO - AS: not good idea. Will be problem with themes
 define('ZBX_STYLE_ACTION_SEVERETY_UP', '#e33734'); // TODO - AS: not good idea. Will be problem with themes
@@ -1928,6 +1935,7 @@ define('ZBX_STYLE_TIME_INPUT_ERROR', 'time-input-error');
 define('ZBX_STYLE_TIME_QUICK', 'time-quick');
 define('ZBX_STYLE_TIME_QUICK_RANGE', 'time-quick-range');
 define('ZBX_STYLE_TIME_SELECTION_CONTAINER', 'time-selection-container');
+define('ZBX_STYLE_TRIGGER_DESCRIPTION', 'trigger-description');
 define('ZBX_STYLE_FILTER_BTN_CONTAINER', 'filter-btn-container');
 define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
 define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');

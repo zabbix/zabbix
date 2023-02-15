@@ -634,115 +634,6 @@
 		}
 	}
 
-	a,
-	button {
-		&.zi-bullet-right,
-		&.zi-bullet-alt-up,
-		&.zi-bullet-alt-down,
-		&.zi-arrow-up,
-		&.zi-arrow-down,
-		&.zi-arrows-top-bottom,
-		&.zi-alert {
-			@extend %btn-reset;
-
-			vertical-align: top;
-			width: 18px;
-			height: 18px;
-			min-height: 0;
-			padding: 0;
-			margin-right: 5px;
-
-			&::after {
-				position: relative;
-				width: 18px;
-				height: 18px;
-				display: inline-flex;
-				justify-content: center;
-				align-items: center;
-				font-size: 9px;
-				font-family: inherit;
-				content: attr(data-count);
-			}
-		}
-	}
-
-	a {
-		&.zi-alert {
-			display: inline-block;
-			margin-left: 5px;
-
-			&::before {
-				top: 0;
-			}
-
-			&::after {
-				top: -2px;
-				right: 13.5px;
-				display: inline;
-				content: '?';
-			}
-
-			&:focus,
-			&:active {
-				box-shadow: 0 0 0 2px $btn-border-focus-color;
-			}
-		}
-	}
-
-	.zi-bullet-right {
-		top: -1px;
-
-		&::before {
-			top: 2px;
-			margin-left: -1px;
-			font-size: 20px;
-		}
-
-		&::after {
-			top: -3px;
-			right: 19px;
-			color: $font-color;
-		}
-	}
-
-	.zi-alert {
-		&::before {
-			top: -2px;
-			right: 1px;
-			font-size: 20px;
-			color: $icon-action-list-table-color;
-		}
-
-		&::after {
-			top: -1px;
-			right: 19.5px;
-			color: $btn-font-color;
-		}
-	}
-
-	.zi-arrow-up,
-	.zi-arrow-down,
-	.zi-arrows-top-bottom {
-		&::before {
-			font-size: 13px;
-		}
-
-		&::after {
-			display: none !important;
-		}
-	}
-
-	.zi-bullet-alt-up,
-	.zi-bullet-alt-down {
-		&::before {
-			color: $icon-action-list-table-color;
-		}
-
-		&::after {
-			display: none !important;
-		}
-	}
-
 	.zi-command,
 	.zi-checkbox,
 	.zi-check,
@@ -752,7 +643,8 @@
 	.zi-alert-more,
 	.zi-calendar-warning,
 	.zi-calendar-check,
-	.zi-envelope-filled {
+	.zi-envelope-filled,
+	.zi-arrow-top-right {
 		color: $icon-action-list-table-color;
 
 		&::before {
@@ -769,28 +661,6 @@
 			padding-left: 6px;
 			font-size: 12px;
 			color: #f3a914;
-		}
-	}
-
-	.zi-more { // TODO - AS: need to fix
-		@extend %btn-reset;
-
-		padding: 0 2px;
-		opacity: .5;
-
-		@if $ui-transitions {
-			transition: opacity $ui-transition-duration ease-out;
-		}
-
-		&::before {
-			font-size: 18px;
-			color: $icon-color;
-		}
-
-		&:hover,
-		&:active,
-		&:focus {
-			opacity: 1;
 		}
 	}
 }
