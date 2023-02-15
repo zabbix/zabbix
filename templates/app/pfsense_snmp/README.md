@@ -3,10 +3,10 @@
 
 ## Overview
 
-For Zabbix version: 5.0 and higher  
+For Zabbix version: 5.0 and higher.  
 Template for monitoring pfSense by SNMP
 
-This template was tested on:
+This template has been tested on:
 
 - pfSense, version 2.5.0, 2.5.1, 2.5.2
 
@@ -37,8 +37,7 @@ No specific Zabbix configuration is required.
 |{$NET.IF.IFALIAS.NOT_MATCHES} |<p>This macro is used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$NET.IF.IFDESCR.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`.*` |
 |{$NET.IF.IFDESCR.NOT_MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$NET.IF.IFNAME.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`^em[0-9]+$` |
-|{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`^$` |
+|{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`(^pflog[0-9.]*$|^pfsync[0-9.]*$)` |
 |{$NET.IF.IFOPERSTATUS.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`^.*$` |
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES} |<p>Ignore notPresent(6)</p> |`^6$` |
 |{$NET.IF.IFTYPE.MATCHES} |<p>This macro used in filters of network interfaces discovery rule.</p> |`.*` |
@@ -55,7 +54,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Network interfaces discovery |<p>Discovering interfaces from IF-MIB.</p> |SNMP |pfsense.net.if.discovery<p>**Filter**:</p>AND <p>- A: {#IFADMINSTATUS} MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.MATCHES}`</p><p>- B: {#IFADMINSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.NOT_MATCHES}`</p><p>- I: {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- J: {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p><p>- G: {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- H: {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- E: {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- F: {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- C: {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- D: {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p><p>- K: {#IFTYPE} MATCHES_REGEX `{$NET.IF.IFTYPE.MATCHES}`</p><p>- L: {#IFTYPE} NOT_MATCHES_REGEX `{$NET.IF.IFTYPE.NOT_MATCHES}`</p> |
+|Network interfaces discovery |<p>Discovering interfaces from IF-MIB.</p> |SNMP |pfsense.net.if.discovery<p>**Filter**:</p>AND <p>- A: {#IFADMINSTATUS} MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.MATCHES}`</p><p>- B: {#IFADMINSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.NOT_MATCHES}`</p><p>- I: {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- J: {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p><p>- G: {#IFNAME} MATCHES_REGEX `@Network interfaces for discovery`</p><p>- H: {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- E: {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- F: {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- C: {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- D: {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p><p>- K: {#IFTYPE} MATCHES_REGEX `{$NET.IF.IFTYPE.MATCHES}`</p><p>- L: {#IFTYPE} NOT_MATCHES_REGEX `{$NET.IF.IFTYPE.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -126,5 +125,5 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 

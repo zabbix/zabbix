@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,18 +31,21 @@ class CElementFilter {
 	 * Possible filter conditions.
 	 */
 	const PRESENT = 'present';
-	const TEXT_PRESENT = 'text_present';
-	const ATTRIBUTES_PRESENT = 'attributes_present';
+	const TEXT_PRESENT = 'text present';
+	const ATTRIBUTES_PRESENT = 'attributes present';
+	const CLASSES_PRESENT = 'classes present';
 	const VISIBLE = 'visible';
 	const CLICKABLE = 'clickable';
 	const READY = 'ready';
 	const NOT_PRESENT = 'not present';
 	const TEXT_NOT_PRESENT = 'text not present';
-	const ATTRIBUTES_NOT_PRESENT = 'attributes_not_present';
+	const ATTRIBUTES_NOT_PRESENT = 'attributes not present';
+	const CLASSES_NOT_PRESENT = 'classes not present';
 	const NOT_VISIBLE = 'not visible';
 	const NOT_CLICKABLE = 'not clickable';
 	const SELECTED = 'selected';
 	const NOT_SELECTED = 'not selected';
+	const KEY = 'key';
 
 	private $type;
 	private $params = [];
@@ -110,6 +113,8 @@ class CElementFilter {
 			static::TEXT_NOT_PRESENT => 'getTextNotPresentCondition',
 			static::ATTRIBUTES_PRESENT => 'getAttributesPresentCondition',
 			static::ATTRIBUTES_NOT_PRESENT => 'getAttributesNotPresentCondition',
+			static::CLASSES_PRESENT => 'getClassesPresentCondition',
+			static::CLASSES_NOT_PRESENT => 'getClassesNotPresentCondition',
 			static::VISIBLE => 'getVisibleCondition',
 			static::NOT_VISIBLE => 'getNotVisibleCondition',
 			static::CLICKABLE => 'getClickableCondition',
@@ -129,13 +134,19 @@ class CElementFilter {
 	 * Determine whether this element matches the filter or not.
 	 *
 	 * @param CElement $element		element to be checked
+	 * @param mixed	   $key			element key in the collection array
 	 *
 	 * @return boolean
 	 */
-	public function match($element) {
+	public function match($element, $key = null) {
+		if ($this->type === self::KEY) {
+			return in_array($key, $this->params);
+		}
+
 		$method = self::getConditionCallable($this->type);
 
-		$callable = call_user_func_array([$element, $method], $this->params);
+		// A reflection-based implementation of callbacks will be required once filters have more than one attribute.
+		$callable = call_user_func_array([$element, $method], [$this->params]);
 		try {
 			if (call_user_func($callable) === true) {
 				return true;
