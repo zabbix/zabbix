@@ -411,10 +411,15 @@ abstract class CController {
 		}
 
 		$skip = ['popup', 'massupdate'];
+		$csrf_token_form = $this->raw_input[CCsrfTokenHelper::CSRF_TOKEN_NAME];
+
+		if (!is_string($csrf_token_form)) {
+			return false;
+		}
 
 		foreach (explode('.', $this->action) as $segment) {
 			if (!in_array($segment, $skip, true)) {
-				return CCsrfTokenHelper::check($this->raw_input[CCsrfTokenHelper::CSRF_TOKEN_NAME], $segment);
+				return CCsrfTokenHelper::check($csrf_token_form, $segment);
 			}
 		}
 
@@ -451,7 +456,7 @@ abstract class CController {
 	 * @return CControllerResponse|null
 	 */
 	final public function run(): ?CControllerResponse {
-		if ($this->validate_csrf_token && !$this->checkCsrfToken()) {
+		if ($this->validate_csrf_token && (!CWebUser::isLoggedIn() || !$this->checkCsrfToken())) {
 			throw new CAccessDeniedException();
 		}
 

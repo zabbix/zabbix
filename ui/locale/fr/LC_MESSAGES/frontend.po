@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-21 13:28+0000\n"
+"PO-Revision-Date: 2023-02-07 17:08+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -2367,6 +2367,11 @@ msgstr "Impossible de créer une règle de découverte"
 msgid "Cannot create icon map"
 msgstr "Impossible de créer la correspondance d'icône"
 
+#: app/controllers/CControllerMaintenanceCreate.php:72
+#: app/controllers/CControllerMaintenanceCreate.php:150
+msgid "Cannot create maintenance period"
+msgstr ""
+
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
 msgstr "Impossible de créer la requête"
@@ -2550,6 +2555,12 @@ msgstr "Impossible de supprimer les éléments"
 #: maintenance.php:224
 msgid "Cannot delete maintenance"
 msgstr "Impossible de supprimer une maintenance"
+
+#: app/controllers/CControllerMaintenanceDelete.php:71
+msgid "Cannot delete maintenance period"
+msgid_plural "Cannot delete maintenance periods"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -3834,6 +3845,11 @@ msgstr "Impossible de mettre à jour les macros"
 #: maintenance.php:119
 msgid "Cannot update maintenance"
 msgstr "Impossible de mettre à jour la maintenance"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:73
+#: app/controllers/CControllerMaintenanceUpdate.php:152
+msgid "Cannot update maintenance period"
+msgstr ""
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -5580,7 +5596,7 @@ msgstr "Période de stockage des données"
 
 #: app/views/connector.edit.php:54 app/views/connector.list.php:73
 msgid "Data type"
-msgstr ""
+msgstr "Type de données"
 
 #: include/classes/setup/CSetupWizard.php:565
 #: include/classes/setup/CSetupWizard.php:717
@@ -6087,6 +6103,10 @@ msgstr "Supprimer les prototypes d'éléments sélectionnés ?"
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
 msgstr "Supprimer les éléments sélectionnés ?"
+
+#: app/views/js/maintenance.list.js.php:88
+msgid "Delete selected maintenance period?"
+msgstr ""
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -7550,7 +7570,7 @@ msgstr[1] "Mettre à jour les événements"
 
 #: app/views/connector.edit.php:58 app/views/connector.list.php:99
 msgid "Events"
-msgstr ""
+msgstr "Événements"
 
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
@@ -12349,9 +12369,23 @@ msgstr "Maintenance supprimée"
 msgid "Maintenance period"
 msgstr "Période de maintenance"
 
+#: app/controllers/CControllerMaintenanceCreate.php:142
+msgid "Maintenance period created"
+msgstr "Période de maintenance créée"
+
+#: app/controllers/CControllerMaintenanceDelete.php:61
+msgid "Maintenance period deleted"
+msgid_plural "Maintenance periods deleted"
+msgstr[0] "Période de maintenance supprimée"
+msgstr[1] "Périodes de maintenance supprimées"
+
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
 msgstr "Durée de la période de maintenance"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:144
+msgid "Maintenance period updated"
+msgstr "Période de maintenance mise à jour"
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -12651,7 +12685,7 @@ msgstr "Période maximale pour le sélecteur de temps"
 
 #: app/views/connector.edit.php:171
 msgid "Max records per message"
-msgstr ""
+msgstr "Nombre maximum d'enregistrements par message"
 
 #: app/controllers/CControllerPopupItemTest.php:1313
 #: app/controllers/CControllerPopupItemTest.php:1319
@@ -13561,6 +13595,11 @@ msgstr "Nouvel hôte"
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
 msgstr "Nouveau groupe d'hôtes"
+
+#: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
+#: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
+msgid "New maintenance period"
+msgstr "Nouvelle période de maintenance"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
@@ -15211,7 +15250,7 @@ msgstr "Les paramètres \"esc_step_from\" et \"esc_step_to\" doivent être défi
 
 #: include/views/configuration.host.discovery.edit.php:68
 msgid "Parent discovery rule"
-msgstr ""
+msgstr "Règle de découverte parente"
 
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.prototype.edit.php:64
@@ -15220,7 +15259,7 @@ msgstr "Règles de découverte parentes"
 
 #: include/views/configuration.graph.edit.php:88
 msgid "Parent graph"
-msgstr ""
+msgstr "Graphique parent"
 
 #: include/views/configuration.graph.edit.php:91
 msgid "Parent graph prototype"
@@ -15875,7 +15914,7 @@ msgstr "Propriétés"
 
 #: app/views/connector.edit.php:47
 msgid "Protocol"
-msgstr ""
+msgstr "Protocole"
 
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
