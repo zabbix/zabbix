@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
+#include "zbxalgo.h"
 
 static int	connector_initialized;
 
@@ -325,7 +326,7 @@ void	zbx_connector_object_free(zbx_connector_object_t connector_object)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees connecto data point                                         *
+ * Purpose: frees connector data point                                        *
  *                                                                            *
  * Parameters: connector_data_point - [IN] connector data point               *
  *                                                                            *

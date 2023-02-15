@@ -115,7 +115,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (configuration\ syncer, data\ sender, discoverer, history\ syncer, housekeeper, http\ poller, preprocessing\ manager, preprocessing\ worker, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, odbc\ poller)
+All processes of specified type (configuration\ syncer, data\ sender, discoverer, history\ syncer, housekeeper, http\ poller, preprocessing\ manager, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, odbc\ poller)
 .RE
 .RS 4
 .TP 4
@@ -134,7 +134,7 @@ Profiling control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (configuration\ syncer, data\ sender, discoverer, history\ syncer, housekeeper, http\ poller, preprocessing\ manager, preprocessing\ worker, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, odbc\ poller)
+All processes of specified type (configuration\ syncer, data\ sender, discoverer, history\ syncer, housekeeper, http\ poller, preprocessing\ manager, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, odbc\ poller)
 .RE
 .RS 4
 .TP 4

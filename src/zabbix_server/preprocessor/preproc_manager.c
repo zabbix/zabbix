@@ -34,8 +34,8 @@
 
 extern unsigned char	program_type;
 
-#define PP_MANAGER_DELAY_SEC	0
-#define PP_MANAGER_DELAY_NS	5e8
+#define PP_MANAGER_DELAY_SEC 	1
+#define PP_MANAGER_DELAY_NS	0
 
 /******************************************************************************
  *                                                                            *
@@ -252,6 +252,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_pp_task_ptr_create(&tasks);
+	zbx_vector_pp_task_ptr_reserve(&tasks, ZBX_PREPROCESSING_BATCH_SIZE);
 
 	preprocessor_sync_configuration(manager);
 
@@ -467,11 +468,12 @@ static void	preprocessor_reply_top_sequences(zbx_pp_manager_t *manager, zbx_ipc_
  *                                                                            *
  * Purpose: respond to worker usage statistics request                        *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
- *             client  - [IN] the request source                              *
+ * Parameters: manager     - [IN] preprocessing manager                       *
+ *             workers_num - [IN] number of preprocessing workers             *
+ *             client      - [IN] the request source                          *
  *                                                                            *
  ******************************************************************************/
-static void	preprocessor_reply_usage_stats(zbx_pp_manager_t *manager, zbx_ipc_client_t *client)
+static void	preprocessor_reply_usage_stats(zbx_pp_manager_t *manager, int workers_num, zbx_ipc_client_t *client)
 {
 	zbx_vector_dbl_t	usage;
 	unsigned char		*data;
@@ -480,12 +482,17 @@ static void	preprocessor_reply_usage_stats(zbx_pp_manager_t *manager, zbx_ipc_cl
 	zbx_vector_dbl_create(&usage);
 	zbx_pp_manager_get_worker_usage(manager, &usage);
 
-	data_len = zbx_preprocessor_pack_usage_stats(&data, &usage);
+	data_len = zbx_preprocessor_pack_usage_stats(&data, &usage,  workers_num);
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT, data, data_len);
 
 	zbx_free(data);
 	zbx_vector_dbl_destroy(&usage);
+}
+
+static void	preprocessor_finished_task_cb(void *data)
+{
+	zbx_ipc_service_alert((zbx_ipc_service_t *)data);
 }
 
 ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
@@ -504,8 +511,9 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	const zbx_thread_preprocessing_manager_args	*pp_args = ((zbx_thread_args_t *)args)->args;
 	zbx_pp_manager_t		*manager;
 	zbx_vector_pp_task_ptr_t	tasks;
-	zbx_uint64_t			pending_num, finished_num, processed_num = 0, queued_num = 0;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
+	zbx_uint64_t			pending_num, finished_num, processed_num = 0, queued_num = 0,
+					processing_num = 0;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -524,7 +532,8 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, &error)))
+	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, preprocessor_finished_task_cb,
+			(void *)&service, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize preprocessing manager: %s", error);
 		zbx_free(error);
@@ -588,7 +597,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 					preprocessor_reply_top_sequences(manager, client, message);
 					break;
 				case ZBX_IPC_PREPROCESSOR_USAGE_STATS:
-					preprocessor_reply_usage_stats(manager, client);
+					preprocessor_reply_usage_stats(manager, pp_args->workers_num, client);
 					break;
 				case ZBX_RTC_LOG_LEVEL_INCREASE:
 				case ZBX_RTC_LOG_LEVEL_DECREASE:
@@ -605,7 +614,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
-		zbx_pp_manager_process_finished(manager, &tasks, &pending_num, &finished_num);
+		zbx_pp_manager_process_finished(manager, &tasks, &pending_num, &processing_num, &finished_num);
 
 		if (0 < tasks.values_num)
 		{
@@ -625,10 +634,11 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			timeout.ns = PP_MANAGER_DELAY_NS;
 		}
 
-		if (0 == pending_num || 1 < sec - time_flush)
+		/* flush local history cache when there is nothing more to process or one second after last flush */
+		if (0 == pending_num + processing_num + finished_num || 1 < sec - time_flush)
 		{
 			dc_flush_history();
-			time_flush = time_now;
+			time_flush = sec;
 		}
 	}
 out:
@@ -637,10 +647,8 @@ out:
 	zbx_vector_pp_task_ptr_destroy(&tasks);
 	zbx_pp_manager_free(manager);
 
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
-
 	zbx_ipc_service_close(&service);
 
+	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

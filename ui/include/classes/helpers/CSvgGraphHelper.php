@@ -540,7 +540,8 @@ class CSvgGraphHelper {
 			$dataset_num = $metric['data_set'];
 
 			if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_ITEM) {
-				$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+				$name = graph_item_aggr_fnc2str($metric['options']['aggregate_function']).
+					'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
 			}
 			else {
 				$name = $data_sets[$dataset_num]['data_set_label'] !== ''
@@ -556,7 +557,7 @@ class CSvgGraphHelper {
 
 			if (!array_key_exists($dataset_num, $dataset_metrics)) {
 				$metric = array_merge($metric, [
-					'name' => graph_item_aggr_fnc2str($metric['options']['aggregate_function']).'('.$name.')',
+					'name' => $name,
 					'items' => [],
 					'points' => []
 				]);
