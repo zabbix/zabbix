@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,6 +81,11 @@ class CTrend extends CApiService {
 						break;
 
 					default:
+						$config = select_config();
+						$options['time_from'] = $config['hk_trends_global'] == 1
+							? max($options['time_from'], time() - timeUnitToSeconds($config['hk_trends']) + 1)
+							: $options['time_from'];
+
 						$data = $this->getFromSql($options);
 				}
 

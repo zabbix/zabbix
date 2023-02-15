@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-01-10T14:11:39Z</date>
+   <date>2022-12-21T12:49:19Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template DB Oracle by Zabbix Agent 2</template>
-         <name>Template DB Oracle by Zabbix Agent 2</name>
+         <template>Template DB Oracle by Zabbix agent 2</template>
+         <name>Template DB Oracle by Zabbix agent 2</name>
          <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
@@ -79,7 +79,7 @@
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>The average active sessions at a point in time. It is the number of sessions that are either working or waiting.</description>
+               <description>The average active sessions at a point in time. The number of sessions that are either working or waiting.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -96,25 +96,12 @@
                </master_item>
             </item>
             <item>
-               <name>Oracle: Get archive log info</name>
-               <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
-               <delay>5m</delay>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
                <name>Oracle: Archiver state</name>
                <type>DEPENDENT</type>
                <key>oracle.archiver_state</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Automatic archiving status.</description>
+               <description>The status of automatic archiving.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -141,7 +128,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Ratio of buffer cache hits. (LogRead - PhyRead)/LogRead</description>
+               <description>The ratio of buffer cache hits ((LogRead - PhyRead)/LogRead).</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -163,7 +150,7 @@
                <key>oracle.cache_blocks_corrupt</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>The number of blocks that encountered a corruption or checksum failure during interconnect.</description>
+               <description>The number of blocks that encountered corruption or checksum failure during the interconnect.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -185,7 +172,7 @@
                <key>oracle.cache_blocks_lost</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>The number of global cache blocks lost</description>
+               <description>The number of lost global cache blocks.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -202,19 +189,6 @@
                </master_item>
             </item>
             <item>
-               <name>Oracle: Get CDB and No-CDB info</name>
-               <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>Get info about CDB and  No-CDB databases on instance.</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
                <name>Oracle: Cursor cache hit ratio</name>
                <type>DEPENDENT</type>
                <key>oracle.cursor_cache_hit_ratio</key>
@@ -222,7 +196,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Ratio of cursor cache hits. CursorCacheHit/SoftParse</description>
+               <description>The ratio of cursor cache hits (CursorCacheHit/SoftParse).</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -246,7 +220,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Calculated by dividing the total CPU used by the database by the Oracle time model statistic DB time.</description>
+               <description>It is calculated by dividing the total CPU (used by the database) by the Oracle time model statistic DB time.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -270,7 +244,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Wait time: the time that the server process spends waiting for available shared resources (to be released by other server processes) such as latches, locks, data buffers, and so on</description>
+               <description>Wait time - the time that the server process spends waiting for available shared resources to be released by other server processes, such as latches, locks, data buffers, etc.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -290,7 +264,7 @@
                <name>Oracle: Datafiles count</name>
                <key>oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                <history>7d</history>
-               <description>Current number of datafile.</description>
+               <description>The current number of datafiles.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -309,7 +283,7 @@
                <key>oracle.db_files_limit</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Max allowable number of  datafile.</description>
+               <description>The maximum allowable number of datafiles.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -333,7 +307,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>Rps</units>
-               <description>The number of sorts going to disk per second</description>
+               <description>The number of sorts going to disk per second.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -348,19 +322,6 @@
                <master_item>
                   <key>oracle.sys.metrics["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                </master_item>
-            </item>
-            <item>
-               <name>Oracle: Get ASM stats</name>
-               <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>Get ASM disk groups stats.</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
             </item>
             <item>
                <name>Oracle: Enqueue timeouts per second</name>
@@ -392,7 +353,7 @@
                <key>oracle.fra_number_of_files</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Number of files in the fast recovery area</description>
+               <description>The number of files in the FRA.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -437,7 +398,7 @@
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Maximum amount of disk space (in bytes) that the database can use for the fast recovery area.</description>
+               <description>The maximum amount of disk space (in bytes) that the database can use for the Fast Recovery Area (FRA).</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -460,7 +421,7 @@
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Total amount of disk space (in bytes) that can be created by deleting obsolete, redundant, and other low priority files from the fast recovery area.</description>
+               <description>The total amount of disk space (in bytes) that can be created by deleting obsolete, redundant, and other low priority files from the FRA.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -483,7 +444,7 @@
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Amount of disk space (in bytes) used by fast recovery area files created in current and all previous fast recovery areas.</description>
+               <description>The amount of disk space (in bytes) used by FRA files created in the current and all the previous FRAs.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -543,7 +504,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>Rps</units>
-               <description>GC CR block received per second.</description>
+               <description>The global cache (GC) and the consistent read (CR) block received per second.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -567,7 +528,7 @@
                <history>7d</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
-               <description>Name of the host machine.</description>
+               <description>The name of the host machine.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -600,7 +561,7 @@
                <history>7d</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
-               <description>Name of the instance.</description>
+               <description>The name of an instance.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -620,7 +581,7 @@
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
                      <name>Oracle: Instance name has changed (new name received: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
-                     <description>Oracle DB Instance name has changed. Ack to close.</description>
+                     <description>Oracle DB Instance name has changed. Ack to close manually.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -631,7 +592,7 @@
                <key>oracle.instance_status</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Status of the instance.</description>
+               <description>The status of the instance.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -656,7 +617,7 @@
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <description>The item gets state of the current instance.</description>
+               <description>The item gets its state of the current instance.</description>
                <applications>
                   <application>
                      <name>Zabbix raw items</name>
@@ -669,7 +630,7 @@
                <key>oracle.instance.role</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Indicates whether the instance is an active instance or an inactive secondary instance.</description>
+               <description>It indicates whether the instance is an active instance or an inactive secondary instance.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -696,7 +657,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Ratio of library cache hits. Hits/Pins</description>
+               <description>The ratio of library cache hits (Hits/Pins).</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -744,7 +705,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>Rps</units>
-               <description>The number of long table scans per second. A table is considered 'long' if the table is not cached and if its high-water mark is greater than 5 blocks.</description>
+               <description>The number of long table scans per second. A table is considered 'long' if the table is not cached and if its high-water mark is greater than five blocks.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -785,26 +746,13 @@
                </master_item>
             </item>
             <item>
-               <name>Oracle: Get PDB info</name>
-               <key>oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>Get info about PDB databases on instance.</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
                <name>Oracle: PGA, Global memory bound</name>
                <type>DEPENDENT</type>
                <key>oracle.pga_global_bound</key>
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Maximum size of a work area executed in automatic mode.</description>
+               <description>The maximum size of work area executed in automatic mode.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -827,7 +775,7 @@
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Current value of the PGA_AGGREGATE_TARGET initialization parameter. If this parameter is not set, then its value is 0 and automatic management of PGA memory is disabled.</description>
+               <description>The current value of the PGA_AGGREGATE_TARGET initialization parameter. If this parameter is not set, then its value is 0 and automatic management of the PGA memory is disabled.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -957,7 +905,7 @@
                <key>oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                <delay>30s</delay>
                <history>7d</history>
-               <description>Test the connection to Oracle Database state</description>
+               <description>Test the connection to Oracle Database state.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1003,7 +951,7 @@
                <key>oracle.processes_limit</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Max user processes.</description>
+               <description>The maximum number of user processes.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1023,7 +971,7 @@
                <name>Oracle: Redo logs available to switch</name>
                <key>oracle.redolog.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                <history>7d</history>
-               <description>Number of available for log switching inactive/unused REDO logs.</description>
+               <description>The number of inactive/unused redo logs available for log switching.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1040,7 +988,7 @@
                      <expression>{max(5m)} &lt; {$ORACLE.REDO.MIN.WARN}</expression>
                      <name>Oracle: Number of REDO logs available for switching is too low (less {$ORACLE.REDO.MIN.WARN} for 5 min)</name>
                      <priority>WARNING</priority>
-                     <description>Number of available for log switching inactive/unused REDOs is low (Database down risk)</description>
+                     <description>The number of inactive/unused REDOs available for log switching is low (database down risk).</description>
                   </trigger>
                </triggers>
             </item>
@@ -1075,7 +1023,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
-               <description>SQL service response time in seconds.</description>
+               <description>The Structured Query Language (SQL) service response time expressed in seconds.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1153,7 +1101,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>The percentage of concurrency. Concurrency is a DB behavior when different transactions request to change the same resource - in case of modifying data transactions sequentially block temporarily the right to change data, the rest of the transactions are waiting for access. In the case when access for resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on performance. A high contention value does not indicate the root cause of the problem, but is a signal to search for it.</description>
+               <description>The percentage of concurrency. Concurrency is a DB behavior when different transactions request to change the same resource. In the case of modifying data transactions, it sequentially temporarily blocks the right to change the data, the rest of the transactions are waiting for the access. In the case when the access for the resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on the performance. A high contention value does not indicate the root cause of the problem but is a signal to search for it.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1173,7 +1121,7 @@
                      <expression>{min(5m)} &gt; {$ORACLE.CONCURRENCY.MAX.WARN}</expression>
                      <name>Oracle: Too high database concurrency (over {$ORACLE.CONCURRENCY.MAX.WARN}% for 5 min)</name>
                      <priority>WARNING</priority>
-                     <description>Concurrency rate is over {$ORACLE.CONCURRENCY.MAX.WARN}%. A high contention value does not indicate the root cause of the problem, but is a signal to search for it. In the case of high competition, an analysis of resource consumption should be carried out, the most "heavy" queries made in the database, possibly - session tracing. All this will help determine the root cause and possible optimization points both in the database configuration and in the logic of building queries of the application itself.</description>
+                     <description>The concurrency rate exceeds {$ORACLE.CONCURRENCY.MAX.WARN}%. A high contention value does not indicate the root cause of the problem, but it is a signal to search for it. In the case of high competition, the analysis of resource consumption should be carried out. Which are the most "heavy" queries made in the database? Possibly, also session tracing. All this will help to determine the root cause and possible optimization points both in the database configuration and in the logic of building queries of the application itself.</description>
                   </trigger>
                </triggers>
             </item>
@@ -1184,7 +1132,7 @@
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Session count.</description>
+               <description>The count of sessions.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1231,7 +1179,7 @@
                <key>oracle.session_limit</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>User and system sessions.</description>
+               <description>The user and system sessions.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1255,7 +1203,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>The percentage of locked sessions. Locks are mechanisms that prevent destructive interaction between transactions accessing the same resource—either user objects such as tables and rows or system objects not visible to users, such as shared data structures in memory and data dictionary rows.</description>
+               <description>The percentage of locked sessions. Locks are mechanisms that prevent destructive interaction between transactions accessing the same resource — either user objects, such as tables and rows or system objects not visible to users, such as shared data structures in memory and data dictionary rows.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1275,7 +1223,7 @@
                      <expression>{min(5m)} &gt; {$ORACLE.SESSIONS.LOCK.MAX.WARN}</expression>
                      <name>Oracle: Too many locked sessions (over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% for 5 min)</name>
                      <priority>WARNING</priority>
-                     <description>Number of locked sessions is over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% of the running sessions.</description>
+                     <description>The number of locked sessions exceeds {$ORACLE.SESSIONS.LOCK.MAX.WARN}% of the running sessions.</description>
                   </trigger>
                </triggers>
             </item>
@@ -1286,7 +1234,7 @@
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Count of the prolongedly locked sessions. (You can change maximum session lock duration in seconds for query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default 600 sec)</description>
+               <description>The count of the prolongedly locked sessions. (You can change the duration of maximum session lock in seconds for a query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default is 600 sec).</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1306,7 +1254,7 @@
                      <expression>{min(5m)} &gt; {$ORACLE.SESSION.LONG.LOCK.MAX.WARN}</expression>
                      <name>Oracle: Too many sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s (over {$ORACLE.SESSION.LONG.LOCK.MAX.WARN} for 5 min)</name>
                      <priority>WARNING</priority>
-                     <description>Number of sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME} seconds is too high. Long-term locks can negatively affect database performance, therefore, if they are detected, you should first find the most difficult queries from the database point of view and analyze possible resource leaks.</description>
+                     <description>The number of locked sessions exceeding {$ORACLE.SESSION.LOCK.MAX.TIME} seconds is too high. Long-term locks can negatively affect the database performance. Therefore, if they are detected, you should first find the most difficult queries from the database point of view and then analyze possible resource leaks.</description>
                   </trigger>
                </triggers>
             </item>
@@ -1330,7 +1278,7 @@
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>The size of the cache of standard blocks.</description>
+               <description>The size of standard block cache.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1353,7 +1301,7 @@
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>The fixed SGA is an internal housekeeping area.</description>
+               <description>The fixed System Global Area (SGA) is an internal housekeeping area.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1376,7 +1324,7 @@
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Memory is allocated from the java pool.</description>
+               <description>The memory is allocated from the Java pool.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1399,7 +1347,7 @@
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Memory is allocated from the large pool.</description>
+               <description>The memory is allocated from a large pool.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1445,7 +1393,7 @@
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Memory is allocated from the shared pool.</description>
+               <description>The memory is allocated from a shared pool.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1482,7 +1430,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Shared pool free memory percent. Free/Total</description>
+               <description>Free memory of a shared pool expressed in %.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1502,7 +1450,7 @@
                      <expression>{max(5m)}&lt;{$ORACLE.SHARED.FREE.MIN.WARN}</expression>
                      <name>Oracle: Shared pool free is too low (less {$ORACLE.SHARED.FREE.MIN.WARN}% for 5m)</name>
                      <priority>WARNING</priority>
-                     <description>The shared pool free memory percent has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% in the last 5 minutes.</description>
+                     <description>The free memory percent of the shared pool has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% for the last 5 minutes.</description>
                   </trigger>
                </triggers>
             </item>
@@ -1513,7 +1461,7 @@
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Total sorts per user call.</description>
+               <description>The total sorts per user call.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1536,7 +1484,7 @@
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <description>The item gets system metric values.</description>
+               <description>The item gets the values of the system metrics.</description>
                <applications>
                   <application>
                      <name>Zabbix raw items</name>
@@ -1564,7 +1512,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>B</units>
-               <description>Temp space used.</description>
+               <description>Used temporary space.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1587,7 +1535,7 @@
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Current amount of PGA memory allocated by the instance. The Oracle Database attempts to keep this number below the value of the PGA_AGGREGATE_TARGET initialization parameter. However, it is possible for the PGA allocated to exceed that value by a small percentage and for a short period of time when the work area workload is increasing very rapidly or when PGA_AGGREGATE_TARGET is set to a small value.</description>
+               <description>The current amount of the PGA memory allocated by the instance. The Oracle Database attempts to keep this number below the value of the PGA_AGGREGATE_TARGET initialization parameter. However, it is possible for the PGA allocated to exceed that value by a small percentage and for a short period of time when the work area workload is increasing very rapidly or when PGA_AGGREGATE_TARGET is set to a small value.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1610,7 +1558,7 @@
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Number of bytes of PGA memory in all processes that could be freed back to the operating system.</description>
+               <description>The number of bytes of the PGA memory in all processes that could be freed back to the operating system.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1633,7 +1581,7 @@
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Indicates how much PGA memory is currently consumed by work areas. This number can be used to determine how much memory is consumed by other consumers of the PGA memory (for example, PL/SQL or Java).</description>
+               <description>It indicates how much the Program Global Area (PGA) memory is currently consumed by work areas. This number can be used to determine how much memory is consumed by other consumers of the PGA memory (for example, PL/SQL or Java).</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1650,19 +1598,6 @@
                </master_item>
             </item>
             <item>
-               <name>Oracle: Get tablespaces stats</name>
-               <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>Get tablespaces stats.</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
                <name>Oracle: Uptime</name>
                <type>DEPENDENT</type>
                <key>oracle.uptime</key>
@@ -1670,7 +1605,7 @@
                <history>7d</history>
                <trends>0d</trends>
                <units>s</units>
-               <description>Oracle instance uptime in seconds.</description>
+               <description>The Oracle instance uptime expressed in seconds.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1696,7 +1631,7 @@
                      <expression>{last()}&lt;10m</expression>
                      <name>Oracle: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -1709,7 +1644,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>Rps</units>
-               <description>The number of times that users manually issue the ROLLBACK statement or an error occurred during a user's transactions.</description>
+               <description>The number of times that users manually issue the ROLLBACK statement or an error occurred during the users' transactions.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1731,7 +1666,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>days</units>
-               <description>The number of days before zabbix account password expired.</description>
+               <description>The number of days before the password of Zabbix account expires.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1748,7 +1683,7 @@
                      <expression>{last()}  &lt; {$ORACLE.EXPIRE.PASSWORD.MIN.WARN}</expression>
                      <name>Oracle: Zabbix account will expire soon (under {$ORACLE.EXPIRE.PASSWORD.MIN.WARN} days)</name>
                      <priority>WARNING</priority>
-                     <description>Password for zabbix user in the database will expire soon.</description>
+                     <description>The password for Zabbix user in the database expires soon.</description>
                   </trigger>
                </triggers>
             </item>
@@ -1760,7 +1695,7 @@
                <history>7d</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
-               <description>Oracle Server version.</description>
+               <description>The Oracle Server version.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1784,7 +1719,7 @@
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
                      <name>Oracle: Version has changed (new version value received: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
-                     <description>Oracle DB version has changed. Ack to close.</description>
+                     <description>The Oracle DB version has changed. Acknowledge (Ack) to close manually.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -1795,8 +1730,22 @@
                <name>Archive log discovery</name>
                <key>oracle.archive.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                <delay>1h</delay>
-               <description>Log archive destinations.</description>
+               <description>Destinations of the log archive.</description>
                <item_prototypes>
+                  <item_prototype>
+                     <name>Archivelog '{#DEST_NAME}': Get archive log info</name>
+                     <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"]</key>
+                     <delay>5m</delay>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>It gets the archivelog statistics.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                  </item_prototype>
                   <item_prototype>
                      <name>Archivelog '{#DEST_NAME}': Error</name>
                      <type>DEPENDENT</type>
@@ -1805,7 +1754,7 @@
                      <history>7d</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
-                     <description>Displays the error text</description>
+                     <description>It displays the error message.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle Archivelog</name>
@@ -1822,7 +1771,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1831,7 +1780,7 @@
                      <key>oracle.archivelog_log_sequence["{#DEST_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>Identifies the sequence number of the last archived redo log to be archived</description>
+                     <description>It identifies the sequence number of the last archived redo log to be archived</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle Archivelog</name>
@@ -1844,7 +1793,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1853,7 +1802,11 @@
                      <key>oracle.archivelog_log_status["{#DEST_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>Identifies the current status of the destination: 1 - 'Valid', 2 - 'Deferred',3 - 'Error', 0 - 'Unknown'</description>
+                     <description>It identifies the current status of the destination where:&#13;
+1 - 'VALID';&#13;
+2 - 'DEFERRED';&#13;
+3 - 'ERROR';&#13;
+0 - 'UNKNOWN'.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle Archivelog</name>
@@ -1873,14 +1826,16 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}&lt;2</expression>
                            <name>Archivelog '{#DEST_NAME}': Log Archive is not valid</name>
                            <priority>HIGH</priority>
-                           <description>ARL destination not in 3 - Valid or 2 - Deferred.</description>
+                           <description>The trigger will launch if the archive log destination is not in one of these states:&#13;
+2 - 'DEFERRED';&#13;
+3 - 'VALID'.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1906,15 +1861,28 @@
                      </condition>
                   </conditions>
                </filter>
-               <description>Scanning databases in DBMS.</description>
+               <description>Scanning databases in the database management system (DBMS).</description>
                <item_prototypes>
+                  <item_prototype>
+                     <name>Oracle Database '{#DBNAME}': Get CDB and No-CDB info</name>
+                     <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>It gets the information about the container database (CDB) and non-CDB database on an instance.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                  </item_prototype>
                   <item_prototype>
                      <name>Oracle Database '{#DBNAME}': Force logging</name>
                      <type>DEPENDENT</type>
                      <key>oracle.db_force_logging["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>Indicates whether the database is under force logging mode (YES) or not (NO)</description>
+                     <description>It indicates whether the database is under force logging mode 'YES' or 'NO'.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#TYPE}</name>
@@ -1934,7 +1902,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1943,7 +1911,10 @@
                      <key>oracle.db_log_mode["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>Archive log mode, 0 - 'NOARCHIVELOG', 1 - 'ARCHIVELOG', 2 - 'MANUAL'</description>
+                     <description>The archive log mode where:&#13;
+0 - 'NOARCHIVELOG';&#13;
+1 - 'ARCHIVELOG';&#13;
+2 - 'MANUAL'.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#TYPE}</name>
@@ -1963,7 +1934,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1972,7 +1943,10 @@
                      <key>oracle.db_open_mode["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>1 - 'MOUNTED', 2 - 'READ WRITE', 3 - 'READ ONLY', 4 - 'READ ONLY WITH APPLY' (A physical standby database is open in real-time query mode)</description>
+                     <description>1 - 'MOUNTED';&#13;
+2 - 'READ WRITE';&#13;
+3 - 'READ ONLY';&#13;
+4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#TYPE}</name>
@@ -1992,19 +1966,19 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{diff()}=1</expression>
                            <name>Oracle Database '{#DBNAME}': Open status has changed (new value received: {ITEM.VALUE})</name>
                            <priority>INFO</priority>
-                           <description>Oracle DB open status has changed. Ack to close.</description>
+                           <description>The Oracle DB open status has changed. Ack to close manually.</description>
                            <manual_close>YES</manual_close>
                            <dependencies>
                               <dependency>
                                  <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
-                                 <expression>{Template DB Oracle by Zabbix Agent 2:oracle.db_open_mode["{#DBNAME}"].last()}=1</expression>
+                                 <expression>{Template DB Oracle by Zabbix agent 2:oracle.db_open_mode["{#DBNAME}"].last()}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -2012,7 +1986,7 @@
                            <expression>{last()}=1</expression>
                            <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
                            <priority>WARNING</priority>
-                           <description>The Oracle DB has a MOUNTED state.</description>
+                           <description>The Oracle DB is in a mounted state.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -2022,7 +1996,12 @@
                      <key>oracle.db_role["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>Current role of the database, 1 - 'SNAPSHOT STANDBY', 2 - 'LOGICAL STANDBY', 3 - 'PHYSICAL STANDBY', 4 - 'PRIMARY ', 5 -'FAR SYNC'</description>
+                     <description>The current role of the database where:&#13;
+1 - 'SNAPSHOT STANDBY';&#13;
+2 - 'LOGICAL STANDBY';&#13;
+3 - 'PHYSICAL STANDBY';&#13;
+4 - 'PRIMARY ';&#13;
+5 -'FAR SYNC'.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#TYPE}</name>
@@ -2042,14 +2021,14 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{diff()}=1</expression>
                            <name>Oracle Database '{#DBNAME}': Role has changed (new value received: {ITEM.VALUE})</name>
                            <priority>INFO</priority>
-                           <description>Oracle DB role has changed. Ack to close.</description>
+                           <description>The Oracle DB role has changed. Ack to close manually.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -2057,10 +2036,10 @@
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template DB Oracle by Zabbix Agent 2:oracle.db_force_logging["{#DBNAME}"].last()} = 0 and {Template DB Oracle by Zabbix Agent 2:oracle.db_log_mode["{#DBNAME}"].last()} = 1</expression>
+                     <expression>{Template DB Oracle by Zabbix agent 2:oracle.db_force_logging["{#DBNAME}"].last()} = 0 and {Template DB Oracle by Zabbix agent 2:oracle.db_log_mode["{#DBNAME}"].last()} = 1</expression>
                      <name>Oracle Database '{#DBNAME}': Force logging is deactivated for DB with active Archivelog</name>
                      <priority>WARNING</priority>
-                     <description>Force Logging mode  - it is very important metric for Databases in 'ARCHIVELOG'. This feature allows to forcibly write all transactions to the REDO.</description>
+                     <description>Force Logging mode - it is very important metric for Databases in 'ARCHIVELOG'. This feature allows to forcibly write all the transactions to the REDO.</description>
                   </trigger_prototype>
                </trigger_prototypes>
             </discovery_rule>
@@ -2068,16 +2047,16 @@
                <name>ASM disk groups discovery</name>
                <key>oracle.diskgroups.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                <delay>1h</delay>
-               <description>ASM disk groups</description>
+               <description>The ASM disk groups.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>ASM '{#DG_NAME}': Free size</name>
+                     <name>ASM '{#DGNAME}': Free size</name>
                      <type>DEPENDENT</type>
-                     <key>oracle.asm_free_size["{#DG_NAME}"]</key>
+                     <key>oracle.asm_free_size["{#DGNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
-                     <description>Free size of ASM disk group.</description>
+                     <description>The free size of the ASM disk group.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle ASM</name>
@@ -2086,21 +2065,21 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DG_NAME}'].free_size_byte.first()</params>
+                           <params>$..['{#DGNAME}'].free_bytes.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>ASM '{#DG_NAME}': Total size</name>
+                     <name>ASM '{#DGNAME}': Total size</name>
                      <type>DEPENDENT</type>
-                     <key>oracle.asm_total_size["{#DG_NAME}"]</key>
+                     <key>oracle.asm_total_size["{#DGNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
-                     <description>Total size of ASM disk group.</description>
+                     <description>The total size of the ASM disk group.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle ASM</name>
@@ -2109,22 +2088,22 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DG_NAME}'].size_byte.first()</params>
+                           <params>$..['{#DGNAME}'].total_bytes.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>ASM '{#DG_NAME}': Free size</name>
+                     <name>ASM '{#DGNAME}': Free size</name>
                      <type>DEPENDENT</type>
-                     <key>oracle.asm_used_pct["{#DG_NAME}"]</key>
+                     <key>oracle.asm_used_pct["{#DGNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <description>Usage percent of ASM disk group.</description>
+                     <description>Usage of the ASM disk group expressed in %.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle ASM</name>
@@ -2133,51 +2112,64 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DG_NAME}'].used_percent.first()</params>
+                           <params>$..['{#DGNAME}'].used_pct.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$ORACLE.ASM.USED.PCT.MAX.HIGH}</expression>
-                           <name>ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</name>
+                           <name>ASM '{#DGNAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</name>
                            <priority>HIGH</priority>
-                           <description>Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}</description>
+                           <description>The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.HIGH}</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$ORACLE.ASM.USED.PCT.MAX.WARN}</expression>
-                           <name>ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)</name>
+                           <name>ASM '{#DGNAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)</name>
                            <priority>WARNING</priority>
-                           <description>Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}</description>
+                           <description>The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.WARN}</description>
                            <dependencies>
                               <dependency>
-                                 <name>ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</name>
-                                 <expression>{Template DB Oracle by Zabbix Agent 2:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}&gt;{$ORACLE.ASM.USED.PCT.MAX.HIGH}</expression>
+                                 <name>ASM '{#DGNAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</name>
+                                 <expression>{Template DB Oracle by Zabbix agent 2:oracle.asm_used_pct["{#DGNAME}"].min(5m)}&gt;{$ORACLE.ASM.USED.PCT.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
+                  <item_prototype>
+                     <name>ASM '{#DGNAME}': Get ASM stats</name>
+                     <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>It gets the ASM disk group statistics.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                  </item_prototype>
                </item_prototypes>
                <graph_prototypes>
                   <graph_prototype>
-                     <name>ASM '{#DG_NAME}': ASM disk group '{#DG_NAME}'</name>
+                     <name>ASM '{#DGNAME}': ASM disk group '{#DGNAME}'</name>
                      <graph_items>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template DB Oracle by Zabbix Agent 2</host>
-                              <key>oracle.asm_free_size["{#DG_NAME}"]</key>
+                              <host>Template DB Oracle by Zabbix agent 2</host>
+                              <key>oracle.asm_free_size["{#DGNAME}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template DB Oracle by Zabbix Agent 2</host>
-                              <key>oracle.asm_total_size["{#DG_NAME}"]</key>
+                              <host>Template DB Oracle by Zabbix agent 2</host>
+                              <key>oracle.asm_total_size["{#DGNAME}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2204,7 +2196,7 @@
                      </condition>
                   </conditions>
                </filter>
-               <description>Scanning PDB in DBMS.</description>
+               <description>Scanning a pluggable database (PDB) in DBMS.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>Oracle Database '{#DBNAME}': Open status</name>
@@ -2212,7 +2204,10 @@
                      <key>oracle.pdb_open_mode["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>1 - 'MOUNTED', 2 - 'READ WRITE', 3 - 'READ ONLY', 4 - 'READ ONLY WITH APPLY' (A physical standby database is open in real-time query mode)</description>
+                     <description>1 - 'MOUNTED';&#13;
+2 - 'READ WRITE';&#13;
+3 - 'READ ONLY';&#13;
+4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle PDB</name>
@@ -2232,23 +2227,36 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{diff()}=1</expression>
                            <name>Oracle Database '{#DBNAME}': Open status has changed (new value received: {ITEM.VALUE})</name>
                            <priority>INFO</priority>
-                           <description>Oracle DB open status has changed. Ack to close.</description>
+                           <description>The Oracle DB open status has changed. Ack to close manually.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{last()}=1</expression>
                            <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
                            <priority>WARNING</priority>
-                           <description>The Oracle DB has a MOUNTED state.</description>
+                           <description>The Oracle DB is in a mounted state.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Oracle Database '{#DBNAME}': Get PDB info</name>
+                     <key>oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>It gets the information about the PDB database on an instance.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
                   </item_prototype>
                </item_prototypes>
             </discovery_rule>
@@ -2281,7 +2289,7 @@
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
-                     <description>Currently allocated bytes for tablespace (sum of the current size of datafiles).</description>
+                     <description>Currently allocated bytes for the tablespace (sum of the current size of datafiles).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2294,7 +2302,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2304,7 +2312,7 @@
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
-                     <description>Free bytes of allocated space.</description>
+                     <description>Free bytes of the allocated space.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2317,7 +2325,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2327,7 +2335,7 @@
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
-                     <description>Maximum size of tablespace.</description>
+                     <description>The maximum size of the tablespace.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2340,7 +2348,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2349,7 +2357,10 @@
                      <key>oracle.tbs_status["{#TABLESPACE}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>Tablespace status. 1 - 'ONLINE' 2 - 'OFFLINE' 3- 'READ ONLY'</description>
+                     <description>The tablespace status where:&#13;
+1 - 'ONLINE';&#13;
+2 - 'OFFLINE';&#13;
+3- 'READ ONLY'.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2365,7 +2376,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2383,7 +2394,7 @@
                            <dependencies>
                               <dependency>
                                  <name>Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE</name>
-                                 <expression>{Template DB Oracle by Zabbix Agent 2:oracle.tbs_status["{#TABLESPACE}"].last()}=2</expression>
+                                 <expression>{Template DB Oracle by Zabbix agent 2:oracle.tbs_status["{#TABLESPACE}"].last()}=2</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -2396,7 +2407,7 @@
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
-                     <description>Currently used bytes for tablespace (current size of datafiles-free space).</description>
+                     <description>Currently used bytes for the tablespace (current size of datafiles - the free space).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2409,7 +2420,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2420,7 +2431,7 @@
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <description>Used bytes/Allocated bytes*100</description>
+                     <description>Used bytes/allocated bytes*100.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2433,7 +2444,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2448,7 +2459,7 @@
                            <dependencies>
                               <dependency>
                                  <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
-                                 <expression>{Template DB Oracle by Zabbix Agent 2:oracle.tbs_used_file_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                                 <expression>{Template DB Oracle by Zabbix agent 2:oracle.tbs_used_file_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -2462,7 +2473,7 @@
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <description>Allocated bytes/Max bytes*100</description>
+                     <description>Allocated bytes/max bytes*100.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2475,7 +2486,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2485,7 +2496,7 @@
                            <dependencies>
                               <dependency>
                                  <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).</name>
-                                 <expression>{Template DB Oracle by Zabbix Agent 2:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</expression>
+                                 <expression>{Template DB Oracle by Zabbix agent 2:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -2496,6 +2507,19 @@
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
+                  <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Get tablespace stats</name>
+                     <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>It gets the statistics of the tablespace.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                  </item_prototype>
                </item_prototypes>
                <graph_prototypes>
                   <graph_prototype>
@@ -2504,7 +2528,7 @@
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template DB Oracle by Zabbix Agent 2</host>
+                              <host>Template DB Oracle by Zabbix agent 2</host>
                               <key>oracle.tbs_alloc_bytes["{#TABLESPACE}"]</key>
                            </item>
                         </graph_item>
@@ -2512,7 +2536,7 @@
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template DB Oracle by Zabbix Agent 2</host>
+                              <host>Template DB Oracle by Zabbix agent 2</host>
                               <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
                            </item>
                         </graph_item>
@@ -2520,7 +2544,7 @@
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Template DB Oracle by Zabbix Agent 2</host>
+                              <host>Template DB Oracle by Zabbix agent 2</host>
                               <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
                            </item>
                         </graph_item>
@@ -2533,17 +2557,17 @@
             <macro>
                <macro>{$ORACLE.ASM.USED.PCT.MAX.HIGH}</macro>
                <value>95</value>
-               <description>Maximum percentage of used ASM disk group for high trigger expression.</description>
+               <description>The maximum percentage of used Automatic Storage Management (ASM) disk group for a high trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.ASM.USED.PCT.MAX.WARN}</macro>
                <value>90</value>
-               <description>Maximum percentage of used ASM disk group for warning trigger expression.</description>
+               <description>The maximum percentage of used ASM disk group for a warning trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.CONCURRENCY.MAX.WARN}</macro>
                <value>80</value>
-               <description>Maximum percentage of sessions concurrency usage for trigger expression.</description>
+               <description>The maximum percentage of sessions concurrency usage for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.CONNSTRING}</macro>
@@ -2552,102 +2576,102 @@
             <macro>
                <macro>{$ORACLE.DB.FILE.MAX.WARN}</macro>
                <value>80</value>
-               <description>Maximum percentage of database files for trigger expression.</description>
+               <description>The maximum percentage of used database files for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.DBNAME.MATCHES}</macro>
                <value>.*</value>
-               <description>This macro is used in database discovery. It can be overridden on the host or linked template level.</description>
+               <description>This macro is used in discovery of the database. It can be overridden on host level or its linked template level.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.DBNAME.NOT_MATCHES}</macro>
                <value>PDB\$SEED</value>
-               <description>This macro is used in database discovery. It can be overridden on a host or linked template level.</description>
+               <description>This macro is used in discovery of the database. It can be overridden on host level or its linked template level.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.EXPIRE.PASSWORD.MIN.WARN}</macro>
                <value>7</value>
-               <description>Number of days of warning before password expires (for trigger expression).</description>
+               <description>The number of warning days before the password expires for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.PASSWORD}</macro>
                <value>zabbix_password</value>
-               <description>Oracle user password.</description>
+               <description>The Oracle user's password.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.PGA.USE.MAX.WARN}</macro>
                <value>90</value>
-               <description>Maximum percentage of PGA usage alert threshold (for trigger expression).</description>
+               <description>Alert threshold for the maximum percentage of the Program Global Area (PGA) usage for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.PROCESSES.MAX.WARN}</macro>
                <value>80</value>
-               <description>Maximum percentage of active processes alert threshold (for trigger expression).</description>
+               <description>Alert threshold for the maximum percentage of active processes for a trigger expression</description>
             </macro>
             <macro>
                <macro>{$ORACLE.REDO.MIN.WARN}</macro>
                <value>3</value>
-               <description>Minimum number of REDO logs alert threshold (for trigger expression).</description>
+               <description>Alert threshold for the minimum number of REDO logs for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SERVICE}</macro>
                <value>ORA</value>
-               <description>Oracle Service Name</description>
+               <description>Oracle Service Name.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SESSION.LOCK.MAX.TIME}</macro>
                <value>600</value>
-               <description>Maximum session lock duration in seconds for count the session as a prolongedly locked query.</description>
+               <description>The maximum duration of the session lock in seconds to count the session as a prolongedly locked query.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SESSION.LONG.LOCK.MAX.WARN}</macro>
                <value>3</value>
-               <description>Maximum number of the prolongedly locked sessions alert threshold (for trigger expression).</description>
+               <description>Alert threshold for the maximum number of the prolongedly locked sessions for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SESSIONS.LOCK.MAX.WARN}</macro>
                <value>20</value>
-               <description>Maximum percentage of locked sessions alert threshold (for trigger expression).</description>
+               <description>Alert threshold for the maximum percentage of locked sessions for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SESSIONS.MAX.WARN}</macro>
                <value>80</value>
-               <description>Maximum percentage of active sessions alert threshold (for trigger expression).</description>
+               <description>Alert threshold for the maximum percentage of active sessions for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SHARED.FREE.MIN.WARN}</macro>
                <value>5</value>
-               <description>Minimum percentage of free shared pool alert threshold (for trigger expression).</description>
+               <description>Alert threshold for the minimum percentage of free shared pool for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TABLESPACE.NAME.MATCHES}</macro>
                <value>.*</value>
-               <description>This macro is used in tablespace discovery. It can be overridden on a host or linked template level.</description>
+               <description>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}</macro>
                <value>CHANGE_IF_NEEDED</value>
-               <description>This macro is used in tablespace discovery. It can be overridden on a host or linked template level.</description>
+               <description>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TBS.USED.PCT.MAX.HIGH}</macro>
                <value>95</value>
-               <description>Maximum percentage of used (Used bytes/Allocated bytes) tablespace high severity alert threshold (for trigger expression).</description>
+               <description>High severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TBS.USED.PCT.MAX.WARN}</macro>
                <value>90</value>
-               <description>Maximum percentage of used (Used bytes/Allocated bytes) tablespace warning severity alert threshold (for trigger expression).</description>
+               <description>Warning severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</macro>
                <value>90</value>
-               <description>Maximum percentage of utilization (Allocated bytes/Max bytes) tablespace high severity alert threshold (for trigger expression).</description>
+               <description>High severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TBS.UTIL.PCT.MAX.WARN}</macro>
                <value>80</value>
-               <description>Maximum percentage of utilization (Allocated bytes/Max bytes) tablespace warning severity alert threshold (for trigger expression).</description>
+               <description>Warning severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.USER}</macro>
@@ -2659,28 +2683,28 @@
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template DB Oracle by Zabbix Agent 2:oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"].min(5m)} * 100 / {Template DB Oracle by Zabbix Agent 2:oracle.processes_limit.last()} &gt; {$ORACLE.PROCESSES.MAX.WARN}</expression>
+         <expression>{Template DB Oracle by Zabbix agent 2:oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"].min(5m)} * 100 / {Template DB Oracle by Zabbix agent 2:oracle.processes_limit.last()} &gt; {$ORACLE.PROCESSES.MAX.WARN}</expression>
          <name>Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min)</name>
          <priority>WARNING</priority>
          <description>Active processes are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available number of processes.</description>
       </trigger>
       <trigger>
-         <expression>{Template DB Oracle by Zabbix Agent 2:oracle.session_count.min(5m)} * 100 / {Template DB Oracle by Zabbix Agent 2:oracle.session_limit.last()} &gt; {$ORACLE.SESSIONS.MAX.WARN}</expression>
+         <expression>{Template DB Oracle by Zabbix agent 2:oracle.session_count.min(5m)} * 100 / {Template DB Oracle by Zabbix agent 2:oracle.session_limit.last()} &gt; {$ORACLE.SESSIONS.MAX.WARN}</expression>
          <name>Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min)</name>
          <priority>WARNING</priority>
          <description>Active sessions are using more than {$ORACLE.SESSIONS.MAX.WARN}% of the available sessions.</description>
       </trigger>
       <trigger>
-         <expression>{Template DB Oracle by Zabbix Agent 2:oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"].min(5m)} * 100 / {Template DB Oracle by Zabbix Agent 2:oracle.db_files_limit.last()} &gt; {$ORACLE.DB.FILE.MAX.WARN}</expression>
+         <expression>{Template DB Oracle by Zabbix agent 2:oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"].min(5m)} * 100 / {Template DB Oracle by Zabbix agent 2:oracle.db_files_limit.last()} &gt; {$ORACLE.DB.FILE.MAX.WARN}</expression>
          <name>Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min)</name>
          <priority>WARNING</priority>
-         <description>Number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafile files limit.</description>
+         <description>The number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafiles limit.</description>
       </trigger>
       <trigger>
-         <expression>{Template DB Oracle by Zabbix Agent 2:oracle.total_pga_used.min(5m)} * 100 / {Template DB Oracle by Zabbix Agent 2:oracle.pga_target.last()} &gt; {$ORACLE.PGA.USE.MAX.WARN}</expression>
+         <expression>{Template DB Oracle by Zabbix agent 2:oracle.total_pga_used.min(5m)} * 100 / {Template DB Oracle by Zabbix agent 2:oracle.pga_target.last()} &gt; {$ORACLE.PGA.USE.MAX.WARN}</expression>
          <name>Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)</name>
          <priority>WARNING</priority>
-         <description>Total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.</description>
+         <description>The total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.</description>
       </trigger>
    </triggers>
    <graphs>
@@ -2690,7 +2714,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                </item>
             </graph_item>
@@ -2698,7 +2722,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.db_files_limit</key>
                </item>
             </graph_item>
@@ -2710,7 +2734,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.total_pga_used</key>
                </item>
             </graph_item>
@@ -2718,7 +2742,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.pga_target</key>
                </item>
             </graph_item>
@@ -2726,7 +2750,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.total_pga_allocated</key>
                </item>
             </graph_item>
@@ -2738,7 +2762,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.physical_writes_rate</key>
                </item>
             </graph_item>
@@ -2746,7 +2770,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.physical_reads_rate</key>
                </item>
             </graph_item>
@@ -2758,7 +2782,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.physical_write_bytes_rate</key>
                </item>
             </graph_item>
@@ -2766,7 +2790,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.physical_read_bytes_rate</key>
                </item>
             </graph_item>
@@ -2778,7 +2802,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                </item>
             </graph_item>
@@ -2786,7 +2810,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.processes_limit</key>
                </item>
             </graph_item>
@@ -2798,7 +2822,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.session_count</key>
                </item>
             </graph_item>
@@ -2806,7 +2830,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.session_active_background</key>
                </item>
             </graph_item>
@@ -2814,7 +2838,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.session_inactive_user</key>
                </item>
             </graph_item>
@@ -2822,7 +2846,7 @@
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.session_active_user</key>
                </item>
             </graph_item>
@@ -2830,7 +2854,7 @@
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.session_limit</key>
                </item>
             </graph_item>
@@ -2843,7 +2867,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.sga_java_pool</key>
                </item>
             </graph_item>
@@ -2851,7 +2875,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.sga_large_pool</key>
                </item>
             </graph_item>
@@ -2859,7 +2883,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.sga_shared_pool</key>
                </item>
             </graph_item>
@@ -2867,7 +2891,7 @@
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.sga_log_buffer</key>
                </item>
             </graph_item>
@@ -2875,7 +2899,7 @@
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.sga_fixed</key>
                </item>
             </graph_item>
@@ -2883,7 +2907,7 @@
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Template DB Oracle by Zabbix agent 2</host>
                   <key>oracle.sga_buffer_cache</key>
                </item>
             </graph_item>

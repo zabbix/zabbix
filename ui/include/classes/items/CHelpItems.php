@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -257,7 +257,7 @@ class CHelpItems {
 					'description' => _('Operating system information. Returns string')
 				],
 				[
-					'key' => 'system.sw.packages[<package>,<manager>,<format>]',
+					'key' => 'system.sw.packages[<regexp>,<manager>,<format>]',
 					'description' => _('Listing of installed packages. Returns text')
 				],
 				[
@@ -607,7 +607,7 @@ class CHelpItems {
 					'description' => _('Operating system information. Returns string')
 				],
 				[
-					'key' => 'system.sw.packages[<package>,<manager>,<format>]',
+					'key' => 'system.sw.packages[<regexp>,<manager>,<format>]',
 					'description' => _('Listing of installed packages. Returns text')
 				],
 				[

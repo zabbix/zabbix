@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ if ($data['form_refresh'] == 0) {
 
 // Create form.
 $user_form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('user_form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])

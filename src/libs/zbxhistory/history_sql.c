@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,10 @@
 #include "dbcache.h"
 #include "zbxhistory.h"
 #include "history.h"
+
+#if defined(HAVE_POSTGRESQL)
+#include "zbxdb.h"
+#endif
 
 typedef struct
 {
@@ -360,6 +364,7 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
+	int			time_from;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select clock,ns,%s"
@@ -367,18 +372,32 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 			" where itemid=" ZBX_FS_UI64,
 			table->fields, table->name, itemid);
 
+	time_from = end_timestamp - seconds;
+
+#if defined(HAVE_POSTGRESQL)
+	zbx_tsdb_recalc_time_period(&time_from, ZBX_TSDB_RECALC_TIME_PERIOD_HISTORY);
+#endif
+
 	if (ZBX_JAN_2038 == end_timestamp)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", end_timestamp - seconds);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", time_from);
 	}
 	else if (1 == seconds)
 	{
+#if defined(HAVE_POSTGRESQL)
+		if (time_from != end_timestamp - seconds)
+		{
+			zbx_free(sql);
+			goto out;
+		}
+#endif
+
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", end_timestamp);
 	}
 	else
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d",
-				end_timestamp - seconds, end_timestamp);
+				time_from, end_timestamp);
 	}
 
 	result = DBselect("%s", sql);
@@ -412,7 +431,7 @@ out:
  * Parameters:  itemid        - [IN] the itemid                                     *
  *              value_type    - [IN] the value type (see ITEM_VALUE_TYPE_* defs)    *
  *              values        - [OUT] the item history data values                  *
- *              count         - [IN] the number of values to read                   *
+ *              count         - [IN] the number of values to read + 1               *
  *              end_timestamp - [IN] the value timestamp to start reading with      *
  *                                                                                  *
  * Return value: SUCCEED - the history data were read successfully                  *
@@ -437,16 +456,18 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
-	const int		periods[] = {SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH, 0, -1};
+	const int		periods[] = {SEC_PER_HOUR, 12 * SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_DAY, SEC_PER_WEEK,
+					SEC_PER_MONTH, 0, -1};
 
 	clock_to = end_timestamp;
 
-	while (-1 != periods[step] && 0 < count)
+	while (-1 != periods[step] && 1 < count)
 	{
 		if (0 > (clock_from = clock_to - periods[step]))
 		{
 			clock_from = clock_to;
-			step = 4;
+
+			step = ARRSIZE(periods) - 1;
 		}
 
 		sql_offset = 0;
@@ -458,7 +479,12 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 				table->fields, table->name, itemid, clock_to);
 
 		if (clock_from != clock_to)
+		{
+#if defined(HAVE_POSTGRESQL)
+			zbx_tsdb_recalc_time_period(&clock_from, ZBX_TSDB_RECALC_TIME_PERIOD_TRENDS);
+#endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", clock_from);
+		}
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by clock desc");
 

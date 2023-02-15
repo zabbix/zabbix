@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,10 +46,10 @@ $fields = [
 											IN([ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]),
 											null
 										],
-	'g_correlationid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({action})'],
-	'conditions' =>						[null,		O_OPT,	null,	null,		null],
-	'new_condition' =>					[null,		O_OPT,	null,	null,		'isset({add_condition})'],
-	'operations' =>						[null,		O_OPT,	null,	null,		null],
+	'g_correlationid' =>				[T_ZBX_INT, O_OPT,	P_ONLY_ARRAY,	DB_ID,		'isset({action})'],
+	'conditions' =>						[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
+	'new_condition' =>					[null,		O_OPT,	P_ONLY_ARRAY,	null,		'isset({add_condition})'],
+	'operations' =>						[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
 	'edit_operationid' =>				[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
 	// actions
 	'action' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -62,7 +62,7 @@ $fields = [
 	'delete' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>							[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form' =>							[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'form_refresh' =>					[T_ZBX_INT, O_OPT, null,		null,	null],
+	'form_refresh' =>					[T_ZBX_INT, O_OPT, P_SYS,		null,	null],
 	// filter
 	'filter_set' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -340,6 +340,7 @@ $config = select_config();
 
 if (hasRequest('form')) {
 	$data = [
+		'form_refresh' => getRequest('form_refresh', 0),
 		'form' => getRequest('form'),
 		'correlationid' => $correlationid,
 		'new_condition' => getRequest('new_condition', []),

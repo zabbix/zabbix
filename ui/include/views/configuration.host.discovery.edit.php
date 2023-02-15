@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ $widget = (new CWidget())
 	));
 
 $form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
@@ -676,7 +677,7 @@ if (!$lld_macro_paths) {
 		'path' => ''
 	]];
 }
-elseif (!hasRequest('form_refresh')) {
+elseif ($data['form_refresh'] == 0) {
 	CArrayHelper::sort($lld_macro_paths, ['lld_macro']);
 }
 
@@ -764,14 +765,14 @@ $tab = (new CTabView())
 	->addTab('preprocTab', _('Preprocessing'),
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),
-				getItemPreprocessing($form, $data['preprocessing'], $data['limited'], $data['preprocessing_types'])
+				getItemPreprocessing($data['preprocessing'], $data['limited'], $data['preprocessing_types'])
 			)
 	)
 	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list)
 	->addTab('macroTab', _('Filters'), $conditionFormList)
 	->addTab('overridesTab', _('Overrides'), $overrides_form_list);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tab->setSelected(0);
 }
 

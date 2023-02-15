@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ $widget = (new CWidget())->setTitle(_('Discovery rules'));
 
 // Create form.
 $discoveryForm = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('discoveryForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form']);
@@ -127,7 +128,7 @@ $discoveryFormList->addRow(_('Visible name'),
 );
 
 // Append status to form list.
-$status = (empty($this->data['druleid']) && empty($this->data['form_refresh']))
+$status = (empty($this->data['druleid']) && $data['form_refresh'] == 0)
 	? true
 	: ($this->data['drule']['status'] == DRULE_STATUS_ACTIVE);
 

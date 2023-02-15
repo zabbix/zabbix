@@ -1804,12 +1804,8 @@ form.is-loading {
       padding: 5px 5px 5px 0;
       position: relative; }
       .table-forms .table-forms-td-right td.td-drag-icon {
-        padding: 0 11px 0 0;
+        padding: 0 0 0 0;
         vertical-align: middle; }
-      .table-forms .table-forms-td-right td .drag-icon {
-        position: absolute;
-        top: 5px;
-        margin-right: 5px; }
       .table-forms .table-forms-td-right td.center {
         text-align: center;
         vertical-align: middle; }
@@ -5158,7 +5154,8 @@ svg {
         top: 0; }
     .navtree .tree .tree-item > .tree-row > .content {
       display: flex;
-      height: 20px; }
+      height: 20px;
+      align-items: center; }
       .navtree .tree .tree-item > .tree-row > .content > .arrow {
         flex: 0 0 15px;
         text-align: center;
@@ -5712,7 +5709,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
   line-height: 24px; }
 
 #itemsTable .table-col-handle {
-  width: 26px; }
+  width: 15px; }
 #itemsTable .table-col-no {
   width: 20px; }
 #itemsTable .table-col-name-normal {
@@ -6249,7 +6246,7 @@ td.log-info-bg,
 td.log-warning-bg,
 td.log-high-bg,
 td.log-disaster-bg {
-  padding-left: 42px;
+  padding-left: 42px !important;
   color: #ffffff; }
 
 .notif-body h4 {

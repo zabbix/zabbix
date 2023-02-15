@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'applications' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'applications' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,			null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({applicationid})'],
 	'applicationid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({form}) && {form} == "update"'],
 	'appname' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
@@ -46,12 +46,12 @@ $fields = [
 	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,		null,	null],
+	'form_refresh' =>		[T_ZBX_INT, O_OPT, P_SYS,		null,	null],
 	// filter
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'filter_groups' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
-	'filter_hostids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
+	'filter_groups' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,	null],
+	'filter_hostids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,	null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -134,18 +134,17 @@ $hostid = (count($filter['hosts']) == 1) ? reset($filter['hosts'])['id'] : getRe
  * Do uncheck.
  */
 if (hasRequest('action')) {
-	if (!hasRequest('applications') || !is_array(getRequest('applications'))) {
+	if (!hasRequest('applications')) {
 		access_deny();
 	}
-	else {
-		$applications = API::Application()->get([
-			'output' => [],
-			'applicationids' => getRequest('applications'),
-			'editable' => true
-		]);
-		if (count($applications) != count(getRequest('applications'))) {
-			uncheckTableRows($hostid, zbx_objectValues($applications, 'applicationid'));
-		}
+
+	$applications = API::Application()->get([
+		'output' => [],
+		'applicationids' => getRequest('applications'),
+		'editable' => true
+	]);
+	if (count($applications) != count(getRequest('applications'))) {
+		uncheckTableRows($hostid, zbx_objectValues($applications, 'applicationid'));
 	}
 }
 
@@ -188,7 +187,7 @@ elseif (hasRequest('delete') && hasRequest('applicationid')) {
 	}
 	show_messages($result, _('Application deleted'), _('Cannot delete application'));
 }
-elseif (hasRequest('action') && getRequest('action') == 'application.massdelete' && hasRequest('applications')) {
+elseif (hasRequest('action') && getRequest('action') == 'application.massdelete') {
 	$applicationids = getRequest('applications');
 
 	$result = (bool) API::Application()->delete($applicationids);
@@ -201,13 +200,12 @@ elseif (hasRequest('action') && getRequest('action') == 'application.massdelete'
 		_n('Cannot delete application', 'Cannot delete applications', count($applicationids))
 	);
 }
-elseif (hasRequest('applications')
-		&& str_in_array(getRequest('action'), ['application.massenable', 'application.massdisable'])) {
+elseif (hasRequest('action') && in_array(getRequest('action'), ['application.massenable', 'application.massdisable'])) {
 	$status = (getRequest('action') === 'application.massenable') ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
 	$db_items = API::Item()->get([
 		'output' => ['itemid'],
-		'applicationids' => getRequest('applications', [])
+		'applicationids' => getRequest('applications')
 	]);
 
 	$items = [];

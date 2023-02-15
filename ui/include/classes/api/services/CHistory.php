@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -173,6 +173,11 @@ class CHistory extends CApiService {
 				return $this->getFromElasticsearch($options);
 
 			default:
+				$config = select_config();
+				$options['time_from'] = $config['hk_history_global'] == 1
+					? max($options['time_from'], time() - timeUnitToSeconds($config['hk_history']) + 1)
+					: $options['time_from'];
+
 				return $this->getFromSql($options);
 		}
 	}

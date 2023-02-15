@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ if (!empty($this->data['hostid'])) {
 
 // create form
 $http_form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('httpForm')
 	->setId('httpForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
@@ -251,7 +252,7 @@ $http_tab = (new CTabView())
 	->addTab('scenarioTab', _('Scenario'), $http_form_list)
 	->addTab('stepTab', _('Steps'), $http_step_form_list)
 	->addTab('authenticationTab', _('Authentication'), $http_authentication_form_list);
-if (!$this->data['form_refresh']) {
+if ($this->data['form_refresh'] == 0) {
 	$http_tab->setSelected(0);
 }
 

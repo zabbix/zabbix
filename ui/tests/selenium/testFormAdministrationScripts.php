@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,21 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup scripts
+ *
+ * @onBefore prepareScriptData
  */
 class testFormAdministrationScripts extends CWebTest {
-
-	private const ID_UPDATE = 200;	// Script for Update.
-
-	private const ID_CLONE = 201; // Script for Clone.
-	private const NAME_CLONE = 'Cloned Script for Clone';
-
-	private const ID_DELETE = 202;
-	private const NAME_DELETE = 'Script for Delete';
+	/**
+	 * Id of scripts.
+	 *
+	 * @var array
+	 */
+	protected static $ids;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -46,6 +47,34 @@ class testFormAdministrationScripts extends CWebTest {
 	}
 
 	/**
+	 * Function used to create scripts.
+	 */
+	public function prepareScriptData() {
+		$response = CDataHelper::call('script.create', [
+			[
+				'name' => 'Script for Clone',
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'command' => 'test',
+				'description' => 'clone description'
+			],
+			[
+				'name' => 'Script for Update',
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'command' => 'test',
+				'description' => 'update description'
+			],
+			[
+				'name' => 'Script for Delete',
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'command' => 'test',
+				'description' => 'delete description'
+			]
+		]);
+		$this->assertArrayHasKey('scriptids', $response);
+		self::$ids = CDataHelper::getIds('name');
+	}
+
+	/**
 	 * Test data for Scripts form.
 	 */
 	public function getScriptsData() {
@@ -53,7 +82,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// Script.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max script',
 						'Type' => 'Script',
 						'Execute on' => 'Zabbix server (proxy)',
@@ -71,7 +100,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'Type' => 'Script',
 						'Commands' => 'Script empty name'
@@ -82,7 +111,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/command": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Script empty command',
 						'Type' => 'Script',
 						'Commands' => ''
@@ -92,7 +121,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// IPMI.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max IPMI',
 						'Type' => 'IPMI',
 						'Command' => 'IPMI command',
@@ -110,7 +139,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'Type' => 'IPMI',
 						'Command' => 'IPMI empty name'
@@ -121,7 +150,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/command": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'IPMI empty command',
 						'Type' => 'IPMI',
 						'Command' => ''
@@ -143,7 +172,7 @@ class testFormAdministrationScripts extends CWebTest {
 	 * @dataProvider getScriptsData
 	 */
 	public function testFormAdministrationScripts_Update($data) {
-		$this->checkScripts($data, true, 'zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
+		$this->checkScripts($data, true, 'zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Delete']);
 	}
 
 	/**
@@ -160,7 +189,7 @@ class testFormAdministrationScripts extends CWebTest {
 		}
 
 		$this->page->login()->open($link);
-		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
+		$form = $this->query('id:scriptForm')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 
 		// Check testing confirmation while configuring.
@@ -224,8 +253,8 @@ class testFormAdministrationScripts extends CWebTest {
 	public function testFormAdministrationScripts_CancelUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
-		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Delete']);
+		$form = $this->query('id:scriptForm')->asForm()->waitUntilVisible()->one();
 		$form->fill([
 			'Name' => 'Cancelled cript',
 			'Type' => 'Script',
@@ -251,8 +280,8 @@ class testFormAdministrationScripts extends CWebTest {
 	public function testFormAdministrationScripts_SimpleUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
-		$this->query('id:scriptForm')->waitUntilReady()->asForm()->one()->submit();
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Delete']);
+		$this->query('id:scriptForm')->asForm()->waitUntilVisible()->one()->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -262,22 +291,23 @@ class testFormAdministrationScripts extends CWebTest {
 	 * Function for checking script cloning with only changed name.
 	 */
 	public function testFormAdministrationScripts_Clone() {
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_CLONE);
-		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
+		$name = 'Cloned Script for Clone';
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Clone']);
+		$form = $this->query('id:scriptForm')->asForm()->waitUntilVisible()->one();
 		$values = $form->getFields()->asValues();
-		$values['Name'] = self::NAME_CLONE;
-		$this->query('button:Clone')->waitUntilReady()->one()->click();
+		$values['Name'] = $name;
+		$this->query('button:Clone')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
 		$form->invalidate();
-		$form->fill(['Name' => self::NAME_CLONE]);
+		$form->fill(['Name' => $name]);
 		$form->submit();
 
 		$this->assertMessage(TEST_GOOD, 'Script added');
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr(self::NAME_CLONE)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr($name)));
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr('Script for Clone')));
 
-		$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr(self::NAME_CLONE));
+		$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($name));
 		$this->page->open('zabbix.php?action=script.edit&scriptid='.$id);
 		$cloned_values = $form->getFields()->asValues();
 		$this->assertEquals($values, $cloned_values);
@@ -287,11 +317,13 @@ class testFormAdministrationScripts extends CWebTest {
 	 * Function for testing script delete from configuration form.
 	 */
 	public function testFormAdministrationScripts_Delete() {
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_DELETE);
-		$this->query('button:Delete')->waitUntilReady()->one()->click();
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Delete']);
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script deleted');
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr(self::NAME_DELETE)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.
+				zbx_dbstr(self::$ids['Script for Delete']))
+		);
 	}
 }

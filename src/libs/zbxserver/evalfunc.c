@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -200,7 +200,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGEVENTID(char **value, DC_ITEM *item, const char *parameters,
+static int	evaluate_LOGEVENTID(char **value, DC_EVALUATE_ITEM *item, const char *parameters,
 		const zbx_timespec_t *ts, char **error)
 {
 	char			*arg1 = NULL;
@@ -293,8 +293,8 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGSOURCE(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		char **error)
+static int	evaluate_LOGSOURCE(char **value, DC_EVALUATE_ITEM *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
 {
 	char			*arg1 = NULL;
 	int			ret = FAIL;
@@ -380,7 +380,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGSEVERITY(char **value, DC_ITEM *item, const zbx_timespec_t *ts, char **error)
+static int	evaluate_LOGSEVERITY(char **value, DC_EVALUATE_ITEM *item, const zbx_timespec_t *ts, char **error)
 {
 	int			ret = FAIL;
 	zbx_history_record_t	vc_value;
@@ -545,7 +545,7 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_COUNT(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+static int	evaluate_COUNT(char **value, DC_EVALUATE_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
 	int				arg1, op = OP_UNKNOWN, numeric_search, nparams, count = 0, i, ret = FAIL;
@@ -849,7 +849,8 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_SUM(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
+static int	evaluate_SUM(char **value, DC_EVALUATE_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
 {
 	int				nparams, arg1, i, ret = FAIL, seconds = 0, nvalues = 0;
 	zbx_value_type_t		arg1_type;
@@ -950,7 +951,8 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_AVG(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
+static int	evaluate_AVG(char **value, DC_EVALUATE_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
 {
 	int				nparams, arg1, ret = FAIL, i, seconds = 0, nvalues = 0;
 	zbx_value_type_t		arg1_type;
@@ -1060,7 +1062,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LAST(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+static int	evaluate_LAST(char **value, DC_EVALUATE_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
 	int				arg1 = 1, ret = FAIL;
@@ -1165,7 +1167,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_MIN_or_MAX(char **value, const DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+static int	evaluate_MIN_or_MAX(char **value, const DC_EVALUATE_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error, int min_or_max)
 {
 	int				nparams, arg1, i, ret = FAIL, seconds = 0, nvalues = 0;
@@ -1301,7 +1303,7 @@ static int	__history_record_uint64_compare(const zbx_history_record_t *d1, const
  *               FAIL    - failed to evaluate function                        *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_PERCENTILE(char **value, DC_ITEM *item, const char *parameters,
+static int	evaluate_PERCENTILE(char **value, DC_EVALUATE_ITEM *item, const char *parameters,
 		const zbx_timespec_t *ts, char **error)
 {
 	int				nparams, arg1, time_shift = 0, ret = FAIL, seconds = 0, nvalues = 0;
@@ -1410,7 +1412,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_DELTA(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+static int	evaluate_DELTA(char **value, DC_EVALUATE_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
 	int				nparams, arg1, ret = FAIL, i, seconds = 0, nvalues = 0;
@@ -1535,7 +1537,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, char **error)
+static int	evaluate_NODATA(char **value, DC_EVALUATE_ITEM *item, const char *parameters, char **error)
 {
 	int				arg1, num, period, lazy = 1, ret = FAIL;
 	zbx_value_type_t		arg1_type;
@@ -1571,11 +1573,11 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 	zbx_timespec(&ts);
 	nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
 
-	if (0 != item->host.proxy_hostid && 0 != lazy)
+	if (0 != item->proxy_hostid && 0 != lazy)
 	{
 		int			lastaccess;
 
-		if (SUCCEED != DCget_proxy_nodata_win(item->host.proxy_hostid, &nodata_win, &lastaccess))
+		if (SUCCEED != DCget_proxy_nodata_win(item->proxy_hostid, &nodata_win, &lastaccess))
 		{
 			*error = zbx_strdup(*error, "cannot retrieve proxy last access");
 			goto out;
@@ -1616,7 +1618,7 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 
 		*value = zbx_strdup(*value, "1");
 
-		if (0 != item->host.proxy_hostid && 0 != lazy)
+		if (0 != item->proxy_hostid && 0 != lazy)
 		{
 			zabbix_log(LOG_LEVEL_TRACE, "Nodata in %s() flag:%d values_num:%d start_time:%d period:%d",
 					__func__, nodata_win.flags, nodata_win.values_num, ts.sec - period, period);
@@ -1646,7 +1648,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_ABSCHANGE(char **value, DC_ITEM *item, const zbx_timespec_t *ts, char **error)
+static int	evaluate_ABSCHANGE(char **value, DC_EVALUATE_ITEM *item, const zbx_timespec_t *ts, char **error)
 {
 	int				ret = FAIL;
 	size_t				value_alloc = 0, value_offset = 0;
@@ -1722,7 +1724,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_CHANGE(char **value, DC_ITEM *item, const zbx_timespec_t *ts, char **error)
+static int	evaluate_CHANGE(char **value, DC_EVALUATE_ITEM *item, const zbx_timespec_t *ts, char **error)
 {
 	int				ret = FAIL;
 	size_t				value_alloc = 0, value_offset = 0;
@@ -1795,7 +1797,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_DIFF(char **value, DC_ITEM *item, const zbx_timespec_t *ts, char **error)
+static int	evaluate_DIFF(char **value, DC_EVALUATE_ITEM *item, const zbx_timespec_t *ts, char **error)
 {
 	int				ret = FAIL;
 	zbx_vector_history_record_t	values;
@@ -1901,7 +1903,7 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 	return FAIL;
 }
 
-static int	evaluate_STR(char **value, DC_ITEM *item, const char *function, const char *parameters,
+static int	evaluate_STR(char **value, DC_EVALUATE_ITEM *item, const char *function, const char *parameters,
 		const zbx_timespec_t *ts, char **error)
 {
 	char				*arg1 = NULL;
@@ -2058,7 +2060,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_STRLEN(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+static int	evaluate_STRLEN(char **value, DC_EVALUATE_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
 	int				arg1 = 1, ret = FAIL;
@@ -2146,8 +2148,8 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_FUZZYTIME(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		char **error)
+static int	evaluate_FUZZYTIME(char **value, DC_EVALUATE_ITEM *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
 {
 	int			arg1, ret = FAIL;
 	zbx_value_type_t	arg1_type;
@@ -2234,7 +2236,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_BAND(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+static int	evaluate_BAND(char **value, DC_EVALUATE_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
 	char		*last_parameters = NULL;
@@ -2294,8 +2296,8 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_FORECAST(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		char **error)
+static int	evaluate_FORECAST(char **value, DC_EVALUATE_ITEM *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
 {
 	char				*fit_str = NULL, *mode_str = NULL;
 	double				*t = NULL, *x = NULL;
@@ -2458,8 +2460,8 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_TIMELEFT(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		char **error)
+static int	evaluate_TIMELEFT(char **value, DC_EVALUATE_ITEM *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
 {
 	char				*fit_str = NULL;
 	double				*t = NULL, *x = NULL, threshold;
@@ -2612,14 +2614,14 @@ out:
  *               FAIL - evaluation failed                                     *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_function(char **value, DC_ITEM *item, const char *function, const char *parameter,
+int	evaluate_function(char **value, DC_EVALUATE_ITEM *item, const char *function, const char *parameter,
 		const zbx_timespec_t *ts, char **error)
 {
 	int		ret;
 	struct tm	*tm = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __func__,
-			item->host.host, item->key_orig, function, parameter);
+			item->host, item->key_orig, function, parameter);
 
 	if (0 == strcmp(function, "last"))
 	{
@@ -3192,11 +3194,12 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 int	evaluate_macro_function(char **result, const char *host, const char *key, const char *function,
 		const char *parameter)
 {
-	zbx_host_key_t	host_key = {(char *)host, (char *)key};
-	DC_ITEM		item;
-	char		*value = NULL, *error = NULL, *resolved_params = NULL;
-	int		ret, errcode;
-	zbx_timespec_t	ts;
+	zbx_host_key_t		host_key = {(char *)host, (char *)key};
+	DC_ITEM			item;
+	char			*value = NULL, *error = NULL, *resolved_params = NULL;
+	int			ret, errcode;
+	zbx_timespec_t		ts;
+	DC_EVALUATE_ITEM	evaluate_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __func__, host, key, function, parameter);
 
@@ -3207,7 +3210,14 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 	/* User macros in trigger and calculated function parameters are resolved during configuration sync. */
 	/* However simple macro user parameters are not expanded, do it now.                                 */
 
-	if (SUCCEED != errcode || SUCCEED != evaluate_function(&value, &item, function,
+
+	evaluate_item.itemid = item.itemid;
+	evaluate_item.value_type = item.value_type;
+	evaluate_item.proxy_hostid = item.host.proxy_hostid;
+	evaluate_item.host = item.host.host;
+	evaluate_item.key_orig = item.key_orig;
+
+	if (SUCCEED != errcode || SUCCEED != evaluate_function(&value, &evaluate_item, function,
 			(resolved_params = zbx_dc_expand_user_macros_in_func_params(parameter, item.host.hostid)),
 			&ts, &error))
 	{
@@ -3240,7 +3250,7 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 				}
 				*dst = '\0';
 			}
-			zbx_format_value(value, len, item.valuemapid, item.units, item.value_type);
+			zbx_format_value(value, len, item.valuemapid, ZBX_NULL2EMPTY_STR(item.units), item.value_type);
 		}
 		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum,forecast", function,
 				','))
@@ -3249,7 +3259,7 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
-					add_value_suffix(value, len, item.units, item.value_type);
+					add_value_suffix(value, len, ZBX_NULL2EMPTY_STR(item.units), item.value_type);
 					break;
 				default:
 					;
