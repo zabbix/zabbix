@@ -711,6 +711,98 @@ class testScimUser extends CAPIScimTest {
 		$this->assertEquals(self::$data['mediatypeid'], $db_result_user_media['mediatypeid']);
 	}
 
+	public function createInvalidDeleteRequest(): array {
+		return [
+			'Delete request with missing id parameter' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "id" is missing.',
+					'status' => 400
+				]
+			],
+			'Delete request with not existing id' => [
+				'user' => ['id' => '1111111111111'],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
+				]
+			],
+			'Delete request for user which belongs to another userdirectory' => [
+				'user' => ['id' => 'ldap_user'],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'status' => 400
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidDeleteRequest
+	 */
+	public function testInvalidDelete($user, $expected_error): void {
+		$this->resolveData($user);
+
+		if (!array_key_exists('detail', $expected_error)) {
+			$expected_error['detail'] = 'The user '.self::$data['userid']['ldap_user'].
+				' belongs to another userdirectory.';
+		}
+
+		$user['token'] = self::$data['token']['token'];
+
+		$this->call('user.delete', $user, $expected_error);
+	}
+
+	public function createValidDeleteRequest(): array {
+		return [
+			'Delete existing user' => [
+				'user' => ['id' => 'new_user'],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User']
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createValidDeleteRequest
+	 */
+	public function testValidDelete($user, $expected_result) {		// TODO this will be fixed with ZBX-21976
+		$this->resolveData($user);
+
+		$user['token'] = self::$data['token']['token'];
+
+		$result = $this->call('user.delete', $user);
+
+		// Compare response with expected response.
+		$this->assertEquals($expected_result, $result, 'Returned response should match.');
+
+		// Check that user is present in the database and does not have role.
+		$db_result_user_data = DBSelect('select roleid, userdirectoryid from users where userid='.
+			zbx_dbstr(self::$data['userid']['new_user'])
+		);
+		$db_result_user = DBFetch($db_result_user_data);
+
+		$this->assertEquals('0', $db_result_user['roleid']);
+		$this->assertEquals(self::$data['userdirectoryid']['saml'], $db_result_user['userdirectoryid']);
+
+		// Check that user data is removed from 'user_scim_group' table.
+		$db_result_user_scim_group_data = DBselect('select * from user_scim_group where userid='.
+			zbx_dbstr(self::$data['userid']['new_user'])
+		);
+		$db_result_user_scim_group = DBfetch($db_result_user_scim_group_data);		// TODO is there a point testing it without Groups requests?
+		$this->assertEmpty($db_result_user_scim_group, 'User should not have any entries in "user_scim_group" table.');
+
+		// Check that user is added to 'Disabled' group.
+		$db_result_user_groups_data = DBselect('select usrgrpid from users_groups where userid='.
+			zbx_dbstr(self::$data['userid']['new_user'])
+		);
+		$db_result_user_groups = DBfetch($db_result_user_groups_data);
+		$this->assertEquals('9', $db_result_user_groups['usrgrpid']);
+	}
+
 	/**
 	 * Accepts test data and returns data with substituted ids and userNames from the database.
 	 *
@@ -728,7 +820,6 @@ class testScimUser extends CAPIScimTest {
 			}
 		}
 	}
-
 
 	/**
 	 * Delete all created data after test.
