@@ -5,7 +5,7 @@
 
 This template is designed to monitor Microsoft Azure by HTTP.
 It works without any external scripts and uses the script item.
-Currently the template supports the discovery of Virtual Machines (VMs), Microsoft SQL, MySQL, and PostgreSQL servers.
+Currently the template supports the discovery of Virtual Machines (VMs), Storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
 
 ## Requirements
 
@@ -154,9 +154,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -277,9 +274,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -372,9 +366,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -465,9 +456,6 @@ No specific Zabbix configuration is required.
 ### Template links
 
 There are no template links in this template.
-
-### Discovery rules
-
 
 ### Items collected
 
@@ -565,9 +553,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -658,9 +643,6 @@ No specific Zabbix configuration is required.
 ### Template links
 
 There are no template links in this template.
-
-### Discovery rules
-
 
 ### Items collected
 
@@ -758,9 +740,6 @@ No specific Zabbix configuration is required.
 ### Template links
 
 There are no template links in this template.
-
-### Discovery rules
-
 
 ### Items collected
 
