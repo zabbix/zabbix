@@ -1121,7 +1121,7 @@ class C60XmlValidator extends CXmlValidatorGeneral {
 					]]
 				]]
 			]],
-			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'uniq' => [['uuid']], 'rules' => [
 				'template' =>				['type' => XML_ARRAY, 'rules' => [
 					'uuid' =>				['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 					'template' =>				['type' => XML_STRING | XML_REQUIRED],

@@ -1,0 +1,1 @@
+A......... [ZBX-19375] fixed api validation of uuid field for graph, host, httptest, item, template and trigger create and update methods (miks)

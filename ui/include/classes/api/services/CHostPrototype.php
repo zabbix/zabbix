@@ -551,7 +551,7 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$host_prototypes, array &$db_host_prototypes = null): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['hostid']], 'fields' => [
 			'uuid' => 	['type' => API_UUID],
 			'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'ruleid' => ['type' => API_UNEXPECTED]

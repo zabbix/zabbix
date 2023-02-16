@@ -419,7 +419,7 @@ class CHttpTest extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$httptests, array &$db_httptests = null) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['httptestid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['httptestid']], 'fields' => [
 			'uuid' => 				['type' => API_UUID],
 			'httptestid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
