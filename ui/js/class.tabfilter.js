@@ -731,6 +731,8 @@ class CTabFilter extends CBaseComponent {
 			stop: (_, ui) => {
 				const $item = ui.item;
 
+				ui.item[0].classList.remove(TABFILTERITEM_STYLE_FOCUSED);
+
 				/**
 				 * Remove inline style position, left and top that stay after sortable.
 				 * This styles broken tabs layout.
