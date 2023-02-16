@@ -46,7 +46,8 @@ class testScimUser extends CAPIScimTest {
 		'token' => [
 			'tokenid' => null,
 			'token' => null
-		]
+		],
+		'mediatypeid' => '3'
 	];
 
 	public function prepareUserData() {
@@ -64,7 +65,7 @@ class testScimUser extends CAPIScimTest {
 			'provision_media' => [
 				[
 					'name' => 'SMS',
-					'mediatypeid' => '1',
+					'mediatypeid' => self::$data['mediatypeid'],
 					'attribute' => 'user_mobile'
 				]
 			],
@@ -90,7 +91,7 @@ class testScimUser extends CAPIScimTest {
 				'name' => 'Jim',
 				'surname' => 'Halpert',
 				'usrgrps' => [['usrgrpid' => 7]],
-				'medias' => [['mediatypeid' => '3', 'sendto' => '123456789']],
+				'medias' => [['mediatypeid' => self::$data['mediatypeid'], 'sendto' => '123456789']],
 				'roleid' => 1
 			]
 		]);
@@ -105,7 +106,7 @@ class testScimUser extends CAPIScimTest {
 				'name' => 'Pam',
 				'surname' => 'Beesly',
 				'usrgrps' => [['usrgrpid' => 9]],
-				'medias' => [['mediatypeid' => '3', 'sendto' => '987654321']],
+				'medias' => [['mediatypeid' => self::$data['mediatypeid'], 'sendto' => '987654321']],
 				'roleid' => 1
 			]
 		]);
@@ -286,6 +287,428 @@ class testScimUser extends CAPIScimTest {
 		if ($expected_result !== null) {
 			$this->assertEquals($expected_result, $result, 'Returned response should match.');
 		}
+	}
+
+	public static function createInvalidPostRequest(): array {
+		return [
+			'Post request with invalid user schema' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [
+					'schemas' => ['invalid:schema'],
+					'active' => true,
+					'userName' => 'michael.scott@office.com',
+					'user_lastname' => 'Scott',
+					'user_name' => 'Michael',
+					'user_mobile' => '999999999'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' =>
+						'Invalid parameter "/schemas/1": value must be "urn:ietf:params:scim:schemas:core:2.0:User".',
+					'status' => 400
+				]
+			],
+			'Post request with missing user schema' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [
+					'active' => true,
+					'userName' => 'michael.scott@office.com',
+					'user_lastname' => 'Scott',
+					'user_name' => 'Michael',
+					'user_mobile' => '999999999'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "schemas" is missing.',
+					'status' => 400
+				]
+			],
+			'Post request with empty user schema' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [
+					'schemas' => [],
+					'active' => true,
+					'userName' => 'michael.scott@office.com',
+					'user_lastname' => 'Scott',
+					'user_name' => 'Michael',
+					'user_mobile' => '999999999'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/schemas": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Post request with missing userName parameter' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'active' => true,
+					'user_lastname' => 'Scott',
+					'user_name' => 'Michael',
+					'user_mobile' => '999999999'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "userName" is missing.',
+					'status' => 400
+				]
+			],
+			'Post request with empty userName parameter' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => '',
+					'active' => true,
+					'user_lastname' => 'Scott',
+					'user_name' => 'Michael',
+					'user_mobile' => '999999999'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/userName": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Create user that already exists and belongs to other userdirectory id' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'active' => true,
+					'userName' => 'ldap_user',
+					'user_lastname' => 'Schrute',
+					'user_name' => 'Dwight',
+					'user_mobile' => '222222222'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'User with username dwight.schrute@office.com already exists.',
+					'status' => 400
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidPostRequest
+	 */
+	public function testInvalidUserPost($user, $expected_error) {
+		$this->resolveData($user);
+
+		$user['token'] = self::$data['token']['token'];
+
+		$this->call('user.post', $user, $expected_error);
+	}
+
+	public static function createValidPostRequest(): array {
+		return [
+			'Create new valid user' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'active' => true,
+					'userName' => 'michael.scott@office.com',
+					'user_lastname' => 'Scott',
+					'user_name' => 'Michael',
+					'user_mobile' => '999999999'
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'active' => true,
+					'userName' => 'michael.scott@office.com',
+					'name' => 'Michael',
+					'surname' => 'Scott',
+					'user_mobile' => '999999999'
+				]
+			],
+			'Create valid user, which already exists but was inactive' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'active' => true,
+					'userName' => 'saml_user_active',
+					'user_lastname' => 'Halpert',
+					'user_name' => 'Jim',
+					'user_mobile' => '123456789'
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'active' => true,
+					'userName' => 'saml_user_active',
+					'id' => 'saml_user_active',
+					'name' => 'Jim',
+					'surname' => 'Halpert',
+					'user_mobile' => '123456789'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createValidPostRequest
+	 */
+	public function testValidUserPost($user, $expected_result) {
+		$this->resolveData($user);
+		$this->resolveData($expected_result);
+
+		$user['token'] = self::$data['token']['token'];
+
+		$result = $this->call('user.post', $user);
+
+		// Compare response with expected response.
+		foreach ($expected_result as $key => $expected) {
+			$this->assertArrayHasKey($key, $result);
+			$this->assertEquals($expected, $result[$key], 'Returned response should match.');
+		}
+
+		// Response should have 'id' value, which is not known for us, if completely new user is created.
+		$this->assertArrayHasKey('id', $result);
+
+		// If user was inactive before, we know the 'id' and it should not change.
+		// If it was new user, 'id' was not know for us and needs to be saved in $data.
+		if (array_key_exists('id', $expected_result)) {
+			$this->assertEquals($expected_result['id'], $result['id'], 'Returned response should match.');
+		}
+		else {
+			self::$data['userid']['new_user'] = $result['id'];
+		}
+
+		// Check that user data in the database is correct.
+		$db_result_user_data = DBSelect('select username, name, surname, userdirectoryid from users where userid='.
+			zbx_dbstr($result['id'])
+		);
+		$db_result_user = DBFetch($db_result_user_data);
+
+		$this->assertEquals($user['userName'], $db_result_user['username']);
+		$this->assertEquals($user['user_name'], $db_result_user['name']);
+		$this->assertEquals($user['user_lastname'], $db_result_user['surname']);
+		$this->assertEquals(self::$data['userdirectoryid']['saml'], $db_result_user['userdirectoryid']);
+
+		// Check that user media data in the database is correct.
+		$db_result_user_media_data = DBselect('select mediatypeid, sendto from media where userid='.
+			zbx_dbstr($result['id'])
+		);
+		$db_result_user_media = DBfetch($db_result_user_media_data);
+
+		$this->assertEquals($user['user_mobile'], $db_result_user_media['sendto']);
+		$this->assertEquals(self::$data['mediatypeid'], $db_result_user_media['mediatypeid']);
+	}
+
+	public function createInvalidPutRequest() {
+		return [
+			'Put request with invalid user schema' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [
+					'schemas' => ['invalid:schema'],
+					'id' => 'saml_user_active',
+					'active' => true,
+					'userName' => 'saml_user_active',
+					'user_lastname' => 'JimJim',
+					'user_name' => 'HalperHalpert',
+					'user_mobile' => '5555555'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' =>
+						'Invalid parameter "/schemas/1": value must be "urn:ietf:params:scim:schemas:core:2.0:User".',
+					'status' => 400
+				]
+			],
+			'Put request with missing user schema' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [
+					'id' => 'saml_user_active',
+					'active' => true,
+					'userName' => 'saml_user_active',
+					'user_lastname' => 'JimJim',
+					'user_name' => 'HalperHalpert',
+					'user_mobile' => '5555555'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "schemas" is missing.',
+					'status' => 400
+				]
+			],
+			'Put request with empty user schema' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [
+					'schemas' => [],
+					'id' => 'saml_user_active',
+					'active' => true,
+					'userName' => 'saml_user_active',
+					'user_lastname' => 'JimJim',
+					'user_name' => 'HalperHalpert',
+					'user_mobile' => '5555555'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/schemas": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Put request with missing userName parameter' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'id' => 'saml_user_active',
+					'active' => true,
+					'user_lastname' => 'JimJim',
+					'user_name' => 'HalperHalpert',
+					'user_mobile' => '5555555'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "userName" is missing.',
+					'status' => 400
+				]
+			],
+			'Put request with empty userName parameter' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => '',
+					'id' => 'saml_user_active',
+					'active' => true,
+					'user_lastname' => 'JimJim',
+					'user_name' => 'HalperHalpert',
+					'user_mobile' => '5555555'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/userName": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Put request with missing id parameter' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_active',
+					'active' => true,
+					'user_lastname' => 'JimJim',
+					'user_name' => 'HalperHalpert',
+					'user_mobile' => '5555555'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "id" is missing.',
+					'status' => 400
+				]
+			],
+			'Put request with empty active parameter' => [		// TODO this will be fixed with ZBX-21976
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_active',
+					'id' => 'saml_user_active',
+					'active' => null,
+					'user_lastname' => 'JimJim',
+					'user_name' => 'HalperHalpert',
+					'user_mobile' => '5555555'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/active": a boolean is expected.',
+					'status' => 400
+				]
+			],
+			'Put request with not existing id' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_active',
+					'id' => '1111111111111',
+					'active' => true,
+					'user_lastname' => 'JimJim',
+					'user_name' => 'HalperHalpert',
+					'user_mobile' => '5555555'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
+				]
+			],
+			'Put request for user which belongs to another userdirectory' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'ldap_user',
+					'id' => 'ldap_user',
+					'active' => true,
+					'user_lastname' => 'DwightDwight',
+					'user_name' => 'Schrute',
+					'user_mobile' => '333333333'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'status' => 400
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidPutRequest
+	 */
+	public function testInvalidUserPut($user, $expected_error) {
+		$this->resolveData($user);
+
+		if (!array_key_exists('detail', $expected_error)) {
+			$expected_error['detail'] = 'The user '.self::$data['userid']['ldap_user'].
+				' belongs to another userdirectory.';
+		}
+
+		$user['token'] = self::$data['token']['token'];
+
+		$this->call('user.put', $user, $expected_error);
+	}
+
+	public function createValidPutRequest() {
+		return [
+			"Put request to update user's name, surname and mobile phone" => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_active',
+					'id' => 'saml_user_active',
+					'active' => true,
+					'user_lastname' => 'JimJim',
+					'user_name' => 'HalperHalpert',
+					'user_mobile' => '5555555'
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_active',
+					'id' => 'saml_user_active',
+					'active' => true,
+					'surname' => 'JimJim',
+					'name' => 'HalperHalpert',
+					'user_mobile' => '5555555'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createValidPutRequest
+	 */
+	public function testValidPutRequest($user, $expected_result) {
+		$this->resolveData($user);
+		$this->resolveData($expected_result);
+
+		$user['token'] = self::$data['token']['token'];
+
+		$result = $this->call('user.put', $user);
+
+		// Compare response with expected response.
+		foreach ($expected_result as $key => $expected) {
+			$this->assertArrayHasKey($key, $result);
+			$this->assertEquals($expected, $result[$key], 'Returned response should match.');
+		}
+
+		// Check that user data in the database is correct.
+		$db_result_user_data = DBSelect('select username, name, surname, userdirectoryid from users where userid='.
+			zbx_dbstr(self::$data['userid']['saml_user_active'])
+		);
+		$db_result_user = DBFetch($db_result_user_data);
+
+		$this->assertEquals($user['userName'], $db_result_user['username']);
+		$this->assertEquals($user['user_name'], $db_result_user['name']);
+		$this->assertEquals($user['user_lastname'], $db_result_user['surname']);
+		$this->assertEquals(self::$data['userdirectoryid']['saml'], $db_result_user['userdirectoryid']);
+
+		// Check that user media data in the database is correct.
+		$db_result_user_media_data = DBselect('select mediatypeid, sendto from media where userid='.
+			zbx_dbstr(self::$data['userid']['saml_user_active'])
+		);
+		$db_result_user_media = DBfetch($db_result_user_media_data);
+
+		$this->assertEquals($user['user_mobile'], $db_result_user_media['sendto']);
+		$this->assertEquals(self::$data['mediatypeid'], $db_result_user_media['mediatypeid']);
 	}
 
 	/**
