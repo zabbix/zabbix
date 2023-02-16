@@ -21,6 +21,7 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
@@ -31,6 +32,7 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
  */
 class testPageWeb extends CWebTest {
 
+	use TagTrait;
 	use TableTrait;
 
 	/**
@@ -81,6 +83,12 @@ class testPageWeb extends CWebTest {
 						'url' => 'http://zabbix.com',
 						'no' => 1
 					]
+				],
+				'tags' => [
+					[
+						'tag' => 'FirstTag',
+						'value' => 'value 1'
+					]
 				]
 			],
 			[
@@ -96,6 +104,16 @@ class testPageWeb extends CWebTest {
 						'name' => 'Homepage2',
 						'url' => 'http://example.com',
 						'no' => 2
+					]
+				],
+				'tags' => [
+					[
+						'tag' => 'SecondTag',
+						'value' => 'value 2'
+					],
+					[
+						'tag' => 'ThirdTag',
+						'value' => 'value 3'
 					]
 				]
 			],
@@ -117,6 +135,20 @@ class testPageWeb extends CWebTest {
 						'name' => 'Homepage3',
 						'url' => 'http://example.com',
 						'no' => 3
+					]
+				],
+				'tags' => [
+					[
+						'tag' => 'FourthTag',
+						'value' => 'value 4'
+					],
+					[
+						'tag' => 'FifthTag',
+						'value' => 'value 5'
+					],
+					[
+						'tag' => 'SixthTag',
+						'value' => 'value 6'
 					]
 				]
 			]
@@ -255,33 +287,258 @@ class testPageWeb extends CWebTest {
 		}
 	}
 
+	public static function getTagsFilterData() {
+		return [
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'FirstTag', 'operator' => 'Exists']
+						]
+					],
+					'Name' => [
+						'Web scenario 1 step'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'FirstTag', 'operator' => 'Exists'],
+							['name' => 'SecondTag', 'operator' => 'Exists'],
+							['name' => 'FourthTag', 'operator' => 'Exists']
+						]
+					],
+					'Name' => [
+						'Web scenario 1 step',
+						'Web scenario 3 step'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'FirstTag', 'value' => 'value 1', 'operator' => 'Equals'],
+						]
+					],
+					'Name' => [
+						'Web scenario 1 step'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'FirstTag', 'value' => 'value 1', 'operator' => 'Equals'],
+						]
+					],
+					'Name' => [
+						'Web scenario 1 step'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'SecondTag', 'value' => 'value 2', 'operator' => 'Contains'],
+							['name' => 'ThirdTag', 'value' => 'value 3', 'operator' => 'Contains'],
+						]
+					],
+					'Name' => [
+						'Web scenario 2 step'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'SecondTag', 'value' => 'value 2', 'operator' => 'Contains'],
+							['name' => 'SixthTag', 'value' => 'value 6', 'operator' => 'Contains'],
+						]
+					],
+					'Name' => [
+						'Web scenario 2 step',
+						'Web scenario 3 step'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'FourthTag', 'operator' => 'Does not exist']
+						]
+					],
+					'Name' => [
+						'testFormWeb1',
+						'testFormWeb2',
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web scenario 1 step',
+						'Web scenario 2 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second',
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'FourthTag', 'operator' => 'Does not exist']
+						]
+					],
+					'Name' => [
+						'testFormWeb1',
+						'testFormWeb2',
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web scenario 1 step',
+						'Web scenario 2 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second',
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'FourthTag', 'value' => 'value 4', 'operator' => 'Does not equal'],
+							['name' => 'FifthTag', 'value' => 'value 5', 'operator' => 'Does not equal']
+						]
+					],
+					'Name' => [
+						'testFormWeb1',
+						'testFormWeb2',
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web scenario 1 step',
+						'Web scenario 2 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second',
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'FourthTag', 'value' => 'value 4', 'operator' => 'Does not equal'],
+							['name' => 'FifthTag', 'value' => 'value 5', 'operator' => 'Does not equal']
+						]
+					],
+					'Name' => [
+						'testFormWeb1',
+						'testFormWeb2',
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web scenario 1 step',
+						'Web scenario 2 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second',
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'FirstTag', 'value' => 'value', 'operator' => 'Does not contain']
+						]
+					],
+					'Name' => [
+						'testFormWeb1',
+						'testFormWeb2',
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web scenario 2 step',
+						'Web scenario 3 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second',
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'FirstTag', 'value' => 'value 6', 'operator' => 'Does not contain'],
+							['name' => 'FirstTag', 'value' => '1', 'operator' => 'Does not contain']
+						]
+					],
+					'Name' => [
+						'testFormWeb1',
+						'testFormWeb2',
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web scenario 2 step',
+						'Web scenario 3 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second',
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * Function which checks if Web service tags are properly displayed.
+	 * @dataProvider getTagsFilterData
 	 */
-	public function testPageWeb_CheckTags() {
+	public function testPageWeb_TagsFilter($data) {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
-		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill(['Hosts' => 'WebData Host'])->submit();
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', 'WebData Host');
-		$tag_before = $row->getColumn('Tags')->getText();
-		$this->assertEquals(null, $tag_before);
-
-		// Create tag for web service
-		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'].'&context=host');
-
-		// Open hosts Web scenarios tags.
-		$this->query('xpath://a[normalize-space()="Web scenario 3 step"]')->one()->click();
-		$this->query('xpath://a[@id="tab_tags-tab"]')->one()->click();
-		$form = $this->query('id:http-form')->asForm()->one();
-		$form->query('id:tags_0_tag')->one()->fill('Web service Tag');
-		$form->query('id:tags_0_value')->one()->fill('Tag value 1');
-		$this->query('xpath://button[@id="update"]')->one()->click();
-
-		// Check if tag is properly displayed
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
-		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill(['Hosts' => 'WebData Host'])->submit();
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', 'WebData Host');
-		$tag_after = $row->getColumn('Tags')->getText();
-		$this->assertNotEquals($tag_before, $tag_after);
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table = $this->query('class:list-table')->waitUntilPresent()->one();
+		$form->fill(['id:filter_evaltype' => $data['tag_options']['type']]);
+		$this->setTagSelector('id:filter-tags');
+		$this->setTags($data['tag_options']['tags']);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$table->waitUntilReloaded();
+		$this->assertTableHasDataColumn(CTestArrayHelper::get($data, 'Name', []));
+		$this->query('button:Reset')->one()->waitUntilClickable()->click();
+		$table->waitUntilReloaded();
 	}
 
 	/**
