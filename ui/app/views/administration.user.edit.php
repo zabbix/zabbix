@@ -208,10 +208,7 @@ else {
 		(new CSimpleButton(_('Change password')))
 			->setEnabled($change_password_enabled)
 			->setAttribute('autofocus', 'autofocus')
-			->onClick($data['readonly'] == true
-				? ''
-				: 'submitFormWithParam("'.$user_form->getName().'", "change_password", "1");'
-			)
+			->onClick('submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY),
 		$hint
 	]);
