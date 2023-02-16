@@ -50,6 +50,7 @@ class testItem extends CAPITest {
 			ITEM_TYPE_SCRIPT => null
 		];
 		$item_type_tests = [];
+		$binary_valuetype_tests = [];
 
 		foreach ($valid_item_types as $type => $interfaceid) {
 			switch ($type) {
@@ -156,6 +157,48 @@ class testItem extends CAPITest {
 				],
 				'expected_error' => null
 			];
+
+			$binary_valuetype_tests[] = [
+				'request_data' => $params + [
+					'hostid' => '50009',
+					'name' => 'Test binary with item type '.$type,
+					'key_' => 'test.binary.'.$type,
+					'type' => $type,
+					'value_type' => ITEM_VALUE_TYPE_BINARY
+				],
+				'expected_error' => $type == ITEM_TYPE_DEPENDENT
+					? null
+					: 'Invalid parameter "/1/value_type": value must be one of '.implode(', ', [
+						ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+						ITEM_VALUE_TYPE_TEXT
+					]).'.'
+			];
+
+			if ($type == ITEM_TYPE_DEPENDENT) {
+				$rejected_fields = [
+					['units', 'b', 'Invalid parameter "/1/units": value must be empty.'],
+					['trends', '1h', 'Invalid parameter "/1/trends": value must be 0.'],
+					['valuemapid', 123, 'Invalid parameter "/1/valuemapid": value must be 0.'],
+					['inventory_link', 123, 'Invalid parameter "/1/inventory_link": value must be 0.'],
+					['logtimefmt', 'x', 'Invalid parameter "/1/logtimefmt": value must be empty.']
+				];
+
+				foreach ($rejected_fields as $config) {
+					[$field, $value, $error] = $config;
+
+					$binary_valuetype_tests[] = [
+						'request_data' => $params + [
+							'hostid' => '50009',
+							'name' => 'Test binary with item type '.$type,
+							'key_' => 'test.binary.'.$type,
+							'type' => $type,
+							'value_type' => ITEM_VALUE_TYPE_BINARY,
+							$field => $value
+						],
+						'expected_error' => $error
+					];
+				}
+			}
 		}
 
 		$interfaces_tests = [];
@@ -181,7 +224,7 @@ class testItem extends CAPITest {
 
 				$interfaces_tests[] = ['request_data' => $request_data] + $item_type_test;
 			}
-			else if (in_array($item_type_test['request_data']['type'], $required)) {
+			elseif (in_array($item_type_test['request_data']['type'], $required)) {
 				unset($item_type_test['request_data']['interfaceid']);
 				$item_type_test['expected_error'] = 'Invalid parameter "/1": the parameter "interfaceid" is missing.';
 				$interfaces_tests[] = $item_type_test;
@@ -313,7 +356,7 @@ class testItem extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/preprocessing/1/error_handler": value must be one of 1, 2, 3.'
 			]
-		], $item_type_tests, $interfaces_tests);
+		], $item_type_tests, $interfaces_tests, $binary_valuetype_tests);
 	}
 
 	/**
