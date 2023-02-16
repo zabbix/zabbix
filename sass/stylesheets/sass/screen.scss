@@ -293,6 +293,12 @@ form {
 	}
 }
 
+.form-submit-hidden {
+	position: absolute;
+	visibility: hidden;
+	max-height: 0;
+}
+
 // Tables.
 .list-table {
 	width: 100%;

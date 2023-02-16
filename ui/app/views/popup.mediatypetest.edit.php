@@ -85,10 +85,10 @@ $form = (new CForm())
 	->setName('mediatypetest_form')
 	->addVar('action', 'popup.mediatypetest.send')
 	->addVar('mediatypeid', $data['mediatypeid'])
-	->addItem([
-		$form_list,
-		(new CInput('submit', 'submit'))->addStyle('display: none;')
-	]);
+	->addItem($form_list);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $output = [
 	'header' => $data['title'],

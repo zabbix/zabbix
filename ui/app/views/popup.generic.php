@@ -713,12 +713,10 @@ $output['script_inline'] = $this->readJsFile('popup.generic.js.php').
 	'});';
 
 if ($form) {
-	$form->addItem([
-		$table,
-		(new CInput('submit', 'submit'))
-			->addStyle('display: none;')
-			->removeId()
-	]);
+	// Enable form submitting on Enter.
+	$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
+	$form->addItem($table);
 	$output['body'] = (new CDiv([$data['messages'], $form]))->toString();
 }
 else {

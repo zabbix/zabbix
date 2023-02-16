@@ -684,10 +684,10 @@ switch ($data['type']) {
 		break;
 }
 
-$form->addItem([
-	$form_list,
-	(new CInput('submit', 'submit'))->addStyle('display: none;')
-]);
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
+$form->addItem($form_list);
 
 $output = [
 	'header' => $data['title'],

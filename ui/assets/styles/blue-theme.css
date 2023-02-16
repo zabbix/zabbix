@@ -2851,6 +2851,11 @@ pre, pre a, pre td, pre span {
 form.is-loading {
   position: relative; }
 
+.form-submit-hidden {
+  position: absolute;
+  visibility: hidden;
+  max-height: 0; }
+
 .list-table {
   width: 100%;
   background-color: #ffffff;
