@@ -695,7 +695,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Preview');
 
 		if (isset($data['templatedHost'])) {
-			$this->zbxTestAssertAttribute("//button[@id='update']", 'disabled');
+			$this->zbxTestAssertAttribute("//button[@id='update']", 'readonly');
 		}
 		else {
 			$this->zbxTestAssertElementNotPresentXpath("//button[@id='update'][@disabled]");
