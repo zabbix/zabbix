@@ -19,7 +19,7 @@ zabbix_export:
       description: |
         This template is designed to monitor Microsoft Azure by HTTP.
         It works without any external scripts and uses the script item.
-        Currently the template supports the discovery of virtual machines (VMs), Microsoft SQL, MySQL, and PostgreSQL servers.
+        Currently the template supports the discovery of virtual machines (VMs), Storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
         
         Setup:
           1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
