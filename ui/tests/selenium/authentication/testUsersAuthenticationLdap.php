@@ -1689,14 +1689,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							],
 							'Media type mapping' => [
 								[
-									// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
-									'Name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
+									'Name' => '1ong_value_long_value_long_value_long_value_long_value_long_valu',
 									'Media type' => 'Discord',
 									'Attribute' => STRING_255
 								],
 								[
-									// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
-									'Name' => '2ong_value_long_value_long_value_long_value_long_value_lon',
+									'Name' => '2ong_value_long_value_long_value_long_value_long_value_long_valu',
 									'Media type' => 'iLert',
 									'Attribute' => STRING_255
 								]
@@ -1744,14 +1742,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						],
 						'userdirectory_media' => [
 							[
-								// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
-								'name' => '1ong_value_long_value_long_value_long_value_long_value_lon',
+								'name' => '1ong_value_long_value_long_value_long_value_long_value_long_valu',
 								'mediatypeid' => 10,
 								'attribute' => STRING_255
 							],
 							[
-								// TODO: Change this to 255 long string, if ZBX-22236 is fixed.
-								'name' => '2ong_value_long_value_long_value_long_value_long_value_lon',
+								'name' => '2ong_value_long_value_long_value_long_value_long_value_long_valu',
 								'mediatypeid' => 22,
 								'attribute' => STRING_255
 							]
