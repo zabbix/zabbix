@@ -617,20 +617,6 @@ form {
 		}
 	}
 
-	.zi-filter {
-		&::after {
-			content: $zi-filter; // TODO acikuns WHY>>>???
-			padding-left: 8px;
-
-			vertical-align: middle;
-			font-size: 18px;
-		}
-
-		&::before {
-			display: none;
-		}
-	}
-
 	.zi-chevron-left,
 	.zi-chevron-right {
 		width: 24px;
@@ -1814,6 +1800,14 @@ select {
 
 		.filter-trigger {
 			padding: 1px 8px 7px 10px !important;
+
+			&::after {
+				vertical-align: middle;
+				padding-left: 8px;
+				@extend %icons-font;
+				font-size: 18px;
+				content: $zi-filter;
+			}
 		}
 
 		.btn-info {
@@ -5427,25 +5421,29 @@ z-select,
 	line-height: 30px;
 }
 .leaflet-control {
+	.navigate-home-button,
+	.geomap-filter-button {
+		cursor: pointer;
+
+		&::before {
+			vertical-align: middle;
+			font-size: $btn-icon-size;
+		}
+	}
+
+	.navigate-home-button, {
+		&::before {
+			top: -1px;
+			color: $icon-color;
+		}
+	}
+
 	&.disabled {
 		background-color: $white;
 		opacity: 1;
 	}
-	.zi-filter,
-	.zi-home {
-		cursor: pointer;
-		&::after {
-			display: none;
-		}
-	}
-	.zi-home {
-		&::before {
-			top: -1px;
-			font-size: 19px;
-			color: $icon-color;
-		}
-	}
 }
+
 .leaflet-container {
 	height: 100%;
 	z-index: 1;
