@@ -70,7 +70,7 @@ $c{"before"} = "/*
 #include \"zbxdbschema.h\"
 #include \"zbxcommon.h\"
 
-const ZBX_TABLE\ttables[] = {
+const zbx_db_table_t\ttables[] = {
 
 #if defined(HAVE_ORACLE)
 #	define ZBX_TYPE_SHORTTEXT_LEN	2048
@@ -781,7 +781,7 @@ sub close_function($)
 {
 	my $type = shift;
 	my ($out, $ret_row);
-	
+
 	if ($type eq "delete")
 	{
 		$ret_row = "old";
@@ -992,11 +992,11 @@ sub process()
 sub c_append_changelog_tables()
 {
 	print "\nconst zbx_db_table_changelog_t\tchangelog_tables[] = {\n";
-	
+
 	while (my ($object, $table) = each(%table_types)) {
 		print "\t{\"$table\", $object},\n"
 	}
-	
+
 	print	"\t{0}\n};\n";
 }
 
@@ -1034,7 +1034,7 @@ sub main()
 	if ($format eq "c")
 	{
 		c_append_changelog_tables();
-		
+
 		$eol = "\\n\\";
 		$fk_bol = "\t\"";
 		$fk_eol = "\",";

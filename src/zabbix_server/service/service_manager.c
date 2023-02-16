@@ -1121,8 +1121,8 @@ static void	sync_config(zbx_service_manager_t *service_manager)
 	}
 	else
 	{
-		const ZBX_TABLE	*table;
-		char		field[16];
+		const zbx_db_table_t	*table;
+		char			field[16];
 
 		table = zbx_db_get_table("config");
 

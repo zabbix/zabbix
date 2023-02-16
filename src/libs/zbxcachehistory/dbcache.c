@@ -5174,12 +5174,12 @@ void	free_database_cache(int sync)
  ******************************************************************************/
 zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 {
-	int		i;
-	DB_RESULT	result;
-	DB_ROW		row;
-	const ZBX_TABLE	*table;
-	ZBX_DC_ID	*id;
-	zbx_uint64_t	min = 0, max = ZBX_DB_MAX_ID, nextid, lastid;
+	int			i;
+	DB_RESULT		result;
+	DB_ROW			row;
+	const zbx_db_table_t	*table;
+	ZBX_DC_ID		*id;
+	zbx_uint64_t		min = 0, max = ZBX_DB_MAX_ID, nextid, lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' num:%d", __func__, table_name, num);
 
