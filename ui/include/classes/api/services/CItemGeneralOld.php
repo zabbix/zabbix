@@ -300,8 +300,8 @@ abstract class CItemGeneralOld extends CApiService {
 
 				if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
 					$field_rules = [
-							'params' => ['template' => 1]
-						] + $this->fieldRules;
+						'params' => ['template' => 1]
+					] + $this->fieldRules;
 				}
 
 				// apply rules
