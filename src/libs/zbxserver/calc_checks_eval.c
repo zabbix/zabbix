@@ -265,7 +265,7 @@ static zbx_expression_item_t	*expression_get_item(zbx_expression_eval_t *eval, z
 			return item;
 	}
 
-	item = (zbx_expression_item_t *)zbx_malloc(NULL, sizeof(zbx_expression_group_t));
+	item = (zbx_expression_item_t *)zbx_malloc(NULL, sizeof(zbx_expression_item_t));
 	item->itemid = itemid;
 	zbx_vector_ptr_create(&item->tags);
 	zbx_dc_get_item_tags(itemid, &item->tags);

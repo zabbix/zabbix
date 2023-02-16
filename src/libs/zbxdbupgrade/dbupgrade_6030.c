@@ -463,14 +463,14 @@ static int	DBpatch_6030059(void)
 	return DBset_default("media_type", &field);
 }
 
-static int DBpatch_6030060(void)
+static int	DBpatch_6030060(void)
 {
 	const ZBX_FIELD	field = {"url_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("triggers", &field);
 }
 
-static int DBpatch_6030061(void)
+static int	DBpatch_6030061(void)
 {
 	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -4220,6 +4220,16 @@ static int	DBpatch_6030191(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_6030192(void)
+{
+	return DBdrop_index("scripts", "scripts_3");
+}
+
+static int	DBpatch_6030193(void)
+{
+	return DBcreate_index("scripts", "scripts_3", "name,menu_path", 1);
+}
 #endif
 
 DBPATCH_START(6030)
@@ -4416,5 +4426,7 @@ DBPATCH_ADD(6030188, 0, 1)
 DBPATCH_ADD(6030189, 0, 1)
 DBPATCH_ADD(6030190, 0, 1)
 DBPATCH_ADD(6030191, 0, 1)
+DBPATCH_ADD(6030192, 0, 1)
+DBPATCH_ADD(6030193, 0, 1)
 
 DBPATCH_END()
