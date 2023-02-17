@@ -163,17 +163,17 @@ class CConfigurationExport {
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
 				'verify_host', 'allow_traps', 'discover', 'uuid'
 			],
-			'trigger_prototype' => ['expression', 'description', 'url', 'url_name', 'status', 'priority', 'comments', 'type', 'flags',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'discover', 'event_name', 'uuid'
+			'trigger_prototype' => ['expression', 'description', 'url', 'url_name', 'status', 'priority', 'comments',
+				'type', 'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
+				'manual_close', 'opdata', 'discover', 'event_name', 'uuid'
 			],
 			'httptests' => ['name', 'hostid', 'delay', 'retries', 'agent', 'http_proxy', 'variables',
 				'headers', 'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
 				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'uuid'
 			],
-			'trigger' => ['expression', 'description', 'url', 'url_name', 'status', 'priority', 'comments', 'type', 'flags',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'event_name', 'uuid'
+			'trigger' => ['expression', 'description', 'url', 'url_name', 'status', 'priority', 'comments', 'type',
+				'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close',
+				'opdata', 'event_name', 'uuid'
 			]
 		];
 	}
