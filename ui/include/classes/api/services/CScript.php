@@ -543,7 +543,6 @@ class CScript extends CApiService {
 				$script['host_access'] = DB::getDefault('scripts', 'host_access');
 				$script['confirmation'] = '';
 			}
-
 		}
 		unset($script);
 
