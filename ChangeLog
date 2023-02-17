@@ -300,9 +300,15 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.8rc1
 
 New features:
+A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuthentication method (rdetlavs)
 A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
+..F....... [ZBX-22320] fixed success message when disabling hosts in host groups (epulke)
+........S. [ZBX-22240] fixed selects of history and trends blocking drop_chunks (dgoloscapov)
+........S. [ZBX-22078] fixed crash in calculated items when using tag filter on 32-bit systems (vso)
+.........T [ZBX-21591] optimized JSONPaths in Nginx Plus template (igorbach)
+A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
 ..F....... [ZBX-21764] fixed misplaced error messages in host group and template group edit forms (dpetra)
 A......... [ZBX-19202] fixed template dashboard availability to users without permissions to the templates (averza)
 ........S. [ZBX-22189] fixed Zabbix server crash appearing when only item tags change between LLD runs (arimdjonoks)
