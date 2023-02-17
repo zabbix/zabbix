@@ -173,10 +173,10 @@ static int	rtc_parse_options_server(const char *opt, zbx_uint32_t *code, struct 
  ******************************************************************************/
 static int	rtc_process_server_loglevel_option(int direction, const char *data, char **result)
 {
-	int	proc_num, proc_type, scope;
+	int	proc_num, proc_type;
 	pid_t	pid;
 
-	if (SUCCEED != zbx_rtc_get_signal_target(data, &pid, &proc_type, &proc_num, &scope, result))
+	if (SUCCEED != zbx_rtc_get_command_target(data, &pid, &proc_type, &proc_num, NULL, result))
 		return SUCCEED;
 
 	/* change loglevel for all processes */

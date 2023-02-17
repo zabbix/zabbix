@@ -73,7 +73,7 @@ static void	rtc_change_service_loglevel(int code)
  * Purpose: get runtime control option targets                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_get_signal_target(const char *data, pid_t *pid, int *proc_type, int *proc_num, int *scope,
+int	zbx_rtc_get_command_target(const char *data, pid_t *pid, int *proc_type, int *proc_num, int *scope,
 		char **result)
 {
 	struct zbx_json_parse	jp;
@@ -85,10 +85,13 @@ int	zbx_rtc_get_signal_target(const char *data, pid_t *pid, int *proc_type, int 
 		return FAIL;
 	}
 
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SCOPE, buf, sizeof(buf), NULL))
-		*scope = atoi(buf);
-	else
-		*scope = ZBX_PROF_UNKNOWN;
+	if (NULL != scope)
+	{
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SCOPE, buf, sizeof(buf), NULL))
+			*scope = atoi(buf);
+		else
+			*scope = ZBX_PROF_UNKNOWN;
+	}
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PID, buf, sizeof(buf), NULL))
 	{
@@ -132,16 +135,16 @@ int	zbx_rtc_get_signal_target(const char *data, pid_t *pid, int *proc_type, int 
 static void	rtc_process_loglevel_option(zbx_rtc_t *rtc, int code, const char *data, char **result)
 {
 	pid_t	pid;
-	int	proc_type, proc_num, scope;
+	int	proc_type, proc_num;
 
-	if (SUCCEED != zbx_rtc_get_signal_target(data, &pid, &proc_type, &proc_num, &scope, result))
+	if (SUCCEED != zbx_rtc_get_command_target(data, &pid, &proc_type, &proc_num, NULL, result))
 		return;
 
 	/* all processes */
 	if (0 == pid && ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
 	{
 		rtc_change_service_loglevel(code);
-		zbx_rtc_notify(rtc, proc_type, proc_num, code, NULL, 0);
+		zbx_rtc_notify(rtc, proc_type, proc_num, code, data, (zbx_uint32_t)strlen(data) + 1);
 		zbx_signal_process_by_pid(0, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
 		return;
 	}
@@ -160,7 +163,7 @@ static void	rtc_process_loglevel_option(zbx_rtc_t *rtc, int code, const char *da
 		return;
 	}
 
-	if (0 == zbx_rtc_notify(rtc, proc_type, proc_num, code, NULL, 0))
+	if (0 == zbx_rtc_notify(rtc, proc_type, proc_num, code, data, (zbx_uint32_t)strlen(data) + 1))
 		zbx_signal_process_by_type(proc_type, proc_num, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
 }
 
@@ -174,7 +177,7 @@ static void	rtc_process_profiler_option(int code, const char *data, char **resul
 	pid_t	pid;
 	int	proc_type, proc_num, scope;
 
-	if (SUCCEED != zbx_rtc_get_signal_target(data, &pid, &proc_type, &proc_num, &scope, result))
+	if (SUCCEED != zbx_rtc_get_command_target(data, &pid, &proc_type, &proc_num, &scope, result))
 		return;
 
 	/* all processes */
@@ -322,8 +325,11 @@ int	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, 
 		if (ZBX_PROCESS_TYPE_UNKNOWN != process_type && process_type != rtc->subs.values[i]->process_type)
 			continue;
 
-		if (0 != process_num && process_num != rtc->subs.values[i]->process_num)
+		if (0 != process_num && 0 != rtc->subs.values[i]->process_num &&
+				process_num != rtc->subs.values[i]->process_num)
+		{
 			continue;
+		}
 
 		if (SUCCEED != rtc_match_message(&rtc->subs.values[i]->msgs, code))
 			continue;

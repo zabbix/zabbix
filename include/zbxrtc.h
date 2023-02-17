@@ -96,7 +96,7 @@ int	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, 
 
 int	zbx_rtc_async_exchange(char **data, zbx_uint32_t code, int config_timeout, char **error);
 
-int	zbx_rtc_get_signal_target(const char *data, pid_t *pid, int *proc_type, int *proc_num, int *scope,
+int	zbx_rtc_get_command_target(const char *data, pid_t *pid, int *proc_type, int *proc_num, int *scope,
 		char **result);
 
 void	zbx_rtc_sub_free(zbx_rtc_sub_t *sub);
