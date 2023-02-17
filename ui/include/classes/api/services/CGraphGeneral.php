@@ -768,8 +768,8 @@ abstract class CGraphGeneral extends CApiService {
 		$colorValidator = new CColorValidator();
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'uuid' => 	['type' => API_UUID],
-			'name' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+			'uuid' => ['type' => API_UUID],
+			'name' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
 		]];
 
 		switch (get_class($this)) {
