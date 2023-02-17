@@ -302,12 +302,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			[
 				[
 					'servers_settings' => [
-						'Host' => 'ipa.demo1.freeipa.org',
+						'Host' => PHPUNIT_LDAP_HOST ,
 						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 						'Search attribute' => 'uid'
 					],
 					'test_settings' => [
-						'Login' => 'test',
+						'Login' => PHPUNIT_LDAP_USERNAME,
 						'User password' => 'test'
 					],
 					'test_error' => 'Login failed',
@@ -339,19 +339,19 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 				[
 					'servers_settings' => [
 						'Name' => 'Test Name',
-						'Host' => 'ipa.demo1.freeipa.org',
-						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-						'Search attribute' => 'uid',
-						'Bind DN' => 'test_DN',
-						'Bind password' => 'test_password',
+						'Host' => PHPUNIT_LDAP_HOST,
+						'Base DN' => 'DC=zbx,DC=local',
+						'Search attribute' => 'sAMAccountName',
+						'Bind DN' => ' CN=Admin,OU=Users,OU=Zabbix,DC=zbx,DC=local',
+						'Bind password' => PHPUNIT_LDAP_BIND_PASSWORD,
 						'Description' => 'Test description',
 						'Advanced configuration' => true,
 						'StartTLS' => true,
 						'Search filter' => 'filter'
 					],
 					'test_settings' => [
-						'Login' => 'employee',
-						'User password' => 'Secret123'
+						'Login' => PHPUNIT_LDAP_USERNAME,
+						'User password' => PHPUNIT_LDAP_USER_PASSWORD
 					],
 					'test_error' => 'Login failed',
 					'test_error_details' => [
@@ -390,7 +390,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Base DN' => 'DC=zbx,DC=local',
 						'Search attribute' => 'sAMAccountName',
 						'Bind DN' => 'CN=Admin,OU=Users,OU=Zabbix,DC=zbx,DC=local',
-						'Bind password' =>PHPUNIT_LDAP_BIND_PASSWORD,
+						'Bind password' => PHPUNIT_LDAP_BIND_PASSWORD,
 						'Configure JIT provisioning' => true,
 						'Group configuration' => 'memberOf',
 						'Group name attribute' => 'CN',
