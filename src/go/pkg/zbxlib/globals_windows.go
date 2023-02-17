@@ -93,12 +93,6 @@ ZBX_METRIC	parameters_common_local[] = {NULL};
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
-static int	config_timeout = 3;
-static int	get_config_timeout(void)
-{
-	return config_timeout;
-}
-
 char	*strerror_from_system(unsigned long error)
 {
 	size_t		offset = 0;
@@ -139,18 +133,5 @@ DWORD	zbx_get_builtin_object_index(zbx_builtin_counter_ref_t object_ref)
 	return 0;
 }
 
-void	init_globals_windows(void)
-{
-	zbx_init_library_sysinfo(get_config_timeout);
-}
 */
 import "C"
-
-import (
-	"git.zabbix.com/ap/plugin-support/log"
-)
-
-func init() {
-	log.Tracef("Calling C function \"init_globals_windows()\"")
-	C.init_globals_windows()
-}
