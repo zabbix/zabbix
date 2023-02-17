@@ -31,6 +31,13 @@
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
 
+typedef struct
+{
+	zbx_pp_worker_t	*worker;
+	int		log_level;
+}
+zbx_pp_worker_args_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: process preprocessing testing task                                *
@@ -101,17 +108,20 @@ static	void	pp_task_process_sequence(zbx_pp_context_t *ctx, zbx_pp_task_t *task_
  * Purpose: preprocessing worker thread entry                                 *
  *                                                                            *
  ******************************************************************************/
-static void	*pp_worker_entry(void *arg)
+static void	*pp_worker_entry(void *args)
 {
-	zbx_pp_worker_t	*worker = (zbx_pp_worker_t *)arg;
-	zbx_pp_queue_t	*queue = worker->queue;
-	zbx_pp_task_t	*in;
-	char		*error = NULL, component[MAX_ID_LEN + 1];
-	sigset_t	mask;
-	int		err;
+	zbx_pp_worker_args_t	*worker_args = (zbx_pp_worker_args_t *)args;
+	zbx_pp_worker_t		*worker = worker_args->worker;
+	zbx_pp_queue_t		*queue = worker->queue;
+	zbx_pp_task_t		*in;
+	char			*error = NULL, component[MAX_ID_LEN + 1];
+	sigset_t		mask;
+	int			err;
 
 	zbx_snprintf(component, sizeof(component), "%d", worker->id);
-	zbx_set_log_component(component);
+	zbx_set_log_component(component, &worker->logger);
+	*worker->logger.level = worker_args->log_level;
+	zbx_free(worker_args);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
@@ -208,13 +218,18 @@ static void	*pp_worker_entry(void *arg)
 int	pp_worker_init(zbx_pp_worker_t *worker, int id, zbx_pp_queue_t *queue, zbx_timekeeper_t *timekeeper,
 		char **error)
 {
-	int	err, ret = FAIL;
+	int			err, ret = FAIL;
+	zbx_pp_worker_args_t	*args;
 
 	worker->id = id;
 	worker->queue = queue;
 	worker->timekeeper = timekeeper;
 
-	if (0 != (err = pthread_create(&worker->thread, NULL, pp_worker_entry, (void *)worker)))
+	args = (zbx_pp_worker_args_t *)zbx_malloc(NULL, sizeof(zbx_pp_worker_args_t));
+	args->worker = worker;
+	args->log_level = zbx_get_log_level();
+
+	if (0 != (err = pthread_create(&worker->thread, NULL, pp_worker_entry, (void *)args)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
 		goto out;

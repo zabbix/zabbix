@@ -495,6 +495,37 @@ static void	preprocessor_finished_task_cb(void *data)
 	zbx_ipc_service_alert((zbx_ipc_service_t *)data);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change log level for the specified worker(s)                      *
+ *                                                                            *
+ * Parameters: manager   - [IN] preprocessing manager                         *
+ *             direction - [IN] 1) increase, -1) decrease                     *
+ *             data      - [IN] rtc data in json format                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	preprocessor_change_loglevel(zbx_pp_manager_t *manager, int direction, const char *data)
+{
+	char	*error = NULL;
+	pid_t	pid;
+	int	proc_type, proc_num;
+
+	if (SUCCEED != zbx_rtc_get_command_target(data, &pid, &proc_type, &proc_num, NULL, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot change log level: %s", error);
+		zbx_free(error);
+		return;
+	}
+
+	if (0 != pid)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot change log level for preprocessing worker by pid");
+		return;
+	}
+
+	zbx_pp_manager_change_worker_loglevel(manager, proc_num, direction);
+}
+
 ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 {
 	zbx_ipc_service_t		service;
@@ -600,8 +631,10 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 					preprocessor_reply_usage_stats(manager, pp_args->workers_num, client);
 					break;
 				case ZBX_RTC_LOG_LEVEL_INCREASE:
+					preprocessor_change_loglevel(manager, 1, (const char *)message->data);
+					break;
 				case ZBX_RTC_LOG_LEVEL_DECREASE:
-					/* TODO: process log level messages for workers */
+					preprocessor_change_loglevel(manager, -1, (const char *)message->data);
 					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
