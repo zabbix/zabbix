@@ -3664,34 +3664,20 @@ char	*zbx_db_get_schema_esc(void)
 
 	return name;
 }
+#endif
 
-void	zbx_tsdb_recalc_time_period(int *ts_from, int table_group)
+void	zbx_recalc_history_time_period(int *ts_from)
 {
 	int		least_ts;
 	zbx_config_t	cfg;
 
-	if (0 >= zbx_tsdb_get_version())
-		return;
-
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
 
-	if (ZBX_TSDB_RECALC_TIME_PERIOD_HISTORY == table_group)
-	{
-		if (1 != cfg.hk.history_global)
-			return;
+	if (1 != cfg.hk.history_global)
+		return;
 
-		least_ts = (int)time(NULL) - cfg.hk.history;
-	}
-	else if (ZBX_TSDB_RECALC_TIME_PERIOD_TRENDS == table_group)
-	{
-		if (1 != cfg.hk.trends_global)
-			return;
-
-		least_ts = (int)time(NULL) - cfg.hk.trends + 1;
-	}
-
+	least_ts = (int)time(NULL) - cfg.hk.history;
 
 	if (least_ts > *ts_from)
 		*ts_from = least_ts;
 }
-#endif
