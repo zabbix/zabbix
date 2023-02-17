@@ -182,8 +182,8 @@ class CConfigurationImportcompare {
 	 * Compare two entities and separate all their keys into added/removed/updated.
 	 * First entities gets compared by uuid then by its unique field values.
 	 *
-	 * @param array $before
-	 * @param array $after
+	 * @param array  $before
+	 * @param array  $after
 	 * @param string $type
 	 *
 	 * @return array
@@ -213,7 +213,6 @@ class CConfigurationImportcompare {
 				if ($before_entity['uuid'] == $after_entity['uuid']
 						|| $before_entity['uniqueness'] == $after_entity['uniqueness']) {
 					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
-
 					$before_entity['uuid'] = $after_entity['uuid'];
 
 					$same_entities[$b_key]['before'] = $before_entity;
@@ -227,6 +226,7 @@ class CConfigurationImportcompare {
 
 		$removed_entities = $before;
 		$added_entities = $after;
+
 		foreach ($added_entities as $entity) {
 			unset($entity['uniqueness']);
 
@@ -281,8 +281,8 @@ class CConfigurationImportcompare {
 	/**
 	 * Get entity field values by giving field key path constructed.
 	 *
-	 * @param array        $entity    entity
-	 * @param string|array $field_key
+	 * @param array        $entity    Entity.
+	 * @param string|array $field_key Field key or field key path given.
 	 */
 	private function getUniqueValuesByFieldPath(array $entity, $field_key_path) {
 		if (is_array($field_key_path)) {
@@ -400,6 +400,18 @@ class CConfigurationImportcompare {
 					continue;
 				}
 
+				if (!$options['templateLinkage']['createMissing'] && !$options['templateLinkage']['deleteMissing']) {
+					$entity['after']['templates'] = $entity['before']['templates'];
+				}
+				elseif ($options['templateLinkage']['createMissing'] && !$options['templateLinkage']['deleteMissing']) {
+					$entity['after']['templates'] = $this->afterForInnerCreateMissing($entity['before']['templates'],
+						$entity['after']['templates']);
+				}
+				elseif ($options['templateLinkage']['deleteMissing'] && !$options['templateLinkage']['createMissing']) {
+					$entity['after']['templates'] = $this->afterForInnerDeleteMissing($entity['before']['templates'],
+						$entity['after']['templates']);
+				}
+
 				if ($entity['before'] === $entity['after'] && count($entity) === 2) {
 					unset($diff['updated'][$key]);
 				}
@@ -475,5 +487,63 @@ class CConfigurationImportcompare {
 		}
 
 		return $diff;
+	}
+
+	/**
+	 * Create "after" that contains all entries from "before" and "after" combined.
+	 *
+	 * @param array $before
+	 * @param array $after
+	 *
+	 * @return array
+	 */
+	protected function afterForInnerCreateMissing(array $before, array $after): array {
+		$missing = [];
+
+		foreach ($after as $after_entity) {
+			$found = false;
+
+			foreach ($before as $before_entity) {
+				if ($before_entity === $after_entity) {
+					$found = true;
+					break;
+				}
+			}
+
+			if (!$found) {
+				$missing[] = $after_entity;
+			}
+		}
+
+		return array_merge($before, $missing);
+	}
+
+	/**
+	 * Create "after" that contains only entries from "after" that were also present in "before".
+	 *
+	 * @param array $before
+	 * @param array $after
+	 *
+	 * @return array
+	 */
+	protected function afterForInnerDeleteMissing(array $before, array $after): array {
+		$new_after = [];
+
+		foreach ($after as $after_entity) {
+			$found = false;
+
+			foreach ($before as $before_entity) {
+				if ($before_entity === $after_entity) {
+					$found = true;
+					break;
+				}
+			}
+
+			if ($found) {
+				$new_after[] = $after_entity;
+			}
+		}
+
+		return $new_after;
 	}
 }

@@ -78,30 +78,8 @@ if ($readonly) {
 
 // Create form list.
 $triggersFormList = new CFormList('triggersFormList');
-
-if (array_key_exists('parent_trigger', $data)) {
-	$parent_template_names = [];
-
-	foreach ($data['parent_trigger']['template_names'] as $templateid => $template_name) {
-		if ($parent_template_names) {
-			$parent_template_names[] = ', ';
-		}
-
-		if ($data['parent_trigger']['editable']) {
-			$parent_template_names[] = new CLink(CHtml::encode($template_name),
-				(new CUrl('triggers.php'))
-					->setArgument('form', 'update')
-					->setArgument('triggerid', $data['templateid'])
-					->setArgument('hostid', $templateid)
-					->setArgument('context', 'template')
-			);
-		}
-		else {
-			$parent_template_names[] = (new CSpan(CHtml::encode($template_name)))->addClass(ZBX_STYLE_GREY);
-		}
-	}
-
-	$triggersFormList->addRow(_('Parent trigger'), $parent_template_names);
+if (!empty($data['templates'])) {
+	$triggersFormList->addRow(_('Parent triggers'), $data['templates']);
 }
 
 if ($discovered_trigger) {
@@ -628,7 +606,6 @@ $triggersTab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab
 		'source' => 'trigger',
 		'tags' => $data['tags'],
 		'show_inherited_tags' => $data['show_inherited_tags'],
-		'context' => $data['context'],
 		'readonly' => $discovered_trigger,
 		'tabs_id' => 'tabs',
 		'tags_tab_id' => 'tags-tab'
