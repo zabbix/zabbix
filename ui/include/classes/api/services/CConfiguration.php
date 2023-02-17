@@ -370,6 +370,7 @@ class CConfiguration extends CApiService {
 			switch ($entity) {
 				case 'host_groups':
 					$imported_ids['host_groups'] = API::HostGroup()->get([
+						'output' => [],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'name' => $data['name']
@@ -383,7 +384,7 @@ class CConfiguration extends CApiService {
 
 				case 'template_groups':
 					$imported_ids['template_groups'] = API::TemplateGroup()->get([
-						'output' => ['groupid'],
+						'output' => [],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'name' => $data['name']
@@ -397,6 +398,7 @@ class CConfiguration extends CApiService {
 
 				case 'templates':
 					$options = [
+						'output' => ['templateid'],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'host' => $data['template']
