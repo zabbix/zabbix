@@ -412,6 +412,10 @@ function interfaceIdsByType(array $interfaces) {
 function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_template, array $dst_hostids): bool {
 	$options = in_array($src_type, ['templateids', 'hostids']) ? ['inherited' => false] : [];
 
+	if ($src_type === 'hostids') {
+		$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_NORMAL];
+	}
+
 	$src_items = API::Item()->get([
 		'output' => ['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 			'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status',
