@@ -2,8 +2,8 @@ zabbix_export:
   version: '6.4'
   template_groups:
     -
-      uuid: 57b7ae836ca64446ba2c296389c009b7
-      name: Templates/Modules
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
   templates:
     -
       uuid: 0f6889282f6048e2b1370e569e578985
@@ -14,13 +14,13 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
       groups:
         -
-          name: Templates/Modules
+          name: Templates/Applications
       items:
         -
           uuid: 803390429cf949d3b8439dd5dd71c706
@@ -323,6 +323,13 @@ zabbix_export:
             -
               lld_macro: '{#VMEM}'
               path: $.vsize
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: process
       macros:
         -
           macro: '{$PROC.NAME.MATCHES}'

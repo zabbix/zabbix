@@ -3,20 +3,24 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
 The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts.
 It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later.
 Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule have pre-defined Vendor Specific Attributes
 for each disk, and will be discovered if attribute is present.
 
+## Tested versions
 
-This template was tested on:
+This template has been tested on:
 
 - Smartmontools, version 7.1 and later
 
+## Requirements
+
+For Zabbix version: 6.4 and higher.
+
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 Install the Zabbix agent 2 and Smartmontools 7.1.
 Grant Zabbix agent 2 super/admin user privileges for smartctl utility.
@@ -30,7 +34,7 @@ Grant Zabbix agent 2 super/admin user privileges for smartctl utility.
 Plugin [parameters list](https://www.zabbix.com/documentation/6.4/manual/appendix/config/zabbix_agent2_plugins/smart_plugin)
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -43,17 +47,17 @@ No specific Zabbix configuration is required.
 |{$SMART.TEMPERATURE.MAX.CRIT} |<p>This macro is used for trigger expression. It can be overridden on the host or linked on the template level.</p> |`65` |
 |{$SMART.TEMPERATURE.MAX.WARN} |<p>This macro is used for trigger expression. It can be overridden on the host or linked on the template level.</p> |`50` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Disk discovery |<p>Discovery SMART disks.</p> |ZABBIX_PASSIVE |smart.disk.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$SMART.DISK.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$SMART.DISK.NAME.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Self-test<br> - {#DISKTYPE} MATCHES_REGEX `nvme`<br>  - ITEM_PROTOTYPE LIKE `Self-test` - NO_DISCOVER</p><p>Not NVMe<br> - {#DISKTYPE} NOT_MATCHES_REGEX `nvme`<br>  - ITEM_PROTOTYPE REGEXP `Media|Percentage|Critical` - NO_DISCOVER</p><p>Raw_Read_Error_Rate<br> - {#ATTRIBUTES} MATCHES_REGEX `Raw_Read_Error_Rate`<br>  - ITEM_PROTOTYPE REGEXP `Raw_Read_Error_Rate` - DISCOVER</p><p>Spin_Up_Time<br> - {#ATTRIBUTES} MATCHES_REGEX `Spin_Up_Time`<br>  - ITEM_PROTOTYPE REGEXP `Spin_Up_Time` - DISCOVER</p><p>Start_Stop_Count<br> - {#ATTRIBUTES} MATCHES_REGEX `Start_Stop_Count`<br>  - ITEM_PROTOTYPE REGEXP `Start_Stop_Count` - DISCOVER</p><p>Power_Cycle_Count<br> - {#ATTRIBUTES} MATCHES_REGEX `Power_Cycle_Count`<br>  - ITEM_PROTOTYPE REGEXP `Power_Cycle_Count` - DISCOVER</p><p>Reported_Uncorrect<br> - {#ATTRIBUTES} MATCHES_REGEX `Reported_Uncorrect`<br>  - ITEM_PROTOTYPE REGEXP `Reported_Uncorrect` - DISCOVER</p><p>Seek_Error_Rate<br> - {#ATTRIBUTES} MATCHES_REGEX `Seek_Error_Rate`<br>  - ITEM_PROTOTYPE REGEXP `Seek_Error_Rate` - DISCOVER</p><p>Bad_Block_Rate<br> - {#ATTRIBUTES} MATCHES_REGEX `Bad_Block_Rate`<br>  - ITEM_PROTOTYPE REGEXP `Bad_Block_Rate` - DISCOVER</p><p>Program_Fail_Count_Chip<br> - {#ATTRIBUTES} MATCHES_REGEX `Program_Fail_Count_Chip`<br>  - ITEM_PROTOTYPE REGEXP `Program_Fail_Count_Chip` - DISCOVER</p><p>Reallocated_Sector_Ct<br> - {#ATTRIBUTES} MATCHES_REGEX `Reallocated_Sector_Ct`<br>  - ITEM_PROTOTYPE REGEXP `Reallocated_Sector_Ct` - DISCOVER</p> |
+|Disk discovery |<p>Discovery SMART disks.</p> |ZABBIX_PASSIVE |smart.disk.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$SMART.DISK.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$SMART.DISK.NAME.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Self-test<br> - {#DISKTYPE} MATCHES_REGEX `nvme`<br>  - ITEM_PROTOTYPE LIKE `Self-test`<br>  - NO_DISCOVER</p><p>Not NVMe<br> - {#DISKTYPE} NOT_MATCHES_REGEX `nvme`<br>  - ITEM_PROTOTYPE REGEXP `Media|Percentage|Critical`<br>  - NO_DISCOVER</p><p>Raw_Read_Error_Rate<br> - {#ATTRIBUTES} MATCHES_REGEX `Raw_Read_Error_Rate`<br>  - ITEM_PROTOTYPE REGEXP `Raw_Read_Error_Rate`<br>  - DISCOVER</p><p>Spin_Up_Time<br> - {#ATTRIBUTES} MATCHES_REGEX `Spin_Up_Time`<br>  - ITEM_PROTOTYPE REGEXP `Spin_Up_Time`<br>  - DISCOVER</p><p>Start_Stop_Count<br> - {#ATTRIBUTES} MATCHES_REGEX `Start_Stop_Count`<br>  - ITEM_PROTOTYPE REGEXP `Start_Stop_Count`<br>  - DISCOVER</p><p>Power_Cycle_Count<br> - {#ATTRIBUTES} MATCHES_REGEX `Power_Cycle_Count`<br>  - ITEM_PROTOTYPE REGEXP `Power_Cycle_Count`<br>  - DISCOVER</p><p>Reported_Uncorrect<br> - {#ATTRIBUTES} MATCHES_REGEX `Reported_Uncorrect`<br>  - ITEM_PROTOTYPE REGEXP `Reported_Uncorrect`<br>  - DISCOVER</p><p>Seek_Error_Rate<br> - {#ATTRIBUTES} MATCHES_REGEX `Seek_Error_Rate`<br>  - ITEM_PROTOTYPE REGEXP `Seek_Error_Rate`<br>  - DISCOVER</p><p>Bad_Block_Rate<br> - {#ATTRIBUTES} MATCHES_REGEX `Bad_Block_Rate`<br>  - ITEM_PROTOTYPE REGEXP `Bad_Block_Rate`<br>  - DISCOVER</p><p>Program_Fail_Count_Chip<br> - {#ATTRIBUTES} MATCHES_REGEX `Program_Fail_Count_Chip`<br>  - ITEM_PROTOTYPE REGEXP `Program_Fail_Count_Chip`<br>  - DISCOVER</p><p>Reallocated_Sector_Ct<br> - {#ATTRIBUTES} MATCHES_REGEX `Reallocated_Sector_Ct`<br>  - ITEM_PROTOTYPE REGEXP `Reallocated_Sector_Ct`<br>  - DISCOVER</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -78,7 +82,7 @@ There are no template links in this template.
 |Zabbix raw items |SMART [{#NAME}]: Program_Fail_Count_Chip |<p>The total number of flash program operation failures since the drive was deployed.</p> |DEPENDENT |smart.disk.attribute.program_fail_count_chip[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.program_fail_count_chip.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Zabbix raw items |SMART [{#NAME}]: Reallocated_Sector_Ct |<p>Disk discovered attribute.</p> |DEPENDENT |smart.disk.attribute.reallocated_sector_ct[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.reallocated_sector_ct.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -98,9 +102,9 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring).
 
 
 ## References

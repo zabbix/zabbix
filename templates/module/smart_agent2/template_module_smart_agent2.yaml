@@ -2,8 +2,8 @@ zabbix_export:
   version: '6.4'
   template_groups:
     -
-      uuid: 57b7ae836ca64446ba2c296389c009b7
-      name: Templates/Modules
+      uuid: e960332b3f6c46a1956486d4f3f99fce
+      name: 'Templates/Server hardware'
   templates:
     -
       uuid: 7b6c6228b25f4586b42cd1bf37ff8034
@@ -14,13 +14,13 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
       groups:
         -
-          name: Templates/Modules
+          name: 'Templates/Server hardware'
       discovery_rules:
         -
           uuid: 4575af2717ec4bf78645edb84a966c84
@@ -1016,6 +1016,16 @@ zabbix_export:
                   value: Start_Stop_Count
                   status: ENABLED
                   discover: DISCOVER
+      tags:
+        -
+          tag: class
+          value: storage
+        -
+          tag: target
+          value: hdd
+        -
+          tag: target
+          value: ssd
       macros:
         -
           macro: '{$SMART.DISK.NAME.MATCHES}'

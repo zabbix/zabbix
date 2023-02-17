@@ -3,13 +3,16 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -20,14 +23,14 @@ No specific Zabbix configuration is required.
 |{$ICMP_LOSS_WARN} |<p>-</p> |`20` |
 |{$ICMP_RESPONSE_TIME_WARN} |<p>-</p> |`0.15` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -35,7 +38,7 @@ There are no template links in this template.
 |Status |ICMP loss |<p>-</p> |SIMPLE |icmppingloss |
 |Status |ICMP response time |<p>-</p> |SIMPLE |icmppingsec |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -45,5 +48,5 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 

@@ -3,13 +3,16 @@
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -21,14 +24,14 @@ No specific Zabbix configuration is required.
 |{$ICMP_RESPONSE_TIME_WARN} |<p>-</p> |`0.15` |
 |{$SNMP.TIMEOUT} |<p>-</p> |`5m` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -45,11 +48,11 @@ There are no template links in this template.
 |Status |ICMP loss |<p>-</p> |SIMPLE |icmppingloss |
 |Status |ICMP response time |<p>-</p> |SIMPLE |icmppingsec |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|System name has changed |<p>System name has changed. Ack to close.</p> |`last(/Generic by SNMP/system.name,#1)<>last(/Generic by SNMP/system.name,#2) and length(last(/Generic by SNMP/system.name))>0` |INFO |<p>Manual close: YES</p> |
+|System name has changed |<p>The name of the system has changed. `Ack` to close the problem manually.</p> |`change(/Generic by SNMP/system.name) and length(last(/Generic by SNMP/system.name))>0` |INFO |<p>Manual close: YES</p> |
 |Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/Generic by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Generic by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Generic by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Generic by SNMP/system.net.uptime[sysUpTime.0])<10m)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
 |No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Generic by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
 |Unavailable by ICMP ping |<p>Last three attempts returned timeout.  Please check device connectivity.</p> |`max(/Generic by SNMP/icmpping,#3)=0` |HIGH | |
