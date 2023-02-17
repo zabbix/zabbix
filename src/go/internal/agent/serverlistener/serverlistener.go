@@ -81,8 +81,9 @@ func (sl *ServerListener) run() {
 				log.Warningf("failed to process an incoming connection from %s: %s", conn.RemoteIP(), err.Error())
 			}
 		} else {
+			log.Errf("failed to accept an incoming connection: %s", err.Error())
+
 			if nerr, ok := err.(net.Error); ok && nerr.Temporary() {
-				log.Errf("failed to accept an incoming connection: %s", err.Error())
 				continue
 			}
 			break

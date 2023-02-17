@@ -1,0 +1,1 @@
+...G...... [ZBX-22306] fixed crash in Zabbix agent 2 when running out of available file descriptors (vso)

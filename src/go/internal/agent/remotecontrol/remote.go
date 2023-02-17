@@ -22,6 +22,8 @@ package remotecontrol
 import (
 	"bufio"
 	"net"
+
+	"git.zabbix.com/ap/plugin-support/log"
 )
 
 type Conn struct {
@@ -61,16 +63,25 @@ func (c *Conn) Stop() {
 
 func (c *Conn) run() {
 	for {
-		if conn, err := c.listener.Accept(); err != nil && !err.(net.Error).Temporary() {
-			break
-		} else {
-			scanner := bufio.NewScanner(conn)
-			if scanner.Scan() {
-				// accept single command line, the connection will be closed after sending reply
-				c.sink <- &Client{request: scanner.Text(), conn: conn}
-			} else {
-				conn.Close()
+
+		conn, err := c.listener.Accept()
+
+		if err != nil {
+			log.Errf("failed to accept an incoming connection for remote command: %s", err.Error())
+
+			if nerr, ok := err.(net.Error); ok && nerr.Temporary() {
+				continue
 			}
+
+			break
+		}
+
+		scanner := bufio.NewScanner(conn)
+		if scanner.Scan() {
+			// accept single command line, the connection will be closed after sending reply
+			c.sink <- &Client{request: scanner.Text(), conn: conn}
+		} else {
+			conn.Close()
 		}
 	}
 }
