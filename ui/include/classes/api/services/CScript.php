@@ -360,8 +360,6 @@ class CScript extends CApiService {
 		}
 
 		$this->checkUniqueness($scripts, 'update');
-		$this->checkDuplicates($scripts, $db_scripts);
-
 		self::addAffectedObjects($scripts, $db_scripts);
 
 		// Validate if scripts belong to actions and scope can be changed.
@@ -549,6 +547,7 @@ class CScript extends CApiService {
 		}
 		unset($script);
 
+		$this->checkDuplicates($scripts, $db_scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
 	}
@@ -1343,19 +1342,23 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Check for duplicate script names within menu path for update() method.
+	 * Check for duplicate script names within menu path.
 	 *
 	 * @param array       $scripts     Array of scripts.
 	 * @param array|null  $db_scripts  Array of scripts from database.
 	 *
 	 * $scripts = [[
 	 *     'scriptid' =>  (string)  Script ID.
+	 *     'name' =>      (string)  Script name.
+	 *     'menu_path' => (string)  Script menu path (exists if scope = 1 for update method).
+	 *     'scope' =>     (string)  Script scope.
 	 * ]]
 	 *
 	 * $db_scripts = [
 	 *     <scriptid> => [
 	 *         'name' =>      (string)  Script name.
 	 *         'menu_path' => (string)  Script menu path.
+	 *         'scope' =>     (string)  Script scope.
 	 *     ]
 	 * ]
 	 *
@@ -1363,12 +1366,17 @@ class CScript extends CApiService {
 	 */
 	private function checkDuplicates(array $scripts, ?array $db_scripts = null): void {
 		if ($db_scripts !== null) {
-			$scripts = $this->extendFromObjects(zbx_toHash($scripts, 'scriptid'), $db_scripts, ['name', 'menu_path']);
+			$scripts = $this->extendFromObjects(zbx_toHash($scripts, 'scriptid'), $db_scripts, ['menu_path']);
 
-			// Remove unchanged scripts and only continue validation on for scripts that have changed name or menu path.
+			/*
+			 * Remove unchanged scripts and continue validation only for scripts that have changed name, menu path or
+			 * scope. If scope is changed to action, menu_path will be reset to empty string and that is a change.
+			 */
 			$scripts = array_filter($scripts, static function ($script) use ($db_scripts) {
 				return ($script['name'] !== $db_scripts[$script['scriptid']]['name']
-					|| $script['menu_path'] !== $db_scripts[$script['scriptid']]['menu_path']);
+					|| $script['menu_path'] !== $db_scripts[$script['scriptid']]['menu_path']
+					|| ($script['scope'] !== $db_scripts[$script['scriptid']]['scope']
+						&& $script['scope'] == ZBX_SCRIPT_SCOPE_ACTION));
 			});
 
 			if (!$scripts) {

@@ -2157,6 +2157,13 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Script "API script unique name in menu path (host scope)" already exists.'
 			],
+			'Test existing name in default menu path and change scope to action' => [
+				'script' => [
+					'scriptid' => 65,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION
+				],
+				'expected_error' => 'Script "API script unique name in default path (host scope)" already exists.'
+			],
 			// Check duplicate names in input.
 			'Test duplicate name within default menu path' => [
 				'script' => [
