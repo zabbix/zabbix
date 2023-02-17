@@ -102,20 +102,21 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			'Search filter' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{attr}=%{user})']
 		];
 
-		foreach ($server_fields as $field => $attributes) {
-			$this->assertEquals($attributes['visible'], $server_form->getField($field)->isVisible());
-			$this->assertTrue($server_form->getField($field)->isEnabled());
+		foreach ($server_fields as $label => $attributes) {
+			$field = $server_form->getField($label);
+			$this->assertEquals($attributes['visible'], $field->isVisible());
+			$this->assertTrue($field->isEnabled());
 
 			if (array_key_exists('value', $attributes)) {
-				$this->assertEquals($attributes['value'], $server_form->getField($field)->getValue());
+				$this->assertEquals($attributes['value'], $field->getValue());
 			}
 
 			if (array_key_exists('maxlength', $attributes)) {
-				$this->assertEquals($attributes['maxlength'], $server_form->getField($field)->getAttribute('maxlength'));
+				$this->assertEquals($attributes['maxlength'], $field->getAttribute('maxlength'));
 			}
 
 			if (array_key_exists('placeholder', $attributes)) {
-				$this->assertEquals($attributes['placeholder'], $server_form->getField($field)->getAttribute('placeholder'));
+				$this->assertEquals($attributes['placeholder'], $field->getAttribute('placeholder'));
 			}
 		}
 
@@ -942,7 +943,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 */
 	public function testUsersAuthenticationLdap_Update($data) {
 		if (CDBHelper::getCount('SELECT * FROM userdirectory_ldap') === 0) {
-			$server_settings['servers_settings'][0]['fields'] = (array_key_exists('start_ldap', $data))
+			$server_settings['servers_settings'][0]['fields'] = (CTestArrayHelper::get($data, 'start_ldap'))
 				? $data['start_ldap']
 				: [
 					'Name' => 'test_update',
@@ -972,9 +973,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		}
 		else {
 			foreach ($data['db_check'] as $table => $rows) {
+				$bebebe = CDBHelper::getAll('SELECT * FROM '.$table.' LIMIT '.count($rows));
 				foreach ($rows as $i => $row) {
-					$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table.' LIMIT 1 OFFSET '.$i;
-					$this->assertEquals([$row], CDBHelper::getAll($sql));
+					//$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table.' LIMIT 1 OFFSET '.$i;
+					//$this->assertEquals([$row], CDBHelper::getAll($sql));
+					foreach ($row as $key => $value) {
+						$this->assertEquals($value, $bebebe[$i][$key]);
+					}
 				}
 			}
 

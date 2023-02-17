@@ -55,7 +55,7 @@ class testFormAuthentication extends CWebTest {
 
 		// Check that Update button is clickable and no other buttons present.
 		$this->assertTrue($form->query('button:Update')->one()->isClickable());
-		$this->assertEquals(1, $form->query('xpath:.//ul[@class="table-forms"]//button')->all()->count());
+		$this->assertEquals(1, $form->query('xpath:.//ul[@class="table-forms"]//button')->count());
 
 		return $form;
 	}
