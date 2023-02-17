@@ -3211,6 +3211,11 @@ msgstr "Nie można zaktualizować wykrytego wykresu."
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "Nie można zaktualizować wykrytej grupy hostów \"%1$s\"."
 
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -16354,6 +16359,10 @@ msgstr "Usługi tworzą cykliczną zależność."
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
 msgstr "Zaktualizowano usługi"
+
+#: include/classes/api/services/CUser.php:1693
+msgid "Session ID or token is expected."
+msgstr ""
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
