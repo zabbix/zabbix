@@ -499,6 +499,7 @@ class testScripts extends CAPITest {
 		}
 		catch (Exception $e) {
 			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -557,6 +558,8 @@ class testScripts extends CAPITest {
 		}
 		catch (Exception $e) {
 			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -579,8 +582,10 @@ class testScripts extends CAPITest {
 			DB::insertBatch('event_symptom', $event_symptom_data, false);
 		}
 		catch (Exception $e) {
-			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
 			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -602,9 +607,11 @@ class testScripts extends CAPITest {
 			$usermacros = CDataHelper::call('usermacro.createglobal', array_values($usermacros_data));
 		}
 		catch (Exception $e) {
+			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -691,9 +698,11 @@ class testScripts extends CAPITest {
 		}
 		catch (Exception $e) {
 			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -720,9 +729,11 @@ class testScripts extends CAPITest {
 		catch (Exception $e) {
 			CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
 			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -766,9 +777,11 @@ class testScripts extends CAPITest {
 			CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
 			CDataHelper::call('role.delete', self::$data['roleids']);
 			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -1064,6 +1077,32 @@ class testScripts extends CAPITest {
 				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
 				'command' => 'reboot server'
 			],
+			'update_existing_scope_one_fail' => [
+				'name' => 'API test script.update scope (fail)',
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_scope_two_fail' => [
+				'name' => 'API test script.update scope (fail)',
+				'menu_path' => 'folder1/folder2',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_scope_one_success' => [
+				'name' => 'API test script.update scope - A (success)',
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_scope_two_success' => [
+				'name' => 'API test script.update scope - B (success)',
+				'menu_path' => 'folder1/folder2',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
 
 			// script.getScriptsByHosts
 			'get_hosts_url' => [
@@ -1185,9 +1224,11 @@ class testScripts extends CAPITest {
 			CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
 			CDataHelper::call('role.delete', self::$data['roleids']);
 			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -1251,9 +1292,11 @@ class testScripts extends CAPITest {
 			CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
 			CDataHelper::call('role.delete', self::$data['roleids']);
 			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -4535,6 +4578,13 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
 			],
+			'Test script.update existing scope change' => [
+				'script' => [
+					'scriptid' => 'update_existing_scope_two_fail',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION
+				],
+				'expected_error' => 'Script "API test script.update scope (fail)" already exists.'
+			],
 
 			// Check duplicate names in input.
 			'Test script.update duplicate name with default menu_path in input' => [
@@ -6311,13 +6361,22 @@ class testScripts extends CAPITest {
 				'expected_error' => null
 			],
 
-			// Check name and menu_path update.
+			// Check name, menu_path and scope update.
 			'Test script.update successful script with existing name in different menu_path' => [
 				'script' => [
 					[
 						'scriptid' => 'update_existing_both_two_success',
 						'name' => 'API test script.update both - C, custom path (success)',
 						'menu_path' => 'folder5/folder6'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.update successful script scope change' => [
+				'script' => [
+					[
+						'scriptid' => 'update_existing_scope_two_success',
+						'scope' => ZBX_SCRIPT_SCOPE_ACTION
 					]
 				],
 				'expected_error' => null
@@ -10303,9 +10362,14 @@ class testScripts extends CAPITest {
 		// Delete hosts (items, triggers are deleted as well).
 		CDataHelper::call('host.delete', self::$data['hostids']);
 
-		// All events have to be deleted manually.
+		/*
+		 * All events and newly insterted housekeepter data (created by trigger.delete and item.delete) have to be
+		 * deleted manually.
+		 */
 		DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 		DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+		DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+		DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
 
 		// Delete hosts groups.
 		CDataHelper::call('hostgroup.delete', self::$data['groupids']);
