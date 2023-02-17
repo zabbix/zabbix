@@ -245,7 +245,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'hgroups' =>
 			[
-				'insert' => '17',
+				'insert' => '16',
 				'update' => '0',
 				'delete' => '0'
 			]
