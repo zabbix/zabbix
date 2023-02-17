@@ -195,7 +195,10 @@ foreach ($data['scripts'] as $script) {
 		$execute_on = '';
 	}
 
-	$link = new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']);
+	$link = new CLink($script['name'], (new CUrl('zabbix.php'))
+		->setArgument('action', 'script.edit')
+		->setArgument('scriptid', $script['scriptid'])
+	);
 
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
