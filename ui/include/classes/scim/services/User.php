@@ -493,26 +493,17 @@ class User extends ScimApiService {
 	 * @return array          Returns only schema parameter, the rest of the parameters are not included.
 	 */
 	public function delete(array $options): array {
-		$db_user = $this->validateDelete($options);
+		$this->validateDelete($options);
 
-		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
+		$provisioning = CProvisioning::forUserDirectoryId($options['userdirectoryid']);
 		$user_data = [
-			'userid' => $db_user['userid']
+			'userid' => $options['id']
 		];
 		$user_data += $provisioning->getUserAttributes($options);
 		$user_data['medias'] = $provisioning->getUserMedias($options);
 		$user_data['usrgrps'] = [];
 
-		$user_groups = DB::select('user_scim_group', [
-			'output' => ['scim_groupid'],
-			'filter' => ['userid' => $user_data['userid']]
-		]);
-
-		if ($user_groups) {
-			DB::delete('user_scim_group', [
-				'userid' => $user_data['userid']
-			]);
-		}
+		DB::delete('user_scim_group', ['userid' => $user_data['userid']]);
 
 		APIRPC::User()->updateProvisionedUser($user_data);
 
@@ -524,7 +515,7 @@ class User extends ScimApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array $options): array {
+	private function validateDelete(array &$options) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 			'id' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
@@ -534,6 +525,7 @@ class User extends ScimApiService {
 		}
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
+		$options['userdirectoryid'] = $userdirectoryid;
 
 		$db_users = APIRPC::User()->get([
 			'output' => ['userid', 'userdirectoryid'],
@@ -548,8 +540,6 @@ class User extends ScimApiService {
 				'The user '.$options['id'].' belongs to another userdirectory.'
 			);
 		}
-
-		return $db_users[0];
 	}
 
 	/**
@@ -592,7 +582,7 @@ class User extends ScimApiService {
 			'schemas'	=> [self::SCIM_USER_SCHEMA],
 			'id' 		=> $user['userid'],
 			'userName'	=> $user['username'],
-			'name' => array_key_exists('name', $options) ? $options['name'] : ['givenName' => [], 'familyName' => []]
+			'name' => array_key_exists('name', $options) ? $options['name'] : ['givenName' => '', 'familyName' => '']
 		];
 
 		$data['active'] = array_key_exists('active', $options) ? $options['active'] : true;
