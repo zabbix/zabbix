@@ -398,7 +398,7 @@ class CConfiguration extends CApiService {
 
 				case 'templates':
 					$options = [
-						'output' => ['templateid'],
+						'output' => ['templateid', 'uuid', 'name'],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'host' => $data['template']
