@@ -192,7 +192,7 @@ class Group extends ScimApiService {
 					);
 				}
 
-				$this->updateProvisionedUsersGroup($memberid, $userdirectoryid);
+				$this->updateProvisionedUserGroups($memberid, $userdirectoryid);
 			}
 		}
 
@@ -274,7 +274,7 @@ class Group extends ScimApiService {
 					);
 				}
 
-				$this->updateProvisionedUsersGroup($userid, $userdirectoryid);
+				$this->updateProvisionedUserGroups($userid, $userdirectoryid);
 			}
 		}
 
@@ -285,7 +285,7 @@ class Group extends ScimApiService {
 			]);
 
 			foreach ($users_to_remove as $userid) {
-				$this->updateProvisionedUsersGroup($userid, $userdirectoryid);
+				$this->updateProvisionedUserGroups($userid, $userdirectoryid);
 			}
 		}
 
@@ -415,7 +415,7 @@ class Group extends ScimApiService {
 			}
 
 			foreach ($scim_users as $scim_user) {
-				$this->updateProvisionedUsersGroup($scim_user, $userdirectoryid);
+				$this->updateProvisionedUserGroups($scim_user, $userdirectoryid);
 			}
 
 			$this->setData($options['id'], $db_scim_groups[0]['name'], $db_users);
@@ -480,7 +480,7 @@ class Group extends ScimApiService {
 		DB::delete('scim_group', ['scim_groupid' => $options['id']]);
 
 		foreach (array_column($db_scim_group_members, 'userid') as $userid) {
-			$this->updateProvisionedUsersGroup($userid, $userdirectoryid);
+			$this->updateProvisionedUserGroups($userid, $userdirectoryid);
 		}
 
 		return $this->data;
@@ -592,7 +592,7 @@ class Group extends ScimApiService {
 	 *
 	 * @return void
 	 */
-	private function updateProvisionedUsersGroup(string $userid, string $userdirectoryid): void {
+	private function updateProvisionedUserGroups(string $userid, string $userdirectoryid): void {
 		$provisioning = CProvisioning::forUserDirectoryId($userdirectoryid);
 
 		$user_scim_groupids = DB::select('user_scim_group', [
@@ -607,27 +607,10 @@ class Group extends ScimApiService {
 
 		$group_rights = $provisioning->getUserGroupsAndRole(array_column($user_scim_group_names, 'name'));
 
-		$user_media = APIRPC::User()->get([
-			'output' => ['medias'],
-			'selectMedias' => ['mediatypeid', 'sendto'],
-			'userids' => $userid,
-			'filter' => ['userdirectoryid' => $userdirectoryid]
-		]);
-
-		if ($user_media) {
-			foreach ($user_media[0]['medias'] as &$media ) {
-				if (!is_array($media['sendto'])) {
-					$media['sendto'] = [$media['sendto']];
-				}
-			}
-			unset($media);
-		}
-
 		APIRPC::User()->updateProvisionedUser([
 			'userid' => $userid,
-			'roleid' => array_key_exists('roleid', $group_rights) ? $group_rights['roleid'] : '0',
-			'usrgrps' => array_key_exists('usrgrps', $group_rights) ? $group_rights['usrgrps'] : [],
-			'medias' => $user_media ? $user_media[0]['medias'] : []
+			'roleid' => $group_rights['roleid'],
+			'usrgrps' => $group_rights['usrgrps'],
 		]);
 	}
 

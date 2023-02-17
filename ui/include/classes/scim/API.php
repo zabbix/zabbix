@@ -102,5 +102,4 @@ class API {
 
 		return $input;
 	}
-
 }
