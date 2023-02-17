@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-12-20 09:33+0000\n"
-"Last-Translator: Morten Moesgaard <Moes@tv2.dk>\n"
+"PO-Revision-Date: 2023-02-17 09:30+0000\n"
+"Last-Translator: Theis Mønsted <tmm@tmm.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -1041,11 +1041,11 @@ msgstr "Tilføjet, %1$s"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "Ekstra regel"
 
 #: app/views/popup.service.edit.php:182
 msgid "Additional rules"
-msgstr ""
+msgstr "Ekstra regler"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"

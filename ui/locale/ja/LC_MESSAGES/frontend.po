@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-05 06:50+0000\n"
+"PO-Revision-Date: 2023-02-13 05:54+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -2342,7 +2342,7 @@ msgstr "アイコンのマッピングを作成できません"
 #: app/controllers/CControllerMaintenanceCreate.php:72
 #: app/controllers/CControllerMaintenanceCreate.php:150
 msgid "Cannot create maintenance period"
-msgstr ""
+msgstr "メンテナンス期間を作成できません"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2521,7 +2521,7 @@ msgstr "メンテナンスを削除できません"
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
 msgid_plural "Cannot delete maintenance periods"
-msgstr[0] ""
+msgstr[0] "メンテナンス期間を削除できません"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -3766,7 +3766,7 @@ msgstr "メンテナンスを更新できません"
 #: app/controllers/CControllerMaintenanceUpdate.php:73
 #: app/controllers/CControllerMaintenanceUpdate.php:152
 msgid "Cannot update maintenance period"
-msgstr ""
+msgstr "メンテナンス期間を更新できません"
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -6011,7 +6011,7 @@ msgstr "選択したアイテムを削除しますか？"
 
 #: app/views/js/maintenance.list.js.php:88
 msgid "Delete selected maintenance period?"
-msgstr ""
+msgstr "選択したメンテナンス期間を削除しますか？"
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -12253,12 +12253,12 @@ msgstr "メンテナンス期間"
 
 #: app/controllers/CControllerMaintenanceCreate.php:142
 msgid "Maintenance period created"
-msgstr ""
+msgstr "メンテナンス期間を作成しました"
 
 #: app/controllers/CControllerMaintenanceDelete.php:61
 msgid "Maintenance period deleted"
 msgid_plural "Maintenance periods deleted"
-msgstr[0] ""
+msgstr[0] "メンテナンス期間を削除しました"
 
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
@@ -12266,7 +12266,7 @@ msgstr "メンテナンス期間"
 
 #: app/controllers/CControllerMaintenanceUpdate.php:144
 msgid "Maintenance period updated"
-msgstr ""
+msgstr "メンテナンス期間を更新しました"
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -13471,7 +13471,7 @@ msgstr "新しいホストグループの作成"
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
 msgid "New maintenance period"
-msgstr ""
+msgstr "新しいメンテナンス期間の作成"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
@@ -15121,7 +15121,7 @@ msgstr "パラメーター\"esc_step_from\"と\"esc_step_to\"は一緒に設定�
 
 #: include/views/configuration.host.discovery.edit.php:68
 msgid "Parent discovery rule"
-msgstr ""
+msgstr "親ディスカバリルール"
 
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.prototype.edit.php:64
@@ -15130,11 +15130,11 @@ msgstr "親ディスカバリルール"
 
 #: include/views/configuration.graph.edit.php:88
 msgid "Parent graph"
-msgstr ""
+msgstr "親グラフ"
 
 #: include/views/configuration.graph.edit.php:91
 msgid "Parent graph prototype"
-msgstr ""
+msgstr "親のグラフのプロトタイプ"
 
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
@@ -15142,7 +15142,7 @@ msgstr "親グラフ"
 
 #: include/views/configuration.host.prototype.edit.php:81
 msgid "Parent host prototype"
-msgstr ""
+msgstr "親のホストのプロトタイプ"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
@@ -15150,11 +15150,11 @@ msgstr "親ホストの値"
 
 #: include/views/configuration.item.edit.php:71
 msgid "Parent item"
-msgstr ""
+msgstr "親アイテム"
 
 #: include/views/configuration.item.prototype.edit.php:70
 msgid "Parent item prototype"
-msgstr ""
+msgstr "親のアイテムのプロトタイプ"
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -15168,7 +15168,7 @@ msgstr "親サービス"
 
 #: app/partials/configuration.tags.tab.php:38
 msgid "Parent template"
-msgstr ""
+msgstr "親テンプレート"
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Parent templates"
@@ -15176,11 +15176,11 @@ msgstr "親テンプレート"
 
 #: include/views/configuration.triggers.edit.php:104
 msgid "Parent trigger"
-msgstr ""
+msgstr "親トリガー"
 
 #: include/views/configuration.trigger.prototype.edit.php:95
 msgid "Parent trigger prototype"
-msgstr ""
+msgstr "親のトリガーのプロトタイプ"
 
 #: include/views/configuration.trigger.prototype.edit.php:69
 #: include/views/configuration.triggers.edit.php:80
@@ -15189,7 +15189,7 @@ msgstr "親トリガー"
 
 #: include/views/configuration.httpconf.edit.php:76
 msgid "Parent web scenario"
-msgstr ""
+msgstr "親Webシナリオ"
 
 #: include/views/configuration.httpconf.edit.php:59
 msgid "Parent web scenarios"
@@ -15299,7 +15299,7 @@ msgstr "メンテナンス中の場合に実行を保留"
 
 #: app/views/popup.action.edit.php:227
 msgid "Pause operations for symptom problems"
-msgstr ""
+msgstr "兆候障害の場合に実行を保留"
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -15499,7 +15499,7 @@ msgstr "位置は、単位がs、uptime、unixtimeの時は無視されます。
 
 #: include/classes/core/ZBase.php:764
 msgid "Possibly the session has expired or the password was changed."
-msgstr ""
+msgstr "セッションの有効期限が切れたか、パスワードが変更された可能性があります。"
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -15785,7 +15785,7 @@ msgstr "プロパティ"
 
 #: app/views/connector.edit.php:47
 msgid "Protocol"
-msgstr ""
+msgstr "プロトコル"
 
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
@@ -17351,7 +17351,7 @@ msgstr[0] "スクリプトを削除しました"
 
 #: app/views/popup.mediatypetest.edit.php:60
 msgid "Script does not have parameters."
-msgstr ""
+msgstr "スクリプトにはパラメータがありません。"
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
