@@ -1943,6 +1943,10 @@ AC_CONFIG_FILES([
 	database/oracle/schema-upgrades/Makefile
 	database/postgresql/Makefile
 	database/postgresql/schema-upgrades/Makefile
+	database/postgresql/timescaledb/Makefile
+	database/postgresql/timescaledb/schema-upgrades/Makefile
+	database/postgresql/timescaledb/schema-upgrades/with-compression/Makefile
+	database/postgresql/timescaledb/schema-upgrades/without-compression/Makefile
 	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile

@@ -1,4 +1,6 @@
 SUBDIRS  = schema-upgrades
+# extensions
+SUBDIRS += timescaledb
 
 if DBSCHEMA
 DATABASE = postgresql

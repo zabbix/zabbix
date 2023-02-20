@@ -78,6 +78,11 @@ dbschema_postgresql:
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) -C schema-upgrades
 
+dbschema_timescaledb:
+	cd database/postgresql/timescaledb && \
+	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
+	$(MAKE) $(AM_MAKEFLAGS) -C schema-upgrades
+
 dbschema_sqlite3:
 	cd database/sqlite3 && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
@@ -87,7 +92,7 @@ dbschema_c:
 	cd src/libs/zbxdbschema && \
 	$(MAKE) $(AM_MAKEFLAGS) dbschema.c
 
-dbschema: dbschema_mysql dbschema_oracle dbschema_postgresql dbschema_sqlite3 dbschema_c
+dbschema: dbschema_mysql dbschema_oracle dbschema_postgresql dbschema_timescaledb dbschema_sqlite3 dbschema_c
 endif
 
 gettext:

@@ -61,6 +61,8 @@ database/postgresql/data.sql
 database/postgresql/schema.sql
 database/postgresql/schema-upgrades
 !database/postgresql/schema-upgrades/double.sql
+database/postgresql/timescaledb/schema.sql
+database/postgresql/timescaledb/schema-upgrades
 database/sqlite3/data.sql
 database/sqlite3/schema.sql
 etc/agent.conf
