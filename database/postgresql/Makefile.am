@@ -15,5 +15,7 @@ EXTRA_DIST = \
 	images.sql \
 	schema.sql
 
-clean:
+clean: clean-recursive
 	rm -f schema.sql data.sql
+
+.PHONY: clean
