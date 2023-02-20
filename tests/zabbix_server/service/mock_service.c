@@ -38,7 +38,7 @@ int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_
 void	__wrap_zbx_clean_events(void);
 int	__wrap_zbx_interface_availability_is_set(const void *ia);
 
-void	__wrap_zbx_tsdb_recalc_time_period(int *tm_start, int table_group)
+void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group)
 {
 	ZBX_UNUSED(tm_start);
 	ZBX_UNUSED(table_group);
