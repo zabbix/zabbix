@@ -412,6 +412,10 @@ function interfaceIdsByType(array $interfaces) {
 function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_template, array $dst_hostids): bool {
 	$options = in_array($src_type, ['templateids', 'hostids']) ? ['inherited' => false] : [];
 
+	if ($src_type === 'hostids') {
+		$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_NORMAL];
+	}
+
 	$src_items = API::Item()->get([
 		'output' => ['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 			'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status',
@@ -561,14 +565,16 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 	if ($dep_itemids) {
 		$master_items = API::Item()->get([
 			'output' => ['itemid', 'key_'],
-			'itemids' => array_keys($dep_itemids)
+			'itemids' => array_keys($dep_itemids),
+			'webitems' => true
 		]);
 
 		$options = $dst_is_template ? ['templateids' => $dst_hostids] : ['hostids' => $dst_hostids];
 
 		$dst_master_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'key_'],
-			'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))]
+			'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))],
+			'webitems' => true
 		] + $options);
 
 		$dst_master_itemids = [];

@@ -2446,7 +2446,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 		if ($dep_itemids) {
 			$master_items = API::Item()->get([
 				'output' => ['itemid', 'key_'],
-				'itemids' => array_keys($dep_itemids)
+				'itemids' => array_keys($dep_itemids),
+				'webitems' => true
 			]);
 
 			$options = $dst_host['status'] == HOST_STATUS_TEMPLATE
@@ -2455,7 +2456,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 
 			$dst_master_items = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'key_'],
-				'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))]
+				'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))],
+				'webitems' => true
 			] + $options);
 
 			$dst_master_itemids = [];
