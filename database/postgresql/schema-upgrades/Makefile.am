@@ -12,4 +12,4 @@ EXTRA_DIST = double.sql \
 clean:
 	rm -f history_pk_prepare.sql
 
-.PHONY: clean
+.PHONY: all clean
