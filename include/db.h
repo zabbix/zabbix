@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -984,5 +984,9 @@ void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
+
+#define ZBX_RECALC_TIME_PERIOD_HISTORY	1
+#define ZBX_RECALC_TIME_PERIOD_TRENDS	2
+void	zbx_recalc_time_period(int *ts_from, int table_group);
 
 #endif

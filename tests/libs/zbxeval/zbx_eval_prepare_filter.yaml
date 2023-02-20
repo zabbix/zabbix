@@ -5,7 +5,7 @@ in:
 out:
   result: SUCCEED
   stack:
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"x"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'x', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
   - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
 ---
@@ -15,7 +15,7 @@ in:
 out:
   result: SUCCEED
   stack:
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"x"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'x', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
   - {type: ZBX_EVAL_TOKEN_OP_NOT, token: '<>', opt: 0}
 ---
@@ -25,10 +25,10 @@ in:
 out:
   result: SUCCEED
   stack:
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"x"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'x', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
   - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"a"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'a', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'tag', opt: 1}
   - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
@@ -39,13 +39,13 @@ in:
 out:
   result: SUCCEED
   stack:
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"x"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'x', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
   - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"y"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'y', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
   - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"a"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'a', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'tag', opt: 1}
   - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_AND, token: 'and', opt: 0}
@@ -57,10 +57,10 @@ in:
 out:
   result: SUCCEED
   stack:
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"x"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'x', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
   - {type: ZBX_EVAL_TOKEN_OP_NOT, token: '<>', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"a"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'a', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'tag', opt: 1}
   - {type: ZBX_EVAL_TOKEN_OP_NOT, token: '<>', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_OR, token: 'or', opt: 0}
@@ -71,10 +71,10 @@ in:
 out:
   result: SUCCEED
   stack:
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"Zabbix servers"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'Zabbix servers', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
   - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"Zabbix servers"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'Zabbix servers', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
   - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_OR, token: 'or', opt: 0}
@@ -91,7 +91,7 @@ in:
 out:
   result: SUCCEED
   stack:
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"x"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'x', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'group', opt: 1}
   - {type: ZBX_EVAL_TOKEN_NOP, token: '', opt: 0}
 ---
@@ -101,8 +101,8 @@ in:
 out:
   result: SUCCEED
   stack:
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"a"', opt: 0}
-  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"b"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'a', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'b', opt: 0}
   - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
 ---
 test case: Expression 'group=(tag="x")'

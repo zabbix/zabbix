@@ -2070,7 +2070,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .msg-good .overlay-close-btn,
   .msg-warning .overlay-close-btn {
     color: #cacaca;
-    font-size: 1.167em; }
+    font-size: 1.167em;
+    background-color: transparent; }
   .msg-bad .link-action,
   .msg-good .link-action,
   .msg-warning .link-action {
@@ -2087,7 +2088,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .msg-bad button,
   .msg-good button,
   .msg-warning button {
-    background-color: #000000 !important; }
+    background-color: transparent; }
   .msg-bad::before,
   .msg-good::before,
   .msg-warning::before {
@@ -2121,7 +2122,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .msg-bad ul {
     border-top-color: #ff3a3a; }
   .msg-bad button {
-    color: #ff3a3a;
+    color: #ffffff;
     border-color: #ff3a3a; }
   .msg-bad::before {
     background-color: #ff3a3a; }
@@ -7525,7 +7526,7 @@ td.log-info-bg,
 td.log-warning-bg,
 td.log-high-bg,
 td.log-disaster-bg {
-  padding-left: 42px;
+  padding-left: 42px !important;
   color: #ffffff; }
 
 .notif-body h4 {

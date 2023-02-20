@@ -15,6 +15,7 @@
 	.overlay-close-btn {
 		color: $font-alt-color;
 		font-size: $font-top-nav-size;
+		background-color: transparent;
 	}
 
 	.link-action {
@@ -31,7 +32,7 @@
 	}
 
 	button {
-		background-color: $white;
+		background-color: transparent;
 	}
 
 	&::before {
@@ -76,7 +77,7 @@
 	}
 
 	button {
-		color: $msg-bad-color;
+		color: $msg-btn-text-color;
 		border-color: $msg-bad-border-color;
 	}
 
