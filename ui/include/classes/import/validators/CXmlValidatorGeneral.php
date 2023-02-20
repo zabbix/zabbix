@@ -247,37 +247,6 @@ abstract class CXmlValidatorGeneral {
 			if ($extra !== null) {
 				$data[$rules['extra']] = $extra;
 			}
-
-			if (array_key_exists('uniq', $rules)) {
-				foreach ($rules['uniq'] as $field_names) {
-					$uniq = [];
-
-					foreach ($data as $index => $object) {
-						$_uniq = &$uniq;
-						$values = [];
-
-						foreach ($field_names as $field_name) {
-							if (!array_key_exists($field_name, $object)) {
-								break;
-							}
-
-							$value = $object[$field_name];
-							$values[] = $value;
-
-							if (array_key_exists($value, $_uniq)) {
-								$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
-								$error = _s('Invalid parameter "%1$s": %2$s.', $subpath, _s('value %1$s already exists',
-									'('.implode(', ', $field_names).')=('.implode(', ', $values).')'
-								));
-
-								throw new Exception($error);
-							}
-
-							$_uniq[$value] = true;
-						}
-					}
-				}
-			}
 		}
 
 		if (array_key_exists('ex_validate', $rules)) {
