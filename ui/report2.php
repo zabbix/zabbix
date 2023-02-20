@@ -521,7 +521,7 @@ else {
 				? new CLink($trigger['description'],
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'problem.view')
-						->setArgument('filter_name', '')
+						->setArgument('filter_set', '1')
 						->setArgument('triggerids', [$trigger['triggerid']])
 				)
 				: $trigger['description'],

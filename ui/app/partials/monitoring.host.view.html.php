@@ -63,7 +63,6 @@ foreach ($data['hosts'] as $hostid => $host) {
 	$problems_link = new CLink('',
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'problem.view')
-			->setArgument('filter_name', '')
 			->setArgument('severities', $data['filter']['severities'])
 			->setArgument('hostids', [$host['hostid']])
 			->setArgument('filter_set', '1')
@@ -123,7 +122,6 @@ foreach ($data['hosts'] as $hostid => $host) {
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'latest.view')
 						->setArgument('hostids', [$host['hostid']])
-						->setArgument('filter_name', '')
 						->setArgument('filter_set', '1')
 				)
 				: (new CSpan(_('Latest data')))->addClass(ZBX_STYLE_DISABLED),
