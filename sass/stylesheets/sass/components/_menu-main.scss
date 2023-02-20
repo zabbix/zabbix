@@ -42,12 +42,10 @@
 	.has-submenu {
 		& > a {
 			&::after {
-				display: inline-block;
+				@extend %icons-font;
 				float: right;
-				font-size: 7px; // TODO - AS: need to use extend chevron icon
-				font-family: 'zabbix-icons' !important;
-				font-style: normal;
-				content: "\ea22";
+				font-size: $icon-default-size * .5;
+				content: $zi-chevron-down;
 				transform: rotate(0deg);
 
 				@if $ui-transitions {
@@ -218,7 +216,6 @@
 		.has-submenu {
 			& > a {
 				&::after {
-					top: 13px;
 					transform: rotate(90deg);
 				}
 			}

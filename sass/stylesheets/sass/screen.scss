@@ -608,68 +608,6 @@ form {
 .filter-btn-container {
 	position: relative;
 	text-align: right;
-
-	.zi-circle-info {
-		&::after {
-			padding-left: 10px;
-			font-size: 18px;
-			vertical-align: top;
-		}
-	}
-
-	.zi-chevron-left,
-	.zi-chevron-right {
-		width: 24px;
-		height: 24px;
-		padding: 0 3px;
-		vertical-align: top;
-		border: none;
-		background-color: transparent;
-		border-radius: 2px;
-		color: $icon-color;
-		&:not(:disabled) {
-			&:hover,
-			&:focus,
-			&:active {
-				background-color: $btn-bg-color;
-				color: $btn-font-color;
-
-				&::before {
-					opacity: 1;
-				}
-			}
-		}
-
-		&:disabled {
-			opacity: .4;
-			&:focus {
-				background-color: $form-border-focus-color;
-				&:hover {
-					background-color: transparent;
-				}
-			}
-		}
-
-		&::before {
-			opacity: .75;
-		}
-	}
-
-	.zi-clock {
-		padding: 0 10px !important;
-
-		&::before {
-			display: none;
-		}
-
-		&::after {
-			content: $zi-clock; // TODO acikuns WHY IS IT NOT WORKING??????!!!!!!!!!!
-			padding-left: 10px;
-			vertical-align: middle;
-
-			font-size: 18px;
-		}
-	}
 }
 
 .filter-container {
@@ -1998,17 +1936,6 @@ select {
 
 		li {
 			margin-right: 10px;
-		}
-	}
-
-	.zi-minimize {
-		width: 24px;
-		height: 24px;
-		padding: 0 3px;
-		font-size: 0;
-
-		&:before {
-			vertical-align: middle;
 		}
 	}
 }
@@ -4153,26 +4080,6 @@ svg {
 	padding-left: 15px;
 	width: calc(100% - 15px);
 
-	.zi-chevron-up {
-		font-size: 0;
-		width: 24px;
-		height: 24px;
-		padding: 0;
-
-		opacity: .5;
-		transition: opacity $ui-transition-duration ease-out;
-		&:hover,
-		&:active,
-		&:focus {
-			opacity: 1;
-		}
-
-		&::before {
-			font-size: 16px;
-			color: $icon-color;
-		}
-	}
-
 	.list-accordion-item-head,
 	.list-accordion-item-body {
 		padding-bottom: 2px;
@@ -4191,9 +4098,6 @@ svg {
 
 		.list-accordion-item-toggle {
 			margin: 0;
-		}
-
-		.zi-chevron-up {
 			transform: rotate(180deg);
 		}
 	}
@@ -4901,24 +4805,18 @@ a.icon-count {
 		}
 	}
 
-	.zi-chevron-down {
-		border-radius: 0 2px 2px 0;
+	.btn-dropdown-toggle {
+		width: auto;
+		align-items: start;
+		padding-top: 4px;
 
 		&::after {
-			display: inline-block;
-			padding-left: 3px;
-			float: right;
-			top: 3px;
-
-			font-size: 7px;
-
-			transform: rotate(0deg) translateX(0) translateY(0);
-		}
-
-		&[aria-expanded="true"] {
-			&::after {
-				transform: rotate(-180deg) translateX(-3px) translateY(1px);
-			}
+			@extend %icons-font;
+			position: relative;
+			top: 4px;
+			padding-left: 2px;
+			font-size: $icon-default-size * .5;
+			content: $zi-chevron-down;
 		}
 	}
 }
@@ -5029,40 +4927,23 @@ a.icon-count {
 	.interface-row {
 		display: contents;
 
-		&[data-type="2"] {
-			.interface-btn-toggle.zi-chevron-down {
+		.interface-btn-toggle {
+			display: none;
+			vertical-align: top;
 
-				display: inline-block;
-				width: 24px;
-				height: 24px;
-				padding: 0 2px;
-
-				opacity: 0.5;
-
-				transition: opacity $ui-transition-duration ease-out;
-				&:hover,
-				&:active,
-				&:focus {
-					opacity: 1;
-				}
-
-				&::before {
-					top: -1px;
-					font-size: 16px;
-					color: $icon-color;
-				}
-				&::after {
-					display: none;
-				}
-
-				&[aria-expanded="true"] {
-					transform: rotate(180deg);
-				}
+			&[aria-expanded="true"] {
+				transform: rotate(-180deg);
 			}
+		}
 
+		&[data-type="2"] {
 			.list-accordion-item-body {
 				display: none;
 				padding-top: 0;
+			}
+
+			.interface-btn-toggle {
+				display: inline-block;
 			}
 
 			&.list-accordion-item-opened {
@@ -5080,11 +4961,6 @@ a.icon-count {
 			display: none;
 			grid-column: 1 / -1;
 		}
-	}
-
-	.interface-btn-toggle.zi-chevron-down {
-		display: none;
-		vertical-align: top;
 	}
 
 	.no-interface {
@@ -5486,6 +5362,25 @@ z-select,
 					color: $icon-color;
 				}
 			}
+		}
+
+		.btn-widget-collapse,
+		.btn-widget-expand {
+			width: 18px;
+			min-height: 18px;
+			margin-top: 7px;
+
+			&::before {
+				font-size: $icon-default-size;
+			}
+		}
+
+		.btn-widget-collapse {
+			transform: rotate(180deg);
+		}
+
+		.btn-widget-expand {
+			transform: rotate(0);
 		}
 
 		[class^="event-action-"], [class*=" event-action-"],

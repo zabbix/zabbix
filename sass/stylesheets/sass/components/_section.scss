@@ -16,24 +16,10 @@ section {
 			line-height: inherit;
 			color: lighten($font-color, 15%);
 		}
-	}
 
-	.zi-chevron-up {
-		margin: 2px 2px 0 auto;
-		padding: 0 1px;
-		width: 24px;
-		height: 24px;
-		color: $icon-color;
-		opacity: 0.5;
-
-		&:hover,
-		&:active,
-		&:focus {
-			color: $icon-color;
-			opacity: 1;
+		.section-toggle {
+			max-height: 24px;
 		}
-
-		transition: opacity .2s ease-out;
 	}
 
 	.section-foot {
@@ -48,7 +34,8 @@ section {
 		.section-foot {
 			display: none;
 		}
-		.zi-chevron-up {
+
+		.section-toggle {
 			transform: rotate(180deg);
 		}
 	}

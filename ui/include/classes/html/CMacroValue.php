@@ -162,7 +162,6 @@ class CMacroValue extends CInput {
 				['label' => _('Vault secret'), 'value' => ZBX_MACRO_TYPE_VAULT, 'class' => ZBX_ICON_LOCK]
 			]))
 				->addClass($dropdown_btn_class)
-				->addClass(ZBX_ICON_CHEVRON_DOWN)
 				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
 				->setAttribute('aria-label', _('Change type'));
 

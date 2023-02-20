@@ -18,6 +18,10 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 	background-color: transparent;
 	margin: 0;
 
+	.btn-iterator-page-next {
+		margin-left: 2px;
+	}
+
 	.form-buttons {
 		[name="filter_new"],
 		[name="filter_update"] {
@@ -98,68 +102,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 				vertical-align: middle;
 				// Remove global defined margin-top for buttons.
 				margin-top: 0;
-			}
-		}
-
-		.zi-chevron-left,
-		.zi-chevron-right,
-		.zi-chevron-down {
-			@extend %btn-icon;
-
-			margin: 0 1px;
-			width: 24px;
-			height: 24px;
-			color: $icon-color;
-			opacity: .5;
-
-			&::before {
-				font-size: 16px;
-			}
-
-			&:focus,
-			&:hover,
-			&:active {
-				opacity: 1;
-			}
-		}
-
-		.zi-chevron-down {
-			&::after {
-				display: none;
-			}
-		}
-
-		.btn-time-left,
-		.btn-time-right {
-			position: relative;
-
-			@if ($ui-transitions) {
-				transition: background-color $ui-transition-duration ease-out;
-			}
-
-			&:not(:disabled) {
-				opacity: 1;
-				cursor: pointer;
-
-				&:focus,
-				&:hover {
-					border: 1px solid $ui-border-color;
-					@include btn-hover-active($btn-font-color, $btn-bg-color);
-				}
-			}
-
-			&:disabled {
-				cursor: default;
-				border: 0;
-				opacity: .4;
-			}
-
-			&:focus {
-				background-color: $form-border-focus-color;
-
-				&:hover {
-					background-color: transparent;
-				}
 			}
 		}
 	}

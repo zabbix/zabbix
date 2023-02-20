@@ -1511,6 +1511,8 @@ class CScreenProblem extends CScreenBase {
 						(new CButton(null))
 							->setAttribute('data-eventid', $problem['eventid'])
 							->setAttribute('data-action', 'show_symptoms')
+							->addClass(ZBX_STYLE_BTN_ICON)
+							->addClass(ZBX_ICON_CHEVRON_DOWN)
 							->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
 							->setTitle(_('Expand'))
 					))->addClass(ZBX_STYLE_THIRD_COL);
