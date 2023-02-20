@@ -67,7 +67,7 @@ $filter_form = (new CFormList())
 					'srcfld1' => 'userid',
 					'srcfld2' => 'fullname',
 					'dstfrm' => 'zbx_filter',
-					'context_audit' => '1',
+					'context' => 'audit',
 					'dstfld1' => 'filter_userids_'
 				]
 			]

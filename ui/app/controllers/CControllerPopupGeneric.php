@@ -439,8 +439,7 @@ class CControllerPopupGeneric extends CController {
 			'with_inherited' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
-			'context' =>							'string|in host,template',
-			'context_audit' =>						'in 1',
+			'context' =>							'string|in host,template,audit',
 			'enabled_only' =>						'in 1',
 			'disable_names' =>						'array',
 			'numeric' =>							'in 1',
@@ -967,7 +966,7 @@ class CControllerPopupGeneric extends CController {
 
 				$records = API::User()->get($options);
 
-				if ($this->hasInput('context_audit')) {
+				if ($this->hasInput('context')) {
 					array_unshift($records, ['userid' => 0, 'username' => 'System', 'name' => '', 'surname' => '']);
 				}
 

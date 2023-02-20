@@ -253,7 +253,7 @@ class CMultiSelect extends CTag {
 					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
 					'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'with_hosts_and_templates', 'user_type', 'disable_selected', 'hostids',
-					'with_inherited', 'context', 'context_audit', 'enabled_only'
+					'with_inherited', 'context', 'enabled_only'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -407,11 +407,6 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('context', $parameters)) {
 					$popup_parameters['context'] = $parameters['context'];
 					$autocomplete_parameters['context'] = $parameters['context'];
-				}
-
-				if (array_key_exists('context_audit', $parameters)) {
-					$popup_parameters['context_audit'] = $parameters['context_audit'];
-					$autocomplete_parameters['context_audit'] = true;
 				}
 
 				if (array_key_exists('enabled_only', $parameters) && $parameters['enabled_only']) {
