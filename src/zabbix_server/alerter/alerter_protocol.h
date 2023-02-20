@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,6 @@ typedef struct
 	char			*gsm_modem;
 	char			*username;
 	char			*passwd;
-	char			*exec_params;
 	char			*script;
 	char			*script_bin;
 	char			*error;
@@ -96,7 +95,6 @@ typedef struct
 	char			*gsm_modem;
 	char			*username;
 	char			*passwd;
-	char			*exec_params;
 	char			*timeout;
 	char			*script;
 	char			*attempt_interval;
@@ -188,9 +186,9 @@ void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t 
 		unsigned char *type, char **smtp_server, char **smtp_helo, char **smtp_email, char **exec_path,
 		char **gsm_modem, char **username, char **passwd, unsigned short *smtp_port,
 		unsigned char *smtp_security, unsigned char *smtp_verify_peer, unsigned char *smtp_verify_host,
-		unsigned char *smtp_authentication, char **exec_params, int *maxsessions, int *maxattempts,
-		char **attempt_interval, unsigned char *content_type, char **script, char **timeout,
-		char **sendto, char **subject, char **message, char **params);
+		unsigned char *smtp_authentication, int *maxsessions, int *maxattempts, char **attempt_interval,
+		unsigned char *content_type, char **script, char **timeout, char **sendto, char **subject,
+		char **message, char **params);
 
 zbx_uint32_t	zbx_alerter_serialize_webhook(unsigned char **data, const char *script_bin, int script_sz,
 		int timeout, const char *params, unsigned char debug);
@@ -235,9 +233,9 @@ zbx_uint32_t	zbx_alerter_serialize_begin_dispatch(unsigned char **data, const ch
 void	zbx_alerter_deserialize_begin_dispatch(const unsigned char *data, char **subject, char **message,
 		char **content_name, char **content_type, char **content, zbx_uint32_t *content_size);
 
-zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const ZBX_DB_MEDIATYPE *mt,
+zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const zbx_db_mediatype *mt,
 		const zbx_vector_str_t *recipients);
-void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, ZBX_DB_MEDIATYPE *mt, zbx_vector_str_t
+void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, zbx_db_mediatype *mt, zbx_vector_str_t
 		*recipients);
 
 #endif

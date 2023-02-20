@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,6 @@ package zbxlib
 #cgo openssl LDFLAGS: -lssl -lcrypto
 #cgo LDFLAGS: -Wl,--end-group
 
-int CONFIG_TIMEOUT = 3;
 int CONFIG_MAX_LINES_PER_SECOND = 20;
 int CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = 20;
 char ZBX_THREAD_LOCAL *CONFIG_HOSTNAME = NULL;
@@ -93,6 +92,12 @@ ZBX_METRIC	parameters_common[] = {NULL};
 ZBX_METRIC	parameters_common_local[] = {NULL};
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
+
+static int	config_timeout = 3;
+static int	get_config_timeout(void)
+{
+	return config_timeout;
+}
 
 char	*strerror_from_system(unsigned long error)
 {
@@ -133,5 +138,19 @@ DWORD	zbx_get_builtin_object_index(zbx_builtin_counter_ref_t object_ref)
 {
 	return 0;
 }
+
+void	init_globals_windows(void)
+{
+	zbx_init_library_sysinfo(get_config_timeout);
+}
 */
 import "C"
+
+import (
+	"git.zabbix.com/ap/plugin-support/log"
+)
+
+func init() {
+	log.Tracef("Calling C function \"init_globals_windows()\"")
+	C.init_globals_windows()
+}

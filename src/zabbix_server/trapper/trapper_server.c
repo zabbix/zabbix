@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -135,22 +135,23 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 				(size_t)(jp_params.end - jp_params.start + 1));
 	}
 
-	result = DBselect("select type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
-				"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,"
-				"exec_params,maxsessions,maxattempts,attempt_interval,content_type,script,timeout"
+	result = zbx_db_select(
+			"select type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,passwd,smtp_port"
+				",smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,maxsessions"
+				",maxattempts,attempt_interval,content_type,script,timeout"
 			" from media_type"
 			" where mediatypeid=" ZBX_FS_UI64, mediatypeid);
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = zbx_db_fetch(result)))
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		error = zbx_dsprintf(NULL, "Cannot find the specified media type.");
 		goto fail;
 	}
 
 	if (FAIL == zbx_is_ushort(row[8], &smtp_port))
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		error = zbx_dsprintf(NULL, "Invalid port value.");
 		goto fail;
 	}
@@ -159,15 +160,15 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	ZBX_STR2UCHAR(smtp_verify_peer, row[10]);
 	ZBX_STR2UCHAR(smtp_verify_host, row[11]);
 	ZBX_STR2UCHAR(smtp_authentication, row[12]);
-	ZBX_STR2UCHAR(content_type, row[17]);
+	ZBX_STR2UCHAR(content_type, row[16]);
 	ZBX_STR2UCHAR(type, row[0]);
 
-	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[1], row[2], row[3], row[4],
-			row[5], row[6], row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
-			smtp_authentication, row[13], atoi(row[14]), atoi(row[15]), row[16], content_type, row[18],
-			row[19], sendto, subject, message, params);
+	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[1], row[2], row[3], row[4], row[5], row[6],
+			row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication,
+			atoi(row[13]), atoi(row[14]), row[15], content_type, row[17], row[18], sendto, subject, message,
+			params);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_SEND_ALERT, SEC_PER_MIN, data,
 			size, &response, &error))

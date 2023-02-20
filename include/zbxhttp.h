@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,11 +46,26 @@ int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header, zb
 int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host, char **error);
 int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
-		char **error);
+		const char *token, char **error);
 char	*zbx_http_parse_header(char **headers);
 
 int	zbx_http_get(const char *url, const char *header, long timeout, const char *ssl_cert_file,
 		const char *ssl_key_file, char **out, long *response_code, char **error);
+
+#define HTTP_REQUEST_GET	0
+#define HTTP_REQUEST_POST	1
+#define HTTP_REQUEST_PUT	2
+#define HTTP_REQUEST_HEAD	3
+
+#define HTTP_STORE_RAW		0
+#define HTTP_STORE_JSON		1
+
+int	zbx_http_request(unsigned char request_method, const char *url, const char *query_fields, char *headers,
+		const char *posts, unsigned char retrieve_mode, const char *http_proxy, unsigned char follow_redirects,
+		const char *timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
+		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
+		unsigned char authtype, const char *username, const char *password, const char *token,
+		unsigned char post_type, char *status_codes, unsigned char output_format, char **out, char **error);
 #endif
 
 #endif

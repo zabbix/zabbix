@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,14 +48,14 @@ class CTemplateImporter extends CImporter {
 		do {
 			$independent_templates = $this->getIndependentTemplates($templates);
 			$templates_api_params = array_flip(['uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name',
-				'description', 'tags'
+				'description', 'tags', 'vendor_name', 'vendor_version'
 			]);
 
 			$templates_to_create = [];
 			$templates_to_update = [];
 			$valuemaps = [];
 			$template_linkage = [];
-			$templates_to_clear = [];
+			$templates_to_unlink = [];
 
 			foreach ($independent_templates as $name) {
 				$template = $templates[$name];
@@ -93,7 +93,7 @@ class CTemplateImporter extends CImporter {
 			}
 
 			if ($templates_to_update) {
-				// Get template linkages to unlink and clear.
+				// Get template linkages to unlink.
 				if ($this->options['templateLinkage']['deleteMissing']) {
 					// Get already linked templates.
 					$db_template_links = API::Template()->get([
@@ -110,22 +110,19 @@ class CTemplateImporter extends CImporter {
 
 					foreach ($templates_to_update as $template) {
 						if (array_key_exists($template['host'], $template_linkage)) {
-							$templates_to_clear[$template['templateid']] = array_diff(
+							$templates_to_unlink[$template['templateid']] = array_diff(
 								$db_template_links[$template['templateid']],
 								array_column($template_linkage[$template['host']], 'templateid')
 							);
 						}
 						else {
-							$templates_to_clear[$template['templateid']] = $db_template_links[$template['templateid']];
+							$templates_to_unlink[$template['templateid']] = $db_template_links[$template['templateid']];
 						}
 					}
 				}
 
 				if ($this->options['templates']['updateExisting']) {
-					API::Template()->update(array_map(function($template) {
-						unset($template['uuid']);
-						return $template;
-					}, $templates_to_update));
+					API::Template()->update($templates_to_update);
 				}
 
 				foreach ($templates_to_update as $template) {
@@ -133,12 +130,11 @@ class CTemplateImporter extends CImporter {
 					$this->processed_templateids[$template['templateid']] = $template['templateid'];
 
 					// Drop existing template linkages if 'delete missing' is selected.
-					if (array_key_exists($template['templateid'], $templates_to_clear)
-							&& $templates_to_clear[$template['templateid']]) {
-						API::Template()->massRemove([
-							'templateids' => [$template['templateid']],
-							'templateids_clear' => $templates_to_clear[$template['templateid']]
-						]);
+					if (array_key_exists($template['templateid'], $templates_to_unlink)
+							&& $templates_to_unlink[$template['templateid']]) {
+						$template['templates'] = [];
+
+						API::Template()->update($template);
 					}
 
 					// Make new template linkages.
@@ -151,17 +147,20 @@ class CTemplateImporter extends CImporter {
 					}
 
 					$db_valuemaps = API::ValueMap()->get([
-						'output' => ['valuemapid', 'uuid'],
+						'output' => ['valuemapid', 'uuid', 'name'],
 						'hostids' => [$template['templateid']]
 					]);
 
 					if ($this->options['valueMaps']['createMissing']
 							&& array_key_exists($template['host'], $valuemaps)) {
 						$valuemaps_to_create = [];
-						$valuemap_uuids = array_column($db_valuemaps, 'uuid');
+
+						$db_valuemap_uuids = array_column($db_valuemaps, 'uuid');
+						$db_valuemap_names = array_column($db_valuemaps, 'name');
 
 						foreach ($valuemaps[$template['host']] as $valuemap) {
-							if (!in_array($valuemap['uuid'], $valuemap_uuids)) {
+							if (!in_array($valuemap['uuid'], $db_valuemap_uuids)
+									&& !in_array($valuemap['name'], $db_valuemap_names)) {
 								$valuemaps_to_create[] = $valuemap  + ['hostid' => $template['templateid']];
 							}
 						}
@@ -177,8 +176,8 @@ class CTemplateImporter extends CImporter {
 
 						foreach ($db_valuemaps as $db_valuemap) {
 							foreach ($valuemaps[$template['host']] as $valuemap) {
-								if ($db_valuemap['uuid'] === $valuemap['uuid']) {
-									unset($valuemap['uuid']);
+								if ($db_valuemap['uuid'] === $valuemap['uuid']
+										|| $db_valuemap['name'] === $valuemap['name']) {
 									$valuemaps_to_update[] = $valuemap + ['valuemapid' => $db_valuemap['valuemapid']];
 								}
 							}
@@ -194,9 +193,11 @@ class CTemplateImporter extends CImporter {
 
 						if (array_key_exists($template['host'], $valuemaps)) {
 							$valuemap_uuids = array_column($valuemaps[$template['host']], 'uuid');
+							$valuemap_names = array_column($valuemaps[$template['host']], 'name');
 
 							foreach ($db_valuemaps as $db_valuemap) {
-								if (!in_array($db_valuemap['uuid'], $valuemap_uuids)) {
+								if (!in_array($db_valuemap['uuid'], $valuemap_uuids)
+										&& !in_array($db_valuemap['name'], $valuemap_names)) {
 									$valuemapids_to_delete[] = $db_valuemap['valuemapid'];
 								}
 							}
@@ -375,6 +376,10 @@ class CTemplateImporter extends CImporter {
 	 */
 	protected function resolveTemplateReferences(array $template): array {
 		$templateid = $this->referencer->findTemplateidByUuid($template['uuid']);
+
+		if ($templateid === null) {
+			$templateid = $this->referencer->findTemplateidByHost($template['host']);
+		}
 
 		if ($templateid !== null) {
 			$template['templateid'] = $templateid;

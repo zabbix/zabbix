@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -726,7 +726,7 @@ function prepareScriptItemFormData(array $item): array {
 function getItemFormData(array $item = [], array $options = []) {
 	$data = [
 		'form' => $options['form'],
-		'form_refresh' => getRequest('form_refresh'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
 		'itemid' => getRequest('itemid'),
@@ -782,7 +782,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'ssl_key_password' => getRequest('ssl_key_password'),
 		'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
 		'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
-		'http_authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
+		'http_authtype' => getRequest('http_authtype', ZBX_HTTP_AUTH_NONE),
 		'http_username' => getRequest('http_username', ''),
 		'http_password' => getRequest('http_password', ''),
 		'preprocessing' => getRequest('preprocessing', []),
@@ -1237,7 +1237,6 @@ function getItemFormData(array $item = [], array $options = []) {
 /**
  * Get list of item pre-processing data and return a prepared HTML object.
  *
- * @param CForm  $form                                     Form object to where add pre-processing list.
  * @param array  $preprocessing                            Array of item pre-processing steps.
  * @param string $preprocessing[]['type']                  Pre-processing step type.
  * @param array  $preprocessing[]['params']                Additional parameters used by pre-processing.
@@ -1248,7 +1247,7 @@ function getItemFormData(array $item = [], array $options = []) {
  *
  * @return CList
  */
-function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, array $types) {
+function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$script_maxlength = DB::getFieldLength('item_preproc', 'params');
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
@@ -1449,9 +1448,10 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 						->setValue($step_param_1_value)
 						->setAdaptiveWidth(202)
 						->addOptions([
-							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
-							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
-							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+							new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
+							new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+							new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+							new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
 						])
 						->setReadonly($readonly)
 				];
@@ -1481,9 +1481,10 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 									->setValue($step['params'][$j + 2])
 									->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
 									->addOptions([
-										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
-										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
-										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+										new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
+										new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+										new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+										new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
 									])
 									->setReadonly($readonly)
 							),

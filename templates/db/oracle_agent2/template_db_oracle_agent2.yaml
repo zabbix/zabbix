@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-12-23T19:05:57Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -11,6 +10,9 @@ zabbix_export:
       template: 'Oracle by Zabbix agent 2'
       name: 'Oracle by Zabbix agent 2'
       description: 'Template tooling version used: 0.42'
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Databases

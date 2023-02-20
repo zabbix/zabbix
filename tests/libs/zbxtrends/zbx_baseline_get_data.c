@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,25 +28,25 @@
 #include "log.h"
 #include "../../../src/libs/zbxtrends/trends.h"
 
-int	__wrap_DBis_null(const char *field);
-DB_ROW	__wrap_DBfetch(DB_RESULT result);
-DB_RESULT	__wrap_DBselect(const char *fmt, ...);
+int	__wrap_zbx_db_is_null(const char *field);
+DB_ROW	__wrap_zbx_db_fetch(DB_RESULT result);
+DB_RESULT	__wrap_zbx_db_select(const char *fmt, ...);
 zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end,
 		double *value);
 
-int	__wrap_DBis_null(const char *field)
+int	__wrap_zbx_db_is_null(const char *field)
 {
 	ZBX_UNUSED(field);
 	return SUCCEED;
 }
 
-DB_ROW	__wrap_DBfetch(DB_RESULT result)
+DB_ROW	__wrap_zbx_db_fetch(DB_RESULT result)
 {
 	ZBX_UNUSED(result);
 	return NULL;
 }
 
-DB_RESULT	__wrap_DBselect(const char *fmt, ...)
+DB_RESULT	__wrap_zbx_db_select(const char *fmt, ...)
 {
 	ZBX_UNUSED(fmt);
 	return NULL;

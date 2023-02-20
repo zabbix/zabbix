@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -186,34 +186,34 @@ $fields = [
 	'ssl_key_file' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'ssl_key_password' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'verify_peer' =>				[T_ZBX_INT, O_OPT, null,
-										IN([HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]),
+										IN([ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]),
 										null
 									],
 	'verify_host' =>				[T_ZBX_INT, O_OPT, null,
-										IN([HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON]),
+										IN([ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]),
 										null
 									],
 	'http_authtype' =>				[T_ZBX_INT, O_OPT, null,
-										IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
-											HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST
+										IN([ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM,
+											ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST
 										]),
 										null
 									],
 	'http_username' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
-											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
-												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+											' && ({http_authtype} == '.ZBX_HTTP_AUTH_BASIC.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_NTLM.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_KERBEROS.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_DIGEST.
 											')',
 										_('Username')
 									],
 	'http_password' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
-											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
-												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+											' && ({http_authtype} == '.ZBX_HTTP_AUTH_BASIC.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_NTLM.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_KERBEROS.
+												' || {http_authtype} == '.ZBX_HTTP_AUTH_DIGEST.
 											')',
 										_('Password')
 									],
@@ -235,7 +235,7 @@ $fields = [
 	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>				[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	// filter
 	'filter_set' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	// sort and sortorder
@@ -634,6 +634,7 @@ else {
 	CProfile::update($prefix.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	$data = [
+		'form_refresh' => getRequest('form_refresh', 0),
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'hostid' => $lld_rules[0]['hostid'],

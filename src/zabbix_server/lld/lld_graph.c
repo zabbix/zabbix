@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -184,7 +184,7 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
 				"g.show_triggers,g.graphtype,g.show_legend,g.show_3d,g.percent_left,g.percent_right,"
 				"g.ymin_type,g.ymin_itemid,g.ymax_type,g.ymax_itemid,gd.lastcheck,gd.ts_delete"
@@ -193,7 +193,7 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 				" and gd.parent_graphid=" ZBX_FS_UI64,
 			parent_graphid);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_lld_graph_t	*graph = (zbx_lld_graph_t *)zbx_malloc(NULL, sizeof(zbx_lld_graph_t));
 
@@ -268,7 +268,7 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 
 		zbx_vector_ptr_append(graphs, graph);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(graphs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -312,14 +312,14 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 			"select gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type"
 			" from graphs_items"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid",
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid",
 			graphids.values, graphids.values_num);
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
 	zbx_free(sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		int			index;
 		zbx_uint64_t		graphid;
@@ -362,7 +362,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 			lld_gitem_free(gitem);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_sort(gitems_proto, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -427,13 +427,13 @@ static void	lld_items_get(const zbx_vector_ptr_t *gitems_proto, zbx_uint64_t ymi
 				"select itemid,flags"
 				" from items"
 				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
 
-		result = DBselect("%s", sql);
+		result = zbx_db_select("%s", sql);
 
 		zbx_free(sql);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			zbx_lld_item_t	*item = (zbx_lld_item_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_t));
 
@@ -442,7 +442,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *gitems_proto, zbx_uint64_t ymi
 
 			zbx_vector_ptr_append(items, item);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
@@ -912,20 +912,20 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 					" and i.hostid=" ZBX_FS_UI64
 					" and",
 				hostid);
-		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name",
+		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name",
 				(const char **)names.values, names.values_num);
 
 		if (0 != graphids.values_num)
 		{
 			zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.graphid",
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.graphid",
 					graphids.values, graphids.values_num);
 		}
 
-		result = DBselect("%s", sql);
+		result = zbx_db_select("%s", sql);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			for (i = 0; i < graphs->values_num; i++)
 			{
@@ -952,7 +952,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 				}
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_free(sql);
 	}
@@ -1040,19 +1040,19 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		goto out;
 	}
 
-	DBbegin();
+	zbx_db_begin();
 
-	if (SUCCEED != (ret = DBlock_hostid(hostid)) ||
-			SUCCEED != (ret = DBlock_graphid(parent_graphid)))
+	if (SUCCEED != (ret = zbx_db_lock_hostid(hostid)) ||
+			SUCCEED != (ret = zbx_db_lock_graphid(parent_graphid)))
 	{
 		/* the host or graph prototype was removed while processing lld rule */
-		DBrollback();
+		zbx_db_rollback();
 		goto out;
 	}
 
 	if (0 != new_graphs)
 	{
-		graphid = DBget_maxid_num("graphs", new_graphs);
+		graphid = zbx_db_get_maxid_num("graphs", new_graphs);
 
 		zbx_db_insert_prepare(&db_insert, "graphs", "graphid", "name", "width", "height", "yaxismin",
 				"yaxismax", "show_work_period", "show_triggers", "graphtype", "show_legend", "show_3d",
@@ -1064,7 +1064,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 	if (0 != new_gitems)
 	{
-		gitemid = DBget_maxid_num("graphs_items", new_gitems);
+		gitemid = zbx_db_get_maxid_num("graphs_items", new_gitems);
 
 		zbx_db_insert_prepare(&db_insert_gitems, "graphs_items", "gitemid", "graphid", "itemid", "drawtype",
 				"sortorder", "color", "yaxisside", "calc_fnc", "type", NULL);
@@ -1073,7 +1073,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 	if (0 != upd_graphs || 0 != upd_gitems.values_num || 0 != del_gitemids.values_num)
 	{
 		sql = (char *)zbx_malloc(sql, sql_alloc);
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	for (i = 0; i < graphs->values_num; i++)
@@ -1110,7 +1110,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
 			{
-				char	*name_esc = DBdyn_escape_string(graph->name);
+				char	*name_esc = zbx_db_dyn_escape_string(graph->name);
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name='%s'", name_esc);
 				zbx_free(name_esc);
@@ -1248,7 +1248,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_YMIN_ITEMID))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symin_itemid=%s", d,
-						DBsql_id_ins(graph->ymin_itemid));
+						zbx_db_sql_id_ins(graph->ymin_itemid));
 				d = ",";
 
 				zbx_audit_graph_update_json_update_ymin_itemid(graph->graphid,
@@ -1270,7 +1270,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_YMAX_ITEMID))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symax_itemid=%s", d,
-						DBsql_id_ins(graph->ymax_itemid));
+						zbx_db_sql_id_ins(graph->ymax_itemid));
 
 				zbx_audit_graph_update_json_update_ymax_itemid(graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, graph->ymax_itemid_orig,
@@ -1346,7 +1346,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 		if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_UPDATE_COLOR))
 		{
-			char	*color_esc = DBdyn_escape_string(gitem->color);
+			char	*color_esc = zbx_db_dyn_escape_string(gitem->color);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scolor='%s'", d, color_esc);
 			zbx_free(color_esc);
@@ -1396,15 +1396,15 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		zbx_vector_uint64_sort(&del_gitemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from graphs_items where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "gitemid",
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "gitemid",
 				del_gitemids.values, del_gitemids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
 	if (0 != upd_graphs || 0 != upd_gitems.values_num || 0 != del_gitemids.values_num)
 	{
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-		DBexecute("%s", sql);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_execute("%s", sql);
 		zbx_free(sql);
 	}
 
@@ -1423,7 +1423,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		zbx_db_insert_clean(&db_insert_gitems);
 	}
 
-	DBcommit();
+	zbx_db_commit();
 out:
 	zbx_vector_uint64_destroy(&del_gitemids);
 	zbx_vector_ptr_destroy(&upd_gitems);
@@ -1477,7 +1477,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 	zbx_vector_ptr_create(&gitems_proto);	/* list of graphs_items which are used by the graph prototype */
 	zbx_vector_ptr_create(&items);		/* list of items which are related to the graph prototype */
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select distinct g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
 				"g.show_triggers,g.graphtype,g.show_legend,g.show_3d,g.percent_left,g.percent_right,"
 				"g.ymin_type,g.ymin_itemid,g.ymax_type,g.ymax_itemid,g.discover"
@@ -1488,7 +1488,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 				" and id.parent_itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	parent_graphid, ymin_itemid_proto, ymax_itemid_proto;
 		const char	*name_proto;
@@ -1531,14 +1531,14 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,
 				percent_right, ymin_type, ymax_type);
 
-		lld_remove_lost_objects("graph_discovery", "graphid", &graphs, lifetime, lastcheck, DBdelete_graphs,
+		lld_remove_lost_objects("graph_discovery", "graphid", &graphs, lifetime, lastcheck, zbx_db_delete_graphs,
 				get_graph_info);
 
 		lld_items_free(&items);
 		lld_gitems_free(&gitems_proto);
 		lld_graphs_free(&graphs);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_ptr_destroy(&items);
 	zbx_vector_ptr_destroy(&gitems_proto);

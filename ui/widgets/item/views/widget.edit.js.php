@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@ window.widget_item_form = new class {
 		thresholds_warning.style.display = 'none';
 
 		if (ms_item_data.length > 0) {
-			const curl = new Curl('jsrpc.php', false);
+			const curl = new Curl('jsrpc.php');
 			curl.setArgument('method', 'item_value_type.get');
 			curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 			curl.setArgument('itemid', ms_item_data[0].id);

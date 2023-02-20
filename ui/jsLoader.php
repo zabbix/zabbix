@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -322,7 +322,7 @@ $translate_strings = [
 	'menupopup.js' => [
 		'500 latest values' => _('500 latest values'),
 		'Actions' => _('Actions'),
-		'Acknowledge' => _('Acknowledge'),
+		'Update problem' => _('Update problem'),
 		'Configuration' => _('Configuration'),
 		'Clone' => _('Clone'),
 		'Create new' => _('Create new'),
