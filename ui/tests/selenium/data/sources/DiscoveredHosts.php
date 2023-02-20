@@ -28,6 +28,12 @@ class DiscoveredHosts {
 	const DISCOVERED_INTERFACEID = 90000080;
 	const DISCOVERED_HOST_GROUPID = 90000081;
 	const DISCOVERED_HOST_GROUPID2 = 90000082;
+	const DISCOVERED_GROUP = 'Group created form host prototype 1';
+	const DISCOVERED_GROUP2 = 'Group created form host prototype 11';
+	const DISCOVERED_GROUPID = 90000079;
+	const DISCOVERED_GROUPID2 = 90000080;
+	const DISCOVERED_HOST_GROUP_PROTOTYPEID = 90000083;
+	const DISCOVERED_HOST_GROUP_PROTOTYPEID2 = 90000084;
 
 	/**
 	 * Parent hostid.
@@ -85,6 +91,7 @@ class DiscoveredHosts {
 			'host' => 'Host created from host prototype {#KEY}',
 			'ruleid' => $lldid,
 			'groupLinks' => [['groupid' => $hostgroupid]],
+			'groupPrototypes' => [['name' => 'Group created form host prototype {#KEY}']],
 			'tags' => [
 				'tag' => 'prototype',
 				'value' => 'true'
@@ -92,6 +99,8 @@ class DiscoveredHosts {
 		]);
 
 		$host_prototypeid = $host_prototypes['hostids'][0];
+		$group_prototypeid = CDBHelper::getValue('SELECT group_prototypeid FROM group_prototype WHERE name='.
+				zbx_dbstr('Group created form host prototype {#KEY}'));
 
 		// Emulate host discovery in DB.
 		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID).
@@ -109,12 +118,32 @@ class DiscoveredHosts {
 		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
 				zbx_dbstr(self::DISCOVERED_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
 		);
+		// Emulate host group discovery.
+		DBexecute("INSERT INTO hstgrp (groupid, name, flags, uuid, type) VALUES (".zbx_dbstr(self::DISCOVERED_GROUPID).
+				", ".zbx_dbstr(self::DISCOVERED_GROUP).", 4, '', 0)"
+		);
+		DBexecute("INSERT INTO hstgrp (groupid, name, flags, uuid, type) VALUES (".zbx_dbstr(self::DISCOVERED_GROUPID2).
+				", ".zbx_dbstr(self::DISCOVERED_GROUP2).", 4, '', 0)"
+		);
+		DBexecute("INSERT INTO group_discovery (groupid, parent_group_prototypeid, name, lastcheck, ts_delete) VALUES(".
+				zbx_dbstr(self::DISCOVERED_GROUPID).", ".$group_prototypeid.", ".zbx_dbstr(self::DISCOVERED_GROUP).", '1672831234', 0)"
+		);
+		DBexecute("INSERT INTO group_discovery (groupid, parent_group_prototypeid, name, lastcheck, ts_delete) VALUES(".
+				zbx_dbstr(self::DISCOVERED_GROUPID2).", ".$group_prototypeid.", ".zbx_dbstr(self::DISCOVERED_GROUP2).", '1672831234', 0)"
+		);
 		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUPID).
 				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", ".$hostgroupid.")"
 		);
 		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUPID2).
-				", ".zbx_dbstr(self::DISCOVERED_HOSTID2).", 4)"
+				", ".zbx_dbstr(self::DISCOVERED_HOSTID2).", ".$hostgroupid.")"
 		);
+		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUP_PROTOTYPEID).
+				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", ".zbx_dbstr(self::DISCOVERED_GROUPID).")"
+		);
+		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUP_PROTOTYPEID2).
+				", ".zbx_dbstr(self::DISCOVERED_HOSTID2).",".zbx_dbstr(self::DISCOVERED_GROUPID2).")"
+		);
+		// Add tags for discovered hosts.
 		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (90000082, ".
 				zbx_dbstr(self::DISCOVERED_HOSTID).", 'action', 'update')"
 		);

@@ -80,6 +80,14 @@ require_once dirname(__FILE__).'/graphs/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
 
+// Groups.
+require_once dirname(__FILE__).'/groups/testFormHostGroup.php';
+require_once dirname(__FILE__).'/groups/testFormHostGroupSearchPage.php';
+require_once dirname(__FILE__).'/groups/testFormHostGroupStandalone.php';
+require_once dirname(__FILE__).'/groups/testFormTemplateGroup.php';
+require_once dirname(__FILE__).'/groups/testFormTemplateGroupSearchPage.php';
+require_once dirname(__FILE__).'/groups/testFormTemplateGroupStandalone.php';
+
 // Hosts.
 require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
 require_once dirname(__FILE__).'/hosts/testFormHostFromMonitoring.php';
@@ -234,7 +242,6 @@ require_once dirname(__FILE__).'/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
-require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
@@ -333,6 +340,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceGraphPrototype');
 		$suite->addTestSuite('testPageGraphPrototypes');
 		$suite->addTestSuite('testPageHostGraph');
+
+		// Groups.
+		$suite->addTestSuite('testFormHostGroup');
+		$suite->addTestSuite('testFormHostGroupSearchPage');
+		$suite->addTestSuite('testFormHostGroupStandalone');
+		$suite->addTestSuite('testFormTemplateGroup');
+		$suite->addTestSuite('testFormTemplateGroupSearchPage');
+		$suite->addTestSuite('testFormTemplateGroupStandalone');
 
 		// Hosts.
 		$suite->addTestSuite('testFormHostFromConfiguration');
@@ -484,7 +499,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
 		$suite->addTestSuite('testFormEventCorrelation');
-		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
