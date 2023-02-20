@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "zbxnum.h"
 #include "zbxtypes.h"
+#include "log.h"
 
 /* unresolved symbols needed for linking */
 
@@ -63,7 +64,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_REPORTWRITER */
 	1, /* ZBX_PROCESS_TYPE_SERVICEMAN */
 	1, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
-	5 /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	5, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	0, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
 };
 
 int	CONFIG_LISTEN_PORT		= 0;
@@ -91,22 +93,8 @@ zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
 
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
-int	CONFIG_UNAVAILABLE_DELAY	= 60;
 int	CONFIG_LOG_LEVEL		= 0;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
-char	*CONFIG_DBHOST			= NULL;
-char	*CONFIG_DBNAME			= NULL;
-char	*CONFIG_DBSCHEMA		= NULL;
-char	*CONFIG_DBUSER			= NULL;
-char	*CONFIG_DBPASSWORD		= NULL;
-char	*CONFIG_DBSOCKET		= NULL;
-char	*CONFIG_DB_TLS_CONNECT		= NULL;
-char	*CONFIG_DB_TLS_CERT_FILE	= NULL;
-char	*CONFIG_DB_TLS_KEY_FILE		= NULL;
-char	*CONFIG_DB_TLS_CA_FILE		= NULL;
-char	*CONFIG_DB_TLS_CIPHER		= NULL;
-char	*CONFIG_DB_TLS_CIPHER_13	= NULL;
-int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
 int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
@@ -188,6 +176,8 @@ int	main (void)
 	{
 		cmocka_unit_test_setup_teardown(zbx_mock_test_entry, zbx_mock_data_init, zbx_mock_data_free)
 	};
+
+	zbx_log_level = LOG_LEVEL_INFORMATION;
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }

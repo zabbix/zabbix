@@ -1823,6 +1823,14 @@ msgstr "Základná farba"
 msgid "Basic"
 msgstr "Zakladná"
 
+#: app/views/connector.edit.php:136
+msgid "Bearer"
+msgstr ""
+
+#: app/views/connector.edit.php:156
+msgid "Bearer token"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
 msgstr "Pred hodnotou"
@@ -2366,6 +2374,11 @@ msgstr "Nie je možné otvoriť ďalšie spojenie k databáze."
 msgid "Cannot create circular dependencies."
 msgstr "Nie je možné vytvoriť zacyklené závislosti."
 
+#: app/controllers/CControllerConnectorCreate.php:89
+#: app/controllers/CControllerConnectorCreate.php:164
+msgid "Cannot create connector"
+msgstr ""
+
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
 msgstr "Nie je možné vytvoriť závislosť prototypu spúšťača na sebe samom."
@@ -2382,6 +2395,11 @@ msgstr "Nie je možné vytvoriť pravidlo zisťovania"
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "Nie je možné vytvoriť mapu ikon"
+
+#: app/controllers/CControllerMaintenanceCreate.php:72
+#: app/controllers/CControllerMaintenanceCreate.php:150
+msgid "Cannot create maintenance period"
+msgstr ""
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2438,6 +2456,13 @@ msgstr "Nie je možné zmazať akciu"
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
 msgstr "Nie je možné odstrániť priradenú rolu používateľa „%1$s“."
+
+#: app/controllers/CControllerConnectorDelete.php:68
+msgid "Cannot delete connector"
+msgid_plural "Cannot delete connectors"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2569,6 +2594,13 @@ msgstr "Nie je možné zmazať položky"
 #: maintenance.php:224
 msgid "Cannot delete maintenance"
 msgstr "Nie je možné zmazať plánovanú odstávku"
+
+#: app/controllers/CControllerMaintenanceDelete.php:71
+msgid "Cannot delete maintenance period"
+msgid_plural "Cannot delete maintenance periods"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -2761,6 +2793,13 @@ msgstr[0] "Nie je možné vypnúť akciu"
 msgstr[1] "Nie je možné vypnúť akcie"
 msgstr[2] "Nie je možné vypnúť akcie"
 
+#: app/controllers/CControllerConnectorDisable.php:77
+msgid "Cannot disable connector"
+msgid_plural "Cannot disable connectors"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
@@ -2856,6 +2895,13 @@ msgid_plural "Cannot enable actions"
 msgstr[0] "Nie je možné vypnúť akciu"
 msgstr[1] "Nie je možné vypnúť akcie"
 msgstr[2] "Nie je možné vypnúť akcie"
+
+#: app/controllers/CControllerConnectorEnable.php:77
+msgid "Cannot enable connector"
+msgid_plural "Cannot enable connectors"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
@@ -3767,6 +3813,11 @@ msgstr "Overenie nie je možné aktualizovať"
 msgid "Cannot update configuration"
 msgstr "Nie je možné aktualizovať nastavenia"
 
+#: app/controllers/CControllerConnectorUpdate.php:90
+#: app/controllers/CControllerConnectorUpdate.php:173
+msgid "Cannot update connector"
+msgstr ""
+
 #: app/controllers/CControllerCorrelationCreate.php:47
 #: app/controllers/CControllerCorrelationUpdate.php:48
 #: app/controllers/CControllerCorrelationUpdate.php:125
@@ -3878,6 +3929,11 @@ msgstr "Nie je možné aktualizovať makrá"
 #: maintenance.php:119
 msgid "Cannot update maintenance"
 msgstr "Nie je možné aktualizovať údržbu"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:73
+#: app/controllers/CControllerMaintenanceUpdate.php:152
+msgid "Cannot update maintenance period"
+msgstr ""
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -4828,6 +4884,51 @@ msgstr "Spojenia k hostovi"
 msgid "Connections to proxy"
 msgstr "Spojenia k proxy"
 
+#: app/controllers/CControllerAuditLogList.php:212
+#: app/views/connector.edit.php:283 app/views/connector.edit.php:297
+msgid "Connector"
+msgstr ""
+
+#: include/classes/api/services/CConnector.php:446
+#, c-format
+msgid "Connector \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerConnectorCreate.php:156
+msgid "Connector created"
+msgstr ""
+
+#: app/controllers/CControllerConnectorDelete.php:60
+msgid "Connector deleted"
+msgid_plural "Connectors deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerConnectorDisable.php:69
+msgid "Connector disabled"
+msgid_plural "Connectors disabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerConnectorEnable.php:69
+msgid "Connector enabled"
+msgid_plural "Connectors enabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerConnectorUpdate.php:165
+msgid "Connector updated"
+msgstr ""
+
+#: app/controllers/CControllerConnectorList.php:104
+#: app/views/connector.list.php:132 include/classes/helpers/CMenuHelper.php:360
+#: include/html.inc.php:891
+msgid "Connectors"
+msgstr ""
+
 #: include/views/monitoring.sysmap.list.php:85
 #: include/views/monitoring.sysmap.list.php:86
 msgid "Constructor"
@@ -4952,6 +5053,30 @@ msgstr "Poloha"
 msgid "Copy"
 msgstr "Kopírovať"
 
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
 msgstr "Skopírovať do schránky"
@@ -5021,6 +5146,10 @@ msgstr "Počet zhodných riadkov pri monitorovaní súboru denníka s podporou r
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Počet zhodných riadkov v monitorovaní súboru denníka. Vráti integer"
 
+#: include/classes/data/CItemData.php:1802
+msgid "Count of values enqueued in the connector queue."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1638
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr "Počet hodnôt zaradených do frontu na low-level discovery preprocessing."
@@ -5057,6 +5186,10 @@ msgstr "Vytvárajte a upravujte mapy"
 #: app/views/administration.image.list.php:62
 msgid "Create background"
 msgstr "Vytvoriť pozadie"
+
+#: app/views/connector.list.php:139
+msgid "Create connector"
+msgstr ""
 
 #: app/views/configuration.correlation.list.php:37
 msgid "Create correlation"
@@ -5557,6 +5690,10 @@ msgstr "Data set label"
 msgid "Data storage period"
 msgstr "Doba uchovávania údajov"
 
+#: app/views/connector.edit.php:54 app/views/connector.list.php:73
+msgid "Data type"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:565
 #: include/classes/setup/CSetupWizard.php:717
 #: include/classes/setup/CSetupWizard.php:976
@@ -5982,6 +6119,14 @@ msgstr "Zmazať označenú akciu?"
 msgid "Delete selected actions?"
 msgstr "Zmazať označené akcie?"
 
+#: app/views/connector.edit.php:332 app/views/js/connector.list.js.php:129
+msgid "Delete selected connector?"
+msgstr ""
+
+#: app/views/js/connector.list.js.php:128
+msgid "Delete selected connectors?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
 msgstr "Odstrániť vybraté korelácie?"
@@ -6054,6 +6199,10 @@ msgstr "Zmazať označené prototypy položiek?"
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
 msgstr "Zmazať označené položky?"
+
+#: app/views/js/maintenance.list.js.php:88
+msgid "Delete selected maintenance period?"
+msgstr ""
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -6412,6 +6561,14 @@ msgstr "Zakázať označenú akciu?"
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
 msgstr "Zakázať označené akcie?"
+
+#: app/views/js/connector.list.js.php:114
+msgid "Disable selected connector?"
+msgstr ""
+
+#: app/views/js/connector.list.js.php:113
+msgid "Disable selected connectors?"
+msgstr ""
 
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
@@ -7216,6 +7373,14 @@ msgstr "Povoliť označenú akciu?"
 msgid "Enable selected actions?"
 msgstr "Povoliť označené akcie?"
 
+#: app/views/js/connector.list.js.php:99
+msgid "Enable selected connector?"
+msgstr ""
+
+#: app/views/js/connector.list.js.php:98
+msgid "Enable selected connectors?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
 msgstr "Povoliť vybraté korelácie?"
@@ -7502,6 +7667,10 @@ msgid_plural "Events updated"
 msgstr[0] "Udalosť bola aktualizovaná"
 msgstr[1] "Udalosti boli aktualizované"
 msgstr[2] " "
+
+#: app/views/connector.edit.php:58 app/views/connector.list.php:99
+msgid "Events"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
@@ -10692,6 +10861,13 @@ msgstr "Inštalácia"
 msgid "Installer name"
 msgstr "Meno technika"
 
+#: include/forms.inc.php:1392 include/forms.inc.php:1425
+#: include/views/js/item.preprocessing.js.php:142
+#: include/views/js/item.preprocessing.js.php:180
+#: include/views/js/item.preprocessing.js.php:227
+msgid "Integer from BITS"
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:360
 msgid "Integrations"
 msgstr "Integrácie"
@@ -12312,9 +12488,24 @@ msgstr "Údržba zmazaná"
 msgid "Maintenance period"
 msgstr "Perióda údržby"
 
+#: app/controllers/CControllerMaintenanceCreate.php:142
+msgid "Maintenance period created"
+msgstr ""
+
+#: app/controllers/CControllerMaintenanceDelete.php:61
+msgid "Maintenance period deleted"
+msgid_plural "Maintenance periods deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
 msgstr "Dĺžka periódy údržby"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:144
+msgid "Maintenance period updated"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -12611,6 +12802,10 @@ msgstr "Maximálny počet stĺpcov a riadkov v prehľadových tabuľkách"
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr "Maximálne obdobie pre výber času"
+
+#: app/views/connector.edit.php:171
+msgid "Max records per message"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1313
 #: app/controllers/CControllerPopupItemTest.php:1319
@@ -13490,6 +13685,10 @@ msgstr "Nový stĺpec"
 msgid "New condition"
 msgstr "Nová podmienka"
 
+#: app/views/connector.edit.php:312 app/views/connector.edit.php:341
+msgid "New connector"
+msgstr ""
+
 #: app/controllers/CControllerDashboardView.php:154
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
 msgid "New dashboard"
@@ -13525,6 +13724,11 @@ msgstr "Nový host"
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
 msgstr "Nová host grupa"
+
+#: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
+#: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
+msgid "New maintenance period"
+msgstr ""
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
@@ -15174,18 +15378,42 @@ msgstr "Parametre"
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr "Parametre \"esc_step_from\" a \"esc_step_to\" musia byť nastavené spoločne."
 
+#: include/views/configuration.host.discovery.edit.php:68
+msgid "Parent discovery rule"
+msgstr ""
+
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.prototype.edit.php:64
 msgid "Parent discovery rules"
 msgstr "Nadradené zisťovacie pravidlá"
 
+#: include/views/configuration.graph.edit.php:88
+msgid "Parent graph"
+msgstr ""
+
+#: include/views/configuration.graph.edit.php:91
+msgid "Parent graph prototype"
+msgstr ""
+
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "Nadradené grafy"
 
+#: include/views/configuration.host.prototype.edit.php:81
+msgid "Parent host prototype"
+msgstr ""
+
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
 msgstr "Hodnota nadradeného hosta"
+
+#: include/views/configuration.item.edit.php:71
+msgid "Parent item"
+msgstr ""
+
+#: include/views/configuration.item.prototype.edit.php:70
+msgid "Parent item prototype"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -15197,14 +15425,30 @@ msgstr "Nadradená položka"
 msgid "Parent services"
 msgstr "Nadradené služby"
 
+#: app/partials/configuration.tags.tab.php:38
+msgid "Parent template"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:42
 msgid "Parent templates"
 msgstr "Rodičovské templaty"
+
+#: include/views/configuration.triggers.edit.php:104
+msgid "Parent trigger"
+msgstr ""
+
+#: include/views/configuration.trigger.prototype.edit.php:95
+msgid "Parent trigger prototype"
+msgstr ""
 
 #: include/views/configuration.trigger.prototype.edit.php:69
 #: include/views/configuration.triggers.edit.php:80
 msgid "Parent triggers"
 msgstr "Nadradené spúšťače"
+
+#: include/views/configuration.httpconf.edit.php:76
+msgid "Parent web scenario"
+msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:59
 msgid "Parent web scenarios"
@@ -15797,6 +16041,10 @@ msgstr "Prometheus do JSON"
 #: include/views/monitoring.sysmap.list.php:83 jsLoader.php:144
 msgid "Properties"
 msgstr "Vlastnosti"
+
+#: app/views/connector.edit.php:47
+msgid "Protocol"
+msgstr ""
 
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
@@ -17378,6 +17626,10 @@ msgstr[0] "Skript zmazaný"
 msgstr[1] "Skript zmazaný"
 msgstr[2] "Skript zmazaný"
 
+#: app/views/popup.mediatypetest.edit.php:60
+msgid "Script does not have parameters."
+msgstr ""
+
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
 msgstr "Protokol vykonávania skriptu"
@@ -18642,6 +18894,10 @@ msgstr "Super admin"
 msgid "Support"
 msgstr "Podpora"
 
+#: app/partials/administration.system.info.php:124
+msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
+msgstr ""
+
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
 msgstr "Podporované formáty:"
@@ -19333,6 +19589,11 @@ msgstr "Trigger už nebude objavený a bude odstránený pri ďalšom spracovan�
 #: app/views/administration.user.edit.php:255
 msgid "Theme"
 msgstr "Téma"
+
+#: app/views/administration.mediatype.edit.php:139
+#: app/views/popup.mediatypetest.edit.php:47
+msgid "These parameters will be passed to the script as command-line arguments in the specified order."
+msgstr ""
 
 #: include/func.inc.php:2468
 msgid "This day last week"
@@ -20672,6 +20933,10 @@ msgstr "Aktualizácia"
 msgid "Updated status of host \"%1$s\"."
 msgstr "Aktualizovaný status hosta \"%1$s\"."
 
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr ""
+
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
 msgstr "Nahrať"
@@ -21715,6 +21980,10 @@ msgstr "Vault secret query reťazec"
 msgid "Vendor"
 msgstr "Výrobca"
 
+#: include/views/configuration.template.edit.php:93
+msgid "Vendor and version"
+msgstr ""
+
 #: include/items.inc.php:43
 msgid "Verbose"
 msgstr "Rozvláčny"
@@ -22359,6 +22628,10 @@ msgstr "Zabbix"
 msgid "Zabbix Integrations"
 msgstr "Integrácie Zabbix"
 
+#: app/views/connector.edit.php:49
+msgid "Zabbix Streaming Protocol v1.0"
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:356
 msgid "Zabbix Technical Support"
 msgstr "Technická podpora Zabbix"
@@ -22841,6 +23114,10 @@ msgstr "blikajúci"
 #: include/classes/api/services/CItemGeneral.php:488
 msgid "both username and password should be either present or empty"
 msgstr "používateľské meno aj heslo by mali byť prítomné alebo prázdne"
+
+#: include/classes/api/services/CTemplate.php:522
+msgid "both vendor_name and vendor_version should be either present or empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"

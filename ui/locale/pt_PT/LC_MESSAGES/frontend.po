@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-12-01 13:30+0000\n"
+"PO-Revision-Date: 2023-01-23 10:27+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -930,11 +930,11 @@ msgstr "Adicionar de"
 
 #: app/partials/configuration.valuemap.php:51
 msgid "Add from host"
-msgstr ""
+msgstr "Adicionar a partir do servidor"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from template"
-msgstr ""
+msgstr "Adicionar a partir do modelo"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -1797,6 +1797,14 @@ msgstr "Cor primária"
 msgid "Basic"
 msgstr "Basico"
 
+#: app/views/connector.edit.php:136
+msgid "Bearer"
+msgstr ""
+
+#: app/views/connector.edit.php:156
+msgid "Bearer token"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
 msgstr "Antes do valor"
@@ -2336,6 +2344,11 @@ msgstr "Não foi possível criar outra ligação à base de dados."
 msgid "Cannot create circular dependencies."
 msgstr "Não é possível criar uma dependência circular."
 
+#: app/controllers/CControllerConnectorCreate.php:89
+#: app/controllers/CControllerConnectorCreate.php:164
+msgid "Cannot create connector"
+msgstr ""
+
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
 msgstr "Não é possível criar uma dependência de um trigger com ele mesmo."
@@ -2352,6 +2365,11 @@ msgstr "Não foi possível criar regra de descoberta"
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "Não foi possível criar o mapa de ícones"
+
+#: app/controllers/CControllerMaintenanceCreate.php:72
+#: app/controllers/CControllerMaintenanceCreate.php:150
+msgid "Cannot create maintenance period"
+msgstr ""
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2406,6 +2424,12 @@ msgstr "Não foi possível eliminar acção"
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
 msgstr "Não é possível eliminar a função de utilizador atribuída \"%1$s\"."
+
+#: app/controllers/CControllerConnectorDelete.php:68
+msgid "Cannot delete connector"
+msgid_plural "Cannot delete connectors"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2530,6 +2554,12 @@ msgstr "Não foi possível eliminar itens"
 #: maintenance.php:224
 msgid "Cannot delete maintenance"
 msgstr "Não foi possível eliminar período de manutenção"
+
+#: app/controllers/CControllerMaintenanceDelete.php:71
+msgid "Cannot delete maintenance period"
+msgid_plural "Cannot delete maintenance periods"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -2708,6 +2738,12 @@ msgid_plural "Cannot disable actions"
 msgstr[0] "Não foi possível desactivar a acção"
 msgstr[1] "Não foi possível desactivar as ações"
 
+#: app/controllers/CControllerConnectorDisable.php:77
+msgid "Cannot disable connector"
+msgid_plural "Cannot disable connectors"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
@@ -2791,6 +2827,12 @@ msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Não foi possível activar a acção"
 msgstr[1] "Não foi possível activar as ações"
+
+#: app/controllers/CControllerConnectorEnable.php:77
+msgid "Cannot enable connector"
+msgid_plural "Cannot enable connectors"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
@@ -3689,6 +3731,11 @@ msgstr "Não é possível atualizar a autenticação"
 msgid "Cannot update configuration"
 msgstr "Não foi possível actualizar a configuração"
 
+#: app/controllers/CControllerConnectorUpdate.php:90
+#: app/controllers/CControllerConnectorUpdate.php:173
+msgid "Cannot update connector"
+msgstr ""
+
 #: app/controllers/CControllerCorrelationCreate.php:47
 #: app/controllers/CControllerCorrelationUpdate.php:48
 #: app/controllers/CControllerCorrelationUpdate.php:125
@@ -3797,6 +3844,11 @@ msgstr "Não foi possível actualizar as macros"
 #: maintenance.php:119
 msgid "Cannot update maintenance"
 msgstr "Não foi possível actualizar o período de manutenção"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:73
+#: app/controllers/CControllerMaintenanceUpdate.php:152
+msgid "Cannot update maintenance period"
+msgstr ""
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -4734,6 +4786,48 @@ msgstr "Ligações com o host (passivas)"
 msgid "Connections to proxy"
 msgstr "Ligações com o proxy"
 
+#: app/controllers/CControllerAuditLogList.php:212
+#: app/views/connector.edit.php:283 app/views/connector.edit.php:297
+msgid "Connector"
+msgstr ""
+
+#: include/classes/api/services/CConnector.php:446
+#, c-format
+msgid "Connector \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerConnectorCreate.php:156
+msgid "Connector created"
+msgstr ""
+
+#: app/controllers/CControllerConnectorDelete.php:60
+msgid "Connector deleted"
+msgid_plural "Connectors deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerConnectorDisable.php:69
+msgid "Connector disabled"
+msgid_plural "Connectors disabled"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerConnectorEnable.php:69
+msgid "Connector enabled"
+msgid_plural "Connectors enabled"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerConnectorUpdate.php:165
+msgid "Connector updated"
+msgstr ""
+
+#: app/controllers/CControllerConnectorList.php:104
+#: app/views/connector.list.php:132 include/classes/helpers/CMenuHelper.php:360
+#: include/html.inc.php:891
+msgid "Connectors"
+msgstr ""
+
 #: include/views/monitoring.sysmap.list.php:85
 #: include/views/monitoring.sysmap.list.php:86
 msgid "Constructor"
@@ -4858,6 +4952,27 @@ msgstr "Coordenadas"
 msgid "Copy"
 msgstr "Copiar"
 
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
 msgstr "Copiar para área de transferência"
@@ -4924,6 +5039,10 @@ msgstr "Quantidade de linhas compatíveis no arquivo de log monitorado com supor
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Quantidade de linhas compatíveis no arquivo de log monitorado. Retorna inteiro"
 
+#: include/classes/data/CItemData.php:1802
+msgid "Count of values enqueued in the connector queue."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1638
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr "Contagem de valores enfileirados na fila de processamento de descoberta de baixo nível."
@@ -4960,6 +5079,10 @@ msgstr "Criar e editar mapas"
 #: app/views/administration.image.list.php:62
 msgid "Create background"
 msgstr "Criar plano de fundo"
+
+#: app/views/connector.list.php:139
+msgid "Create connector"
+msgstr ""
 
 #: app/views/configuration.correlation.list.php:37
 msgid "Create correlation"
@@ -5459,6 +5582,10 @@ msgstr ""
 msgid "Data storage period"
 msgstr "Périodo de armazenamento de dados"
 
+#: app/views/connector.edit.php:54 app/views/connector.list.php:73
+msgid "Data type"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:565
 #: include/classes/setup/CSetupWizard.php:717
 #: include/classes/setup/CSetupWizard.php:976
@@ -5884,6 +6011,14 @@ msgstr ""
 msgid "Delete selected actions?"
 msgstr "Eliminar acções seleccionadas?"
 
+#: app/views/connector.edit.php:332 app/views/js/connector.list.js.php:129
+msgid "Delete selected connector?"
+msgstr ""
+
+#: app/views/js/connector.list.js.php:128
+msgid "Delete selected connectors?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
 msgstr "Eliminar os correlacionamentos selecionados?"
@@ -5957,6 +6092,10 @@ msgstr "Eliminar o protótipos de item selecionados?"
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
 msgstr "Eliminar itens seleccionados?"
+
+#: app/views/js/maintenance.list.js.php:88
+msgid "Delete selected maintenance period?"
+msgstr ""
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -6315,6 +6454,14 @@ msgstr ""
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
 msgstr "Desactivar acções seleccionadas?"
+
+#: app/views/js/connector.list.js.php:114
+msgid "Disable selected connector?"
+msgstr ""
+
+#: app/views/js/connector.list.js.php:113
+msgid "Disable selected connectors?"
+msgstr ""
 
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
@@ -7116,6 +7263,14 @@ msgstr ""
 msgid "Enable selected actions?"
 msgstr "Activar acções seleccionadas?"
 
+#: app/views/js/connector.list.js.php:99
+msgid "Enable selected connector?"
+msgstr ""
+
+#: app/views/js/connector.list.js.php:98
+msgid "Enable selected connectors?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
 msgstr "Ativar correlacionamentos selecionados?"
@@ -7401,6 +7556,10 @@ msgid "Event updated"
 msgid_plural "Events updated"
 msgstr[0] "Evento atualizado"
 msgstr[1] "Eventos atualizados"
+
+#: app/views/connector.edit.php:58 app/views/connector.list.php:99
+msgid "Events"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
@@ -10582,6 +10741,13 @@ msgstr "Instalação"
 msgid "Installer name"
 msgstr "Nome do instalador"
 
+#: include/forms.inc.php:1392 include/forms.inc.php:1425
+#: include/views/js/item.preprocessing.js.php:142
+#: include/views/js/item.preprocessing.js.php:180
+#: include/views/js/item.preprocessing.js.php:227
+msgid "Integer from BITS"
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:360
 msgid "Integrations"
 msgstr "Integrações"
@@ -12193,9 +12359,23 @@ msgstr "Manutenção eliminada"
 msgid "Maintenance period"
 msgstr "Período de manutenção"
 
+#: app/controllers/CControllerMaintenanceCreate.php:142
+msgid "Maintenance period created"
+msgstr ""
+
+#: app/controllers/CControllerMaintenanceDelete.php:61
+msgid "Maintenance period deleted"
+msgid_plural "Maintenance periods deleted"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
 msgstr "Duração do período de manutenção"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:144
+msgid "Maintenance period updated"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -12492,6 +12672,10 @@ msgstr "Número máximo de colunas e linhas em tabelas de visão geral"
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr "Período máximo para o seletor de tempo"
+
+#: app/views/connector.edit.php:171
+msgid "Max records per message"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1313
 #: app/controllers/CControllerPopupItemTest.php:1319
@@ -13362,6 +13546,10 @@ msgstr "Nova coluna"
 msgid "New condition"
 msgstr "Nova condição"
 
+#: app/views/connector.edit.php:312 app/views/connector.edit.php:341
+msgid "New connector"
+msgstr ""
+
 #: app/controllers/CControllerDashboardView.php:154
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
 msgid "New dashboard"
@@ -13397,6 +13585,11 @@ msgstr "Novo host"
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
 msgstr "Novo grupo de hosts"
+
+#: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
+#: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
+msgid "New maintenance period"
+msgstr ""
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
@@ -15045,18 +15238,42 @@ msgstr "Parâmetros"
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr ""
 
+#: include/views/configuration.host.discovery.edit.php:68
+msgid "Parent discovery rule"
+msgstr ""
+
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.prototype.edit.php:64
 msgid "Parent discovery rules"
 msgstr "Regras de descoberta pai"
 
+#: include/views/configuration.graph.edit.php:88
+msgid "Parent graph"
+msgstr ""
+
+#: include/views/configuration.graph.edit.php:91
+msgid "Parent graph prototype"
+msgstr ""
+
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "Gráficos herdados"
 
+#: include/views/configuration.host.prototype.edit.php:81
+msgid "Parent host prototype"
+msgstr ""
+
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
 msgstr "Valor do servidor pai"
+
+#: include/views/configuration.item.edit.php:71
+msgid "Parent item"
+msgstr ""
+
+#: include/views/configuration.item.prototype.edit.php:70
+msgid "Parent item prototype"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -15068,14 +15285,30 @@ msgstr "Itens pai"
 msgid "Parent services"
 msgstr "Serviços pai"
 
+#: app/partials/configuration.tags.tab.php:38
+msgid "Parent template"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:42
 msgid "Parent templates"
 msgstr "Modelos pai"
+
+#: include/views/configuration.triggers.edit.php:104
+msgid "Parent trigger"
+msgstr ""
+
+#: include/views/configuration.trigger.prototype.edit.php:95
+msgid "Parent trigger prototype"
+msgstr ""
 
 #: include/views/configuration.trigger.prototype.edit.php:69
 #: include/views/configuration.triggers.edit.php:80
 msgid "Parent triggers"
 msgstr "Triggers pai"
+
+#: include/views/configuration.httpconf.edit.php:76
+msgid "Parent web scenario"
+msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:59
 msgid "Parent web scenarios"
@@ -15668,6 +15901,10 @@ msgstr ""
 #: include/views/monitoring.sysmap.list.php:83 jsLoader.php:144
 msgid "Properties"
 msgstr "Propriedades"
+
+#: app/views/connector.edit.php:47
+msgid "Protocol"
+msgstr ""
 
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
@@ -17240,6 +17477,10 @@ msgid_plural "Scripts deleted"
 msgstr[0] "Script eliminado"
 msgstr[1] "Script eliminado"
 
+#: app/views/popup.mediatypetest.edit.php:60
+msgid "Script does not have parameters."
+msgstr ""
+
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
 msgstr ""
@@ -18503,6 +18744,10 @@ msgstr ""
 msgid "Support"
 msgstr "Suporte"
 
+#: app/partials/administration.system.info.php:124
+msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
+msgstr ""
+
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
 msgstr ""
@@ -19191,6 +19436,11 @@ msgstr ""
 #: app/views/administration.user.edit.php:255
 msgid "Theme"
 msgstr "Tema"
+
+#: app/views/administration.mediatype.edit.php:139
+#: app/views/popup.mediatypetest.edit.php:47
+msgid "These parameters will be passed to the script as command-line arguments in the specified order."
+msgstr ""
 
 #: include/func.inc.php:2468
 msgid "This day last week"
@@ -20525,6 +20775,10 @@ msgstr ""
 msgid "Updated status of host \"%1$s\"."
 msgstr "O status do host \"%1$s\" foi actualizado."
 
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr ""
+
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
 msgstr "Carregar"
@@ -21563,6 +21817,10 @@ msgstr ""
 msgid "Vendor"
 msgstr "Vendedor"
 
+#: include/views/configuration.template.edit.php:93
+msgid "Vendor and version"
+msgstr ""
+
 #: include/items.inc.php:43
 msgid "Verbose"
 msgstr "Detalhado"
@@ -22205,6 +22463,10 @@ msgstr "Zabbix"
 msgid "Zabbix Integrations"
 msgstr ""
 
+#: app/views/connector.edit.php:49
+msgid "Zabbix Streaming Protocol v1.0"
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:356
 msgid "Zabbix Technical Support"
 msgstr ""
@@ -22680,6 +22942,10 @@ msgstr "piscando"
 
 #: include/classes/api/services/CItemGeneral.php:488
 msgid "both username and password should be either present or empty"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:522
+msgid "both vendor_name and vendor_version should be either present or empty"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:484

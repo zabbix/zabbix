@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -296,7 +296,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_REPORTWRITER */
 	0, /* ZBX_PROCESS_TYPE_SERVICEMAN */
 	0, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
-	0 /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	0, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	0 /* ZBX_PROCESS_TYPE_CONNECTORWORKER*/
 };
 
 static char	*config_file		= NULL;
@@ -1426,14 +1427,27 @@ int	main(int argc, char **argv)
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
+
+#ifdef _WINDOWS
+	/* if agent is started as windows service then try to log errors */
+	/* into windows event log while zabbix_log is not ready */
+	if (ZBX_TASK_START == t.task && 0 == (t.flags & ZBX_TASK_FLAG_FOREGROUND))
+	{
+		zbx_config_log_t	log_cfg	= {NULL, NULL, LOG_TYPE_SYSTEM, 1};
+
+		zabbix_open_log(&log_cfg, LOG_LEVEL_WARNING, NULL);
+	}
+#endif
+
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_import_symbols();
 #endif
+
 #ifdef _WINDOWS
 	if (ZBX_TASK_SHOW_USAGE != t.task && ZBX_TASK_SHOW_VERSION != t.task && ZBX_TASK_SHOW_HELP != t.task &&
 			SUCCEED != zbx_socket_start(&error))
 	{
-		zbx_error(error);
+		zabbix_log(LOG_LEVEL_CRIT, error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -1559,6 +1573,10 @@ int	main(int argc, char **argv)
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
 			load_aliases(CONFIG_ALIASES);
+#ifdef _WINDOWS
+			if (0 == (t.flags & ZBX_TASK_FLAG_FOREGROUND))
+				zabbix_close_log();
+#endif
 			break;
 	}
 

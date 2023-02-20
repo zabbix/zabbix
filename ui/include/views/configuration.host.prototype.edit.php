@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ $url = (new CUrl('host_prototypes.php'))
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host_prototypes.php')))->removeId())
 	->setId('host-prototype-form')
 	->setName('hostPrototypeForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -436,7 +437,8 @@ if ($host_prototype['hostid'] != 0) {
 			new CSubmit('clone', _('Clone')),
 			(new CButtonDelete(
 				_('Delete selected host prototype?'),
-				url_params(['form', 'hostid', 'parent_discoveryid', 'context']), 'context'
+				url_params(['form', 'hostid', 'parent_discoveryid', 'context']).'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.
+				'='.CCsrfTokenHelper::get('host_prototypes.php'), 'context'
 			))->setEnabled($host_prototype['templateid'] == 0),
 			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]

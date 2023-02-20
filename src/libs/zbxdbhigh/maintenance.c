@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 	zbx_vector_uint64_sort(maintenanceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select maintenanceid from maintenances where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "maintenanceid", maintenanceids->values,
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "maintenanceid", maintenanceids->values,
 			maintenanceids->values_num);
 #if defined(HAVE_MYSQL)
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid lock in share mode");
@@ -64,20 +64,20 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 #else
 	/* For PostgreSQL table level locks are used because row level shared locks have reader preference which */
 	/* could lead to theoretical situation when server blocks out frontend from maintenances updates.        */
-	DBexecute("lock table maintenances in share mode");
+	zbx_db_execute("lock table maintenances in share mode");
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid");
 #endif
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 	zbx_free(sql);
 
-	for (i = 0; NULL != (row = DBfetch(result)); i++)
+	for (i = 0; NULL != (row = zbx_db_fetch(result)); i++)
 	{
 		ZBX_STR2UINT64(maintenanceid, row[0]);
 
 		while (maintenanceid != maintenanceids->values[i])
 			zbx_vector_uint64_remove(maintenanceids, i);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	while (i != maintenanceids->values_num)
 		zbx_vector_uint64_remove_noorder(maintenanceids, i);

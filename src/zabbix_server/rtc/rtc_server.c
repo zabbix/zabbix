@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -269,7 +269,8 @@ static int	rtc_process_diaginfo(const char *data, char **result)
 
 	if (0 == strcmp(buf, "all"))
 	{
-		scope = (1 << ZBX_DIAGINFO_VALUECACHE) | (1 << ZBX_DIAGINFO_LLD) | (1 << ZBX_DIAGINFO_ALERTING);
+		scope = (1 << ZBX_DIAGINFO_VALUECACHE) | (1 << ZBX_DIAGINFO_LLD) | (1 << ZBX_DIAGINFO_ALERTING) |
+				(1 << ZBX_DIAGINFO_CONNECTOR);
 	}
 	else if (0 == strcmp(buf, ZBX_DIAG_VALUECACHE))
 	{

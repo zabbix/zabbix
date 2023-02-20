@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "log.h"
 #include "zbxtrends.h"
 #include "zbxha.h"
+#include "zbxconnector.h"
 
 /******************************************************************************
  *                                                                            *
@@ -40,7 +41,7 @@
 void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 {
 	zbx_vc_stats_t			vc_stats;
-	zbx_uint64_t			queue_size;
+	zbx_uint64_t			queue_size, connector_queue_size;
 	char				*value, *error = NULL;
 	zbx_tfc_stats_t			tcache_stats;
 
@@ -56,6 +57,18 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get LLD queue size: %s", error);
 		zbx_free(error);
 	}
+
+	/* zabbix[connector_queue] */
+	if (SUCCEED == zbx_connector_get_queue_size(&connector_queue_size, &error))
+	{
+		zbx_json_adduint64(json, "connector_queue", queue_size);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get connector queue size: %s", error);
+		zbx_free(error);
+	}
+
 
 	/* zabbix[triggers] */
 	zbx_json_adduint64(json, "triggers", DCget_trigger_count());
@@ -127,6 +140,4 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy data: %s", error);
 		zbx_free(error);
 	}
-
-	zbx_json_close(json);
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -300,6 +300,7 @@ void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value
 void	zbx_json_addint64(struct zbx_json *j, const char *name, zbx_int64_t value);
 void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *data);
 void	zbx_json_addfloat(struct zbx_json *j, const char *name, double value);
+void	zbx_json_adddouble(struct zbx_json *j, const char *name, double value);
 int	zbx_json_close(struct zbx_json *j);
 
 int		zbx_json_open(const char *buffer, struct zbx_json_parse *jp);
@@ -364,7 +365,9 @@ struct zbx_jsonobj
 {
 	zbx_json_type_t		type;
 	zbx_jsonobj_data_t	data;
+
 	zbx_jsonobj_index_t	*index;
+	int			index_num;	/* used by root object - number of indexed children */
 };
 
 typedef struct

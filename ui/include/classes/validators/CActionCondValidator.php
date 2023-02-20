@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -166,7 +166,7 @@ class CActionCondValidator extends CValidator {
 				break;
 
 			case CONDITION_TYPE_DUPTIME:
-				if ($condition['value'] < 0 || $condition['value'] > SEC_PER_MONTH) {
+				if (!ctype_digit(strval($condition['value'])) || $condition['value'] > SEC_PER_MONTH) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value',
 						_s('value must be between "%1$s" and "%2$s"', 0, SEC_PER_MONTH)
 					));

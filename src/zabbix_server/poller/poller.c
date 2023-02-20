@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -209,20 +209,22 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/********************************************************************************
- *                                                                              *
- * Purpose: deactivate item interface                                           *
- *                                                                              *
- * Parameters: ts         - [IN] the timestamp                                  *
- *             item       - [IN/OUT] the item                                   *
- *             data       - [IN/OUT] the serialized availability data           *
- *             data_alloc - [IN/OUT] the serialized availability data size      *
- *             data_alloc - [IN/OUT] the serialized availability data offset    *
- *             ts         - [IN] the timestamp                                  *
- *                                                                              *
- *******************************************************************************/
+/***********************************************************************************
+ *                                                                                 *
+ * Purpose: deactivate item interface                                              *
+ *                                                                                 *
+ * Parameters: ts                - [IN] timestamp                                  *
+ *             item              - [IN/OUT] item                                   *
+ *             data              - [IN/OUT] serialized availability data           *
+ *             data_alloc        - [IN/OUT] serialized availability data size      *
+ *             data_alloc        - [IN/OUT] serialized availability data offset    *
+ *             ts                - [IN] timestamp                                  *
+ *             unavailable_delay - [IN]                                            *
+ *             error             - [IN/OUT]                                        *
+ *                                                                                 *
+ ***********************************************************************************/
 void	zbx_deactivate_item_interface(zbx_timespec_t *ts, DC_ITEM *item, unsigned char **data, size_t *data_alloc,
-		size_t *data_offset, const char *error)
+		size_t *data_offset, int unavailable_delay, const char *error)
 {
 	zbx_interface_availability_t	in, out;
 
@@ -237,8 +239,11 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, DC_ITEM *item, unsigned c
 
 	interface_get_availability(&item->interface, &in);
 
-	if (FAIL == DCinterface_deactivate(item->interface.interfaceid, ts, &in.agent, &out.agent, error))
+	if (FAIL == DCinterface_deactivate(item->interface.interfaceid, ts, unavailable_delay, &in.agent, &out.agent,
+			error))
+	{
 		goto out;
+	}
 
 	if (FAIL == update_interface_availability(data, data_alloc, data_offset, &out))
 		goto out;
@@ -811,7 +816,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  *                                                                            *
  ******************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time)
+		int config_startup_time, int config_unavailable_delay)
 {
 	DC_ITEM			item, *items;
 	AGENT_RESULT		results[MAX_POLLER_ITEMS];
@@ -861,7 +866,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 				if (INTERFACE_AVAILABLE_FALSE != last_available)
 				{
 					zbx_deactivate_item_interface(&timespec, &items[i], &data, &data_alloc,
-							&data_offset, results[i].msg);
+							&data_offset, config_unavailable_delay, results[i].msg);
 					last_available = INTERFACE_AVAILABLE_FALSE;
 				}
 				break;
@@ -985,7 +990,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type),
 				process_num);
 
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
+		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 	}
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
@@ -1008,7 +1013,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		}
 
 		processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms,
-				poller_args_in->config_startup_time);
+				poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay);
 		total_sec += zbx_time() - sec;
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);

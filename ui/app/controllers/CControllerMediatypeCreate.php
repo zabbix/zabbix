@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,11 +34,11 @@ class CControllerMediatypeCreate extends CController {
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
-			'exec_params' =>			'array',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
-			'parameters' =>				'array',
+			'parameters_exec' =>		'array',
+			'parameters_webhook' =>		'array',
 			'script' => 				'db media_type.script',
 			'timeout' => 				'db media_type.timeout',
 			'process_tags' =>			'in '.ZBX_MEDIA_TYPE_TAGS_DISABLED.','.ZBX_MEDIA_TYPE_TAGS_ENABLED,
@@ -58,16 +58,6 @@ class CControllerMediatypeCreate extends CController {
 
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
-
-		if ($ret && $this->hasInput('exec_params')) {
-			foreach ($this->getInput('exec_params') as $exec_param) {
-				if (count($exec_param) != 1
-						|| !array_key_exists('exec_param', $exec_param) || !is_string($exec_param['exec_param'])) {
-					$ret = false;
-					break;
-				}
-			}
-		}
 
 		if ($ret && $this->getInput('type') == MEDIA_TYPE_EMAIL) {
 			$email_validator = new CEmailValidator();
@@ -144,16 +134,12 @@ class CControllerMediatypeCreate extends CController {
 				break;
 
 			case MEDIA_TYPE_EXEC:
+				$mediatype['parameters'] = [];
+
 				$this->getInputs($mediatype, ['exec_path']);
 
-				$mediatype['exec_params'] = '';
-
-				if ($this->hasInput('exec_params')) {
-					$exec_params = zbx_objectValues($this->getInput('exec_params'), 'exec_param');
-
-					foreach ($exec_params as $exec_param) {
-						$mediatype['exec_params'] .= $exec_param."\n";
-					}
+				foreach (array_values($this->getInput('parameters_exec', [])) as $sortorder => $parameter) {
+					$mediatype['parameters'][] = ['sortorder' => $sortorder, 'value' => $parameter['value']];
 				}
 				break;
 
@@ -168,7 +154,7 @@ class CControllerMediatypeCreate extends CController {
 				$this->getInputs($mediatype, ['script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
 					'event_menu_name'
 				]);
-				$parameters = $this->getInput('parameters', []);
+				$parameters = $this->getInput('parameters_webhook', []);
 
 				if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
 					$mediatype['parameters'] = array_map(function ($name, $value) {

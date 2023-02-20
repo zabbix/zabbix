@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2022 Zabbix SIA
+dnl Copyright (C) 2001-2023 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.4.0beta6])
+AC_INIT([Zabbix],[6.4.0rc2])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -1538,6 +1538,9 @@ ZBXJS_LIBS="$ZBXJS_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 AM_CONDITIONAL(HAVE_IPMI, [test "x$have_ipmi" = "xyes"])
 AM_CONDITIONAL(HAVE_LIBXML2, test "x$have_libxml2" = "xyes")
 
+AM_CONDITIONAL(HAVE_SSH, [test "x$have_ssh" = "xyes (libssh)"])
+AM_CONDITIONAL(HAVE_SSH2, [test "x$have_ssh" = "xyes (libssh2)"])
+
 dnl Check if Zabbix internal IPC services are used
 have_ipcservice="no"
 if test "x$have_ipmi" = "xyes"; then
@@ -1945,6 +1948,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxalgo/Makefile
 	src/libs/zbxaudit/Makefile
 	src/libs/zbxavailability/Makefile
+	src/libs/zbxconnector/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
@@ -1984,6 +1988,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxnix/Makefile
 	src/libs/zbxnum/Makefile
 	src/libs/zbxparam/Makefile
+	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxrtc/Makefile
@@ -2009,9 +2014,11 @@ AC_CONFIG_FILES([
 	src/libs/zbxsysinfo/solaris/Makefile
 	src/libs/zbxsysinfo/unknown/Makefile
 	src/libs/zbxstats/Makefile
+	src/libs/zbxtagfilter/Makefile
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
+	src/libs/zbxtimekeeper/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
 	src/libs/zbxvault/Makefile
@@ -2035,6 +2042,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/Makefile
 	src/zabbix_server/alerter/Makefile
 	src/zabbix_server/availability/Makefile
+	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/diag/Makefile
