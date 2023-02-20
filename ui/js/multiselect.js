@@ -861,7 +861,7 @@
 			}
 		});
 		$('input', $obj).each(function(){
-			if ($(this).val() == id) {
+			if ($(this).val() === id) {
 				$(this).remove();
 			}
 		});
