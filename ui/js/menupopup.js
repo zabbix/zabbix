@@ -142,7 +142,6 @@ function getMenuPopupHost(options, trigger_element) {
 			url.setArgument('tags', options.tags);
 			url.setArgument('evaltype', options.evaltype);
 		}
-		url.setArgument('filter_name', '');
 		url.setArgument('hostids[]', options.hostid);
 		url.setArgument('filter_set', '1');
 		latest_data.url = url.getUrl();
@@ -153,7 +152,7 @@ function getMenuPopupHost(options, trigger_element) {
 		else {
 			var url = new Curl('zabbix.php', false);
 			url.setArgument('action', 'problem.view');
-			url.setArgument('filter_name', '');
+			url.setArgument('filter_set', '1');
 			url.setArgument('hostids[]', options.hostid);
 			if (typeof options.severities !== 'undefined') {
 				url.setArgument('severities[]', options.severities);
@@ -356,7 +355,7 @@ function getMenuPopupMapElementGroup(options) {
 		problems_url = new Curl('zabbix.php', false);
 
 	problems_url.setArgument('action', 'problem.view');
-	problems_url.setArgument('filter_name', '');
+	problems_url.setArgument('filter_set', '1');
 	problems_url.setArgument('groupids[]', options.groupid);
 	if (typeof options.severities !== 'undefined') {
 		problems_url.setArgument('severities[]', options.severities);
@@ -409,7 +408,7 @@ function getMenuPopupMapElementTrigger(options) {
 		problems_url = new Curl('zabbix.php', false);
 
 	problems_url.setArgument('action', 'problem.view');
-	problems_url.setArgument('filter_name', '');
+	problems_url.setArgument('filter_set', '1');
 	problems_url.setArgument('triggerids[]', options.triggerids);
 	if (typeof options.severities !== 'undefined') {
 		problems_url.setArgument('severities[]', options.severities);
@@ -593,7 +592,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
 		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'problem.view');
-		url.setArgument('filter_name', '');
+		url.setArgument('filter_set', '1');
 		url.setArgument('triggerids[]', options.triggerid);
 
 			events.url = url.getUrl();
@@ -782,7 +781,6 @@ function getMenuPopupItemConfiguration(options) {
 		url.setArgument('action', 'latest.view');
 		url.setArgument('hostids[]', options.hostid);
 		url.setArgument('name', options.name);
-		url.setArgument('filter_name', '');
 		url.setArgument('filter_set', '1');
 
 		items.push({
