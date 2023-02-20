@@ -1,1 +1,0 @@
-..F....... [ZBX-22375] prevented copying of discovered items when full cloning the host; fixed inability to full clone the host with item which depends on web scenario item (vmaksimovs)
