@@ -1938,8 +1938,11 @@ AC_CONFIG_FILES([
 	include/Makefile
 	database/Makefile
 	database/mysql/Makefile
+	database/mysql/schema-upgrades/Makefile
 	database/oracle/Makefile
+	database/oracle/schema-upgrades/Makefile
 	database/postgresql/Makefile
+	database/postgresql/schema-upgrades/Makefile
 	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile
