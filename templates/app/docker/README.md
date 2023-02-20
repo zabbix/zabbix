@@ -23,7 +23,7 @@ For Zabbix version: 6.4 and higher.
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
-Setup and configure zabbix-agent2 compiled with the Docker monitoring plugin. The user by which the zabbix-agent2 is running should have access permissions to the Docker socket.
+Setup and configure Zabbix agent 2 compiled with the Docker monitoring plugin. The user by which the Zabbix agent 2 is running should have access permissions to the Docker socket.
 
 Test availability: `zabbix_get -s docker-host -k docker.info`
 
