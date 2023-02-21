@@ -700,18 +700,20 @@ function getMenuPopupDashboard(options, trigger_element) {
 /**
  * Get menu popup trigger section data.
  *
- * @param {string} options['triggerid']               Trigger ID.
- * @param {string} options['eventid']                 (optional) Required for "Update problem" section and event
- *                                                    rank change.
- * @param {object} options['items']                   Link to trigger item history page (optional).
- * @param {string} options['items'][]['name']         Item name.
- * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
- * @param {bool}   options['update_problem']          (optional) Whether to show "Update problem" section.
- * @param {object} options['configuration']           Link to trigger configuration page (optional).
- * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
- * @param {string} options['url']                     Trigger URL link (optional).
- * @param {object} trigger_element                    UI element which triggered opening of overlay dialogue.
- * @param {string} options[csrf_token]                CSRF token for script execution.
+ * @param {string} options['triggerid']                   Trigger ID.
+ * @param {string} options['eventid']                     (optional) Required for "Update problem" section and event
+ *                                                        rank change.
+ * @param {object} options['items']                       Link to trigger item history page (optional).
+ * @param {string} options['items'][]['name']             Item name.
+ * @param {object} options['items'][]['params']           Item URL parameters ("name" => "value").
+ * @param {bool}   options['update_problem']              (optional) Whether to show "Update problem" section.
+ * @param {object} options['configuration']               Link to trigger configuration page (optional).
+ * @param {bool}   options['showEvents']                  Show Problems item enabled. Default: false.
+ * @param {string} options['url']                         Trigger URL link (optional).
+ * @param {object} trigger_element                        UI element which triggered opening of overlay dialogue.
+ * @param {array} options[csrf_tokens][]
+ * @param {string} options[csrf_tokens][]['scriptexec']   CSRF token for script execution.
+ * @param {string} options[csrf_tokens][]['acknowledge']  CSRF token for acknowledge action.
  *
  * @return array
  */
@@ -841,7 +843,8 @@ function getMenuPopupTrigger(options, trigger_element) {
 						headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 						body: urlEncodeData({
 							eventids: [options.eventid],
-							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE,
+							_csrf_token: options.csrf_tokens['acknowledge']
 						})
 					})
 						.then((response) => response.json())
@@ -888,7 +891,8 @@ function getMenuPopupTrigger(options, trigger_element) {
 						body: urlEncodeData({
 							eventids: options.eventids,
 							cause_eventid: options.eventid,
-							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
+							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
+							_csrf_token: options.csrf_tokens['acknowledge']
 						})
 					})
 						.then((response) => response.json())
@@ -943,7 +947,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		sections.push({
 			label: t('Scripts'),
 			items: getMenuPopupScriptData(options.scripts, trigger_element, null, options.eventid,
-				options.csrf_token
+				options.csrf_tokens['scriptexec']
 			)
 		});
 	}

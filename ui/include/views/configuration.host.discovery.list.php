@@ -212,37 +212,22 @@ $discoveryTable = (new CTableInfo())
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 $csrf_token = CCsrfTokenHelper::get('host_discovery.php');
 
-foreach ($data['items'] as $item) {
+foreach ($data['discoveries'] as $discovery) {
 	// description
 	$description = [];
+	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_RULE,
+		$data['allowed_ui_conf_templates']
+	);
 
-	if (array_key_exists($item['templateid'], $data['parent_items'])) {
-		$parent_item = $data['parent_items'][$item['templateid']];
-
-		if ($parent_item['editable']) {
-			$parent_template_name = (new CLink(CHtml::encode($parent_item['template_name']),
-				(new CUrl('host_discovery.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$parent_item['templateid']])
-					->setArgument('context', 'template')
-			))->addClass(ZBX_STYLE_LINK_ALT);
+	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {
+		if ($discovery['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
+			$description[] = CHtml::encode($discovery['master_item']['name']);
 		}
 		else {
-			$parent_template_name = new CSpan(CHtml::encode($parent_item['template_name']));
-		}
-
-		$description[] = [$parent_template_name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
-	}
-
-	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = CHtml::encode($item['master_item']['name']);
-		}
-		else {
-			$description[] = (new CLink(CHtml::encode($item['master_item']['name']),
+			$description[] = (new CLink(CHtml::encode($discovery['master_item']['name']),
 				(new CUrl('items.php'))
 					->setArgument('form', 'update')
-					->setArgument('itemid', $item['master_item']['itemid'])
+					->setArgument('itemid', $discovery['master_item']['itemid'])
 					->setArgument('context', $data['context'])
 					->getUrl()
 			))
@@ -254,20 +239,20 @@ foreach ($data['items'] as $item) {
 	}
 
 	$description[] = new CLink(
-		CHtml::encode($item['name']),
+		CHtml::encode($discovery['name']),
 		(new CUrl('host_discovery.php'))
 			->setArgument('form', 'update')
-			->setArgument('itemid', $item['itemid'])
+			->setArgument('itemid', $discovery['itemid'])
 			->setArgument('context', $data['context'])
 	);
 
 	// status
 	$status = (new CLink(
-		itemIndicator($item['status'], $item['state']),
+		itemIndicator($discovery['status'], $discovery['state']),
 		(new CUrl('host_discovery.php'))
-			->setArgument('hostid', $item['hostid'])
-			->setArgument('g_hostdruleid[]', $item['itemid'])
-			->setArgument('action', ($item['status'] == ITEM_STATUS_DISABLED)
+			->setArgument('hostid', $discovery['hostid'])
+			->setArgument('g_hostdruleid[]', $discovery['itemid'])
+			->setArgument('action', ($discovery['status'] == ITEM_STATUS_DISABLED)
 				? 'discoveryrule.massenable'
 				: 'discoveryrule.massdisable'
 			)
@@ -276,76 +261,76 @@ foreach ($data['items'] as $item) {
 		))
 			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($item['status'], $item['state']));
+			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
-	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
-			|| $item['type'] == ITEM_TYPE_DEPENDENT || ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-				&& strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
-		$item['delay'] = '';
+	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
+			|| $discovery['type'] == ITEM_TYPE_DEPENDENT || ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+				&& strncmp($discovery['key_'], 'mqtt.get', 8) === 0)) {
+		$discovery['delay'] = '';
 	}
-	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
-		$item['delay'] = $update_interval_parser->getDelay();
+	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
+		$discovery['delay'] = $update_interval_parser->getDelay();
 	}
 
 	// info
 	if ($data['context'] === 'host') {
 		$info_icons = [];
 
-		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info_icons[] = makeErrorIcon($item['error']);
+		if ($discovery['status'] == ITEM_STATUS_ACTIVE && $discovery['error'] !== '') {
+			$info_icons[] = makeErrorIcon($discovery['error']);
 		}
 	}
 
-	$checkbox = new CCheckBox('g_hostdruleid['.$item['itemid'].']', $item['itemid']);
+	$checkbox = new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']);
 
-	if (in_array($item['type'], checkNowAllowedTypes())
-			&& $item['status'] == ITEM_STATUS_ACTIVE
-			&& $item['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
+	if (in_array($discovery['type'], checkNowAllowedTypes())
+			&& $discovery['status'] == ITEM_STATUS_ACTIVE
+			&& $discovery['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
 		$checkbox->setAttribute('data-actions', 'execute');
 	}
 
 	$discoveryTable->addRow([
 		$checkbox,
-		$item['hosts'][0]['name'],
+		$discovery['hosts'][0]['name'],
 		$description,
 		[
 			new CLink(_('Item prototypes'),
 				(new CUrl('disc_prototypes.php'))
-					->setArgument('parent_discoveryid', $item['itemid'])
+					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),
-			CViewHelper::showNum($item['items'])
+			CViewHelper::showNum($discovery['items'])
 		],
 		[
 			new CLink(_('Trigger prototypes'),
 				(new CUrl('trigger_prototypes.php'))
-					->setArgument('parent_discoveryid', $item['itemid'])
+					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),
-			CViewHelper::showNum($item['triggers'])
+			CViewHelper::showNum($discovery['triggers'])
 		],
 		[
 			new CLink(_('Graph prototypes'),
 				(new CUrl('graphs.php'))
-					->setArgument('parent_discoveryid', $item['itemid'])
+					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),
-			CViewHelper::showNum($item['graphs'])
+			CViewHelper::showNum($discovery['graphs'])
 		],
-		($item['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+		($discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
 			? [
 				new CLink(_('Host prototypes'),
 					(new CUrl('host_prototypes.php'))
-						->setArgument('parent_discoveryid', $item['itemid'])
+						->setArgument('parent_discoveryid', $discovery['itemid'])
 						->setArgument('context', $data['context'])
 				),
-				CViewHelper::showNum($item['hostPrototypes'])
+				CViewHelper::showNum($discovery['hostPrototypes'])
 			]
 			: '',
-		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
-		$item['delay'],
-		item_type2str($item['type']),
+		(new CDiv(CHtml::encode($discovery['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
+		$discovery['delay'],
+		item_type2str($discovery['type']),
 		$status,
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);

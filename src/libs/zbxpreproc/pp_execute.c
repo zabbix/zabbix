@@ -32,8 +32,6 @@
 #	endif
 #endif
 
-extern ZBX_THREAD_LOCAL int __zbxthread__;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: execute 'multiply by' step                                        *
@@ -918,7 +916,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char 
 
 	pp_cache_copy_value(cache, step->type, value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() step:%d params:'%s' value:'%s' cache:%p", __zbxthread__, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%s' cache:%p", __func__,
 			step->type, ZBX_NULL2EMPTY_STR(step->params), zbx_variant_value_desc(value), (void *)cache);
 
 	switch (step->type)
@@ -1006,7 +1004,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char 
 			ret = FAIL;
 		}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ret:%s value:%s", __zbxthread__, __func__, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s value:%s", __func__, zbx_result_string(ret),
 			zbx_variant_value_desc(value));
 
 	return ret;
@@ -1035,7 +1033,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	int			quote_error, results_num, action;
 	zbx_variant_t		value_raw;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s(): value:%s type:%s", __zbxthread__, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): value:%s type:%s", __func__,
 			zbx_variant_value_desc(NULL == cache ? value_in : &cache->value),
 			zbx_variant_type_desc(NULL == cache ? value_in : &cache->value));
 
@@ -1134,7 +1132,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	else
 		pp_free_results(results, results_num);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s(): value:'%s' type:%s", __zbxthread__, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): value:'%s' type:%s", __func__,
 			zbx_variant_value_desc(value_out), zbx_variant_type_desc(value_out));
 
 }

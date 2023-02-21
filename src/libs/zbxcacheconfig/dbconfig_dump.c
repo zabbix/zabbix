@@ -1337,12 +1337,12 @@ static void	DCdump_strpool()
 static void	DCdump_drules(void)
 {
 	zbx_hashset_iter_t	iter;
-	DC_DRULE		*drule;
+	zbx_dc_drule_t		*drule;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
 	zbx_hashset_iter_reset(&config->drules, &iter);
-	while (NULL != (drule = (DC_DRULE *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "druleid:" ZBX_FS_UI64 " proxy_hostid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64,
 				drule->druleid, drule->proxy_hostid, drule->revision);
@@ -1356,12 +1356,12 @@ static void	DCdump_drules(void)
 static void	DCdump_dchecks(void)
 {
 	zbx_hashset_iter_t	iter;
-	DC_DCHECK		*dcheck;
+	zbx_dc_dcheck_t		*dcheck;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
 	zbx_hashset_iter_reset(&config->dchecks, &iter);
-	while (NULL != (dcheck = (DC_DCHECK *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (dcheck = (zbx_dc_dcheck_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "dcheckid:" ZBX_FS_UI64 " druleid:" ZBX_FS_UI64,
 				dcheck->dcheckid, dcheck->druleid);

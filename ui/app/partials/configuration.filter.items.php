@@ -113,6 +113,7 @@ if ($data['filter_data']['hosts']) {
 					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_valuemapids_',
 					'hostids' => array_column($data['filter_data']['hosts'], 'id'),
+					'with_inherited' => true,
 					'context' => $data['context']
 				]
 			]

@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-12-20 09:33+0000\n"
-"Last-Translator: Morten Moesgaard <Moes@tv2.dk>\n"
+"PO-Revision-Date: 2023-02-21 07:29+0000\n"
+"Last-Translator: Theis Mønsted <tmm@tmm.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -1041,37 +1041,37 @@ msgstr "Tilføjet, %1$s"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "Ekstra regel"
 
 #: app/views/popup.service.edit.php:182
 msgid "Additional rules"
-msgstr ""
+msgstr "Ekstra regler"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"
-msgstr ""
+msgstr "Addresse"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: include/classes/helpers/CMenuHelper.php:331
 #: include/classes/helpers/CRoleHelper.php:316
 msgid "Administration"
-msgstr ""
+msgstr "Administration"
 
 #: app/views/popup.service.edit.php:158
 #: include/classes/widgets/forms/CWidgetFormItem.php:69
 msgid "Advanced configuration"
-msgstr ""
+msgstr "Advanceret konfiguration"
 
 #: include/views/monitoring.sysmap.edit.php:160
 msgid "Advanced labels"
-msgstr ""
+msgstr "Advancerede etiketter"
 
 #: app/views/popup.import.php:175
 msgid "Advanced options"
-msgstr ""
+msgstr "Advancerede valgmuligheder"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -1079,17 +1079,17 @@ msgstr ""
 
 #: include/events.inc.php:288
 msgid "Age"
-msgstr ""
+msgstr "Alder"
 
 #: app/partials/monitoring.problem.filter.php:116
 msgid "Age less than"
-msgstr ""
+msgstr "Alder mindre end"
 
 #: app/views/administration.script.list.php:164 include/hosts.inc.php:1191
 #: include/items.inc.php:347 include/views/configuration.httpconf.edit.php:98
 #: jsLoader.php:317
 msgid "Agent"
-msgstr ""
+msgstr "Agent"
 
 #: include/classes/data/CItemData.php:818
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1097,11 +1097,11 @@ msgstr ""
 
 #: app/views/configuration.host.list.php:197
 msgid "Agent encryption"
-msgstr ""
+msgstr "Agent kryptering"
 
 #: include/classes/data/CItemData.php:810
 msgid "Agent host metadata. Returns string"
-msgstr ""
+msgstr "Agent værtsnavn. Returnerer streng"
 
 #: include/classes/data/CItemData.php:814
 msgid "Agent host name. Returns string"
@@ -1140,19 +1140,19 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:338
 msgid "Alerts"
-msgstr ""
+msgstr "Alarmer"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
-msgstr ""
+msgstr "Algoritme"
 
 #: include/hosts.inc.php:114
 msgid "Alias"
-msgstr ""
+msgstr "Alias"
 
 #: include/views/monitoring.sysmap.constructor.php:75
 msgid "Align map elements"
-msgstr ""
+msgstr "Tilpas kortelementer"
 
 #: app/controllers/CControllerAuditLogList.php:172
 #: app/controllers/CControllerAuditLogList.php:173
@@ -1171,7 +1171,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
 #: include/views/monitoring.sysmap.edit.php:263 jsLoader.php:413
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 #: app/views/monitoring.dashboard.view.php:186
 msgid "All dashboards"
@@ -1179,17 +1179,17 @@ msgstr ""
 
 #: app/views/monitoring.charts.view.php:83
 msgid "All graphs"
-msgstr ""
+msgstr "Alle grafer"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:429
 #: app/views/administration.user.edit.php:435
 msgid "All groups"
-msgstr ""
+msgstr "Alle grupper"
 
 #: app/views/monitoring.host.dashboard.view.php:120 include/html.inc.php:305
 msgid "All hosts"
-msgstr ""
+msgstr "Alle værter"
 
 #: jsLoader.php:284
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -1197,12 +1197,12 @@ msgstr ""
 
 #: include/html.inc.php:516
 msgid "All maps"
-msgstr ""
+msgstr "Alle kort"
 
 #: include/views/configuration.trigger.prototype.edit.php:514
 #: include/views/configuration.triggers.edit.php:543
 msgid "All problems"
-msgstr ""
+msgstr "Alle problemer"
 
 #: include/views/configuration.trigger.prototype.edit.php:515
 #: include/views/configuration.triggers.edit.php:544
@@ -1211,7 +1211,7 @@ msgstr ""
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
-msgstr ""
+msgstr "Alle services"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
@@ -1236,11 +1236,11 @@ msgstr ""
 #: include/views/configuration.item.edit.php:945
 #: include/views/configuration.item.prototype.edit.php:852
 msgid "Allowed hosts"
-msgstr ""
+msgstr "Tilladte værter"
 
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
-msgstr ""
+msgstr "Tilladte metoder"
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
 msgid "Also used as legend label for aggregated data sets."
@@ -1290,7 +1290,7 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
-msgstr ""
+msgstr "Analog"
 
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
@@ -1302,7 +1302,7 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:183
 #: include/views/configuration.triggers.edit.php:383
 msgid "And"
-msgstr ""
+msgstr "Og"
 
 #: app/partials/monitoring.host.filter.php:32
 #: app/partials/monitoring.latest.filter.php:93
@@ -1325,11 +1325,11 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:143
 #: include/views/js/monitoring.sysmaps.js.php:242
 msgid "And/Or"
-msgstr ""
+msgstr "Og/Eller"
 
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
-msgstr ""
+msgstr "Årligt"
 
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:60
@@ -1400,27 +1400,27 @@ msgstr ""
 
 #: include/func.inc.php:103 include/func.inc.php:256 jsLoader.php:236
 msgid "April"
-msgstr ""
+msgstr "april"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
-msgstr ""
+msgstr "Er du sikker på du vil slette dette filter?"
 
 #: app/views/js/administration.macros.edit.js.php:86
 msgid "Are you sure you want to delete?"
-msgstr ""
+msgstr "Er du sikker på du vil slette?"
 
 #: include/classes/html/CButtonQMessage.php:52
 msgid "Are you sure you want to perform this action?"
-msgstr ""
+msgstr "Er du sikker på at du vil udføre denne handling?"
 
 #: include/views/js/monitoring.sysmaps.js.php:122
 msgid "Area size"
-msgstr ""
+msgstr "Område størrelse"
 
 #: include/views/js/monitoring.sysmaps.js.php:115
 msgid "Area type"
-msgstr ""
+msgstr "Område type"
 
 #: include/items.inc.php:1835
 msgid "Arithmetic"
@@ -1474,11 +1474,11 @@ msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:125
 msgid "At least one LDAP server must exist."
-msgstr ""
+msgstr "Mindst en LDAP server må eksistere."
 
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
-msgstr ""
+msgstr "Mindst et UI element skal være checked."
 
 #: include/classes/api/services/CRole.php:487
 #, c-format
@@ -1551,7 +1551,7 @@ msgstr ""
 #: include/views/configuration.httpconf.edit.php:78
 #: include/views/configuration.httpconf.list.php:141
 msgid "Attempts"
-msgstr ""
+msgstr "Forsøg"
 
 #: app/views/administration.authentication.edit.php:520
 #: app/views/popup.ldap.edit.php:265
@@ -1647,7 +1647,7 @@ msgstr ""
 #: app/views/administration.module.edit.php:40
 #: app/views/administration.module.list.php:77
 msgid "Author"
-msgstr ""
+msgstr "Forfatter"
 
 #: app/views/administration.miscconfig.edit.php:87
 msgid "Authorization"
@@ -1784,7 +1784,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:175
 msgid "Base DN"
-msgstr ""
+msgstr "Base DN"
 
 #: app/views/popup.tophosts.column.edit.php:171
 #: include/classes/widgets/CWidgetHelper.php:954
@@ -1810,15 +1810,15 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr ""
+msgstr "Under værdi"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
-msgstr ""
+msgstr "Bind DN"
 
 #: app/views/administration.authentication.edit.php:198
 msgid "Bind password"
-msgstr ""
+msgstr "Bind kodeord"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:428
 #: app/controllers/CControllerPopupTriggerExpr.php:461
@@ -1831,41 +1831,41 @@ msgstr ""
 
 #: app/views/administration.user.list.php:144
 msgid "Blocked"
-msgstr ""
+msgstr "Blokeret"
 
 #: include/classes/core/ZBase.php:358
 msgid "Blue"
-msgstr ""
+msgstr "Blå"
 
 #: app/views/popup.httpstep.php:160
 #: include/views/configuration.host.discovery.edit.php:400
 #: include/views/configuration.item.edit.php:458
 #: include/views/configuration.item.prototype.edit.php:436
 msgid "Body"
-msgstr ""
+msgstr "Body"
 
 #: app/views/popup.httpstep.php:162
 #: include/views/configuration.host.discovery.edit.php:402
 #: include/views/configuration.item.edit.php:460
 #: include/views/configuration.item.prototype.edit.php:438
 msgid "Body and headers"
-msgstr ""
+msgstr "Body og headers"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:131
 #: include/classes/widgets/forms/CWidgetFormItem.php:212
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "Fed"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:804
 #: include/views/js/monitoring.sysmaps.js.php:894
 msgid "Bold line"
-msgstr ""
+msgstr "Fed linie"
 
 #: include/items.inc.php:1848
 msgid "Boolean to decimal"
-msgstr ""
+msgstr "Boolean til decimal"
 
 #: include/views/js/monitoring.sysmaps.js.php:421
 msgid "Border"
@@ -1895,7 +1895,7 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:683
 #: include/views/monitoring.sysmap.edit.php:250
 msgid "Bottom"
-msgstr ""
+msgstr "Bund"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
@@ -1975,7 +1975,7 @@ msgstr ""
 
 #: include/items.inc.php:1828
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV til JSON"
 
 #: include/classes/validators/CApiInputValidator.php:2717
 #: include/classes/validators/CNewValidator.php:352
@@ -1985,11 +1985,11 @@ msgstr ""
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:179
 #: include/views/configuration.graph.edit.php:254
 msgid "Calculated"
-msgstr ""
+msgstr "Beregnet"
 
 #: jsLoader.php:232
 msgid "Calendar"
-msgstr ""
+msgstr "Kalender"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
@@ -2027,19 +2027,19 @@ msgstr ""
 #: include/classes/setup/CSetupWizard.php:322 jsLoader.php:207 jsLoader.php:217
 #: jsLoader.php:332 jsLoader.php:409
 msgid "Cancel"
-msgstr ""
+msgstr "Annullér"
 
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:140
 msgid "Cannot add API token"
-msgstr ""
+msgstr "Kan ikke tilføje API token"
 
 #: include/classes/api/services/CGraph.php:517
 #: include/classes/api/services/CGraph.php:531
 #: include/classes/api/services/CGraph.php:545
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr ""
+msgstr "Kan ikke tilføje ikke-nummerisk genstand \"%1$s\" til graf \"%2$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:471
 #: include/classes/api/services/CGraphPrototype.php:535
@@ -2049,7 +2049,7 @@ msgstr ""
 
 #: actionconf.php:302
 msgid "Cannot add action"
-msgstr ""
+msgstr "Kan ikke tilføje handling"
 
 #: app/controllers/CControllerCorrelationCreate.php:115
 msgid "Cannot add correlation"
@@ -2077,69 +2077,69 @@ msgstr ""
 
 #: graphs.php:245
 msgid "Cannot add graph"
-msgstr ""
+msgstr "Kan ikke tilføje graf"
 
 #: graphs.php:227
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "Kan ikke tilføje graf prototype"
 
 #: hostgroups.php:114
 msgid "Cannot add group"
-msgstr ""
+msgstr "Kan ikke tilføje gruppe"
 
 #: app/controllers/CControllerHostCreate.php:34
 #: app/controllers/CControllerHostCreate.php:136
 msgid "Cannot add host"
-msgstr ""
+msgstr "Kan ikke tilføje vært"
 
 #: app/controllers/CControllerHostGroupCreate.php:40
 #: app/controllers/CControllerHostGroupCreate.php:70
 msgid "Cannot add host group"
-msgstr ""
+msgstr "Kan ikke tilføje vært-gruppe"
 
 #: host_prototypes.php:304
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "Kan ikke tilføje vært prototype"
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:101
 #: app/controllers/CControllerImageCreate.php:132
 msgid "Cannot add image"
-msgstr ""
+msgstr "Kan ikke tilføje billede"
 
 #: items.php:876
 msgid "Cannot add item"
-msgstr ""
+msgstr "Kan ikke tilføje genstand"
 
 #: disc_prototypes.php:553
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "Kan ikke tilføje prototype"
 
 #: maintenance.php:123
 msgid "Cannot add maintenance"
-msgstr ""
+msgstr "Kan ikke tilføje vedligehold"
 
 #: include/classes/api/services/CMap.php:1559
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "Kan ikke tilføje kort element fra kortet \"%1$s\" på grund af circulær reference."
 
 #: app/controllers/CControllerMediatypeCreate.php:76
 #: app/controllers/CControllerMediatypeCreate.php:165
 msgid "Cannot add media type"
-msgstr ""
+msgstr "Kan ikke tilføje medie type"
 
 #: app/controllers/CControllerModuleScan.php:103
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke tilføje modul: %1$s."
+msgstr[1] "Kan ikke tilføje moduler: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "Kan ikke tilføje mere end et element med typen \"Graf sum\" på graf \"%1$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:40
 #, c-format
@@ -2153,38 +2153,38 @@ msgstr ""
 #: app/controllers/CControllerProxyCreate.php:58
 #: app/controllers/CControllerProxyCreate.php:122
 msgid "Cannot add proxy"
-msgstr ""
+msgstr "Kan ikke tilføje proxy"
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
 msgid "Cannot add regular expression"
-msgstr ""
+msgstr "Kan ikke tilføje regular expression"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "Kan ikke tilføje scheduleret rapport"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
 msgid "Cannot add script"
-msgstr ""
+msgstr "Kan ikke tilføje script"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:63
 msgid "Cannot add submaps. Max depth reached."
-msgstr ""
+msgstr "Kan ikke tilføje under-kort. Max dybde nået."
 
 #: templates.php:205
 msgid "Cannot add template"
-msgstr ""
+msgstr "Kan ikke tilføje template"
 
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "Kan ikke tilføje template gruppe"
 
 #: triggers.php:306
 msgid "Cannot add trigger"
-msgstr ""
+msgstr "Kan ikke tilføje udløser"
 
 #: trigger_prototypes.php:257
 msgid "Cannot add trigger prototype"
@@ -2193,12 +2193,12 @@ msgstr ""
 #: app/controllers/CControllerUserCreate.php:63
 #: app/controllers/CControllerUserCreate.php:119
 msgid "Cannot add user"
-msgstr ""
+msgstr "Kan ikke tilføje bruger"
 
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Kan ikke tilføje bruger-gruppe"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
@@ -2230,15 +2230,15 @@ msgstr ""
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "Kan ikke fjernes"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
-msgstr ""
+msgstr "Kan ikke forbinde anonymt til LDAP server"
 
 #: include/classes/validators/CLdapAuthValidator.php:78
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "Kan ikke forbinde til LDAP server."
 
 #: include/forms.inc.php:1932 include/forms.inc.php:1939
 #: include/forms.inc.php:1949 include/forms.inc.php:1983
@@ -2253,7 +2253,7 @@ msgstr ""
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
-msgstr ""
+msgstr "Kan ikke rydde historik"
 
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
@@ -2263,40 +2263,40 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:2373
 #: include/classes/api/services/CDiscoveryRule.php:2391
 msgid "Cannot clone item prototypes."
-msgstr ""
+msgstr "Kan ikke klone element prototyper."
 
 #: include/classes/api/services/CDiscoveryRule.php:802
 msgid "Cannot clone trigger prototypes."
-msgstr ""
+msgstr "Kan ikke klone udløser prototyper."
 
 #: include/classes/api/services/CEvent.php:848
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr ""
+msgstr "Kan ikke lukke problem: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "Kan ikke forbinde til LDAP server."
 
 #: include/classes/setup/CSetupWizard.php:593
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "Kan ikke forbinde til databasen."
 
 #: include/views/js/configuration.httpconf.edit.js.php:182
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "Kan ikke konvertere POST data:"
 
 #: graphs.php:390
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke kopiere graf"
+msgstr[1] "Kan ikke kopiere grafer"
 
 #: items.php:965
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke kopiere genstand"
+msgstr[1] "Kan ikke kopiere genstande"
 
 #: include/classes/api/services/CDiscoveryRule.php:2475
 #, c-format
@@ -2311,8 +2311,8 @@ msgstr ""
 #: triggers.php:538
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke kopiere udløser"
+msgstr[1] "Kan ikke kopiere udløsere"
 
 #: include/triggers.inc.php:246
 #, c-format
@@ -2372,7 +2372,7 @@ msgstr ""
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
-msgstr ""
+msgstr "Kan ikke oprette forespørgsel"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
@@ -2381,48 +2381,48 @@ msgstr ""
 #: app/controllers/CControllerServiceCreate.php:96
 #: app/controllers/CControllerServiceCreate.php:184
 msgid "Cannot create service"
-msgstr ""
+msgstr "Kan ikke oprette service"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan ikke oprette service \"%1$s\": %2$s."
 
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Cannot create the configuration file."
-msgstr ""
+msgstr "Kan ikke oprette konfigurations-filen."
 
 #: app/controllers/CControllerUserroleCreate.php:103
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
-msgstr ""
+msgstr "Kan ikke oprette bruger rolle"
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
-msgstr[0] ""
+msgstr[0] "Kan ikke slette API token"
 msgstr[1] ""
 
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette SLA"
+msgstr[1] "Kan ikke slette SLA'er"
 
 #: include/classes/api/services/CUser.php:1257
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr ""
+msgstr "Kan ikke slette Zabbix intern bruger \"%1$s\", prøv at deaktivere den bruger."
 
 #: actionconf.php:323
 msgid "Cannot delete action"
-msgstr ""
+msgstr "Kan ikke slette handling"
 
 #: include/classes/api/services/CRole.php:375
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "Kan ikke slette tildelt bruger rolle \"%1$s\"."
 
 #: app/controllers/CControllerConnectorDelete.php:68
 msgid "Cannot delete connector"
@@ -2440,17 +2440,17 @@ msgstr[1] ""
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette dashboard"
+msgstr[1] "Kan ikke slette dashboards"
 
 #: include/classes/api/services/CUserDirectory.php:383
 msgid "Cannot delete default user directory."
-msgstr ""
+msgstr "Kan ikke slette standard bruger-bibliotek."
 
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
 msgid "Cannot delete dependency"
-msgstr ""
+msgstr "Kan ikke slette afhængighed"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
 msgid "Cannot delete discovery rule"
@@ -2511,7 +2511,7 @@ msgstr[1] ""
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
-msgstr ""
+msgstr "Kan ikke slette værts-grupper"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"

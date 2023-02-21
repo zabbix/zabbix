@@ -84,7 +84,7 @@ static DB_RESULT	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, const char
  * Parameters: host ip address                                                *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_separate_host(zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip)
+static void	discovery_separate_host(const zbx_db_drule *drule, zbx_db_dhost *dhost, const char *ip)
 {
 	DB_RESULT	result;
 	char		*ip_esc, *sql = NULL;
@@ -109,7 +109,7 @@ static void	discovery_separate_host(zbx_uint64_t druleid, zbx_db_dhost *dhost, c
 
 		zbx_db_execute("insert into dhosts (dhostid,druleid)"
 				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-				dhostid, druleid);
+				dhostid, drule->druleid);
 
 		zbx_db_execute("update dservices"
 				" set dhostid=" ZBX_FS_UI64
@@ -137,8 +137,8 @@ static void	discovery_separate_host(zbx_uint64_t druleid, zbx_db_dhost *dhost, c
  * Parameters: host ip address                                                *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid, zbx_uint64_t unique_dcheckid,
-		zbx_db_dhost *dhost, const char *ip, int port, int status, const char *value)
+static void	discovery_register_host(const zbx_db_drule *drule, zbx_uint64_t dcheckid, zbx_db_dhost *dhost,
+		const char *ip, int port, int status, const char *value)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -146,7 +146,7 @@ static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' status:%d value:'%s'", __func__, ip, status, value);
 
-	if (unique_dcheckid == dcheckid)
+	if (drule->unique_dcheckid == dcheckid)
 	{
 		result = discovery_get_dhost_by_value(dcheckid, value);
 
@@ -154,7 +154,7 @@ static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		{
 			zbx_db_free_result(result);
 
-			result = discovery_get_dhost_by_ip_port(druleid, ip, port);
+			result = discovery_get_dhost_by_ip_port(drule->druleid, ip, port);
 			row = zbx_db_fetch(result);
 		}
 		else
@@ -163,7 +163,7 @@ static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 	}
 	else
 	{
-		result = discovery_get_dhost_by_ip_port(druleid, ip, port);
+		result = discovery_get_dhost_by_ip_port(drule->druleid, ip, port);
 		row = zbx_db_fetch(result);
 	}
 
@@ -180,7 +180,7 @@ static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 
 			zbx_db_execute("insert into dhosts (dhostid,druleid)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-					dhost->dhostid, druleid);
+					dhost->dhostid, drule->druleid);
 		}
 	}
 	else
@@ -193,7 +193,7 @@ static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		dhost->lastdown = atoi(row[3]);
 
 		if (0 == match_value)
-			discovery_separate_host(druleid, dhost, ip);
+			discovery_separate_host(drule, dhost, ip);
 	}
 	zbx_db_free_result(result);
 
@@ -465,8 +465,8 @@ void	zbx_discovery_update_host(zbx_db_dhost *dhost, int status, int now)
  * Parameters: service - service info                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, zbx_uint64_t unique_dcheckid,
-		zbx_db_dhost *dhost, const char *ip, const char *dns, int port, int status, const char *value, int now)
+void	zbx_discovery_update_service(const zbx_db_drule *drule, zbx_uint64_t dcheckid, zbx_db_dhost *dhost,
+		const char *ip, const char *dns, int port, int status, const char *value, int now)
 {
 	DB_DSERVICE	dservice;
 
@@ -477,7 +477,7 @@ void	zbx_discovery_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, z
 
 	/* register host if is not registered yet */
 	if (0 == dhost->dhostid)
-		discovery_register_host(druleid, dcheckid, unique_dcheckid, dhost, ip, port, status, value);
+		discovery_register_host(drule, dcheckid, dhost, ip, port, status, value);
 
 	/* register service if is not registered yet */
 	if (0 != dhost->dhostid)

@@ -110,23 +110,15 @@ int	zbx_init_selfmon_collector(zbx_get_config_forks_f get_config_forks, char **e
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)sz_total);
 
 	if (SUCCEED != zbx_mutex_create(&sm_lock, ZBX_MUTEX_SELFMON, error))
-	{
-		zbx_error("unable to create mutex for a self-monitoring collector");
-		exit(EXIT_FAILURE);
-	}
+		goto out;
 
 	if (SUCCEED != (ret = zbx_shmem_create_min(&sm_mem, sz_total, "self-monitor cache", NULL, 0, error)))
-	{
-		zbx_error("cannot create self-monitor shared cache");
-		exit(EXIT_FAILURE);
-	}
+		goto out;
 
 	zbx_timekeeper_sync_init(&collector.sync, sm_sync_lock, sm_sync_unlock, (void *)&sm_lock);
 	collector.monitor = zbx_timekeeper_create_ext(units_num, &collector.sync, __sm_shmem_malloc_func,
 			__sm_shmem_realloc_func, __sm_shmem_free_func);
-
-	ret = SUCCEED;
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() collector.monitor:%p", __func__, (void *)collector.monitor);
 
 	return ret;
