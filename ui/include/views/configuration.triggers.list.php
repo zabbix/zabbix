@@ -195,12 +195,6 @@ $triggers_form = (new CForm('post', $url))
 	->addVar('context', $data['context'], 'form_context');
 
 // create table
-$object_label = null;
-
-if ($data['single_selected_hostid'] == 0) {
-	$object_label = $data['context'] === 'host' ? _('Host') : _('Template');
-}
-
 $triggers_table = (new CTableInfo())->setHeader([
 	(new CColHeader(
 		(new CCheckBox('all_triggers'))
@@ -208,7 +202,11 @@ $triggers_table = (new CTableInfo())->setHeader([
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
 	$data['show_value_column'] ? _('Value') : null,
-	$object_label,
+	($data['single_selected_hostid'] == 0)
+		? ($data['context'] === 'host')
+			? _('Host')
+			: _('Template')
+		: null,
 	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
 	_('Operational data'),
 	_('Expression'),
@@ -230,36 +228,9 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	// description
 	$description = [];
-
-	if (array_key_exists($trigger['templateid'], $data['parent_triggers'])) {
-		$parent_trigger = $data['parent_triggers'][$trigger['templateid']];
-
-		$parent_template_names = [];
-
-		foreach ($parent_trigger['template_names'] as $templateid => $template_name) {
-			if ($parent_template_names) {
-				$parent_template_names[] = ',';
-			}
-
-			if ($parent_trigger['editable']) {
-				$parent_template_names[] = (new CLink(CHtml::encode($template_name),
-					(new CUrl('triggers.php'))
-						->setArgument('filter_hostids', [$templateid])
-						->setArgument('filter_set', 1)
-						->setArgument('context', 'template')
-				))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY);
-			}
-			else {
-				$parent_template_names[] = (new CSpan(CHtml::encode($template_name)))->addClass(ZBX_STYLE_GREY);
-			}
-		}
-
-		$parent_template_names[] = NAME_DELIMITER;
-
-		$description[] = $parent_template_names;
-	}
+	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
+		ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
+	);
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 

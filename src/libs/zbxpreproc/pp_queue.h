@@ -33,6 +33,7 @@ typedef struct
 	int		workers_num;
 	zbx_uint64_t	pending_num;
 	zbx_uint64_t	finished_num;
+	zbx_uint64_t	processing_num;
 
 	zbx_hashset_t	sequences;
 
@@ -54,7 +55,7 @@ void	pp_task_queue_register_worker(zbx_pp_queue_t *queue);
 void	pp_task_queue_deregister_worker(zbx_pp_queue_t *queue);
 void	pp_task_queue_remove_sequence(zbx_pp_queue_t *queue, zbx_uint64_t itemid);
 
-int	pp_task_queue_wait(zbx_pp_queue_t *queuem, char **error);
+int	pp_task_queue_wait(zbx_pp_queue_t *queue, char **error);
 void	pp_task_queue_notify(zbx_pp_queue_t *queue);
 void	pp_task_queue_notify_all(zbx_pp_queue_t *queue);
 

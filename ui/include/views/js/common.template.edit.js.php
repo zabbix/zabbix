@@ -100,72 +100,96 @@
 <?php endif ?>
 
 <script type="text/javascript">
+	/**
+	 * Collects IDs selected in "Add templates" multiselect.
+	 *
+	 * @returns {array|getAddTemplates.templateids}
+	 */
+	function getAddTemplates() {
+		const $ms = $('#add_templates_');
+		let templateids = [];
+
+		// Readonly forms don't have multiselect.
+		if ($ms.length) {
+			// Collect IDs from Multiselect.
+			$ms.multiSelect('getData').forEach(function(template) {
+				templateids.push(template.id);
+			});
+		}
+
+		return templateids;
+	}
+
 	jQuery(function($) {
+		var $show_inherited_macros = $('input[name="show_inherited_macros"]'),
+			linked_templateids = <?= json_encode($data['macros_tab']['linked_templates']) ?>;
+
 		$('#template_name')
 			.on('input keydown paste', function() {
 				$('#visiblename').attr('placeholder', $(this).val());
 			})
 			.trigger('input');
 
-		const $show_inherited_macros = $('input[name="show_inherited_macros"]');
-		const {readonly, parent_hostid} = <?= json_encode(
-			array_intersect_key($data, array_flip(['readonly', 'parent_hostid'])) + ['parent_hostid' => null]
-		) ?>;
+		window.macros_manager = new HostMacrosManager(<?= json_encode([
+			'readonly' => $data['readonly'],
+			'parent_hostid' =>  array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null
+		]) ?>);
 
-		window.macros_manager = new HostMacrosManager({readonly, parent_hostid});
-
-		$('#tabs').on('tabscreate tabsactivate', function(e, ui) {
-			var panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
+		$('#tabs').on('tabscreate tabsactivate', function(event, ui) {
+			var panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 			if (panel.attr('id') === 'macroTab') {
-				const show_inherited_macros = ($show_inherited_macros.filter(':checked').val() == 1);
+				const macros_initialized = panel.data('macros_initialized') || false;
 
-				if (e.type === 'tabsactivate' && parent_hostid !== null) {
-					const templateids = common_template_edit.getAllTemplates();
+				// Please note that macro initialization must take place once and only when the tab is visible.
+				if (event.type === 'tabsactivate') {
+					let panel_templateids = panel.data('templateids') || [],
+						templateids = getAddTemplates();
 
-					if (typeof panel.data('templateids') === 'undefined') {
-						panel.data('templateids', []);
-					}
-
-					if (show_inherited_macros
-							&& common_template_edit.templatesChanged(panel.data('templateids'), templateids)) {
+					if (panel_templateids.xor(templateids).length > 0) {
 						panel.data('templateids', templateids);
-						window.macros_manager.load(show_inherited_macros, templateids);
+
+						window.macros_manager.load(
+							$show_inherited_macros.filter(':checked').val() == 1,
+							linked_templateids.concat(templateids)
+						);
+
 						panel.data('macros_initialized', true);
 					}
 				}
 
-				if (panel.data('macros_initialized') ?? false === true) {
+				if (macros_initialized) {
 					return;
 				}
 
 				// Initialize macros.
-				if (readonly === true) {
+				<?php if ($data['readonly']): ?>
 					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
-				}
-				else {
-					window.macros_manager.initMacroTable(show_inherited_macros);
-				}
+				<?php else: ?>
+					window.macros_manager.initMacroTable($show_inherited_macros.filter(':checked').val() == 1);
+				<?php endif ?>
 
 				panel.data('macros_initialized', true);
 			}
 		});
 
 		$show_inherited_macros.on('change', function() {
-			window.macros_manager.load(this.value == 1,
-				parent_hostid !== null ? common_template_edit.getAllTemplates() : null
-			);
+			if (!$(this).is(':checked')) {
+				return;
+			}
+
+			window.macros_manager.load($(this).val() == 1, linked_templateids.concat(getAddTemplates()));
 		});
 
-		if (parent_hostid !== null) {
-			const $template_ms = $('#add_templates_');
-
-			$template_ms.on('change', (e) => {
-				$template_ms.multiSelect('setDisabledEntries', common_template_edit.getAllTemplates());
-			});
-		}
-
 		const $groups_ms = $('#groups_, #group_links_');
+		const $template_ms = $('#add_templates_');
+
+		$template_ms.on('change', (e) => {
+			$template_ms.multiSelect('setDisabledEntries',
+				[... document.querySelectorAll('[name^="add_templates["], [name^="templates["]')]
+					.map((input) => input.value)
+			);
+		});
 
 		$groups_ms.on('change', (e) => {
 			$groups_ms.multiSelect('setDisabledEntries',

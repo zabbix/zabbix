@@ -57,7 +57,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		);
 
 		// Check layout at Host tab.
-		$this->zbxTestAssertElementPresentXpath('//label[text()="Parent host prototype"]/../..//'.
+		$this->zbxTestAssertElementPresentXpath('//label[text()="Parent discovery rules"]/../..//'.
 				'a[contains(@href, "&hostid='.$host_prototype.'") and contains(@href, "&parent_discoveryid='.$discovery_id.'")]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="host"][@readonly]');

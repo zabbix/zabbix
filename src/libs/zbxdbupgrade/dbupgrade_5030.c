@@ -23,6 +23,7 @@
 #include "zbxeval.h"
 #include "log.h"
 #include "zbxdbhigh.h"
+#include "zbxregexp.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "zbxsysinfo.h"
@@ -5769,6 +5770,50 @@ static int	DBpatch_5030189(void)
 	return DBadd_field("valuemap", &field);
 }
 
+static char	*update_template_name(char *old)
+{
+	char	*ptr, new[MAX_STRING_LEN + 1], *ptr_snmp;
+
+#define MIN_TEMPLATE_NAME_LEN	3
+
+	ptr = old;
+
+	if (NULL != zbx_regexp_match(old, "Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) ", NULL) &&
+			1 == sscanf(old, "Template %*[^ ] %" ZBX_STR(MAX_STRING_LEN) "[^\n]s", new) &&
+			MIN_TEMPLATE_NAME_LEN <= strlen(new))
+	{
+		ptr = zbx_strdup(ptr, new);
+	}
+
+	ptr_snmp = zbx_string_replace(ptr, "SNMPv2", "SNMP");
+	zbx_free(ptr);
+
+	return ptr_snmp;
+}
+
+static char	*DBpatch_make_trigger_function(const char *name, const char *tpl, const char *key, const char *param)
+{
+	char	*template_name, *func = NULL;
+	size_t	func_alloc = 0, func_offset = 0;
+
+	template_name = zbx_strdup(NULL, tpl);
+	template_name = update_template_name(template_name);
+
+	zbx_snprintf_alloc(&func, &func_alloc, &func_offset, "%s(/%s/%s", name, template_name, key);
+
+	if ('$' == *param && ',' == *++param)
+		param++;
+
+	if ('\0' != *param)
+		zbx_snprintf_alloc(&func, &func_alloc, &func_offset, ",%s", param);
+
+	zbx_chrcpy_alloc(&func, &func_alloc, &func_offset, ')');
+
+	zbx_free(template_name);
+
+	return func;
+}
+
 static int	DBpatch_5030190(void)
 {
 	int		ret = SUCCEED;
@@ -5791,7 +5836,7 @@ static int	DBpatch_5030190(void)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		name = zbx_strdup(NULL, row[1]);
-		name = zbx_update_template_name(name);
+		name = update_template_name(name);
 		uuid = zbx_gen_uuid4(name);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set uuid='%s' where hostid=%s;\n",
 				uuid, row[0]);
@@ -5836,7 +5881,7 @@ static int	DBpatch_5030191(void)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		name = zbx_strdup(NULL, row[2]);
-		name = zbx_update_template_name(name);
+		name = update_template_name(name);
 		seed = zbx_dsprintf(seed, "%s/%s", name, row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set uuid='%s' where itemid=%s;\n",
@@ -5884,15 +5929,80 @@ static int	DBpatch_5030192(void)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		char		*uuid, *seed = NULL;
+		char		*trigger_expr, *uuid, *seed = NULL;
 		char		*composed_expr[] = { NULL, NULL };
+		int		i;
 		size_t		seed_alloc = 0, seed_offset = 0;
+		DB_ROW		row2;
+		DB_RESULT	result2;
 
-		if (FAIL == zbx_compose_trigger_expression(row, ZBX_EVAL_PARSE_TRIGGER_EXPRESSION, composed_expr))
+		for (i = 0; i < 2; i++)
 		{
-			zbx_db_free_result(result);
+			int			j;
+			char			*error = NULL;
+			zbx_eval_context_t	ctx;
 
-			return FAIL;
+			trigger_expr = row[i + 2];
+
+			if ('\0' == *trigger_expr)
+			{
+				if (0 == i)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
+							__func__, row[0]);
+				}
+				continue;
+			}
+
+			if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, ZBX_EVAL_PARSE_TRIGGER_EXPRESSION,
+					&error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
+						__func__, row[0], error);
+				zbx_free(error);
+				zbx_db_free_result(result);
+				return FAIL;
+			}
+
+			for (j = 0; j < ctx.stack.values_num; j++)
+			{
+				zbx_eval_token_t	*token = &ctx.stack.values[j];
+				zbx_uint64_t		functionid;
+
+				if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+					continue;
+
+				if (SUCCEED != zbx_is_uint64_n(ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
+				{
+					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
+							" zbx_is_uint64_n error", __func__, row[0]);
+					zbx_db_free_result(result);
+					return FAIL;
+				}
+
+				result2 = zbx_db_select(
+						"select h.host,i.key_,f.name,f.parameter"
+						" from functions f"
+						" join items i on i.itemid=f.itemid"
+						" join hosts h on h.hostid=i.hostid"
+						" where f.functionid=" ZBX_FS_UI64,
+						functionid);
+
+				if (NULL != (row2 = zbx_db_fetch(result2)))
+				{
+					char	*func;
+
+					func = DBpatch_make_trigger_function(row2[2], row2[0], row2[1], row2[3]);
+					zbx_variant_clear(&token->value);
+					zbx_variant_set_str(&token->value, func);
+				}
+
+				zbx_db_free_result(result2);
+			}
+
+			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
+			zbx_eval_clear(&ctx);
 		}
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/", row[1]);
@@ -5964,7 +6074,7 @@ static int	DBpatch_5030193(void)
 		while (NULL != (row2 = zbx_db_fetch(result2)))
 		{
 			host_name = zbx_strdup(NULL, row2[0]);
-			host_name = zbx_update_template_name(host_name);
+			host_name = update_template_name(host_name);
 
 			zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", host_name);
 			zbx_free(host_name);
@@ -6016,7 +6126,7 @@ static int	DBpatch_5030194(void)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		template_name = zbx_strdup(NULL, row[2]);
-		template_name = zbx_update_template_name(template_name);
+		template_name = update_template_name(template_name);
 		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -6063,7 +6173,7 @@ static int	DBpatch_5030195(void)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		template_name = zbx_strdup(NULL, row[2]);
-		template_name = zbx_update_template_name(template_name);
+		template_name = update_template_name(template_name);
 		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -6110,7 +6220,7 @@ static int	DBpatch_5030196(void)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		template_name = zbx_strdup(NULL, row[2]);
-		template_name = zbx_update_template_name(template_name);
+		template_name = update_template_name(template_name);
 		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -6196,7 +6306,7 @@ static int	DBpatch_5030198(void)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		template_name = zbx_strdup(NULL, row[2]);
-		template_name = zbx_update_template_name(template_name);
+		template_name = update_template_name(template_name);
 		seed = zbx_dsprintf(seed, "%s/%s/%s", template_name, row[3], row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set uuid='%s' where itemid=%s;\n",
@@ -6244,8 +6354,9 @@ static int	DBpatch_5030199(void)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		char		*uuid, *seed = NULL;
+		char		*trigger_expr, *uuid, *seed = NULL;
 		char		*composed_expr[] = { NULL, NULL };
+		int		i;
 		size_t		seed_alloc = 0, seed_offset = 0;
 		DB_ROW		row2;
 		DB_RESULT	result2;
@@ -6269,11 +6380,73 @@ static int	DBpatch_5030199(void)
 
 		zbx_db_free_result(result2);
 
-		if (FAIL == zbx_compose_trigger_expression(row, ZBX_EVAL_TRIGGER_EXPRESSION_LLD, composed_expr))
+		for (i = 0; i < 2; i++)
 		{
-			zbx_db_free_result(result);
+			int			j;
+			char			*error = NULL;
+			zbx_eval_context_t	ctx;
 
-			return FAIL;
+			trigger_expr = row[i + 2];
+
+			if ('\0' == *trigger_expr)
+			{
+				if (0 == i)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
+							__func__, row[0]);
+				}
+				continue;
+			}
+
+			if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, ZBX_EVAL_TRIGGER_EXPRESSION_LLD,
+					&error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
+						__func__, row[0], error);
+				zbx_free(error);
+				zbx_db_free_result(result);
+				return FAIL;
+			}
+
+			for (j = 0; j < ctx.stack.values_num; j++)
+			{
+				zbx_eval_token_t	*token = &ctx.stack.values[j];
+				zbx_uint64_t		functionid;
+
+				if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+					continue;
+
+				if (SUCCEED != zbx_is_uint64_n(ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
+				{
+					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
+							" zbx_is_uint64_n error", __func__, row[0]);
+					zbx_db_free_result(result);
+					return FAIL;
+				}
+
+				result2 = zbx_db_select(
+						"select h.host,i.key_,f.name,f.parameter"
+						" from functions f"
+						" join items i on i.itemid=f.itemid"
+						" join hosts h on h.hostid=i.hostid"
+						" where f.functionid=" ZBX_FS_UI64,
+						functionid);
+
+				if (NULL != (row2 = zbx_db_fetch(result2)))
+				{
+					char	*func;
+
+					func = DBpatch_make_trigger_function(row2[2], row2[0], row2[1], row2[3]);
+					zbx_variant_clear(&token->value);
+					zbx_variant_set_str(&token->value, func);
+				}
+
+				zbx_db_free_result(result2);
+			}
+
+			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
+			zbx_eval_clear(&ctx);
 		}
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s/", row[1]);
@@ -6331,7 +6504,7 @@ static int	DBpatch_5030200(void)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		templ_name = zbx_strdup(NULL, row[2]);
-		templ_name = zbx_update_template_name(templ_name);
+		templ_name = update_template_name(templ_name);
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/%s/%s", templ_name, row[3], row[1]);
 
 		uuid = zbx_gen_uuid4(seed);
@@ -6381,7 +6554,7 @@ static int	DBpatch_5030201(void)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		name_tmpl = zbx_strdup(NULL, row[2]);
-		name_tmpl = zbx_update_template_name(name_tmpl);
+		name_tmpl = update_template_name(name_tmpl);
 		seed = zbx_dsprintf(seed, "%s/%s/%s", name_tmpl, row[3], row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set uuid='%s' where hostid=%s;\n",
