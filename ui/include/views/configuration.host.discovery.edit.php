@@ -1004,14 +1004,14 @@ if (!empty($data['itemid'])) {
 	))->setEnabled(!$data['limited']);
 	$buttons[] = new CButtonCancel(url_param('context'));
 
-	$form_footer = makeFormFooter(new CSubmit('update', _('Update')), $buttons);
+	$form_actions = new CFormActions(new CSubmit('update', _('Update')), $buttons);
 }
 else {
 	$cancel_button = $data['backurl'] !== null
 		? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
 		: new CButtonCancel(url_param('context'));
 
-	$form_footer = makeFormFooter(
+	$form_actions = new CFormActions(
 		new CSubmit('add', _('Add')),
 		[
 			(new CSimpleButton(_('Test')))->setId('test_item'),
@@ -1020,7 +1020,7 @@ else {
 	);
 }
 
-$tab->setFooter($form_footer);
+$tab->setFooter(new CFormGrid($form_actions));
 
 $form->addItem($tab);
 $html_page->addItem($form);
