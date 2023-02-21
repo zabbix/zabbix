@@ -252,6 +252,10 @@ void	*DCget_stats(int request)
 			value_uint = cache->stats.history_text_counter;
 			ret = (void *)&value_uint;
 			break;
+		case ZBX_STATS_HISTORY_BIN_COUNTER:
+			value_uint = cache->stats.history_bin_counter;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_NOTSUPPORTED_COUNTER:
 			value_uint = cache->stats.notsupported_counter;
 			ret = (void *)&value_uint;
@@ -1390,8 +1394,12 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, h->value.log->value,
 						ZBX_JSON_TYPE_STRING);
 				break;
+			case ITEM_VALUE_TYPE_BIN:
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 		}
 
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_TYPE, h->value_type);
@@ -2001,10 +2009,19 @@ static void	dc_history_clean_value(ZBX_DC_HISTORY *history)
 			zbx_free(history->value.log->source);
 			zbx_free(history->value.log);
 			break;
+		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 			zbx_free(history->value.str);
 			break;
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_UINT64:
+		case ITEM_VALUE_TYPE_MAX:
+		case ITEM_VALUE_TYPE_NONE:
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 }
 
@@ -2082,6 +2099,11 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 			hdata->value.str = value->data.str;
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_TEXT_VALUE_LEN)] = '\0';
 			break;
+		case ITEM_VALUE_TYPE_BIN:
+			dc_history_clean_value(hdata);
+			hdata->value.str = value->data.str;
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_TEXT_VALUE_LEN)] = '\0';
+			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (ITEM_VALUE_TYPE_LOG != hdata->value_type)
 			{
@@ -2091,6 +2113,7 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 			}
 			hdata->value.log->value = value->data.str;
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
+			break;
 	}
 
 	hdata->value_type = value_type;
@@ -3092,6 +3115,10 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 				h_log->logeventid = log->logeventid;
 				h_log->severity = log->severity;
 				break;
+			case ITEM_VALUE_TYPE_BIN:
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
+				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
@@ -3648,8 +3675,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 							&history_log_num);
 
 					DCmodule_sync_history(history_float_num, history_integer_num, history_string_num,
-							history_text_num, history_log_num, history_float, history_integer,
-							history_string, history_text, history_log);
+							history_text_num, history_log_num, history_float,
+							history_integer, history_string, history_text, history_log);
 				}
 
 				if (SUCCEED == (history_export_enabled =
@@ -4012,6 +4039,39 @@ static void	dc_local_add_history_text(zbx_uint64_t itemid, unsigned char item_va
 		item_value->value.value_str.len = 0;
 }
 
+static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
+		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
+{
+	dc_item_value_t	*item_value;
+
+	item_value = dc_local_get_history_slot();
+
+	item_value->itemid = itemid;
+	item_value->ts = *ts;
+	item_value->item_value_type = item_value_type;
+	item_value->value_type = ITEM_VALUE_TYPE_BIN;
+	item_value->state = ITEM_STATE_NORMAL;
+	item_value->flags = flags;
+
+	if (0 != (item_value->flags & ZBX_DC_FLAG_META))
+	{
+		item_value->lastlogsize = lastlogsize;
+		item_value->mtime = mtime;
+	}
+
+	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
+	{
+		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, ZBX_HISTORY_VALUE_LEN) + 1;
+		dc_string_buffer_realloc(item_value->value.value_str.len);
+
+		item_value->value.value_str.pvalue = string_values_offset;
+		memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
+		string_values_offset += item_value->value.value_str.len;
+	}
+	else
+		item_value->value.value_str.len = 0;
+}
+
 static void	dc_local_add_history_log(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
 		const zbx_log_t *log, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
@@ -4168,6 +4228,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 			mtime = 0;
 		}
 		dc_local_add_history_notsupported(itemid, ts, error, lastlogsize, mtime, value_flags);
+
 		return;
 	}
 
@@ -4227,6 +4288,11 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		else if (ZBX_ISSET_TEXT(result))
 		{
 			dc_local_add_history_text(itemid, item_value_type, ts, result->text, result->lastlogsize,
+					result->mtime, value_flags);
+		}
+		else if (ZBX_ISSET_BIN(result))
+		{
+			dc_local_add_history_bin(itemid, item_value_type, ts, result->bin, result->lastlogsize,
 					result->mtime, value_flags);
 		}
 		else
@@ -4425,6 +4491,7 @@ static void	hc_free_data(zbx_hc_data_t *data)
 			{
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
+				case ITEM_VALUE_TYPE_BIN:
 					__hc_shmem_free_func(data->value.str);
 					break;
 				case ITEM_VALUE_TYPE_LOG:
@@ -4660,6 +4727,11 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 					return FAIL;
 				}
 				break;
+			case ITEM_VALUE_TYPE_BIN:
+				if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str,
+						&item_value->value.value_str))
+					return FAIL;
+				break;
 			case ITEM_VALUE_TYPE_LOG:
 				if (SUCCEED != hc_clone_history_log_data(&(*data)->value.log, item_value))
 					return FAIL;
@@ -4682,6 +4754,9 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				cache->stats.history_log_counter++;
+				break;
+			case ITEM_VALUE_TYPE_BIN:
+				cache->stats.history_bin_counter++;
 				break;
 		}
 
@@ -4806,6 +4881,7 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_BIN:
 				history->value.str = zbx_strdup(NULL, data->value.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
@@ -4822,6 +4898,9 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 				history->value.log->logeventid = data->value.log->logeventid;
 
 				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 		}
 	}
 }

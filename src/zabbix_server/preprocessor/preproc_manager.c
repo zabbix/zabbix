@@ -157,6 +157,16 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
 		zbx_variant_set_str(var, value->result->text);
 		value->result->text = NULL;
 	}
+	else if (ZBX_ISSET_TEXT(value->result))
+	{
+		zbx_variant_set_str(var, value->result->text);
+		value->result->text = NULL;
+	}
+	else if (ZBX_ISSET_BIN(value->result))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
 	else
 		zbx_variant_set_none(var);
 
@@ -566,6 +576,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
+
 		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)

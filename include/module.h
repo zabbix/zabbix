@@ -82,9 +82,10 @@ zbx_log_t;
 #define AR_DOUBLE	0x02
 #define AR_STRING	0x04
 #define AR_TEXT		0x08
-#define AR_LOG		0x10
-#define AR_MESSAGE	0x20
-#define AR_META		0x40
+#define AR_BIN		0x10
+#define AR_LOG		0x20
+#define AR_MESSAGE	0x40
+#define AR_META		0x80
 
 /* agent return structure */
 typedef struct
@@ -96,6 +97,7 @@ typedef struct
 	char		*text;
 	char		*msg;		/* possible error message */
 	zbx_log_t	*log;
+	char		*bin;
 	int		type;		/* flags: see AR_* above */
 	int		mtime;		/* meta information */
 }
@@ -136,6 +138,13 @@ ZBX_METRIC;
 (						\
 	(res)->type |= AR_TEXT,			\
 	(res)->text = (char *)(val)		\
+)
+
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
+#define SET_BIN_RESULT(res, val)		\
+(						\
+	(res)->type |= AR_BIN,			\
+	(res)->bin = (char *)(val)		\
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
@@ -197,6 +206,15 @@ typedef struct
 	int		clock;
 	int		ns;
 	const char	*value;
+}
+ZBX_HISTORY_BIN;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	int		clock;
+	int		ns;
+	const char	*value;
 	const char	*source;
 	int		timestamp;
 	int		logeventid;
@@ -211,6 +229,7 @@ typedef struct
 	void	(*history_string_cb)(const ZBX_HISTORY_STRING *history, int history_num);
 	void	(*history_text_cb)(const ZBX_HISTORY_TEXT *history, int history_num);
 	void	(*history_log_cb)(const ZBX_HISTORY_LOG *history, int history_num);
+	void	(*history_bin_cb)(const ZBX_HISTORY_BIN *history, int history_num);
 }
 ZBX_HISTORY_WRITE_CBS;
 

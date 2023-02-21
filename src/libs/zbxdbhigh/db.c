@@ -27,6 +27,7 @@
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
+#include "base64.h"
 
 #define ZBX_DB_WAIT_DOWN	10
 
@@ -555,6 +556,7 @@ static size_t	get_string_field_size(unsigned char type)
 {
 	switch(type)
 	{
+		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
 			return ZBX_SIZE_T_MAX;
 		case ZBX_TYPE_CHAR:
@@ -573,6 +575,7 @@ static size_t	get_string_field_size(unsigned char type)
 {
 	switch(type)
 	{
+		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
 			return ZBX_SIZE_T_MAX;
@@ -602,7 +605,7 @@ static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx
 {
 	size_t	length;
 
-	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
+	if ((ZBX_TYPE_LONGTEXT == field->type || ZBX_TYPE_BLOB == field->type) && 0 == field->length)
 		length = ZBX_SIZE_T_MAX;
 	else if (ZBX_TYPE_CUID == field->type)
 		length = CUID_LEN;
@@ -2755,6 +2758,7 @@ static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t *valu
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "'%s'", value->str);
 				break;
 			case ZBX_TYPE_FLOAT:
@@ -2803,7 +2807,9 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
+				case ZBX_TYPE_BLOB:
 					zbx_free(row[j].str);
+					break;
 			}
 		}
 
@@ -2838,7 +2844,8 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
  *             zbx_db_insert_clean(&ins);                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, const ZBX_FIELD **fields, int fields_num)
+void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, const ZBX_FIELD **fields,
+		int fields_num)
 {
 	int	i;
 
@@ -2922,7 +2929,7 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
  *           for insert preparation functions.                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num)
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values, int values_num)
 {
 	int		i;
 	zbx_db_value_t	*row;
@@ -2937,8 +2944,8 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 
 	for (i = 0; i < self->fields.values_num; i++)
 	{
-		ZBX_FIELD		*field = (ZBX_FIELD *)self->fields.values[i];
-		const zbx_db_value_t	*value = values[i];
+		ZBX_FIELD	*field = (ZBX_FIELD *)self->fields.values[i];
+		zbx_db_value_t	*value = values[i];
 
 		switch (field->type)
 		{
@@ -2947,15 +2954,23 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 #ifdef HAVE_ORACLE
 				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_OFF);
 #else
 				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_ON);
 #endif
 				break;
-			default:
+			case ZBX_TYPE_INT:
+			case ZBX_TYPE_FLOAT:
+			case ZBX_TYPE_UINT:
+			case ZBX_TYPE_ID:
+			case ZBX_TYPE_SERIAL:
 				row[i] = *value;
 				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 		}
 	}
 
@@ -3000,6 +3015,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 				value->str = va_arg(args, char *);
 				break;
 			case ZBX_TYPE_INT:
@@ -3022,11 +3038,34 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 
 	va_end(args);
 
-	zbx_db_insert_add_values_dyn(self, (const zbx_db_value_t **)values.values, values.values_num);
+	zbx_db_insert_add_values_dyn(self, (zbx_db_value_t **)values.values, values.values_num);
 
 	zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&values);
 }
+
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+static void	format_binary_value_for_sql(char **in)
+{
+	char	*chunk, *dst = NULL;
+	int	data_len, src_len;
+
+	src_len = strlen(*in) * 3 / 4 ;
+	dst = (char*)zbx_malloc(NULL, src_len);
+	str_base64_decode(*in, (char *)dst, src_len, &data_len);
+#if defined (HAVE_MYSQL)
+	chunk = (char*)zbx_malloc(NULL, 2 * data_len);
+	zbx_mysql_escape_bin((char*)dst, chunk, data_len);
+#elif defined (HAVE_POSTGRESQL)
+	zbx_postgresql_escape_bin((char*)dst, &chunk, data_len);
+#else
+#error "Unsupported db during blob insert"
+#endif
+	zbx_free(dst);
+	zbx_free(*in);
+	*in = chunk;
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -3197,7 +3236,7 @@ retry_oracle:
 #	endif
 		for (j = 0; j < self->fields.values_num; j++)
 		{
-			const zbx_db_value_t	*value = &values[j];
+			zbx_db_value_t	*value = &values[j];
 
 			field = (const ZBX_FIELD *)self->fields.values[j];
 
@@ -3211,6 +3250,15 @@ retry_oracle:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
+					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					break;
+				case ZBX_TYPE_BLOB:
+					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+					/* Oracle converts base64 to binary when it formats prepared statement */
+					format_binary_value_for_sql(&(value->str));
+#endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;

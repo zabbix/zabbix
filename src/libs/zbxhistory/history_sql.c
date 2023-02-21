@@ -85,7 +85,8 @@ static zbx_vc_history_table_t	vc_history_tables[] = {
 	{"history_str", "value", row2value_str},
 	{"history_log", "timestamp,logeventid,severity,source,value", row2value_log},
 	{"history_uint", "value", row2value_ui64},
-	{"history_text", "value", row2value_str}
+	{"history_text", "value", row2value_str},
+	{"history_bin", "value", row2value_str}
 };
 
 /******************************************************************************************************************
@@ -297,6 +298,27 @@ static void	add_history_log(const zbx_vector_ptr_t *history)
 
 		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, log->timestamp,
 				ZBX_NULL2EMPTY_STR(log->source), log->severity, log->value, log->logeventid);
+	}
+
+	sql_writer_add_dbinsert(db_insert);
+}
+
+static void	add_history_bin(const zbx_vector_ptr_t *history)
+{
+	int		i;
+	zbx_db_insert_t	*db_insert;
+
+	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
+	zbx_db_insert_prepare(db_insert, "history_bin", "itemid", "clock", "ns", "value", NULL);
+
+	for (i = 0; i < history->values_num; i++)
+	{
+		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+
+		if (ITEM_VALUE_TYPE_BIN != h->value_type)
+			continue;
+
+		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.str);
 	}
 
 	sql_writer_add_dbinsert(db_insert);
@@ -624,8 +646,8 @@ static int	sql_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int st
  *                                                                                  *
  * Purpose: sends history data to the storage                                       *
  *                                                                                  *
- * Parameters:  hist    - [IN] the history storage interface                        *
- *              history - [IN] the history data vector (may have mixed value types) *
+ * Parameters:  hist    - [IN] history storage interface                            *
+ *              history - [IN] history data vector (may have mixed value types)     *
  *                                                                                  *
  ************************************************************************************/
 static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history)
@@ -703,6 +725,13 @@ int	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, ch
 		case ITEM_VALUE_TYPE_LOG:
 			hist->data.sql_history_func = add_history_log;
 			break;
+		case ITEM_VALUE_TYPE_BIN:
+			hist->data.sql_history_func = add_history_bin;
+			break;
+		case ITEM_VALUE_TYPE_MAX:
+		case ITEM_VALUE_TYPE_NONE:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	hist->requires_trends = 1;

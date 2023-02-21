@@ -832,6 +832,7 @@ void	zbx_free_agent_result(AGENT_RESULT *result)
 	ZBX_UNSET_DBL_RESULT(result);
 	ZBX_UNSET_STR_RESULT(result);
 	ZBX_UNSET_TEXT_RESULT(result);
+	ZBX_UNSET_BIN_RESULT(result);
 	ZBX_UNSET_LOG_RESULT(result);
 	ZBX_UNSET_MSG_RESULT(result);
 }
@@ -1290,6 +1291,8 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 			add_log_result(result, c);
 			ret = SUCCEED;
 			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
 	return ret;

@@ -135,6 +135,13 @@ int		zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, uns
 void		zbx_db_clean_bind_context(zbx_db_bind_context_t *context);
 int		zbx_db_statement_execute(int iters);
 #endif
+
+#ifdef HAVE_MYSQL
+void	zbx_mysql_escape_bin(char* dst, char chunk[], size_t size);
+#else
+void	zbx_postgresql_escape_bin(char* dst, char **chunk, size_t size);
+#endif
+
 int		zbx_db_vexecute(const char *fmt, va_list args);
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
 DB_RESULT	zbx_db_select_n_basic(const char *query, int n);

@@ -62,6 +62,7 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, in
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
+		case ITEM_VALUE_TYPE_BIN:
 			ret = zbx_variant_convert(value, ZBX_VARIANT_STR);
 			break;
 		default:

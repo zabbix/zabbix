@@ -230,6 +230,7 @@ typedef enum
 	ITEM_VALUE_TYPE_LOG,
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT,
+	ITEM_VALUE_TYPE_BIN,
 	/* the number of defined value types */
 	ITEM_VALUE_TYPE_MAX,
 	ITEM_VALUE_TYPE_NONE,
