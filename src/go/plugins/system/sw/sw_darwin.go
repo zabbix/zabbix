@@ -1,3 +1,6 @@
+//go:build darwin
+// +build darwin
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -17,28 +20,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_VERSION_H
-#define ZABBIX_VERSION_H
+package sw
 
-#define ZBX_STR2(str)	#str
-#define ZBX_STR(str)	ZBX_STR2(str)
+import (
+	"git.zabbix.com/ap/plugin-support/plugin"
+)
 
-#define APPLICATION_NAME	"Zabbix Agent"
-#define ZABBIX_REVDATE		"21 February 2023"
-#define ZABBIX_VERSION_MAJOR	6
-#define ZABBIX_VERSION_MINOR	4
-#define ZABBIX_VERSION_PATCH	0
-#ifndef ZABBIX_VERSION_REVISION
-#	define ZABBIX_VERSION_REVISION	{ZABBIX_REVISION}
-#endif
-#ifdef _WINDOWS
-#	ifndef ZABBIX_VERSION_RC_NUM
-#		define ZABBIX_VERSION_RC_NUM	{ZABBIX_RC_NUM}
-#	endif
-#endif
-#define ZABBIX_VERSION_RC	"rc2"
-#define ZABBIX_VERSION		ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
-				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
-#define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
+func (p *Plugin) systemSwPackages(params []string) (result interface{}, err error) {
+	return nil, plugin.UnsupportedMetricError
+}
 
-#endif /* ZABBIX_VERSION_H */
+func (p *Plugin) systemSwPackagesGet(params []string) (result interface{}, err error) {
+	return nil, plugin.UnsupportedMetricError
+}
+
+func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
+	return nil, plugin.UnsupportedMetricError
+}
+
+func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
+	return nil, plugin.UnsupportedMetricError
+}
