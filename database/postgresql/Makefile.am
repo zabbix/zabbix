@@ -1,4 +1,4 @@
-SUBDIRS  = schema-upgrades
+SUBDIRS  = option-patches
 # extensions
 SUBDIRS += timescaledb
 

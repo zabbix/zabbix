@@ -64,24 +64,24 @@ dbschema_mysql:
 	cd database/mysql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) -C schema-upgrades
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_oracle:
 	cd database/oracle && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) -C schema-upgrades
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_postgresql:
 	cd database/postgresql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) -C schema-upgrades
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_timescaledb:
 	cd database/postgresql/timescaledb && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) -C schema-upgrades
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_sqlite3:
 	cd database/sqlite3 && \
