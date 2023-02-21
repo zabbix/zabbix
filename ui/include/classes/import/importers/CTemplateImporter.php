@@ -48,7 +48,7 @@ class CTemplateImporter extends CImporter {
 		do {
 			$independent_templates = $this->getIndependentTemplates($templates);
 			$templates_api_params = array_flip(['uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name',
-				'description', 'tags'
+				'description', 'tags', 'vendor_name', 'vendor_version'
 			]);
 
 			$templates_to_create = [];

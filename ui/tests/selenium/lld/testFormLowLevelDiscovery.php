@@ -271,7 +271,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		if (!isset($data['form'])) {
 			switch($type) {
 				case 'SSH agent':
-					$this->zbxTestAssertElementValue('key', 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
+					$this->zbxTestAssertElementValue('key', 'ssh.run[<unique short description>,<ip>,<port>,<encoding>,<ssh options>]');
 					break;
 				case 'TELNET agent':
 					$this->zbxTestAssertElementValue('key', 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');

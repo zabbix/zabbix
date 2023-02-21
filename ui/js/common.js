@@ -453,7 +453,7 @@ function acknowledgePopUp(parameters, trigger_element) {
 	overlay.trigger_parents = $(trigger_element).parents();
 
 	overlay.xhr.then(function() {
-		var url = new Curl('zabbix.php', false);
+		var url = new Curl('zabbix.php');
 		url.setArgument('action', 'popup');
 		url.setArgument('popup_action', 'acknowledge.edit');
 		url.setArgument('eventids', parameters.eventids);
@@ -756,11 +756,10 @@ function validate_trigger_expression(overlay) {
 	});
 }
 
-function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
+function redirect(uri, method, needle, invert_needle, allow_empty) {
 	method = (method || 'get').toLowerCase();
-	add_sid = (method !== 'get' && (typeof add_sid === 'undefined' || add_sid));
 
-	var url = new Curl(uri, add_sid);
+	var url = new Curl(uri);
 
 	if (method == 'get') {
 		window.location = url.getUrl();

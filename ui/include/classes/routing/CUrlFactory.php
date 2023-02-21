@@ -54,9 +54,6 @@ class CUrlFactory {
 		'items.php' => [
 			'remove' => ['itemid']
 		],
-		'maintenance.php' => [
-			'remove' => ['maintenanceid']
-		],
 		'sysmaps.php' => [
 			'remove' => ['sysmapid']
 		],

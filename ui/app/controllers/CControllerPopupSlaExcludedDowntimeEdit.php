@@ -21,6 +21,10 @@
 
 class CControllerPopupSlaExcludedDowntimeEdit extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'edit' => 			'in 1',

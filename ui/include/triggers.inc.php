@@ -103,38 +103,6 @@ function get_triggers_by_hostid($hostid) {
 	);
 }
 
-// unescape Raw URL
-function utf8RawUrlDecode($source) {
-	$decodedStr = '';
-	$pos = 0;
-	$len = strlen($source);
-	while ($pos < $len) {
-		$charAt = substr($source, $pos, 1);
-		if ($charAt == '%') {
-			$pos++;
-			$charAt = substr($source, $pos, 1);
-			if ($charAt == 'u') {
-				// we got a unicode character
-				$pos++;
-				$unicodeHexVal = substr($source, $pos, 4);
-				$unicode = hexdec($unicodeHexVal);
-				$entity = "&#".$unicode.';';
-				$decodedStr .= html_entity_decode(utf8_encode($entity), ENT_COMPAT, 'UTF-8');
-				$pos += 4;
-			}
-			else {
-				$decodedStr .= substr($source, $pos-1, 1);
-			}
-		}
-		else {
-			$decodedStr .= $charAt;
-			$pos++;
-		}
-	}
-
-	return $decodedStr;
-}
-
 /**
  * Copy the given triggers to the target hosts or templates, taking care of copied trigger dependencies.
  *

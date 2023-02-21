@@ -25,14 +25,12 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setName('services_form');
 
 // Enable form submitting on Enter.
 $form->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $controls = (new CForm())
-	->cleanItems()
 	->setName('services_filter_form')
 	->addVar('title', $data['title'])
 	->addVar('exclude_serviceids', $data['exclude_serviceids'])

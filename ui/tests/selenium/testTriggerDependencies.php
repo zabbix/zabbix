@@ -38,7 +38,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 		return [CMessageBehavior::class];
 	}
 
-	const TEMPLATE_AGENT = 'Zabbix agent';
+	const TEMPLATE_AGENT = 'Apache by Zabbix agent';
 	const TEMPLATE_FREEBSD = 'FreeBSD by Zabbix agent';
 	const TEMPLATE_APACHE = 'Apache by HTTP';
 
@@ -55,8 +55,8 @@ class testTriggerDependencies extends CLegacyWebTest {
 		);
 
 		self::$apache_templateid = $template_ids[0]['hostid'];
-		self::$freebsd_templateid = $template_ids[1]['hostid'];
-		self::$agent_templateid = $template_ids[2]['hostid'];
+		self::$agent_templateid = $template_ids[1]['hostid'];
+		self::$freebsd_templateid = $template_ids[2]['hostid'];
 
 		CDataHelper::call('template.update', [
 			[
@@ -110,11 +110,11 @@ class testTriggerDependencies extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'trigger' => 'Zabbix agent is not available',
+					'trigger' => 'Apache: Host has been restarted',
 					'template' => self::TEMPLATE_FREEBSD,
 					'dependency' => '/etc/passwd has been changed on FreeBSD by Zabbix agent',
-					'error_message' => 'Trigger "Zabbix agent is not available" cannot depend on the trigger "/etc/passwd has been changed'.
-							' on {HOST.NAME}" from the template "FreeBSD by Zabbix agent", because dependencies on triggers'.
+					'error_message' => 'Trigger "Apache: Host has been restarted" cannot depend on the trigger "/etc/passwd has been changed on'.
+							' {HOST.NAME}" from the template "FreeBSD by Zabbix agent", because dependencies on triggers'.
 							' from a child template or host are not allowed.'
 				]
 			],

@@ -29,7 +29,6 @@
 use Widgets\NavTree\Widget;
 
 $form = (new CForm('post'))
-	->cleanItems()
 	->setId('widget-dialogue-form')
 	->setName('widget_dialogue_form')
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
