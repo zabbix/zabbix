@@ -1795,6 +1795,23 @@ static int	DBpatch_6030193(void)
 	return DBcreate_index("scripts", "scripts_3", "name,menu_path", 1);
 }
 
+static int	DBpatch_6030194(void)
+{
+	zbx_db_insert_t	db_insert;
+	int	ret = FAIL;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "module", "moduleid", "id", "relative_path", "status", "config", NULL);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), "gauge", "widgets/gauge", 1, "[]");
+	zbx_db_insert_autoincrement(&db_insert, "moduleid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -1981,5 +1998,6 @@ DBPATCH_ADD(6030190, 0, 1)
 DBPATCH_ADD(6030191, 0, 1)
 DBPATCH_ADD(6030192, 0, 1)
 DBPATCH_ADD(6030193, 0, 1)
+DBPATCH_ADD(6030194, 0, 1)
 
 DBPATCH_END()
