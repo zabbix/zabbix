@@ -1579,7 +1579,6 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_LOG => 'history_log',
 			ITEM_VALUE_TYPE_TEXT => 'history_text',
 			ITEM_VALUE_TYPE_STR => 'history_str',
-			ITEM_VALUE_TYPE_BIN => 'history_bin',
 			ITEM_VALUE_TYPE_FLOAT => 'history',
 			ITEM_VALUE_TYPE_UINT64 => 'history_uint',
 			ITEM_VALUE_TYPE_BINARY => 'history_bin'
