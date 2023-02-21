@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup config, widget
+ * backup config, widget
  *
  * @onBefore prepareDashboardData, prepareProblemsData
  */
@@ -97,23 +97,23 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Create triggers based on items.
 		$triggers = CDataHelper::call('trigger.create', [
 			[
-				'description' => 'Trigger for widget float',
+				'description' => 'Trigger for widget 1 float',
 				'expression' => 'last(/Host for Problems Widgets/float)=0',
 				'priority' => 0
 			],
 			[
-				'description' => 'Trigger for widget char',
+				'description' => 'Trigger for widget 1 char',
 				'expression' => 'last(/Host for Problems Widgets/char)=0',
 				'priority' => 1,
 				'manual_close' => 1
 			],
 			[
-				'description' => 'Trigger for widget log',
+				'description' => 'Trigger for widget 2 log',
 				'expression' => 'last(/Host for Problems Widgets/log)=0',
 				'priority' => 2
 			],
 			[
-				'description' => 'Trigger for widget unsigned',
+				'description' => 'Trigger for widget 2 unsigned',
 				'expression' => 'last(/Host for Problems Widgets/unsigned)=0',
 				'priority' => 3
 			],
@@ -145,17 +145,17 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			$j++;
 		}
 
-		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for widget char'.
-		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for widget float').', '.
-				zbx_dbstr('Trigger for widget log').', '.zbx_dbstr('Trigger for widget unsigned').', '.
+		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for widget 1 char'.
+		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for widget 1 float').', '.
+				zbx_dbstr('Trigger for widget 2 log').', '.zbx_dbstr('Trigger for widget 2 unsigned').', '.
 				zbx_dbstr('Trigger for widget text').')'
 		);
-		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.zbx_dbstr('Trigger for widget char'));
+		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.zbx_dbstr('Trigger for widget 1 char'));
 
 		// Suppress the problem: 'Trigger for widget text'.
 		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES (100990, 1009954, NULL, 0)');
 
-		// Acknowledge the problem: 'Trigger for widget unsigned' and get acknowledge time.
+		// Acknowledge the problem: 'Trigger for widget 2 unsigned' and get acknowledge time.
 		CDataHelper::call('event.acknowledge', [
 			'eventids' => 1009953,
 			'action' => 6,
@@ -171,7 +171,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 	public static function getCheckWidgetTable() {
 		return [
-			// #0 Widget with empty 'Show lines' field.
+			// #0 Filtered by Host group.
 			[
 				[
 					'fields' => [
@@ -179,13 +179,14 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Host groups' => 'Group for Problems Widgets'
 					],
 					'result' => [
-						'Trigger for widget unsigned',
-						'Trigger for widget log',
-						'Trigger for widget char',
-						'Trigger for widget float'
+						'Trigger for widget 2 unsigned',
+						'Trigger for widget 2 log',
+						'Trigger for widget 1 char',
+						'Trigger for widget 1 float'
 					]
 				]
 			],
+			// #1 Filtered by Host group, show suppressed.
 			[
 				[
 					'fields' => [
@@ -195,13 +196,14 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					],
 					'result' => [
 						'Trigger for widget text',
-						'Trigger for widget unsigned',
-						'Trigger for widget log',
-						'Trigger for widget char',
-						'Trigger for widget float'
+						'Trigger for widget 2 unsigned',
+						'Trigger for widget 2 log',
+						'Trigger for widget 1 char',
+						'Trigger for widget 1 float'
 					]
 				]
 			],
+			// #2 Filtered by Host group, show unacknowledged.
 			[
 				[
 					'fields' => [
@@ -210,24 +212,90 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Show unacknowledged only' => true
 					],
 					'result' => [
-						'Trigger for widget log',
-						'Trigger for widget char',
-						'Trigger for widget float'
+						'Trigger for widget 2 log',
+						'Trigger for widget 1 char',
+						'Trigger for widget 1 float'
 					]
 				]
 			],
+			// #3 Filtered by Host group, Sort by problem.
 			[
 				[
 					'fields' => [
-						'Name' => 'Group, unucknowledged filter',
+						'Name' => 'Group, sort by Problem ascending filter',
 						'Host groups' => 'Group for Problems Widgets',
+						'Sort entries by' => 'Problem (ascending)'
+					],
+					'result' => [
+						'Trigger for widget 1 char',
+						'Trigger for widget 1 float',
+						'Trigger for widget 2 log',
+						'Trigger for widget 2 unsigned'
+					]
+				]
+			],
+			// #4 Filtered by Host, Sort by severity.
+			[
+				[
+					'fields' => [
+						'Name' => 'Group, sort by Severity ascending filter',
+						'Hosts' => 'Host for Problems Widgets',
 						'Sort entries by' => 'Severity (ascending)'
 					],
 					'result' => [
-						'Trigger for widget float',
-						'Trigger for widget char',
-						'Trigger for widget log',
-						'Trigger for widget unsigned'
+						'Trigger for widget 1 float',
+						'Trigger for widget 1 char',
+						'Trigger for widget 2 log',
+						'Trigger for widget 2 unsigned'
+					]
+				]
+			],
+			// #5 Filtered by Host, Problem.
+			[
+				[
+					'fields' => [
+						'Name' => 'Group, Problem filter',
+						'Hosts' => 'Host for Problems Widgets',
+						'Problem' => 'Trigger for widget 2'
+					],
+					'result' => [
+						'Trigger for widget 2 unsigned',
+						'Trigger for widget 2 log'
+					]
+				]
+			],
+			// #6 Filtered by Excluded groups.
+			[
+				[
+					'fields' => [
+						'Name' => 'Group, Excluded groups',
+						'Exclude host groups' => [
+							'Group for Problems Widgets',
+							'Zabbix servers',
+							'Group to check triggers filtering',
+							'Another group to check Overview',
+							'Group to check Overview'
+						]
+					],
+					'result' => [
+						'Trigger for tag permissions Oracle',
+						'Trigger for tag permissions MySQL'
+					]
+				]
+			],
+			// #7 Filtered by Host, some severities.
+			[
+				[
+					'fields' => [
+						'Name' => 'Group, some severities',
+						'Hosts' => 'Host for Problems Widgets',
+						'id:severities_0' => true,
+						'id:severities_2' => true,
+						'id:severities_4' => true,
+					],
+					'result' => [
+						'Trigger for widget 2 log',
+						'Trigger for widget 1 float'
 					]
 				]
 			]
