@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-02-08 15:52+0000\n"
-"Last-Translator: Jose Carlos <jcarlesmarino@gmail.com>\n"
+"PO-Revision-Date: 2023-02-17 20:45+0000\n"
+"Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -3137,6 +3137,11 @@ msgstr "No es pot pas actualitzar un gràfic descobert."
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "No es pot pas actualitzar un grup d'equips descobert \"%1$s\"."
 
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr "No es pot pas actualitzar una plantilla de gràfic \"%1$s\"."
+
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -3931,7 +3936,7 @@ msgstr "Configuració de la neteja"
 #: app/controllers/CControllerIconMapEdit.php:98
 #: app/controllers/CControllerIconMapList.php:75
 msgid "Configuration of icon mapping"
-msgstr "Configuració del mapeig d'icones"
+msgstr "Configuració del mapatge d'icones"
 
 #: app/controllers/CControllerImageEdit.php:75
 #: app/controllers/CControllerImageList.php:57
@@ -16229,6 +16234,10 @@ msgstr "Els serveis formen una dependència circular."
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
 msgstr "Serveis actualitzats"
+
+#: include/classes/api/services/CUser.php:1693
+msgid "Session ID or token is expected."
+msgstr "S'espera un ID o token de sessió."
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
