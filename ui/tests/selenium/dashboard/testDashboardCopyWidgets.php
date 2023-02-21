@@ -581,7 +581,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 		// Get count of inaccessible widgets.
 		$inaccessible_xpath = 'xpath:.//div[contains(@class, "dashboard-widget-inaccessible")]';
-		$count = $dashboard->query($inaccessible_xpath)->waitUntilVisible()->all()->count();
+		$count = $dashboard->query($inaccessible_xpath)->waitUntilVisible()->count();
 
 		// Template dashbards are always in edit mode, so entering edit mode is only required for regular dashboards.
 		if(!CTestArrayHelper::get($data, 'template')) {
@@ -593,14 +593,14 @@ class testDashboardCopyWidgets extends CWebTest {
 				$dashboard->pasteWidget();
 
 				// Check that the number on inaccessible widgets is still the same.
-				$this->assertEquals($count, $dashboard->query($inaccessible_xpath)->waitUntilVisible()->all()->count());
+				$this->assertEquals($count, $dashboard->query($inaccessible_xpath)->waitUntilVisible()->count());
 				break;
 
 			case 'replace':
 				$dashboard->replaceWidget($data['target']);
 
 				// Check that the number on inaccessible widgets is still the same.
-				$this->assertEquals($count, $dashboard->query($inaccessible_xpath)->waitUntilVisible()->all()->count());
+				$this->assertEquals($count, $dashboard->query($inaccessible_xpath)->waitUntilVisible()->count());
 
 				// Make sure that the target widget is still present
 				$this->assertTrue($dashboard->getWidget($data['target'])->isValid());

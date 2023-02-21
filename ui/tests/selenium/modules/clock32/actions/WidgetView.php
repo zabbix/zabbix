@@ -32,7 +32,6 @@ use API,
 
 use Modules\Clock2\Widget;
 
-
 class WidgetView extends CControllerDashboardWidgetView {
 	protected function init(): void {
 		parent::init();

@@ -66,6 +66,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			[
 				'name' => 'Dashboard for widget module testing',
 				'private' => 0,
+				'auto_start' => 0,
 				'pages' => [
 					[
 						'name' => 'Map page',
@@ -201,6 +202,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			[
 				'templateid' => self::TEMPLATEID,
 				'name' => 'Templated dashboard for module widgets',
+				'auto_start' => 0,
 				'pages' => [
 					[
 						'name' => 'Default clock page',
@@ -467,7 +469,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Enabled' => false
 				]
 			],
-			// Clock2.
+			// Empty widget.
 			[
 				[
 					'Name' => 'Empty widget',
@@ -912,20 +914,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		if ($initial_status === 'Disabled') {
 			$this->enableModule($module, 'list');
-
 			$this->checkWidgetModuleStatus($module);
-
 			$this->disableModule($module, 'list');
-
 			$this->checkWidgetModuleStatus($module, 'disabled');
 		}
 		else {
 			$this->disableModule($module, 'list');
-
 			$this->checkWidgetModuleStatus($module, 'disabled');
-
 			$this->enableModule($module, 'list');
-
 			$this->checkWidgetModuleStatus($module);
 		}
 	}
@@ -999,7 +995,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$url = CTestArrayHelper::get($data, 'template')
 			? 'zabbix.php?action=template.dashboard.edit&dashboardid='.self::$template_dashboardid
 			: 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
-		$this->page->open($url)->waitUntilReady($url);
+		$this->page->open($url)->waitUntilReady();
 
 		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
 		$dashboard->selectPage($data['page']);
@@ -1073,10 +1069,11 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			? 'zabbix.php?action=host.dashboard.view&hostid='.self::$hostid.'&dashboardid='.self::$template_dashboardid
 			: 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
 		$this->page->open($url)->waitUntilReady();
-		$this->checkWidgetStatusOnDashboard($module, $status);
+		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
+		$this->checkWidgetStatusOnDashboard($dashboard, $module, $status);
 
 		// Open Kiosk mode and check widget display again.
-		$this->checkWidgetStatusOnDashboard($module, $status, 'kiosk');
+		$this->checkWidgetStatusOnDashboard($dashboard, $module, $status, 'kiosk');
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
 		$this->page->waitUntilReady();
 
@@ -1086,13 +1083,11 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					->waitUntilReady();
 		}
 
-		$dashboard = CDashboardElement::find()->one();
-
 		if (!array_key_exists('template', $module)) {
 			$dashboard->edit();
 		}
 
-		$this->checkWidgetStatusOnDashboard($module, $status, 'edit');
+		$this->checkWidgetStatusOnDashboard($dashboard, $module, $status, 'edit');
 
 		// Check that widget is present among widget types dropdown.
 		$widget_form = $dashboard->addWidget();
@@ -1100,12 +1095,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$options = $widget_form->asForm()->getField('Type')->asDropdown()->getOptions()->asText();
 
 		// Check that widget type is present in "Type" dropdown only if corresponding module is enabled.
-		if ($status === 'enabled') {
-			$this->assertTrue(in_array($widget_type, $options));
-		}
-		else {
-			$this->assertFalse(in_array($widget_type, $options));
-		}
+		$this->assertTrue(($status === 'enabled') ? in_array($widget_type, $options) : !in_array($widget_type, $options));
 
 		// Check that module that should be present only on regular dashboards is not present (key used only on template).
 		if (array_key_exists('not_available', $module)) {
@@ -1121,12 +1111,12 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 * Check enabled or disabled widget display and its parameters on a particular dashboard page.
 	 * Requirements to the widget are dependent on corresponding module status and dashboard mode (view, kiosk, edit modes).
 	 *
-	 * @param array		$module		module related information from data provider.
-	 * @param string	$status		status of widget module before execution of this function.
-	 * @param string	$mode		mode of the dashboard.
+	 * @param CDashboardElement		$dashboard	dashboard that contains the corresponding module widget.
+	 * @param array					$module		module related information from data provider.
+	 * @param string				$status		status of widget module before execution of this function.
+	 * @param string				$mode		mode of the dashboard.
 	 */
-	private function checkWidgetStatusOnDashboard($module, $status, $mode = null) {
-		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
+	private function checkWidgetStatusOnDashboard($dashboard, $module, $status, $mode = null) {
 		$dashboard->selectPage($module['page']);
 
 		// Switch to kiosk mode if required.
@@ -1177,21 +1167,17 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			 * Check that edit widget button on disabled module widget is hidden and that it doesn't exist
 			 * if the dashboard is opened in Monitoring => Hosts view (where All hosts link is present) or in kiosk mode.
 			 */
-			$edit_button_xpath = 'xpath:.//button[contains(@class, "btn-widget-edit")]';
-
-			if ($mode === 'kiosk' || $this->query('link:All hosts')->one(false)->isValid()) {
-				$this->assertFalse($inaccessible_widget->query($edit_button_xpath)->one(false)->isValid());
-			}
-			else {
-				$this->assertFalse($inaccessible_widget->query($edit_button_xpath)->one()->isDisplayed());
-			}
-
-			$button_xpath = 'xpath:.//button[contains(@class, "btn-widget-action")]';
+			$edit_button = $inaccessible_widget->query('xpath:.//button[contains(@class, "btn-widget-edit")]');
+			$this->assertFalse(($mode === 'kiosk' || $this->query('link:All hosts')->one(false)->isValid())
+					? $edit_button->one(false)->isValid()
+					: $edit_button->one()->isDisplayed()
+			);
 
 			// It should not be possible only to Delete the widget and only when the dashboard is in edit mode.
+			$button = $inaccessible_widget->query('xpath:.//button[contains(@class, "btn-widget-action")]')->one();
+
 			if ($mode === 'edit') {
-				$popup_menu = $inaccessible_widget->query($button_xpath)->waitUntilPresent()->asPopupButton()
-						->one()->getMenu();
+				$popup_menu = $button->waitUntilPresent()->asPopupButton()->getMenu();
 				$menu_items = $popup_menu->getItems();
 				$this->assertEquals(['Copy', 'Paste', 'Delete'], $menu_items->asText());
 
@@ -1200,7 +1186,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				$popup_menu->close();
 			}
 			else {
-				$this->assertFalse($inaccessible_widget->query($button_xpath)->one()->isVisible());
+				$this->assertFalse($button->isVisible());
 			}
 		}
 	}
@@ -1309,6 +1295,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			$title = ($view === 'form') ? 'Cannot update module: ' : 'Cannot enable module: ';
 			$this->assertMessage($module['expected'], $title.$module['module_name'].'.', $module['error_details']);
 			$this->assertModuleDisabled($module);
+
 			return;
 		}
 		// Check message and confirm that changes, made by the enabled module, took place.
@@ -1319,14 +1306,16 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	/**
 	 * Function disables module from the list in modules page or from module details form, depending on input parameters.
 	 *
-	 * @param array		$data	data array with module details
+	 * @param array		$module	data array with module details
 	 * @param string	$view	view from which the module should be enabled - module list or module details form.
 	 */
 	private function disableModule($module, $view) {
 		// In case of negative test do nothing.
 		if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_BAD) {
+
 			return;
 		}
+
 		// Change module status from Enabled to Disabled.
 		if ($view === 'form') {
 			$this->changeModuleStatusFromForm($module['module_name'], false);
