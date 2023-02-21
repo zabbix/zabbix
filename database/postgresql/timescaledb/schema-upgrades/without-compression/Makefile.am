@@ -22,6 +22,8 @@ history_pk_str.sql: $(top_srcdir)/create/bin/gen_history_pk.pl
 history_pk_uint.sql: $(top_srcdir)/create/bin/gen_history_pk.pl
 	$(top_srcdir)/create/bin/gen_history_pk.pl timescaledb history_uint without_compression > $@
 
+EXTRA_DIST = $(PATCHES)
+
 clean:
 	rm -f $(PATCHES)
 
