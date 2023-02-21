@@ -2727,7 +2727,9 @@ div.dashboard-widget-tophosts z-bar-gauge {
       border-left-color: transparent;
       color: #ffffff; }
 .menu-main .has-submenu > a::after {
+  position: relative;
   float: right;
+  top: 4px;
   font-size: 8px;
   content: "";
   transform: rotate(0deg);
@@ -2855,7 +2857,9 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .menu-user > li:not(.is-expanded) .submenu {
     max-height: 0 !important; }
   .menu-user .has-submenu > a::after {
+    position: relative;
     float: right;
+    top: 4px;
     font-size: 8px;
     content: "";
     transform: rotate(0deg);
