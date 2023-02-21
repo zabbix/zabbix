@@ -146,6 +146,7 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 		{
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_BIN:
 				value->str = zbx_strdup(NULL, data);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
@@ -154,6 +155,8 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 				value->dbl = atof(data);
+			default:
+				fail_msg("Unexpected value type: %c", value_type);
 		}
 	}
 	else
@@ -244,6 +247,7 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 		{
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_BIN:
 				zbx_mock_assert_str_eq(prefix, expected->value.str, returned->value.str);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
@@ -259,6 +263,8 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 			case ITEM_VALUE_TYPE_FLOAT:
 				zbx_mock_assert_double_eq(prefix, expected->value.dbl, returned->value.dbl);
 				break;
+			default:
+				fail_msg("Unexpected value type: %c", value_type);
 		}
 	}
 }

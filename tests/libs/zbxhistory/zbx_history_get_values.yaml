@@ -393,5 +393,32 @@ out:
   values: []
 db data:
   history_str: [] 
+---
+test case: Test binary value type empty
+in:
+    itemid: 28244
+    value type: ITEM_VALUE_TYPE_BIN
+    seconds: 10
+    count: 10
+    end: 2017-01-10 09:00:00.000000000 +02:00
+out:
+  values: []
+db data:
+  history_bin: [] 
+---
+test case: Test binary value type single value
+in:
+    itemid: 28244
+    value type: ITEM_VALUE_TYPE_BIN
+    seconds: 10
+    count: 10
+    end: 2017-01-10 10:00:10.000000000 +02:00
+out:
+  values:
+  - value: 'a'
+    ts: 2017-01-10 10:00:10.500000000 +02:00
+db data:
+  history_bin:
+  - [1484035210, 500000000, 'a']
 ...
 
