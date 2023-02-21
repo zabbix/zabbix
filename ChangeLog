@@ -7,6 +7,7 @@ A.F.....S. [ZBXNEXT-8087] reverted removing of template nesting (Sasha)
 .......PS. [ZBXNEXT-8262] updated soft minimal threshold for MySQL to version 8.0.30 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-22384] fixed Zabbix agent 2 build on macOS (vso)
 ..F....... [ZBX-22375] prevented copying of discovered items when full cloning the host; fixed inability to full clone the host with an item which depends on a web scenario item (vmaksimovs)
 .........T [ZBX-22271] removed module templates (aiantsen)
 ..F....... [ZBX-22346] fixed item value dynamic background not working with double-digit negative values (acikuns)
