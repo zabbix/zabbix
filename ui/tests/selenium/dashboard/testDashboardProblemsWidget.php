@@ -219,8 +219,8 @@ class testDashboardProblemsWidget extends CWebTest {
 
 	public function testDashboardProblemsWidget_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog =  CDashboardElement::find()->one()->edit()->addWidget();
+		$form = $dialog->asForm();
 
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form->fill(['Type' => 'Problems']);
@@ -296,7 +296,7 @@ class testDashboardProblemsWidget extends CWebTest {
 		];
 
 		foreach ($dropdowns as $dropdown => $labels) {
-				$this->assertEquals($labels, $form->getField($dropdown)->asDropdown()->getOptions()->asText());
+			$this->assertEquals($labels, $form->getField($dropdown)->asDropdown()->getOptions()->asText());
 		}
 
 		// Check severities fields.
@@ -313,6 +313,7 @@ class testDashboardProblemsWidget extends CWebTest {
 			'Show' => ['Recent problems', 'Problems', 'History'],
 			'Tags' => ['And/Or', 'Or'],
 			'Show tags' => ['None', '1', '2', '3'],
+			'Tag name' => ['Full', 'Shortened', 'None'],
 			'Show operational data' => ['None', 'Separately', 'With problem name']
 		];
 
@@ -339,9 +340,10 @@ class testDashboardProblemsWidget extends CWebTest {
 			'Host (ascending)' => false
 		];
 
+		$timeline_field = $form->getField('Show timeline');
+
 		foreach ($sort_timeline_statuses as $entry => $timeline_status) {
 			$form->getField('Sort entries by')->asDropdown()->select($entry);
-			$timeline_field = $form->getField('Show timeline');
 			$this->assertTrue($timeline_field->isEnabled($timeline_status));
 			$this->assertTrue($timeline_field->isChecked($timeline_status));
 		}
@@ -351,7 +353,7 @@ class testDashboardProblemsWidget extends CWebTest {
 
 	public static function getCommonData() {
 		return [
-			// 0.
+			// #0 Widget with empty 'Show lines' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -361,7 +363,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// 1.
+			// #1 Widget with zero in 'Show lines' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -371,7 +373,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// 2.
+			// #2 Widget with 999 in 'Show lines' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -381,7 +383,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// 3.
+			// #3 Widget with text in 'Show lines' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -391,7 +393,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// 4.
+			// #4 Widget with negative number in 'Show lines' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -401,7 +403,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// 5.
+			// #5 Widget with tags.
 			[
 				[
 					'fields' => [
@@ -468,7 +470,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					]
 				]
 			],
-			// 6.
+			// #6 Widget with other form settings.
 			[
 				[
 					'fields' => [
@@ -490,7 +492,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					]
 				]
 			],
-			// 7.
+			// #7 Widget with random severities.
 			[
 				[
 					'fields' => [
@@ -506,7 +508,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					]
 				]
 			],
-			// 8.
+			// #8 Widget with all fields set to minimal.
 			[
 				[
 					'clear_tag_priority' => true,
@@ -537,7 +539,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'Tags' => []
 				]
 			],
-			// 9.
+			// #9 Cyrillyc and special symbols in inputs.
 			[
 				[
 					'fields' => [
@@ -548,7 +550,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					]
 				]
 			],
-			// 10.
+			// #10 Widget with leading and trailing spaces in inputs.
 			[
 				[
 					'trim' => true,
@@ -560,7 +562,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					]
 				]
 			],
-			// 11.
+			// #11 Widget with several groups and hosts in correcponding fields.
 			[
 				[
 					'fields' => [
@@ -574,23 +576,11 @@ class testDashboardProblemsWidget extends CWebTest {
 		];
 	}
 
-	public static function getCreateEmptyData() {
-		return [
-			[
-				[
-					'fields' => []
-				]
-			]
-		];
-	}
-
 	/**
-	 * @backupOnce widget
-	 *
-	 * @dataProvider getCreateEmptyData
+	 * @backup widget
 	 */
-	public function testDashboardProblemsWidget_CreateEmpty($data) {
-		$this->checkFormProblemsWidget($data);
+	public function testDashboardProblemsWidget_CreateDefault() {
+		$this->checkFormProblemsWidget(['fields' => []]);
 	}
 
 	/**
@@ -612,7 +602,7 @@ class testDashboardProblemsWidget extends CWebTest {
 	/**
 	 * Function for checking Problems widget form.
 	 *
-	 * @param array        $data       data provider
+	 * @param array      $data      data provider
 	 * @param boolean    $update    true if update scenario, false if create
 	 */
 	public function checkFormProblemsWidget($data, $update = false) {
@@ -633,10 +623,8 @@ class testDashboardProblemsWidget extends CWebTest {
 		if (!$update) {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Problems')]);
 		}
-		else {
-			if  (CTestArrayHelper::get($data, 'clear_tag_priority', false)) {
-				$form->fill(['Show tags' => 1, 'Tag display priority' => '']);
-			}
+		elseif (CTestArrayHelper::get($data, 'clear_tag_priority', false)) {
+			$form->fill(['Show tags' => 1, 'Tag display priority' => '']);
 		}
 
 		$form->fill($data['fields']);
@@ -646,10 +634,8 @@ class testDashboardProblemsWidget extends CWebTest {
 		}
 
 		if (array_key_exists('Tags', $data)) {
-			$tags_table = $form->getField('id:tags_table_tags')->asMultifieldTable();
-
 			if (empty($data['Tags'])) {
-				$tags_table->clear();
+				$form->getField('id:tags_table_tags')->asMultifieldTable()->clear();
 			}
 			else {
 				$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
@@ -690,11 +676,16 @@ class testDashboardProblemsWidget extends CWebTest {
 				$header = $update ? self::$update_widget : 'Problems';
 			}
 
-			$dashboard->getWidget($header)->waitUntilReady();
+			$dashboard->getWidget($header);
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
 			$saved_form = $dashboard->getWidget($header)->edit();
+
+			// Write new name to updated widget name.
+			if ($update) {
+				self::$update_widget = $header;
+			}
 
 			// If tags table has been cleared, after form saving there is one empty tag field.
 			if (CTestArrayHelper::get($data, 'Tags') === []) {
@@ -717,11 +708,6 @@ class testDashboardProblemsWidget extends CWebTest {
 							' AND dp.dashboardid='.self::$dashboardid.
 							' AND w.name ='.zbx_dbstr(CTestArrayHelper::get($data['fields'], 'Name', '')).')'
 			));
-
-			// Write new name to updated widget name.
-			if ($update) {
-				self::$update_widget = $header;
-			}
 		}
 	}
 
@@ -791,13 +777,13 @@ class testDashboardProblemsWidget extends CWebTest {
 			? $dashboard->edit()->addWidget()->asForm()
 			: $dashboard->getWidget(self::$update_widget)->edit();
 
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one();
 
-		if (!$create) {
-			$values = $form->getFields()->asValues();
+		if ($create) {
+			$form->fill(['Type' => 'Problems']);
 		}
 		else {
-			$form->fill(['Type' => 'Problems']);
+			$values = $form->getFields()->asValues();
 		}
 
 		if ($cancel || !$save_dashboard) {
@@ -842,7 +828,7 @@ class testDashboardProblemsWidget extends CWebTest {
 		COverlayDialogElement::ensureNotPresent();
 
 		if (!$cancel) {
-			$dashboard->getWidget(!$save_dashboard ? 'new name' : self::$update_widget)->waitUntilReady();
+			$this->assertTrue($dashboard->getWidget(!$save_dashboard ? 'new name' : self::$update_widget)->isPresent());
 		}
 
 		if ($save_dashboard) {
