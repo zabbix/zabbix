@@ -1020,7 +1020,9 @@ else {
 	);
 }
 
-$tab->setFooter(new CFormGrid($form_actions));
+$tab->setFooter(
+	(new CFormGrid($form_actions))->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_ACTIONS)
+);
 
 $form->addItem($tab);
 $html_page->addItem($form);
