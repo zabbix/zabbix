@@ -1,20 +1,20 @@
 Changes for 6.4.0rc2
 
 New features:
-A.F.....S. [ZBXNEXT-8087] reverted removed template nesting (Sasha)
+A.F.....S. [ZBXNEXT-8087] reverted removing of template nesting (Sasha)
 .......PS. [ZBXNEXT-2732] reverted network discovery manager improvements (asestakovs)
-..F....... [ZBXNEXT-8257] removed aggregate function's label from graph widget's legend (acikuns)
+..F....... [ZBXNEXT-8257] removed aggregate function labels from the graph widget legend (acikuns)
 .......PS. [ZBXNEXT-8262] updated soft minimal threshold for MySQL to version 8.0.30 (mprihodko)
 
 Bug fixes:
-..F....... [ZBX-22375] prevented copying of discovered items when full cloning the host; fixed inability to full clone the host with item which depends on web scenario item (vmaksimovs)
+..F....... [ZBX-22375] prevented copying of discovered items when full cloning the host; fixed inability to full clone the host with an item which depends on a web scenario item (vmaksimovs)
 .........T [ZBX-22271] removed module templates (aiantsen)
 ..F....... [ZBX-22346] fixed item value dynamic background not working with double-digit negative values (acikuns)
-..F....... [ZBX-22352] added missing crsf token for macros expansion in maps (epulke)
-..F....... [ZBX-22333] added CSRF token to problem 'Make cause' and 'Make symptom' actions (epulke)
+..F....... [ZBX-22352] added missing CSRF token for macros expansion in maps (epulke)
+..F....... [ZBX-22333] added CSRF token to the 'Make cause' and 'Make symptom' problem actions (epulke)
 .......PS. [ZBXNEXT-8105] fixed build when cURL library version is less than 7.61.0 (vso)
-........S. [ZBX-22078] fixed crash in calculated items when using tag filter on 32-bit systems (vso)
-..F....... [ZBX-22280] fixed symptom counter for cause problem events in Problems section and Problems widget (miks)
+........S. [ZBX-22078] fixed the crash in calculated items when using tag filter on 32-bit systems (vso)
+..F....... [ZBX-22280] fixed the symptom counter for cause problem events in the Problems section and Problems widget (miks)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0rc1
