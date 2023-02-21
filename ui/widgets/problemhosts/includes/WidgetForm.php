@@ -43,14 +43,17 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField(
-				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			->addField($this->templateid === null
+				? new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+				: null
 			)
-			->addField(
-				new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
+			->addField($this->templateid === null
+				? new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
+				: null
 			)
-			->addField(
-				new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
+			->addField($this->templateid === null
+				? new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
+				: null
 			)
 			->addField(
 				new CWidgetFieldTextBox('problem', _('Problem'))
@@ -59,7 +62,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldSeverities('severities', _('Severity'))
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+				(new CWidgetFieldRadioButtonList('evaltype', _('Problem tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
@@ -70,8 +73,9 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
-			->addField(
-				new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems'))
+			->addField($this->templateid === null
+				? new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems'))
+				: null
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [

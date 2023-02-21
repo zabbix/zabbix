@@ -45,14 +45,16 @@ class WidgetForm extends CWidgetForm {
 					TRIGGERS_OPTION_ALL => _('Any')
 				]))->setDefault(TRIGGERS_OPTION_RECENT_PROBLEM)
 			)
-			->addField(
-				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			->addField($this->templateid === null
+				? new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+				: null
+			)
+			->addField($this->templateid === null
+				? new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
+				: null
 			)
 			->addField(
-				new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
-			)
-			->addField(
-				(new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+				(new CWidgetFieldRadioButtonList('evaltype', _('Problem tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
@@ -64,7 +66,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('style', _('Hosts location'), [
+				(new CWidgetFieldRadioButtonList('style', _('Host location'), [
 					STYLE_LEFT => _('Left'),
 					STYLE_TOP => _('Top')
 				]))->setDefault(STYLE_LEFT)

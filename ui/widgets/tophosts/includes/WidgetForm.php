@@ -98,20 +98,24 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField(
-				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			->addField($this->templateid === null
+				? new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+				: null
 			)
-			->addField(
-				new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
+			->addField($this->templateid === null
+				? new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
+				: null
 			)
-			->addField(
-				(new CWidgetFieldRadioButtonList('evaltype', _('Host tags'), [
+			->addField($this->templateid === null
+				? (new CWidgetFieldRadioButtonList('evaltype', _('Host tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
+				: null
 			)
-			->addField(
-				new CWidgetFieldTags('tags', '')
+			->addField($this->templateid === null
+				? new CWidgetFieldTags('tags', '')
+				: null
 			)
 			->addField(
 				(new CWidgetFieldColumnsList('columns', _('Columns')))->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
@@ -130,10 +134,11 @@ class WidgetForm extends CWidgetForm {
 					)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
-			->addField(
-				(new CWidgetFieldIntegerBox('count', _('Host count'), ZBX_MIN_WIDGET_LINES, ZBX_MAX_WIDGET_LINES))
+			->addField($this->templateid === null
+				? (new CWidgetFieldIntegerBox('count', _('Host count'), ZBX_MIN_WIDGET_LINES, ZBX_MAX_WIDGET_LINES))
 					->setDefault(self::DEFAULT_HOSTS_COUNT)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+				: null
 			);
 	}
 }

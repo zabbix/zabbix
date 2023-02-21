@@ -100,19 +100,14 @@ class CDashboardHelper {
 						$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widget_data['widgetid']);
 
 						if ($rf_rate == -1) {
-							if ($templateid === null) {
-								// Transforms corrupted data to default values.
-								$widget_form = $widget->getForm($grid_page_widget['fields'], $templateid);
-								$widget_form->validate();
-								$values = $widget_form->getFieldsValues();
+							// Transforms corrupted data to default values.
+							$widget_form = $widget->getForm($grid_page_widget['fields'], $templateid);
+							$widget_form->validate();
+							$values = $widget_form->getFieldsValues();
 
-								$rf_rate = $values['rf_rate'] == -1
-									? $widget->getDefaultRefreshRate()
-									: $values['rf_rate'];
-							}
-							else {
-								$rf_rate = $widget->getDefaultRefreshRate();
-							}
+							$rf_rate = $values['rf_rate'] == -1
+								? $widget->getDefaultRefreshRate()
+								: $values['rf_rate'];
 						}
 
 						$grid_page_widget['rf_rate'] = $rf_rate;
