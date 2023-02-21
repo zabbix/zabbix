@@ -469,8 +469,7 @@ class CElement extends CBaseElement implements IWaitable {
 				}
 			}
 			elseif ($this->getAttribute($key) !== $value) {
-				throw new Exception('Attribute "'.$key.'" value "'.$this->getAttribute($key).
-						'" doesn\'t match expected "'.$value.'".');
+				return false;
 			}
 		}
 

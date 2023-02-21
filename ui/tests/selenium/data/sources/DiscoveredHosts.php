@@ -28,8 +28,8 @@ class DiscoveredHosts {
 	const DISCOVERED_INTERFACEID = 90000080;
 	const DISCOVERED_HOST_GROUPID = 90000081;
 	const DISCOVERED_HOST_GROUPID2 = 90000082;
-	const DISCOVERED_GROUP = 'Group created form host prototype 1';
-	const DISCOVERED_GROUP2 = 'Group created form host prototype 11';
+	const DISCOVERED_GROUP = 'Group created from host prototype 1';
+	const DISCOVERED_GROUP2 = 'Group created from host prototype 11';
 	const DISCOVERED_GROUPID = 90000079;
 	const DISCOVERED_GROUPID2 = 90000080;
 	const DISCOVERED_HOST_GROUP_PROTOTYPEID = 90000083;
@@ -91,7 +91,7 @@ class DiscoveredHosts {
 			'host' => 'Host created from host prototype {#KEY}',
 			'ruleid' => $lldid,
 			'groupLinks' => [['groupid' => $hostgroupid]],
-			'groupPrototypes' => [['name' => 'Group created form host prototype {#KEY}']],
+			'groupPrototypes' => [['name' => 'Group created from host prototype {#KEY}']],
 			'tags' => [
 				'tag' => 'prototype',
 				'value' => 'true'
@@ -100,7 +100,7 @@ class DiscoveredHosts {
 
 		$host_prototypeid = $host_prototypes['hostids'][0];
 		$group_prototypeid = CDBHelper::getValue('SELECT group_prototypeid FROM group_prototype WHERE name='.
-				zbx_dbstr('Group created form host prototype {#KEY}'));
+				zbx_dbstr('Group created from host prototype {#KEY}'));
 
 		// Emulate host discovery in DB.
 		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID).

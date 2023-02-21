@@ -42,7 +42,7 @@ class testFormGroups extends CWebTest {
 	/**
 	 * Objects created in dataSource DiscoveredHosts.
 	 */
-	const DISCOVERED_GROUP = 'Group created form host prototype 1';
+	const DISCOVERED_GROUP = 'Group created from host prototype 1';
 	const HOST_PROTOTYPE = 'Host created from host prototype {#KEY}';
 	const LLD = 'LLD for Discovered host tests';
 
