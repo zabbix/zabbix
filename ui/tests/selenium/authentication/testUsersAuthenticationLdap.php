@@ -943,15 +943,15 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 */
 	public function testUsersAuthenticationLdap_Update($data) {
 		if (CDBHelper::getCount('SELECT * FROM userdirectory_ldap') === 0) {
-			$server_settings['servers_settings'][0]['fields'] = (CTestArrayHelper::get($data, 'start_ldap'))
-				? $data['start_ldap']
-				: [
-					'Name' => 'test_update',
-					'Host' => 'test_update',
-					'Base DN' => 'test_update',
-					'Bind password' => 'test_password',
-					'Search attribute' => 'test_update'
-				];
+			$server_settings['servers_settings'][0]['fields'] = (CTestArrayHelper::get($data, 'start_ldap',
+					[
+						'Name' => 'test_update',
+						'Host' => 'test_update',
+						'Base DN' => 'test_update',
+						'Bind password' => 'test_password',
+						'Search attribute' => 'test_update'
+					]
+			));
 
 			if (array_key_exists('start_group_mapping', $data)) {
 				$server_settings['servers_settings'][0]['User group mapping'] =	$data['start_group_mapping'];
