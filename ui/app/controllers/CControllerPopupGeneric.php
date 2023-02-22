@@ -967,7 +967,7 @@ class CControllerPopupGeneric extends CController {
 				$records = API::User()->get($options);
 
 				if ($this->hasInput('context')) {
-					array_unshift($records, ['userid' => 0, 'username' => 'System', 'name' => '', 'surname' => '']);
+					$records[0] = ['userid' => 0, 'username' => 'System', 'name' => '', 'surname' => ''];
 				}
 
 				CArrayHelper::sort($records, ['username']);
