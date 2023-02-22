@@ -145,9 +145,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			'Media type mapping' => true
 		];
 
-		foreach ($jit_fields_memberOf as $field => $visible) {
-			$this->assertEquals($visible, $server_form->getField($field)->isVisible());
-			$this->assertTrue($server_form->getField($field)->isEnabled());
+		foreach ($jit_fields_memberOf as $label => $visible) {
+			$field = $server_form->getField($label);
+			$this->assertEquals($visible, $field->isVisible());
+			$this->assertTrue($field->isEnabled());
 		}
 
 		// Check JIT fields (groupOfNames).
