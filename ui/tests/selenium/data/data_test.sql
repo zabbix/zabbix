@@ -1810,7 +1810,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90008, 100005, 1, 'ds.hosts.0.0', 0, 'Host*');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90009, 100005, 1, 'ds.items.0.0', 0, 'Available memory');
 -- widget "Test cases for update"
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90011, 100004, 0, 'ds.axisy.0', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90010, 100004, 0, 'ds.axisy.0', 1, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90011, 100004, 1, 'ds.color.0', 0, 'FF465C');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90012, 100004, 0, 'ds.pointsize.0', 4, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90013, 100004, 0, 'ds.transparency.0', 6, '');
