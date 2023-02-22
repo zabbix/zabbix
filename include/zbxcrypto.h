@@ -40,4 +40,11 @@ zbx_crypto_hash_t;
 
 int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const char *text, size_t text_len,
 		char **out);
+
+
+#if defined(HAVE_OPENSSL) || defined(HAVE_GNUTLS)
+int	zbx_format_pem_pkey(char **key);
+int	zbx_rs256_sign(char *key, char *data, unsigned char **output, size_t *output_len, char **error);
+#endif
+
 #endif /* ZABBIX_ZBXCRYPTO_H */
