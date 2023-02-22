@@ -105,7 +105,6 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						'Base DN' => 'DC=zbx,DC=local',
 						'Search attribute' => 'sAMAccountName',
 						'Bind DN' => 'CN=Admin,OU=Users,OU=Zabbix,DC=zbx,DC=local',
-						'Case sensitive login' => true,
 						'Bind password' => PHPUNIT_LDAP_BIND_PASSWORD,
 						'Login' => PHPUNIT_LDAP_USERNAME,
 						'User password' => PHPUNIT_LDAP_USER_PASSWORD
