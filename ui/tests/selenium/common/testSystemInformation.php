@@ -86,7 +86,7 @@ class testSystemInformation extends CWebTest {
 		$file_path = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
 		$pattern = array('/[$]ZBX_SERVER/','/[$]ZBX_SERVER_PORT/');
 		$replace = array('// $ZBX_SERVER','// $ZBX_SERVER_PORT');
-		$content = preg_replace($pattern, $replace, file_get_contents($file_path),1);
+		$content = preg_replace($pattern, $replace, file_get_contents($file_path), 1);
 		file_put_contents($file_path, $content);
 
 		// Insert HA cluster data into ha_node table.
