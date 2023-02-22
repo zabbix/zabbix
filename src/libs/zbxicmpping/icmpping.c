@@ -267,7 +267,7 @@ static int	get_ipv6_support(const char *fping, const char *dst)
 #endif	/* HAVE_IPV6 */
 
 static int	check_hostip_response(char *resp, ZBX_FPING_HOST *hosts, const int hosts_count, const int rdns,
-		int *dnsname_len, ZBX_FPING_HOST **host)
+		size_t *dnsname_len, ZBX_FPING_HOST **host)
 {
 	int	i, ret = FAIL;
 	char	*c, *tmp = resp;
@@ -635,7 +635,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		{
 			ZBX_FPING_HOST	*host = NULL;
 			char		*c;
-			int		dnsname_len;
+			size_t		dnsname_len;
 
 			zbx_rtrim(tmp, "\n");
 			zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", tmp);
@@ -728,7 +728,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #endif
 			if (0 != rdns)
 			{
-				host->dnsname = zbx_dsprintf(NULL, "%.*s", dnsname_len, tmp);
+				host->dnsname = zbx_dsprintf(NULL, "%.*s", (int)dnsname_len, tmp);
 			}
 
 			ret = SUCCEED;

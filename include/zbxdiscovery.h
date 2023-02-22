@@ -39,13 +39,15 @@ ZBX_PTR_VECTOR_DECL(discoverer_net_check, DC_DCHECK *)
 typedef struct
 {
 	zbx_uint64_t				druleid;
-	DC_DRULE				*drule;
 	zbx_vector_discoverer_net_check_t	dchecks;
 	char					*ip;
 	zbx_vector_str_t			*ips;
 	unsigned short				port;
 	int					now;
+	zbx_uint64_t				unique_dcheckid;
+	zbx_uint64_t				drule_revision;
 	int					config_timeout;
+	int					resolve_dns;
 }
 zbx_discoverer_net_check_job_t;
 
