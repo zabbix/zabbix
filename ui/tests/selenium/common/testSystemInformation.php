@@ -83,9 +83,11 @@ class testSystemInformation extends CWebTest {
 		];
 
 		// Update Zabbix frontend config to make sure that the address of the active node is shown correctly in tests.
-		$file_name = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
-		$config = strtr(file_get_contents($file_name), ['$ZBX_SERVER ' => '// $ZBX_SERVER ', '$ZBX_SERVER_PORT' => '// $ZBX_SERVER_PORT']);
-		file_put_contents($file_name, $config);
+		$file_path = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+		$pattern = array('/[$]ZBX_SERVER/','/[$]ZBX_SERVER_PORT/');
+		$replace = array('// $ZBX_SERVER','// $ZBX_SERVER_PORT');
+		$content = preg_replace($pattern, $replace, file_get_contents($file_path),1);
+		file_put_contents($file_path, $content);
 
 		// Insert HA cluster data into ha_node table.
 		foreach ($nodes as $node) {
