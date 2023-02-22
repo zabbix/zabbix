@@ -147,13 +147,12 @@
 			this.setVisibleNamePlaceholder(host_field.value);
 			this.initHostInterfaces(host_interfaces, host_is_discovered);
 
+			const $groups_ms = $('#groups_');
 			const $template_ms = $('#add_templates_');
 
 			$template_ms.on('change', (e) => {
-				$template_ms.multiSelect('setDisabledEntries', common_template_edit.getAllTemplates());
+				$template_ms.multiSelect('setDisabledEntries', this.getAllTemplates());
 			});
-
-			const $groups_ms = $('#groups_');
 
 			$groups_ms.on('change', (e) => {
 				$groups_ms.multiSelect('setDisabledEntries',
@@ -205,35 +204,82 @@
 		},
 
 		/**
+		 * Helper to get linked template IDs as an array.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getLinkedTemplates() {
+			const linked_templateids = [];
+
+			this.form.querySelectorAll('[name^="templates["').forEach((input) => {
+				linked_templateids.push(input.value);
+			});
+
+			return linked_templateids;
+		},
+
+		/**
+		 * Helper to get added template IDs as an array.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getNewTemplates() {
+			const $template_multiselect = $('#add_templates_'),
+				templateids = [];
+
+			// Readonly forms don't have multiselect.
+			if ($template_multiselect.length) {
+				$template_multiselect.multiSelect('getData').forEach(template => {
+					templateids.push(template.id);
+				});
+			}
+
+			return templateids;
+		},
+
+		/**
+		 * Collects ids of currently active (linked + new) templates.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getAllTemplates() {
+			return this.getLinkedTemplates().concat(this.getNewTemplates());
+		},
+
+		/**
 		 * Set up of macros functionality.
 		 */
 		initMacrosTab() {
 			const $show_inherited_macros = $('input[name="show_inherited_macros"]');
 
-			this.macros_manager = new HostMacrosManager();
+			this.macros_manager = new HostMacrosManager({});
 
 			$('#host-tabs').on('tabscreate tabsactivate', (e, ui) => {
 				const panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
+				const show_inherited_macros = ($show_inherited_macros.filter(':checked').val() == 1);
 
 				if (panel.attr('id') === 'macros-tab') {
-					const show_inherited_macros = ($show_inherited_macros.filter(':checked').val() == 1);
-
+					// Please note that macro initialization must take place once and only when the tab is visible.
 					if (e.type === 'tabsactivate') {
-						const templateids = common_template_edit.getAllTemplates();
+						const templateids = this.getAllTemplates();
 
+						// First time always load inherited macros.
 						if (this.macros_templateids === null) {
-							this.macros_templateids = [];
-						}
+							this.macros_templateids = templateids;
 
-						if (show_inherited_macros
-								&& common_template_edit.templatesChanged(this.macros_templateids, templateids)) {
+							if (show_inherited_macros) {
+								this.macros_manager.load(show_inherited_macros, templateids);
+								this.macros_initialized = true;
+							}
+						}
+						// Other times load inherited macros only if templates changed.
+						else if (show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
 							this.macros_templateids = templateids;
 							this.macros_manager.load(show_inherited_macros, templateids);
-							this.macros_initialized = true;
 						}
 					}
 
-					if (this.macros_initialized === true) {
+					if (this.macros_initialized) {
 						return;
 					}
 
@@ -245,7 +291,7 @@
 			});
 
 			$show_inherited_macros.on('change', function() {
-				host_edit.macros_manager.load(this.value == 1, common_template_edit.getAllTemplates());
+				host_edit.macros_manager.load(this.value == 1, host_edit.getAllTemplates());
 				host_edit.updateEncryptionFields();
 			});
 		},

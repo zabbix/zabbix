@@ -26,6 +26,8 @@
 #include "zbxtimekeeper.h"
 #include "zbxipcservice.h"
 
+typedef void (*zbx_pp_notify_cb_t)(void *data);
+
 /* one preprocessing step history */
 typedef struct
 {
@@ -165,7 +167,8 @@ int	zbx_pp_preproc_has_history(int type);
 
 typedef struct zbx_pp_manager zbx_pp_manager_t;
 
-zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, char **error);
+zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
+		void *finished_data, char **error);
 void	zbx_pp_manager_free(zbx_pp_manager_t *manager);
 zbx_pp_task_t	*zbx_pp_manager_create_task(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value,
 		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);
@@ -173,7 +176,7 @@ void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp
 void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
 		zbx_timespec_t ts, zbx_ipc_client_t *client);
 void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks,
-		zbx_uint64_t *pending_num, zbx_uint64_t *finished_num);
+		zbx_uint64_t *pending_num, zbx_uint64_t *processing_num, zbx_uint64_t *finished_num);
 void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager);
 
 zbx_uint64_t	zbx_pp_manager_get_revision(const zbx_pp_manager_t *manager);

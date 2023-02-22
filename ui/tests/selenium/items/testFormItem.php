@@ -361,13 +361,13 @@ class testFormItem extends CLegacyWebTest {
 		$form = $this->query('id:item-form')->asForm()->waitUntilVisible()->one();
 
 		if (isset($templateid)) {
-			$this->zbxTestTextPresent('Parent item');
+			$this->zbxTestTextPresent('Parent items');
 			if (isset($data['hostTemplate'])) {
 				$this->assertTrue($form->query('link', $data['hostTemplate'])->exists());
 			}
 		}
 		else {
-			$this->zbxTestTextNotPresent('Parent item');
+			$this->zbxTestTextNotPresent('Parent items');
 		}
 
 		$this->zbxTestTextPresent('Name');

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-29 16:00+0000\n"
+"PO-Revision-Date: 2023-02-16 21:36+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -2376,7 +2376,7 @@ msgstr "Nie można utworzyć cyklicznych zależności."
 #: app/controllers/CControllerConnectorCreate.php:89
 #: app/controllers/CControllerConnectorCreate.php:164
 msgid "Cannot create connector"
-msgstr ""
+msgstr "Nie można utworzyć konektora"
 
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
@@ -2398,7 +2398,7 @@ msgstr "Nie można utworzyć mapy ikon"
 #: app/controllers/CControllerMaintenanceCreate.php:72
 #: app/controllers/CControllerMaintenanceCreate.php:150
 msgid "Cannot create maintenance period"
-msgstr ""
+msgstr "Nie można utworzyć okresu utrzymania"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2459,9 +2459,9 @@ msgstr "Nie można usunąć przypisanej roli użytkownika \"%1$s\"."
 #: app/controllers/CControllerConnectorDelete.php:68
 msgid "Cannot delete connector"
 msgid_plural "Cannot delete connectors"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie można usunąć konektora"
+msgstr[1] "Nie można usunąć konektorów"
+msgstr[2] "Nie można usunąć konektorów"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2597,9 +2597,9 @@ msgstr "Nie można usunąć utrzymania"
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
 msgid_plural "Cannot delete maintenance periods"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie można usunąć okresu utrzymania"
+msgstr[1] "Nie można usunąć okresów utrzymania"
+msgstr[2] "Nie można usunąć okresów utrzymania"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -2795,9 +2795,9 @@ msgstr[2] "Nie można wyłączyć akcji"
 #: app/controllers/CControllerConnectorDisable.php:77
 msgid "Cannot disable connector"
 msgid_plural "Cannot disable connectors"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie można wyłączyć konektora"
+msgstr[1] "Nie można wyłączyć konektorów"
+msgstr[2] "Nie można wyłączyć konektorów"
 
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
@@ -2898,9 +2898,9 @@ msgstr[2] "Nie można włączyć akcji"
 #: app/controllers/CControllerConnectorEnable.php:77
 msgid "Cannot enable connector"
 msgid_plural "Cannot enable connectors"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie można włączyć konektora"
+msgstr[1] "Nie można włączyć konektorów"
+msgstr[2] "Nie można włączyć konektorów"
 
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
@@ -3815,7 +3815,7 @@ msgstr "Nie można zaktualizować konfiguracji"
 #: app/controllers/CControllerConnectorUpdate.php:90
 #: app/controllers/CControllerConnectorUpdate.php:173
 msgid "Cannot update connector"
-msgstr ""
+msgstr "Nie można zaktualizować konektora"
 
 #: app/controllers/CControllerCorrelationCreate.php:47
 #: app/controllers/CControllerCorrelationUpdate.php:48
@@ -3932,7 +3932,7 @@ msgstr "Nie można zaktualizować utrzymania"
 #: app/controllers/CControllerMaintenanceUpdate.php:73
 #: app/controllers/CControllerMaintenanceUpdate.php:152
 msgid "Cannot update maintenance period"
-msgstr ""
+msgstr "Nie można zaktualizować okresu utrzymania"
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -4886,47 +4886,47 @@ msgstr "Połączenia do proxy"
 #: app/controllers/CControllerAuditLogList.php:212
 #: app/views/connector.edit.php:283 app/views/connector.edit.php:297
 msgid "Connector"
-msgstr ""
+msgstr "Konektor"
 
 #: include/classes/api/services/CConnector.php:446
 #, c-format
 msgid "Connector \"%1$s\" already exists."
-msgstr ""
+msgstr "Konektor \"%1$s\" już istnieje."
 
 #: app/controllers/CControllerConnectorCreate.php:156
 msgid "Connector created"
-msgstr ""
+msgstr "Utworzono konektor"
 
 #: app/controllers/CControllerConnectorDelete.php:60
 msgid "Connector deleted"
 msgid_plural "Connectors deleted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Usunięto konektor"
+msgstr[1] "Usunięto konektory"
+msgstr[2] "Usunięto konektory"
 
 #: app/controllers/CControllerConnectorDisable.php:69
 msgid "Connector disabled"
 msgid_plural "Connectors disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Wyłączono konektor"
+msgstr[1] "Wyłączono konektory"
+msgstr[2] "Wyłączono konektory"
 
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
 msgid_plural "Connectors enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Włączono konektor"
+msgstr[1] "Włączono konektory"
+msgstr[2] "Włączono konektory"
 
 #: app/controllers/CControllerConnectorUpdate.php:165
 msgid "Connector updated"
-msgstr ""
+msgstr "Zaktualizowano konektor"
 
 #: app/controllers/CControllerConnectorList.php:104
 #: app/views/connector.list.php:132 include/classes/helpers/CMenuHelper.php:360
 #: include/html.inc.php:891
 msgid "Connectors"
-msgstr ""
+msgstr "Konektory"
 
 #: include/views/monitoring.sysmap.list.php:85
 #: include/views/monitoring.sysmap.list.php:86
@@ -5188,7 +5188,7 @@ msgstr "Utwórz tło"
 
 #: app/views/connector.list.php:139
 msgid "Create connector"
-msgstr ""
+msgstr "Utwórz konektor"
 
 #: app/views/configuration.correlation.list.php:37
 msgid "Create correlation"
@@ -5691,7 +5691,7 @@ msgstr "Czas przechowywania danych"
 
 #: app/views/connector.edit.php:54 app/views/connector.list.php:73
 msgid "Data type"
-msgstr ""
+msgstr "Typ danych"
 
 #: include/classes/setup/CSetupWizard.php:565
 #: include/classes/setup/CSetupWizard.php:717
@@ -6120,11 +6120,11 @@ msgstr "Usunąć wybrane akcje?"
 
 #: app/views/connector.edit.php:332 app/views/js/connector.list.js.php:129
 msgid "Delete selected connector?"
-msgstr ""
+msgstr "Usunąć wybrany konektor?"
 
 #: app/views/js/connector.list.js.php:128
 msgid "Delete selected connectors?"
-msgstr ""
+msgstr "Usunąć wybrane konektory?"
 
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
@@ -6201,7 +6201,7 @@ msgstr "Usunąć wybrane pozycje?"
 
 #: app/views/js/maintenance.list.js.php:88
 msgid "Delete selected maintenance period?"
-msgstr ""
+msgstr "Usunąć wybrany okres utrzymania?"
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -6563,11 +6563,11 @@ msgstr "Wyłączyć wybrane akcje?"
 
 #: app/views/js/connector.list.js.php:114
 msgid "Disable selected connector?"
-msgstr ""
+msgstr "Wyłączyć wybrany konektor?"
 
 #: app/views/js/connector.list.js.php:113
 msgid "Disable selected connectors?"
-msgstr ""
+msgstr "Wyłączyć wybrane konektory?"
 
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
@@ -7374,11 +7374,11 @@ msgstr "Włączyć wybrane akcje?"
 
 #: app/views/js/connector.list.js.php:99
 msgid "Enable selected connector?"
-msgstr ""
+msgstr "Włączyć wybrany konektor?"
 
 #: app/views/js/connector.list.js.php:98
 msgid "Enable selected connectors?"
-msgstr ""
+msgstr "Włączyć wybrane konektory?"
 
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
@@ -7669,7 +7669,7 @@ msgstr[2] "Zdarzeń zaktualizowanych"
 
 #: app/views/connector.edit.php:58 app/views/connector.list.php:99
 msgid "Events"
-msgstr ""
+msgstr "Zdarzenia"
 
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
@@ -8048,7 +8048,7 @@ msgstr "Pole \"%1$s\" jest niewłaściwe: %2$s"
 #: include/validate.inc.php:185 include/validate.inc.php:190
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s."
-msgstr ""
+msgstr "Pole \"%1$s\" jest niewłaściwe: %2$s."
 
 #: include/validate.inc.php:167
 #, c-format
@@ -12489,7 +12489,7 @@ msgstr "Okres utrzymania"
 
 #: app/controllers/CControllerMaintenanceCreate.php:142
 msgid "Maintenance period created"
-msgstr ""
+msgstr "Utworzono okres utrzymania"
 
 #: app/controllers/CControllerMaintenanceDelete.php:61
 msgid "Maintenance period deleted"
@@ -16043,7 +16043,7 @@ msgstr "Właściwości"
 
 #: app/views/connector.edit.php:47
 msgid "Protocol"
-msgstr ""
+msgstr "Protokół"
 
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
@@ -16365,7 +16365,7 @@ msgstr "Odbiorca już istnieje."
 
 #: app/views/reports.actionlog.list.csv.php:39
 msgid "Recipient's Zabbix username"
-msgstr ""
+msgstr "Nazwa użytkownika odbiorcy w Zabbix"
 
 #: app/views/reports.actionlog.list.csv.php:40
 msgid "Recipient's name"
@@ -16430,7 +16430,7 @@ msgstr "Prostokąt"
 
 #: app/views/popup.ldap.edit.php:168
 msgid "Reference attribute"
-msgstr ""
+msgstr "Atrybut odniesienia"
 
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
@@ -17627,7 +17627,7 @@ msgstr[2] "Usunięto skrypt"
 
 #: app/views/popup.mediatypetest.edit.php:60
 msgid "Script does not have parameters."
-msgstr ""
+msgstr "Skrypt nie ma parametrów."
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"

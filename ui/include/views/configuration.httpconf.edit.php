@@ -56,26 +56,10 @@ if ($data['httptestid'] != 0) {
 // Scenario tab.
 $scenario_tab = new CFormGrid();
 
-if (array_key_exists('parent_httptest', $data)) {
-	$parent_httptest = $data['parent_httptest'];
-
-	if ($parent_httptest['editable']) {
-		$parent_template_name = new CLink(CHtml::encode($parent_httptest['template_name']),
-			(new CUrl('httpconf.php'))
-				->setArgument('form', 'update')
-				->setArgument('context', 'template')
-				->setArgument('hostid', $parent_httptest['templateid'])
-				->setArgument('httptestid', $data['templateid'])
-		);
-	}
-	else {
-		$parent_template_name = (new CSpan(CHtml::encode($parent_httptest['template_name'])))
-			->addClass(ZBX_STYLE_GREY);
-	}
-
+if ($data['templates']) {
 	$scenario_tab->addItem([
-		new CLabel(_('Parent web scenario')),
-		new CFormField($parent_template_name)
+		new CLabel(_('Parent web scenarios')),
+		new CFormField($data['templates'])
 	]);
 }
 
@@ -414,7 +398,6 @@ $webscenario_tabs = (new CTabView())
 			'source' => 'httptest',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
-			'context' => $data['context'],
 			'readonly' => false,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab'
