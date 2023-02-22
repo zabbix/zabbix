@@ -1806,7 +1806,7 @@ INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height)
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100005, 15680, 'svggraph', 'Test cases for simple update and deletion', 6, 0, 6, 5);
 -- widget "Test cases for simple update and deletion"
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90006, 100005, 1, 'ds.color.0', 0, 'FF465C');
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90006, 100005, 0, 'righty', 0, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90007, 100005, 0, 'righty', 0, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90008, 100005, 1, 'ds.hosts.0.0', 0, 'Host*');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90009, 100005, 1, 'ds.items.0.0', 0, 'Available memory');
 -- widget "Test cases for update"
