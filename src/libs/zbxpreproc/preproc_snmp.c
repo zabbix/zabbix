@@ -891,7 +891,7 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 			else if (0 != strncmp(param_field.oid_prefix, p.oid, prefix_len))
 				continue;
 
-			if ('\0' == *(prefix_len + p.oid) || 0 != isdigit(p.oid[prefix_len]))
+			if ('.' != p.oid[prefix_len])
 				continue;
 
 			if (SUCCEED != preproc_snmp_convert_value(&p.value, p.type, param_field.format_flag, errmsg))
