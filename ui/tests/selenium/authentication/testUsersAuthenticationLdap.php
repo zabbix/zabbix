@@ -976,8 +976,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			foreach ($data['db_check'] as $table => $rows) {
 				$bebebe = CDBHelper::getAll('SELECT * FROM '.$table.' LIMIT '.count($rows));
 				foreach ($rows as $i => $row) {
-					//$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table.' LIMIT 1 OFFSET '.$i;
-					//$this->assertEquals([$row], CDBHelper::getAll($sql));
 					foreach ($row as $key => $value) {
 						$this->assertEquals($value, $bebebe[$i][$key]);
 					}
