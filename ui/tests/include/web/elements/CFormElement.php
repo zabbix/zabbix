@@ -534,7 +534,10 @@ class CFormElement extends CElement {
 	 * @return boolean
 	 */
 	public function isRequired($label) {
-		return $this->getLabel($label)->hasClass($this->required_label);
+		$labels = $this->getLabels(CElementFilter::CLASSES_PRESENT, [$this->required_label])
+				->filter(CElementFilter::VISIBLE)->asText();
+
+		return array_values($labels);
 	}
 
 	/**
