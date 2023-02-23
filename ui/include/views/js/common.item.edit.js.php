@@ -162,10 +162,10 @@
 				binary_selected = this.value == ITEM_VALUE_TYPE_BINARY,
 				disable_binary = $('#type').val() != <?= ITEM_TYPE_DEPENDENT ?>;
 
-			this.getOptionByValue(ITEM_VALUE_TYPE_BINARY).disabled = disable_binary;
+			this.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
 			document.querySelector('z-select[name="value_type_steps"]')
 				.getOptionByValue(ITEM_VALUE_TYPE_BINARY)
-				.disabled = disable_binary;
+				.hidden = disable_binary;
 
 			if (binary_selected && disable_binary) {
 				this.value = this.getOptions().find((option) => option.value != ITEM_VALUE_TYPE_BINARY).value;

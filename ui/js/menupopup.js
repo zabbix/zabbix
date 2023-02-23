@@ -1024,12 +1024,12 @@ function getMenuPopupItem(options) {
 	});
 
 	if (options.allowed_ui_conf_hosts) {
-		options.allowed_triggers = !options.hasOwnProperty('allowed_triggers') || options.allowed_triggers;
+		options.binary_data = options.binary_data || false;
 
 		const config_urls = [];
 		const config_triggers = {
 			label: t('Triggers'),
-			disabled: !options.allowed_triggers || options.triggers.length === 0
+			disabled: options.binary_data || options.triggers.length === 0
 		};
 
 		if (options.isWriteable) {
@@ -1078,7 +1078,7 @@ function getMenuPopupItem(options) {
 		config_urls.push({
 			label: t('Create trigger'),
 			url: url.getUrl(),
-			disabled: !options.allowed_triggers
+			disabled: options.binary_data
 		});
 
 		url = new Curl('items.php');
@@ -1092,7 +1092,7 @@ function getMenuPopupItem(options) {
 		config_urls.push({
 			label: t('Create dependent item'),
 			url: url.getUrl(),
-			disabled: options.isDiscovery
+			disabled: options.isDiscovery || options.binary_data
 		});
 
 		url = new Curl('host_discovery.php');
@@ -1106,7 +1106,7 @@ function getMenuPopupItem(options) {
 		config_urls.push({
 			label: t('Create dependent discovery rule'),
 			url: url.getUrl(),
-			disabled: options.isDiscovery
+			disabled: options.isDiscovery || options.binary_data
 		});
 
 		sections.push({

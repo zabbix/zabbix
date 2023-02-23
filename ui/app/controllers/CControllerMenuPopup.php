@@ -62,7 +62,7 @@ class CControllerMenuPopup extends CController {
 				$rules = [
 					'itemid' => 'required|db items.itemid',
 					'backurl' => 'required|string',
-					'triggers' => 'in 0,1'
+					'binary_data' => 'in 1'
 				];
 				break;
 
@@ -70,7 +70,7 @@ class CControllerMenuPopup extends CController {
 				$rules = [
 					'itemid' => 'required|db items.itemid',
 					'backurl' => 'required|string',
-					'triggers' => 'in 0,1'
+					'binary_data' => 'in 1'
 				];
 				break;
 
@@ -364,8 +364,8 @@ class CControllerMenuPopup extends CController {
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			];
 
-			if (array_key_exists('triggers', $data)) {
-				$result['allowed_triggers'] = $data['triggers'] != 0;
+			if (array_key_exists('binary_data', $data)) {
+				$result['binary_data'] = true;
 			}
 
 			return $result;

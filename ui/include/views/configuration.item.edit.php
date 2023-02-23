@@ -123,10 +123,7 @@ $item_type_options = CSelect::createOptionsFromArray([
 	ITEM_VALUE_TYPE_STR => _('Character'),
 	ITEM_VALUE_TYPE_LOG => _('Log'),
 	ITEM_VALUE_TYPE_TEXT => _('Text'),
-	ITEM_VALUE_TYPE_BINARY => [
-		'label' => _('Binary'),
-		'disabled' => $data['type'] != ITEM_TYPE_DEPENDENT
-	]
+	ITEM_VALUE_TYPE_BINARY => _('Binary')
 ]);
 $type_mismatch_hint = (new CSpan(makeWarningIcon(_('This type of information may not match the key.'))))
 	->setId('js-item-type-hint')
@@ -589,7 +586,14 @@ $item_tab
 						'dstfld1' => 'master_itemid',
 						'hostid' => $data['hostid'],
 						'excludeids' => $data['itemid'] != 0 ? [$data['itemid']] : [],
-						'normal_only' => true
+						'normal_only' => true,
+						'value_types' => [
+							ITEM_VALUE_TYPE_FLOAT,
+							ITEM_VALUE_TYPE_STR,
+							ITEM_VALUE_TYPE_LOG,
+							ITEM_VALUE_TYPE_UINT64,
+							ITEM_VALUE_TYPE_TEXT
+						]
 					]
 				]
 			]))

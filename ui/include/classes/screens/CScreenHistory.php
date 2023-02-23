@@ -82,6 +82,13 @@ class CScreenHistory extends CScreenBase {
 	public $page_file;
 
 	/**
+	 * Substitute for binary value output.
+	 *
+	 * @var CTag
+	 */
+	private static $binary_value;
+
+	/**
 	 * Init screen data.
 	 *
 	 * @param array		$options
@@ -118,6 +125,10 @@ class CScreenHistory extends CScreenBase {
 			$this->itemids = array_column($itemids, 'itemid', 'itemid');
 			$this->graphid = $options['graphid'];
 		}
+
+		self::$binary_value = $this->plaintext
+			? _('binary data')
+			: (new CTag('em', true, _('binary data')))->addClass(ZBX_STYLE_GREY);
 	}
 
 	/**
@@ -206,7 +217,7 @@ class CScreenHistory extends CScreenBase {
 					if ($item_data) {
 						if ($value_type == ITEM_VALUE_TYPE_BINARY) {
 							foreach ($item_data as &$row) {
-								$row['value'] = _('binary data');
+								$row['value'] = self::$binary_value;
 							}
 							unset($row);
 						}
@@ -308,7 +319,7 @@ class CScreenHistory extends CScreenBase {
 					if ($item_data) {
 						if ($value_type == ITEM_VALUE_TYPE_BINARY) {
 							foreach ($item_data as &$row) {
-								$row['value'] = _('binary data');
+								$row['value'] = self::$binary_value;
 							}
 							unset($row);
 						}
@@ -431,7 +442,7 @@ class CScreenHistory extends CScreenBase {
 					if ($item_data) {
 						if ($value_type == ITEM_VALUE_TYPE_BINARY) {
 							foreach ($item_data as &$row) {
-								$row['value'] = _('binary data');
+								$row['value'] = self::$binary_value;
 							}
 							unset($row);
 						}
@@ -490,7 +501,7 @@ class CScreenHistory extends CScreenBase {
 
 					if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
 						foreach ($item_data as &$row) {
-							$row['value'] = _('binary data');
+							$row['value'] = self::$binary_value;
 						}
 						unset($row);
 					}

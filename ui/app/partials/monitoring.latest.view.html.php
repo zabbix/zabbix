@@ -128,7 +128,7 @@ foreach ($data['items'] as $itemid => $item) {
 	]);
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-		$popup_parameters['data']['triggers'] = 0;
+		$popup_parameters['data']['binary_data'] = 1;
 	}
 
 	$item_name = (new CDiv([
@@ -149,7 +149,7 @@ foreach ($data['items'] as $itemid => $item) {
 			->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']), '', true, '', 0);
 
 		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-			$last_value = new CSpan(_('binary data'));
+			$last_value = (new CTag('em', true, _('binary data')))->addClass(ZBX_STYLE_GREY);
 		}
 		else {
 			$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
