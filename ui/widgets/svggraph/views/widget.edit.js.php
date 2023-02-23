@@ -25,12 +25,12 @@ use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
 
 window.widget_svggraph_form = new class {
 
-	init({form_tabs_id, color_palette}) {
+	init({form_tabs_id, color_palette, templateid}) {
 		colorPalette.setThemeColors(color_palette);
 
 		this._$overlay_body = jQuery('.overlay-dialogue-body');
 		this._form = document.getElementById('widget-dialogue-form');
-
+		this.templateid = templateid;
 
 		this._dataset_wrapper = document.getElementById('data_sets');
 
@@ -467,17 +467,32 @@ window.widget_svggraph_form = new class {
 	}
 
 	_selectItems() {
-		PopUp('popup.generic', {
-			srctbl: 'items',
-			srcfld1: 'itemid',
-			srcfld2: 'name',
-			dstfrm: this._form.id,
-			numeric: 1,
-			writeonly: 1,
-			multiselect: 1,
-			with_webitems: 1,
-			real_hosts: 1
-		});
+		if (this.templateid === null) {
+			PopUp('popup.generic', {
+				srctbl: 'items',
+				srcfld1: 'itemid',
+				srcfld2: 'name',
+				dstfrm: this._form.id,
+				numeric: 1,
+				writeonly: 1,
+				multiselect: 1,
+				with_webitems: 1,
+				real_hosts: 1
+			});
+		}
+		else {
+			PopUp('popup.generic', {
+				srctbl: 'items',
+				srcfld1: 'itemid',
+				srcfld2: 'name',
+				dstfrm: this._form.id,
+				numeric: 1,
+				writeonly: 1,
+				multiselect: 1,
+				with_webitems: 1,
+				hostid: this.templateid
+			});
+		}
 	}
 
 	_addSingleItem(itemid, name) {

@@ -65,7 +65,8 @@ $form
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_svggraph_form.init('.json_encode([
 		'form_tabs_id' => $form_tabs->getId(),
-		'color_palette' => CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE
+		'color_palette' => CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE,
+		'templateid' => $data['fields']['ds']->templateid
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
@@ -255,9 +256,11 @@ function getProblemsTab(CWidgetFormView $form, array $fields): CFormGrid {
 			new CWidgetFieldCheckBoxView($fields['graph_item_problems'])
 		),
 
-		$form->makeCustomField(
-			(new CWidgetFieldHostPatternSelectView($fields['problemhosts']))->setPlaceholder(_('host pattern'))
-		),
+		array_key_exists('problemhosts', $fields)
+			? $form->makeCustomField(
+				(new CWidgetFieldHostPatternSelectView($fields['problemhosts']))->setPlaceholder(_('host pattern'))
+			)
+			: null,
 
 		$form->makeCustomField(
 			new CWidgetFieldSeveritiesView($fields['severities'])

@@ -45,8 +45,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	// First color from the default color palette.
 	private const DEFAULT_COLOR = 'FF465C';
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, string $label = null, string $templateid = null) {
 		parent::__construct($name, $label);
+		$this->templateid = $templateid;
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
@@ -94,7 +95,11 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		if ($flags & self::FLAG_NOT_EMPTY) {
 			$strict_validation_rules = $this->getValidationRules();
 			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
-			self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
+
+			if ($this->templateid === null) {
+				self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
+			}
+
 			self::setValidationRuleFlag($strict_validation_rules['fields']['items'], API_NOT_EMPTY);
 			self::setValidationRuleFlag($strict_validation_rules['fields']['itemids'], API_NOT_EMPTY);
 			$this->setStrictValidationRules($strict_validation_rules);

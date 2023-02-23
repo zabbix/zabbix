@@ -736,6 +736,10 @@ switch ($data['method']) {
 					$hostids = array_keys($hosts);
 				}
 
+				if (array_key_exists('hostid', $data)) {
+					$hostids = $data['hostid'];
+				}
+
 				$options = [
 					'output' => ['name'],
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
