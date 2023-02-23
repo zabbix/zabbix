@@ -3052,7 +3052,7 @@ static void	format_binary_value_for_sql(char **in)
 
 	src_len = strlen(*in) * 3 / 4 ;
 	dst = (char*)zbx_malloc(NULL, src_len);
-	str_base64_decode(*in, (char *)dst, src_len, &data_len);
+	str_base64_decode_size_t(*in, (char *)dst, src_len, &data_len);
 #if defined (HAVE_MYSQL)
 	chunk = (char*)zbx_malloc(NULL, 2 * data_len);
 	zbx_mysql_escape_bin((char*)dst, chunk, data_len);
