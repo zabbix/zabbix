@@ -271,7 +271,7 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	public function testFormUpdateProblem_Layout($data) {
 		// Open filtered Problems list.
-		$this->page->login()->open('zabbix.php?&action=problem.view&filter_set=1&filter_name=&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRows('Problem', $data['problems'])->select();
 		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
@@ -541,7 +541,7 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	public function testFormUpdateProblem_Form($data) {
 		// Open filtered Problems list.
-		$this->page->login()->open('zabbix.php?&action=problem.view&filter_set=1&filter_name=&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?&action=problem.view&filter_set=1&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		$count = count($data['problems']);
@@ -604,7 +604,7 @@ class testFormUpdateProblem extends CWebTest {
 		$old_hash = $this->getHash();
 
 		// Open filtered Problems list.
-		$this->page->login()->open('zabbix.php?&action=problem.view&filter_set=1&filter_name=&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
 		$this->query('class:list-table')->asTable()->one()->findRow('Problem', 'Trigger for char')->getColumn('Ack')
 				->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
