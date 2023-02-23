@@ -54,12 +54,11 @@ $hintbox_tile_url = makeHelpIcon([
 	]))->addClass(ZBX_STYLE_LIST_DASHED)
 ]);
 
-$warning_attribution = makeWarningIcon(
-	_(
-		'Tile provider attribution data displayed in a small text box on the map.
-		Make sure the code comes from a reliable source and does not contain malicious scripts.'
-	)
-);
+$warning_attribution = makeWarningIcon([
+	_('Tile provider attribution data displayed in a small text box on the map.'),
+	BR(),
+	_('Make sure the code comes from a reliable source and does not contain malicious scripts.')
+]);
 
 $hintbox_max_zoom = makeHelpIcon(_('Maximum zoom level of the map.'));
 
