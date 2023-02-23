@@ -434,8 +434,6 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 	/**
 	 * @dataProvider getCheckWidgetTable
-	 *
-	 * @onAfter deleteWidgets
 	 */
 	public function testDashboardProblemsWidgetDisplay_CheckTable($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
@@ -462,15 +460,12 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Assert Problems widget's table.
 		$this->assertTableDataColumn($data['result'], 'Problem • Severity');
 
+		// Assert Problems widget's tags column.
 		if (array_key_exists('Tags', $data)) {
 			$this->assertTableDataColumn($data['tags_display'], 'Tags');
 		}
-	}
 
-	/**
-	 * Delete all widgets on the dashboard after case.
-	 */
-	private function deleteWidgets() {
+		// Delete created widget.
 		DBexecute('DELETE FROM widget w'.
 				' WHERE EXISTS ('.
 					'SELECT NULL'.
