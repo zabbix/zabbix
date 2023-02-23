@@ -1395,8 +1395,6 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 						ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_BIN:
-				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				exit(EXIT_FAILURE);
@@ -4507,6 +4505,12 @@ static void	hc_free_data(zbx_hc_data_t *data)
 
 					__hc_shmem_free_func(data->value.log);
 					break;
+				case ITEM_VALUE_TYPE_UINT64:
+				case ITEM_VALUE_TYPE_FLOAT:
+					break;
+				case ITEM_VALUE_TYPE_NONE:
+					THIS_SHOULD_NEVER_HAPPEN;
+					exit(EXIT_FAILURE);
 			}
 		}
 	}
@@ -4741,6 +4745,9 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 				if (SUCCEED != hc_clone_history_log_data(&(*data)->value.log, item_value))
 					return FAIL;
 				break;
+			case ITEM_VALUE_TYPE_NONE:
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 		}
 
 		switch (item_value->item_value_type)
@@ -4763,6 +4770,9 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 			case ITEM_VALUE_TYPE_BIN:
 				cache->stats.history_bin_counter++;
 				break;
+			case ITEM_VALUE_TYPE_NONE:
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 		}
 
 		cache->stats.history_counter++;
@@ -4903,6 +4913,7 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 				history->value.log->logeventid = data->value.log->logeventid;
 
 				break;
+			case ITEM_VALUE_TYPE_NONE:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				exit(EXIT_FAILURE);

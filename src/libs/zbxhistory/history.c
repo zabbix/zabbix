@@ -287,6 +287,7 @@ void	zbx_history_value2str(char *buffer, size_t size, const zbx_history_value_t 
 		case ITEM_VALUE_TYPE_LOG:
 			zbx_strlcpy_utf8(buffer, value->log->value, size);
 			break;
+		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
@@ -323,6 +324,7 @@ char	*zbx_history_value2str_dyn(const zbx_history_value_t *value, int value_type
 		case ITEM_VALUE_TYPE_LOG:
 			str = zbx_strdup(NULL, value->log->value);
 			break;
+		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
@@ -458,6 +460,11 @@ void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char v
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			zbx_variant_set_str(var, zbx_strdup(NULL, value->log->value));
+			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 }
 
