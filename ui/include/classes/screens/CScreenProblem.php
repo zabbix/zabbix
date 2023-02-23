@@ -1414,6 +1414,7 @@ class CScreenProblem extends CScreenBase {
 
 			if ($data['filter']['compact_view'] && $data['filter']['show_suppressed'] && count($info_icons) > 1) {
 				$cell_info = (new CButton(null))
+					->addClass(ZBX_STYLE_BTN_ICON)
 					->addClass(ZBX_ICON_MORE)
 					->addStyle('margin-left: -3px;')
 					->setHint(makeInformationList($info_icons));

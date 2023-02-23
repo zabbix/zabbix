@@ -1,29 +1,3 @@
-%btn-icon { // TODO - AS: should be checked and removed
-	display: inline-block;
-	width: 18px;
-	height: 18px;
-	min-height: auto;
-	padding: 0;
-	line-height: 18px;
-	text-decoration: none;
-	vertical-align: middle;
-	cursor: pointer;
-	background-color: transparent;
-	border: 0;
-	border-radius: 2px;
-	opacity: .5;
-	transition: opacity .2s ease-out;
-
-	&:hover,
-	&:focus,
-	&:active {
-		text-decoration: none;
-		background-color: transparent;
-		outline: none;
-		opacity: 1;
-	}
-}
-
 %btn-icon-position {
 	display: inline-flex;
 	align-items: center;

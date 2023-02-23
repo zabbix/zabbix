@@ -176,6 +176,7 @@ foreach ($data['items'] as $item) {
 	]);
 
 	$wizard = (new CButton(null))
+		->addClass(ZBX_STYLE_BTN_ICON)
 		->addClass(ZBX_ICON_MORE)
 		->setMenuPopup($item_menu);
 

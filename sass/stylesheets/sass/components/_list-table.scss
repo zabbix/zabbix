@@ -4,11 +4,30 @@
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
 
-	.zi-i,
-	.zi-alert {
+	.btn-icon {
+		&::before {
+			color: $icon-color;
+		}
+	}
+
+	a.zi-i,
+	a.zi-alert {
 		&:before {
 			vertical-align: middle;
 			position: relative;
+		}
+	}
+
+	span.zi-calendar-warning {
+		display: inline-block;
+		width: 18px;
+		height: 18px;
+
+		&::before {
+			display: inline-block;
+			width: 18px;
+			height: 18px;
+			font-size: 18px;
 		}
 	}
 
@@ -24,11 +43,6 @@
 			@extend %overflow-ellipsis;
 		}
 
-		// TODO - AS: check
-		//[class*='icon-'] {
-		//	flex-shrink: 0;
-		//}
-
 		.rel-container {
 			display: flex;
 		}
@@ -40,17 +54,26 @@
 	}
 
 	td {
-		// TODO - AS: check
-		//.icon-maintenance {
-		//	margin: 0 0 -3px 4px;
-		//}
+		.zi-wrench-alt {
+			display: inline-block;
+			margin-left: 6px;
+			width: 16px;
+			height: 16px;
+			cursor: pointer;
+			border-bottom: none;
 
-		// TODO - AS: check
-		//.icon-depend-up,
-		//.icon-depend-down,
-		//.icon-ackn {
-		//	margin: 0 4px -3px 0;
-		//}
+			&::before {
+				margin-left: 2px;
+				vertical-align: middle;
+				font-size: $btn-icon-small-size;
+				color: $icon-maintenance;
+			}
+
+			&:focus {
+				box-shadow: 0 0 0 2px rgba($blue, .35);
+				border-radius: 2px;
+			}
+		}
 
 		// Align tags and checkboxes. Tags are too low.
 		.tag {
@@ -65,27 +88,6 @@
 				}
 			}
 		}
-
-		// TODO - AS: check
-		//.btn-widget-expand,
-		//.btn-widget-collapse {
-		//	background-color: $ui-bg-color;
-		//	width: 18px;
-		//	height: 18px;
-		//	background-position-x: -9px;
-		//	margin: 7px 0 0 0;
-		//	opacity: 1;
-		//}
-
-		// TODO - AS: check
-		//.btn-widget-expand {
-		//	background-position-y: -693px;
-		//}
-
-		// TODO - AS: check
-		//.btn-widget-collapse {
-		//	background-position-y: -657px;
-		//}
 	}
 
 	.second-col {
@@ -134,225 +136,6 @@
 
 		.tag {
 			font-size: 12px;
-		}
-	}
-
-	&.compact-view {
-		tr {
-			&[class*='flh-'] {
-				@if $theme-name == 'blue' {
-					&:not(.row-selected):not(:hover) {
-						td {
-							color: $font-color;
-
-							sup,
-							a,
-							.problem-unack-fg,
-							.problem-ack-fg,
-							.ok-unack-fg,
-							.ok-ack-fg {
-								color: $font-color;
-								border-bottom-color: rgba($font-color, .5);
-							}
-
-							.tag {
-								background-color: rgba($font-color, .5);
-							}
-
-							// TODO - AS: check
-							//.icon-wizard-action {
-							//	background-position: -165px -624px;
-							//}
-
-							button:focus {
-								box-shadow: 0 0 0 2px rgba($font-color, .5);
-							}
-						}
-					}
-				}
-
-				@if $theme-name == 'dark' {
-					&:not(.row-selected):not(:hover) {
-						td {
-							color: #000000;
-
-							sup,
-							a,
-							.problem-unack-fg,
-							.problem-ack-fg,
-							.ok-unack-fg,
-							.ok-ack-fg {
-								color: #000000;
-								border-bottom-color: rgba(0, 0, 0, .5);
-							}
-
-							// TODO - AS: check
-							//.icon-wizard-action {
-							//	background-position: -165px -624px;
-							//}
-
-							button:focus {
-								box-shadow: 0 0 0 2px rgba(0, 0, 0, .5);
-							}
-						}
-					}
-				}
-
-				@if $theme-name == 'blue' or $theme-name == 'dark' {
-					&:not(.row-selected):not(:hover) {
-						td {
-							// TODO - AS: check
-							//[class*='icon-'] {
-							//	background-color: $ui-bg-color;
-							//	border-radius: 2px;
-							//}
-
-							// TODO - AS: check
-							//[class*='icon-depend-'],
-							//.icon-description,
-							//.icon-wizard-action {
-							//	background-color: transparent;
-							//}
-						}
-					}
-				}
-			}
-		}
-
-		.link-action {
-			color: $font-color;
-
-			&:hover,
-			&:focus {
-				color: $link-hover-color;
-			}
-
-			&.red {
-				color: $red;
-			}
-
-			&.orange {
-				color: $orange;
-			}
-
-			&.yellow {
-				color: $dark-yellow;
-			}
-
-			&.green {
-				color: $green;
-			}
-		}
-
-		.problem-nested:not([class*='flh-']):not(.row-selected) {
-			td, .timeline-axis, .timeline-td {
-				border-bottom: 0 !important;
-			}
-		}
-
-		td {
-			padding-top: 0;
-			padding-bottom: 0;
-			border-bottom: 0;
-			box-shadow: inset 0 -1px 0 0 rgba($font-color, .1);
-			color: $font-color;
-			height: 22px;
-			vertical-align: middle;
-			white-space: nowrap;
-
-			// TODO - AS: check
-			//[class*='icon-'] {
-			//	&::after {
-			//		margin: 0;
-			//		line-height: 14px;
-			//		top: 0;
-			//	}
-			// }
-
-			// button[class*='icon-'] {
-				//&:last-of-type {
-				//	margin-right: 0;
-				//}
-			//}
-
-			.rel-container {
-				span {
-					margin: 0;
-				}
-			}
-
-			.tag {
-				display: inline-block;
-				line-height: 16px;
-				margin-right: 3px;
-				padding: 0 3px;
-				max-width: 40px;
-
-				@media screen and (min-width: 1200px) {
-					max-width: 71px;
-				}
-
-				@media screen and (min-width: 1400px) {
-					max-width: 102px;
-				}
-
-				@media screen and (min-width: 1600px) {
-					max-width: 133px;
-				}
-			}
-
-			// TODO - AS: check
-			//.icon-maintenance {
-			//	height: 12px;
-			//	width: 12px;
-			//	margin: 3px 1px 2px 4px;
-
-			//	&::before {
-			//		height: 12px;
-			//		width: 12px;
-			//		background-position: -49px -805px;
-			//	}
-			//}
-
-			// TODO - AS: check
-			/*
-			.icon-depend-up,
-			.icon-depend-down {
-				width: 12px;
-			}
-
-			.icon-depend-up::before {
-				background-position: -49px -731px;
-			}
-
-			.icon-depend-down::before {
-				background-position: -49px -767px;
-			}
-
-			.icon-wizard-action {
-				background: url($sprite-path) no-repeat -6px -624px;
-				height: 12px;
-				min-height: 12px;
-				margin: 0;
-				position: relative;
-			}
-
-			.icon-description {
-				margin-left: 2px;
-			}
-
-			// Align action icons according to tags and problem description icons in compact view.
-			[class*='icon-action'] {
-				margin-top: -2px;
-			}
-			*/
-
-			// Align the expand and collapse icons in compact view.
-			.btn-widget-expand,
-			.btn-widget-collapse {
-				vertical-align: top;
-				margin: 0;
-			}
 		}
 	}
 
@@ -652,15 +435,41 @@
 		}
 	}
 
-	.zi-wrench-alt {
-		cursor: pointer;
-		border-bottom: none;
+	a,
+	button {
+		&.trigger-description {
+			vertical-align: top;
+			width: 18px;
+			height: 18px;
+			min-height: 0;
+			padding: 0;
+			margin-right: 5px;
 
-		&::before {
-			vertical-align: middle;
-			padding-left: 6px;
-			font-size: 12px;
-			color: #f3a914;
+			&::before {
+				color: $icon-color;
+			}
+		}
+	}
+
+	.trigger-description {
+		&::after {
+			position: absolute;
+			top: 4px;
+			width: 18px;
+			height: 18px;
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+			font-size: 9px;
+			font-family: inherit;
+		}
+	}
+
+	.trigger-description {
+		margin-left: 5px;
+
+		&::after {
+			content: '?' !important;
 		}
 	}
 }

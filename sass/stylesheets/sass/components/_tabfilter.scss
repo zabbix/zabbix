@@ -207,21 +207,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		}
 	}
 
-	// TODO - AS: need to check
-	.zi-cog-filled {
-		@extend %btn-widget-defaults;
-		width: 24px;
-		height: 22px;
-		color: $icon-color;
-		cursor: pointer;
-		margin: 0;
-		padding-bottom: 7px !important;
-		margin-bottom: -7px;
-		vertical-align: middle;
-		display: inline-block;
-		opacity: 0;
-	}
-
 	// Tab filter contents container.
 	.tabfilter-tabs-container {
 		.filter-container.time-selection-container {

@@ -2088,8 +2088,8 @@ function makeActionTableIcon(array $action): ?CTag {
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY) {
 				$action_type = ($action['new_severity'] > $action['old_severity'])
-					? ZBX_STYLE_ACTION_ICON_SEV_UP    // TODO - AS: need to update to icon class
-					: ZBX_STYLE_ACTION_ICON_SEV_DOWN; // TODO - AS: need to update to icon class
+					? ZBX_STYLE_EVENT_SEVERITY_UP
+					: ZBX_STYLE_EVENT_SEVERITY_DOWN;
 
 				$old_severity_name = CSeverityHelper::getName((int) $action['old_severity']);
 				$new_severity_name = CSeverityHelper::getName((int) $action['new_severity']);

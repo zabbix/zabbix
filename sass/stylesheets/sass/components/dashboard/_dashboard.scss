@@ -24,48 +24,18 @@
 	margin-right: 5px;
 	position: relative;
 
-	&::after {
-		content: '';
-		position: absolute;
-		min-height: 24px;
-		z-index: -1;
-		top: -5px;
-		right: -5px;
-		bottom: -5px;
-		left: -5px;
-		border: 1px solid $ui-border-color;
-	}
-
 	ul {
 		li {
 			vertical-align: middle;
 
+			//.btn-alt.zi-plus::before { // TODO acikuns check
+			//	font-size: 12px * .8;
+			//	font-weight: bolder;
+			//}
+
 			&:first-child {
 				padding: 0;
 			}
-
-			// TODO - AS: need to check
-			//.zi-plus {
-			//	vertical-align: middle;
-			//	width: unset;
-			//	height: unset;
-			//	padding: 0 11px 0 8px;
-			//	color: $btn-alt-font-color;
-			//	background-color: $btn-alt-bg-color;
-			//	font-size: 100%;
-
-			//	&:hover,
-			//	&:focus,
-			//	&:active {
-			//		@include btn-hover-active($btn-font-color, $btn-bg-color);
-			//	}
-
-			//	&::before {
-			//		padding-right: 5px;
-			//		vertical-align: middle;
-			//		font-size: 8px;
-			//	}
-			//}
 		}
 	}
 }
@@ -175,18 +145,13 @@
 		}
 	}
 
-	.zi-more { // TODO - AS: need to fix
-		padding: 0;
-		opacity: .5;
-		transition: opacity .2s ease-out;
-
-		&::before {
-			padding: 0 3px;
-		}
-
+	.btn-dashboard-page-properties {
 		&:hover,
-		&:focus {
-			opacity: 1;
+		&:focus,
+		&:active {
+			&::before {
+				color: $white; // TODO acikuns check
+			}
 		}
 	}
 }

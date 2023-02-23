@@ -28,7 +28,7 @@ const TABFILTERITEM_EVENT_DELETE = 'delete.item.tabfilter';
 const TABFILTERITEM_EVENT_ACTION = 'action.item.tabfilter';
 
 const TABFILTERITEM_STYLE_UNSAVED = 'unsaved';
-const TABFILTERITEM_STYLE_EDIT_BTN = 'icon-edit';
+const TABFILTERITEM_STYLE_EDIT_BTN = 'tabfilter-edit';
 const TABFILTERITEM_STYLE_SELECTED = 'selected';
 const TABFILTERITEM_STYLE_EXPANDED = 'expanded';
 const TABFILTERITEM_STYLE_DISABLED = 'disabled';
@@ -183,7 +183,7 @@ class CTabFilterItem extends CBaseComponent {
 
 		let edit = document.createElement('a');
 
-		edit.classList.add(TABFILTERITEM_STYLE_EDIT_BTN, ZBX_ICON_COG_FILLED);
+		edit.classList.add('btn-icon', ZBX_ICON_COG_FILLED, TABFILTERITEM_STYLE_EDIT_BTN);
 		edit.addEventListener('click', () => this.openPropertiesDialog({}, this._target));
 
 		this._target.parentNode.appendChild(edit);

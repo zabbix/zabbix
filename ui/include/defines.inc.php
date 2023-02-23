@@ -1902,7 +1902,6 @@ define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
-define('ZBX_STYLE_FONT_COLOR', '#1f2c33;'); // TODO - AS: not good idea. Will be problem with themes
 define('ZBX_STYLE_EVENT_ACTION_RED', 'event-action-red');
 define('ZBX_STYLE_EVENT_ACTION_YELLOW', 'event-action-yellow');
 define('ZBX_STYLE_EVENT_ACTION_GRAY', 'event-action-gray');
@@ -1913,11 +1912,6 @@ define('ZBX_STYLE_EVENT_ACKNOWLEDGED', 'event-acknowledged');
 define('ZBX_STYLE_EVENT_MESSAGES', 'event-messages');
 define('ZBX_STYLE_TRIGGER_DEPENDENCY', 'trigger-dependency');
 define('ZBX_STYLE_SUPPRESSIONS_PROBLEM', 'suppressions-problem');
-
-define('ZBX_STYLE_ACTION_SEVERETY_CHANGED', '#768d99'); // TODO - AS: not good idea. Will be problem with themes
-define('ZBX_STYLE_ACTION_SEVERETY_DOWN', '#009900'); // TODO - AS: not good idea. Will be problem with themes
-define('ZBX_STYLE_ACTION_SEVERETY_UP', '#e33734'); // TODO - AS: not good idea. Will be problem with themes
-
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
 define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
 define('ZBX_STYLE_OK_UNACK_FG', 'ok-unack-fg');
@@ -1925,7 +1919,6 @@ define('ZBX_STYLE_OK_ACK_FG', 'ok-ack-fg');
 define('ZBX_STYLE_OVERRIDES_LIST', 'overrides-list');
 define('ZBX_STYLE_OVERRIDES_LIST_ITEM', 'overrides-list-item');
 define('ZBX_STYLE_OVERRIDES_OPTIONS_LIST', 'overrides-options-list');
-define('ZBX_STYLE_PLUS_ICON', 'plus-icon'); // TODO - AS: should be checked and removed
 define('ZBX_STYLE_DRAG_DROP_AREA', 'drag-drop-area');
 define('ZBX_STYLE_TABLE_FORMS_SEPARATOR', 'table-forms-separator');
 define('ZBX_STYLE_TABLE_LEFT_BORDER', 'border-left');
@@ -1964,10 +1957,8 @@ define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
 define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
 define('ZBX_STYLE_ICON_COUNT', 'icon-count');
-define('ZBX_STYLE_ACTION_ICON_SEV_UP', 'icon-action-severity-up');
-define('ZBX_STYLE_ACTION_ICON_SEV_DOWN', 'icon-action-severity-down');
-define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause'); // TODO - AS: check. ZBXNEXT-7964
-define('ZBX_STYLE_ACTION_ICON_SYMPTOM', 'icon-action-symptom'); // TODO - AS: check. ZBXNEXT-7964
+define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause');
+define('ZBX_STYLE_ACTION_ICON_SYMPTOM', 'icon-action-symptom');
 define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');
 define('ZBX_STYLE_PROBLEM_LIST', 'problem-list');
 define('ZBX_STYLE_PROBLEM_RECOVERY', 'icon-problem-recovery');

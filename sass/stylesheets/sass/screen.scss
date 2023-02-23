@@ -1428,49 +1428,16 @@ select {
 	color: $btn-alt-font-color;
 	background-color: $btn-alt-bg-color;
 
-	.plus-icon { // TODO - AS: should be checked and removed
-		background-color: $btn-alt-font-color;
-		margin-right: 8px;
-
-		&::after {
-			background-color: $btn-alt-font-color;
-		}
-	}
-
 	&:hover {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
-
-		.plus-icon { // TODO - AS: should be checked and removed
-			background-color: $btn-font-color;
-
-			&::after {
-				background-color: $btn-font-color;
-			}
-		}
 	}
 
 	&:focus {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
-
-		.plus-icon { // TODO - AS: should be checked and removed
-			background-color: $btn-font-color;
-
-			&::after {
-				background-color: $btn-font-color;
-			}
-		}
 	}
 
 	&:active {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
-
-		.plus-icon { // TODO - AS: should be checked and removed
-			background-color: $btn-font-color;
-
-			&::after {
-				background-color: $btn-font-color;
-			}
-		}
 	}
 }
 
@@ -1706,6 +1673,34 @@ select {
 		padding: 0 8px 0 10px;
 	}
 
+	.ui-tabs-tab {
+		.btn-info {
+			&::after {
+				@extend %icons-font;
+				margin-left: 8px;
+				content: $zi-circle-info;
+			}
+		}
+
+		.filter-trigger {
+			&::after {
+				vertical-align: middle;
+				padding-left: 8px;
+				@extend %icons-font;
+				font-size: 18px;
+				content: $zi-filter;
+			}
+		}
+
+		.btn-time {
+			&::after {
+				@extend %icons-font;
+				margin-left: 5px;
+				content: $zi-clock;
+			}
+		}
+	}
+
 	.ui-state-focus {
 		.btn-info,
 		.btn-time,
@@ -1738,25 +1733,10 @@ select {
 
 		.filter-trigger {
 			padding: 1px 8px 7px 10px !important;
-
-			&::after {
-				vertical-align: middle;
-				padding-left: 8px;
-				@extend %icons-font;
-				font-size: 18px;
-				content: $zi-filter;
-			}
 		}
 
-		.btn-info {
-			&::after {
-				background-position: -279px -621px; // TODO - AS: need to check
-				top: 1px;
-			}
-		}
-
-		.zi-clock {
-			padding: 1px 6px 6px 10px !important;
+		.btn-time {
+			padding: 1px 6px 7px 10px !important;
 		}
 	}
 
@@ -2402,7 +2382,6 @@ $trigger-expression-tree-icons: (
 .menu-popup-item.zi-lock {
 	padding: 0 0 0 5px;
 	&::before {
-		top: -2px; // TODO acikuns check
 		padding-right: 5px;
 		vertical-align: middle;
 
@@ -2660,6 +2639,8 @@ $trigger-expression-tree-icons: (
 
 	button {
 		position: relative;
+		min-width: 24px;
+		margin-right: 1px;
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
 
@@ -2689,12 +2670,11 @@ $trigger-expression-tree-icons: (
 		}
 	}
 
-	//.zi-pencil { // TODO - AS: check
-	//	padding: 0 2px;
-	//	&::before {
-	//		color: $icon-color;
-	//	}
-	//}
+	button.zi-pencil {
+		&::before {
+			color: $icon-color;
+		}
+	}
 }
 
 .multilineinput-modal {
@@ -4554,37 +4534,6 @@ a.icon-count {
 	}
 }
 
-// TODO - AS: check
-//.zi-plus {
-//	vertical-align: middle;
-//	width: unset;
-//	height: unset;
-
-//	padding: 0 11px 0 8px;
-//	color: $btn-alt-font-color;
-//	background-color: $btn-alt-bg-color;
-//	font-size: 100%;
-
-//	&::before {
-//		padding-right: 5px;
-//		vertical-align: middle;
-
-//		font-size: 8px;
-//	}
-
-//	&:hover {
-//		@include btn-hover-active($btn-font-color, $btn-bg-color);
-//	}
-
-//	&:focus {
-//		@include btn-hover-active($btn-font-color, $btn-bg-color);
-//	}
-
-//	&:active {
-//		@include btn-hover-active($btn-font-color, $btn-bg-color);
-//	}
-//}
-
 #expressions_list .ui-sortable-helper {
 	display: table;
 }
@@ -4809,12 +4758,13 @@ a.icon-count {
 		width: auto;
 		align-items: start;
 		padding-top: 4px;
+		border-radius: 0 2px 2px 0;
 
 		&::after {
 			@extend %icons-font;
 			position: relative;
 			top: 4px;
-			padding-left: 2px;
+			margin-left: 2px;
 			font-size: $icon-default-size * .5;
 			content: $zi-chevron-down;
 		}
@@ -5256,16 +5206,16 @@ z-select,
 		margin: 0 5px 0 5px;
 	}
 }
-// TODO - AS: code style should be fixed
+
 .geomap-filter {
-	border: 1px solid $overlay-border-color;
-	background-color: $ui-bg-color;
-	padding: 5px 20px 5px 10px;
 	position: absolute;
-	margin-right: -2px;
-	margin-top: 5px;
-	display: none;
 	right: 0;
+	display: none;
+	padding: 5px 20px 5px 10px;
+	margin-top: 5px;
+	margin-right: -2px;
+	background-color: $ui-bg-color;
+	border: 1px solid $overlay-border-color;
 }
 .geomap-filter.collapsed {
 	display: block;
@@ -5348,7 +5298,6 @@ z-select,
 			&.event-severity-down,
 			&.event-severity-up,
 			&.event-severity-changed,
-			&.trigger-description,
 			&.trigger-dependency,
 			&.suppressions-problem {
 				vertical-align: top;
@@ -5360,6 +5309,17 @@ z-select,
 
 				&::before {
 					color: $icon-color;
+				}
+			}
+		}
+
+		.problem-row {
+			button.zi-eye-off {
+				width: 18px;
+				min-height: 18px;
+
+				&::before {
+					font-size: 18px;
 				}
 			}
 		}
@@ -5384,8 +5344,7 @@ z-select,
 		}
 
 		[class^="event-action-"], [class*=" event-action-"],
-		.event-messages,
-		.trigger-description {
+		.event-messages {
 			&::after {
 				position: absolute;
 				top: 4px;
@@ -5403,14 +5362,6 @@ z-select,
 		.event-messages {
 			&::after {
 				content: attr(data-count);
-			}
-		}
-
-		.trigger-description {
-			margin-left: 5px;
-
-			&::after {
-				content: '?' !important;
 			}
 		}
 
@@ -5477,6 +5428,179 @@ z-select,
 
 			&::before {
 				color: $icon-action-check !important;
+			}
+		}
+
+		&.compact-view {
+			tr {
+				&[class*='flh-'] {
+					@if $theme-name == 'blue' {
+						&:not(.row-selected):not(:hover) {
+							td {
+								color: $font-color;
+
+								sup,
+								a,
+								.problem-unack-fg,
+								.problem-ack-fg,
+								.ok-unack-fg,
+								.ok-ack-fg {
+									color: $font-color;
+									border-bottom-color: rgba($font-color, .5);
+								}
+
+								.tag {
+									background-color: rgba($font-color, .5);
+								}
+
+								button:focus {
+									box-shadow: 0 0 0 2px rgba($font-color, .5);
+								}
+							}
+						}
+					}
+
+					@if $theme-name == 'dark' {
+						&:not(.row-selected):not(:hover) {
+							td {
+								color: #000000;
+
+								sup,
+								a,
+								.problem-unack-fg,
+								.problem-ack-fg,
+								.ok-unack-fg,
+								.ok-ack-fg {
+									color: #000000;
+									border-bottom-color: rgba(0, 0, 0, .5);
+								}
+
+								button:focus {
+									box-shadow: 0 0 0 2px rgba(0, 0, 0, .5);
+								}
+							}
+						}
+					}
+
+					@if $theme-name == 'blue' or $theme-name == 'dark' {
+						&:not(.row-selected):not(:hover) {
+							td {
+								// TODO - AS: check
+								//[class*='icon-'] {
+								//	background-color: $ui-bg-color;
+								//	border-radius: 2px;
+								//}
+
+								// TODO - AS: check
+								//[class*='icon-depend-'],
+								//.icon-description,
+								//.icon-wizard-action {
+								//	background-color: transparent;
+								//}
+							}
+						}
+					}
+				}
+			}
+
+			td.nowrap {
+				text-overflow: clip;
+			}
+
+			button.zi-more {
+				min-height: 12px;
+			}
+
+			.event-messages,
+			.trigger-description {
+				&::after {
+					top: 1px;
+				}
+			}
+
+			[class^="event-action-"], [class*=" event-action-"] {
+				&::before {
+					top: 7px;
+				}
+
+				&::after {
+					top: -1px;
+				}
+			}
+
+			.link-action {
+				color: $font-color;
+
+				&:hover,
+				&:focus {
+					color: $link-hover-color;
+				}
+
+				&.red {
+					color: $red;
+				}
+
+				&.orange {
+					color: $orange;
+				}
+
+				&.yellow {
+					color: $dark-yellow;
+				}
+
+				&.green {
+					color: $green;
+				}
+			}
+
+			.problem-nested:not([class*='flh-']):not(.row-selected) {
+				td, .timeline-axis, .timeline-td {
+					border-bottom: 0 !important;
+				}
+			}
+
+			td {
+				padding-top: 0;
+				padding-bottom: 0;
+				border-bottom: 0;
+				box-shadow: inset 0 -1px 0 0 rgba($font-color, .1);
+				color: $font-color;
+				height: 22px;
+				vertical-align: middle;
+				white-space: nowrap;
+
+				.rel-container {
+					span {
+						margin: 0;
+					}
+				}
+
+				.tag {
+					display: inline-block;
+					line-height: 16px;
+					margin-right: 3px;
+					padding: 0 3px;
+					max-width: 40px;
+
+					@media screen and (min-width: 1200px) {
+						max-width: 71px;
+					}
+
+					@media screen and (min-width: 1400px) {
+						max-width: 102px;
+					}
+
+					@media screen and (min-width: 1600px) {
+						max-width: 133px;
+					}
+				}
+
+				// Align the expand and collapse icons in compact view.
+				.btn-widget-expand,
+				.btn-widget-collapse {
+					vertical-align: top;
+					margin: 0;
+				}
 			}
 		}
 	}

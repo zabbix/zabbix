@@ -282,8 +282,7 @@ class CFilter extends CDiv {
 
 			$this->addTab(
 				(new CLink($header, '#'.$anchor))
-					->addClass(ZBX_STYLE_BTN_TIME) // TODO - AS: check class
-					->addClass(ZBX_ICON_CLOCK),
+					->addClass(ZBX_STYLE_BTN_TIME),
 				(new CDiv([
 					(new CDiv([
 						new CList([

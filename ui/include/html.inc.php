@@ -988,6 +988,7 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false) {
 	$maintenances = implode(',', $maintenance_names);
 
 	return (new CSimpleButton())
+		->addClass(ZBX_STYLE_BTN_ICON)
 		->addClass(ZBX_ICON_EYE_OFF)
 		->addClass($blink ? 'blink' : null)
 		->setHint(
