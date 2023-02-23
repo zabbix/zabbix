@@ -96,7 +96,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '1s'
-					],
+					]
 				]
 			],
 			[
