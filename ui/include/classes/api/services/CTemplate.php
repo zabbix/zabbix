@@ -367,6 +367,8 @@ class CTemplate extends CHostGeneral {
 			'host' =>			['type' => API_H_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name'), 'default_source' => 'host'],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'description')],
+			'vendor_name' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'vendor_name')],
+			'vendor_version' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'vendor_version')],
 			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -392,10 +394,10 @@ class CTemplate extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkGroups($templates);
-		$this->checkDuplicates($templates);
+		self::checkVendorFields($templates);
 		self::checkAndAddUuid($templates);
-
+		$this->checkDuplicates($templates);
+		$this->checkGroups($templates);
 		$this->checkTemplates($templates);
 	}
 
@@ -475,6 +477,8 @@ class CTemplate extends CHostGeneral {
 			'host' =>				['type' => API_H_NAME, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'description')],
+			'vendor_name' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'vendor_name')],
+			'vendor_version' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'vendor_version')],
 			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -502,7 +506,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$db_templates = $this->get([
-			'output' => ['templateid', 'host', 'name', 'description'],
+			'output' => ['templateid', 'host', 'name', 'description', 'vendor_name', 'vendor_version'],
 			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -514,11 +518,45 @@ class CTemplate extends CHostGeneral {
 
 		$this->addAffectedObjects($templates, $db_templates);
 
+		self::checkVendorFields($templates, $db_templates);
 		$this->checkDuplicates($templates, $db_templates);
 		$this->checkGroups($templates, $db_templates);
 		$this->checkTemplates($templates, $db_templates);
 		$this->checkTemplatesLinks($templates, $db_templates);
 		$templates = $this->validateHostMacros($templates, $db_templates);
+	}
+
+	/**
+	 * Check vendor fields for update or create operation.
+	 *
+	 * @param array      $templates
+	 * @param array|null $db_templates
+	 *
+	 * @throws Exception
+	 */
+	private static function checkVendorFields(array $templates, array $db_templates = null): void {
+		$vendor_fields = array_fill_keys(['vendor_name', 'vendor_version'], '');
+
+		foreach ($templates as $i => $template) {
+			if (!array_key_exists('vendor_name', $template) && !array_key_exists('vendor_version', $template)) {
+				continue;
+			}
+
+			$_template = array_intersect_key($template, $vendor_fields);
+
+			if ($db_templates === null) {
+				$_template += $vendor_fields;
+			}
+			else {
+				$_template += array_intersect_key($db_templates[$template['templateid']], $vendor_fields);
+			}
+
+			if (($_template['vendor_name'] === '') !== ($_template['vendor_version'] === '')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+					_('both vendor_name and vendor_version should be either present or empty')
+				));
+			}
+		}
 	}
 
 	/**

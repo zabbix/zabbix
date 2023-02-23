@@ -169,7 +169,7 @@ class CArrayHelper {
 			}
 		}
 		self::$fields = $fields;
-		uasort($array, ['self', 'compare']);
+		uasort($array, [self::class, 'compare']);
 	}
 
 	/**

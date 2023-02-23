@@ -58,7 +58,6 @@ abstract class CControllerResponse {
 
 	protected function getForm(): CForm {
 		$form = (new CForm())
-				->cleanItems()
 				->setAction($this->getLocation())
 				->setEnctype('multipart/form-data')
 				->setId('form-data');

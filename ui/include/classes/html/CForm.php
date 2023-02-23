@@ -27,8 +27,6 @@ class CForm extends CTag {
 		$this->setAction($action);
 		$this->setEnctype($enctype);
 		$this->setAttribute('accept-charset', 'utf-8');
-
-		$this->addItem((new CVar('sid', substr(CSessionHelper::getId(), 16, 16)))->removeId());
 	}
 
 	public function setMethod($value = 'post') {

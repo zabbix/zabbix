@@ -154,10 +154,10 @@ int	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t 
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	if (NULL == (result = DBselect("%s", sql)))
+	if (NULL == (result = zbx_db_select("%s", sql)))
 		return FAIL;
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	id;
 

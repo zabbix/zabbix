@@ -27,6 +27,10 @@ class CControllerPopupImportCompare extends CController {
 
 	private $toc = [];
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'import' => 'in 1',

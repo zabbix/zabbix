@@ -186,7 +186,6 @@ CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 	->setWebLayoutMode($page['web_layout_mode'])
 	->setControls((new CTag('nav', true,
 		(new CForm())
-			->cleanItems()
 			->addItem((new CList())->addItem(get_icon('kioskmode', ['mode' => $page['web_layout_mode']])))
 		))
 			->setAttribute('aria-label', _('Content controls'))

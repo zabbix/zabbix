@@ -4,6 +4,7 @@
 
 #ifdef HAVE_LIBEVENT
 #	include <event.h>
+#	include <event2/thread.h>
 #endif
 
 #include "zbxipcservice.h"
@@ -1341,6 +1342,13 @@ void	zbx_ipc_message_copy(zbx_ipc_message_t *dst, const zbx_ipc_message_t *src)
 	memcpy(dst->data, src->data, src->size);
 }
 
+static void	ipc_service_user_cb(evutil_socket_t fd, short what, void *arg)
+{
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(what);
+	ZBX_UNUSED(arg);
+}
+
 /*
  * Public service API
  */
@@ -1402,6 +1410,12 @@ int	zbx_ipc_service_init_env(const char *path, char **error)
 		ipc_path[--ipc_path_root_len] = '\0';
 
 	ipc_service_init_libevent();
+
+	if (0 != evthread_use_pthreads())
+	{
+		*error = zbx_strdup(*error, "Cannot initialize libevent threading support");
+		goto out;
+	}
 
 	ret = SUCCEED;
 out:
@@ -1495,6 +1509,7 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 	event_add(service->ev_listener, NULL);
 
 	service->ev_timer = event_new(service->ev, -1, 0, ipc_service_timer_cb, service);
+	service->ev_alert = event_new(service->ev, -1, 0, ipc_service_user_cb, NULL);
 
 	ret = SUCCEED;
 out:
@@ -1528,6 +1543,7 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 	zbx_vector_ptr_destroy(&service->clients);
 	zbx_queue_ptr_destroy(&service->clients_recv);
 
+	event_free(service->ev_alert);
 	event_free(service->ev_timer);
 	event_free(service->ev_listener);
 	event_base_free(service->ev);
@@ -1613,6 +1629,16 @@ int	zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeo
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, ret);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: interrupt IPC service recv loop from another thread               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_ipc_service_alert(zbx_ipc_service_t *service)
+{
+	event_active(service->ev_alert, 0, 0);
 }
 
 /******************************************************************************

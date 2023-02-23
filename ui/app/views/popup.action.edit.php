@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('action')))->removeId())
 	->setName('action.edit')
 	->setId('action-form')
 	->addVar('actionid', $data['actionid'] ?: 0)

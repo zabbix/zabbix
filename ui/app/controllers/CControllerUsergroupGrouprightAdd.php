@@ -21,6 +21,10 @@
 
 class CControllerUsergroupGrouprightAdd extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'group_rights'    => 'required|array',

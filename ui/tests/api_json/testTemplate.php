@@ -22,12 +22,34 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
+ * @onBefore prepareTestData
+ *
  * @backup hstgrp
  * @backup hosts
  */
 class testTemplate extends CAPITest {
 
-	public static function dataProviderCreate() {
+	private static $data = [
+		'templateids' => [
+			'api_vendor_test' => null
+		]
+	];
+
+	public function prepareTestData() {
+		$templates_data = [
+			[
+				'host' => 'api_vendor_test',
+				'groups' => ['groupid' => 1],
+				'vendor_name' => 'Zabbix',
+				'vendor_version' => '6.4-0'
+			]
+		];
+		$templates = CDataHelper::call('template.create', $templates_data);
+		$this->assertArrayHasKey('templateids', $templates);
+		self::$data['templateids']['api_vendor_test'] = $templates['templateids'][0];
+	}
+
+	public function dataProviderCreate() {
 		return [
 			[
 				'request' => [
@@ -169,6 +191,77 @@ class testTemplate extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix']
+			],
+			[
+				'request' => [
+					[
+						'host' => 'vendor-template-error',
+						'groups' => ['groupid' => 1],
+						'vendor_name' => 'Zabbix'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1": both vendor_name and vendor_version should be either present or empty.'
+			],
+			[
+				'request' => [
+					[
+						'host' => 'vendor-template-error',
+						'groups' => ['groupid' => 1],
+						'vendor_name' => '',
+						'vendor_version' => '6.4-0'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1": both vendor_name and vendor_version should be either present or empty.'
+			]
+		];
+	}
+
+	public function dataProviderUpdate() {
+		return [
+			[
+				'request' => [
+					[
+						'templateid' => 'api_vendor_test',
+						'vendor_name' => '',
+						'vendor_version' => ''
+					]
+				]
+			],
+			[
+				'request' => [
+					[
+						'templateid' => 'api_vendor_test',
+						'vendor_name' => 'ZABBIX'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1": both vendor_name and vendor_version should be either present or empty.'
+			],
+			[
+				'request' => [
+					[
+						'templateid' => 'api_vendor_test',
+						'vendor_name' => 'Zabbix',
+						'vendor_version' => '6.4-0'
+					]
+				]
+			],
+			// The next two test cases depends on the previous one.
+			[
+				'request' => [
+					[
+						'templateid' => 'api_vendor_test',
+						'vendor_name' => 'ZABBIX'
+					]
+				]
+			],
+			[
+				'request' => [
+					[
+						'templateid' => 'api_vendor_test',
+						'vendor_version' => ''
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1": both vendor_name and vendor_version should be either present or empty.'
 			]
 		];
 	}
@@ -480,5 +573,42 @@ class testTemplate extends CAPITest {
 				]
 			]
 		], 'Cannot link template "test-template-trigger-expression-02" without template "test-template-trigger-expression-01" to template "test-template-trigger-expression-05" due to expression of trigger "trigger".');
+	}
+
+	/**
+	 * @dataProvider dataProviderUpdate
+	 */
+	public function testTemplate_Update(array $request, string $expected_error = null, array $user = null) {
+		if ($user !== null) {
+			$this->authorize($user['user'], $user['password']);
+		}
+
+		foreach ($request as &$request_item) {
+			$request_item['templateid'] = self::$data['templateids'][$request_item['templateid']];
+		}
+		unset($request_item);
+
+		$this->call('template.update', $request, $expected_error);
+
+		if ($expected_error === null) {
+			$fields = array_reduce($request, 'array_replace', []);
+			$db_templates = $this->call('template.get', [
+				'output' => array_keys($fields),
+				'templateids' => array_column($request, 'templateid'),
+				'preservekeys' => true
+			])['result'];
+			$templates = [];
+
+			foreach ($request as &$request_item) {
+				$templateid = $request_item['templateid'];
+
+				if (array_key_exists($templateid, $db_templates)) {
+					$templates[$templateid] = array_intersect_key($db_templates[$templateid], $request_item);
+				}
+			}
+			unset($request_item);
+
+			$this->assertEquals($templates, $db_templates);
+		}
 	}
 }

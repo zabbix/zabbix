@@ -31,9 +31,9 @@ typedef struct
 	int		status;
 	time_t		itemtime;
 }
-zbx_service_t;
+zbx_dservice_t;
 
-void	zbx_discovery_update_host(ZBX_DB_DHOST *dhost, int status, int now);
-void	zbx_discovery_update_service(const ZBX_DB_DRULE *drule, zbx_uint64_t dcheckid, ZBX_DB_DHOST *dhost,
+void	zbx_discovery_update_host(zbx_db_dhost *dhost, int status, int now);
+void	zbx_discovery_update_service(const zbx_db_drule *drule, zbx_uint64_t dcheckid, zbx_db_dhost *dhost,
 		const char *ip, const char *dns, int port, int status, const char *value, int now);
 #endif

@@ -30,7 +30,7 @@ class CControllerModuleEdit extends CController {
 	private array $module = [];
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {

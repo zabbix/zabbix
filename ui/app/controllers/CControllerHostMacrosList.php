@@ -32,6 +32,10 @@ class CControllerHostMacrosList extends CController {
 	 */
 	protected $parent_macros = [];
 
+	protected function init(): void {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'macros'				=> 'array',

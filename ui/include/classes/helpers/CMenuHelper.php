@@ -195,7 +195,7 @@ class CMenuHelper {
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
-				? (new CMenuItem(_('Maintenance')))->setUrl(new CUrl('maintenance.php'), 'maintenance.php')
+				? (new CMenuItem(_('Maintenance')))->setAction('maintenance.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
 				? (new CMenuItem(_('Event correlation')))
@@ -357,6 +357,9 @@ class CMenuHelper {
 						(new CMenuItem(_('Modules')))
 							->setAction('module.list')
 							->setAliases(['module.edit', 'module.scan']),
+						(new CMenuItem(_('Connectors')))
+							->setAction('connector.list')
+							->setAliases(['connector.edit']),
 						(new CMenuItem(_('Other')))
 							->setAction('miscconfig.edit')
 					])))

@@ -67,7 +67,7 @@ static int	DBpatch_3040005(void)
 
 int	DBpatch_3040006(void)
 {
-	if (FAIL == DBindex_exists("problem", "problem_3"))
+	if (FAIL == zbx_db_index_exists("problem", "problem_3"))
 		return DBcreate_index("problem", "problem_3", "r_eventid", 0);
 
 	return SUCCEED;
@@ -76,7 +76,7 @@ int	DBpatch_3040006(void)
 int	DBpatch_3040007(void)
 {
 #ifdef HAVE_MYSQL	/* MySQL automatically creates index and might not remove it on some conditions */
-	if (SUCCEED == DBindex_exists("problem", "c_problem_2"))
+	if (SUCCEED == zbx_db_index_exists("problem", "c_problem_2"))
 		return DBdrop_index("problem", "c_problem_2");
 #endif
 	return SUCCEED;
