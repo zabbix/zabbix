@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * backup config, widget
+ * @backup config, hstgrp, widget
  *
  * @onBefore prepareDashboardData, prepareProblemsData
  */
@@ -298,12 +298,144 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Trigger for widget 1 float'
 					]
 				]
+			],
+			// #8 Filtered by Host group, tags.
+			[
+				[
+					'fields' => [
+						'Name' => 'Group, tags, show 1',
+						'Host groups' => 'Zabbix servers',
+						'Show tags' => 1
+					],
+					'Tags' => [
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag' => 'Delta',
+								'operator' => 'Exists'
+							]
+						]
+					],
+					'result' => [
+						'Fourth test trigger with tag priority',
+						'First test trigger with tag priority'
+					],
+					'tags_display' => [
+						'Delta: t',
+						'Alpha: a'
+					]
+				]
+			],
+			// #9 Filtered by Host group, tag + value.
+			[
+				[
+					'fields' => [
+						'Name' => 'Group, tags, show 2',
+						'Host groups' => 'Zabbix servers',
+						'Show tags' => 2
+					],
+					'Tags' => [
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag' => 'Eta',
+								'operator' => 'Equals',
+								'value' => 'e'
+							]
+						]
+					],
+					'result' => [
+						'Fourth test trigger with tag priority',
+						'Second test trigger with tag priority'
+					],
+					'tags_display' => [
+						'Eta: eDelta: t',
+						'Eta: eBeta: b'
+					]
+				]
+			],
+			// #10 Filtered by Host group, Operator: Or, show 3, shortened.
+			[
+				[
+					'fields' => [
+						'Name' => 'Group, tags, show 3, shortened',
+						'Host groups' => 'Zabbix servers',
+						'Show tags' => 3,
+						'Tag name' => 'Shortened',
+						'Show timeline' => false
+					],
+					'Tags' => [
+						'evaluation' => 'Or',
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag' => 'Theta',
+								'operator' => 'Contains',
+								'value' => 't'
+							],
+							[
+								'tag' => 'Tag4',
+								'operator' => 'Exists'
+							]
+						]
+					],
+					'result' => [
+						'Test trigger to check tag filter on problem page',
+						'Fourth test trigger with tag priority',
+						'Third test trigger with tag priority'
+					],
+					'tags_display' => [
+						'DatSer: abcser: abcdef',
+						'The: tDel: tEta: e',
+						'The: tAlp: aIot: i'
+					]
+				]
+			],
+			// #11 Filtered by Host group, Operator: And, show 3, None.
+			[
+				[
+					'fields' => [
+						'Name' => 'Group, tags, show 3, shortened',
+						'Host groups' => 'Zabbix servers',
+						'Show tags' => 3,
+						'Tag name' => 'None',
+						'Show timeline' => false,
+						'Tag display priority' => 'Gamma, Eta'
+					],
+					'Tags' => [
+						'evaluation' => 'And/Or',
+						'tags' => [
+							[
+								'action' => USER_ACTION_UPDATE,
+								'index' => 0,
+								'tag' => 'Theta',
+								'operator' => 'Equals',
+								'value' => 't'
+							],
+							[
+								'tag' => 'Kappa',
+								'operator' => 'Does not exist'
+							]
+						]
+					],
+					'result' => [
+						'Fourth test trigger with tag priority'
+					],
+					'tags_display' => [
+						'get'
+					]
+				]
 			]
 		];
 	}
 
 	/**
 	 * @dataProvider getCheckWidgetTable
+	 *
+	 * @onAfter deleteWidgets
 	 */
 	public function testDashboardProblemsWidgetDisplay_CheckTable($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
@@ -314,6 +446,12 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Fill Problems widget filter.
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Problems')]);
 		$form->fill($data['fields']);
+
+		if (array_key_exists('Tags', $data)) {
+			$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
+			$form->getField('id:tags_table_tags')->asMultifieldTable()->fill($data['Tags']['tags']);
+		}
+
 		$form->submit();
 
 		// Check saved dashboard.
@@ -324,8 +462,22 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Assert Problems widget's table.
 		$this->assertTableDataColumn($data['result'], 'Problem • Severity');
 
-		// Delete created widget.
-		$dashboard->edit()->deleteWidget($data['fields']['Name'])->save();
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		if (array_key_exists('Tags', $data)) {
+			$this->assertTableDataColumn($data['tags_display'], 'Tags');
+		}
+	}
+
+	/**
+	 * Delete all widgets on the dashboard after case.
+	 */
+	private function deleteWidgets() {
+		DBexecute('DELETE FROM widget w'.
+				' WHERE EXISTS ('.
+					'SELECT NULL'.
+					' FROM dashboard_page dp'.
+					' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+						' AND dp.dashboardid='.self::$dashboardid.
+				')'
+		);
 	}
 }
