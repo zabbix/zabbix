@@ -43,7 +43,7 @@ class testPageConnectors extends CWebTest {
 	}
 
 	private static $connectors;
-	private static $delete_connector = '©∅∩∩∈©⊤∅Ř для удаления';
+	private static $delete_connector = 'Connector для удаления - ⊏∅∩∩∈©⊤∅Ř';
 	private static $update_connector = 'Update connector';
 
 	public static function prepareData() {
@@ -67,7 +67,7 @@ class testPageConnectors extends CWebTest {
 				'data_type' => ZBX_CONNECTOR_DATA_TYPE_EVENTS
 			],
 			[
-				'name' => '©∅∩∩∈©⊤∅Ř для удаления',
+				'name' => 'Connector для удаления - ⊏∅∩∩∈©⊤∅Ř',
 				'url' => '{$URL}'
 			],
 			[
@@ -102,6 +102,11 @@ class testPageConnectors extends CWebTest {
 				'Status' => 'Enabled'
 			],
 			[
+				'Name' => 'Connector для удаления - ⊏∅∩∩∈©⊤∅Ř',
+				'Data type' => 'Item values',
+				'Status' => 'Enabled'
+			],
+			[
 				'Name' => 'Default connector',
 				'Data type' => 'Item values',
 				'Status' => 'Enabled'
@@ -123,11 +128,6 @@ class testPageConnectors extends CWebTest {
 			],
 			[
 				'Name' => 'Item value connector',
-				'Data type' => 'Item values',
-				'Status' => 'Enabled'
-			],
-			[
-				'Name' => '©∅∩∩∈©⊤∅Ř для удаления',
 				'Data type' => 'Item values',
 				'Status' => 'Enabled'
 			],
@@ -277,10 +277,10 @@ class testPageConnectors extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => '©∅∩∩∈©⊤∅Ř'
+						'Name' => '⊏∅∩∩∈©⊤∅Ř'
 					],
 					'expected' => [
-						'©∅∩∩∈©⊤∅Ř для удаления'
+						'Connector для удаления - ⊏∅∩∩∈©⊤∅Ř'
 					]
 				]
 			],
@@ -314,12 +314,12 @@ class testPageConnectors extends CWebTest {
 					],
 					'expected' => [
 						'Connector with Advanced configuration',
+						'Connector для удаления - ⊏∅∩∩∈©⊤∅Ř',
 						'Default connector',
 						'Disabled connector',
 						'Enabled connector',
 						'Events connector',
 						'Item value connector',
-						'©∅∩∩∈©⊤∅Ř для удаления',
 						'Update connector'
 					]
 				]
@@ -331,7 +331,7 @@ class testPageConnectors extends CWebTest {
 						'Name' => 'я у'
 					],
 					'expected' => [
-						'©∅∩∩∈©⊤∅Ř для удаления'
+						'Connector для удаления - ⊏∅∩∩∈©⊤∅Ř'
 					]
 				]
 			],
@@ -383,11 +383,11 @@ class testPageConnectors extends CWebTest {
 					],
 					'expected' => [
 						'Connector with Advanced configuration',
+						'Connector для удаления - ⊏∅∩∩∈©⊤∅Ř',
 						'Default connector',
 						'Enabled connector',
 						'Events connector',
 						'Item value connector',
-						'©∅∩∩∈©⊤∅Ř для удаления',
 						'Update connector'
 					]
 				]
@@ -446,6 +446,7 @@ class testPageConnectors extends CWebTest {
 					],
 					'expected' => [
 						'Connector with Advanced configuration',
+						'Connector для удаления - ⊏∅∩∩∈©⊤∅Ř',
 						'Default connector',
 						'Disabled connector',
 						'Enabled connector',
@@ -492,12 +493,12 @@ class testPageConnectors extends CWebTest {
 					'expected' => [
 						'ZABBIX',
 						'Update connector',
-						'©∅∩∩∈©⊤∅Ř для удаления',
 						'Item value connector',
 						'Events connector',
 						'Enabled connector',
 						'Disabled connector',
 						'Default connector',
+						'Connector для удаления - ⊏∅∩∩∈©⊤∅Ř',
 						'Connector with Advanced configuration'
 					]
 				]
