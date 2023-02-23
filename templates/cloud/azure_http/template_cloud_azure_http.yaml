@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-02-01T10:43:10Z'
+  date: '2023-02-23T15:28:52Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -268,17 +268,17 @@ zabbix_export:
             var Azure = {
                 params: {},
                 token: '',
-
+            
                 setParams: function (params) {
                     ['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: ' + field + '.';
                         }
                     });
-
+            
                     Azure.params = params;
                 },
-
+            
                 login: function () {
                     var response, login = new HttpRequest();
                     login.addHeader('Content-Type: application/x-www-form-urlencoded');
@@ -286,7 +286,7 @@ zabbix_export:
                         'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) + '/oauth2/token',
                         'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
                     );
-
+            
                     if (login.getStatus() !== 200) {
                         throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
                     }
@@ -299,20 +299,20 @@ zabbix_export:
                     catch (error) {
                         throw 'Authentication response does not contain access token.';
                     }
-
+            
                     Azure.token = response['access_token'];
                 },
-
+            
                 request: function (url) {
                     var response, request = new HttpRequest();
-
+            
                     if (!Azure.token) {
                         throw 'Request does not contain access token.'; 
                     }
                     request.addHeader('Accept: application/json');
                     request.addHeader('Authorization: Bearer ' + Azure.token);
                     response = request.get(url);
-
+            
                     if (request.getStatus() !== 200) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
@@ -323,7 +323,7 @@ zabbix_export:
                         throw 'Failed to parse response received from API.';
                     }
                 },
-
+            
                 getField: function (data, path) {
                     var steps = path.split('.');
                     for (var i = 0; i < steps.length; i++) {
@@ -331,17 +331,17 @@ zabbix_export:
                         if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                             throw 'Required field was not found: ' + path;
                         }
-
+            
                         data = data[step];
                     }
-
+            
                     return data;
                 },
-
+            
                 getMetricsData: function () {
                     var metric = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.Storage/storageAccounts?api-version=2021-05-01');
                         data = [];
-
+            
                     if (!metric.hasOwnProperty('value')) {
                         throw 'Failed getting required field. Check debug log for more information.';
                     }
@@ -360,11 +360,11 @@ zabbix_export:
                             'token': Azure.token
                         });
                     }
-
+            
                     return data;
                 }
             };
-
+            
             try {
                 Azure.setParams(JSON.parse(value));
                 Azure.login();
@@ -890,23 +890,23 @@ zabbix_export:
               params: |
                 var AzureStorage = {
                     params: {},
-
+                
                     setParams: function (params) {
                         ['token', 'id'].forEach(function (field) {
                             if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                                 throw 'Required param is not set: ' + field + '.';
                             }
                         });
-
+                
                         AzureStorage.params = params;
                     },
-
+                
                     request: function (url) {
                         var response, request = new HttpRequest();
-                            request.addHeader('Accept: application/json');
-                            request.addHeader('Authorization: Bearer ' + AzureStorage.params.token);
-                            Zabbix.log(4, '[ Azure ] Sending request: ' + url);
-                            response = request.get(url);
+                        request.addHeader('Accept: application/json');
+                        request.addHeader('Authorization: Bearer ' + AzureStorage.params.token);
+                        Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+                        response = request.get(url);
                         if (request.getStatus() !== 200) {
                             throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                         }
@@ -917,36 +917,54 @@ zabbix_export:
                             throw 'Failed to parse response received from API.';
                         }
                     },
-
+                
                     getField: function (data, path) {
                         var steps = path.split('.');
                         for (var i = 0; i < steps.length; i++) {
                             var step = steps[i];
                             if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                                throw 'Required field was not found: ' + path;
+                                throw 'Required field was not found: ' + path + ' input data: ' + JSON.stringify(data);
                             }
-
+                
                             data = data[step];
                         }
-
+                
                         return data;
                     },
-
+                
                     getMetricsData: function () {
-                        var data = {'metrics': {}};
-                            metrics_data = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id + '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=BlobCapacity,BlobCount,ContainerCount,IndexCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&interval=PT1H&api-version=2021-05-01');
-                        if (!metrics_data.hasOwnProperty('value')) {
-                            throw 'Failed getting required field. Check debug log for more information.';
-                        }
-                        for (k in metrics_data.value) {
-                            key = AzureStorage.getField(metrics_data.value[k], 'name.value')
-                            data.metrics[key] = AzureStorage.getField(metrics_data.value[k], 'timeseries.0.data.0');
-                        }
-
-                        return data;
+                        var data = {};
+                        start_date = new Date((new Date().getTime()) - 4200000).toISOString().replace(/\.\d+/, '');
+                        end_date = new Date((new Date().getTime()) - 600000).toISOString().replace(/\.\d+/, '');
+                        endpoints = {
+                            'tableServices': '/tableServices/default/providers/Microsoft.Insights/metrics?metricnames=TableCapacity,TableCount,TableEntityCount,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                            'blobServices': '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=BlobCapacity,BlobCount,ContainerCount,IndexCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                            'fileServices': '/fileServices/default/providers/Microsoft.Insights/metrics?metricnames=FileCapacity,FileCount,FileShareCount,FileShareSnapshotCount,FileShareSnapshotSize,FileShareCapacityQuota,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                            'storageAccount': '/providers/Microsoft.Insights/metrics?metricnames=UsedCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                            'queueServices': '/queueServices/default/providers/Microsoft.Insights/metrics?metricnames=QueueCapacity,QueueCount,QueueMessageCount,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date)
+                        };
+                
+                        Object.keys(endpoints).forEach(function (field) {
+                            data[field] = {};
+                            metrics = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id + endpoints[field]);
+                
+                            if (!metrics.hasOwnProperty('value')) {
+                                throw 'Failed getting required field. Check debug log for more information.';
+                            }
+                
+                            for (k in metrics.value) {
+                                key = AzureStorage.getField(metrics.value[k], 'name.value')
+                                if (metrics.value[k].timeseries.length === 0) {
+                                    metrics.value[k].timeseries.push({ 'data': ['nodata'] })
+                                }
+                                data[field][key] = AzureStorage.getField(metrics.value[k], 'timeseries.0.data.0');
+                            }
+                        });
+                        return data
                     }
+                
                 };
-
+                
                 try {
                     AzureStorage.setParams(JSON.parse(value));
                     return JSON.stringify(AzureStorage.getMetricsData());
@@ -954,7 +972,7 @@ zabbix_export:
                 catch (error) {
                     error += (String(error).endsWith('.')) ? '' : '.';
                     Zabbix.log(3, '[ Azure ] ERROR: ' + error);
-                    return JSON.stringify({'error': error});
+                    return JSON.stringify({ 'error': error });
                 }
               description: 'The HTTP API endpoint that returns storage metrics with the name `[{#NAME}]`.'
               parameters:
@@ -975,7 +993,7 @@ zabbix_export:
                   tag: storage
                   value: '{#NAME}'
             -
-              uuid: 9ae0af76a37047f5ba84de2f43dfb5c4
+              uuid: 08ce66b39b084182bdb60a5556b88c88
               name: 'Azure: Storage account [{#NAME}]: Availability'
               type: DEPENDENT
               key: 'azure.storage.availability[{#NAME}]'
@@ -991,7 +1009,50 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.metrics.Availability.average
+                    - $.storageAccount.Availability.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 6a0b3edebded4d848ad76f86f8152377
+                  expression: '(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}'
+                  name: 'Azure: Storage account [{#NAME}]: Availability is low'
+                  opdata: '{ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 9ae0af76a37047f5ba84de2f43dfb5c4
+              name: 'Azure: Storage account [{#NAME}]: Blob Availability'
+              type: DEPENDENT
+              key: 'azure.storage.blob.availability[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                The percentage of availability for the storage service or a specified API operation.
+                Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.
+                All unexpected errors result in reduced availability for the storage service or the specified API operation.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.blobServices.Availability.average
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1009,8 +1070,8 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 4cd8ac56b50c4120bf9de56bb1f06245
-                  expression: '(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}'
-                  name: 'Azure: Storage account [{#NAME}]: Availability is low'
+                  expression: '(min(/Azure by HTTP/azure.storage.blob.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY:"{#NAME}"}'
+                  name: 'Azure: Storage account [{#NAME}]: Blob Availability is low'
                   opdata: '{ITEM.LASTVALUE1}'
                   priority: WARNING
                   tags:
@@ -1026,12 +1087,39 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The amount of storage used by the blob service of the storage account with the name `[{#NAME}]`, expressed in bytes."'
+              description: 'The amount of storage used by the blob service of the storage account with the name `[{#NAME}]`, expressed in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.metrics.BlobCapacity.average
+                    - $.blobServices.BlobCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 707be15f02a141548ce5f89097c303a0
+              name: 'Azure: Storage account [{#NAME}]: Blob Container Count'
+              type: DEPENDENT
+              key: 'azure.storage.blob.container.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of containers in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.blobServices.ContainerCount.average
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1058,34 +1146,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.metrics.BlobCount.average
-                  error_handler: DISCARD_VALUE
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 3h
-              master_item:
-                key: 'azure.get.storage.acc[{#NAME}]'
-              tags:
-                -
-                  tag: component
-                  value: storages
-                -
-                  tag: storage
-                  value: '{#NAME}'
-            -
-              uuid: 707be15f02a141548ce5f89097c303a0
-              name: 'Azure: Storage account [{#NAME}]: Container Count'
-              type: DEPENDENT
-              key: 'azure.storage.container.count[{#NAME}]'
-              delay: '0'
-              history: 7d
-              description: 'The number of containers in the storage account with the name `[{#NAME}]`.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - $.metrics.ContainerCount.average
+                    - $.blobServices.BlobCount.average
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1102,9 +1163,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: ae28bbd289644619b20b1907212d8293
-              name: 'Azure: Storage account [{#NAME}]: Egress'
+              name: 'Azure: Storage account [{#NAME}]: Blob Egress'
               type: DEPENDENT
-              key: 'azure.storage.engress[{#NAME}]'
+              key: 'azure.storage.blob.engress[{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -1116,7 +1177,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.metrics.Egress.total
+                    - $.blobServices.Egress.total
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1133,9 +1194,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 8e73a2aba92444dd9c02c6f94227a4e5
-              name: 'Azure: Storage account [{#NAME}]: Index Capacity'
+              name: 'Azure: Storage account [{#NAME}]: Blob Index Capacity'
               type: DEPENDENT
-              key: 'azure.storage.index.capacity[{#NAME}]'
+              key: 'azure.storage.blob.index.capacity[{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -1145,7 +1206,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.metrics.IndexCapacity.average
+                    - $.blobServices.IndexCapacity.average
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1162,9 +1223,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: ff40325efb174839bef7bc775049837e
-              name: 'Azure: Storage account [{#NAME}]: Ingress'
+              name: 'Azure: Storage account [{#NAME}]: Blob Ingress'
               type: DEPENDENT
-              key: 'azure.storage.ingress[{#NAME}]'
+              key: 'azure.storage.blob.ingress[{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -1174,7 +1235,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.metrics.Ingress.total
+                    - $.blobServices.Ingress.total
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1191,9 +1252,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: e17d6f2ed79c4b5eaa54730c82d6840f
-              name: 'Azure: Storage account [{#NAME}]: Success E2E Latency'
+              name: 'Azure: Storage account [{#NAME}]: Blob Success E2E Latency'
               type: DEPENDENT
-              key: 'azure.storage.success.e2e.latency[{#NAME}]'
+              key: 'azure.storage.blob.success.e2e.latency[{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -1205,7 +1266,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.metrics.SuccessE2ELatency.average
+                    - $.blobServices.SuccessE2ELatency.average
                   error_handler: DISCARD_VALUE
                 -
                   type: MULTIPLIER
@@ -1226,9 +1287,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 727fb792fe5c4229995f7aa5bbb681ed
-              name: 'Azure: Storage account [{#NAME}]: Success Server Latency'
+              name: 'Azure: Storage account [{#NAME}]: Blob Success Server Latency'
               type: DEPENDENT
-              key: 'azure.storage.success.server.latency[{#NAME}]'
+              key: 'azure.storage.blob.success.server.latency[{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -1240,7 +1301,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.metrics.SuccessServerLatency.average
+                    - $.blobServices.SuccessServerLatency.average
                   error_handler: DISCARD_VALUE
                 -
                   type: MULTIPLIER
@@ -1261,9 +1322,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 48ecb880def34474b73a03eb895db3ea
-              name: 'Azure: Storage account [{#NAME}]: Transactions'
+              name: 'Azure: Storage account [{#NAME}]: Blob Transactions'
               type: DEPENDENT
-              key: 'azure.storage.transactions[{#NAME}]'
+              key: 'azure.storage.blob.transactions[{#NAME}]'
               delay: '0'
               history: 7d
               description: |
@@ -1274,7 +1335,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.metrics.Transactions.total
+                    - $.blobServices.Transactions.total
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1289,6 +1350,1206 @@ zabbix_export:
                 -
                   tag: storage
                   value: '{#NAME}'
+            -
+              uuid: 4198807e1e08439a9009481ddcfd3bab
+              name: 'Azure: Storage account [{#NAME}]: Egress'
+              type: DEPENDENT
+              key: 'azure.storage.engress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: |
+                The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
+                As a result, this number does not reflect billable egress.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.Egress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 8adc470c703e44dc96b42ac32b98252e
+              name: 'Azure: Storage account [{#NAME}]: File Availability'
+              type: DEPENDENT
+              key: 'azure.storage.file.availability[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                The percentage of availability for the storage service or a specified API operation.
+                Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.
+                All unexpected errors result in reduced availability for the storage service or the specified API operation.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.Availability.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 729885e79d1b4c11923606b6d559e0cc
+                  expression: '(min(/Azure by HTTP/azure.storage.file.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.FILE.AVAILABILITY:"{#NAME}"}'
+                  name: 'Azure: Storage account [{#NAME}]: File Availability is low'
+                  opdata: '{ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 43069f165849449d8403d1a8c82fe634
+              name: 'Azure: Storage account [{#NAME}]: File Capacity'
+              type: DEPENDENT
+              key: 'azure.storage.file.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of File storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.FileCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 3483741c11a141c2866ea58a74a91135
+              name: 'Azure: Storage account [{#NAME}]: File Count'
+              type: DEPENDENT
+              key: 'azure.storage.file.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of files in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.FileCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 7f6d01573bf24d9889f41a14cb581075
+              name: 'Azure: Storage account [{#NAME}]: File Egress'
+              type: DEPENDENT
+              key: 'azure.storage.file.engress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: |
+                The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
+                As a result, this number does not reflect billable egress.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.Egress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 9f9b6772f9d9478ba3be3a93c5408ba2
+              name: 'Azure: Storage account [{#NAME}]: File Ingress'
+              type: DEPENDENT
+              key: 'azure.storage.file.ingress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.Ingress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 4cb60e5473ce46a08bc962dc97c1f4db
+              name: 'Azure: Storage account [{#NAME}]: File Share Capacity Quota'
+              type: DEPENDENT
+              key: 'azure.storage.file.share.capacity.quota[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The upper limit on the amount of storage that can be used by Azure Files Service in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.FileShareCapacityQuota.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 220673a2e99a4108b034d04d79108231
+              name: 'Azure: Storage account [{#NAME}]: File Share Count'
+              type: DEPENDENT
+              key: 'azure.storage.file.share.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of file shares in the storage account.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.FileShareCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 47c48f39b9744a92ac13e9db69f6e629
+              name: 'Azure: Storage account [{#NAME}]: File Share Snapshot Size'
+              type: DEPENDENT
+              key: 'azure.storage.file.share.snapshot.size[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The amount of storage used by the snapshots in storage account''s File service in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.FileShareSnapshotSize.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: f0394f8f2d55471c8ab557045349a6ec
+              name: 'Azure: Storage account [{#NAME}]: File Share Snapshot Count'
+              type: DEPENDENT
+              key: 'azure.storage.file.shares.snapshot.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of snapshots present on the share in storage account''s Files Service.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.FileShareSnapshotCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 431a6c51418d401697d105a0d9b62d23
+              name: 'Azure: Storage account [{#NAME}]: File Success E2E Latency'
+              type: DEPENDENT
+              key: 'azure.storage.file.success.e2e.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.file.SuccessE2ELatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 43b6c0b948f64d9daada7aaac520c839
+              name: 'Azure: Storage account [{#NAME}]: File Success Server Latency'
+              type: DEPENDENT
+              key: 'azure.storage.file.success.server.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average time used to process a successful request by Azure Storage.
+                This value does not include the network latency specified in `SuccessE2ELatency`.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.SuccessServerLatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: ed4b7ac10368493ba01c7cbeffba3042
+              name: 'Azure: Storage account [{#NAME}]: File Transactions'
+              type: DEPENDENT
+              key: 'azure.storage.file.transactions[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The number of requests made to the storage service or a specified API operation.
+                This number includes successful and failed requests and also requests, which produced errors.
+                Use `ResponseType` dimension for the number of different type of responses.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.Transactions.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: caeaa6805904471a8b18480f34ef9807
+              name: 'Azure: Storage account [{#NAME}]: Ingress'
+              type: DEPENDENT
+              key: 'azure.storage.ingress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.Ingress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 74af681b7eb54de2978229354ffe3542
+              name: 'Azure: Storage account [{#NAME}]: Queue Availability'
+              type: DEPENDENT
+              key: 'azure.storage.queue.availability[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                The percentage of availability for the storage service or a specified API operation.
+                Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.
+                All unexpected errors result in reduced availability for the storage service or the specified API operation.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.Availability.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 6ea928c21ea7487098d1aee8ce3ff3f6
+                  expression: '(min(/Azure by HTTP/azure.storage.queue.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.QUEUE.AVAILABILITY:"{#NAME}"}'
+                  name: 'Azure: Storage account [{#NAME}]: Queue Availability is low'
+                  opdata: '{ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: be8b82396ff243e8a52864069b192dea
+              name: 'Azure: Storage account [{#NAME}]: Queue Capacity'
+              type: DEPENDENT
+              key: 'azure.storage.queue.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of Queue storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.QueueCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 9174d372235e4d14a4896a79ddcbc051
+              name: 'Azure: Storage account [{#NAME}]: Queue Count'
+              type: DEPENDENT
+              key: 'azure.storage.queue.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of queues in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.QueueCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: b8cff599c4194b4abd74f4a27ca93284
+              name: 'Azure: Storage account [{#NAME}]: Queue Egress'
+              type: DEPENDENT
+              key: 'azure.storage.queue.engress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: |
+                The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
+                As a result, this number does not reflect billable egress.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.Egress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 599f612c3cc64e81a53d507ae0078ab1
+              name: 'Azure: Storage account [{#NAME}]: Queue Ingress'
+              type: DEPENDENT
+              key: 'azure.storage.queue.ingress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.Ingress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 70c7b436a03145c5ab694b3a20ac52b1
+              name: 'Azure: Storage account [{#NAME}]: Queue Message Count'
+              type: DEPENDENT
+              key: 'azure.storage.queue.message.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of unexpired queue messages in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.QueueMessageCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: eccdbf48412e4c28afc3bbf87c545cc2
+              name: 'Azure: Storage account [{#NAME}]: Queue Success E2E Latency'
+              type: DEPENDENT
+              key: 'azure.storage.queue.success.e2e.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.queue.SuccessE2ELatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 4d9aa2753d944690b01a23bcd44fd52d
+              name: 'Azure: Storage account [{#NAME}]: Queue Success Server Latency'
+              type: DEPENDENT
+              key: 'azure.storage.queue.success.server.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average time used to process a successful request by Azure Storage.
+                This value does not include the network latency specified in `SuccessE2ELatency`.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.SuccessServerLatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: e472739df4634b55be2466bd91af9886
+              name: 'Azure: Storage account [{#NAME}]: Queue Transactions'
+              type: DEPENDENT
+              key: 'azure.storage.queue.transactions[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The number of requests made to the storage service or a specified API operation.
+                This number includes successful and failed requests and also requests, which produced errors.
+                Use `ResponseType` dimension for the number of different type of responses.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.Transactions.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 48437de0bdca4f5392c295ca8b82bd0a
+              name: 'Azure: Storage account [{#NAME}]: Success E2E Latency'
+              type: DEPENDENT
+              key: 'azure.storage.success.e2e.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.SuccessE2ELatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 7076dbfb45cd49828b96064aa892e8e4
+              name: 'Azure: Storage account [{#NAME}]: Success Server Latency'
+              type: DEPENDENT
+              key: 'azure.storage.success.server.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average time used to process a successful request by Azure Storage.
+                This value does not include the network latency specified in `SuccessE2ELatency`.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.SuccessServerLatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 918f1d1c70964e7c9f5521cf99bbb21d
+              name: 'Azure: Storage account [{#NAME}]: Table Availability'
+              type: DEPENDENT
+              key: 'azure.storage.table.availability[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                The percentage of availability for the storage service or a specified API operation.
+                Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.
+                All unexpected errors result in reduced availability for the storage service or the specified API operation.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.Availability.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: bfb1e82685224048ba8082447cad57ca
+                  expression: '(min(/Azure by HTTP/azure.storage.table.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY:"{#NAME}"}'
+                  name: 'Azure: Storage account [{#NAME}]: Table Availability is low'
+                  opdata: '{ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: ee19a3857a7a4650952eb855193991ee
+              name: 'Azure: Storage account [{#NAME}]: Table Capacity'
+              type: DEPENDENT
+              key: 'azure.storage.table.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of storage used by the table service of the storage account with the name `[{#NAME}]`, expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.TableCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: a3d11321b1cc4c1b9c322c0a7162e76e
+              name: 'Azure: Storage account [{#NAME}]: Table Count'
+              type: DEPENDENT
+              key: 'azure.storage.table.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of tables in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.TableCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: d75bd57fdd9f4377aea7c1e52a109c18
+              name: 'Azure: Storage account [{#NAME}]: Table Egress'
+              type: DEPENDENT
+              key: 'azure.storage.table.engress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: |
+                The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
+                As a result, this number does not reflect billable egress.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.Egress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: f2911504457b4d329ae7cf7d7a24594a
+              name: 'Azure: Storage account [{#NAME}]: Table Entity Count'
+              type: DEPENDENT
+              key: 'azure.storage.table.entity.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of table entities in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.TableEntityCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 993ca2e5bcd74d27b19998d77f0abec8
+              name: 'Azure: Storage account [{#NAME}]: Table Ingress'
+              type: DEPENDENT
+              key: 'azure.storage.table.ingress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.Ingress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 00c441cc77f4447584d4bffbefc304e0
+              name: 'Azure: Storage account [{#NAME}]: Table Success E2E Latency'
+              type: DEPENDENT
+              key: 'azure.storage.table.success.e2e.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.SuccessE2ELatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: f29e3ad4be034f38932cb85654397926
+              name: 'Azure: Storage account [{#NAME}]: Table Success Server Latency'
+              type: DEPENDENT
+              key: 'azure.storage.table.success.server.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average time used to process a successful request by Azure Storage.
+                This value does not include the network latency specified in `SuccessE2ELatency`.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.SuccessServerLatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 9ba25e87c5bb466a99855a9fb893283d
+              name: 'Azure: Storage account [{#NAME}]: Table Transactions'
+              type: DEPENDENT
+              key: 'azure.storage.table.transactions[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The number of requests made to the storage service or a specified API operation.
+                This number includes successful and failed requests and also requests, which produced errors.
+                Use `ResponseType` dimension for the number of different type of responses.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.Transactions.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 6f68f0d8a63640ffa549fde44e8fe56c
+              name: 'Azure: Storage account [{#NAME}]: Transactions'
+              type: DEPENDENT
+              key: 'azure.storage.transactions[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The number of requests made to the storage service or a specified API operation.
+                This number includes successful and failed requests and also requests, which produced errors.
+                Use `ResponseType` dimension for the number of different type of responses.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.Transactions.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 08ef07d874db4823bd167482bf049916
+              name: 'Azure: Storage account [{#NAME}]: Used Capacity'
+              type: DEPENDENT
+              key: 'azure.storage.used.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: |
+                The amount of storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.
+                For standard storage accounts, it's the sum of capacity used by blob, table, file, and queue. 
+                For premium storage accounts and Blob storage accounts, it is the same as BlobCapacity or FileCapacity.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.UsedCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+          graph_prototypes:
+            -
+              uuid: d569e0daf1974df58584432805f95557
+              name: 'Azure: Capacity by storage [{#NAME}]'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.used.capacity[{#NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.blob.capacity[{#NAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.table.capacity[{#NAME}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.file.capacity[{#NAME}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.queue.capacity[{#NAME}]'
+            -
+              uuid: 9c87dfb9ed7e4c1ea32c8e35c6e23381
+              name: 'Azure: Transactions by storage [{#NAME}]'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.transactions[{#NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.blob.transactions[{#NAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.table.transactions[{#NAME}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.file.transactions[{#NAME}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.queue.transactions[{#NAME}]'
           master_item:
             key: azure.get.storage.acc
           lld_macro_paths:
@@ -1499,6 +2760,14 @@ zabbix_export:
           value: '70'
           description: 'The warning threshold of the storage account availability.'
         -
+          macro: '{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY}'
+          value: '70'
+          description: 'The warning threshold of the storage account blob services availability.'
+        -
+          macro: '{$AZURE.STORAGE.ACC.FILE.AVAILABILITY}'
+          value: '70'
+          description: 'The warning threshold of the storage account file services availability.'
+        -
           macro: '{$AZURE.STORAGE.ACC.LOCATION.MATCHES}'
           value: '.*'
           description: 'This macro is used in storage accounts discovery rule.'
@@ -1514,6 +2783,14 @@ zabbix_export:
           macro: '{$AZURE.STORAGE.ACC.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in storage accounts discovery rule.'
+        -
+          macro: '{$AZURE.STORAGE.ACC.QUEUE.AVAILABILITY}'
+          value: '70'
+          description: 'The warning threshold of the storage account queue services availability.'
+        -
+          macro: '{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY}'
+          value: '70'
+          description: 'The warning threshold of the storage account table services availability.'
         -
           macro: '{$AZURE.SUBSCRIPTION_ID}'
           description: 'Microsoft Azure subscription ID.'
