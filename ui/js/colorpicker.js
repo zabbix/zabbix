@@ -188,7 +188,6 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 					.html(t('Use default'))
 					.on('click', () => setColorHandler(''));
 
-
 				overlay = $('<div>', {
 					class: 'overlay-dialogue color-picker-dialogue',
 					id: 'color_picker'
