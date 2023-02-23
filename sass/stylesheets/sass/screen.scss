@@ -707,6 +707,10 @@ form {
 		@extend %form-disabled;
 	}
 
+	span.zi-remove {
+		margin-left: 3px;
+	}
+
 	input[type="text"] {
 		border: 0;
 		background: none;
