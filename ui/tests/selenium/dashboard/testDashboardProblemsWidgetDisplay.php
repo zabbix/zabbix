@@ -457,7 +457,10 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
+		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
+
 		// Assert Problems widget's table.
+		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
 		$this->assertTableDataColumn($data['result'], 'Problem • Severity');
 
 		// Assert Problems widget's tags column.
