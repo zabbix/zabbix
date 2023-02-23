@@ -188,6 +188,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 					.html(t('Use default'))
 					.on('click', () => setColorHandler(''));
 
+
 				overlay = $('<div>', {
 					class: 'overlay-dialogue color-picker-dialogue',
 					id: 'color_picker'
@@ -360,11 +361,11 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				.on('keydown', function (e) {
 					if (e.keyCode == KEY_ENTER || e.keyCode == KEY_SPACE) {
 						e.preventDefault();
-						methods.show(id, e.target);
+						methods.show(element.id, e.target);
 					}
 				})
 				.on('click', function (e) {
-					methods.show(id, e.target);
+					methods.show(element.id, e.target);
 				})
 				.insertAfter(element);
 
