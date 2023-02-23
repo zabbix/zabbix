@@ -39,6 +39,9 @@ require_once dirname(__FILE__).'/authentication/testUsersAuthenticationLdap.php'
 require_once dirname(__FILE__).'/authentication/testUsersAuthenticationSaml.php';
 require_once dirname(__FILE__).'/authentication/testUsersPasswordComplexity.php';
 
+// Connectors.
+require_once dirname(__FILE__).'/connectors/testPageConnectors.php';
+
 // Dashboards.
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
@@ -294,6 +297,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testUsersAuthenticationLdap');
 		$suite->addTestSuite('testUsersAuthenticationSaml');
 		$suite->addTestSuite('testUsersPasswordComplexity');
+
+		// Connectors.
+		$suite->addTestSuite('testPageConnectors');
 
 		// Dashboards.
 		$suite->addTestSuite('testDashboardCopyWidgets');
