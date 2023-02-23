@@ -2114,6 +2114,9 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 			hdata->value.log->value = value->data.str;
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	hdata->value_type = value_type;
@@ -2648,6 +2651,7 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 					break;
 				case ITEM_VALUE_TYPE_LOG:
 					continue;
+				case ITEM_VALUE_TYPE_BIN:
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;
@@ -2718,6 +2722,7 @@ static void	dc_add_proxy_history_meta(ZBX_DC_HISTORY *history, int history_num)
 				case ITEM_VALUE_TYPE_TEXT:
 					pvalue = h->value.str;
 					break;
+				case ITEM_VALUE_TYPE_BIN:
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;
@@ -2882,6 +2887,7 @@ static void	DBmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 			case ITEM_VALUE_TYPE_NONE:
 				h_num++;
 				break;
+			case ITEM_VALUE_TYPE_BIN:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
@@ -3116,11 +3122,9 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 				h_log->severity = log->severity;
 				break;
 			case ITEM_VALUE_TYPE_BIN:
-				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
-				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 		}
 	}
 }

@@ -248,6 +248,14 @@ void	zbx_history_record_clear(zbx_history_record_t *value, int value_type)
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			history_logfree(value->value.log);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_BIN:
+			break;
+		case ITEM_VALUE_TYPE_NONE:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 }
 

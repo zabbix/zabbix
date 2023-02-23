@@ -135,6 +135,7 @@ unsigned char	zbx_mock_str_to_value_type(const char *str)
 		return ITEM_VALUE_TYPE_BIN;
 
 	fail_msg("Unknown value type \"%s\"", str);
+
 	return ITEM_VALUE_TYPE_MAX;
 }
 

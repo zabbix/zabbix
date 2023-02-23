@@ -108,6 +108,12 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 				value->dbl = atof(data);
+				break;
+			case ITEM_VALUE_TYPE_BIN:
+				break;
+			case ITEM_VALUE_TYPE_NONE:
+			default:
+				fail_msg("Unexpected value type: %c", value_type);
 		}
 	}
 	else
@@ -197,6 +203,10 @@ static void	zbx_vcmock_ds_clone_record(const zbx_history_record_t *src, unsigned
 			log->timestamp = src->value.log->timestamp;
 			dst->value.log = log;
 			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			fail_msg("Unexpected value type: %c", value_type);
 	}
 }
 
@@ -408,6 +418,10 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 			case ITEM_VALUE_TYPE_FLOAT:
 				zbx_mock_assert_double_eq(prefix, expected->value.dbl, returned->value.dbl);
 				break;
+			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_NONE:
+			default:
+				fail_msg("Unexpected value type: %c", value_type);
 		}
 	}
 }
@@ -470,6 +484,13 @@ void	zbx_vcmock_free_dc_history(void *ptr)
 			zbx_free(h->value.log->value);
 			zbx_free(h->value.log);
 			break;
+		case ITEM_VALUE_TYPE_UINT64:
+		case ITEM_VALUE_TYPE_FLOAT:
+			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			fail_msg("Unexpected value type: %c", h->value_type);
 	}
 
 	zbx_free(h);
