@@ -178,6 +178,8 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 			return "Binary";
 		case ITEM_VALUE_TYPE_NONE:
 			return "None";
+		case ITEM_VALUE_TYPE_MAX:
+			return "Max";
 		default:
 			return "unknown";
 	}

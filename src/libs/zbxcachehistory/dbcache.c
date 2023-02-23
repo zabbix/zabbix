@@ -1395,6 +1395,8 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 						ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_NONE:
+			case ITEM_VALUE_TYPE_MAX:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				exit(EXIT_FAILURE);
@@ -2014,9 +2016,9 @@ static void	dc_history_clean_value(ZBX_DC_HISTORY *history)
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
 		case ITEM_VALUE_TYPE_UINT64:
-		case ITEM_VALUE_TYPE_MAX:
-		case ITEM_VALUE_TYPE_NONE:
 			break;
+		case ITEM_VALUE_TYPE_NONE:
+		case ITEM_VALUE_TYPE_MAX:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -2112,6 +2114,8 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 			hdata->value.log->value = value->data.str;
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 			break;
+		case ITEM_VALUE_TYPE_NONE:
+		case ITEM_VALUE_TYPE_MAX:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -2651,6 +2655,7 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 					continue;
 				case ITEM_VALUE_TYPE_BIN:
 				case ITEM_VALUE_TYPE_NONE:
+				case ITEM_VALUE_TYPE_MAX:
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;
@@ -2722,6 +2727,8 @@ static void	dc_add_proxy_history_meta(ZBX_DC_HISTORY *history, int history_num)
 					pvalue = h->value.str;
 					break;
 				case ITEM_VALUE_TYPE_BIN:
+				case ITEM_VALUE_TYPE_NONE:
+				case ITEM_VALUE_TYPE_MAX:
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;
@@ -2887,6 +2894,7 @@ static void	DBmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 				h_num++;
 				break;
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_MAX:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
@@ -3121,6 +3129,8 @@ static void	DCmodule_prepare_history(ZBX_DC_HISTORY *history, int history_num, Z
 				h_log->severity = log->severity;
 				break;
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_NONE:
+			case ITEM_VALUE_TYPE_MAX:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				exit(EXIT_FAILURE);
@@ -4509,6 +4519,8 @@ static void	hc_free_data(zbx_hc_data_t *data)
 				case ITEM_VALUE_TYPE_FLOAT:
 					break;
 				case ITEM_VALUE_TYPE_NONE:
+				case ITEM_VALUE_TYPE_MAX:
+				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 					exit(EXIT_FAILURE);
 			}
@@ -4746,6 +4758,8 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 					return FAIL;
 				break;
 			case ITEM_VALUE_TYPE_NONE:
+			case ITEM_VALUE_TYPE_MAX:
+			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				exit(EXIT_FAILURE);
 		}
@@ -4771,6 +4785,8 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 				cache->stats.history_bin_counter++;
 				break;
 			case ITEM_VALUE_TYPE_NONE:
+			case ITEM_VALUE_TYPE_MAX:
+			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				exit(EXIT_FAILURE);
 		}
@@ -4914,6 +4930,7 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 
 				break;
 			case ITEM_VALUE_TYPE_NONE:
+			case ITEM_VALUE_TYPE_MAX:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				exit(EXIT_FAILURE);

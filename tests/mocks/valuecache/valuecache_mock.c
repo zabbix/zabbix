@@ -112,6 +112,7 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 			case ITEM_VALUE_TYPE_BIN:
 				break;
 			case ITEM_VALUE_TYPE_NONE:
+			case ITEM_VALUE_TYPE_MAX:
 			default:
 				fail_msg("Unexpected value type: %c", value_type);
 		}
@@ -205,6 +206,7 @@ static void	zbx_vcmock_ds_clone_record(const zbx_history_record_t *src, unsigned
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_NONE:
+		case ITEM_VALUE_TYPE_MAX:
 		default:
 			fail_msg("Unexpected value type: %c", value_type);
 	}
@@ -420,6 +422,7 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 				break;
 			case ITEM_VALUE_TYPE_BIN:
 			case ITEM_VALUE_TYPE_NONE:
+			case ITEM_VALUE_TYPE_MAX:
 			default:
 				fail_msg("Unexpected value type: %c", value_type);
 		}
@@ -489,6 +492,7 @@ void	zbx_vcmock_free_dc_history(void *ptr)
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_NONE:
+		case ITEM_VALUE_TYPE_MAX:
 		default:
 			fail_msg("Unexpected value type: %c", h->value_type);
 	}

@@ -120,6 +120,8 @@ static zbx_history_value_t	history_str2value(char *str, unsigned char value_type
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_NONE:
+		case ITEM_VALUE_TYPE_MAX:
+		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 	}
@@ -146,6 +148,8 @@ static const char	*history_value2str(const ZBX_DC_HISTORY *h)
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_NONE:
+		case ITEM_VALUE_TYPE_MAX:
+		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 	}

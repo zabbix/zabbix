@@ -728,8 +728,9 @@ int	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, ch
 		case ITEM_VALUE_TYPE_BIN:
 			hist->data.sql_history_func = add_history_bin;
 			break;
-		case ITEM_VALUE_TYPE_MAX:
 		case ITEM_VALUE_TYPE_NONE:
+		case ITEM_VALUE_TYPE_MAX:
+		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 	}
