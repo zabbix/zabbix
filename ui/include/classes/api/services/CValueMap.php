@@ -170,16 +170,17 @@ class CValueMap extends CApiService {
 
 			$db_valuemap = $db_valuemaps[$valuemapid];
 
-			if (array_key_exists('name', $valuemap) && $valuemap['name'] !== $db_valuemap['name']) {
-				$upd_valuemaps[] = [
-					'values' => ['name' => $valuemap['name']],
-					'where' => ['valuemapid' => $valuemap['valuemapid']]
-				];
-			}
+			$valuemap += ['name' => $db_valuemap['name']];
 
 			if (array_key_exists('uuid', $valuemap) && $valuemap['uuid'] !== $db_valuemap['uuid']) {
 				$upd_valuemaps[] = [
 					'values' => ['uuid' => $valuemap['uuid'], 'name' => $valuemap['name']],
+					'where' => ['valuemapid' => $valuemap['valuemapid']]
+				];
+			}
+			elseif ($valuemap['name'] !== $db_valuemap['name']) {
+				$upd_valuemaps[] = [
+					'values' => ['name' => $valuemap['name']],
 					'where' => ['valuemapid' => $valuemap['valuemapid']]
 				];
 			}
