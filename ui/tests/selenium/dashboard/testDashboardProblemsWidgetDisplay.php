@@ -468,7 +468,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Delete created widget.
 		DBexecute('DELETE FROM widget w'.
 				' WHERE EXISTS ('.
-					'SELECT NULL'.
+					'SELECT *'.
 					' FROM dashboard_page dp'.
 					' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
 						' AND dp.dashboardid='.self::$dashboardid.
