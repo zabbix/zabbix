@@ -20,8 +20,10 @@
 #ifndef ZABBIX_BASE64_H
 #define ZABBIX_BASE64_H
 
+#include "zbxtypes.h"
+
 void	str_base64_encode(const char *p_str, char *p_b64str, int in_size);
 void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size);
-void	str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_out_size);
+void	str_base64_decode(const char *p_b64str, char *p_str, size_t maxsize, size_t *p_out_size);
 
 #endif /* ZABBIX_BASE64_H */
