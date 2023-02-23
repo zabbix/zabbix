@@ -43,7 +43,7 @@ class testPageConnectors extends CWebTest {
 	}
 
 	private static $connectors;
-	private static $delete_connector = '⊏∅∩∩∈©⊤∅Ř для удаления';
+	private static $delete_connector = '©∅∩∩∈©⊤∅Ř для удаления';
 	private static $update_connector = 'Update connector';
 
 	public static function prepareData() {
@@ -67,7 +67,7 @@ class testPageConnectors extends CWebTest {
 				'data_type' => ZBX_CONNECTOR_DATA_TYPE_EVENTS
 			],
 			[
-				'name' => '⊏∅∩∩∈©⊤∅Ř для удаления',
+				'name' => '©∅∩∩∈©⊤∅Ř для удаления',
 				'url' => '{$URL}'
 			],
 			[
@@ -127,7 +127,7 @@ class testPageConnectors extends CWebTest {
 				'Status' => 'Enabled'
 			],
 			[
-				'Name' => '⊏∅∩∩∈©⊤∅Ř для удаления',
+				'Name' => '©∅∩∩∈©⊤∅Ř для удаления',
 				'Data type' => 'Item values',
 				'Status' => 'Enabled'
 			],
@@ -277,10 +277,10 @@ class testPageConnectors extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => '⊏∅∩∩∈©⊤∅Ř'
+						'Name' => '©∅∩∩∈©⊤∅Ř'
 					],
 					'expected' => [
-						'⊏∅∩∩∈©⊤∅Ř для удаления'
+						'©∅∩∩∈©⊤∅Ř для удаления'
 					]
 				]
 			],
@@ -319,7 +319,7 @@ class testPageConnectors extends CWebTest {
 						'Enabled connector',
 						'Events connector',
 						'Item value connector',
-						'⊏∅∩∩∈©⊤∅Ř для удаления',
+						'©∅∩∩∈©⊤∅Ř для удаления',
 						'Update connector'
 					]
 				]
@@ -331,7 +331,7 @@ class testPageConnectors extends CWebTest {
 						'Name' => 'я у'
 					],
 					'expected' => [
-						'⊏∅∩∩∈©⊤∅Ř для удаления'
+						'©∅∩∩∈©⊤∅Ř для удаления'
 					]
 				]
 			],
@@ -387,7 +387,7 @@ class testPageConnectors extends CWebTest {
 						'Enabled connector',
 						'Events connector',
 						'Item value connector',
-						'⊏∅∩∩∈©⊤∅Ř для удаления',
+						'©∅∩∩∈©⊤∅Ř для удаления',
 						'Update connector'
 					]
 				]
@@ -454,7 +454,7 @@ class testPageConnectors extends CWebTest {
 						'Update connector'
 					]
 				]
-			],
+			]
 		];
 	}
 
@@ -492,7 +492,7 @@ class testPageConnectors extends CWebTest {
 					'expected' => [
 						'ZABBIX',
 						'Update connector',
-						'⊏∅∩∩∈©⊤∅Ř для удаления',
+						'©∅∩∩∈©⊤∅Ř для удаления',
 						'Item value connector',
 						'Events connector',
 						'Enabled connector',
