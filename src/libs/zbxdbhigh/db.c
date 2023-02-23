@@ -3048,11 +3048,11 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 static void	format_binary_value_for_sql(char **in)
 {
 	char	*chunk, *dst = NULL;
-	int	data_len, src_len;
+	size_t	data_len, src_len;
 
 	src_len = strlen(*in) * 3 / 4 ;
 	dst = (char*)zbx_malloc(NULL, src_len);
-	str_base64_decode(*in, (char *)dst, src_len, &data_len);
+	str_base64_decode(*in, (char *)dst, (int)src_len, &data_len);
 #if defined (HAVE_MYSQL)
 	chunk = (char*)zbx_malloc(NULL, 2 * data_len);
 	zbx_mysql_escape_bin((char*)dst, chunk, data_len);

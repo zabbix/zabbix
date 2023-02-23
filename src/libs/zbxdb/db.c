@@ -22,13 +22,13 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "log.h"
-#include "base64.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
 #	include "errmsg.h"
 #	include "mysqld_error.h"
 #elif defined(HAVE_ORACLE)
+#	include "base64.h"
 #	include "zbxdbschema.h"
 #	include "oci.h"
 #elif defined(HAVE_POSTGRESQL)
