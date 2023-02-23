@@ -1795,6 +1795,55 @@ static int	DBpatch_6030193(void)
 	return DBcreate_index("scripts", "scripts_3", "name,menu_path", 1);
 }
 
+static int	DBpatch_6030194(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("config", &field, NULL);
+}
+
+static int	DBpatch_6030195(void)
+{
+	const ZBX_FIELD	field = {"geomaps_tile_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("config", &field, NULL);
+}
+
+static int	DBpatch_6030196(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmap_url", &field, NULL);
+}
+
+static int	DBpatch_6030197(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmap_element_url", &field, NULL);
+}
+
+static int	DBpatch_6030198(void)
+{
+	const ZBX_FIELD	field = {"url_a", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
+static int	DBpatch_6030199(void)
+{
+	const ZBX_FIELD	field = {"url_b", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
+static int	DBpatch_6030200(void)
+{
+	const ZBX_FIELD	field = {"url_c", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -1981,5 +2030,12 @@ DBPATCH_ADD(6030190, 0, 1)
 DBPATCH_ADD(6030191, 0, 1)
 DBPATCH_ADD(6030192, 0, 1)
 DBPATCH_ADD(6030193, 0, 1)
+DBPATCH_ADD(6030194, 0, 1)
+DBPATCH_ADD(6030195, 0, 1)
+DBPATCH_ADD(6030196, 0, 1)
+DBPATCH_ADD(6030197, 0, 1)
+DBPATCH_ADD(6030198, 0, 1)
+DBPATCH_ADD(6030199, 0, 1)
+DBPATCH_ADD(6030200, 0, 1)
 
 DBPATCH_END()
