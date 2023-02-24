@@ -44,7 +44,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	protected $hostName = 'Template inheritance test host';
 
 	public function testTemplateInheritance_linkHost(){
-		$sql = "select hostid from hosts where host='Zabbix agent';";
+		$sql = "select hostid from hosts where host='Linux by Zabbix agent';";
 		$this->assertEquals(1, CDBHelper::getCount($sql));
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
@@ -56,8 +56,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		COverlayDialogElement::find()->all()->last()->setDataContext('Templates');
-		$this->zbxTestClickLinkTextWait('Zabbix agent');
-		$this->zbxTestTextPresent('Zabbix agent');
+		$this->zbxTestClickLinkTextWait('Linux by Zabbix agent');
+		$this->zbxTestTextPresent('Linux by Zabbix agent');
 		$form->submit();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
@@ -83,9 +83,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 				'testInheritance',
 				'key-item-inheritance',
 				[
-					'Cannot inherit item with key "key-item-inheritance" of template "Inheritance test template" '.
-						'to host "Template inheritance test host", because an item with the same key is already '.
-						'inherited from template "Inheritance test template 2".'
+					'Cannot inherit LLD rule with key "key-item-inheritance" of template "Inheritance test template" '.
+						'to host "Template inheritance test host", because an item with the same key already exists.'
 				]
 			],
 			// Item added to Template inheritance test host
@@ -161,7 +160,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 				$this->zbxTestAssertElementValue('history', '54d');
 				$this->zbxTestAssertElementValue('trends', '55d');
 				$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
-				$this->zbxTestTextPresent('Parent item');
+				$this->zbxTestTextPresent('Parent items');
 				$this->zbxTestTextPresent($template);
 				break;
 			case TEST_BAD:
@@ -227,7 +226,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('url', 'zabbix.php');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('status'));
-		$this->zbxTestTextPresent('Parent trigger');
+		$this->zbxTestTextPresent('Parent triggers');
 	}
 
 	/**
@@ -282,7 +281,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('percent_right', '5');
 		$this->zbxTestDropdownAssertSelected('ymin_type', 'Calculated');
 		$this->zbxTestDropdownAssertSelected('ymax_type', 'Calculated');
-		$this->zbxTestTextPresent('Parent graph');
+		$this->zbxTestTextPresent('Parent graphs');
 		$this->zbxTestTextPresent($this->hostName.': testInheritanceItem1');
 	}
 
@@ -327,7 +326,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('delay_flex_0_period', '1-7,00:00-24:00');
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
-		$this->zbxTestTextPresent('Parent discovery rule');
+		$this->zbxTestTextPresent('Parent discovery rules');
 		$this->zbxTestTextPresent($this->templateName);
 	}
 
@@ -388,7 +387,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->assertEquals(['Template value mapping'], $this->query('id:item-prototype-form')->asForm()->one()->
 				getField('Value mapping')->getValue());
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
-		$this->zbxTestTextPresent('Parent item');
+		$this->zbxTestTextPresent('Parent items');
 		$this->zbxTestTextPresent($this->templateName);
 	}
 
@@ -444,7 +443,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('url', 'zabbix.php');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('status'));
-		$this->zbxTestTextPresent('Parent trigger');
+		$this->zbxTestTextPresent('Parent triggers');
 		$this->zbxTestTextPresent($this->templateName);
 	}
 
@@ -521,7 +520,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestDropdownAssertSelected('ymax_type', 'Calculated');
 		$this->zbxTestTextPresent($this->hostName.': itemDiscovery');
 		$this->zbxTestTextPresent($this->hostName.': testInheritanceItem1');
-		$this->zbxTestTextPresent('Parent graph');
+		$this->zbxTestTextPresent('Parent graphs');
 		$this->zbxTestTextPresent($this->templateName);
 	}
 

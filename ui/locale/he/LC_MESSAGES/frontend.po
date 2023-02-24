@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-26 11:28+0000\n"
+"PO-Revision-Date: 2023-02-15 15:01+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -1072,7 +1072,7 @@ msgstr "תוויות מתקדמות"
 
 #: app/views/popup.import.php:175
 msgid "Advanced options"
-msgstr ""
+msgstr "אפשרויות מתקדמות"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"

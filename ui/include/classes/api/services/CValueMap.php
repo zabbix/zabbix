@@ -283,7 +283,6 @@ class CValueMap extends CApiService {
 	 */
 	public function delete(array $valuemapids) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-
 		if (!CApiInputValidator::validate($api_input_rules, $valuemapids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -295,54 +294,24 @@ class CValueMap extends CApiService {
 			'preservekeys' => true
 		]);
 
-		if (count($db_valuemaps) != count($valuemapids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		foreach ($valuemapids as $valuemapid) {
+			if (!array_key_exists($valuemapid, $db_valuemaps)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
-		self::resetItemValuemaps($valuemapids);
+		DB::update('items', [[
+			'values' => ['valuemapid' => 0],
+			'where' => ['valuemapid' => $valuemapids]
+		]]);
 
 		$this->deleteByIds($valuemapids);
 
 		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_VALUE_MAP, $db_valuemaps);
 
 		return ['valuemapids' => $valuemapids];
-	}
-
-	/**
-	 * Reset the links on the given value maps for items, item prototypes.
-	 *
-	 * @param array $valuemapids
-	 */
-	private static function resetItemValuemaps(array $valuemapids): void {
-		$options = [
-			'output' => ['itemid', 'name', 'flags', 'valuemapid'],
-			'filter' => ['valuemapid' => $valuemapids]
-		];
-		$result = DBselect(DB::makeSql('items', $options));
-
-		$items = [];
-		$db_items = [];
-		$item_prototypes = [];
-		$db_item_prototypes = [];
-
-		while ($row = DBfetch($result)) {
-			if (in_array($row['flags'], [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])) {
-				$items[] = ['itemid' => $row['itemid'], 'valuemapid' => 0];
-				$db_items[$row['itemid']] = $row;
-			}
-			else {
-				$item_prototypes[] = ['itemid' => $row['itemid'], 'valuemapid' => 0];
-				$db_item_prototypes[$row['itemid']] = $row;
-			}
-		}
-
-		if ($items) {
-			CItem::updateForce($items, $db_items);
-		}
-
-		if ($item_prototypes) {
-			CItemPrototype::updateForce($item_prototypes, $db_item_prototypes);
-		}
 	}
 
 	/**

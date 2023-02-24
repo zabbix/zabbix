@@ -1143,6 +1143,11 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 						'name' =>					['type' => XML_STRING | XML_REQUIRED],
 						'version' =>				['type' => XML_STRING | XML_REQUIRED]
 					]],
+					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+						'template' =>				['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED]
+						]]
+					]],
 					'groups' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'group', 'rules' => [
 						'group' =>					['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]

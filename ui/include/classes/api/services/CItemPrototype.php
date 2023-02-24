@@ -739,7 +739,8 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function updateDiscoveredItems(array $item_prototypes, array $db_item_prototypes): void {
 		foreach ($item_prototypes as $i => $item_prototype) {
-			if (!array_key_exists('update_discovered_items', $db_item_prototypes[$item_prototype['itemid']])) {
+			if (!in_array($item_prototype['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+					|| !array_key_exists('update_discovered_items', $db_item_prototypes[$item_prototype['itemid']])) {
 				unset($item_prototype[$i]);
 				continue;
 			}
@@ -984,6 +985,8 @@ class CItemPrototype extends CItemGeneral {
 		if ($ins_items) {
 			self::createForce($ins_items);
 		}
+
+		self::inherit(array_merge($upd_items, $ins_items), $upd_db_items);
 	}
 
 	/**
@@ -1014,6 +1017,10 @@ class CItemPrototype extends CItemGeneral {
 			foreach ($upd_db_items as &$upd_db_item) {
 				$item = $items[$parent_indexes[$upd_db_item['templateid']]];
 				$db_item = $db_items[$upd_db_item['templateid']];
+
+				if (array_key_exists('update_discovered_items', $db_item)) {
+					$upd_db_item['update_discovered_items'] = true;
+				}
 
 				$upd_item = [
 					'itemid' => $upd_db_item['itemid'],
@@ -1175,7 +1182,9 @@ class CItemPrototype extends CItemGeneral {
 		$parent_indexes = [];
 
 		foreach ($items as $i => &$item) {
+			$item['uuid'] = '';
 			$item = self::unsetNestedObjectIds($item);
+
 			$parent_indexes[$item['hostid']][$item['key_']] = $i;
 		}
 		unset($item);
@@ -1285,33 +1294,54 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public static function unlinkTemplateObjects(array $ruleids): void {
 		$result = DBselect(
-			'SELECT id.itemid,i.name,i.templateid,i.valuemapid'.
-			' FROM item_discovery id,items i'.
+			'SELECT id.itemid,i.name,i.type,i.key_,i.templateid,i.uuid,i.valuemapid,i.hostid,h.status AS host_status'.
+			' FROM item_discovery id,items i,hosts h'.
 			' WHERE id.itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
 				' AND '.dbConditionId('id.parent_itemid', $ruleids).
 				' AND '.dbConditionId('i.templateid', [0], true)
 		);
 
 		$items = [];
 		$db_items = [];
+		$i = 0;
+		$tpl_itemids = [];
 
 		while ($row = DBfetch($result)) {
 			$item = [
 				'itemid' => $row['itemid'],
-				'templateid' => 0
+				'type'  => $row['type'],
+				'templateid' => 0,
+				'host_status' => $row['host_status']
 			];
 
-			if ($row['valuemapid'] != 0) {
-				$item['valuemapid'] = 0;
-				$row['update_discovered_items'] = true;
+			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+				$item += ['uuid' => generateUuidV4()];
 			}
 
-			$items[] = $item;
+			if ($row['valuemapid'] != 0) {
+				$item += ['valuemapid' => 0];
+				$row['update_discovered_items'] = true;
+
+				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+					$tpl_itemids[$i] = $row['itemid'];
+					$item += array_intersect_key($row, array_flip(['key_', 'hostid']));
+				}
+			}
+
+			$items[$i++] = $item;
 			$db_items[$row['itemid']] = $row;
 		}
 
 		if ($items) {
 			self::updateForce($items, $db_items);
+
+			if ($tpl_itemids) {
+				$items = array_intersect_key($items, $tpl_itemids);
+				$db_items = array_intersect_key($db_items, array_flip($tpl_itemids));
+
+				self::inherit($items, $db_items);
+			}
 		}
 	}
 
