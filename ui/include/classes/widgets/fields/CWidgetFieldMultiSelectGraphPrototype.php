@@ -33,6 +33,7 @@ class CWidgetFieldMultiSelectGraphPrototype extends CWidgetFieldMultiSelect {
 		}
 		else {
 			$this->setFilterParameter('hostid', $hostid);
+			$this->setFilterParameter('template_dashboard_widget', true);
 		}
 	}
 }

@@ -168,6 +168,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 							'srctbl' => 'items',
 							'srcfld1' => 'name',
 							'hostid' => $this->field->templateid,
+							'template_dashboard_widget' => true,
 							'numeric' => 1,
 							'dstfrm' => $this->form_name,
 							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')

@@ -579,7 +579,8 @@ class CControllerPopupGeneric extends CController {
 			'hostids' =>							'array',
 			'host_pattern' =>						'array|not_empty',
 			'host_pattern_wildcard_allowed' =>		'in 1',
-			'host_pattern_multiple' =>				'in 1'
+			'host_pattern_multiple' =>				'in 1',
+			'template_dashboard_widget' =>			'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -913,6 +914,7 @@ class CControllerPopupGeneric extends CController {
 				'data' => array_values($hosts),
 				'selectedLimit' => 1,
 				'disabled' => $this->hasInput('only_hostid'),
+				'hidden' => $this->hasInput('template_dashboard_widget'),
 				'popup' => [
 					'parameters' => [
 						'srctbl' => $src_name,

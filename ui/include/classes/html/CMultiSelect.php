@@ -88,7 +88,7 @@ class CMultiSelect extends CTag {
 			$params['data'] = zbx_cleanHashes($options['data']);
 		}
 
-		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder'] as $option) {
+		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder', 'hidden'] as $option) {
 			if (array_key_exists($option, $options)) {
 				$params[$option] = $options[$option];
 			}
@@ -149,7 +149,7 @@ class CMultiSelect extends CTag {
 	 */
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
-			'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest'
+			'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'hidden'
 		];
 
 		foreach ($options as $field => $value) {
@@ -163,6 +163,7 @@ class CMultiSelect extends CTag {
 			'name' => 'name',
 			'object_name' => 'object_name',
 			'disabled' => 'disabled',
+			'hidden' => 'hidden',
 			'default_value' => 'defaultValue',
 			'data' => 'data',
 			'add_new' => 'addNew',
@@ -242,7 +243,7 @@ class CMultiSelect extends CTag {
 					'with_items', 'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers',
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'context', 'enabled_only',
-					'group_status'
+					'group_status', 'template_dashboard_widget'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -272,6 +273,10 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('hostid', $parameters) && $parameters['hostid'] > 0) {
 					$popup_parameters['only_hostid'] = (string) $parameters['hostid'];
 					$autocomplete_parameters['hostid'] = (string) $parameters['hostid'];
+
+					if (array_key_exists('template_dashboard_widget', $parameters)) {
+						$popup_parameters['template_dashboard_widget'] = '1';
+					}
 				}
 
 				if (array_key_exists('groupid', $parameters) && $parameters['groupid'] > 0) {

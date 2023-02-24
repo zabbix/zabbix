@@ -339,6 +339,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 						'srctbl' => 'items',
 						'srcfld1' => 'itemid',
 						'hostid' => $this->field->templateid,
+						'template_dashboard_widget' => true,
 						'numeric' => 1,
 						'dstfrm' => $this->form_name,
 						'dstfld1' => zbx_formatDomId($this->field->getName().'['.$row_num.'][items][]')
