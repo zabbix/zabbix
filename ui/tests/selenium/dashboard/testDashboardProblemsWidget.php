@@ -422,6 +422,7 @@ class testDashboardProblemsWidget extends CWebTest {
 						'id:severities_3' => true,
 						'id:severities_4' => true,
 						'id:severities_5' => true,
+						'Tags' => 'Or',
 						'Show tags' => 1,
 						'Tag name' => 'Shortened',
 						'Tag display priority' => 'tag, tag2, tag4',
@@ -430,43 +431,40 @@ class testDashboardProblemsWidget extends CWebTest {
 						'Show unacknowledged only' => true,
 						'Sort entries by' => 'Severity (ascending)'
 					],
-					'Tags' => [
-						'evaluation' => 'Or',
-						'tags' => [
-							[
-								'action' => USER_ACTION_UPDATE,
-								'index' => 0,
-								'tag' => '!@#$%^&*()_+<>,.\/',
-								'operator' => 'Equals',
-								'value' => '!@#$%^&*()_+<>,.\/'
-							],
-							[
-								'tag' => 'tag1',
-								'operator' => 'Contains',
-								'value' => 'value1'
-							],
-							[
-								'tag' => 'tag2',
-								'operator' => 'Exists'
-							],
-							[
-								'tag' => 'tag3',
-								'operator' => 'Does not exist'
-							],
-							[
-								'tag' => '{$MACRO:A}',
-								'operator' => 'Does not equal',
-								'value' => '{$MACRO:A}'
-							],
-							[
-								'tag' => '{$MACRO}',
-								'operator' => 'Does not contain',
-								'value' => '{$MACRO}'
-							],
-							[
-								'tag' => 'Таг',
-								'value' => 'Значение'
-							]
+					'tag_fields' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'tag' => '!@#$%^&*()_+<>,.\/',
+							'operator' => 'Equals',
+							'value' => '!@#$%^&*()_+<>,.\/'
+						],
+						[
+							'tag' => 'tag1',
+							'operator' => 'Contains',
+							'value' => 'value1'
+						],
+						[
+							'tag' => 'tag2',
+							'operator' => 'Exists'
+						],
+						[
+							'tag' => 'tag3',
+							'operator' => 'Does not exist'
+						],
+						[
+							'tag' => '{$MACRO:A}',
+							'operator' => 'Does not equal',
+							'value' => '{$MACRO:A}'
+						],
+						[
+							'tag' => '{$MACRO}',
+							'operator' => 'Does not contain',
+							'value' => '{$MACRO}'
+						],
+						[
+							'tag' => 'Таг',
+							'value' => 'Значение'
 						]
 					]
 				]
@@ -516,7 +514,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'clear_tag_priority' => true,
 					'fields' => [
 						'id:show_header' => false,
-						'Name' => '',
+						'Name' => 'Minimal',
 						'Refresh interval' => 'Default (1 minute)',
 						'Show' => 'Recent problems',
 						'Host groups' => '',
@@ -538,7 +536,7 @@ class testDashboardProblemsWidget extends CWebTest {
 						'Show timeline' => false,
 						'Show lines' => 1
 					],
-					'Tags' => []
+					'tag_fields' => []
 				]
 			],
 			// #9 Cyrillyc and special symbols in inputs.
@@ -571,23 +569,27 @@ class testDashboardProblemsWidget extends CWebTest {
 						'Name' => 'Array of groups',
 						'Host groups' => [ 'Group to check Overview',  'Zabbix servers'],
 						'Exclude host groups' => ['Group to copy all graph', 'Inheritance test'],
-						'Hosts' => [ 'Host_1 with proxy', 'Host for triggers filtering']
+						'Hosts' => ['Host to check graph 1', 'Host for triggers filtering']
 					]
 				]
 			]
 		];
 	}
 
-	/**
-	 * @backup widget
-	 */
-	public function testDashboardProblemsWidget_CreateDefault() {
-		$this->checkFormProblemsWidget(['fields' => []]);
+	public static function getCreateDefaultData() {
+		return [
+			[
+				[
+					'fields' => []
+				]
+			]
+		];
 	}
 
 	/**
 	 * @backupOnce widget
 	 *
+	 * @dataProvider getCreateDefaultData
 	 * @dataProvider getCommonData
 	 */
 	public function testDashboardProblemsWidget_Create($data) {
@@ -635,13 +637,19 @@ class testDashboardProblemsWidget extends CWebTest {
 			$form->getField('id:show_header')->fill($data['show_header']);
 		}
 
-		if (array_key_exists('Tags', $data)) {
-			if (empty($data['Tags'])) {
-				$form->getField('id:tags_table_tags')->asMultifieldTable()->clear();
+		if (array_key_exists('tag_fields', $data)) {
+			$tags_table = $form->getField('id:tags_table_tags')->asMultifieldTable();
+
+			if (empty($data['tag_fields'])) {
+				$tags_table->clear();
 			}
 			else {
-				$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
-				$form->getField('id:tags_table_tags')->asMultifieldTable()->fill(CTestArrayHelper::get($data['Tags'], 'tags'));
+				if ($update) {
+					$data['tag_fields'][1]['action'] = USER_ACTION_UPDATE;
+					$data['tag_fields'][1]['index'] = 1;
+				}
+
+				$tags_table->fill($data['tag_fields']);
 			}
 		}
 
@@ -690,8 +698,19 @@ class testDashboardProblemsWidget extends CWebTest {
 			}
 
 			// If tags table has been cleared, after form saving there is one empty tag field.
-			if (CTestArrayHelper::get($data, 'Tags') === []) {
-				$values[''] = [['tag' => '', 'operator' => 'Contains', 'value' => '']];
+			if (array_key_exists('tag_fields', $data)) {
+				if ($data['tag_fields'] === []) {
+					$data['tag_fields'] = [['tag' => '', 'operator' => 'Contains', 'value' => '']];
+				}
+
+				// Remove 'action' and 'index' fields from tags for comparison.
+				$expected = $data['tag_fields'];
+				foreach ($expected as &$tag) {
+					unset($tag['action'], $tag['index']);
+				}
+				unset($tag);
+
+				$this->query('id:tags_table_tags')->asMultifieldTable()->one()->checkValue($expected);
 			}
 
 			// Check widget form fields and values in frontend.
@@ -762,7 +781,7 @@ class testDashboardProblemsWidget extends CWebTest {
 	}
 
 	/**
-	 * Function for checking canceling form or submitting without any changes.
+	 * Function for checking cancelling form or submitting without any changes.
 	 *
 	 * @param boolean $cancel			true if cancel scenario, false if form is submitted
 	 * @param boolean $create			true if create scenario, false if update
