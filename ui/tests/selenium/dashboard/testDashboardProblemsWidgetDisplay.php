@@ -34,6 +34,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 	private static $hostid;
 	private static $dashboardid;
+	private static $itemids;
 	private static $triggerids;
 	private static $acktime;
 
@@ -93,12 +94,14 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		$items = CDataHelper::call('item.create', $items_data);
 		$this->assertArrayHasKey('itemids', $items);
+		self::$itemids = CDataHelper::getIds('name');
 
 		// Create triggers based on items.
 		$triggers = CDataHelper::call('trigger.create', [
 			[
 				'description' => 'Trigger for widget 1 float',
 				'expression' => 'last(/Host for Problems Widgets/float)=0',
+				'opdata' => 'Item value: {ITEM.LASTVALUE}',
 				'priority' => 0
 			],
 			[
@@ -115,6 +118,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			[
 				'description' => 'Trigger for widget 2 unsigned',
 				'expression' => 'last(/Host for Problems Widgets/unsigned)=0',
+				'opdata' => 'Item value: {ITEM.LASTVALUE}',
 				'priority' => 3
 			],
 			[
@@ -129,6 +133,11 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Create events.
 		$time = time();
 		$i=0;
+
+		foreach (array_values(self::$itemids) as $itemid) {
+			CDataHelper::addItemData($itemid, 0);
+		}
+
 		foreach (self::$triggerids as $name => $id) {
 			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.
 				(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
@@ -394,11 +403,11 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					]
 				]
 			],
-			// #11 Filtered by Host group, Operator: And, show 3, None.
+			// #11 Filtered by Host group, tags, show 3, shortened, tag priority.
 			[
 				[
 					'fields' => [
-						'Name' => 'Group, tags, show 3, shortened',
+						'Name' => 'Group, tags, show 3, shortened, tag priority',
 						'Host groups' => 'Zabbix servers',
 						'Show tags' => 3,
 						'Tag name' => 'None',
@@ -427,6 +436,65 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'tags_display' => [
 						'get'
 					]
+				]
+			],
+			// #12 Filtered by Host, operational data - Separately, Show suppressed.
+			[
+				[
+					'fields' => [
+						'Name' => 'Host, operational data - Separately, Show suppressed',
+						'Hosts' => 'Host for Problems Widgets',
+						'Show operational data' => 'Separately',
+						'Show suppressed problems' => true
+					],
+					'result' => [
+						'Trigger for widget text',
+						'Trigger for widget 2 unsigned',
+						'Trigger for widget 2 log',
+						'Trigger for widget 1 char',
+						'Trigger for widget 1 float'
+					],
+					'operational_data' => [
+						'0',
+						"Item value: ".
+								"\n0",
+						'0',
+						'0',
+						"Item value: ".
+								"\n0"
+					]
+				]
+			],
+			// #13 Filtered by Host, operational data - With problem name, Show unacknowledged.
+			[
+				[
+					'fields' => [
+						'Name' => 'Host, operational data - With problem name, Show unacknowledged',
+						'Hosts' => 'Host for Problems Widgets',
+						'Show operational data' => 'With problem name',
+						'Show unacknowledged only' => true
+					],
+					'result' => [
+						'Trigger for widget 2 log',
+						'Trigger for widget 1 char',
+						"Trigger for widget 1 float (Item value: ".
+								"\n0)"
+					]
+				]
+			],
+			// #14 Filtered by Host group, show lines = 2.
+			[
+				[
+					'fields' => [
+						'Name' => 'Host group, show lines = 2',
+						'Host groups' => 'Group for Problems Widgets',
+						'Show lines' => 2
+					],
+					'result' => [
+						'Trigger for widget 2 unsigned',
+						'Trigger for widget 2 log'
+					],
+					'stats' => '2 of 4 problems are shown'
 				]
 			]
 		];
@@ -459,7 +527,30 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		// Assert Problems widget's table.
 		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
-		$this->assertTableDataColumn($data['result'], 'Problem • Severity');
+
+
+		// When there are shown less lines than filered, table appears unusual and doesn't fit for framework functions.
+		if (CTestArrayHelper::get($data['fields'], 'Show lines')) {
+			$table = $this->query('class:list-table')->asTable()->one();
+			$this->assertEquals(count($data['result'])+1, $table->getRows()->count());
+
+			// Assert table rows.
+			$result = [];
+			for ($i=0; $i<count($data['result']); $i++) {
+				$result[] = $table->getRow($i)->getColumn('Problem • Severity')->getText();
+			}
+
+			$this->assertEquals($data['result'], $result);
+
+			// Assert table stats.
+			$this->assertEquals($data['stats'], $table->getRow(count($data['result']))->getText());
+		}
+		else {
+			$this->assertTableDataColumn($data['result'], 'Problem • Severity');
+		}
+		if (CTestArrayHelper::get($data, 'operational_data')) {
+			$this->assertTableDataColumn($data['operational_data'], 'Operational data');
+		}
 
 		// Assert Problems widget's tags column.
 		if (array_key_exists('Tags', $data)) {
