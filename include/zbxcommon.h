@@ -378,7 +378,7 @@ zbx_script_t;
 #define ZBX_SCRIPT_EXECUTE_ON_PROXY	2	/* fall back to execution on server if target not monitored by proxy */
 
 #define POLLER_DELAY		5
-#define DISCOVERER_DELAY	10
+#define DISCOVERER_DELAY	60
 
 #define HOUSEKEEPER_STARTUP_DELAY	30	/* in minutes */
 

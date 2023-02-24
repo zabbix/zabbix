@@ -1509,7 +1509,7 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 	event_add(service->ev_listener, NULL);
 
 	service->ev_timer = event_new(service->ev, -1, 0, ipc_service_timer_cb, service);
-	service->ev_alert = evuser_new(service->ev, ipc_service_user_cb, NULL);
+	service->ev_alert = event_new(service->ev, -1, 0, ipc_service_user_cb, NULL);
 
 	ret = SUCCEED;
 out:
@@ -1638,7 +1638,7 @@ int	zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeo
  ******************************************************************************/
 void	zbx_ipc_service_alert(zbx_ipc_service_t *service)
 {
-	evuser_trigger(service->ev_alert);
+	event_active(service->ev_alert, 0, 0);
 }
 
 /******************************************************************************

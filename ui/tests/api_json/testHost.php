@@ -3148,6 +3148,55 @@ class testHost extends CAPITest {
 					]
 				]
 			],
+			'Test host.get with limits zero' => [
+				'request' => [
+					'output' => ['hostid'],
+					'hostids' => [
+						'discovered_limit_selects'
+					],
+					'selectParentTemplates' => [
+						'templateid', 'host', 'link_type'
+					],
+					'limitSelects' => '0'
+				],
+				'expected_results' => [
+					[
+						'hostid' => 'discovered_limit_selects',
+						'parentTemplates' => [
+							[
+								'templateid' => 'api_test_hosts_a_tpl',
+								'host' => 'api_test_hosts_a_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_b_tpl',
+								'host' => 'api_test_hosts_b_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_c_tpl',
+								'host' => 'api_test_hosts_c_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_d_tpl',
+								'host' => 'api_test_hosts_d_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_e_tpl',
+								'host' => 'api_test_hosts_e_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							],
+							[
+								'templateid' => 'api_test_hosts_f_tpl',
+								'host' => 'api_test_hosts_f_tpl',
+								'link_type' => (string) TEMPLATE_LINK_LLD
+							]
+						]
+					]
+				]
+			],
 			'Test host.get with limits three' => [
 				'request' => [
 					'output' => ['hostid'],
