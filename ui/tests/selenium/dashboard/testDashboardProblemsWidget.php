@@ -645,6 +645,10 @@ class testDashboardProblemsWidget extends CWebTest {
 			}
 			else {
 				if ($update) {
+					/**
+					 * The Widget for update already has 2 tags, so we need to update them. The first tag has action
+					 * and index in data provider, so we add them to the 2nd tag.
+					 */
 					$data['tag_fields'][1]['action'] = USER_ACTION_UPDATE;
 					$data['tag_fields'][1]['index'] = 1;
 				}
@@ -710,6 +714,7 @@ class testDashboardProblemsWidget extends CWebTest {
 				}
 				unset($tag);
 
+				// Function asValues() does not get tags from the form, so we need to check them separately.
 				$this->query('id:tags_table_tags')->asMultifieldTable()->one()->checkValue($expected);
 			}
 
