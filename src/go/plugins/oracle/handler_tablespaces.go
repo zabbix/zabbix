@@ -63,10 +63,11 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 }
 
 func getQuery(params map[string]string) (string, error) {
+	conn := params["Connname"]
 	ts := params["Tablespace"]
 	t := params["Type"]
 
-	if ts == "" && t == "" {
+	if ts == "" && t == "" && conn == "" {
 		return getFullQuery(), nil
 	}
 
@@ -80,9 +81,9 @@ func getQuery(params map[string]string) (string, error) {
 
 	switch t {
 	case perm, undo:
-		query = getPermQueryPart(ts)
+		query = getPermQueryPart(conn, ts)
 	case temp:
-		query = getTempQueryPart(ts)
+		query = getTempQueryPart(conn, ts)
 	default:
 		return "", zbxerr.ErrorInvalidParams.Wrap(fmt.Errorf("incorrect table-space type %s", t))
 	}
@@ -232,7 +233,7 @@ UNION ALL
 `
 }
 
-func getPermQueryPart(name string) string {
+func getPermQueryPart(conName, name string) string {
 	return fmt.Sprintf(`
 SELECT
     JSON_ARRAYAGG(
@@ -252,12 +253,13 @@ SELECT
 FROM
     (
         SELECT
+            df.CON_NAME AS CON_NAME
             df.TABLESPACE_NAME AS TABLESPACE_NAME,
             df.CONTENTS AS CONTENTS,
             NVL(SUM(df.BYTES), 0) AS FILE_BYTES,
             NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES,
             NVL(SUM(f.FREE), 0) AS FREE_BYTES,
-            SUM(df.BYTES) - SUM(f.FREE) AS USED_BYTES,
+            NVL(SUM(df.BYTES) - SUM(f.FREE), 0) AS USED_BYTES,
             ROUND(
                 DECODE(
                     SUM(df.MAX_BYTES),
@@ -272,7 +274,7 @@ FROM
                     SUM(df.BYTES),
                     0,
                     0,
-                    (SUM(df.BYTES) - SUM(f.FREE)) / SUM(df.BYTES) * 100
+                    (NVL(SUM(df.BYTES) - SUM(f.FREE), 0)) / SUM(df.BYTES) * 100
                 ),
                 2
             ) AS USED_FILE_PCT,
@@ -289,25 +291,28 @@ FROM
         FROM
             (
                 SELECT
-                    ddf.FILE_ID,
-                    dt.CONTENTS,
-                    dt.STATUS,
-                    ddf.FILE_NAME,
-                    ddf.TABLESPACE_NAME,
-                    TRUNC(ddf.BYTES) AS BYTES,
-                    TRUNC(GREATEST(ddf.BYTES, ddf.MAXBYTES)) AS MAX_BYTES
+                    ct.CON$NAME AS CON_NAME,
+                    cdf.FILE_ID,
+                    ct.CONTENTS,
+                    ct.STATUS,
+                    cdf.FILE_NAME,
+                    cdf.TABLESPACE_NAME,
+                    TRUNC(cdf.BYTES) AS BYTES,
+                    TRUNC(GREATEST(cdf.BYTES, cdf.MAXBYTES)) AS MAX_BYTES
                 FROM
-                    DBA_DATA_FILES ddf,
-                    DBA_TABLESPACES dt
+                    CDB_DATA_FILES cdf,
+                    CDB_TABLESPACES ct
                 WHERE
-                    ddf.TABLESPACE_NAME = dt.TABLESPACE_NAME
+                    cdf.TABLESPACE_NAME = ct.TABLESPACE_NAME
+                    AND cdf.CON_ID = ct.CON_ID
+                    AND ((ct.CON$NAME = %s or (ct.CON$NAME is null and ct.CON_ID = 0))
             ) df,
             (
                 SELECT
                     TRUNC(SUM(BYTES)) AS FREE,
                     FILE_ID
                 FROM
-                    DBA_FREE_SPACE
+                    CDB_FREE_SPACE
                 GROUP BY
                     FILE_ID
             ) f
@@ -315,14 +320,15 @@ FROM
             df.FILE_ID = f.FILE_ID (+)
 		AND df.TABLESPACE_NAME = '%s'
         GROUP BY
+            df.CON_NAME
             df.TABLESPACE_NAME,
             df.CONTENTS,
             df.STATUS
 	)
-`, name)
+`, conName, name)
 }
 
-func getTempQueryPart(name string) string {
+func getTempQueryPart(conName, name string) string {
 	return fmt.Sprintf(`
 	SELECT
     JSON_ARRAYAGG(
@@ -342,12 +348,13 @@ func getTempQueryPart(name string) string {
 FROM
     (
         SELECT
+            Y.CON_NAME,
             Y.NAME AS TABLESPACE_NAME,
             Y.CONTENTS AS CONTENTS,
             NVL(SUM(Y.BYTES), 0) AS FILE_BYTES,
             NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES,
             NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE_BYTES,
-            SUM(Y.BYTES) - SUM(Y.FREE_BYTES) AS USED_BYTES,
+            NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0) AS USED_BYTES,
             ROUND(
                 DECODE(
                     SUM(Y.MAX_BYTES),
@@ -362,12 +369,12 @@ FROM
                     SUM(Y.BYTES),
                     0,
                     0,
-                    (SUM(Y.BYTES) - SUM(Y.FREE_BYTES)) / SUM(Y.BYTES) * 100
+                    (NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES)), 0)) / SUM(Y.BYTES) * 100
                 ),
                 2
             ) AS USED_FILE_PCT,
             DECODE(
-                Y.TBS_STATUS,
+                Y.STATUS,
                 'ONLINE',
                 1,
                 'OFFLINE',
@@ -379,35 +386,39 @@ FROM
         FROM
             (
                 SELECT
-                    dtf.TABLESPACE_NAME AS NAME,
-                    dt.CONTENTS,
-                    dt.STATUS AS TBS_STATUS,
-                    dtf.STATUS AS STATUS,
-                    dtf.BYTES AS BYTES,
+                    ct.CON$NAME         AS CON_NAME,
+                    ctf.TABLESPACE_NAME AS NAME,
+                    ct.CONTENTS,
+                    ctf.STATUS AS STATUS,
+                    ctf.BYTES AS BYTES,
                     (
                         SELECT
                             ((f.TOTAL_BLOCKS - s.TOT_USED_BLOCKS) * vp.VALUE)
                         FROM
                             (
                                 SELECT
+                                    CON_ID,
                                     TABLESPACE_NAME,
                                     SUM(USED_BLOCKS) TOT_USED_BLOCKS
                                 FROM
-                                    GV$SORT_SEGMENT
+                                    V$SORT_SEGMENT
                                 WHERE
                                     TABLESPACE_NAME != 'DUMMY'
                                 GROUP BY
+                                    CON_ID,
                                     TABLESPACE_NAME
                             ) s,
                             (
                                 SELECT
+                                    CON_ID,
                                     TABLESPACE_NAME,
                                     SUM(BLOCKS) TOTAL_BLOCKS
                                 FROM
-                                    DBA_TEMP_FILES
+                                    CDB_TEMP_FILES
                                 WHERE
                                     TABLESPACE_NAME != 'DUMMY'
                                 GROUP BY
+                                    CON_ID,
                                     TABLESPACE_NAME
                             ) f,
                             (
@@ -420,22 +431,27 @@ FROM
                             ) vp
                         WHERE
                             f.TABLESPACE_NAME = s.TABLESPACE_NAME
-                            AND f.TABLESPACE_NAME = dtf.TABLESPACE_NAME
+                            AND f.TABLESPACE_NAME = ctf.TABLESPACE_NAME
+                            AND f.CON_ID = s.CON_ID
+                            AND f.CON_ID = ct.CON_ID
                     ) AS FREE_BYTES,
                     CASE
-                        WHEN dtf.MAXBYTES = 0 THEN dtf.BYTES
-                        ELSE dtf.MAXBYTES
+                        WHEN ctf.MAXBYTES = 0 THEN ctf.BYTES
+                        ELSE ctf.MAXBYTES
                     END AS MAX_BYTES
                 FROM
-                    sys.DBA_TEMP_FILES dtf,
-                    sys.DBA_TABLESPACES dt
+                    CDB_TEMP_FILES ctf,
+                    CDB_TABLESPACES ct
                 WHERE
-                    dtf.TABLESPACE_NAME = dt.TABLESPACE_NAME
+                    ctf.TABLESPACE_NAME = ct.TABLESPACE_NAME
+                    AND ctf.CON_ID = ct.CON_ID
+                    AND ((ct.CON$NAME = '%s') or (ct.CON$NAME is null and ct.CON_ID = 0))
                     AND dtf.TABLESPACE_NAME = '%s'
             ) Y
         GROUP BY
+            Y.CON_NAME
             Y.NAME,
             Y.CONTENTS,
             Y.TBS_STATUS
-    )`, name)
+    )`, conName, name)
 }

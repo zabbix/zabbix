@@ -34,11 +34,12 @@ func tablespacesDiscoveryHandler(ctx context.Context, conn OraClient, params map
 			JSON_ARRAYAGG(
 				JSON_OBJECT(
 					'{#TABLESPACE}' VALUE TABLESPACE_NAME, 
-					'{#CONTENTS}'   VALUE CONTENTS
+					'{#CONTENTS}'   VALUE CONTENTS,
+					'{#CON_NAME}' 	VALUE NVL(CON$NAME, 'DB') CON_NAME
 				) RETURNING CLOB 
 			) LLD
 		FROM
-			DBA_TABLESPACES
+			CDB_TABLESPACES
 	`)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)

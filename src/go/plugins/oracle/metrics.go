@@ -202,6 +202,7 @@ var metrics = metric.MetricSet{
 	keyTablespaces: metric.New("Returns tablespaces statistics.",
 		[]*metric.Param{
 			paramURI, paramUsername, paramPassword, paramService,
+			metric.NewParam("Conname", "Connection name."),
 			metric.NewParam("Tablespace", "Table-space name."),
 			metric.NewParam("Type", "table-space type."),
 		}, false),
