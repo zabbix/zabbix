@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,7 +113,8 @@ $fields = [
 										getParamFieldLabelByType(getRequest('type', 0))
 									],
 	'inventory_link' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),
-										'(isset({add}) || isset({update})) && {value_type} != '.ITEM_VALUE_TYPE_LOG
+										'(isset({add}) || isset({update})) && isset({value_type})'.
+											' && {value_type} != '.ITEM_VALUE_TYPE_LOG
 									],
 	'snmp_oid' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
