@@ -378,7 +378,7 @@ zbx_script_t;
 #define ZBX_SCRIPT_EXECUTE_ON_PROXY	2	/* fall back to execution on server if target not monitored by proxy */
 
 #define POLLER_DELAY		5
-#define DISCOVERER_DELAY	10
+#define DISCOVERER_DELAY	60
 
 #define HOUSEKEEPER_STARTUP_DELAY	30	/* in minutes */
 
@@ -799,5 +799,13 @@ zbx_uint64_t	suffix2factor(char c);
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
 char	*zbx_strerror(int errnum);
+
+#if !defined(_WINDOWS)
+#	if defined(HAVE_LIBPTHREAD)
+#		define zbx_sigmask	pthread_sigmask
+#	else
+#		define zbx_sigmask	sigprocmask
+#	endif
+#endif
 
 #endif
