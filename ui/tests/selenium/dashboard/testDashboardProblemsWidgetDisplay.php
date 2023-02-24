@@ -240,6 +240,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Trigger for widget 1 float',
 						'Trigger for widget 2 log',
 						'Trigger for widget 2 unsigned'
+					],
+					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
+						'Ack', 'Actions'
 					]
 				]
 			],
@@ -256,6 +259,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Trigger for widget 1 char',
 						'Trigger for widget 2 log',
 						'Trigger for widget 2 unsigned'
+					],
+					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
+						'Ack', 'Actions'
 					]
 				]
 			],
@@ -333,6 +339,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'tags_display' => [
 						'Delta: t',
 						'Alpha: a'
+					],
+					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
+							'Ack', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -362,6 +371,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'tags_display' => [
 						'Eta: eDelta: t',
 						'Eta: eBeta: b'
+					],
+					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
+							'Ack', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -400,6 +412,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'DatSer: abcser: abcdef',
 						'The: tDel: tEta: e',
 						'The: tAlp: aIot: i'
+					],
+					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
+							'Ack', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -435,6 +450,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					],
 					'tags_display' => [
 						'get'
+					],
+					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
+							'Ack', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -462,6 +480,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'0',
 						"Item value: ".
 								"\n0"
+					],
+					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Operational data',
+							'Duration', 'Ack', 'Actions'
 					]
 				]
 			],
@@ -527,11 +548,16 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		// Assert Problems widget's table.
 		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
 
+		// Assert table headers depending on widget settings.
+		$headers = (CTestArrayHelper::get($data, 'headers', ['Time', '', '', 'Recovery time', 'Status', 'Info',
+				'Host', 'Problem • Severity', 'Duration','Ack', 'Actions']
+		));
+		$this->assertEquals($headers, $table->getHeadersText());
 
 		// When there are shown less lines than filered, table appears unusual and doesn't fit for framework functions.
 		if (CTestArrayHelper::get($data['fields'], 'Show lines')) {
-			$table = $this->query('class:list-table')->asTable()->one();
 			$this->assertEquals(count($data['result'])+1, $table->getRows()->count());
 
 			// Assert table rows.
@@ -548,6 +574,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		else {
 			$this->assertTableDataColumn($data['result'], 'Problem • Severity');
 		}
+
 		if (CTestArrayHelper::get($data, 'operational_data')) {
 			$this->assertTableDataColumn($data['operational_data'], 'Operational data');
 		}
