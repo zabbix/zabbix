@@ -306,7 +306,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Hosts' => 'Host for Problems Widgets',
 						'id:severities_0' => true,
 						'id:severities_2' => true,
-						'id:severities_4' => true,
+						'id:severities_4' => true
 					],
 					'result' => [
 						'Trigger for widget 2 log',
