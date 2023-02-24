@@ -1938,6 +1938,9 @@ static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
 	{
 		while (0 == memcmp(oids->values[i - 1]->str_oid, oids->values[i]->str_oid, len))
 		{
+			if (NULL == strchr(oids->values[i]->str_oid + len - 1, '.'))
+				break;
+
 			vector_snmp_oid_free(oids->values[i]);
 			zbx_vector_snmp_oid_remove(oids, i);
 
