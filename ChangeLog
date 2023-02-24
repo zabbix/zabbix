@@ -2,7 +2,6 @@ Changes for 6.4.0rc2
 
 New features:
 A.F.....S. [ZBXNEXT-8087] reverted removing of template nesting (Sasha)
-.......PS. [ZBXNEXT-2732] reverted network discovery manager improvements (asestakovs)
 ..F....... [ZBXNEXT-8257] removed aggregate function labels from the graph widget legend (acikuns)
 .......PS. [ZBXNEXT-8262] updated soft minimal threshold for MySQL to version 8.0.30 (mprihodko)
 .......PS. [ZBXNEXT-8105] fixed build when cURL library version is less than 7.61.0 (vso)
@@ -23,7 +22,6 @@ Changes for 6.4.0rc1
 New features:
 ..F.I..... [ZBXNEXT-7836] added modal form for maintenance periods in Data collection->Maintenance (averza, dpetra)
 A.F.....S. [ZBXNEXT-6796,ZBXNEXT-8203] added support for notification macros in the Script media type parameters (ashubin, dimir)
-.......PS. [ZBXNEXT-2732] improved network discovery by implementing concurrent checks within a single discovery rule (asestakovs)
 A.F....... [ZBXNEXT-1111] added template versioning fields (gcalenko)
 .........T [ZBXNEXT-8249] updated attributes in the template files (abakaldin)
 ..F....... [ZBXNEXT-8165] added the possibility to specify decimal places in Top hosts widget (averza, esekace)
