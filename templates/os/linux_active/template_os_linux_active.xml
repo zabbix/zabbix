@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-12-16T14:54:01Z</date>
+   <date>2023-01-12T06:03:18Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -2382,14 +2382,6 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <item>
                   <host>Template Module Linux generic by Zabbix agent active</host>
                   <key>proc.num[,,run]</key>
-               </item>
-            </graph_item>
-            <graph_item>
-               <sortorder>2</sortorder>
-               <color>F63100</color>
-               <item>
-                  <host>Template Module Linux generic by Zabbix agent active</host>
-                  <key>kernel.maxproc</key>
                </item>
             </graph_item>
          </graph_items>

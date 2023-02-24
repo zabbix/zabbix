@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/../include/CTest.php';
+require_once dirname(__FILE__).'/../../include/profiles.inc.php';
 require_once dirname(__FILE__).'/../../include/classes/api/managers/CHistoryManager.php';
 require_once dirname(__FILE__).'/../../include/classes/core/CRegistryFactory.php';
 require_once dirname(__FILE__).'/../../include/classes/core/Manager.php';

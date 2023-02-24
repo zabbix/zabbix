@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -825,4 +825,6 @@ void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int fiel
 int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
 
 int	zbx_db_check_instanceid(void);
+
+void	zbx_recalc_history_time_period(int *ts_from);
 #endif
