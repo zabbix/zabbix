@@ -881,6 +881,12 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 			param_field = parsed_params.values[i];
 			prefix_len = strlen(param_field.oid_prefix);
 
+			if ('.' == param_field.oid_prefix[prefix_len - 1])
+			{
+				param_field.oid_prefix[prefix_len - 1] = '\0';
+				prefix_len--;
+			}
+
 			if ('.' != param_field.oid_prefix[0])
 			{
 				if (0 != strncmp(param_field.oid_prefix, p.oid + 1, prefix_len))
