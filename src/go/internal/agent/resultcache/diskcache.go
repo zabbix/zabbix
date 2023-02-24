@@ -188,7 +188,6 @@ func (c *DiskCache) resultsGet() (results []*AgentData, maxDataId uint64, maxLog
 		} else {
 			maxLogId = result.Id
 		}
-
 	}
 	if err = rows.Err(); err != nil {
 		return nil, 0, 0, err

@@ -1,1 +1,1 @@
-...G...... [ZBX-22204] fixed data sending to server from agent2 persistent buffer (akozlovs)
+...G...... [ZBX-22204] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
