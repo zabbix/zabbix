@@ -703,7 +703,7 @@ class testDashboardProblemsWidget extends CWebTest {
 
 			// If tags table has been cleared, after form saving there is one empty tag field.
 			if (CTestArrayHelper::get($data, 'Tags') === []) {
-					$values[''] = [['tag' => '', 'operator' => 'Contains', 'value' => '']];
+				$values[''] = [['tag' => '', 'operator' => 'Contains', 'value' => '']];
 			}
 
 			// Check widget form fields and values in frontend.
