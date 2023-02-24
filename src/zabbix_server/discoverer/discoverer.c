@@ -618,8 +618,8 @@ static void	process_rule(zbx_db_drule *drule, int config_timeout, const zbx_even
 				if (NULL != events_cbs->process_events_cb)
 					events_cbs->process_events_cb(NULL, NULL);
 
-				if (NULL != events_cbs->process_events_cb)
-					events_cbs->process_events_cb(NULL, NULL);
+				if (NULL != events_cbs->clean_events_cb)
+					events_cbs->clean_events_cb();
 			}
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 				proxy_update_host(drule->druleid, ip, dns, host_status, now);
