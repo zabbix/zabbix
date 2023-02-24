@@ -851,6 +851,30 @@ abstract class CItemGeneralOld extends CApiService {
 
 			$this->updateReal($upd_items);
 		}
+
+		$new_items = array_merge($upd_items, $ins_items);
+
+		// Inheriting items from the templates.
+		$db_items = DBselect(
+			'SELECT i.itemid'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
+				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
+		);
+
+		$tpl_itemids = [];
+		while ($db_item = DBfetch($db_items)) {
+			$tpl_itemids[$db_item['itemid']] = true;
+		}
+
+		foreach ($new_items as $index => $new_item) {
+			if (!array_key_exists($new_item['itemid'], $tpl_itemids)) {
+				unset($new_items[$index]);
+			}
+		}
+
+		$this->inherit($new_items);
 	}
 
 	/**

@@ -1,3 +1,23 @@
+Changes for 6.4.0rc2
+
+New features:
+A.F.....S. [ZBXNEXT-8087] reverted removing of template nesting (Sasha)
+.......PS. [ZBXNEXT-2732] reverted network discovery manager improvements (asestakovs)
+..F....... [ZBXNEXT-8257] removed aggregate function labels from the graph widget legend (acikuns)
+.......PS. [ZBXNEXT-8262] updated soft minimal threshold for MySQL to version 8.0.30 (mprihodko)
+.......PS. [ZBXNEXT-8105] fixed build when cURL library version is less than 7.61.0 (vso)
+
+Bug fixes:
+...G...... [ZBX-22384] fixed Zabbix agent 2 build on macOS (vso)
+..F....... [ZBX-22375] prevented copying of discovered items when full cloning the host; fixed inability to full clone the host with an item which depends on a web scenario item (vmaksimovs)
+.........T [ZBX-22271] removed module templates (aiantsen)
+..F....... [ZBX-22346] fixed item value dynamic background not working with double-digit negative values (acikuns)
+..F....... [ZBX-22352] added missing CSRF token for macros expansion in maps (epulke)
+..F....... [ZBX-22333] added CSRF token to the 'Make cause' and 'Make symptom' problem actions (epulke)
+........S. [ZBX-22078] fixed the crash in calculated items when using tag filter on 32-bit systems (vso)
+..F....... [ZBX-22280] fixed the symptom counter for cause problem events in the Problems section and Problems widget (miks)
+
+--------------------------------------------------------------------------------
 Changes for 6.4.0rc1
 
 New features:
@@ -293,15 +313,23 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.8rc1
 
 New features:
+A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuthentication method (rdetlavs)
 A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
+........S. [ZBX-22240] fixed selects of history and trends being able to block housekeeping (dgoloscapov)
+..F....... [ZBX-22320] fixed success message when disabling hosts in host groups (epulke)
+........S. [ZBX-22240] fixed selects of history and trends blocking drop_chunks (dgoloscapov)
+........S. [ZBX-22078] fixed the crash in calculated items when using tag filter on 32-bit systems (vso)
+.........T [ZBX-21591] optimized JSONPaths in the Nginx Plus template (igorbach)
+A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
+..F....... [ZBX-21764] fixed misplaced error messages in the edit forms for host groups and template groups (dpetra)
 A......... [ZBX-19202] fixed template dashboard availability to users without permissions to the templates (averza)
 ........S. [ZBX-22189] fixed Zabbix server crash appearing when only item tags change between LLD runs (arimdjonoks)
-.........T [ZBX-21591] optimized Nginx Plus by HTTP template to spread the load across the workers (igorbach)
-.......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
-.........T [ZBX-21597] optimized Remote Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
-.........T [ZBX-21602] optimized Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
+.........T [ZBX-21591] optimized Nginx Plus by HTTP template to spread the load across worker porcesses (igorbach)
+.......PS. [ZBX-22032] added the cookie engine to HTTP checks (askolmeisters)
+.........T [ZBX-21597] optimized Remote Zabbix server health template to spread the load across worker processes, updated descriptions (drasikhov)
+.........T [ZBX-21602] optimized Zabbix server health template to spread the load across worker processes, updated descriptions (drasikhov)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.7
@@ -910,15 +938,22 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.14rc1
 
 New features:
+A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuthentication method (rdetlavs)
 A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
+........S. [ZBX-22240] fixed selects of history and trends being able to block housekeeping (dgoloscapov)
+........S. [ZBX-22240] fixed selects of history and trends blocking drop_chunks (dgoloscapov)
+........S. [ZBX-22078] fixed the crash in calculated items when using tag filter on 32-bit systems (vso)
+.........T [ZBX-21591] optimized JSONPaths in the Nginx Plus template (igorbach)
+A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
+..F....... [ZBX-21748] fixed the background of the Close button in the message box for dark theme (dpetra)
 A......... [ZBX-19202] fixed template dashboard availability to users without permissions to the templates (averza)
 ........S. [ZBX-22189] fixed Zabbix server crash appearing when only item tags change between LLD runs (arimdjonoks)
-.........T [ZBX-21591] optimized Nginx Plus by HTTP template to spread the load across the workers (igorbach)
-.......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
-.........T [ZBX-21597] optimized Remote Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
-.........T [ZBX-21602] optimized Zabbix server health template to spread load across workers, updated descriptions (drasikhov)
+.........T [ZBX-21591] optimized Nginx Plus by HTTP template to spread the load across worker processes (igorbach)
+.......PS. [ZBX-22032] added the cookie engine to HTTP checks (askolmeisters)
+.........T [ZBX-21597] optimized Remote Zabbix server health template to spread the load across worker processes, updated descriptions (drasikhov)
+.........T [ZBX-21602] optimized Zabbix server health template to spread the load across worker processes, updated descriptions (drasikhov)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.13
@@ -3276,6 +3311,8 @@ Changes for 5.0.32rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-22240] fixed selects of history and trends blocking drop_chunks (dgoloscapov)
+A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
 .......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
 
 --------------------------------------------------------------------------------

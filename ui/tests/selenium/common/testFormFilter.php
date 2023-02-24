@@ -173,12 +173,10 @@ class testFormFilter extends CWebTest {
 
 		// Getting changed host/problem result and then comparing it with displayed result from dropdown.
 		$result = $this->getTableResults($table_selector);
-		$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
+		$this->query('xpath://a[@aria-label="Home"]')->waitUntilClickable()->one()->click();
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
-		$this->page->waitUntilReady();
-		$this->assertEquals($result, $this->query('xpath://a[@aria-label="update_tab"]')
-				->one()->getAttribute('data-counter')
-		);
+		$popup_item = CPopupMenuElement::find()->waitUntilVisible()->one()->getItem('update_tab');
+		$this->assertEquals($result, $popup_item->getAttribute('data-counter'));
 
 		// Checking that hosts/problems amount in filter displayed near name at the tab changed.
 		$this->assertEquals($result, $this->query('xpath://li[@data-target="tabfilter_1"]/a')

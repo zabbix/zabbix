@@ -928,9 +928,9 @@ class testDashboardItemValueWidget extends CWebTest {
 					'thresholds' => [
 						['threshold' => '0.9999'],
 						['color' => 'AABBCC', 'threshold' => '1'],
-						['threshold' => '999999999999999'],
-						['threshold' => '1K'],
-						['color' => 'FFEB3B', 'threshold' => '5G']
+						['threshold' => '5K'],
+						['color' => 'FFEB3B', 'threshold' => '1G'],
+						['threshold' => '999999999999999']
 					]
 				]
 			]

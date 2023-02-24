@@ -37,6 +37,7 @@
 #include "zbxjson.h"
 #include "zbxvariant.h"
 #include "zbxconnector.h"
+#include "zbxtagfilter.h"
 
 /* event recovery data */
 typedef struct
