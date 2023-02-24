@@ -340,8 +340,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Delta: t',
 						'Alpha: a'
 					],
-					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-							'Ack', 'Actions', 'Tags'
+					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
+							'Duration', 'Ack', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -372,8 +372,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Eta: eDelta: t',
 						'Eta: eBeta: b'
 					],
-					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-							'Ack', 'Actions', 'Tags'
+					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
+							'Duration', 'Ack', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -477,8 +477,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'0',
 						"Item value: \n0"
 					],
-					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Operational data',
-							'Duration', 'Ack', 'Actions'
+					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
+							'Operational data', 'Duration', 'Ack', 'Actions'
 					]
 				]
 			],
@@ -547,7 +547,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		// Assert table headers depending on widget settings.
 		$headers = (CTestArrayHelper::get($data, 'headers', ['Time', '', '', 'Recovery time', 'Status', 'Info',
-				'Host', 'Problem • Severity', 'Duration','Ack', 'Actions']
+				'Host', 'Problem • Severity', 'Duration', 'Ack', 'Actions']
 		));
 		$this->assertEquals($headers, $table->getHeadersText());
 

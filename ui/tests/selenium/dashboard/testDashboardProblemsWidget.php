@@ -514,7 +514,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'clear_tag_priority' => true,
 					'fields' => [
 						'id:show_header' => false,
-						'Name' => '',
+						'Name' => 'Minimal',
 						'Refresh interval' => 'Default (1 minute)',
 						'Show' => 'Recent problems',
 						'Host groups' => '',
@@ -576,16 +576,20 @@ class testDashboardProblemsWidget extends CWebTest {
 		];
 	}
 
-	/**
-	 * @backup widget
-	 */
-	public function testDashboardProblemsWidget_CreateDefault() {
-		$this->checkFormProblemsWidget(['fields' => []]);
+	public static function getCreateDefaultData() {
+		return [
+			[
+				[
+					'fields' => []
+				]
+			]
+		];
 	}
 
 	/**
 	 * @backupOnce widget
 	 *
+	 * @dataProvider getCreateDefaultData
 	 * @dataProvider getCommonData
 	 */
 	public function testDashboardProblemsWidget_Create($data) {
@@ -634,12 +638,22 @@ class testDashboardProblemsWidget extends CWebTest {
 		}
 
 		if (array_key_exists('Tags', $data)) {
+			$tags_table = $form->getField('id:tags_table_tags')->asMultifieldTable();
+
 			if (empty($data['Tags'])) {
-				$form->getField('id:tags_table_tags')->asMultifieldTable()->clear();
+				$tags_table->clear();
 			}
 			else {
-				$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
-				$form->getField('id:tags_table_tags')->asMultifieldTable()->fill(CTestArrayHelper::get($data['Tags'], 'tags'));
+				if ($update) {
+					/**
+					 * The Widget for update already has 2 tags, so we need to update them. The first tag has action°
+					 * and index in data provider, so we add them to 2nd tag.
+					 */
+					$data['Tags']['tags'][1]['action'] = USER_ACTION_UPDATE;
+					$data['Tags']['tags'][1]['index'] = 1;
+				}
+
+				$tags_table->fill($data['Tags']['tags']);
 			}
 		}
 
@@ -689,7 +703,7 @@ class testDashboardProblemsWidget extends CWebTest {
 
 			// If tags table has been cleared, after form saving there is one empty tag field.
 			if (CTestArrayHelper::get($data, 'Tags') === []) {
-				$values[''] = [['tag' => '', 'operator' => 'Contains', 'value' => '']];
+					$values[''] = [['tag' => '', 'operator' => 'Contains', 'value' => '']];
 			}
 
 			// Check widget form fields and values in frontend.
@@ -760,9 +774,9 @@ class testDashboardProblemsWidget extends CWebTest {
 	}
 
 	/**
-	 * Function for checking canceling form or submitting without any changes.
+	 * Function for checking cancelling form or submitting without any changes.
 	 *
-	 * @param boolean $cancel			true if cancel scenario, false if form is submitted
+	 * @param boolean $cancel			true if cancels scenario, false if form is submitted
 	 * @param boolean $create			true if create scenario, false if update
 	 * @param boolean $save_dashboard	true if dashboard will be saved, false if not
 	 */
