@@ -448,9 +448,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'result' => [
 						'Fourth test trigger with tag priority'
 					],
-					'tags_display' => [
-						'get'
-					],
+					'tags_display' => ['get'],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
 							'Ack', 'Actions', 'Tags'
 					]
@@ -474,12 +472,10 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					],
 					'operational_data' => [
 						'0',
-						"Item value: ".
-								"\n0",
+						"Item value: \n0",
 						'0',
 						'0',
-						"Item value: ".
-								"\n0"
+						"Item value: \n0"
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Operational data',
 							'Duration', 'Ack', 'Actions'
@@ -498,8 +494,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'result' => [
 						'Trigger for widget 2 log',
 						'Trigger for widget 1 char',
-						"Trigger for widget 1 float (Item value: ".
-								"\n0)"
+						"Trigger for widget 1 float (Item value: \n0)"
 					]
 				]
 			],
