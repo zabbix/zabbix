@@ -181,6 +181,7 @@ AC_SEARCH_LIBS(jail_getname, jail, [AC_DEFINE([HAVE_LIBJAIL], 1, [Define to 1 if
 
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
+AC_CHECK_LIB(pthread, main)
 
 dnl check for DNS lookup functions
 found_resolv="no"
