@@ -457,8 +457,6 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
-
 		// Assert Problems widget's table.
 		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
 		$this->assertTableDataColumn($data['result'], 'Problem • Severity');
@@ -469,12 +467,11 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		}
 
 		// Delete created widget.
-		DBexecute('DELETE FROM widget w'.
-				' WHERE EXISTS ('.
-					'SELECT *'.
-					' FROM dashboard_page dp'.
-					' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-						' AND dp.dashboardid='.self::$dashboardid.
+		DBexecute('DELETE FROM widget'.
+				' WHERE dashboard_pageid'.
+				' IN (SELECT dashboard_pageid'.
+					' FROM dashboard_page'.
+					' WHERE dashboardid='.self::$dashboardid.
 				')'
 		);
 	}
