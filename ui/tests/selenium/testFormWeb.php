@@ -18,155 +18,51 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
 /**
+ * @dataSource WebScenarios
+ *
+ * @onBefore getContextData
+ *
  * @backup httptest
  */
-class testFormWeb extends CLegacyWebTest {
+class testFormWeb extends CWebTest {
 
-	/**
-	 * The name of the test host created in the test data set.
-	 *
-	 * @var string
-	 */
-	protected $host = 'Simple form test host';
+	private static $hostid;
+	private static $templateid;
+	private static $template_name;
+	private static $template_scenarioid;
 
-	/**
-	 * The name of the test template created in the test data set.
-	 *
-	 * @var string
-	 */
-	protected $template = 'Inheritance test template';
+	const TEMPLATE_SCENARIO = 'Template_Web_scenario';
 
-	/**
-	 * The number of the test host created in the test data set.
-	 *
-	 * @var int
-	 */
-	protected $hostid = 40001;
+	public static function getContextData() {
+		self::$hostid = CDataHelper::get('WebScenarios.hostid');
+		self::$templateid = CDataHelper::get('WebScenarios.templateid');
+		self::$template_name = CDataHelper::get('WebScenarios.template_name');
+		self::$template_scenarioid = CDataHelper::get('WebScenarios.httptestids.'.self::TEMPLATE_SCENARIO);
+	}
 
 	// Returns layout data
 	public static function layout() {
 		return [
 			[
 				[
-					'agent' => 'Internet Explorer 10',
-					'authentication' => 'None',
-					'host' => 'Simple form test host'
+					'context' => 'host'
 				]
 			],
 			[
 				[
-					'agent' => 'Internet Explorer 10',
-					'authentication' => 'Basic',
-					'host' => 'Simple form test host'
+					'scenario_name' => self::TEMPLATE_SCENARIO,
+					'context' => 'host'
 				]
 			],
 			[
 				[
-					'agent' => 'Internet Explorer 10',
-					'authentication' => 'NTLM',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'other ...',
-					'authentication' => 'None',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'other ...',
-					'authentication' => 'Basic',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'other ...',
-					'authentication' => 'NTLM',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'agent' => 'other ...',
-					'authentication' => 'Kerberos',
-					'host' => 'Simple form test host'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Internet Explorer 10',
-					'authentication' => 'None',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Internet Explorer 10',
-					'authentication' => 'Basic',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'Internet Explorer 10',
-					'authentication' => 'NTLM',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'other ...',
-					'authentication' => 'None',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'other ...',
-					'authentication' => 'Basic',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'agent' => 'other ...',
-					'authentication' => 'NTLM',
-					'template' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'host' => 'Simple form test host',
-					'form' => 'testFormWeb1'
-				]
-			],
-			[
-				[
-					'template' => 'Inheritance test template',
-					'form' => 'testInheritanceWeb1'
-				]
-			],
-			[
-				[
-					'host' => 'Template inheritance test host',
-					'form' => 'testInheritanceWeb1',
-					'templatedHost' => true,
-					'hostTemplate' => 'Inheritance test template'
+					'context' => 'template'
 				]
 			]
 		];
@@ -176,360 +72,491 @@ class testFormWeb extends CLegacyWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormWeb_CheckLayout($data) {
-		if (isset($data['template'])) {
-			$this->zbxTestLogin('templates.php');
-			$this->zbxTestClickLinkTextWait($data['template']);
+		$context_id = ($data['context'] === 'host') ? self::$hostid : self::$templateid;
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.$context_id)->waitUntilReady();
+
+		$selector = (array_key_exists('scenario_name', $data))
+			? 'link:'.$data['scenario_name']
+			: 'button:Create web scenario';
+
+		$this->query($selector)->waitUntilClickable()->one()->click();
+		$form = $this->query('name:httpForm')->waitUntilVisible()->asForm()->one();
+
+		$this->page->assertHeader('Web monitoring');
+		$this->page->assertTitle('Configuration of web monitoring');
+
+		// Check tabs available in the form.
+		$this->assertEquals(['Scenario', 'Steps', 'Authentication'], $form->getTabs());
+
+		$scenario_fields = [
+			'Name' => ['autofocus' => 'true', 'maxlength' => 64],
+			'Application' => [],
+			'id:new_application' => ['maxlength' => 255],
+			'Update interval' => ['value' => '1m', 'maxlength' => 255],
+			'Attempts' => ['value' => 1, 'maxlength' => 2],
+			'Agent' => ['value' => 'Zabbix'],
+			'id:agent_other' => ['visible' => false, 'enabled' => false, 'maxlength' => 255],
+			'HTTP proxy' => ['placeholder' => '[protocol://][user[:password]@]proxy.example.com[:port]', 'maxlength' => 255],
+			'xpath:(//table[@data-type="variables"]//input)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(//table[@data-type="variables"]//input)[2]' => ['placeholder' => 'value', 'maxlength' => 2000],
+			'xpath:(//table[@data-type="headers"]//input)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(//table[@data-type="headers"]//input)[2]' => ['placeholder' => 'value', 'maxlength' => 2000],
+			'Enabled' => ['value' => true]
+		];
+
+		// Substitute inherited web scenario speciffic fields and check Parent web scenario field.
+		if (array_key_exists('scenario_name', $data)) {
+			$scenario_fields['Name'] = ['value' => $data['scenario_name'], 'enabled' => false, 'maxlength' => 64];
+			$scenario_fields['Agent'] = ['value' => 'Internet Explorer 10'];
+
+			$parent_field = $form->getField('Parent web scenarios');
+			$this->assertTrue($parent_field->isCLickable());
+
+			$this->assertEquals('httpconf.php?form=update&hostid='.self::$templateid.'&httptestid='.self::$template_scenarioid,
+					$parent_field->query('link', self::$template_name)->one()->getAttribute('href')
+			);
 		}
 
-		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
-			$this->zbxTestClickLinkTextWait($data['host']);
-		}
+		$this->checkFieldAttributes($form, $scenario_fields);
+		$this->assertEquals(['Name', 'Update interval', 'Attempts'], $form->getRequiredLabels());
 
-		$this->zbxTestClickLinkTextWait('Web scenarios');
+		$dropdowns = [
+			'Agent' => ['Microsoft Edge 80', 'Microsoft Edge 44', 'Internet Explorer 11', 'Internet Explorer 10',
+				'Internet Explorer 9', 'Internet Explorer 8', 'Firefox 73 (Windows)', 'Firefox 73 (Linux)',
+				'Firefox 73 (macOS)', 'Chrome 80 (Windows)', 'Chrome 80 (Linux)', 'Chrome 80 (macOS)', 'Chrome 80 (iOS)',
+				'Chromium 80 (Linux)', 'Opera 67 (Windows)', 'Opera 67 (Linux)', 'Opera 67 (macOS)', 'Safari 13 (macOS)',
+				'Safari 13 (iPhone)', 'Safari 13 (iPad)', 'Safari 13 (iPod Touch)', 'Zabbix', 'Lynx 2.8.8rel.2', 'Links 2.8',
+				'Googlebot 2.1', 'other ...'
+			]
+		];
 
-		$this->zbxTestCheckTitle('Configuration of web monitoring');
-		$this->zbxTestCheckHeader('Web monitoring');
-
-		if (isset($data['form'])) {
-			$this->zbxTestClickLinkTextWait($data['form']);
+		// The template doesn't have any applications, so a "No applications found" text should be displayed.
+		if ($data['context'] === 'template') {
+			$this->assertEquals('No applications found.', $form->getField('Application')->getText());
 		}
 		else {
-			$this->zbxTestContentControlButtonClickTextWait('Create web scenario');
+			$dropdowns['Application'] = ['', 'App 1', 'Заббикс'];
 		}
 
-		$this->zbxTestCheckTitle('Configuration of web monitoring');
-		$this->zbxTestCheckHeader('Web monitoring');
+		// Check the dropdown options.
+		foreach ($dropdowns as $dropdown => $options) {
+			$this->assertEquals($options, $form->getField($dropdown)->getOptions()->asText());
+		}
 
-		if (isset($data['templatedHost'])) {
-			$this->zbxTestTextPresent('Parent web scenarios');
-			if (isset($data['hostTemplate'])) {
-				$this->zbxTestAssertElementPresentXpath("//a[text()='".$data['hostTemplate']."']");
+		// Check that "User agent string" field is displayed only when Agent is set to other
+		$user_string = $form->getField('User agent string');
+		$this->assertFalse($user_string->isDisplayed());
+		$form->getField('Agent')->select('other ...');
+		$this->assertTrue($user_string->isDisplayed());
+		$this->assertTrue($user_string->isEnabled());
+
+		// Check layout of Variables and Headers tables.
+		$table_layout = [
+			'headers' => ['', 'Name', '', 'Value', '']
+		];
+
+		foreach (['Variables' => false, 'Headers' => true] as $table_name => $row_dragable) {
+			$table = $form->getField($table_name)->asTable();
+			$row = $table->getRow(0);
+			$this->assertSame($table_layout['headers'], $table->getHeadersText());
+
+			// Check that Add button is clickable and tha Remove button is not.
+			$add_button = $table->query('button:Add')->one();
+			$this->assertTrue($add_button->isClickable());
+			$remove_button = $row->query('button:Remove')->one();
+			$this->assertFalse($remove_button->isClickable());
+
+			// Check the presence of the draggable icon.
+			if ($row_dragable) {
+				$drag_icon = $row->query('xpath:.//div[contains(@class,"drag-icon")]')->one();
+				$this->assertFalse($drag_icon->isEnabled());
+			}
+			else {
+				$this->assertFalse($row->query('xpath:.//div[contains(@class,"drag-icon")]')->one(false)->isValid());
+			}
+
+			// Fill in some data in first for and check that Remove buttons and draggable icon became enabled.
+			$row->getColumn('Name')->query('xpath:./input')->one()->fill('zabbix');
+			$this->assertTrue($remove_button->isClickable());
+
+			// Check that draggable icon becomes enabled when a new row is added.
+			if ($row_dragable) {
+				$this->assertFalse($drag_icon->isEnabled());
+				$add_button->click();
+				$this->assertTrue($drag_icon->isEnabled());
 			}
 		}
-		else {
-			$this->zbxTestTextNotPresent('Parent web scenarios');
-		}
 
-		if (isset($data['agent'])) {
-			$this->zbxTestDropdownSelect('agent', $data['agent']);
-			$agent = $data['agent'];
-		}
-		else {
-			$agent = $this->zbxTestGetSelectedLabel('agent');
-		}
+		$form->selectTab('Steps');
+		$this->assertTrue($form->isRequired('Steps'));
+		$steps_table = $form->getField('Steps')->asTable();
 
-		$this->zbxTestTextPresent('Name');
-		$this->zbxTestAssertVisibleId('name');
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 64);
-		if (isset($data['templatedHost'])) {
-			$this->zbxTestAssertAttribute("//input[@id='name']", 'readonly');
+		$this->assertEquals(['', '', 'Name', 'Timeout', 'URL', 'Required', 'Status codes', 'Action'],
+				$steps_table->getHeadersText()
+		);
+
+		if (array_key_exists('scenario_name', $data)) {
+			$this->assertFalse($steps_table->query('xpath:.//button')->one(false)->isValid());
 		}
 		else {
-			$this->zbxTestAssertAttribute("//input[@id='name']", 'autofocus');
+			$this->assertEquals(['Add'], $steps_table->query('xpath:.//button')->all()->asText());
 		}
 
-		$this->zbxTestTextPresent('Application');
 
-		$this->zbxTestTextPresent('New application');
-		$this->zbxTestAssertVisibleId('new_application');
-		$this->zbxTestAssertAttribute("//input[@id='new_application']", 'maxlength', 255);
+		$form->selectTab('Authentication');
 
-		$this->zbxTestTextPresent('Update interval');
-		$this->zbxTestAssertVisibleId('delay');
-		$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
-		$this->zbxTestAssertElementValue('delay', '1m');
+		$authentication_fields = [
+			'HTTP authentication' => ['value' => 'None'],
+			'User' => ['visible' => false, 'enabled' => false, 'maxlength' => 64],
+			'Password' => ['visible' => false, 'enabled' => false, 'maxlength' => 64],
+			'SSL verify peer' => ['value' => false],
+			'SSL verify host' => ['value' => false],
+			'SSL certificate file' => ['maxlength' => 255],
+			'SSL key file' => ['maxlength' => 255],
+			'SSL key password' => ['maxlength' => 64]
+		];
 
-		$this->zbxTestTextPresent('Attempts');
-		$this->zbxTestAssertVisibleId('retries');
-		$this->zbxTestAssertAttribute("//input[@id='retries']", 'maxlength', 2);
-		$this->zbxTestAssertElementValue('retries', 1);
+		$this->checkFieldAttributes($form, $authentication_fields);
 
-		$this->zbxTestTextPresent('Agent');
+		$auth_field = $form->getField('HTTP authentication');
+		$this->assertEquals(['None', 'Basic', 'NTLM', 'Kerberos'], $auth_field->getOptions()->asText());
 
-		$agents = ['Microsoft Edge 80', 'Microsoft Edge 44', 'Internet Explorer 11', 'Internet Explorer 10',
-			'Internet Explorer 9', 'Internet Explorer 8', 'Firefox 73 (Windows)', 'Firefox 73 (Linux)',
-			'Firefox 73 (macOS)', 'Chrome 80 (Windows)', 'Chrome 80 (Linux)', 'Chrome 80 (macOS)', 'Chrome 80 (iOS)',
-			'Chromium 80 (Linux)', 'Opera 67 (Windows)', 'Opera 67 (Linux)', 'Opera 67 (macOS)', 'Safari 13 (macOS)',
-			'Safari 13 (iPhone)', 'Safari 13 (iPad)', 'Safari 13 (iPod Touch)', 'Zabbix', 'Lynx 2.8.8rel.2', 'Links 2.8',
-			'Googlebot 2.1', 'other ...'];
-		$agent_element = $this->query('id:agent')->asDropdown()->one();
-		$this->assertEquals($agent_element->getOptions()->asText(), $agents);
+		$user_field = $form->getField('User');
+		$password_field = $form->getField('Password');
 
-		$agent_groups = ['Internet Explorer', 'Mozilla Firefox', 'Opera', 'Safari', 'Google Chrome', 'Others'];
-		foreach ($agent_groups as $group) {
-			$this->zbxTestAssertElementPresentXpath("//z-select[@id='agent']//li[@optgroup='$group']");
+		foreach (['Basic', 'NTLM', 'Kerberos'] as $auth_type) {
+			$auth_field->select($auth_type);
+
+			$this->assertTrue($user_field->isDisplayed());
+			$this->assertTrue($user_field->isEnabled());
 		}
 
-		if ($agent == 'other ...') {
-			$this->zbxTestAssertVisibleId('agent_other');
-		}
-		else {
-			$this->zbxTestAssertNotVisibleId('agent_other');
-		}
+		$expected_buttons = (array_key_exists('scenario_name', $data))
+			? ['Update' => true, 'Clone' => true, 'Clear history and trends' => true, 'Delete' => false, 'Cancel' => true]
+			: ['Add' => true, 'Cancel' => true];
 
-		$this->zbxTestTextPresent('HTTP proxy');
-		$this->zbxTestAssertVisibleId('http_proxy');
-		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]');
+		$footer_buttons = $form->query('xpath:.//div[contains(@class, "tfoot-buttons")]')->one()->query('xpath:.//button')->all();
+		$this->assertEquals(count($expected_buttons), $footer_buttons->count());
 
-		$this->zbxTestTextPresent('Variables');
-		$this->zbxTestAssertVisibleXpath("//div[@id='scenarioTab']//table[contains(@data-type, 'variables')]");
-		$this->zbxTestAssertAttribute("//table[@data-type='variables']//tr[@data-index='1']//input[@data-type='name']", 'maxlength', 255);
-		$this->zbxTestAssertVisibleXpath("//table[@data-type='variables']//tr[@data-index='1']//input[@data-type='value']");
-
-		$this->zbxTestTextPresent('Headers');
-		$this->zbxTestAssertVisibleXpath("//div[@id='scenarioTab']//table[contains(@data-type, 'headers')]");
-		$this->zbxTestAssertAttribute("//table[@data-type='headers']//tr[@data-index='1']//input[@data-type='name']", 'maxlength', 255);
-		$this->zbxTestAssertVisibleXpath("//table[@data-type='headers']//tr[@data-index='1']//input[@data-type='value']");
-
-		$this->zbxTestTextPresent('Enabled');
-		$this->zbxTestAssertElementPresentId('status');
-		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
-
-		$this->zbxTestAssertVisibleId('cancel');
-		$this->zbxTestAssertAttribute("//button[@id='cancel']", 'name', 'cancel');
-		$this->zbxTestAssertAttribute("//button[@id='cancel']", 'type', 'button');
-
-		if (isset($data['form']) && !isset($data['templatedHost'])) {
-			$this->zbxTestAssertVisibleId('update');
-			$this->zbxTestAssertElementValue('update', 'Update');
-
-			$this->zbxTestAssertVisibleId('clone');
-			$this->zbxTestAssertElementValue('clone', 'Clone');
-
-			$this->zbxTestAssertVisibleId('delete');
-			$this->zbxTestAssertElementValue('delete', 'Delete');
-		}
-		elseif (isset($data['form']) && isset($data['templatedHost']))  {
-			$this->zbxTestAssertVisibleId('clone');
-			$this->zbxTestAssertElementValue('clone', 'Clone');
-
-			$this->zbxTestAssertElementPresentXpath("//button[@id='delete'][@disabled]");
-		}
-		else {
-			$this->zbxTestAssertElementPresentId('add');
-			$this->zbxTestAssertElementNotPresentId('clone');
-			$this->zbxTestAssertElementNotPresentId('delete');
-			$this->zbxTestAssertElementNotPresentId('update');
-		}
-
-		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('authentication'));
-
-		$this->zbxTestTextPresent('Authentication');
-		$this->zbxTestDropdownHasOptions('authentication', ['None',	'Basic', 'NTLM', 'Kerberos']);
-
-		if (isset($data['authentication'])) {
-			$this->zbxTestDropdownSelect('authentication', $data['authentication']);
-			$authentication = $data['authentication'];
-		}
-		else {
-			$authentication = $this->zbxTestGetSelectedLabel('authentication');
-		}
-
-		if ($authentication!='None') {
-			$this->zbxTestTextPresent('User');
-			$this->zbxTestAssertVisibleId('http_user');
-			$this->zbxTestAssertAttribute("//input[@id='http_user']", 'maxlength', 64);
-
-			$this->zbxTestTextPresent('Password');
-			$this->zbxTestAssertVisibleId('http_password');
-			$this->zbxTestAssertAttribute("//input[@id='http_password']", 'maxlength', 64);
-		}
-		else {
-			$this->zbxTestTextNotVisible(['User', 'Password'], $this->query('id:authenticationTab')->one());
-			$this->zbxTestAssertNotVisibleId('http_user');
-			$this->zbxTestAssertNotVisibleId('http_password');
-		}
-
-		$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
-		$this->zbxTestTextPresent(['Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes', 'Action']);
-
-		if (isset($data['form']) && !isset($data['templatedHost'])) {
-			$this->zbxTestAssertVisibleXpath("//td[@colspan='8']/button[contains(@class, 'element-table-add')]");
-			$this->zbxTestAssertElementText("//td[@colspan='8']/button[contains(@class, 'element-table-add')]", 'Add');
-
-			$this->zbxTestAssertVisibleXpath("//table[contains(@class,'httpconf-steps-dynamic-row')]//button[contains(@class,'element-table-remove')]");
-			$this->zbxTestAssertElementText("//table[contains(@class,'httpconf-steps-dynamic-row')]//button[contains(@class,'element-table-remove')]", 'Remove');
-		}
-		elseif (!isset($data['form'])) {
-			$this->zbxTestAssertVisibleXpath("//td[@colspan='8']/button[contains(@class, 'element-table-add')]");
-			$this->zbxTestAssertElementText("//td[@colspan='8']/button[contains(@class, 'element-table-add')]", 'Add');
-
-			$this->zbxTestAssertElementNotPresentXpath("//table[contains(@class,'httpconf-steps-dynamic-row')]//button[contains(@class,'element-table-remove')]");
-		}
-		else {
-			$this->zbxTestAssertElementNotPresentXpath("//td[@colspan='8']/button[contains(@class, 'element-table-add')]");
-			$this->zbxTestAssertElementNotPresentXpath("//table[contains(@class,'httpconf-steps-dynamic-row')]//button[contains(@class,'element-table-remove')]");
+		foreach ($footer_buttons as $footer_button) {
+			$button_text = $footer_button->getText();
+			$this->assertEquals($expected_buttons[$button_text], $footer_button->isClickable());
 		}
 	}
 
-	// Returns update data
-	public static function update() {
-		return CDBHelper::getDataProvider("select * from httptest where hostid = 40001 and name LIKE 'testFormWeb%'");
+	private function checkFieldAttributes($form, $fields) {
+		foreach ($fields as $field => $attributes) {
+			$value = (array_key_exists('value', $attributes)) ? $attributes['value'] : '';
+			$visible = (array_key_exists('visible', $attributes)) ? $attributes['visible'] : true;
+			$enabled = (array_key_exists('enabled', $attributes)) ? $attributes['enabled'] : true;
+
+			$this->assertEquals($visible, $form->getField($field)->isVisible());
+			$this->assertEquals($value, $form->getField($field)->getValue());
+			$this->assertTrue($form->getField($field)->isEnabled($enabled));
+
+			foreach (['maxlength', 'placeholder', 'autofocus'] as $attribute) {
+				if (array_key_exists($attribute, $attributes)) {
+					$this->assertEquals($attributes[$attribute], $form->getField($field)->getAttribute($attribute));
+				}
+			}
+		}
 	}
 
-	/**
-	 * @dataProvider update
-	 */
-	public function testFormWeb_SimpleUpdate($data) {
-		$name = $data['name'];
-
-		$sqlItems = "select * from items ORDER BY itemid";
-		$oldHashItems = CDBHelper::getHash($sqlItems);
-
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickLinkTextWait('Web scenarios');
-		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickWait('update');
-
-		$this->zbxTestTextPresent('Web scenario updated');
-		$this->zbxTestTextPresent("$name");
-		$this->zbxTestCheckTitle('Configuration of web monitoring');
-
-		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
-	}
-
-	public static function create() {
+	public static function getWebScenarioData() {
 		return [
-			// Empty name/steps
-			[
-				[
-					'expected' => TEST_BAD,
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Incorrect value for field "Name": cannot be empty.',
-						'Field "Steps" is mandatory.'
-					]
-				]
-			],
-			// Empty steps
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Empty steps',
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Field "Steps" is mandatory.'
-					]
-				]
-			],
 			// Empty name
 			[
 				[
 					'expected' => TEST_BAD,
-					'add_step' => [
-						['step' => 'Empty name']
+//					'error_msg' => 'Page received incorrect data',
+					'error' => 'Incorrect value for field "Name": cannot be empty.'
+				]
+			],
+			// Empty space in name
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => '   '
 					],
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Incorrect value for field "Name": cannot be empty.'
-					]
+					'error' => 'Incorrect value for field "Name": cannot be empty.'
 				]
 			],
-			// Name - numbers only
+			// Missing steps
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Missing steps'
+					],
+					'missing_steps' => true,
+					'error' => 'Field "Steps" is mandatory.'
+				]
+			],
+			// Netagite update interval
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Netagite update interval',
+						'Update interval' => '-1'
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
+				]
+			],
+			// Zero update interval
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Zero update interval',
+						'Update interval' => 0
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
+				]
+			],
+			// Too big update interval
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Too big update interval',
+						'Update interval' => 86401
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
+				]
+			],
+			// Too big update interval with suffix
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Too big update interval with suffix',
+						'Update interval' => '1441h'
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
+				]
+			],
+			// Negative number of retries.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Negative number of retries',
+						'Attempts' => '-1'
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Incorrect value "-1" for "Attempts" field: must be between 1 and 10.'
+				]
+			],
+			// Zero retries
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Zero retries',
+						'Attempts' => 0
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Incorrect value "0" for "Attempts" field: must be between 1 and 10.'
+				]
+			],
+			// Too high number of retries
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Too high number of retries',
+						'Attempts' => 11
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Incorrect value "11" for "Attempts" field: must be between 1 and 10.'
+				]
+			],
+			// Non-numeric number of retries
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Too high number of retries',
+						'Attempts' => 'aa'
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Incorrect value "0" for "Attempts" field: must be between 1 and 10.'
+				]
+			],
+			// Variable without brackets
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Variable name without brackets'
+					],
+					'variables' => [
+						['name' => 'abc']
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+				]
+			],
+			// Variable without opening bracket
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Variable name without opening bracket'
+					],
+					'variables' => [
+						['name' => 'abc}']
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+				]
+			],
+			// Variable without closing bracket
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Variable name without closing bracket'
+					],
+					'variables' => [
+						['name' => '{abc']
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+				]
+			],
+			// Variable with misplaced brackets
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Variable with misplaced brackets'
+					],
+					'variables' => [
+						['name' => '{}abc']
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+				]
+			],
+			// Duplicate variable names
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Duplicate variable names'
+					],
+					'variables' => [
+						['name' => '{abc}', 'value' => '123'],
+						['name' => '{abc}', 'value' => '987']
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Invalid parameter "/1/variables/2": value (name)=({abc}) already exists.'
+				]
+			],
+			// Missing variable name
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Missing variable name'
+					],
+					'variables' => [
+						['name' => ' ', 'value' => '123'],
+						['name' => '{abc}', 'value' => '987']
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Invalid parameter "/1/variables/1/name": cannot be empty.'
+				]
+			],
+			// Headers - empty name
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Missing header name'
+					],
+					'headers' => [
+						['name' => ' ', 'value' => '123'],
+						['name' => 'abc', 'value' => '987']
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Invalid parameter "/1/headers/1/name": cannot be empty.'
+				]
+			],
+			// Duplicate web scenario name
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => self::TEMPLATE_SCENARIO
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Web scenario "'.self::TEMPLATE_SCENARIO.'" already exists.'
+				]
+			],
+			// Both Application and New application fields are specified
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Name' => 'Application + New application',
+						'Application' => 'App 1',
+						'New application' => 'New app'
+					],
+					'error_title' => 'Cannot add web scenario',
+					'errors' => 'Cannot create new application, web scenario is already assigned to application.'
+				]
+			],
+			// Minimal config
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => '1234567890',
-					'add_step' => [
-						['step' => '1234567890']
+					'fields' =>  [
+						'Name' => 'Min required configuration'
 					]
 				]
 			],
-			// Name - symbols only
+			// All possible fields specified
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => '!@#$%^&*()_+{}:"|<>?,./',
-					'add_step' => [
-						['step' => '!@#$%^&*()_+{}:"|<>?,./']
+					'fields' =>  [
+						'Name' => 'All fields specified',
+						'Application' => 'Заббикс',
+						'Update interval' => '6h',
+						'Attempts' => 7,
+						'Agents' => 'other ...',
+						'User agent string' => 'My super puper agent string 良い一日を',
+						'HTTP proxy' => '良い一日を',
+						'Enabled' => false,
+						'HTTP authentication' => 'Basic',
+						'User' => '!@#$%^&*()_+=-良い一日を',
+						'Password' => '!@#$%^&*()_+=-良い一日を',
+						'SSL verify peer' => true,
+						'SSL verify host' => true,
+						'SSL certificate file' => '!@#$%^&*()_+=-良い一日を',
+						'SSL key file' => '!@#$%^&*()_+=-良い一日を',
+						'SSL key password' => '!@#$%^&*()_+=-良い一日を'
+					],
+					'variables' => [
+						['name' => '{!@#$%^&*()_+=-良い一日を}', 'value' => '!@#$%^&*()_+=-良い一日を'],
+						['name' => '{abc}']
+					],
+					'headers' => [
+						['name' => 'OneTwoThree'],
+						['name' => '!@#$%^&*()_+=-良い一日を', 'value' => '!@#$%^&*()_+=-良い一日を']
 					]
 				]
 			],
-			// Name- spaces
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => '   zabbix  123  ',
-					'add_step' => [
-						['step' => '   zabbix  123  ']
-					]
-				]
-			],
-			// Max - 64 symbols
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'qwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop1234',
-					'add_step' => [
-						['step' => 'qwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop']
-					]
-				]
-			],
-			// Application - numbers
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Application numbers only',
-					'new_application' => '1234567890',
-					'add_step' => [
-						['step' => 'Application numbers only']
-					]
-				]
-			],
-			// Application - symbols
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Application symbols only',
-					'new_application' => '!@#$%^&*()_+{}:"|<>?,./',
-					'add_step' => [
-						['step' => 'Application symbols only']
-					]
-				]
-			],
-			// Application - max length
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Application max length',
-					'new_application' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
-						'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
-						'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
-						'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
-						'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012345',
-					'add_step' => [
-						['step' => 'Application max length']
-					]
-				]
-			],
-			// User/password empty
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'User/password empty',
-					'authentication' => 'Basic',
-					'add_step' => [
-						['step' => 'User/password empty']
-					]
-				]
-			],
-			// User empty
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Password empty',
-					'authentication' => 'Basic',
-					'http_user' => 'zabbix',
-					'add_step' => [
-						['step' => 'Password empty']
-					]
-				]
-			],
-			// Password empty
+
+			// Password empty + add case for user empty
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -541,46 +568,8 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Username/password numbers only
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Username/password numbers only',
-					'authentication' => 'Basic',
-					'http_user' => '12345',
-					'http_password' => '67890',
-					'add_step' => [
-						['step' => 'Username/password numbers only']
-					]
-				]
-			],
-			// Username/password symbols only
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Username/password symbols only',
-					'authentication' => 'Basic',
-					'http_user' => '!@#$%^&*()_+{}:"|<>?,./',
-					'http_password' => '!@#$%^&*()_+{}:"|<>?,./',
-					'add_step' => [
-						['step' => 'Username/password symbols only']
-					]
-				]
-			],
-			// Username/password with spaces
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Username/password with spaces',
-					'authentication' => 'Basic',
-					'http_user' => '   zabbix  123  ',
-					'http_password' => '   zabbix  123  ',
-					'add_step' => [
-						['step' => 'Username/password with spaces']
-					]
-				]
-			],
-			// Username/password - 64 max allowed
+
+			// Max allowed length
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -593,435 +582,8 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Retries-minus one
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Retries- minus one',
-					'retries' => '-1',
-					'add_step' => [
-						['step' => 'Retries- minus one']
-					],
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Incorrect value "-1" for "Attempts" field: must be between 1 and 10.'
-					]
-				]
-			],
-			// Retries-zero
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Retries- zero',
-					'retries' => '0',
-					'add_step' => [
-						['step' => 'Retries- zero']
-					],
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Incorrect value "0" for "Attempts" field: must be between 1 and 10.'
-					]
-				]
-			],
-			// Retries-number
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Retries-one',
-					'retries' => '1',
-					'add_step' => [
-						['step' => 'Retries-one']
-					]
-				]
-			],
-			// Retries-ten
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Retries- ten',
-					'retries' => '10',
-					'add_step' => [
-						['step' => 'Retries- ten']
-					]
-				]
-			],
-			// Retries-eleven
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Retries- eleven',
-					'retries' => '11',
-					'add_step' => [
-						['step' => 'Retries- eleven']
-					],
-					'error_msg' => 'Page received incorrect data',
-					'errors' => [
-						'Incorrect value "11" for "Attempts" field: must be between 1 and 10.'
-					]
-				]
-			],
-			// Interval-minus one
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Interval- minus one',
-					'delay' => '-1',
-					'add_step' => [
-						['step' => 'Interval- minus one']
-					],
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/delay": value must be one of 1-86400.'
-					]
-				]
-			],
-			// Interval-zero
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Interval- zero',
-					'delay' => '0',
-					'add_step' => [
-						['step' => 'Interval- zero']
-					],
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/delay": value must be one of 1-86400.'
-					]
-				]
-			],
-			// Interval-number
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Interval-one',
-					'delay' => '1',
-					'add_step' => [
-						['step' => 'Interval-one']
-					]
-				]
-			],
-			// Interval-86400
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Interval- 86400',
-					'delay' => '86400',
-					'add_step' => [
-						['step' => 'Interval- 86400']
-					]
-				]
-			],
-			// Interval-86401
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Interval- 86401',
-					'delay' => '86401',
-					'add_step' => [
-						['step' => 'Interval- 86401']
-					],
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/delay": value must be one of 1-86400.'
-					]
-				]
-			],
-			// Http proxy - just numbers
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Http proxy - just numbers',
-					'http_proxy' => '1234567890',
-					'add_step' => [
-						['step' => 'Http proxy - just numbers']
-					]
-				]
-			],
-			// Http proxy - symbols
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Http proxy - symbols',
-					'http_proxy' => '!@#$%^&*()_+{}:"|<>?,./',
-					'add_step' => [
-						['step' => 'Http proxy - symbols']
-					]
-				]
-			],
-			// Http proxy - max allowed length
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Http proxy - max allowed length',
-					'http_proxy' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
-						'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
-						'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
-						'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
-						'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012345',
-					'add_step' => [
-						['step' => 'Http proxy - max allowed length']
-					]
-				]
-			],
-			// Variables - just numbers
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Variables - just numbers',
-					'variables' => [
-						['name' => '{1234567890}']
-					],
-					'add_step' => [
-						['step' => 'Variables - just numbers']
-					]
-				]
-			],
-			// Variables - symbols
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Variables - symbols',
-					'variables' => [
-						['name' => '{!@#$%^&*()_+:"|<>?,./}']
-					],
-					'add_step' => [
-						['step' => 'Variables - symbols']
-					]
-				]
-			],
-			// Variables - 255 max allowed
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Variables - 255 length',
-					'variables' => [
-						['name' => '{qwertyuiopqwertyuiopqwertyuiopqwertyui'.
-							'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
-							'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
-							'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
-							'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012}']
-					],
-					'add_step' => [
-						['step' => 'Variables - 255 length']
-					]
-				]
-			],
-			// Variables - without {}
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Variables - without {}',
-					'variables' => [
-						['name' => 'test']
-					],
-					'add_step' => [
-						['step' => 'Variables - without {}']
-					],
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
-					]
-				]
-			],
-			// Variables - without {}
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Variables - without {}',
-					'variables' => [
-						['name' => '{test']
-					],
-					'add_step' => [
-						['step' => 'Variables - without {}']
-					],
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
-					]
-				]
-			],
-			// Variables - without {}
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Variables - without {}',
-					'variables' => [
-						['name' => 'test}']
-					],
-					'add_step' => [
-						['step' => 'Variables - without {}']
-					],
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
-					]
-				]
-			],
-			// Variables - with the same names
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Variables - with the same names',
-					'variables' => [
-						['name' => '{test}'],
-						['name' => '{test}']
-					],
-					'add_step' => [
-						['step' => 'Variables - with the same names']
-					],
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/variables/2": value (name)=({test}) already exists.'
-					]
-				]
-			],
-			// Variables - two different
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Variables - two different',
-					'variables' => [
-						['name' => '{test1}', 'value' => 'test1'],
-						['name' => '{test2}', 'value' => 'test1']
-					],
-					'add_step' => [
-						['step' => 'Variables - two different']
-					]
-				]
-			],
-			// Variables - empty name
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Variables - two different',
-					'variables' => [
-						['value' => 'test']
-					],
-					'add_step' => [
-						['step' => 'Variables - two different']
-					],
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/variables/1/name": cannot be empty.'
-					]
-				]
-			],
-			// Headers - just numbers
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Headers - just numbers',
-					'headers' => [
-						['name' => '1234567890', 'value' => '123456']
-					],
-					'add_step' => [
-						['step' => 'Headers - just numbers']
-					]
-				]
-			],
-			// Headers - just symbols
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Headers - just symbols',
-					'headers' => [
-						['name' => '!@#$%^&*()_+:"{}|<>?,./', 'value' => '!@#$%^&*()_+:"{}|<>?,./']
-					],
-					'add_step' => [
-						['step' => 'Headers - just symbols']
-					]
-				]
-			],
-			// Headers - 255 length
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Headers - 255 length',
-					'headers' => [
-						['name' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
-							'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
-							'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
-							'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
-							'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop12345678901234',
-							'value' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
-							'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
-							'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
-							'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
-							'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop12345678901234']
-					],
-					'add_step' => [
-						['step' => 'Headers - 255 length']
-					]
-				]
-			],
-			// Headers - two different
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Headers - two different',
-					'headers' => [
-						['name' => 'test', 'value' => 'test_value'],
-						['name' => 'test', 'value' => 'test_value']
-					],
-					'add_step' => [
-						['step' => 'Headers - two different']
-					]
-				]
-			],
-			// Headers - empty value
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Headers - empty value',
-					'headers' => [
-						['name' => 'test']
-					],
-					'add_step' => [
-						['step' => 'Headers - empty value']
-					]
-				]
-			],
-			// Headers - empty name
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Headers - empty name',
-					'headers' => [
-						['value' => 'test']
-					],
-					'add_step' => [
-						['step' => 'Headers - empty name']
-					],
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/headers/1/name": cannot be empty.'
-					]
-				]
-			],
-			// Duplicate web scenario
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Duplicate web test',
-					'add_step' => [
-						['step' => 'Duplicate web test']
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Duplicate web test',
-					'add_step' => [
-						['step' => 'Duplicate web test']
-					],
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Web scenario "Duplicate web test" already exists.'
-					]
-				]
-			],
+
+
 			// testing created items using triggers
 			[
 				[
@@ -1062,325 +624,14 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-		// many steps added
+
+			// Trim trailing and leading spaces in fields
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Many websteps added web test',
+					'name' => '   zabbix  123  ',
 					'add_step' => [
-						['step' => 'Many websteps added web test1'],
-						['step' => 'Many websteps added web test2'],
-						['step' => 'Many websteps added web test3'],
-						['step' => 'Many websteps added web test4'],
-						['step' => 'Many websteps added web test5'],
-						['step' => 'Many websteps added web test6'],
-						['step' => 'Many websteps added web test7'],
-						['step' => 'Many websteps added web test8'],
-						['step' => 'Many websteps added web test9'],
-						['step' => 'Many websteps added web test10'],
-						['step' => 'Many websteps added web test11'],
-						['step' => 'Many websteps added web test12'],
-						['step' => 'Many websteps added web test13'],
-						['step' => 'Many websteps added web test14'],
-						['step' => 'Many websteps added web test15']
-					]
-				]
-			],
-			// List of main agents
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Internet Explorer 11 None',
-					'agent' => 'Internet Explorer 11',
-					'authentication' => 'None',
-					'add_step' => [
-						['step' => 'Internet Explorer 11 None']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Internet Explorer 11 Basic',
-					'agent' => 'Internet Explorer 11',
-					'authentication' => 'Basic',
-					'http_user' => 'zabbix',
-					'http_password' => 'zabbix123',
-					'add_step' => [
-						['step' => 'Internet Explorer 11 Basic']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Internet Explorer 11 NTLM',
-					'agent' => 'Internet Explorer 11',
-					'authentication' => 'NTLM',
-					'http_user' => 'zabbix',
-					'http_password' => 'zabbix123',
-					'add_step' => [
-						['step' => 'Internet Explorer 11 NTLM']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Firefox 73 (Windows) None',
-					'agent' => 'Firefox 73 (Windows)',
-					'authentication' => 'None',
-					'add_step' => [
-						['step' => 'Firefox 73 (Windows) None']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Firefox 73 (Windows) Basic',
-					'agent' => 'Firefox 73 (Windows)',
-					'authentication' => 'Basic',
-					'http_user' => 'zabbix',
-					'http_password' => 'zabbix123',
-					'add_step' => [
-						['step' => 'Firefox 73 (Windows) Basic']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Firefox 73 (Windows) 8.0 NTLM',
-					'agent' => 'Firefox 73 (Windows)',
-					'authentication' => 'NTLM',
-					'http_user' => 'zabbix',
-					'http_password' => 'zabbix123',
-					'add_step' => [
-						['step' => 'Firefox 73 (Windows) NTLM']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Opera 67 (Windows) None',
-					'agent' => 'Opera 67 (Windows)',
-					'authentication' => 'None',
-					'add_step' => [
-						['step' => 'Opera 67 (Windows) None']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Opera 67 (Windows) Basic',
-					'agent' => 'Opera 67 (Windows)',
-					'authentication' => 'Basic',
-					'http_user' => 'zabbix',
-					'http_password' => 'zabbix123',
-					'add_step' => [
-						['step' => 'Opera 67 (Windows) Basic']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Opera 67 (Windows) NTLM',
-					'agent' => 'Opera 67 (Windows)',
-					'authentication' => 'NTLM',
-					'http_user' => 'zabbix',
-					'http_password' => 'zabbix123',
-					'add_step' => [
-						['step' => 'Opera 67 (Windows) NTLM']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Safari 13 (macOS)',
-					'agent' => 'Safari 13 (macOS)',
-					'authentication' => 'None',
-					'add_step' => [
-						['step' => 'Safari 13 (macOS) None']
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Safari 13 (macOS) Basic',
-					'agent' => 'Safari 13 (macOS)',
-					'authentication' => 'Basic',
-					'http_user' => 'zabbix',
-					'http_password' => 'zabbix123',
-					'add_step' => [
-						['step' => 'Safari 13 (macOS) Basic']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Safari 13 (macOS) NTLM',
-					'agent' => 'Safari 13 (macOS)',
-					'authentication' => 'NTLM',
-					'http_user' => 'zabbix',
-					'http_password' => 'zabbix123',
-					'add_step' => [
-						['step' => 'Safari 13 (macOS) NTLM', 'remove' => true],
-						['step' => 'Safari 13 (macOS) NTLM']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Chrome 80 (Windows) None',
-					'agent' => 'Chrome 80 (Windows)',
-					'authentication' => 'None',
-					'add_step' => [
-						['step' => 'Chrome 80 (Windows) None']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Chrome 80 (Windows) Basic',
-					'agent' => 'Chrome 80 (Windows)',
-					'authentication' => 'Basic',
-					'http_user' => 'zabbix',
-					'http_password' => 'zabbix123',
-					'add_step' => [
-						['step' => 'Chrome 80 (Windows) Basic']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Chrome 80 (Windows) NTLM',
-					'agent' => 'Chrome 80 (Windows)',
-					'authentication' => 'NTLM',
-					'http_user' => 'zabbix',
-					'http_password' => 'zabbix123',
-					'add_step' => [
-						['step' => 'Chrome 80 (Windows) NTLM']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => '(other ...) None',
-					'agent' => 'other ...',
-					'authentication' => 'None',
-					'add_step' => [
-						['step' => '(other ...) None']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => '(other ...) Basic',
-					'agent' => 'other ...',
-					'authentication' => 'Basic',
-					'http_user' => 'zabbix',
-					'http_password' => 'zabbix123',
-					'add_step' => [
-						['step' => '(other ...) Basic']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => '(other ...) NTLM',
-					'agent' => 'other ...',
-					'authentication' => 'NTLM',
-					'http_user' => 'zabbix',
-					'http_password' => 'zabbix123',
-					'add_step' => [
-						['step' => '(other ...) NTLM', 'remove' => true],
-						['step' => '(other ...) NTLM']
-					],
-					'dbCheck' => true,
-					'formCheck' => true,
-					'remove' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Kerberos empty fields',
-					'authentication' => 'Kerberos',
-					'add_step' => [
-						['step' => 'Kerberos1']
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Kerberos user-password',
-					'authentication' => 'Kerberos',
-					'http_user' => 'k_user',
-					'http_password' => 'zabbix_k2',
-					'add_step' => [
-						['step' => 'Kerberos2']
+						['step' => '   zabbix  123  ']
 					]
 				]
 			]
@@ -1502,6 +753,7 @@ class testFormWeb extends CLegacyWebTest {
 
 		$this->zbxTestClickWait('add');
 		$expected = $data['expected'];
+
 		switch ($expected) {
 			case TEST_GOOD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added');
