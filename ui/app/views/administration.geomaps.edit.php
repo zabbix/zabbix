@@ -87,7 +87,7 @@ $form_grid = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel([_('Attribution HTML'), '&nbsp;', $warning_attribution], 'geomaps_attribution'),
+		new CLabel([_('Attribution HTML'), ' ', $warning_attribution], 'geomaps_attribution'),
 		new CFormField(
 			(new CTextArea('geomaps_attribution', $data['geomaps_attribution']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
