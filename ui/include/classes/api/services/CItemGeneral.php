@@ -136,7 +136,7 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
-			'uuid' => ['type' => API_UUID, 'flags' => API_NOT_EMPTY]
+			'uuid' => ['type' => API_UUID]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {

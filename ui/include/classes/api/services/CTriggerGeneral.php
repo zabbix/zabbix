@@ -881,7 +881,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 */
 	protected function validateCreate(array &$triggers) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['description', 'expression']], 'fields' => [
-			'uuid' =>					['type' => API_UUID, 'flags' => API_NOT_EMPTY],
+			'uuid' =>					['type' => API_UUID],
 			'description' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'description')],
 			'expression' =>				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_LLD_MACRO],
 			'event_name' =>				['type' => API_EVENT_NAME, 'length' => DB::getFieldLength('triggers', 'event_name')],
@@ -982,7 +982,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 */
 	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['description', 'expression']], 'fields' => [
-			'uuid' => 					['type' => API_UUID, 'flags' => API_NOT_EMPTY],
+			'uuid' => 					['type' => API_UUID],
 			'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'description' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'description')],
 			'expression' =>				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_NOT_EMPTY | API_ALLOW_LLD_MACRO],
