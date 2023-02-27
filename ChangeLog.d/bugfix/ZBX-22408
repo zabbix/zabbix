@@ -1,0 +1,1 @@
+.......PS. [ZBX-22408] fixed multiple preprocessing workers trying to index json object at the same time (wiper)
