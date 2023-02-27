@@ -63,7 +63,7 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 }
 
 func getQuery(params map[string]string) (string, error) {
-	conn := params["Connname"]
+	conn := params["Conname"]
 	ts := params["Tablespace"]
 	t := params["Type"]
 
