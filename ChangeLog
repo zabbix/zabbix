@@ -1,3 +1,9 @@
+Changes for 6.0.14rc2
+
+Bug fixes:
+...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.14rc1
 
 New features:
@@ -2371,14 +2377,11 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 --------------------------------------------------------------------------------
 Changes for 5.0.32rc1
 
-New features:
-
 Bug fixes:
-...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
-........S. [ZBX-22240] fixed selects of history and trends being able to block housekeeping (dgoloscapov)
-........S. [ZBX-22240] fixed selects of history and trends blocking drop_chunks (dgoloscapov)
+........S. [ZBX-22240] fixed selects of history, trends blocking drop_chunks and housekeeping (dgoloscapov)
 A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
 .......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
+...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.31
