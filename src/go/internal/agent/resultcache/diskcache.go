@@ -168,7 +168,7 @@ func (c *DiskCache) resultsGet() (results []*AgentData, maxDataId uint64, maxLog
 	if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
 		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
 		" FROM data_%d"+
-		" UNION"+
+		" UNION ALL"+
 		" SELECT "+
 		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
 		" FROM log_%d"+
