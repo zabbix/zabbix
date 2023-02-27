@@ -389,7 +389,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->checkGroups($templates);
 		$this->checkDuplicates($templates);
-		self::checkAndAddUuid($templates);
+		self::checkAndAddUuid($templates, []);
 
 		$this->checkTemplates($templates);
 	}
@@ -397,28 +397,42 @@ class CTemplate extends CHostGeneral {
 	/**
 	 * Check that no duplicate UUID is being added. Add UUID to all templates, if it doesn't exist.
 	 *
-	 * @param array $templates_to_create
+	 * @param array $templates
+	 * @param array $db_templates
 	 *
 	 * @throws APIException
 	 */
-	private static function checkAndAddUuid(array &$templates_to_create): void {
-		foreach ($templates_to_create as &$template) {
+	private static function checkAndAddUuid(array &$templates, array $db_templates): void {
+		$new_templates_uuids = [];
+
+		foreach ($templates as &$template) {
+			$db_uuid = array_key_exists('templateid', $template)
+					&& array_key_exists($template['templateid'], $db_templates)
+				? $db_templates[$template['templateid']]['uuid']
+				: '';
+
 			if (!array_key_exists('uuid', $template)) {
-				$template['uuid'] = generateUuidV4();
+				$template['uuid'] = $db_uuid !== '' ? $db_uuid : generateUuidV4();
+			}
+
+			if ($template['uuid'] !== $db_uuid) {
+				$new_templates_uuids[] = $template['uuid'];
 			}
 		}
 		unset($template);
 
-		$db_uuid = DB::select('hosts', [
-			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($templates_to_create, 'uuid')],
-			'limit' => 1
-		]);
+		if ($new_templates_uuids) {
+			$db_uuid = DB::select('hosts', [
+				'output' => ['uuid'],
+				'filter' => ['uuid' => $new_templates_uuids],
+				'limit' => 1
+			]);
 
-		if ($db_uuid) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
-			);
+			if ($db_uuid) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				);
+			}
 		}
 	}
 
@@ -497,7 +511,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$db_templates = $this->get([
-			'output' => ['templateid', 'host', 'name', 'description'],
+			'output' => ['templateid', 'host', 'name', 'description', 'uuid'],
 			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -509,6 +523,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->addAffectedObjects($templates, $db_templates);
 
+		self::checkAndAddUuid($templates, $db_templates);
 		$this->checkDuplicates($templates, $db_templates);
 		$this->checkGroups($templates, $db_templates);
 		$this->checkTemplates($templates, $db_templates);
