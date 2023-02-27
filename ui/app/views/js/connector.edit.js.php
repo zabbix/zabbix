@@ -120,8 +120,14 @@ window.connector_edit_popup = new class {
 
 		if ('tags' in fields) {
 			for (const tag of Object.values(fields.tags)) {
-				tag.tag = tag.tag.trim();
-				tag.value = tag.value.trim();
+				if (tag.operator == <?= CONDITION_OPERATOR_EXISTS ?>
+						|| tag.operator == <?= CONDITION_OPERATOR_NOT_EXISTS ?>) {
+					tag.value = '';
+				}
+				else {
+					tag.tag = tag.tag.trim();
+					tag.value = tag.value.trim();
+				}
 			}
 		}
 
