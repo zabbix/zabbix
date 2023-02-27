@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -14,12 +15,26 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
-class CWidgetGauge extends CWidget {
-	_init() {
-		super._init();
-	}
+/**
+ * Gauge widget view.
+ *
+ * @var CView $this
+ * @var array $data
+ */
+
+use Widgets\Gauge\Widget;
+
+if ($data['error'] !== '') {
+	$body = (new CTableInfo())->setNoDataMessage($data['error']);
 }
+else {
+	$body = new CDiv('Hello world!');
+}
+
+(new CWidgetView($data))
+	->addItem($body)
+	->show();

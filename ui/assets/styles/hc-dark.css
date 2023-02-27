@@ -1602,6 +1602,46 @@ div.dashboard-widget-clock .clock-digital {
     color: #cacaca;
     font-weight: bold; }
 
+form.dashboard-widget-gauge .fields-group.fields-group-description, form.dashboard-widget-gauge .fields-group.fields-group-value, form.dashboard-widget-gauge .fields-group.fields-group-needle, form.dashboard-widget-gauge .fields-group.fields-group-minmax, form.dashboard-widget-gauge .fields-group.fields-group-thresholds {
+  display: grid;
+  grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 5px; }
+  form.dashboard-widget-gauge .fields-group.fields-group-description label, form.dashboard-widget-gauge .fields-group.fields-group-value label, form.dashboard-widget-gauge .fields-group.fields-group-needle label, form.dashboard-widget-gauge .fields-group.fields-group-minmax label, form.dashboard-widget-gauge .fields-group.fields-group-thresholds label {
+    text-align: right; }
+  form.dashboard-widget-gauge .fields-group.fields-group-description hr, form.dashboard-widget-gauge .fields-group.fields-group-value hr, form.dashboard-widget-gauge .fields-group.fields-group-needle hr, form.dashboard-widget-gauge .fields-group.fields-group-minmax hr, form.dashboard-widget-gauge .fields-group.fields-group-thresholds hr {
+    grid-column: 1 / -1;
+    margin: 0;
+    width: 100%;
+    border: solid #333333;
+    border-width: 1px 0 0 0; }
+  form.dashboard-widget-gauge .fields-group.fields-group-description .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-value .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-needle .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-minmax .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .field-fluid {
+    grid-column: 2 / -1; }
+  form.dashboard-widget-gauge .fields-group.fields-group-description .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-value .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-needle .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-minmax .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .offset-3 {
+    grid-column-start: 3; }
+  form.dashboard-widget-gauge .fields-group.fields-group-description .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-value .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-needle .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-minmax .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .field-size input {
+    margin-right: 5px; }
+  form.dashboard-widget-gauge .fields-group.fields-group-description .form-field, form.dashboard-widget-gauge .fields-group.fields-group-value .form-field, form.dashboard-widget-gauge .fields-group.fields-group-needle .form-field, form.dashboard-widget-gauge .fields-group.fields-group-minmax .form-field, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .form-field {
+    line-height: 24px; }
+form.dashboard-widget-gauge .fields-group.fields-group-description .form-field:nth-child(1) {
+  grid-column: 1 / -1; }
+form.dashboard-widget-gauge .fields-group.fields-group-value .units-show {
+  display: flex; }
+  form.dashboard-widget-gauge .fields-group.fields-group-value .units-show label[for='units'] {
+    width: 100%; }
+form.dashboard-widget-gauge .fields-group.fields-group-needle .needle-show {
+  display: flex; }
+  form.dashboard-widget-gauge .fields-group.fields-group-needle .needle-show label[for='lbl_needle_color'] {
+    width: 100%; }
+form.dashboard-widget-gauge .fields-group.fields-group-minmax .minmax-show {
+  display: flex; }
+  form.dashboard-widget-gauge .fields-group.fields-group-minmax .minmax-show label[for='minmax_size'] {
+    width: 100%; }
+
+div.dashboard-widget-gauge a:link {
+  border-bottom: none; }
+
 .dashboard-widget-inaccessible {
   display: grid;
   align-items: center;

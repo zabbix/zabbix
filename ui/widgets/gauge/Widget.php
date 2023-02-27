@@ -25,6 +25,16 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
+	// Description vertical position.
+	public const DESC_V_POSITION_TOP = 0;
+	public const DESC_V_POSITION_BOTTOM = 1;
+
+	// Units position.
+	public const UNITS_POSITION_BEFORE = 0;
+	public const UNITS_POSITION_ABOVE = 1;
+	public const UNITS_POSITION_AFTER = 2;
+	public const UNITS_POSITION_BELOW = 3;
+
 	public function getDefaultName(): string {
 		return _('Gauge');
 	}

@@ -1,0 +1,95 @@
+// Widget configuration.
+
+form.dashboard-widget-gauge {
+	.fields-group {
+		&.fields-group-description,
+		&.fields-group-value,
+		&.fields-group-needle,
+		&.fields-group-minmax,
+		&.fields-group-thresholds {
+			display: grid;
+			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+			align-items: center;
+			column-gap: 10px;
+			row-gap: 5px;
+
+			label {
+				text-align: right;
+			}
+
+			hr {
+				grid-column: 1 / -1;
+				margin: 0;
+				width: 100%;
+				border: solid $table-border-color;
+				border-width: 1px 0 0 0;
+			}
+
+			.field-fluid {
+				grid-column: 2 / -1;
+			}
+
+			.offset-3 {
+				grid-column-start: 3;
+			}
+
+			.field-size {
+				input {
+					margin-right: 5px;
+				}
+			}
+
+			.form-field {
+				line-height: 24px;
+			}
+		}
+
+		&.fields-group-description {
+			.form-field:nth-child(1) {
+				grid-column: 1 / -1;
+			}
+		}
+
+		&.fields-group-value {
+			.units-show {
+				display: flex;
+
+				label[for='units'] {
+					width: 100%;
+				}
+			}
+		}
+
+		&.fields-group-needle {
+			.needle-show {
+				display: flex;
+
+				label[for='lbl_needle_color'] {
+					width: 100%;
+				}
+			}
+		}
+
+		&.fields-group-minmax {
+			.minmax-show {
+				display: flex;
+
+				label[for='minmax_size'] {
+					width: 100%;
+				}
+			}
+		}
+	}
+}
+
+// Modifications by themes.
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+	div.dashboard-widget-gauge {
+		a {
+			&:link {
+				border-bottom: none;
+			}
+		}
+	}
+}

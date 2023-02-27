@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -18,8 +19,41 @@
 **/
 
 
-class CWidgetGauge extends CWidget {
-	_init() {
-		super._init();
+namespace Widgets\Gauge\Actions;
+
+use API,
+	CControllerDashboardWidgetView,
+	CControllerResponseData,
+	CMacrosResolverHelper,
+	CSettingsHelper,
+	CUrl,
+	CValueMapHelper,
+	Manager;
+
+use Widgets\Gauge\Widget;
+
+use Zabbix\Core\CWidget;
+
+class WidgetView extends CControllerDashboardWidgetView {
+
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules([
+			'dynamic_hostid' => 'db hosts.hostid'
+		]);
+	}
+
+	protected function doAction(): void {
+		$name = $this->widget->getDefaultName();
+		$error = '';
+
+		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', $name),
+			'error' => $error,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		]));
 	}
 }
