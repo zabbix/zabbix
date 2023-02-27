@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-07-21T12:31:29Z'
+  date: '2023-02-27T15:06:58Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -17,7 +17,7 @@ zabbix_export:
           For more information, see MSSQL documentation.
         2. Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).
           Do not forget to install Microsoft ODBC driver on Zabbix server or Zabbix proxy.
-          See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.
+          See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16.
           Note! Credentials in the odbc.ini do not work for MSSQL.
         3. For named instance set the value of {$MSSQL.INSTANCE} macro as MSSQL$instance name.
         The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance.
@@ -40,24 +40,28 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            SELECT sj.name AS JobName
-            , sj.enabled AS Enabled
-            , sjs.last_run_outcome AS RunStatus
-            , sjs.last_outcome_message AS LastRunStatusMessage
-            , sjs.last_run_duration/10000*3600 + sjs.last_run_duration/100%100*60 + sjs.last_run_duration%100 AS RunDuration
-            , CASE sjs.last_run_date
+            SELECT sj.name AS JobName,
+              sj.enabled AS Enabled,
+              sjs.last_run_outcome AS RunStatus,
+              sjs.last_outcome_message AS LastRunStatusMessage,
+              sjs.last_run_duration/10000*3600 + sjs.last_run_duration/100%100*60 + sjs.last_run_duration%100 AS RunDuration,
+              CASE sjs.last_run_date
                 WHEN 0 THEN NULL
                 ELSE msdb.dbo.agent_datetime(sjs.last_run_date,sjs.last_run_time)
-                END AS LastRunDateTime
-            , sja.next_scheduled_run_date AS NextRunDateTime
+              END AS LastRunDateTime,
+              sja.next_scheduled_run_date AS NextRunDateTime
             FROM msdb..sysjobs AS sj
-            LEFT JOIN msdb..sysjobservers AS sjs ON sj.job_id = sjs.job_id
-            LEFT JOIN ( SELECT job.job_id,
+            LEFT JOIN msdb..sysjobservers AS sjs
+              ON sj.job_id = sjs.job_id
+            LEFT JOIN (
+              SELECT job.job_id,
                 max(act.session_id) AS s_id,
                 max(act.next_scheduled_run_date) AS next_scheduled_run_date
-                FROM msdb..sysjobs AS job
-                LEFT JOIN msdb..sysjobactivity AS act ON act.job_id = job.job_id
-                GROUP BY job.job_id ) AS sja ON sja.job_id = sj.job_id
+              FROM msdb..sysjobs AS job
+              LEFT JOIN msdb..sysjobactivity AS act
+                ON act.job_id = job.job_id
+              GROUP BY  job.job_id ) AS sja
+                ON sja.job_id = sj.job_id
             WHERE Enabled = 1
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
@@ -76,17 +80,30 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            SELECT bs.database_name as dbname,[type], DATEDIFF(SECOND, bs.backup_finish_date, getdate()) as timesincelastbackup, (DATEDIFF(SECOND, bs.backup_start_date, bs.backup_finish_date)) as duration
-            FROM msdb.dbo.backupset as bs WHERE bs.database_name not in (
-            SELECT
-            AGDatabases.database_name AS Databasename
-            FROM sys.dm_hadr_availability_group_states States
-            INNER JOIN master.sys.availability_groups Groups ON States.group_id = Groups.group_id
-            INNER JOIN sys.availability_databases_cluster AGDatabases ON Groups.group_id = AGDatabases.group_id
-            WHERE primary_replica != @@Servername OR primary_replica is NULL
+            SELECT bs.database_name as dbname,
+              [type], 
+              DATEDIFF(SECOND, bs.backup_finish_date, getdate()) as timesincelastbackup, 
+              (DATEDIFF(SECOND, bs.backup_start_date, bs.backup_finish_date)) as duration
+            FROM msdb.dbo.backupset as bs 
+            WHERE bs.database_name not in (
+              SELECT AGDatabases.database_name AS Databasename
+              FROM sys.dm_hadr_availability_group_states States
+              INNER JOIN master.sys.availability_groups Groups 
+                ON States.group_id = Groups.group_id
+              INNER JOIN sys.availability_databases_cluster AGDatabases 
+                ON Groups.group_id = AGDatabases.group_id
+              WHERE primary_replica != @@Servername OR primary_replica is NULL
             )
-            GROUP BY bs.database_name, backup_finish_date, [type], backup_start_date
-            HAVING backup_finish_date = (SELECT MAX(backup_finish_date) from msdb.dbo.backupset WHERE database_name = bs.database_name AND bs.type = [type])
+            GROUP BY bs.database_name, 
+              backup_finish_date, 
+              [type], 
+              backup_start_date
+            HAVING backup_finish_date = (
+              SELECT MAX(backup_finish_date)
+              FROM msdb.dbo.backupset 
+              WHERE database_name = bs.database_name 
+                AND bs.type = [type]
+            )
             ORDER BY bs.database_name
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
@@ -105,43 +122,97 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            SELECT object_name,counter_name,instance_name,cntr_value
+            SELECT object_name,
+              counter_name,
+              instance_name,
+              cntr_value
             FROM sys.dm_os_performance_counters
-            UNION
-            SELECT '{$MSSQL.INSTANCE}' as object_name,'Version' as counter_name,@@version as instance_name,0 as cntr_value
-            UNION
-            SELECT '{$MSSQL.INSTANCE}' as object_name,'Uptime' as counter_name,'' as instance_name,DATEDIFF(second,sqlserver_start_time,GETDATE()) as cntr_value
+            UNION SELECT 'SQLServer' AS object_name,
+              'Version' AS counter_name,
+              @@version AS instance_name,
+              0 AS cntr_value
+            UNION SELECT 'SQLServer' AS object_name,
+              'Uptime' AS counter_name,
+              '' AS instance_name,
+              DATEDIFF(second, sqlserver_start_time, GETDATE()) AS cntr_value
             FROM sys.dm_os_sys_info
-            UNION
-            SELECT '{$MSSQL.INSTANCE}:Databases' as object_name,'State' as counter_name,name as instance_name,state as cntr_value
+            UNION SELECT 'SQLServer:Databases' AS object_name,
+              'State' AS counter_name,
+              name AS instance_name,
+              state AS cntr_value
             FROM sys.databases
-            UNION
-            SELECT a.object_name,'BufferCacheHitRatio' as counter_name,'' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
+            UNION SELECT a.object_name,
+              'BufferCacheHitRatio' AS counter_name,
+              '' AS instance_name,
+              cast(a.cntr_value * ISNULL((100.0 / NULLIF(b.cntr_value,0)),0) AS dec(3, 0)) AS cntr_value
             FROM sys.dm_os_performance_counters a
-            JOIN (SELECT cntr_value,OBJECT_NAME
-            FROM sys.dm_os_performance_counters
-            WHERE counter_name='Buffer cache hit ratio base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Buffer Manager') b
-            ON a.OBJECT_NAME=b.OBJECT_NAME
-            WHERE a.counter_name='Buffer cache hit ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Buffer Manager'
-            UNION
-            SELECT a.object_name,'WorktablesFromCacheRatio' as counter_name,'' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
+            JOIN (
+              SELECT cntr_value,
+                OBJECT_NAME
+              FROM sys.dm_os_performance_counters
+              WHERE counter_name = 'Buffer cache hit ratio base'
+                AND OBJECT_NAME = 'SQLServer:Buffer Manager'
+            ) b
+              ON a.OBJECT_NAME = b.OBJECT_NAME
+            WHERE a.counter_name = 'Buffer cache hit ratio'
+              AND a.OBJECT_NAME = 'SQLServer:Buffer Manager'
+            UNION SELECT a.object_name,
+              'WorktablesFromCacheRatio' AS counter_name,
+              '' AS instance_name,
+              cast(a.cntr_value * ISNULL((100.0 / NULLIF(b.cntr_value,0)),0) AS dec(3, 0)) AS cntr_value
             FROM sys.dm_os_performance_counters a
-            JOIN (SELECT cntr_value,OBJECT_NAME
-            FROM sys.dm_os_performance_counters
-            WHERE counter_name='Worktables From Cache Base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Access Methods') b
-            ON a.OBJECT_NAME=b.OBJECT_NAME
-            WHERE a.counter_name='Worktables From Cache Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Access Methods'
-            UNION
-            SELECT a.object_name,'CacheHitRatio' as counter_name,'_Total' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
+            JOIN (
+              SELECT cntr_value,
+                OBJECT_NAME
+              FROM sys.dm_os_performance_counters
+              WHERE counter_name = 'Worktables From Cache Base'
+                AND OBJECT_NAME = 'SQLServer:Access Methods'
+            ) b
+              ON a.OBJECT_NAME = b.OBJECT_NAME
+            WHERE a.counter_name = 'Worktables From Cache Ratio'
+              AND a.OBJECT_NAME = 'SQLServer:Access Methods'
+            UNION SELECT a.object_name,
+              'CacheHitRatio' AS counter_name,
+              '_Total' AS instance_name,
+              cast(a.cntr_value * ISNULL((100.0 / NULLIF(b.cntr_value,0)),0) AS dec(3, 0)) AS cntr_value
             FROM sys.dm_os_performance_counters a
-            JOIN (SELECT cntr_value,OBJECT_NAME
-            FROM sys.dm_os_performance_counters
-            WHERE counter_name='Cache Hit Ratio base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Plan Cache' AND instance_name='_Total') b
-            ON a.OBJECT_NAME=b.OBJECT_NAME
-            WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan Cache' AND instance_name='_Total'
+            JOIN (
+              SELECT cntr_value,
+                OBJECT_NAME
+              FROM sys.dm_os_performance_counters
+              WHERE counter_name = 'Cache Hit Ratio base'
+                AND OBJECT_NAME = 'SQLServer:Plan Cache'
+                AND instance_name = '_Total'
+            ) b
+              ON a.OBJECT_NAME = b.OBJECT_NAME
+            WHERE a.counter_name = 'Cache Hit Ratio'
+              AND a.OBJECT_NAME = 'SQLServer:Plan Cache'
+              AND instance_name = '_Total'
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'The item gets server global status information.'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: c0400032a74549078448a928f17d3128
+          name: 'MSSQL: Get Access Methods counters'
+          type: DEPENDENT
+          key: mssql.access_methods.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The item gets server information about access methods.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'')]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
           tags:
             -
               tag: component
@@ -159,13 +230,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''Auto-Param Attempts/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Auto-Param Attempts/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.sql_statistics.raw
           tags:
             -
               tag: component
@@ -200,9 +271,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Latches'' && @.counter_name==''Average Latch Wait Time Base'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Average Latch Wait Time Base'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.latches_info.raw
           tags:
             -
               tag: component
@@ -220,9 +291,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Latches'' && @.counter_name==''Average Latch Wait Time (ms)'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Average Latch Wait Time (ms)'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.latches_info.raw
           tags:
             -
               tag: component
@@ -269,9 +340,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Average Wait Time Base'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Average Wait Time Base'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.locks_info.raw
           tags:
             -
               tag: component
@@ -289,9 +360,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Average Wait Time (ms)'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Average Wait Time (ms)'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.locks_info.raw
           tags:
             -
               tag: component
@@ -310,13 +381,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''Batch Requests/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Batch Requests/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.sql_statistics.raw
           tags:
             -
               tag: component
@@ -335,9 +406,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''BufferCacheHitRatio'')].cntr_value.first()'
+                - '$[?(@.counter_name==''BufferCacheHitRatio'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.buffer_manager.raw
           tags:
             -
               tag: component
@@ -370,6 +441,28 @@ zabbix_export:
                   tag: scope
                   value: performance
         -
+          uuid: eadb0b4b4eed412c9a29137a2f4232fd
+          name: 'MSSQL: Get Buffer Manager counters'
+          type: DEPENDENT
+          key: mssql.buffer_manager.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The item gets server information about buffer pool.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'')]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: 1900fc83a4d74c599f5f3438450b5d8b
           name: 'MSSQL: Cache hit ratio'
           type: DEPENDENT
@@ -383,13 +476,35 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.counter_name==''CacheHitRatio'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''CacheHitRatio'')].cntr_value.first()'
+          master_item:
+            key: mssql.cache_info.raw
+          tags:
+            -
+              tag: component
+              value: cache
+        -
+          uuid: b9bab8e37b9c46acbf9c64073bfcf0e6
+          name: 'MSSQL: Get Cache counters'
+          type: DEPENDENT
+          key: mssql.cache_info.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The item gets server information about cache.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.instance_name==''_Total'')]'
+              error_handler: DISCARD_VALUE
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
           tags:
             -
               tag: component
-              value: cache
+              value: raw
         -
           uuid: 064e1279ae0a4260ab02c08cd3c3f77d
           name: 'MSSQL: Cache objects in use'
@@ -402,9 +517,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.counter_name==''Cache Objects in use'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Cache Objects in use'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.cache_info.raw
           tags:
             -
               tag: component
@@ -421,9 +536,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.counter_name==''Cache Object Counts'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Cache Object Counts'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.cache_info.raw
           tags:
             -
               tag: component
@@ -440,9 +555,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.counter_name==''Cache Pages'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Cache Pages'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.cache_info.raw
           tags:
             -
               tag: component
@@ -463,13 +578,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Checkpoint pages/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Checkpoint pages/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.buffer_manager.raw
           tags:
             -
               tag: component
@@ -489,9 +604,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Database pages'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Database pages'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.buffer_manager.raw
           tags:
             -
               tag: component
@@ -509,17 +624,39 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Data File(s) Size (KB)'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Data File(s) Size (KB)'')].cntr_value.first()'
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.db_info.raw
           tags:
             -
               tag: component
               value: application
+        -
+          uuid: 9f7bc0b3ae25483cb7290ef6feaa5c84
+          name: 'MSSQL: Get DB counters'
+          type: DEPENDENT
+          key: mssql.db_info.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The item gets summary information about databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.instance_name==''_Total'')]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: 4cdecc74a6e44b57b17f44988d3ffa21
           name: 'MSSQL: Total errors per second'
@@ -533,13 +670,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Errors'' && @.counter_name==''Errors/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Errors/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.sql_errors.raw
           tags:
             -
               tag: component
@@ -560,13 +697,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''Failed Auto-Params/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Failed Auto-Params/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.sql_statistics.raw
           tags:
             -
               tag: component
@@ -584,13 +721,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Forwarded Records/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Forwarded Records/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.access_methods.raw
           tags:
             -
               tag: component
@@ -609,13 +746,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Free list stalls/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Free list stalls/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.buffer_manager.raw
           tags:
             -
               tag: component
@@ -645,17 +782,39 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Full Scans/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Full Scans/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.access_methods.raw
           tags:
             -
               tag: component
               value: performance
+        -
+          uuid: 6c17a38a9e9246ecbad3a6b2cb83c6cc
+          name: 'MSSQL: Get General Statistics counters'
+          type: DEPENDENT
+          key: mssql.general_statistics.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The item gets general statistic information.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:General Statistics'')]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: f2539791f65a40569bcf6b1c89647904
           name: 'MSSQL: Granted Workspace Memory'
@@ -669,13 +828,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Granted Workspace Memory (KB)'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Granted Workspace Memory (KB)'')].cntr_value.first()'
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.mem_manager.raw
           tags:
             -
               tag: component
@@ -693,13 +852,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Index Searches/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Index Searches/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.access_methods.raw
           tags:
             -
               tag: component
@@ -717,13 +876,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Errors'' && @.counter_name==''Errors/sec'' && @.instance_name==''Info Errors'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Errors/sec'' && @.instance_name==''Info Errors'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.sql_errors.raw
           tags:
             -
               tag: component
@@ -744,13 +903,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Errors'' && @.counter_name==''Errors/sec'' && @.instance_name==''Kill Connection Errors'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Errors/sec'' && @.instance_name==''Kill Connection Errors'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.sql_errors.raw
           tags:
             -
               tag: component
@@ -758,6 +917,28 @@ zabbix_export:
             -
               tag: component
               value: performance
+        -
+          uuid: 04714203d50645fdb4c69e333facd60e
+          name: 'MSSQL: Get Latches counters'
+          type: DEPENDENT
+          key: mssql.latches_info.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The item gets server information about latches.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Latches'')]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: c1242c5530654057bca59cb9ad12c319
           name: 'MSSQL: Latch waits per second'
@@ -772,13 +953,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Latches'' && @.counter_name==''Latch Waits/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Latch Waits/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.latches_info.raw
           tags:
             -
               tag: component
@@ -799,13 +980,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Lazy writes/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Lazy writes/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.buffer_manager.raw
           tags:
             -
               tag: component
@@ -823,6 +1004,28 @@ zabbix_export:
                   tag: scope
                   value: performance
         -
+          uuid: 1b39ade916d243299f6350faaee167c8
+          name: 'MSSQL: Get Locks counters'
+          type: DEPENDENT
+          key: mssql.locks_info.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The item gets server information about locks.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.instance_name==''_Total'')]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: 1b4c71c016504eb08b1a49146095c231
           name: 'MSSQL: Total lock requests per second'
           type: DEPENDENT
@@ -836,13 +1039,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Lock Requests/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Lock Requests/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.locks_info.raw
           tags:
             -
               tag: component
@@ -876,13 +1079,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Lock Timeouts/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Lock Timeouts/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.locks_info.raw
           tags:
             -
               tag: component
@@ -916,13 +1119,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Lock Waits/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Lock Waits/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.locks_info.raw
           tags:
             -
               tag: component
@@ -955,13 +1158,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Lock Wait Time (ms)'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Lock Wait Time (ms)'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.locks_info.raw
           tags:
             -
               tag: component
@@ -979,13 +1182,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:General Statistics'' && @.counter_name==''Logins/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Logins/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.general_statistics.raw
           tags:
             -
               tag: component
@@ -1003,13 +1206,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:General Statistics'' && @.counter_name==''Logouts/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Logouts/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.general_statistics.raw
           tags:
             -
               tag: component
@@ -1027,13 +1230,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log File(s) Size (KB)'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Log File(s) Size (KB)'')].cntr_value.first()'
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.db_info.raw
           tags:
             -
               tag: component
@@ -1051,13 +1254,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log File(s) Used Size (KB)'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Log File(s) Used Size (KB)'')].cntr_value.first()'
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.db_info.raw
           tags:
             -
               tag: component
@@ -1075,13 +1278,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Maximum Workspace Memory (KB)'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Maximum Workspace Memory (KB)'')].cntr_value.first()'
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.mem_manager.raw
           tags:
             -
               tag: component
@@ -1098,9 +1301,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Memory Grants Outstanding'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Memory Grants Outstanding'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.mem_manager.raw
           tags:
             -
               tag: component
@@ -1117,13 +1320,35 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Memory Grants Pending'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Memory Grants Pending'')].cntr_value.first()'
+          master_item:
+            key: mssql.mem_manager.raw
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 982b21186af84be2a34f76e5bccb7a27
+          name: 'MSSQL: Get Memory counters'
+          type: DEPENDENT
+          key: mssql.mem_manager.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The item gets memory information.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'')]'
+              error_handler: DISCARD_VALUE
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
           tags:
             -
               tag: component
-              value: memory
+              value: raw
         -
           uuid: 18c0d77ded2b4533a559643006a93406
           name: 'MSSQL: Total lock requests per second that have deadlocks'
@@ -1138,13 +1363,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Number of Deadlocks/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Number of Deadlocks/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.locks_info.raw
           tags:
             -
               tag: component
@@ -1177,13 +1402,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Errors'' && @.counter_name==''Errors/sec'' && @.instance_name==''DB Offline Errors'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Errors/sec'' && @.instance_name==''DB Offline Errors'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.sql_errors.raw
           tags:
             -
               tag: component
@@ -1205,9 +1430,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Page life expectancy'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Page life expectancy'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.buffer_manager.raw
           tags:
             -
               tag: component
@@ -1238,13 +1463,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Page lookups/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Page lookups/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.buffer_manager.raw
           tags:
             -
               tag: component
@@ -1262,13 +1487,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Page reads/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Page reads/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.buffer_manager.raw
           tags:
             -
               tag: component
@@ -1301,13 +1526,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Page Splits/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Page Splits/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.access_methods.raw
           tags:
             -
               tag: component
@@ -1328,13 +1553,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Page writes/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Page writes/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.buffer_manager.raw
           tags:
             -
               tag: component
@@ -1424,9 +1649,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:General Statistics'' && @.counter_name==''Processes blocked'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Processes blocked'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.general_statistics.raw
           tags:
             -
               tag: component
@@ -1444,13 +1669,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Readahead pages/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Readahead pages/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.buffer_manager.raw
           tags:
             -
               tag: component
@@ -1471,13 +1696,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''Safe Auto-Params/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Safe Auto-Params/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.sql_statistics.raw
           tags:
             -
               tag: component
@@ -1520,17 +1745,39 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''SQL Compilations/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''SQL Compilations/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.sql_statistics.raw
           tags:
             -
               tag: component
               value: performance
+        -
+          uuid: c7e0a26bf403482daec65a4b3cd0fd18
+          name: 'MSSQL: Get SQL Errors counters'
+          type: DEPENDENT
+          key: mssql.sql_errors.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The item gets SQL errors information.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Errors'')]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: a72415acabda46309c4dbc692e026cc2
           name: 'MSSQL: SQL re-compilations per second'
@@ -1544,17 +1791,39 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''SQL Re-Compilations/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''SQL Re-Compilations/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.sql_statistics.raw
           tags:
             -
               tag: component
               value: performance
+        -
+          uuid: ca60d01d14d04566bf1a5e6b3b819538
+          name: 'MSSQL: Get SQL Statistics counters'
+          type: DEPENDENT
+          key: mssql.sql_statistics.raw
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The item gets SQL statistic information.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'')]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: 595aa3989b4e41cc8649827525adc0a0
           name: 'MSSQL: Table lock escalations per second'
@@ -1568,13 +1837,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Table Lock Escalations/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Table Lock Escalations/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.access_methods.raw
           tags:
             -
               tag: component
@@ -1594,9 +1863,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Target pages'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Target pages'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.buffer_manager.raw
           tags:
             -
               tag: component
@@ -1614,13 +1883,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Target Server Memory (KB)'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Target Server Memory (KB)'')].cntr_value.first()'
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.mem_manager.raw
           tags:
             -
               tag: component
@@ -1639,13 +1908,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Latches'' && @.counter_name==''Total Latch Wait Time (ms)'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Total Latch Wait Time (ms)'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.latches_info.raw
           tags:
             -
               tag: component
@@ -1663,13 +1932,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Total Server Memory (KB)'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Total Server Memory (KB)'')].cntr_value.first()'
             -
               type: MULTIPLIER
               parameters:
                 - '1024'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.mem_manager.raw
           tags:
             -
               tag: component
@@ -1706,13 +1975,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Transactions/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Transactions/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.db_info.raw
           tags:
             -
               tag: component
@@ -1733,13 +2002,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''Unsafe Auto-Params/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Unsafe Auto-Params/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.sql_statistics.raw
           tags:
             -
               tag: component
@@ -1805,9 +2074,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:General Statistics'' && @.counter_name==''User Connections'')].cntr_value.first()'
+                - '$[?(@.counter_name==''User Connections'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.general_statistics.raw
           tags:
             -
               tag: component
@@ -1825,13 +2094,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Errors'' && @.counter_name==''Errors/sec'' && @.instance_name==''User Errors'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Errors/sec'' && @.instance_name==''User Errors'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.sql_errors.raw
           tags:
             -
               tag: component
@@ -1890,13 +2159,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Workfiles Created/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Workfiles Created/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.access_methods.raw
           tags:
             -
               tag: component
@@ -1926,13 +2195,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Worktables Created/sec'')].cntr_value.first()'
+                - '$[?(@.counter_name==''Worktables Created/sec'')].cntr_value.first()'
             -
               type: CHANGE_PER_SECOND
               parameters:
                 - ''
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.access_methods.raw
           tags:
             -
               tag: component
@@ -1963,9 +2232,9 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''WorktablesFromCacheRatio'')].cntr_value.first()'
+                - '$[?(@.counter_name==''WorktablesFromCacheRatio'')].cntr_value.first()'
           master_item:
-            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            key: mssql.access_methods.raw
           tags:
             -
               tag: component
@@ -2031,19 +2300,31 @@ zabbix_export:
               name: 'MSSQL AG ''{#GROUP_NAME}'': Get replica states'
               type: ODBC
               key: 'db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]'
-              history: 0h
+              history: '0'
               trends: '0'
               value_type: TEXT
               params: |
-                SELECT ag.name as group_name,
-                ISNULL(ags.primary_recovery_health, 2) as primary_recovery_health,
-                ISNULL(ags.primary_replica, 'Unknown') as primary_replica,
-                ISNULL(ags.secondary_recovery_health, 2) as secondary_recovery_health,
-                ags.synchronization_health as synchronization_health
-                FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag ON ag.group_id = ags.group_id
+                SELECT 
+                  ag.name as group_name, 
+                  ISNULL(ags.primary_recovery_health, 2) as primary_recovery_health, 
+                  ISNULL(ags.primary_replica, 'Unknown') as primary_replica, 
+                  ISNULL(
+                    ags.secondary_recovery_health, 2
+                  ) as secondary_recovery_health, 
+                  ags.synchronization_health as synchronization_health 
+                FROM 
+                  sys.dm_hadr_availability_group_states ags 
+                JOIN sys.availability_groups ag ON ag.group_id = ags.group_id 
+                  and ag.name = '{#GROUP_NAME}'
               username: '{$MSSQL.USER}'
               password: '{$MSSQL.PASSWORD}'
               description: 'Getting replica states - name, primary and secondary health, synchronization health.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.first()
+                  error_handler: DISCARD_VALUE
               tags:
                 -
                   tag: availability-group
@@ -2069,7 +2350,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'')].primary_recovery_health.first()'
+                    - $.primary_recovery_health
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2111,7 +2392,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'')].primary_replica.first()'
+                    - $.primary_replica
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2143,7 +2424,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'')].secondary_recovery_health.first()'
+                    - $.secondary_recovery_health
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2189,7 +2470,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'')].synchronization_health.first()'
+                    - $.synchronization_health
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2273,11 +2554,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.dbname==''{#DBNAME}'' && @.type==''I'')].duration.first()'
+                    - '$[?(@.type==''I'')].duration.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+                key: 'mssql.backup.raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2298,11 +2579,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.dbname==''{#DBNAME}'' && @.type==''I'')].timesincelastbackup.first()'
+                    - '$[?(@.type==''I'')].timesincelastbackup.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+                key: 'mssql.backup.raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2360,11 +2641,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.dbname==''{#DBNAME}'' && @.type==''D'')].duration.first()'
+                    - '$[?(@.type==''D'')].duration.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+                key: 'mssql.backup.raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2385,11 +2666,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.dbname==''{#DBNAME}'' && @.type==''D'')].timesincelastbackup.first()'
+                    - '$[?(@.type==''D'')].timesincelastbackup.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+                key: 'mssql.backup.raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2444,11 +2725,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.dbname==''{#DBNAME}'' && @.type==''L'')].duration.first()'
+                    - '$[?(@.type==''L'')].duration.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+                key: 'mssql.backup.raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2469,11 +2750,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.dbname==''{#DBNAME}'' && @.type==''L'')].timesincelastbackup.first()'
+                    - '$[?(@.type==''L'')].timesincelastbackup.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+                key: 'mssql.backup.raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2519,6 +2800,31 @@ zabbix_export:
                       tag: scope
                       value: availability
             -
+              uuid: a6a276b5a8ce4b00b277e507ea7b15ee
+              name: 'MSSQL DB ''{#DBNAME}'': Get last backup'
+              type: DEPENDENT
+              key: 'mssql.backup.raw["{#DBNAME}"]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The item gets information about backup processes for {#DBNAME}.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.dbname==''{#DBNAME}'')]'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+            -
               uuid: f4f218f22d6d48419260003880b38abd
               name: 'MSSQL DB ''{#DBNAME}'': Active transactions'
               type: DEPENDENT
@@ -2530,9 +2836,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Active Transactions'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Active Transactions'')].cntr_value.first()'
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2553,13 +2859,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Data File(s) Size (KB)'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Data File(s) Size (KB)'')].cntr_value.first()'
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2581,13 +2887,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Bytes Flushed/sec'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Log Bytes Flushed/sec'')].cntr_value.first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2608,13 +2914,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log File(s) Size (KB)'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Log File(s) Size (KB)'')].cntr_value.first()'
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2635,13 +2941,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log File(s) Used Size (KB)'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Log File(s) Used Size (KB)'')].cntr_value.first()'
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1024'
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2662,13 +2968,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Flushes/sec'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Log Flushes/sec'')].cntr_value.first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2689,13 +2995,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Flush Waits/sec'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Log Flush Waits/sec'')].cntr_value.first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2732,13 +3038,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Flush Wait Time'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Log Flush Wait Time'')].cntr_value.first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2773,9 +3079,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Growths'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Log Growths'')].cntr_value.first()'
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2795,9 +3101,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Shrinks'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Log Shrinks'')].cntr_value.first()'
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2817,9 +3123,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Truncations'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Log Truncations'')].cntr_value.first()'
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2841,9 +3147,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Percent Log Used'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Percent Log Used'')].cntr_value.first()'
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2867,6 +3173,31 @@ zabbix_export:
                       tag: scope
                       value: performance
             -
+              uuid: 74b107e240274c69ae1e8f0632b67e14
+              name: 'MSSQL DB ''{#DBNAME}'': Get performance counters'
+              type: DEPENDENT
+              key: 'mssql.db.perf_raw["{#DBNAME}"]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The item gets server status information for {#DBNAME}.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.instance_name==''{#DBNAME}'')]'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+            -
               uuid: fe7d7c3e0aab43d79c00eaceb39c8c6c
               name: 'MSSQL DB ''{#DBNAME}'': State'
               type: DEPENDENT
@@ -2889,13 +3220,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''State'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''State'')].cntr_value.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2930,13 +3261,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Transactions/sec'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                    - '$[?(@.counter_name==''Transactions/sec'')].cntr_value.first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+                key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -3032,14 +3363,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.JobName==''{#JOBNAME}'')].LastRunDateTime.first()'
-                  error_handler: DISCARD_VALUE
+                    - $.LastRunDateTime
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
+                key: 'mssql.job.status_raw["{#JOBNAME}"]'
               tags:
                 -
                   tag: component
@@ -3061,14 +3391,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.JobName==''{#JOBNAME}'')].LastRunStatusMessage.first()'
-                  error_handler: DISCARD_VALUE
+                    - $.LastRunStatusMessage
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
+                key: 'mssql.job.status_raw["{#JOBNAME}"]'
               tags:
                 -
                   tag: component
@@ -3090,14 +3419,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.JobName==''{#JOBNAME}'')].NextRunDateTime.first()'
-                  error_handler: DISCARD_VALUE
+                    - $.NextRunDateTime
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
+                key: 'mssql.job.status_raw["{#JOBNAME}"]'
               tags:
                 -
                   tag: component
@@ -3125,14 +3453,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.JobName==''{#JOBNAME}'')].RunStatus.first()'
-                  error_handler: DISCARD_VALUE
+                    - $.RunStatus
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
+                key: 'mssql.job.status_raw["{#JOBNAME}"]'
               tags:
                 -
                   tag: component
@@ -3168,14 +3495,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.JobName==''{#JOBNAME}'')].RunDuration.first()'
-                  error_handler: DISCARD_VALUE
+                    - $.RunDuration
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
+                key: 'mssql.job.status_raw["{#JOBNAME}"]'
               tags:
                 -
                   tag: component
@@ -3200,6 +3526,31 @@ zabbix_export:
                     -
                       tag: scope
                       value: performance
+            -
+              uuid: 3660503b46be4c92a7b1d5040bc8cd0d
+              name: 'MSSQL Job ''{#JOBNAME}'': Get job status'
+              type: DEPENDENT
+              key: 'mssql.job.status_raw["{#JOBNAME}"]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The item gets sql agent job {#JOBNAME} status.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.JobName==''{#JOBNAME}'')].first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'db.odbc.get[get_job_status,"{$MSSQL.DSN}"]'
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: mssql-job
+                  value: '{#JOBNAME}'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3212,12 +3563,17 @@ zabbix_export:
           key: 'db.odbc.discovery[local_db,"{$MSSQL.DSN}"]'
           delay: 1h
           params: |
-            SELECT ag.name AS group_name, arcs.replica_server_name AS replica_name,
-            db_name(drs.database_id) AS dbname, drs.is_local
-            FROM sys.dm_hadr_database_replica_states drs JOIN sys.dm_hadr_availability_replica_cluster_states arcs
-            ON arcs.replica_id = drs.replica_id
-            JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
-            JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+            SELECT ag.name AS group_name, 
+              arcs.replica_server_name AS replica_name,
+              db_name(drs.database_id) AS dbname, 
+              drs.is_local
+            FROM sys.dm_hadr_database_replica_states drs 
+            JOIN sys.dm_hadr_availability_replica_cluster_states arcs
+              ON arcs.replica_id = drs.replica_id
+            JOIN sys.availability_groups ag 
+              ON ag.group_id = arcs.group_id
+            JOIN sys.dm_hadr_availability_replica_states ars 
+              ON ars.replica_id = arcs.replica_id
             WHERE drs.is_local = 1
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
@@ -3228,23 +3584,34 @@ zabbix_export:
               name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': Get local DB states'
               type: ODBC
               key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]'
-              history: 0h
+              history: '0'
               trends: '0'
               value_type: TEXT
               params: |
-                SELECT drs.database_state as database_state, 
-                drs.is_suspended as is_suspended, 
-                drs.synchronization_health as synchronization_health, 
-                ag.name as group_name,
-                arcs.replica_server_name as replica_name,
-                db_name(drs.database_id) as dbname
-                FROM sys.dm_hadr_database_replica_states drs 
+                SELECT 
+                  drs.database_state as database_state, 
+                  drs.is_suspended as is_suspended, 
+                  drs.synchronization_health as synchronization_health, 
+                  ag.name as group_name, 
+                  arcs.replica_server_name as replica_name, 
+                  db_name(drs.database_id) as dbname 
+                FROM 
+                  sys.dm_hadr_database_replica_states drs 
                 JOIN sys.dm_hadr_availability_replica_cluster_states arcs ON arcs.replica_id = drs.replica_id 
+                  AND arcs.replica_server_name = '{#REPLICA_NAME}' 
                 JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id 
-                JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+                  AND ag.name = '{#GROUP_NAME}' 
+                JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id 
+                  AND db_name(drs.database_id) = '{#DBNAME}'
               username: '{$MSSQL.USER}'
               password: '{$MSSQL.PASSWORD}'
               description: 'Getting the states of the local availability database.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.first()
+                  error_handler: DISCARD_VALUE
               tags:
                 -
                   tag: availability-group
@@ -3270,7 +3637,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'' && @.dbname==''{#DBNAME}'')].is_suspended.first()'
+                    - $.is_suspended
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3308,7 +3675,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'' && @.dbname==''{#DBNAME}'')].database_state.first()'
+                    - $.database_state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3361,7 +3728,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'' && @.dbname==''{#DBNAME}'')].synchronization_health.first()'
+                    - $.synchronization_health
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3440,21 +3807,31 @@ zabbix_export:
               name: 'MSSQL Mirroring ''{#DBNAME}'': Get the mirror state'
               type: ODBC
               key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
-              history: 0h
+              history: '0'
               trends: '0'
               value_type: TEXT
               params: |
-                SELECT ISNULL(m.mirroring_role,0) as mirroring_role,
-                ISNULL(m.mirroring_role_sequence,0) as mirroring_role_sequence,
-                ISNULL(m.mirroring_state,7) as mirroring_state,
-                ISNULL(m.mirroring_witness_state,3) as mirroring_witness_state,
-                ISNULL(m.mirroring_safety_level,3) as mirroring_safety_level,
-                db_name(m.database_id) as dbname 
-                FROM sys.database_mirroring as m
-                WHERE m.mirroring_state_desc IS NOT NULL
+                SELECT 
+                  ISNULL(m.mirroring_role, 0) as mirroring_role, 
+                  ISNULL(m.mirroring_role_sequence, 0) as mirroring_role_sequence, 
+                  ISNULL(m.mirroring_state, 7) as mirroring_state, 
+                  ISNULL(m.mirroring_witness_state, 3) as mirroring_witness_state, 
+                  ISNULL(m.mirroring_safety_level, 3) as mirroring_safety_level, 
+                  db_name(m.database_id) as dbname 
+                FROM 
+                  sys.database_mirroring as m 
+                WHERE 
+                  db_name(m.database_id) = '{#DBNAME}' 
+                  AND m.mirroring_state_desc IS NOT NULL
               username: '{$MSSQL.USER}'
               password: '{$MSSQL.PASSWORD}'
               description: 'Getting mirrors state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.first()
+                  error_handler: DISCARD_VALUE
               tags:
                 -
                   tag: component
@@ -3479,7 +3856,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.dbname==''{#DBNAME}'')].mirroring_role.first()'
+                    - $.mirroring_role
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3505,7 +3882,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.dbname==''{#DBNAME}'')].mirroring_role_sequence.first()'
+                    - $.mirroring_role_sequence
                 -
                   type: SIMPLE_CHANGE
                   parameters:
@@ -3537,7 +3914,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.dbname==''{#DBNAME}'')].mirroring_safety_level.first()'
+                    - $.mirroring_safety_level
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3573,7 +3950,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.dbname==''{#DBNAME}'')].mirroring_state.first()'
+                    - $.mirroring_state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3645,7 +4022,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.dbname==''{#DBNAME}'')].mirroring_witness_state.first()'
+                    - $.mirroring_witness_state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3701,12 +4078,17 @@ zabbix_export:
           key: 'db.odbc.discovery[non-local_db,"{$MSSQL.DSN}"]'
           delay: 1h
           params: |
-            SELECT ag.name AS group_name, arcs.replica_server_name AS replica_name,
-            db_name(drs.database_id) AS dbname, drs.is_local
-            FROM sys.dm_hadr_database_replica_states drs JOIN sys.dm_hadr_availability_replica_cluster_states arcs
-            ON arcs.replica_id = drs.replica_id
-            JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
-            JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+            SELECT ag.name AS group_name, 
+              arcs.replica_server_name AS replica_name,
+              db_name(drs.database_id) AS dbname, 
+              drs.is_local
+            FROM sys.dm_hadr_database_replica_states drs 
+            JOIN sys.dm_hadr_availability_replica_cluster_states arcs
+              ON arcs.replica_id = drs.replica_id
+            JOIN sys.availability_groups ag 
+              ON ag.group_id = arcs.group_id
+            JOIN sys.dm_hadr_availability_replica_states ars 
+              ON ars.replica_id = arcs.replica_id
             WHERE drs.is_local = 0
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
@@ -3717,22 +4099,33 @@ zabbix_export:
               name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''*{#REPLICA_NAME}*{#DBNAME}'': Get non-local DB states'
               type: ODBC
               key: 'db.odbc.get["{#GROUP_NAME}*{#REPLICA_NAME}*{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
-              history: 0h
+              history: '0'
               trends: '0'
               value_type: TEXT
               params: |
-                SELECT drs.log_send_queue_size as log_send_queue_size,
-                drs.redo_queue_size as redo_queue_size,
-                ag.name as group_name,
-                arcs.replica_server_name as replica_name,
-                db_name(drs.database_id) as dbname
-                FROM sys.dm_hadr_database_replica_states drs 
+                SELECT 
+                  ISNULL(drs.log_send_queue_size, 0) as log_send_queue_size, 
+                  ISNULL(drs.redo_queue_size, 0) as redo_queue_size, 
+                  ag.name as group_name, 
+                  arcs.replica_server_name as replica_name, 
+                  db_name(drs.database_id) as dbname 
+                FROM 
+                  sys.dm_hadr_database_replica_states drs 
                 JOIN sys.dm_hadr_availability_replica_cluster_states arcs ON arcs.replica_id = drs.replica_id 
+                  AND arcs.replica_server_name = '{#REPLICA_NAME}' 
                 JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id 
-                JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+                  AND ag.name = '{#GROUP_NAME}' 
+                JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id 
+                  AND db_name(drs.database_id) = '{#DBNAME}'
               username: '{$MSSQL.USER}'
               password: '{$MSSQL.PASSWORD}'
               description: 'Getting the states of the non-local availability database.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.first()
+                  error_handler: DISCARD_VALUE
               tags:
                 -
                   tag: availability-group
@@ -3756,7 +4149,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'' && @.dbname==''{#DBNAME}'')].log_send_queue_size.first()'
+                    - $.log_send_queue_size
                 -
                   type: MULTIPLIER
                   parameters:
@@ -3807,7 +4200,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'' && @.dbname==''{#DBNAME}'')].redo_queue_size.first()'
+                    - $.redo_queue_size
                 -
                   type: MULTIPLIER
                   parameters:
@@ -3858,10 +4251,12 @@ zabbix_export:
           delay: 1h
           params: |
             SELECT ag.name as group_name,
-            arcs.replica_server_name as replica_name
+              arcs.replica_server_name as replica_name
             FROM sys.dm_hadr_availability_replica_cluster_states as arcs
-            JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
-            JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+            JOIN sys.availability_groups ag 
+              ON ag.group_id = arcs.group_id
+            JOIN sys.dm_hadr_availability_replica_states ars 
+              ON ars.replica_id = arcs.replica_id
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'Discovery of the database replicas.'
@@ -3871,26 +4266,35 @@ zabbix_export:
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Get the replica state'
               type: ODBC
               key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
-              history: 0h
+              history: '0'
               trends: '0'
               value_type: TEXT
               params: |
-                SELECT ars.connected_state as connected_state,
-                ars.is_local as is_local,
-                arcs.join_state as join_state,
-                ISNULL(ars.operational_state,6) as operational_state,
-                ISNULL(ars.recovery_health,2) as recovery_health,
-                ars.role as role,
-                ars.synchronization_health as synchronization_health,
-                ag.name as group_name, 
-                arcs.replica_server_name as replica_name
-                FROM sys.dm_hadr_availability_replica_cluster_states as arcs 
-                JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
+                SELECT 
+                  ars.connected_state as connected_state, 
+                  ars.is_local as is_local, 
+                  arcs.join_state as join_state, 
+                  ISNULL(ars.operational_state, 6) as operational_state, 
+                  ISNULL(ars.recovery_health, 2) as recovery_health, 
+                  ars.role as role, 
+                  ars.synchronization_health as synchronization_health, 
+                  ag.name as group_name, 
+                  arcs.replica_server_name as replica_name 
+                FROM 
+                  sys.dm_hadr_availability_replica_cluster_states as arcs 
+                JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id 
+                  AND ag.name = '{#GROUP_NAME}' 
                 JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
-                WHERE ag.name = '{#GROUP_NAME}' AND arcs.replica_server_name = '{#REPLICA_NAME}'
+                  AND arcs.replica_server_name = '{#REPLICA_NAME}'
               username: '{$MSSQL.USER}'
               password: '{$MSSQL.PASSWORD}'
               description: 'Getting the database replica states.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.first()
+                  error_handler: DISCARD_VALUE
               tags:
                 -
                   tag: availability-group
@@ -3920,7 +4324,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].connected_state.first()'
+                    - $.connected_state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3954,7 +4358,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].is_local.first()'
+                    - $.is_local
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3988,7 +4392,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].join_state.first()'
+                    - $.join_state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -4027,7 +4431,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].operational_state.first()'
+                    - $.operational_state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -4111,7 +4515,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].recovery_health.first()'
+                    - $.recovery_health
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -4163,7 +4567,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].role.first()'
+                    - $.role
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -4198,7 +4602,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].synchronization_health.first()'
+                    - $.synchronization_health
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
