@@ -2000,49 +2000,15 @@ select {
 	margin: 0 14px 0 0;
 }
 
-// todo no icon present
-$trigger-expression-tree-icons: (
-	top-bottom: -84px -300px,
-	top-bottom-right: -84px -334px,
-	top-right: -84px -372px,
-	empty: -84px -350px
-);
-
-%trigger-expression-tree-icons-common {
-	margin: 0 12px 0 0;
-	// todo no icon present
+.zi-tree-top-right,
+.zi-tree-top-right-bottom,
+.zi-tree-top-bottom {
 	&::before {
-		background: url($sprite-path) no-repeat; // TODO - AS: should be removed
-		display: inline-block;
-		width: 12px;
-		height: 12px;
-		position: absolute;
-		content: '';
-	}
-}
-// todo no icon present
-// Dynamically generated classes:
-//  .icon-tree-top-bottom
-//  .icon-tree-top-bottom-right
-//  .icon-tree-top-right
-//  .icon-tree-empty
-@each $class, $bg-position in $trigger-expression-tree-icons {
-	.icon-tree-#{$class} { // TODO - AS: should be checked and fixed
-		@extend %trigger-expression-tree-icons-common;
-
-		&::before {
-			background-position: $bg-position;
-		}
+		//vertical-align: middle;
+		font-size: $btn-icon-small-size;
 	}
 }
 
-%var-icons {
-	display: inline-block;
-	width: 18px;
-	height: 18px;
-	position: absolute;
-	content: '';
-}
 
 .drag-icon,
 .ui-draggable .dashboard-widget-head {

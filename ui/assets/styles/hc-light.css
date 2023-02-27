@@ -41,7 +41,7 @@ svg *:focus {
 
 @font-face {
   font-family: "zabbix-icons";
-  src: url("../fonts/zabbix-icons.woff2?t=1675758509683") format("woff2"), url("../fonts/zabbix-icons.woff?t=1675758509683") format("woff"), url("../fonts/zabbix-icons.ttf?t=1675758509683") format("truetype"), url("../fonts/zabbix-icons.svg?t=1675758509683#zabbix-icons") format("svg"); }
+  src: url("../fonts/zabbix-icons.woff2?t=1677498778051") format("woff2"), url("../fonts/zabbix-icons.woff?t=1677498778051") format("woff"), url("../fonts/zabbix-icons.ttf?t=1677498778051") format("truetype"), url("../fonts/zabbix-icons.svg?t=1677498778051#zabbix-icons") format("svg"); }
 [class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, z-select button.focusable::after, z-select a.focusable.btn-icon::after,
 .z-select button.focusable::after,
 .z-select a.focusable.btn-icon::after, .ui-tabs-nav .ui-tabs-tab .btn-info::after, .ui-tabs-nav .ui-tabs-tab .filter-trigger::after, .ui-tabs-nav .ui-tabs-tab .btn-time::after, .btn-dropdown-container .btn-dropdown-toggle::after {
@@ -334,41 +334,50 @@ svg *:focus {
 .zi-trash:before {
   content: "\ea5d"; }
 
-.zi-triangle-flipped-warning:before {
+.zi-tree-top-bottom:before {
   content: "\ea5e"; }
 
-.zi-triangle-warning:before {
+.zi-tree-top-right-bottom:before {
   content: "\ea5f"; }
 
-.zi-uncheck:before {
+.zi-tree-top-right:before {
   content: "\ea60"; }
 
-.zi-user-filled:before {
+.zi-triangle-flipped-warning:before {
   content: "\ea61"; }
 
-.zi-user:before {
+.zi-triangle-warning:before {
   content: "\ea62"; }
 
-.zi-users-filled:before {
+.zi-uncheck:before {
   content: "\ea63"; }
 
-.zi-users:before {
+.zi-user-filled:before {
   content: "\ea64"; }
 
-.zi-widget-add:before {
+.zi-user:before {
   content: "\ea65"; }
 
-.zi-widget-resize:before {
+.zi-users-filled:before {
   content: "\ea66"; }
 
-.zi-wrench-alt:before {
+.zi-users:before {
   content: "\ea67"; }
 
-.zi-wrench:before {
+.zi-widget-add:before {
   content: "\ea68"; }
 
-.zi-z:before {
+.zi-widget-resize:before {
   content: "\ea69"; }
+
+.zi-wrench-alt:before {
+  content: "\ea6a"; }
+
+.zi-wrench:before {
+  content: "\ea6b"; }
+
+.zi-z:before {
+  content: "\ea6c"; }
 
 body {
   position: relative;
@@ -4833,27 +4842,10 @@ z-select button.focusable, z-select a.focusable.btn-icon,
   display: inline-block;
   margin: 0 14px 0 0; }
 
-.icon-tree-top-bottom, .icon-tree-top-bottom-right, .icon-tree-top-right, .icon-tree-empty {
-  margin: 0 12px 0 0; }
-  .icon-tree-top-bottom::before, .icon-tree-top-bottom-right::before, .icon-tree-top-right::before, .icon-tree-empty::before {
-    background: url("../img/icon-sprite.svg?20220722") no-repeat;
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    position: absolute;
-    content: ''; }
-
-.icon-tree-top-bottom::before {
-  background-position: -84px -300px; }
-
-.icon-tree-top-bottom-right::before {
-  background-position: -84px -334px; }
-
-.icon-tree-top-right::before {
-  background-position: -84px -372px; }
-
-.icon-tree-empty::before {
-  background-position: -84px -350px; }
+.zi-tree-top-right::before,
+.zi-tree-top-right-bottom::before,
+.zi-tree-top-bottom::before {
+  font-size: 12px; }
 
 .zi-i {
   position: relative;

@@ -1213,10 +1213,10 @@ function expressionLevelDraw(array $next, $level) {
 	$expr = [];
 	for ($i = 1; $i <= $level; $i++) {
 		if ($i == $level) {
-			$class_name = $next[$i] ? 'icon-tree-top-bottom-right' : 'icon-tree-top-right';
+			$class_name = $next[$i] ? 'zi-tree-top-right-bottom' : 'zi-tree-top-right';
 		}
 		else {
-			$class_name = $next[$i] ? 'icon-tree-top-bottom' : 'icon-tree-empty';
+			$class_name = $next[$i] ? 'zi-tree-top-bottom' : 'icon-tree-empty';
 		}
 
 		$expr[] = (new CSpan(''))->addClass($class_name);
