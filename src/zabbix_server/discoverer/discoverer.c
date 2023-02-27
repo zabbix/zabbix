@@ -1192,7 +1192,9 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_net_check_t
 		h->dnsname = NULL;
 
 		if (0 != h->rcv)
+		{
 			((zbx_dservice_t*)result->services.values[0])->status = DOBJECT_STATUS_UP;
+		}
 	}
 err:
 	zbx_vector_fping_host_clear(&hosts);
