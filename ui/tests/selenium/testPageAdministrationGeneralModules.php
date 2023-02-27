@@ -1022,7 +1022,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	/**
 	 * @depends testPageAdministrationGeneralModules_ChangeWidgetModuleStatus
 	 */
-	public function testPageAdministrationGeneralModules_disableAllModules() {
+	public function testPageAdministrationGeneralModules_DisableAllModules() {
 		$this->page->login()->open('zabbix.php?action=module.list')->waitUntilReady();
 
 		// Disable all modules.
@@ -1031,7 +1031,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->page->acceptAlert();
 
 		// Wait for the Success message to confirm that modules were disabled before heading to the dashboard.
-		$this->assertTrue(CMessageElement::find()->waitUntilVisible()->one()->isGood());
+		$message = CMessageElement::find()->waitUntilVisible()->one();
+		$this->assertTrue($message->isGood());
+		$this->assertStringStartsWith('Modules disabled:', $message->getText());
 
 		// Open dashboard and check that all widgets are inaccessible.
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
