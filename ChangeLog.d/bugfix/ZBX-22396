@@ -1,0 +1,1 @@
+........S. [ZBX-22396] fixed handling of oids of different lengths before index in snmpwalk2json preprocessing step (dgoloscapov)
