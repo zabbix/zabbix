@@ -287,6 +287,8 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 			*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 			return FAIL;
 		}
+
+		zbx_jsonobj_disable_indexing(obj);
 	}
 
 	if (NULL == data)
