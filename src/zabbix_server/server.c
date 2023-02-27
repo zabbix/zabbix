@@ -1301,6 +1301,7 @@ static void	zbx_check_db(void)
 {
 	struct zbx_json	db_version_json;
 	int		result = SUCCEED;
+	zbx_ha_mode_t	ha_mode;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
 	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, program_type);
@@ -1310,11 +1311,16 @@ static void	zbx_check_db(void)
 		zbx_db_extract_dbextension_info(&db_version_info);
 	}
 
+	if (NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
+		ha_mode = ZBX_HA_MODE_CLUSTER;
+	else
+		ha_mode = ZBX_HA_MODE_STANDALONE;
+
 	if (SUCCEED == result && (
 #ifdef HAVE_POSTGRESQL
 			SUCCEED != zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
 #endif
-			SUCCEED != DBcheck_version()))
+			SUCCEED != DBcheck_version(ha_mode)))
 	{
 		result = FAIL;
 	}
