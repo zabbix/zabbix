@@ -146,16 +146,20 @@ class testSystemInformation extends CWebTest {
 		foreach ($nodes as $name => $lastaccess_db) {
 			$row = $nodes_table->findRow('Name', $name);
 			$last_seen = $row->getColumn('Last access');
-			// Converting unix timestamp difference into difference in time units and comparing with lastaccess from report.
-			$lastaccess_expected = convertUnitsS($current_time - $lastaccess_db);
-			$lastaccess_actual = $last_seen->getText();
+
 			/**
-			 *  In case if the actual last access doesn't coincide with expected check that the difference is only 1s.
-			 *  This is required because a second might have passed from defining $current_time and loading the page.
+			 * Converting unix timestamp difference into difference in time units and creating an array of such reference
+			 * values. This is required because several seconds might have passed from defining $current_time and
+			 * loading the page. Afterwards, the presence of the actual last access value in this array is determined.
 			 */
-			if ($lastaccess_expected !== $lastaccess_actual) {
-				$this->assertEquals(convertUnitsS($current_time - $lastaccess_db - 1), $lastaccess_actual);
+			$lastaccess_expected = [];
+
+			for ($i = 0; $i <= 10; $i++) {
+				$lastaccess_expected[] = convertUnitsS($current_time - $lastaccess_db - $i);
 			}
+
+			$lastaccess_actual = $last_seen->getText();
+			$this->assertTrue(in_array($lastaccess_actual, $lastaccess_expected));
 
 			self::$skip_fields[] = $last_seen;
 
