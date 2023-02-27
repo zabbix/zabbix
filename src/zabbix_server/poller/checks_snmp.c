@@ -1928,24 +1928,25 @@ static void	snmp_bulkwalk_set_options(zbx_snmp_format_opts_t *opts)
 
 static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
 {
-	size_t	len;
 	int	i;
 
 	zbx_vector_snmp_oid_sort(oids, (zbx_compare_func_t)zbx_snmp_oid_compare);
-	len = strlen(oids->values[0]->str_oid);
 
 	for (i = 1; i < oids->values_num; i++)
 	{
-		while (0 == memcmp(oids->values[i - 1]->str_oid, oids->values[i]->str_oid, len))
+		size_t len = strlen(oids->values[i - 1]->str_oid);
+
+		while (0 == strncmp(oids->values[i - 1]->str_oid, oids->values[i]->str_oid, len))
 		{
+			if ('.' != oids->values[i]->str_oid[len] && '\0' != oids->values[i]->str_oid[len])
+				break;
+
 			vector_snmp_oid_free(oids->values[i]);
 			zbx_vector_snmp_oid_remove(oids, i);
 
 			if (i == oids->values_num)
 				return;
 		}
-
-		len = strlen(oids->values[i]->str_oid);
 	}
 }
 
