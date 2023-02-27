@@ -564,7 +564,7 @@ class CItem extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items);
 
-		self::checkAndAddUuid($items);
+		self::checkAndAddUuid($items, []);
 		self::checkDuplicates($items);
 		self::checkValueMaps($items);
 		self::checkInventoryLinks($items);
@@ -658,7 +658,7 @@ class CItem extends CItemGeneral {
 		 */
 		$db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
+				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status', 'uuid'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
@@ -707,6 +707,7 @@ class CItem extends CItemGeneral {
 
 		self::addAffectedObjects($items, $db_items);
 
+		self::checkAndAddUuid($items, $db_items);
 		self::checkDuplicates($items, $db_items);
 		self::checkValueMaps($items, $db_items);
 		self::checkInventoryLinks($items, $db_items);

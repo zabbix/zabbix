@@ -436,7 +436,7 @@ class CItemPrototype extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items);
 
-		self::checkAndAddUuid($items);
+		self::checkAndAddUuid($items, []);
 		self::checkDuplicates($items);
 		self::checkDiscoveryRules($items);
 		self::checkValueMaps($items);
@@ -511,7 +511,7 @@ class CItemPrototype extends CItemGeneral {
 	 * @throws APIException
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['itemid']], 'fields' => [
 			'uuid' => 	['type' => API_UUID],
 			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
@@ -536,7 +536,7 @@ class CItemPrototype extends CItemGeneral {
 		 */
 		$db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
+				'valuemapid', 'logtimefmt', 'description', 'status', 'discover', 'uuid'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
@@ -582,6 +582,7 @@ class CItemPrototype extends CItemGeneral {
 
 		self::addAffectedObjects($items, $db_items);
 
+		self::checkAndAddUuid($items, $db_items);
 		self::checkDuplicates($items, $db_items);
 		self::checkValueMaps($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);

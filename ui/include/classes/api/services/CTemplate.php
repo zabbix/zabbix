@@ -362,7 +362,7 @@ class CTemplate extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array &$templates) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['host'], ['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['host'], ['name']], 'fields' => [
 			'uuid' =>			['type' => API_UUID],
 			'host' =>			['type' => API_H_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name'), 'default_source' => 'host'],
@@ -395,7 +395,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		self::checkVendorFields($templates);
-		self::checkAndAddUuid($templates);
+		self::checkAndAddUuid($templates, []);
 		$this->checkDuplicates($templates);
 		$this->checkGroups($templates);
 		$this->checkTemplates($templates);
@@ -404,28 +404,41 @@ class CTemplate extends CHostGeneral {
 	/**
 	 * Check that no duplicate UUID is being added. Add UUID to all templates, if it doesn't exist.
 	 *
-	 * @param array $templates_to_create
+	 * @param array $templates
 	 *
 	 * @throws APIException
 	 */
-	private static function checkAndAddUuid(array &$templates_to_create): void {
-		foreach ($templates_to_create as &$template) {
+	private static function checkAndAddUuid(array &$templates, array $db_templates): void {
+		$new_templates_uuids = [];
+
+		foreach ($templates as &$template) {
+			$db_uuid = array_key_exists('templateid', $template)
+					&& array_key_exists($template['templateid'], $db_templates)
+				? $db_templates[$template['templateid']]['uuid']
+				: '';
+
 			if (!array_key_exists('uuid', $template)) {
-				$template['uuid'] = generateUuidV4();
+				$template['uuid'] = $db_uuid !== '' ? $db_uuid : generateUuidV4();
+			}
+
+			if ($template['uuid'] !== $db_uuid) {
+				$new_templates_uuids[] = $template['uuid'];
 			}
 		}
 		unset($template);
 
-		$db_uuid = DB::select('hosts', [
-			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($templates_to_create, 'uuid')],
-			'limit' => 1
-		]);
+		if ($new_templates_uuids) {
+			$db_uuid = DB::select('hosts', [
+				'output' => ['uuid'],
+				'filter' => ['uuid' => $new_templates_uuids],
+				'limit' => 1
+			]);
 
-		if ($db_uuid) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
-			);
+			if ($db_uuid) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				);
+			}
 		}
 	}
 
@@ -471,7 +484,7 @@ class CTemplate extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$templates, array &$db_templates = null) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid'], ['host'], ['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['templateid'], ['host'], ['name']], 'fields' => [
 			'uuid' => 				['type' => API_UUID],
 			'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'length' => DB::getFieldLength('hosts', 'host')],
@@ -506,7 +519,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$db_templates = $this->get([
-			'output' => ['templateid', 'host', 'name', 'description', 'vendor_name', 'vendor_version'],
+			'output' => ['templateid', 'host', 'name', 'description', 'vendor_name', 'vendor_version', 'uuid'],
 			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -518,6 +531,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->addAffectedObjects($templates, $db_templates);
 
+		self::checkAndAddUuid($templates, $db_templates);
 		self::checkVendorFields($templates, $db_templates);
 		$this->checkDuplicates($templates, $db_templates);
 		$this->checkGroups($templates, $db_templates);

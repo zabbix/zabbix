@@ -494,7 +494,7 @@ class CHostPrototype extends CHostBase {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkAndAddUuid($host_prototypes);
+		self::checkAndAddUuid($host_prototypes, []);
 		self::checkDiscoveryRules($host_prototypes);
 		self::checkDuplicates($host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
@@ -563,7 +563,7 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$host_prototypes, array &$db_host_prototypes = null): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['hostid']], 'fields' => [
 			'uuid' =>	['type' => API_UUID],
 			'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'ruleid' => ['type' => API_UNEXPECTED]
@@ -585,7 +585,7 @@ class CHostPrototype extends CHostBase {
 
 		$db_host_prototypes = DBfetchArrayAssoc(DBselect(
 			'SELECT h.hostid,h.host,h.name,h.custom_interfaces,h.status,h.discover,h.templateid,'.
-				'hd.parent_itemid AS ruleid,'.
+				'hd.parent_itemid AS ruleid,uuid,'.
 				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode').
 			' FROM hosts h'.
 			' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
@@ -627,6 +627,7 @@ class CHostPrototype extends CHostBase {
 
 		$this->addAffectedObjects($host_prototypes, $db_host_prototypes);
 
+		self::checkAndAddUuid($host_prototypes, $db_host_prototypes);
 		self::checkDuplicates($host_prototypes, $db_host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
 		self::checkGroupLinks($host_prototypes, $db_host_prototypes);
@@ -1042,10 +1043,11 @@ class CHostPrototype extends CHostBase {
 	 * if it doesn't exist.
 	 *
 	 * @param array $host_prototypes
+	 * @param array $db_host_prototypes
 	 *
 	 * @throws APIException
 	 */
-	private static function checkAndAddUuid(array &$host_prototypes): void {
+	private static function checkAndAddUuid(array &$host_prototypes, array $db_host_prototypes): void {
 		$templated_ruleids = DBfetchColumn(DBselect(
 			'SELECT i.itemid'.
 			' FROM items i,hosts h'.
@@ -1054,31 +1056,45 @@ class CHostPrototype extends CHostBase {
 			' AND h.status='.HOST_STATUS_TEMPLATE
 		), 'itemid');
 
+		$new_host_prototype_uuids = [];
+
 		foreach ($host_prototypes as $index => &$host_prototype) {
-			if (!in_array($host_prototype['ruleid'], $templated_ruleids) && array_key_exists('uuid', $host_prototype)) {
+			if (in_array($host_prototype['ruleid'], $templated_ruleids)) {
+				$db_uuid = array_key_exists('hostid', $host_prototype)
+						&& array_key_exists($host_prototype['hostid'], $db_host_prototypes)
+					? $db_host_prototypes[$host_prototype['hostid']]['uuid']
+					: '';
+
+				if (!array_key_exists('uuid', $host_prototype)) {
+					$host_prototype['uuid'] = $db_uuid !== '' ? $db_uuid : generateUuidV4();
+				}
+
+				if ($host_prototype['uuid'] !== $db_uuid) {
+					$new_host_prototype_uuids[] = $host_prototype['uuid'];
+				}
+			}
+			elseif (array_key_exists('uuid', $host_prototype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
 				);
 			}
-
-			if (in_array($host_prototype['ruleid'], $templated_ruleids) && !array_key_exists('uuid', $host_prototype)) {
-				$host_prototype['uuid'] = generateUuidV4();
-			}
 		}
 		unset($host_prototype);
 
-		$duplicates = DB::select('hosts', [
-			'output' => ['uuid'],
-			'filter' => [
-				'uuid' => array_column($host_prototypes, 'uuid')
-			],
-			'limit' => 1
-		]);
+		if ($new_host_prototype_uuids) {
+			$duplicates = DB::select('hosts', [
+				'output' => ['uuid'],
+				'filter' => [
+					'uuid' => $new_host_prototype_uuids
+				],
+				'limit' => 1
+			]);
 
-		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $duplicates[0]['uuid'])
-			);
+			if ($duplicates) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Entry with UUID "%1$s" already exists.', $duplicates[0]['uuid'])
+				);
+			}
 		}
 	}
 

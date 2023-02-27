@@ -654,38 +654,53 @@ abstract class CTriggerGeneral extends CApiService {
 	/**
 	 * Check that only triggers on templates have UUID. Add UUID to all triggers on templates, if it does not exists.
 	 *
-	 * @param array $triggers_to_create
+	 * @param array $triggers_to_save
+	 * @param array $db_triggers
 	 * @param array $descriptions
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$triggers_to_create, array $descriptions): void {
+	protected function checkAndAddUuid(array &$triggers_to_save, array $db_triggers, array $descriptions): void {
+		$new_trigger_uuids = [];
+
 		foreach ($descriptions as $triggers) {
 			foreach ($triggers as $trigger) {
-				if ($trigger['host']['status'] != HOST_STATUS_TEMPLATE && $trigger['uuid'] !== null) {
+				if ($trigger['host']['status'] == HOST_STATUS_TEMPLATE) {
+					$db_uuid = array_key_exists('triggerid', $triggers_to_save[$trigger['index']])
+							&& array_key_exists($triggers_to_save[$trigger['index']]['triggerid'], $db_triggers)
+						? $db_triggers[$triggers_to_save[$trigger['index']]['triggerid']]['uuid']
+						: '';
+
+					if (!array_key_exists('uuid', $trigger) || $trigger['uuid'] === null) {
+						$triggers_to_save[$trigger['index']]['uuid'] = $db_uuid !== '' ? $db_uuid : generateUuidV4();
+					}
+
+					if ($triggers_to_save[$trigger['index']]['uuid'] !== $db_uuid) {
+						$new_trigger_uuids[] = $triggers_to_save[$trigger['index']]['uuid'];
+					}
+				}
+				elseif (array_key_exists('uuid', $trigger) && $trigger['uuid'] !== null) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Invalid parameter "%1$s": %2$s.', '/'.($trigger['index'] + 1),
 							_s('unexpected parameter "%1$s"', 'uuid')
 						)
 					);
 				}
-
-				if ($trigger['host']['status'] == HOST_STATUS_TEMPLATE && $trigger['uuid'] === null) {
-					$triggers_to_create[$trigger['index']]['uuid'] = generateUuidV4();
-				}
 			}
 		}
 
-		$db_uuid = DB::select('triggers', [
-			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($triggers_to_create, 'uuid')],
-			'limit' => 1
-		]);
+		if ($new_trigger_uuids) {
+			$db_uuid = DB::select('triggers', [
+				'output' => ['uuid'],
+				'filter' => ['uuid' => $new_trigger_uuids],
+				'limit' => 1
+			]);
 
-		if ($db_uuid) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
-			);
+			if ($db_uuid) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				);
+			}
 		}
 	}
 
@@ -955,7 +970,7 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$descriptions = $this->populateHostIds($descriptions);
-		$this->checkAndAddUuid($triggers, $descriptions);
+		$this->checkAndAddUuid($triggers, [], $descriptions);
 		$this->checkDuplicates($descriptions);
 		$this->checkDependencies($triggers);
 	}
@@ -1009,7 +1024,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException if validation failed.
 	 */
 	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['description', 'expression']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['description', 'expression']], 'fields' => [
 			'uuid' => 					['type' => API_UUID],
 			'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'description' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'description')],
@@ -1050,7 +1065,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'url_name', 'url', 'status', 'priority', 'comments',
 				'type', 'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'manual_close', 'opdata', 'event_name'
+				'manual_close', 'opdata', 'event_name', 'uuid'
 			],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'editable' => true,
@@ -1098,8 +1113,9 @@ abstract class CTriggerGeneral extends CApiService {
 		];
 
 		$descriptions = [];
+		$trigger_uuids = [];
 
-		foreach ($triggers as &$trigger) {
+		foreach ($triggers as  $index => &$trigger) {
 			$db_trigger = $db_triggers[$trigger['triggerid']];
 			$description = array_key_exists('description', $trigger)
 				? $trigger['description']
@@ -1140,6 +1156,15 @@ abstract class CTriggerGeneral extends CApiService {
 			self::checkTriggerRecoveryMode($trigger);
 			self::checkTriggerCorrelationMode($trigger);
 
+			if (!array_key_exists('uuid', $trigger) || $trigger['uuid'] !== $db_trigger['uuid']) {
+				$trigger_uuids[$trigger['description']][] = [
+					'index' => $index,
+					'uuid' => array_key_exists('uuid', $trigger) ? $trigger['uuid'] : null,
+					'expression' => $trigger['expression'],
+					'recovery_expression' => $trigger['recovery_expression']
+				];
+			}
+
 			if ($trigger['expression'] !== $db_trigger['expression']
 					|| $trigger['recovery_expression'] !== $db_trigger['recovery_expression']
 					|| $trigger['description'] !== $db_trigger['description']) {
@@ -1154,6 +1179,10 @@ abstract class CTriggerGeneral extends CApiService {
 		if ($descriptions) {
 			$descriptions = $this->populateHostIds($descriptions);
 			$this->checkDuplicates($descriptions);
+		}
+		if ($trigger_uuids) {
+			$trigger_uuids = $this->populateHostIds($trigger_uuids);
+			$this->checkAndAddUuid($triggers, $db_triggers, $trigger_uuids);
 		}
 
 		$this->checkDependencies($triggers, $db_triggers);

@@ -653,43 +653,57 @@ abstract class CGraphGeneral extends CApiService {
 		unset($graph);
 
 		$this->validateHostsAndTemplates($graphs);
-		$this->checkAndAddUuid($graphs, $templated_graph_indexes);
+		$this->checkAndAddUuid($graphs, [], $templated_graph_indexes);
 	}
 
 	/**
 	 * Check that only graphs on templates have UUID. Add UUID to all graphs on templates, if it does not exists.
 	 *
-	 * @param array $graphs_to_create
+	 * @param array $graphs
+	 * @param array $db_graphs
 	 * @param array $templated_graph_indexes
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$graphs_to_create, array $templated_graph_indexes): void {
-		foreach ($graphs_to_create as $index => &$graph) {
-			if (!array_key_exists($index, $templated_graph_indexes) && array_key_exists('uuid', $graph)) {
+	protected function checkAndAddUuid(array &$graphs, array $db_graphs, array $templated_graph_indexes): void {
+		$new_graph_uuids = [];
+
+		foreach ($graphs as $index => &$graph) {
+			if (array_key_exists($index, $templated_graph_indexes)) {
+				$db_uuid = array_key_exists('graphid', $graph) && array_key_exists($graph['graphid'], $db_graphs)
+					? $db_graphs[$graph['graphid']]['uuid']
+					: '';
+
+				if (!array_key_exists('uuid', $graph)) {
+					$graph['uuid'] = $db_uuid !== '' ? $db_uuid : generateUuidV4();
+				}
+
+				if ($graph['uuid'] !== $db_uuid) {
+					$new_graph_uuids[] = $graph['uuid'];
+				}
+			}
+			elseif (array_key_exists('uuid', $graph)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1),
 						_s('unexpected parameter "%1$s"', 'uuid')
 					)
 				);
 			}
-
-			if (array_key_exists($index, $templated_graph_indexes) && !array_key_exists('uuid', $graph)) {
-				$graph['uuid'] = generateUuidV4();
-			}
 		}
 		unset($graph);
 
-		$db_uuid = DB::select('graphs', [
-			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($graphs_to_create, 'uuid')],
-			'limit' => 1
-		]);
+		if ($new_graph_uuids) {
+			$db_uuid = DB::select('graphs', [
+				'output' => ['uuid'],
+				'filter' => ['uuid' => $new_graph_uuids],
+				'limit' => 1
+			]);
 
-		if ($db_uuid) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
-			);
+			if ($db_uuid) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				);
+			}
 		}
 	}
 
@@ -764,7 +778,7 @@ abstract class CGraphGeneral extends CApiService {
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$colorValidator = new CColorValidator();
 
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
 			'uuid' => ['type' => API_UUID],
 			'name' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
 		]];
@@ -784,6 +798,7 @@ abstract class CGraphGeneral extends CApiService {
 		}
 
 		$read_only_fields = ['templateid', 'flags'];
+		$templated_graph_indexes = [];
 
 		foreach ($graphs as $key => $graph) {
 			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_update, $graph['name']);
@@ -812,6 +827,7 @@ abstract class CGraphGeneral extends CApiService {
 				// if the current graph is templated and new items to be added
 				if (HOST_STATUS_TEMPLATE == $host['status']) {
 					$templatedGraph = $host['hostid'];
+					$templated_graph_indexes[$key] = true;
 
 					$itemIds = [];
 
@@ -854,6 +870,7 @@ abstract class CGraphGeneral extends CApiService {
 		}
 
 		$this->validateHostsAndTemplates($graphs);
+		$this->checkAndAddUuid($graphs, $dbGraphs, $templated_graph_indexes);
 	}
 
 	/**

@@ -419,36 +419,51 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Check and add UUID to all item prototypes on templates, if it doesn't exist.
+	 * Check that only items on templates have UUID. Add UUID to all host prototypes on templates,
+	 *   if it doesn't exist.
 	 *
 	 * @param array $items
+	 * @param array $db_items
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkAndAddUuid(array &$items): void {
-		foreach ($items as &$item) {
-			if ($item['host_status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
-				$item['uuid'] = generateUuidV4();
+	protected static function checkAndAddUuid(array &$items, array $db_items): void {
+		$new_item_uuids = [];
+
+		foreach ($items as $index => &$item) {
+			if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
+				$db_uuid = array_key_exists('itemid', $item) && array_key_exists($item['itemid'], $db_items)
+					? $db_items[$item['itemid']]['uuid']
+					: '';
+
+				if (!array_key_exists('uuid', $item)) {
+					$item['uuid'] = $db_uuid !== '' ? $db_uuid : generateUuidV4();
+				}
+
+				if ($item['uuid'] !== $db_uuid) {
+					$new_item_uuids[] = $item['uuid'];
+				}
+			}
+			elseif (array_key_exists('uuid', $item)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
 			}
 		}
 		unset($item);
 
-		$uuids = array_column($items, 'uuid');
+		if ($new_item_uuids) {
+			$db_uuid = DB::select('items', [
+				'output' => ['uuid'],
+				'filter' => ['uuid' => $new_item_uuids],
+				'limit' => 1
+			]);
 
-		if (!$uuids) {
-			return;
-		}
-
-		$duplicates = DB::select('items', [
-			'output' => ['uuid'],
-			'filter' => ['uuid' => $uuids],
-			'limit' => 1
-		]);
-
-		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $duplicates[0]['uuid'])
-			);
+			if ($db_uuid) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				);
+			}
 		}
 	}
 

@@ -344,7 +344,7 @@ class CHttpTest extends CApiService {
 			$names_by_hostid[$httptest['hostid']][] = $httptest['name'];
 		}
 
-		$this->checkAndAddUuid($httptests);
+		$this->checkAndAddUuid($httptests, []);
 
 		$this->checkHostsAndTemplates($httptests, $db_hosts, $db_templates);
 		self::addHostStatus($httptests, $db_hosts, $db_templates);
@@ -358,40 +358,55 @@ class CHttpTest extends CApiService {
 	/**
 	 * Check that only httptests on templates have UUID. Add UUID to all httptests on templates, if it does not exists.
 	 *
-	 * @param array $httptests_to_create
+	 * @param array $httptests_to_save
+	 * @param array $db_httptests
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$httptests_to_create): void {
+	protected function checkAndAddUuid(array &$httptests_to_save, array $db_httptests): void {
 		$db_templateids = API::Template()->get([
 			'output' => [],
-			'templateids' => array_column($httptests_to_create, 'hostid'),
+			'templateids' => array_column($httptests_to_save, 'hostid'),
 			'preservekeys' => true
 		]);
 
-		foreach ($httptests_to_create as $index => &$httptest) {
-			if (!array_key_exists($httptest['hostid'], $db_templateids) && array_key_exists('uuid', $httptest)) {
+		$new_httptest_uuids = [];
+
+		foreach ($httptests_to_save as $index => &$httptest) {
+			if (array_key_exists($httptest['hostid'], $db_templateids)) {
+				$db_uuid = array_key_exists('httptestid', $httptest)
+						&& array_key_exists($httptest['httptestid'], $db_httptests)
+					? $db_httptests[$httptest['httptestid']]['uuid']
+					: '';
+
+				if (!array_key_exists('uuid', $httptest)) {
+					$httptest['uuid'] = $db_uuid !== '' ? $db_uuid : generateUuidV4();
+				}
+
+				if (array_key_exists('uuid', $httptest) && $httptest['uuid'] !== $db_uuid) {
+					$new_httptest_uuids[] = $httptest['uuid'];
+				}
+			}
+			elseif (array_key_exists('uuid', $httptest)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
 				);
 			}
-
-			if (array_key_exists($httptest['hostid'], $db_templateids) && !array_key_exists('uuid', $httptest)) {
-				$httptest['uuid'] = generateUuidV4();
-			}
 		}
 		unset($httptest);
 
-		$db_uuid = DB::select('httptest', [
-			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($httptests_to_create, 'uuid')],
-			'limit' => 1
-		]);
+		if ($new_httptest_uuids) {
+			$db_uuid = DB::select('httptest', [
+				'output' => ['uuid'],
+				'filter' => ['uuid' => $new_httptest_uuids],
+				'limit' => 1
+			]);
 
-		if ($db_uuid) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
-			);
+			if ($db_uuid) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				);
+			}
 		}
 	}
 
@@ -422,7 +437,7 @@ class CHttpTest extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$httptests, array &$db_httptests = null) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['httptestid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['httptestid']], 'fields' => [
 			'uuid' => 				['type' => API_UUID],
 			'httptestid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
@@ -485,7 +500,7 @@ class CHttpTest extends CApiService {
 		$db_httptests = $this->get([
 			'output' => ['httptestid', 'hostid', 'name', 'delay', 'retries', 'agent', 'http_proxy',
 				'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
-				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'templateid'
+				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'templateid', 'uuid'
 			],
 			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required',
 				'status_codes', 'follow_redirects', 'retrieve_mode', 'post_type'
@@ -573,6 +588,7 @@ class CHttpTest extends CApiService {
 		$this->validateAuthParameters($httptests, __FUNCTION__, $db_httptests);
 		$this->validateSslParameters($httptests, __FUNCTION__, $db_httptests);
 		$this->validateSteps($httptests, __FUNCTION__, $db_httptests);
+		$this->checkAndAddUuid($httptests, $db_httptests);
 
 		return $httptests;
 	}
