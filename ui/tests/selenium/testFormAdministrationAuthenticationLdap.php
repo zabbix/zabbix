@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,24 +100,23 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 					'password' => 'zabbix',
 					'ldap_settings' => [
 						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ipa.demo1.freeipa.org',
+						'LDAP host' => PHPUNIT_LDAP_HOST,
 						'Port' => '389',
-						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-						'Search attribute' => 'uid',
-						'Bind DN' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-						'Case-sensitive login' => true,
-						'Bind password' => 'Secret123',
-						'Login' => 'admin',
-						'User password' => 'Secret123'
+						'Base DN' => 'DC=zbx,DC=local',
+						'Search attribute' => 'sAMAccountName',
+						'Bind DN' => 'CN=Admin,OU=Users,OU=Zabbix,DC=zbx,DC=local',
+						'Bind password' => PHPUNIT_LDAP_BIND_PASSWORD,
+						'Login' => PHPUNIT_LDAP_USERNAME,
+						'User password' => PHPUNIT_LDAP_USER_PASSWORD
 					],
 					'db_check' => [
 						'authentication_type' => '1',
-						'ldap_host' => 'ipa.demo1.freeipa.org',
+						'ldap_host' => PHPUNIT_LDAP_HOST,
 						'ldap_port' => '389',
-						'ldap_base_dn' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-						'ldap_bind_dn' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-						'ldap_bind_password' => 'Secret123',
-						'ldap_search_attribute' => 'uid',
+						'ldap_base_dn' => 'DC=zbx,DC=local',
+						'ldap_bind_dn' => 'CN=Admin,OU=Users,OU=Zabbix,DC=zbx,DC=local',
+						'ldap_bind_password' => PHPUNIT_LDAP_BIND_PASSWORD,
+						'ldap_search_attribute' => 'sAMAccountName',
 						'http_auth_enabled' => '0',
 						'http_login_form' => '0',
 						'http_strip_domains' => '',

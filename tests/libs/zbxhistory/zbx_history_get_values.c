@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,6 +98,12 @@ int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_
 
 void	__wrap_zbx_clean_events(void)
 {
+}
+
+void	__wrap_zbx_config_get(void *cfg, int flags)
+{
+	ZBX_UNUSED(cfg);
+	ZBX_UNUSED(flags);
 }
 
 /******************************************************************************
