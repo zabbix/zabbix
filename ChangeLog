@@ -1,8 +1,12 @@
 Changes for 6.4.0rc3
 
-New features:
-
 Bug fixes:
+...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
+.......PS. [ZBX-22408] fixed multiple preprocessing workers trying to index json object at the same time (wiper)
+.......PS. [ZBX-22419] fixed wrongful removal of matching oids (dgoloscapov)
+...G...PS. [ZBX-22368] replaced sigprocmask with pthread_sigmask when libpthread is available (wiper)
+.......PS. [ZBX-22412] fixed dependent items beging generated from discarded master item value (wiper)
+........S. [ZBX-22396] fixed handling of oids of different lengths before index in snmpwalk2json preprocessing step (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0rc2
