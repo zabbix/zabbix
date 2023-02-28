@@ -317,12 +317,12 @@ static void	prepare_include_path(char **raw_path, char **path)
 		wchar_t	*wconfig_path;
 		wchar_t	dir_buf[_MAX_DIR];
 		char	*dir_utf8;
-		
+
 		wconfig_path = zbx_utf8_to_unicode(CONFIG_FILE);
 		_wsplitpath(wconfig_path, NULL, dir_buf, NULL, NULL);
-		
+
 		zbx_free(wconfig_path);
-		
+
 		dir_utf8 = zbx_unicode_to_utf8(dir_buf);
 		*path = zbx_dsprintf(*path, "%s%s", dir_utf8, *raw_path);
 		zbx_free(dir_utf8);
