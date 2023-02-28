@@ -1825,21 +1825,21 @@ static int	DBpatch_6030197(void)
 
 static int	DBpatch_6030198(void)
 {
-	const ZBX_FIELD	field = {"url_a", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"url_a", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("host_inventory", &field, NULL);
 }
 
 static int	DBpatch_6030199(void)
 {
-	const ZBX_FIELD	field = {"url_b", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"url_b", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("host_inventory", &field, NULL);
 }
 
 static int	DBpatch_6030200(void)
 {
-	const ZBX_FIELD	field = {"url_c", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"url_c", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("host_inventory", &field, NULL);
 }
