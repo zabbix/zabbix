@@ -1210,7 +1210,7 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_ptr_t *vr_s
 	{
 		zbx_discovery_results_t	*dst, *src = vr_src->values[i];
 
-		discoverer_job_count_decrease(&dmanager.incomplete_job_count, dst->druleid, dst->ip, 1);
+		discoverer_job_count_decrease(&dmanager.incomplete_job_count, src->druleid, src->ip, 1);
 
 		/* result is incomplete without dnsname so skip it */
 		if (NULL == src->dnsname)
