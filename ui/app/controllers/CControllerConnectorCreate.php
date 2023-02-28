@@ -110,18 +110,24 @@ class CControllerConnectorCreate extends CController {
 		];
 
 		$this->getInputs($connector, ['name', 'protocol', 'data_type', 'url', 'description', 'tags_evaltype']);
+		$tags = $this->getInput('tags', []);
 
-		foreach ($this->getInput('tags', []) as $tag) {
+		foreach ($tags as $id => &$tag) {
 			if ($tag['tag'] === '' && $tag['value'] === '') {
 				continue;
 			}
 
 			if ($tag['operator'] == CONDITION_OPERATOR_EXISTS || $tag['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
 				unset($tag['value']);
+
+				if ($tag['tag'] == '') {
+					unset($tags[$id]);
+				}
 			}
 
-			$connector['tags'][] = $tag;
+			$connector['tags'] = $tags;
 		}
+		unset($tag);
 
 		switch ($connector['authtype']) {
 			case ZBX_HTTP_AUTH_BASIC:
