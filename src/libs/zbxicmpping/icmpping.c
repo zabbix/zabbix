@@ -98,7 +98,7 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  * Return value: SUCCEED if processed successfully or FAIL otherwise          *
  *                                                                            *
  ******************************************************************************/
-static int	get_fping_out(const char *fping, char **out, char *error, int max_error_len)
+static int	get_fping_out(const char *fping, char **out, char *error, size_t max_error_len)
 {
 	FILE	*f;
 	size_t	buf_size = 0, offset = 0;
