@@ -376,7 +376,14 @@ class Group extends ScimApiService {
 					$scim_users = array_column($operation['value'], 'value');
 					$db_users = $this->verifyUserids($scim_users, $userdirectoryid);
 
-					$this->patchAddUserToGroup($options['id'], $scim_users);
+					$db_scim_group_members = DB::select('user_scim_group', [
+						'output' => ['userid'],
+						'filter' => ['scim_groupid' => $options['id'], 'userid' => $scim_users]
+					]);
+					$db_scim_group_members = array_column($db_scim_group_members, 'userid');
+					$new_scim_group_members = array_diff($scim_users, $db_scim_group_members);
+
+					$this->patchAddUserToGroup($options['id'], $new_scim_group_members);
 
 					break;
 

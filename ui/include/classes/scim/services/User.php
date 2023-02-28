@@ -281,19 +281,12 @@ class User extends ScimApiService {
 		$user_data += $provisioning->getUserGroupsAndRole($user_group_names);
 		$user_data['medias'] = $provisioning->getUserMedias($options);
 
-		if ($options['active'] == true) {
-			APIRPC::User()->updateProvisionedUser($user_data);
-
-			$this->setData($db_user['userid'], $db_user['userdirectoryid'], $options);
-		}
-		else {
-			DB::delete('user_scim_group', [
-				'userid' => $user_data['userid']
-			]);
-
+		if ($options['active'] == false) {
 			$user_data['usrgrps'] = [];
-			APIRPC::User()->updateProvisionedUser($user_data);
 		}
+
+		APIRPC::User()->updateProvisionedUser($user_data);
+		$this->setData($db_user['userid'], $db_user['userdirectoryid'], $options);
 
 		return $this->data;
 	}
@@ -412,18 +405,6 @@ class User extends ScimApiService {
 		// If user status 'active' is changed to false, user needs to be added to disabled group.
 		if (array_key_exists('active', $user_data) && strtolower($user_data['active']) == false) {
 			$user_data['usrgrps'] = [];
-
-			$user_groups = DB::select('user_scim_group', [
-				'output' => ['scim_groupid'],
-				'filter' => ['userid' => $options['id']]
-			]);
-
-			if ($user_groups) {
-				DB::delete('user_scim_group', [
-					'userid' => $options['id']
-				]);
-			}
-
 			$user_data['active'] = false;
 		}
 
