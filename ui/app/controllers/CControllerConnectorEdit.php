@@ -127,10 +127,18 @@ class CControllerConnectorEdit extends CController {
 			];
 
 			if ($data['form']['tags']) {
+				foreach ($data['form']['tags'] as $id => $tag) {
+					if ($tag['tag'] == '' && ($tag['operator'] == CONDITION_OPERATOR_EXISTS
+							|| $tag['operator'] == CONDITION_OPERATOR_NOT_EXISTS)) {
+						unset($data['form']['tags'][$id]);
+
+					}
+				}
 				CArrayHelper::sort($data['form']['tags'], ['tag', 'value', 'operator']);
 				$data['form']['tags'] = array_values($data['form']['tags']);
 			}
-			else {
+
+			if (!$data['form']['tags']) {
 				$data['form']['tags'] = [['tag' => '', 'operator' => CONDITION_OPERATOR_EQUAL, 'value' => '']];
 			}
 		}
