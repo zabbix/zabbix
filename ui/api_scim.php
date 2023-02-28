@@ -51,7 +51,7 @@ catch (Throwable $e) {
 	$response = new HttpResponse();
 
 	if (!$e->getCode() || $e instanceof APIException) {
-		$e = new Exception($e->getMessage(), 400);
+		$e = new Exception($e->getMessage(), 500);
 	}
 
 	$response->setException($e);

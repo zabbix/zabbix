@@ -138,7 +138,7 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
 		}
 	}
 
@@ -217,7 +217,7 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
 		}
 
 		if (!in_array(self::SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
@@ -316,7 +316,7 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
 		}
 
 		if (!in_array(self::SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
@@ -453,7 +453,7 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
 		}
 
 		if (!in_array(self::SCIM_PATCH_SCEMA, $options['schemas'], true)) {
@@ -504,7 +504,7 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
 		}
 	}
 

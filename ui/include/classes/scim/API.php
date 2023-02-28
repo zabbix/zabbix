@@ -21,7 +21,6 @@
 
 namespace SCIM;
 
-use APIException;
 use CJsonRpc;
 use Exception;
 use CHttpRequest;
@@ -51,10 +50,6 @@ class API {
 		]);
 
 		if ($response->errorCode !== null) {
-			if ($response->errorCode === ZBX_API_ERROR_PARAMETERS) {
-				throw new APIException($response->errorCode, $response->errorMessage);
-			}
-
 			throw new Exception($response->errorMessage, $response->errorCode);
 		}
 
