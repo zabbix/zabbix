@@ -359,21 +359,11 @@ class Group extends ScimApiService {
 		}
 
 		foreach ($operations as $operation) {
-			// Azure AD sends PATCH Groups request with its own 'externalId' that we do not store.
-			// We just return it back with 200 response code, but do not store it.
-			if ($operation['path'] === 'externalId') {
-				$this->data['externalId'] = $operation['path'];
-				$this->data['value'] = $operation['value'];
-				$this->data['id'] = $options['id'];
-
-				return $this->data;
-			}
-
 			$db_users = [];
 			$scim_users = [];
 			switch ($operation['op']) {
 				case 'add':
-					$scim_users = array_column($operation['value'], 'value');
+					$scim_users = array_column($operation['value'], 'value') ?: [];
 					$db_users = $this->verifyUserids($scim_users, $userdirectoryid);
 
 					$db_scim_group_members = DB::select('user_scim_group', [
