@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,7 +146,7 @@ class testFormGroups extends CWebTest {
 		]);
 		$host_groupids = CDataHelper::getIds('name');
 
-		// Create elements with host gorups.
+		// Create elements with host groups.
 		$host = CDataHelper::createHosts([
 			[
 				'host' => 'Host for host group testing',
@@ -426,7 +426,7 @@ class testFormGroups extends CWebTest {
 	}
 
 	/**
-	 * Test for checking new host creation form.
+	 * Test for checking new group creation form.
 	 *
 	 * @param array $data          data provider
 	 */
@@ -452,7 +452,7 @@ class testFormGroups extends CWebTest {
 	}
 
 	/**
-	 * Test for checking new host creation form.
+	 * Test for checking group form on update.
 	 *
 	 * @param array     $data          data provider
 	 */
@@ -572,16 +572,18 @@ class testFormGroups extends CWebTest {
 		$form = $this->openForm($data['name'], CTestArrayHelper::get($data, 'discovered', false));
 		$footer = ($this->standalone) ? $form : COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
 		$footer->query('button:Clone')->one()->waitUntilClickable()->click();
+		$form->invalidate();
 
 		// Check that the group creation form is open after cloning.
+		$title = 'New '.$this->object.' group';
 		if ($this->standalone) {
-			$this->page->assertHeader('New '.$this->object.' group');
+			$this->page->assertHeader($title);
 		}
 		else {
-			$this->assertEquals('New '.$this->object.' group', COverlayDialogElement::find()->one()->getTitle());
+			$this->assertEquals($title, COverlayDialogElement::find()->one()->waitUntilReady()->getTitle());
 		}
+
 		$this->assertEquals(PHPUNIT_URL.'zabbix.php?action='.$this->object.'group.edit', $this->page->getCurrentUrl());
-		$form->invalidate();
 		$this->assertEquals(['Add', 'Cancel'], $footer->query('button')->all()->filter(CElementFilter::CLICKABLE)->asText());
 		$form->fill(CTestArrayHelper::get($data, 'fields', []));
 		$form->submit();
@@ -669,6 +671,11 @@ class testFormGroups extends CWebTest {
 
 		if ($data['action'] === 'Delete') {
 			$this->page->dismissAlert();
+		}
+
+		// Refresh element after opening new form after cloning.
+		if ($data['action'] === 'Clone') {
+			$footer = ($this->standalone) ? $form->invalidate() : COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
 		}
 
 		$footer->query('button:Cancel')->waitUntilClickable()->one()->click();
