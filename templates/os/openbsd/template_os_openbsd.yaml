@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-24T17:01:23Z'
+  date: '2022-12-19T09:46:26Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -741,6 +741,22 @@ zabbix_export:
                   item:
                     host: 'OpenBSD by Zabbix agent'
                     key: 'vfs.fs.size[{#FSNAME},free]'
+          overrides:
+            -
+              name: 'Skip metadata collection for dynamic FS'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: inode
+                  discover: NO_DISCOVER
       tags:
         -
           tag: class
@@ -773,8 +789,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'OpenBSD by Zabbix agent'
                         name: 'CPU load'
-                        host: 'OpenBSD by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -789,8 +805,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'OpenBSD by Zabbix agent'
                         name: 'CPU utilization'
-                        host: 'OpenBSD by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -805,8 +821,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory usage'
                         host: 'OpenBSD by Zabbix agent'
+                        name: 'Memory usage'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -822,8 +838,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Swap usage'
                         host: 'OpenBSD by Zabbix agent'
+                        name: 'Swap usage'
       valuemaps:
         -
           uuid: 693c226692c548869e77d3313934ca28

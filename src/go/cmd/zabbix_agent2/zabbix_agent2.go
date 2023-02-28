@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -301,7 +301,7 @@ func main() {
 	})
 
 	if argVersion {
-		version.Display([]string{fmt.Sprintf("Plugin support version %d.%d\n", comms.MajorVersion, comms.MinorVersion)})
+		version.Display([]string{fmt.Sprintf("Plugin communication protocol version is %s", comms.ProtocolVersion)})
 		os.Exit(0)
 	}
 
@@ -346,6 +346,21 @@ func main() {
 
 	if err = log.Open(log.Console, log.Warning, "", 0); err != nil {
 		fatalExit("cannot initialize logger", err)
+	}
+
+	if remoteCommand != "" {
+		if agent.Options.ControlSocket == "" {
+			log.Errf("Cannot send remote command: ControlSocket configuration parameter is not defined")
+			os.Exit(0)
+		}
+
+		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand,
+			remoteCommandSendingTimeout); err != nil {
+			log.Errf("Cannot send remote command: %s", err)
+		} else {
+			log.Infof(reply)
+		}
+		os.Exit(0)
 	}
 
 	if pluginsocket, err = initExternalPlugins(&agent.Options); err != nil {
@@ -412,21 +427,6 @@ func main() {
 
 	if argVerbose {
 		fatalExit("", errors.New("verbose parameter can be specified only with test or print parameters"))
-	}
-
-	if remoteCommand != "" {
-		if agent.Options.ControlSocket == "" {
-			log.Errf("Cannot send remote command: ControlSocket configuration parameter is not defined")
-			os.Exit(0)
-		}
-
-		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand,
-			remoteCommandSendingTimeout); err != nil {
-			log.Errf("Cannot send remote command: %s", err)
-		} else {
-			log.Infof(reply)
-		}
-		os.Exit(0)
 	}
 
 	var logType, logLevel int

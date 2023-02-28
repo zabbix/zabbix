@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,9 +24,6 @@ require_once dirname(__FILE__).'/common/testMassUpdateItems.php';
  * Test the mass update of items.
  *
  * @backup items, interface
- *
- * TODO: This annotation should be removed after ZBX-19257 is fixed.
- * @ignoreBrowserErrors
  */
 class testPageMassUpdateItems extends testMassUpdateItems {
 

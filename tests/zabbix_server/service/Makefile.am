@@ -41,6 +41,7 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
@@ -61,7 +62,9 @@ SERVICE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_add_event \
 	-Wl,--wrap=zbx_process_events \
 	-Wl,--wrap=zbx_clean_events \
-	-Wl,--wrap=zbx_interface_availability_is_set
+	-Wl,--wrap=zbx_interface_availability_is_set \
+	-Wl,--wrap=zbx_tsdb_recalc_time_period \
+	-Wl,--wrap=zbx_config_get
 	
 # service_get_rootcause_eventids
 

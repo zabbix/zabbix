@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		}
 
 		/* with successful LLD processing LLD error will be set to empty string */
-		if (NULL != error && 0 != strcmp(error, item.error))
+		if (NULL != error && 0 != strcmp(error, ZBX_NULL2EMPTY_STR(item.error)))
 		{
 			diff.error = error;
 			diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
@@ -228,7 +228,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
-		zbx_update_env(time_read);
+		zbx_update_env(get_process_type_string(process_type), time_read);
 
 		switch (message.code)
 		{
