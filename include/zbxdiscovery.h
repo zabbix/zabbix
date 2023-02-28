@@ -55,6 +55,7 @@ typedef struct
 	int					config_timeout;
 	int					workers_used;
 	int					workers_max;
+	unsigned char				pending;
 }
 zbx_discoverer_drule_job_t;
 

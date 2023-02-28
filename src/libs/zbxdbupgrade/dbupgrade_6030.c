@@ -4223,9 +4223,17 @@ static int	DBpatch_6030191(void)
 
 static int	DBpatch_6030192(void)
 {
-	const ZBX_FIELD	field = {"workers_max", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"workers_max", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("drules", &field);
+}
+
+static int	DBpatch_6030193(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update drules set workers_max=1"))
+		return FAIL;
+
+	return SUCCEED;
 }
 #endif
 
@@ -4424,5 +4432,6 @@ DBPATCH_ADD(6030189, 0, 1)
 DBPATCH_ADD(6030190, 0, 1)
 DBPATCH_ADD(6030191, 0, 1)
 DBPATCH_ADD(6030192, 0, 1)
+DBPATCH_ADD(6030193, 0, 1)
 
 DBPATCH_END()

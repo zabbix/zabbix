@@ -1071,6 +1071,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_p
 			job->workers_used = 0;
 			job->config_timeout = config_timeout;
 			job->drule_revision = drule->revision;
+			job->pending = 0;
 			zbx_list_create(&job->tasks);
 
 			process_rule(drule, &tasks, job_count);
@@ -1311,7 +1312,6 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_net
 
 	zbx_vector_ptr_append_array(&result->services, services.values, services.values_num);
 	discoverer_job_count_decrease(&dmanager.incomplete_job_count, druleid, task->ip, task->dchecks.values_num);
-
 	pthread_rwlock_unlock(&dmanager.results_rwlock);
 
 	zbx_free(value);
@@ -1341,64 +1341,31 @@ static void	*discoverer_net_check(void *net_check_worker)
 			int				index, config_timeout, dismiss = 1;
 			zbx_uint64_t			druleid, drule_revision;
 			zbx_uint64_pair_t		revision, *revision_updated;
-			zbx_discoverer_drule_job_t	job_cmp, *job_pending = NULL;
-			zbx_discoverer_net_check_task_t	*task, *task_next;
+			zbx_discoverer_net_check_task_t	*task;
 
 			if (SUCCEED != zbx_list_pop(&job->tasks, (void*)&task))
 			{
-				zbx_discoverer_job_net_check_free(job);
-				discoverer_queue_lock(queue);
+				if (0 == job->workers_used)
+					zbx_discoverer_job_net_check_free(job);
+
 				continue;
 			}
+
+			job->workers_used++;
+
+			if (0 == job->workers_max || job->workers_used != job->workers_max)
+			{
+				discoverer_queue_push(queue, job);
+				discoverer_queue_notify_all(queue);
+			}
+			else
+				job->pending = 1;
 
 			config_timeout = job->config_timeout;
 			druleid = job->druleid;
 			drule_revision = job->drule_revision;
 
-			if (SUCCEED == zbx_list_peek(&job->tasks, (void*)&task_next))
-			{
-				if (NULL != (job_pending = zbx_hashset_search(&queue->jobs_pending, job)))
-				{
-					job_pending->workers_used++;
-
-					if (job_pending->workers_used == job_pending->workers_max)
-					{
-						zbx_list_destroy(&job_pending->tasks);
-						job_pending->tasks = job->tasks;
-					}
-					else
-					{
-						job->workers_used = job_pending->workers_used;
-						discoverer_queue_push(queue, job);
-						discoverer_queue_notify_all(queue);
-						job = NULL;
-					}
-				}
-				else
-				{
-					job->workers_used++;
-
-					if (job->workers_used != job->workers_max)
-					{
-						discoverer_queue_push(queue, job);
-						discoverer_queue_notify_all(queue);
-					}
-					else
-					{
-						zbx_hashset_insert(&queue->jobs_pending, job,
-								sizeof(zbx_discoverer_drule_job_t));
-					}
-
-					job = NULL;
-				}
-			}
-			else
-				zbx_hashset_remove(&queue->jobs_pending, job);
-
 			discoverer_queue_unlock(queue);
-
-			if (NULL != job)
-				zbx_discoverer_job_net_check_free(job);
 
 			/* check if drule was updated or deleted */
 
@@ -1421,12 +1388,13 @@ static void	*discoverer_net_check(void *net_check_worker)
 				pthread_rwlock_wrlock(&dmanager.results_rwlock);
 				discoverer_job_count_reset(&dmanager.incomplete_job_count, druleid);
 				pthread_rwlock_unlock(&dmanager.results_rwlock);
-
-				if (NULL != job_pending)
-					zbx_hashset_remove_direct(&queue->jobs_pending, job_pending);
-
 				zbx_discoverer_job_net_check_task_free(task);
+
 				discoverer_queue_lock(queue);
+
+				if (0 == job->workers_used)
+					zbx_discoverer_job_net_check_free(job);
+
 				continue;
 			}
 
@@ -1438,25 +1406,17 @@ static void	*discoverer_net_check(void *net_check_worker)
 				discoverer_net_check_icmp(druleid, task);
 
 			zbx_discoverer_job_net_check_task_free(task);
-			job_cmp.druleid = druleid;
 
 			/* proceed to the next job */
 
 			discoverer_queue_lock(queue);
+			job->workers_used--;
 
-			if (NULL != (job_pending = (zbx_hashset_search(&queue->jobs_pending, &job_cmp))))
+			if (1 == job->pending && job->workers_used != job->workers_max)
 			{
-				job_pending->workers_used--;
-
-				if (job_pending->workers_used == job_pending->workers_max)
-				{
-					job = (zbx_discoverer_drule_job_t*)zbx_malloc(NULL,
-							sizeof(zbx_discoverer_drule_job_t));
-					memcpy(job, job_pending, sizeof(zbx_discoverer_drule_job_t));
-
-					discoverer_queue_push(queue, job);
-					discoverer_queue_notify_all(queue);
-				}
+				job->pending = 0;
+				discoverer_queue_push(queue, job);
+				discoverer_queue_notify_all(queue);
 			}
 
 			continue;
