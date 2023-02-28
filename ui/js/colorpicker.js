@@ -344,7 +344,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 		 * @param {callable}  options.onUpdate     Callback function to execute once color has changed.
 		 */
 		return this.each(function (_, element) {
-			const id = $(element).attr('id');
+			const id = element.id;
 
 			if ($('#lbl_' + id).length) {
 				return;
@@ -371,7 +371,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			$(element)
 				.data('use_default', options.use_default)
 				.change(function () {
-					methods.set_color_by_id($(element).attr('id'), this.value);
+					methods.set_color_by_id(element.id, this.value);
 					if (options.onUpdate !== null) {
 						options.onUpdate.call(element, this.value);
 					}
