@@ -314,7 +314,6 @@ Bug fixes:
 ...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
 
 --------------------------------------------------------------------------------
-
 Changes for 6.2.8rc1
 
 New features:
