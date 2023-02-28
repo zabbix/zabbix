@@ -276,6 +276,7 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 			{
 				*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 				zbx_free(obj);
+				cache->type = ZBX_PREPROC_NONE;
 				return FAIL;
 			}
 
@@ -287,6 +288,8 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 			*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 			return FAIL;
 		}
+
+		zbx_jsonobj_disable_indexing(obj);
 	}
 
 	if (NULL == data)
@@ -691,14 +694,15 @@ static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *val
 
 		if (NULL == (prom_cache = (zbx_prometheus_t *)cache->data))
 		{
-			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
-
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 				return FAIL;
+
+			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
 
 			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &err))
 			{
 				zbx_free(prom_cache);
+				cache->type = ZBX_PREPROC_NONE;
 				goto out;
 			}
 
