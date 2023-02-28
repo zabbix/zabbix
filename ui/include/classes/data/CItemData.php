@@ -1279,39 +1279,39 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.hv.cluster.name[url,uuid]' => [
-				'description' => _('VMware hypervisor cluster name, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor cluster name, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.hv.cpu.usage.perf[url,uuid]' => [
-				'description' => _('CPU usage as a percentage during the interval, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('CPU usage as a percentage during the interval, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.hv.cpu.usage[url,uuid]' => [
-				'description' => _('VMware hypervisor processor usage in Hz, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor processor usage in Hz, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.cpu.utilization[url,uuid]' => [
-				'description' => _('CPU usage as a percentage during the interval depends on power management or HT, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('CPU usage as a percentage during the interval depends on power management or HT, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.hv.datacenter.name[url,uuid]' => [
-				'description' => _('VMware hypervisor datacenter name, "url" - VMware service URL, "uuid" - VMware hypervisor host name. Returns string'),
+				'description' => _('VMware hypervisor datacenter name, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier. Returns string'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.hv.datastore.discovery[url,uuid]' => [
-				'description' => _('Discovery of VMware hypervisor datastores, "url" - VMware service URL, "uuid" - VMware hypervisor host name. Returns JSON'),
+				'description' => _('Discovery of VMware hypervisor datastores, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier. Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.hv.datastore.list[url,uuid]' => [
-				'description' => _('VMware hypervisor datastores list, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor datastores list, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.hv.datastore.multipath[url,uuid,<datastore>,<partitionid>]' => [
-				'description' => _('Number of available DS paths, "url" - VMware service URL, "uuid" - VMware hypervisor host name, "datastore" - Datastore name, "partitionid" - internal id of physical device from vmware.hv.datastore.discovery'),
+				'description' => _('Number of available DS paths, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier, "datastore" - Datastore name, "partitionid" - internal id of physical device from vmware.hv.datastore.discovery'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.datastore.read[url,uuid,datastore,<mode>]' => [
-				'description' => _('VMware hypervisor datastore read statistics, "url" - VMware service URL, "uuid" - VMware hypervisor host name, "datastore" - datastore name, "mode" - latency'),
+				'description' => _('VMware hypervisor datastore read statistics, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier, "datastore" - datastore name, "mode" - latency'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.hv.datastore.size[url,uuid,datastore,<mode>]' => [
@@ -1319,7 +1319,7 @@ final class CItemData {
 				'value_type' => null
 			],
 			'vmware.hv.datastore.write[url,uuid,datastore,<mode>]' => [
-				'description' => _('VMware hypervisor datastore write statistics, "url" - VMware service URL, "uuid" - VMware hypervisor host name, "datastore" - datastore name, "mode" - latency'),
+				'description' => _('VMware hypervisor datastore write statistics, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier, "datastore" - datastore name, "mode" - latency'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.hv.discovery[url]' => [
@@ -1327,91 +1327,91 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.hv.fullname[url,uuid]' => [
-				'description' => _('VMware hypervisor name, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor name, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.hv.hw.cpu.freq[url,uuid]' => [
-				'description' => _('VMware hypervisor processor frequency, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor processor frequency, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.hv.hw.cpu.model[url,uuid]' => [
-				'description' => _('VMware hypervisor processor model, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor processor model, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.hv.hw.cpu.num[url,uuid]' => [
-				'description' => _('Number of processor cores on VMware hypervisor, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('Number of processor cores on VMware hypervisor, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.hw.cpu.threads[url,uuid]' => [
-				'description' => _('Number of processor threads on VMware hypervisor, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('Number of processor threads on VMware hypervisor, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.hw.memory[url,uuid]' => [
-				'description' => _('VMware hypervisor total memory size, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor total memory size, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.hw.model[url,uuid]' => [
-				'description' => _('VMware hypervisor model, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor model, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.hv.hw.uuid[url,uuid]' => [
-				'description' => _('VMware hypervisor BIOS UUID, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor BIOS UUID, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.hv.hw.vendor[url,uuid]' => [
-				'description' => _('VMware hypervisor vendor name, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor vendor name, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.hv.maintenance[url,uuid]' => [
-				'description' => _('VVMware hypervisor maintenance status, "url" - VMware service URL, "uuid" - VMware hypervisor host name. Returns 0 - not in maintenance; 1 - in maintenance'),
+				'description' => _('VVMware hypervisor maintenance status, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.memory.size.ballooned[url,uuid]' => [
-				'description' => _('VMware hypervisor ballooned memory size, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor ballooned memory size, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.memory.used[url,uuid]' => [
-				'description' => _('VMware hypervisor used memory size, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor used memory size, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.network.in[url,uuid,<mode>]' => [
-				'description' => _('VMware hypervisor network input statistics, "url" - VMware service URL, "uuid" - VMware hypervisor host name, "mode" - "bps"'),
+				'description' => _('VMware hypervisor network input statistics, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier, "mode" - "bps"'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.network.out[url,uuid,<mode>]' => [
-				'description' => _('VMware hypervisor network output statistics, "url" - VMware service URL, "uuid" - VMware hypervisor host name, "mode" - "bps"'),
+				'description' => _('VMware hypervisor network output statistics, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier, "mode" - "bps"'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.perfcounter[url,uuid,path,<instance>]' => [
-				'description' => _('VMware hypervisor performance counter, "url" - VMware service URL, "uuid" - VMware hypervisor host name, "path" - performance counter path, "instance" - performance counter instance'),
+				'description' => _('VMware hypervisor performance counter, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier, "path" - performance counter path, "instance" - performance counter instance'),
 				'value_type' => null
 			],
 			'vmware.hv.power[url,uuid,<max>]' => [
-				'description' => _('Power usage , "url" - VMware service URL, "uuid" - VMware hypervisor host name, "max" - Maximum allowed power usage'),
+				'description' => _('Power usage , "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier, "max" - Maximum allowed power usage'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.hv.sensor.health.state[url,uuid]' => [
-				'description' => _('VMware hypervisor health state rollup sensor, "url" - VMware service URL, "uuid" - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red'),
+				'description' => _('VMware hypervisor health state rollup sensor, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.sensors.get[url,uuid]' => [
-				'description' => _('VMware hypervisor HW vendor state sensors, "url" - VMware service URL, "uuid" - VMware hypervisor host name. Returns JSON'),
+				'description' => _('VMware hypervisor HW vendor state sensors, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier. Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.hv.status[url,uuid]' => [
-				'description' => _('VMware hypervisor status, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor status, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => null
 			],
 			'vmware.hv.uptime[url,uuid]' => [
-				'description' => _('VMware hypervisor uptime, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor uptime, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.version[url,uuid]' => [
-				'description' => _('VMware hypervisor version, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('VMware hypervisor version, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.hv.vm.num[url,uuid]' => [
-				'description' => _('Number of virtual machines on VMware hypervisor, "url" - VMware service URL, "uuid" - VMware hypervisor host name'),
+				'description' => _('Number of virtual machines on VMware hypervisor, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.version[url]' => [
@@ -1419,39 +1419,39 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.vm.cluster.name[url,uuid]' => [
-				'description' => _('VMware virtual machine name, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine name, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.vm.cpu.latency[url,uuid]' => [
-				'description' => _('Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.vm.cpu.num[url,uuid]' => [
-				'description' => _('Number of processors on VMware virtual machine, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('Number of processors on VMware virtual machine, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.cpu.readiness[url,uuid,<instance>]' => [
-				'description' => _('Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, "url" - VMware service URL, "uuid" - VMware virtual machine host name, "instance" - CPU instance'),
+				'description' => _('Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "instance" - CPU instance'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.vm.cpu.ready[url,uuid]' => [
-				'description' => _('VMware virtual machine processor ready time ms, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine processor ready time ms, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.cpu.swapwait[url,uuid,<instance>]' => [
-				'description' => _('CPU time spent waiting for swap-in, "url" - VMware service URL, "uuid" - VMware virtual machine host name, "instance" - CPU instance'),
+				'description' => _('CPU time spent waiting for swap-in, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "instance" - CPU instance'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.cpu.usage.perf[url,uuid]' => [
-				'description' => _('CPU usage as a percentage during the interval, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('CPU usage as a percentage during the interval, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.cpu.usage[url,uuid]' => [
-				'description' => _('VMware virtual machine processor usage in Hz, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine processor usage in Hz, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.datacenter.name[url,uuid]' => [
-				'description' => _('VMware virtual machine datacenter name, "url" - VMware service URL, "uuid" - VMware virtual machine host name. Returns string'),
+				'description' => _('VMware virtual machine datacenter name, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier. Returns string'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.vm.discovery[url]' => [
@@ -1459,131 +1459,131 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.vm.guest.memory.size.swapped[url,uuid]' => [
-				'description' => _('Amount of guest physical memory that is swapped out to the swap space, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('Amount of guest physical memory that is swapped out to the swap space, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.guest.osuptime[url,uuid]' => [
-				'description' => _('Total time elapsed, in seconds, since last operating system boot-up, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('Total time elapsed, in seconds, since last operating system boot-up, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.hv.name[url,uuid]' => [
-				'description' => _('VMware virtual machine hypervisor name, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine hypervisor name, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.vm.memory.size.ballooned[url,uuid]' => [
-				'description' => _('VMware virtual machine ballooned memory size, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine ballooned memory size, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.memory.size.compressed[url,uuid]' => [
-				'description' => _('VMware virtual machine compressed memory size, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine compressed memory size, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.memory.size.consumed[url,uuid]' => [
-				'description' => _('Amount of host physical memory consumed for backing up guest physical memory pages, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('Amount of host physical memory consumed for backing up guest physical memory pages, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.memory.size.private[url,uuid]' => [
-				'description' => _('VMware virtual machine private memory size, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine private memory size, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.memory.size.shared[url,uuid]' => [
-				'description' => _('VMware virtual machine shared memory size, "url" - VMware service URL, "uuid - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine shared memory size, "url" - VMware service URL, "uuid - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.memory.size.swapped[url,uuid]' => [
-				'description' => _('VMware virtual machine swapped memory size, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine swapped memory size, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.memory.size.usage.guest[url,uuid]' => [
-				'description' => _('VMware virtual machine guest memory usage, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine guest memory usage, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.memory.size.usage.host[url,uuid]' => [
-				'description' => _('VMware virtual machine host memory usage, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine host memory usage, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.memory.size[url,uuid]' => [
-				'description' => _('VMware virtual machine total memory size, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine total memory size, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.memory.usage[url,uuid]' => [
-				'description' => _('Percentage of host physical memory that has been consumed, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('Percentage of host physical memory that has been consumed, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.vm.net.if.discovery[url,uuid]' => [
-				'description' => _('Discovery of VMware virtual machine network interfaces, "url" - VMware service URL, "uuid" - VMware virtual machine host name. Returns JSON'),
+				'description' => _('Discovery of VMware virtual machine network interfaces, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier. Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.vm.net.if.in[url,uuid,instance,<mode>]' => [
-				'description' => _('VMware virtual machine network interface input statistics, "url" - VMware service URL, "uuid" - VMware virtual machine host name, "instance" - network interface instance, "mode" - bps/pps - bytes/packets per second'),
+				'description' => _('VMware virtual machine network interface input statistics, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "instance" - network interface instance, "mode" - bps/pps - bytes/packets per second'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.vm.net.if.out[url,uuid,instance,<mode>]' => [
-				'description' => _('VMware virtual machine network interface output statistics, "url" - VMware service URL, "uuid" - VMware virtual machine host name, "instance" - network interface instance, "mode" - bps/pps - bytes/packets per second'),
+				'description' => _('VMware virtual machine network interface output statistics, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "instance" - network interface instance, "mode" - bps/pps - bytes/packets per second'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.vm.net.if.usage[url,uuid,<instance>]' => [
-				'description' => _('Network utilization (combined transmit-rates and receive-rates) during the interval, "url" - VMware service URL, "uuid" - VMware virtual machine host name, "instance" - network interface instance'),
+				'description' => _('Network utilization (combined transmit-rates and receive-rates) during the interval, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "instance" - network interface instance'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.vm.perfcounter[url,uuid,path,<instance>]' => [
-				'description' => _('VMware virtual machine performance counter, "url" - VMware service URL, "uuid" - VMware virtual machine host name, "path" - performance counter path, "instance" - performance counter instance'),
+				'description' => _('VMware virtual machine performance counter, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "path" - performance counter path, "instance" - performance counter instance'),
 				'value_type' => null
 			],
 			'vmware.vm.powerstate[url,uuid]' => [
-				'description' => _('VMware virtual machine power state, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine power state, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.storage.committed[url,uuid]' => [
-				'description' => _('VMware virtual machine committed storage space, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine committed storage space, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => null
 			],
 			'vmware.vm.storage.readoio[url,uuid,instance]' => [
-				'description' => _('Average number of outstanding read requests to the virtual disk during the collection interval , "url" - VMware service URL, "uuid" - VMware virtual machine host name, "instance" - disk device instance'),
+				'description' => _('Average number of outstanding read requests to the virtual disk during the collection interval , "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "instance" - disk device instance'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.storage.totalreadlatency[url,uuid,instance]' => [
-				'description' => _('The average time a read from the virtual disk takes, "url" - VMware service URL, "uuid" - VMware virtual machine host name, "instance" - disk device instance'),
+				'description' => _('The average time a read from the virtual disk takes, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "instance" - disk device instance'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.storage.totalwritelatency[url,uuid,instance]' => [
-				'description' => _('The average time a write to the virtual disk takes, "url" - VMware service URL, "uuid" - VMware virtual machine host name, "instance" - disk device instance'),
+				'description' => _('The average time a write to the virtual disk takes, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "instance" - disk device instance'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.storage.uncommitted[url,uuid]' => [
-				'description' => _('VMware virtual machine uncommitted storage space, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine uncommitted storage space, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.storage.unshared[url,uuid]' => [
-				'description' => _('VMware virtual machine unshared storage space, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine unshared storage space, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.storage.writeoio[url,uuid,instance]' => [
-				'description' => _('Average number of outstanding write requests to the virtual disk during the collection interval, "url" - VMware service URL, "uuid" - VMware virtual machine host name, "instance" - disk device instance'),
+				'description' => _('Average number of outstanding write requests to the virtual disk during the collection interval, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "instance" - disk device instance'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.uptime[url,uuid]' => [
-				'description' => _('VMware virtual machine uptime, "url" - VMware service URL, "uuid" - VMware virtual machine host name'),
+				'description' => _('VMware virtual machine uptime, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.vm.vfs.dev.discovery[url,uuid]' => [
-				'description' => _('Discovery of VMware virtual machine disk devices, "url" - VMware service URL, "uuid" - VMware virtual machine host name. Returns JSON'),
+				'description' => _('Discovery of VMware virtual machine disk devices, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier. Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.vm.vfs.dev.read[url,uuid,instance,<mode>]' => [
-				'description' => _('VMware virtual machine disk device read statistics, "url" - VMware service URL, "uuid" - VMware virtual machine host name, "instance" - disk device instance, "mode" - bps/ops - bytes/operations per second'),
+				'description' => _('VMware virtual machine disk device read statistics, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "instance" - disk device instance, "mode" - bps/ops - bytes/operations per second'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.vm.vfs.dev.write[url,uuid,instance,<mode>]' => [
-				'description' => _('VMware virtual machine disk device write statistics, "url" - VMware service URL, "uuid" - VMware virtual machine host name, "instance" - disk device instance, "mode" - bps/ops - bytes/operations per second'),
+				'description' => _('VMware virtual machine disk device write statistics, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "instance" - disk device instance, "mode" - bps/ops - bytes/operations per second'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.vm.vfs.fs.discovery[url,uuid]' => [
-				'description' => _('Discovery of VMware virtual machine file systems, "url" - VMware service URL, "uuid" - VMware virtual machine host name. Returns JSON'),
+				'description' => _('Discovery of VMware virtual machine file systems, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier. Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.vm.vfs.fs.size[url,uuid,fsname,<mode>]' => [
-				'description' => _('VMware virtual machine file system statistics, "url" - VMware service URL, "uuid" - VMware virtual machine host name, "fsname" - file system name, "mode" - total/free/used/pfree/pused'),
+				'description' => _('VMware virtual machine file system statistics, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier, "fsname" - file system name, "mode" - total/free/used/pfree/pused'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'web.page.get[host,<path>,<port>]' => [
