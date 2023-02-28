@@ -255,7 +255,7 @@ class testFormHost extends CWebTest {
 			'SNMPv2' => ['SNMP version', 'SNMP community', 'Use bulk requests'],
 			'SNMPv3' => ['SNMP version', 'Context name', 'Security name', 'Security level', 'Use bulk requests'],
 			'authNoPriv' => ['SNMP version', 'Context name', 'Security name', 'Security level',
-				'Authentication protocol', 'Authentication passphrase', 'Use combined requests'
+				'Authentication protocol', 'Authentication passphrase', 'Use bulk requests'
 			]
 		];
 

@@ -108,7 +108,7 @@ class testFormGroups extends CWebTest {
 		]);
 		$host_groupids = CDataHelper::getIds('name');
 
-		// Create elements with host gorups.
+		// Create elements with host groups.
 		$host = CDataHelper::createHosts([
 			[
 				'host' => 'Host for host group testing',
@@ -378,7 +378,7 @@ class testFormGroups extends CWebTest {
 	}
 
 	/**
-	 * Test for checking new host creation form.
+	 * Test for checking new group creation form.
 	 *
 	 * @param array $data          data provider
 	 */
@@ -404,7 +404,7 @@ class testFormGroups extends CWebTest {
 	}
 
 	/**
-	 * Test for checking host group form on update
+	 * Test for checking host group form on update.
 	 *
 	 * @param array     $data          data provider
 	 */
