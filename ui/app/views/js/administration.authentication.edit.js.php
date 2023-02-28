@@ -101,8 +101,8 @@
 			});
 
 			this.ldap_jit_status.addEventListener('change', (e) => {
-				this.jit_provision_interval.toggleAttribute('readonly', !e.target.checked)
-				this.jit_provision_interval.toggleAttribute('disabled', !e.target.checked)
+				this.jit_provision_interval.toggleAttribute('readonly', !e.target.checked);
+				this.jit_provision_interval.toggleAttribute('disabled', !e.target.checked);
 			});
 
 			this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]').addEventListener('change', (e) => {
