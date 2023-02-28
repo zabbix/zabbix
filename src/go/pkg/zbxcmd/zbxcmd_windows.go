@@ -23,6 +23,7 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -38,10 +39,22 @@ type process struct {
 	Handle uintptr
 }
 
-var ntResumeProcess *syscall.Proc
+var (
+	ntResumeProcess *syscall.Proc
+	cmd_path        string
+)
 
 func execute(s string, timeout time.Duration, path string, strict bool) (out string, err error) {
-	cmd := exec.Command("cmd")
+	if cmd_path == "" {
+		cmd_exe := "cmd.exe"
+		if cmd_exe, err = exec.LookPath(cmd_exe); err != nil {
+			return "", fmt.Errorf("Cannot find path to %s command: %s", cmd_exe, err)
+		}
+		if cmd_path, err = filepath.Abs(cmd_exe); err != nil {
+			return "", fmt.Errorf("Cannot find full path to %s command: %s", cmd_exe, err)
+		}
+	}
+	cmd := exec.Command(cmd_path)
 	cmd.Dir = path
 
 	var b bytes.Buffer
@@ -107,13 +120,22 @@ func execute(s string, timeout time.Duration, path string, strict bool) (out str
 	return strings.TrimRight(b.String(), " \t\r\n"), nil
 }
 
-func ExecuteBackground(s string) error {
-	cmd := exec.Command("cmd")
+func ExecuteBackground(s string) (err error) {
+	if cmd_path == "" {
+		cmd_exe := "cmd.exe"
+		if cmd_exe, err = exec.LookPath(cmd_exe); err != nil {
+			return fmt.Errorf("Cannot find path to %s command: %s", cmd_exe, err)
+		}
+		if cmd_path, err = filepath.Abs(cmd_exe); err != nil {
+			return fmt.Errorf("Cannot find full path to %s command: %s", cmd_exe, err)
+		}
+	}
+	cmd := exec.Command(cmd_path)
 	cmd.SysProcAttr = &windows.SysProcAttr{
 		CmdLine: fmt.Sprintf(`/C %s`, s),
 	}
 
-	if err := cmd.Start(); err != nil {
+	if err = cmd.Start(); err != nil {
 		return fmt.Errorf("Cannot execute command: %s", err)
 	}
 
