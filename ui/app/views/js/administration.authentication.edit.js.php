@@ -96,26 +96,10 @@
 				}
 			});
 
-			const enable_ldap = this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]').checked;
-			const enable_provisioning = this.form.querySelector('[type="checkbox"][name="ldap_jit_status"]').checked;
-
-			this.ldap_provisioning_fields.forEach(field => {
-				if (field.name === 'jit_provision_interval') {
-					field.toggleAttribute('readonly', !(enable_ldap && enable_provisioning));
-					field.toggleAttribute('disabled', !(enable_ldap && enable_provisioning));
-				}
-				else {
-					field.toggleAttribute('readonly', !enable_ldap);
-					field.toggleAttribute('disabled', !enable_ldap);
-				}
-			});
-
-			const jit_povision_interval = this.form.querySelector('[name="jit_provision_interval"]');
-
-			this.ldap_jit_status.addEventListener('change', (e) => {
-				jit_povision_interval.toggleAttribute('readonly', !e.target.checked)
-				jit_povision_interval.toggleAttribute('disabled', !e.target.checked)
-			});
+			this.ldap_jit_status.addEventListener('change', (e) =>
+				this.form.querySelector('[name="jit_provision_interval"]')
+					.toggleAttribute('readonly', !e.target.checked)
+			);
 
 			this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]').addEventListener('change', (e) => {
 				const is_readonly = !e.target.checked;
@@ -124,15 +108,13 @@
 
 				this.ldap_provisioning_fields.forEach(field => {
 					field.toggleAttribute('readonly', is_readonly);
-					field.toggleAttribute('disabled', is_readonly);
 					field.setAttribute('tabindex', is_readonly ? -1 : 0);
 				});
 				this._setTableVisiblityState(this.ldap_servers_table, is_readonly);
 				this._disableRemoveLdapServersWithUserGroups();
 
 				if (!is_readonly && !this.ldap_jit_status.checked) {
-					jit_povision_interval.toggleAttribute('readonly', true);
-					jit_povision_interval.toggleAttribute('disabled', true);
+					this.form.querySelector('[name="jit_provision_interval"]').toggleAttribute('readonly', true);
 				}
 
 				if (is_readonly && default_index && ldap_default_row_index) {
@@ -183,19 +165,11 @@
 				}
 			});
 
-			const saml_enabled = document.getElementById('saml_auth_enabled').checked;
-
-			this.form.querySelectorAll('.saml-enabled').forEach(field => {
-				field.toggleAttribute('readonly', !saml_enabled);
-				field.toggleAttribute('disabled', !saml_enabled);
-			});
-
 			document.getElementById('saml_auth_enabled').addEventListener('change', (e) => {
 				const is_readonly = !e.target.checked;
 
 				this.form.querySelectorAll('.saml-enabled').forEach(field => {
 					field.toggleAttribute('readonly', is_readonly);
-					field.toggleAttribute('disabled', is_readonly);
 					field.setAttribute('tabindex', is_readonly ? -1 : 0);
 				});
 				this._setTableVisiblityState(this.saml_provision_groups_table, is_readonly);
