@@ -79,8 +79,8 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(Widget::SHOW_GROUPS)
 				: null
 			)
-			->addField(
-				(new CWidgetFieldRadioButtonList('layout', _('Layout'), [
+			->addField($this->templateid === null
+				? (new CWidgetFieldRadioButtonList('layout', _('Layout'), [
 					STYLE_HORIZONTAL => _('Horizontal'),
 					STYLE_VERTICAL => _('Vertical')
 				]))
@@ -91,6 +91,7 @@ class WidgetForm extends CWidgetForm {
 						? CWidgetField::FLAG_DISABLED
 						: 0x00
 					)
+				: null,
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('show_opdata', _('Show operational data'), [

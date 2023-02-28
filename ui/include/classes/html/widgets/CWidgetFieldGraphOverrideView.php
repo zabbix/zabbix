@@ -348,7 +348,6 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 				'add_post_js' => false
 			]);
 
-
 		$item_pattern_field
 			->setEnabled(!$this->isDisabled())
 			->setAriaRequired($this->isRequired());

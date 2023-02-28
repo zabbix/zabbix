@@ -29,219 +29,252 @@ use API,
 
 class WidgetView extends CControllerDashboardWidgetView {
 
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules([
+			'dynamic_hostid' => 'db hosts.hostid'
+		]);
+	}
+
 	protected function doAction(): void {
-		$filter_groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
-		$filter_hostids = $this->fields_values['hostids'] ?: null;
-		$filter_problem = $this->fields_values['problem'] !== '' ? $this->fields_values['problem'] : null;
-		$filter_severities = $this->fields_values['severities'] ?: range(TRIGGER_SEVERITY_NOT_CLASSIFIED,
-			TRIGGER_SEVERITY_COUNT - 1
-		);
-		$filter_show_suppressed = $this->fields_values['show_suppressed'];
-		$filter_ext_ack = $this->fields_values['ext_ack'];
+		$is_template_dashboard = $this->hasInput('templateid');
 
-		if ($this->fields_values['exclude_groupids']) {
-			$exclude_groupids = getSubGroups($this->fields_values['exclude_groupids']);
-
-			if ($filter_hostids === null) {
-				// Get all groups if no selected groups defined.
-				if ($filter_groupids === null) {
-					$filter_groupids = array_keys(API::HostGroup()->get([
-						'output' => [],
-						'with_hosts' => true,
-						'preservekeys' => true
-					]));
-				}
-
-				$filter_groupids = array_diff($filter_groupids, $exclude_groupids);
-
-				// Get available hosts.
-				$filter_hostids = array_keys(API::Host()->get([
-					'output' => [],
-					'groupids' => $filter_groupids,
-					'preservekeys' => true
-				]));
-			}
-
-			$exclude_hostids = array_keys(API::Host()->get([
-				'output' => [],
-				'groupids' => $exclude_groupids,
-				'preservekeys' => true
-			]));
-
-			$filter_hostids = array_diff($filter_hostids, $exclude_hostids);
-		}
-
-		// Get host groups.
-		$groups = API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $filter_groupids,
-			'hostids' => $filter_hostids,
-			'with_monitored_hosts' => true,
-			'preservekeys' => true
-		]);
-
-		foreach ($groups as $groupid => $group) {
-			$groups[$groupid]['highest_severity'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-			$groups[$groupid]['hosts_total_count'] = 0;
-			$groups[$groupid]['hosts_problematic_unack_count'] = 0;
-			$groups[$groupid]['hosts_problematic_unack_list'] = [];
-
-			if ($filter_ext_ack != EXTACK_OPTION_UNACK) {
-				$groups[$groupid]['hosts_problematic_count'] = 0;
-				$groups[$groupid]['hosts_problematic_list'] = [];
-			}
-		}
-
-		// Get hosts.
-		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
-			'selectHostGroups' => ['groupid'],
-			'groupids' => array_keys($groups),
-			'hostids' => $filter_hostids,
-			'filter' => [
-				'maintenance_status' => null
-			],
-			'monitored_hosts' => true,
-			'preservekeys' => true
-		]);
-
-		// Get triggers.
-		$triggers = API::Trigger()->get([
-			'output' => [],
-			'selectHosts' => ['hostid'],
-			'hostids' => array_keys($hosts),
-			'groupids' => array_keys($groups),
-			'filter' => [
-				'value' => TRIGGER_VALUE_TRUE
-			],
-			'monitored' => true,
-			'preservekeys' => true
-		]);
-
-		// Add default values for each host group and count hosts inside.
-		foreach ($hosts as $host) {
-			foreach ($host['hostgroups'] as $group) {
-				if (array_key_exists($group['groupid'], $groups)) {
-					$groups[$group['groupid']]['hosts_total_count']++;
-				}
-			}
-		}
-
-		// Get problems.
-		$problems = API::Problem()->get([
-			'output' => ['objectid', 'acknowledged', 'severity'],
-			'groupids' => array_keys($groups),
-			'hostids' => array_keys($hosts),
-			'objectids' => array_keys($triggers),
-			'search' => [
-				'name' => $filter_problem
-			],
-			'severities' => $filter_severities,
-			'evaltype' => $this->fields_values['evaltype'],
-			'tags' => $this->fields_values['tags'],
-			'acknowledged' => ($filter_ext_ack == EXTACK_OPTION_UNACK) ? false : null,
-			'suppressed' => ($filter_show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
-			'symptom' => false
-		]);
-
-		$hosts_data = [];
-
-		// Process problems.
-		foreach ($problems as $problem) {
-			foreach ($triggers[$problem['objectid']]['hosts'] as $trigger_host) {
-				if (!array_key_exists($trigger_host['hostid'], $hosts)) {
-					continue;
-				}
-
-				$host = $hosts[$trigger_host['hostid']];
-
-				// Prepare hosts data for tables displayed in hintboxes.
-				if (!array_key_exists($host['hostid'], $hosts_data)) {
-					$hosts_data[$host['hostid']] = [
-						'host' => $host['name'],
-						'hostid' => $host['hostid'],
-						'maintenanceid' => $host['maintenanceid'],
-						'maintenance_status' => $host['maintenance_status'],
-						'maintenance_type' => $host['maintenance_type'],
-						'severities' => array_fill_keys($filter_severities, 0)
-					];
-				}
-
-				// Count number of host problems per severity.
-				$hosts_data[$host['hostid']]['severities'][$problem['severity']]++;
-
-				// Propagate problem to all host groups in which host is added.
-				foreach ($host['hostgroups'] as $group) {
-					$groupid = $group['groupid'];
-
-					if (!array_key_exists($groupid, $groups)) {
-						continue;
-					}
-
-					// Searches for the highest severity set for filtered problems in particular host group.
-					if ($problem['severity'] > $groups[$groupid]['highest_severity']) {
-						$groups[$groupid]['highest_severity'] = $problem['severity'];
-					}
-
-					/**
-					 * Counts:
-					 *  - problematic hosts (hosts with events in 'problem' state);
-					 *  - unacknowledged problematic hosts (hosts with unacknowledged events in 'problem' state).
-					 *
-					 * Creates a list of problematic hosts and unacknowledged problematic hosts for each host group.
-					 *
-					 * Each host need to be counted only one time in each host group.
-					 * Host name is added for sorting.
-					 */
-					if ($filter_ext_ack != EXTACK_OPTION_UNACK
-							&& !array_key_exists($host['hostid'], $groups[$groupid]['hosts_problematic_list'])) {
-						$groups[$groupid]['hosts_problematic_list'][$host['hostid']]['name'] = $host['name'];
-						$groups[$groupid]['hosts_problematic_count']++;
-					}
-
-					if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED
-							&& !array_key_exists($host['hostid'], $groups[$groupid]['hosts_problematic_unack_list'])) {
-						$groups[$groupid]['hosts_problematic_unack_list'][$host['hostid']]['name'] = $host['name'];
-						$groups[$groupid]['hosts_problematic_unack_count']++;
-					}
-				}
-			}
-		}
-
-		// Sort results.
-		foreach ($groups as $groupid => $group) {
-			if ($group['hosts_total_count'] != 0) {
-				CArrayHelper::sort($groups[$groupid]['hosts_problematic_unack_list'], ['name']);
-
-				if ($filter_ext_ack != EXTACK_OPTION_UNACK) {
-					CArrayHelper::sort($groups[$groupid]['hosts_problematic_list'], ['name']);
-				}
-			}
-			else {
-				// Unset groups without any monitored hosts.
-				unset($groups[$groupid]);
-			}
-		}
-
-		CArrayHelper::sort($groups, ['name']);
-
-		// Pass results to view.
-		$this->setResponse(new CControllerResponseData([
+		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'filter' => [
-				'hostids' => $this->fields_values['hostids'],
-				'problem' => $this->fields_values['problem'],
-				'severities' => $filter_severities,
-				'show_suppressed' => $this->fields_values['show_suppressed'],
-				'hide_empty_groups' => $this->fields_values['hide_empty_groups'],
-				'ext_ack' => $this->fields_values['ext_ack']
-			],
-			'hosts_data' => $hosts_data,
-			'groups' => $groups,
+			'error' => null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
 			'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
-		]));
+		];
+
+		// Editing template dashboard?
+		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+			$data['error'] = _('No data.');
+		}
+		else {
+			$filter_groupids = !$is_template_dashboard && $this->fields_values['groupids']
+				? getSubGroups($this->fields_values['groupids'])
+				: null;
+
+			if ($is_template_dashboard) {
+				$filter_hostids = [$this->getInput('dynamic_hostid')];
+			}
+			else {
+				$filter_hostids = $this->fields_values['hostids'] ?: null;
+			}
+
+			$filter_problem = $this->fields_values['problem'] !== '' ? $this->fields_values['problem'] : null;
+			$filter_severities = $this->fields_values['severities'] ?: range(TRIGGER_SEVERITY_NOT_CLASSIFIED,
+				TRIGGER_SEVERITY_COUNT - 1
+			);
+			$filter_show_suppressed = $this->fields_values['show_suppressed'];
+			$filter_ext_ack = $this->fields_values['ext_ack'];
+
+			if (!$is_template_dashboard && $this->fields_values['exclude_groupids']) {
+				$exclude_groupids = getSubGroups($this->fields_values['exclude_groupids']);
+
+				if ($filter_hostids === null) {
+					// Get all groups if no selected groups defined.
+					if ($filter_groupids === null) {
+						$filter_groupids = array_keys(API::HostGroup()->get([
+							'output' => [],
+							'with_hosts' => true,
+							'preservekeys' => true
+						]));
+					}
+
+					$filter_groupids = array_diff($filter_groupids, $exclude_groupids);
+
+					// Get available hosts.
+					$filter_hostids = array_keys(API::Host()->get([
+						'output' => [],
+						'groupids' => $filter_groupids,
+						'preservekeys' => true
+					]));
+				}
+
+				$exclude_hostids = array_keys(API::Host()->get([
+					'output' => [],
+					'groupids' => $exclude_groupids,
+					'preservekeys' => true
+				]));
+
+				$filter_hostids = array_diff($filter_hostids, $exclude_hostids);
+			}
+
+			// Get host groups.
+			$groups = API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $filter_groupids,
+				'hostids' => $filter_hostids,
+				'with_monitored_hosts' => true,
+				'preservekeys' => true
+			]);
+
+			foreach ($groups as $groupid => $group) {
+				$groups[$groupid]['highest_severity'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+				$groups[$groupid]['hosts_total_count'] = 0;
+				$groups[$groupid]['hosts_problematic_unack_count'] = 0;
+				$groups[$groupid]['hosts_problematic_unack_list'] = [];
+
+				if ($filter_ext_ack != EXTACK_OPTION_UNACK) {
+					$groups[$groupid]['hosts_problematic_count'] = 0;
+					$groups[$groupid]['hosts_problematic_list'] = [];
+				}
+			}
+
+			// Get hosts.
+			$hosts = API::Host()->get([
+				'output' => ['hostid', 'name', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
+				'selectHostGroups' => ['groupid'],
+				'groupids' => array_keys($groups),
+				'hostids' => $filter_hostids,
+				'filter' => [
+					'maintenance_status' => null
+				],
+				'monitored_hosts' => true,
+				'preservekeys' => true
+			]);
+
+			// Get triggers.
+			$triggers = API::Trigger()->get([
+				'output' => [],
+				'selectHosts' => ['hostid'],
+				'hostids' => array_keys($hosts),
+				'groupids' => array_keys($groups),
+				'filter' => [
+					'value' => TRIGGER_VALUE_TRUE
+				],
+				'monitored' => true,
+				'preservekeys' => true
+			]);
+
+			// Add default values for each host group and count hosts inside.
+			foreach ($hosts as $host) {
+				foreach ($host['hostgroups'] as $group) {
+					if (array_key_exists($group['groupid'], $groups)) {
+						$groups[$group['groupid']]['hosts_total_count']++;
+					}
+				}
+			}
+
+			// Get problems.
+			$problems = API::Problem()->get([
+				'output' => ['objectid', 'acknowledged', 'severity'],
+				'groupids' => array_keys($groups),
+				'hostids' => array_keys($hosts),
+				'objectids' => array_keys($triggers),
+				'search' => [
+					'name' => $filter_problem
+				],
+				'severities' => $filter_severities,
+				'evaltype' => $this->fields_values['evaltype'],
+				'tags' => $this->fields_values['tags'],
+				'acknowledged' => ($filter_ext_ack == EXTACK_OPTION_UNACK) ? false : null,
+				'suppressed' => ($filter_show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
+				'symptom' => false
+			]);
+
+			$hosts_data = [];
+
+			// Process problems.
+			foreach ($problems as $problem) {
+				foreach ($triggers[$problem['objectid']]['hosts'] as $trigger_host) {
+					if (!array_key_exists($trigger_host['hostid'], $hosts)) {
+						continue;
+					}
+
+					$host = $hosts[$trigger_host['hostid']];
+
+					// Prepare hosts data for tables displayed in hintboxes.
+					if (!array_key_exists($host['hostid'], $hosts_data)) {
+						$hosts_data[$host['hostid']] = [
+							'host' => $host['name'],
+							'hostid' => $host['hostid'],
+							'maintenanceid' => $host['maintenanceid'],
+							'maintenance_status' => $host['maintenance_status'],
+							'maintenance_type' => $host['maintenance_type'],
+							'severities' => array_fill_keys($filter_severities, 0)
+						];
+					}
+
+					// Count number of host problems per severity.
+					$hosts_data[$host['hostid']]['severities'][$problem['severity']]++;
+
+					// Propagate problem to all host groups in which host is added.
+					foreach ($host['hostgroups'] as $group) {
+						$groupid = $group['groupid'];
+
+						if (!array_key_exists($groupid, $groups)) {
+							continue;
+						}
+
+						// Searches for the highest severity set for filtered problems in particular host group.
+						if ($problem['severity'] > $groups[$groupid]['highest_severity']) {
+							$groups[$groupid]['highest_severity'] = $problem['severity'];
+						}
+
+						/**
+						 * Counts:
+						 *  - problematic hosts (hosts with events in 'problem' state);
+						 *  - unacknowledged problematic hosts (hosts with unacknowledged events in 'problem' state).
+						 *
+						 * Creates a list of problematic hosts and unacknowledged problematic hosts for each host group.
+						 *
+						 * Each host need to be counted only one time in each host group.
+						 * Host name is added for sorting.
+						 */
+						if ($filter_ext_ack != EXTACK_OPTION_UNACK
+							&& !array_key_exists($host['hostid'], $groups[$groupid]['hosts_problematic_list'])) {
+							$groups[$groupid]['hosts_problematic_list'][$host['hostid']]['name'] = $host['name'];
+							$groups[$groupid]['hosts_problematic_count']++;
+						}
+
+						if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED
+							&& !array_key_exists($host['hostid'], $groups[$groupid]['hosts_problematic_unack_list'])) {
+							$groups[$groupid]['hosts_problematic_unack_list'][$host['hostid']]['name'] = $host['name'];
+							$groups[$groupid]['hosts_problematic_unack_count']++;
+						}
+					}
+				}
+			}
+
+			// Sort results.
+			foreach ($groups as $groupid => $group) {
+				if ($group['hosts_total_count'] != 0) {
+					CArrayHelper::sort($groups[$groupid]['hosts_problematic_unack_list'], ['name']);
+
+					if ($filter_ext_ack != EXTACK_OPTION_UNACK) {
+						CArrayHelper::sort($groups[$groupid]['hosts_problematic_list'], ['name']);
+					}
+				}
+				else {
+					// Unset groups without any monitored hosts.
+					unset($groups[$groupid]);
+				}
+			}
+
+			CArrayHelper::sort($groups, ['name']);
+
+			$data += [
+				'filter' => [
+					'hostids' => $is_template_dashboard
+						? [$this->getInput('dynamic_hostid')]
+						: $this->fields_values['hostids'],
+					'problem' => $this->fields_values['problem'],
+					'severities' => $filter_severities,
+					'show_suppressed' => $this->fields_values['show_suppressed'],
+					'hide_empty_groups' => !$is_template_dashboard ? $this->fields_values['hide_empty_groups'] : null,
+					'ext_ack' => $this->fields_values['ext_ack']
+				],
+				'hosts_data' => $hosts_data,
+				'groups' => $groups
+			];
+		}
+
+		// Pass results to view.
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }

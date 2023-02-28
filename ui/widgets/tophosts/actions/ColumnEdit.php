@@ -70,7 +70,8 @@ class ColumnEdit extends CController {
 			'thresholds' => 'array',
 			'text' => 'string',
 			'edit' => 'in 1',
-			'update' => 'in 1'
+			'update' => 'in 1',
+			'templateid' => 'string'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateFields($this->getInputAll());
@@ -95,7 +96,7 @@ class ColumnEdit extends CController {
 			$input += $this->column_defaults;
 		}
 
-		unset($input['edit'], $input['update']);
+		unset($input['edit'], $input['update'], $input['templateid']);
 		$field->setValue([$input]);
 		$errors = $field->validate();
 		array_map('error', $errors);

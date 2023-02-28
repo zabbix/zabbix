@@ -34,177 +34,195 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'initial_load' => 'in 0,1'
+			'initial_load' => 'in 0,1',
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
 	protected function doAction(): void {
-		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
-		$data = CScreenProblem::getData([
-			'show' => $this->fields_values['show'],
-			'groupids' => $this->fields_values['groupids'],
-			'exclude_groupids' => $this->fields_values['exclude_groupids'],
-			'hostids' => $this->fields_values['hostids'],
-			'name' => $this->fields_values['problem'],
-			'severities' => $this->fields_values['severities'],
-			'evaltype' => $this->fields_values['evaltype'],
-			'tags' => $this->fields_values['tags'],
-			'show_symptoms' => $this->fields_values['show_symptoms'],
-			'show_suppressed' => $this->fields_values['show_suppressed'],
-			'unacknowledged' => $this->fields_values['unacknowledged'],
-			'show_opdata' => $this->fields_values['show_opdata']
-		], $search_limit);
+		$is_template_dashboard = $this->hasInput('templateid');
 
-		[$sortfield, $sortorder] = self::getSorting($this->fields_values['sort_triggers']);
-		$data = CScreenProblem::sortData($data, $search_limit, $sortfield, $sortorder);
-
-		if (count($data['problems']) > $this->fields_values['show_lines']) {
-			$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown',
-				min($this->fields_values['show_lines'], count($data['problems'])),
-				(count($data['problems']) > $search_limit) ? '+' : '',
-				min($search_limit, count($data['problems']))
-			);
+		// Editing template dashboard?
+		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+			$this->setResponse(new CControllerResponseData([
+				'name' => $this->getInput('name', $this->widget->getDefaultName()),
+				'error' => _('No data.'),
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				]
+			]));
 		}
 		else {
-			$info = '';
-		}
+			$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+			$data = CScreenProblem::getData([
+				'show' => $this->fields_values['show'],
+				'groupids' => !$is_template_dashboard ? $this->fields_values['groupids'] : null,
+				'exclude_groupids' => !$is_template_dashboard ? $this->fields_values['exclude_groupids'] : null,
+				'hostids' => !$is_template_dashboard
+					? $this->fields_values['hostids']
+					: [$this->getInput('dynamic_hostid')],
+				'name' => $this->fields_values['problem'],
+				'severities' => $this->fields_values['severities'],
+				'evaltype' => $this->fields_values['evaltype'],
+				'tags' => $this->fields_values['tags'],
+				'show_symptoms' => $this->fields_values['show_symptoms'],
+				'show_suppressed' => $this->fields_values['show_suppressed'],
+				'unacknowledged' => $this->fields_values['unacknowledged'],
+				'show_opdata' => $this->fields_values['show_opdata']
+			], $search_limit);
 
-		$data['problems'] = array_slice($data['problems'], 0, $this->fields_values['show_lines'], true);
+			[$sortfield, $sortorder] = self::getSorting($this->fields_values['sort_triggers']);
+			$data = CScreenProblem::sortData($data, $search_limit, $sortfield, $sortorder);
 
-		$data = CScreenProblem::makeData($data, [
-			'show' => $this->fields_values['show'],
-			'details' => 0,
-			'show_opdata' => $this->fields_values['show_opdata']
-		]);
-
-		$data += [
-			'show_three_columns' => false,
-			'show_two_columns' => false
-		];
-
-		$cause_eventids_with_symptoms = [];
-		$symptom_data['problems'] = [];
-
-		if ($data['problems']) {
-			$data['triggers_hosts'] = getTriggersHostsList($data['triggers']);
-
-			foreach ($data['problems'] as &$problem) {
-				$problem['symptom_count'] = 0;
-				$problem['symptoms'] = [];
-
-				if ($problem['cause_eventid'] == 0) {
-					$options = [
-						'countOutput' => true,
-						'filter' => ['cause_eventid' => $problem['eventid']]
-					];
-
-					$problem['symptom_count'] = ($this->fields_values['show'] == TRIGGERS_OPTION_ALL)
-						? API::Event()->get($options)
-						: API::Problem()->get($options + ['recent' => true]);
-
-					if ($problem['symptom_count'] > 0) {
-						$data['show_three_columns'] = true;
-						$cause_eventids_with_symptoms[] = $problem['eventid'];
-					}
-				}
-
-				// There is at least one independent symptom event.
-				if ($problem['cause_eventid'] != 0) {
-					$data['show_two_columns'] = true;
-				}
+			if (count($data['problems']) > $this->fields_values['show_lines']) {
+				$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown',
+					min($this->fields_values['show_lines'], count($data['problems'])),
+					(count($data['problems']) > $search_limit) ? '+' : '',
+					min($search_limit, count($data['problems']))
+				);
 			}
-			unset($problem);
+			else {
+				$info = '';
+			}
 
-			if ($cause_eventids_with_symptoms) {
-				// Get all symptoms for given cause event IDs.
-				$symptom_data = CScreenProblem::getData([
-					'show_symptoms' => true,
-					'show_suppressed' => true,
-					'cause_eventid' => $cause_eventids_with_symptoms,
-					'show' => $this->fields_values['show'],
-					'show_opdata' => $this->fields_values['show_opdata']
-				], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
+			$data['problems'] = array_slice($data['problems'], 0, $this->fields_values['show_lines'], true);
 
-				if ($symptom_data['problems']) {
-					$symptom_data = CScreenProblem::sortData($symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT, $sortfield,
-						$sortorder
-					);
+			$data = CScreenProblem::makeData($data, [
+				'show' => $this->fields_values['show'],
+				'details' => 0,
+				'show_opdata' => $this->fields_values['show_opdata']
+			]);
 
-					// Filter does not matter.
-					$symptom_data = CScreenProblem::makeData($symptom_data, [
-						'show' => $this->fields_values['show'],
-						'show_opdata' => $this->fields_values['show_opdata'],
-						'details' => 0
-					], true);
+			$data += [
+				'show_three_columns' => false,
+				'show_two_columns' => false
+			];
 
-					$data['users'] += $symptom_data['users'];
-					$data['correlations'] += $symptom_data['correlations'];
+			$cause_eventids_with_symptoms = [];
+			$symptom_data['problems'] = [];
 
-					foreach ($symptom_data['actions'] as $key => $actions) {
-						$data['actions'][$key] += $actions;
-					}
+			if ($data['problems']) {
+				$data['triggers_hosts'] = getTriggersHostsList($data['triggers']);
 
-					if ($symptom_data['triggers']) {
-						// Add hosts from symptoms to the list.
-						$data['triggers_hosts'] += getTriggersHostsList($symptom_data['triggers']);
+				foreach ($data['problems'] as &$problem) {
+					$problem['symptom_count'] = 0;
+					$problem['symptoms'] = [];
 
-						// Store all known triggers in one place.
-						$data['triggers'] += $symptom_data['triggers'];
-					}
+					if ($problem['cause_eventid'] == 0) {
+						$options = [
+							'countOutput' => true,
+							'filter' => ['cause_eventid' => $problem['eventid']]
+						];
 
-					foreach ($data['problems'] as &$problem) {
-						foreach ($symptom_data['problems'] as $symptom) {
-							if (bccomp($symptom['cause_eventid'], $problem['eventid']) == 0) {
-								$problem['symptoms'][] = $symptom;
-							}
+						$problem['symptom_count'] = ($this->fields_values['show'] == TRIGGERS_OPTION_ALL)
+							? API::Event()->get($options)
+							: API::Problem()->get($options + ['recent' => true]);
+
+						if ($problem['symptom_count'] > 0) {
+							$data['show_three_columns'] = true;
+							$cause_eventids_with_symptoms[] = $problem['eventid'];
 						}
 					}
-					unset($problem);
+
+					// There is at least one independent symptom event.
+					if ($problem['cause_eventid'] != 0) {
+						$data['show_two_columns'] = true;
+					}
+				}
+				unset($problem);
+
+				if ($cause_eventids_with_symptoms) {
+					// Get all symptoms for given cause event IDs.
+					$symptom_data = CScreenProblem::getData([
+						'show_symptoms' => true,
+						'show_suppressed' => true,
+						'cause_eventid' => $cause_eventids_with_symptoms,
+						'show' => $this->fields_values['show'],
+						'show_opdata' => $this->fields_values['show_opdata']
+					], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
+
+					if ($symptom_data['problems']) {
+						$symptom_data = CScreenProblem::sortData($symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT, $sortfield,
+							$sortorder
+						);
+
+						// Filter does not matter.
+						$symptom_data = CScreenProblem::makeData($symptom_data, [
+							'show' => $this->fields_values['show'],
+							'show_opdata' => $this->fields_values['show_opdata'],
+							'details' => 0
+						], true);
+
+						$data['users'] += $symptom_data['users'];
+						$data['correlations'] += $symptom_data['correlations'];
+
+						foreach ($symptom_data['actions'] as $key => $actions) {
+							$data['actions'][$key] += $actions;
+						}
+
+						if ($symptom_data['triggers']) {
+							// Add hosts from symptoms to the list.
+							$data['triggers_hosts'] += getTriggersHostsList($symptom_data['triggers']);
+
+							// Store all known triggers in one place.
+							$data['triggers'] += $symptom_data['triggers'];
+						}
+
+						foreach ($data['problems'] as &$problem) {
+							foreach ($symptom_data['problems'] as $symptom) {
+								if (bccomp($symptom['cause_eventid'], $problem['eventid']) == 0) {
+									$problem['symptoms'][] = $symptom;
+								}
+							}
+						}
+						unset($problem);
+					}
 				}
 			}
-		}
 
-		if ($this->fields_values['show_tags']) {
-			$data['tags'] = makeTags($data['problems'] + $symptom_data['problems'], true, 'eventid',
-				$this->fields_values['show_tags'], $this->fields_values['tags'], null,
-				$this->fields_values['tag_name_format'], $this->fields_values['tag_priority']
-			);
-		}
+			if ($this->fields_values['show_tags']) {
+				$data['tags'] = makeTags($data['problems'] + $symptom_data['problems'], true, 'eventid',
+					$this->fields_values['show_tags'], $this->fields_values['tags'], null,
+					$this->fields_values['tag_name_format'], $this->fields_values['tag_priority']
+				);
+			}
 
-		$this->setResponse(new CControllerResponseData($data + [
-			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'initial_load' => (bool) $this->getInput('initial_load', 0),
-			'fields' => [
-				'show' => $this->fields_values['show'],
-				'show_lines' => $this->fields_values['show_lines'],
-				'show_tags' => $this->fields_values['show_tags'],
-				'show_timeline' => $this->fields_values['show_timeline'],
-				'tags' => $this->fields_values['tags'],
-				'tag_name_format' => $this->fields_values['tag_name_format'],
-				'tag_priority' => $this->fields_values['tag_priority'],
-				'show_opdata' => $this->fields_values['show_opdata']
-			],
-			'info' => $info,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			],
-			'config' => [
-				'problem_ack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_STYLE),
-				'problem_unack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_STYLE),
-				'blink_period' => CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD)
-			],
-			'allowed' => [
-				'ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
-				'add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
-				'change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
-				'acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
-				'close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
-				'suppress_problems' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
-				'rank_change' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
-			]
-		]));
+			$this->setResponse(new CControllerResponseData($data + [
+					'name' => $this->getInput('name', $this->widget->getDefaultName()),
+					'error' => null,
+					'initial_load' => (bool) $this->getInput('initial_load', 0),
+					'fields' => [
+						'show' => $this->fields_values['show'],
+						'show_lines' => $this->fields_values['show_lines'],
+						'show_tags' => $this->fields_values['show_tags'],
+						'show_timeline' => $this->fields_values['show_timeline'],
+						'tags' => $this->fields_values['tags'],
+						'tag_name_format' => $this->fields_values['tag_name_format'],
+						'tag_priority' => $this->fields_values['tag_priority'],
+						'show_opdata' => $this->fields_values['show_opdata']
+					],
+					'info' => $info,
+					'sortfield' => $sortfield,
+					'sortorder' => $sortorder,
+					'user' => [
+						'debug_mode' => $this->getDebugMode()
+					],
+					'config' => [
+						'problem_ack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_STYLE),
+						'problem_unack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_STYLE),
+						'blink_period' => CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD)
+					],
+					'allowed' => [
+						'ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+						'add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+						'change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+						'acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+						'close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
+						'suppress_problems' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
+						'rank_change' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
+					]
+				]));
+		}
 	}
 
 	private static function getSorting(int $sort_triggers): array {

@@ -49,7 +49,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->addValidationRules([
 			'initial_load' => 'in 0,1',
 			'widgetid' => 'db widget.widgetid',
-			'unique_id' => 'required|string'
+			'unique_id' => 'required|string',
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
@@ -81,21 +82,41 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * Get hosts and their properties to show on the map as markers.
 	 */
 	private function getHosts(): array {
-		$filter_groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+		$is_template_dashboard = $this->hasInput('templateid');
+		$hosts = [];
 
-		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name'],
-			'selectInventory' => ['location_lat', 'location_lon'],
-			'groupids' => $filter_groupids,
-			'hostids' => $this->fields_values['hostids'] ?: null,
-			'evaltype' => $this->fields_values['evaltype'],
-			'tags' => $this->fields_values['tags'],
-			'filter' => [
-				'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
-			],
-			'monitored_hosts' => true,
-			'preservekeys' => true
-		]);
+		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+			return $hosts;
+		}
+		else if ($is_template_dashboard && $this->hasInput('dynamic_hostid')) {
+			$hosts = API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'selectInventory' => ['location_lat', 'location_lon'],
+				'hostids' => [$this->getInput('dynamic_hostid')],
+				'filter' => [
+					'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
+				],
+				'monitored_hosts' => true,
+				'preservekeys' => true
+			]);
+		}
+		else {
+			$filter_groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+
+			$hosts = API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'selectInventory' => ['location_lat', 'location_lon'],
+				'groupids' => $filter_groupids,
+				'hostids' => $this->fields_values['hostids'] ?: null,
+				'evaltype' => $this->fields_values['evaltype'],
+				'tags' => $this->fields_values['tags'],
+				'filter' => [
+					'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
+				],
+				'monitored_hosts' => true,
+				'preservekeys' => true
+			]);
+		}
 
 		$hosts = array_filter($hosts, static function ($host) {
 			$lat = $host['inventory']['location_lat'];

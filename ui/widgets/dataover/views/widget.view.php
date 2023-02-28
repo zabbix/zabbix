@@ -26,9 +26,16 @@
  * @var array $data
  */
 
-(new CWidgetView($data))
-	->addItem($data['style'] == STYLE_TOP
+if ($data['error'] !== null) {
+	$table = new CTableInfo();
+	$table->setNoDataMessage($data['error']);
+}
+else {
+	$table = $data['style'] == STYLE_TOP
 		? (new CPartial('dataoverview.table.top', $data))->getOutput()
-		: (new CPartial('dataoverview.table.left', $data))->getOutput()
-	)
+		: (new CPartial('dataoverview.table.left', $data))->getOutput();
+}
+
+(new CWidgetView($data))
+	->addItem($table)
 	->show();

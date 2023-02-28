@@ -26,23 +26,53 @@ use CControllerDashboardWidgetView,
 
 class WidgetView extends CControllerDashboardWidgetView {
 
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules([
+			'dynamic_hostid' => 'db hosts.hostid'
+		]);
+	}
+
 	protected function doAction(): void {
-		$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
-		$hostids = $this->fields_values['hostids'] ?: null;
+		$is_template_dashboard = $this->hasInput('templateid');
 
-		[$items, $hosts, $has_hidden_data] = getDataOverview($groupids, $hostids, $this->fields_values);
-
-		$this->setResponse(new CControllerResponseData([
+		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'groupids' => getSubGroups($this->fields_values['groupids']),
-			'show_suppressed' => $this->fields_values['show_suppressed'],
-			'style' => $this->fields_values['style'],
-			'items' => $items,
-			'hosts' => $hosts,
-			'has_hidden_data' => $has_hidden_data,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
-		]));
+		];
+
+		// Editing template dashboard?
+		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+			$data['error'] = _('No data.');
+		}
+		else {
+			$groupids = !$is_template_dashboard && $this->fields_values['groupids']
+				? getSubGroups($this->fields_values['groupids'])
+				: null;
+			if (!$is_template_dashboard) {
+				$hostids = $this->fields_values['hostids'] ?: null;
+			}
+			else {
+				$hostids = [$this->getInput('dynamic_hostid')];
+			}
+
+			[$items, $hosts, $has_hidden_data] = getDataOverview($groupids, $hostids, $this->fields_values);
+
+			$data += [
+				'error' => null,
+				'groupids' => $groupids,
+				'show_suppressed' => $this->fields_values['show_suppressed'],
+				'style' => $this->fields_values['style'],
+				'items' => $items,
+				'hosts' => $hosts,
+				'has_hidden_data' => $has_hidden_data,
+
+			];
+		}
+
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }

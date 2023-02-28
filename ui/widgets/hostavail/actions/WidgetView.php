@@ -27,8 +27,16 @@ use API,
 	CItemGeneral;
 
 class WidgetView extends CControllerDashboardWidgetView {
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules([
+			'dynamic_hostid' => 'db hosts.hostid'
+		]);
+	}
 
 	protected function doAction(): void {
+		$is_template_dashboard = $this->hasInput('templateid');
 		$interface_types = CItemGeneral::INTERFACE_TYPES_BY_PRIORITY;
 
 		// Sanitize non-existing interface types.
@@ -36,7 +44,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			array_intersect($interface_types, $this->fields_values['interface_type'])
 		);
 
-		$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+		$groupids = !$is_template_dashboard && $this->fields_values['groupids']
+			? getSubGroups($this->fields_values['groupids'])
+			: null;
 
 		$hosts_types = $this->fields_values['interface_type'] ?: $interface_types;
 

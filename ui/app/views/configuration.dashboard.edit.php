@@ -49,6 +49,8 @@ $this->addJsFile('class.tagfilteritem.js');
 
 $this->includeJsFile('configuration.dashboard.edit.js.php');
 
+$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
+
 $html_page = (new CHtmlPage())
 	->setTitle(_('Dashboards'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DASHBOARDS_EDIT))

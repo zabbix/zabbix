@@ -761,7 +761,7 @@ jQuery(function() {
 					.append(hint_body)
 					.append(triggers_length > data.hintMaxRows
 						? makeHintBoxFooter(data.hintMaxRows, triggers_length)
-						:null
+						: null
 					);
 
 				graph.data('simpleTriggersHintbox', true);

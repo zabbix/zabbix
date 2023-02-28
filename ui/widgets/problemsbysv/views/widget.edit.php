@@ -59,8 +59,9 @@ $groupids = array_key_exists('groupids', $data['fields'])
 		? new CWidgetFieldRadioButtonListView($data['fields']['show_type'])
 		: null
 	)
-	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['layout'])
+	->addField(array_key_exists('layout', $data['fields'])
+		? new CWidgetFieldRadioButtonListView($data['fields']['layout'])
+		: null,
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['show_opdata'])

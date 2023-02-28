@@ -37,7 +37,17 @@ use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules([
+			'dynamic_hostid' => 'db hosts.hostid'
+		]);
+	}
+
 	protected function doAction(): void {
+		$is_template_dashboard = $this->hasInput('templateid');
+
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'user' => [
@@ -45,16 +55,32 @@ class WidgetView extends CControllerDashboardWidgetView {
 			]
 		];
 
-		$data += $this->getData();
+		// Editing template dashboard?
+		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+			$data['error'] = _('No data.');
+		}
+		else {
+			$data += $this->getData();
+			$data['error'] = null;
+		}
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
 	private function getData(): array {
+		$is_template_dashboard = $this->hasInput('templateid');
 		$configuration = $this->fields_values['columns'];
 
-		$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
-		$hostids = $this->fields_values['hostids'] ?: null;
+		$groupids = !$is_template_dashboard && $this->fields_values['groupids']
+			? getSubGroups($this->fields_values['groupids'])
+			: null;
+
+		if (!$is_template_dashboard) {
+			$hostids = $this->fields_values['hostids'] ?: null;
+		}
+		else {
+			$hostids = [$this->getInput('dynamic_hostid')];
+		}
 
 		if (array_key_exists('tags', $this->fields_values)) {
 			$hosts = API::Host()->get([
@@ -117,7 +143,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$master_item_values = array_slice($master_item_values, 0, $this->fields_values['count'], true);
+		$count = !$is_template_dashboard ? $this->fields_values['count'] : 1;
+		$master_item_values = array_slice($master_item_values, 0, $count, true);
 		$master_items = array_intersect_key($master_items, $master_item_values);
 
 		$master_hostids = [];

@@ -234,8 +234,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 				->setAttribute('title', _('Delete'))
 				->addClass(ZBX_STYLE_BTN_REMOVE)
 				->removeId()
-		))
-			->addClass('dataset-actions');
+		))->addClass('dataset-actions');
 
 		return (new CListItem([
 			(new CLabel(''))
