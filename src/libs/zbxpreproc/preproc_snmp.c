@@ -817,6 +817,7 @@ int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value,
 			if (SUCCEED != zbx_snmp_value_cache_init(snmp_cache, value->data.str, &err))
 			{
 				zbx_free(snmp_cache);
+				cache->type = ZBX_PREPROC_NONE;
 				goto out;
 			}
 
