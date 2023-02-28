@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-16 21:36+0000\n"
+"PO-Revision-Date: 2023-02-22 22:30+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -5147,7 +5147,7 @@ msgstr "Liczba zgodnych linii w monitorowaniu pliku logu. Zwraca liczbę całkow
 
 #: include/classes/data/CItemData.php:1802
 msgid "Count of values enqueued in the connector queue."
-msgstr ""
+msgstr "Liczba wartości w kolejce konektora."
 
 #: include/classes/data/CItemData.php:1638
 msgid "Count of values enqueued in the low-level discovery processing queue."
@@ -11075,7 +11075,7 @@ msgstr "Nieprawidłowy klucz \"%1$s\": %2$s."
 #: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
 #: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
 msgid "Invalid media type mapping configuration."
-msgstr ""
+msgstr "Nieprawidłowa konfiguracja mapowania typów mediów."
 
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
@@ -12494,9 +12494,9 @@ msgstr "Utworzono okres utrzymania"
 #: app/controllers/CControllerMaintenanceDelete.php:61
 msgid "Maintenance period deleted"
 msgid_plural "Maintenance periods deleted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Usunięto okres utrzymania"
+msgstr[1] "Usunięto okresy utrzymania"
+msgstr[2] "Usunięto okresy utrzymania"
 
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
@@ -12504,7 +12504,7 @@ msgstr "Długość okresu utrzymania"
 
 #: app/controllers/CControllerMaintenanceUpdate.php:144
 msgid "Maintenance period updated"
-msgstr ""
+msgstr "Zaktualizowano okres utrzymania"
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -12804,7 +12804,7 @@ msgstr "Maksymalny okres dla wyboru czasu"
 
 #: app/views/connector.edit.php:171
 msgid "Max records per message"
-msgstr ""
+msgstr "Maksymalna liczba wpisów na wiadomość"
 
 #: app/controllers/CControllerPopupItemTest.php:1313
 #: app/controllers/CControllerPopupItemTest.php:1319
@@ -13686,7 +13686,7 @@ msgstr "Nowy warunek"
 
 #: app/views/connector.edit.php:312 app/views/connector.edit.php:341
 msgid "New connector"
-msgstr ""
+msgstr "Nowy konektor"
 
 #: app/controllers/CControllerDashboardView.php:154
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
@@ -13727,7 +13727,7 @@ msgstr "Nowa grupa hostów"
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
 msgid "New maintenance period"
-msgstr ""
+msgstr "Nowy okres utrzymania"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
