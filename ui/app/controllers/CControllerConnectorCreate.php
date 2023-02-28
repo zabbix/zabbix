@@ -114,7 +114,7 @@ class CControllerConnectorCreate extends CController {
 
 		foreach ($tags as $id => &$tag) {
 			if ($tag['tag'] === '' && $tag['value'] === '') {
-				continue;
+				unset($tags[$id]);
 			}
 
 			if ($tag['operator'] == CONDITION_OPERATOR_EXISTS || $tag['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
