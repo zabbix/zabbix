@@ -405,7 +405,7 @@ class User extends ScimApiService {
 	 */
 	private function validatePatch(array &$options, array &$db_user = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
-			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'Operations' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'op' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'])],
