@@ -22,6 +22,12 @@
 #include "common.h"
 #include "log.h"
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#include <shlwapi.h>
+#else
+#include <libgen.h>
+#endif
+
 extern unsigned char	program_type;
 
 char	*CONFIG_FILE		= NULL;
@@ -299,6 +305,46 @@ out:
 }
 #endif
 
+static void	prepare_include_path(char **raw_path, char **path)
+{
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	wchar_t	*wraw_path;
+
+	wraw_path = zbx_utf8_to_unicode(*raw_path);
+
+	if (TRUE == PathIsRelativeW(wraw_path))
+	{
+		wchar_t	*wconfig_path;
+		wchar_t	dir_buf[_MAX_DIR];
+		char	*dir_utf8;
+		
+		wconfig_path = zbx_utf8_to_unicode(CONFIG_FILE);
+		_wsplitpath(wconfig_path, NULL, dir_buf, NULL, NULL);
+		
+		zbx_free(wconfig_path);
+		
+		dir_utf8 = zbx_unicode_to_utf8(dir_buf);
+		*path = zbx_dsprintf(*path, "%s%s", dir_utf8, *raw_path);
+		zbx_free(dir_utf8);
+		zbx_free(*raw_path);
+	}
+	else
+		*path = *raw_path;
+#else
+	if ('.' == (*raw_path)[0])
+	{
+		char	*basedir;
+
+		basedir = dirname(CONFIG_FILE);
+		*path = zbx_dsprintf(*path, "%s/%s", basedir, *raw_path);
+		zbx_free(*raw_path);
+	}
+	else
+		*path = *raw_path;
+#endif
+	*raw_path = NULL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: parse "Include=..." line in configuration file                    *
@@ -316,11 +362,13 @@ out:
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict, int noexit)
 {
 	int		ret = FAIL;
-	char		*path = NULL, *pattern = NULL;
+	char		*path = NULL, *raw_path = NULL, *pattern = NULL;
 	zbx_stat_t	sb;
 
-	if (SUCCEED != parse_glob(cfg_file, &path, &pattern))
+	if (SUCCEED != parse_glob(cfg_file, &raw_path, &pattern))
 		goto clean;
+
+	prepare_include_path(&raw_path, &path);
 
 	if (0 != zbx_stat(path, &sb))
 	{
@@ -343,6 +391,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	ret = parse_cfg_dir(path, pattern, cfg, level, strict, noexit);
 clean:
 	zbx_free(pattern);
+	zbx_free(raw_path);
 	zbx_free(path);
 
 	return ret;
