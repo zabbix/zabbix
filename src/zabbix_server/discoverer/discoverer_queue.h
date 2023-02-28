@@ -26,6 +26,7 @@ typedef struct
 {
 	int		workers_num;
 	zbx_list_t	jobs;
+	zbx_hashset_t	jobs_pending;
 	pthread_mutex_t	lock;
 	pthread_cond_t	event;
 	int		flags;
@@ -41,8 +42,8 @@ void	discoverer_queue_deregister_worker(zbx_discoverer_queue_t *queue);
 int	discoverer_queue_wait(zbx_discoverer_queue_t *queue, char **error);
 int	discoverer_queue_init(zbx_discoverer_queue_t *queue, char **error);
 void	discoverer_queue_clear_jobs(zbx_list_t *jobs);
-void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_net_check_job_t *net_check);
+void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_drule_job_t *net_check);
 
-zbx_discoverer_net_check_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue);
+zbx_discoverer_drule_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue);
 
 #endif

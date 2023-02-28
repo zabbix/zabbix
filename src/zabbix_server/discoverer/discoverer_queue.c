@@ -25,6 +25,23 @@
 #define DISCOVERER_QUEUE_INIT_LOCK	0x01
 #define DISCOVERER_QUEUE_INIT_EVENT	0x02
 
+static zbx_hash_t	discoverer_queue_job_hash(const void *data)
+{
+	const zbx_discoverer_drule_job_t	*job = (const zbx_discoverer_drule_job_t *)data;
+
+	return ZBX_DEFAULT_UINT64_HASH_FUNC(&job->druleid);
+}
+
+static int	discoverer_queue_job_compare(const void *d1, const void *d2)
+{
+	const zbx_discoverer_drule_job_t	*j1 = (const zbx_discoverer_drule_job_t *)d1;
+	const zbx_discoverer_drule_job_t	*j2 = (const zbx_discoverer_drule_job_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(j1->druleid, j2->druleid);
+
+	return 0;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: lock job queue                                                    *
@@ -73,12 +90,12 @@ void	discoverer_queue_notify_all(zbx_discoverer_queue_t *queue)
  *               processed.                                                   *
  *                                                                            *
  ******************************************************************************/
-zbx_discoverer_net_check_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
+zbx_discoverer_drule_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 {
 	void	*job;
 
 	if (SUCCEED == zbx_list_pop(&queue->jobs, &job))
-		return (zbx_discoverer_net_check_job_t*)job;
+		return (zbx_discoverer_drule_job_t*)job;
 
 	return NULL;
 }
@@ -91,7 +108,7 @@ zbx_discoverer_net_check_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *que
  *             net_check - [IN] the net check job                             *
  *                                                                            *
 *******************************************************************************/
-void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_net_check_job_t *net_check)
+void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_drule_job_t *net_check)
 {
 	zbx_list_append(&queue->jobs, net_check, NULL);
 }
@@ -103,7 +120,7 @@ void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_net_che
  ******************************************************************************/
 void	discoverer_queue_clear_jobs(zbx_list_t *jobs)
 {
-	zbx_discoverer_net_check_job_t	*job = NULL;
+	zbx_discoverer_drule_job_t	*job = NULL;
 
 	while (SUCCEED == zbx_list_pop(jobs, (void **)&job))
 		zbx_discoverer_job_net_check_free(job);
@@ -193,6 +210,7 @@ int	discoverer_queue_init(zbx_discoverer_queue_t *queue, char **error)
 	queue->flags = DISCOVERER_QUEUE_INIT_NONE;
 
 	zbx_list_create(&queue->jobs);
+	zbx_hashset_create(&queue->jobs_pending, 1, discoverer_queue_job_hash, discoverer_queue_job_compare);
 
 	if (0 != (err = pthread_mutex_init(&queue->lock, NULL)))
 	{

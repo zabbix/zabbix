@@ -22,6 +22,7 @@
 
 #include "zbxdiscovery.h"
 
-void	zbx_discoverer_job_net_check_free(zbx_discoverer_net_check_job_t *job);
+void	zbx_discoverer_job_net_check_task_free(zbx_discoverer_net_check_task_t *task);
+void	zbx_discoverer_job_net_check_free(zbx_discoverer_drule_job_t *job);
 
 #endif

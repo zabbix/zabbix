@@ -4220,6 +4220,13 @@ static int	DBpatch_6030191(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_6030192(void)
+{
+	const ZBX_FIELD	field = {"workers_max", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("drules", &field);
+}
 #endif
 
 DBPATCH_START(6030)
@@ -4416,5 +4423,6 @@ DBPATCH_ADD(6030188, 0, 1)
 DBPATCH_ADD(6030189, 0, 1)
 DBPATCH_ADD(6030190, 0, 1)
 DBPATCH_ADD(6030191, 0, 1)
+DBPATCH_ADD(6030192, 0, 1)
 
 DBPATCH_END()
