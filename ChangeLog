@@ -308,6 +308,13 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
 
 --------------------------------------------------------------------------------
+Changes for 6.2.8rc2
+
+Bug fixes:
+...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
+
+--------------------------------------------------------------------------------
+
 Changes for 6.2.8rc1
 
 New features:
@@ -315,9 +322,8 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
-........S. [ZBX-22240] fixed selects of history and trends being able to block housekeeping (dgoloscapov)
+........S. [ZBX-22240] fixed selects of history, trends blocking drop_chunks and housekeeping (dgoloscapov)
 ..F....... [ZBX-22320] fixed success message when disabling hosts in host groups (epulke)
-........S. [ZBX-22240] fixed selects of history and trends blocking drop_chunks (dgoloscapov)
 ........S. [ZBX-22078] fixed the crash in calculated items when using tag filter on 32-bit systems (vso)
 .........T [ZBX-21591] optimized JSONPaths in the Nginx Plus template (igorbach)
 A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
