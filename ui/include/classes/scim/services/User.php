@@ -48,8 +48,6 @@ class User extends ScimApiService {
 		'schemas' => [self::SCIM_USER_SCHEMA]
 	];
 
-	protected array $patch_op = ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'];
-
 	/**
 	 * Returns information on specific user or all users if no specific information is requested.
 	 * If user is not in database, returns only 'schemas' parameter.
@@ -366,10 +364,6 @@ class User extends ScimApiService {
 		$user_data = $provisioning->getCurrentUserAttributes($db_user);
 		$operations = $options['Operations'];
 
-		$add = [];
-		$replace = [];
-		$remove = [];
-
 		foreach ($operations as $operation) {
 			if (!in_array($operation['path'], $supported_paths, true)) {
 				continue;
@@ -377,28 +371,12 @@ class User extends ScimApiService {
 
 			switch ($operation['op']) {
 				case 'add':
-					$add[$operation['path']] = $operation['value'];
-					break;
 				case 'replace':
-					$replace[$operation['path']] = $operation['value'];
+					$user_data[$operation['path']] = $operation['value'];
 					break;
 				case 'remove':
-					$remove[] = $operation['path'];
+					unset($user_data[$operation['path']]);
 					break;
-			}
-		}
-
-		if ($add || $replace) {
-			$user_data = array_merge($user_data, $add);
-		}
-
-		if ($replace) {
-			$user_data = array_merge($user_data, $replace);
-		}
-
-		if ($remove) {
-			foreach ($remove as $remove_path) {
-				unset($user_data[$remove_path]);
 			}
 		}
 
@@ -408,8 +386,8 @@ class User extends ScimApiService {
 			$user_data['active'] = false;
 		}
 
+		// Media attributes currently cannot be supported by PATCH request, thus this data is not updated.
 		$new_user_data = $provisioning->getUserAttributes($user_data);
-		$new_user_data['medias'] = $provisioning->getUserMedias($user_data);
 		$new_user_data['userid'] = $options['id'];
 
 		APIRPC::User()->updateProvisionedUser($new_user_data);
@@ -430,9 +408,13 @@ class User extends ScimApiService {
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'Operations' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-				'op' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $this->patch_op)],
+				'op' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'])],
 				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+				'value' =>      ['type' => API_MULTIPLE, 'rules' => [
+					['if' => ['field' => 'path', 'in' => implode(',', ['active'])], 'type' => API_BOOLEAN, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'op', 'in' => implode(',', ['remove', 'Remove'])], 'type' => API_STRING_UTF8],
+					['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+				]]
 			]]
 		]];
 
@@ -445,9 +427,8 @@ class User extends ScimApiService {
 		}
 
 		[$db_user] = APIRPC::User()->get([
-			'output' => ['userid', 'username', 'name', 'surname', 'userdirectoryid'],
-			'userids' => $options['id'],
-			'selectMedias' => ['mediatypeid', 'sendto']
+			'output' => ['userid', 'name', 'surname', 'userdirectoryid'],
+			'userids' => $options['id']
 		]);
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 
