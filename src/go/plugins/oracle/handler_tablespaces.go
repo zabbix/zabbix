@@ -253,7 +253,6 @@ SELECT
 FROM
     (
         SELECT
-            df.CON_NAME AS CON_NAME
             df.TABLESPACE_NAME AS TABLESPACE_NAME,
             df.CONTENTS AS CONTENTS,
             NVL(SUM(df.BYTES), 0) AS FILE_BYTES,
@@ -305,7 +304,7 @@ FROM
                 WHERE
                     cdf.TABLESPACE_NAME = ct.TABLESPACE_NAME
                     AND cdf.CON_ID = ct.CON_ID
-                    AND ((ct.CON$NAME = %s or (ct.CON$NAME is null and ct.CON_ID = 0))
+                    AND (ct.CON$NAME = '%s' or (ct.CON$NAME is null and ct.CON_ID = 0))
             ) df,
             (
                 SELECT
@@ -320,7 +319,7 @@ FROM
             df.FILE_ID = f.FILE_ID (+)
 		AND df.TABLESPACE_NAME = '%s'
         GROUP BY
-            df.CON_NAME
+            df.CON_NAME,
             df.TABLESPACE_NAME,
             df.CONTENTS,
             df.STATUS
@@ -330,7 +329,7 @@ FROM
 
 func getTempQueryPart(conName, name string) string {
 	return fmt.Sprintf(`
-	SELECT
+SELECT
     JSON_ARRAYAGG(
         JSON_OBJECT(
             TABLESPACE_NAME VALUE JSON_OBJECT(
@@ -348,7 +347,6 @@ func getTempQueryPart(conName, name string) string {
 FROM
     (
         SELECT
-            Y.CON_NAME,
             Y.NAME AS TABLESPACE_NAME,
             Y.CONTENTS AS CONTENTS,
             NVL(SUM(Y.BYTES), 0) AS FILE_BYTES,
@@ -369,7 +367,7 @@ FROM
                     SUM(Y.BYTES),
                     0,
                     0,
-                    (NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES)), 0)) / SUM(Y.BYTES) * 100
+                    (NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0)) / SUM(Y.BYTES) * 100
                 ),
                 2
             ) AS USED_FILE_PCT,
@@ -446,12 +444,12 @@ FROM
                     ctf.TABLESPACE_NAME = ct.TABLESPACE_NAME
                     AND ctf.CON_ID = ct.CON_ID
                     AND ((ct.CON$NAME = '%s') or (ct.CON$NAME is null and ct.CON_ID = 0))
-                    AND dtf.TABLESPACE_NAME = '%s'
+                    AND ctf.TABLESPACE_NAME = '%s'
             ) Y
         GROUP BY
-            Y.CON_NAME
+            Y.CON_NAME,
             Y.NAME,
             Y.CONTENTS,
-            Y.TBS_STATUS
+            Y.STATUS
     )`, conName, name)
 }
