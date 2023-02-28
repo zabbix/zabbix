@@ -127,16 +127,16 @@ zabbix_export:
               instance_name,
               cntr_value
             FROM sys.dm_os_performance_counters
-            UNION SELECT 'SQLServer' AS object_name,
+            UNION SELECT '{$MSSQL.INSTANCE}' AS object_name,
               'Version' AS counter_name,
               @@version AS instance_name,
               0 AS cntr_value
-            UNION SELECT 'SQLServer' AS object_name,
+            UNION SELECT '{$MSSQL.INSTANCE}' AS object_name,
               'Uptime' AS counter_name,
               '' AS instance_name,
               DATEDIFF(second, sqlserver_start_time, GETDATE()) AS cntr_value
             FROM sys.dm_os_sys_info
-            UNION SELECT 'SQLServer:Databases' AS object_name,
+            UNION SELECT '{$MSSQL.INSTANCE}:Databases' AS object_name,
               'State' AS counter_name,
               name AS instance_name,
               state AS cntr_value
@@ -151,11 +151,11 @@ zabbix_export:
                 OBJECT_NAME
               FROM sys.dm_os_performance_counters
               WHERE counter_name = 'Buffer cache hit ratio base'
-                AND OBJECT_NAME = 'SQLServer:Buffer Manager'
+                AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Buffer Manager'
             ) b
               ON a.OBJECT_NAME = b.OBJECT_NAME
             WHERE a.counter_name = 'Buffer cache hit ratio'
-              AND a.OBJECT_NAME = 'SQLServer:Buffer Manager'
+              AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Buffer Manager'
             UNION SELECT a.object_name,
               'WorktablesFromCacheRatio' AS counter_name,
               '' AS instance_name,
@@ -166,11 +166,11 @@ zabbix_export:
                 OBJECT_NAME
               FROM sys.dm_os_performance_counters
               WHERE counter_name = 'Worktables From Cache Base'
-                AND OBJECT_NAME = 'SQLServer:Access Methods'
+                AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Access Methods'
             ) b
               ON a.OBJECT_NAME = b.OBJECT_NAME
             WHERE a.counter_name = 'Worktables From Cache Ratio'
-              AND a.OBJECT_NAME = 'SQLServer:Access Methods'
+              AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Access Methods'
             UNION SELECT a.object_name,
               'CacheHitRatio' AS counter_name,
               '_Total' AS instance_name,
@@ -181,12 +181,12 @@ zabbix_export:
                 OBJECT_NAME
               FROM sys.dm_os_performance_counters
               WHERE counter_name = 'Cache Hit Ratio base'
-                AND OBJECT_NAME = 'SQLServer:Plan Cache'
+                AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Plan Cache'
                 AND instance_name = '_Total'
             ) b
               ON a.OBJECT_NAME = b.OBJECT_NAME
             WHERE a.counter_name = 'Cache Hit Ratio'
-              AND a.OBJECT_NAME = 'SQLServer:Plan Cache'
+              AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Plan Cache'
               AND instance_name = '_Total'
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
