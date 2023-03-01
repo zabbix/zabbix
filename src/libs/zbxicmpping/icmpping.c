@@ -125,7 +125,10 @@ static int	get_fping_out(const char *fping, char **out, char *error, size_t max_
 	pclose(f);
 
 	if (NULL == buffer)
+	{
+		zbx_strlcpy(error, "Can't obtain the program output", max_error_len);
 		return FAIL;
+	}
 
 	*out = buffer;
 
