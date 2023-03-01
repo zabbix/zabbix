@@ -39,7 +39,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	private static $graphids;
 
 	public function prepareGraphsData() {
-		$hosts = CDataHelper::call('host.create', [
+		CDataHelper::createHosts([
 			[
 				'host' => 'Host for monitoring graphs',
 				'groups' => [
@@ -52,36 +52,29 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'ip' => '127.0.0.1',
 					'dns' => '',
 					'port' => '10050'
+				],
+				'items' => [
+					[
+						'name' => 'Item for graph 1',
+						'key_' => 'trap_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Item for graph 2',
+						'key_' => 'trap_2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Item for graph 3',
+						'key_' => 'trap_3',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
 				]
 			]
 		]);
-		$this->assertArrayHasKey('hostids', $hosts);
-		$hostid = $hosts['hostids'][0];
-
-		$items = CDataHelper::call('item.create', [
-			[
-				'name' => 'Item for graph 1',
-				'key_' => 'trap_1',
-				'hostid' => $hostid,
-				'type' => 2,
-				'value_type' => 0
-			],
-			[
-				'name' => 'Item for graph 2',
-				'key_' => 'trap_2',
-				'hostid' => $hostid,
-				'type' => 2,
-				'value_type' => 0
-			],
-			[
-				'name' => 'Item for graph 3',
-				'key_' => 'trap_3',
-				'hostid' => $hostid,
-				'type' => 2,
-				'value_type' => 0
-			]
-		]);
-		$this->assertArrayHasKey('itemids', $items);
 		$itemids = CDataHelper::getIds('name');
 
 		self::$time = time()-300;
@@ -145,7 +138,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		}
 
 		// Check that timeselector set to display Last hour data.
-		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')->one()->getAttribute('class'));
+		$this->assertTrue($this->query('xpath://a[@data-label="Last 1 hour"]')->one()->hasClass('selected'));
 
 		// If the filter is not visible - enable it.
 		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
@@ -406,7 +399,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			$this->query('id:ui-id-2')->one()->click();
 		}
 
-		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['filter'])->submit();
 		$this->page->waitUntilReady();
 
