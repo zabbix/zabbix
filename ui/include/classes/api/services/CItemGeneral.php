@@ -697,7 +697,6 @@ abstract class CItemGeneral extends CApiService {
 							: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
 						break 2;
 				}
-				break;
 
 			case ZBX_FLAG_DISCOVERY_RULE:
 				switch ($upd_db_item['flags']) {
@@ -719,7 +718,6 @@ abstract class CItemGeneral extends CApiService {
 							: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
 						break 2;
 				}
-				break;
 
 			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 				switch ($upd_db_item['flags']) {
@@ -741,7 +739,6 @@ abstract class CItemGeneral extends CApiService {
 							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
 						break 2;
 				}
-				break;
 		}
 
 		if ($error) {
@@ -2572,11 +2569,25 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $db_items
 	 */
 	public static function addInheritedItems(array &$db_items): void {
-		$options = [
-			'output' => ['itemid', 'name'],
-			'filter' => ['templateid' => array_keys($db_items)]
-		];
-		$db_items += DBfetchArrayAssoc(DBselect(DB::makeSql('items', $options)), 'itemid');
+		$templateids = array_keys($db_items);
+
+		do {
+			$options = [
+				'output' => ['itemid', 'name'],
+				'filter' => ['templateid' => $templateids]
+			];
+			$result = DBselect(DB::makeSql('items', $options));
+
+			$templateids = [];
+
+			while ($row = DBfetch($result)) {
+				if (!array_key_exists($row['itemid'], $db_items)) {
+					$templateids[] = $row['itemid'];
+
+					$db_items[$row['itemid']] = $row;
+				}
+			}
+		} while ($templateids);
 	}
 
 	/**
@@ -2588,7 +2599,7 @@ abstract class CItemGeneral extends CApiService {
 		DB::update('graphs', [
 			'values' => [
 				'ymin_type' => GRAPH_YAXIS_TYPE_CALCULATED,
-				'ymin_itemid' => 0
+				'ymin_itemid' => null
 			],
 			'where' => ['ymin_itemid' => $del_itemids]
 		]);
@@ -2596,7 +2607,7 @@ abstract class CItemGeneral extends CApiService {
 		DB::update('graphs', [
 			'values' => [
 				'ymax_type' => GRAPH_YAXIS_TYPE_CALCULATED,
-				'ymax_itemid' => 0
+				'ymax_itemid' => null
 			],
 			'where' => ['ymax_itemid' => $del_itemids]
 		]);

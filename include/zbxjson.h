@@ -386,4 +386,6 @@ void	zbx_jsonobj_clear(zbx_jsonobj_t *obj);
 int	zbx_jsonobj_query(zbx_jsonobj_t *obj, const char *path, char **output);
 int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, zbx_jsonobj_t *obj);
 
+void	zbx_jsonobj_disable_indexing(zbx_jsonobj_t *obj);
+
 #endif /* ZABBIX_ZJSON_H */
