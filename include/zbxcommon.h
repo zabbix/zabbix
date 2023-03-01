@@ -800,4 +800,12 @@ zbx_uint64_t	suffix2factor(char c);
 
 char	*zbx_strerror(int errnum);
 
+#if !defined(_WINDOWS)
+#	if defined(HAVE_LIBPTHREAD)
+#		define zbx_sigmask	pthread_sigmask
+#	else
+#		define zbx_sigmask	sigprocmask
+#	endif
+#endif
+
 #endif
