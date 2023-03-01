@@ -46,19 +46,50 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	private static $graphids;
 
 	public static function prepareGraphsData() {
-		CDataHelper::call('host.create', [
+		CDataHelper::createHosts([
 			[
 				'host' => 'Host_for_monitoring_graphs_1',
 				'groups' => [
 					'groupid' => 4
 				],
-				'interfaces' => [
-					'type' => 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => '10050'
+				'interfaces' => [],
+				'items' => [
+					[
+						'name' => 'Item_for_graph_1',
+						'key_' => 'trap_1',
+						'type' => 2,
+						'value_type' => 0,
+						'tags' => [
+							[
+								'tag' => 'tag_name_1',
+								'value' => 'tag_value_1'
+							]
+						]
+					],
+					[
+						'name' => 'Item_for_graph_2',
+						'key_' => 'trap_2',
+						'type' => 2,
+						'value_type' => 0,
+						'tags' => [
+							[
+								'tag' => 'tag_name_2',
+								'value' => 'tag_value_2'
+							]
+						]
+					],
+					[
+						'name' => 'Item_for_graph_3',
+						'key_' => 'trap_3',
+						'type' => 2,
+						'value_type' => 0,
+						'tags' => [
+							[
+								'tag' => 'tag_name_3',
+								'value' => 'tag_value_3'
+							]
+						]
+					]
 				]
 			],
 			[
@@ -66,64 +97,15 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				'groups' => [
 					'groupid' => 4
 				],
-				'interfaces' => [
-					'type' => 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => '10050'
-				]
-			]
-		]);
-		$hostid = CDataHelper::getIds('host');
-
-		CDataHelper::call('item.create', [
-			[
-				'name' => 'Item_for_graph_1',
-				'key_' => 'trap_1',
-				'hostid' => $hostid['Host_for_monitoring_graphs_1'],
-				'type' => 2,
-				'value_type' => 0,
-				'tags' => [
+				'interfaces' => [],
+				'items' => [
 					[
-						'tag' => 'tag_name_1',
-						'value' => 'tag_value_1'
+						'name' => 'Item_for_graph_4',
+						'key_' => 'trap_4',
+						'type' => 2,
+						'value_type' => 0
 					]
 				]
-			],
-			[
-				'name' => 'Item_for_graph_2',
-				'key_' => 'trap_2',
-				'hostid' => $hostid['Host_for_monitoring_graphs_1'],
-				'type' => 2,
-				'value_type' => 0,
-				'tags' => [
-					[
-						'tag' => 'tag_name_2',
-						'value' => 'tag_value_2'
-					]
-				]
-			],
-			[
-				'name' => 'Item_for_graph_3',
-				'key_' => 'trap_3',
-				'hostid' => $hostid['Host_for_monitoring_graphs_1'],
-				'type' => 2,
-				'value_type' => 0,
-				'tags' => [
-					[
-						'tag' => 'tag_name_3',
-						'value' => 'tag_value_3'
-					]
-				]
-			],
-			[
-				'name' => 'Item_for_graph_4',
-				'key_' => 'trap_4',
-				'hostid' => $hostid['Host_for_monitoring_graphs_2'],
-				'type' => 2,
-				'value_type' => 0
 			]
 		]);
 		self::$itemids = CDataHelper::getIds('name');
@@ -187,11 +169,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		// If the time selector is not visible - enable it.
 		if ($this->query('xpath://li[@aria-labelledby="ui-id-1" and @aria-selected="false"]')->exists()) {
-				$this->query('id:ui-id-1')->one()->click();
+			$this->query('id:ui-id-1')->one()->click();
 		}
 
 		// Check that time selector set to display Last hour data.
-		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')->one()->getAttribute('class'));
+		$this->assertTrue($this->query('xpath://a[@data-label="Last 1 hour"]')->one()->hasClass('selected'));
 
 		// Enable filter and check filter labels.
 		$this->query('id:ui-id-2')->one()->click();
@@ -848,7 +830,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			$this->query('id:ui-id-2')->one()->click();
 		}
 
-		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->query('button:Reset')->one()->click();
 
 		// Filter using tags.
@@ -860,8 +842,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			foreach ($data['subfilter'] as $header => $values) {
 				foreach ($values as $value) {
 					$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
-						CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
-					$this->page->waitUntilReady();
+							CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
+					$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
+							CXPathHelper::escapeQuotes($value)."]/ancestor::span")->one()->
+							waitUntilAttributesPresent(['class' => 'subfilter subfilter-enabled']);
 				}
 			}
 		}
@@ -928,7 +912,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	 *
 	 * @param array   $names			items or graph names list
 	 * @param array   $graph_sources	displayed graphs src attribute values
-	 * @param boolean $graph			if graphs ids checked
+	 * @param boolean $graph			true if graph id need to be checked, false if simple graph id need to be checked
 	 */
 	private function checkGraphsIds($names, $graph_sources, $graph = true) {
 		foreach ($names as $name) {
