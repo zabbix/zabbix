@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,13 +118,14 @@ foreach ($this->data['triggers'] as $trigger) {
 	// status
 	$status = (new CLink(
 		($trigger['status'] == TRIGGER_STATUS_DISABLED) ? _('No') : _('Yes'),
-		'trigger_prototypes.php?'.
-			'action='.(($trigger['status'] == TRIGGER_STATUS_DISABLED)
+		(new CUrl('trigger_prototypes.php'))
+			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
 				? 'triggerprototype.massenable'
 				: 'triggerprototype.massdisable'
-			).
-			'&g_triggerid='.$triggerid.
-			'&parent_discoveryid='.$this->data['parent_discoveryid']
+			)
+			->setArgument('g_triggerid[]', $triggerid)
+			->setArgument('parent_discoveryid', $this->data['parent_discoveryid'])
+			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(triggerIndicatorStyle($trigger['status']))

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1916,6 +1916,15 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto out;
 	}
+
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
+#endif
 
 	if (NULL != CONFIG_SOURCE_IP)
 	{

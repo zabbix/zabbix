@@ -2735,6 +2735,11 @@ msgstr ""
 msgid "Cannot update a discovered host group."
 msgstr ""
 
+#: include/classes/api/services/CGraphGeneral.php:69
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:455
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -6298,6 +6303,11 @@ msgstr ""
 #: include/validate.inc.php:229
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
+msgstr ""
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
 msgstr ""
 
 #: include/validate.inc.php:167
@@ -20001,6 +20011,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:279
 msgid "invalid byte sequence in UTF-8"
+msgstr ""
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
 msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035

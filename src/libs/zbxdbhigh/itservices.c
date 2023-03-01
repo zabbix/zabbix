@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -775,7 +775,10 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_ptr_t	updates;
+	zbx_vector_uint64_t	triggerids_serviced;
 	int			i, ret = FAIL, now;
+	DB_RESULT		result;
+	DB_ROW			row;
 
 	if (0 == triggerids_num)
 		return SUCCEED;
@@ -783,27 +786,57 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 	now = time(NULL);
 
 	zbx_vector_ptr_create(&updates);
+	zbx_vector_uint64_create(&triggerids_serviced);
 
-	for (i = 0; i < triggerids_num; i++)
-		its_updates_append(&updates, triggerids[i], 0, now);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select triggerid"
+			" from services"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids, triggerids_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	triggerid;
+
+		ZBX_STR2UINT64(triggerid, row[0]);
+		zbx_vector_uint64_append(&triggerids_serviced, triggerid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&triggerids_serviced, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&triggerids_serviced, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	/* avoid update and select queries under lock if deleting triggers without services */
+	if (0 == triggerids_serviced.values_num)
+	{
+		ret = SUCCEED;
+		goto cleanup;
+	}
+
+	for (i = 0; i < triggerids_serviced.values_num; i++)
+		its_updates_append(&updates, triggerids_serviced.values[i], 0, now);
 
 	LOCK_ITSERVICES;
 
 	if (FAIL == its_flush_updates(&updates))
 		goto out;
 
+	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update services set triggerid=null,showsla=0 where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids, triggerids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids_serviced.values,
+			triggerids_serviced.values_num);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
-
-	zbx_free(sql);
 out:
 	UNLOCK_ITSERVICES;
-
+cleanup:
+	zbx_free(sql);
 	zbx_vector_ptr_clear_ext(&updates, (zbx_clean_func_t)zbx_status_update_free);
 	zbx_vector_ptr_destroy(&updates);
+	zbx_vector_uint64_destroy(&triggerids_serviced);
 
 	return ret;
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ $widget = (new CWidget())->setTitle(_('Services'));
 
 // create form
 $servicesForm = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('servicesForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
@@ -348,7 +349,7 @@ $servicesTimeFormList->addRow(_('New service time'),
  * Append tabs to form
  */
 $servicesTab = new CTabView();
-if (!$this->data['form_refresh']) {
+if ($this->data['form_refresh'] == 0) {
 	$servicesTab->setSelected(0);
 }
 $servicesTab

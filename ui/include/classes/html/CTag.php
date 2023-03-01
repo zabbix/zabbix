@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -275,12 +275,6 @@ class CTag extends CObject {
 	public function error($value) {
 		error('class('.get_class($this).') - '.$value);
 		return 1;
-	}
-
-	public function getForm($method = 'post', $action = null, $enctype = null) {
-		$form = (new CForm($method, $action, $enctype))
-			->addItem($this);
-		return $form;
 	}
 
 	public function setTitle($value) {

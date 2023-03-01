@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -307,10 +307,13 @@ addressCheck:
 		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS log_%d_1 ON log_%d (write_clock)", id, id)); err != nil {
 			return err
 		}
+
+		/* delete gathered logs - they will be rescanned using the lastlogsize received from server */
 		if _, err = database.Exec(fmt.Sprintf("DELETE FROM log_%d", id)); err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 

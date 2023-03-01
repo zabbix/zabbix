@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,14 +33,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hosts' =>					[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
-	'groups' =>					[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'hosts' =>					[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,		null],
+	'groups' =>					[null,      O_OPT, P_ONLY_ARRAY,		NOT_EMPTY,	'isset({add}) || isset({update})'],
 	'mass_update_groups' =>		[T_ZBX_INT, O_OPT, null,
 									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 									null
 								],
-	'hostids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
-	'groupids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'groupids' =>				[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,			DB_ID,		null],
 	'applications' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'],
 	'clone_hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,
@@ -55,11 +54,11 @@ $fields = [
 	'status' =>					[T_ZBX_INT, O_OPT, null,
 									IN([HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), null
 								],
-	'interfaces' =>				[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
+	'interfaces' =>				[null,      O_OPT, P_ONLY_TD_ARRAY,			NOT_EMPTY,
 									'isset({add}) || isset({update})'
 								],
-	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-	'tags' =>					[T_ZBX_STR, O_OPT, null,			null,		null],
+	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,			DB_ID,		null],
+	'tags' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,			null,		null],
 	'mass_update_tags' =>		[T_ZBX_INT, O_OPT, null,
 									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 									null
@@ -72,10 +71,9 @@ $fields = [
 	'macros_update' =>			[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	'macros_remove' =>			[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	'macros_remove_all' =>		[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
-	'templates' =>				[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-	'add_templates' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-	'templates_rem' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
-	'clear_templates' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'templates' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'add_templates' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'clear_templates' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,			DB_ID,		null],
 	'ipmi_authtype' =>			[T_ZBX_INT, O_OPT, null,			BETWEEN(-1, 6), null],
 	'ipmi_privilege' =>			[T_ZBX_INT, O_OPT, null,			BETWEEN(0, 5), null],
 	'ipmi_username' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
@@ -106,9 +104,9 @@ $fields = [
 									IN(HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC),
 									null
 								],
-	'host_inventory' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	null,		null],
-	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
-	'visible' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
+	'host_inventory' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY|P_ONLY_ARRAY,	null,		null],
+	'macros' =>					[null,      O_OPT, P_SYS|P_ONLY_TD_ARRAY,			null,		null],
+	'visible' =>				[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,			null,		null],
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -119,8 +117,8 @@ $fields = [
 								],
 	'add_to_group' =>			[T_ZBX_INT, O_OPT, P_SYS|P_ACT,		DB_ID,		null],
 	'delete_from_group' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ACT,		DB_ID,		null],
-	'unlink' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
-	'unlink_and_clear' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
+	'unlink' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT|P_ONLY_ARRAY,	null,	null],
+	'unlink_and_clear' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT|P_ONLY_ARRAY,	null,	null],
 	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
 	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
 	'masssave' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
@@ -129,13 +127,13 @@ $fields = [
 	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
-	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,			null,		null],
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,			null,		null],
 	// filter
 	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'filter_host' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
-	'filter_templates' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
-	'filter_groups' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'filter_templates' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'filter_groups' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'filter_ip' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_dns' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_port' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
@@ -143,12 +141,12 @@ $fields = [
 									IN([ZBX_MONITORED_BY_ANY, ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY]),
 									null
 								],
-	'filter_proxyids' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'filter_proxyids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_evaltype' =>		[T_ZBX_INT, O_OPT, null,
 									IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
 									null
 								],
-	'filter_tags' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
+	'filter_tags' =>			[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -272,27 +270,18 @@ $macros = array_filter($macros, function($macro) {
  * Actions
  */
 if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
-	$_REQUEST['clear_templates'] = getRequest('clear_templates', []);
-
 	$unlinkTemplates = [];
 
 	if (isset($_REQUEST['unlink'])) {
-		// templates_rem for old style removal in massupdate form
-		if (isset($_REQUEST['templates_rem'])) {
-			$unlinkTemplates = array_keys($_REQUEST['templates_rem']);
-		}
-		elseif (is_array($_REQUEST['unlink'])) {
-			$unlinkTemplates = array_keys($_REQUEST['unlink']);
-		}
+		$unlinkTemplates = array_keys($_REQUEST['unlink']);
 	}
 	else {
 		$unlinkTemplates = array_keys($_REQUEST['unlink_and_clear']);
-
-		$_REQUEST['clear_templates'] = array_merge($_REQUEST['clear_templates'], $unlinkTemplates);
+		$_REQUEST['clear_templates'] = array_merge($unlinkTemplates, getRequest('clear_templates', []));
 	}
 
-	foreach ($unlinkTemplates as $templateId) {
-		unset($_REQUEST['templates'][array_search($templateId, $_REQUEST['templates'])]);
+	foreach ($unlinkTemplates as $id) {
+		unset($_REQUEST['templates'][array_search($id, $_REQUEST['templates'])]);
 	}
 }
 elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone'))) {
@@ -1098,6 +1087,7 @@ if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || ha
 elseif (hasRequest('form')) {
 	$data = [
 		// Common & auxiliary
+		'form_refresh' => getRequest('form_refresh', 0),
 		'form' => getRequest('form', ''),
 		'hostid' => getRequest('hostid', 0),
 		'clone_hostid' => getRequest('clone_hostid', 0),

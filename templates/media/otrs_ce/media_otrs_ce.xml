@@ -4,7 +4,7 @@
     <date>2020-05-10T00:00:00Z</date>
     <media_types>
         <media_type>
-            <name>OTRS</name>
+            <name>OTRS CE</name>
             <type>WEBHOOK</type>
             <parameters>
                 <parameter>
@@ -73,7 +73,7 @@
                 </parameter>
                 <parameter>
                     <name>otrs_url</name>
-                    <value>&lt;PUT YOUR OTRS URL&gt;</value>
+                    <value>&lt;PUT YOUR ((OTRS)) CE URL&gt;</value>
                 </parameter>
                 <parameter>
                     <name>trigger_id</name>
@@ -145,7 +145,7 @@
             data = JSON.stringify(data);&#13;
         }&#13;
 &#13;
-        Zabbix.Log(4, '[ OTRS Webhook ] Sending request: ' +&#13;
+        Zabbix.Log(4, '[ ((OTRS)) CE Webhook ] Sending request: ' +&#13;
             url + ((typeof data === 'string') ? (' ' + data) : ''));&#13;
 &#13;
         switch (method) {&#13;
@@ -165,7 +165,7 @@
                 throw 'Unsupported HTTP request method: ' + method;&#13;
         }&#13;
 &#13;
-        Zabbix.Log(4, '[ OTRS Webhook ] Received response with status code ' + request.Status() + ': ' + response);&#13;
+        Zabbix.Log(4, '[ ((OTRS)) CE Webhook ] Received response with status code ' + request.Status() + ': ' + response);&#13;
 &#13;
         if (request.Status() &lt; 200 || request.Status() &gt;= 300) {&#13;
             var message = 'Request failed with status code ' + request.Status();&#13;
@@ -179,7 +179,7 @@
                 response = JSON.parse(response);&#13;
             }&#13;
             catch (error) {&#13;
-                Zabbix.Log(4, '[ OTRS Webhook ] Failed to parse response received from OTRS');&#13;
+                Zabbix.Log(4, '[ ((OTRS)) CE Webhook ] Failed to parse response received from ((OTRS)) CE');&#13;
                 response = null;&#13;
             }&#13;
         }&#13;
@@ -219,7 +219,7 @@
         if (typeof result.response !== 'object'&#13;
             || typeof result.response.TicketID === 'undefined'&#13;
             || result.status != 200) {&#13;
-            throw 'Cannot create OTRS ticket. Check debug log for more information.';&#13;
+            throw 'Cannot create ((OTRS)) CE ticket. Check debug log for more information.';&#13;
         }&#13;
 &#13;
         return result.response.TicketID;&#13;
@@ -241,7 +241,7 @@
         if (typeof result.response !== 'object'&#13;
             || typeof result.response.TicketID === 'undefined'&#13;
             || result.status != 200) {&#13;
-            throw 'Cannot update OTRS ticket. Check debug log for more information.';&#13;
+            throw 'Cannot update ((OTRS)) CE ticket. Check debug log for more information.';&#13;
         }&#13;
     }&#13;
 };&#13;
@@ -352,13 +352,13 @@ try {&#13;
     return JSON.stringify(result);&#13;
 }&#13;
 catch (error) {&#13;
-    Zabbix.Log(3, '[ OTRS Webhook ] ERROR: ' + error);&#13;
+    Zabbix.Log(3, '[ ((OTRS)) CE Webhook ] ERROR: ' + error);&#13;
     throw 'Sending failed: ' + error;&#13;
 }</script>
             <process_tags>YES</process_tags>
             <show_event_menu>YES</show_event_menu>
             <event_menu_url>{EVENT.TAGS.__zbx_otrs_ticketlink}</event_menu_url>
-            <event_menu_name>OTRS: ticket #{EVENT.TAGS.__zbx_otrs_ticket_id}</event_menu_name>
+            <event_menu_name>((OTRS)) CE: ticket #{EVENT.TAGS.__zbx_otrs_ticket_id}</event_menu_name>
             <message_templates>
                 <message_template>
                     <event_source>TRIGGERS</event_source>
