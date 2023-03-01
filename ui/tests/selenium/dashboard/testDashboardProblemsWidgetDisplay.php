@@ -224,7 +224,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 				zbx_dbstr('Trigger for widget text').', '.zbx_dbstr('Cause problem 1').', '.
 				zbx_dbstr('Symptom problem 2').', '.zbx_dbstr('Symptom problem 3').')'
 		);
-		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.zbx_dbstr('Trigger for widget 1 char'));
+		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.
+				zbx_dbstr('Trigger for widget 1 char')
+		);
 
 		// Set cause and symptoms.
 		DBexecute('UPDATE problem SET cause_eventid = 1009850 WHERE name IN ('.zbx_dbstr('Symptom problem 2').', '.
