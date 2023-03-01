@@ -129,8 +129,9 @@ static zbx_hash_t	discoverer_net_check_hash(const void *data)
 {
 	const zbx_discoverer_net_check_task_t	*net_check = (const zbx_discoverer_net_check_task_t *)data;
 	zbx_hash_t				hash;
+	zbx_uint64_t				port = net_check->port;
 
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&net_check->port);
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&port);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO(net_check->ip, strlen(net_check->ip), hash);
 
 	return hash;
