@@ -1607,6 +1607,7 @@ int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **er
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
 
+	zbx_free(replace_str);
 	zbx_free(search_str);
 
 	return ret;
