@@ -180,11 +180,11 @@ static int	get_preprocessor_selfmon_stats(unsigned char aggr_func, int proc_num,
 		double *value, char **error)
 {
 	zbx_vector_dbl_t	usage;
-	int			ret;
+	int			ret, count;
 
 	zbx_vector_dbl_create(&usage);
 
-	if (SUCCEED != (ret = zbx_preprocessor_get_usage_stats(&usage, error)))
+	if (SUCCEED != (ret = zbx_preprocessor_get_usage_stats(&usage, &count, error)))
 		goto out;
 
 	if (0 == usage.values_num)

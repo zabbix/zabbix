@@ -110,13 +110,27 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 					if ($problem['cause_eventid'] == 0) {
 						$options = [
-							'countOutput' => true,
+							'output' => ['objectid'],
 							'filter' => ['cause_eventid' => $problem['eventid']]
 						];
 
-						$problem['symptom_count'] = ($this->fields_values['show'] == TRIGGERS_OPTION_ALL)
+						$symptom_events = $this->fields_values['show'] == TRIGGERS_OPTION_ALL
 							? API::Event()->get($options)
 							: API::Problem()->get($options + ['recent' => true]);
+
+						if ($symptom_events) {
+							$enabled_triggers = API::Trigger()->get([
+								'output' => [],
+								'triggerids' => array_column($symptom_events, 'objectid'),
+								'filter' => ['status' => TRIGGER_STATUS_ENABLED],
+								'preservekeys' => true
+							]);
+
+							$symptom_events = array_filter($symptom_events,
+								static fn($event) => array_key_exists($event['objectid'], $enabled_triggers)
+							);
+							$problem['symptom_count'] = count($symptom_events);
+						}
 
 						if ($problem['symptom_count'] > 0) {
 							$data['show_three_columns'] = true;
@@ -188,40 +202,40 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			$this->setResponse(new CControllerResponseData($data + [
-					'name' => $this->getInput('name', $this->widget->getDefaultName()),
-					'error' => null,
-					'initial_load' => (bool) $this->getInput('initial_load', 0),
-					'fields' => [
-						'show' => $this->fields_values['show'],
-						'show_lines' => $this->fields_values['show_lines'],
-						'show_tags' => $this->fields_values['show_tags'],
-						'show_timeline' => $this->fields_values['show_timeline'],
-						'tags' => $this->fields_values['tags'],
-						'tag_name_format' => $this->fields_values['tag_name_format'],
-						'tag_priority' => $this->fields_values['tag_priority'],
-						'show_opdata' => $this->fields_values['show_opdata']
-					],
-					'info' => $info,
-					'sortfield' => $sortfield,
-					'sortorder' => $sortorder,
-					'user' => [
-						'debug_mode' => $this->getDebugMode()
-					],
-					'config' => [
-						'problem_ack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_STYLE),
-						'problem_unack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_STYLE),
-						'blink_period' => CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD)
-					],
-					'allowed' => [
-						'ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
-						'add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
-						'change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
-						'acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
-						'close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
-						'suppress_problems' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
-						'rank_change' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
-					]
-				]));
+				'name' => $this->getInput('name', $this->widget->getDefaultName()),
+				'error' => null,
+				'initial_load' => (bool) $this->getInput('initial_load', 0),
+				'fields' => [
+					'show' => $this->fields_values['show'],
+					'show_lines' => $this->fields_values['show_lines'],
+					'show_tags' => $this->fields_values['show_tags'],
+					'show_timeline' => $this->fields_values['show_timeline'],
+					'tags' => $this->fields_values['tags'],
+					'tag_name_format' => $this->fields_values['tag_name_format'],
+					'tag_priority' => $this->fields_values['tag_priority'],
+					'show_opdata' => $this->fields_values['show_opdata']
+				],
+				'info' => $info,
+				'sortfield' => $sortfield,
+				'sortorder' => $sortorder,
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				],
+				'config' => [
+					'problem_ack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_STYLE),
+					'problem_unack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_STYLE),
+					'blink_period' => CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD)
+				],
+				'allowed' => [
+					'ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+					'add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+					'change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+					'acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+					'close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
+					'suppress_problems' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
+					'rank_change' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
+				]
+			]));
 		}
 	}
 

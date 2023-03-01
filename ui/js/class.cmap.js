@@ -301,12 +301,13 @@ ZABBIX.apps.map = (function($) {
 					}
 
 					$.ajax({
-						url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
+						url: url.getPath() + '?output=ajax',
 						type: 'post',
 						dataType: 'html',
 						data: {
 							favobj: 'sysmap',
 							action: 'expand',
+							_csrf_token: this.csrf_token,
 							sysmapid: this.sysmapid,
 							name: this.data.name,
 							source: JSON.stringify(post)
