@@ -846,6 +846,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
 							CXPathHelper::escapeQuotes($value)."]/ancestor::span")->one()->
 							waitUntilAttributesPresent(['class' => 'subfilter subfilter-enabled']);
+					$this->page->waitUntilReady();
 				}
 			}
 		}
