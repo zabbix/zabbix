@@ -142,35 +142,24 @@ class testPageConnectors extends CWebTest {
 				'Status' => 'Disabled'
 			]
 		];
-
-		$reference_headers = [
-			'Name' => true,
-			'Data type' => true,
-			'Status' => false
-		];
-
-		$form_buttons = [
-			'Create connector' => true,
-			'Apply' => true,
-			'Reset' => true,
-			'Enable' => false,
-			'Disable' => false,
-			'Delete' => false
-		];
-
 		$connectors_count = count($connectors_data);
+
 		$this->page->login()->open('zabbix.php?action=connector.list');
 		$this->page->assertHeader('Connectors');
 		$this->page->assertTitle('Connectors');
 
-		// Check status of buttons on the Connectors page.
-		foreach ($form_buttons as $button => $enabled) {
-			$this->assertTrue($this->query('button', $button)->one()->isEnabled($enabled));
-		}
+		// Check  enabled/disabled buttons on the Connectors page.
+		$this->assertEquals(3, $this->query('button', ['Create connector', 'Apply', 'Reset'])
+				->all()->filter(CElementFilter::CLICKABLE)->count()
+		);
+
+		$this->assertEquals(0, $this->query('button', ['Enable', 'Disable', 'Delete'])
+				->all()->filter(CElementFilter::CLICKABLE)->count()
+		);
 
 		// Check displaying and hiding the filter.
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
-		$filter_tab = $this->query('xpath://a[contains(text(), "Filter")]')->one();
+		$filter_tab = $this->query('xpath://a[text()="Filter"]')->one();
 		$filter = $filter_form->query('id:tab_0')->one();
 		$this->assertTrue($filter->isDisplayed());
 		$filter_tab->click();
@@ -178,23 +167,25 @@ class testPageConnectors extends CWebTest {
 		$filter_tab->click();
 		$this->assertTrue($filter->isDisplayed());
 
-		// Check that all filter fields are present.
+		// Check filter fields.
 		$this->assertEquals(['Name', 'Status'], $filter_form->getLabels()->asText());
+		$filter_form->checkValue(['Name' => '', 'Status' => 'Any']);
+		$this->assertEquals('255', $filter_form->getField('Name')->getAttribute('maxlength'));
 
 		// Check the count of returned Connectors and the count of selected Connectors.
 		$this->assertTableStats($connectors_count);
 		$selected_count = $this->query('id:selected_count')->one();
 		$this->assertEquals('0 selected', $selected_count->getText());
 		$all_connectors = $this->query('id:all_connectors')->asCheckbox()->one();
-		$all_connectors->set(true);
+		$all_connectors->check();
 		$this->assertEquals($connectors_count.' selected', $selected_count->getText());
 
 		// Check that buttons became enabled.
-		foreach (['Enable', 'Disable', 'Delete'] as $button) {
-			$this->assertTrue($this->query('button', $button)->one()->isClickable());
-		}
+		$this->assertEquals(3, $this->query('button', ['Enable', 'Disable', 'Delete'])
+				->all()->filter(CElementFilter::CLICKABLE)->count()
+		);
 
-		$all_connectors->set(false);
+		$all_connectors->uncheck();
 		$this->assertEquals('0 selected', $selected_count->getText());
 
 		// Check Connectors table headers.
@@ -203,21 +194,18 @@ class testPageConnectors extends CWebTest {
 
 		// Remove empty element from headers array.
 		array_shift($headers_text);
-		$this->assertSame(array_keys($reference_headers), $headers_text);
+		$this->assertSame(['Name', 'Data type', 'Status'], $headers_text);
 
 		// Check which headers are sortable.
-		foreach ($reference_headers as $header => $sortable) {
-			$xpath = 'xpath:.//th/a[text()='.CXPathHelper::escapeQuotes($header).']';
-			if ($sortable) {
-				$this->assertTrue($table->query($xpath)->one()->isClickable());
-			}
-			else {
-				$this->assertFalse($table->query($xpath)->one(false)->isValid());
+		foreach ($table->getHeaders() as $header) {
+			if ($header->query('tag:a')->one(false)->isValid()) {
+				$sortable[] = $header->getText();
 			}
 		}
+		$this->assertEquals(['Name', 'Data type'], $sortable);
 
 		// Check Connectors table content.
-		$this->assertTableData($connectors_data);
+		$this->assertTableHasData($connectors_data);
 	}
 
 	public function testPageConnectors_ChangeStatus() {
@@ -464,7 +452,7 @@ class testPageConnectors extends CWebTest {
 	 */
 	public function  testPageConnectors_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=connector.list');
-		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
@@ -555,7 +543,7 @@ class testPageConnectors extends CWebTest {
 
 		// Delete Connector.
 		if ($all) {
-			$this->query('id:all_connectors')->asCheckbox()->one()->set(true);
+			$this->selectTableRows();
 		}
 		else {
 			$this->selectTableRows(self::$delete_connector);
@@ -567,8 +555,9 @@ class testPageConnectors extends CWebTest {
 
 		// Check that Connector is deleted.
 		$this->assertMessage(TEST_GOOD, $all ? 'Connectors deleted' : 'Connector deleted');
-
+		$this->assertEquals('0 selected', $this->query('id:selected_count')->one()->getText());
 		$this->assertEquals(0, $all ? CDBHelper::getCount('SELECT connectorid FROM connector')
-			: CDBHelper::getCount('SELECT connectorid FROM connector WHERE name='.zbx_dbstr(self::$delete_connector)));
+				: CDBHelper::getCount('SELECT connectorid FROM connector WHERE name='.zbx_dbstr(self::$delete_connector))
+		);
 	}
 }
