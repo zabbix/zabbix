@@ -29,8 +29,6 @@
 #include "zbxthreads.h"
 #include "zbxtypes.h"
 
-#define zbx_sigmask	pthread_sigmask
-
 static const zbx_config_icmpping_t	*config_icmpping;
 
 /* old official fping (2.4b2_to_ipv6) did not support source IP address */
