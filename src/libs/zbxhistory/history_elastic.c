@@ -1125,7 +1125,7 @@ out:
 	db_version_info.database = "ElasticDB";
 	db_version_info.friendly_current_version = version_friendly;
 	db_version_info.friendly_min_version = ZBX_ELASTIC_MIN_VERSION_STR;
-	db_version_info.friendly_max_version = ZBX_ELASTIC_MIN_VERSION_STR;
+	db_version_info.friendly_max_version = ZBX_ELASTIC_MAX_VERSION_STR;
 	db_version_info.friendly_min_supported_version = NULL;
 
 	db_version_info.flag = zbx_db_version_check(db_version_info.database, version, ZBX_ELASTIC_MIN_VERSION,
