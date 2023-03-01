@@ -361,7 +361,7 @@ class User extends ScimApiService {
 
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 		$supported_paths = array_merge($provisioning->getUserIdpAttributes(), ['active', 'userName']);
-		$user_data = $provisioning->getCurrentUserAttributes($db_user);
+		$user_idp_data = $provisioning->getCurrentUserAttributes($db_user);
 		$operations = $options['Operations'];
 
 		foreach ($operations as $operation) {
@@ -372,27 +372,43 @@ class User extends ScimApiService {
 			switch ($operation['op']) {
 				case 'add':
 				case 'replace':
-					$user_data[$operation['path']] = $operation['value'];
+					$user_idp_data[$operation['path']] = $operation['value'];
 					break;
 				case 'remove':
-					unset($user_data[$operation['path']]);
+					unset($user_idp_data[$operation['path']]);
 					break;
 			}
 		}
 
+		$new_user_data = $provisioning->getUserAttributes($user_idp_data);
+		$new_user_data['userid'] = $options['id'];
+		$new_user_data = array_merge($db_user, $new_user_data);
+
 		// If user status 'active' is changed to false, user needs to be added to disabled group.
-		if (array_key_exists('active', $user_data) && strtolower($user_data['active']) == false) {
-			$user_data['usrgrps'] = [];
-			$user_data['active'] = false;
+		if (array_key_exists('active', $user_idp_data) && strtolower($user_idp_data['active']) == false) {
+			$new_user_data['usrgrps'] = [];
+			$user_idp_data['active'] = false;
 		}
 
-		// Media attributes currently cannot be supported by PATCH request, thus this data is not updated.
-		$new_user_data = $provisioning->getUserAttributes($user_data);
-		$new_user_data['userid'] = $options['id'];
+		// If disabled user is activated again, need to return group mapping.
+		if ($db_user['roleid'] == 0 && array_key_exists('active', $user_idp_data)
+				&& strtolower($user_idp_data['active']) == true) {
+			$user_scim_groupids = DB::select('user_scim_group', [
+				'output' => ['scim_groupid'],
+				'filter' => ['userid' => $new_user_data['userid']]
+			]);
+			$user_scim_group_names = DB::select('scim_group', [
+				'output' => ['name'],
+				'scim_groupids' => array_column($user_scim_groupids, 'scim_groupid')
+			]);
+			$new_user_data['usrgrps'] = [];
+			$user_groups_and_role = $provisioning->getUserGroupsAndRole(array_column($user_scim_group_names, 'name'));
+			$new_user_data = array_merge($new_user_data, $user_groups_and_role);
+		}
 
 		APIRPC::User()->updateProvisionedUser($new_user_data);
 
-		$this->setData($db_user['userid'], $db_user['userdirectoryid'], $user_data);
+		$this->setData($db_user['userid'], $db_user['userdirectoryid'], $user_idp_data);
 
 		return $this->data;
 	}
@@ -427,7 +443,7 @@ class User extends ScimApiService {
 		}
 
 		[$db_user] = APIRPC::User()->get([
-			'output' => ['userid', 'name', 'surname', 'userdirectoryid'],
+			'output' => ['userid', 'name', 'surname', 'userdirectoryid', 'roleid'],
 			'userids' => $options['id']
 		]);
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
