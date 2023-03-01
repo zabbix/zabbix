@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ class testFormGraphs extends CWebTest {
 						'Graph type' => 'Normal'
 					],
 					'check_fields' => [
-						'id:name' =>  ['value' => '', 'maxlength' => 255],
+						'id:name' =>  ['value' => '', 'maxlength' => 128],
 						'id:width' =>  ['value' => '900', 'maxlength' => 5],
 						'id:height' =>  ['value' => '200', 'maxlength' => 5],
 						'id:graphtype' =>  ['value' => 'Normal'],

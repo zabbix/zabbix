@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,29 +85,82 @@ class CTemplateDashboard extends CDashboardGeneral {
 
 		// permissions
 		if (in_array(self::$userData['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN])) {
-			if ($options['templateids'] !== null) {
-				$options['templateids'] = array_keys(API::Template()->get([
-					'output' => [],
-					'templateids' => $options['templateids'],
-					'editable' => $options['editable'],
-					'preservekeys' => true
-				]));
+			if ($options['editable']) {
+				if ($options['templateids'] !== null) {
+					$options['templateids'] = array_keys(API::Template()->get([
+						'output' => [],
+						'templateids' => $options['templateids'],
+						'editable' => true,
+						'preservekeys' => true
+					]));
+				}
+				else {
+					$user_groups = getUserGroupsByUserId(self::$userData['userid']);
+
+					$sql_parts['where'][] = 'EXISTS ('.
+						'SELECT NULL'.
+						' FROM hosts_groups hgg'.
+							' JOIN rights r'.
+								' ON r.id=hgg.groupid'.
+									' AND '.dbConditionInt('r.groupid', $user_groups).
+						' WHERE d.templateid=hgg.hostid'.
+						' GROUP BY hgg.hostid'.
+						' HAVING MIN(r.permission)>'.PERM_DENY.
+							' AND MAX(r.permission)>='.PERM_READ_WRITE.
+						')';
+				}
 			}
 			else {
-				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 				$user_groups = getUserGroupsByUserId(self::$userData['userid']);
 
-				$sql_parts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $user_groups).
-					' WHERE d.templateid=hgg.hostid'.
-					' GROUP BY hgg.hostid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.zbx_dbstr($permission).
-					')';
+				// Select direct templates of all hosts accessible to the current user.
+				$db_host_templates = DBselect(
+					'SELECT DISTINCT ht.templateid FROM hosts_templates ht'.
+					' WHERE ht.hostid IN ('.
+						'SELECT h.hostid FROM hosts h'.
+						' WHERE h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+							' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+							' AND EXISTS ('.
+								'SELECT NULL'.
+								' FROM hosts_groups hgg'.
+									' JOIN rights r'.
+										' ON r.id=hgg.groupid'.
+											' AND '.dbConditionId('r.groupid', $user_groups).
+								' WHERE h.hostid=hgg.hostid'.
+								' GROUP BY hgg.hostid'.
+								' HAVING MIN(r.permission)>'.PERM_DENY.
+									' AND MAX(r.permission)>='.PERM_READ.
+							')'.
+					')'
+				);
+
+				$templateids = [];
+
+				while ($db_host_template = DBfetch($db_host_templates)) {
+					$templateids[$db_host_template['templateid']] = true;
+				}
+
+				$all_templateids = [];
+
+				while ($templateids) {
+					$all_templateids += $templateids;
+
+					$db_parent_templates = DBselect(
+						'SELECT ht.templateid'.
+						' FROM hosts_templates ht'.
+						' WHERE '.dbConditionId('ht.hostid', array_keys($templateids))
+					);
+
+					$templateids = [];
+
+					while ($db_parent_template = DBfetch($db_parent_templates)) {
+						$templateids[$db_parent_template['templateid']] = true;
+					}
+				}
+
+				$options['templateids'] = $options['templateids'] !== null
+					? array_intersect($options['templateids'], array_keys($all_templateids))
+					: array_keys($all_templateids);
 			}
 		}
 
@@ -322,6 +375,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 */
 	protected function validateUpdate(array &$dashboards, array &$db_dashboards = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['dashboardid']], 'fields' => [
+			'uuid' => 				['type' => API_UUID],
 			'dashboardid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
 			'display_period' =>		['type' => API_INT32, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],

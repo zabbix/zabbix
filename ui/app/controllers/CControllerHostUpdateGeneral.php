@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,6 +120,11 @@ abstract class CControllerHostUpdateGeneral extends CController {
 	 * @return array Macros for assigning to host.
 	 */
 	protected function processUserMacros(array $macros): array {
+		foreach ($macros as &$macro) {
+			unset($macro['allow_revert']);
+		}
+		unset($macro);
+
 		return array_filter(cleanInheritedMacros($macros),
 			function (array $macro): bool {
 				return (bool) array_filter(

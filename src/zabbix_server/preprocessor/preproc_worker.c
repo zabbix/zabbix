@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -624,7 +624,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-		zbx_update_env(zbx_time());
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		switch (message.code)
 		{

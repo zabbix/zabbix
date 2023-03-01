@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -851,7 +851,7 @@ void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	if (NULL == (result = DBselect("select db_extension from config")))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = DBfetch(result)) || '\0' == *row[0])
 		goto clean;
 
 	version_info->extension = zbx_strdup(NULL, row[0]);
@@ -2329,6 +2329,46 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 }
 
 #ifndef HAVE_SQLITE3
+int	DBtrigger_exists(const char *table_name, const char *trigger_name)
+{
+	char		*table_name_esc, *trigger_name_esc;
+	DB_RESULT	result;
+	int		ret;
+
+	table_name_esc = DBdyn_escape_string(table_name);
+	trigger_name_esc = DBdyn_escape_string(trigger_name);
+
+#if defined(HAVE_MYSQL)
+	result = DBselect(
+			"show triggers where `table`='%s'"
+			" and `trigger`='%s'",
+			table_name_esc, trigger_name_esc);
+#elif defined(HAVE_ORACLE)
+	result = DBselect(
+			"select 1"
+			" from all_triggers"
+			" where lower(table_name)='%s'"
+				" and lower(trigger_name)='%s'",
+			table_name_esc, trigger_name_esc);
+#elif defined(HAVE_POSTGRESQL)
+	result = DBselect(
+			"select 1"
+			" from information_schema.triggers"
+			" where event_object_table='%s'"
+			" and trigger_name='%s'"
+			" and trigger_schema='%s'",
+			table_name_esc, trigger_name_esc, zbx_db_get_schema_esc());
+#endif
+	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
+
+	DBfree_result(result);
+
+	zbx_free(table_name_esc);
+	zbx_free(trigger_name_esc);
+
+	return ret;
+}
+
 int	DBindex_exists(const char *table_name, const char *index_name)
 {
 	char		*table_name_esc, *index_name_esc;
@@ -3867,3 +3907,42 @@ char	*zbx_db_get_schema_esc(void)
 	return name;
 }
 #endif
+
+void	zbx_recalc_time_period(int *ts_from, int table_group)
+{
+#define HK_CFG_UPDATE_INTERVAL	5
+	int			least_ts, now;
+	zbx_config_t		cfg;
+	static int		last_cfg_retrieval = 0;
+	static zbx_config_hk_t	hk;
+
+	now = (int)time(NULL);
+
+	if (HK_CFG_UPDATE_INTERVAL < now - last_cfg_retrieval)
+	{
+		last_cfg_retrieval = now;
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+		hk = cfg.hk;
+	}
+
+	if (ZBX_RECALC_TIME_PERIOD_HISTORY == table_group)
+	{
+		if (1 != hk.history_global)
+			return;
+
+		least_ts = now - hk.history;
+	}
+	else if (ZBX_RECALC_TIME_PERIOD_TRENDS == table_group)
+	{
+		if (1 != hk.trends_global)
+			return;
+
+		least_ts = now - hk.trends + 1;
+	}
+
+
+	if (least_ts > *ts_from)
+		*ts_from = least_ts;
+#undef HK_CFG_UPDATE_INTERVAL
+}
