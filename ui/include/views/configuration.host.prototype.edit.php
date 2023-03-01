@@ -35,10 +35,6 @@ $widget = (new CWidget())
 
 $tabs = new CTabView();
 
-if ($host_prototype['templateid'] !=0) {
-	$tabs->addClass('readonly');
-}
-
 if (!hasRequest('form_refresh')) {
 	$tabs->setSelected(0);
 }
