@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBX_DBVER_SUPPORT_H
-#define ZABBIX_ZBX_DBVER_SUPPORT_H
+#ifndef ZABBIX_ZBX_DBVER_CONSTANTS_H
+#define ZABBIX_ZBX_DBVER_CONSTANTS_H
 
 #define ZBX_DBVERSION_UNDEFINED					0
 
@@ -71,4 +71,4 @@
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY_STR			"TimescaleDB Community Edition"
 
-#endif /*ZABBIX_ZBX_DBVER_SUPPORT_H*/
+#endif /*ZABBIX_ZBX_DBVER_CONSTANTS_H*/
