@@ -57,8 +57,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					[
 						'name' => 'Item_for_graph_1',
 						'key_' => 'trap_1',
-						'type' => 2,
-						'value_type' => 0,
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
 						'tags' => [
 							[
 								'tag' => 'tag_name_1',
@@ -69,8 +69,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					[
 						'name' => 'Item_for_graph_2',
 						'key_' => 'trap_2',
-						'type' => 2,
-						'value_type' => 0,
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
 						'tags' => [
 							[
 								'tag' => 'tag_name_2',
@@ -81,8 +81,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					[
 						'name' => 'Item_for_graph_3',
 						'key_' => 'trap_3',
-						'type' => 2,
-						'value_type' => 0,
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
 						'tags' => [
 							[
 								'tag' => 'tag_name_3',
@@ -102,8 +102,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					[
 						'name' => 'Item_for_graph_4',
 						'key_' => 'trap_4',
-						'type' => 2,
-						'value_type' => 0
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
 			]
