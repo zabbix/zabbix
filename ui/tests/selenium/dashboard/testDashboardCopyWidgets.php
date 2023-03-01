@@ -584,7 +584,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		$count = $dashboard->query($inaccessible_xpath)->waitUntilVisible()->count();
 
 		// Template dashbards are always in edit mode, so entering edit mode is only required for regular dashboards.
-		if(!CTestArrayHelper::get($data, 'template')) {
+		if(!array_key_exists('template', $data)) {
 			$dashboard->edit();
 		}
 

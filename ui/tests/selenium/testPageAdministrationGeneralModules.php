@@ -973,7 +973,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	public function testPageAdministrationGeneralModules_CheckWidgetDimentions($data) {
 		$this->page->login();
 
-		if (CTestArrayHelper::get($data, 'enable')) {
+		if (array_key_exists('enable', $data)) {
 			$this->page->open('zabbix.php?action=module.list');
 			$this->enableModule($data, 'list');
 		}
@@ -992,7 +992,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 */
 	private function checkWidgetDimentions($data) {
 		// Open required dashboard page in edit mode.
-		$url = CTestArrayHelper::get($data, 'template')
+		$url = (array_key_exists('template', $data))
 			? 'zabbix.php?action=template.dashboard.edit&dashboardid='.self::$template_dashboardid
 			: 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
 		$this->page->open($url)->waitUntilReady();
@@ -1000,7 +1000,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
 		$dashboard->selectPage($data['page']);
 
-		if (!CTestArrayHelper::get($data, 'template')) {
+		if (!array_key_exists('template', $data)) {
 			$dashboard->edit();
 		}
 
@@ -1015,7 +1015,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$dimention_array = array_map('trim', explode(';', $widget_dimentions));
 
 		foreach ($data['dimentions'] as $dimention) {
-			$this->assertTrue(in_array($dimention, $dimention_array));
+			$this->assertContains($dimention, $dimention_array);
 		}
 	}
 
@@ -1067,7 +1067,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 */
 	private function checkWidgetModuleStatus($module, $status = 'enabled') {
 		// Open dashboard or host dashboard and check widget display in this view.
-		$url = CTestArrayHelper::get($module, 'template')
+		$url = array_key_exists('template', $module)
 			? 'zabbix.php?action=host.dashboard.view&hostid='.self::$hostid.'&dashboardid='.self::$template_dashboardid
 			: 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
 		$this->page->open($url)->waitUntilReady();
@@ -1080,21 +1080,20 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// Open dashboard in edit mode or open dashboard on template and check widget display again.
-		if (CTestArrayHelper::get($module, 'template')) {
+		if (array_key_exists('template', $module)) {
 			$this->page->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$template_dashboardid)
 					->waitUntilReady();
 		}
-
-		if (!array_key_exists('template', $module)) {
+		else {
 			$dashboard->edit();
 		}
 
 		$this->checkWidgetStatusOnDashboard($dashboard, $module, $status, 'edit');
 
 		// Check that widget is present among widget types dropdown.
-		$widget_form = $dashboard->addWidget();
+		$widget_dialog = $dashboard->addWidget();
 		$widget_type = (array_key_exists('widget_type', $module) ? $module['widget_type'] : $module['module_name']);
-		$options = $widget_form->asForm()->getField('Type')->asDropdown()->getOptions()->asText();
+		$options = $widget_dialog->asForm()->getField('Type')->asDropdown()->getOptions()->asText();
 
 		// Check that widget type is present in "Type" dropdown only if corresponding module is enabled.
 		$this->assertTrue(($status === 'enabled') ? in_array($widget_type, $options) : !in_array($widget_type, $options));
@@ -1105,7 +1104,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		}
 
 		// Go back to the list of modules after the check is complete.
-		$widget_form->close();
+		$widget_dialog->close();
 		$this->page->open('zabbix.php?action=module.list');
 	}
 
@@ -1144,7 +1143,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			if (array_key_exists('dependent_widget', $module)) {
 				$dependent_widget = $dashboard->getWidget($module['dependent_widget']);
 				$this->assertTrue($dependent_widget->isValid());
-				$this->assertFalse($dependent_widget->getContent()->getText() === self::INACCESSIBLE_TEXT);
+				$this->assertNotEquals(self::INACCESSIBLE_TEXT, $dependent_widget->getContent()->getText());
 			}
 		}
 		else {
@@ -1225,9 +1224,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$xpath = 'xpath://ul[@class="menu-main"]//a[text()="';
 		// If module removes a menu entry or top level menu entry, check that such entries are not present.
 		if (CTestArrayHelper::get($module, 'remove', false)) {
-			$this->assertTrue($this->query($xpath.$module['menu_entry'].'"]')->count() === 0);
+			$this->assertEquals(0, $this->query($xpath.$module['menu_entry'].'"]')->count());
 			if (array_key_exists('top_menu_entry', $module)) {
-				$this->assertTrue($this->query($xpath.$module['top_menu_entry'].'"]')->count() === 0);
+				$this->assertEquals(0, $this->query($xpath.$module['top_menu_entry'].'"]')->count());
 			}
 
 			return;
@@ -1256,8 +1255,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	private function assertModuleDisabled($module) {
 		$xpath = 'xpath://ul[@class="menu-main"]//li/a[text()="';
 		// If module removes a menu entry or top level menu entry, check that entries are back after disabling the module.
-		if (CTestArrayHelper::get($module, 'remove', false)) {
+		if (array_key_exists('remove', $module)) {
 			$this->assertEquals(1, $this->query($xpath.$module['menu_entry'].'"]')->count());
+
 			if (array_key_exists('top_menu_entry', $module)) {
 				$this->assertEquals(1, $this->query($xpath.$module['top_menu_entry'].'"]')->count());
 			}
