@@ -1,1 +1,1 @@
-.......PS. [ZBX-22440] replaced large stack allocations with heap alloactions in preprocessing (wiper)
+.......PS. [ZBX-22440] replaced large stack allocations with heap allocations in preprocessing (wiper)
