@@ -123,6 +123,10 @@ static int	get_fping_out(const char *fping, char **out, char *error, size_t max_
 	}
 
 	pclose(f);
+
+	if (NULL == buffer)
+		return FAIL;
+
 	*out = buffer;
 
 	return SUCCEED;
