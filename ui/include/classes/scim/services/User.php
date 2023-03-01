@@ -342,7 +342,7 @@ class User extends ScimApiService {
 	 *                                                             attributes .
 	 * @param string $options['Operations'][]['value']             Value on which operation should be
 	 *                                                             performed. If operation is 'remove' this can be
-	 *                                                             ommited.
+	 *                                                             omitted.
 	 *
 	 * @return array  Returns array with data necessary for SCIM response.
 	 *
@@ -351,29 +351,18 @@ class User extends ScimApiService {
 	public function patch(array $options): array {
 		$this->validatePatch($options, $db_user);
 
-		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
-		$supported_paths = array_merge($provisioning->getUserIdpAttributes(), ['active', 'userName']);
-		$user_idp_data = $provisioning->getCurrentUserAttributes($db_user);
-		$operations = $options['Operations'];
-
-		foreach ($operations as $operation) {
-			if (!in_array($operation['path'], $supported_paths, true)) {
-				continue;
+		$user_idp_data = [];
+		foreach ($options['Operations'] as $operation) {
+			if ($operation['op'] === 'remove') {
+				$user_idp_data[$operation['path']] = '';
 			}
-
-			switch ($operation['op']) {
-				case 'add':
-				case 'replace':
-					$user_idp_data[$operation['path']] = $operation['value'];
-					break;
-				case 'remove':
-					unset($user_idp_data[$operation['path']]);
-					break;
+			else {
+				$user_idp_data[$operation['path']] = $operation['value'];
 			}
 		}
 
+		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 		$new_user_data = $provisioning->getUserAttributes($user_idp_data);
-		$new_user_data['userid'] = $options['id'];
 		$new_user_data = array_merge($db_user, $new_user_data);
 
 		// If user status 'active' is changed to false, user needs to be added to disabled group.
@@ -385,17 +374,14 @@ class User extends ScimApiService {
 		// If disabled user is activated again, need to return group mapping.
 		if ($db_user['roleid'] == 0 && array_key_exists('active', $user_idp_data)
 				&& strtolower($user_idp_data['active']) == true) {
-			$user_scim_groupids = DB::select('user_scim_group', [
-				'output' => ['scim_groupid'],
-				'filter' => ['userid' => $new_user_data['userid']]
-			]);
-			$user_scim_group_names = DB::select('scim_group', [
-				'output' => ['name'],
-				'scim_groupids' => array_column($user_scim_groupids, 'scim_groupid')
-			]);
-			$new_user_data['usrgrps'] = [];
-			$user_groups_and_role = $provisioning->getUserGroupsAndRole(array_column($user_scim_group_names, 'name'));
-			$new_user_data = array_merge($new_user_data, $user_groups_and_role);
+
+			$group_names = DBfetchColumn(DBselect(
+				'SELECT g.name'.
+				' FROM user_scim_group ug,scim_group g'.
+				' WHERE g.scim_groupid=ug.scim_groupid AND '.dbConditionId('ug.userid', [$options['id']])
+			), 'name');
+
+			$new_user_data = array_merge($new_user_data, $provisioning->getUserGroupsAndRole($group_names));
 		}
 
 		APIRPC::User()->updateProvisionedUser($new_user_data);
