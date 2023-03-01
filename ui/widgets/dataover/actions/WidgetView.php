@@ -68,8 +68,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'style' => $this->fields_values['style'],
 				'items' => $items,
 				'hosts' => $hosts,
-				'has_hidden_data' => $has_hidden_data,
-
+				'has_hidden_data' => $has_hidden_data
 			];
 		}
 

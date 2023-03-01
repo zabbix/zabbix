@@ -490,7 +490,8 @@ window.widget_svggraph_form = new class {
 				writeonly: 1,
 				multiselect: 1,
 				with_webitems: 1,
-				hostid: this.templateid
+				hostid: this.templateid,
+				template_dashboard_widget: 1
 			});
 		}
 	}
@@ -597,20 +598,39 @@ window.widget_svggraph_form = new class {
 						ids.push(jQuery(`#items_${dataset_index}_${i}_input`).val());
 					}
 
-					PopUp('popup.generic', {
-						srctbl: 'items',
-						srcfld1: 'itemid',
-						srcfld2: 'name',
-						dstfrm: widget_svggraph_form._form.id,
-						dstfld1: `items_${dataset_index}_${i}_input`,
-						dstfld2: `items_${dataset_index}_${i}_name`,
-						numeric: 1,
-						writeonly: 1,
-						with_webitems: 1,
-						real_hosts: 1,
-						dialogue_class: 'modal-popup-generic',
-						excludeids: ids
-					});
+					if (this.templateid === null) {
+						PopUp('popup.generic', {
+							srctbl: 'items',
+							srcfld1: 'itemid',
+							srcfld2: 'name',
+							dstfrm: widget_svggraph_form._form.id,
+							dstfld1: `items_${dataset_index}_${i}_input`,
+							dstfld2: `items_${dataset_index}_${i}_name`,
+							numeric: 1,
+							writeonly: 1,
+							with_webitems: 1,
+							real_hosts: 1,
+							dialogue_class: 'modal-popup-generic',
+							excludeids: ids
+						});
+					}
+					else {
+						PopUp('popup.generic', {
+							srctbl: 'items',
+							srcfld1: 'itemid',
+							srcfld2: 'name',
+							dstfrm: widget_svggraph_form._form.id,
+							dstfld1: `items_${dataset_index}_${i}_input`,
+							dstfld2: `items_${dataset_index}_${i}_name`,
+							numeric: 1,
+							writeonly: 1,
+							with_webitems: 1,
+							hostid: this.templateid,
+							template_dashboard_widget: 1,
+							dialogue_class: 'modal-popup-generic',
+							excludeids: ids
+						});
+					}
 				});
 			}
 		}

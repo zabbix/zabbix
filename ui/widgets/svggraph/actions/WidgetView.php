@@ -26,9 +26,11 @@ use CControllerDashboardWidgetView,
 	CNumberParser,
 	CParser,
 	CRangeTimeParser,
-	CSvgGraphHelper;
+	CSvgGraphHelper,
+	API;
 
 use Widgets\SvgGraph\Includes\WidgetForm;
+use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -46,11 +48,48 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'content_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'preview' => 'in 1',
 			'from' => 'string',
-			'to' => 'string'
+			'to' => 'string',
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
 	protected function doAction(): void {
+		$is_template_dashboard = $this->hasInput('templateid');
+
+		if ($is_template_dashboard && $this->hasInput('dynamic_hostid')) {
+			$dynamic_host = API::Host()->get([
+				'output' => ['name'],
+				'hostids' => [$this->getInput('dynamic_hostid')]
+			]);
+
+			foreach ($this->fields_values['ds'] as &$dataset) {
+				if ($dataset['dataset_type'] === CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
+					$dataset['hosts'] = [$dynamic_host[0]['name']];
+				}
+				else {
+					$tmp_items = API::Item()->get([
+						'output' => ['key_'],
+						'itemids' => $dataset['itemids'],
+						'webitems' => true
+					]);
+
+					if ($tmp_items) {
+						$options = [
+							'output' => ['itemid'],
+							'hostids' => [$this->getInput('dynamic_hostid')],
+							'webitems' => true,
+							'filter' => [
+								'key_' => array_column($tmp_items, 'key_')
+							]
+						];
+						$items = API::Item()->get($options);
+						$dataset['itemids'] = $items ? array_column($items, 'itemid') : null;
+					}
+				}
+			}
+			unset($dataset);
+		}
+
 		$edit_mode = $this->getInput('edit_mode', 0);
 		$width = (int) $this->getInput('content_width', self::GRAPH_WIDTH_MIN);
 		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
@@ -141,7 +180,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'problems' => [
 				'show_problems' => $this->fields_values['show_problems'] == SVG_GRAPH_PROBLEMS_ON,
 				'graph_item_problems' => $this->fields_values['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS,
-				'problemhosts' => $this->fields_values['problemhosts'],
+				'problemhosts' => !$is_template_dashboard ? $this->fields_values['problemhosts'] : null,
 				'severities' => $this->fields_values['severities'],
 				'problem_name' => $this->fields_values['problem_name'],
 				'evaltype' => $this->fields_values['evaltype'],
