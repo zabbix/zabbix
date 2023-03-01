@@ -87,6 +87,7 @@ class CControllerPopupImport extends CController {
 				$rules['templateDashboards'] = ['updateExisting' => true, 'createMissing' => true,
 					'deleteMissing' => true
 				];
+				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => true];
 				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
 					'deleteMissing' => true

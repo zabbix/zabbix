@@ -181,8 +181,8 @@ static int	pp_execute_delta(int type, unsigned char value_type, zbx_variant_t *v
 		return SUCCEED;
 
 	zbx_variant_clear(value);
-	zbx_variant_set_error(value, zbx_dsprintf(NULL,  "cannot calculate delta (%s) for value of type \"%s\": %s",
-			pp_delta_desc(type), zbx_variant_type_desc(value), errmsg));
+	zbx_variant_set_error(value, zbx_dsprintf(NULL,  "cannot calculate delta (%s) for value of type"
+				" \"%s\": %s", pp_delta_desc(type), zbx_variant_type_desc(value), errmsg));
 	zbx_free(errmsg);
 
 	return FAIL;
@@ -214,7 +214,8 @@ static int	pp_execute_regsub(zbx_variant_t *value, const char *params)
 
 	zbx_variant_clear(value);
 	zbx_variant_set_error(value, zbx_dsprintf(NULL, "cannot perform regular expression \"%.*s\""
-			" match for value of type \"%s\": %s", len, params, zbx_variant_type_desc(value), errmsg));
+			" match for value of type \"%s\": %s",
+			len, params, zbx_variant_type_desc(value), errmsg));
 
 	zbx_free(errmsg);
 
@@ -276,6 +277,7 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 			{
 				*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 				zbx_free(obj);
+				cache->type = ZBX_PREPROC_NONE;
 				return FAIL;
 			}
 
@@ -287,6 +289,8 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 			*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 			return FAIL;
 		}
+
+		zbx_jsonobj_disable_indexing(obj);
 	}
 
 	if (NULL == data)
@@ -692,14 +696,15 @@ static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *val
 
 		if (NULL == (prom_cache = (zbx_prometheus_t *)cache->data))
 		{
-			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
-
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 				return FAIL;
+
+			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
 
 			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &err))
 			{
 				zbx_free(prom_cache);
+				cache->type = ZBX_PREPROC_NONE;
 				goto out;
 			}
 
@@ -916,7 +921,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char 
 
 	pp_cache_copy_value(cache, step->type, value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() step:%d params:'%s' value:'%s' cache:%p", pp_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%s' cache:%p", __func__,
 			step->type, ZBX_NULL2EMPTY_STR(step->params), zbx_variant_value_desc(value), (void *)cache);
 
 	switch (step->type)
@@ -1004,7 +1009,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char 
 			ret = FAIL;
 		}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ret:%s value:%s", pp_worker_id, __func__, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s value:%s", __func__, zbx_result_string(ret),
 			zbx_variant_value_desc(value));
 
 	return ret;
@@ -1033,7 +1038,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	int			quote_error, results_num, action;
 	zbx_variant_t		value_raw;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s(): value:%s type:%s", pp_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): value:%s type:%s", __func__,
 			zbx_variant_value_desc(NULL == cache ? value_in : &cache->value),
 			zbx_variant_type_desc(NULL == cache ? value_in : &cache->value));
 
@@ -1132,7 +1137,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	else
 		pp_free_results(results, results_num);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s(): value:'%s' type:%s", pp_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): value:'%s' type:%s", __func__,
 			zbx_variant_value_desc(value_out), zbx_variant_type_desc(value_out));
 
 }

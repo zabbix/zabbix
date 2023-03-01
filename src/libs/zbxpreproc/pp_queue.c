@@ -38,13 +38,6 @@ typedef struct
 }
 zbx_pp_item_task_sequence_t;
 
-static void	pp_item_task_sequence_clear(void *d)
-{
-	zbx_pp_item_task_sequence_t	*seq = (zbx_pp_item_task_sequence_t *)d;
-
-	pp_task_free(seq->task);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize task queue                                             *
@@ -63,13 +56,12 @@ int	pp_task_queue_init(zbx_pp_queue_t *queue, char **error)
 	queue->workers_num = 0;
 	queue->pending_num = 0;
 	queue->finished_num = 0;
+	queue->processing_num = 0;
 	zbx_list_create(&queue->pending);
 	zbx_list_create(&queue->immediate);
 	zbx_list_create(&queue->finished);
 
-	zbx_hashset_create_ext(&queue->sequences, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			pp_item_task_sequence_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
-			ZBX_DEFAULT_MEM_FREE_FUNC);
+	zbx_hashset_create(&queue->sequences, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (0 != (err = pthread_mutex_init(&queue->lock, NULL)))
 	{
@@ -323,6 +315,7 @@ zbx_pp_task_t	*pp_task_queue_pop_new(zbx_pp_queue_t *queue)
 		/* while sequence tasks do not affect statistics, the first task in sequence */
 		/* does, so the statistics can be updated for all tasks                      */
 		queue->pending_num--;
+		queue->processing_num++;
 
 		return (zbx_pp_task_t *)task;
 	}
@@ -339,6 +332,7 @@ zbx_pp_task_t	*pp_task_queue_pop_new(zbx_pp_queue_t *queue)
 		if (NULL != task)
 		{
 			queue->pending_num--;
+			queue->processing_num++;
 
 			return task;
 		}
@@ -358,6 +352,7 @@ zbx_pp_task_t	*pp_task_queue_pop_new(zbx_pp_queue_t *queue)
 void	pp_task_queue_push_finished(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 {
 	queue->finished_num++;
+	queue->processing_num--;
 	zbx_list_append(&queue->finished, task, NULL);
 }
 

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-07 11:49+0000\n"
+"PO-Revision-Date: 2023-02-12 15:40+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -4535,7 +4535,7 @@ msgstr "Configuració de la neteja"
 #: app/controllers/CControllerIconMapEdit.php:98
 #: app/controllers/CControllerIconMapList.php:75
 msgid "Configuration of icon mapping"
-msgstr "Configuració del mapeig d'icones"
+msgstr "Configuració del mapatge d'icones"
 
 #: app/controllers/CControllerImageEdit.php:75
 #: app/controllers/CControllerImageList.php:57
@@ -10966,7 +10966,7 @@ msgstr "La clau \"%1$s\" no és vàlida: %2$s."
 #: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
 #: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
 msgid "Invalid media type mapping configuration."
-msgstr "La configuració de mapeig del tipus de suport no és vàlida."
+msgstr "La configuració de mapatge del tipus de suport no és vàlida."
 
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
@@ -11273,7 +11273,7 @@ msgstr "Període de temps no vàlid."
 #: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
 #: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
 msgid "Invalid user group mapping configuration."
-msgstr "La configuració de mapeig del grup d'usuaris no és vàlida."
+msgstr "La configuració de mapatge del grup d'usuaris no és vàlida."
 
 #: include/classes/validators/CApiInputValidator.php:2852
 #, c-format
@@ -12800,7 +12800,7 @@ msgstr[1] "Habilitats els tipus de suport"
 #: app/views/popup.ldap.edit.php:255
 #: app/views/popup.mediatypemapping.edit.php:85
 msgid "Media type mapping"
-msgstr "Mapeig del tipus de suport"
+msgstr "Mapatge del tipus de suport"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -13602,7 +13602,7 @@ msgstr "Nou període de manteniment"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
-msgstr "Nou mapeig del tipus de suport"
+msgstr "Nou mapatge del tipus de suport"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -13635,7 +13635,7 @@ msgstr "Nous triggers"
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
-msgstr "Nou mapeig de grups d'usuaris"
+msgstr "Nou mapatge de grups d'usuaris"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -21018,7 +21018,7 @@ msgstr "Grup d'usuaris per al missatge de baixa de la base de dades"
 #: app/views/popup.ldap.edit.php:226
 #: app/views/popup.usergroupmapping.edit.php:126
 msgid "User group mapping"
-msgstr "Mapeig de grups d'usuaris"
+msgstr "Mapatge de grups d'usuaris"
 
 #: app/views/popup.ldap.edit.php:196
 msgid "User group membership attribute"
