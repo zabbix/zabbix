@@ -72,131 +72,31 @@ class testDashboardProblemsWidget extends CWebTest {
 							'height' => 6,
 							'view_mode' => 0,
 							'fields' => [
-								[
-									'type' => 0,
-									'name' => 'severities',
-									'value' => 0
-								],
-								[
-									'type' => 0,
-									'name' => 'severities',
-									'value' => 4
-								],
-								[
-									'type' => 0,
-									'name' => 'severities',
-									'value' => 2
-								],
-								[
-									'type' => 0,
-									'name' => 'evaltype',
-									'value' => 2
-								],
-								[
-									'type' => 0,
-									'name' => 'rf_rate',
-									'value' => '900'
-								],
-								[
-									'type' => 0,
-									'name' => 'show',
-									'value' => 3
-								],
-								[
-									'type' => 0,
-									'name' => 'show_lines',
-									'value' => 12
-								],
-								[
-									'type' => 0,
-									'name' => 'show_opdata',
-									'value' => 1
-								],
-								[
-									'type' => 0,
-									'name' => 'show_suppressed',
-									'value' => 1
-								],
-								[
-									'type' => 0,
-									'name' => 'show_tags',
-									'value' => 2
-								],
-								[
-									'type' => 0,
-									'name' => 'sort_triggers',
-									'value' => 15
-								],
-								[
-									'type' => 0,
-									'name' => 'show_timeline',
-									'value' => 0
-								],
-								[
-									'type' => 0,
-									'name' => 'tag_name_format',
-									'value' => 1
-								],
-								[
-									'type' => 0,
-									'name' => 'tags.operator.0',
-									'value' => 1
-								],
-								[
-									'type' => 0,
-									'name' => 'tags.operator.1',
-									'value' => 1
-								],
-								[
-									'type' => 0,
-									'name' => 'unacknowledged',
-									'value' => 1
-								],
-								[
-									'type' => 1,
-									'name' => 'problem',
-									'value' => 'test2'
-								],
-								[
-									'type' => 1,
-									'name' => 'tags.value.0',
-									'value' => '2'
-								],
-								[
-									'type' => 1,
-									'name' => 'tags.value.1',
-									'value' => '33'
-								],
-								[
-									'type' => 1,
-									'name' => 'tag_priority',
-									'value' => '1,2'
-								],
-								[
-									'type' => 1,
-									'name' => 'tags.tag.0',
-									'value' => 'tag2'
-								],
-								[
-									'type' => 1,
-									'name' => 'tags.tag.1',
-									'value' => 'tagg33'
-								],
-								[
-									'type' => 2,
-									'name' => 'exclude_groupids',
-									'value' => 50014
-								],
-								[
-									'type' => 2,
-									'name' => 'groupids',
-									'value' => 50005
-								],
-								[
-									'type' => 3,
-									'name' => 'hostids',
-									'value' => 99026
-								]
+								['type' => 0, 'name' => 'severities', 'value' => 0],
+								['type' => 0, 'name' => 'severities', 'value' => 4],
+								['type' => 0, 'name' => 'severities', 'value' => 2],
+								['type' => 0, 'name' => 'evaltype', 'value' => 2],
+								['type' => 0, 'name' => 'rf_rate', 'value' => '900'],
+								['type' => 0, 'name' => 'show', 'value' => 3],
+								['type' => 0, 'name' => 'show_lines', 'value' => 12],
+								['type' => 0, 'name' => 'show_opdata', 'value' => 1],
+								['type' => 0, 'name' => 'show_suppressed', 'value' => 1],
+								['type' => 0, 'name' => 'show_tags', 'value' => 2],
+								['type' => 0, 'name' => 'sort_triggers', 'value' => 15],
+								['type' => 0, 'name' => 'show_timeline', 'value' => 0],
+								['type' => 0, 'name' => 'tag_name_format', 'value' => 1],
+								['type' => 0, 'name' => 'tags.operator.0', 'value' => 1],
+								['type' => 0, 'name' => 'tags.operator.1', 'value' => 1],
+								['type' => 0, 'name' => 'unacknowledged', 'value' => 1],
+								['type' => 1, 'name' => 'problem', 'value' => 'test2'],
+								['type' => 1, 'name' => 'tags.value.0', 'value' => '2'],
+								['type' => 1, 'name' => 'tags.value.1', 'value' => '33'],
+								['type' => 1, 'name' => 'tag_priority', 'value' => '1,2'],
+								['type' => 1, 'name' => 'tags.tag.0', 'value' => 'tag2'],
+								['type' => 1, 'name' => 'tags.tag.1', 'value' => 'tagg33'],
+								['type' => 2, 'name' => 'exclude_groupids', 'value' => 50014],
+								['type' => 2, 'name' => 'groupids', 'value' => 50005],
+								['type' => 3, 'name' => 'hostids', 'value' => 99026]
 							]
 						],
 						[
