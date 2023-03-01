@@ -34,7 +34,34 @@ typedef struct
 }
 zbx_dservice_t;
 
+ZBX_PTR_VECTOR_DECL(discoverer_net_check, DC_DCHECK *)
+
+typedef struct
+{
+	zbx_vector_discoverer_net_check_t	dchecks;
+	char					*ip;
+	zbx_vector_str_t			*ips;
+	unsigned short				port;
+	zbx_uint64_t				unique_dcheckid;
+	int					resolve_dns;
+}
+zbx_discoverer_net_check_task_t;
+
+typedef struct
+{
+	zbx_uint64_t				druleid;
+	zbx_list_t				tasks;
+	zbx_uint64_t				drule_revision;
+	int					config_timeout;
+	int					workers_used;
+	int					workers_max;
+	unsigned char				pending;
+}
+zbx_discoverer_drule_job_t;
+
 void	zbx_discovery_update_host(zbx_db_dhost *dhost, int status, int now);
 void	zbx_discovery_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, zbx_uint64_t unique_dcheckid,
 		zbx_db_dhost *dhost, const char *ip, const char *dns, int port, int status, const char *value, int now);
+void	zbx_discovery_dcheck_free(DC_DCHECK *dcheck);
+void	zbx_discovery_drule_free(DC_DRULE *drule);
 #endif

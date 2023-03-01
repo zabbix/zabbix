@@ -24,11 +24,12 @@
 #include "log.h"
 #include "zbxcommon.h"
 #include "zbxcomms.h"
-#include "zbxexec.h"
 #include "zbxip.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxtypes.h"
+
+#define zbx_sigmask	pthread_sigmask
 
 static const zbx_config_icmpping_t	*config_icmpping;
 
@@ -36,21 +37,21 @@ static const zbx_config_icmpping_t	*config_icmpping;
 /* old patched versions (2.4b2_to_ipv6) provided either -I or -S options */
 /* since fping 3.x it provides -I option for binding to an interface and -S option for source IP address */
 
-static unsigned char	source_ip_checked;
-static const char	*source_ip_option;
+static ZBX_THREAD_LOCAL unsigned char	source_ip_checked;
+static ZBX_THREAD_LOCAL const char	*source_ip_option;
 #ifdef HAVE_IPV6
-static unsigned char	source_ip6_checked;
-static const char	*source_ip6_option;
+static ZBX_THREAD_LOCAL unsigned char	source_ip6_checked;
+static ZBX_THREAD_LOCAL const char	*source_ip6_option;
 #endif
 
 #define FPING_UNINITIALIZED_VALUE	-2
-static int		packet_interval;
+static ZBX_THREAD_LOCAL int		packet_interval;
 #ifdef HAVE_IPV6
-static int		packet_interval6;
-static int		fping_ipv6_supported;
+static ZBX_THREAD_LOCAL int		packet_interval6;
+static ZBX_THREAD_LOCAL int		fping_ipv6_supported;
 #endif
 
-static time_t	fping_check_reset_at;	/* time of the last fping options expiration */
+static ZBX_THREAD_LOCAL time_t		fping_check_reset_at;	/* time of the last fping options expiration */
 
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
 {
@@ -83,6 +84,48 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 	pclose(f);
 
 	*checked = 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute external program and return stdout and stderr values      *
+ *                                                                            *
+ * Parameters: fping         - [IN] the location of fping program             *
+ *             value         - [OUT] stdout and stderr values                 *
+ *             error         - [OUT] error string if function fails           *
+ *             max_error_len - [IN] length of error buffer                    *
+ *                                                                            *
+ * Return value: SUCCEED if processed successfully or FAIL otherwise          *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_fping_out(const char *fping, char **out, char *error, size_t max_error_len)
+{
+	FILE	*f;
+	size_t	buf_size = 0, offset = 0;
+	char	tmp[MAX_STRING_LEN], *buffer = NULL;
+
+	zbx_snprintf(tmp, sizeof(tmp), "%s 2>&1", fping);
+
+	if (NULL == (f = popen(tmp, "r")))
+	{
+		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
+		return FAIL;
+	}
+
+	while (NULL != zbx_fgets(tmp, sizeof(tmp), f))
+	{
+		size_t	len = strlen(tmp);
+
+		if (MAX_EXECUTE_OUTPUT_LEN < offset + len)
+			break;
+
+		zbx_strncpy_alloc(&buffer, &buf_size, &offset, tmp, len);
+	}
+
+	pclose(f);
+	*out = buffer;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -129,7 +172,6 @@ static int	get_interval_option(const char *fping, ZBX_FPING_HOST *hosts, int hos
 
 		for (j = 0; j < ARRSIZE(intervals); j++)
 		{
-			int		ret_exec;
 			char		tmp[MAX_STRING_LEN], err[255];
 			const char	*p;
 
@@ -139,15 +181,7 @@ static int	get_interval_option(const char *fping, ZBX_FPING_HOST *hosts, int hos
 
 			zbx_free(out);
 
-			/* call fping, ignore its exit code but mind execution failures */
-			if (TIMEOUT_ERROR == (ret_exec = zbx_execute(tmp, &out, err, sizeof(err), 1,
-					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)))
-			{
-				zbx_snprintf(error, max_error_len, "Timeout while executing \"%s\"", tmp);
-				goto out;
-			}
-
-			if (SUCCEED != ret_exec)
+			if (FAIL == get_fping_out(tmp, &out, err, sizeof(err)))
 			{
 				zbx_snprintf(error, max_error_len, "Cannot execute \"%s\": %s", tmp, err);
 				goto out;
@@ -245,16 +279,12 @@ out:
 static int	get_ipv6_support(const char *fping, const char *dst)
 {
 	int	ret;
-	char	tmp[MAX_STRING_LEN], error[255], *out = NULL;
+	char	tmp[MAX_STRING_LEN], *out = NULL, error[255];
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s -6 -c1 -t50 %s", fping, dst);
 
-	if ((SUCCEED == (ret = zbx_execute(tmp, &out, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)) &&
-				ZBX_KIBIBYTE > strlen(out) && NULL != strstr(out, dst)) || TIMEOUT_ERROR == ret)
-	{
-		ret = SUCCEED;
-	}
-	else
+	if ((FAIL == (ret = get_fping_out(tmp, &out, error, sizeof(error))) ||
+			ZBX_KIBIBYTE < strlen(out) || NULL == strstr(out, dst)))
 	{
 		ret = FAIL;
 	}
@@ -262,12 +292,59 @@ static int	get_ipv6_support(const char *fping, const char *dst)
 	zbx_free(out);
 
 	return ret;
-
 }
 #endif	/* HAVE_IPV6 */
 
+static int	check_hostip_response(char *resp, ZBX_FPING_HOST *hosts, const int hosts_count, const int rdns,
+		size_t *dnsname_len, ZBX_FPING_HOST **host)
+{
+	int	i, ret = FAIL;
+	char	*c, *tmp = resp;
+
+	if (NULL == (c = strchr(tmp, ' ')))
+		return FAIL;
+
+	*c = '\0';
+
+	/* when rdns is used, there are also lines like */
+	/* Lab-u22 (192.168.6.51) : [0], 64 bytes, 0.024 ms (0.024 avg, 0% loss) */
+
+	if (0 != rdns)
+	{
+		*dnsname_len = zbx_strlen_utf8(tmp);
+		*c = ' ';
+
+		if (ZBX_MAX_DNSNAME_LEN < *dnsname_len)
+			return FAIL;
+
+		if (NULL == (c = strchr(tmp, '(')))
+			return FAIL;
+
+		tmp = c + 1;
+
+		if (NULL == (c = strchr(tmp, ')')))
+			return FAIL;
+
+		*c = '\0';
+	}
+
+	for (i = 0; i < hosts_count; i++)
+	{
+		if (0 == strcmp(tmp, hosts[i].addr))
+		{
+			*host = &hosts[i];
+			ret = SUCCEED;
+			break;
+		}
+	}
+
+	*c = (0 == rdns) ? ' ' : ')';
+
+	return ret;
+}
+
 static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout,
-		char *error, size_t max_error_len)
+		int rdns, char *error, size_t max_error_len)
 {
 	const int	response_time_chars_max = 20;
 	FILE		*f;
@@ -361,6 +438,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -b%d", size);
 	if (0 != timeout)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -t%d", timeout);
+	if (0 != rdns)
+		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -dA");
 
 #ifdef HAVE_IPV6
 	zbx_strscpy(params6, params);
@@ -370,7 +449,16 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 		if (FPING_UNINITIALIZED_VALUE == packet_interval)
 		{
-			if (SUCCEED != get_interval_option(config_icmpping->get_fping_location(), hosts, hosts_count,
+			int		hsts_count = 1;
+			ZBX_FPING_HOST	h = {.addr = "127.0.0.1"}, *hsts = &h;
+
+			if (0 == rdns)
+			{
+				hsts = hosts;
+				hsts_count = hosts_count;
+			}
+
+			if (SUCCEED != get_interval_option(config_icmpping->get_fping_location(), hsts, hsts_count,
 					&packet_interval, error, max_error_len))
 			{
 				goto out;
@@ -387,7 +475,16 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 		if (FPING_UNINITIALIZED_VALUE == packet_interval6)
 		{
-			if (SUCCEED != get_interval_option(config_icmpping->get_fping6_location(), hosts, hosts_count,
+			int		hsts_count = 1;
+			ZBX_FPING_HOST	h = {.addr = "::1"}, *hsts = &h;
+
+			if (0 == rdns)
+			{
+				hsts = hosts;
+				hsts_count = hosts_count;
+			}
+
+			if (SUCCEED != get_interval_option(config_icmpping->get_fping6_location(), hsts, hsts_count,
 					&packet_interval6, error, max_error_len))
 			{
 				goto out;
@@ -404,7 +501,16 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 		if (FPING_UNINITIALIZED_VALUE == packet_interval)
 		{
-			if (SUCCEED != get_interval_option(config_icmpping->get_fping_location(), hosts, hosts_count,
+			int		hsts_count = 1;
+			ZBX_FPING_HOST	h = {.addr = "127.0.0.1"}, *hsts = &h;
+
+			if (0 == rdns)
+			{
+				hsts = hosts;
+				hsts_count = hosts_count;
+			}
+
+			if (SUCCEED != get_interval_option(config_icmpping->get_fping_location(), hsts, hsts_count,
 					&packet_interval, error, max_error_len))
 			{
 				goto out;
@@ -555,7 +661,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	sigaddset(&mask, SIGQUIT);
 
 	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
-		zbx_error("cannot set signal mask to block the user signal");
+		zbx_error("cannot set sigprocmask to block the user signal");
 
 	if (NULL == (f = popen(tmp, "r")))
 	{
@@ -564,7 +670,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		unlink(filename);
 
 		if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
-			zbx_error("cannot restore signal mask");
+			zbx_error("cannot restore sigprocmask");
 
 		goto out;
 	}
@@ -585,27 +691,13 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		{
 			ZBX_FPING_HOST	*host = NULL;
 			char		*c;
+			size_t		dnsname_len;
 
 			zbx_rtrim(tmp, "\n");
 			zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", tmp);
 
-			if (NULL != (c = strchr(tmp, ' ')))
-			{
-				*c = '\0';
 
-				for (i = 0; i < hosts_count; i++)
-				{
-					if (0 == strcmp(tmp, hosts[i].addr))
-					{
-						host = &hosts[i];
-						break;
-					}
-				}
-
-				*c = ' ';
-			}
-
-			if (NULL == host)
+			if (FAIL == check_hostip_response(tmp, hosts, hosts_count, rdns, &dnsname_len, &host))
 				continue;
 
 			if (NULL == (c = strstr(tmp, " : ")))
@@ -690,6 +782,11 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				memset(host->status, 0, (size_t)count);	/* reset response statuses for IPv6 */
 			}
 #endif
+			if (0 != rdns)
+			{
+				host->dnsname = zbx_dsprintf(NULL, "%.*s", (int)dnsname_len, tmp);
+			}
+
 			ret = SUCCEED;
 		}
 		while (NULL != zbx_fgets(tmp, (int)tmp_size, f));
@@ -700,7 +797,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	rc = pclose(f);
 
 	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
-		zbx_error("cannot restore signal mask");
+		zbx_error("cannot restore sigprocmask");
 
 	unlink(filename);
 
@@ -742,6 +839,8 @@ void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config)
  *             timeout       - [IN]  individual target initial timeout except *
  *                                   when count > 1, where it's the -p period *
  *                                   (fping option -t)                        *
+ *             rdns          - [IN]  flag required rdns option                *
+ *                                   (fping option -dA)                       *
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN]  length of error buffer                   *
  *                                                                            *
@@ -751,14 +850,14 @@ void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config)
  * Comments: use external binary 'fping' to avoid superuser privileges        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int period, int size, int timeout,
+int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int period, int size, int timeout, int rdns,
 		char *error, size_t max_error_len)
 {
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __func__, hosts_count);
 
-	if (NOTSUPPORTED == (ret = process_ping(hosts, hosts_count, count, period, size, timeout, error,
+	if (NOTSUPPORTED == (ret = process_ping(hosts, hosts_count, count, period, size, timeout, rdns, error,
 			max_error_len)))
 		zabbix_log(LOG_LEVEL_ERR, "%s", error);
 

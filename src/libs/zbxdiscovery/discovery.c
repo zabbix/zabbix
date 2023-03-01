@@ -491,3 +491,34 @@ void	zbx_discovery_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, z
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free discovery check                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_discovery_dcheck_free(DC_DCHECK *dcheck)
+{
+	zbx_free(dcheck->key_);
+	zbx_free(dcheck->snmp_community);
+	zbx_free(dcheck->snmpv3_securityname);
+	zbx_free(dcheck->ports);
+	zbx_free(dcheck->snmpv3_authpassphrase);
+	zbx_free(dcheck->snmpv3_privpassphrase);
+	zbx_free(dcheck->snmpv3_contextname);
+	zbx_free(dcheck);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free discovery rule                                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_discovery_drule_free(DC_DRULE *drule)
+{
+	zbx_free(drule->delay_str);
+	zbx_free(drule->iprange);
+	zbx_free(drule->name);
+
+	zbx_free(drule);
+}

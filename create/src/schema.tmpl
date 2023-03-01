@@ -133,6 +133,7 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|iprange	|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|delay		|t_varchar(255)	|'1h'	|NOT NULL	|ZBX_PROXY
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|workers_max	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|proxy_hostid
 UNIQUE		|2		|name
 CHANGELOG	|9

@@ -1795,6 +1795,20 @@ static int	DBpatch_6030193(void)
 	return DBcreate_index("scripts", "scripts_3", "name,menu_path", 1);
 }
 
+static int	DBpatch_6030194(void)
+{
+	const ZBX_FIELD	field = {"workers_max", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("drules", &field);
+}
+
+static int	DBpatch_6030195(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update drules set workers_max=1"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6030)
@@ -1981,5 +1995,7 @@ DBPATCH_ADD(6030190, 0, 1)
 DBPATCH_ADD(6030191, 0, 1)
 DBPATCH_ADD(6030192, 0, 1)
 DBPATCH_ADD(6030193, 0, 1)
+DBPATCH_ADD(6030194, 0, 1)
+DBPATCH_ADD(6030195, 0, 1)
 
 DBPATCH_END()

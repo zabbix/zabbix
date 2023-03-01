@@ -672,6 +672,7 @@ typedef struct
 	char			*name;
 	zbx_uint64_t		unique_dcheckid;
 	zbx_vector_ptr_t	dchecks;
+	int			workers_max;
 }
 DC_DRULE;
 

@@ -1346,8 +1346,9 @@ static void	DCdump_drules(void)
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "druleid:" ZBX_FS_UI64 " proxy_hostid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64,
 				drule->druleid, drule->proxy_hostid, drule->revision);
-		zabbix_log(LOG_LEVEL_TRACE, "  status:%u delay:%d location:%d nextcheck:%ld",
-				drule->status, drule->delay, drule->location, (long int)drule->nextcheck);
+		zabbix_log(LOG_LEVEL_TRACE, "  status:%u delay:%d location:%d nextcheck:%ld workers_max:%d",
+				drule->status, drule->delay, drule->location, (long int)drule->nextcheck,
+				drule->workers_max);
 	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);

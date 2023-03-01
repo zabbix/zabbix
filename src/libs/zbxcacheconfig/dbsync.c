@@ -3792,9 +3792,9 @@ int	zbx_dbsync_prepare_drules(zbx_dbsync_t *sync)
 	int	ret = SUCCEED;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select druleid,proxy_hostid,delay,name,iprange,status from drules");
+			"select druleid,proxy_hostid,delay,name,iprange,status,workers_max from drules");
 
-	dbsync_prepare(sync, 6, NULL);
+	dbsync_prepare(sync, 7, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
