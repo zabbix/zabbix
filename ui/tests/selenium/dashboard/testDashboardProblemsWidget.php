@@ -342,8 +342,9 @@ class testDashboardProblemsWidget extends CWebTest {
 
 		$timeline_field = $form->getField('Show timeline');
 
+		$dropdown = $form->getField('Sort entries by')->asDropdown();
 		foreach ($sort_timeline_statuses as $entry => $timeline_status) {
-			$form->getField('Sort entries by')->asDropdown()->select($entry);
+			$dropdown->select($entry);
 			$this->assertTrue($timeline_field->isEnabled($timeline_status));
 			$this->assertTrue($timeline_field->isChecked($timeline_status));
 		}
@@ -646,8 +647,8 @@ class testDashboardProblemsWidget extends CWebTest {
 			else {
 				if ($update) {
 					/**
-					 * The Widget for update already has 2 tags, so we need to update them. The first tag has action°
-					 * and index in data provider, so we add them to 2nd tag.
+					 * The Widget for update already has 2 tags, so we need to update them. The first tag has action
+					 * and index in data provider, so we add them to the 2nd tag.
 					 */
 					$data['Tags']['tags'][1]['action'] = USER_ACTION_UPDATE;
 					$data['Tags']['tags'][1]['index'] = 1;
@@ -776,7 +777,7 @@ class testDashboardProblemsWidget extends CWebTest {
 	/**
 	 * Function for checking cancelling form or submitting without any changes.
 	 *
-	 * @param boolean $cancel			true if cancels scenario, false if form is submitted
+	 * @param boolean $cancel			true if cancel scenario, false if form is submitted
 	 * @param boolean $create			true if create scenario, false if update
 	 * @param boolean $save_dashboard	true if dashboard will be saved, false if not
 	 */
