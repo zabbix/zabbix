@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,26 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup scripts
+ *
+ * @onBefore prepareScriptData
  */
 class testFormAdministrationScripts extends CWebTest {
-
-	private const ID_UPDATE = 200;	// Script for Update.
-
-	private const ID_DELETE = 202;
-	private const NAME_DELETE = 'Script for Delete';
 
 	/**
 	 * Id of scripts that created for future cloning.
 	 *
 	 * @var integer
 	 */
-	protected static $scriptids;
+	protected static $clone_scriptids;
+
+	/**
+	 * Id of scripts.
+	 *
+	 * @var array
+	 */
+	protected static $ids;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -49,6 +53,89 @@ class testFormAdministrationScripts extends CWebTest {
 	}
 
 	/**
+	 * Function used to create scripts.
+	 */
+	public function prepareScriptData() {
+		$response = CDataHelper::call('script.create', [
+			[
+				'name' => 'Script for Clone',
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'command' => 'test',
+				'parameters' => [
+					[
+						'name' => 'name1',
+						'value' => 'value1'
+					],
+					[
+						'name' => 'name2',
+						'value' => 'value2'
+					]
+				],
+				'description' => 'clone description'
+			],
+			[
+				'name' => 'SSH_api_clone_1',
+				'type' => ZBX_SCRIPT_TYPE_SSH,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'username' => 'SSH_username',
+				'password' => 'SSH_password',
+				'command' => 'test',
+				'port' => '80'
+			],
+			[
+				'name' => 'SSH_api_clone_2',
+				'type' => ZBX_SCRIPT_TYPE_SSH,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
+				'username' => 'SSH_username',
+				'privatekey' => 'private_key',
+				'publickey' => 'public_key',
+				'command' => 'test'
+			],
+			[
+				'name' => 'TELNET_api_clone',
+				'type' => ZBX_SCRIPT_TYPE_TELNET,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'username' => 'TELNET_username',
+				'password' => 'TELNET_password',
+				'command' => 'test'
+			]
+		]);
+		$this->assertArrayHasKey('scriptids', $response);
+		self::$clone_scriptids = $response['scriptids'];
+
+		$scripts = CDataHelper::call('script.create', [
+			[
+				'name' => 'Script for Update',
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'command' => 'test',
+				'parameters' => [
+					[
+						'name' => 'update_name',
+						'value' => 'update_value'
+					],
+					[
+						'name' => 'update_name2',
+						'value' => 'update_value2'
+					]
+				],
+				'description' => 'update description'
+			],
+			[
+				'name' => 'Script for Delete',
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'command' => 'test',
+				'description' => 'delete description'
+			]
+		]);
+		$this->assertArrayHasKey('scriptids', $scripts);
+		self::$ids = CDataHelper::getIds('name');
+	}
+
+	/**
 	 * Test data for Scripts form.
 	 */
 	public function getScriptsData() {
@@ -56,7 +143,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// Webhook.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Minimal script',
 						'Script' => 'java script'
 					]
@@ -66,7 +153,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				[
 					'trim' => true,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Test trailing spaces',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script'
@@ -89,7 +176,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max webhook',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
@@ -122,7 +209,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max webhook 2',
 						'Scope' => 'Action operation',
 						'Type' => 'Webhook',
@@ -150,7 +237,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max webhook 3',
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
@@ -183,7 +270,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Test parameters',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script',
@@ -222,7 +309,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Webhook false confirmation',
 						'Script' => 'webhook',
 						'Script' => 'java script',
@@ -232,7 +319,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test 1',
 						'Script' => 'java script',
 						'Timeout' => '1'
@@ -241,7 +328,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test 60',
 						'Script' => 'java script',
 						'Timeout' => '60'
@@ -252,7 +339,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "timeout": value must be one of 1-60.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test 0',
 						'Script' => 'java script',
 						'Timeout' => '0'
@@ -261,7 +348,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test 1m',
 						'Script' => 'java script',
 						'Timeout' => '1m'
@@ -272,7 +359,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "timeout": value must be one of 1-60.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test 1h',
 						'Script' => 'java script',
 						'Timeout' => '1h'
@@ -283,7 +370,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "timeout": value must be one of 1-60.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test 70',
 						'Script' => 'java script',
 						'Timeout' => '70s'
@@ -294,7 +381,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "timeout": a time unit is expected.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test -1',
 						'Script' => 'java script',
 						'Timeout' => '-1'
@@ -305,7 +392,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "timeout": a time unit is expected.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test character',
 						'Script' => 'java script',
 						'Timeout' => 'char'
@@ -316,7 +403,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Test empty parameters',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script'
@@ -341,7 +428,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/parameters/2": value (name)=(Param1) already exists.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Test empty parameter names',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script'
@@ -366,7 +453,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Test trailing spaces',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script'
@@ -385,7 +472,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/command": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Webhook Empty script',
 						'Script' => ''
 					]
@@ -395,7 +482,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'Script' => 'Webhook: empty name'
 					]
@@ -404,7 +491,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// Script.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max script',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
@@ -422,7 +509,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max script 2',
 						'Scope' => 'Action operation',
 						'Type' => 'Script',
@@ -436,7 +523,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max script 3',
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
@@ -456,7 +543,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'Type' => 'Script',
 						'Commands' => 'Script empty name'
@@ -467,7 +554,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/command": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Script empty command',
 						'Type' => 'Script',
 						'Commands' => ''
@@ -477,7 +564,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// IPMI.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max IPMI',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
@@ -495,7 +582,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max IPMI 2',
 						'Scope' => 'Action operation',
 						'Type' => 'IPMI',
@@ -508,7 +595,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max IPMI 3',
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
@@ -528,7 +615,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'Type' => 'IPMI',
 						'Command' => 'IPMI empty name'
@@ -539,7 +626,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/command": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'IPMI empty command',
 						'Type' => 'IPMI',
 						'Command' => ''
@@ -549,7 +636,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// SSH.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max SSH',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
@@ -569,7 +656,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max SSH 2',
 						'Scope' => 'Action operation',
 						'Type' => 'SSH',
@@ -585,7 +672,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max SSH 3',
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
@@ -605,7 +692,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max SSH 4',
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
@@ -628,7 +715,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max SSH 5',
 						'Scope' => 'Action operation',
 						'Type' => 'SSH',
@@ -647,7 +734,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max SSH 6',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
@@ -672,7 +759,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'Type' => 'SSH',
 						'Commands' => 'SSH empty name'
@@ -683,7 +770,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/command": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'SSH empty command',
 						'Type' => 'SSH',
 						'Commands' => ''
@@ -694,7 +781,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/username": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'SSH empty username',
 						'Type' => 'SSH',
 						'Commands' => 'SSH empty username',
@@ -705,7 +792,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// Telnet
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max Telnet',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
@@ -725,7 +812,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max Telnet 2',
 						'Scope' => 'Action operation',
 						'Type' => 'Telnet',
@@ -741,7 +828,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max Telnet 3',
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
@@ -763,7 +850,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'Type' => 'Telnet',
 						'Commands' => 'Telnet empty name'
@@ -774,7 +861,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/command": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Telnet empty command',
 						'Type' => 'Telnet',
 						'Commands' => ''
@@ -785,7 +872,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/username": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Telnet empty username',
 						'Type' => 'Telnet',
 						'Commands' => 'Telnet empty username',
@@ -808,7 +895,7 @@ class testFormAdministrationScripts extends CWebTest {
 	 * @dataProvider getScriptsData
 	 */
 	public function testFormAdministrationScripts_Update($data) {
-		$this->checkScripts($data, true, 'zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
+		$this->checkScripts($data, true, 'zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
 	}
 
 	/**
@@ -825,7 +912,7 @@ class testFormAdministrationScripts extends CWebTest {
 		}
 
 		$this->page->login()->open($link);
-		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
+		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'Parameters')) {
@@ -913,11 +1000,10 @@ class testFormAdministrationScripts extends CWebTest {
 		if (CTestArrayHelper::get($data['fields'], 'Confirmation text')) {
 			$this->query('button:Test confirmation')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->one();
-			$this->assertEquals('Execution confirmation', $dialog->getTitle());
 			$this->assertEquals($data['fields']['Confirmation text'],
-					$dialog->query('xpath://span[@class="confirmation-msg"]')->waitUntilReady()->one()->getText());
-			$this->assertFalse($dialog->query('button:Execute')->one()->isEnabled());
-			$dialog->query('button:Cancel')->one()->click();
+					$dialog->query('xpath:.//span[@class="confirmation-msg"]')->waitUntilVisible()->one()->getText()
+			);
+			$dialog->close();
 		}
 	}
 
@@ -927,8 +1013,8 @@ class testFormAdministrationScripts extends CWebTest {
 	public function testFormAdministrationScripts_CancelUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
-		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
+		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
 		$form->fill([
 			'Name' => 'Cancelled cript',
 			'Type' => 'Script',
@@ -954,59 +1040,20 @@ class testFormAdministrationScripts extends CWebTest {
 	public function testFormAdministrationScripts_SimpleUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
-		$this->query('id:script-form')->waitUntilReady()->asForm()->one()->submit();
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
+		$this->query('id:script-form')->asForm()->waitUntilVisible()->one()->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
 	/**
-	 * Function used to create scripts.
-	 */
-	public function prepareScriptData() {
-		$response = CDataHelper::call('script.create', [
-			[
-				'name' => 'SSH_api_clone_1',
-				'type' => 2,
-				'scope' => 1,
-				'username' => 'SSH_username',
-				'password' => 'SSH_password',
-				'command' => 'test',
-				'port' => '80'
-			],
-			[
-				'name' => 'SSH_api_clone_2',
-				'type' => 2,
-				'authtype' => '1',
-				'username' => 'SSH_username',
-				'privatekey' => 'private_key',
-				'publickey' => 'public_key',
-				'command' => 'test'
-			],
-			[
-				'name' => 'TELNET_api_clone',
-				'type' => 3,
-				'username' => 'TELNET_username',
-				'password' => 'TELNET_password',
-				'command' => 'test'
-			]
-		]);
-		$this->assertArrayHasKey('scriptids', $response);
-		self::$scriptids = $response['scriptids'];
-	}
-
-	/**
 	 * Function for checking script cloning with only changed name.
-	 *
-	 * @onBefore prepareScriptData
 	 */
 	public function testFormAdministrationScripts_Clone() {
-		// Added existing webhook to the list.
-		array_push(self::$scriptids, '201');
-		foreach (self::$scriptids as $scriptid) {
+		foreach (self::$clone_scriptids as $scriptid) {
 			$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.$scriptid);
-			$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
+			$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
 			$values = $form->getFields()->asValues();
 			$script_name = $values['Name'];
 			$this->query('button:Clone')->waitUntilReady()->one()->click();
@@ -1036,11 +1083,193 @@ class testFormAdministrationScripts extends CWebTest {
 	 * Function for testing script delete from configuration form.
 	 */
 	public function testFormAdministrationScripts_Delete() {
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_DELETE);
-		$this->query('button:Delete')->waitUntilReady()->one()->click();
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Delete']);
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script deleted');
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr(self::NAME_DELETE)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.
+				zbx_dbstr(self::$ids['Script for Delete']))
+		);
+	}
+
+	/**
+	 * Check all fields default values, lengths, placeholders, element options and table headers.
+	 */
+	public function testFormAdministrationScripts_Layout() {
+		$this->page->login()->open('zabbix.php?action=script.edit');
+		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
+
+		$default_values = ['Scope' => 'Action operation', 'Type' => 'Webhook', 'Host group' => 'All',
+			'User group' => 'All', 'Required host permissions' => 'Read', 'Enable confirmation' => false, 'Timeout' => '30s',
+			'Execute on' => 'Zabbix agent', 'Authentication method' => 'Password'
+		];
+		$form->checkValue($default_values);
+
+		// Check table headers.
+		$this->assertEquals(['Name', 'Value', 'Action'], $form->query('id:parameters-table')->asTable()->one()->getHeadersText());
+
+		// Check fields' lengths.
+		$field_maxlength = ['Name' => 255, 'Timeout' => 32, 'Description' => 65535, 'Menu path' => 255,
+			'Confirmation text' => 255, 'Commands' => 65535, 'Username' => 64, 'Password' => 64, 'Port' => 64,
+			'Public key file' => 64, 'Private key file' => 64, 'Key passphrase' => 64, 'Command' => 65535
+		];
+		foreach ($field_maxlength as $input => $value) {
+			$this->assertEquals($value, $form->getField($input)->getAttribute('maxlength'));
+		}
+
+		// Check fields' placeholders.
+		$this->assertEquals('script', $form->getField('Script')->query('xpath:.//input[@type="text"]')->one()->getAttribute('placeholder'));
+		$this->assertEquals('<sub-menu/sub-menu/...>', $form->getField('Menu path')->getAttribute('placeholder'));
+
+		// Check dropdown options.
+		$user_groups = CDBHelper::getColumn('SELECT name FROM usrgrp ORDER BY name', 'name');
+		$dropdowns = [
+			'Host group' => ['All', 'Selected'],
+			'User group' => array_merge(['All'], $user_groups),
+			'Authentication method' => ['Password', 'Public key']
+		];
+		foreach ($dropdowns as $field => $options) {
+			$this->assertEquals($options, $form->getField($field)->getOptions()->asText());
+		}
+
+		// Check segmented radio element options.
+		$segmented_elements = [
+			'Scope' => ['Action operation', 'Manual host action', 'Manual event action'],
+			'Type' => ['Webhook', 'Script', 'SSH', 'Telnet', 'IPMI'],
+			'Execute on' => ['Zabbix agent', 'Zabbix server (proxy)', 'Zabbix server'],
+			'Required host permissions' => ['Read', 'Write']
+		];
+		foreach ($segmented_elements as $field => $options) {
+			$this->assertEquals($options, $form->getField($field)->getLabels()->asText());
+		}
+
+		// Check "Script" dialog window.
+		$script_dialog = $form->getField('Script')->edit();
+		$this->assertEquals('JavaScript', $script_dialog->getTitle());
+		$this->assertEquals(65535, $script_dialog->query('tag:textarea')->one()->getAttribute('maxlength'));
+		$this->assertEquals('return value', $script_dialog->query('tag:textarea')->one()->getAttribute('placeholder'));
+		$this->assertEquals('65535 characters remaining', $script_dialog->query('class:multilineinput-char-count')->one()->getText());
+		$script_dialog->query('tag:textarea')->one()->type('aaa');
+		$this->assertEquals('65532 characters remaining', $script_dialog->query('class:multilineinput-char-count')->one()->getText());
+		$script_dialog->query('button:Cancel')->one()->click();
+		$script_dialog->ensureNotPresent();
+		$form->checkValue(['Script' => '']);
+
+		// Check "Confirmation" dialog window.
+		$form->fill(['Scope' => 'Manual host action', 'Enable confirmation' => true, 'Confirmation text' => 'test']);
+		$this->query('button:Test confirmation')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->one();
+		$this->assertEquals('Execution confirmation', $dialog->getTitle());
+		$this->assertFalse($dialog->query('button:Execute')->one()->isEnabled());
+		$dialog->query('button:Cancel')->one()->click();
+		$dialog->ensureNotPresent();
+	}
+
+	/**
+	 * Check the visible fields and their default values, and the required class based on the selected scope and type.
+	 */
+	public function testFormAdministrationScripts_VisibleFields() {
+		$common_all_scopes = [
+			'fields' => ['Name', 'Scope', 'Type', 'Description', 'Host group'],
+			'required' => ['Name'],
+			'default' => ['Host group' => 'All']
+		];
+		$common_manual_scope = [
+			'fields' => ['Menu path', 'User group', 'Required host permissions', 'Enable confirmation', 'Confirmation text'],
+			'default' => ['User group' => 'All', 'Required host permissions' => 'Read', 'Enable confirmation' => false]
+		];
+		$types = [
+			'Webhook' => [
+				'fields' => ['Parameters', 'Script', 'Timeout'],
+				'required' => ['Script', 'Timeout'],
+				'default' => ['Timeout' => '30s']
+			],
+			'Script' => [
+				'fields' => ['Execute on', 'Commands'],
+				'required' => ['Commands'],
+				'default' => ['Execute on' => 'Zabbix agent']
+			],
+			'SSH' => [
+				'fields' => ['Authentication method', 'Username', 'Password', 'Port', 'Commands'],
+				'required' => ['Username', 'Commands'],
+				'default' => ['Authentication method' => 'Password'],
+				'fields_public_key' => ['Authentication method', 'Username', 'Public key file', 'Private key file',
+						'Key passphrase', 'Port', 'Commands'
+				],
+				'required_public_key' => ['Username', 'Public key file', 'Private key file', 'Commands']
+			],
+			'Telnet' => [
+				'fields' => ['Username', 'Password', 'Port', 'Commands'],
+				'required' => ['Username', 'Commands'],
+				'default' => []
+			],
+			'IPMI' => [
+				'fields' => ['Command'],
+				'required' => ['Command'],
+				'default' => []
+			]
+		];
+
+		$this->page->login()->open('zabbix.php?action=script.edit');
+		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
+		$form->checkValue(['Scope' => 'Action operation', 'Type' => 'Webhook']);
+
+		foreach (['Action operation', 'Manual host action', 'Manual event action'] as $scope) {
+			// Merge all common fields based on scope type, manual or action operation.
+			if ($scope === 'Action operation') {
+				$scope_fields = $common_all_scopes['fields'];
+				$scope_default = $common_all_scopes['default'];
+			}
+			else {
+				$form->fill(['Scope' => $scope]);
+				$scope_fields = array_merge($common_all_scopes['fields'], $common_manual_scope['fields']);
+				$scope_default = array_merge($common_all_scopes['default'], $common_manual_scope['default']);
+			}
+
+			foreach ($types as $type => $type_fields) {
+				$form->fill(['Type' => $type]);
+
+				// Check visible fields.
+				$this->compareArrays(array_merge($scope_fields, $type_fields['fields']),
+						$form->getLabels(CElementFilter::VISIBLE)->asText()
+				);
+
+				// Check default values.
+				$form->checkValue(array_merge($scope_default, $type_fields['default']));
+
+				// Check required fields.
+				$this->compareArrays(array_merge($common_all_scopes['required'], $type_fields['required']),
+						$form->getRequiredLabels()
+				);
+
+				if ($type === 'SSH') {
+					// Check fields with 'Public key' authentication method.
+					$form->fill(['Authentication method' => 'Public key']);
+
+					$this->compareArrays(array_merge($scope_fields, $type_fields['fields_public_key']),
+							$form->getLabels(CElementFilter::VISIBLE)->asText()
+					);
+					$this->compareArrays(array_merge($common_all_scopes['required'], $type_fields['required_public_key']),
+							$form->getRequiredLabels()
+					);
+
+					// Reset the value of the "Authentication method" field.
+					$form->fill(['Authentication method' => 'Password']);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Sort arrays and compare if they are equal.
+	 *
+	 * @param array $expected	expected fields from data provider
+	 * @param array $actual		actual fields on page
+	 */
+	private function compareArrays($expected, $actual) {
+		sort($expected);
+		sort($actual);
+		$this->assertEquals(json_encode($expected), json_encode($actual));
 	}
 }

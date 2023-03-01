@@ -3144,6 +3144,11 @@ msgstr "Keşfedilmiş bir grafik güncellenemiyor."
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr ""
 
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -6986,6 +6991,11 @@ msgstr "\"%2$s\" haritası için \"%1$s\" alanında bir değer eksik."
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "\"%1$s\" alanı doğru değil: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
 
 #: include/validate.inc.php:167
 #, c-format
@@ -16224,6 +16234,10 @@ msgstr "Servisler bir çevrimsel bağımlılık oluşturuyor."
 msgid "Services updated"
 msgstr ""
 
+#: include/classes/api/services/CUser.php:1693
+msgid "Session ID or token is expected."
+msgstr ""
+
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
@@ -21400,6 +21414,10 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8'de geçersiz bayt dizisi"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
 msgid "invalid delay"

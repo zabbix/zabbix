@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-11-18 16:34+0000\n"
+"PO-Revision-Date: 2023-01-08 02:31+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -3065,6 +3065,11 @@ msgstr "ディスカバリされたグラフを更新できません。"
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "ディスカバリされたホストグループ\"%1$s\"を更新できません。"
 
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -3953,7 +3958,7 @@ msgstr "データベース接続設定"
 
 #: app/views/js/administration.authentication.edit.js.php:56
 msgid "Confirm changes"
-msgstr ""
+msgstr "変更の確認"
 
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
@@ -6190,7 +6195,7 @@ msgstr "HTTP認証の有効化"
 
 #: app/views/js/administration.authentication.edit.js.php:59
 msgid "Enable HTTP authentication for all users."
-msgstr ""
+msgstr "すべてのユーザーでHTTP認証を有効にします。"
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
@@ -6902,6 +6907,11 @@ msgstr "マップ\"%2$s\"のためのフィールド\"%1$s\"が設定されて�
 #: include/validate.inc.php:229
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
+msgstr "フィールド\"%1$s\"の設定が正しくありません: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
 msgstr "フィールド\"%1$s\"の設定が正しくありません: %2$s"
 
 #: include/validate.inc.php:167
@@ -8404,7 +8414,7 @@ msgstr "システムの識別文字列。文字列値を返す。"
 
 #: app/views/administration.authentication.edit.php:113
 msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
-msgstr ""
+msgstr "HTTP認証が有効になっている場合、すべてのユーザー(WebインターフェースへのアクセスがLDAPや内部DBに設定されている場合でも)は、ZabbixではなくWebサーバーによって認証されます。"
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -16102,6 +16112,10 @@ msgstr "サービスの依存関係が循環設定されています。"
 msgid "Services updated"
 msgstr "サービスを更新しました"
 
+#: include/classes/api/services/CUser.php:1693
+msgid "Session ID or token is expected."
+msgstr ""
+
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
@@ -21266,6 +21280,10 @@ msgstr "集計方法が正しくありません"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8のバイトシーケンスが正しくありません"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr "データタイプが正しくありません"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
 msgid "invalid delay"
