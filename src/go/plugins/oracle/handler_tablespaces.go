@@ -112,124 +112,108 @@ func prepValues(ts, t string) (outTableSpace string, outType string, err error) 
 }
 
 func getFullQuery() string {
-	return `SELECT
-	JSON_ARRAYAGG(
-		JSON_OBJECT(TABLESPACE_NAME VALUE
-			JSON_OBJECT(
-				'contents'	    VALUE CONTENTS,
-				'file_bytes'    VALUE FILE_BYTES,
-				'max_bytes'     VALUE MAX_BYTES,
-				'free_bytes'    VALUE FREE_BYTES,
-				'used_bytes'    VALUE USED_BYTES,
-				'used_pct_max'  VALUE USED_PCT_MAX,
-				'used_file_pct' VALUE USED_FILE_PCT,
-				'status'        VALUE STATUS
-			)
-		) RETURNING CLOB
-	)
-FROM
-	(
-	SELECT
-		df.TABLESPACE_NAME AS TABLESPACE_NAME,
-		df.CONTENTS AS CONTENTS,
-		NVL(SUM(df.BYTES), 0) AS FILE_BYTES,
-		NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES,
-		NVL(SUM(f.FREE), 0) AS FREE_BYTES,
-		SUM(df.BYTES)-SUM(f.FREE) AS USED_BYTES,
-		ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
-		ROUND(DECODE(SUM(df.BYTES), 0, 0, (SUM(df.BYTES)-SUM(f.FREE)) / SUM(df.BYTES)* 100), 2) AS USED_FILE_PCT,
-		DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
-	FROM
-		(
-		SELECT
-			ddf.FILE_ID,
-			dt.CONTENTS,
-			dt.STATUS,
-			ddf.FILE_NAME,
-			ddf.TABLESPACE_NAME,
-			TRUNC(ddf.BYTES) AS BYTES,
-			TRUNC(GREATEST(ddf.BYTES, ddf.MAXBYTES)) AS MAX_BYTES
-		FROM
-			DBA_DATA_FILES ddf,
-			DBA_TABLESPACES dt
-		WHERE
-			ddf.TABLESPACE_NAME = dt.TABLESPACE_NAME
-		) df,
-		(
-		SELECT
-			TRUNC(SUM(BYTES)) AS FREE,
-			FILE_ID
-		FROM
-			DBA_FREE_SPACE
-		GROUP BY
-			FILE_ID
-		) f
-	WHERE
-		df.FILE_ID = f.FILE_ID (+)
-	GROUP BY
-		df.TABLESPACE_NAME, df.CONTENTS, df.STATUS
-UNION ALL
-	SELECT
-		Y.NAME AS TABLESPACE_NAME,
-		Y.CONTENTS AS CONTENTS,
-		NVL(SUM(Y.BYTES), 0) AS FILE_BYTES,
-		NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES,
-		NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE,
-		SUM(Y.BYTES)-SUM(Y.FREE_BYTES) AS USED_BYTES,
-		ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
-		ROUND(DECODE(SUM(Y.BYTES), 0, 0, (SUM(Y.BYTES)-SUM(Y.FREE_BYTES)) / SUM(Y.BYTES)* 100), 2) AS USED_FILE_PCT,
-		DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
-	FROM
-		(
-		SELECT
-			dtf.TABLESPACE_NAME AS NAME,
-			dt.CONTENTS,
-			dt.STATUS AS TBS_STATUS,
-			dtf.STATUS AS STATUS,
-			dtf.BYTES AS BYTES,
-			(
-			SELECT
-				((f.TOTAL_BLOCKS - s.TOT_USED_BLOCKS) * vp.VALUE)
-			FROM
-				(
-				SELECT
-					TABLESPACE_NAME, SUM(USED_BLOCKS) TOT_USED_BLOCKS
-				FROM
-					GV$SORT_SEGMENT
-				WHERE
-					TABLESPACE_NAME != 'DUMMY'
-				GROUP BY
-					TABLESPACE_NAME) s, (
-				SELECT
-					TABLESPACE_NAME, SUM(BLOCKS) TOTAL_BLOCKS
-				FROM
-					DBA_TEMP_FILES
-				WHERE
-					TABLESPACE_NAME != 'DUMMY'
-				GROUP BY
-					TABLESPACE_NAME) f, (
-				SELECT
-					VALUE
-				FROM
-					V$PARAMETER
-				WHERE
-					NAME = 'db_block_size') vp
-			WHERE
-				f.TABLESPACE_NAME = s.TABLESPACE_NAME
-				AND f.TABLESPACE_NAME = dtf.TABLESPACE_NAME
-			) AS FREE_BYTES,
-			CASE
-				WHEN dtf.MAXBYTES = 0 THEN dtf.BYTES
-				ELSE dtf.MAXBYTES
-			END AS MAX_BYTES
-		FROM
-			sys.DBA_TEMP_FILES dtf,
-			sys.DBA_TABLESPACES dt
-		WHERE
-			dtf.TABLESPACE_NAME = dt.TABLESPACE_NAME ) Y
-	GROUP BY
-		Y.NAME, Y.CONTENTS, Y.TBS_STATUS
-	)
+	return `
+SELECT
+    JSON_ARRAYAGG(
+        JSON_OBJECT(CON_NAME VALUE
+            JSON_ARRAYAGG(
+                JSON_OBJECT(TABLESPACE_NAME VALUE
+                    JSON_OBJECT(
+                        'contents' 		VALUE CONTENTS,
+                        'file_bytes' 	VALUE FILE_BYTES,
+                        'max_bytes' 	VALUE MAX_BYTES,
+                        'free_bytes' 	VALUE FREE_BYTES,
+                        'used_bytes' 	VALUE USED_BYTES,
+                        'used_pct_max' 	VALUE USED_PCT_MAX,
+                        'used_file_pct' VALUE USED_FILE_PCT,
+                        'status' 		VALUE STATUS
+                    )
+                )
+            )
+        ) RETURNING CLOB
+   )
+FROM (SELECT df.CON_NAME,
+             df.TABLESPACE_NAME                                                                                 AS TABLESPACE_NAME,
+             df.CONTENTS                                                                                        AS CONTENTS,
+             NVL(SUM(df.BYTES), 0)                                                                              AS FILE_BYTES,
+             NVL(SUM(df.MAX_BYTES), 0)                                                                          AS MAX_BYTES,
+             NVL(SUM(f.FREE), 0)                                                                                AS FREE_BYTES,
+             NVL(SUM(df.BYTES) - SUM(f.FREE), 0)                                                                AS USED_BYTES,
+             ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2)               AS USED_PCT_MAX,
+             ROUND(DECODE(SUM(df.BYTES), 0, 0, (NVL(SUM(df.BYTES) - SUM(f.FREE), 0)) / SUM(df.BYTES) * 100), 2) AS USED_FILE_PCT,
+             DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0)                                    AS STATUS
+      FROM (SELECT ct.CON$NAME                              AS CON_NAME,
+                   cdf.FILE_ID,
+                   ct.CONTENTS,
+                   ct.STATUS,
+                   cdf.FILE_NAME,
+                   cdf.TABLESPACE_NAME,
+                   TRUNC(cdf.BYTES)                         AS BYTES,
+                   TRUNC(GREATEST(cdf.BYTES, cdf.MAXBYTES)) AS MAX_BYTES
+            FROM CDB_DATA_FILES cdf,
+                 CDB_TABLESPACES ct
+            WHERE cdf.TABLESPACE_NAME = ct.TABLESPACE_NAME
+              AND cdf.CON_ID = ct.CON_ID) df,
+           (SELECT TRUNC(SUM(BYTES)) AS FREE,
+                   FILE_ID
+            FROM CDB_FREE_SPACE
+            GROUP BY FILE_ID) f
+      WHERE df.FILE_ID = f.FILE_ID (+)
+      GROUP BY df.CON_NAME,
+               df.TABLESPACE_NAME,
+               df.CONTENTS,
+               df.STATUS
+      UNION ALL
+      SELECT Y.CON_NAME,
+             Y.NAME                                                                                                AS TABLESPACE_NAME,
+             Y.CONTENTS                                                                                            AS CONTENTS,
+             NVL(SUM(Y.BYTES), 0)                                                                                  AS FILE_BYTES,
+             NVL(SUM(Y.MAX_BYTES), 0)                                                                              AS MAX_BYTES,
+             NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0)                                                                     AS FREE_BYTES,
+             NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0)                                                              AS USED_BYTES,
+             ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2)                     AS USED_PCT_MAX,
+             ROUND(DECODE(SUM(Y.BYTES), 0, 0, (NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0)) / SUM(Y.BYTES) * 100), 2) AS USED_FILE_PCT,
+             DECODE(Y.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0)                                        AS STATUS
+      FROM (SELECT ct.CON$NAME                  AS CON_NAME,
+                   ctf.TABLESPACE_NAME          AS NAME,
+                   ct.CONTENTS,
+                   ctf.STATUS                   AS STATUS,
+                   ctf.BYTES                    AS BYTES,
+                   (SELECT ((f.TOTAL_BLOCKS - s.TOT_USED_BLOCKS) * vp.VALUE)
+                    FROM (SELECT CON_ID,
+                                 TABLESPACE_NAME,
+                                 SUM(USED_BLOCKS) TOT_USED_BLOCKS
+                          FROM V$SORT_SEGMENT
+                          WHERE TABLESPACE_NAME != 'DUMMY'
+                          GROUP BY CON_ID,
+                                   TABLESPACE_NAME) s,
+                         (SELECT CON_ID,
+                                 TABLESPACE_NAME,
+                                 SUM(BLOCKS) TOTAL_BLOCKS
+                          FROM CDB_TEMP_FILES
+                          WHERE TABLESPACE_NAME != 'DUMMY'
+                          GROUP BY CON_ID,
+                                   TABLESPACE_NAME) f,
+                         (SELECT VALUE
+                          FROM V$PARAMETER
+                          WHERE NAME = 'db_block_size') vp
+                    WHERE f.TABLESPACE_NAME = s.TABLESPACE_NAME
+                      AND f.TABLESPACE_NAME = ctf.TABLESPACE_NAME
+                      AND f.CON_ID = s.CON_ID
+                      AND f.CON_ID = ct.CON_ID) AS FREE_BYTES,
+                   CASE
+                       WHEN ctf.MAXBYTES = 0 THEN ctf.BYTES
+                       ELSE ctf.MAXBYTES
+                       END                      AS MAX_BYTES
+            FROM CDB_TEMP_FILES ctf,
+                 CDB_TABLESPACES ct
+            WHERE ctf.TABLESPACE_NAME = ct.TABLESPACE_NAME
+              AND ctf.CON_ID = ct.CON_ID) Y
+      GROUP BY Y.CON_NAME,
+               Y.NAME,
+               Y.CONTENTS,
+               Y.STATUS)
+GROUP BY CON_NAME
 `
 }
 
