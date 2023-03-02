@@ -47,9 +47,6 @@ class Group extends ScimApiService {
 		'schemas' => [self::SCIM_GROUP_SCHEMA]
 	];
 
-	protected array $patch_op = ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'];
-	protected array $patch_path = ['members', 'externalId'];
-
 	/**
 	 * Returns information on specific group or all groups if no specific information is requested.
 	 *
@@ -431,8 +428,8 @@ class Group extends ScimApiService {
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'Operations' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
-				'op' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $this->patch_op)],
-				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', $this->patch_path)],
+				'op' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'])],
+				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['members', 'externalId'])],
 				'value' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'path', 'in' => 'members'], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
 										'value' =>		['type' => API_ID]
