@@ -30,16 +30,16 @@ class testScimGroup extends CAPIScimTest {
 
 	private static $data = [
 		'userdirectoryids' => [
-//			'ldap' => null,
+			'ldap' => null,
 			'saml' => null
 		],
 		'userids' => [
-//			'ldap_user' => null,
+			'ldap_user' => null,
 			'user_active' => null,
 			'user_inactive' => null
 		],
 		'usernames' => [
-//			'ldap_user' => 'dwight.schrute@office.com',
+			'ldap_user' => 'dwight.schrute@office.com',
 			'user_active' => 'jim.halpert@office.com',
 			'user_inactive' => 'pam.beesly@office.com'
 		],
@@ -140,6 +140,29 @@ class testScimGroup extends CAPIScimTest {
 		]]);
 		$this->assertNotEmpty($user_scim_group);
 		self::$data['user_scim_groupids']['user_group_w_members'] = $user_scim_group[0];
+
+		// Create userdirectory for LDAP.
+		$userdirectory_ldap = CDataHelper::call('userdirectory.create', [
+			'idp_type' => IDP_TYPE_LDAP,
+			'name' => 'LDAP',
+			'host' => 'test',
+			'port' => 389,
+			'base_dn' => 'test',
+			'search_attribute' => 'test'
+		]);
+		$this->assertArrayHasKey('userdirectoryids', $userdirectory_ldap);
+		self::$data['userdirectoryids']['ldap'] = $userdirectory_ldap['userdirectoryids'][0];
+
+		// Create user with newly created userdirectoryid for LDAP.
+		$user = CDataHelper::call('user.create', [
+			[
+				'username' => self::$data['usernames']['ldap_user'],
+				'userdirectoryid' => self::$data['userdirectoryids']['ldap'],
+
+			]
+		]);
+		$this->assertArrayHasKey('userids', $user);
+		self::$data['userids']['ldap_user'] = $user['userids'][0];
 
 		// Create authorization token to execute requests.
 		$tokenid = CDataHelper::call('token.create', [
@@ -254,20 +277,298 @@ class testScimGroup extends CAPIScimTest {
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
 	}
 
-	public function resolveData(array &$group_data): void {
-		foreach ($group_data as $key => &$data) {
-			if ($key === 'id' || $key === 'displayName') {
-				$data_key = ($key === 'id') ? 'scim_groupids' : 'scim_group_names';
+	public function createInvalidPostRequest(): array {
+		return [
+			'Post request is missing parameter "schema".' => [
+				'group' => [
+					'displayName' => 'office_it',
+					'members' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "schemas" is missing.',
+					'status' => 400
+				]
+			],
+			'Post request contains empty "schemas" parameter.' => [
+				'group' => [
+					'schemas' => [],
+					'displayName' => 'office_it',
+					'members' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/schemas": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Post request contains invalid "schemas" parameter.' => [
+				'group' => [
+					'schemas' => ['invalid:schema'],
+					'displayName' => 'office_it',
+					'members' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' =>
+						'Invalid parameter "/schemas/1": value must be "urn:ietf:params:scim:schemas:core:2.0:Group".',
+					'status' => 400
+				]
+			],
+			'Post request is missing "displayName" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'members' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "displayName" is missing.',
+					'status' => 400
+				]
+			],
+			'Post request contains empty "displayName" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'displayName' => '',
+					'members' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/displayName": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Post request contains empty "members"/"value" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'displayName' => 'office_it',
+					'members' => [
+						[
+							'display' => 'user_active',
+							'value' => ''
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/members/1/value": a number is expected.',
+					'status' => 400
+				]
+			],
+			'Post request is missing "members"/"value" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'displayName' => 'office_it',
+					'members' => [
+						[
+							'display' => 'user_active'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/members/1": the parameter "value" is missing.',
+					'status' => 400
+				]
+			],
+			'Post request contains empty "members"/"display" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'displayName' => 'office_it',
+					'members' => [
+						[
+							'display' => '',
+							'value' => 'user_active'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/members/1/display": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Post request is missing "members"/"display" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'displayName' => 'office_it',
+					'members' => [
+						[
+							'value' => 'user_active'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/members/1": the parameter "display" is missing.',
+					'status' => 400
+				]
+			],
+			'Post request contains non-existing user as a member.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'displayName' => 'office_it',
+					'members' => [
+						[
+							'display' => 'creed.bratton@office.com',
+							'value' => '999999999'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
+				]
+			],
+			'Post request contains user as a member that belongs to another userdirectory.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'displayName' => 'office_it',
+					'members' => [
+						[
+							'display' => 'ldap_user',
+							'value' => 'ldap_user'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
+				]
+			]
+		];
+	}
 
-				$group_data[$key] = self::$data[$data_key][$data];
-			}
-			elseif ($key === 'members') {
-				foreach ($data as &$member) {
-					$member['value'] = self::$data['userids'][$member['value']];
-					$member['display'] = self::$data['usernames'][$member['display']];
+	/**
+	 * @dataProvider createInvalidPostRequest
+	 */
+	public function testInvalidPost($group, $expected_error): void {
+		$this->resolveData($group);
+
+		$group['token'] = self::$data['token']['token'];
+
+		$this->call('group.post', $group, $expected_error);
+	}
+
+	public function createValidPostRequest(): array {
+		return [
+			'Create new SCIM group without members via POST request.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'displayName' => 'office_it',
+					'members' => []
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'displayName' => 'office_it',
+					'members' => []
+				]
+			],
+			'Create new SCIM group with members via POST request.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'displayName' => 'office_accounting',
+					'members' => [
+						[
+							'display' => 'user_active',
+							'value' => 'user_active'
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'displayName' => 'office_accounting',
+					'members' => [
+						[
+							'display' => 'user_active',
+							'value' => 'user_active'
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createValidPostRequest
+	 */
+	public function testValidPost(array $group, array $expected_result): void {
+		$this->resolveData($group);
+		$this->resolveData($expected_result);
+
+		$group['token'] = self::$data['token']['token'];
+
+		$result = $this->call('group.post', $group);
+
+		// Compare response with expected response.
+		foreach ($expected_result as $key => $expected) {
+			$this->assertArrayHasKey($key, $result);
+			$this->assertEquals($expected, $result[$key], 'Returned response should match.');
+		}
+
+		// Response should have 'id' value, which is not known for us, if completely new group is created.
+		$this->assertArrayHasKey('id', $result);
+
+		if ($result['displayName'] === 'office_it') {
+			self::$data['scim_groupids']['new_group_wo_users'] = $result['id'];
+		}
+		else {
+			self::$data['scim_groupids']['new_group_w_users'] = $result['id'];
+		}
+
+		// Check that scim group in the database is correct.
+		$db_result_group_data = DBSelect('select name from scim_group where scim_groupid='.
+			zbx_dbstr($result['id'])
+		);
+		$db_result_group = DBFetch($db_result_group_data);
+
+		$this->assertEquals($group['displayName'], $db_result_group['name']);
+
+		if ($group['members'] !== []) {
+			// Check that scim group and user relations in database are correct.
+			$db_result_user_group_data = DBSelect('select userid from user_scim_group where scim_groupid='.
+				zbx_dbstr($result['id'])
+			);
+			$db_result_user_group = DBFetch($db_result_user_group_data);
+			$expected_userids_in_group = array_column($group['members'], 'value');
+
+			$this->assertEquals($expected_userids_in_group, [$db_result_user_group['userid']]);
+		}
+	}
+
+	/**
+	 * Resolves unknown parameters in the input data or expected results.
+	 *
+	 * @param array $group_data  Data to be resolved.
+	 *
+	 * @return void
+	 */
+	public function resolveData(array &$group_data): void {
+		foreach ($group_data as $attribute_name => &$attribute_value) {
+			if ($attribute_name === 'id' || $attribute_name === 'displayName') {
+				$data_key = ($attribute_name === 'id') ? 'scim_groupids' : 'scim_group_names';
+
+				if (array_key_exists($attribute_value, self::$data[$data_key])) {
+					$group_data[$attribute_name] = self::$data[$data_key][$attribute_value];
 				}
 			}
+			elseif ($attribute_name === 'members') {
+				foreach ($attribute_value as &$member) {
+					if (array_key_exists('value', $member)
+							&& array_key_exists($member['value'], self::$data['userids'])) {
+						$member['value'] = self::$data['userids'][$member['value']];
+					}
+					if (array_key_exists('display', $member)
+							&& array_key_exists($member['display'], self::$data['usernames'])) {
+						$member['display'] = self::$data['usernames'][$member['display']];
+					}
+				}
+				unset($member);
+			}
 		}
+		unset($attribute_value);
 	}
 
 	/**
