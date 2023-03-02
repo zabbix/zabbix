@@ -112,6 +112,7 @@ class ColumnEdit extends CController {
 		unset($input['update']);
 
 		if (!$this->hasInput('update')) {
+
 			$this->setResponse(new CControllerResponseData([
 					'action' => $this->getAction(),
 					'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE,
@@ -141,7 +142,11 @@ class ColumnEdit extends CController {
 		}
 
 		if ($thresholds) {
-			CArrayHelper::sort($thresholds, ['order_threshold']);
+			uasort($thresholds,
+				static function (array $threshold_1, array $threshold_2): int {
+					return $threshold_1['order_threshold'] <=> $threshold_2['order_threshold'];
+				}
+			);
 
 			$input['thresholds'] = [];
 

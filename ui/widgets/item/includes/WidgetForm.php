@@ -21,6 +21,8 @@
 
 namespace Widgets\Item\Includes;
 
+use API;
+
 use Zabbix\Widgets\{
 	CWidgetField,
 	CWidgetForm
@@ -54,6 +56,26 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_VALUE_SIZE = 45;
 	private const DEFAULT_UNITS_SIZE = 35;
 	private const DEFAULT_TIME_SIZE = 15;
+
+	private bool $is_binary_units = false;
+
+
+	public function __construct(array $values, ?string $templateid) {
+		parent::__construct($values, $templateid);
+
+		if (array_key_exists('units', $this->values) && $this->values['units'] !== '') {
+			$this->is_binary_units = isBinaryUnits($this->values['units']);
+		}
+		elseif (array_key_exists('itemid', $this->values)) {
+			$items = API::Item()->get([
+				'output' => ['units'],
+				'itemids' => $this->values['itemid'],
+				'webitems' => true
+			]);
+
+			$this->is_binary_units = $items && isBinaryUnits($items[0]['units']);
+		}
+	}
 
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
@@ -239,7 +261,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
-				new CWidgetFieldThresholds('thresholds', _('Thresholds'))
+				new CWidgetFieldThresholds('thresholds', _('Thresholds'), $this->is_binary_units)
 			)
 			->addField($this->templateid === null
 				? new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))

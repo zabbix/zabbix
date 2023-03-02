@@ -1445,6 +1445,17 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 }
 
 /**
+ * Check whether the unit of an item is binary or not
+ *
+ * @param string $units
+ *
+ * @return bool
+ */
+function isBinaryUnits(string $units): bool {
+	return $units === 'B' || $units === 'Bps';
+}
+
+/**
  * Retrieves from DB historical data for items and applies functional calculations.
  * If fails for some reason, returns UNRESOLVED_MACRO_STRING.
  *

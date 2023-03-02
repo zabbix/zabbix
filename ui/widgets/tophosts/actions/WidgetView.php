@@ -126,11 +126,23 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$master_hostids[$master_items[$itemid]['hostid']] = true;
 		}
 
-		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-
 		$item_values = [];
 
 		foreach ($configuration as $column_index => &$column) {
+			$is_numeric_only = self::isNumericOnlyColumn($column);
+
+			$items = self::getItems($column['item'], $is_numeric_only, $groupids, $hostids);
+
+			foreach ($items as $item) {
+				$is_binary = isBinaryUnits($item['units']);
+			}
+
+			$number_parser = new CNumberParser([
+				'with_size_suffix' => true,
+				'with_time_suffix' => true,
+				'is_binary_size' => $is_binary
+			]);
+
 			if ($column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
 				continue;
 			}
