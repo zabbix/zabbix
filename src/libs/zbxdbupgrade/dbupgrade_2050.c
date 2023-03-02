@@ -1051,7 +1051,8 @@ static int	DBpatch_2050113(void)
 
 static int	DBpatch_2050114(void)
 {
-	const zbx_db_field_t	field = {"slideshowid", NULL, "slideshows", "slideshowid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"slideshowid", NULL, "slideshows", "slideshowid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("slideshow_user", 1, &field);
 }
@@ -1088,7 +1089,8 @@ static int	DBpatch_2050117(void)
 
 static int	DBpatch_2050118(void)
 {
-	const zbx_db_field_t	field = {"slideshowid", NULL, "slideshows", "slideshowid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"slideshowid", NULL, "slideshows", "slideshowid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("slideshow_usrgrp", 1, &field);
 }

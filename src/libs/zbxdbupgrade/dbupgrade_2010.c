@@ -753,14 +753,16 @@ static int	DBpatch_2010077(void)
 
 static int	DBpatch_2010078(void)
 {
-	const zbx_db_field_t	field = {"applicationid", NULL, "applications", "applicationid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"applicationid", NULL, "applications", "applicationid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("application_template", 1, &field);
 }
 
 static int	DBpatch_2010079(void)
 {
-	const zbx_db_field_t	field = {"templateid", NULL, "applications", "applicationid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"templateid", NULL, "applications", "applicationid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("application_template", 2, &field);
 }
@@ -986,9 +988,10 @@ static int	DBpatch_2010101(void)
 			params_esc = zbx_db_dyn_escape_string(sql);
 			key_esc = zbx_db_dyn_escape_string(key);
 
-			if (ZBX_DB_OK > zbx_db_execute("update items set username='%s',password='%s',key_='%s',params='%s'"
-					" where itemid=" ZBX_FS_UI64,
-					username_esc, password_esc, key_esc, params_esc, itemid))
+			if (ZBX_DB_OK > zbx_db_execute(
+					"update items set username='%s',password='%s',key_='%s',params='%s' "
+					"where itemid=" ZBX_FS_UI64, username_esc, password_esc, key_esc, params_esc,
+					itemid))
 			{
 				ret = FAIL;
 			}
@@ -1493,7 +1496,8 @@ static int	DBpatch_2010176(void)
 		{
 			name_esc = zbx_db_dyn_escape_string_len(name, 255);
 
-			if (ZBX_DB_OK > zbx_db_execute("update scripts set name='%s' where scriptid=%s", name_esc, row[0]))
+			if (ZBX_DB_OK > zbx_db_execute("update scripts set name='%s' where scriptid=%s", name_esc,
+					row[0]))
 				ret = FAIL;
 
 			zbx_free(name_esc);
