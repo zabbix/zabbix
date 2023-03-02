@@ -47,6 +47,10 @@ typedef struct
 }
 zbx_discoverer_net_check_task_t;
 
+#define DISCOVERER_JOB_STATUS_QUEUED	0
+#define DISCOVERER_JOB_STATUS_WAITING	1
+#define DISCOVERER_JOB_STATUS_REMOVING	2
+
 typedef struct
 {
 	zbx_uint64_t				druleid;
@@ -55,7 +59,7 @@ typedef struct
 	int					config_timeout;
 	int					workers_used;
 	int					workers_max;
-	unsigned char				pending;
+	unsigned char				status;
 }
 zbx_discoverer_drule_job_t;
 

@@ -64,6 +64,24 @@ void	discoverer_queue_unlock(zbx_discoverer_queue_t *queue)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: notify one worker                                                 *
+ *                                                                            *
+ * Parameters: queue - [IN] the job queue                                     *
+ *                                                                            *
+ * Comments: This function is used by manager to notify worker when single    *
+ *           job have been pushed                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	discoverer_queue_notify(zbx_discoverer_queue_t *queue)
+{
+	int	err;
+
+	if (0 != (err = pthread_cond_signal(&queue->event)))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot signal conditional variable: %s", zbx_strerror(err));
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: notify all workers                                                *
  *                                                                            *
  * Parameters: queue - [IN] the job queue                                     *

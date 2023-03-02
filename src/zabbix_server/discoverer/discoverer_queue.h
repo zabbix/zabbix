@@ -35,6 +35,7 @@ zbx_discoverer_queue_t;
 
 void	discoverer_queue_lock(zbx_discoverer_queue_t *queue);
 void	discoverer_queue_unlock(zbx_discoverer_queue_t *queue);
+void	discoverer_queue_notify(zbx_discoverer_queue_t *queue);
 void	discoverer_queue_notify_all(zbx_discoverer_queue_t *queue);
 void	discoverer_queue_destroy(zbx_discoverer_queue_t *queue);
 void	discoverer_queue_register_worker(zbx_discoverer_queue_t *queue);
