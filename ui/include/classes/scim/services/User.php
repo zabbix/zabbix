@@ -237,7 +237,7 @@ class User extends ScimApiService {
 	 */
 	public function put(array $options): array {
 		$db_user = $this->validatePut($options);
-
+		$user_group_names = [];
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 
 		// Some IdPs have group attribute, but others don't.
@@ -256,9 +256,6 @@ class User extends ScimApiService {
 					'scim_groupids' => array_column($user_groupids, 'scim_groupid')
 				]);
 				$user_group_names = array_column($user_group_names, 'name');
-			}
-			else {
-				$user_group_names = [];
 			}
 		}
 
