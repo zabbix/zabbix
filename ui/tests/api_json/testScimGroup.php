@@ -538,6 +538,313 @@ class testScimGroup extends CAPIScimTest {
 		}
 	}
 
+	public function createInvalidPutRequest(): array {
+		return [
+			'Put request is missing parameter "schema".' => [
+				'group' => [
+					'id' => 'group_w_members',
+					'displayName' => 'office_it',
+					'members' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "schemas" is missing.',
+					'status' => 400
+				]
+			],
+			'Put request contains empty "schemas" parameter.' => [
+				'group' => [
+					'schemas' => [],
+					'id' => 'group_w_members',
+					'displayName' => 'office_it',
+					'members' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/schemas": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Put request contains invalid "schemas" parameter.' => [
+				'group' => [
+					'schemas' => ['invalid:schema'],
+					'id' => 'group_w_members',
+					'displayName' => 'office_it',
+					'members' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' =>
+						'Invalid parameter "/schemas/1": value must be "urn:ietf:params:scim:schemas:core:2.0:Group".',
+					'status' => 400
+				]
+			],
+			'Put request is missing "displayName" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'members' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "displayName" is missing.',
+					'status' => 400
+				]
+			],
+			'Put request contains empty "displayName" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'displayName' => '',
+					'members' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/displayName": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Put request contains empty "members"/"value" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'displayName' => 'office_it',
+					'members' => [
+						[
+							'display' => 'user_active',
+							'value' => ''
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/members/1/value": a number is expected.',
+					'status' => 400
+				]
+			],
+			'Put request is missing "members"/"value" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'displayName' => 'office_it',
+					'members' => [
+						[
+							'display' => 'user_active'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/members/1": the parameter "value" is missing.',
+					'status' => 400
+				]
+			],
+			'Put request contains empty "members"/"display" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'displayName' => 'office_it',
+					'members' => [
+						[
+							'display' => '',
+							'value' => 'user_active'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/members/1/display": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Put request is missing "members"/"display" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'displayName' => 'office_it',
+					'members' => [
+						[
+							'value' => 'user_active'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/members/1": the parameter "display" is missing.',
+					'status' => 400
+				]
+			],
+			'Put request contains non-existing user as a member.' => [		// TODO need to fix Group.php, this is not validated
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'displayName' => 'group_w_members',
+					'members' => [
+						[
+							'display' => 'creed.bratton@office.com',
+							'value' => '999999999'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
+				]
+			],
+			'Put request contains user as a member that belongs to another userdirectory.' => [  // TODO need to fix Group.php, this is not validated
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'displayName' => 'group_w_members',
+					'members' => [
+						[
+							'display' => 'ldap_user',
+							'value' => 'ldap_user'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
+				]
+			],
+			'Put request is missing "id" parameter.' => [			// TODO In Group need to fix validation rules, so that id is required.
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'displayName' => 'group_w_members',
+					'members' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "id" is missing.',
+					'status' => 400
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidPutRequest
+	 */
+	public function testInvalidPut(array $group, array $expected_error) {
+		$this->resolveData($group);
+
+		$group['token'] = self::$data['token']['token'];
+
+		$this->call('group.put', $group, $expected_error);
+	}
+
+	public function createValidPutRequest(): array {
+		return [
+			'Update SCIM group name without members via PUT request and add new member.' => [ // TODO need to add possibility to change group name
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_wo_members',
+					'displayName' => 'group_wo_members',
+					'members' => [
+						[
+							'display' => 'user_active',
+							'value' => 'user_active'
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_wo_members',
+					'displayName' => 'group_wo_members',
+					'members' => [
+						[
+							'display' => 'user_active',
+							'value' => 'user_active'
+						]
+					]
+				]
+			],
+			'Update SCIM group with members via PUT request - add new member.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'displayName' => 'group_w_members',
+					'members' => [
+						[
+							'display' => 'user_active',
+							'value' => 'user_active'
+						],
+						[
+							'display' => 'user_inactive',
+							'value' => 'user_inactive'
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'displayName' => 'group_w_members',
+					'members' => [
+						[
+							'display' => 'user_active',
+							'value' => 'user_active'
+						],
+						[
+							'display' => 'user_inactive',
+							'value' => 'user_inactive'
+						]
+					]
+				]
+			],
+			'Update SCIM group - leave the group empty' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_wo_members',
+					'displayName' => 'group_wo_members',
+					'members' => []
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_wo_members',
+					'displayName' => 'group_wo_members',
+					'members' => []
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createValidPutRequest
+	 */
+	public function testValidPut(array $group, array $expected_result): void {
+		$this->resolveData($group);
+		$this->resolveData($expected_result);
+
+		$group['token'] = self::$data['token']['token'];
+
+		$result = $this->call('group.put', $group);
+
+		// Compare response with expected response.
+		$this->assertEquals($expected_result, $result, 'Returned response should match.');
+
+		// Check that scim group in the database is correct.
+		$db_result_group_data = DBSelect('select name from scim_group where scim_groupid='.
+			zbx_dbstr($result['id'])
+		);
+		$db_result_group = DBFetch($db_result_group_data);
+
+		$this->assertEquals($group['displayName'], $db_result_group['name']);
+
+		if ($group['members'] !== []) {
+			// Check that scim group and user relations in database are correct.
+			$db_result_user_group_data = DBSelect('select userid from user_scim_group where scim_groupid='.
+				zbx_dbstr($result['id'])
+			);
+			$db_result_user_group = DBfetchColumn($db_result_user_group_data, 'userid');
+			$expected_userids_in_group = array_column($group['members'], 'value');
+
+			$this->assertEquals($expected_userids_in_group, $db_result_user_group);
+		}
+	}
+
 	/**
 	 * Resolves unknown parameters in the input data or expected results.
 	 *
