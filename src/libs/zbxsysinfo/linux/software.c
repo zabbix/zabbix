@@ -620,7 +620,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 	size_t			offset = 0;
 	int			ret = SYSINFO_RET_FAIL, show_pm, i, check_regex, check_manager;
 	char			buffer[MAX_BUFFER_LEN], *regex, *manager, *mode, tmp[MAX_STRING_LEN], *buf = NULL,
-				*package;
+				*package, *saveptr;
 	zbx_vector_str_t	packages;
 	ZBX_PACKAGE_MANAGER	*mng;
 
@@ -653,6 +653,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 	for (i = 0; NULL != package_managers[i].name; i++)
 	{
 		mng = &package_managers[i];
+		saveptr = NULL;
 
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
@@ -669,7 +670,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			ret = SYSINFO_RET_OK;
 
-			package = strtok(buf, "\n");
+			package = strtok_r(buf, "\n", &saveptr);
 
 			while (NULL != package)
 			{
@@ -686,7 +687,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 				zbx_vector_str_append(&packages, zbx_strdup(NULL, package));
 next:
-				package = strtok(NULL, "\n");
+				package = strtok_r(NULL, "\n", &saveptr);
 			}
 
 			if (1 == show_pm)
@@ -824,7 +825,7 @@ out:
 int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int			ret = SYSINFO_RET_FAIL, i, check_regex, check_manager;
-	char			*regex, *manager, *line, *buf = NULL, error[MAX_STRING_LEN];
+	char			*regex, *manager, *line, *saveptr, *buf = NULL, error[MAX_STRING_LEN];
 	ZBX_PACKAGE_MANAGER	*mng;
 	struct zbx_json		json;
 
@@ -845,6 +846,7 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	for (i = 0; NULL != package_managers[i].name; i++)
 	{
 		mng = &package_managers[i];
+		saveptr = NULL;
 
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
@@ -861,13 +863,13 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			ret = SYSINFO_RET_OK;
 
-			line = strtok(buf, "\n");
+			line = strtok_r(buf, "\n", &saveptr);
 
 			while (NULL != line)
 			{
 				mng->details_parser(mng->name, line, (1 == check_regex ? regex : NULL), &json);
 
-				line = strtok(NULL, "\n");
+				line = strtok_r(NULL, "\n", &saveptr);
 			}
 		}
 	}
