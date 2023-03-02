@@ -112,7 +112,6 @@ class ColumnEdit extends CController {
 		unset($input['update']);
 
 		if (!$this->hasInput('update')) {
-
 			$this->setResponse(new CControllerResponseData([
 					'action' => $this->getAction(),
 					'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE,
