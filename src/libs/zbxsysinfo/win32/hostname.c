@@ -36,6 +36,36 @@ static void	retrieve_hostname(char *buffer, int len, char **error)
 	}
 }
 
+static char	*retrieve_dns_name(void)
+{
+	FIXED_INFO		*net_params = NULL;
+	ULONG			length = 0;
+	WCHAR			*workgroup;
+	NETSETUP_JOIN_STATUS	status;
+	char			*result = NULL;
+
+	if (ERROR_SUCCESS == GetNetworkParams(net_params, &length))
+	{
+		net_params = malloc(length);
+		GetNetworkParams(net_params, &length);
+	}
+
+	if (0 == *(net_params->DomainName))
+	{
+		result = zbx_unicode_to_utf8(workgroup);
+		NetApiBufferFree(workgroup);
+	}
+	else
+	{
+		result = zbx_strdup(NULL, net_params->DomainName);
+	}
+
+	if (NULL != net_params)
+		zbx_free(net_params);
+
+	return result;
+}
+
 int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DWORD		dwSize = 256;
@@ -98,6 +128,29 @@ int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 
 			name = zbx_strdup(NULL, buffer);
+		}
+		else if (0 == strcmp(type, "fdqn"))
+		{
+			char	*domain_name;
+
+			retrieve_hostname(buffer, sizeof(buffer), &error);
+			if (NULL != error)
+			{
+				SET_MSG_RESULT(result, error);
+				return SYSINFO_RET_FAIL;
+			}
+
+			domain_name = retrieve_dns_name();
+
+			if (NULL != domain_name)
+			{
+				name = zbx_dsprintf(NULL, "%s.%s", buffer, domain_name);
+				zbx_free(domain_name);
+			}
+			else
+			{
+				name = zbx_strdup(NULL, buffer);
+			}
 		}
 		else
 		{

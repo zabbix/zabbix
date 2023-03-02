@@ -52,7 +52,7 @@ func getHostname(params []string) (uname string, err error) {
 			return "", err
 		}
 		uname = windows.UTF16ToString(w)
-	case "host":
+	case "host", "fqdn":
 		if uname, err = os.Hostname(); err != nil {
 			return "", err
 		}

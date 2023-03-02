@@ -66,7 +66,7 @@ func getHostname(params []string) (hostname string, err error) {
 	}
 
 	switch mode {
-	case "host", "":
+	case "host", "fqdn", "":
 		hostname = util.UnameArrayToString(&utsname.Nodename)
 	case "shorthost":
 		hostname = util.UnameArrayToString(&utsname.Nodename)

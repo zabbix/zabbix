@@ -2043,7 +2043,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 	type = get_rparam(request, 0);
 	transform = get_rparam(request, 1);
 
-	if (NULL != type && '\0' != *type && 0 != strcmp(type, "host"))
+	if (NULL != type && '\0' != *type && 0 != strcmp(type, "host") && 0 != strcmp(type, "fdqn"))
 	{
 		if (0 == strcmp(type, "shorthost"))
 		{
