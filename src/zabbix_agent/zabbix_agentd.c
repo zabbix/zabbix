@@ -1360,7 +1360,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		/* Wait for the service worker thread to terminate us. Listener threads may not exit up to */
 		/* config_timeout seconds if they're waiting for external processes to finish / timeout */
-		zbx_sleep(config_timeout);
+		zbx_sleep(zbx_config_timeout);
 
 		THIS_SHOULD_NEVER_HAPPEN;
 	}

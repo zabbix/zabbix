@@ -23,29 +23,35 @@ package zbxlib
 /*
 #include "zbxsysinfo.h"
 
-static int	config_timeout = 3;
-static int	get_config_timeout(void)
-{
-	return config_timeout;
-}
+///static int	config_timeout = 3;
+///static int	get_config_timeout(void)
+///{
+///	return config_timeout;
+///}
+///
+///static int	config_enable_remote_commands = 1;
+///static int	get_config_enable_remote_commands(void)
+///{
+///	return config_enable_remote_commands;
+///}
+///
+///static int	config_log_remote_commands = 0;
+///static int	get_config_log_remote_commands(void)
+///{
+///	return config_log_remote_commands;
+///}
+///
+///static int	config_unsafe_user_parameters = 0;
+///static int	get_config_unsafe_user_parameters(void)
+///{
+///	return config_unsafe_user_parameters;
+///}
 
-static int	config_enable_remote_commands = 1;
-static int	get_config_enable_remote_commands(void)
-{
-	return config_enable_remote_commands;
-}
 
-static int	config_log_remote_commands = 0;
-static int	get_config_log_remote_commands(void)
-{
-	return config_log_remote_commands;
-}
-
-static int	config_unsafe_user_parameters = 0;
-static int	get_config_unsafe_user_parameters(void)
-{
-	return config_unsafe_user_parameters;
-}
+DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_timeout, 3)
+DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_enable_remote_commands, 1)
+DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_log_remote_commands, 0)
+DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_unsafe_user_parameters, 0)
 
 void	init_globals(void)
 {
