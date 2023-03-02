@@ -985,4 +985,8 @@ int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str
 
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
 
+#define ZBX_RECALC_TIME_PERIOD_HISTORY	1
+#define ZBX_RECALC_TIME_PERIOD_TRENDS	2
+void	zbx_recalc_time_period(int *ts_from, int table_group);
+
 #endif

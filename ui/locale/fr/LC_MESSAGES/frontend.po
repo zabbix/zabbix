@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-01-08 10:03+0000\n"
+"PO-Revision-Date: 2023-02-18 08:45+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -3137,6 +3137,11 @@ msgstr "Impossible de mettre à jour un graphique découvert."
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "Impossible de mettre à jour un groupe d'hôtes découvert \"%1$s\"."
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr "Impossible de mettre à jour un graphique basé sur un modèle \"%1$s\"."
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -16230,6 +16235,10 @@ msgstr "Les services forment une dépendance circulaire."
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
 msgstr "Services mis à jour"
+
+#: include/classes/api/services/CUser.php:1693
+msgid "Session ID or token is expected."
+msgstr "Un ID de session ou un token est attendu."
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
