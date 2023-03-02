@@ -272,7 +272,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							'xpath:.//button[contains(@class, "icon-actions-number-gray")]' => [
 								[
 									'Time' => 'acknowledged',
-									'User/Recipient' => '(Zabbix Administrator)',
+									'User/Recipient' => 'Admin (Zabbix Administrator)',
 									'Action' => '',
 									'Message/Command' => 'Acknowledged event',
 									'Status' => '',
@@ -280,9 +280,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 								],
 								[
 									'Time' => 'created',
-									'User/Recipient' => '(Zabbix Administrator)',
+									'User/Recipient' => '',
 									'Action' => '',
-									'Message/Command' => 'Acknowledged event',
+									'Message/Command' => '',
 									'Status' => '',
 									'Info' => ''
 								]
@@ -733,8 +733,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 					if ($selector !== 'class:icon-action-ack-green') {
 						$button->click();
-						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->last();
-						$hint_table = $hint->query('class:list-table')->asTable()->one()->waitUntilVisible();
+						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible();
+						$hint_table = $hint->query('class:list-table')->asTable()->one();
 
 						foreach ($hint_table->getRows() as $i => $row) {
 							$hint_rows[$i]['Time'] = ($hint_rows[$i]['Time'] === 'acknowledged')
@@ -743,7 +743,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							$row->assertValues($hint_rows[$i]);
 						}
 
-						$hint->query('class:overlay-close-btn')->one()->click()->waitUntilNotPresent();
+//						$hint->query('class:overlay-close-btn')->one()->click()->waitUntilNotPresent();
+						$this->query('xpath://div[@class="overlay-dialogue"]/button[@title="Close"]')
+								->one()->click()->waitUntilNotPresent();
 					}
 				}
 			}
