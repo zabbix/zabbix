@@ -676,7 +676,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 
-		// For easier maintenance we'll check the whole table only in some cases.
+		// Change time for actual value, because it cannot be used in data provider.
 		if (CTestArrayHelper::get($data['result'], 'Time')) {
 			foreach ($data['result'] as &$row) {
 				$row['Time'] = date('H:i:s', self::$time);
@@ -699,7 +699,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			$this->assertEquals($data['stats'], $table->getRow(count($data['result']))->getText());
 		}
 		else {
-			$this->assertTableHasData($data['table_result']);
+			$this->assertTableHasData($data['result']);
 		}
 
 		// Assert table headers depending on widget settings.
