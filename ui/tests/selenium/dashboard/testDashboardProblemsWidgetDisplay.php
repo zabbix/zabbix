@@ -32,14 +32,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 	use TableTrait;
 
-	private static $problem_hostid;
-	private static $symptoms_hostid;
 	private static $dashboardid;
-	private static $problem_itemids;
-	private static $symptoms_itemids;
-	private static $problem_triggerids;
-	private static $symptoms_triggerids;
-	private static $acktime;
+	private static $time;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -88,8 +82,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			]
 		]);
 		$this->assertArrayHasKey('hostids', $hosts);
-		self::$problem_hostid = $hosts['hostids'][0];
-		self::$symptoms_hostid = $hosts['hostids'][1];
+		$problem_hostid = $hosts['hostids'][0];
+		$symptoms_hostid = $hosts['hostids'][1];
 
 		// Create items on previously created hosts.
 		$problem_item_names = ['float', 'char', 'log', 'unsigned', 'text'];
@@ -97,7 +91,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		$problem_items_data = [];
 		foreach ($problem_item_names as $i => $item) {
 			$problem_items_data[] = [
-				'hostid' => self::$problem_hostid,
+				'hostid' => $problem_hostid,
 				'name' => $item,
 				'key_' => $item,
 				'type' => ITEM_TYPE_TRAPPER,
@@ -107,12 +101,12 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		$problem_items = CDataHelper::call('item.create', $problem_items_data);
 		$this->assertArrayHasKey('itemids', $problem_items);
-		self::$problem_itemids = CDataHelper::getIds('name');
+		$problem_itemids = CDataHelper::getIds('name');
 
 		$symptoms_items_data = [];
 		foreach (['trap1', 'trap2', 'trap3'] as $i => $item) {
 			$symptoms_items_data[] = [
-				'hostid' => self::$symptoms_hostid,
+				'hostid' => $symptoms_hostid,
 				'name' => $item,
 				'key_' => $item,
 				'type' => ITEM_TYPE_TRAPPER,
@@ -122,7 +116,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		$symptoms_items = CDataHelper::call('item.create', $symptoms_items_data);
 		$this->assertArrayHasKey('itemids', $symptoms_items);
-		self::$symptoms_itemids = CDataHelper::getIds('name');
+		$symptoms_itemids = CDataHelper::getIds('name');
 
 		// Create triggers based on items.
 		$problem_triggers = CDataHelper::call('trigger.create', [
@@ -156,7 +150,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $problem_triggers);
-		self::$problem_triggerids = CDataHelper::getIds('description');
+		$problem_triggerids = CDataHelper::getIds('description');
 
 		$symptoms_triggers = CDataHelper::call('trigger.create', [
 			[
@@ -176,68 +170,63 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $symptoms_triggers);
-		self::$symptoms_triggerids = CDataHelper::getIds('description');
+		$symptoms_triggerids = CDataHelper::getIds('description');
 
-		// Create events.
-		$time = time();
+		// Create events and problems.
+		self::$time = time();
 
-		foreach (array_values(self::$problem_itemids) as $itemid) {
+		foreach (array_values($problem_itemids) as $itemid) {
+			CDataHelper::addItemData($itemid, 0);
+		}
+
+		foreach (array_values($symptoms_itemids) as $itemid) {
 			CDataHelper::addItemData($itemid, 0);
 		}
 
 		$i = 0;
-		foreach (self::$problem_triggerids as $name => $id) {
+		foreach ($problem_triggerids as $name => $id) {
 			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.
-					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
+				(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
+			);
+			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.
+				(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
 			);
 			$i++;
 		}
 
 		$j = 0;
-		foreach (self::$symptoms_triggerids as $name => $id) {
+		foreach ($symptoms_triggerids as $name => $id) {
 			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.
-					(1009850 + $j).', 0, 0, '.zbx_dbstr($id).', '.$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
+				(1009850 + $j).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
+			);
+			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.
+				(1009850 + $j).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
 			);
 			$j++;
 		}
 
-		// Create problems.
-		$k = 0;
-		foreach (self::$problem_triggerids as $name => $id) {
-			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.
-					(1009950 + $k).', 0, 0, '.zbx_dbstr($id).', '.$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($k).')'
-			);
-			$k++;
-		}
-
-		$l = 0;
-		foreach (self::$symptoms_triggerids as $name => $id) {
-			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.
-					(1009850 + $l).', 0, 0, '.zbx_dbstr($id).', '.$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($l).')'
-			);
-			$l++;
-		}
-
-		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for widget 1 char.
+		// Change triggers' state to Problem.
 		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for widget 1 float').', '.
-				zbx_dbstr('Trigger for widget 2 log').', '.zbx_dbstr('Trigger for widget 2 unsigned').', '.
-				zbx_dbstr('Trigger for widget text').', '.zbx_dbstr('Cause problem 1').', '.
-				zbx_dbstr('Symptom problem 2').', '.zbx_dbstr('Symptom problem 3').')'
+			zbx_dbstr('Trigger for widget 2 log').', '.zbx_dbstr('Trigger for widget 2 unsigned').', '.
+			zbx_dbstr('Trigger for widget text').', '.zbx_dbstr('Cause problem 1').', '.
+			zbx_dbstr('Symptom problem 2').', '.zbx_dbstr('Symptom problem 3').')'
 		);
+
+		// Manual close is true for the problem: Trigger for widget 1 char.
 		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.
-				zbx_dbstr('Trigger for widget 1 char')
+			zbx_dbstr('Trigger for widget 1 char')
 		);
 
 		// Set cause and symptoms.
 		DBexecute('UPDATE problem SET cause_eventid = 1009850 WHERE name IN ('.zbx_dbstr('Symptom problem 2').', '.
-				zbx_dbstr('Symptom problem 3').')'
+			zbx_dbstr('Symptom problem 3').')'
 		);
 		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES (1009851, 1009850)');
 		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES (1009852, 1009850)');
 
 		// Suppress the problem: 'Trigger for widget text'.
 		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES '.
-				'(100990, 1009954, NULL, 0)'
+			'(100990, 1009954, NULL, 0)'
 		);
 
 		// Acknowledge the problem: 'Trigger for widget 2 unsigned' and get acknowledge time.
@@ -246,12 +235,6 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			'action' => 6,
 			'message' => 'Acknowledged event'
 		]);
-
-		$event = CDataHelper::call('event.get', [
-			'eventids' => 1009953,
-			'select_acknowledges' => ['clock']
-		]);
-		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
 
 	public static function getCheckWidgetTable() {
@@ -318,7 +301,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Trigger for widget 2 unsigned'
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-							'Update', 'Actions'
+						'Update', 'Actions'
 					]
 				]
 			],
@@ -337,7 +320,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Trigger for widget 2 unsigned'
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-							'Update', 'Actions'
+						'Update', 'Actions'
 					]
 				]
 			],
@@ -385,9 +368,23 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'id:severities_2' => true,
 						'id:severities_4' => true
 					],
-					'result' => [
-						'Trigger for widget 2 log',
-						'Trigger for widget 1 float'
+					'table_result' => [
+						[
+							'Recovery time' => '',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'Host for Problems Widgets',
+							'Problem • Severity' => 'Trigger for widget 2 log',
+							'Update' => 'Update'
+						],
+						[
+							'Recovery time' => '',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'Host for Problems Widgets',
+							'Problem • Severity' => 'Trigger for widget 1 float',
+							'Update' => 'Update'
+						]
 					]
 				]
 			],
@@ -418,7 +415,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Alpha: a'
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-							'Duration', 'Update', 'Actions', 'Tags'
+						'Duration', 'Update', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -450,7 +447,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Eta: eBeta: b'
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-							'Duration', 'Update', 'Actions', 'Tags'
+						'Duration', 'Update', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -491,7 +488,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'The: tAlp: aIot: i'
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-							'Update', 'Actions', 'Tags'
+						'Update', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -527,7 +524,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					],
 					'tags_display' => ['get'],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-							'Update', 'Actions', 'Tags'
+						'Update', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -555,7 +552,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						"Item value: \n0"
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-							'Operational data', 'Duration', 'Update', 'Actions'
+						'Operational data', 'Duration', 'Update', 'Actions'
 					]
 				]
 			],
@@ -604,7 +601,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Symptom problem 2'
 					],
 					'headers' => ['', '', 'Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-							'Duration', 'Update', 'Actions'
+						'Duration', 'Update', 'Actions'
 					]
 				]
 			],
@@ -624,7 +621,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Symptom problem 2'
 					],
 					'headers' => ['', '', 'Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-							'Duration', 'Update', 'Actions'
+						'Duration', 'Update', 'Actions'
 					]
 				]
 			]
@@ -660,47 +657,57 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 
-		// Assert table headers depending on widget settings.
-		$headers = (CTestArrayHelper::get($data, 'headers', ['Time', '', '', 'Recovery time', 'Status', 'Info',
-				'Host', 'Problem • Severity', 'Duration', 'Update', 'Actions']
-		));
-		$this->assertEquals($headers, $table->getHeadersText());
-
-		// When there are shown less lines than filtered, table appears unusual and doesn't fit for framework functions.
-		if (CTestArrayHelper::get($data['fields'], 'Show lines')) {
-			$this->assertEquals(count($data['result']) + 1, $table->getRows()->count());
-
-			// Assert table rows.
-			$result = [];
-			for ($i = 0; $i < count($data['result']); $i++) {
-				$result[] = $table->getRow($i)->getColumn('Problem • Severity')->getText();
+		// For easier maintenance we'll check the whole table only in some cases.
+		if (CTestArrayHelper::get($data, 'table_result')) {
+			foreach ($data['table_result'] as &$row) {
+				$row['Time'] = date('Y-m-d H:i:s', self::$time);
 			}
 
-			$this->assertEquals($data['result'], $result);
-
-			// Assert table stats.
-			$this->assertEquals($data['stats'], $table->getRow(count($data['result']))->getText());
+			$this->assertTableHasData($data['table_result']);
 		}
 		else {
-			$this->assertTableDataColumn($data['result'], 'Problem • Severity');
-		}
+			// Assert table headers depending on widget settings.
+			$headers = (CTestArrayHelper::get($data, 'headers', ['Time', '', '', 'Recovery time', 'Status', 'Info',
+					'Host', 'Problem • Severity', 'Duration', 'Update', 'Actions']
+			));
+			$this->assertEquals($headers, $table->getHeadersText());
 
-		if (CTestArrayHelper::get($data, 'operational_data')) {
-			$this->assertTableDataColumn($data['operational_data'], 'Operational data');
-		}
+			// When there are shown less lines than filtered, table appears unusual and doesn't fit for framework functions.
+			if (CTestArrayHelper::get($data['fields'], 'Show lines')) {
+				$this->assertEquals(count($data['result']) + 1, $table->getRows()->count());
 
-		// Assert Problems widget's tags column.
-		if (array_key_exists('Tags', $data)) {
-			$this->assertTableDataColumn($data['tags_display'], 'Tags');
+				// Assert table rows.
+				$result = [];
+				for ($i = 0; $i < count($data['result']); $i++) {
+					$result[] = $table->getRow($i)->getColumn('Problem • Severity')->getText();
+				}
+
+				$this->assertEquals($data['result'], $result);
+
+				// Assert table stats.
+				$this->assertEquals($data['stats'], $table->getRow(count($data['result']))->getText());
+			}
+			else {
+				$this->assertTableDataColumn($data['result'], 'Problem • Severity');
+			}
+
+			if (CTestArrayHelper::get($data, 'operational_data')) {
+				$this->assertTableDataColumn($data['operational_data'], 'Operational data');
+			}
+
+			// Assert Problems widget's tags column.
+			if (array_key_exists('Tags', $data)) {
+				$this->assertTableDataColumn($data['tags_display'], 'Tags');
+			}
 		}
 
 		// Delete created widget.
 		DBexecute('DELETE FROM widget'.
-				' WHERE dashboard_pageid'.
-				' IN (SELECT dashboard_pageid'.
-					' FROM dashboard_page'.
-					' WHERE dashboardid='.self::$dashboardid.
-				')'
+			' WHERE dashboard_pageid'.
+			' IN (SELECT dashboard_pageid'.
+			' FROM dashboard_page'.
+			' WHERE dashboardid='.self::$dashboardid.
+			')'
 		);
 	}
 }
