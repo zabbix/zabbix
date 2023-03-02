@@ -115,11 +115,10 @@ class testSystemInformation extends CWebTest {
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
-		$this->page->login()->open($url);
+		$this->page->login()->open($url)->waitUntilReady();
 
 		// Not waiting for page to load to minimise the possibility of difference between the time in report and in constant.
 		$current_time = time();
-		$this->page->waitUntilReady();
 
 		if (!$dashboardid) {
 			$nodes_table = $this->query('xpath://table[@class="list-table sticky-header sticky-footer"]')->asTable()->one();
@@ -146,22 +145,21 @@ class testSystemInformation extends CWebTest {
 		foreach ($nodes as $name => $lastaccess_db) {
 			$row = $nodes_table->findRow('Name', $name);
 			$last_seen = $row->getColumn('Last access');
+			self::$skip_fields[] = $last_seen;
 
 			/**
 			 * Converting unix timestamp difference into difference in time units and creating an array of such reference
 			 * values. This is required because several seconds might have passed from defining $current_time and
 			 * loading the page. Afterwards, the presence of the actual last access value in this array is determined.
 			 */
-			$lastaccess_expected = [];
+			$last_expected = [];
 
 			for ($i = 0; $i <= 10; $i++) {
-				$lastaccess_expected[] = convertUnitsS($current_time - $lastaccess_db - $i);
+				$last_expected[] = convertUnitsS($current_time - $lastaccess_db - $i);
 			}
 
-			$lastaccess_actual = $last_seen->getText();
-			$this->assertTrue(in_array($lastaccess_actual, $lastaccess_expected));
-
-			self::$skip_fields[] = $last_seen;
+			$last_actual = $last_seen->getText();
+			$this->assertContains($last_actual, $last_expected, $last_actual.' not in ['.implode(', ', $last_expected).']');
 
 			// Check Zabbix server address and port for each record in the HA cluster nodes table.
 			if ($name === 'Active node') {
