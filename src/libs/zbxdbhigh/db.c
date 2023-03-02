@@ -23,7 +23,7 @@
 #include "events.h"
 #include "threads.h"
 #include "zbxserver.h"
-#include "zbx_dbver_constants.h"
+#include "zbx_dbversion_constants.h"
 #include "dbcache.h"
 #include "zbxalgo.h"
 #include "cfg.h"
