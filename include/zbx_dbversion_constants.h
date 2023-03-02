@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBX_DBVER_CONSTANTS_H
-#define ZABBIX_ZBX_DBVER_CONSTANTS_H
+#ifndef ZABBIX_ZBX_DBVERSION_CONSTANTS_H
+#define ZABBIX_ZBX_DBVERSION_CONSTANTS_H
 
 #define ZBX_DBVERSION_UNDEFINED					0
 
@@ -75,4 +75,4 @@
 #define ZBX_TIMESCALE_COMPRESSED_CHUNKS_HISTORY			"compressed_chunks_history"
 #define ZBX_TIMESCALE_COMPRESSED_CHUNKS_TRENDS			"compressed_chunks_trends"
 
-#endif /*ZABBIX_ZBX_DBVER_CONSTANTS_H*/
+#endif /*ZABBIX_ZBX_DBVERSION_CONSTANTS_H*/

@@ -24,7 +24,7 @@
 #include "threads.h"
 #include "dbcache.h"
 #include "cfg.h"
-#include "zbx_dbver_constants.h"
+#include "zbx_dbversion_constants.h"
 
 typedef struct
 {

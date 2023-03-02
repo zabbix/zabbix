@@ -21,7 +21,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
-#include "zbx_dbver_constants.h"
+#include "zbx_dbversion_constants.h"
 #include "zbxhistory.h"
 
 #include "history.h"

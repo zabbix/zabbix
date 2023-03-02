@@ -21,7 +21,7 @@
 #include "log.h"
 
 #include "zbxdb.h"
-#include "zbx_dbver_constants.h"
+#include "zbx_dbversion_constants.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
