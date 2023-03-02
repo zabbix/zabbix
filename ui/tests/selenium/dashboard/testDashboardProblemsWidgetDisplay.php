@@ -660,7 +660,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// For easier maintenance we'll check the whole table only in some cases.
 		if (CTestArrayHelper::get($data, 'table_result')) {
 			foreach ($data['table_result'] as &$row) {
-				$row['Time'] = date('Y-m-d H:i:s', self::$time);
+				$row['Time'] = date('H:i:s', self::$time);
 			}
 
 			$this->assertTableHasData($data['table_result']);
