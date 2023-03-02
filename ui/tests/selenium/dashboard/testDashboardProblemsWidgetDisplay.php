@@ -531,8 +531,10 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'result' => [
-						'Problem • Severity' => 'Fourth test trigger with tag priority',
-						'Tags' => 'get'
+						[
+							'Problem • Severity' => 'Fourth test trigger with tag priority',
+							'Tags' => 'get'
+						]
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
 						'Update', 'Actions', 'Tags'
