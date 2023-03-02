@@ -151,8 +151,6 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
 				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
 
-
-
 			if ($calc_extremes) {
 				if ($column['min'] !== '' && $number_parser->parse($column['min']) == CParser::PARSE_SUCCESS) {
 					$column['min'] = $number_parser->calcValue();
