@@ -3331,6 +3331,7 @@ Changes for 5.0.32rc2
 New features:
 
 Bug fixes:
+........S. [ZBX-22240] fixed invalid memory access during retrieval of historical data (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.32rc1
