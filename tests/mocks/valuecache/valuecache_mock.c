@@ -31,7 +31,7 @@
 #include "zbxhistory.h"
 #include "history.h"
 #include "zbxcacheconfig.h"
-#include "zbx_dbver_constants.h"
+#include "zbx_dbversion_constants.h"
 
 #include <setjmp.h>
 #include <cmocka.h>

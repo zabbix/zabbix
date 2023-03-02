@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbx_dbver_constants.h"
+#include "zbx_dbversion_constants.h"
 #include "zbxdb.h"
 
 #include "zbxstr.h"
