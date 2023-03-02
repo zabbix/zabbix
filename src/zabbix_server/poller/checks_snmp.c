@@ -1928,24 +1928,25 @@ static void	snmp_bulkwalk_set_options(zbx_snmp_format_opts_t *opts)
 
 static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
 {
-	size_t	len;
 	int	i;
 
 	zbx_vector_snmp_oid_sort(oids, (zbx_compare_func_t)zbx_snmp_oid_compare);
-	len = strlen(oids->values[0]->str_oid);
 
 	for (i = 1; i < oids->values_num; i++)
 	{
-		while (0 == memcmp(oids->values[i - 1]->str_oid, oids->values[i]->str_oid, len))
+		size_t len = strlen(oids->values[i - 1]->str_oid);
+
+		while (0 == strncmp(oids->values[i - 1]->str_oid, oids->values[i]->str_oid, len))
 		{
+			if ('.' != oids->values[i]->str_oid[len] && '\0' != oids->values[i]->str_oid[len])
+				break;
+
 			vector_snmp_oid_free(oids->values[i]);
 			zbx_vector_snmp_oid_remove(oids, i);
 
 			if (i == oids->values_num)
 				return;
 		}
-
-		len = strlen(oids->values[i]->str_oid);
 	}
 }
 
@@ -2439,12 +2440,12 @@ static void	zbx_init_snmp(void)
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
 	init_snmp(progname);
 	zbx_snmp_init_done = 1;
 
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
 void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type,
@@ -2533,12 +2534,12 @@ static void	zbx_shutdown_snmp(void)
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
 	snmp_shutdown(progname);
 	zbx_snmp_init_done = 0;
 
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
