@@ -34,6 +34,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 	private static $dashboardid;
 	private static $time;
+	protected static $acktime;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -235,6 +236,12 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			'action' => 6,
 			'message' => 'Acknowledged event'
 		]);
+
+		$event = CDataHelper::call('event.get', [
+			'eventids' => 1009953,
+			'select_acknowledges' => ['clock']
+		]);
+		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
 
 	public static function getCheckWidgetTable() {
@@ -247,10 +254,40 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Host groups' => 'Group for Problems Widgets'
 					],
 					'result' => [
-						['Problem • Severity' => 'Trigger for widget 2 unsigned'],
+						['Problem • Severity' => 'Trigger for widget 2 unsigned', 'Actions' => "1 message\n1 action"],
 						['Problem • Severity' => 'Trigger for widget 2 log'],
 						['Problem • Severity' => 'Trigger for widget 1 char'],
 						['Problem • Severity' => 'Trigger for widget 1 float']
+					],
+					'actions' => [
+						'Trigger for widget 2 unsigned' => [
+							'class:icon-action-ack-green' => true,
+							'xpath:.//button[contains(@class, "icon-action-msgs")]' => [
+								[
+									'Time' => 'acknowledged',
+									'User' => 'Admin (Zabbix Administrator)',
+									'Message' => 'Acknowledged event'
+								]
+							],
+							'xpath:.//button[contains(@class, "icon-actions-number-gray")]' => [
+								[
+									'Time' => 'acknowledged',
+									'User/Recipient' => '(Zabbix Administrator)',
+									'Action' => '',
+									'Message/Command' => 'Acknowledged event',
+									'Status' => '',
+									'Info' => ''
+								],
+								[
+									'Time' => 'created',
+									'User/Recipient' => '(Zabbix Administrator)',
+									'Action' => '',
+									'Message/Command' => 'Acknowledged event',
+									'Status' => '',
+									'Info' => ''
+								]
+							]
+						]
 					]
 				]
 			],
@@ -682,6 +719,34 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		if (CTestArrayHelper::get($data['result'], 'Time')) {
 			foreach ($data['result'] as &$row) {
 				$row['Time'] = date('H:i:s', self::$time);
+			}
+			uset($row);
+		}
+
+		if (CTestArrayHelper::get($data, 'actions')) {
+			foreach ($data['actions'] as $problem => $action) {
+				$action_cell = $table->findRow('Problem • Severity', $problem)->getColumn('Actions');
+
+				foreach ($action as $selector => $hint_rows) {
+					$button = $action_cell->query($selector)->one();
+					$this->assertTrue($button->isVisible());
+
+					if ($selector !== 'class:icon-action-ack-green') {
+						$button->click();
+						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+						$hint_table = $hint->query('class:list-table')
+							->asTable()->one()->waitUntilVisible();
+
+						foreach ($hint_table->getRows() as $i => $row) {
+							$hint_rows[$i]['Time'] = ($hint_rows[$i]['Time'] === 'acknowledged')
+								? date('Y-m-d H:i:s', self::$acktime)
+								: date('Y-m-d H:i:s', self::$time);
+							$row->assertValues($hint_rows[$i]);
+						}
+
+						$hint->close();
+					}
+				}
 			}
 		}
 
