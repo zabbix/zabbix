@@ -602,8 +602,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Show lines' => 2
 					],
 					'result' => [
-						['Problem • Severity' => 'Trigger for widget 2 unsigned'],
-						['Problem • Severity' => 'Trigger for widget 2 log']
+						'Trigger for widget 2 unsigned',
+						'Trigger for widget 2 log'
 					],
 					'stats' => '2 of 4 problems are shown'
 				]
