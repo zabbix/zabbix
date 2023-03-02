@@ -1332,7 +1332,7 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.datastore.perfcounter[url,uuid,path,<instance>]' => [
-				'description' => _('VMware datastore performance counter, "url" - VMware service URL, "uuid" - VMware datastore global unique identifier, "path" - performance counter path, "instance" - performance counter instance'),
+				'description' => _('VMware datastore performance counter, "url" - VMware service URL, "uuid" - VMware datastore global unique identifier, "path" - performance counter path, "instance" - datastore perfcounter instance from vmware.hv.diskinfo.get'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.datastore.property[url,uuid,prop]' => [
