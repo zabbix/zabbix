@@ -30,6 +30,7 @@
 #include "zbxself.h"
 #include "zbxstr.h"
 #include "zbxcachehistory.h"
+#include "zbxprof.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
@@ -89,14 +90,18 @@ static void	pp_curl_destroy(void)
  *                                                                            *
  * Purpose: create preprocessing manager                                      *
  *                                                                            *
- * Parameters: program_type - [IN] the component type (server/proxy)          *
- *             workers_num  - [IN] the number of workers to create            *
- *             error        - [OUT] the error message                         *
+ * Parameters: program_type  - [IN] the component type (server/proxy)         *
+ *             workers_num   - [IN] the number of workers to create           *
+ *             finished_cb   - [IN] a callback to call after finishing        *
+ *                                  task (optional)                           *
+ *             finished_data - [IN] the callback data (optional)              *
+ *             error         - [OUT] the error message                        *
  *                                                                            *
  * Return value: The created manager or NULL on error.                        *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, char **error)
+zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
+		void *finished_data, char **error)
 {
 	int			i, ret = FAIL, started_num = 0;
 	time_t			time_start;
@@ -125,6 +130,8 @@ zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, char **error)
 	{
 		if (SUCCEED != pp_worker_init(&manager->workers[i], i + 1, &manager->queue, manager->timekeeper, error))
 			goto out;
+
+		pp_worker_set_finished_cb(&manager->workers[i], finished_cb, finished_data);
 	}
 
 	zbx_hashset_create_ext(&manager->items, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
@@ -234,17 +241,17 @@ void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t 
  ******************************************************************************/
 void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks)
 {
+	zbx_prof_start(__func__, ZBX_PROF_MUTEX);
 	pp_task_queue_lock(&manager->queue);
+	zbx_prof_end_wait();
 
 	for (int i = 0; i < tasks->values_num; i++)
 		pp_task_queue_push(&manager->queue, tasks->values[i]);
 
-	if (1 == tasks->values_num)
-		pp_task_queue_notify(&manager->queue);
-	else
-		pp_task_queue_notify_all(&manager->queue);
+	pp_task_queue_notify(&manager->queue);
 
 	pp_task_queue_unlock(&manager->queue);
+	zbx_prof_end();
 }
 
 /******************************************************************************
@@ -360,7 +367,7 @@ static void	pp_manager_queue_dependents(zbx_pp_manager_t *manager, zbx_pp_item_p
 	}
 
 	if (0 < queued_num)
-		pp_task_queue_notify_all(&manager->queue);
+		pp_task_queue_notify(&manager->queue);
 
 	pp_cache_release(cache);
 }
@@ -380,6 +387,9 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 {
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 	zbx_pp_item_t		*item;
+
+	if (ZBX_VARIANT_NONE == d->result.type)
+		return;
 
 	if (NULL != (item = pp_manager_get_cacheable_dependent_item(manager, d->preproc->dep_itemids,
 			d->preproc->dep_itemids_num)))
@@ -465,7 +475,10 @@ static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *ma
 		pp_task_queue_notify(&manager->queue);
 	}
 	else
+	{
 		pp_task_queue_remove_sequence(&manager->queue, task_seq->itemid);
+		pp_task_free(task_seq);
+	}
 
 	return task;
 }
@@ -480,7 +493,7 @@ static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *ma
  *                                                                            *
  ******************************************************************************/
 void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks,
-		zbx_uint64_t *pending_num, zbx_uint64_t *finished_num)
+		zbx_uint64_t *pending_num, zbx_uint64_t *processing_num, zbx_uint64_t *finished_num)
 {
 	zbx_pp_task_t	*task;
 	static time_t	timekeeper_clock = 0;
@@ -489,9 +502,9 @@ void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_pp_task_ptr_reserve(tasks, PP_FINISHED_TASK_BATCH_SIZE);
-
+	zbx_prof_start(__func__, ZBX_PROF_MUTEX);
 	pp_task_queue_lock(&manager->queue);
-
+	zbx_prof_end_wait();
 	while (PP_FINISHED_TASK_BATCH_SIZE > tasks->values_num)
 	{
 		if (NULL != (task = pp_task_queue_pop_finished(&manager->queue)))
@@ -520,9 +533,10 @@ void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 
 	*pending_num = manager->queue.pending_num;
 	*finished_num = manager->queue.finished_num;
+	*processing_num = manager->queue.processing_num;
 
 	pp_task_queue_unlock(&manager->queue);
-
+	zbx_prof_end();
 	now = time(NULL);
 	if (now != timekeeper_clock)
 	{
