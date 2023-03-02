@@ -475,7 +475,7 @@ class CValueMap extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['valuemapid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['valuemapid']], 'fields' => [
 			'uuid' =>		['type' => API_UUID],
 			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
