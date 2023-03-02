@@ -46,7 +46,8 @@ static zbx_uint32_t	fields_calc_size(zbx_packed_field_t *fields, int fields_num)
 	{
 		if (PACKED_FIELD_STRING == fields[i].type)
 		{
-			field_size = (NULL != fields[i].value) ? (zbx_uint32_t)strlen((const char *)fields[i].value) + 1 : 0;
+			field_size = (NULL != fields[i].value) ?
+					(zbx_uint32_t)strlen((const char *)fields[i].value) + 1 : 0;
 			fields[i].size = (zbx_uint32_t)field_size;
 			field_size += (zbx_uint32_t)sizeof(zbx_uint32_t);
 		}
