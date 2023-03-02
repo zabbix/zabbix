@@ -26,7 +26,6 @@ typedef struct
 {
 	int		workers_num;
 	zbx_list_t	jobs;
-	zbx_hashset_t	jobs_pending;
 	pthread_mutex_t	lock;
 	pthread_cond_t	event;
 	int		flags;
