@@ -736,7 +736,7 @@ class testScimGroup extends CAPIScimTest {
 		$this->call('group.put', $group, $expected_error);
 	}
 
-	public function createValidPutRequest(): array {
+	public function createValidPutRequest(): array {		// TODO, when ZBX-21976 is merged, need to add option to change status active to false or true.
 		return [
 			'Update SCIM group name without members via PUT request and add new member.' => [ // TODO need to add possibility to change group name
 				'group' => [
@@ -843,6 +843,80 @@ class testScimGroup extends CAPIScimTest {
 
 			$this->assertEquals($expected_userids_in_group, $db_result_user_group);
 		}
+	}
+
+	public function createInvalidDeleteRequest(): array {
+		return [
+			'Delete request is missing group id.' => [
+				'group' => [],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "id" is missing.',
+					'status' => 400
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidDeleteRequest
+	 */
+	public function testInvalidDelete(array $group, array $expected_error): void {
+		$group['token'] = self::$data['token']['token'];
+
+		$this->call('group.delete', $group, $expected_error);
+	}
+
+	public function createValidDeleteRequest(): array {
+		return [
+			'Delete SCIM group without members' => [
+				'group' => [
+					'id' => 'new_group_wo_users'
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group']
+				]
+			],
+			'Delete SCIM group with members' => [
+				'group' => [
+					'id' => 'new_group_w_users'
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group']
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createValidDeleteRequest
+	 */
+	public function testValidDelete(array $group, array $expected_result): void {
+		$this->resolveData($group);
+		$this->resolveData($expected_result);
+
+		$group['token'] = self::$data['token']['token'];
+
+		$result = $this->call('group.delete', $group);
+
+		// Compare response with expected response.
+		$this->assertEquals($expected_result, $result, 'Returned response should match.');
+
+		// Check that scim group in the database is deleted.
+		$db_result_group_data = DBSelect('select name from scim_group where scim_groupid='.
+			zbx_dbstr($group['id'])
+		);
+		$db_result_group = DBFetch($db_result_group_data);
+
+		$this->assertFalse($db_result_group);
+
+		// Check that scim user group relations in database are deleted.
+		$db_result_user_group_data = DBSelect('select userid from user_scim_group where scim_groupid='.
+			zbx_dbstr($group['id'])
+		);
+		$db_result_user_group = DBfetchColumn($db_result_user_group_data, 'userid');
+
+		$this->assertEmpty($db_result_user_group);
 	}
 
 	/**
