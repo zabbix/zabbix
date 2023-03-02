@@ -34,7 +34,7 @@ class CDocHelper {
 	const ADMINISTRATION_IMAGE_LIST =							'web_interface/frontend_sections/administration/general#images';
 	const ADMINISTRATION_MACROS_EDIT =							'web_interface/frontend_sections/administration/macros';
 	const ADMINISTRATION_MISCCONFIG_EDIT =						'web_interface/frontend_sections/administration/general#other-parameters';
-	const ADMINISTRATION_MODULE_EDIT =							'modules#manifest-preparation';
+	const ADMINISTRATION_MODULE_EDIT =							'extensions/frontendmodules#manifest-preparation';
 	const ADMINISTRATION_MODULE_LIST =							'web_interface/frontend_sections/administration/general#modules';
 	const ADMINISTRATION_PROXY_EDIT =							'distributed_monitoring/proxies#configuration';
 	const ADMINISTRATION_PROXY_LIST =							'web_interface/frontend_sections/administration/proxies';

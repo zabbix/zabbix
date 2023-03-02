@@ -92,7 +92,6 @@ class CControllerModuleEdit extends CController {
 			];
 
 			$response = new CControllerResponseData($data);
-			$response->setTitle(_('Modules'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))

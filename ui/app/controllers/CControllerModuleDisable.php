@@ -20,12 +20,12 @@
 
 
 /**
- * Module update action.
+ * Module disable action from module list.
  */
-class CControllerModuleUpdate extends CController {
+class CControllerModuleDisable extends CController {
 
 	/**
-	 * List of modules to update.
+	 * List of modules to disable.
 	 */
 	private array $modules = [];
 
@@ -74,7 +74,7 @@ class CControllerModuleUpdate extends CController {
 	}
 
 	protected function doAction(): void {
-		$set_status = ($this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED);
+		$set_status = MODULE_STATUS_DISABLED;
 
 		$db_modules_update_names = [];
 
@@ -85,44 +85,30 @@ class CControllerModuleUpdate extends CController {
 		]);
 
 		$module_manager = new CModuleManager(APP::getRootDir());
-		$module_manager_enabled = new CModuleManager(APP::getRootDir());
 
 		foreach ($db_modules as $moduleid => $db_module) {
-			$new_status = array_key_exists($moduleid, $this->modules) ? $set_status : $db_module['status'];
-
-			if ($new_status == MODULE_STATUS_ENABLED) {
-				$manifest = $module_manager_enabled->addModule($db_module['relative_path']);
-			}
-			else {
-				$manifest = $module_manager->addModule($db_module['relative_path']);
-			}
+			$manifest = $module_manager->addModule($db_module['relative_path']);
 
 			if (array_key_exists($moduleid, $this->modules) && $manifest) {
 				$db_modules_update_names[] = $manifest['name'];
 			}
 		}
 
-		$errors = $module_manager_enabled->checkConflicts()['conflicts'];
+		$update = [];
 
-		array_map('error', $errors);
-
-		$result = false;
-
-		if (!$errors) {
-			$update = [];
-
-			foreach (array_keys($this->modules) as $moduleid) {
-				$update[] = [
-					'moduleid' => $moduleid,
-					'status' => $set_status
-				];
-			}
-
-			$result = API::Module()->update($update);
+		foreach (array_keys($this->modules) as $moduleid) {
+			$update[] = [
+				'moduleid' => $moduleid,
+				'status' => $set_status
+			];
 		}
 
+		$result = API::Module()->update($update);
+
 		if ($result) {
-			$output['success']['title'] = (_s('Module updated: %1$s.', $db_modules_update_names[0]));
+			$output['success']['title'] = _n('Module disabled: %1$s.', 'Modules disabled: %1$s.',
+				implode(', ', $db_modules_update_names), count($this->modules)
+			);
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -130,10 +116,14 @@ class CControllerModuleUpdate extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => (_s('Cannot update module: %1$s.', $db_modules_update_names[0])),
+				'title' => _n('Cannot disable module: %1$s.', 'Cannot disable modules: %1$s.',
+					implode(', ', $db_modules_update_names), count($this->modules)
+				),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
+
+		$output['keepids'] = array_keys($this->modules);
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
