@@ -1612,6 +1612,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		goto out;
 	}
 
+	zbx_mt_init_snmp();
+
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_uint32_t	rtc_cmd;
