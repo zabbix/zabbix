@@ -73,7 +73,6 @@ $fields = [
 check_fields($fields);
 
 $hostid = getRequest('hostid', 0);
-$hostPrototype = null;
 
 // permissions
 if (getRequest('parent_discoveryid')) {
@@ -121,11 +120,6 @@ foreach ($tags as $key => $tag) {
 
 // Remove inherited macros data (actions: 'add', 'update' and 'form').
 $macros = cleanInheritedMacros(getRequest('macros', []));
-
-foreach ($macros as &$macro) {
-	unset($macro['allow_revert']);
-}
-unset($macro);
 
 // Remove empty new macro lines.
 $macros = array_filter($macros, function($macro) {
@@ -175,35 +169,40 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$result = true;
-
 	try {
-		$custom_interfaces = getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces'));
+		$save_macros = $macros;
+
+		foreach ($save_macros as &$macro) {
+			unset($macro['allow_revert']);
+		}
+		unset($macro);
 
 		$input = [
-			'templateid' => $hostid == 0 ? 0 : $hostPrototype['templateid'],
-
 			'host' => getRequest('host', DB::getDefault('hosts', 'host')),
 			'name' => getRequest(getRequest('name', '') === '' ? 'host' : 'name', DB::getDefault('hosts', 'name')),
-			'custom_interfaces' => $custom_interfaces,
+			'custom_interfaces' => getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces')),
 			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 			'discover' => getRequest('discover', DB::getDefault('hosts', 'discover')),
-			'interfaces' => $custom_interfaces == HOST_PROT_INTERFACES_CUSTOM
-					? preparePrototypeInterfaces(getRequest('interfaces', []), getRequest('mainInterfaces', []))
-					: [],
-			'groupLinks' => prepareHostPrototypeGroupLinks($hostPrototype, getRequest('group_links', [])),
-			'groupPrototypes' => prepareGroupPrototypes(getRequest('group_prototypes', [])),
+			'interfaces' => prepareHostPrototypeInterfaces(
+				getRequest('interfaces', []), getRequest('mainInterfaces', [])
+			),
+			'groupLinks' => prepareHostPrototypeGroupLinks(getRequest('group_links', [])),
+			'groupPrototypes' => prepareHostPrototypeGroupPrototypes(getRequest('group_prototypes', [])),
 			'templates' => zbx_toObject(
 				array_merge(getRequest('templates', []), getRequest('add_templates', [])),
 				'templateid'
 			),
 			'tags' => $tags,
-			'macros' => $macros,
+			'macros' => $save_macros,
 			'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED)
 		];
 
+		$result = true;
+
 		if (hasRequest('add')) {
-			$host = ['ruleid' => getRequest('parent_discoveryid')] + getSanitizedHostPrototypeFields($input);
+			$host = ['ruleid' => getRequest('parent_discoveryid')] + getSanitizedHostPrototypeFields(
+				['templateid' => 0] + $input
+			);
 
 			$response = API::HostPrototype()->create($host);
 
@@ -213,7 +212,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if (hasRequest('update')) {
-			$host = ['hostid' => $hostid] + getSanitizedHostPrototypeFields($input);
+			$host = ['hostid' => $hostid] + getSanitizedHostPrototypeFields(
+				['templateid' => $hostPrototype['templateid']] + $input
+			);
 
 			$response = API::HostPrototype()->update($host);
 

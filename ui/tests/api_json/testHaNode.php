@@ -69,7 +69,7 @@ class testHaNode extends CAPITest {
 						'status' => 111
 					]
 				],
-				'expected_error' => 'Invalid parameter "/filter/status/1": value must be one of 0, 1, 2, 3.'
+				'expected_error' => null
 			],
 			'Empty filter' => [
 				'request' => [

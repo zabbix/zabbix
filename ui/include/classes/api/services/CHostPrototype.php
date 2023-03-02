@@ -636,7 +636,6 @@ class CHostPrototype extends CHostBase {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
 			'uuid' => 	['type' => API_UUID],
 			'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'ruleid' => ['type' => API_UNEXPECTED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
@@ -851,8 +850,8 @@ class CHostPrototype extends CHostBase {
 		$upd_hostids = [];
 
 		$internal_fields = array_flip(['hostid', 'host', 'ruleid', 'custom_interfaces', 'inventory_mode']);
-		$nested_object_fields = array_flip(['interfaces', 'groupLinks', 'groupPrototypes', 'templates', 'tags',
-			'macros', 'host_inventory'
+		$nested_object_fields = array_flip([
+			'interfaces', 'groupLinks', 'groupPrototypes', 'templates', 'tags', 'macros'
 		]);
 		$parent_fields = [];
 

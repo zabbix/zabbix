@@ -1264,35 +1264,19 @@ function getMacroConfigValue(array $macro): string {
 }
 
 /**
- * @param array|null $host
- * @param array      $group_links
+ * Format host prototype group links received via form for API input.
+ *
+ * @param array $group_links
  *
  * @return array
  */
-function prepareHostPrototypeGroupLinks(?array $host, array $group_links) {
-	$_group_links =[];
-
-	if ($host !== null) {
-		if ($host['templateid'] == 0) {
-			$host_groupids = zbx_toHash($host['groupLinks'], 'groupid');
-			unset($host_groupids[0]);
-
-			foreach ($group_links as $groupid) {
-				$_group_links[] = [
-					'groupid' => array_key_exists($groupid, $host_groupids)
-						? $host_groupids[$groupid]['groupid']
-						: $groupid
-				];
-			}
-		}
+function prepareHostPrototypeGroupLinks(array $group_links) {
+	foreach ($group_links as &$value) {
+		$value = ['groupid' => $value];
 	}
-	else {
-		foreach ($group_links as $groupid) {
-			$_group_links[] = ['groupid' => $groupid];
-		}
-	}
+	unset($value);
 
-	return $_group_links;
+	return $group_links;
 }
 
 /**
@@ -1300,86 +1284,117 @@ function prepareHostPrototypeGroupLinks(?array $host, array $group_links) {
  *
  * @return array
  */
-function prepareGroupPrototypes(array $group_prototypes): array {
-	$_group_prototypes = [];
-
-	foreach ($group_prototypes as $group_prototype) {
-		if ($group_prototype['name'] !== '') {
-			$_group_prototypes[] = $group_prototype;
+function prepareHostPrototypeGroupPrototypes(array $group_prototypes): array {
+	foreach ($group_prototypes as $i => $group_prototype) {
+		if ($group_prototype['name'] === '') {
+			unset($group_prototypes[$i]);
 		}
 	}
 
-	return $_group_prototypes;
+	return array_values($group_prototypes);
 }
 
 
 /**
+ * Format host prototype group links received via form for API input.
+ *
  * @param array $interfaces
  * @param array $main_interfaces
  *
  * @return array
  */
-function preparePrototypeInterfaces(array $interfaces, array $main_interfaces): array {
-	foreach ($interfaces as &$interface) {
-		// Process SNMP interface fields.
-		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-			$interface['details']['bulk'] = array_key_exists('bulk', $interface['details'])
-				? SNMP_BULK_ENABLED
-				: SNMP_BULK_DISABLED;
-
-			switch ($interface['details']['version']) {
-				case SNMP_V1:
-				case SNMP_V2C:
-					$interface['details'] = array_intersect_key($interface['details'],
-						array_flip(['version', 'bulk', 'community'])
-					);
-					break;
-
-				case SNMP_V3:
-					$field_names = array_flip(['version', 'bulk', 'contextname', 'securityname', 'securitylevel']);
-
-					if ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
-						$field_names += array_flip(['authprotocol', 'authpassphrase']);
-					}
-					elseif ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-						$field_names +=
-							array_flip(['authprotocol', 'authpassphrase', 'privprotocol', 'privpassphrase']);
-					}
-
-					$interface['details'] = array_intersect_key($interface['details'], $field_names);
-					break;
-			}
-		}
-
-		unset($interface['isNew'], $interface['items'], $interface['interfaceid']);
-		$interface['main'] = 0;
+function prepareHostPrototypeInterfaces(array $interfaces, array $main_interfaces): array {
+	foreach ($interfaces as $i => &$interface) {
+		$interface['main'] = $i == $main_interfaces[$interface['type']] ? INTERFACE_PRIMARY : INTERFACE_SECONDARY;
 	}
 	unset($interface);
-
-	foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $type) {
-		if (array_key_exists($type, $main_interfaces)
-				&& array_key_exists($main_interfaces[$type], $interfaces)) {
-			$interfaces[$main_interfaces[$type]]['main'] = INTERFACE_PRIMARY;
-		}
-	}
 
 	return $interfaces;
 }
 
 /**
- * @param array  $input
- * @param string $input['templateid']
+ * Get sanitized host prototype fields of given input.
+ *
+ * Param array  $input
+ * Param string $input['templateid']
  *
  * @return array
  */
 function getSanitizedHostPrototypeFields(array $input): array {
 	if ($input['templateid'] == 0) {
-		$field_names = ['host', 'name', 'custom_interfaces', 'status', 'discover', 'interfaces', 'groupLinks',
-			'groupPrototypes', 'templates', 'tags' , 'macros', 'inventory_mode'];
+		$field_names = ['host', 'name', 'custom_interfaces', 'status', 'discover', 'groupLinks',
+			'groupPrototypes', 'templates', 'tags' , 'macros', 'inventory_mode'
+		];
+
+		if ($input['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
+			$field_names[] = 'interfaces';
+
+			$input['interfaces'] = getSanitizedHostPrototypeInterfacesFields($input['interfaces']);
+		}
 	}
 	else {
 		$field_names = ['status', 'discover'];
 	}
 
 	return array_intersect_key($input, array_flip($field_names));
+}
+
+/**
+ * Get sanitized host prototype interface fields of given input.
+ *
+ * Param array  $interfaces
+ *
+ * @return array
+ */
+function getSanitizedHostPrototypeInterfacesFields(array $interfaces): array {
+	foreach ($interfaces as &$interface) {
+		$field_names = ['type', 'useip', 'ip', 'dns', 'port', 'main'];
+
+		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+			$field_names[] = 'details';
+
+			$interface['details'] = getSanitizedHostPrototypeInterfaceDetailsFields($interface['details']);
+		}
+
+		$interface = array_intersect_key($interface, array_flip($field_names));
+	}
+	unset($interface);
+
+	return $interfaces;
+}
+
+/**
+ * Get sanitized host prototype interface details fields of given input.
+ *
+ * Param array  $details
+ *
+ * @return array
+ */
+function getSanitizedHostPrototypeInterfaceDetailsFields(array $details): array {
+	$field_names = ['version', 'bulk'];
+
+	switch ($details['version']) {
+		case SNMP_V1:
+		case SNMP_V2C:
+			$field_names[] = 'community';
+			break;
+
+		case SNMP_V3:
+			$field_names = array_merge($field_names, ['contextname', 'securityname', 'securitylevel']);
+
+			switch ($details['securitylevel']) {
+				case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
+					$field_names = array_merge($field_names, ['authprotocol', 'authpassphrase']);
+					break;
+
+				case ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:
+					$field_names = array_merge($field_names,
+						['authprotocol', 'authpassphrase', 'privprotocol', 'privpassphrase']
+					);
+					break;
+			}
+			break;
+	}
+
+	return array_intersect_key($details, array_flip($field_names));
 }
