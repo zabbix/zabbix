@@ -733,7 +733,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 					if ($selector !== 'class:icon-action-ack-green') {
 						$button->click();
-						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible();
 						$hint_table = $hint->query('class:list-table')
 							->asTable()->one()->waitUntilVisible();
 
@@ -744,7 +744,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							$row->assertValues($hint_rows[$i]);
 						}
 
-						$hint->close();
+						$hint->query('xpath:.//button[@title="Close"]')->one()->waitUntilClickable()->click();
 					}
 				}
 			}
