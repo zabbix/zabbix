@@ -241,7 +241,7 @@ class User extends ScimApiService {
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 
 		// Some IdPs have group attribute, but others don't.
-		if (array_key_exists('groups', $options) && array_key_exists('display', $options['groups'][0])) {
+		if (array_key_exists('groups', $options)) {
 			$user_group_names = array_column($options['groups'], 'display');
 		}
 		else {
