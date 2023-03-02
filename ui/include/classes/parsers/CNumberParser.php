@@ -34,7 +34,8 @@ class CNumberParser extends CParser {
 		'with_float' => true,
 		'with_size_suffix' => false,
 		'with_time_suffix' => false,
-		'with_year' => false
+		'with_year' => false,
+		'is_binary_size' => false
 	];
 
 	/**
@@ -73,8 +74,11 @@ class CNumberParser extends CParser {
 		}
 
 		if ($this->options['with_size_suffix']) {
-			$this->suffixes .= ZBX_BYTE_SUFFIXES;
-			self::$suffix_multipliers = ZBX_BYTE_SUFFIX_MULTIPLIERS;
+			$this->suffixes .= ZBX_SIZE_SUFFIXES;
+
+			self::$suffix_multipliers = $this->options['is_binary_size']
+				? ZBX_SIZE_SUFFIX_MULTIPLIERS_BINARY
+				: ZBX_SIZE_SUFFIX_MULTIPLIERS;
 		}
 
 		if ($this->options['with_time_suffix']) {
