@@ -48,8 +48,8 @@ typedef struct
 	char			*hostname;
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-	char			*config_file;
-	int			config_timeout;
+	char			*zbx_config_file;
+	int			zbx_config_timeout;
 }
 zbx_thread_activechk_args;
 

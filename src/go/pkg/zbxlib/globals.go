@@ -29,9 +29,28 @@ static int	get_config_timeout(void)
 	return config_timeout;
 }
 
+static int	config_enable_remote_commands = 1;
+static int	get_config_enable_remote_commands(void)
+{
+	return config_enable_remote_commands;
+}
+
+static int	config_log_remote_commands = 0;
+static int	get_config_log_remote_commands(void)
+{
+	return config_log_remote_commands;
+}
+
+static int	config_unsafe_user_parameters = 0;
+static int	get_config_unsafe_user_parameters(void)
+{
+	return config_unsafe_user_parameters;
+}
+
 void	init_globals(void)
 {
-	zbx_init_library_sysinfo(get_config_timeout);
+	zbx_init_library_sysinfo(get_config_timeout, get_config_enable_remote_commands,
+			get_config_log_remote_commands, get_config_unsafe_user_parameters);
 }
 */
 import "C"

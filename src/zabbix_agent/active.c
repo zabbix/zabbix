@@ -1479,7 +1479,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		if (1 == need_update_userparam)
 		{
 			zbx_setproctitle("active checks #%d [reloading user parameters]", process_num);
-			reload_user_parameters(process_type, process_num, activechks_args_in->config_file);
+			reload_user_parameters(process_type, process_num, activechks_args_in->zbx_config_file);
 			need_update_userparam = 0;
 		}
 #endif
@@ -1489,7 +1489,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		if ((now = time(NULL)) >= nextsend)
 		{
 			send_buffer(&activechk_args.addrs, &pre_persistent_vec, activechks_args_in->zbx_config_tls,
-					activechks_args_in->config_timeout);
+					activechks_args_in->zbx_config_timeout);
 			nextsend = time(NULL) + 1;
 		}
 
@@ -1497,7 +1497,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		{
 			heartbeat_nextcheck = now + CONFIG_HEARTBEAT_FREQUENCY;
 			send_heartbeat_msg(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
-					activechks_args_in->config_timeout);
+					activechks_args_in->zbx_config_timeout);
 		}
 
 		if (now >= nextrefresh)
@@ -1505,7 +1505,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			zbx_setproctitle("active checks #%d [getting list of active checks]", process_num);
 
 			if (FAIL == refresh_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
-					&config_revision_local, activechks_args_in->config_timeout))
+					&config_revision_local, activechks_args_in->zbx_config_timeout))
 			{
 				nextrefresh = time(NULL) + 60;
 			}
@@ -1524,7 +1524,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			zbx_setproctitle("active checks #%d [processing active checks]", process_num);
 
 			process_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
-					activechks_args_in->config_timeout);
+					activechks_args_in->zbx_config_timeout);
 
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)	/* failed to complete processing active checks */
 				continue;

@@ -317,11 +317,7 @@ static const char	*get_alert_scripts_path(void)
 	return config_alert_scripts_path;
 }
 
-static int	config_timeout = 3;
-static int	get_config_timeout(void)
-{
-	return config_timeout;
-}
+DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_timeout, 3)
 
 static int	config_startup_time		= 0;
 static int	config_unavailable_delay	= 60;
@@ -355,9 +351,13 @@ int	CONFIG_UNREACHABLE_DELAY	= 15;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
-int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
-int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
-int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
+
+//static int	zbx_config_enable_remote_commands = 0;
+//static int	zbx_config_log_remote_commands = 0;
+//static int	zbx_config_unsafe_user_parameters = 0;
+DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_enable_remote_commands, 0)
+DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_log_remote_commands, 0)
+DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_unsafe_user_parameters, 0)
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
@@ -1269,7 +1269,8 @@ int	main(int argc, char **argv)
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
 	zbx_init_library_stats(get_program_type);
-	zbx_init_library_sysinfo(get_config_timeout);
+	zbx_init_library_sysinfo(get_config_timeout, get_zbx_config_enable_remote_commands,
+			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
