@@ -36,6 +36,7 @@ parse_cfg_file_LDADD = \
 	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
+	$(top_srcdir)/src/libs/zbxtimekeeper/libzbxtimekeeper.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \

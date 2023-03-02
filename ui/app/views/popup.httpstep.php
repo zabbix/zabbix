@@ -31,7 +31,6 @@ $output = [
 $options = $data['options'];
 
 $http_popup_form = (new CForm())
-	->cleanItems()
 	->setId('http_step')
 	->addVar('no', $options['no'])
 	->addVar('httpstepid', $options['httpstepid'])

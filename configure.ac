@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.4.0beta6])
+AC_INIT([Zabbix],[6.4.0rc4])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -181,6 +181,7 @@ AC_SEARCH_LIBS(jail_getname, jail, [AC_DEFINE([HAVE_LIBJAIL], 1, [Define to 1 if
 
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
+AC_CHECK_LIB(pthread, main)
 
 dnl check for DNS lookup functions
 found_resolv="no"
@@ -1948,6 +1949,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxalgo/Makefile
 	src/libs/zbxaudit/Makefile
 	src/libs/zbxavailability/Makefile
+	src/libs/zbxconnector/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
@@ -1987,6 +1989,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxnix/Makefile
 	src/libs/zbxnum/Makefile
 	src/libs/zbxparam/Makefile
+	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxrtc/Makefile
@@ -2012,9 +2015,11 @@ AC_CONFIG_FILES([
 	src/libs/zbxsysinfo/solaris/Makefile
 	src/libs/zbxsysinfo/unknown/Makefile
 	src/libs/zbxstats/Makefile
+	src/libs/zbxtagfilter/Makefile
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile
+	src/libs/zbxtimekeeper/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
 	src/libs/zbxvault/Makefile
@@ -2038,6 +2043,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/Makefile
 	src/zabbix_server/alerter/Makefile
 	src/zabbix_server/availability/Makefile
+	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/diag/Makefile

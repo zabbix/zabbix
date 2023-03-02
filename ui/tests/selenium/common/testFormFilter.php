@@ -138,6 +138,7 @@ class testFormFilter extends CWebTest {
 	public function updateFilterForm($user, $password, $table_selector) {
 		$this->page->userLogin($user, $password);
 		$this->page->open($this->url)->waitUntilReady();
+		$table = $this->query($table_selector)->asTable()->waitUntilPresent()->one();
 
 		// Changing filter data.
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
@@ -153,32 +154,32 @@ class testFormFilter extends CWebTest {
 				$this->assertFalse($result_before === $this->getTableResults($table_selector));
 			}
 
-			$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
-			$this->page->waitUntilReady();
+			$this->query('xpath://a[@aria-label="Home"]')->one()->click();
+			$table->waitUntilReloaded();
 			$this->assertFalse($this->query('xpath://li[@data-target="tabfilter_1"]//span')->one()->hasClass('display-none'));
 
 			$filter_container->selectTab('update_tab');
+			$table->waitUntilReloaded();
 
 			if ($i === 0) {
 				$this->query('button:Reset')->one()->click();
+				$this->page->waitUntilReady();
+				$table->waitUntilReloaded();
 			}
 			else {
 				$this->assertTrue($result_before === $this->getTableResults($table_selector));
 				$this->query('button:Update')->one()->click();
+				$table->waitUntilReloaded();
 			}
 		}
 
-		// This time needed for filter to update table with results.
-		sleep(1);
-
 		// Getting changed host/problem result and then comparing it with displayed result from dropdown.
 		$result = $this->getTableResults($table_selector);
-		$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
+		$this->query('xpath://a[@aria-label="Home"]')->waitUntilClickable()->one()->click();
+		$table->waitUntilReloaded();
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
-		$this->page->waitUntilReady();
-		$this->assertEquals($result, $this->query('xpath://a[@aria-label="update_tab"]')
-				->one()->getAttribute('data-counter')
-		);
+		$popup_item = CPopupMenuElement::find()->waitUntilVisible()->one()->getItem('update_tab');
+		$this->assertEquals($result, $popup_item->getAttribute('data-counter'));
 
 		// Checking that hosts/problems amount in filter displayed near name at the tab changed.
 		$this->assertEquals($result, $this->query('xpath://li[@data-target="tabfilter_1"]/a')

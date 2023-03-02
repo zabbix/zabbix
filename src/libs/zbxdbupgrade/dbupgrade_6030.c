@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
+#include "zbxeval.h"
 
 /*
  * 6.4 development database patches
@@ -38,14 +38,14 @@ static int	DBpatch_6030000(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	result = DBselect("select roleid,type,name,value_int from role_rule where name in ("
+	result = zbx_db_select("select roleid,type,name,value_int from role_rule where name in ("
 			"'ui.configuration.actions',"
 			"'ui.services.actions',"
 			"'ui.administration.general')");
 
 	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int", NULL);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	roleid;
 		int		value_int, type;
@@ -94,7 +94,7 @@ static int	DBpatch_6030000(void)
 
 	if (SUCCEED == (ret = zbx_db_insert_execute(&db_insert)))
 	{
-		if (ZBX_DB_OK > DBexecute("delete from role_rule where name in ("
+		if (ZBX_DB_OK > zbx_db_execute("delete from role_rule where name in ("
 			"'ui.configuration.actions',"
 			"'ui.services.actions')"))
 		{
@@ -116,7 +116,7 @@ static int	DBpatch_6030001(void)
 
 static int	DBpatch_6030002(void)
 {
-	if (ZBX_DB_OK > DBexecute(
+	if (ZBX_DB_OK > zbx_db_execute(
 			"update group_discovery gd"
 			" set name=("
 				"select gp.name"
@@ -460,14 +460,14 @@ static int	DBpatch_6030059(void)
 	return DBset_default("media_type", &field);
 }
 
-static int DBpatch_6030060(void)
+static int	DBpatch_6030060(void)
 {
 	const ZBX_FIELD	field = {"url_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("triggers", &field);
 }
 
-static int DBpatch_6030061(void)
+static int	DBpatch_6030061(void)
 {
 	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -487,11 +487,11 @@ static int	DBpatch_6030062(void)
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect("select moduleid,relative_path from module");
+	result = zbx_db_select("select moduleid,relative_path from module");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		const char	*rel_path = row[1];
 		char		*updated_path, *updated_path_esc;
@@ -501,7 +501,7 @@ static int	DBpatch_6030062(void)
 
 		updated_path = zbx_dsprintf(NULL, "modules/%s", rel_path);
 
-		updated_path_esc = DBdyn_escape_string(updated_path);
+		updated_path_esc = zbx_db_dyn_escape_string(updated_path);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update module set relative_path='%s' "
 				"where moduleid=%s;\n", updated_path_esc, row[0]);
@@ -509,15 +509,15 @@ static int	DBpatch_6030062(void)
 		zbx_free(updated_path);
 		zbx_free(updated_path_esc);
 
-		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 	zbx_db_free_result(result);
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
 
@@ -564,7 +564,7 @@ static int	DBpatch_6030064(void)
 {
 	const ZBX_FIELD	field = {"name_upper", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("hosts", "hosts_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
 				" skipping patch of adding \"name_upper\" column to \"hosts\" table");
@@ -576,7 +576,7 @@ static int	DBpatch_6030064(void)
 
 static int	DBpatch_6030065(void)
 {
-	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("hosts", "hosts_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
 				" skipping patch of adding index to \"name_upper\" column");
@@ -588,7 +588,7 @@ static int	DBpatch_6030065(void)
 
 static int	DBpatch_6030066(void)
 {
-	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("hosts", "hosts_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
 				" skipping patch of updating \"name_upper\" column");
@@ -596,7 +596,7 @@ static int	DBpatch_6030066(void)
 		return SUCCEED;
 	}
 
-	if (ZBX_DB_OK > DBexecute("update hosts set name_upper=upper(name)"))
+	if (ZBX_DB_OK > zbx_db_execute("update hosts set name_upper=upper(name)"))
 		return FAIL;
 
 	return SUCCEED;
@@ -604,7 +604,7 @@ static int	DBpatch_6030066(void)
 
 static int	DBpatch_6030067(void)
 {
-	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_insert"))
+	if (SUCCEED == zbx_db_trigger_exists("hosts", "hosts_name_upper_insert"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_insert trigger for table \"hosts\" already exists,"
 				" skipping patch of adding it to \"hosts\" table");
@@ -616,7 +616,7 @@ static int	DBpatch_6030067(void)
 
 static int	DBpatch_6030068(void)
 {
-	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("hosts", "hosts_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
 				" skipping patch of adding it to \"hosts\" table");
@@ -630,7 +630,7 @@ static int	DBpatch_6030069(void)
 {
 	const ZBX_FIELD field = {"name_upper", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("items", "items_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
 				" skipping patch of adding \"name_upper\" column to \"items\" table");
@@ -642,7 +642,7 @@ static int	DBpatch_6030069(void)
 
 static int	DBpatch_6030070(void)
 {
-	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("items", "items_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
 				" skipping patch of adding index to \"name_upper\" column");
@@ -655,14 +655,14 @@ static int	DBpatch_6030070(void)
 
 static int	DBpatch_6030071(void)
 {
-	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("items", "items_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
 				" skipping patch of updating \"name_upper\" column");
 		return SUCCEED;
 	}
 
-	if (ZBX_DB_OK > DBexecute("update items set name_upper=upper(name)"))
+	if (ZBX_DB_OK > zbx_db_execute("update items set name_upper=upper(name)"))
 		return FAIL;
 
 	return SUCCEED;
@@ -670,7 +670,7 @@ static int	DBpatch_6030071(void)
 
 static int	DBpatch_6030072(void)
 {
-	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_insert"))
+	if (SUCCEED == zbx_db_trigger_exists("items", "items_name_upper_insert"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_insert trigger for table \"items\" already exists,"
 				" skipping patch of adding it to \"items\" table");
@@ -682,7 +682,7 @@ static int	DBpatch_6030072(void)
 
 static int	DBpatch_6030073(void)
 {
-	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	if (SUCCEED == zbx_db_trigger_exists("items", "items_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
 				" skipping patch of adding it to \"items\" table");
@@ -690,28 +690,6 @@ static int	DBpatch_6030073(void)
 	}
 
 	return zbx_dbupgrade_attach_trigger_with_function_on_update("items", "name", "name_upper", "upper", "itemid");
-}
-
-static int	DBpatch_6030074(void)
-{
-	int		i;
-	const char	*values[] = {
-			"web.auditacts.filter.from", "web.actionlog.filter.from",
-			"web.auditacts.filter.to", "web.actionlog.filter.to",
-			"web.auditacts.filter.active", "web.actionlog.filter.active",
-			"web.auditacts.filter.userids", "web.actionlog.filter.userids"
-		};
-
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	for (i = 0; i < (int)ARRSIZE(values); i += 2)
-	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
-			return FAIL;
-	}
-
-	return SUCCEED;
 }
 
 static int	DBpatch_6030075(void)
@@ -1138,7 +1116,7 @@ static int	DBpatch_6030123(void)
 
 static int	migrate_ldap_data(void)
 {
-	DB_RESULT	result = DBselect("select userdirectoryid,host,port,base_dn,bind_dn,bind_password,"
+	DB_RESULT	result = zbx_db_select("select userdirectoryid,host,port,base_dn,bind_dn,bind_password,"
 					"search_attribute,start_tls,search_filter"
 					" from userdirectory");
 	if (NULL == result)
@@ -1146,16 +1124,16 @@ static int	migrate_ldap_data(void)
 
 	DB_ROW	row;
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		char	*host = DBdyn_escape_string(row[1]);
-		char	*base_dn = DBdyn_escape_string(row[3]);
-		char	*bind_dn = DBdyn_escape_string(row[4]);
-		char	*bind_password = DBdyn_escape_string(row[5]);
-		char	*search_attribute = DBdyn_escape_string(row[6]);
-		char	*search_filter = DBdyn_escape_string(row[8]);
+		char	*host = zbx_db_dyn_escape_string(row[1]);
+		char	*base_dn = zbx_db_dyn_escape_string(row[3]);
+		char	*bind_dn = zbx_db_dyn_escape_string(row[4]);
+		char	*bind_password = zbx_db_dyn_escape_string(row[5]);
+		char	*search_attribute = zbx_db_dyn_escape_string(row[6]);
+		char	*search_filter = zbx_db_dyn_escape_string(row[8]);
 
-		int	rc = DBexecute("insert into userdirectory_ldap (userdirectoryid,host,port,"
+		int	rc = zbx_db_execute("insert into userdirectory_ldap (userdirectoryid,host,port,"
 					"base_dn,search_attribute,bind_dn,bind_password,start_tls,search_filter)"
 					" values (%s,'%s',%s,'%s','%s','%s','%s',%s,'%s')", row[0], host, row[2],
 					base_dn, search_attribute, bind_dn, bind_password, row[7], search_filter);
@@ -1174,7 +1152,7 @@ static int	migrate_ldap_data(void)
 		}
 
 #define IDP_TYPE_LDAP	1	/* user directory of type LDAP */
-		if (ZBX_DB_OK > DBexecute("update userdirectory set idp_type=%d where userdirectoryid=%s",
+		if (ZBX_DB_OK > zbx_db_execute("update userdirectory set idp_type=%d where userdirectoryid=%s",
 				IDP_TYPE_LDAP, row[0]))
 		{
 			zbx_db_free_result(result);
@@ -1198,7 +1176,7 @@ static int	DBpatch_6030124(void)
 
 static int	migrate_saml_data(void)
 {
-	DB_RESULT	result = DBselect("select saml_idp_entityid,saml_sso_url,saml_slo_url,saml_username_attribute,"
+	DB_RESULT	result = zbx_db_select("select saml_idp_entityid,saml_sso_url,saml_slo_url,saml_username_attribute,"
 					"saml_sp_entityid,saml_nameid_format,saml_sign_messages,saml_sign_assertions,"
 					"saml_sign_authn_requests,saml_sign_logout_requests,saml_sign_logout_responses,"
 					"saml_encrypt_nameid,saml_encrypt_assertions"
@@ -1206,7 +1184,7 @@ static int	migrate_saml_data(void)
 	if (NULL == result)
 		return FAIL;
 
-	DB_ROW	row = DBfetch(result);
+	DB_ROW	row = zbx_db_fetch(result);
 
 	if (NULL == row)
 	{
@@ -1222,10 +1200,10 @@ static int	migrate_saml_data(void)
 		return SUCCEED;
 	}
 
-	zbx_uint64_t	userdirectoryid = DBget_maxid("userdirectory");
+	zbx_uint64_t	userdirectoryid = zbx_db_get_maxid("userdirectory");
 
 #define IDP_TYPE_SAML	2	/* user directory of type SAML */
-	int	rc = DBexecute("insert into userdirectory (userdirectoryid,idp_type,description) values"
+	int	rc = zbx_db_execute("insert into userdirectory (userdirectoryid,idp_type,description) values"
 			" (" ZBX_FS_UI64 ",%d,'')", userdirectoryid, IDP_TYPE_SAML);
 #undef IDP_TYPE_SAML
 	if (ZBX_DB_OK > rc)
@@ -1234,14 +1212,14 @@ static int	migrate_saml_data(void)
 		return FAIL;
 	}
 
-	char	*idp_entityid = DBdyn_escape_string(row[0]);
-	char	*sso_url = DBdyn_escape_string(row[1]);
-	char	*slo_url = DBdyn_escape_string(row[2]);
-	char	*username_attribute = DBdyn_escape_string(row[3]);
-	char	*sp_entityid = DBdyn_escape_string(row[4]);
-	char	*nameid_format = DBdyn_escape_string(row[5]);
+	char	*idp_entityid = zbx_db_dyn_escape_string(row[0]);
+	char	*sso_url = zbx_db_dyn_escape_string(row[1]);
+	char	*slo_url = zbx_db_dyn_escape_string(row[2]);
+	char	*username_attribute = zbx_db_dyn_escape_string(row[3]);
+	char	*sp_entityid = zbx_db_dyn_escape_string(row[4]);
+	char	*nameid_format = zbx_db_dyn_escape_string(row[5]);
 
-	int	rc2 = DBexecute("insert into userdirectory_saml (userdirectoryid,idp_entityid,sso_url,slo_url,"
+	int	rc2 = zbx_db_execute("insert into userdirectory_saml (userdirectoryid,idp_entityid,sso_url,slo_url,"
 				"username_attribute,sp_entityid,nameid_format,sign_messages,sign_assertions,"
 				"sign_authn_requests,sign_logout_requests,sign_logout_responses,encrypt_nameid,"
 				"encrypt_assertions) values (" ZBX_FS_UI64 ",'%s','%s','%s','%s','%s','%s',%s,%s,%s,%s,"
@@ -1474,15 +1452,325 @@ static int	DBpatch_6030158(void)
 	return DBcreate_index("event_symptom", "event_symptom_1", "cause_eventid", 0);
 }
 
-static int	DBpatch_6030159(void)
+static int	DBpatch_6030160(void)
+{
+	const ZBX_FIELD	field = {"secret", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sessions", &field);
+}
+
+static int	DBpatch_6030161(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update sessions set secret=sessionid"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030162(void)
+{
+	const ZBX_FIELD field = {"vendor_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6030163(void)
+{
+	const ZBX_FIELD field = {"vendor_version", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6030164(void)
+{
+	const ZBX_TABLE table =
+		{"connector", "connectorid", 0,
+			{
+				{"connectorid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"protocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"data_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"max_records", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"max_senders", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"max_attempts", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"timeout", "5s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"http_proxy", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"authtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"username", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"token", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"verify_peer", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"verify_host", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"ssl_cert_file", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"ssl_key_file", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"ssl_key_password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"status", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"tags_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030165(void)
+{
+	return DBcreate_index("connector", "connector_1", "name", 1);
+}
+
+static int	DBpatch_6030166(void)
+{
+	return DBcreate_changelog_insert_trigger("connector", "connectorid");
+}
+
+static int	DBpatch_6030167(void)
+{
+	return DBcreate_changelog_update_trigger("connector", "connectorid");
+}
+
+static int	DBpatch_6030168(void)
+{
+	return DBcreate_changelog_delete_trigger("connector", "connectorid");
+}
+
+static int	DBpatch_6030169(void)
+{
+	const ZBX_TABLE table =
+		{"connector_tag", "connector_tagid", 0,
+			{
+				{"connector_tagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"connectorid", NULL, "connector", "connectorid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030170(void)
+{
+	return DBcreate_index("connector_tag", "connector_tag_1", "connectorid", 0);
+}
+
+static int	DBpatch_6030171(void)
+{
+	const ZBX_FIELD	field = {"connectorid", NULL, "connector", "connectorid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("connector_tag", 1, &field);
+}
+
+static int	DBpatch_6030172(void)
+{
+	return DBcreate_changelog_insert_trigger("connector_tag", "connector_tagid");
+}
+
+static int	DBpatch_6030173(void)
+{
+	return DBcreate_changelog_update_trigger("connector_tag", "connector_tagid");
+}
+
+static int	DBpatch_6030174(void)
+{
+	return DBcreate_changelog_delete_trigger("connector_tag", "connector_tagid");
+}
+
+static int	DBpatch_6030187(void)
+{
+	const ZBX_FIELD field = {"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type_param", &field);
+}
+
+static int	DBpatch_6030188(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	DB_RESULT	result = zbx_db_select("select mediatypeid,exec_params from media_type where type=1");
+	DB_ROW		row;
+	zbx_db_insert_t	db_insert;
+
+	zbx_db_insert_prepare(&db_insert, "media_type_param", "mediatype_paramid", "mediatypeid", "name", "value",
+			"sortorder", NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	mediatypeid;
+
+		ZBX_STR2UINT64(mediatypeid, row[0]);
+
+		char	*params = zbx_strdup(NULL, row[1]);
+		char	*saveptr;
+		char	*token = strtok_r(params, "\r\n", &saveptr);
+
+		for (int i = 0; NULL != token; i++)
+		{
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), mediatypeid, "", token, i);
+
+			token = strtok_r(NULL, "\r\n", &saveptr);
+		}
+
+		zbx_free(params);
+	}
+
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "mediatype_paramid");
+
+	int	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out,
+		size_t *out_alloc)
+{
+	zbx_token_t	token;
+	int		pos = 0;
+	size_t		out_offset = 0, macrovalue_len;
+
+	macrovalue_len = strlen(macrovalue);
+	zbx_strcpy_alloc(out, out_alloc, &out_offset, in);
+	out_offset++;
+
+	for (; SUCCEED == zbx_token_find(*out, pos, &token, ZBX_TOKEN_SIMPLE_MACRO); pos++)
+	{
+		pos = token.loc.r;
+
+		if (0 == strncmp(*out + token.loc.l, macro, token.loc.r - token.loc.l + 1))
+		{
+			pos += zbx_replace_mem_dyn(out, out_alloc, &out_offset, token.loc.l,
+					token.loc.r - token.loc.l + 1, macrovalue, macrovalue_len);
+		}
+	}
+}
+
+static void	get_mediatype_params(zbx_uint64_t mediatypeid, const char *sendto, const char *subject,
+		const char *message, char **params)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	struct zbx_json		json;
+	char			*value = NULL;
+	size_t			value_alloc = 0;
+
+	result = zbx_db_select(
+			"select value"
+			" from media_type_param"
+				" where mediatypeid=" ZBX_FS_UI64
+			" order by sortorder",
+			mediatypeid);
+
+	zbx_json_initarray(&json, 1024);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		char	*param = NULL;
+
+		param = zbx_strdup(param, row[0]);
+		substitute_macro(param, "{ALERT.SENDTO}", sendto, &value, &value_alloc);
+
+		param = zbx_strdup(param, value);
+		substitute_macro(param, "{ALERT.SUBJECT}", subject, &value, &value_alloc);
+
+		param = zbx_strdup(param, value);
+		substitute_macro(param, "{ALERT.MESSAGE}", message, &value, &value_alloc);
+
+		zbx_free(param);
+
+		zbx_json_addstring(&json, NULL, value, ZBX_JSON_TYPE_STRING);
+	}
+
+	zbx_db_free_result(result);
+
+	zbx_free(value);
+
+	*params = zbx_strdup(NULL, json.buffer);
+
+	zbx_json_free(&json);
+}
+
+static int	DBpatch_6030189(void)
+{
+	int	ret = FAIL;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* select alerts of Script Mediatype that aren't sent */
+	DB_RESULT	result = zbx_db_select(
+			"select a.alertid,m.mediatypeid,a.sendto,a.subject,a.message"
+			" from alerts a,media_type m"
+			" where a.mediatypeid=m.mediatypeid"
+				" and a.status in (0,3)"
+				" and m.type=1"
+			" order by a.mediatypeid");
+
+	DB_ROW		row;
+
+	/* set their parameters according to how we now store them */
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	alertid, mediatypeid;
+		char		*params, *params_esc;
+
+		ZBX_STR2UINT64(alertid, row[0]);
+		ZBX_STR2UINT64(mediatypeid, row[1]);
+
+		get_mediatype_params(mediatypeid, row[2], row[3], row[4], &params);
+
+		params_esc = zbx_db_dyn_escape_field("alerts", "parameters", params);
+
+		zbx_free(params);
+
+		int	rv = zbx_db_execute("update alerts set parameters='%s' where alertid=" ZBX_FS_UI64,
+				params_esc, alertid);
+
+		zbx_free(params_esc);
+
+		if (ZBX_DB_OK > rv)
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_6030190(void)
+{
+	return DBdrop_field("media_type", "exec_params");
+}
+
+static int	DBpatch_6030191(void)
 {
 	int		i;
 	const char	*values[] = {
+			"web.auditacts.filter.from", "web.actionlog.filter.from",
+			"web.auditacts.filter.to", "web.actionlog.filter.to",
+			"web.auditacts.filter.active", "web.actionlog.filter.active",
+			"web.auditacts.filter.userids", "web.actionlog.filter.userids",
 			"web.actionconf.php.sort", "web.action.list.sort",
 			"web.actionconf.php.sortorder", "web.action.list.sortorder",
 			"web.actionconf.filter_name", "web.action.list.filter_name",
 			"web.actionconf.filter_status", "web.action.list.filter_status",
-			"web.actionconf.filter.active", "web.action.list.filter.active"
+			"web.actionconf.filter.active", "web.action.list.filter.active",
+			"web.maintenance.php.sortorder", "web.maintenance.list.sortorder",
+			"web.maintenance.php.sort", "web.maintenance.list.sort"
 		};
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
@@ -1490,12 +1778,23 @@ static int	DBpatch_6030159(void)
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
 	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
 			return FAIL;
 	}
 
 	return SUCCEED;
 }
+
+static int	DBpatch_6030192(void)
+{
+	return DBdrop_index("scripts", "scripts_3");
+}
+
+static int	DBpatch_6030193(void)
+{
+	return DBcreate_index("scripts", "scripts_3", "name,menu_path", 1);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -1576,7 +1875,6 @@ DBPATCH_ADD(6030070, 0, 1)
 DBPATCH_ADD(6030071, 0, 1)
 DBPATCH_ADD(6030072, 0, 1)
 DBPATCH_ADD(6030073, 0, 1)
-DBPATCH_ADD(6030074, 0, 1)
 DBPATCH_ADD(6030075, 0, 1)
 DBPATCH_ADD(6030076, 0, 1)
 DBPATCH_ADD(6030077, 0, 1)
@@ -1661,6 +1959,27 @@ DBPATCH_ADD(6030155, 0, 1)
 DBPATCH_ADD(6030156, 0, 1)
 DBPATCH_ADD(6030157, 0, 1)
 DBPATCH_ADD(6030158, 0, 1)
-DBPATCH_ADD(6030159, 0, 1)
+DBPATCH_ADD(6030160, 0, 1)
+DBPATCH_ADD(6030161, 0, 1)
+DBPATCH_ADD(6030162, 0, 1)
+DBPATCH_ADD(6030163, 0, 1)
+DBPATCH_ADD(6030164, 0, 1)
+DBPATCH_ADD(6030165, 0, 1)
+DBPATCH_ADD(6030166, 0, 1)
+DBPATCH_ADD(6030167, 0, 1)
+DBPATCH_ADD(6030168, 0, 1)
+DBPATCH_ADD(6030169, 0, 1)
+DBPATCH_ADD(6030170, 0, 1)
+DBPATCH_ADD(6030171, 0, 1)
+DBPATCH_ADD(6030172, 0, 1)
+DBPATCH_ADD(6030173, 0, 1)
+DBPATCH_ADD(6030174, 0, 1)
+DBPATCH_ADD(6030187, 0, 1)
+DBPATCH_ADD(6030188, 0, 1)
+DBPATCH_ADD(6030189, 0, 1)
+DBPATCH_ADD(6030190, 0, 1)
+DBPATCH_ADD(6030191, 0, 1)
+DBPATCH_ADD(6030192, 0, 1)
+DBPATCH_ADD(6030193, 0, 1)
 
 DBPATCH_END()

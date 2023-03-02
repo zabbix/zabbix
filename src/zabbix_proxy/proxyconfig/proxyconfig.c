@@ -167,9 +167,9 @@ static void	proxyconfig_remove_unused_templates(void)
 	zbx_vector_uint64_create(&templateids);
 	zbx_hashset_create(&templates, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	result = DBselect("select hostid,status from hosts");
+	result = zbx_db_select("select hostid,status from hosts");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	hostid;
 		unsigned char	status;
@@ -191,29 +191,29 @@ static void	proxyconfig_remove_unused_templates(void)
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
-		DBbegin();
+		zbx_db_begin();
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts_templates where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
 				templateids.values_num);
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			goto fail;
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hostmacro where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
 				templateids.values_num);
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			goto fail;
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
 				templateids.values_num);
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			goto fail;
 fail:
-		DBcommit();
+		zbx_db_commit();
 
 		zbx_free(sql);
 	}
@@ -259,7 +259,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, proxyconfig_args_in->config_vault);

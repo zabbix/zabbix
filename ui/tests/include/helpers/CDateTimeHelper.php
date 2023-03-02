@@ -76,7 +76,10 @@ class CDateTimeHelper {
 	 * @return int
 	 */
 	public static function countDays($date = 'now', $period = 'P1Y') {
-		return (new DateTime($date))->diff((new DateTime($date))->sub(new DateInterval($period)))->days;
+		$to = new DateTime($date);
+		$from = (clone $to)->sub(new DateInterval($period));
+
+		return $from->diff($to)->days;
 	}
 
 	/**

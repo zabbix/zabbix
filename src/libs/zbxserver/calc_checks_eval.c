@@ -265,7 +265,7 @@ static zbx_expression_item_t	*expression_get_item(zbx_expression_eval_t *eval, z
 			return item;
 	}
 
-	item = (zbx_expression_item_t *)zbx_malloc(NULL, sizeof(zbx_expression_group_t));
+	item = (zbx_expression_item_t *)zbx_malloc(NULL, sizeof(zbx_expression_item_t));
 	item->itemid = itemid;
 	zbx_vector_ptr_create(&item->tags);
 	zbx_dc_get_item_tags(itemid, &item->tags);
@@ -430,7 +430,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_HOST_ONE))
 	{
-		esc = DBdyn_escape_string(query->ref.host);
+		esc = zbx_db_dyn_escape_string(query->ref.host);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",hosts h"
 				" where h.hostid=i.hostid"
 				" and h.host='%s'", esc);
@@ -451,7 +451,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 		key = zbx_strdup(NULL, query->ref.key);
 		zbx_replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param_wildcard_cb, NULL, NULL, 0);
 
-		esc = DBdyn_escape_string(key);
+		esc = zbx_db_dyn_escape_string(key);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " %s i.key_ like '%s'", clause, esc);
 		zbx_free(esc);
 		zbx_free(key);
@@ -459,7 +459,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 	}
 	else if (0 != (query->flags & ZBX_ITEM_QUERY_KEY_ONE))
 	{
-		esc = DBdyn_escape_string(query->ref.key);
+		esc = zbx_db_dyn_escape_string(query->ref.key);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " %s i.key_='%s'", clause, esc);
 		zbx_free(esc);
 		clause = "and";
@@ -495,7 +495,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 
 			if (0 < group->hostids.values_num)
 			{
-				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", group->hostids.values,
+				zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", group->hostids.values,
 						group->hostids.values_num);
 			}
 			else
@@ -509,9 +509,9 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, filter_template + last_pos);
 	}
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_pair_t	pair;
 
@@ -1962,7 +1962,7 @@ static void	macro_index_free(zbx_macro_index_t *index)
 	zbx_free(index);
 }
 
-static int	resolve_expression_query_macro(const ZBX_DB_TRIGGER *trigger, int request, int func_num,
+static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, int request, int func_num,
 		zbx_expression_query_t *query, char **entity, zbx_vector_ptr_t *indices)
 {
 	int			id;
@@ -2003,7 +2003,7 @@ static int	resolve_expression_query_macro(const ZBX_DB_TRIGGER *trigger, int req
 *             trigger - [IN] trigger which defines the evaluation expression  *
 *                                                                             *
 *******************************************************************************/
-void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval, const ZBX_DB_TRIGGER *trigger)
+void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval, const zbx_db_trigger *trigger)
 {
 	int			i, func_num;
 	zbx_vector_ptr_t	hosts, item_keys;

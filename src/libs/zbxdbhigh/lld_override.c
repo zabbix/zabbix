@@ -66,15 +66,15 @@ static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrid
 			" from lld_override_operation o,lld_override_optag ot"
 			" where o.lld_override_operationid=ot.lld_override_operationid"
 			" and");
-	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
+	zbx_db_add_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
 			overrideids->values_num);
 	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset, " and o.operationobject in (%d,%d,%d)",
 			ZBX_LLD_OVERRIDE_OP_OBJECT_TRIGGER, ZBX_LLD_OVERRIDE_OP_OBJECT_HOST,
 			ZBX_LLD_OVERRIDE_OP_OBJECT_ITEM);
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_override_operationid");
 
-	result = DBselect("%s", *sql);
-	while (NULL != (row = DBfetch(result)))
+	result = zbx_db_select("%s", *sql);
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	override_operationid;
 		zbx_db_tag_t	*tag;
@@ -127,14 +127,14 @@ static void	lld_override_operations_load_templates(const zbx_vector_uint64_t *ov
 			" from lld_override_operation o,lld_override_optemplate ot"
 			" where o.lld_override_operationid=ot.lld_override_operationid"
 			" and");
-	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
+	zbx_db_add_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
 			overrideids->values_num);
 	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset, " and o.operationobject=%d",
 			ZBX_LLD_OVERRIDE_OP_OBJECT_HOST);
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_override_operationid");
 
-	result = DBselect("%s", *sql);
-	while (NULL != (row = DBfetch(result)))
+	result = zbx_db_select("%s", *sql);
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	templateid, override_operationid;
 
@@ -207,12 +207,12 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 			" left join lld_override_opinventory i"
 				" on o.lld_override_operationid=i.lld_override_operationid"
 			" where");
-	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
+	zbx_db_add_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
 			overrideids->values_num);
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_override_operationid");
 
-	result = DBselect("%s", *sql);
-	while (NULL != (row = DBfetch(result)))
+	result = zbx_db_select("%s", *sql);
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		override_operation = (zbx_lld_override_operation_t *)zbx_malloc(NULL,
 				sizeof(zbx_lld_override_operation_t));
@@ -227,22 +227,22 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 		override_operation->operator = (unsigned char)atoi(row[3]);
 		override_operation->value = zbx_strdup(NULL, row[4]);
 
-		override_operation->status = FAIL == DBis_null(row[5]) ? (unsigned char)atoi(row[5]) :
+		override_operation->status = FAIL == zbx_db_is_null(row[5]) ? (unsigned char)atoi(row[5]) :
 				ZBX_PROTOTYPE_STATUS_COUNT;
 
-		override_operation->discover = FAIL == DBis_null(row[6]) ? (unsigned char)atoi(row[6]) :
+		override_operation->discover = FAIL == zbx_db_is_null(row[6]) ? (unsigned char)atoi(row[6]) :
 				ZBX_PROTOTYPE_DISCOVER_COUNT;
 
-		override_operation->delay = FAIL == DBis_null(row[7]) ? zbx_strdup(NULL, row[7]) :
+		override_operation->delay = FAIL == zbx_db_is_null(row[7]) ? zbx_strdup(NULL, row[7]) :
 				NULL;
-		override_operation->history = FAIL == DBis_null(row[8]) ? zbx_strdup(NULL, row[8]) :
+		override_operation->history = FAIL == zbx_db_is_null(row[8]) ? zbx_strdup(NULL, row[8]) :
 				NULL;
-		override_operation->trends = FAIL == DBis_null(row[9]) ? zbx_strdup(NULL, row[9]) :
+		override_operation->trends = FAIL == zbx_db_is_null(row[9]) ? zbx_strdup(NULL, row[9]) :
 				NULL;
-		override_operation->severity = FAIL == DBis_null(row[10]) ? (unsigned char)atoi(row[10]) :
+		override_operation->severity = FAIL == zbx_db_is_null(row[10]) ? (unsigned char)atoi(row[10]) :
 				TRIGGER_SEVERITY_COUNT;
 
-		override_operation->inventory_mode = FAIL == DBis_null(row[11]) ? (signed char)atoi(row[11]) :
+		override_operation->inventory_mode = FAIL == zbx_db_is_null(row[11]) ? (signed char)atoi(row[11]) :
 				HOST_INVENTORY_COUNT;
 
 		zbx_vector_ptr_append(ops, override_operation);

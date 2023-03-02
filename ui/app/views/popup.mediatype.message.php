@@ -24,7 +24,6 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setId('mediatype_message_form')
 	->setName('mediatype_message_form')
 	->addVar('action', 'popup.mediatype.message')
