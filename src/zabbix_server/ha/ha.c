@@ -30,10 +30,10 @@
  ******************************************************************************/
 int	zbx_ha_get_nodes(char **nodes, char **error)
 {
-	unsigned char		*data, *ptr;
-	zbx_uint32_t		str_len;
-	int			ret;
-	char			*str;
+	unsigned char	*data, *ptr;
+	zbx_uint32_t	str_len;
+	int		ret;
+	char		*str;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -72,7 +72,8 @@ int	zbx_ha_remove_node(const char *node, char **result, char **error)
 	zbx_uint32_t	error_len, result_len;
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_REMOVE_NODE,
-			ZBX_HA_SERVICE_TIMEOUT, (const unsigned char *)node, (zbx_uint32_t)strlen(node) + 1, &data, error))
+			ZBX_HA_SERVICE_TIMEOUT, (const unsigned char *)node, (zbx_uint32_t)strlen(node) + 1, &data,
+			error))
 	{
 		return FAIL;
 	}

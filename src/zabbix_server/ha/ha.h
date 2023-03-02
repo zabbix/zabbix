@@ -56,12 +56,6 @@
 
 typedef struct
 {
-	char	str[CUID_LEN];
-}
-zbx_cuid_t;
-
-typedef struct
-{
 	char	*ha_node_name;
 	char	*ha_node_address;
 	char	*default_node_ip;

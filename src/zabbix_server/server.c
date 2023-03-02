@@ -84,7 +84,6 @@
 #include "zbxipcservice.h"
 #include "preprocessor/preproc_stats.h"
 #include "preproc.h"
-#include "ha/ha.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"

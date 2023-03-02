@@ -47,6 +47,12 @@
 #define zbx_cuid_compare(a, b)	(0 == memcmp((a).str, (b).str, CUID_LEN) ? SUCCEED : FAIL)
 #define zbx_cuid_clear(a)	memset((a).str, 0, CUID_LEN)
 
+typedef struct
+{
+	char	str[CUID_LEN];
+}
+zbx_cuid_t;
+
 static pid_t		ha_pid = ZBX_THREAD_ERROR;
 static zbx_cuid_t	ha_sessionid;
 
@@ -1490,7 +1496,8 @@ static void	ha_db_update_exit_status(zbx_ha_info_t *info)
 	{
 		zbx_audit_init(info->auditlog);
 		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, info->ha_nodeid.str, info->name);
-		zbx_audit_ha_update_field_int(info->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, info->ha_status, ZBX_NODE_STATUS_STOPPED);
+		zbx_audit_ha_update_field_int(info->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, info->ha_status,
+				ZBX_NODE_STATUS_STOPPED);
 		ha_flush_audit(info);
 	}
 out:
@@ -1597,7 +1604,6 @@ int	zbx_ha_dispatch_message(const char *ha_node_name, zbx_ipc_message_t *message
 				/* reset heartbeat on status change */
 				if (ha_status_old != *ha_status)
 					last_hb = now;
-
 				break;
 			case ZBX_IPC_SERVICE_HA_HEARTBEAT:
 				last_hb = now;
