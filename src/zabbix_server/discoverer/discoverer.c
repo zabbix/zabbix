@@ -1280,7 +1280,7 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_net
 	}
 
 	if (1 == task->resolve_dns)
-		result->dnsname = zbx_strdup(NULL, dns);
+		result->dnsname = zbx_strdup(result->dnsname, dns);
 
 	zbx_vector_ptr_append_array(&result->services, services.values, services.values_num);
 	discoverer_host_job_count_decrease(&dmanager.incomplete_job_count, druleid, task->ip, task->dchecks.values_num);
