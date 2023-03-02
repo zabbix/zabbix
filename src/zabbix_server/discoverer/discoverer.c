@@ -1275,8 +1275,8 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_net
 		r = rdiscovery_result_create(druleid, task);
 		r->ip = zbx_strdup(NULL, task->ip);
 
-		zbx_vector_ptr_create(&r->services);
 		result = zbx_hashset_insert(&dmanager.results, r, sizeof(zbx_discovery_results_t));
+		zbx_free(r);
 	}
 
 	if (1 == task->resolve_dns)
