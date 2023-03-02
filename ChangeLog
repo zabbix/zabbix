@@ -1,3 +1,9 @@
+Changes for 6.4.0rc4
+
+Bug fixes:
+.......PS. [ZBX-22440] replaced large stack allocations with heap alloactions in preprocessing (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 6.4.0rc3
 
 Bug fixes:
@@ -3327,8 +3333,6 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 
 --------------------------------------------------------------------------------
 Changes for 5.0.32rc2
-
-New features:
 
 Bug fixes:
 ........S. [ZBX-22240] fixed invalid memory access during retrieval of historical data (dgoloscapov)
