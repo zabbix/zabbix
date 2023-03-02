@@ -2788,6 +2788,11 @@ msgstr "No es posible actualizar una gráfico descubierta."
 msgid "Cannot update a discovered host group."
 msgstr "No es posible actualizar un grupo de hosts descubierto."
 
+#: include/classes/api/services/CGraphGeneral.php:69
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:455
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."

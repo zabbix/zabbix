@@ -59,6 +59,10 @@ abstract class CBaseElement extends RemoteWebElement {
 
 			$this->reload();
 		}
+		// Allow single communication timeout during test execution
+		catch (\Facebook\WebDriver\Exception\WebDriverCurlException $exception) {
+			// Code is not missing here
+		}
 		// Workaraund for communication errors present on Jenkins
 		catch (\Facebook\WebDriver\Exception\WebDriverException $exception) {
 			if (strpos($exception->getMessage(), 'START_MAP') === false) {

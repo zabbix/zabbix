@@ -825,4 +825,6 @@ void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int fiel
 int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
 
 int	zbx_db_check_instanceid(void);
+
+void	zbx_recalc_history_time_period(int *ts_from);
 #endif

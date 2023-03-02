@@ -3664,7 +3664,32 @@ char	*zbx_db_get_schema_esc(void)
 
 	return name;
 }
-
-
-
 #endif
+
+void	zbx_recalc_history_time_period(int *ts_from)
+{
+#define HK_CFG_UPDATE_INTERVAL	5
+	int			least_ts, now;
+	zbx_config_t		cfg;
+	static int		last_cfg_retrieval = 0;
+	static zbx_config_hk_t	hk;
+
+	now = (int)time(NULL);
+
+	if (HK_CFG_UPDATE_INTERVAL < now - last_cfg_retrieval)
+	{
+		last_cfg_retrieval = now;
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+		hk = cfg.hk;
+	}
+
+	if (1 != hk.history_global)
+		return;
+
+	least_ts = (int)time(NULL) - hk.history;
+
+	if (least_ts > *ts_from)
+		*ts_from = least_ts;
+#undef HK_CFG_UPDATE_INTERVAL
+}

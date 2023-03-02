@@ -284,7 +284,7 @@ class testFormGraph extends CLegacyWebTest {
 		}
 
 		if (isset($data['templatedHost'])) {
-			$this->zbxTestAssertAttribute("//z-select[@id='graphtype']", 'disabled');
+			$this->zbxTestAssertAttribute("//z-select[@id='graphtype']", 'readonly');
 		}
 		else {
 			$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='graphtype'][@disabled]");
