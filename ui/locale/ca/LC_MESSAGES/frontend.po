@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-02-21 21:12+0000\n"
+"PO-Revision-Date: 2023-03-01 21:30+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1541,7 +1541,7 @@ msgstr "Per plantilla de trigger"
 #: include/views/configuration.host.list.php:385
 #: include/views/configuration.host.list.php:388
 msgid "CERT"
-msgstr ""
+msgstr "CERT"
 
 #: app/views/hintbox.eventlist.php:110
 #: app/views/monitoring.widget.problems.view.php:95
@@ -1550,68 +1550,68 @@ msgstr ""
 #: include/classes/screens/CScreenProblem.php:969
 #: include/classes/screens/CScreenProblem.php:1169 include/events.inc.php:335
 msgid "CLOSING"
-msgstr ""
+msgstr "TANCANT"
 
 #: include/classes/items/CHelpItems.php:229
 #: include/classes/items/CHelpItems.php:579
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "Informació de CPU. Retorna una cadena o un enter"
 
 #: include/classes/items/CHelpItems.php:205
 #: include/classes/items/CHelpItems.php:555
 msgid "CPU load. Returns float"
-msgstr ""
+msgstr "Càrrega de la CPU. Retorns un flotant"
 
 #: include/classes/items/CHelpItems.php:217
 #: include/classes/items/CHelpItems.php:567
 msgid "CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Percentatge d'ús de la CPU. Retorna un nombre flotant"
 
 #: app/views/popup.itemtestedit.view.php:163
 msgid "CRLF"
-msgstr ""
+msgstr "CRLF"
 
 #: include/items.inc.php:1796
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV a JSON"
 
 #: include/views/configuration.services.edit.php:90 services.php:40
 msgid "Calculate SLA, acceptable SLA (in %)"
-msgstr ""
+msgstr "SLA calculat, SLA acceptable (en %)"
 
 #: include/items.inc.php:101 include/views/configuration.graph.edit.php:171
 #: include/views/configuration.graph.edit.php:258
 msgid "Calculated"
-msgstr ""
+msgstr "Calculat"
 
 #: include/classes/items/CHelpItems.php:741
 msgid "Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Calcula la mitjana, en funció dels diferents paràmetres proveïts. El servidor Zabbix recull la informació afegida fent peticions directament a la base de dades."
 
 #: include/classes/items/CHelpItems.php:749
 msgid "Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Calcula el valor màxim, en funció dels diferents paràmetres proveïts. El servidor Zabbix recull la informació afegida fent peticions directament a la base de dades."
 
 #: include/classes/items/CHelpItems.php:745
 msgid "Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Calcula el valor mínim, en funció dels diferents paràmetres proveïts. El servidor Zabbix recull la informació afegida fent peticions directament a la base de dades."
 
 #: include/classes/items/CHelpItems.php:753
 msgid "Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Calcula la suma de valors, en funció dels diferents paràmetres proveïts. El servidor Zabbix recull la informació afegida fent peticions directament a la base de dades."
 
 #: jsLoader.php:154
 msgid "Calendar"
-msgstr ""
+msgstr "Calendari"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
-msgstr ""
+msgstr "Tornar la trucada"
 
 #: jsLoader.php:254
 msgctxt "screen reader"
 msgid "Can not be removed"
-msgstr ""
+msgstr "No es pot pas esborrar"
 
 #: app/views/administration.iconmap.edit.php:145
 #: app/views/administration.iconmap.edit.php:155
@@ -1637,396 +1637,396 @@ msgstr ""
 #: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:122
 #: jsLoader.php:139 jsLoader.php:243 jsLoader.php:324 jsLoader.php:336
 msgid "Cancel"
-msgstr ""
+msgstr "Cancel·lar"
 
 #: include/classes/api/services/CHttpTest.php:700
 #, c-format
 msgid "Cannot add a discovered application \"%1$s\" to a web scenario."
-msgstr ""
+msgstr "No es pot pas afegir l'aplicació descoberta \"%1$s\" a un escenari web."
 
 #: include/classes/api/services/CGraph.php:706
 #: include/classes/api/services/CGraph.php:720
 #: include/classes/api/services/CGraph.php:734
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr ""
+msgstr "No es pot afegir un element no numèric \"%1$s\" al gràfic \"%2$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:671
 #: include/classes/api/services/CGraphPrototype.php:735
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "No es pot afegir un element no numèric \"%1$s\" al prototip de gràfic \"%2$s\"."
 
 #: actionconf.php:181
 msgid "Cannot add action"
-msgstr ""
+msgstr "No es pot pas afegir l'acció"
 
 #: applications.php:170
 msgid "Cannot add application"
-msgstr ""
+msgstr "No es pot pas afegir l'aplicació"
 
 #: correlation.php:144
 msgid "Cannot add correlation"
-msgstr ""
+msgstr "No es pot pas afegir la correlació"
 
 #: correlation.php:226 correlation.php:236 correlation.php:242
 #: correlation.php:262 correlation.php:266 correlation.php:279
 msgid "Cannot add correlation condition"
-msgstr ""
+msgstr "No es pot pas afegir una condició de correlació"
 
 #: include/classes/api/services/CTrigger.php:970
 #: include/classes/api/services/CTriggerPrototype.php:795
 msgid "Cannot add dependency from a host to a template."
-msgstr ""
+msgstr "No es pot pas afegir la dependència d'un equip a una plantilla."
 
 #: include/classes/api/services/CDiscoveryRule.php:869
 #: include/triggers.inc.php:553
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "No es pot pas afegir la dependència del trigger \"%1$s:%2$s\" al trigger inexistent \"%3$s:%4$s\"."
 
 #: host_discovery.php:673
 msgid "Cannot add discovery rule"
-msgstr ""
+msgstr "No es pot pas afegir una regla de descobriment"
 
 #: graphs.php:248
 msgid "Cannot add graph"
-msgstr ""
+msgstr "No es pot pas afegir el gràfic"
 
 #: graphs.php:230
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "No es pot pas afegir el prototip de gràfic"
 
 #: hostgroups.php:114
 msgid "Cannot add group"
-msgstr ""
+msgstr "No es pot pas afegir el grup"
 
 #: hosts.php:731
 msgid "Cannot add host"
-msgstr ""
+msgstr "No es pot afegir l'equip"
 
 #: host_prototypes.php:245
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "No es pot afegir el prototip d'equip"
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:107
 #: app/controllers/CControllerImageCreate.php:133
 msgid "Cannot add image"
-msgstr ""
+msgstr "No es pot pas afegir la imatge"
 
 #: items.php:849
 msgid "Cannot add item"
-msgstr ""
+msgstr "No es pot pas afegir l'element"
 
 #: include/classes/api/services/CApplication.php:560
 #, c-format
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas afegir l'element \"%1$s\" de \"%2$s\" a l'aplicació \"%3$s\" de \"%4$s\"."
 
 #: disc_prototypes.php:642
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "No es pot pas afegir un prototip d'element"
 
 #: include/classes/api/services/CApplication.php:613
 msgid "Cannot add items."
-msgstr ""
+msgstr "No es poden pas afegir els elements."
 
 #: maintenance.php:113
 msgid "Cannot add maintenance"
-msgstr ""
+msgstr "No es pot pas afegir el manteniment"
 
 #: include/classes/api/services/CMap.php:1509
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "No es pot pas afegir l'element del mapa \"%1$s\" a causa d'una referència circular."
 
 #: app/controllers/CControllerMediatypeCreate.php:76
 #: app/controllers/CControllerMediatypeCreate.php:165
 msgid "Cannot add media type"
-msgstr ""
+msgstr "No es pot pas afegir el tipus de suport"
 
 #: app/controllers/CControllerModuleScan.php:103
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas afegir el mòdul: %1$s."
+msgstr[1] "No es poden pas afegir els mòduls: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas afegir més d'un element amb el tipus \"Suma del gràfic\" al gràfic \"%1$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:40
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas afegir més d'un element amb el tipus \"Suma gràfica\" al prototip de gràfic \"%1$s\"."
 
 #: sysmaps.php:211
 msgid "Cannot add network map"
-msgstr ""
+msgstr "No es pot pas afegir el mapa de xarxa"
 
 #: httpconf.php:320
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas afegir la nova aplicació \"%1$s\"."
 
 #: app/controllers/CControllerProxyCreate.php:56
 #: app/controllers/CControllerProxyCreate.php:112
 msgid "Cannot add proxy"
-msgstr ""
+msgstr "No es pot pas afegir el proxy"
 
 #: app/controllers/CControllerRegExCreate.php:43
 #: app/controllers/CControllerRegExCreate.php:90
 msgid "Cannot add regular expression"
-msgstr ""
+msgstr "No es pot pas afegir una expressió regular"
 
 #: screenconf.php:175
 msgid "Cannot add screen"
-msgstr ""
+msgstr "No es pot pas afegir la pantalla"
 
 #: app/controllers/CControllerScriptCreate.php:47
 #: app/controllers/CControllerScriptCreate.php:97
 msgid "Cannot add script"
-msgstr ""
+msgstr "No es pot pas afegir l'script"
 
 #: services.php:154
 msgid "Cannot add service"
-msgstr ""
+msgstr "No es pot pas afegir el servei"
 
 #: slideconf.php:156
 msgid "Cannot add slide show"
-msgstr ""
+msgstr "No es pot pas afegir la presentació"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:63
 msgid "Cannot add submaps. Max depth reached."
-msgstr ""
+msgstr "No es poden pas afegir submapes. S'ha arribat a la profunditat màxima."
 
 #: templates.php:512
 msgid "Cannot add template"
-msgstr ""
+msgstr "No es pot pas afegir la plantilla"
 
 #: app/controllers/CControllerPopupTriggerWizard.php:210 triggers.php:299
 msgid "Cannot add trigger"
-msgstr ""
+msgstr "No es pot pas afegir el trigger"
 
 #: trigger_prototypes.php:250
 msgid "Cannot add trigger prototype"
-msgstr ""
+msgstr "No es pot pas afegir un prototip de trigger"
 
 #: app/controllers/CControllerUserCreate.php:61
 #: app/controllers/CControllerUserCreate.php:117
 msgid "Cannot add user"
-msgstr ""
+msgstr "No es pot pas afegir l'usuari"
 
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:100
 msgid "Cannot add user group"
-msgstr ""
+msgstr "No es pot pas afegir el grup d'usuaris"
 
 #: app/controllers/CControllerValuemapCreate.php:41
 #: app/controllers/CControllerValuemapCreate.php:77
 msgid "Cannot add value map"
-msgstr ""
+msgstr "No es pot pas afegir el mapa de valors"
 
 #: httpconf.php:199
 msgid "Cannot add web scenario"
-msgstr ""
+msgstr "No es pot pas afegir l'escenari web"
 
 #: jsLoader.php:136
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "No es pot pas afegir el giny: no hi ha prou espai lliure al tauler."
 
 #: jsLoader.php:126
 msgid "Cannot add widgets in kiosk mode"
-msgstr ""
+msgstr "No es poden pas afegir els ginys en mode quiosc"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
-msgstr ""
+msgstr "No es pot vincular de manera anònima al servidor LDAP."
 
 #: include/classes/validators/CLdapAuthValidator.php:78
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "No es pot pas vincular al servidor LDAP."
 
 #: httpconf.php:190 httpconf.php:503 items.php:879
 msgid "Cannot clear history"
-msgstr ""
+msgstr "No es pot pas esborrar l'historial"
 
 #: items.php:1293
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
-msgstr ""
+msgstr "No es pot pas netejar l'històric: com a mínim un dels elements triats no pertany a cap equip monitorat"
 
 #: include/classes/api/services/CDiscoveryRule.php:2448
 msgid "Cannot clone graph prototypes."
-msgstr ""
+msgstr "No es poden pas clonar prototips de gràfics."
 
 #: include/classes/api/services/CDiscoveryRule.php:2502
 msgid "Cannot clone host prototypes."
-msgstr ""
+msgstr "No es poden pas clonar prototips d'equips."
 
 #: include/classes/api/services/CDiscoveryRule.php:2251
 #: include/classes/api/services/CDiscoveryRule.php:2307
 #: include/classes/api/services/CDiscoveryRule.php:2325
 msgid "Cannot clone item prototypes."
-msgstr ""
+msgstr "No es poden pas clonar prototips d'elements."
 
 #: include/classes/api/services/CDiscoveryRule.php:782
 msgid "Cannot clone trigger prototypes."
-msgstr ""
+msgstr "No es poden pas clonar prototips de triggers."
 
 #: include/classes/api/services/CEvent.php:840
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr ""
+msgstr "No es pot pas tancar el problema: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "No es pot pas connectar amb el servidor LDAP."
 
 #: include/classes/setup/CSetupWizard.php:321
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "No es pot connectar a la base de dades."
 
 #: include/views/js/configuration.httpconf.edit.js.php:106
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "No es poden pas convertir les dades POST:"
 
 #: graphs.php:400
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas copiar el gràfic"
+msgstr[1] "No es poden pas copiar els gràfics"
 
 #: items.php:1276
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas copiar l'element"
+msgstr[1] "No es poden pas copiar els elements"
 
 #: triggers.php:603
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas copiar el trigger"
+msgstr[1] "No es poden pas copiar els triggers"
 
 #: include/triggers.inc.php:409
 #, c-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "No es pot copiar el trigger \"%1$s:%2$s\", perquè té diversos equips a l'expressió."
 
 #: include/classes/api/services/CHostPrototype.php:252
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr ""
+msgstr "No es pot crear un prototip d'equip en un equip descobert \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
-msgstr ""
+msgstr "No es pot crear una altra connexió a la base de dades."
 
 #: include/classes/api/services/CTrigger.php:1004
 #: include/classes/api/services/CTriggerPrototype.php:826
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "No es poden pas crear dependències circulars."
 
 #: include/classes/api/services/CTrigger.php:976
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "No es pot pas crear dependència del propi trigger."
 
 #: include/classes/api/services/CTriggerPrototype.php:765
 msgid "Cannot create dependency on trigger prototype itself."
-msgstr ""
+msgstr "No es pot pas crear dependència del propi prototip de trigger."
 
 #: discoveryconf.php:133
 msgid "Cannot create discovery rule"
-msgstr ""
+msgstr "No es pot pas crear una regla de descobriment"
 
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
-msgstr ""
+msgstr "No es pot pas crear un mapa d'icones"
 
 #: httpconf.php:208
 msgid "Cannot create new application, web scenario is already assigned to application."
-msgstr ""
+msgstr "No es pot pas crear una nova aplicació, l'escenari web ja s'ha assignat a una aplicació."
 
 #: include/classes/setup/CSetupWizard.php:469
 msgid "Cannot create the configuration file."
-msgstr ""
+msgstr "No es pot pas crear el fitxer de configuració."
 
 #: include/classes/api/services/CDashboard.php:388
 #, c-format
 msgid "Cannot create widget: %1$s."
-msgstr ""
+msgstr "No es pot pas crear el giny: %1$s."
 
 #: include/classes/api/services/CUser.php:993
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr ""
+msgstr "No es pot pas esborrar l'usuari intern de Zabbix \"%1$s\"; proveu a desactivar aquest usuari."
 
 #: actionconf.php:202
 msgid "Cannot delete action"
-msgstr ""
+msgstr "No es pot pas esborrar l'acció"
 
 #: applications.php:189 applications.php:201
 msgid "Cannot delete application"
 msgid_plural "Cannot delete applications"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar l'aplicació"
+msgstr[1] "No es poden pas esborrar les aplicacions"
 
 #: correlation.php:160
 msgid "Cannot delete correlation"
-msgstr ""
+msgstr "No es pot pas esborrar la correlació"
 
 #: app/controllers/CControllerDashboardDelete.php:62
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar el tauler"
+msgstr[1] "No es poden pas esborrar els taulers"
 
 #: include/classes/api/services/CTrigger.php:874
 #: include/classes/api/services/CTriggerPrototype.php:577
 msgid "Cannot delete dependency"
-msgstr ""
+msgstr "No es pot pas esborrar la dependència"
 
 #: include/classes/api/services/CApplication.php:461
 #, c-format
 msgid "Cannot delete discovered application \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas esborrar l'aplicació descoberta \"%1$s\"."
 
 #: discoveryconf.php:157 host_discovery.php:391
 msgid "Cannot delete discovery rule"
-msgstr ""
+msgstr "No es pot pas esborrar la regla de descoberta"
 
 #: discoveryconf.php:199 host_discovery.php:716
 msgid "Cannot delete discovery rules"
-msgstr ""
+msgstr "No es poden pas esborrar les regles de descoberta"
 
 #: graphs.php:291
 msgid "Cannot delete graph"
-msgstr ""
+msgstr "No es pot pas esborrar el gràfic"
 
 #: graphs.php:283
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "No es pot pas esborrar el prototip de gràfic"
 
 #: graphs.php:324
 msgid "Cannot delete graph prototypes"
-msgstr ""
+msgstr "No es poden pas esborrar els prototips de gràfics"
 
 #: graphs.php:341
 msgid "Cannot delete graphs"
-msgstr ""
+msgstr "No es poden pas esborrar gràfics"
 
 #: hostgroups.php:134 hostgroups.php:156
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar el grup"
+msgstr[1] "No es poden pas esborrar els grups"
 
 #: hosts.php:968 hosts.php:989
 msgid "Cannot delete host"
-msgstr ""
+msgstr "No es pot esborrar l'equip"
 
 #: include/classes/api/services/CHost.php:1463
 #, c-format
