@@ -1086,7 +1086,7 @@ static zbx_dservice_t	*result_dservice_create(const zbx_discoverer_net_check_tas
 
 	service = (zbx_dservice_t *)zbx_malloc(NULL, sizeof(zbx_dservice_t));
 	service->dcheckid = dcheck->dcheckid;
-	service->itemtime = (time_t)time(NULL);
+	service->itemtime = time(NULL);
 	service->port = task->port;
 
 	return service;
@@ -1248,16 +1248,11 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_net
 	for (i = 0; i < task->dchecks.values_num; i++)
 	{
 		DC_DCHECK		*dcheck = (DC_DCHECK*)task->dchecks.values[i];
-		zbx_dservice_t		*service = NULL;
+		zbx_dservice_t		*service;
 
-		service = (zbx_dservice_t *)zbx_malloc(service, sizeof(zbx_dservice_t));
-
+		service = result_dservice_create(task, dcheck);
 		service->status = (SUCCEED == discover_service(dcheck, task->ip, task->port, config_timeout, &value,
 				&value_alloc)) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
-
-		service->dcheckid = dcheck->dcheckid;
-		service->itemtime = (time_t)time(NULL);
-		service->port = task->port;
 		zbx_strlcpy_utf8(service->value, value, ZBX_MAX_DISCOVERED_VALUE_SIZE);
 
 		zbx_vector_ptr_append(&services, service);
