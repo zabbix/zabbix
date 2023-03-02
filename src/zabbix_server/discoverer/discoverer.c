@@ -1564,6 +1564,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	char				*error;
+	zbx_vector_uint64_pair_t	revisions;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -1590,6 +1591,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	}
 
 	zbx_mt_init_snmp();
+	zbx_vector_uint64_pair_create(&revisions);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -1607,9 +1609,11 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		}
 
 		/* update local drules revisions */
+		zbx_vector_uint64_pair_clear(&revisions);
+		zbx_dc_drule_revisions_get(&revisions);
 		pthread_rwlock_wrlock(&dmanager.revisions_rwlock);
 		zbx_vector_uint64_pair_clear(&dmanager.revisions);
-		zbx_dc_drule_revisions_get(&dmanager.revisions);
+		zbx_vector_uint64_pair_append_array(&dmanager.revisions, revisions.values, revisions.values_num);
 		pthread_rwlock_unlock(&dmanager.revisions_rwlock);
 
 		if ((int)sec >= nextresult)
