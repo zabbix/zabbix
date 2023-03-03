@@ -661,30 +661,29 @@ static int	pp_execute_script(zbx_pp_context_t *ctx, zbx_variant_t *value, const 
 static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params,
 		char **errmsg)
 {
-	char	pattern[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *request, *output,
-			*value_out = NULL, *err = NULL;
+	char	*pattern, *request, *output, *value_out = NULL, *err = NULL;
 	int	ret = FAIL;
 
-	zbx_strlcpy(pattern, params, sizeof(pattern));
+	pattern = zbx_strdup(NULL, params);
 
 	if (NULL == (request = strchr(pattern, '\n')))
 	{
 		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
-		return FAIL;
+		goto out;
 	}
 	*request++ = '\0';
 
 	if (NULL == (output = strchr(request, '\n')))
 	{
 		*errmsg = zbx_strdup(*errmsg, "cannot find third parameter");
-		return FAIL;
+		goto out;
 	}
 	*output++ = '\0';
 
 	if (NULL == cache || ZBX_PREPROC_PROMETHEUS_PATTERN != cache->type)
 	{
 		if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
-			return FAIL;
+			goto out;
 
 		ret = zbx_prometheus_pattern(value->data.str, pattern, request, output, &value_out, &err);
 	}
@@ -695,7 +694,7 @@ static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *val
 		if (NULL == (prom_cache = (zbx_prometheus_t *)cache->data))
 		{
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
-				return FAIL;
+				goto out;
 
 			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
 
@@ -712,9 +711,13 @@ static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *val
 		ret = zbx_prometheus_pattern_ex(prom_cache, pattern, request, output, &value_out, &err);
 	}
 out:
+	zbx_free(pattern);
+
 	if (FAIL == ret)
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "cannot apply Prometheus pattern: %s", err);
+		if (NULL == *errmsg)
+			*errmsg = zbx_dsprintf(*errmsg, "cannot apply Prometheus pattern: %s", err);
+
 		zbx_free(err);
 		return FAIL;
 	}

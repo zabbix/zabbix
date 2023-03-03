@@ -1,3 +1,9 @@
+Changes for 6.4.0rc4
+
+Bug fixes:
+.......PS. [ZBX-22440] replaced large stack allocations with heap alloactions in preprocessing (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 6.4.0rc3
 
 Bug fixes:
@@ -3324,6 +3330,12 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.32rc2
+
+Bug fixes:
+........S. [ZBX-22240] fixed invalid memory access during retrieval of historical data (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.32rc1
