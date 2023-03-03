@@ -459,8 +459,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 		// Fill login and user password in Test authentication form.
 		if (array_key_exists('test_settings', $data)) {
-			$test_form = $test_form_dialog->asForm();
-			$test_form->fill($data['test_settings'])->submit()->waitUntilReady();
+			$test_form_dialog->asForm()->fill($data['test_settings'])->submit();
+			$test_form_dialog->waitUntilReady();
 		}
 
 		// Check error messages testing LDAP settings.
@@ -473,7 +473,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 		if (array_key_exists('check_provisioning', $data)) {
 			foreach ($data['check_provisioning'] as $id => $text) {
-				$this->assertEquals($text, $test_form_dialog->query('id:provisioning_'.$id)->waitUntilVisible()->one()->getText());
+				$this->assertEquals($text, $test_form_dialog->query('id:provisioning_'.$id)->waitUntilVisible()
+						->one()->getText()
+				);
 			}
 		}
 

@@ -1,8 +1,24 @@
+Changes for 6.4.0rc4
+
+Bug fixes:
+.......PS. [ZBX-22440] replaced large stack allocations with heap alloactions in preprocessing (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.0rc3
+
+Bug fixes:
+...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
+.......PS. [ZBX-22408] fixed multiple preprocessing workers trying to index json object at the same time (wiper)
+.......PS. [ZBX-22419] fixed wrongful removal of matching oids (dgoloscapov)
+...G...PS. [ZBX-22368] replaced sigprocmask with pthread_sigmask when libpthread is available (wiper)
+.......PS. [ZBX-22412] fixed dependent items beging generated from discarded master item value (wiper)
+........S. [ZBX-22396] fixed handling of oids of different lengths before index in snmpwalk2json preprocessing step (dgoloscapov)
+
+--------------------------------------------------------------------------------
 Changes for 6.4.0rc2
 
 New features:
 A.F.....S. [ZBXNEXT-8087] reverted removing of template nesting (Sasha)
-.......PS. [ZBXNEXT-2732] reverted network discovery manager improvements (asestakovs)
 ..F....... [ZBXNEXT-8257] removed aggregate function labels from the graph widget legend (acikuns)
 .......PS. [ZBXNEXT-8262] updated soft minimal threshold for MySQL to version 8.0.30 (mprihodko)
 .......PS. [ZBXNEXT-8105] fixed build when cURL library version is less than 7.61.0 (vso)
@@ -23,7 +39,6 @@ Changes for 6.4.0rc1
 New features:
 ..F.I..... [ZBXNEXT-7836] added modal form for maintenance periods in Data collection->Maintenance (averza, dpetra)
 A.F.....S. [ZBXNEXT-6796,ZBXNEXT-8203] added support for notification macros in the Script media type parameters (ashubin, dimir)
-.......PS. [ZBXNEXT-2732] improved network discovery by implementing concurrent checks within a single discovery rule (asestakovs)
 A.F....... [ZBXNEXT-1111] added template versioning fields (gcalenko)
 .........T [ZBXNEXT-8249] updated attributes in the template files (abakaldin)
 ..F....... [ZBXNEXT-8165] added the possibility to specify decimal places in Top hosts widget (averza, esekace)
@@ -310,6 +325,12 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
 
 --------------------------------------------------------------------------------
+Changes for 6.2.8rc2
+
+Bug fixes:
+...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
+
+--------------------------------------------------------------------------------
 Changes for 6.2.8rc1
 
 New features:
@@ -317,9 +338,8 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
-........S. [ZBX-22240] fixed selects of history and trends being able to block housekeeping (dgoloscapov)
+........S. [ZBX-22240] fixed selects of history, trends blocking drop_chunks and housekeeping (dgoloscapov)
 ..F....... [ZBX-22320] fixed success message when disabling hosts in host groups (epulke)
-........S. [ZBX-22240] fixed selects of history and trends blocking drop_chunks (dgoloscapov)
 ........S. [ZBX-22078] fixed the crash in calculated items when using tag filter on 32-bit systems (vso)
 .........T [ZBX-21591] optimized JSONPaths in the Nginx Plus template (igorbach)
 A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
@@ -933,6 +953,12 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.14rc2
+
+Bug fixes:
+...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.14rc1
@@ -3306,14 +3332,19 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.32rc1
-
-New features:
+Changes for 5.0.32rc2
 
 Bug fixes:
-........S. [ZBX-22240] fixed selects of history and trends blocking drop_chunks (dgoloscapov)
+........S. [ZBX-22240] fixed invalid memory access during retrieval of historical data (dgoloscapov)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.32rc1
+
+Bug fixes:
+........S. [ZBX-22240] fixed selects of history, trends blocking drop_chunks and housekeeping (dgoloscapov)
 A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
 .......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
+...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.31

@@ -817,6 +817,7 @@ int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value,
 			if (SUCCEED != zbx_snmp_value_cache_init(snmp_cache, value->data.str, &err))
 			{
 				zbx_free(snmp_cache);
+				cache->type = ZBX_PREPROC_NONE;
 				goto out;
 			}
 
@@ -875,11 +876,17 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 
 		for (i = 0; i < parsed_params.values_num; i++)
 		{
-			zbx_snmp_walk_json_output_obj_t		*oobj_cached, oobj_local;
-			zbx_snmp_value_pair_t			*output_value;
+			zbx_snmp_walk_json_output_obj_t	*oobj_cached, oobj_local;
+			zbx_snmp_value_pair_t		*output_value;
 
 			param_field = parsed_params.values[i];
 			prefix_len = strlen(param_field.oid_prefix);
+
+			if ('.' == param_field.oid_prefix[prefix_len - 1])
+			{
+				param_field.oid_prefix[prefix_len - 1] = '\0';
+				prefix_len--;
+			}
 
 			if ('.' != param_field.oid_prefix[0])
 			{
@@ -889,6 +896,9 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 				prefix_len++;
 			}
 			else if (0 != strncmp(param_field.oid_prefix, p.oid, prefix_len))
+				continue;
+
+			if ('.' != p.oid[prefix_len])
 				continue;
 
 			if (SUCCEED != preproc_snmp_convert_value(&p.value, p.type, param_field.format_flag, errmsg))
