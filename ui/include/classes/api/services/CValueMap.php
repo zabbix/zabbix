@@ -168,20 +168,12 @@ class CValueMap extends CApiService {
 		foreach ($valuemaps as $valuemap) {
 			$valuemapid = $valuemap['valuemapid'];
 
-			$db_valuemap = $db_valuemaps[$valuemapid];
+			$upd_valuemap = DB::getUpdatedValues('valuemap', $valuemap, $db_valuemaps[$valuemapid]);
 
-			$valuemap += ['name' => $db_valuemap['name']];
-
-			if (array_key_exists('uuid', $valuemap) && $valuemap['uuid'] !== $db_valuemap['uuid']) {
+			if ($upd_valuemap) {
 				$upd_valuemaps[] = [
-					'values' => ['uuid' => $valuemap['uuid'], 'name' => $valuemap['name']],
-					'where' => ['valuemapid' => $valuemap['valuemapid']]
-				];
-			}
-			elseif ($valuemap['name'] !== $db_valuemap['name']) {
-				$upd_valuemaps[] = [
-					'values' => ['name' => $valuemap['name']],
-					'where' => ['valuemapid' => $valuemap['valuemapid']]
+					'values' => $upd_valuemap,
+					'where' => ['valuemapid' => $valuemapid]
 				];
 			}
 
