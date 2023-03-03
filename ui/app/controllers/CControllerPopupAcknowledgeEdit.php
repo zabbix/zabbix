@@ -22,7 +22,7 @@
 class CControllerPopupAcknowledgeEdit extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -77,7 +77,6 @@ class CControllerPopupAcknowledgeEdit extends CController {
 
 	protected function doAction() {
 		$data = [
-			'sid' => $this->getUserSID(),
 			'eventids' => $this->getInput('eventids'),
 			'message' => $this->getInput('message', ''),
 			'scope' => (int) $this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED),

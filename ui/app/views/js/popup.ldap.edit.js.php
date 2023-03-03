@@ -153,7 +153,7 @@ window.ldap_edit_popup = new class {
 		this.overlay.setLoading();
 
 		const fields = this.preprocessFormFields(getFormFields(this.form));
-		const curl = new Curl(this.form.getAttribute('action'), false);
+		const curl = new Curl(this.form.getAttribute('action'));
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

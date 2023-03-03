@@ -21,6 +21,10 @@
 
 class CControllerUsergroupTemplateGrouprightAdd extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'templategroup_rights'    => 'required|array',

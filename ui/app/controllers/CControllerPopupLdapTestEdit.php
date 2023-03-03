@@ -21,6 +21,10 @@
 
 class CControllerPopupLdapTestEdit extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'userdirectoryid' =>		'db userdirectory.userdirectoryid',

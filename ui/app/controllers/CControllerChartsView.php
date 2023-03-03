@@ -25,7 +25,7 @@
 class CControllerChartsView extends CControllerCharts {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {

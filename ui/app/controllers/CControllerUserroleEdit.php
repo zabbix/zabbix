@@ -27,7 +27,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	private $role;
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {

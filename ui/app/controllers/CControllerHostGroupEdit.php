@@ -22,7 +22,7 @@
 class CControllerHostGroupEdit extends CController{
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -59,7 +59,6 @@ class CControllerHostGroupEdit extends CController{
 
 	protected function doAction(): void {
 		$data = [
-			'sid' => $this->getUserSID(),
 			'groupid' => null,
 			'name' => '',
 			'subgroups' => 0

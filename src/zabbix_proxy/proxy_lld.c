@@ -30,3 +30,16 @@ void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGEN
 	ZBX_UNUSED(ts);
 	ZBX_UNUSED(error);
 }
+
+void	zbx_lld_queue_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
+		unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error)
+{
+	ZBX_UNUSED(itemid);
+	ZBX_UNUSED(hostid);
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(ts);
+	ZBX_UNUSED(meta);
+	ZBX_UNUSED(lastlogsize);
+	ZBX_UNUSED(mtime);
+	ZBX_UNUSED(error);
+}

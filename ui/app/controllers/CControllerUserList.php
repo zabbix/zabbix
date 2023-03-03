@@ -27,7 +27,7 @@ class CControllerUserList extends CController {
 	public const FILTERS_SOURCE_SAML = 3;
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {

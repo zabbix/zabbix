@@ -86,6 +86,7 @@ void	jsonobj_init(zbx_jsonobj_t *obj, zbx_json_type_t type)
 	}
 
 	obj->index = NULL;
+	obj->index_num = 0;
 }
 
 /******************************************************************************
@@ -366,4 +367,15 @@ out:
 	}
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: disable automatic json object indexing during jsonpath query      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_jsonobj_disable_indexing(zbx_jsonobj_t *obj)
+{
+	if (0 == obj->index_num)
+		obj->index_num = -1;
 }
