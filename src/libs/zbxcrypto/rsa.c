@@ -34,28 +34,6 @@
 #endif
 
 #if defined(HAVE_OPENSSL) || defined(HAVE_GNUTLS)
-static int	pem_insert_newlines(char **key, size_t header_len)
-{
-	char	*end_ptr;
-	size_t	offset;
-
-	offset = header_len - 1;
-
-	if ('\n' != (*key)[offset + 1])
-		zbx_replace_string(key, offset, &offset, "-\n");
-
-	if (NULL == (end_ptr = strstr(*key, "-----END")))
-		return FAIL;
-
-	if ('\n' != *(end_ptr - 1))
-	{
-		offset = end_ptr - *key;
-		zbx_replace_string(key, offset, &offset, "\n-");
-	}
-
-	return SUCCEED;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: receive private key in PEM container with arbitrary newlines,     *
@@ -73,26 +51,41 @@ static int	pem_insert_newlines(char **key, size_t header_len)
  ******************************************************************************/
 int	zbx_format_pem_pkey(char **key)
 {
-#define	PEM_HEADER_PKCS1	"-----BEGIN RSA PRIVATE KEY-----"
-#define	PEM_HEADER_PKCS8	"-----BEGIN PRIVATE KEY-----"
-	if (0 == strncmp(*key, PEM_HEADER_PKCS8, ZBX_CONST_STRLEN(PEM_HEADER_PKCS8)))
+#define PEM_PKEY_BEGIN			"-----BEGIN"
+#define PEM_PKEY_BEGIN_HEADER_END	"KEY-----"
+#define PEM_PKEY_FOOTER_END		"-----END"
+
+	char	*begin_ptr, *end_ptr, *newline_begin, *newline_end;
+	size_t	offset;
+
+	if (0 == strncmp(*key, PEM_PKEY_BEGIN, ZBX_CONST_STRLEN(PEM_PKEY_BEGIN)))
 	{
-		if (SUCCEED == pem_insert_newlines(key, ZBX_CONST_STRLEN(PEM_HEADER_PKCS8)))
+		if (NULL == (begin_ptr = strstr(*key, PEM_PKEY_BEGIN_HEADER_END)))
+			return FAIL;
+
+		if ('\n' != *(newline_begin = begin_ptr + ZBX_CONST_STRLEN(PEM_PKEY_BEGIN_HEADER_END)))
 		{
-			return SUCCEED;
+			offset = newline_begin - *key - 1;
+			zbx_replace_string(key, offset, &offset, "-\n");
 		}
-	}
-	else if (0 == strncmp(*key, PEM_HEADER_PKCS1, ZBX_CONST_STRLEN(PEM_HEADER_PKCS1)))
-	{
-		if (SUCCEED == pem_insert_newlines(key, ZBX_CONST_STRLEN(PEM_HEADER_PKCS1)))
+
+		if (NULL == (end_ptr = strstr(*key, PEM_PKEY_FOOTER_END)))
+			return FAIL;
+
+		if ('\n' != *(newline_end = end_ptr - 1))
 		{
-			return SUCCEED;
+			offset = newline_end - *key + 1;
+			zbx_replace_string(key, offset, &offset, "\n-");
 		}
+
+		return SUCCEED;
 	}
 
 	return FAIL;
-#undef	PEM_HEADER_PKCS8
-#undef	PEM_HEADER_PKCS1
+
+#undef PEM_PKEY_BEGIN
+#undef PEM_PKEY_BEGIN_HEADER_END
+#undef PEM_PKEY_FOOTER_END
 }
 #endif
 
@@ -104,6 +97,7 @@ int	zbx_format_pem_pkey(char **key)
  * Parameters:                                                                *
  *     key         - [IN] private key in a PEM container (PKCS#1 or PKCS#8)   *
  *     data        - [IN] data to sign                                        *
+ *     data        - [IN] length of data to sign                              *
  *     output      - [OUT] dynamically allocated memory with signature        *
  *     output_len  - [OUT] length of a signature (bytes)                      *
  *     error       - [OUT] dynamically allocated memory with error message    *
@@ -113,18 +107,22 @@ int	zbx_format_pem_pkey(char **key)
  *     FAIL    - an error occurred                                            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rs256_sign(char *key, char *data, unsigned char **output, size_t *output_len, char **error)
+int	zbx_rs256_sign(char *key, size_t key_len, char *data, size_t data_len, unsigned char **output,
+		size_t *output_len, char **error)
 {
 	int		ret = SUCCEED;
 	BIO		*bio = NULL;
 	EVP_PKEY	*pkey = NULL;
 	EVP_MD_CTX	*mdctx = NULL;
-	unsigned char	*sig;
+	unsigned char	*sig = NULL;
 	size_t		sign_len;
+
+	ZBX_UNUSED(key_len);
 
 	bio = BIO_new_mem_buf(key, -1);
 
-	if (NULL == (pkey = PEM_read_bio_PrivateKey(bio, NULL, NULL, NULL)) || NULL == (mdctx = EVP_MD_CTX_create()))
+	if (NULL == (pkey = PEM_read_bio_PrivateKey(bio, NULL, NULL, NULL)) ||
+			NULL == (mdctx = EVP_MD_CTX_create()))
 	{
 		*error = zbx_strdup(NULL, "failed to import private key");
 		ret = FAIL;
@@ -147,7 +145,7 @@ int	zbx_rs256_sign(char *key, char *data, unsigned char **output, size_t *output
 
 	sig = OPENSSL_malloc(sign_len);
 
-	if (0 >= EVP_DigestSign(mdctx, sig, &sign_len, (const unsigned char *)data, strlen(data)))
+	if (0 >= EVP_DigestSign(mdctx, sig, &sign_len, (const unsigned char *)data, data_len))
 	{
 		*error = zbx_strdup(NULL, "signing failed");
 		ret = FAIL;
@@ -159,15 +157,23 @@ int	zbx_rs256_sign(char *key, char *data, unsigned char **output, size_t *output
 		memcpy(*output, sig, sign_len);
 	}
 out:
-	BIO_free(bio);
-	EVP_PKEY_free(pkey);
-	EVP_MD_CTX_destroy(mdctx);
-	OPENSSL_free(sig);
+	if (NULL != bio)
+		BIO_free(bio);
+
+	if (NULL != pkey)
+		EVP_PKEY_free(pkey);
+
+	if (NULL != mdctx)
+		EVP_MD_CTX_destroy(mdctx);
+
+	if (NULL != sig)
+		OPENSSL_free(sig);
 
 	return ret;
 }
 #elif defined(HAVE_GNUTLS)
-int	zbx_rs256_sign(char *key, char *data, unsigned char **output, size_t *output_len, char **error)
+int	zbx_rs256_sign(char *key, size_t key_len, char *data, size_t data_len, unsigned char **output,
+		size_t *output_len, char **error)
 {
 	gnutls_x509_privkey_t	x509key;
 	gnutls_privkey_t	privkey;
@@ -175,9 +181,9 @@ int	zbx_rs256_sign(char *key, char *data, unsigned char **output, size_t *output
 	int			ret = SUCCEED;
 
 	keyd.data = (unsigned char *)key;
-	keyd.size = strlen(key);
+	keyd.size = key_len;
 	bodyd.data = (unsigned char *)data;
-	bodyd.size = strlen(data);
+	bodyd.size = data_len;
 
 	if (GNUTLS_E_SUCCESS != gnutls_x509_privkey_init(&x509key))
 	{

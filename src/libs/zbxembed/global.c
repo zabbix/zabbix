@@ -27,8 +27,6 @@
 #include "zbxjson.h"
 #include "log.h"
 
-#define ES_RSA_HEX_SIGNATURE_MAX_LEN	2048
-
 /******************************************************************************
  *                                                                            *
  * Purpose: encodes parameter to base64 string                                *
@@ -128,12 +126,12 @@ static char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 		case DUK_TYPE_BUFFER:
 		case DUK_TYPE_OBJECT:
 			ptr = duk_require_buffer_data(ctx, index, len);
-			buf = zbx_malloc(NULL, *len + 1);
+			buf = zbx_malloc(NULL, *len);
 			memcpy(buf, ptr, *len);
 			break;
 		default:
 			ptr = duk_require_lstring(ctx, index, len);
-			buf = zbx_malloc(NULL, *len + 1);
+			buf = zbx_malloc(NULL, *len);
 			memcpy(buf, ptr, *len);
 			break;
 	}
@@ -250,6 +248,29 @@ static duk_ret_t	es_hmac(duk_context *ctx)
 	return 1;
 }
 
+static void	unescape_newlines(const char *in, size_t *len, char *out)
+{
+	const char	*end = in + *len;
+
+	for (; in < end; in++, out++)
+	{
+		if ('\\' == *in)
+		{
+			if ('n' == *(++in))
+			{
+				*out = '\n';
+				*len = *len - 1;
+			}
+			else
+				*out = *(--in);
+		}
+		else
+			*out = *in;
+	}
+
+	*out = '\0';
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: sign data using RSA with SHA-256                                  *
@@ -268,35 +289,62 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 
 	return duk_error(ctx, DUK_RET_TYPE_ERROR, "encryption support was not compiled in");
 #else
-	char			*key, *key_unesc = NULL, *text, *error = NULL, *out = NULL;
+	char			*key = NULL, *key_unesc = NULL, *text, *error = NULL, *out = NULL;
 	unsigned char		*raw_sig = NULL;
-	const char		*type;
+	const char		*algo;
 	duk_size_t		key_len, text_len;
+	duk_int_t		arg_type;
 	size_t			raw_sig_len, key_unesc_alloc = 0;
 	int			ret, err_index = -1;
 	zbx_json_type_t		jtype;
 
-	type = duk_require_string(ctx, 0);
+	algo = duk_require_string(ctx, 0);
 
-	if (0 != strcmp(type, "sha256"))
+	if (0 != strcmp(algo, "sha256"))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "unsupported hash function, only 'sha256' is supported");
-
-	key = es_get_buffer_dyn(ctx, 1, &key_len);
-
-	if (0 == key_len)
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "private key cannot be empty");
 
 	text = es_get_buffer_dyn(ctx, 2, &text_len);
 
-	if (0 == text)
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "data cannot be empty");
+	arg_type = duk_get_type(ctx, 1);
 
-	key[key_len] = '\0';
-	text[text_len] = '\0';
+	if (DUK_TYPE_UNDEFINED == arg_type)
+	{
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "parameter 'key' is missing or is undefined");
+	}
+	else
+	{
+		const char	*ptr;
+
+		if (DUK_TYPE_BUFFER == arg_type || DUK_TYPE_OBJECT == arg_type)
+		{
+			ptr = duk_buffer_to_string(ctx, 1);
+		}
+		else
+			ptr = duk_require_lstring(ctx, 1, &key_len);
+
+		if ('\0' == ptr[0])
+			return duk_error(ctx, DUK_RET_TYPE_ERROR, "private key cannot be empty");
+
+		key = zbx_strdup(NULL, ptr);
+	}
+
+	if (0 == text_len)
+	{
+		zbx_free(key);
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "data cannot be empty");
+	}
 
 	zbx_json_decodevalue_dyn(key, &key_unesc, &key_unesc_alloc, &jtype);
 	if (NULL != key_unesc)
 	{
+		zbx_free(key);
+		key = key_unesc;
+		key_len = strlen(key);
+	}
+	else if (NULL != strstr(key, "\\n"))
+	{
+		key_unesc = zbx_calloc(NULL, key_len + 1, sizeof(char));
+		unescape_newlines(key, &key_len, key_unesc);
 		zbx_free(key);
 		key = key_unesc;
 	}
@@ -308,7 +356,7 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "failed to parse private key");
 	}
 
-	if (SUCCEED == (ret = zbx_rs256_sign(key, text, &raw_sig, &raw_sig_len, &error)))
+	if (SUCCEED == (ret = zbx_rs256_sign(key, key_len, text, text_len, &raw_sig, &raw_sig_len, &error)))
 	{
 		size_t	hex_sig_len;
 
@@ -359,5 +407,5 @@ void	es_init_global_functions(zbx_es_t *es)
 	duk_put_global_string(es->env->ctx, "hmac");
 
 	duk_push_c_function(es->env->ctx, es_rsa_sign, 3);
-	duk_put_global_string(es->env->ctx, "signWithRSA");
+	duk_put_global_string(es->env->ctx, "sign");
 }
