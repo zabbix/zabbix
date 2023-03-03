@@ -1002,6 +1002,9 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_p
 		if (NULL != job_count && 0 < job_count->host_job_count.num_data)
 		{
 			zbx_dc_drule_queue(now, drule->druleid, drule->delay);
+			zbx_vector_ptr_clear_ext(&drule->dchecks, (zbx_clean_func_t)zbx_discovery_dcheck_free);
+			zbx_vector_ptr_destroy(&drule->dchecks);
+			zbx_discovery_drule_free(drule);
 			continue;
 		}
 
@@ -1293,6 +1296,17 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_net
 	zbx_vector_ptr_destroy(&services);
 }
 
+static void	discoverer_job_remove(zbx_discoverer_drule_job_t *job)
+{
+	int			i;
+	zbx_discoverer_drule_t	cmp = {.druleid = job->druleid};
+
+	if (FAIL != (i = zbx_vector_discoverer_drules_bsearch(&dmanager.drules, cmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		zbx_vector_discoverer_drules_remove(&dmanager.drules, i);
+
+	zbx_discoverer_job_net_check_destroy(job);
+}
+
 static void	*discoverer_net_check(void *net_check_worker)
 {
 	zbx_discoverer_worker_t		*worker = (zbx_discoverer_worker_t*)net_check_worker;
@@ -1320,7 +1334,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 			if (SUCCEED != zbx_list_pop(&job->tasks, (void*)&task))
 			{
 				if (0 == job->workers_used)
-					zbx_discoverer_job_net_check_destroy(job);
+					discoverer_job_remove(job);
 				else
 					job->status = DISCOVERER_JOB_STATUS_REMOVING;
 
@@ -1363,7 +1377,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 			}
 			else if (DISCOVERER_JOB_STATUS_REMOVING == job->status && 0 == job->workers_used)
 			{
-				zbx_discoverer_job_net_check_free(job);
+				discoverer_job_remove(job);
 			}
 
 			continue;
@@ -1647,8 +1661,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 				discoverer_queue_lock(&dmanager.queue);
 
-				zbx_vector_discoverer_drules_clear(&dmanager.drules);
-
 				for (i = 0; i < jobs.values_num; i++)
 				{
 					zbx_discoverer_drule_job_t	*job;
@@ -1660,6 +1672,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 					drule.job_ref = job;
 					zbx_vector_discoverer_drules_append(&dmanager.drules, drule);
 				}
+
+				zbx_vector_discoverer_drules_sort(&dmanager.drules, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 				discoverer_queue_notify_all(&dmanager.queue);
 				discoverer_queue_unlock(&dmanager.queue);
