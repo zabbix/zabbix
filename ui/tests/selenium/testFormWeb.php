@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -36,14 +37,76 @@ class testFormWeb extends CWebTest {
 	private static $templateid;
 	private static $template_name;
 	private static $template_scenarioid;
+	private static $delete_scenarioid;
+	private static $update_scenario = 'Scenario for Update';
 
 	const TEMPLATE_SCENARIO = 'Template_Web_scenario';
+	const DELETE_SCENARIO = 'Scenario for Delete';
+	const SQL = 'SELECT * FROM httptest h LEFT JOIN httptest_field hf ON hf.httptestid = h.httptestid ORDER BY h.httptestid, hf.httptest_fieldid';
+	const CLONE_SCENARIO = 'Scenario for Clone';
+
+	private static $all_fields = [
+		'scenario_fields' =>  [
+			'Name' => 'All fields specified',
+			'Application' => 'Заббикс',
+			'Update interval' => '6h',
+			'Attempts' => 7,
+			'Agent' => 'other ...',
+			'User agent string' => 'My super puper agent string 良い一日を',
+			'HTTP proxy' => '良い一日を',
+			'Enabled' => false
+		],
+		'auth_fields' => [
+			'HTTP authentication' => 'Basic',
+			'User' => '!@#$%^&*()_+=-良い一日を',
+			'Password' => '!@#$%^&*()_+=-良い一日を',
+			'SSL verify peer' => true,
+			'SSL verify host' => true,
+			'SSL certificate file' => '!@#$%^&*()_+=-良い一日を',
+			'SSL key file' => '!@#$%^&*()_+=-良い一日を',
+			'SSL key password' => '!@#$%^&*()_+=-良い一日を'
+		],
+		'variables' => [
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'name' => '{!@#$%^&*()_+=-良い一日を}',
+				'value' => '!@#$%^&*()_+=-良い一日を'
+			],
+			[
+				'name' => '{xyz}',
+				'value' => ''
+			]
+		],
+		'headers' => [
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'name' => 'OneTwoThree',
+				'value' => ''
+			],
+			[
+				'name' => '!@#$%^&*()_+=-良い一日を',
+				'value' => '!@#$%^&*()_+=-良い一日を'
+			]
+		]
+	];
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	public static function getContextData() {
 		self::$hostid = CDataHelper::get('WebScenarios.hostid');
 		self::$templateid = CDataHelper::get('WebScenarios.templateid');
 		self::$template_name = CDataHelper::get('WebScenarios.template_name');
 		self::$template_scenarioid = CDataHelper::get('WebScenarios.httptestids.'.self::TEMPLATE_SCENARIO);
+		self::$delete_scenarioid = CDataHelper::get('WebScenarios.httptestids.'.self::DELETE_SCENARIO);
 	}
 
 	// Returns layout data
@@ -118,7 +181,7 @@ class testFormWeb extends CWebTest {
 		}
 
 		$this->checkFieldAttributes($form, $scenario_fields);
-		$this->assertEquals(['Name', 'Update interval', 'Attempts'], $form->getRequiredLabels());
+		$this->assertEquals(['Name', 'Update interval', 'Attempts'], array_values($form->getRequiredLabels()));
 
 		$dropdowns = [
 			'Agent' => ['Microsoft Edge 80', 'Microsoft Edge 44', 'Internet Explorer 11', 'Internet Explorer 10',
@@ -268,258 +331,322 @@ class testFormWeb extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-//					'error_msg' => 'Page received incorrect data',
-					'error' => 'Incorrect value for field "Name": cannot be empty.'
+					'scenario_fields' =>  [
+						'Name' => ''
+					],
+					'error_title' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value for field "Name": cannot be empty.'
 				]
 			],
 			// Empty space in name
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => '   '
 					],
-					'error' => 'Incorrect value for field "Name": cannot be empty.'
+					'error_title' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value for field "Name": cannot be empty.'
 				]
 			],
 			// Missing steps
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Missing steps'
 					],
-					'missing_steps' => true,
-					'error' => 'Field "Steps" is mandatory.'
+					'no_steps' => true,
+					'error_title' => 'Page received incorrect data',
+					'error_details' => 'Field "Steps" is mandatory.'
 				]
 			],
-			// Netagite update interval
+			// Negative update interval
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
-						'Name' => 'Netagite update interval',
+					'scenario_fields' =>  [
+						'Name' => 'Negative update interval',
 						'Update interval' => '-1'
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
+					'error_details' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
 				]
 			],
 			// Zero update interval
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Zero update interval',
 						'Update interval' => 0
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
+					'error_details' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
 				]
 			],
 			// Too big update interval
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Too big update interval',
 						'Update interval' => 86401
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
+					'error_details' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
 				]
 			],
 			// Too big update interval with suffix
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Too big update interval with suffix',
 						'Update interval' => '1441h'
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
+					'error_details' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
 				]
 			],
 			// Negative number of retries.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Negative number of retries',
 						'Attempts' => '-1'
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Incorrect value "-1" for "Attempts" field: must be between 1 and 10.'
+					'error_title' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value "-1" for "Attempts" field: must be between 1 and 10.'
 				]
 			],
 			// Zero retries
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Zero retries',
 						'Attempts' => 0
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Incorrect value "0" for "Attempts" field: must be between 1 and 10.'
+					'error_title' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value "0" for "Attempts" field: must be between 1 and 10.'
 				]
 			],
 			// Too high number of retries
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Too high number of retries',
 						'Attempts' => 11
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Incorrect value "11" for "Attempts" field: must be between 1 and 10.'
+					'error_title' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value "11" for "Attempts" field: must be between 1 and 10.'
 				]
 			],
 			// Non-numeric number of retries
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Too high number of retries',
 						'Attempts' => 'aa'
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Incorrect value "0" for "Attempts" field: must be between 1 and 10.'
+					'error_title' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value "0" for "Attempts" field: must be between 1 and 10.'
 				]
 			],
 			// Variable without brackets
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Variable name without brackets'
 					],
 					'variables' => [
-						['name' => 'abc']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => 'abc',
+							'value' => ''
+						]
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+					'error_details' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
 			// Variable without opening bracket
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Variable name without opening bracket'
 					],
 					'variables' => [
-						['name' => 'abc}']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => 'abc}',
+							'value' => 'abc'
+						]
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+					'error_details' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
 			// Variable without closing bracket
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Variable name without closing bracket'
 					],
 					'variables' => [
-						['name' => '{abc']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '{abc',
+							'value' => ''
+						]
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+					'error_details' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
 			// Variable with misplaced brackets
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Variable with misplaced brackets'
 					],
 					'variables' => [
-						['name' => '{}abc']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '{}abc',
+							'value' => '!@#$%^&*()_+=-良い一日を'
+						]
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
+					'error_details' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
 			// Duplicate variable names
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Duplicate variable names'
 					],
 					'variables' => [
-						['name' => '{abc}', 'value' => '123'],
-						['name' => '{abc}', 'value' => '987']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '{abc}',
+							'value' => '123'
+						],
+						[
+							'name' => '{abc}',
+							'value' => '987'
+						]
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Invalid parameter "/1/variables/2": value (name)=({abc}) already exists.'
+					'error_details' => 'Invalid parameter "/1/variables/2": value (name)=({abc}) already exists.'
 				]
 			],
 			// Missing variable name
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Missing variable name'
 					],
 					'variables' => [
-						['name' => ' ', 'value' => '123'],
-						['name' => '{abc}', 'value' => '987']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => ' ',
+							'value' => '123'
+						],
+						[
+							'name' => '{abc}',
+							'value' => '987'
+						]
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Invalid parameter "/1/variables/1/name": cannot be empty.'
+					'error_details' => 'Invalid parameter "/1/variables/1/name": cannot be empty.'
 				]
 			],
 			// Headers - empty name
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Missing header name'
 					],
 					'headers' => [
-						['name' => ' ', 'value' => '123'],
-						['name' => 'abc', 'value' => '987']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '',
+							'value' => '123'
+						],
+						[
+							'name' => 'abc',
+							'value' => '987'
+						]
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Invalid parameter "/1/headers/1/name": cannot be empty.'
+					'error_details' => 'Invalid parameter "/1/headers/1/name": cannot be empty.'
 				]
 			],
 			// Duplicate web scenario name
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => self::TEMPLATE_SCENARIO
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Web scenario "'.self::TEMPLATE_SCENARIO.'" already exists.'
+					'error_details' => 'Web scenario "'.self::TEMPLATE_SCENARIO.'" already exists.'
 				]
 			],
 			// Both Application and New application fields are specified
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Application + New application',
 						'Application' => 'App 1',
-						'New application' => 'New app'
+						'id:new_application' => 'New app'
 					],
-					'error_title' => 'Cannot add web scenario',
-					'errors' => 'Cannot create new application, web scenario is already assigned to application.'
+					'error_details' => 'Cannot create new application, web scenario is already assigned to application.'
 				]
 			],
 			// Minimal config
 			[
 				[
 					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'scenario_fields' =>  [
 						'Name' => 'Min required configuration'
+					]
+				]
+			],
+			// Web scenario with basic auth with populated username and empty password.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'scenario_fields' =>  [
+						'Name' => 'No password'
+					],
+					'auth_fields' => [
+						'HTTP authentication' => 'Basic',
+						'User' => 'Passwordless_user',
+						'Password' => ''
+					]
+				]
+			],
+			// Web scenario with kerberos auth with empty username and populated password.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'scenario_fields' =>  [
+						'Name' => 'No username'
+					],
+					'auth_fields' => [
+						'HTTP authentication' => 'Kerberos',
+						'User' => '',
+						'Password' => 'Userless_password'
 					]
 				]
 			],
@@ -527,315 +654,389 @@ class testFormWeb extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'fields' =>  [
-						'Name' => 'All fields specified',
-						'Application' => 'Заббикс',
-						'Update interval' => '6h',
-						'Attempts' => 7,
-						'Agents' => 'other ...',
-						'User agent string' => 'My super puper agent string 良い一日を',
-						'HTTP proxy' => '良い一日を',
-						'Enabled' => false,
+					'scenario_fields' =>  self::$all_fields['scenario_fields'],
+					'auth_fields' => self::$all_fields['auth_fields'],
+					'variables' => self::$all_fields['variables'],
+					'headers' => self::$all_fields['headers']
+				]
+			],
+			// Maximal possible value length in input elements except for update interval.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'scenario_fields' =>  [
+						'Name' => STRING_64,
+						'Application' => '',
+						'id:new_application' => STRING_255,
+						'Update interval' => '999',
+						'Attempts' => 10,
+						'Agent' => 'other ...',
+						'User agent string' => STRING_255,
+						'HTTP proxy' => STRING_255
+					],
+					'auth_fields' => [
 						'HTTP authentication' => 'Basic',
-						'User' => '!@#$%^&*()_+=-良い一日を',
-						'Password' => '!@#$%^&*()_+=-良い一日を',
-						'SSL verify peer' => true,
-						'SSL verify host' => true,
-						'SSL certificate file' => '!@#$%^&*()_+=-良い一日を',
-						'SSL key file' => '!@#$%^&*()_+=-良い一日を',
-						'SSL key password' => '!@#$%^&*()_+=-良い一日を'
+						'User' => STRING_64,
+						'Password' => STRING_64,
+						'SSL certificate file' => STRING_255,
+						'SSL key file' => STRING_255,
+						'SSL key password' => STRING_64
 					],
 					'variables' => [
-						['name' => '{!@#$%^&*()_+=-良い一日を}', 'value' => '!@#$%^&*()_+=-良い一日を'],
-						['name' => '{abc}']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '{'.substr(STRING_255, 0, 253).'}',
+							'value' => STRING_2000
+						]
 					],
 					'headers' => [
-						['name' => 'OneTwoThree'],
-						['name' => '!@#$%^&*()_+=-良い一日を', 'value' => '!@#$%^&*()_+=-良い一日を']
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => STRING_255,
+							'value' => STRING_2000
+						]
 					]
 				]
 			],
-
-			// Password empty + add case for user empty
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'User empty',
-					'authentication' => 'Basic',
-					'http_password' => 'zabbix',
-					'add_step' => [
-						['step' => 'User empty']
-					]
-				]
-			],
-
-			// Max allowed length
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Username/password max allowed',
-					'authentication' => 'Basic',
-					'http_user' => 'wertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop1234',
-					'http_password' => 'wertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop1234',
-					'add_step' => [
-						['step' => 'Username/password max allowed']
-					]
-				]
-			],
-
-
-			// testing created items using triggers
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Trigger create web test',
-					'add_step' => [
-						['step' => 'Trigger create web test']
-					],
-					'createTriggers' => [
-						'web.test.in[Trigger create web test,,bps]',
-						'web.test.fail[Trigger create web test]',
-						'web.test.error[Trigger create web test]',
-						'web.test.in[Trigger create web test,Trigger create web test step,bps]',
-						'web.test.time[Trigger create web test,Trigger create web test step,resp]',
-						'web.test.rspcode[Trigger create web test,Trigger create web test step]'
-					]
-				]
-			],
-			// testing created items using triggers - multiple steps added
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Trigger create multiple steps web test',
-					'add_step' => [
-						['step' => 'Trigger create multiple steps web test1'],
-						['step' => 'Trigger create multiple steps web test2']
-					],
-					'createTriggers' => [
-						'web.test.in[Trigger create multiple steps web test,,bps]',
-						'web.test.fail[Trigger create multiple steps web test]',
-						'web.test.error[Trigger create multiple steps web test]',
-						'web.test.in[Trigger create multiple steps web test,Trigger create multiple steps web test1 step,bps]',
-						'web.test.time[Trigger create multiple steps web test,Trigger create multiple steps web test1 step,resp]',
-						'web.test.rspcode[Trigger create multiple steps web test,Trigger create multiple steps web test1 step]',
-						'web.test.in[Trigger create multiple steps web test,Trigger create multiple steps web test2 step,bps]',
-						'web.test.time[Trigger create multiple steps web test,Trigger create multiple steps web test2 step,resp]',
-						'web.test.rspcode[Trigger create multiple steps web test,Trigger create multiple steps web test2 step]'
-					]
-				]
-			],
-
 			// Trim trailing and leading spaces in fields
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => '   zabbix  123  ',
-					'add_step' => [
-						['step' => '   zabbix  123  ']
-					]
+					'scenario_fields' =>  [
+						'Name' => '   Trim this name   ',
+						'Application' => '',
+						'id:new_application' => '   New_app   ',
+						'Update interval' => '     1d    ',
+						'Attempts' => '9 ',
+						'Agent' => 'other ...',
+						'User agent string' => '    My super puper trimmed agent string 良い一日を    ',
+						'HTTP proxy' => '    Trimmed proxy     '
+					],
+					'auth_fields' => [
+						'HTTP authentication' => 'NTLM',
+						'User' => '   Trimmed user   ',
+						'Password' => '   NOT trimmed password   ',
+						'SSL certificate file' => '   Trimmed SSL cert filename   ',
+						'SSL key file' => '   Trimmed SSL key filename   ',
+						'SSL key password' => '   NOT trimmed SSL key password   '
+					],
+					'trim' => true
+					// TODO: uncomment these lines when ZBX-22433 will be merged.
+//					'variables' => [
+//						[
+//							'action' => USER_ACTION_UPDATE,
+//							'index' => 0,
+//							'name' => '{!@#$%^&*()_+=-良い一日を}',
+//							'value' => '!@#$%^&*()_+=-良い一日を'
+//						],
+//						[
+//							'action' => USER_ACTION_UPDATE,
+//							'index' => 0,
+//							'name' => '{abc}'
+//						]
+//					],
+//					'headers' => [
+//						[
+//							'action' => USER_ACTION_UPDATE,
+//							'index' => 0,
+//							'name' => 'OneTwoThree'
+//						],
+//						[
+//							'name' => '!@#$%^&*()_+=-良い一日を',
+//							'value' => '!@#$%^&*()_+=-良い一日を'
+//						]
+//					]
 				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider create
+	 * @dataProvider getWebScenarioData
 	 */
-	public function testFormWeb_SimpleCreate($data) {
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickLinkTextWait('Web scenarios');
+	public function testFormWeb_Create($data) {
+		$this->checkAction($data);
+	}
 
-		$this->zbxTestCheckTitle('Configuration of web monitoring');
+	/**
+	 * @dataProvider getWebScenarioData
+	 */
+	public function testFormWeb_Update($data) {
+		$this->checkAction($data, 'update');
+	}
 
-		$this->zbxTestContentControlButtonClickTextWait('Create web scenario');
-		$this->zbxTestCheckTitle('Configuration of web monitoring');
-		$this->zbxTestCheckHeader('Web monitoring');
+	public function testFormWeb_SimpleUpdate() {
+		$this->checkImpactlessAction('simple_update');
+	}
 
-		if (isset($data['agent'])) {
-			switch ($data['agent']) {
-				case 'other ...':
-					$this->zbxTestDropdownSelect('agent', $data['agent']);
-					$agent = $this->zbxTestGetValue("//input[@id='agent_other']");
-					break;
-				default:
-					$this->zbxTestDropdownSelect('agent', $data['agent']);
-					$agent = $this->zbxTestGetValue('//z-select[@id="agent"]');
-					break;
-			}
-		}
+	public function testFormWeb_CancelCreate() {
+		$this->checkImpactlessAction('cancel_create');
+	}
 
-		if (isset($data['name'])) {
-			$this->zbxTestInputTypeWait('name', $data['name']);
-		}
-		$name = $this->zbxTestGetValue("//input[@id='name']");
+	public function testFormWeb_CancelUpdate() {
+		$this->checkImpactlessAction('cancel_update');
+	}
 
-		if (isset($data['new_application'])) {
-			$this->zbxTestInputType('new_application', $data['new_application']);
-		}
-		$new_application = $this->zbxTestGetValue("//input[@id='new_application']");
+	public function testFormWeb_CancelDelete() {
+		$this->checkImpactlessAction('cancel_delete');
+	}
 
-		if (isset($data['delay']))	{
-			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
-		}
-		$delay = $this->zbxTestGetValue("//input[@id='delay']");
+	public function testFormWeb_Delete() {
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
+		$this->query('link', self::DELETE_SCENARIO)->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 
-		if (isset($data['retries'])) {
-			$this->zbxTestInputTypeOverwrite('retries', $data['retries']);
-		}
-		$retries = $this->zbxTestGetValue("//input[@id='retries']");
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->assertEquals('Delete web scenario?', $this->page->getAlertText());
+		$this->page->acceptAlert();
 
-		if (isset($data['http_proxy'])) {
-			$this->zbxTestInputType('http_proxy', $data['http_proxy']);
-		}
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Web scenario deleted');
 
-		if (isset($data['variables'])) {
-			$i = 1;
-			foreach($data['variables'] as $variable) {
-				if (isset($variable['name'])) {
-					$this->zbxTestInputTypeByXpath('//table[@data-type="variables"]//tr[@data-index="'.$i.'"]//input[@data-type="name"]', $variable['name']);
-				}
-				if (isset($variable['value'])) {
-					$this->zbxTestInputTypeByXpath('//table[@data-type="variables"]//tr[@data-index="'.$i.'"]//input[@data-type="value"]', $variable['value']);
-				}
-				$this->zbxTestClickXpath('//table[@data-type="variables"]//button[contains(@class, "element-table-add")]');
-				$i++;
-			}
-		}
-
-		if (isset($data['headers'])) {
-			$i = 1;
-			foreach($data['headers'] as $header) {
-				if (isset($header['name'])) {
-					$this->zbxTestInputTypeByXpath('//table[@data-type="headers"]//tr[@data-index="'.$i.'"]//input[@data-type="name"]', $header['name']);
-				}
-				if (isset($header['value'])) {
-					$this->zbxTestInputTypeByXpath('//table[@data-type="headers"]//tr[@data-index="'.$i.'"]//input[@data-type="value"]', $header['value']);
-				}
-				$this->zbxTestClickXpath('//table[@data-type="headers"]//button[contains(@class, "element-table-add")]');
-				$i++;
-			}
-		}
-
-		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
-		if (isset($data['authentication'])) {
-			$this->zbxTestDropdownSelectWait('authentication', $data['authentication']);
-		}
-		$authentication = $this->zbxTestGetSelectedLabel('authentication');
-
-		if (isset($data['http_user'])) {
-			$this->zbxTestInputTypeWait('http_user', $data['http_user']);
-		}
-
-		if (isset($data['http_password'])) {
-			$this->zbxTestInputType('http_password', $data['http_password']);
-		}
-
-		$check = false;
-		if (isset($data['add_step'])) {
-			$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
-			foreach($data['add_step'] as $item) {
-				$this->zbxTestClickXpathWait('//td[@colspan="8"]/button[contains(@class, "element-table-add")]');
-				$this->zbxTestLaunchOverlayDialog('Step of web scenario');
-				$step = $item['step'].' step';
-				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="step_name"]', $step, false);
-				$url = $step.' url';
-				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $url);
-				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
-				$this->zbxTestWaitForPageToLoad();
-				COverlayDialogElement::ensureNotPresent();
-
-				if (isset($item['remove'])) {
-					$this->zbxTestClickXpathWait('//table[contains(@class, "httpconf-steps-dynamic-row")]//button[contains(@class,"element-table-remove")]');
-				}
-			}
-		}
-
-		$this->zbxTestClickWait('add');
-		$expected = $data['expected'];
-
-		switch ($expected) {
-			case TEST_GOOD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added');
-				$this->zbxTestCheckTitle('Configuration of web monitoring');
-				$this->zbxTestTextPresent(['Number of steps', 'Interval', 'Status']);
-				break;
-
-			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
-				$this->zbxTestCheckTitle('Configuration of web monitoring');
-				foreach ($data['errors'] as $msg) {
-					$this->zbxTestTextPresent($msg);
-				}
-				$this->zbxTestTextNotPresent('Web scenario added');
-				break;
-		}
-
-		if (isset($data['dbCheck'])) {
-			$result = DBselect("SELECT * FROM httptest test LEFT JOIN httpstep step ON ".
-				"step.httptestid = test.httptestid ".
-				"WHERE test.name = '".$name."' AND step.name = '".$step."'");
-			while ($row = DBfetch($result)) {
-				$this->assertEquals($row['agent'], $agent);
-				$this->assertEquals($row['url'], $url);
-				$this->assertEquals($row['delay'], $delay);
-				$this->assertEquals($row['hostid'], $this->hostid);
-				$this->assertEquals($row['retries'], $retries);
-				$httptestid = $row['httptestid'];
-			}
-		}
-
-		if (isset($data['formCheck'])) {
-			if (isset ($data['dbName'])) {
-				$dbName = $data['dbName'];
-			}
-			else {
-				$dbName = $name;
-			}
-			$this->zbxTestClickLinkTextWait($dbName);
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
-			$this->zbxTestAssertElementValue('name', $name);
-			$this->zbxTestDropdownAssertSelected('agent', $data['agent']);
-			if (isset($data['add_step'])) {
-				$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
-				foreach($data['add_step'] as $item) {
-					$step = $item['step']." step";
-					$this->zbxTestTextPresent($step);
-				}
-			}
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Web scenarios');
-			$this->zbxTestCheckHeader('Web monitoring');
-			$this->zbxTestTextPresent($name);
-		}
-
-		if (isset($data['createTriggers'])) {
-			$this->zbxTestClickLinkTextWait('Triggers');
-
-			foreach ($data['createTriggers'] as $trigger) {
-				$this->zbxTestContentControlButtonClickTextWait('Create trigger');
-
-				$this->zbxTestInputType('description', $trigger);
-				$expressionTrigger = '{'.$this->host.':'.$trigger.'.last(0)}=0';
-				$this->zbxTestInputTypeWait('expression', $expressionTrigger);
-				$this->zbxTestClickWait('add');
-
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger added');
-				$this->zbxTestCheckTitle('Configuration of triggers');
-				$this->zbxTestCheckHeader('Triggers');
-			}
-		}
-
-		if (isset($data['remove'])) {
-			$this->zbxTestCheckboxSelect("group_httptestid_$httptestid");
-			$this->zbxTestClickButton('httptest.massdelete');
-
-			$this->zbxTestAcceptAlert();
-
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario deleted');
-			$this->assertEquals(0, CDBHelper::getCount("SELECT * FROM httptest test LEFT JOIN httpstep step ON ".
-				"step.httptestid = test.httptestid ".
-				"WHERE test.name = '".$name."' AND step.name = '".$step."'"));
+		foreach (['httptest', 'httptest_field', 'httptestitem', 'httpstep'] as $table) {
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM '.$table.' WHERE httptestid='.self::$delete_scenarioid));
 		}
 	}
+
+	public function testFormWeb_Clone() {
+		$clone_name = 'Clone of '.self::CLONE_SCENARIO;
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
+		$this->query('link', self::CLONE_SCENARIO)->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+
+		$form = $this->query('id:httpForm')->asForm()->one();
+
+		$fields = $form->getFields()->asValues();
+		// Due to the "New application" field structure it cannot be checked via checkValue, but it's empty, so there is no need.
+		unset($fields['New application']);
+
+		foreach (['variables', 'headers'] as $field_name) {
+			// TODO: Replace the below workaround with the below commented line when ZBX-22433 is merged.
+//			$table_fields[$field_name] = $form->getField($field_name)->asMultifieldTable()->getValue();
+			$field = $form->getField(ucfirst($field_name));
+
+			$table_fields[$field_name]['name'] = $field->query("xpath:(//table[@data-type=".
+					CXPathHelper::escapeQuotes($field_name)."]//input)[1]")->one()->getValue();
+			$table_fields[$field_name]['value'] = $field->query("xpath:(//table[@data-type=".
+					CXPathHelper::escapeQuotes($field_name)."]//input)[2]")->one()->getValue();
+		}
+
+		$form->query('button:Clone')->one()->click();
+		$form->invalidate();
+		$form->getField('Name')->fill('Clone of '.self::CLONE_SCENARIO);
+		$form->submit();
+
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Web scenario added');
+
+		$this->query('link', $clone_name)->one()->click();
+		$this->page->waitUntilReady();
+		$form->invalidate();
+
+		$fields['Name'] = $clone_name;
+		$form->checkValue($fields);
+
+		foreach (['variables', 'headers'] as $field_name) {
+			// TODO: Replace the below workaround with the below commented line when ZBX-22433 is merged.
+//			$this->assertEquals($table_fields[$field_name], $form->getField($field_name)->asMultifieldTable()->getValue());
+			$field = $form->getField(ucfirst($field_name));
+
+			$this->assertEquals($table_fields[$field_name]['name'], $field->query("xpath:(//table[@data-type=".
+					CXPathHelper::escapeQuotes($field_name)."]//input)[1]")->one()->getValue()
+			);
+			$this->assertEquals($table_fields[$field_name]['value'], $field->query("xpath:(//table[@data-type=".
+					CXPathHelper::escapeQuotes($field_name)."]//input)[2]")->one()->getValue()
+			);
+		}
+	}
+
+	private function checkImpactlessAction($action) {
+		$old_hash = CDBHelper::getHash(self::SQL);
+
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
+
+		switch ($action) {
+			case 'simple_update':
+				$this->query('link:'.self::CLONE_SCENARIO)->waitUntilClickable()->one()->click();
+				$this->query('id:httpForm')->asForm()->one()->submit();
+				$this->page->waitUntilReady();
+				$this->assertMessage(TEST_GOOD, 'Web scenario updated');
+
+				break;
+
+			case 'cancel_create':
+			case 'cancel_update':
+				$button = ($action === 'cancel_create') ? 'button:Create web scenario' : 'link:'.self::CLONE_SCENARIO;
+				$this->query('link:'.self::CLONE_SCENARIO)->waitUntilClickable()->one()->click();
+				$this->page->waitUntilReady();
+
+				$form = $this->query('id:httpForm')->asForm()->one();
+				$this->fillScenarioForm(self::$all_fields, $form);
+				$form->query('button:Cancel')->one()->click();
+				$this->page->waitUntilReady();
+				break;
+
+			case 'cancel_delete':
+				$this->query('link', self::DELETE_SCENARIO)->waitUntilClickable()->one()->click();
+				$this->page->waitUntilReady();
+
+				$this->query('button:Delete')->waitUntilClickable()->one()->click();
+				$this->page->dismissAlert();
+				$this->query('button:Cancel')->one()->click();
+				$this->page->waitUntilReady();
+				break;
+		}
+
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+	}
+
+	private function checkAction($data, $action = 'create') {
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		if ($expected === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::SQL);
+		}
+
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
+
+		$selector = ($action === 'create') ? 'button:Create web scenario' : 'link:'.self::$update_scenario;
+		$this->query($selector)->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$form = $this->query('id:httpForm')->asForm()->one();
+
+		if ($action === 'update' && !in_array($data['scenario_fields']['Name'], ['', '   ', self::TEMPLATE_SCENARIO])) {
+			$data['scenario_fields']['Name'] = ($data['scenario_fields']['Name'] === STRING_64)
+				? $data['scenario_fields']['Name'] = substr(STRING_64, 0, 57).' update'
+				: $data['scenario_fields']['Name'].((array_key_exists('trim', $data)) ? ' update   ' : ' update');
+		}
+
+		$this->fillScenarioForm($data, $form, $action);
+		$form->submit();
+
+		if ($expected === TEST_BAD) {
+			// In case if something goes wrong and the scenario gets updated, then it shouldnt impact following update cases.
+			if ($action === 'update' && CMessageElement::find()->one()->isGood()) {
+				self::$update_scenario = $data['scenario_fields']['Name'];
+			}
+
+			$message_title = CTestArrayHelper::get($data, 'error_title', ($action === 'create')
+					? 'Cannot add web scenario'
+					: 'Cannot update web scenario'
+			);
+			$this->assertMessage(TEST_BAD, $message_title, $data['error_details']);
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+		}
+		else {
+			$message_title = ($action === 'create') ? 'Web scenario added' : 'Web scenario updated';
+			$this->assertMessage(TEST_GOOD, $message_title);
+
+			if ($action === 'update') {
+				self::$update_scenario = $data['scenario_fields']['Name'];
+			}
+
+			// TODO: add logic to trim headers an variables after ZBX-22433 is merged.
+			if (array_key_exists('trim', $data)) {
+				$skip_fields = ['Password', 'SSL key password'];
+
+				foreach (['scenario_fields', 'auth_fields'] as $tab_fields) {
+					$original_fields = $data[$tab_fields];
+					$data[$tab_fields] = array_map('trim', $data[$tab_fields]);
+
+					// Return the original values to the fields that shouldn't be trimmed.
+					foreach ($skip_fields as $skip_field) {
+						if (array_key_exists($skip_field, $data[$tab_fields])) {
+							$data[$tab_fields][$skip_field] = $original_fields[$skip_field];
+						}
+					}
+				}
+			}
+
+			// Open web scenario - in web scenario list multiple consequent spaces are displayed as a single space.
+			$link = (array_key_exists('trim', $data))
+				? preg_replace('!\s+!', ' ', $data['scenario_fields']['Name'])
+				: $data['scenario_fields']['Name'];
+
+			$this->query('link', $link)->waitUntilCLickable()->one()->click();
+			$this->page->waitUntilReady();
+
+			$form->invalidate();
+
+			if (array_key_exists('id:new_application', $data['scenario_fields'])) {
+				$data['scenario_fields']['Application'] = $data['scenario_fields']['id:new_application'];
+
+				unset($data['scenario_fields']['id:new_application']);
+			}
+
+			$form->checkValue($data['scenario_fields']);
+
+			foreach (['variables', 'headers'] as $field_name) {
+				if (array_key_exists($field_name, $data)) {
+					// TODO: Replace the below workaround with a check via $table->checkValue() when ZBX-22433 is merged.
+					$field = $form->getField(ucfirst($field_name));
+
+					$i = 1;
+					foreach ($data[$field_name] as $field_pair) {
+						$this->assertEquals($field_pair['name'], $field->query("xpath:(//table[@data-type=".
+								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//input)[1]")->one()->getValue());
+						$this->assertEquals($field_pair['value'], $field->query("xpath:(//table[@data-type=".
+								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//input)[2]")->one()->getValue());
+						$i++;
+					}
+				}
+			}
+
+			if (array_key_exists('auth_fields', $data)) {
+				$form->selectTab('Authentication');
+				$form->checkValue($data['auth_fields']);
+			}
+		}
+	}
+
+	private function fillScenarioForm($data, $form, $action = 'update') {
+		$form->fill($data['scenario_fields']);
+
+		foreach (['variables', 'headers'] as $field_name) {
+			if (array_key_exists($field_name, $data)) {
+				// TODO: Replace the below workaround with the commented line when ZBX-22433 is merged.
+//				$form->getField(ucfirst($field_name))->asMultifieldTable()->fill($data[$field_name]);
+				$field = $form->getField(ucfirst($field_name));
+
+				if (count($data[$field_name]) > 1) {
+					$field->query('button:Add')->one()->click();
+				}
+
+				$i = 1;
+				foreach ($data[$field_name] as $field_pair) {
+					$field->query("xpath:(//table[@data-type=".CXPathHelper::escapeQuotes($field_name)."]//tr[".
+							$i."]//input)[1]")->one()->fill($field_pair['name']);
+					$field->query("xpath:(//table[@data-type=".CXPathHelper::escapeQuotes($field_name)."]//tr[".
+							$i."]//input)[2]")->one()->fill($field_pair['value']);
+					$i++;
+				}
+			}
+		}
+
+		if (!CTestArrayHelper::get($data, 'no_steps') && $action === 'create') {
+			$form->selectTab('Steps');
+			$form->getField('Steps')->query('button:Add')->waitUntilClickable()->one()->click();
+
+			$step_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$step_form = $step_dialog->asForm();
+			$step_form->fill(['Name' => 'Step1', 'id:url' => 'https://zabbix.com']);
+			$step_form->submit();
+			$step_dialog->ensureNotPresent();
+		}
+		elseif (CTestArrayHelper::get($data, 'no_steps') && $action === 'update') {
+			$form->selectTab('Steps');
+			$form->getField('Steps')->query('button:Remove')->waitUntilClickable()->one()->click();
+		}
+
+		if (array_key_exists('auth_fields', $data)) {
+			$form->selectTab('Authentication');
+			$form->fill($data['auth_fields']);
+		}
+	}
+
+	// Check items can be used in Triggers.
 }

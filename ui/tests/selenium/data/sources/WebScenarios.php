@@ -78,7 +78,7 @@ class WebScenarios {
 
 		CDataHelper::call('httptest.create', [
 			[
-				'name' => 'Scenario for update',
+				'name' => 'Scenario for Update',
 				'hostid' => $hostid,
 				'agent' => 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
 				'steps' => [
@@ -126,19 +126,11 @@ class WebScenarios {
 				'verify_peer' => 1,
 				'headers' => [
 					[
-						'name' => 'header1',
-						'value' => 'value1'
-					],
-					[
 						'name' => '!@#$%^&*()_-=+',
 						'value' => '+=_-)(*&^%$#@'
 					]
 				],
 				'variables' => [
-					[
-						'name' => '{variable1}',
-						'value' => 'value1'
-					],
 					[
 						'name' => '{!@#$%^&*()_-=+}',
 						'value' => '+=_-)(*&^%$#@'
@@ -181,12 +173,12 @@ class WebScenarios {
 						'timeout' => '2m',
 						'variables' => [
 							[
-								'name' => '{step_variable1}',
-								'value' => 'step_value1'
-							],
-							[
 								'name' => '{step_!@#$%^&*()_-=+}',
 								'value' => '+=_-)(*&^%$#@_pets'
+							],
+							[
+								'name' => '{step_variable1}',
+								'value' => 'step_value1'
 							]
 						],
 						'query_fields' => [
