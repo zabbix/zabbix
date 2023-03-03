@@ -580,7 +580,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	}
 
 	zbx_snprintf(filename, sizeof(filename), "%s/%s_%li.pinger", config_icmpping->get_tmpdir(), progname,
-			zbx_get_thread_id());
+			(long int)gettid());
 
 #ifdef HAVE_IPV6
 	if (NULL != config_icmpping->get_source_ip())
