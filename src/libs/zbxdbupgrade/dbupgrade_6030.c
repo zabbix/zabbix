@@ -1795,6 +1795,13 @@ static int	DBpatch_6030193(void)
 	return DBcreate_index("scripts", "scripts_3", "name,menu_path", 1);
 }
 
+static int	DBpatch_6030194(void)
+{
+	const ZBX_FIELD	field = {"allow_redirect", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -1981,5 +1988,6 @@ DBPATCH_ADD(6030190, 0, 1)
 DBPATCH_ADD(6030191, 0, 1)
 DBPATCH_ADD(6030192, 0, 1)
 DBPATCH_ADD(6030193, 0, 1)
+DBPATCH_ADD(6030194, 0, 1)
 
 DBPATCH_END()
