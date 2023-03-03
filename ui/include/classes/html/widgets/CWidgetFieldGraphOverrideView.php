@@ -371,6 +371,6 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 				)
 		]))
 			->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM)
-			->addClass($this->field->templateid !== null ? 'template-dashboard' : null);
+			->addClass($this->field->templateid === null ? null : 'with-hosts-multiselect');
 	}
 }

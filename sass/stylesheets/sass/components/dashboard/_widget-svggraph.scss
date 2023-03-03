@@ -164,9 +164,9 @@ form.dashboard-widget-svggraph {
 			}
 		}
 
-		&.template-dashboard {
+		&.with-hosts-multiselect {
 			.multiselect-control {
-				grid-column: span 2
+				grid-column: span 2;
 			}
 		}
 	}
@@ -223,9 +223,9 @@ form.dashboard-widget-svggraph {
 			vertical-align: baseline;
 		}
 
-		&.template-dashboard {
+		&.with-hosts-multiselect {
 			.multiselect-control {
-				grid-column: span 2
+				grid-column: span 2;
 			}
 		}
 	}
