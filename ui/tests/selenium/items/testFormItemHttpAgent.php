@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -905,7 +905,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => 'Content-Type', 'value' => 'application/xml']
 					],
 					'request_type' => 'JSON data',
-					'check_form' => true
+					'check_form' => true,
+					'screenshot' => true
 				]
 			],
 			// Empty Basic authentication user/password
@@ -1000,6 +1001,13 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 		if (array_key_exists('headers', $data)) {
 			$this->processPairFields($data['headers'], 'headers');
+		}
+
+		// Take a screenshot to test draggable object position of query and headers fields.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('id:query_fields_pairs')->one(), 'Query fields');
+			$this->assertScreenshot($this->query('id:headers_pairs')->one(), 'Headers fields');
 		}
 
 		// Check query fields after url parse.
