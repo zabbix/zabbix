@@ -2596,7 +2596,7 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 	zbx_shutdown_snmp();
 
 	if (0 != snmp_rwlock_init_done)
-		zbx_init_snmp();
+		zbx_mt_init_snmp();
 
 	SNMP_MT_UNLOCK;
 }

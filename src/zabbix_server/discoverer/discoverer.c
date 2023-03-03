@@ -1152,21 +1152,17 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_net_check_t
 	}
 
 	if (0 == worker_max)
-	{
-		if (SUCCEED != zbx_ping(hosts.values, hosts.values_num, 3, 0, 0, 0, 1, error, sizeof(error)))
-			goto err;
-	}
-	else
-	{
-		for (i = 0; i < hosts.values_num; i += worker_max)
-		{
-			int	c = hosts.values_num - i;
+		worker_max = hosts.values_num;
 
-			if (SUCCEED != zbx_ping(&hosts.values[i], c > worker_max ? worker_max : c,
-					3, 0, 0, 0, 1, error, sizeof(error)))
-			{
-				goto err;
-			}
+	for (i = 0; i < hosts.values_num; i += worker_max)
+	{
+		if (hosts.values_num - i < worker_max)
+			worker_max = hosts.values_num - i;
+
+		if (SUCCEED != zbx_ping(&hosts.values[i], worker_max, 3, 0, 0, 0, 1, error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() %d icmp checks failed with error:%s", __func__,
+					worker_max, error);
 		}
 	}
 
@@ -1196,7 +1192,7 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_net_check_t
 			((zbx_dservice_t*)result->services.values[0])->status = DOBJECT_STATUS_UP;
 		}
 	}
-err:
+
 	zbx_vector_fping_host_clear(&hosts);
 	zbx_vector_fping_host_destroy(&hosts);
 }
