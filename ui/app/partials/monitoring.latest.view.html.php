@@ -118,21 +118,18 @@ foreach ($data['items'] as $itemid => $item) {
 
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
-	$popup_parameters = CMenuPopupHelper::getItem([
-		'itemid' => $itemid,
-		'context' => 'host',
-		'backurl' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'latest.view')
-			->setArgument('context','host')
-			->getUrl()
-	]);
-
-	if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-		$popup_parameters['data']['binary_data'] = 1;
-	}
-
 	$item_name = (new CDiv([
-		(new CLinkAction($item['name']))->setMenuPopup($popup_parameters),
+		(new CLinkAction($item['name']))
+			->setMenuPopup(
+				CMenuPopupHelper::getItem([
+					'itemid' => $itemid,
+					'context' => 'host',
+					'backurl' => (new CUrl('zabbix.php'))
+						->setArgument('action', 'latest.view')
+						->setArgument('context','host')
+						->getUrl()
+				])
+			),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
 	]))->addClass(ZBX_STYLE_ACTION_CONTAINER);
 

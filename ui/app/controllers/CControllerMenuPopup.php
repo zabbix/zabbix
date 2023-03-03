@@ -61,16 +61,14 @@ class CControllerMenuPopup extends CController {
 			case 'item':
 				$rules = [
 					'itemid' => 'required|db items.itemid',
-					'backurl' => 'required|string',
-					'binary_data' => 'in 1'
+					'backurl' => 'required|string'
 				];
 				break;
 
 			case 'item_prototype':
 				$rules = [
 					'itemid' => 'required|db items.itemid',
-					'backurl' => 'required|string',
-					'binary_data' => 'in 1'
+					'backurl' => 'required|string'
 				];
 				break;
 
@@ -314,15 +312,13 @@ class CControllerMenuPopup extends CController {
 		$db_items = API::Item()->get([
 			'output' => ['hostid', 'key_', 'name', 'flags', 'type', 'value_type', 'history', 'trends'],
 			'selectHosts' => ['host'],
-			'selectTriggers' => !array_key_exists('triggers', $data) || $data['triggers'] !=0
-				? ['triggerid', 'description']
-				: null,
+			'selectTriggers' => ['triggerid', 'description'],
 			'itemids' => $data['itemid'],
 			'webitems' => true
 		]);
 
 		if ($db_items) {
-			$db_item = $db_items[0] + ['triggers' => []];
+			$db_item = $db_items[0];
 			$is_writable = false;
 			$is_executable = false;
 
@@ -343,7 +339,7 @@ class CControllerMenuPopup extends CController {
 				$is_executable = $is_writable ? true : CWebUser::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW);
 			}
 
-			$result = [
+			return [
 				'type' => 'item',
 				'backurl' => $data['backurl'],
 				'itemid' => $data['itemid'],
@@ -361,14 +357,9 @@ class CControllerMenuPopup extends CController {
 				'isExecutable' => $is_executable,
 				'isWriteable' => $is_writable,
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
-				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+				'binary_data' => $db_item['value_type'] == ITEM_VALUE_TYPE_BINARY
 			];
-
-			if (array_key_exists('binary_data', $data)) {
-				$result['binary_data'] = true;
-			}
-
-			return $result;
 		}
 
 		error(_('No permissions to referred object or it does not exist!'));

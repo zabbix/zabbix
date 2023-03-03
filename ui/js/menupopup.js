@@ -1024,8 +1024,6 @@ function getMenuPopupItem(options) {
 	});
 
 	if (options.allowed_ui_conf_hosts) {
-		options.binary_data = options.binary_data || false;
-
 		const config_urls = [];
 		const config_triggers = {
 			label: t('Triggers'),

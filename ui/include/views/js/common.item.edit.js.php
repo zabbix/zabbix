@@ -186,7 +186,9 @@
 
 				setAuthTypeLabel();
 
-				item_type_lookup.update();
+				if (item_type_lookup.form !== null) {
+					item_type_lookup.update();
+				}
 			})
 			.trigger('change');
 
