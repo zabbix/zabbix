@@ -2594,6 +2594,7 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 	zbx_shutdown_snmp();
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 0);
 
 	if (0 != snmp_rwlock_init_done)
 		zbx_mt_init_snmp();
