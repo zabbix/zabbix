@@ -815,6 +815,4 @@ static type	get_##varname(void) \
 	return varname; \
 }
 
-
-
 #endif

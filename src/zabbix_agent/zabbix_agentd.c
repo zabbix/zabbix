@@ -44,24 +44,6 @@ DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_enable_remote_commands, 1)
 DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_log_remote_commands, 0)
 DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_unsafe_user_parameters, 0)
 
-//static int	get_config_enable_remote_commands(void)
-//{
-//	return config_enable_remote_commands;
-//}
-//static int	config_enable_remote_commands = 1;
-//
-//static int	get_config_log_remote_commands(void)
-//{
-//	return config_log_remote_commands;
-//}
-//static int	config_log_remote_commands = 0;
-//
-//static int	get_config_unsafe_user_parameters(void)
-//{
-//	return config_unsafe_user_parameters;
-//}
-//static int	config_unsafe_user_parameters = 0;
-
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 5;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -270,14 +252,7 @@ static const char	*get_progname(void)
 }
 #endif
 
-
 DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_timeout, 3)
-
-//static int	config_timeout = 3;
-//static int	get_config_timeout(void)
-//{
-//	return config_timeout;
-//}
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
 

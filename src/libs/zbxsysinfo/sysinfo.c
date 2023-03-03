@@ -1109,8 +1109,11 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int zbx_
 			{
 				tmp = get_rparam(request, num - 1);
 
-				if (SUCCEED != (ret = zbx_check_user_parameter(tmp, zbx_config_user_parameters, error, max_error_len)))
+				if (SUCCEED != (ret = zbx_check_user_parameter(tmp, zbx_config_user_parameters, error,
+						max_error_len)))
+				{
 					break;
+				}
 
 				zbx_strcpy_alloc(out, &out_alloc, &out_offset, tmp);
 			}

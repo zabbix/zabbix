@@ -255,11 +255,6 @@ static int	get_config_forks(unsigned char process_type)
 	return 0;
 }
 
-//static int	config_timeout = 3;
-//static int	get_config_timeout(void)
-//{
-//	return config_timeout;
-//}
 DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_timeout, 3)
 
 static int	zbx_config_startup_time	= 0;
@@ -299,9 +294,6 @@ int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 
-//static int	zbx_config_enable_remote_commands = 0;
-//static int	zbx_config_log_remote_commands = 0;
-//static int	zbx_config_unsafe_user_parameters = 0;
 DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_enable_remote_commands, 0)
 DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_log_remote_commands, 0)
 DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_unsafe_user_parameters, 0)
@@ -621,7 +613,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 			err = 1;
 		}
 	}
-	else if (ZBX_PROXYMODE_PASSIVE == zbx_config_proxymode && FAIL == zbx_validate_peer_list(CONFIG_SERVER, &ch_error))
+	else if (ZBX_PROXYMODE_PASSIVE == zbx_config_proxymode && FAIL == zbx_validate_peer_list(CONFIG_SERVER,
+			&ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"Server\" configuration parameter: %s", ch_error);
 		zbx_free(ch_error);
