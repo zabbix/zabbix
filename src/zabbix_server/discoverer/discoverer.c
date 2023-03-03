@@ -1124,7 +1124,7 @@ ZBX_PTR_VECTOR_DECL(fping_host, ZBX_FPING_HOST)
 ZBX_PTR_VECTOR_IMPL(fping_host, ZBX_FPING_HOST)
 
 static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_net_check_task_t *task,
-		const DC_DCHECK *dcheck, zbx_vector_ptr_t *results)
+		const DC_DCHECK *dcheck, zbx_vector_ptr_t *results, int worker_max)
 {
 	zbx_vector_fping_host_t	hosts;
 	char			error[ZBX_ITEM_ERROR_LEN_MAX];
@@ -1151,8 +1151,24 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_net_check_t
 		zbx_vector_ptr_append(results, result);
 	}
 
-	if (SUCCEED != zbx_ping(hosts.values, hosts.values_num, 3, 0, 0, 0, 1, error, sizeof(error)))
-		goto err;
+	if (0 == worker_max)
+	{
+		if (SUCCEED != zbx_ping(hosts.values, hosts.values_num, 3, 0, 0, 0, 1, error, sizeof(error)))
+			goto err;
+	}
+	else
+	{
+		for (i = 0; i < hosts.values_num; i += worker_max)
+		{
+			int	c = hosts.values_num - i;
+
+			if (SUCCEED != zbx_ping(&hosts.values[i], c > worker_max ? worker_max : c,
+					3, 0, 0, 0, 1, error, sizeof(error)))
+			{
+				goto err;
+			}
+		}
+	}
 
 	zbx_vector_ptr_sort(results, discoverer_results_compare);
 
@@ -1218,7 +1234,7 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_ptr_t *vr_s
 	}
 }
 
-static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_net_check_task_t *task)
+static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_net_check_task_t *task, int worker_max)
 {
 	DC_DCHECK		*dcheck;
 	zbx_vector_ptr_t	results;
@@ -1229,7 +1245,7 @@ static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_net_c
 	dcheck = (DC_DCHECK*)task->dchecks.values[0];
 
 	zbx_vector_ptr_create(&results);
-	discover_icmp(druleid, task, dcheck, &results);
+	discover_icmp(druleid, task, dcheck, &results, worker_max);
 
 	pthread_rwlock_wrlock(&dmanager.results_rwlock);
 	discover_results_merge(&dmanager.results, &results);
@@ -1327,7 +1343,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 
 		if (NULL != (job = discoverer_queue_pop(queue)))
 		{
-			int				config_timeout;
+			int				config_timeout, worker_max;
 			zbx_uint64_t			druleid;
 			zbx_discoverer_net_check_task_t	*task;
 
@@ -1353,6 +1369,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 
 			config_timeout = job->config_timeout;
 			druleid = job->druleid;
+			worker_max = job->workers_max;
 
 			discoverer_queue_unlock(queue);
 
@@ -1361,7 +1378,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 			if (NULL == task->ips)
 				discoverer_net_check_common(druleid, task, config_timeout);
 			else
-				discoverer_net_check_icmp(druleid, task);
+				discoverer_net_check_icmp(druleid, task, worker_max);
 
 			zbx_discoverer_job_net_check_task_free(task);
 
