@@ -118,6 +118,18 @@ typedef void*	zbx_snmp_sess_t;
 
 static ZBX_THREAD_LOCAL zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
 static char				zbx_snmp_init_done;
+pthread_rwlock_t			snmp_exec_rwlock;
+static char				snmp_rwlock_init_done;
+
+#define	SNMP_MT_EXECLOCK					\
+	if (0 != snmp_rwlock_init_done)				\
+		pthread_rwlock_rdlock(&snmp_exec_rwlock)
+#define	SNMP_MT_INITLOCK					\
+	if (0 != snmp_rwlock_init_done)				\
+		pthread_rwlock_wrlock(&snmp_exec_rwlock)
+#define	SNMP_MT_UNLOCK						\
+	if (0 != snmp_rwlock_init_done)				\
+		pthread_rwlock_unlock(&snmp_exec_rwlock)
 
 static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
 {
@@ -2460,6 +2472,16 @@ void	zbx_mt_init_snmp(void)
 {
 	zbx_init_snmp();
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
+
+	if (0 == snmp_rwlock_init_done)
+	{
+		int	err;
+
+		if (0 != (err = pthread_rwlock_init(&snmp_exec_rwlock, NULL)))
+			zabbix_log(LOG_LEVEL_WARNING, "cannot initialize snmp execute mutex: %s", zbx_strerror(err));
+		else
+			snmp_rwlock_init_done = 1;
+	}
 }
 
 void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type,
@@ -2483,6 +2505,8 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 
 	if (j == num)	/* all items already NOTSUPPORTED (with invalid key, port or SNMP parameters) */
 		goto out;
+
+	SNMP_MT_EXECLOCK;
 
 	if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout)))
 	{
@@ -2536,6 +2560,8 @@ exit:
 		DCconfig_update_interface_snmp_stats(items[j].interface.interfaceid, max_succeed, min_fail);
 	}
 out:
+	SNMP_MT_UNLOCK;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -2558,16 +2584,21 @@ static void	zbx_shutdown_snmp(void)
 
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 {
-	int	state = netsnmp_ds_get_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE);
+	zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d]",
+			get_process_type_string(process_type), process_num);
 
-	zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d]", get_process_type_string(process_type),
-			process_num);
-
-	if (0 == zbx_snmp_init_done || 0 != state)
+	if (0 == zbx_snmp_init_done)
 		return;
+
+	SNMP_MT_INITLOCK;
 
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 	zbx_shutdown_snmp();
+
+	if (0 != snmp_rwlock_init_done)
+		zbx_init_snmp();
+
+	SNMP_MT_UNLOCK;
 }
 
 #endif	/* HAVE_NETSNMP */
