@@ -40,9 +40,9 @@ char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
 
 ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME = NULL;
 
-DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_enable_remote_commands, 1)
-DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_log_remote_commands, 0)
-DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_unsafe_user_parameters, 0)
+ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_enable_remote_commands, 1)
+ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_log_remote_commands, 0)
+ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_unsafe_user_parameters, 0)
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 5;
@@ -252,7 +252,7 @@ static const char	*get_progname(void)
 }
 #endif
 
-DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_timeout, 3)
+ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_timeout, 3)
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
 

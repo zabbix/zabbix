@@ -23,10 +23,10 @@ package zbxlib
 /*
 #include "zbxsysinfo.h"
 
-DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_timeout, 3)
-DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_enable_remote_commands, 1)
-DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_log_remote_commands, 0)
-DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_unsafe_user_parameters, 0)
+ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_timeout, 3)
+ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_enable_remote_commands, 1)
+ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_log_remote_commands, 0)
+ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, config_unsafe_user_parameters, 0)
 
 void	init_globals(void)
 {

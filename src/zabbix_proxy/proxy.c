@@ -255,7 +255,7 @@ static int	get_config_forks(unsigned char process_type)
 	return 0;
 }
 
-DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_timeout, 3)
+ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_timeout, 3)
 
 static int	zbx_config_startup_time	= 0;
 static int	zbx_config_unavailable_delay	=60;
@@ -294,9 +294,9 @@ int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 
-DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_enable_remote_commands, 0)
-DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_log_remote_commands, 0)
-DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_unsafe_user_parameters, 0)
+ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_enable_remote_commands, 0)
+ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_log_remote_commands, 0)
+ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_unsafe_user_parameters, 0)
 
 char	*CONFIG_SERVER			= NULL;
 int	CONFIG_SERVER_PORT;
