@@ -55,39 +55,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function doAction(): void {
 		$is_template_dashboard = $this->hasInput('templateid');
+		$dynamic_host_name = null;
 
 		if ($is_template_dashboard && $this->hasInput('dynamic_hostid')) {
 			$dynamic_host = API::Host()->get([
 				'output' => ['name'],
 				'hostids' => [$this->getInput('dynamic_hostid')]
 			]);
-
-			foreach ($this->fields_values['ds'] as &$dataset) {
-				if ($dataset['dataset_type'] === CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
-					$dataset['hosts'] = [$dynamic_host[0]['name']];
-				}
-				else {
-					$tmp_items = API::Item()->get([
-						'output' => ['key_'],
-						'itemids' => $dataset['itemids'],
-						'webitems' => true
-					]);
-
-					if ($tmp_items) {
-						$options = [
-							'output' => ['itemid'],
-							'hostids' => [$this->getInput('dynamic_hostid')],
-							'webitems' => true,
-							'filter' => [
-								'key_' => array_column($tmp_items, 'key_')
-							]
-						];
-						$items = API::Item()->get($options);
-						$dataset['itemids'] = $items ? array_column($items, 'itemid') : null;
-					}
-				}
-			}
-			unset($dataset);
+			$dynamic_host_name = $dynamic_host[0]['name'];
 		}
 
 		$edit_mode = $this->getInput('edit_mode', 0);
@@ -180,13 +155,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'problems' => [
 				'show_problems' => $this->fields_values['show_problems'] == SVG_GRAPH_PROBLEMS_ON,
 				'graph_item_problems' => $this->fields_values['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS,
-				'problemhosts' => !$is_template_dashboard ? $this->fields_values['problemhosts'] : null,
+				'problemhosts' => !$is_template_dashboard ? $this->fields_values['problemhosts'] : [$dynamic_host_name],
 				'severities' => $this->fields_values['severities'],
 				'problem_name' => $this->fields_values['problem_name'],
 				'evaltype' => $this->fields_values['evaltype'],
 				'tags' => $this->fields_values['tags']
 			],
-			'overrides' => array_values($this->fields_values['or'])
+			'overrides' => array_values($this->fields_values['or']),
+			'templateid' => $is_template_dashboard ? $this->getInput('templateid') : '',
+			'dynamic_hostid' => $this->hasInput('dynamic_hostid') ? $this->getInput('dynamic_hostid') : ''
 		];
 
 		$svg_options = CSvgGraphHelper::get($graph_data, $width, $height);

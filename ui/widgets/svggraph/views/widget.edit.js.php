@@ -837,6 +837,10 @@ window.widget_svggraph_form = new class {
 		}
 		data.fields = form_fields;
 
+		if (this.templateid !== null) {
+			data.templateid = this.templateid
+		}
+
 		if (preview_data.xhr) {
 			preview_data.xhr.abort();
 		}
