@@ -438,6 +438,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
 			->addClass(ZBX_STYLE_SORTABLE_ITEM)
 			->addClass($is_opened ? ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED : ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED)
+			->addClass($this->field->templateid !== null ? 'template-dashboard' : null)
 			->setAttribute('data-set', $row_num)
 			->setAttribute('data-type', $dataset_type);
 	}

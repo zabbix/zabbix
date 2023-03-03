@@ -369,6 +369,8 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 						->setAttribute('data-row', $row_num)
 						->addClass(ZBX_STYLE_BTN_ALT)
 				)
-		]))->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM);
+		]))
+			->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM)
+			->addClass($this->field->templateid !== null ? 'template-dashboard' : null);
 	}
 }
