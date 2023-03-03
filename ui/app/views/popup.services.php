@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,14 +25,12 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setName('services_form');
 
 // Enable form submitting on Enter.
 $form->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $controls = (new CForm())
-	->cleanItems()
 	->setName('services_filter_form')
 	->addVar('title', $data['title'])
 	->addVar('exclude_serviceids', $data['exclude_serviceids'])

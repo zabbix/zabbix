@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 		if ($action === 'Click on state') {
 			foreach ($data['hosts'] as $host) {
 				$id = DBfetch(DBselect('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host)));
-				$this->zbxTestClickXpathWait("//a[contains(@onclick,'group_hostid=".$id['hostid']."')]");
+				$this->zbxTestClickXpathWait("//a[contains(@onclick,'group_hostid%5B%5D=".$id['hostid']."')]");
 			}
 		}
 		else {

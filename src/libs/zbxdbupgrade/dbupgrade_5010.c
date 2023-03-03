@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ static int	DBpatch_5010001(void)
 
 static int	DBpatch_5010002(void)
 {
-	if (ZBX_DB_OK > DBexecute("update users set lang='default',theme='default' where alias='guest'"))
+	if (ZBX_DB_OK > zbx_db_execute("update users set lang='default',theme='default' where alias='guest'"))
 		return FAIL;
 
 	return SUCCEED;
@@ -56,7 +56,7 @@ static int	DBpatch_5010003(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ('web.latest.toggle','web.latest.toggle_other')"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx in ('web.latest.toggle','web.latest.toggle_other')"))
 		return FAIL;
 
 	return SUCCEED;
@@ -71,11 +71,11 @@ static int	DBpatch_5010004(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	result = DBselect("select userid from profiles where idx='web.latest.sort' and value_str='lastclock'");
+	result = zbx_db_select("select userid from profiles where idx='web.latest.sort' and value_str='lastclock'");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (ZBX_DB_OK > DBexecute(
+		if (ZBX_DB_OK > zbx_db_execute(
 			"delete from profiles"
 			" where userid='%s'"
 				" and idx in ('web.latest.sort','web.latest.sortorder')", row[0]))
@@ -84,7 +84,7 @@ static int	DBpatch_5010004(void)
 			break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -311,8 +311,11 @@ static int	DBpatch_5010035(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.hostsmon.filter.%%' or idx like 'web.problem.filter%%'"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hostsmon.filter.%%' or"
+			" idx like 'web.problem.filter%%'"))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -346,7 +349,7 @@ static int	DBpatch_5010040(void)
 static int	DBpatch_5010041(void)
 {
 #ifdef HAVE_MYSQL	/* MySQL automatically creates index and might not remove it on some conditions */
-	if (SUCCEED == DBindex_exists("dashboard", "c_dashboard_1"))
+	if (SUCCEED == zbx_db_index_exists("dashboard", "c_dashboard_1"))
 		return DBdrop_index("dashboard", "c_dashboard_1");
 #endif
 	return SUCCEED;
@@ -1168,12 +1171,12 @@ static int 	DBpatch_add_dashboard(zbx_db_dashboard_t *dashboard)
 	char	*name_esc;
 	int	res;
 
-	dashboard->dashboardid = DBget_maxid("dashboard");
-	name_esc = DBdyn_escape_string(dashboard->name);
+	dashboard->dashboardid = zbx_db_get_maxid("dashboard");
+	name_esc = zbx_db_dyn_escape_string(dashboard->name);
 
 	zabbix_log(LOG_LEVEL_TRACE, "adding dashboard id:" ZBX_FS_UI64, dashboard->dashboardid);
 
-	res = DBexecute("insert into dashboard (dashboardid,name,templateid) values ("
+	res = zbx_db_execute("insert into dashboard (dashboardid,name,templateid) values ("
 			ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ")", dashboard->dashboardid, name_esc,
 			dashboard->templateid);
 
@@ -1189,13 +1192,13 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 	int		i, ret = SUCCEED;
 	char		*name_esc;
 
-	widget->widgetid = DBget_maxid("widget");
+	widget->widgetid = zbx_db_get_maxid("widget");
 	widget->dashboardid = dashboardid;
-	name_esc = DBdyn_escape_string(widget->name);
+	name_esc = zbx_db_dyn_escape_string(widget->name);
 
 	zabbix_log(LOG_LEVEL_TRACE, "adding widget id: " ZBX_FS_UI64 ", type: %s", widget->widgetid, widget->type);
 
-	if (ZBX_DB_OK > DBexecute("insert into widget (widgetid,dashboardid,type,name,x,y,width,height,view_mode) "
+	if (ZBX_DB_OK > zbx_db_execute("insert into widget (widgetid,dashboardid,type,name,x,y,width,height,view_mode) "
 			"values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s',%d,%d,%d,%d,%d)",
 			widget->widgetid, widget->dashboardid, widget->type, name_esc, widget->x, widget->y,
 			widget->width, widget->height, widget->view_mode))
@@ -1206,7 +1209,7 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 	zbx_free(name_esc);
 
 	if (SUCCEED == ret && 0 < fields->values_num)
-		new_fieldid = DBget_maxid_num("widget_field", fields->values_num);
+		new_fieldid = zbx_db_get_maxid_num("widget_field", fields->values_num);
 
 	for (i = 0; SUCCEED == ret && i < fields->values_num; i++)
 	{
@@ -1214,12 +1217,12 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 		zbx_db_widget_field_t	*f;
 
 		f = (zbx_db_widget_field_t *)fields->values[i];
-		url_esc = DBdyn_escape_string(f->value_str);
+		url_esc = zbx_db_dyn_escape_string(f->value_str);
 
-		if (ZBX_DB_OK > DBexecute("insert into widget_field (widget_fieldid,widgetid,type,name,value_int,"
+		if (ZBX_DB_OK > zbx_db_execute("insert into widget_field (widget_fieldid,widgetid,type,name,value_int,"
 				"value_str,value_itemid,value_graphid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,"
 				"'%s',%d,'%s',%s,%s)", new_fieldid++, widget->widgetid, f->type, f->name, f->value_int,
-				url_esc, DBsql_id_ins(f->value_itemid), DBsql_id_ins(f->value_graphid)))
+				url_esc, zbx_db_sql_id_ins(f->value_itemid), zbx_db_sql_id_ins(f->value_graphid)))
 		{
 			ret = FAIL;
 		}
@@ -1232,10 +1235,10 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 
 static int	DBpatch_delete_screen(uint64_t screenid)
 {
-	if (ZBX_DB_OK > DBexecute("delete from screens_items where screenid=" ZBX_FS_UI64, screenid))
+	if (ZBX_DB_OK > zbx_db_execute("delete from screens_items where screenid=" ZBX_FS_UI64, screenid))
 		return FAIL;
 
-	if (ZBX_DB_OK > DBexecute("delete from screens where screenid=" ZBX_FS_UI64, screenid))
+	if (ZBX_DB_OK > zbx_db_execute("delete from screens where screenid=" ZBX_FS_UI64, screenid))
 		return FAIL;
 
 	return SUCCEED;
@@ -1254,7 +1257,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 	zbx_vector_char_t	*dim_x, *dim_y;
 	int			offsets_x[OFFSET_ARRAY_SIZE], offsets_y[OFFSET_ARRAY_SIZE];
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select screenitemid,screenid,resourcetype,resourceid,width,height,x,y,colspan,rowspan"
 			",elements,style,url,max_columns from screens_items where screenid=" ZBX_FS_UI64,
 			screenid);
@@ -1265,7 +1268,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 	zbx_vector_ptr_create(&screen_items);
 	DBpatch_init_dashboard(&dashboard, name, templateid);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		scr_item = (zbx_db_screen_item_t*)zbx_calloc(NULL, 1, sizeof(zbx_db_screen_item_t));
 
@@ -1339,7 +1342,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		zbx_vector_ptr_append(&screen_items, (void *)scr_item);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (screen_items.values_num > 0)
 	{
@@ -1451,9 +1454,9 @@ static int	DBpatch_5010044(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	result = DBselect("select screenid,name,templateid from screens where templateid is not null");
+	result = zbx_db_select("select screenid,name,templateid from screens where templateid is not null");
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		uint64_t	screenid, templateid;
 
@@ -1464,7 +1467,7 @@ static int	DBpatch_5010044(void)
 			ret = DBpatch_delete_screen(screenid);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1523,7 +1526,7 @@ static int	DBpatch_5010047(void)
 static int	DBpatch_5010048(void)
 {
 #ifdef HAVE_MYSQL	/* fix automatic index name on MySQL */
-	if (SUCCEED == DBindex_exists("screens", "c_screens_3"))
+	if (SUCCEED == zbx_db_index_exists("screens", "c_screens_3"))
 	{
 		return DBdrop_index("screens", "c_screens_3");
 	}
@@ -1634,7 +1637,7 @@ static int	DBpatch_5010058(void)
 
 	for (i = 0; NULL != values[i]; i++)
 	{
-		if (ZBX_DB_OK > DBexecute("insert into role (%s) values (%s)", columns, values[i]))
+		if (ZBX_DB_OK > zbx_db_execute("insert into role (%s) values (%s)", columns, values[i]))
 			return FAIL;
 	}
 
@@ -1670,7 +1673,7 @@ static int	DBpatch_5010059(void)
 
 	for (i = 0; NULL != values[i]; i++)
 	{
-		if (ZBX_DB_OK > DBexecute("insert into role_rule (%s) values (%s)", columns, values[i]))
+		if (ZBX_DB_OK > zbx_db_execute("insert into role_rule (%s) values (%s)", columns, values[i]))
 			return FAIL;
 	}
 
@@ -1693,7 +1696,7 @@ static int	DBpatch_5010061(void)
 
 	for (i = 1; i <= 3; i++)
 	{
-		if (ZBX_DB_OK > DBexecute("update users set roleid=%d where type=%d", i, i))
+		if (ZBX_DB_OK > zbx_db_execute("update users set roleid=%d where type=%d", i, i))
 			return FAIL;
 	}
 
@@ -1752,7 +1755,7 @@ static int	DBpatch_5010067(void)
 
 	for (i = 0; NULL != values[i]; i++)
 	{
-		if (ZBX_DB_OK > DBexecute("update profiles set value_id=%s,type=1,value_int=0 "
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set value_id=%s,type=1,value_int=0 "
 				"where idx='web.user.filter_type' and value_int=%s", values[i], values[i]))
 		{
 			return FAIL;
@@ -1760,7 +1763,7 @@ static int	DBpatch_5010067(void)
 	}
 
 	/* -1 - ANY PROFILE */
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.user.filter_type' and value_int=-1"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.user.filter_type' and value_int=-1"))
 		return FAIL;
 
 	return SUCCEED;

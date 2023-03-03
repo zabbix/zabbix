@@ -3,14 +3,17 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 New official Linux template. Requires agent of Zabbix 3.0.14, 3.4.5 and 4.0.0 or newer.
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/6.4/manual/concepts/agent#agent-on-unix-like-systems).
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -47,11 +50,11 @@ No specific Zabbix configuration is required.
 |{$VFS.FS.PUSED.MAX.CRIT} |<p>The critical threshold of the filesystem utilization.</p> |`90` |
 |{$VFS.FS.PUSED.MAX.WARN} |<p>The warning threshold of the filesystem utilization.</p> |`80` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
@@ -59,7 +62,7 @@ There are no template links in this template.
 |Mounted filesystem discovery |<p>The discovery of mounted filesystems with different types.</p> |DEPENDENT |vfs.fs.dependent.discovery<p>**Filter**:</p>AND <p>- {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Skip metadata collection for dynamic FS<br> - {#FSTYPE} MATCHES_REGEX `^(btrfs|zfs)$`<br>  - ITEM_PROTOTYPE LIKE `inode`<br>  - NO_DISCOVER</p> |
 |Network interface discovery |<p>The discovery of network interfaces.</p> |ZABBIX_PASSIVE |net.if.discovery<p>**Filter**:</p>AND <p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -96,7 +99,7 @@ There are no template links in this template.
 |General |Number of running processes |<p>-</p> |ZABBIX_PASSIVE |proc.num[,,run] |
 |Inventory |Operating system |<p>-</p> |ZABBIX_PASSIVE |system.sw.os<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Inventory |Operating system architecture |<p>The architecture of the operating system.</p> |ZABBIX_PASSIVE |system.sw.arch<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Inventory |Software installed |<p>-</p> |ZABBIX_PASSIVE |system.sw.packages<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Inventory |Number of installed packages |<p>-</p> |ZABBIX_PASSIVE |system.sw.packages.get<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p><p>- JSONPATH: `$.length()`</p> |
 |Memory |Memory utilization |<p>The percentage of used memory is calculated as `100-pavailable`.</p> |DEPENDENT |vm.memory.utilization<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return (100-value);`</p> |
 |Memory |Available memory in % |<p>The available memory as percentage of the total. See also Appendixes in Zabbix Documentation about parameters of the `vm.memory.size` item.</p> |ZABBIX_PASSIVE |vm.memory.size[pavailable] |
 |Memory |Total memory |<p>The total memory expressed in Bytes.</p> |ZABBIX_PASSIVE |vm.memory.size[total] |
@@ -131,7 +134,7 @@ There are no template links in this template.
 |Zabbix raw items |{#DEVNAME}: Disk write time (rate) |<p>The rate of total write time counter; used in `w_await` calculation.</p> |DEPENDENT |vfs.dev.write.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[7]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
 |Zabbix raw items |{#FSNAME}: Get filesystem data |<p>-</p> |DEPENDENT |vfs.fs.dependent[{#FSNAME},data]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.fsname=='{#FSNAME}')].first()`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -143,11 +146,12 @@ There are no template links in this template.
 |{#FSNAME}: Running out of free inodes |<p>It may become impossible to write to a disk if there are no index nodes left.</p><p>The following error messages may be returned as symptoms, even though the free space is available:</p><p> -  "No space left on device";</p><p> -  "Disk is full".</p> |`min(/Linux by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}` |AVERAGE | |
 |{#FSNAME}: Running out of free inodes |<p>It may become impossible to write to a disk if there are no index nodes left.</p><p>The following error messages may be returned as symptoms, even though the free space is available:</p><p> - "No space left on device";</p><p> - "Disk is full".</p> |`min(/Linux by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}` |WARNING |<p>**Depends on**:</p><p>- {#FSNAME}: Running out of free inodes</p> |
 |System time is out of sync |<p>The host's system time is different from Zabbix server time.</p> |`fuzzytime(/Linux by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0` |WARNING |<p>Manual close: YES</p> |
-|System name has changed |<p>The name of the system has changed. `Ack` to close the problem manually.</p> |`last(/Linux by Zabbix agent/system.hostname,#1)<>last(/Linux by Zabbix agent/system.hostname,#2) and length(last(/Linux by Zabbix agent/system.hostname))>0` |INFO |<p>Manual close: YES</p> |
+|System name has changed |<p>The name of the system has changed. `Ack` to close the problem manually.</p> |`change(/Linux by Zabbix agent/system.hostname) and length(last(/Linux by Zabbix agent/system.hostname))>0` |INFO |<p>Manual close: YES</p> |
 |Configured max number of open filedescriptors is too low |<p>-</p> |`last(/Linux by Zabbix agent/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}` |INFO | |
 |Configured max number of processes is too low |<p>-</p> |`last(/Linux by Zabbix agent/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}` |INFO |<p>**Depends on**:</p><p>- Getting closer to process limit</p> |
 |Getting closer to process limit |<p>-</p> |`last(/Linux by Zabbix agent/proc.num)/last(/Linux by Zabbix agent/kernel.maxproc)*100>80` |WARNING | |
-|Operating system description has changed |<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Ack to close the problem manually.</p> |`last(/Linux by Zabbix agent/system.sw.os,#1)<>last(/Linux by Zabbix agent/system.sw.os,#2) and length(last(/Linux by Zabbix agent/system.sw.os))>0` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- System name has changed</p> |
+|Operating system description has changed |<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Ack to close the problem manually.</p> |`change(/Linux by Zabbix agent/system.sw.os) and length(last(/Linux by Zabbix agent/system.sw.os))>0` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- System name has changed</p> |
+|Number of installed packages has been changed |<p>-</p> |`change(/Linux by Zabbix agent/system.sw.packages.get)<>0` |WARNING |<p>Manual close: YES</p> |
 |High memory utilization |<p>The system is running out of free memory.</p> |`min(/Linux by Zabbix agent/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}` |AVERAGE |<p>**Depends on**:</p><p>- Lack of available memory</p> |
 |Lack of available memory |<p>-</p> |`max(/Linux by Zabbix agent/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Zabbix agent/vm.memory.size[total])>0` |AVERAGE | |
 |High swap space usage |<p>If there is no swap configured, this trigger is ignored.</p> |`max(/Linux by Zabbix agent/system.swap.size[,pfree],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by Zabbix agent/system.swap.size[,total])>0` |WARNING |<p>**Depends on**:</p><p>- High memory utilization</p><p>- Lack of available memory</p> |

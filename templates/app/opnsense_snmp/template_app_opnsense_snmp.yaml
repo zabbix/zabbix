@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-10-27T14:29:36Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -29,6 +28,9 @@ zabbix_export:
         HOST-RESOURCES-MIB
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications
@@ -483,7 +485,7 @@ zabbix_export:
                 formulaid: J
               -
                 macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
+                value: '@Network interfaces for discovery'
                 formulaid: G
               -
                 macro: '{#IFNAME}'
@@ -1623,12 +1625,8 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in filters of network interfaces discovery rule.'
         -
-          macro: '{$NET.IF.IFNAME.MATCHES}'
-          value: '^em[0-9]+$'
-          description: 'This macro is used in filters of network interfaces discovery rule.'
-        -
           macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
-          value: ^$
+          value: '(^pflog[0-9.]*$|^pfsync[0-9.]*$)'
           description: 'This macro is used in filters of network interfaces discovery rule.'
         -
           macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'

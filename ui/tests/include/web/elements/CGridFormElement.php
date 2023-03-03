@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,20 +31,14 @@ class CGridFormElement extends CFormElement {
 	const TABLE_FORM_FIELD = 'following-sibling::div[1]';
 
 	/**
-	 * Get collection of form label elements.
-	 *
-	 * @return CElementCollection
+	 * @inheritDoc
 	 */
-	public function getLabels() {
+	public function getLabels($filter = null, $filter_params = []) {
 		$labels = $this->query("xpath:.//div/div/".self::TABLE_FORM."/label|./".self::TABLE_FORM.
 				"/label|./div/div/div/div/".self::TABLE_FORM."/label"
 		)->all();
 
-		if ($this->filter !== null) {
-			return $labels->filter($this->filter);
-		}
-
-		return $labels;
+		return $this->filterCollection($labels, $filter, $filter_params);
 	}
 
 	/**

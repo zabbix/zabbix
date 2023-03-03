@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ class testPageTriggerUrl extends CWebTest {
 		// Add 'Acknowledge' menu link to data provider.
 		$array = $data['links'];
 		array_shift($array);
-		$data['links'] = ['Problems' => $data['links']['Problems'],	'Acknowledge' => ''] + $array;
+		$data['links'] = ['Problems' => $data['links']['Problems'],	'Update problem' => ''] + $array;
 
 		// Remove 'cause and symptoms' from data provider.
 		unset($data['links']['Mark as cause']);

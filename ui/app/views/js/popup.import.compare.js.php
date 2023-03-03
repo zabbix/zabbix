@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,24 +24,45 @@
  */
 ?>
 
-jQuery(function($) {
-	$(document).on('click', '.import-compare .<?= ZBX_STYLE_TOC_ARROW ?>', function() {
-		$(this).parent().siblings('.<?= ZBX_STYLE_TOC_SUBLIST ?>').toggle();
-		$('span', $(this)).toggleClass('<?= ZBX_STYLE_ARROW_DOWN ?> <?= ZBX_STYLE_ARROW_UP ?>');
 
-		return false;
-	});
-});
+window.popup_import_compare = new class {
 
-function submitImportComparePopup(compare_overlay) {
-	const form = document.querySelector('.import-compare');
-	const import_overlayid = form.querySelector('#import_overlayid').value;
-	const import_overlay = overlays_stack.getById(import_overlayid);
-
-	if (isDeleteMissingChecked(import_overlay)) {
-		return confirmSubmit(import_overlay, compare_overlay);
+	constructor() {
+		this.overlay = null;
+		this.dialogue = null;
+		this.form = null;
 	}
 
-	overlayDialogueDestroy(compare_overlay.dialogueid);
-	return submitImportPopup(import_overlay);
+	init() {
+		this.overlay = overlays_stack.getById('popup_import_compare');
+		this.dialogue = this.overlay.$dialogue[0];
+		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.footer = this.overlay.$dialogue.$footer[0];
+
+		this.addEventListeners();
+	}
+
+	addEventListeners() {
+		this.form.addEventListener('click', (e) => {
+			if (e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')) {
+				e.preventDefault();
+				const arrow = e.target.querySelector('span');
+				const show = arrow.classList.contains('<?= ZBX_STYLE_ARROW_UP ?>');
+
+				e.target.parentNode.nextSibling.style.display = show ? '' : 'none';
+
+				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_UP ?>');
+				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_DOWN ?>');
+			}
+		});
+	}
+
+	submitImportComparePopup() {
+		if (popup_import.isDeleteMissingChecked()) {
+			return popup_import.confirmSubmit(this.overlay);
+		}
+
+		overlayDialogueDestroy(this.overlay.dialogueid);
+		return popup_import.submitImportPopup();
+	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ $fields = [
 	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,		null,				null],
 	'profileIdx' =>		[T_ZBX_STR,			O_OPT, null,		null,				null],
 	'profileIdx2' =>	[T_ZBX_STR,			O_OPT, null,		null,				null],
-	'httptestid' =>		[T_ZBX_INT,			O_OPT, P_NZERO,	null,				null],
+	'httptestid' =>		[T_ZBX_INT,			O_OPT, P_NZERO,		null,				null],
 	'http_item_type' =>	[T_ZBX_INT,			O_OPT, null,		null,				null],
 	'name' =>			[T_ZBX_STR,			O_OPT, null,		null,				null],
 	'width' =>			[T_ZBX_INT,			O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
@@ -50,8 +50,8 @@ $fields = [
 	'percent_left' =>	[T_ZBX_DBL,			O_OPT, null,		BETWEEN_DBL(0, 100, 4),	null],
 	'percent_right' =>	[T_ZBX_DBL,			O_OPT, null,		BETWEEN_DBL(0, 100, 4),	null],
 	'outer' =>			[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null],
-	'items' =>			[T_ZBX_STR,			O_OPT, null,		null,				null],
-	'i' =>				[T_ZBX_STR,			O_OPT, null,		null,				null],
+	'items' =>			[T_ZBX_STR,			O_OPT, P_ONLY_TD_ARRAY,	null,			null],
+	'i' =>				[T_ZBX_STR,			O_OPT, P_ONLY_ARRAY,	null,			null],
 	'onlyHeight' =>		[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null],
 	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null]
 ];
@@ -103,10 +103,10 @@ if ($httptestid = getRequest('httptestid', false)) {
 }
 elseif (hasRequest('i') || hasRequest('items')) {
 	if (hasRequest('i')) {
-		$items = array_map('expandShortGraphItem', getRequest('i', []));
+		$items = array_map('expandShortGraphItem', getRequest('i'));
 	}
 	else {
-		$items = getRequest('items', []);
+		$items = getRequest('items');
 	}
 
 	CArrayHelper::sort($items, ['sortorder']);

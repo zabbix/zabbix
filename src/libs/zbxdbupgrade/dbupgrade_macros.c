@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,9 +127,9 @@ int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, zbx_f
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		old_offset = sql_offset;
 
@@ -147,7 +147,7 @@ int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, zbx_f
 					continue;
 				}
 
-				value_esc = DBdyn_escape_string(value);
+				value_esc = zbx_db_dyn_escape_string(value);
 
 				if (old_offset == sql_offset)
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table);
@@ -164,14 +164,14 @@ int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, zbx_f
 		if (old_offset != sql_offset)
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=%s;\n", pkey, row[0]);
-			if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 				goto out;
 		}
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_free(value);
@@ -255,7 +255,7 @@ static void	dbpatch_update_func_delta(zbx_dbpatch_function_t *function, const ch
 
 	dbpatch_update_function(function, "max", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
 
-	functionid2 = (NULL == function->arg0 ? DBget_maxid("functions") : (zbx_uint64_t)functions->values_num);
+	functionid2 = (NULL == function->arg0 ? zbx_db_get_maxid("functions") : (zbx_uint64_t)functions->values_num);
 	dbpatch_add_function(function, functionid2, "min", parameter, ZBX_DBPATCH_FUNCTION_CREATE, functions);
 
 	*replace = zbx_dsprintf(NULL, "({" ZBX_FS_UI64 "}-{" ZBX_FS_UI64 "})", function->functionid, functionid2);
@@ -267,7 +267,7 @@ static void	dbpatch_update_func_diff(zbx_dbpatch_function_t *function, char **re
 
 	dbpatch_update_function(function, "last", "#1", ZBX_DBPATCH_FUNCTION_UPDATE);
 
-	functionid2 = (NULL == function->arg0 ? DBget_maxid("functions") : (zbx_uint64_t)functions->values_num);
+	functionid2 = (NULL == function->arg0 ? zbx_db_get_maxid("functions") : (zbx_uint64_t)functions->values_num);
 	dbpatch_add_function(function, functionid2, "last", "#2", ZBX_DBPATCH_FUNCTION_CREATE, functions);
 
 	*replace = zbx_dsprintf(NULL, "({" ZBX_FS_UI64 "}<>{" ZBX_FS_UI64 "})", function->functionid, functionid2);
@@ -280,7 +280,7 @@ static void	dbpatch_update_func_trenddelta(zbx_dbpatch_function_t *function, con
 
 	dbpatch_update_function(function, "trendmax", parameter, ZBX_DBPATCH_FUNCTION_UPDATE);
 
-	functionid2 = (NULL == function->arg0 ? DBget_maxid("functions") : (zbx_uint64_t)functions->values_num);
+	functionid2 = (NULL == function->arg0 ? zbx_db_get_maxid("functions") : (zbx_uint64_t)functions->values_num);
 	dbpatch_add_function(function, functionid2, "trendmin", parameter, ZBX_DBPATCH_FUNCTION_CREATE, functions);
 
 	*replace = zbx_dsprintf(NULL, "({" ZBX_FS_UI64 "}-{" ZBX_FS_UI64 "})", function->functionid, functionid2);
