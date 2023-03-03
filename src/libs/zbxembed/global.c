@@ -28,6 +28,42 @@
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: export duktape data at the index into buffer                      *
+ *                                                                            *
+ * Comments: Throws an error:                                                 *
+ *               - if the top value at ctx value stack is non buffer object   *
+ *               - if the value stack is empty                                *
+ *           The returned buffer must be freed by the caller.                 *
+ *                                                                            *
+ ******************************************************************************/
+static char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
+{
+	duk_int_t	type;
+	const char	*ptr;
+	char		*buf = NULL;
+
+	type = duk_get_type(ctx, index);
+
+	switch (type)
+	{
+		case DUK_TYPE_BUFFER:
+		case DUK_TYPE_OBJECT:
+			ptr = duk_require_buffer_data(ctx, index, len);
+			buf = zbx_malloc(NULL, *len);
+			memcpy(buf, ptr, *len);
+			break;
+		default:
+			ptr = duk_require_lstring(ctx, index, len);
+			buf = zbx_malloc(NULL, *len);
+			memcpy(buf, ptr, *len);
+			break;
+	}
+
+	return buf;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: encodes parameter to base64 string                                *
  *                                                                            *
  * Parameters: ctx - [IN] pointer to duk_context                              *
@@ -39,15 +75,16 @@
  ******************************************************************************/
 static duk_ret_t	es_btoa(duk_context *ctx)
 {
-	char	*str = NULL, *b64str = NULL;
+	char		*str, *b64str = NULL;
+	duk_size_t	len;
 
-	if (SUCCEED != es_duktape_string_decode(duk_require_string(ctx, 0), &str))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
+	str = es_get_buffer_dyn(ctx, 0, &len);
 
-	str_base64_encode_dyn(str, &b64str, (int)strlen(str));
+	str_base64_encode_dyn(str, &b64str, (int)len);
 	duk_push_string(ctx, b64str);
 	zbx_free(str);
 	zbx_free(b64str);
+
 	return 1;
 }
 
@@ -100,42 +137,6 @@ static void	es_bin_to_hex(const unsigned char *bin, size_t len, char *out)
 	}
 
 	*out = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: export duktape data at the index into buffer                      *
- *                                                                            *
- * Comments: Throws an error:                                                 *
- *               - if the top value at ctx value stack is non buffer object   *
- *               - if the value stack is empty                                *
- *           The returned buffer must be freed by the caller.                 *
- *                                                                            *
- ******************************************************************************/
-static char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
-{
-	duk_int_t	type;
-	const char	*ptr;
-	char		*buf = NULL;
-
-	type = duk_get_type(ctx, index);
-
-	switch (type)
-	{
-		case DUK_TYPE_BUFFER:
-		case DUK_TYPE_OBJECT:
-			ptr = duk_require_buffer_data(ctx, index, len);
-			buf = zbx_malloc(NULL, *len);
-			memcpy(buf, ptr, *len);
-			break;
-		default:
-			ptr = duk_require_lstring(ctx, index, len);
-			buf = zbx_malloc(NULL, *len);
-			memcpy(buf, ptr, *len);
-			break;
-	}
-
-	return buf;
 }
 
 /******************************************************************************
