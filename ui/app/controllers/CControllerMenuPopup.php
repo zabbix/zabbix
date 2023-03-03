@@ -358,7 +358,7 @@ class CControllerMenuPopup extends CController {
 				'isWriteable' => $is_writable,
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-				'binary_data' => $db_item['value_type'] == ITEM_VALUE_TYPE_BINARY
+				'binary_value_type' => $db_item['value_type'] == ITEM_VALUE_TYPE_BINARY
 			];
 		}
 

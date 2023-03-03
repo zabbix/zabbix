@@ -1027,7 +1027,7 @@ function getMenuPopupItem(options) {
 		const config_urls = [];
 		const config_triggers = {
 			label: t('Triggers'),
-			disabled: options.binary_data || options.triggers.length === 0
+			disabled: options.binary_value_type || options.triggers.length === 0
 		};
 
 		if (options.isWriteable) {
@@ -1076,7 +1076,7 @@ function getMenuPopupItem(options) {
 		config_urls.push({
 			label: t('Create trigger'),
 			url: url.getUrl(),
-			disabled: options.binary_data
+			disabled: options.binary_value_type
 		});
 
 		url = new Curl('items.php');
@@ -1090,7 +1090,7 @@ function getMenuPopupItem(options) {
 		config_urls.push({
 			label: t('Create dependent item'),
 			url: url.getUrl(),
-			disabled: options.isDiscovery || options.binary_data
+			disabled: options.isDiscovery || options.binary_value_type
 		});
 
 		url = new Curl('host_discovery.php');
@@ -1104,7 +1104,7 @@ function getMenuPopupItem(options) {
 		config_urls.push({
 			label: t('Create dependent discovery rule'),
 			url: url.getUrl(),
-			disabled: options.isDiscovery || options.binary_data
+			disabled: options.isDiscovery || options.binary_value_type
 		});
 
 		sections.push({
