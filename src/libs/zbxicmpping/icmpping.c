@@ -50,6 +50,7 @@ static ZBX_THREAD_LOCAL int		fping_ipv6_supported;
 #endif
 
 static ZBX_THREAD_LOCAL time_t		fping_check_reset_at;	/* time of the last fping options expiration */
+static ZBX_THREAD_LOCAL char		tmpfile_uniq[255] = "";
 
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
 {
@@ -300,6 +301,21 @@ static int	get_ipv6_support(const char *fping, const char *dst)
 }
 #endif	/* HAVE_IPV6 */
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check fping response                                              *
+ *                                                                            *
+ * Parameters: resp        - [IN] fping stdout                                *
+ *             hosts       - [IN] array of ip address for test                *
+ *             hosts_count - [IN] size of ip address array for test           *
+ *             rdns        - [IN] flag that dns name is present               *
+ *             dnsname_len - [OUT] dns name length                            *
+ *             host        - [OUT] found correspondent host from array        *
+ *                                                                            *
+ * Return value: SUCCEED - successfully processed hosts                       *
+ *               NOTSUPPORTED - otherwise                                     *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_hostip_response(char *resp, ZBX_FPING_HOST *hosts, const int hosts_count, const int rdns,
 		size_t *dnsname_len, ZBX_FPING_HOST **host)
 {
@@ -579,8 +595,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #endif	/* HAVE_IPV6 */
 	}
 
-	zbx_snprintf(filename, sizeof(filename), "%s/%s_%li.pinger", config_icmpping->get_tmpdir(), progname,
-			(long int)gettid());
+	zbx_snprintf(filename, sizeof(filename), "%s/%s_%s.pinger", config_icmpping->get_tmpdir(), progname,
+			tmpfile_uniq);
 
 #ifdef HAVE_IPV6
 	if (NULL != config_icmpping->get_source_ip())
@@ -826,6 +842,19 @@ out:
 void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config)
 {
 	config_icmpping = config;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize unique tmp file name                                   *
+ *                                                                            *
+ * Parameters: prefix - [IN] base name                                        *
+ *             id     - [IN] thread or process id                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_init_icmpping_env(const char *prefix, long int id)
+{
+	zbx_snprintf(tmpfile_uniq, sizeof(tmpfile_uniq), "%s_%li", prefix, id);
 }
 
 /******************************************************************************

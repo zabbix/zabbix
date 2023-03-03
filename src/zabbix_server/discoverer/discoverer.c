@@ -1267,6 +1267,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
 
+	zbx_init_icmpping_env("discoverer", worker->worker_id);
 	worker->stop = 0;
 
 	discoverer_queue_lock(queue);

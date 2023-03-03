@@ -76,6 +76,7 @@ typedef struct
 icmpitem_t;
 
 void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config);
+void	zbx_init_icmpping_env(const char *prefix, long int id);
 
 int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int period, int size, int timeout, int rdns,
 		char *error, size_t max_error_len);
