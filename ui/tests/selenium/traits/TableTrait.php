@@ -201,4 +201,13 @@ trait TableTrait {
 		}
 		return $result;
 	}
+
+	/**
+	 * Assert text of selected rows amount.
+	 *
+	 * @param string $count		selected rows
+	 */
+	private function assertSelectedCount($count) {
+		$this->assertEquals($count.' selected', $this->query('id:selected_count')->one()->getText());
+	}
 }
