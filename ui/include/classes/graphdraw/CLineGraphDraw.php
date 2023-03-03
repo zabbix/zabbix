@@ -2035,7 +2035,8 @@ class CLineGraphDraw extends CGraphDraw {
 			if ($graph_item['type'] == ITEM_TYPE_DEPENDENT) {
 				$master_item = $graph_item;
 
-				while ($master_item && $master_item['type'] == ITEM_TYPE_DEPENDENT) {
+				while ($master_item && $master_item['type'] == ITEM_TYPE_DEPENDENT
+						&& array_key_exists($master_item['master_itemid'], $items_cache)) {
 					$master_item = $items_cache[$master_item['master_itemid']];
 				}
 				$graph_item['type'] = $master_item['type'];
