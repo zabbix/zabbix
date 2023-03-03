@@ -248,7 +248,7 @@ static duk_ret_t	es_hmac(duk_context *ctx)
 	return 1;
 }
 
-#if !defined(HAVE_OPENSSL) && !defined(HAVE_GNUTLS)
+#if defined(HAVE_OPENSSL) || defined(HAVE_GNUTLS)
 static void	unescape_newlines(const char *in, size_t *len, char *out)
 {
 	const char	*end = in + *len;
