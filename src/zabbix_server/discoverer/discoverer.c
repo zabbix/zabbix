@@ -77,20 +77,28 @@ zbx_discoverer_host_job_count_t;
 
 typedef struct
 {
+	zbx_uint64_t			druleid;
+	zbx_discoverer_drule_job_t	*job_ref;
+}
+zbx_discoverer_drule_t;
+
+ZBX_PTR_VECTOR_DECL(discoverer_drules, zbx_discoverer_drule_t)
+
+typedef struct
+{
 	int				workers_num;
 	zbx_discoverer_worker_t		*workers;
 	zbx_discoverer_queue_t		queue;
+	zbx_vector_discoverer_drules_t	drules;
 
 	zbx_vector_ptr_t		incomplete_job_count;
 	zbx_hashset_t			results;
 	pthread_rwlock_t		results_rwlock;
-
-	zbx_vector_uint64_pair_t	revisions;
-	pthread_rwlock_t		revisions_rwlock;
 }
 zbx_discoverer_manager_t;
 
 ZBX_PTR_VECTOR_IMPL(discoverer_net_check, DC_DCHECK *)
+ZBX_PTR_VECTOR_IMPL(discoverer_drules, zbx_discoverer_drule_t)
 
 extern unsigned char			program_type;
 
@@ -1305,15 +1313,14 @@ static void	*discoverer_net_check(void *net_check_worker)
 
 		if (NULL != (job = discoverer_queue_pop(queue)))
 		{
-			int				index, config_timeout, dismiss = 1;
-			zbx_uint64_t			druleid, drule_revision;
-			zbx_uint64_pair_t		revision, *revision_updated;
+			int				config_timeout;
+			zbx_uint64_t			druleid;
 			zbx_discoverer_net_check_task_t	*task;
 
 			if (SUCCEED != zbx_list_pop(&job->tasks, (void*)&task))
 			{
 				if (0 == job->workers_used)
-					zbx_discoverer_job_net_check_free(job);
+					zbx_discoverer_job_net_check_destroy(job);
 				else
 					job->status = DISCOVERER_JOB_STATUS_REMOVING;
 
@@ -1332,41 +1339,8 @@ static void	*discoverer_net_check(void *net_check_worker)
 
 			config_timeout = job->config_timeout;
 			druleid = job->druleid;
-			drule_revision = job->drule_revision;
 
 			discoverer_queue_unlock(queue);
-
-			/* check if drule was updated or deleted */
-
-			revision.first = druleid;
-			pthread_rwlock_rdlock(&dmanager.revisions_rwlock);
-
-			if (FAIL != (index = zbx_vector_uint64_pair_bsearch(&dmanager.revisions, revision,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-			{
-				revision_updated = (zbx_uint64_pair_t*)&dmanager.revisions.values[index];
-
-				if (revision_updated->second == drule_revision)
-					dismiss = 0;
-			}
-
-			pthread_rwlock_unlock(&dmanager.revisions_rwlock);
-
-			if (0 != dismiss)
-			{
-				pthread_rwlock_wrlock(&dmanager.results_rwlock);
-				discoverer_host_job_count_decrease(&dmanager.incomplete_job_count, druleid, task->ip,
-						task->dchecks.values_num);
-				pthread_rwlock_unlock(&dmanager.results_rwlock);
-				zbx_discoverer_job_net_check_task_free(task);
-
-				discoverer_queue_lock(queue);
-
-				if (1 == job->workers_used)
-					zbx_discoverer_job_net_check_free(job);
-
-				continue;
-			}
 
 			/* process checks */
 
@@ -1442,11 +1416,10 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 
 	zbx_hashset_create(&manager->results, 1, discoverer_result_hash, discoverer_result_compare);
 
-	zbx_vector_uint64_pair_create(&manager->revisions);
 	zbx_vector_ptr_create(&manager->incomplete_job_count);
+	zbx_vector_discoverer_drules_create(&manager->drules);
 
-	if (0 != (err = pthread_rwlock_init(&manager->revisions_rwlock, NULL)) ||
-			0 != (err = pthread_rwlock_init(&manager->results_rwlock, NULL)))
+	if (0 != (err = pthread_rwlock_init(&manager->results_rwlock, NULL)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot initialize mutex: %s", zbx_strerror(err));
 		return FAIL;
@@ -1530,8 +1503,20 @@ static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 
 	discoverer_queue_destroy(&manager->queue);
 
-	zbx_vector_uint64_pair_clear(&manager->revisions);
+	for (i = 0; i < manager->incomplete_job_count.values_num; i++)
+	{
+		zbx_discoverer_job_count_t	*job_count;
+
+		job_count = (zbx_discoverer_job_count_t*)manager->incomplete_job_count.values[i];
+
+		zbx_hashset_destroy(&job_count->host_job_count);
+	}
+
 	zbx_vector_ptr_clear(&manager->incomplete_job_count);
+	zbx_vector_ptr_destroy(&manager->incomplete_job_count);
+
+	zbx_vector_discoverer_drules_clear(&manager->drules);
+	zbx_vector_discoverer_drules_destroy(&manager->drules);
 
 	zbx_hashset_iter_reset(&manager->results, &iter);
 
@@ -1592,6 +1577,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
+		int		i;
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
@@ -1606,10 +1592,28 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		/* update local drules revisions */
 		zbx_vector_uint64_pair_clear(&revisions);
 		zbx_dc_drule_revisions_get(&revisions);
-		pthread_rwlock_wrlock(&dmanager.revisions_rwlock);
-		zbx_vector_uint64_pair_clear(&dmanager.revisions);
-		zbx_vector_uint64_pair_append_array(&dmanager.revisions, revisions.values, revisions.values_num);
-		pthread_rwlock_unlock(&dmanager.revisions_rwlock);
+
+		discoverer_queue_lock(&dmanager.queue);
+
+		for (i = 0; i < dmanager.drules.values_num; i++)
+		{
+			int			k;
+			zbx_uint64_pair_t	revision;
+			zbx_discoverer_drule_t	*drule = (zbx_discoverer_drule_t*)&dmanager.drules.values[i];
+
+			revision.first = drule->druleid;
+
+			if (FAIL != (k = zbx_vector_uint64_pair_bsearch(&revisions, revision,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				zbx_uint64_pair_t	*rev = (zbx_uint64_pair_t*)&revisions.values[k];
+
+				if (rev->second != drule->job_ref->drule_revision)
+					zbx_discoverer_job_net_check_free(drule->job_ref);
+			}
+		}
+
+		discoverer_queue_unlock(&dmanager.queue);
 
 		if ((int)sec >= nextresult)
 		{
@@ -1635,8 +1639,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 			if (0 < rule_count)
 			{
-				int	i;
-
 				pthread_rwlock_wrlock(&dmanager.results_rwlock);
 				zbx_vector_ptr_append_array(&dmanager.incomplete_job_count, job_counts.values,
 						job_counts.values_num);
@@ -1645,12 +1647,18 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 				discoverer_queue_lock(&dmanager.queue);
 
+				zbx_vector_discoverer_drules_clear(&dmanager.drules);
+
 				for (i = 0; i < jobs.values_num; i++)
 				{
 					zbx_discoverer_drule_job_t	*job;
+					zbx_discoverer_drule_t		drule;
 
 					job = (zbx_discoverer_drule_job_t*)jobs.values[i];
 					discoverer_queue_push(&dmanager.queue, job);
+					drule.druleid = job->druleid;
+					drule.job_ref = job;
+					zbx_vector_discoverer_drules_append(&dmanager.drules, drule);
 				}
 
 				discoverer_queue_notify_all(&dmanager.queue);

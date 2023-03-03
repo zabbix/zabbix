@@ -41,6 +41,11 @@ void	zbx_discoverer_job_net_check_free(zbx_discoverer_drule_job_t *job)
 
 	while (SUCCEED == zbx_list_pop(&job->tasks, (void*)&task))
 		zbx_discoverer_job_net_check_task_free(task);
+}
+
+void	zbx_discoverer_job_net_check_destroy(zbx_discoverer_drule_job_t *job)
+{
+	zbx_discoverer_job_net_check_free(job);
 
 	zbx_free(job);
 }

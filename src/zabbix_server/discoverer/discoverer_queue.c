@@ -124,7 +124,7 @@ void	discoverer_queue_clear_jobs(zbx_list_t *jobs)
 	zbx_discoverer_drule_job_t	*job = NULL;
 
 	while (SUCCEED == zbx_list_pop(jobs, (void **)&job))
-		zbx_discoverer_job_net_check_free(job);
+		zbx_discoverer_job_net_check_destroy(job);
 }
 
 /******************************************************************************
