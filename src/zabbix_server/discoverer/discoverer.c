@@ -1220,6 +1220,8 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_net
 		zbx_vector_ptr_append(&services, service);
 	}
 
+	zbx_free(value);
+
 	result_cmp.druleid = druleid;
 	result_cmp.ip = task->ip;
 
@@ -1243,7 +1245,6 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_net
 	discoverer_task_count_decrease(&dmanager.incomplete_task_count, druleid, task->ip, task->dchecks.values_num);
 	pthread_rwlock_unlock(&dmanager.results_rwlock);
 
-	zbx_free(value);
 	zbx_vector_ptr_destroy(&services);
 }
 
@@ -1598,7 +1599,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			if (0 < rule_count)
 			{
 				pthread_rwlock_wrlock(&dmanager.results_rwlock);
-				zbx_hashset_clear(&dmanager.incomplete_task_count);
+				zbx_hashset_destroy(&dmanager.incomplete_task_count);
 				zbx_hashset_copy(&dmanager.incomplete_task_count, &task_counts,
 						sizeof(zbx_discoverer_task_count_t));
 				pthread_rwlock_unlock(&dmanager.results_rwlock);
