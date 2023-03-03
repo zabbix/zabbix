@@ -175,15 +175,15 @@ static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process low level discovery value/error                           *
+ * Purpose: enqueue low level discovery value/error                           *
  *                                                                            *
- * Parameters: itemid      - [IN] LLD rule id                                 *
- *             hostid      - [IN] host id                                     *
+ * Parameters: itemid      - [IN]                                             *
+ *             hostid      - [IN]                                             *
  *             value       - [IN] rule value (can be NULL if error is set)    *
  *             ts          - [IN] value timestamp                             *
  *             meta        - [IN] flag to include metadata                    *
- *             lastlogsize - [IN] metadata of last log size                   *
- *             mtime       - [IN] metadata timestamp                          *
+ *             lastlogsize - [IN] (metadata)                                  *
+ *             mtime       - [IN] (metadata)                                  *
  *             error       - [IN] error message (can be NULL)                 *
  *                                                                            *
  ******************************************************************************/
@@ -217,8 +217,8 @@ void	zbx_lld_queue_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *v
  *                                                                            *
  * Purpose: process low level discovery agent result                          *
  *                                                                            *
- * Parameters: itemid - [IN] LLD rule id                                      *
- *             hostid - [IN] host id                                          *
+ * Parameters: itemid - [IN]                                                  *
+ *             hostid - [IN]                                                  *
  *             result - [IN] agent result                                     *
  *             ts     - [IN] value timestamp                                  *
  *             error  - [IN] error message (can be NULL)                      *

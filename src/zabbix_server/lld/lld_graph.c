@@ -173,7 +173,8 @@ static void	lld_graphs_free(zbx_vector_ptr_t *graphs)
  *                                                                            *
  * Parameters: parent_graphid - [IN] graph prototype identifier               *
  *             graphs         - [OUT] sorted list of graphs                   *
- *             ...            - [IN] update flag condition values             *
+ *             ...            - [IN] new values which should be updated if    *
+ *                                   different from original                  *
  *                                                                            *
  ******************************************************************************/
 static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs, int width, int height,
@@ -818,7 +819,7 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
  *                                                                            *
  * Purpose: validate sorted graph                                             *
  *                                                                            *
- * Parameters: hostid - [IN] host identifier                                  *
+ * Parameters: hostid - [IN]                                                  *
  *             graphs - [IN] sorted list of graphs                            *
  *             error  - [OUT]                                                 *
  *                                                                            *

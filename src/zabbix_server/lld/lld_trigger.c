@@ -295,7 +295,6 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 {
 	DB_RESULT			result;
 	DB_ROW				row;
-	zbx_lld_trigger_prototype_t	*trigger_prototype;
 	char				*errmsg = NULL;
 
 	result = zbx_db_select(
@@ -314,7 +313,7 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 	/* run through trigger prototypes */
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		trigger_prototype = (zbx_lld_trigger_prototype_t *)zbx_malloc(NULL,
+		zbx_lld_trigger_prototype_t	*trigger_prototype = (zbx_lld_trigger_prototype_t *)zbx_malloc(NULL,
 				sizeof(zbx_lld_trigger_prototype_t));
 
 		ZBX_STR2UINT64(trigger_prototype->triggerid, row[0]);
@@ -3372,7 +3371,7 @@ static void	zbx_trigger_cache_clean(zbx_hashset_t *cache)
  * Purpose: removes trigger dependency                                        *
  *                                                                            *
  * Parameters: from  - [IN] reference to dependent trigger                    *
- *             to    - [IN] reference to trigger the from depends on          *
+ *             to    - [IN] reference to trigger the 'from' depends on        *
  *             error - [OUT] error message                                    *
  *                                                                            *
  * Comments: If possible (the dependency loop was introduced by discovered    *
@@ -3434,7 +3433,6 @@ static void	lld_trigger_dependency_delete(zbx_lld_trigger_ref_t *from, zbx_lld_t
  * Purpose: iterates through trigger dependencies to find dependency loops    *
  *                                                                            *
  * Parameters: cache         - [IN] trigger cache                             *
- *             triggers      - [IN] discovered triggers                       *
  *             trigger_node  - [IN] trigger to check                          *
  *             iter          - [IN] dependency iterator                       *
  *             level         - [IN] dependency level                          *

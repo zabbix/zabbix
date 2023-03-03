@@ -99,7 +99,7 @@ zbx_lld_item_preproc_t;
 
 ZBX_PTR_VECTOR_DECL(lld_item_preproc, zbx_lld_item_preproc_t*)
 
-typedef struct zbx_lld_item_preproc_s
+typedef struct
 {
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		valuemapid;
