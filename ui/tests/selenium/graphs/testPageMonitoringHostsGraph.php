@@ -46,50 +46,19 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	private static $graphids;
 
 	public static function prepareGraphsData() {
-		CDataHelper::createHosts([
+		CDataHelper::call('host.create', [
 			[
 				'host' => 'Host_for_monitoring_graphs_1',
 				'groups' => [
 					'groupid' => 4
 				],
-				'interfaces' => [],
-				'items' => [
-					[
-						'name' => 'Item_for_graph_1',
-						'key_' => 'trap_1',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'tags' => [
-							[
-								'tag' => 'tag_name_1',
-								'value' => 'tag_value_1'
-							]
-						]
-					],
-					[
-						'name' => 'Item_for_graph_2',
-						'key_' => 'trap_2',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'tags' => [
-							[
-								'tag' => 'tag_name_2',
-								'value' => 'tag_value_2'
-							]
-						]
-					],
-					[
-						'name' => 'Item_for_graph_3',
-						'key_' => 'trap_3',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'tags' => [
-							[
-								'tag' => 'tag_name_3',
-								'value' => 'tag_value_3'
-							]
-						]
-					]
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => '10050'
 				]
 			],
 			[
@@ -97,15 +66,64 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				'groups' => [
 					'groupid' => 4
 				],
-				'interfaces' => [],
-				'items' => [
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => '10050'
+				]
+			]
+		]);
+		$hostid = CDataHelper::getIds('host');
+
+		CDataHelper::call('item.create', [
+			[
+				'name' => 'Item_for_graph_1',
+				'key_' => 'trap_1',
+				'hostid' => $hostid['Host_for_monitoring_graphs_1'],
+				'type' => 2,
+				'value_type' => 0,
+				'tags' => [
 					[
-						'name' => 'Item_for_graph_4',
-						'key_' => 'trap_4',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
+						'tag' => 'tag_name_1',
+						'value' => 'tag_value_1'
 					]
 				]
+			],
+			[
+				'name' => 'Item_for_graph_2',
+				'key_' => 'trap_2',
+				'hostid' => $hostid['Host_for_monitoring_graphs_1'],
+				'type' => 2,
+				'value_type' => 0,
+				'tags' => [
+					[
+						'tag' => 'tag_name_2',
+						'value' => 'tag_value_2'
+					]
+				]
+			],
+			[
+				'name' => 'Item_for_graph_3',
+				'key_' => 'trap_3',
+				'hostid' => $hostid['Host_for_monitoring_graphs_1'],
+				'type' => 2,
+				'value_type' => 0,
+				'tags' => [
+					[
+						'tag' => 'tag_name_3',
+						'value' => 'tag_value_3'
+					]
+				]
+			],
+			[
+				'name' => 'Item_for_graph_4',
+				'key_' => 'trap_4',
+				'hostid' => $hostid['Host_for_monitoring_graphs_2'],
+				'type' => 2,
+				'value_type' => 0
 			]
 		]);
 		self::$itemids = CDataHelper::getIds('name');
