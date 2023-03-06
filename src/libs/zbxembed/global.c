@@ -291,9 +291,9 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 
 	return duk_error(ctx, DUK_RET_TYPE_ERROR, "encryption support was not compiled in");
 #else
-	char			*key = NULL, *key_unesc = NULL, *text, *error = NULL, *out = NULL;
+	char			*key = NULL, *key_unesc = NULL, *text = NULL, *error = NULL, *out = NULL;
 	unsigned char		*raw_sig = NULL;
-	const char		*algo;
+	const char		*algo, *key_ptr;
 	duk_size_t		key_len, text_len;
 	duk_int_t		arg_type;
 	size_t			raw_sig_len, key_unesc_alloc = 0;
@@ -305,38 +305,42 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 	if (0 != strcmp(algo, "sha256"))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "unsupported hash function, only 'sha256' is supported");
 
-	text = es_get_buffer_dyn(ctx, 2, &text_len);
-
 	arg_type = duk_get_type(ctx, 1);
 
 	if (DUK_TYPE_UNDEFINED == arg_type)
 	{
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "parameter 'key' is missing or is undefined");
+		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "parameter 'key' is missing or is undefined");
+		goto out;
 	}
 	else
 	{
-		const char	*ptr;
-
 		if (DUK_TYPE_BUFFER == arg_type || DUK_TYPE_OBJECT == arg_type)
 		{
-			ptr = duk_buffer_to_string(ctx, 1);
+			key_ptr = duk_buffer_to_string(ctx, 1);
+			key_len = strlen(key_ptr);
 		}
 		else
-			ptr = duk_require_lstring(ctx, 1, &key_len);
+			key_ptr = duk_require_lstring(ctx, 1, &key_len);
 
-		if ('\0' == ptr[0])
-			return duk_error(ctx, DUK_RET_TYPE_ERROR, "private key cannot be empty");
-
-		key = zbx_strdup(NULL, ptr);
+		if ('\0' == key_ptr[0])
+		{
+			err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "private key cannot be empty");
+			goto out;
+		}
 	}
+
+	text = es_get_buffer_dyn(ctx, 2, &text_len);
 
 	if (0 == text_len)
 	{
-		zbx_free(key);
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "data cannot be empty");
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "data cannot be empty");
+		goto out;
 	}
 
+	key = zbx_strdup(NULL, key_ptr);
+
 	zbx_json_decodevalue_dyn(key, &key_unesc, &key_unesc_alloc, &jtype);
+
 	if (NULL != key_unesc)
 	{
 		zbx_free(key);
@@ -353,9 +357,8 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 
 	if (SUCCEED != zbx_format_pem_pkey(&key))
 	{
-		zbx_free(key);
-		zbx_free(text);
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "failed to parse private key");
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "failed to parse private key");
+		goto out;
 	}
 
 	if (SUCCEED == (ret = zbx_rs256_sign(key, key_len, text, text_len, &raw_sig, &raw_sig_len, &error)))
@@ -366,19 +369,19 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 		out = (char *)zbx_malloc(NULL, hex_sig_len);
 		zbx_bin2hex(raw_sig, raw_sig_len, out, hex_sig_len);
 		zbx_free(raw_sig);
+
+		duk_push_string(ctx, out);
+		zbx_free(out);
 	}
 	else
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, error);
-
+out:
 	zbx_free(error);
 	zbx_free(text);
 	zbx_free(key);
 
 	if (-1 != err_index)
 		return duk_throw(ctx);
-
-	duk_push_string(ctx, out);
-	zbx_free(out);
 
 	return 1;
 #endif
