@@ -28,9 +28,8 @@
 #include "zbxnum.h"
 
 #if !defined(HAVE_SSH_OPTIONS_KEY_EXCHANGE) && !defined(HAVE_SSH_OPTIONS_HOSTKEYS) && \
-		!defined(HAVE_SSH_OPTIONS_HOSTKEYS) && !defined(HAVE_SSH_OPTIONS_CIPHERS_C_S) && \
-		!defined(HAVE_SSH_OPTIONS_CIPHERS_S_C) && !defined(HAVE_SSH_OPTIONS_HMAC_C_S) && \
-		!defined(HAVE_SSH_OPTIONS_HMAC_S_C)
+		!defined(HAVE_SSH_OPTIONS_CIPHERS_C_S) && !defined(HAVE_SSH_OPTIONS_CIPHERS_S_C) && \
+		!defined(HAVE_SSH_OPTIONS_HMAC_C_S) && !defined(HAVE_SSH_OPTIONS_HMAC_S_C)
 #define HAVE_NO_SSH_OPTIONS	1
 #endif
 
@@ -40,6 +39,7 @@
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_SSH_KEY_LOCATION;
 
+#ifndef HAVE_NO_SSH_OPTIONS
 static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const char *key_str, const char *value,
 		char **err_msg)
 {
@@ -58,6 +58,7 @@ static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const c
 
 	return ret;
 }
+#endif
 
 static int	ssh_parse_options(ssh_session session, const char *options, char **err_msg)
 {
@@ -79,7 +80,6 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 #ifdef HAVE_NO_SSH_OPTIONS
 		ZBX_UNUSED(session);
 		ZBX_UNUSED(eq_str);
-		ZBX_UNUSED(ssh_set_options);
 #endif
 
 #ifdef HAVE_SSH_OPTIONS_KEY_EXCHANGE
@@ -145,6 +145,7 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 
 	return ret;
 }
+#undef HAVE_NO_SSH_OPTIONS
 
 /* example ssh.run["ls /"] */
 int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const char *options)
