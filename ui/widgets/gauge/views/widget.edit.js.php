@@ -68,11 +68,17 @@ window.widget_gauge_form = new class {
 			}
 		}
 
-		this.toggleGoup(document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color'),
+		/*
+		 * "Min/Max show units" must be before "Show units", because the "Show units" takes higher priority. Disabling
+		 * "Show units" should also disable "Min/max show units". But when enabled, "Min/max show units" depends on the
+		 * main "Min/Max" checkbox.
+		 */
+		this.toggleGoup(document.querySelectorAll('#minmax, #minmax_size, #minmax_show_units'), this._minmax_show);
+		this.toggleGoup(
+			document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color, #minmax_show_units'),
 			this._units_show
 		);
 		this.toggleGoup(document.querySelectorAll('#needle, #needle_color'), this._needle_show);
-		this.toggleGoup(document.querySelectorAll('#minmax, #minmax_size, #minmax_show_units'), this._minmax_show);
 		this.toggleGoup(document.querySelectorAll('#th_arc_size'), this._th_show_arc);
 	}
 

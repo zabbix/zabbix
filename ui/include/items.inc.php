@@ -1403,18 +1403,20 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 				return [
 					'value' => $mapped_value.' ('.$value.')',
 					'units' => '',
+					'power' => null,
 					'is_mapped' => true
 				];
 			}
 
 			$converted_value = convertUnitsRaw([
 				'value' => $value,
-				'units' => $item['units']
+				'units' => $item['units'],
 			] + $convert_options);
 
 			return [
 				'value' => $converted_value['value'],
 				'units' => $converted_value['units'],
+				'power' => $converted_value['power'],
 				'is_mapped' => false
 			];
 
@@ -1432,6 +1434,7 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 			return [
 				'value' => $value,
 				'units' => '',
+				'power' => null,
 				'is_mapped' => $mapped_value !== false
 			];
 
@@ -1439,6 +1442,7 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 			return [
 				'value' => _('Unknown value type'),
 				'units' => '',
+				'power' => null,
 				'is_mapped' => false
 			];
 	}

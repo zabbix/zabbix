@@ -35,8 +35,12 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldSelect,
 	CWidgetFieldTextArea,
 	CWidgetFieldTextBox,
+	CWidgetFieldNumericBox,
 	CWidgetFieldThresholds
 };
+
+use CNumberParser,
+	CParser;
 
 use Widgets\Gauge\Widget;
 
@@ -57,9 +61,9 @@ class WidgetForm extends CWidgetForm {
 	private const MAX = ZBX_MAX_INT32;
 	private const DEFAULT_MIN = 0;
 	private const DEFAULT_MAX = 100;
-	private const DEFAULT_MINMAX_SHOW = 0;
-	private const DEFAULT_MINMAX_SHOW_UNITS = 1;
-	private const DEFAULT_MINMAX_SIZE_PERCENT = 15;
+	private const DEFAULT_MINMAX_SHOW = 1;
+	private const DEFAULT_MINMAX_SHOW_UNITS = 0;
+	private const DEFAULT_MINMAX_SIZE_PERCENT = 5;
 
 	// Description defaults.
 	private const DEFAULT_DESCRIPTION_SIZE_PERCENT = 15;
@@ -71,28 +75,76 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_DECIMAL_PLACES = 2;
 
 	// Value defaults.
-	private const DEFAULT_VALUE_SIZE_PERCENT = 35;
+	private const DEFAULT_VALUE_SIZE_PERCENT = 30;
 	private const DEFAULT_VALUE_ARC_SHOW = 1;
-	private const DEFAULT_VALUE_BOLD = 1;
+	private const DEFAULT_VALUE_BOLD = 0;
 
 	// Value arc defaults.
 	private const DEFAULT_VALUE_ARC_SIZE_PERCENT = 5;
 
 	// Unit defaults.
 	private const DEFAULT_UNITS_SHOW = 1;
-	private const DEFAULT_UNITS_SIZE_PERCENT = 35;
+	private const DEFAULT_UNITS_SIZE_PERCENT = 30;
 	private const DEFAULT_UNITS_BOLD = 1;
 
 	// Needle defaults.
-	private const DEFAULT_NEEDLE_SHOW = 1;
+	private const DEFAULT_NEEDLE_SHOW = 0;
 
 	// Threshold defaults.
-	private const DEFAULT_TH_SHOW_LABELS = 1;
-	private const DEFAULT_TH_SHOW_ARC = 1;
-	private const DEFAULT_TH_ARC_SIZE_PERCENT = 35;
+	private const DEFAULT_TH_SHOW_LABELS = 0;
+	private const DEFAULT_TH_SHOW_ARC = 0;
+	private const DEFAULT_TH_ARC_SIZE_PERCENT = 10;
 
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
+
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+
+		$min = $number_parser->parse($this->getFieldValue('min')) == CParser::PARSE_SUCCESS
+			? $number_parser->calcValue()
+			: null;
+
+		$max = $number_parser->parse($this->getFieldValue('max')) == CParser::PARSE_SUCCESS
+			? $number_parser->calcValue()
+			: null;
+
+		if ($min !== null && $max !== null && $min >= $max) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _s('value must be greater than "%1$s"', $min));
+		}
+
+		$prev_treshold = null;
+		$min_treshold = null;
+		$max_treshold = null;
+
+		foreach ($this->getFieldValue('thresholds') as $threshold) {
+			$threshold_value = $number_parser->parse($threshold['threshold_value']) == CParser::PARSE_SUCCESS
+				? $number_parser->calcValue()
+				: null;
+
+			if ($threshold_value !== null) {
+				if ($prev_treshold === null) {
+					$min_treshold = $threshold_value;
+					$max_treshold = $threshold_value;
+				}
+				elseif ($threshold_value > $prev_treshold) {
+					$max_treshold = $threshold_value;
+				}
+				elseif ($threshold_value < $prev_treshold) {
+					$min_treshold = $threshold_value;
+				}
+			}
+		}
+
+		if ($min_treshold !== null && $min_treshold < $min) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Thresholds'),
+				_s('value must be no less than "%1$s"', $min)
+			);
+		}
+		if ($max_treshold !== null && $max_treshold > $max) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Thresholds'),
+				_s('value must be no greater than "%1$s"', $max)
+			);
+		}
 
 		return $errors;
 	}
@@ -103,6 +155,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldMultiSelectItem('itemid', _('Item'), $this->templateid))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
+					->setFilterParameter('numeric', true)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('angle', _('Angle'),
@@ -111,14 +164,14 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(self::DEFAULT_ANGLE)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('min', _('Min'), self::MIN, self::MAX))
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+				(new CWidgetFieldNumericBox('min', _('Min')))
 					->setDefault(self::DEFAULT_MIN)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('max', _('Max'), self::MIN, self::MAX))
+				(new CWidgetFieldNumericBox('max', _('Max')))
+				->setDefault(self::DEFAULT_MAX)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-					->setDefault(self::DEFAULT_MAX)
 			)
 			->addField(
 				new CWidgetFieldCheckBox('adv_conf', _('Advanced configuration'))

@@ -38,10 +38,10 @@ $form
 		new CWidgetFieldRadioButtonListView($data['fields']['angle'])
 	)
 	->addField(
-		new CWidgetFieldIntegerBoxView($data['fields']['min'])
+		new CWidgetFieldNumericBoxView($data['fields']['min'])
 	)
 	->addField(
-		new CWidgetFieldIntegerBoxView($data['fields']['max'])
+		new CWidgetFieldNumericBoxView($data['fields']['max'])
 	)
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['adv_conf'])

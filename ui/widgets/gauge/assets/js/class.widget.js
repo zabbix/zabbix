@@ -21,5 +21,20 @@
 class CWidgetGauge extends CWidget {
 	_init() {
 		super._init();
+
+		this._initial_load = true;
+	}
+
+	_getUpdateRequestData() {
+		return {
+			...super._getUpdateRequestData(),
+			initial_load: this._initial_load ? 1 : 0
+		};
+	}
+
+	_processUpdateResponse(response) {
+		super._processUpdateResponse(response);
+
+		this._initial_load = false;
 	}
 }
