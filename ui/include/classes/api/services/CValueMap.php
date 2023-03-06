@@ -365,7 +365,7 @@ class CValueMap extends CApiService {
 			'host_status' =>	['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid')]
+				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('valuemap', 'uuid')]
 			]],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
@@ -413,7 +413,7 @@ class CValueMap extends CApiService {
 		}
 
 		$this->checkDuplicates($names_by_hostid);
-		$this->checkAndAddUuid($valuemaps, []);
+		$this->checkAndAddUuid($valuemaps);
 	}
 
 	/**
@@ -424,7 +424,7 @@ class CValueMap extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$valuemaps, array $db_valuemaps): void {
+	protected function checkAndAddUuid(array &$valuemaps, array $db_valuemaps = []): void {
 		$new_value_map_uuids = [];
 
 		foreach ($valuemaps as &$valuemap) {
@@ -494,7 +494,7 @@ class CValueMap extends CApiService {
 			'host_status' =>	['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid')]
+				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('valuemap', 'uuid')]
 			]],
 			'valuemapid' =>		['type' => API_ANY],
 			'hostid' =>			['type' => API_ANY],

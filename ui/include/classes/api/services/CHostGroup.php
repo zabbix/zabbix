@@ -559,7 +559,7 @@ class CHostGroup extends CApiService {
 		}
 
 		self::checkDuplicates($groups);
-		self::checkAndAddUuid($groups, []);
+		self::checkAndAddUuid($groups);
 	}
 
 	/**
@@ -749,7 +749,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkAndAddUuid(array &$groups, array $db_groups): void {
+	private static function checkAndAddUuid(array &$groups, array $db_groups = []): void {
 		$new_groups_uuids = [];
 
 		foreach ($groups as &$group) {

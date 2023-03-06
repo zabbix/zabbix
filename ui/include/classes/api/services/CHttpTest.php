@@ -296,7 +296,7 @@ class CHttpTest extends CApiService {
 			'host_status' =>		['type' => API_ANY],
 			'uuid' =>				['type' => API_MULTIPLE, 'rules' => [
 				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_UNEXPECTED]
+				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('httptest', 'uuid')]
 			]],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
 			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
@@ -359,7 +359,7 @@ class CHttpTest extends CApiService {
 			$names_by_hostid[$httptest['hostid']][] = $httptest['name'];
 		}
 
-		$this->checkAndAddUuid($httptests, []);
+		$this->checkAndAddUuid($httptests);
 
 		$this->checkDuplicates($names_by_hostid);
 		$this->validateAuthParameters($httptests, __FUNCTION__);
@@ -375,7 +375,7 @@ class CHttpTest extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$httptests_to_save, array $db_httptests): void {
+	protected function checkAndAddUuid(array &$httptests_to_save, array $db_httptests = []): void {
 		$new_httptest_uuids = [];
 
 		foreach ($httptests_to_save as &$httptest) {
@@ -484,7 +484,7 @@ class CHttpTest extends CApiService {
 			'host_status' => 		['type' => API_ANY],
 			'uuid' =>				['type' => API_MULTIPLE, 'rules' => [
 				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_UNEXPECTED]
+				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('httptest', 'uuid')]
 			]],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
 			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],

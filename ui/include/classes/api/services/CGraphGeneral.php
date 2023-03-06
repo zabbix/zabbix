@@ -582,7 +582,7 @@ abstract class CGraphGeneral extends CApiService {
 			'host_status' =>	['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_UNEXPECTED]
+				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('graphs', 'uuid')]
 			]],
 			'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
 		]];
@@ -783,7 +783,7 @@ abstract class CGraphGeneral extends CApiService {
 			'host_status' => ['type' => API_ANY],
 			'uuid' =>		['type' => API_MULTIPLE, 'rules' => [
 				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_UNEXPECTED]
+				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('graphs', 'uuid')]
 			]],
 			'name' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
 		]];

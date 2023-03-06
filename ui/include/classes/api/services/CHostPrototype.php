@@ -470,7 +470,7 @@ class CHostPrototype extends CHostBase {
 			'host_status' =>		['type' => API_ANY],
 			'uuid' =>				['type' => API_MULTIPLE, 'rules' => [
 				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_UNEXPECTED]
+				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'uuid')]
 			]],
 			'ruleid' =>				['type' => API_ANY],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
@@ -508,7 +508,7 @@ class CHostPrototype extends CHostBase {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkAndAddUuid($host_prototypes, []);
+		self::checkAndAddUuid($host_prototypes);
 		self::checkDiscoveryRules($host_prototypes);
 		self::checkDuplicates($host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
@@ -643,7 +643,7 @@ class CHostPrototype extends CHostBase {
 			'host_status' => ['type' => API_ANY],
 			'uuid' =>	['type' => API_MULTIPLE, 'rules' => [
 				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_UNEXPECTED]
+				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'uuid')]
 			]],
 			'ruleid' =>	['type' => API_ANY],
 			'host' =>	['type' => API_H_NAME],
@@ -1075,7 +1075,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkAndAddUuid(array &$host_prototypes, array $db_host_prototypes): void {
+	private static function checkAndAddUuid(array &$host_prototypes, array $db_host_prototypes = []): void {
 		$new_host_prototype_uuids = [];
 
 		foreach ($host_prototypes as &$host_prototype) {
