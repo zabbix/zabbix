@@ -68,6 +68,7 @@ $module_tab = (new CFormGrid())
 			: (new CLink($data['url'], $data['url']))->setTarget('_blank'))
 		)
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+			->setAttribute('autofocus', 'autofocus')
 	])
 	->addItem([
 		new CLabel(_('Enabled'), 'status'),
