@@ -610,7 +610,7 @@ abstract class CItemGeneral extends CApiService {
 		unset($item);
 
 		$this->validateValueMaps($items);
-		$this->checkAndAddUuid($items, $dbItems, $dbHosts);
+		$this->checkAndAddUuid($items, $dbItems);
 		$this->checkExistingItems($items);
 	}
 
@@ -620,15 +620,14 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @param array $items
 	 * @param array $db_items
-	 * @param array $db_hosts
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$items, array $db_items, array $db_hosts): void {
+	protected function checkAndAddUuid(array &$items, array $db_items): void {
 		$new_item_uuids = [];
 
-		foreach ($items as $index => &$item) {
-			if ($db_hosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
+		foreach ($items as &$item) {
+			if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
 				$db_uuid = array_key_exists('itemid', $item) && array_key_exists($item['itemid'], $db_items)
 					? $db_items[$item['itemid']]['uuid']
 					: '';
@@ -640,11 +639,6 @@ abstract class CItemGeneral extends CApiService {
 				if ($item['uuid'] !== $db_uuid) {
 					$new_item_uuids[] = $item['uuid'];
 				}
-			}
-			elseif (array_key_exists('uuid', $item)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
 			}
 		}
 		unset($item);
