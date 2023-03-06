@@ -291,7 +291,7 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 
 	return duk_error(ctx, DUK_RET_TYPE_ERROR, "encryption support was not compiled in");
 #else
-	char			*key = NULL, *key_unesc = NULL, *text = NULL, *error = NULL, *out = NULL;
+	char			*key_unesc = NULL, *text = NULL, *error = NULL, *out = NULL;
 	unsigned char		*raw_sig = NULL;
 	const char		*algo, *key_ptr;
 	duk_size_t		key_len, text_len;
@@ -337,27 +337,22 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 		goto out;
 	}
 
-	key = zbx_strdup(NULL, key_ptr);
-
-	zbx_json_decodevalue_dyn(key, &key_unesc, &key_unesc_alloc, &jtype);
-
-	if (NULL != key_unesc)
+	if (NULL != zbx_json_decodevalue_dyn(key_ptr, &key_unesc, &key_unesc_alloc, &jtype))
 	{
-		zbx_free(key);
-		key = key_unesc;
-		key_len = strlen(key);
+		key_len = strlen(key_unesc);
 	}
-	else if (NULL != strstr(key, "\\n"))
+	else if (NULL != strstr(key_ptr, "\\n"))
 	{
 		key_unesc = zbx_calloc(NULL, key_len + 1, sizeof(char));
-		unescape_newlines(key, &key_len, key_unesc);
-		zbx_free(key);
-		key = key_unesc;
+		unescape_newlines(key_ptr, &key_len, key_unesc);
 	}
 	else
-		zbx_normalize_pem(&key);
+	{
+		key_unesc = zbx_strdup(NULL, key_ptr);
+		zbx_normalize_pem(&key_unesc, &key_len);
+	}
 
-	if (SUCCEED == (ret = zbx_rs256_sign(key, key_len, text, text_len, &raw_sig, &raw_sig_len, &error)))
+	if (SUCCEED == (ret = zbx_rs256_sign(key_unesc, key_len, text, text_len, &raw_sig, &raw_sig_len, &error)))
 	{
 		size_t	hex_sig_len;
 
@@ -374,7 +369,7 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 out:
 	zbx_free(error);
 	zbx_free(text);
-	zbx_free(key);
+	zbx_free(key_unesc);
 
 	if (-1 != err_index)
 		return duk_throw(ctx);

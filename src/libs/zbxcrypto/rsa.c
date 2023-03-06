@@ -44,32 +44,34 @@
  *     key     - [OUT/IN] the key in PEM container                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_normalize_pem(char **key)
+void	zbx_normalize_pem(char **key, size_t *key_len)
 {
 #define PEM_BEGIN		"-----BEGIN"
 #define PEM_BEGIN_HEADER_END	"-----"
 #define PEM_FOOTER_END		"-----END"
-	char	*begin_ptr, *end_ptr, *newline_begin, *newline_end;
+	char	*ptr, *newline_ptr;
 	size_t	offset;
 
 	if (0 == strncmp(*key, PEM_BEGIN, ZBX_CONST_STRLEN(PEM_BEGIN)))
 	{
-		if (NULL == (begin_ptr = strstr(*key + ZBX_CONST_STRLEN(PEM_BEGIN), PEM_BEGIN_HEADER_END)))
+		if (NULL == (ptr = strstr(*key + ZBX_CONST_STRLEN(PEM_BEGIN), PEM_BEGIN_HEADER_END)))
 			return;
 
-		if ('\n' != *(newline_begin = begin_ptr + ZBX_CONST_STRLEN(PEM_BEGIN_HEADER_END)))
+		if ('\n' != *(newline_ptr = ptr + ZBX_CONST_STRLEN(PEM_BEGIN_HEADER_END)))
 		{
-			offset = newline_begin - *key - 1;
+			offset = newline_ptr - *key - 1;
 			zbx_replace_string(key, offset, &offset, "-\n");
+			*key_len = *key_len + 1;
 		}
 
-		if (NULL == (end_ptr = strstr(*key, PEM_FOOTER_END)))
+		if (NULL == (ptr = strstr(*key, PEM_FOOTER_END)))
 			return;
 
-		if ('\n' != *(newline_end = end_ptr - 1))
+		if ('\n' != *(newline_ptr = ptr - 1))
 		{
-			offset = newline_end - *key + 1;
+			offset = newline_ptr - *key + 1;
 			zbx_replace_string(key, offset, &offset, "\n-");
+			*key_len = *key_len + 1;
 		}
 	}
 #undef PEM_BEGIN
@@ -106,9 +108,7 @@ int	zbx_rs256_sign(char *key, size_t key_len, char *data, size_t data_len, unsig
 	unsigned char	*sig = NULL;
 	size_t		sign_len;
 
-	ZBX_UNUSED(key_len);
-
-	bio = BIO_new_mem_buf(key, -1);
+	bio = BIO_new_mem_buf(key, (int)key_len);
 
 	if (NULL == (pkey = PEM_read_bio_PrivateKey(bio, NULL, NULL, NULL)) ||
 			NULL == (mdctx = EVP_MD_CTX_create()))
