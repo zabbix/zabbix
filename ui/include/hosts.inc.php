@@ -1330,7 +1330,7 @@ function prepareHostPrototypeTags(array $tags): array {
 }
 
 /**
- * Format host prototype group links received via form for API input.
+ * Format host prototype interfaces received via form for API input.
  *
  * @param array $interfaces
  * @param array $main_interfaces
