@@ -36,7 +36,7 @@
  *           The returned buffer must be freed by the caller.                 *
  *                                                                            *
  ******************************************************************************/
-static char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
+char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 {
 	duk_int_t	type;
 	const char	*ptr;
