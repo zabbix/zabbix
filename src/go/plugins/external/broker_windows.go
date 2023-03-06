@@ -24,8 +24,9 @@ package external
 
 import (
 	"errors"
-	"github.com/Microsoft/go-winio"
 	"io"
+
+	"github.com/Microsoft/go-winio"
 )
 
 func isErrConnectionClosed(err error) bool {
