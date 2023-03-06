@@ -557,8 +557,14 @@ abstract class CGraphGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	protected function validateCreate(array &$graphs) {
+		self::addGraphHostStatus($graphs);
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
-			'uuid' =>		['type' => API_UUID]
+			'host_status' =>	['type' => API_INT32],
+			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $graphs, '/', $error)) {
@@ -674,13 +680,6 @@ abstract class CGraphGeneral extends CApiService {
 					$new_graph_uuids[] = $graph['uuid'];
 				}
 			}
-			elseif (array_key_exists('uuid', $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1),
-						_s('unexpected parameter "%1$s"', 'uuid')
-					)
-				);
-			}
 		}
 		unset($graph);
 
@@ -768,8 +767,14 @@ abstract class CGraphGeneral extends CApiService {
 	 * @param array $dbGraphs
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
+		self::addGraphHostStatus($graphs);
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
-			'uuid' =>		['type' => API_UUID]
+			'host_status' => ['type' => API_INT32],
+			'uuid' =>		['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $graphs, '/', $error)) {
@@ -1347,6 +1352,55 @@ abstract class CGraphGeneral extends CApiService {
 
 		if ($graphs) {
 			$this->inherit($graphs, $data['hostids']);
+		}
+	}
+
+	/**
+	 * Extend $graphs by host status in 'host_status' property. It indicates if graph belongs to host or template.
+	 *
+	 * Function is using only the first graph item to determin its host status.
+	 *
+	 * @param array  $graphs       Graphs to extend.
+	 */
+	private static function addGraphHostStatus(array &$graphs): void {
+		$itemids_by_graph = [];
+		foreach ($graphs as $index => $graph) {
+			$itemids_by_graph[$index] = array_column($graph['gitems'], 'itemid');
+		}
+
+		if ($itemids_by_graph) {
+			$itemids = [];
+			foreach ($itemids_by_graph as $grap_itemids) {
+				$itemids += array_flip($grap_itemids);
+			}
+
+			$items = API::Item()->get([
+				'output' => [],
+				'selectHosts' => ['status'],
+				'itemids' => array_keys($itemids),
+				'preservekeys' => true
+			]);
+
+			if (count($items) != count($itemids)) {
+				$items += API::ItemPrototype()->get([
+					'output' => [],
+					'selectHosts' => ['status'],
+					'itemids' => array_keys($itemids),
+					'preservekeys' => true
+				]);
+			}
+
+			foreach ($graphs as $index => &$graph) {
+				$graph += ['host_status' => -1];
+
+				if ($graph['host_status'] == -1) {
+					$itemid = $itemids_by_graph[$index][0];
+					if (array_key_exists($itemid, $items)) {
+						$graph['host_status'] = $items[$itemid]['hosts'][0]['status'];
+					}
+				}
+			}
+			unset($graph);
 		}
 	}
 }

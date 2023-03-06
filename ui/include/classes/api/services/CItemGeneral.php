@@ -135,8 +135,14 @@ abstract class CItemGeneral extends CApiService {
 	 * @param bool  $update
 	 */
 	protected function checkInput(array &$items, $update = false) {
+		$this->addItemHostStatus($items, $update);
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
-			'uuid' => ['type' => API_UUID]
+			'host_status' => ['type' => API_INT32],
+			'uuid' =>		['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -2977,5 +2983,59 @@ abstract class CItemGeneral extends CApiService {
 		unset($step);
 
 		return $preprocessing;
+	}
+
+	/**
+	 * Extend $items by host status in 'host_status' property. It indicates if item belongs to host or template.
+	 *
+	 * @param array  $items       Items to extend.
+	 * @param bool   $update      True if called from API update method.
+	 */
+	private function addItemHostStatus(array &$items, $update): void {
+		if ($update) {
+			$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
+				'itemid' => ['type' => API_ID, 'flags' => API_REQUIRED]
+			]];
+
+			if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+
+			$db_items = $this->get([
+				'output' => [],
+				'selectHosts' => ['status'],
+				'itemids' => array_column($items, 'itemid'),
+				'preservekeys' => true
+			]);
+
+			foreach ($items as &$item) {
+				$item['host_status'] = array_key_exists($item['itemid'], $db_items)
+					? $db_items[$item['itemid']]['hosts'][0]['status']
+					: -1;
+			}
+		}
+		else {
+			$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
+				'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+			]];
+
+			if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+
+			$templateids = array_column($items, 'hostid', 'hostid');
+			$db_templates = API::Template()->get([
+				'output' => [],
+				'templateids' => $templateids,
+				'preservekeys' => true
+			]);
+
+			foreach ($items as &$item) {
+				$item['host_status'] = array_key_exists($item['hostid'], $db_templates)
+					? HOST_STATUS_TEMPLATE
+					: -1;
+			}
+			unset($item);
+		}
 	}
 }

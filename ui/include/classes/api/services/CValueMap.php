@@ -337,13 +337,40 @@ class CValueMap extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateCreate(array &$valuemaps) {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
+			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		// check permissions by hostid
+		$hostids = array_column($valuemaps, 'hostid', 'hostid');
+		$count_hosts = API::Host()->get([
+			'countOutput' => true,
+			'hostids' => $hostids,
+			'templated_hosts' => true,
+			'editable' => true
+		]);
+
+		if ($count_hosts != count($hostids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		self::addValuemapHostStatus($valuemaps);
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['hostid', 'name']], 'fields' => [
-			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-			'uuid' =>		['type' => API_UUID],
-			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
-			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-				'type' =>		['type' => API_INT32, 'default' => VALUEMAP_MAPPING_TYPE_EQUAL, 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_EQUAL, VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL, VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP, VALUEMAP_MAPPING_TYPE_DEFAULT])],
-				'value' =>		['type' => API_MULTIPLE, 'rules' => [
+			'hostid' =>			['type' => API_ID],
+			'host_status' =>	['type' => API_INT32],
+			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
+			'mappings' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'type' =>			['type' => API_INT32, 'default' => VALUEMAP_MAPPING_TYPE_EQUAL, 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_EQUAL, VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL, VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP, VALUEMAP_MAPPING_TYPE_DEFAULT])],
+				'value' =>			['type' => API_MULTIPLE, 'rules' => [
 					[
 						'if' => ['field' => 'type', 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_EQUAL])],
 						'type' => API_STRING_UTF8,
@@ -371,7 +398,7 @@ class CValueMap extends CApiService {
 						'type' => API_STRING_UTF8
 					]
 				]],
-				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
+				'newvalue' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
@@ -379,35 +406,14 @@ class CValueMap extends CApiService {
 		}
 
 		$this->validateValuemapMappings($valuemaps);
-		$hostids = [];
-
-		foreach ($valuemaps as $valuemap) {
-			$hostids[$valuemap['hostid']] = true;
-		}
-
-		$db_hosts = API::Host()->get([
-			'output' => ['status'],
-			'hostids' => array_keys($hostids),
-			'templated_hosts' => true,
-			'editable' => true,
-			'preservekeys' => true
-		]);
 
 		$names_by_hostid = [];
-
 		foreach ($valuemaps as $valuemap) {
-			// check permissions by hostid
-			if (!array_key_exists($valuemap['hostid'], $db_hosts)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
 			$names_by_hostid[$valuemap['hostid']][] = $valuemap['name'];
 		}
 
-		$this->checkAndAddUuid($valuemaps, [], $db_hosts);
 		$this->checkDuplicates($names_by_hostid);
+		$this->checkAndAddUuid($valuemaps, []);
 	}
 
 	/**
@@ -415,15 +421,14 @@ class CValueMap extends CApiService {
 	 *
 	 * @param array $valuemaps
 	 * @param array $db_valuemaps
-	 * @param array $db_hosts
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$valuemaps, array $db_valuemaps, array $db_hosts): void {
+	protected function checkAndAddUuid(array &$valuemaps, array $db_valuemaps): void {
 		$new_value_map_uuids = [];
 
-		foreach ($valuemaps as $index => &$valuemap) {
-			if ($db_hosts[$valuemap['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
+		foreach ($valuemaps as &$valuemap) {
+			if ($valuemap['host_status'] == HOST_STATUS_TEMPLATE) {
 				$db_uuid = array_key_exists('valuemapid', $valuemap)
 						&& array_key_exists($valuemap['valuemapid'], $db_valuemaps)
 					? $db_valuemaps[$valuemap['valuemapid']]['uuid']
@@ -436,11 +441,6 @@ class CValueMap extends CApiService {
 				if ($valuemap['uuid'] !== $db_uuid) {
 					$new_value_map_uuids[] = $valuemap['uuid'];
 				}
-			}
-			elseif (array_key_exists('uuid', $valuemap)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
 			}
 		}
 		unset($valuemap);
@@ -467,13 +467,42 @@ class CValueMap extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['valuemapid']], 'fields' => [
-			'uuid' => 		['type' => API_UUID],
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['valuemapid']], 'fields' => [
 			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
-			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
-				'type' =>		['type' => API_INT32, 'default' => VALUEMAP_MAPPING_TYPE_EQUAL, 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_EQUAL, VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL, VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP, VALUEMAP_MAPPING_TYPE_DEFAULT])],
-				'value' =>		['type' => API_MULTIPLE, 'rules' => [
+			'hostid' =>		['type' => API_UNEXPECTED]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_valuemaps = $this->get([
+			'output' => ['valuemapid', 'hostid', 'name', 'uuid'],
+			'valuemapids' => array_column($valuemaps, 'valuemapid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		if (count($valuemaps) != count($db_valuemaps)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$valuemaps = $this->extendObjectsByKey($valuemaps, $db_valuemaps, 'valuemapid', ['hostid']);
+		self::addValuemapHostStatus($valuemaps);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['hostid', 'name']], 'fields' => [
+			'host_status' =>	['type' => API_INT32],
+			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'valuemapid' =>		['type' => API_ID],
+			'hostid' =>			['type' => API_ID],
+			'host_status' =>	['type' => API_INT32],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
+			'mappings' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
+				'type' =>			['type' => API_INT32, 'default' => VALUEMAP_MAPPING_TYPE_EQUAL, 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_EQUAL, VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL, VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP, VALUEMAP_MAPPING_TYPE_DEFAULT])],
+				'value' =>			['type' => API_MULTIPLE, 'rules' => [
 					[
 						'if' => ['field' => 'type', 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_EQUAL])],
 						'type' => API_STRING_UTF8,
@@ -510,31 +539,6 @@ class CValueMap extends CApiService {
 		}
 
 		$this->validateValuemapMappings($valuemaps);
-		$db_valuemaps = $this->get([
-			'output' => ['valuemapid', 'hostid', 'name', 'uuid'],
-			'valuemapids' => array_column($valuemaps, 'valuemapid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		foreach ($valuemaps as $valuemap) {
-			if (!array_key_exists($valuemap['valuemapid'], $db_valuemaps)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
-
-		$valuemaps = $this->extendObjectsByKey($valuemaps, $db_valuemaps, 'valuemapid', ['hostid']);
-
-		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid', 'name']], 'fields' => [
-			'hostid' =>	['type' => API_ID],
-			'name' =>	['type' => API_STRING_UTF8]
-		]];
-
-		if (!CApiInputValidator::validateUniqueness($api_input_rules, $valuemaps, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
 
 		$names_by_hostid = [];
 
@@ -550,15 +554,7 @@ class CValueMap extends CApiService {
 			$this->checkDuplicates($names_by_hostid);
 		}
 
-		$db_hosts = API::Host()->get([
-			'output' => ['status'],
-			'hostids' => array_column($valuemaps, 'hostid'),
-			'templated_hosts' => true,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		$this->checkAndAddUuid($valuemaps, $db_valuemaps, $db_hosts);
+		$this->checkAndAddUuid($valuemaps, $db_valuemaps);
 	}
 
 	/**
@@ -661,5 +657,25 @@ class CValueMap extends CApiService {
 		}
 
 		return $db_valuemaps;
+	}
+
+	/**
+	 * Extend $valuemaps by host status in 'host_status' property. It indicates if valuemap belongs to host or template.
+	 *
+	 * @param array  $valuemaps    Valuemaps to extend.
+	 */
+	private static function addValuemapHostStatus(array &$valuemaps): void {
+		$templates = API::Template()->get([
+			'output' => ['status'],
+			'templateids' => array_column($valuemaps, 'hostid'),
+			'preservekeys' => true
+		]);
+
+		foreach ($valuemaps as &$valuemap) {
+			$valuemap['host_status'] = array_key_exists($valuemap['hostid'], $templates)
+				? $templates[$valuemap['hostid']]['status']
+				: 0;
+		}
+		unset($valuemap);
 	}
 }
