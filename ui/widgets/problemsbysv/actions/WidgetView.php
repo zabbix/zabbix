@@ -64,8 +64,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 					: [$this->getInput('dynamic_hostid')],
 				'problem' => $this->fields_values['problem'],
 				'severities' => $this->fields_values['severities'],
-				'show_type' => !$is_template_dashboard ? $this->fields_values['show_type'] : null,
-				'layout' => !$is_template_dashboard ? $this->fields_values['layout'] : null,
+				'show_type' => !$is_template_dashboard ? $this->fields_values['show_type'] : Widget::SHOW_TOTALS,
+				'layout' => $this->fields_values['layout'],
 				'show_suppressed' => $this->fields_values['show_suppressed'],
 				'hide_empty_groups' => !$is_template_dashboard ? $this->fields_values['hide_empty_groups'] : null,
 				'show_opdata' => $this->fields_values['show_opdata'],
@@ -77,7 +77,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$data = getSystemStatusData($filter);
 
-			if (!$is_template_dashboard && $filter['show_type'] == Widget::SHOW_TOTALS) {
+			if ($filter['show_type'] == Widget::SHOW_TOTALS) {
 				$data['groups'] = getSystemStatusTotals($data);
 			}
 

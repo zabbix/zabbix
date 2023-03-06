@@ -33,7 +33,7 @@ if ($data['error'] !== null) {
 	$table->setNoDataMessage($data['error']);
 }
 else {
-	if (array_key_exists('show_type', $data['filter']) && $data['filter']['show_type'] == Widget::SHOW_TOTALS) {
+	if ($data['filter']['show_type'] == Widget::SHOW_TOTALS) {
 		$table = makeSeverityTotals($data)
 			->addClass(ZBX_STYLE_BY_SEVERITY_WIDGET)
 			->addClass(ZBX_STYLE_TOTALS_LIST)

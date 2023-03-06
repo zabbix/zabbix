@@ -79,19 +79,20 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(Widget::SHOW_GROUPS)
 				: null
 			)
-			->addField($this->templateid === null
-				? (new CWidgetFieldRadioButtonList('layout', _('Layout'), [
+			->addField(
+				(new CWidgetFieldRadioButtonList('layout', _('Layout'), [
 					STYLE_HORIZONTAL => _('Horizontal'),
 					STYLE_VERTICAL => _('Vertical')
 				]))
 					->setDefault(STYLE_HORIZONTAL)
 					->setFlags(
-						!array_key_exists('show_type', $this->values)
+						$this->templateid === null
+						? !array_key_exists('show_type', $this->values)
 							|| !$this->values['show_type'] == Widget::SHOW_TOTALS
-						? CWidgetField::FLAG_DISABLED
+							? CWidgetField::FLAG_DISABLED
+							: 0x00
 						: 0x00
 					)
-				: null,
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('show_opdata', _('Show operational data'), [
