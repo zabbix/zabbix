@@ -34,13 +34,12 @@
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
-extern zbx_vector_ptr_t	zbx_addrs;
 extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
 		const zbx_config_tls_t *config_tls, const zbx_config_vault_t *config_vault,
-		const zbx_thread_info_t *thread_info, int config_timeout)
+		const zbx_thread_info_t *thread_info, int config_timeout, zbx_vector_ptr_t *config_server_addrs)
 {
 	zbx_socket_t		sock;
 	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
@@ -72,7 +71,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 
 	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_IDLE);
 
-	if (FAIL == zbx_connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, config_timeout,
+	if (FAIL == zbx_connect_to_server(&sock,CONFIG_SOURCE_IP, config_server_addrs, 600, config_timeout,
 			CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING, config_tls)) /* retry till have a connection */
 	{
 		zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
@@ -318,7 +317,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
 		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->config_tls,
-				proxyconfig_args_in->config_vault, info, proxyconfig_args_in->config_timeout);
+				proxyconfig_args_in->config_vault, info, proxyconfig_args_in->config_timeout,
+				proxyconfig_args_in->config_server_addrs);
 
 		interval = zbx_time() - sec;
 
