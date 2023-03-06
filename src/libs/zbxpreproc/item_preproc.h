@@ -20,8 +20,8 @@
 #ifndef ZABBIX_ITEM_PREPROC_H
 #define ZABBIX_ITEM_PREPROC_H
 
-#include "zbxcacheconfig.h"
 #include "zbxembed.h"
+#include "zbxtime.h"
 
 int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
 		unsigned char value_type, char **errmsg);

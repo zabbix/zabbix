@@ -19,15 +19,14 @@
 
 #include "pp_worker.h"
 #include "pp_task.h"
-#include "pp_cache.h"
 #include "pp_queue.h"
 #include "pp_execute.h"
-#include "pp_error.h"
 
 #include "zbxcommon.h"
 #include "log.h"
 #include "zbxself.h"
 #include "zbxpreproc.h"
+#include "zbxalgo.h"
 
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01

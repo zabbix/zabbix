@@ -20,7 +20,6 @@
 #include "preproc_server.h"
 
 #include "zbxpreproc.h"
-#include "zbxcommon.h"
 #include "zbxtime.h"
 #include "zbxcachehistory.h"
 #include "zbxlld.h"

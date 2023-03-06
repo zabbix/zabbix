@@ -25,9 +25,13 @@
 #include "zbxprometheus.h"
 #include "zbxxml.h"
 #include "preproc_snmp.h"
-#include "pp_worker.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
+#include "pp_history.h"
+#include "zbxdbhigh.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_LIBXML2
 #	ifndef LIBXML_THREAD_ENABLED
@@ -98,7 +102,7 @@ static const char	*pp_trim_desc(int type)
  * Purpose: execute 'trim ?' step                                             *
  *                                                                            *
  * Parameters: type   - [IN] preprocessing step type - (left|right)trim       *
- *             value  - [IN/OUT] input/output value                           *
+ *             value  - [IN/OUT]                                              *
  *             params - [IN] preprocessing parameters                         *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
@@ -163,7 +167,7 @@ static const char	*pp_delta_desc(int type)
  *                                                                            *
  * Parameters: type          - [IN] preprocessing step type - (change|speed)  *
  *             value_type    - [IN] item value type                           *
- *             value         - [IN/OUT] input/output value                    *
+ *             value         - [IN/OUT]                                       *
  *             ts            - [IN] value timestamp                           *
  *             history_value - [IN/OUT] last value                            *
  *             history_ts    - [IN/OUT] last value timestamp                  *
@@ -1022,9 +1026,9 @@ out:
  * Parameters: ctx             - [IN] worker specific execution context       *
  *             preproc         - [IN] item preprocessing data                 *
  *             cache           - [IN] preprocessing cache                     *
- *             value_in        - [IN] input value                             *
+ *             value_in        - [IN]                                         *
  *             ts              - [IN] value timestamp                         *
- *             value_out       - [OUT] output value                           *
+ *             value_out       - [OUT]                                        *
  *             results_out     - [OUT] results for each step (optional)       *
  *             results_num_out - [OUT] number of results (optional)           *
  *                                                                            *

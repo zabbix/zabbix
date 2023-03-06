@@ -19,7 +19,7 @@
 
 #include "pp_task.h"
 #include "pp_error.h"
-#include "zbxcommon.h"
+#include "pp_item.h"
 #include "zbxalgo.h"
 #include "zbxsysinc.h"
 #include "zbxipcservice.h"
@@ -101,7 +101,7 @@ static void	pp_task_test_clear(zbx_pp_task_test_t *task)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create value preprocesing task                                    *
+ * Purpose: create value preprocessing task                                   *
  *                                                                            *
  * Parameters: itemid    - [IN] item identifier                               *
  *             preproc   - [IN] item preprocessing data                       *
@@ -161,7 +161,7 @@ static void	pp_task_value_clear(zbx_pp_task_value_t *task)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create serial value preprocesing task                             *
+ * Purpose: create serial value preprocessing task                            *
  *                                                                            *
  * Parameters: itemid    - [IN] item identifier                               *
  *             preproc   - [IN] item preprocessing data                       *
@@ -251,9 +251,9 @@ zbx_pp_task_t	*pp_task_sequence_create(zbx_uint64_t itemid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: clear sequence task task                                          *
+ * Purpose: clear sequence of tasks                                           *
  *                                                                            *
- * Parameters: task - [IN] task to clear                                      *
+ * Parameters: seq - [IN] tasks to clear                                      *
  *                                                                            *
  ******************************************************************************/
 static void	pp_task_sequence_clear(zbx_pp_task_sequence_t *seq)

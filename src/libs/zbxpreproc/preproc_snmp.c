@@ -21,6 +21,8 @@
 #include "preproc_snmp.h"
 #include "zbxjson.h"
 #include "zbxcrypto.h"
+#include "zbxstr.h"
+#include "zbxvariant.h"
 
 ZBX_VECTOR_IMPL(snmp_walk_to_json_param, zbx_snmp_walk_to_json_param_t)
 ZBX_PTR_VECTOR_IMPL(snmp_walk_to_json_output_val, zbx_snmp_walk_json_output_value_t *)

@@ -26,6 +26,7 @@
 #include "zbx_item_constants.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
+#include "zbxstats.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
@@ -512,6 +513,7 @@ zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t
  *                                                                            *
  * Parameters: data  - [OUT] memory buffer for packed data                    *
  *             usage - [IN] worker usage statistics                           *
+ *             count - [IN]                                                   *
  *                                                                            *
  ******************************************************************************/
 zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count)
@@ -721,6 +723,7 @@ void	zbx_preprocessor_unpack_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t 
  * Purpose: unpack worker usage statistics                                    *
  *                                                                            *
  * Parameters: usage - [OUT] worker usage statistics                          *
+ *             count - [OUT]                                                  *
  *             data  - [IN] input data                                        *
  *                                                                            *
  ******************************************************************************/

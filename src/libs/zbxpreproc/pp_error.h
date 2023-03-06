@@ -20,7 +20,6 @@
 #ifndef ZABBIX_PP_ERROR_H
 #define ZABBIX_PP_ERROR_H
 
-#include "pp_item.h"
 #include "zbxpreproc.h"
 #include "zbxvariant.h"
 

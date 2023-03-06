@@ -22,6 +22,8 @@
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
 #include "zbxvariant.h"
+#include "zbxalgo.h"
+#include "zbxdbschema.h"
 
 /* mock field to estimate how much data can be stored in characters, bytes or both, */
 /* depending on database backend                                                    */
@@ -295,9 +297,8 @@ void	pp_format_error(const zbx_variant_t *value, zbx_pp_result_t *results, int r
  *                                                                            *
  * Purpose: apply 'on fail' preprocessing error handler                       *
  *                                                                            *
- * Parameters: value         - [IN/OUT] value                                 *
- *             step          - [IN] preprocessing operation that produced     *
- *                                  error                                     *
+ * Parameters: value - [IN/OUT]                                               *
+ *             step  - [IN] preprocessing operation that produced error       *
  *                                                                            *
  ******************************************************************************/
 int	pp_error_on_fail(zbx_variant_t *value, const zbx_pp_step_t *step)

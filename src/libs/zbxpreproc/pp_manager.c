@@ -36,12 +36,19 @@
 #include "zbx_item_constants.h"
 #include "zbxnix.h"
 #include "zbxvariant.h"
+#include "log.h"
+#include "module.h"
+#include "pp_cache.h"
+#include "zbxcacheconfig.h"
+#include "zbxipcservice.h"
+#include "zbxthreads.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
 
-static zbx_flush_value_func_t flush_value_func_cb = NULL;
+static zbx_flush_value_func_t	flush_value_func_cb = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -139,7 +146,9 @@ zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t fini
 	{
 		if (SUCCEED != pp_worker_init(&manager->workers[i], i + 1, &manager->queue, manager->timekeeper,
 				error))
+		{
 			goto out;
+		}
 
 		pp_worker_set_finished_cb(&manager->workers[i], finished_cb, finished_data);
 	}
@@ -228,12 +237,12 @@ void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
  *                                                                            *
  * Purpose: queue value for preprocessing test                                *
  *                                                                            *
- * Parameters: manager   - [IN] manager                                       *
- *             preproc   - [IN] item preprocessing data                       *
- *             value     - [IN] value to preprocess, its contents will be     *
- *                              directly copied over and cleared by the task  *
- *             ts        - [IN] value timestamp                               *
- *             client    - [IN] request source                                *
+ * Parameters: manager - [IN]                                                 *
+ *             preproc - [IN] item preprocessing data                         *
+ *             value   - [IN] value to preprocess, its contents will be       *
+ *                            directly copied over and cleared by the task    *
+ *             ts      - [IN] value timestamp                                 *
+ *             client  - [IN] request source                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
@@ -271,7 +280,7 @@ void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp
  *                                                                            *
  * Purpose: create preprocessing task from request                            *
  *                                                                            *
- * Parameters: manager   - [IN] manager                                       *
+ * Parameters: manager   - [IN]                                               *
  *             itemid    - [IN] item identifier                               *
  *             value     - [IN] value to preprocess, its contents will be     *
  *                              directly copied over and cleared by the task  *
@@ -305,7 +314,7 @@ zbx_pp_task_t	*zbx_pp_manager_create_task(zbx_pp_manager_t *manager, zbx_uint64_
  *                                                                            *
  * Purpose: get first dependent item with preprocessing that can be cached    *
  *                                                                            *
- * Parameters: manager     - [IN] manager                                     *
+ * Parameters: manager     - [IN]                                             *
  *             itemids     - [IN] dependent itemids                           *
  *             itemids_num - [IN] number of dependent itemids                 *
  *                                                                            *

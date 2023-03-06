@@ -21,10 +21,8 @@
 #define ZABBIX_PP_TASK_H
 
 #include "zbxpreproc.h"
-#include "pp_item.h"
 #include "pp_cache.h"
 
-#include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"

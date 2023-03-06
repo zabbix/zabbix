@@ -22,6 +22,9 @@
 
 #include "pp_cache.h"
 #include "zbxembed.h"
+#include "zbxpreproc.h"
+#include "zbxtime.h"
+#include "zbxvariant.h"
 
 typedef struct
 {
