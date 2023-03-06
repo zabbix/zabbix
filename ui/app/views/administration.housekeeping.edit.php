@@ -222,9 +222,7 @@ $house_keeper_tab = (new CFormList())
 				$timescaledb_error = '';
 		}
 
-		$timescaledb_error = $timescaledb_error !== ''
-			? (makeErrorIcon($timescaledb_error))->addStyle('margin-left: 5px;')
-			: null;
+		$timescaledb_error = $timescaledb_error !== '' ? makeErrorIcon($timescaledb_error) : null;
 
 		$compression_status_checkbox = (new CCheckBox('compression_status'))
 			->setChecked($data['compression_status'] == 1)
@@ -233,8 +231,8 @@ $house_keeper_tab = (new CFormList())
 		$house_keeper_tab
 			->addRow((new CTag('h4', true, _('History and trends compression')))->addClass('input-section-header'))
 			->addRow(
-				new CLabel(_('Enable compression'), 'compression_status'),
-				[$compression_status_checkbox, $timescaledb_error]
+				new CLabel([_('Enable compression'), $timescaledb_error], 'compression_status'),
+				$compression_status_checkbox
 			)
 			->addRow(
 				(new CLabel(_('Compress records older than'), 'compress_older'))
