@@ -389,7 +389,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->checkGroups($templates);
 		$this->checkDuplicates($templates);
-		self::checkAndAddUuid($templates, []);
+		self::checkAndAddUuid($templates);
 
 		$this->checkTemplates($templates);
 	}
@@ -402,7 +402,7 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkAndAddUuid(array &$templates, array $db_templates): void {
+	private static function checkAndAddUuid(array &$templates, array $db_templates = []): void {
 		$new_templates_uuids = [];
 
 		foreach ($templates as &$template) {

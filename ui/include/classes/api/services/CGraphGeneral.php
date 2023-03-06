@@ -557,7 +557,7 @@ abstract class CGraphGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	protected function validateCreate(array &$graphs) {
-		self::addGraphHostStatus($graphs);
+		self::addHostStatus($graphs);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
 			'host_status' =>	['type' => API_INT32],
@@ -767,7 +767,7 @@ abstract class CGraphGeneral extends CApiService {
 	 * @param array $dbGraphs
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
-		self::addGraphHostStatus($graphs);
+		self::addHostStatus($graphs);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
 			'host_status' => ['type' => API_INT32],
@@ -1362,7 +1362,7 @@ abstract class CGraphGeneral extends CApiService {
 	 *
 	 * @param array  $graphs       Graphs to extend.
 	 */
-	private static function addGraphHostStatus(array &$graphs): void {
+	private static function addHostStatus(array &$graphs): void {
 		$itemids_by_graph = [];
 		foreach ($graphs as $index => $graph) {
 			$itemids_by_graph[$index] = array_column($graph['gitems'], 'itemid');

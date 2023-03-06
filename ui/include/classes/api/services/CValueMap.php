@@ -358,7 +358,7 @@ class CValueMap extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::addValuemapHostStatus($valuemaps);
+		self::addHostStatus($valuemaps);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['hostid', 'name']], 'fields' => [
 			'hostid' =>			['type' => API_ID],
@@ -413,7 +413,7 @@ class CValueMap extends CApiService {
 		}
 
 		$this->checkDuplicates($names_by_hostid);
-		$this->checkAndAddUuid($valuemaps, []);
+		$this->checkAndAddUuid($valuemaps);
 	}
 
 	/**
@@ -424,7 +424,7 @@ class CValueMap extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$valuemaps, array $db_valuemaps): void {
+	protected function checkAndAddUuid(array &$valuemaps, array $db_valuemaps = []): void {
 		$new_value_map_uuids = [];
 
 		foreach ($valuemaps as &$valuemap) {
@@ -488,7 +488,7 @@ class CValueMap extends CApiService {
 		}
 
 		$valuemaps = $this->extendObjectsByKey($valuemaps, $db_valuemaps, 'valuemapid', ['hostid']);
-		self::addValuemapHostStatus($valuemaps);
+		self::addHostStatus($valuemaps);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['hostid', 'name']], 'fields' => [
 			'host_status' =>	['type' => API_INT32],
@@ -498,7 +498,6 @@ class CValueMap extends CApiService {
 			]],
 			'valuemapid' =>		['type' => API_ID],
 			'hostid' =>			['type' => API_ID],
-			'host_status' =>	['type' => API_INT32],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
 				'type' =>			['type' => API_INT32, 'default' => VALUEMAP_MAPPING_TYPE_EQUAL, 'in' => implode(',', [VALUEMAP_MAPPING_TYPE_EQUAL, VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL, VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP, VALUEMAP_MAPPING_TYPE_DEFAULT])],
@@ -664,7 +663,7 @@ class CValueMap extends CApiService {
 	 *
 	 * @param array  $valuemaps    Valuemaps to extend.
 	 */
-	private static function addValuemapHostStatus(array &$valuemaps): void {
+	private static function addHostStatus(array &$valuemaps): void {
 		$templates = API::Template()->get([
 			'output' => ['status'],
 			'templateids' => array_column($valuemaps, 'hostid'),
@@ -674,7 +673,7 @@ class CValueMap extends CApiService {
 		foreach ($valuemaps as &$valuemap) {
 			$valuemap['host_status'] = array_key_exists($valuemap['hostid'], $templates)
 				? $templates[$valuemap['hostid']]['status']
-				: 0;
+				: -1;
 		}
 		unset($valuemap);
 	}

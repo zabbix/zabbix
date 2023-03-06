@@ -333,7 +333,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->checkAndAddUuid($dashboards, []);
+		$this->checkAndAddUuid($dashboards);
 		$this->checkDuplicates($dashboards);
 		$this->checkWidgets($dashboards);
 		$this->checkWidgetFields($dashboards);
@@ -347,7 +347,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$dashboards, array $db_dashboards): void {
+	protected function checkAndAddUuid(array &$dashboards, array $db_dashboards = []): void {
 		$new_dashboards_uuids = [];
 
 		foreach ($dashboards as &$dashboard) {

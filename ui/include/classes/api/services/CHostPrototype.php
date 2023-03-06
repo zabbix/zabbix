@@ -460,7 +460,9 @@ class CHostPrototype extends CHostBase {
 		]);
 
 		foreach ($host_prototypes as &$host_prototype) {
-			$host_prototype['host_status'] = $drule_hosts[$host_prototype['ruleid']]['hosts'][0]['status'];
+			$host_prototype['host_status'] = array_key_exists($host_prototype['ruleid'], $drule_hosts)
+				? $drule_hosts[$host_prototype['ruleid']]['hosts'][0]['status']
+				: -1;
 		}
 		unset($host_prototype);
 
@@ -470,7 +472,7 @@ class CHostPrototype extends CHostBase {
 				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'ruleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+			'ruleid' =>				['type' => API_ID],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name'), 'default_source' => 'host'],
 			'custom_interfaces' =>	['type' => API_INT32, 'in' => implode(',', [HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), 'default' => DB::getDefault('hosts', 'custom_interfaces')],
@@ -506,7 +508,7 @@ class CHostPrototype extends CHostBase {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkAndAddUuid($host_prototypes, []);
+		self::checkAndAddUuid($host_prototypes);
 		self::checkDiscoveryRules($host_prototypes);
 		self::checkDuplicates($host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
@@ -1074,7 +1076,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkAndAddUuid(array &$host_prototypes, array $db_host_prototypes): void {
+	private static function checkAndAddUuid(array &$host_prototypes, array $db_host_prototypes = []): void {
 		$new_host_prototype_uuids = [];
 
 		foreach ($host_prototypes as &$host_prototype) {

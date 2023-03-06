@@ -288,7 +288,7 @@ class CHttpTest extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::addHttptestHostStatus($httptests);
+		self::addHostStatus($httptests);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['hostid', 'name']], 'fields' => [
 			'hostid' =>				['type' => API_ID],
@@ -358,7 +358,7 @@ class CHttpTest extends CApiService {
 			$names_by_hostid[$httptest['hostid']][] = $httptest['name'];
 		}
 
-		$this->checkAndAddUuid($httptests, []);
+		$this->checkAndAddUuid($httptests);
 		$this->checkHostPermissions(array_keys($names_by_hostid));
 		$this->checkDuplicates($names_by_hostid);
 		$this->validateAuthParameters($httptests, __FUNCTION__);
@@ -374,7 +374,7 @@ class CHttpTest extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$httptests_to_save, array $db_httptests): void {
+	protected function checkAndAddUuid(array &$httptests_to_save, array $db_httptests = []): void {
 		$new_httptest_uuids = [];
 
 		foreach ($httptests_to_save as &$httptest) {
@@ -463,7 +463,7 @@ class CHttpTest extends CApiService {
 		}
 
 		$httptests = $this->extendObjectsByKey($httptests, $db_httptests, 'httptestid', ['hostid', 'name']);
-		self::addHttptestHostStatus($httptests);
+		self::addHostStatus($httptests);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['httptestid']], 'fields' => [
 			'hostid' => 			['type' => API_ID],
@@ -1124,7 +1124,7 @@ class CHttpTest extends CApiService {
 	 *
 	 * @param array  $httptests    Http tests to extend.
 	 */
-	private static function addHttptestHostStatus(array &$httptests): void {
+	private static function addHostStatus(array &$httptests): void {
 		$templates = API::Template()->get([
 			'output' => ['status'],
 			'templateids' => array_column($httptests, 'hostid'),
@@ -1134,7 +1134,7 @@ class CHttpTest extends CApiService {
 		foreach ($httptests as &$httptest) {
 			$httptest['host_status'] = array_key_exists($httptest['hostid'], $templates)
 				? $templates[$httptest['hostid']]['status']
-				: 0;
+				: -1;
 		}
 		unset($httptest);
 	}

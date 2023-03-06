@@ -135,7 +135,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param bool  $update
 	 */
 	protected function checkInput(array &$items, $update = false) {
-		$this->addItemHostStatus($items, $update);
+		$this->addHostStatus($items, $update);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
 			'host_status' => ['type' => API_INT32],
@@ -2985,7 +2985,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array  $items       Items to extend.
 	 * @param bool   $update      True if called from API update method.
 	 */
-	private function addItemHostStatus(array &$items, $update): void {
+	private function addHostStatus(array &$items, $update): void {
 		if ($update) {
 			$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
 				'itemid' => ['type' => API_ID, 'flags' => API_REQUIRED]
