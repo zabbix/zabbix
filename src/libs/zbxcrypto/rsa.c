@@ -34,6 +34,29 @@
 #endif
 
 #if defined(HAVE_OPENSSL) || defined(HAVE_GNUTLS)
+
+#define PEM_BEGIN		"-----BEGIN"
+#define PEM_BEGIN_HEADER_END	"-----"
+#define PEM_FOOTER_END		"-----END"
+
+static void	pem_replace_spaces(char *s)
+{
+	char	*end_ptr;
+
+	end_ptr = strstr(s, "-----END");
+
+	while ('\0' != *s)
+	{
+		if (' ' == *s)
+			*s = '\n';
+
+		if (NULL != end_ptr && end_ptr + 1 == s + 1)
+			return;
+
+		s++;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: receive PEM container with arbitrary newlines, validate if        *
@@ -46,9 +69,6 @@
  ******************************************************************************/
 void	zbx_normalize_pem(char **key, size_t *key_len)
 {
-#define PEM_BEGIN		"-----BEGIN"
-#define PEM_BEGIN_HEADER_END	"-----"
-#define PEM_FOOTER_END		"-----END"
 	char	*ptr, *newline_ptr;
 	size_t	offset;
 
@@ -59,6 +79,12 @@ void	zbx_normalize_pem(char **key, size_t *key_len)
 
 		if ('\n' != *(newline_ptr = ptr + ZBX_CONST_STRLEN(PEM_BEGIN_HEADER_END)))
 		{
+			if (' ' == *newline_ptr)
+			{
+				pem_replace_spaces(newline_ptr);
+				return;
+			}
+
 			offset = newline_ptr - *key - 1;
 			zbx_replace_string(key, offset, &offset, "-\n");
 			*key_len = *key_len + 1;
@@ -74,10 +100,12 @@ void	zbx_normalize_pem(char **key, size_t *key_len)
 			*key_len = *key_len + 1;
 		}
 	}
+}
+
 #undef PEM_BEGIN
 #undef PEM_BEGIN_HEADER_END
 #undef PEM_FOOTER_END
-}
+
 #endif
 
 #if defined(HAVE_OPENSSL)
