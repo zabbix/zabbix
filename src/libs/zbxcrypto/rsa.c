@@ -52,7 +52,7 @@
 int	zbx_format_pem_pkey(char **key)
 {
 #define PEM_PKEY_BEGIN			"-----BEGIN"
-#define PEM_PKEY_BEGIN_HEADER_END	"KEY-----"
+#define PEM_PKEY_BEGIN_HEADER_END	"-----"
 #define PEM_PKEY_FOOTER_END		"-----END"
 
 	char	*begin_ptr, *end_ptr, *newline_begin, *newline_end;
@@ -60,7 +60,7 @@ int	zbx_format_pem_pkey(char **key)
 
 	if (0 == strncmp(*key, PEM_PKEY_BEGIN, ZBX_CONST_STRLEN(PEM_PKEY_BEGIN)))
 	{
-		if (NULL == (begin_ptr = strstr(*key, PEM_PKEY_BEGIN_HEADER_END)))
+		if (NULL == (begin_ptr = strstr(*key + ZBX_CONST_STRLEN(PEM_PKEY_BEGIN), PEM_PKEY_BEGIN_HEADER_END)))
 			return FAIL;
 
 		if ('\n' != *(newline_begin = begin_ptr + ZBX_CONST_STRLEN(PEM_PKEY_BEGIN_HEADER_END)))
