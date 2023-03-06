@@ -36,56 +36,45 @@
 #if defined(HAVE_OPENSSL) || defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
- * Purpose: receive private key in PEM container with arbitrary newlines,     *
- *          validate if its header corresponds to PKCS#1 or PKCS#8 format,    *
- *          the if required - add newlines to header and footer (so OpenSSL   *
- *          or GnuTLS would be able to parse it)                              *
+ * Purpose: receive PEM container with arbitrary newlines, validate if        *
+ *          contains necessary newlines after header and before footer,       *
+ *          insert them if they are absent.                                   *
  *                                                                            *
  * Parameters:                                                                *
- *     key         - [OUT/IN] the private key in ASCII format                 *
- *                                                                            *
- * Return value:                                                              *
- *     SUCCEED - key was successfully formatted                               *
- *     FAIL    - an error occurred                                            *
+ *     key     - [OUT/IN] the key in PEM container                            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_format_pem_pkey(char **key)
+void	zbx_normalize_pem(char **key)
 {
-#define PEM_PKEY_BEGIN			"-----BEGIN"
-#define PEM_PKEY_BEGIN_HEADER_END	"-----"
-#define PEM_PKEY_FOOTER_END		"-----END"
-
+#define PEM_BEGIN		"-----BEGIN"
+#define PEM_BEGIN_HEADER_END	"-----"
+#define PEM_FOOTER_END		"-----END"
 	char	*begin_ptr, *end_ptr, *newline_begin, *newline_end;
 	size_t	offset;
 
-	if (0 == strncmp(*key, PEM_PKEY_BEGIN, ZBX_CONST_STRLEN(PEM_PKEY_BEGIN)))
+	if (0 == strncmp(*key, PEM_BEGIN, ZBX_CONST_STRLEN(PEM_BEGIN)))
 	{
-		if (NULL == (begin_ptr = strstr(*key + ZBX_CONST_STRLEN(PEM_PKEY_BEGIN), PEM_PKEY_BEGIN_HEADER_END)))
-			return FAIL;
+		if (NULL == (begin_ptr = strstr(*key + ZBX_CONST_STRLEN(PEM_BEGIN), PEM_BEGIN_HEADER_END)))
+			return;
 
-		if ('\n' != *(newline_begin = begin_ptr + ZBX_CONST_STRLEN(PEM_PKEY_BEGIN_HEADER_END)))
+		if ('\n' != *(newline_begin = begin_ptr + ZBX_CONST_STRLEN(PEM_BEGIN_HEADER_END)))
 		{
 			offset = newline_begin - *key - 1;
 			zbx_replace_string(key, offset, &offset, "-\n");
 		}
 
-		if (NULL == (end_ptr = strstr(*key, PEM_PKEY_FOOTER_END)))
-			return FAIL;
+		if (NULL == (end_ptr = strstr(*key, PEM_FOOTER_END)))
+			return;
 
 		if ('\n' != *(newline_end = end_ptr - 1))
 		{
 			offset = newline_end - *key + 1;
 			zbx_replace_string(key, offset, &offset, "\n-");
 		}
-
-		return SUCCEED;
 	}
-
-	return FAIL;
-
-#undef PEM_PKEY_BEGIN
-#undef PEM_PKEY_BEGIN_HEADER_END
-#undef PEM_PKEY_FOOTER_END
+#undef PEM_BEGIN
+#undef PEM_BEGIN_HEADER_END
+#undef PEM_FOOTER_END
 }
 #endif
 

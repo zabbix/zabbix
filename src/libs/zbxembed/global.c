@@ -354,12 +354,8 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 		zbx_free(key);
 		key = key_unesc;
 	}
-
-	if (SUCCEED != zbx_format_pem_pkey(&key))
-	{
-		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "failed to parse private key");
-		goto out;
-	}
+	else
+		zbx_normalize_pem(&key);
 
 	if (SUCCEED == (ret = zbx_rs256_sign(key, key_len, text, text_len, &raw_sig, &raw_sig_len, &error)))
 	{

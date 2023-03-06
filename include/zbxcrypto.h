@@ -43,7 +43,7 @@ int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const
 
 
 #if defined(HAVE_OPENSSL) || defined(HAVE_GNUTLS)
-int	zbx_format_pem_pkey(char **key);
+void	zbx_normalize_pem(char **key);
 int	zbx_rs256_sign(char *key, size_t key_len, char *data, size_t data_len, unsigned char **output,
 		size_t *output_len, char **error);
 #endif
