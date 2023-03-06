@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-03-01 21:30+0000\n"
+"PO-Revision-Date: 2023-03-05 11:09+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -190,7 +190,7 @@ msgstr[1] "%1$s de %2$s elements en estat problemàtic"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr "%1$s preseleccionats, utilitzeu les tecles de fletxa avall, amunt i Intro per seleccionar"
+msgstr "%1$s preseleccionats, empreu les tecles de fletxa avall, amunt i Intro per seleccionar"
 
 #: include/maps.inc.php:335 include/maps.inc.php:339 include/maps.inc.php:346
 #: include/maps.inc.php:395
@@ -2032,368 +2032,368 @@ msgstr "No es pot esborrar l'equip"
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot esborrar l'equip perquè el manteniment \"%1$s\" ha de contindre, com a mínim, un equip o grup d'equips."
+msgstr[1] "No es poden pas esborrar els equips perquè el manteniment \"%1$s\" ha de contindre, com a mínim, un equip o grup d'equips."
 
 #: include/classes/api/services/CHostGroup.php:1578
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar el grup d'equips perquè el manteniment \"%1$s\" ha de contindre, com a mínim, un equip o grup d'equips."
+msgstr[1] "No es poden pas esborrar els grups d'equips perquè el manteniment \"%1$s\" ha de contindre, com a mínim, un equip o grup d'equips."
 
 #: host_prototypes.php:132 host_prototypes.php:297
 msgid "Cannot delete host prototypes"
-msgstr ""
+msgstr "No es poden pas esborrar els prototips d'equips"
 
 #: app/controllers/CControllerIconMapDelete.php:64
 msgid "Cannot delete icon map"
-msgstr ""
+msgstr "No es pot pas esborrar el mapa d'icones"
 
 #: app/controllers/CControllerImageDelete.php:70
 msgid "Cannot delete image"
-msgstr ""
+msgstr "No es pot pas esborrar la imatge"
 
 #: include/classes/api/services/CHostInterface.php:626
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "No es pot esborrar la interfície de l'amfitrió descobert \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1250
 msgid "Cannot delete inventory."
-msgstr ""
+msgstr "No es pot pas esborrar l'inventari."
 
 #: items.php:477
 msgid "Cannot delete item"
-msgstr ""
+msgstr "No es pot pas esborrar l'element"
 
 #: disc_prototypes.php:308
 msgid "Cannot delete item prototype"
-msgstr ""
+msgstr "No es pot pas esborrar el prototip d'element"
 
 #: disc_prototypes.php:685
 msgid "Cannot delete item prototypes"
-msgstr ""
+msgstr "No es poden pas esborrar els prototips d'elements"
 
 #: items.php:1349
 msgid "Cannot delete items"
-msgstr ""
+msgstr "No es poden pas esborrar els elements"
 
 #: maintenance.php:212
 msgid "Cannot delete maintenance"
-msgstr ""
+msgstr "No es pot pas esborrar el manteniment"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar el tipus de suport"
+msgstr[1] "No es poden pas esborrar els tipus de suport"
 
 #: app/controllers/CControllerModuleScan.php:118
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar el mòdul: %1$s."
+msgstr[1] "No es poden pas esborrar els mòduls: %1$s."
 
 #: sysmaps.php:259
 msgid "Cannot delete network map"
-msgstr ""
+msgstr "No es pot pas esborrar el mapa de xarxa"
 
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar el proxy"
+msgstr[1] "No es poden pas esborrar els proxys"
 
 #: app/controllers/CControllerRegExDelete.php:79
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar l'expressió regular"
+msgstr[1] "No es poden pas esborrar les expressions regulars"
 
 #: screenconf.php:283
 msgid "Cannot delete screen"
-msgstr ""
+msgstr "No es pot pas esborrar la pantalla"
 
 #: app/controllers/CControllerScriptDelete.php:69
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar l'script"
+msgstr[1] "No es poden pas esborrar els scripts"
 
 #: include/classes/api/services/CScript.php:594
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr ""
+msgstr "No es poden pas esborrar els scripts. L'script \"%1$s\" s'empra en l'operació d'acció \"%2$s\"."
 
 #: actionconf.php:400
 msgid "Cannot delete selected actions"
-msgstr ""
+msgstr "No es poden pas esborrar les accions triades"
 
 #: correlation.php:331
 msgid "Cannot delete selected correlations"
-msgstr ""
+msgstr "No es poden pas esborrar les correlacions triades"
 
 #: services.php:108
 msgid "Cannot delete service"
-msgstr ""
+msgstr "No es pot pas esborrar el servei"
 
 #: slideconf.php:187 slideconf.php:208
 msgid "Cannot delete slide show"
-msgstr ""
+msgstr "No es pot pas esborrar la presentació"
 
 #: templates.php:700 templates.php:714 templates.php:747
 msgid "Cannot delete template"
-msgstr ""
+msgstr "No es pot pas esborrar la plantilla"
 
 #: include/classes/api/services/CApplication.php:468
 msgid "Cannot delete templated application."
-msgstr ""
+msgstr "No es pot pas esborrar l'aplicació provinent d'una plantilla."
 
 #: include/classes/api/services/CGraphPrototype.php:577
 msgid "Cannot delete templated graph prototype."
-msgstr ""
+msgstr "No es pot pas esborrar el prototip de gràfic de plantilla."
 
 #: include/classes/api/services/CGraph.php:563
 msgid "Cannot delete templated graph."
-msgstr ""
+msgstr "No es pot pas esborrar el gràfic de plantilla."
 
 #: include/classes/api/services/CHostPrototype.php:1161
 msgid "Cannot delete templated host prototype."
-msgstr ""
+msgstr "No es pot pas esborrar el prototip d'equip amb plantilla"
 
 #: include/classes/api/services/CItemPrototype.php:924
 msgid "Cannot delete templated item prototype."
-msgstr ""
+msgstr "No es pot pas esborrar el prototip d'element amb plantilla."
 
 #: include/classes/api/services/CItem.php:767
 msgid "Cannot delete templated item."
-msgstr ""
+msgstr "No es pot pas esborrar l'element de plantilla."
 
 #: include/classes/api/services/CDiscoveryRule.php:565
 msgid "Cannot delete templated items."
-msgstr ""
+msgstr "No es poden pas esborrar els elements de plantilla."
 
 #: include/classes/api/services/CTrigger.php:661
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr ""
+msgstr "No es pot pas esborrar el trigger de plantilla \"%1$s:%2$s\"."
 
 #: include/classes/api/services/CTriggerPrototype.php:530
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr ""
+msgstr "No es pot pas esborrar el prototip de trigger de plantilla \"%1$s:%2$s\"."
 
 #: include/classes/api/services/CHttpTest.php:547
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas esborrar l'escenari web amb plantilla \"%1$s\"."
 
 #: triggers.php:416
 msgid "Cannot delete trigger"
-msgstr ""
+msgstr "No es pot pas esborrar el trigger"
 
 #: trigger_prototypes.php:365
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "No es pot pas esborrar el prototip de trigger"
 
 #: trigger_prototypes.php:519
 msgid "Cannot delete trigger prototypes"
-msgstr ""
+msgstr "No es poden pas esborrar els prototips de triggers"
 
 #: triggers.php:617
 msgid "Cannot delete triggers"
-msgstr ""
+msgstr "No es poden pas esborrar els triggers"
 
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar l'usuari"
+msgstr[1] "No es poden pas esborrar els usuaris"
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar el grup d'usuaris"
+msgstr[1] "No es poden pas esborrar els grups d'usuaris"
 
 #: app/controllers/CControllerValuemapDelete.php:66
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar el mapa de valors"
+msgstr[1] "No es poden pas esborrar els mapes de valors"
 
 #: httpconf.php:150 httpconf.php:512
 msgid "Cannot delete web scenario"
-msgstr ""
+msgstr "No es pot pas esborrar l'escenari web"
 
 #: actionconf.php:389
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot desactivar l'acció"
+msgstr[1] "No es poden desactivar les accions"
 
 #: correlation.php:318
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot desactivar la correlació"
+msgstr[1] "No es poden desactivar les correlacions"
 
 #: discoveryconf.php:184 host_discovery.php:706
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot desactivar la regla de descobriment"
+msgstr[1] "No es poden desactivar les regles de descobriment"
 
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 #: hosts.php:1021
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot desactivar l'equip"
+msgstr[1] "No es poden desactivar els equips"
 
 #: applications.php:231 items.php:1236
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas desactivar l'element"
+msgstr[1] "No es poden pas desactivar els elements"
 
 #: app/controllers/CControllerMediatypeDisable.php:75
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas desactivar el tipus de suport"
+msgstr[1] "No es poden pas desactivar els tipus de suport"
 
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas desactivar el mòdul: %1$s."
+msgstr[1] "No es poden pas desactivar els mòduls: %1$s."
 
 #: triggers.php:555
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas desactivar el trigger"
+msgstr[1] "No es poden pas desactivar els triggers"
 
 #: httpconf.php:456
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas desactivar l'escenari web"
+msgstr[1] "No es poden pas desactivar els escenaris web"
 
 #: queue.php:60
 msgid "Cannot display item queue."
-msgstr ""
+msgstr "No es pot pas mostrar la cua d'elements."
 
 #: chart7.php:91
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr ""
+msgstr "No es pot pas mostrar més d'un element del tipus \"Suma gràfica\"."
 
 #: actionconf.php:388
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas activar l'acció"
+msgstr[1] "No es poden pas activar les accions"
 
 #: correlation.php:317
 msgid "Cannot enable correlation"
 msgid_plural "Cannot enable correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas activar la correlació"
+msgstr[1] "No es poden pas activar les correlacions"
 
 #: discoveryconf.php:183 host_discovery.php:705
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas activar la regla de descobriment"
+msgstr[1] "No es poden pas activar les regles de descobriment"
 
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
 #: hosts.php:1020
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot activar l'equip"
+msgstr[1] "No es poden activar els equips"
 
 #: applications.php:230 items.php:1235
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas activar l'element"
+msgstr[1] "No es poden pas activar els elements"
 
 #: app/controllers/CControllerMediatypeEnable.php:75
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas activar el tipus de suport"
+msgstr[1] "No es poden pas activar els tipus de suport"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
 msgid "Cannot enable module: %1$s."
 msgid_plural "Cannot enable modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas activar el mòdul: %1$s."
+msgstr[1] "No es poden pas activar els mòduls: %1$s."
 
 #: triggers.php:554
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas activar el trigger"
+msgstr[1] "No es poden pas activar els triggers"
 
 #: httpconf.php:455
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas activar l'escenari web"
+msgstr[1] "No es poden pas activar els escenaris web"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:213
 msgid "Cannot evaluate expression"
-msgstr ""
+msgstr "No es pot pas avaluar l'expressió"
 
 #: app/controllers/CControllerPopupScriptExec.php:89
 msgid "Cannot execute script"
-msgstr ""
+msgstr "No es pot pas executar l'script"
 
 #: jsLoader.php:209
 msgid "Cannot expand macros."
-msgstr ""
+msgstr "No es poden pas ampliar les macros."
 
 #: include/classes/import/importers/CMapImporter.php:267
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar la imatge de fons \"%1$s\" emprada al mapa \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:80
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar el gràfic \"%1$s\" emprat a la pantalla \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:145
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No es troba pas el grup \"%1$s\" emprat al mapa \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, c-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar el grup \"%1$s\" emprat a la pantalla \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:155
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No es troba l'equip \"%1$s\" emprat al mapa \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'equip \"%1$s\" emprat a la pantalla \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1231
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "No es troba el grup d'equips \"%1$s\" per al prototip d'equips \"%2$s\" de la regla de descoberta \"%3$s\" a \"%4$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:2096
 #: include/classes/api/services/CDiscoveryRule.php:2278
@@ -2401,413 +2401,413 @@ msgstr ""
 #: include/items.inc.php:644
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr ""
+msgstr "No es troba pas la interfície de l'equip a \"%1$s\" per a l'element clau \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:197
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar la icona \"%1$s\" emprada al mapa \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:255
 #, c-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar el mapa d'icones \"%1$s\" emprat al mapa \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:972
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "No es pot pas trobar la interfície \"%1$s\" emprada per a la regla de descobriment \"%2$s\" a \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:762
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "No es pot pas trobar la interfície \"%1$s\" emprada per element \"%2$s\" a \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas trobar la interfície \"%1$s\" emprada per al prototip d'element \"%2$s\" de la regla de descoberta \"%3$s\" a \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1636
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MAX de l'eix Y per al gràfic \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1405
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MAX de l'eix Y per al prototip de gràfic \"%3$s\" de la regla de descoberta \"%4$s\" a \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1620
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MIN de l'eix Y per al gràfic \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1385
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MIN de l'eix Y per al prototip de gràfic \"%3$s\" de la regla de descoberta \"%4$s\" a \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1654
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat al gràfic \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1425
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat al prototip de gràfic \"%3$s\" de la regla de descoberta \"%4$s\" a \"%5$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:99
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'element \"%1$s\" emprat a la pantalla \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:135
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar el mapa \"%1$s\" emprat al mapa \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:107
 #, c-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar el mapa \"%1$s\" emprat a la pantalla \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1254
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas trobar la plantilla \"%1$s\" per al prototip d'equip \"%2$s\" de la regla de descoberta \"%3$s\" a \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1025
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas trobar la plantilla \"%1$s\" per substituir \"%2$s\" de la regla de descoberta \"%3$s\" a \"%4$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:170
 #: include/classes/import/importers/CMapImporter.php:223
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar el trigger \"%1$s\" emprat al mapa \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:773
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat per l'element \"%2$s\" a \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1153
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat al prototip d'element \"%2$s\" de la regla de descoberta \"%3$s\" a \"%4$s\"."
 
 #: srv_status.php:179
 msgid "Cannot format Tree. Check logic structure in service links."
-msgstr ""
+msgstr "No es pot pas formatar l'arbre. Verifiqueu l'estructura lògica dels enllaços dels serveis."
 
 #: services.php:358
 msgid "Cannot format tree."
-msgstr ""
+msgstr "No es pot pas formatar l'arbre."
 
 #: include/classes/api/services/CTemplate.php:906
 msgid "Cannot have empty visible template name."
-msgstr ""
+msgstr "El nom visible del model no pot ésser pas buit."
 
 #: include/classes/import/importers/CTemplateImporter.php:169
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas importar la plantilla \"%1$s\", doncs la plantilla enllaçada \"%2$s\" no existeix pas."
+msgstr[1] "No es pot pas importar la plantilla \"%1$s\", doncs les plantilles enllaçades \"%2$s\" no existeixen pas."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:717
 msgid "Cannot insert trigger expression"
-msgstr ""
+msgstr "No es pot pas inserir l'expressió al trigger"
 
 #: include/classes/api/services/CHost.php:1228
 msgid "Cannot link template"
-msgstr ""
+msgstr "No es pot pas enllaçar la plantilla"
 
 #: include/classes/api/services/CTemplate.php:993
 #: include/classes/api/services/CTemplate.php:1007
 msgid "Cannot link template."
-msgstr ""
+msgstr "No es pot pas enllaçar la plantilla."
 
 #: app/controllers/CControllerModuleEdit.php:106
 #: include/classes/core/ZBase.php:607
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas carregar el mòdul a: %1$s."
+msgstr[1] "No es poden pas carregar els mòduls a: %1$s."
 
 #: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
-msgstr ""
+msgstr "No es pot tancar sessió."
 
 #: include/classes/api/services/CHost.php:1094
 msgid "Cannot mass update host name."
-msgstr ""
+msgstr "No es pot pas actualitzar massivament el nom d'equip."
 
 #: include/classes/api/services/CTemplate.php:1131
 msgid "Cannot mass update template name."
-msgstr ""
+msgstr "No es pot pas actualitzar massivament el nom de la plantilla."
 
 #: include/classes/api/services/CHost.php:1080
 msgid "Cannot mass update visible host name."
-msgstr ""
+msgstr "No es pot pas actualitzar massivament el nom d'equip visible."
 
 #: include/classes/api/services/CTemplate.php:1096
 msgid "Cannot mass update visible template name."
-msgstr ""
+msgstr "No es pot pas actualitzar massivament el nom visible de la plantilla."
 
 #: include/classes/api/services/CHostBase.php:61
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
-msgstr ""
+msgstr "No es poden pas passar els ID de plantilla duplicats per a l'enllaç: %1$s."
 
 #: include/classes/db/DB.php:852
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr ""
+msgstr "No es pot pas fer la instrucció d'esborrar a la taula \"%1$s\" sense la condició where."
 
 #: include/classes/db/DB.php:565
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
-msgstr ""
+msgstr "No es pot pas fer la instrucció d'actualització a la taula \"%1$s\" sense valors."
 
 #: include/classes/db/DB.php:578
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
-msgstr ""
+msgstr "No es pot pas executar la instrucció d'actualització a la taula \"%1$s\" sense valors."
 
 #: include/classes/api/services/CApplication.php:549
 msgid "Cannot process applications from different hosts or templates."
-msgstr ""
+msgstr "No es poden tractar les aplicacions de diferents equips o plantilles."
 
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
 msgid "Cannot read JSON: %1$s."
-msgstr ""
+msgstr "No es pot pas llegir el JSON: %1$s."
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "Cannot read XML: %1$s."
-msgstr ""
+msgstr "No es pot pas llegir l'XML: %1$s."
 
 #: include/classes/server/CZabbixServer.php:480
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "No es pot llegir la resposta; comproveu la connexió amb el servidor Zabbix \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:432
 msgid "Cannot rename guest user."
-msgstr ""
+msgstr "No es pot pas canviar el nom de l'usuari convidat."
 
 #: include/classes/api/services/CDRule.php:257
 #: include/classes/api/services/CDRule.php:407
 msgid "Cannot save discovery rule without checks."
-msgstr ""
+msgstr "No es pot pas desar la regla de descobriment sense comprovacions."
 
 #: app/controllers/CControllerDashboardUpdate.php:165
 #, c-format
 msgid "Cannot save widget \"%1$s\"."
-msgstr ""
+msgstr "No es pot desar el giny \"%1$s\"."
 
 #: include/classes/server/CZabbixServer.php:421
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas enviar la comanda; comproveu la connexió amb el servidor Zabbix \"%1$s\"."
 
 #: host_discovery.php:403 host_discovery.php:736 items.php:868 items.php:1369
 msgid "Cannot send request"
-msgstr ""
+msgstr "No es pot pas enviar la sol·licitud"
 
 #: include/classes/api/services/CTask.php:438
 #: include/classes/api/services/CTask.php:451
 #, c-format
 msgid "Cannot send request: %1$s."
-msgstr ""
+msgstr "No es pot pas enviar la sol·licitud: %1$s."
 
 #: include/classes/api/services/CAction.php:2872
 #, c-format
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas establir \"%1$s\" a l'acció \"%2$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:498
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas establir \"%1$s\" per al gràfic \"%2$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:503
 #, c-format
 msgid "Cannot set \"%1$s\" for graph prototype \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas establir \"%1$s\" per al prototip de gràfic \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:325
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas establir \"%1$s\" per a l'element \"%2$s\"."
 
 #: include/classes/api/services/CTemplateScreen.php:605
 #: include/classes/api/services/CTemplateScreen.php:703
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas establir \"%1$s\" per la pantalla de plantilla \"%2$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:350
 #, c-format
 msgid "Cannot set \"templateid\" field for application prototype in item prototype \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas configurar el camp \"templateid\" per el prototip d'aplicació al prototip d'element \"%1$s\"."
 
 #: include/classes/api/services/CScreen.php:435
 #, c-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas configurar el valor \"templateid\" per a la pantalla \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1145
 #: include/classes/api/services/CHost.php:2093
 #: include/classes/api/services/CHost.php:2254
 msgid "Cannot set inventory fields for disabled inventory."
-msgstr ""
+msgstr "No es poden pas establir camps d'inventari per a l'inventari desactivat."
 
 #: include/classes/api/services/CScreenItem.php:539
 #: include/classes/api/services/CScreenItem.php:557
 msgid "Cannot set resource ID for screen element."
-msgstr ""
+msgstr "No es pot configurar l'ID de recurs per l'element de pantalla."
 
 #: jsLoader.php:217
 msgid "Cannot support notification audio for this device."
-msgstr ""
+msgstr "No s'admet pas l'àudio de notificació per a aquest dispositiu."
 
 #: include/classes/api/services/CHostInterface.php:296
 msgid "Cannot switch host for interface."
-msgstr ""
+msgstr "No es pot pas canviar l'equip per la interfície."
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:71
 #: app/controllers/CControllerPopupMediatypeTestSend.php:81
 msgid "Cannot test disabled media type."
-msgstr ""
+msgstr "No es pot pas provar un tipus de suport desactivat."
 
 #: app/controllers/CControllerUserUnblock.php:78
 msgid "Cannot unblock user"
 msgid_plural "Cannot unblock users"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas desblocar l'usuari"
+msgstr[1] "No es poden pas desblocar els usuaris"
 
 #: include/classes/api/services/CHostGeneral.php:550
 msgid "Cannot unlink and clear Web scenarios."
-msgstr ""
+msgstr "No es poden pas desenllaçar i esborrar els escenaris web."
 
 #: include/classes/api/services/CHostGeneral.php:611
 msgid "Cannot unlink and clear applications."
-msgstr ""
+msgstr "No es poden pas desenllaçar i netejar les aplicacions."
 
 #: include/classes/api/services/CHost.php:1203
 msgid "Cannot unlink template"
-msgstr ""
+msgstr "No es pot pas desenllaçar la plantilla"
 
 #: include/classes/api/services/CTemplate.php:958
 #: include/classes/api/services/CTemplate.php:981
 msgid "Cannot unlink template."
-msgstr ""
+msgstr "No es pot pas desenllaçar la plantilla."
 
 #: include/classes/api/services/CHostGeneral.php:263
 #, c-format
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
-msgstr ""
+msgstr "No es pot pas desenllaçar el trigger \"%1$s\", té elements de la plantilla que s'han deixat enllaçades a l'equip."
 
 #: include/classes/api/services/CAction.php:3012
 #: include/classes/api/services/CAction.php:3017
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar \"%1$s\" per a l'acció \"%2$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:640
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar \"%1$s\" per al gràfic \"%2$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:645
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar \"%1$s\" per al prototip de gràfic \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:279
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar \"%1$s\" per a l'element \"%2$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:917
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar \"%1$s\" per al prototip de trigger amb plantilla \"%2$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:928
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar \"%1$s\" per al prototip de trigger amb plantilla \"%2$s\"."
 
 #: include/classes/api/services/CHost.php:2231
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar \"%2$s\" per a un equip descobert \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:209
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar \"%2$s\" per a un element descobert \"%1$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:923
 #: include/classes/api/services/CTrigger.php:705
 #: include/classes/api/services/CTrigger.php:834
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar \"%2$s\" per a un trigger descobert \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:499
 #, c-format
 msgid "Cannot update \"imagetype\" for image \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar \"imagetype\" per l'imatge \"%1$s\"."
 
 #: include/classes/api/services/CScreen.php:754
 #, c-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar el valor \"templateid\" per a la pantalla \"%1$s\"."
 
 #: include/classes/api/services/CTemplateScreen.php:693
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar el valor \"templateid\" per la pantalla de model \"%1$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:58
 msgid "Cannot update a discovered graph."
-msgstr ""
+msgstr "No es pot pas actualitzar un gràfic descobert."
 
 #: include/classes/api/services/CHostGroup.php:866
 msgid "Cannot update a discovered host group."
-msgstr ""
+msgstr "No es pot pas actualitzar un grup d'equips descobert."
 
 #: include/classes/api/services/CGraphGeneral.php:69
 #, c-format
 msgid "Cannot update a templated graph \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar una plantilla de gràfic \"%1$s\"."
 
 #: include/classes/api/services/CHttpTest.php:455
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
-msgstr ""
+msgstr "No es pot pas actualitzar un escenari web amb plantilla \"%1$s\": %2$s."
 
 #: actionconf.php:173
 msgid "Cannot update action"
-msgstr ""
+msgstr "No es pot pas actualitzar l'acció"
 
 #: applications.php:162
 msgid "Cannot update application"
-msgstr ""
+msgstr "No es pot pas actualitzar l'aplicació"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:318
 msgid "Cannot update authentication"
-msgstr ""
+msgstr "No es pot pas actualitzar l'autenticació"
 
 #: app/controllers/CControllerAutoregUpdate.php:41
 #: app/controllers/CControllerAutoregUpdate.php:73
@@ -2824,26 +2824,26 @@ msgstr ""
 #: app/controllers/CControllerWorkingTimeUpdate.php:37
 #: app/controllers/CControllerWorkingTimeUpdate.php:62
 msgid "Cannot update configuration"
-msgstr ""
+msgstr "No es pot pas actualitzar la configuració"
 
 #: correlation.php:138
 msgid "Cannot update correlation"
-msgstr ""
+msgstr "No es pot pas actualitzar la correlació"
 
 #: include/classes/api/services/CApplication.php:363
 #, c-format
 msgid "Cannot update discovered application \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar l'aplicació descoberta \"%1$s\"."
 
 #: discoveryconf.php:126 host_discovery.php:676
 msgid "Cannot update discovery rule"
-msgstr ""
+msgstr "No es pot pas actualitzar la regla de descoberta"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:156
 msgid "Cannot update event"
 msgid_plural "Cannot update events"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas actualitzar l'esdeveniment"
+msgstr[1] "No es poden pas actualitzar els esdeveniments"
 
 #: graphs.php:242 graphs.php:304
 msgid "Cannot update graph"
