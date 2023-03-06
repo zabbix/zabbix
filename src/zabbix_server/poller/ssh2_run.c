@@ -39,6 +39,7 @@ extern char	*CONFIG_SSH_KEY_LOCATION;
 
 static const char	*password;
 
+#ifndef HAVE_NO_LIBSSH2_METHODS
 static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_str, const char *value,
 		char **err_msg)
 {
@@ -87,6 +88,7 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 
 	return ret;
 }
+#endif
 
 static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char **err_msg)
 {
@@ -108,7 +110,6 @@ static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char
 #ifdef HAVE_NO_LIBSSH2_METHODS
 		ZBX_UNUSED(session);
 		ZBX_UNUSED(eq_str);
-		ZBX_UNUSED(ssh_set_options);
 #endif
 
 #ifdef HAVE_LIBSSH2_METHOD_KEX
@@ -174,6 +175,7 @@ static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char
 
 	return ret;
 }
+#undef HAVE_NO_LIBSSH2_METHODS
 
 static void	kbd_callback(const char *name, int name_len, const char *instruction,
 		int instruction_len, int num_prompts,
