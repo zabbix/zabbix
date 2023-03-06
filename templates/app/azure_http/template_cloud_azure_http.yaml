@@ -1,10 +1,16 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-03-06T14:12:55Z'
+  date: '2023-03-06T14:18:51Z'
   groups:
     -
-      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
-      name: Templates/Applications
+      uuid: c2c162144c2d4c5491c8801193af4945
+      name: Templates/Cloud
+    -
+      uuid: 748ad4d098d447d492bb935c907f652f
+      name: Templates/Databases
+    -
+      uuid: 137f19e6e2dc4219b33553b812627bc2
+      name: 'Virtual machines'
   templates:
     -
       uuid: fa58228fee8a4e34a7c6503950d1c615
@@ -27,7 +33,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Applications
+          name: Templates/Cloud
       items:
         -
           uuid: 7b2fe9a7ee164718933eb456b0068fea
@@ -433,6 +439,113 @@ zabbix_export:
                   value: availability
       discovery_rules:
         -
+          uuid: 3bfbfc8d770a4c77a17d62aaebb55e64
+          name: 'Cosmos DB account discovery'
+          type: DEPENDENT
+          key: azure.cosmos.mongo.db.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: ^Microsoft.DocumentDB/databaseAccounts
+                formulaid: G
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.COSMOS.MONGO.DB.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'The list of the Cosmos databases is provided by the subscription.'
+          host_prototypes:
+            -
+              uuid: 16eec30e921e4627b3599b4d06e48072
+              host: 'Azure Cosmos DB {#NAME}'
+              name: 'Azure Cosmos DB {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Databases
+              macros:
+                -
+                  macro: '{$AZURE.RESOURCE_ID}'
+                  value: '{#ID}'
+              tags:
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+                -
+                  tag: resource-group
+                  value: '{#GROUP}'
+                -
+                  tag: version
+                  value: '{#VERSION}'
+          master_item:
+            key: azure.get.resources
+          lld_macro_paths:
+            -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#LOCATION}'
+              path: $.location
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#TYPE}'
+              path: $.type
+            -
+              lld_macro: '{#VERSION}'
+              path: $.kind
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.resources.value
+          overrides:
+            -
+              name: MongoDB
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#VERSION}'
+                    value: ^MongoDB$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    -
+                      name: 'Azure Cosmos DB for MongoDB by HTTP'
+        -
           uuid: c875a410ddd84ccfbc5b407cd6e34803
           name: 'Microsoft SQL databases discovery'
           type: DEPENDENT
@@ -486,7 +599,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: Templates/Databases
               macros:
                 -
                   macro: '{$AZURE.RESOURCE_ID}'
@@ -619,7 +732,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: Templates/Databases
               macros:
                 -
                   macro: '{$AZURE.RESOURCE_ID}'
@@ -752,7 +865,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: Templates/Databases
               macros:
                 -
                   macro: '{$AZURE.RESOURCE_ID}'
@@ -2617,7 +2730,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: 'Virtual machines'
               templates:
                 -
                   name: 'Azure Virtual Machine by HTTP'
@@ -2682,6 +2795,22 @@ zabbix_export:
         -
           macro: '{$AZURE.APP_ID}'
           description: 'The App ID of Microsoft Azure.'
+        -
+          macro: '{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+        -
+          macro: '{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+        -
+          macro: '{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+        -
+          macro: '{$AZURE.COSMOS.MONGO.DB.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
@@ -2809,6 +2938,748 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in virtual machines discovery rule.'
     -
+      uuid: 29325098807848aa928b4192ad5e020f
+      template: 'Azure Cosmos DB for MongoDB by HTTP'
+      name: 'Azure Cosmos DB for MongoDB by HTTP'
+      description: |
+        This template is designed to monitor Microsoft Azure Cosmos DB by HTTP.
+        It works without any external scripts and uses the script item.
+        
+        Setup:
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+            `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+            See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
+          2. Link the template to a host.
+          3. Configure the macros: {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Cloud
+      items:
+        -
+          uuid: 9e247bdb17f44630b9440b59d5ef251b
+          name: 'Azure Microsoft Cosmos DB: Autoscale Max Throughput'
+          type: DEPENDENT
+          key: azure.cosmosdb.autoscale.max.throughput
+          delay: '0'
+          history: 7d
+          description: 'The autoscale max throughput.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.usage.AutoscaleMaxThroughput.maximum
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 35a7d2c96990407f937e07fd160266a9
+          name: 'Azure Microsoft Cosmos DB: Get errors'
+          type: DEPENDENT
+          key: azure.cosmosdb.data.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: dfd484aa8a4e4b759e4e34c5318c7176
+              expression: 'length(last(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.data.errors))>0'
+              name: 'Azure Microsoft Cosmos DB: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in response to API requests.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 647faea1597c4da6a3cd78694be8e77e
+          name: 'Azure Microsoft Cosmos DB: Get data'
+          type: SCRIPT
+          key: azure.cosmosdb.data.get
+          delay: 5m
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var AzureCosmoDB = {
+                params: {},
+                token: null, 
+            
+                setParams: function (params) {
+                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    AzureCosmoDB.params = params;
+                },
+            
+                login: function () {
+                    var response, login = new HttpRequest();
+                    login.addHeader('Content-Type: application/x-www-form-urlencoded');
+                    response = login.post(
+                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureCosmoDB.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureCosmoDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureCosmoDB.params.password)
+                    );
+            
+                    if (login.getStatus() !== 200) {
+                        throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
+                    }
+                    try {
+                        response = JSON.parse(response);
+                        if (!response.hasOwnProperty('access_token')) {
+                            throw null;
+                        }
+                    }
+                    catch (error) {
+                        throw 'Authentication response does not contain access token.';
+                    }
+            
+                    AzureCosmoDB.token = response['access_token'];
+                },
+            
+                request: function (url) {
+                    var response, request = new HttpRequest();
+            
+                    if (!AzureCosmoDB.token) {
+                        throw 'Request does not contain access token.';
+                    }
+                    request.addHeader('Accept: application/json');
+                    request.addHeader('Authorization: Bearer ' + AzureCosmoDB.token);
+                    Zabbix.log(5, '[ AzureCosmoDB ] request url: ' + url);
+                    response = request.get(url);
+            
+                    if (request.getStatus() !== 200) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+                    try {
+                        return JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
+                    }
+                },
+            
+                getField: function (data, path) {
+                    var steps = path.split('.');
+                    for (var i = 0; i < steps.length; i++) {
+                        var step = steps[i];
+                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                            throw 'Required field was not found: ' + path;
+                        }
+            
+                        data = data[step];
+                    }
+            
+                    return data;
+                },
+            
+                getMetricsData: function () {
+                    var data = {};
+                    start_date = new Date((new Date().getTime()) - 600000).toISOString().replace(/\.\d+/, '');
+                    end_date = new Date(new Date().getTime()).toISOString().replace(/\.\d+/, '');
+                    endpoints = {
+                        'requests': '/providers/Microsoft.Insights/metrics?metricnames=TotalRequests,TotalRequestUnits,MetadataRequests,MongoRequests,MongoRequestCharge,ServerSideLatency,ServerSideLatencyGateway,ServerSideLatencyDirect,ServiceAvailability,ReplicationLatency&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                        'usage': '/providers/Microsoft.Insights/metrics?metricnames=DataUsage,IndexUsage,DocumentQuota,AvailableStorage,DocumentCount,NormalizedRUConsumption,PhysicalPartitionThroughputInfo,PhysicalPartitionSizeInfo,AutoscaleMaxThroughput,ProvisionedThroughput&api-version=2021-05-01&interval=PT5M&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                    };
+            
+                    Object.keys(endpoints).forEach(function (field) {
+                        data[field] = {};
+                        metrics = AzureCosmoDB.request('https://management.azure.com' + AzureCosmoDB.params.resource_id + endpoints[field]);
+            
+                        if (!metrics.hasOwnProperty('value')) {
+                            throw 'Failed getting required field. Check debug log for more information.';
+                        }
+            
+                        for (k in metrics.value) {
+                            key = AzureCosmoDB.getField(metrics.value[k], 'name.value')
+                            if (metrics.value[k].timeseries.length === 0) {
+                                metrics.value[k].timeseries.push({ 'data': ['nodata'] })
+                            }
+                            data[field][key] = AzureCosmoDB.getField(metrics.value[k], 'timeseries.0.data.0');
+                        }
+                    });
+                    return data
+                }
+            
+            };
+            
+            try {
+                AzureCosmoDB.setParams(JSON.parse(value));
+                AzureCosmoDB.login();
+                return JSON.stringify(AzureCosmoDB.getMetricsData());
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ AzureCosmoDB ] ERROR: ' + error);
+                return JSON.stringify({ 'error': error });
+            }
+          description: 'The result of API requests is expressed in the JSON.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: app_id
+              value: '{$AZURE.APP_ID}'
+            -
+              name: password
+              value: '{$AZURE.PASSWORD}'
+            -
+              name: tenant_id
+              value: '{$AZURE.TENANT_ID}'
+            -
+              name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION_ID}'
+            -
+              name: resource_id
+              value: '{$AZURE.RESOURCE_ID}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 947a2eb530754a609fa81c59e29fe7b7
+          name: 'Azure Microsoft Cosmos DB: Data Usage'
+          type: DEPENDENT
+          key: azure.cosmosdb.data.usage
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The total data usage.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.usage.DataUsage.total
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 0bf3da9168144016b663c9b8e76447fa
+          name: 'Azure Microsoft Cosmos DB: Document Count'
+          type: DEPENDENT
+          key: azure.cosmosdb.document.count
+          delay: '0'
+          history: 7d
+          description: 'The total document count.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.usage.DocumentCount.total
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 7fa0f59f8cfa4d9e83086b203e4f71ea
+          name: 'Azure Microsoft Cosmos DB: Document Quota'
+          type: DEPENDENT
+          key: azure.cosmosdb.document.quota
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The total storage quota.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.usage.DocumentQuota.total
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: b09f9445d960415185457b89b6a73452
+          name: 'Azure Microsoft Cosmos DB: Index Usage'
+          type: DEPENDENT
+          key: azure.cosmosdb.index.usage
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The total index usage.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.usage.IndexUsage.total
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: cd35f04b180542cda50dc5d4e979e54e
+          name: 'Azure Microsoft Cosmos DB: Metadata Requests'
+          type: DEPENDENT
+          key: azure.cosmosdb.metadata.requests
+          delay: '0'
+          history: 7d
+          description: |
+            The count of metadata requests. 
+            Cosmos DB maintains system metadata collection for each account, that allows you to enumerate collections, databases, etc, and their configurations, free of charge.
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.MetadataRequests.count
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: e42cf83e456a490295a84cfe9eb288ef
+          name: 'Azure Microsoft Cosmos DB: Mongo Requests'
+          type: DEPENDENT
+          key: azure.cosmosdb.mongo.requests
+          delay: '0'
+          history: 7d
+          description: 'The number of Mongo requests made.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.MetadataRequests.count
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 8fd4068986af444799ae64c6bc8f16a6
+          name: 'Azure Microsoft Cosmos DB: Mongo Request Charge'
+          type: DEPENDENT
+          key: azure.cosmosdb.mongo.requests.charge
+          delay: '0'
+          history: 7d
+          description: 'The Mongo request units consumed.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.MongoRequestCharge.total
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: fda6b39ce6ef4b8c8418b2e123ecdd17
+          name: 'Azure Microsoft Cosmos DB: Normalized RU Consumption'
+          type: DEPENDENT
+          key: azure.cosmosdb.normalized.ru.consumption
+          delay: '0'
+          history: 7d
+          units: '%'
+          description: 'The max RU consumption percentage per minute.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.usage.NormalizedRUConsumption.maximum
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: be6800214a0443e899c40f8a4b6c3f21
+          name: 'Azure Microsoft Cosmos DB: Physical Partition Size Info'
+          type: DEPENDENT
+          key: azure.cosmosdb.physical.partition.size.info
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The physical partition size in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.usage.PhysicalPartitionSizeInfo.maximum
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: e30d5eadde15427484e7a0d1cb38e9e3
+          name: 'Azure Microsoft Cosmos DB: Physical Partition Throughput Info'
+          type: DEPENDENT
+          key: azure.cosmosdb.physical.partition.throughput.info
+          delay: '0'
+          history: 7d
+          description: 'The physical partition throughput.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.usage.PhysicalPartitionThroughputInfo.maximum
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 49311bbfb2584a46b42ed1a7d8fcfd94
+          name: 'Azure Microsoft Cosmos DB: Provisioned Throughput'
+          type: DEPENDENT
+          key: azure.cosmosdb.provisioned.throughput
+          delay: '0'
+          history: 7d
+          description: 'The provisioned throughput.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.usage.ProvisionedThroughput.maximum
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 6d7175e27d10406191c883dc2e5949e4
+          name: 'Azure Microsoft Cosmos DB: Replication Latency'
+          type: DEPENDENT
+          key: azure.cosmosdb.replication.latency
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The P99 replication latency across source and target regions for geo-enabled account.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.ReplicationLatency.average
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: d9b5af0c71874114b48464ce20f8cf3d
+          name: 'Azure Microsoft Cosmos DB: Server Side Latency'
+          type: DEPENDENT
+          key: azure.cosmosdb.server.side.latency
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The server side latency.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.ServerSideLatency.average
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 7587d3750d1643f085db5931670dc2f3
+          name: 'Azure Microsoft Cosmos DB: Server Side Latency Direct'
+          type: DEPENDENT
+          key: azure.cosmosdb.server.side.latency.direct
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The server side latency in direct connection mode.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.ServerSideLatencyDirect.average
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 0aefdc3101fe4bcba4743d6e32671554
+          name: 'Azure Microsoft Cosmos DB: Server Side Latency Gateway'
+          type: DEPENDENT
+          key: azure.cosmosdb.server.side.latency.gateway
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The server side latency in gateway connection mode.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.ServerSideLatencyGateway.average
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 42bd03c1753b4f19bc9793b03834cd3d
+          name: 'Azure Microsoft Cosmos DB: Service Availability'
+          type: DEPENDENT
+          key: azure.cosmosdb.service.availability
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The account requests availability at one hour, day or month granularity.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.ServiceAvailability.average
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: c7649cd317f04a3d8fec0eebe3df6766
+              expression: '(min(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.service.availability,#3))<{$AZURE.COSMOS.MONGO.DB.AVAILABILITY}'
+              name: 'Azure Microsoft Cosmos DB: Cosmos DB for Mongo DB account: Availability is low'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: f4d4d2def5e945ab9048ada4813b7f04
+          name: 'Azure Microsoft Cosmos DB: Total Request Units'
+          type: DEPENDENT
+          key: azure.cosmosdb.total.request.units
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The request Units consumed.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.TotalRequestUnits.total
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 3dd2cd4edb7746edb9d917c83b280ca3
+          name: 'Azure Microsoft Cosmos DB: Total Requests'
+          type: DEPENDENT
+          key: azure.cosmosdb.total.requests
+          delay: '0'
+          history: 7d
+          description: 'The number of requests made.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.TotalRequests.count
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: azure
+        -
+          tag: target
+          value: mssql
+      macros:
+        -
+          macro: '{$AZURE.APP_ID}'
+          description: 'The App ID of Microsoft Azure.'
+        -
+          macro: '{$AZURE.COSMOS.MONGO.DB.AVAILABILITY}'
+          value: '70'
+          description: 'The warning threshold of the Cosmos DB for MongoDB service availability.'
+        -
+          macro: '{$AZURE.DATA.TIMEOUT}'
+          value: 60s
+          description: 'A response timeout for an API.'
+        -
+          macro: '{$AZURE.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Microsoft Azure password.'
+        -
+          macro: '{$AZURE.RESOURCE_ID}'
+          description: 'Microsoft Azure Cosmos DB ID.'
+        -
+          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          description: 'Microsoft Azure subscription ID.'
+        -
+          macro: '{$AZURE.TENANT_ID}'
+          description: 'Microsoft Azure tenant ID.'
+    -
       uuid: 2d8b9329b5d04cdf85bf17d2d0db2b29
       template: 'Azure Microsoft SQL Database by HTTP'
       name: 'Azure Microsoft SQL Database by HTTP'
@@ -2828,7 +3699,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Applications
+          name: Templates/Cloud
       items:
         -
           uuid: 2ff1f479e0b447f2b85e75e99bc011fe
@@ -3835,7 +4706,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Applications
+          name: Templates/Cloud
       items:
         -
           uuid: 7c11fcc4f4b349f8b98fac93ae5e32be
@@ -4798,7 +5669,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Applications
+          name: Templates/Cloud
       items:
         -
           uuid: 9c87cde45e984ce282d8ba9fbe184f9b
@@ -5604,7 +6475,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Applications
+          name: Templates/Cloud
       items:
         -
           uuid: c7771aa67d3c424490d8de2d6c2d609a
@@ -6409,7 +7280,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Applications
+          name: Templates/Cloud
       items:
         -
           uuid: 7f7deae517e54cf582ae758a6988037b
@@ -7338,7 +8209,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Applications
+          name: Templates/Cloud
       items:
         -
           uuid: 9eb43a5ffb0d4e07be8d1fccfdecd2aa
@@ -8150,7 +9021,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Applications
+          name: Templates/Cloud
       items:
         -
           uuid: c299999d69904340acd44fead6c7672c
@@ -9787,6 +10658,87 @@ zabbix_export:
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.miss
+    -
+      uuid: 89256a1eba8c49d2b7469a68ff050ac5
+      name: 'Azure Microsoft Cosmos DB: Latency'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.server.side.latency.gateway
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.server.side.latency
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.server.side.latency.direct
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.replication.latency
+    -
+      uuid: a1225fc27d334c5bbb5043e3d468bf02
+      name: 'Azure Microsoft Cosmos DB: Requests'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.total.requests
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.total.request.units
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.metadata.requests
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.mongo.requests
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.mongo.requests.charge
+    -
+      uuid: 07168aaf3abb42f6b61746cc6e2d2910
+      name: 'Azure Microsoft Cosmos DB: Usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.data.usage
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.index.usage
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.document.quota
     -
       uuid: 3b278de1b81a4be7acc865568962c323
       name: 'Azure Microsoft SQL: Connections'

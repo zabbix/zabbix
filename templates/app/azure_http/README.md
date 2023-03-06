@@ -5,7 +5,7 @@
 
 This template is designed to monitor Microsoft Azure by HTTP.
 It works without any external scripts and uses the script item.
-Currently the template supports the discovery of Virtual Machines (VMs), Cosmos DB for Mongo DB, Storage accounts,  Microsoft SQL, MySQL, and PostgreSQL servers.
+Currently the template supports the discovery of Virtual Machines (VMs), Cosmos DB for Mongo DB, Storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
 
 ## Requirements
 
@@ -33,6 +33,10 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
+|{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES} |<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p> |`.*` |
+|{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT_MATCHES} |<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES} |<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p> |`.*` |
+|{$AZURE.COSMOS.MONGO.DB.NAME.NOT_MATCHES} |<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`15s` |
 |{$AZURE.MSSQL.DB.LOCATION.MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`.*` |
 |{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`CHANGE_IF_NEEDED` |
@@ -74,6 +78,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
+|Cosmos DB account discovery |<p>The list of the Cosmos databases is provided by the subscription.</p> |DEPENDENT |azure.cosmos.mongo.db.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DocumentDB/databaseAccounts`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.COSMOS.MONGO.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p><p>**Overrides:**</p><p>MongoDB<br> - {#VERSION} MATCHES_REGEX `^MongoDB$`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
 |Microsoft SQL databases discovery |<p>The list of the Microsoft SQL databases is provided by the subscription.</p> |DEPENDENT |azure.mssql.databases.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Sql/servers/databases`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.MSSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.MSSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.MSSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p><p>- {#SIZE} NOT_MATCHES_REGEX `{$AZURE.MSSQL.DB.SIZE.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Serverless<br> - {#VERSION} MATCHES_REGEX `^.*serverless$`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Server<br> - {#VERSION} MATCHES_REGEX `^((?!serverless).)*$`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
 |MySQL servers discovery |<p>The list of the MySQL servers is provided by the subscription.</p> |DEPENDENT |azure.mysql.servers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DBforMySQL`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Flexible server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforMySQL/flexibleServers`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Single server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforMySQL/servers`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
 |PostgreSQL servers discovery |<p>The list of the PostgreSQL servers is provided by the subscription.</p> |DEPENDENT |azure.pgsql.servers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DBforPostgreSQL`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.PGSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.PGSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.PGSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.PGSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Flexible server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforPostgreSQL/flexibleServers`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Single server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforPostgreSQL/servers`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
@@ -199,9 +204,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -322,9 +324,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -417,9 +416,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -510,9 +506,6 @@ No specific Zabbix configuration is required.
 ### Template links
 
 There are no template links in this template.
-
-### Discovery rules
-
 
 ### Items collected
 
@@ -610,9 +603,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -703,9 +693,6 @@ No specific Zabbix configuration is required.
 ### Template links
 
 There are no template links in this template.
-
-### Discovery rules
-
 
 ### Items collected
 
@@ -804,9 +791,6 @@ No specific Zabbix configuration is required.
 
 There are no template links in this template.
 
-### Discovery rules
-
-
 ### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
@@ -851,6 +835,92 @@ There are no template links in this template.
 |Azure Microsoft SQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
 |Azure Microsoft SQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
 |Azure Microsoft SQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
+
+## Feedback
+
+Please report any issues with the template at https://support.zabbix.com.
+
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+
+# Azure Cosmos DB for MongoDB by HTTP
+
+## Overview
+
+This template is designed to monitor Microsoft Azure Cosmo DB by HTTP.
+It works without any external scripts and uses the script item.
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
+
+## Setup
+
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+
+1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure the macros: `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+
+## Configuration
+
+No specific Zabbix configuration is required.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
+|{$AZURE.COSMOS.MONGO.DB.AVAILABILITY} |<p>The warning threshold of the Cosmos DB for MongoDB service availability.</p> |`70` |
+|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
+|{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
+|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure Cosmo DB ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+
+### Template links
+
+There are no template links in this template.
+
+### Discovery rules
+
+
+### Items collected
+
+|Group|Name|Description|Type|Key and additional info|
+|-----|----|-----------|----|---------------------|
+|Azure |Azure Microsoft Cosmos DB: Get data |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.cosmosdb.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure Microsoft Cosmos DB: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.cosmosdb.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Total Requests |<p>The number of requests made.</p> |DEPENDENT |azure.cosmosdb.total.requests<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.TotalRequests.count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Total Request Units |<p>The request Units consumed.</p> |DEPENDENT |azure.cosmosdb.total.request.units<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.TotalRequestUnits.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Metadata Requests |<p>The count of metadata requests. </p><p>Cosmos DB maintains system metadata collection for each account, that allows you to enumerate collections, databases, etc, and their configurations, free of charge.</p> |DEPENDENT |azure.cosmosdb.metadata.requests<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.MetadataRequests.count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Mongo Requests |<p>The number of Mongo requests made.</p> |DEPENDENT |azure.cosmosdb.mongo.requests<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.MetadataRequests.count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Mongo Request Charge |<p>The Mongo request units consumed.</p> |DEPENDENT |azure.cosmosdb.mongo.requests.charge<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.MongoRequestCharge.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Server Side Latency |<p>The server side latency.</p> |DEPENDENT |azure.cosmosdb.server.side.latency<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.ServerSideLatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Server Side Latency Gateway |<p>The server side latency in gateway connection mode.</p> |DEPENDENT |azure.cosmosdb.server.side.latency.gateway<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.ServerSideLatencyGateway.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Server Side Latency Direct |<p>The server side latency in direct connection mode.</p> |DEPENDENT |azure.cosmosdb.server.side.latency.direct<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.ServerSideLatencyDirect.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Replication Latency |<p>The P99 replication latency across source and target regions for geo-enabled account.</p> |DEPENDENT |azure.cosmosdb.replication.latency<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.ReplicationLatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Service Availability |<p>The account requests availability at one hour, day or month granularity.</p> |DEPENDENT |azure.cosmosdb.service.availability<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.ServiceAvailability.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Data Usage |<p>The total data usage.</p> |DEPENDENT |azure.cosmosdb.data.usage<p>**Preprocessing**:</p><p>- JSONPATH: `$.usage.DataUsage.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Index Usage |<p>The total index usage.</p> |DEPENDENT |azure.cosmosdb.index.usage<p>**Preprocessing**:</p><p>- JSONPATH: `$.usage.IndexUsage.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Document Quota |<p>The total storage quota.</p> |DEPENDENT |azure.cosmosdb.document.quota<p>**Preprocessing**:</p><p>- JSONPATH: `$.usage.DocumentQuota.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Document Count |<p>The total document count.</p> |DEPENDENT |azure.cosmosdb.document.count<p>**Preprocessing**:</p><p>- JSONPATH: `$.usage.DocumentCount.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Normalized RU Consumption |<p>The max RU consumption percentage per minute.</p> |DEPENDENT |azure.cosmosdb.normalized.ru.consumption<p>**Preprocessing**:</p><p>- JSONPATH: `$.usage.NormalizedRUConsumption.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Physical Partition Throughput Info |<p>The physical partition throughput.</p> |DEPENDENT |azure.cosmosdb.physical.partition.throughput.info<p>**Preprocessing**:</p><p>- JSONPATH: `$.usage.PhysicalPartitionThroughputInfo.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Autoscale Max Throughput |<p>The autoscale max throughput.</p> |DEPENDENT |azure.cosmosdb.autoscale.max.throughput<p>**Preprocessing**:</p><p>- JSONPATH: `$.usage.AutoscaleMaxThroughput.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Provisioned Throughput |<p>The provisioned throughput.</p> |DEPENDENT |azure.cosmosdb.provisioned.throughput<p>**Preprocessing**:</p><p>- JSONPATH: `$.usage.ProvisionedThroughput.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Azure |Azure Microsoft Cosmos DB: Physical Partition Size Info |<p>The physical partition size in bytes.</p> |DEPENDENT |azure.cosmosdb.physical.partition.size.info<p>**Preprocessing**:</p><p>- JSONPATH: `$.usage.PhysicalPartitionSizeInfo.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----|----|----|
+|Azure Microsoft Cosmos DB: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.data.errors))>0` |AVERAGE | |
+|Azure Microsoft Cosmos DB: Cosmos DB for Mongo DB account: Availability is low |<p>-</p> |`(min(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.service.availability,#3))<{$AZURE.COSMOS.MONGO.DB.AVAILABILITY}` |WARNING | |
 
 ## Feedback
 
