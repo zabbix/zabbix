@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-13 05:54+0000\n"
+"PO-Revision-Date: 2023-03-02 12:23+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -412,6 +412,10 @@ msgstr "軽"
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
 msgstr "オーバーライドの追加"
+
+#: tests/selenium/modules/clock32/Widget.php:46
+msgid "ALARM CLOCK"
+msgstr ""
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
@@ -10649,7 +10653,7 @@ msgstr "インストーラ名"
 #: include/views/js/item.preprocessing.js.php:180
 #: include/views/js/item.preprocessing.js.php:227
 msgid "Integer from BITS"
-msgstr ""
+msgstr "BITSから整数値"
 
 #: include/classes/helpers/CMenuHelper.php:360
 msgid "Integrations"
@@ -17078,11 +17082,11 @@ msgstr "SNMPバージョン"
 
 #: include/items.inc.php:1802
 msgid "SNMP walk to JSON"
-msgstr ""
+msgstr "SNMP walkからJSON"
 
 #: include/items.inc.php:1798
 msgid "SNMP walk value"
-msgstr ""
+msgstr "SNMP walkの値"
 
 #: include/items.inc.php:1299
 #, c-format
@@ -17994,7 +17998,7 @@ msgstr "メンテナンス中の障害を表示"
 #: app/partials/monitoring.problem.filter.php:129
 #: widgets/problems/includes/WidgetForm.php:120
 msgid "Show symptoms"
-msgstr ""
+msgstr "兆候を表示"
 
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
@@ -18617,7 +18621,7 @@ msgstr "サポート"
 
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
-msgstr ""
+msgstr "古い数値型のサポートは廃止されました。拡張された数値型にアップグレードしてください。"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
@@ -18672,7 +18676,7 @@ msgstr "認証方式の変更を行うと現在のセッション以外はリセ
 #: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
 #: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
 msgid "Symptom"
-msgstr ""
+msgstr "兆候"
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -19178,7 +19182,7 @@ msgstr "テキスト、マクロの{INVENTORY.*}と{HOST.*}をサポート"
 #: include/classes/api/clients/CLocalApiClient.php:96
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without authorization header."
-msgstr ""
+msgstr "\"%1$s.%2$s\"メソッドは、認証ヘッダーなしで呼び出す必要があります。"
 
 #: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
@@ -19308,7 +19312,7 @@ msgstr "テーマ"
 #: app/views/administration.mediatype.edit.php:139
 #: app/views/popup.mediatypetest.edit.php:47
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
-msgstr ""
+msgstr "これらのパラメーターは、指定された順序でコマンドライン引数としてスクリプトに渡されます。"
 
 #: include/func.inc.php:2468
 msgid "This day last week"
@@ -19360,7 +19364,7 @@ msgstr "このデータ型はアイテムキーと合ってません。"
 
 #: app/views/administration.user.edit.php:59
 msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
-msgstr ""
+msgstr "このユーザーはIdPでプロビジョニングされています。プロビジョニングされたフィールドを手動で変更することはできません。"
 
 #: include/func.inc.php:2474
 msgid "This week"
@@ -20196,7 +20200,7 @@ msgstr "URL"
 #: include/views/js/item.preprocessing.js.php:177
 #: include/views/js/item.preprocessing.js.php:223
 msgid "UTF-8 from Hex-STRING"
-msgstr ""
+msgstr "16進文字列からUTF-8"
 
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
@@ -20306,7 +20310,7 @@ msgstr "選択したユーザーのブロックを解除しますか？"
 #: include/views/js/item.preprocessing.js.php:176
 #: include/views/js/item.preprocessing.js.php:222
 msgid "Unchanged"
-msgstr ""
+msgstr "変更なし"
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20640,7 +20644,7 @@ msgstr "ホスト\"%1$s\"のステータスを更新しました。"
 
 #: include/events.inc.php:346
 msgid "Updating"
-msgstr ""
+msgstr "更新中"
 
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
@@ -20672,7 +20676,7 @@ msgstr "アップタイム/ダウンタイム"
 
 #: app/views/popup.ldap.edit.php:169
 msgid "Use %{ref} in group filter to reference value of this user attribute."
-msgstr ""
+msgstr "このユーザー属性の値を参照するには、グループフィルターで%{ref}を使用します。"
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
@@ -20808,7 +20812,7 @@ msgstr "ユーザーディレクトリ\"%1$s\"はすでに存在します。"
 #: include/classes/api/services/CUser.php:715
 #, c-format
 msgid "User directory with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID\"%1$s\"のユーザーディレクトリは利用できません。"
 
 #: app/views/administration.user.list.php:211
 msgid "User does not have user groups."
@@ -21677,7 +21681,7 @@ msgstr "ベンダー"
 
 #: include/views/configuration.template.edit.php:93
 msgid "Vendor and version"
-msgstr ""
+msgstr "ベンダーとバージョン"
 
 #: include/items.inc.php:43
 msgid "Verbose"
@@ -22028,7 +22032,7 @@ msgstr "表示/設定"
 #: include/classes/core/CModuleManager.php:136
 #, c-format
 msgid "Wrong %1$s.php class name for module located at %2$s."
-msgstr ""
+msgstr "%2$sにあるモジュールの%1$s.phpのクラス名が間違っています。"
 
 #: include/classes/core/CModuleManager.php:203
 #, c-format
@@ -22321,7 +22325,7 @@ msgstr "Zabbixインテグレーション"
 
 #: app/views/connector.edit.php:49
 msgid "Zabbix Streaming Protocol v1.0"
-msgstr ""
+msgstr "Zabbixストリーミングプロトコル v1.0"
 
 #: include/classes/helpers/CMenuHelper.php:356
 msgid "Zabbix Technical Support"
