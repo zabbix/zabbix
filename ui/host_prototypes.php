@@ -111,12 +111,6 @@ else {
 }
 
 $tags = getRequest('tags', []);
-foreach ($tags as $key => $tag) {
-	// remove empty new tag lines
-	if ($tag['tag'] === '' && $tag['value'] === '') {
-		unset($tags[$key]);
-	}
-}
 
 // Remove inherited macros data (actions: 'add', 'update' and 'form').
 $macros = cleanInheritedMacros(getRequest('macros', []));
@@ -170,13 +164,6 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	try {
-		$save_macros = $macros;
-
-		foreach ($save_macros as &$macro) {
-			unset($macro['allow_revert']);
-		}
-		unset($macro);
-
 		$input = [
 			'host' => getRequest('host', DB::getDefault('hosts', 'host')),
 			'name' => getRequest(getRequest('name', '') === '' ? 'host' : 'name', DB::getDefault('hosts', 'name')),
@@ -192,8 +179,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				array_merge(getRequest('templates', []), getRequest('add_templates', [])),
 				'templateid'
 			),
-			'tags' => $tags,
-			'macros' => $save_macros,
+			'tags' => prepareHostPrototypeTags(getRequest('tags', [])),
+			'macros' => prepareHostPrototypeMacros($macros),
 			'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED)
 		];
 

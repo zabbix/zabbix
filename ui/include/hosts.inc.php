@@ -1280,6 +1280,8 @@ function prepareHostPrototypeGroupLinks(array $group_links) {
 }
 
 /**
+ * Format host prototype group prototypes received via form for API input.
+ *
  * @param array $group_prototypes
  *
  * @return array
@@ -1294,6 +1296,38 @@ function prepareHostPrototypeGroupPrototypes(array $group_prototypes): array {
 	return array_values($group_prototypes);
 }
 
+/**
+ * Format host prototype macros received via form for API input.
+ *
+ * @param array $macros
+ *
+ * @return array
+ */
+function prepareHostPrototypeMacros(array $macros): array {
+	foreach ($macros as &$macro) {
+		unset($macro['allow_revert']);
+	}
+	unset($macro);
+
+	return $macros;
+}
+
+/**
+ * Format host prototype tags received via form for API input.
+ *
+ * @param array $tags
+ *
+ * @return array
+ */
+function prepareHostPrototypeTags(array $tags): array {
+	foreach ($tags as $i => $tag) {
+		if ($tag['tag'] === '' && $tag['value'] === '') {
+			unset($tags[$i]);
+		}
+	}
+
+	return array_values($tags);
+}
 
 /**
  * Format host prototype group links received via form for API input.
@@ -1340,7 +1374,7 @@ function getSanitizedHostPrototypeFields(array $input): array {
 }
 
 /**
- * Get sanitized host prototype interface fields of given input.
+ * Get sanitized host prototype interface fields of given interfaces input.
  *
  * Param array  $interfaces
  *
@@ -1364,7 +1398,7 @@ function getSanitizedHostPrototypeInterfacesFields(array $interfaces): array {
 }
 
 /**
- * Get sanitized host prototype interface details fields of given input.
+ * Get sanitized host prototype interface details fields of given details input.
  *
  * Param array  $details
  *
