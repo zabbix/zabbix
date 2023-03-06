@@ -30,6 +30,8 @@ typedef struct
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
 	zbx_vector_ptr_t	*config_server_addrs;
+	zbx_get_config_str_f	get_source_ip;
+	zbx_get_config_str_f	get_hostname;
 }
 zbx_thread_datasender_args;
 

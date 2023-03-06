@@ -203,6 +203,12 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
+char	*CONFIG_HOSTNAME = NULL;
+static const char	*get_hostname(void)
+{
+	return CONFIG_HOSTNAME;
+}
+
 static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
 
 int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
@@ -303,7 +309,6 @@ int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 
 char	*CONFIG_SERVER			= NULL;
 int	CONFIG_SERVER_PORT;
-char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
@@ -1272,7 +1277,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_program_type, config_timeout, &config_server_addrs};
 	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, config_timeout,
-								&config_server_addrs};
+								&config_server_addrs, get_source_ip, get_hostname};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, config_timeout};
