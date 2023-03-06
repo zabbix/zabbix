@@ -30,11 +30,6 @@ class CHistoryManager {
 	private $primary_keys_enabled = false;
 
 	/**
-	 * @var string
-	 */
-	private static $binary_value = '*UNKNOWN*';
-
-	/**
 	 * Whether to enable optimizations that make use of PRIMARY KEY (itemid, clock, ns) on the history tables.
 	 *
 	 * @param bool $enabled
@@ -264,7 +259,7 @@ class CHistoryManager {
 				$max_clock_per_item = DBselect(
 					'SELECT h.itemid, MAX(h.clock) AS clock'.
 					' FROM '.$history_table.' h'.
-					' WHERE '.dbConditionId('h.itemid', array_column($items, 'itemid', 'itemid')).
+					' WHERE '.dbConditionId('h.itemid', array_column($items, 'itemid')).
 						($period !== null ? ' AND h.clock>'.$period : '').
 					' GROUP BY h.itemid'
 				);
@@ -284,7 +279,7 @@ class CHistoryManager {
 					if ($db_values) {
 						if ($value_type == ITEM_VALUE_TYPE_BINARY) {
 							foreach ($db_values as &$db_value) {
-								$db_value['value'] = self::$binary_value;
+								$db_value['value'] = UNRESOLVED_MACRO_STRING;
 							}
 							unset($db_value);
 						}
@@ -318,7 +313,7 @@ class CHistoryManager {
 					if ($values) {
 						if ($value_type == ITEM_VALUE_TYPE_BINARY) {
 							foreach ($values as &$value) {
-								$value['value'] = self::$binary_value;
+								$value['value'] = UNRESOLVED_MACRO_STRING;
 							}
 							unset($value);
 						}
@@ -380,7 +375,7 @@ class CHistoryManager {
 						if ($values) {
 							if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
 								foreach ($values as &$value) {
-									$value['value'] = self::$binary_value;
+									$value['value'] = UNRESOLVED_MACRO_STRING;
 								}
 								unset($value);
 							}
@@ -447,7 +442,7 @@ class CHistoryManager {
 
 					if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
 						foreach ($values as &$value) {
-							$value['value'] = self::$binary_value;
+							$value['value'] = UNRESOLVED_MACRO_STRING;
 						}
 						unset($value);
 					}
@@ -586,7 +581,7 @@ class CHistoryManager {
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
 			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-				$row['value'] = self::$binary_value;
+				$row['value'] = UNRESOLVED_MACRO_STRING;
 			}
 
 			return $row;
@@ -607,7 +602,7 @@ class CHistoryManager {
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
 			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-				$row['value'] = self::$binary_value;
+				$row['value'] = UNRESOLVED_MACRO_STRING;
 			}
 
 			return $row;
@@ -645,7 +640,7 @@ class CHistoryManager {
 
 		if ($result !== null) {
 			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-				$result['value'] = self::$binary_value;
+				$result['value'] = UNRESOLVED_MACRO_STRING;
 			}
 
 			return $result;
@@ -702,7 +697,7 @@ class CHistoryManager {
 		}
 
 		if ($result !== null && $item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-			$result['value'] = self::$binary_value;
+			$result['value'] = UNRESOLVED_MACRO_STRING;
 		}
 
 		return $result;
