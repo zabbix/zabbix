@@ -424,13 +424,28 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @param array $items
 	 * @param array $db_items
+	 * @param bool  $update
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkAndAddUuid(array &$items, array $db_items): void {
+	protected static function checkAndAddUuid(array &$items, array $db_items, bool $update = false): void {
+		if ($update) {
+			$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
+				'host_status' =>	['type' => API_ANY],
+				'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+					['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
+					['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid')]
+				]]
+			]];
+
+			if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
+
 		$new_item_uuids = [];
 
-		foreach ($items as $index => &$item) {
+		foreach ($items as &$item) {
 			if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
 				$db_uuid = array_key_exists('itemid', $item) && array_key_exists($item['itemid'], $db_items)
 					? $db_items[$item['itemid']]['uuid']
@@ -443,11 +458,6 @@ abstract class CItemGeneral extends CApiService {
 				if ($item['uuid'] !== $db_uuid) {
 					$new_item_uuids[] = $item['uuid'];
 				}
-			}
-			elseif (array_key_exists('uuid', $item)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
 			}
 		}
 		unset($item);

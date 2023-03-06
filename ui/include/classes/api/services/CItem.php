@@ -564,7 +564,7 @@ class CItem extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items);
 
-		self::checkAndAddUuid($items, []);
+		self::checkAndAddUuid($items, [], false);
 		self::checkDuplicates($items);
 		self::checkValueMaps($items);
 		self::checkInventoryLinks($items);
@@ -634,7 +634,6 @@ class CItem extends CItemGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-			'uuid' => 	['type' => API_UUID],
 			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
@@ -707,7 +706,7 @@ class CItem extends CItemGeneral {
 
 		self::addAffectedObjects($items, $db_items);
 
-		self::checkAndAddUuid($items, $db_items);
+		self::checkAndAddUuid($items, $db_items, true);
 		self::checkDuplicates($items, $db_items);
 		self::checkValueMaps($items, $db_items);
 		self::checkInventoryLinks($items, $db_items);
