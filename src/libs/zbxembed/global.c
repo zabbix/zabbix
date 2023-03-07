@@ -291,23 +291,18 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 
 	return duk_error(ctx, DUK_RET_TYPE_ERROR, "encryption support was not compiled in");
 #else
-	char			*key_unesc = NULL, *data = NULL, *error = NULL, *out = NULL;
-	unsigned char		*raw_sig = NULL;
-	const char		*algo, *key_ptr;
-	duk_size_t		key_len, data_len;
-	duk_int_t		arg_type;
-	size_t			raw_sig_len, key_unesc_alloc = 0;
-	int			ret, err_index = -1;
-	zbx_json_type_t		jtype;
+	char		*key_unesc = NULL, *data = NULL, *error = NULL;
+	unsigned char	*raw_sig = NULL;
+	const char	*key_ptr;
+	duk_size_t	key_len, data_len;
+	duk_int_t	arg_type;
+	size_t		raw_sig_len, key_unesc_alloc = 0;
+	int		err_index = -1;
 
-	algo = duk_require_string(ctx, 0);
-
-	if (0 != strcmp(algo, "sha256"))
+	if (0 != strcmp(duk_require_string(ctx, 0), "sha256"))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "unsupported hash function, only 'sha256' is supported");
 
-	arg_type = duk_get_type(ctx, 1);
-
-	if (DUK_TYPE_UNDEFINED == arg_type)
+	if (DUK_TYPE_UNDEFINED == (arg_type = duk_get_type(ctx, 1)))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "parameter 'key' is missing or is undefined");
 		goto out;
@@ -337,7 +332,7 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 		goto out;
 	}
 
-	if (NULL != zbx_json_decodevalue_dyn(key_ptr, &key_unesc, &key_unesc_alloc, &jtype))
+	if (NULL != zbx_json_decodevalue_dyn(key_ptr, &key_unesc, &key_unesc_alloc, NULL))
 	{
 		key_len = strlen(key_unesc);
 	}
@@ -352,9 +347,10 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 		zbx_normalize_pem(&key_unesc, &key_len);
 	}
 
-	if (SUCCEED == (ret = zbx_rs256_sign(key_unesc, key_len, data, data_len, &raw_sig, &raw_sig_len, &error)))
+	if (SUCCEED == zbx_rs256_sign(key_unesc, key_len, data, data_len, &raw_sig, &raw_sig_len, &error))
 	{
 		size_t	hex_sig_len;
+		char	*out = NULL;
 
 		hex_sig_len = raw_sig_len * 2 + 1;
 		out = (char *)zbx_malloc(NULL, hex_sig_len);
