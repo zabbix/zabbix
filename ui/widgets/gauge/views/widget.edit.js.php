@@ -24,12 +24,15 @@
 window.widget_gauge_form = new class {
 
 	init({thresholds_colors}) {
+		const threshold_row_selector = '#' + $thresholds_table.attr('id') + ' .form_row';
+
 		this._form = document.getElementById('widget-dialogue-form');
 		this._advanced_configuration = document.getElementById('adv_conf');
 		this._units_show = document.getElementById('units_show');
 		this._needle_show = document.getElementById('needle_show');
 		this._minmax_show = document.getElementById('minmax_show');
 		this._th_show_arc = document.getElementById('th_show_arc');
+		this._th_rows_count = document.querySelectorAll(threshold_row_selector).length;
 
 		jQuery('#itemid').on('change', () => this.updateWarningIcon());
 
@@ -52,6 +55,16 @@ window.widget_gauge_form = new class {
 			checkbox.addEventListener('change', () => this.updateForm());
 		}
 
+		$thresholds_table
+			.on('afteradd.dynamicRows', () => {
+				this._th_rows_count = document.querySelectorAll(threshold_row_selector).length;
+				this.updateForm();
+			})
+			.on('afterremove.dynamicRows', () => {
+				this._th_rows_count = document.querySelectorAll(threshold_row_selector).length;
+				this.updateForm();
+			});
+
 		colorPalette.setThemeColors(thresholds_colors);
 
 		this.updateForm();
@@ -63,23 +76,33 @@ window.widget_gauge_form = new class {
 				' .fields-group-thresholds')) {
 			element.style.display = this._advanced_configuration.checked ? '' : 'none';
 
+			// Disable all advanced configuration elements if, advanced configuration is disabled.
 			for (const input of element.querySelectorAll('input, textarea')) {
 				input.disabled = !this._advanced_configuration.checked;
 			}
 		}
 
 		/*
-		 * "Min/Max show units" must be before "Show units", because the "Show units" takes higher priority. Disabling
-		 * "Show units" should also disable "Min/max show units". But when enabled, "Min/max show units" depends on the
-		 * main "Min/Max" checkbox.
+		 * Disabling "Show units" should also disable "Min/max show units". But when enabled, "Min/max show units"
+		 * depends on the main "Min/Max" checkbox.
 		 */
-		this.toggleGoup(document.querySelectorAll('#minmax, #minmax_size, #minmax_show_units'), this._minmax_show);
-		this.toggleGoup(
-			document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color, #minmax_show_units'),
-			this._units_show
+		this.toggleGoup(document.querySelectorAll('#minmax_size, #minmax_show_units'), this._minmax_show.checked);
+		this.toggleGoup(document.querySelectorAll('#minmax_show_units'), this._units_show.checked,
+			this._minmax_show.checked
 		);
-		this.toggleGoup(document.querySelectorAll('#needle, #needle_color'), this._needle_show);
-		this.toggleGoup(document.querySelectorAll('#th_arc_size'), this._th_show_arc);
+		this.toggleGoup(
+			document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color'),
+			this._units_show.checked
+		);
+		this.toggleGoup(document.querySelectorAll('#needle, #needle_color'), this._needle_show.checked);
+
+		/*
+		 * Adding and removing thresholds, enables or disables other threshold controls. There must be at least one
+		 * threshold to enable other controls. Treshold "Arc size" depends on both, number of threshold rows and
+		 * if "Show arc" is selected.
+		 */
+		this.toggleGoup(document.querySelectorAll('#th_show_labels, #th_show_arc, #th_arc_size'), this._th_rows_count);
+		this.toggleGoup(document.querySelectorAll('#th_arc_size'), this._th_show_arc.checked, this._th_rows_count);
 	}
 
 	updateWarningIcon() {
@@ -112,9 +135,25 @@ window.widget_gauge_form = new class {
 		}
 	}
 
-	toggleGoup(elements, checkbox) {
+	/**
+	 * Enables or disables elements, depeding on infinite amount of arguments. First argument is removed, since it is
+	 * the list of elements. Other arguments are booleans. So elements can depend on one or more checkboxes. Both
+	 * checkboxes should be selected to enable the element.
+	 *
+	 * @param {NodeList} elements  List of elements to enable/disable.
+	 */
+	toggleGoup(elements) {
+		const args = Array.from(arguments);
+		let dependencies = true;
+
+		args.shift();
+
+		for (const arg of args) {
+			dependencies = dependencies && !!arg;
+		}
+
 		for (const element of elements) {
-			element.disabled = !this._advanced_configuration.checked || !checkbox.checked;
+			element.disabled = !this._advanced_configuration.checked || !dependencies;
 		}
 	}
 };
