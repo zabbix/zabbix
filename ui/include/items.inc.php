@@ -1479,7 +1479,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 }
 
 /**
- * Check whether the unit of an item is binary or not
+ * Check whether the unit of an item is binary or not.
  *
  * @param string $units
  *
