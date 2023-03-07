@@ -390,7 +390,7 @@ out:
  *           sent by proxy.                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_timespec_t *ts,
+static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, const zbx_timespec_t *ts,
 		const zbx_events_funcs_t *events_cbs, int *more)
 {
 	struct zbx_json_parse	jp;

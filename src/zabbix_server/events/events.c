@@ -717,12 +717,9 @@ static int	correlation_match_event_hostgroup(const zbx_db_event *event, zbx_uint
  *                                depending on old events                     *
  *                                                                            *
  ******************************************************************************/
-static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *condition,
+static const char	*correlation_condition_match_new_event(const zbx_corr_condition_t *condition,
 		const zbx_db_event *event, int old_value)
 {
-	int		i, ret;
-	zbx_tag_t	*tag;
-
 	/* return SUCCEED for conditions using old events */
 	switch (condition->type)
 	{
@@ -733,6 +730,9 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 
 	switch (condition->type)
 	{
+		int		i, ret;
+		const zbx_tag_t	*tag;
+
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 			for (i = 0; i < event->tags.values_num; i++)
 			{
@@ -746,7 +746,7 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 			for (i = 0; i < event->tags.values_num; i++)
 			{
-				zbx_corr_condition_tag_value_t	*cond = &condition->data.tag_value;
+				const zbx_corr_condition_tag_value_t	*cond = &condition->data.tag_value;
 
 				tag = event->tags.values[i];
 
@@ -797,7 +797,7 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
  *               CORRELATION_NO_MATCH  - correlation rule doesn't match       *
  *                                                                            *
  ******************************************************************************/
-static zbx_correlation_match_result_t	correlation_match_new_event(zbx_correlation_t *correlation,
+static zbx_correlation_match_result_t	correlation_match_new_event(const zbx_correlation_t *correlation,
 		const zbx_db_event *event, int old_value)
 {
 	char				*expression, error[256];
@@ -806,7 +806,6 @@ static zbx_correlation_match_result_t	correlation_match_new_event(zbx_correlatio
 	int				pos = 0;
 	zbx_uint64_t			conditionid;
 	zbx_strloc_t			*loc;
-	zbx_corr_condition_t		*condition;
 	double				result;
 	zbx_correlation_match_result_t	ret = CORRELATION_NO_MATCH;
 
@@ -817,6 +816,8 @@ static zbx_correlation_match_result_t	correlation_match_new_event(zbx_correlatio
 
 	for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
+		const zbx_corr_condition_t	*condition;
+
 		if (ZBX_TOKEN_OBJECTID != token.type)
 			continue;
 
@@ -943,7 +944,8 @@ static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, s
  * Return value: the created filter or NULL                                   *
  *                                                                            *
  ******************************************************************************/
-static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condition, const zbx_db_event *event)
+static char	*correlation_condition_get_event_filter(const zbx_corr_condition_t *condition,
+		const zbx_db_event *event)
 {
 	int			i;
 	zbx_tag_t		*tag;
@@ -1038,7 +1040,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
  *                                                                            *
  ******************************************************************************/
 static int	correlation_add_event_filter(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		zbx_correlation_t *correlation, const zbx_db_event *event)
+		const zbx_correlation_t *correlation, const zbx_db_event *event)
 {
 	char			*expression, *filter;
 	zbx_token_t		token;
@@ -1091,12 +1093,12 @@ out:
  *          old eventid                                                       *
  *                                                                            *
  * Parameters: correlation  - [IN] correlation to execute                     *
- *             event        - [IN] new event                                  *
+ *             event        - [IN/OUT] new event                              *
  *             old_eventid  - [IN]                                            *
  *             old_objectid - [IN] old event source objectid (triggerid)      *
  *                                                                            *
  ******************************************************************************/
-static void	correlation_execute_operations(zbx_correlation_t *correlation, zbx_db_event *event,
+static void	correlation_execute_operations(const zbx_correlation_t *correlation, zbx_db_event *event,
 		zbx_uint64_t old_eventid, zbx_uint64_t old_objectid)
 {
 	int			i;
@@ -2230,7 +2232,7 @@ static void	recover_event(zbx_uint64_t eventid, int source, int object, zbx_uint
  * Parameters: ok_events - [IN] the recovery events to process                *
  *                                                                            *
  ******************************************************************************/
-static void	process_internal_ok_events(zbx_vector_ptr_t *ok_events)
+static void	process_internal_ok_events(const zbx_vector_ptr_t *ok_events)
 {
 	int			i, object;
 	zbx_uint64_t		objectid, eventid;
@@ -2553,7 +2555,7 @@ static int	match_tag(const char *name, const zbx_vector_tags_t *tags1, const zbx
  *             trigger_diff   - [IN] trigger changeset                        *
  *                                                                            *
  ******************************************************************************/
-static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_ptr_t *trigger_diff)
+static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events, const zbx_vector_ptr_t *trigger_diff)
 {
 	int			i, j, index;
 	zbx_vector_uint64_t	triggerids;
@@ -2711,8 +2713,8 @@ static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_
  *             trigger_diff   -  [IN] trigger changeset                       *
  *                                                                            *
  ******************************************************************************/
-static void	process_internal_events_dependency(zbx_vector_ptr_t *internal_events, zbx_vector_ptr_t *trigger_events,
-		zbx_vector_ptr_t *trigger_diff)
+static void	process_internal_events_dependency(const zbx_vector_ptr_t *internal_events, const zbx_vector_ptr_t *trigger_events,
+		const zbx_vector_ptr_t *trigger_diff)
 {
 	int			i, index;
 	zbx_db_event		*event;
