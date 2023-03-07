@@ -63,7 +63,7 @@ static void	pem_replace_spaces(char *s)
 void	zbx_normalize_pem(char **key, size_t *key_len)
 {
 	char	*ptr, *newline_ptr;
-	size_t	offset = 0;
+	size_t	offset;
 
 	if (0 == strncmp(*key, PEM_BEGIN, ZBX_CONST_STRLEN(PEM_BEGIN)))
 	{
@@ -75,12 +75,12 @@ void	zbx_normalize_pem(char **key, size_t *key_len)
 			offset = newline_ptr - *key - 1;
 			zbx_replace_string(key, offset, &offset, "-\n");
 			*key_len = *key_len + 1;
+			ptr = *key + offset;
 		}
-
-		if (0 == offset)
-			pem_replace_spaces(newline_ptr);
 		else
-			pem_replace_spaces(*key + offset);
+			ptr = newline_ptr;
+
+		pem_replace_spaces(ptr);
 
 		if (NULL == (ptr = strstr(*key, PEM_FOOTER_END)))
 			return;
