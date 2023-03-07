@@ -22,6 +22,6 @@
 
 #include "zbxthreads.h"
 
-ZBX_THREAD_ENTRY(dbsyncer_thread, args);
+ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args);
 
 #endif

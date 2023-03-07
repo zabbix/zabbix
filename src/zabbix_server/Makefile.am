@@ -2,7 +2,6 @@
 
 SUBDIRS = \
 	alerter \
-	dbsyncer \
 	dbconfig \
 	diag \
 	discoverer \
@@ -59,7 +58,7 @@ zabbix_server_SOURCES = \
 	server.c
 
 zabbix_server_LDADD = \
-	dbsyncer/libzbxdbsyncer.a \
+	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	dbconfig/libzbxdbconfig.a \
 	diag/libzbxdiag_server.a \
 	alerter/libzbxalerter.a \

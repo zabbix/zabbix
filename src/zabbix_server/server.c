@@ -36,7 +36,7 @@
 #include "zbxcomms.h"
 
 #include "alerter/alerter.h"
-#include "dbsyncer/dbsyncer.h"
+#include "zbxdbsyncer.h"
 #include "dbconfig/dbconfig.h"
 #include "discoverer/discoverer.h"
 #include "httppoller/httppoller.h"
@@ -1588,7 +1588,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
-				zbx_thread_start(dbsyncer_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_dbsyncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ESCALATOR:
 				thread_args.args = &escalator_args;

@@ -17,6 +17,7 @@ DIST_SUBDIRS = \
 	zbxcachevalue \
 	zbxdbhigh \
 	zbxdbwrap \
+	zbxdbsyncer \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
@@ -79,6 +80,7 @@ SERVER_SUBDIRS = \
 	zbxcachevalue \
 	zbxdbhigh \
 	zbxdbwrap \
+	zbxdbsyncer \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
@@ -127,6 +129,7 @@ PROXY_SUBDIRS = \
 	zbxcachevalue \
 	zbxdbhigh \
 	zbxdbwrap \
+	zbxdbsyncer \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \

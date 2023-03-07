@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "dbsyncer.h"
+#include "zbxdbsyncer.h"
 
 #include "log.h"
 #include "zbxnix.h"
@@ -97,7 +97,7 @@ static void	db_trigger_queue_cleanup(void)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(dbsyncer_thread, args)
+ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 {
 	int			sleeptime = -1, total_values_num = 0, values_num, more, total_triggers_num = 0,
 				triggers_num;
