@@ -27,8 +27,7 @@
 #include "zbxexport.h"
 #include "zbxprof.h"
 
-extern int				CONFIG_HISTSYNCER_FREQUENCY;
-static sigset_t				orig_mask;
+static sigset_t			orig_mask;
 
 static zbx_export_file_t	*problems_export = NULL;
 static zbx_export_file_t	*get_problems_export(void)
@@ -55,7 +54,6 @@ static zbx_export_file_t	*get_trends_export(void)
  ******************************************************************************/
 static void	zbx_db_flush_timer_queue(void)
 {
-	int			i;
 	zbx_vector_ptr_t	persistent_timers;
 	zbx_db_insert_t		db_insert;
 
@@ -64,9 +62,10 @@ static void	zbx_db_flush_timer_queue(void)
 
 	if (0 != persistent_timers.values_num)
 	{
-		zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns", NULL);
+		zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns",
+				NULL);
 
-		for (i = 0; i < persistent_timers.values_num; i++)
+		for (int i = 0; i < persistent_timers.values_num; i++)
 		{
 			zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)persistent_timers.values[i];
 
@@ -110,6 +109,9 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+
+	zbx_thread_dbsyncer_args	*dbsyncer_args = (zbx_thread_dbsyncer_args *)
+			(((zbx_thread_args_t *)args)->args);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, (process_name = get_process_type_string(process_type)), process_num);
@@ -170,7 +172,7 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		total_triggers_num += triggers_num;
 		total_sec += zbx_time() - sec;
 
-		sleeptime = (ZBX_SYNC_MORE == more ? 0 : CONFIG_HISTSYNCER_FREQUENCY);
+		sleeptime = (ZBX_SYNC_MORE == more ? 0 : dbsyncer_args->config_histsyncer_frequency);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{

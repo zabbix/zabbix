@@ -325,6 +325,7 @@ static int	get_config_timeout(void)
 
 static int	config_startup_time		= 0;
 static int	config_unavailable_delay	= 60;
+static int	config_histsyncer_frequency = 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -333,7 +334,6 @@ char	*CONFIG_SERVER			= NULL;		/* not used in zabbix_server, required for linkin
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
-int	CONFIG_HISTSYNCER_FREQUENCY	= 1;
 int	CONFIG_CONFSYNCER_FREQUENCY	= 10;
 
 int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
@@ -1423,6 +1423,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			zbx_config_dbhigh};
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
+	zbx_thread_dbsyncer_args		dbsyncer_args = {config_histsyncer_frequency};
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1588,6 +1589,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				thread_args.args = &dbsyncer_args;
 				zbx_thread_start(zbx_dbsyncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ESCALATOR:
