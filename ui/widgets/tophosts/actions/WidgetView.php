@@ -129,6 +129,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$item_values = [];
 
 		foreach ($configuration as $column_index => &$column) {
+			if ($column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
+				continue;
+			}
+
 			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
 				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
 
@@ -159,10 +163,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'with_time_suffix' => true,
 				'is_binary_size' => $is_binary
 			]);
-
-			if ($column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
-				continue;
-			}
 
 			if ($calc_extremes) {
 				if ($column['min'] !== '' && $number_parser->parse($column['min']) == CParser::PARSE_SUCCESS) {
