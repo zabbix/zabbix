@@ -41,17 +41,10 @@
 
 static void	pem_replace_spaces(char *s)
 {
-	char	*end_ptr;
-
-	end_ptr = strstr(s, "-----END");
-
-	while ('\0' != *s)
+	while ('\0' != *s && '-' != *s)
 	{
 		if (' ' == *s)
 			*s = '\n';
-
-		if (NULL != end_ptr && end_ptr + 1 == s + 1)
-			return;
 
 		s++;
 	}
@@ -70,25 +63,24 @@ static void	pem_replace_spaces(char *s)
 void	zbx_normalize_pem(char **key, size_t *key_len)
 {
 	char	*ptr, *newline_ptr;
-	size_t	offset;
+	size_t	offset = 0;
 
 	if (0 == strncmp(*key, PEM_BEGIN, ZBX_CONST_STRLEN(PEM_BEGIN)))
 	{
 		if (NULL == (ptr = strstr(*key + ZBX_CONST_STRLEN(PEM_BEGIN), PEM_BEGIN_HEADER_END)))
 			return;
 
-		if ('\n' != *(newline_ptr = ptr + ZBX_CONST_STRLEN(PEM_BEGIN_HEADER_END)))
+		if ('\n' != *(newline_ptr = ptr + ZBX_CONST_STRLEN(PEM_BEGIN_HEADER_END)) && ' ' != *newline_ptr)
 		{
-			if (' ' == *newline_ptr)
-			{
-				pem_replace_spaces(newline_ptr);
-				return;
-			}
-
 			offset = newline_ptr - *key - 1;
 			zbx_replace_string(key, offset, &offset, "-\n");
 			*key_len = *key_len + 1;
 		}
+
+		if (0 == offset)
+			pem_replace_spaces(newline_ptr);
+		else
+			pem_replace_spaces(*key + offset);
 
 		if (NULL == (ptr = strstr(*key, PEM_FOOTER_END)))
 			return;
