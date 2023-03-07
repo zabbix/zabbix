@@ -110,7 +110,7 @@
 
 // Custom intervals.
 (() => {
-	const custom_elem = document.querySelector('#update_interval_div');
+	const custom_elem = document.querySelector('#update_interval');
 
 	if (!custom_elem) {
 		return false;

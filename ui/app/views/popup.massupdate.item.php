@@ -210,13 +210,6 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 			->setId('preprocessing_div')
 	);
 
-// Prepare Update interval for form list.
-$update_interval = (new CTable())
-	->setId('update_interval')
-	->addRow([_('Delay'),
-		(new CDiv((new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)))
-	]);
-
 $custom_intervals = (new CTable())
 	->setId('custom_intervals')
 	->setHeader([
@@ -269,19 +262,26 @@ $custom_intervals->addRow([(new CButton('interval_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
-$update_interval->addRow(
-	(new CRow([
-		(new CCol(_('Custom intervals')))->addStyle('vertical-align: top;'),
-		new CCol($custom_intervals)
-	]))
-);
+// Prepare Update interval for form list.
+$update_interval = (new CTable())
+	->setId('update_interval')
+	->addRow([
+		_('Delay'),
+		new CDiv((new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
+	])
+	->addRow(
+		(new CRow([
+			(new CCol(_('Custom intervals')))->addStyle('vertical-align: top;'),
+			new CCol($custom_intervals)
+		]))
+	);
 
 // Append update interval to form list.
 $item_form_list
 	// Append delay to form list.
 	->addRow(
-		(new CVisibilityBox('visible[delay]', 'update_interval_div', _('Original')))->setLabel(_('Update interval')),
-		(new CDiv($update_interval))->setId('update_interval_div')
+		(new CVisibilityBox('visible[delay]', 'update_interval', _('Original')))->setLabel(_('Update interval')),
+		$update_interval
 	)
 	// Append history to form list.
 	->addRow(
