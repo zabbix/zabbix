@@ -44,15 +44,16 @@ else {
 
 	$body->addRow(['value type: ', $data['data']['value']['type']]);
 	$body->addRow(['value text: ', $data['data']['value']['text']]);
+	$body->addRow(['value raw: ', $data['data']['value']['raw']]);
 	$body->addRow(['value font_size: ', $data['data']['value']['font_size']]);
 	$body->addRow(['value bold: ', $data['data']['value']['is_bold']]);
 	$body->addRow(['value color: ', $data['data']['value']['color']]);
 	$body->addRow(['value show_arc: ', $data['data']['value']['show_arc']]);
 	$body->addRow(['value arc_size: ', $data['data']['value']['arc_size']]);
-	$body->addRow(['value prev_value: ', $data['data']['value']['prev_value']]);
 	$body->addRow(['&nbsp;', '&nbsp;']);
 
 	$body->addRow(['units text: ', $data['data']['units']['text']]);
+	$body->addRow(['units base: ', $data['data']['units']['base']]);
 	$body->addRow(['units pos: ', $data['data']['units']['pos']]);
 	$body->addRow(['units show: ', $data['data']['units']['show']]);
 	$body->addRow(['units font_size: ', $data['data']['units']['font_size']]);

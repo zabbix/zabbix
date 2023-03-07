@@ -57,8 +57,6 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_ANGLE = 180;
 
 	// Min/Max defaults.
-	private const MIN = 0;
-	private const MAX = ZBX_MAX_INT32;
 	private const DEFAULT_MIN = 0;
 	private const DEFAULT_MAX = 100;
 	private const DEFAULT_MINMAX_SHOW = 1;

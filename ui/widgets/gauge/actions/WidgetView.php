@@ -86,16 +86,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 */
 	private $value = [
 		'type' => ITEM_VALUE_TYPE_TEXT,
+		'raw' => null,
 		'units' => '',
 		'power' => null
 	];
-
-	/**
-	 * Previous item value.
-	 *
-	 * @var int|float
-	 */
-	private $prev_value = null;
 
 	/**
 	 * Array of gauge min values. Contains raw value and converted value with units.
@@ -122,13 +116,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'initial_load' => 'in 0,1',
 			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
 	protected function doAction(): void {
 		$error = '';
+		$url = '';
+
 		// Set default text in case there is no data for item.
 		$this->value['text'] = _('No data.');
 
@@ -146,7 +141,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($this->items) {
 			$history = $this->getItemHistory();
 			$this->setValue($history);
-			$this->setPreviousValue($history);
 
 			$is_binary = false || in_array($this->unit_base, ['B', 'Bps']);
 			$calc_power = false || $this->unit_base === '' || $this->unit_base[0] !== '!';
@@ -159,17 +153,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 				? $number_parser->calcValue()
 				: null;
 
-			// At this point the Min/Max should be floatin point values. If not, then that is a critical system error.
-			$minmax_power = $calc_power
-				? (int) min(8, max(0, floor(log(max(
-					abs(truncateFloat($this->min['raw'])),
-					abs(truncateFloat($this->max['raw']))
-				), $is_binary ? ZBX_KIBIBYTE : 1000))))
-				: 0;
+			if ($this->fields_values['minmax_show_units'] == 1) {
+				// At this point the Min/Max should be floating point values. If not, that is a critical system error.
+				$minmax_power = $calc_power
+					? (int) min(8, max(0, floor(log(max(
+						abs(truncateFloat($this->min['raw'])),
+						abs(truncateFloat($this->max['raw']))
+					), $is_binary ? ZBX_KIBIBYTE : 1000))))
+					: 0;
 
-			$power = $minmax_power;
-
-			if ($this->fields_values['minmax_show_units'] == 0) {
+				$power = $minmax_power;
+			}
+			else {
 				$power = $this->value['power'];
 			}
 
@@ -201,15 +196,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'value' => [
 					'type' => $this->value['type'],
 					'text' => $this->value['text'],
+					'raw' => $this->value['raw'],
 					'font_size' => $this->fields_values['value_size'],
 					'is_bold' => ($this->fields_values['value_bold'] == 1),
 					'color' => $this->fields_values['value_color'],
 					'show_arc' => ($this->fields_values['value_arc'] == 1),
-					'arc_size' => $this->fields_values['value_arc_size'],
-					'prev_value' => $this->prev_value
+					'arc_size' => $this->fields_values['value_arc_size']
 				],
 				'units' => [
 					'text' => $this->value['units'],
+					'base' => $this->unit_base,
 					'pos' => $this->fields_values['units_pos'],
 					'show' => ($this->fields_values['units_show'] == 1),
 					'font_size' => $this->fields_values['units_size'],
@@ -388,15 +384,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * Set units to items array if units are supposed to be shown and overwritten.
 	 */
 	private function setItemUnits(): void {
-		if ($this->fields_values['units_show'] == 1) {
-			if ($this->fields_values['units'] !== '') {
-				// Overwrite units for item.
-				$this->items[$this->itemid]['units'] = $this->fields_values['units'];
+		if ($this->items) {
+			if ($this->fields_values['units_show'] == 1) {
+				if ($this->fields_values['units'] !== '') {
+					// Overwrite units for item.
+					$this->items[$this->itemid]['units'] = $this->fields_values['units'];
+				}
 			}
-		}
-		else {
-			// Do not make any unit conversions if units are supposed to be hidden.
-			$this->items[$this->itemid]['units'] = '';
+			else {
+				// Do not make any unit conversions if units are supposed to be hidden.
+				$this->items[$this->itemid]['units'] = '';
+			}
 		}
 	}
 
@@ -420,16 +418,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	/**
-	 * Get history data. If widget was previously loaded, get two values from history so that there is a transition from
-	 * old value to new value with a fancy animation. If this is the initial load (for example manual refresh of the
-	 * page), get only one value from history.
+	 * Get one latest history data value.
 	 *
 	 * @return array
 	 */
 	private function getItemHistory(): array {
-		$history_limit = $this->getInput('initial_load', 1) ? 1 : 2;
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-		$history = Manager::History()->getLastValues($this->items, $history_limit, $history_period);
+		$history = Manager::History()->getLastValues($this->items, 1, $history_period);
 
 		return $history;
 	}
@@ -465,6 +460,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$value = $formatted_value['value'];
 			$value_units = $formatted_value['units'];
 			$value_power = $formatted_value['power'];
+			$decimals = '';
 
 			if (!$formatted_value['is_mapped']) {
 				$numeric_formatting = getNumericFormatting();
@@ -480,23 +476,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$this->value['units'] = $value_units;
 			$this->value['power'] = $value_power;
 		}
-		// Otherwise the "No data." text is displayed instead of value. Which is not the same as "0".
-	}
-
-	/**
-	 * Set the previous value to display animation based on history data.
-	 *
-	 * @param array $history  Array of history data.
-	 *
-	 * $history = [
-	 *     <itemid> => [
-	 *         1 => 'value' (string)  Item previous value from the history data. Which may or may not exist.
-	 *     ]
-	 * ]
-	 */
-	private function setPreviousValue(array $history) {
-		if ($history && array_key_exists(1, $history[$this->itemid])) {
-			$this->prev_value = $history[$this->itemid][1]['value'];
+		else {
+			// Otherwise the "No data." is displayed as text.
+			$this->value['type'] = ITEM_VALUE_TYPE_TEXT;
 		}
 	}
 
@@ -514,8 +496,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'unit_base' => $is_binary ? ZBX_KIBIBYTE : 1000,
 			'power' => $power,
 			'ignore_milliseconds' => ($this->min['raw'] <= -1 || $this->max['raw'] >= 1),
-			'decimals' => $this->fields_values['decimal_places'],
-			'decimals_exact' => true,
+			'decimals' => $this->fields_values['decimal_places']
 		];
 	}
 
@@ -537,8 +518,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		else {
 			$min = convertUnitsRaw(['value' => $this->min['raw']] + $this->getConvertUnitsOptions($is_binary, $power));
 
+			// In case Min value is "0" and unit base is "s", display simply "0" to maintain consistency with graphs.
 			$this->min['text'] = $min['value'];
-			$this->min['text'] .= ($this->fields_values['minmax_show_units'] == 1) ? ' '.$min['units'] : '';
+			$this->min['text'] .= ($this->fields_values['minmax_show_units'] == 1 && $min['units'] !== '')
+				? ' '.$min['units']
+				: '';
 		}
 	}
 
@@ -560,8 +544,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		else {
 			$max = convertUnitsRaw(['value' => $this->max['raw']] + $this->getConvertUnitsOptions($is_binary, $power));
 
+			// In case Max value is "0" and unit base is "s", display simply "0" to maintain consistency with graphs.
 			$this->max['text'] = $max['value'];
-			$this->max['text'] .= ($this->fields_values['minmax_show_units'] == 1) ? ' '.$max['units'] : '';
+			$this->max['text'] .= ($this->fields_values['minmax_show_units'] == 1 && $max['units'] !== '')
+				? ' '.$max['units']
+				: '';
 		}
 	}
 
