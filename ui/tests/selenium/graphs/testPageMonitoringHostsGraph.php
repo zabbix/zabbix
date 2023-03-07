@@ -39,7 +39,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	private static $graphids;
 
 	public function prepareGraphsData() {
-		CDataHelper::createHosts([
+		$hosts = CDataHelper::call('host.create', [
 			[
 				'host' => 'Host for monitoring graphs',
 				'groups' => [
@@ -52,29 +52,36 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'ip' => '127.0.0.1',
 					'dns' => '',
 					'port' => '10050'
-				],
-				'items' => [
-					[
-						'name' => 'Item for graph 1',
-						'key_' => 'trap_1',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
-					],
-					[
-						'name' => 'Item for graph 2',
-						'key_' => 'trap_2',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
-					],
-					[
-						'name' => 'Item for graph 3',
-						'key_' => 'trap_3',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
-					]
 				]
 			]
 		]);
+		$this->assertArrayHasKey('hostids', $hosts);
+		$hostid = $hosts['hostids'][0];
+
+		$items = CDataHelper::call('item.create', [
+			[
+				'name' => 'Item for graph 1',
+				'key_' => 'trap_1',
+				'hostid' => $hostid,
+				'type' => 2,
+				'value_type' => 0
+			],
+			[
+				'name' => 'Item for graph 2',
+				'key_' => 'trap_2',
+				'hostid' => $hostid,
+				'type' => 2,
+				'value_type' => 0
+			],
+			[
+				'name' => 'Item for graph 3',
+				'key_' => 'trap_3',
+				'hostid' => $hostid,
+				'type' => 2,
+				'value_type' => 0
+			]
+		]);
+		$this->assertArrayHasKey('itemids', $items);
 		$itemids = CDataHelper::getIds('name');
 
 		self::$time = time()-300;
