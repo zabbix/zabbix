@@ -30,7 +30,9 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 	public const DEFAULT_VALUE = [];
 
-	public function __construct(string $name, string $label = null, string $templateid = null) {
+	protected ?string $templateid;
+
+	public function __construct(string $name, string $label = null, ?string $templateid = null) {
 		parent::__construct($name, $label);
 		$this->templateid = $templateid;
 

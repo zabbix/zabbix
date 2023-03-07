@@ -170,7 +170,7 @@ class CSvgGraphHelper {
 
 			$items = null;
 
-			if ($options['hostids']) {
+			if (array_key_exists('hostids', $options) && $options['hostids']) {
 				$items = API::Item()->get($options);
 			}
 
