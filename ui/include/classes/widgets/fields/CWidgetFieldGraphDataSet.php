@@ -45,7 +45,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	// First color from the default color palette.
 	private const DEFAULT_COLOR = 'FF465C';
 
-	protected ?string $templateid;
+	public ?string $templateid;
 
 	public function __construct(string $name, string $label = null, ?string $templateid = null) {
 		parent::__construct($name, $label);
