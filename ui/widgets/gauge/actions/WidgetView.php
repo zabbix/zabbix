@@ -136,14 +136,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->setItemUnits();
 		$this->setUnitBase();
 
-		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-
 		if ($this->items) {
 			$history = $this->getItemHistory();
 			$this->setValue($history);
 
 			$is_binary = false || in_array($this->unit_base, ['B', 'Bps']);
 			$calc_power = false || $this->unit_base === '' || $this->unit_base[0] !== '!';
+
+			$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 			$this->min['raw'] = $number_parser->parse($this->fields_values['min']) == CParser::PARSE_SUCCESS
 				? $number_parser->calcValue()
@@ -168,9 +168,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$power = $this->value['power'];
 			}
 
-			$this->setMin($is_binary, $power);
-			$this->setMax($is_binary, $power);
-			$this->setThresholds($is_binary, $power);
+			$options = $this->getConvertUnitsOptions($is_binary, $power);
+			$this->setMin($options);
+			$this->setMax($options);
+			$this->setThresholds($options);
 
 			// Create and URL to history. Widget will be placed inside <a>.
 			$url = (new CUrl('history.php'))
@@ -384,17 +385,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * Set units to items array if units are supposed to be shown and overwritten.
 	 */
 	private function setItemUnits(): void {
-		if ($this->items) {
-			if ($this->fields_values['units_show'] == 1) {
-				if ($this->fields_values['units'] !== '') {
-					// Overwrite units for item.
-					$this->items[$this->itemid]['units'] = $this->fields_values['units'];
-				}
+		if (!$this->items) {
+			return;
+		}
+
+		if ($this->fields_values['units_show'] == 1) {
+			if ($this->fields_values['units'] !== '') {
+				// Overwrite units for item.
+				$this->items[$this->itemid]['units'] = $this->fields_values['units'];
 			}
-			else {
-				// Do not make any unit conversions if units are supposed to be hidden.
-				$this->items[$this->itemid]['units'] = '';
-			}
+		}
+		else {
+			// Do not make any unit conversions if units are supposed to be hidden.
+			$this->items[$this->itemid]['units'] = '';
 		}
 	}
 
@@ -504,10 +507,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * Set the Min values. If a mapped value is found, return that value. Otherwise use the converted value and add
 	 * units if needed.
 	 *
-	 * @param bool     $is_binary  If true, use 1024 as base. Use 1000 otherwise.
-	 * @param int|null $power      Convert to the specific power (0 => '', 1 => K, 2 => M, ...)
+	 * @param array  $options  Array of unit conversion options.
 	 */
-	private function setMin(bool $is_binary, ?int $power): void {
+	private function setMin(array $options): void {
 		$mapped_value = CValueMapHelper::getMappedValue(ITEM_VALUE_TYPE_UINT64, $this->min['raw'],
 			$this->items[$this->itemid]['valuemap']
 		);
@@ -516,7 +518,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$this->min['text'] = $mapped_value;
 		}
 		else {
-			$min = convertUnitsRaw(['value' => $this->min['raw']] + $this->getConvertUnitsOptions($is_binary, $power));
+			$min = convertUnitsRaw(['value' => $this->min['raw']] + $options);
 
 			// In case Min value is "0" and unit base is "s", display simply "0" to maintain consistency with graphs.
 			$this->min['text'] = $min['value'];
@@ -530,10 +532,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * Set the Max values. If a mapped value is found, return that value. Otherwise use the converted value and add
 	 * units if needed.
 	 *
-	 * @param bool     $is_binary  If true, use 1024 as base. Use 1000 otherwise.
-	 * @param int|null $power      Convert to the specific power (0 => '', 1 => K, 2 => M, ...)
+	 * @param array  $options  Array of unit conversion options.
 	 */
-	private function setMax(bool $is_binary, ?int $power): void {
+	private function setMax(array $options): void {
 		$mapped_value = CValueMapHelper::getMappedValue(ITEM_VALUE_TYPE_UINT64, $this->max['raw'],
 			$this->items[$this->itemid]['valuemap']
 		);
@@ -542,7 +543,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$this->max['text'] = $mapped_value;
 		}
 		else {
-			$max = convertUnitsRaw(['value' => $this->max['raw']] + $this->getConvertUnitsOptions($is_binary, $power));
+			$max = convertUnitsRaw(['value' => $this->max['raw']] + $options);
 
 			// In case Max value is "0" and unit base is "s", display simply "0" to maintain consistency with graphs.
 			$this->max['text'] = $max['value'];
@@ -557,10 +558,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * add units if needed. Thresholds values depend on Min/Max units. In case Min/Max units are hidden, thresholds will
 	 * use units from item. Meaning it will use the same power by which items were converted.
 	 *
-	 * @param bool     $is_binary  If true, use 1024 as base. Use 1000 otherwise.
-	 * @param int|null $power      Convert to the specific power (0 => '', 1 => K, 2 => M, ...)
+	 * @param array  $options  Array of unit conversion options.
 	 */
-	private function setThresholds(bool $is_binary, ?int $power): void {
+	private function setThresholds(array $options): void {
 		foreach ($this->fields_values['thresholds'] as &$threshold) {
 			$mapped_value = CValueMapHelper::getMappedValue(ITEM_VALUE_TYPE_FLOAT,
 				$threshold['threshold_value'], $this->items[$this->itemid]['valuemap']
@@ -570,9 +570,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$threshold['text'] = $mapped_value;
 			}
 			else {
-				$converted = convertUnitsRaw(
-					['value' => $threshold['threshold_value']] + $this->getConvertUnitsOptions($is_binary, $power)
-				);
+				$converted = convertUnitsRaw(['value' => $threshold['threshold_value']] + $options);
 				$threshold['text'] = $converted['value'];
 			}
 		}
