@@ -97,14 +97,6 @@ $operations_popup_form_list = (new CFormList())
 		'opdiscover_row'
 	);
 
-$update_interval = (new CTable())
-	->setId('update_interval')
-	->addRow([_('Delay'),
-		(new CDiv((new CTextBox('opperiod[delay]', $field_values['opperiod']['delay'], $options['templated']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		))
-	]);
-
 $custom_intervals = (new CTable())
 	->setId('lld_overrides_custom_intervals')
 	->setHeader([
@@ -161,20 +153,27 @@ $custom_intervals->addRow([(new CButton('interval_add', _('Add')))
 	->removeId()
 ]);
 
-$update_interval->addRow(
-	(new CRow([
-		(new CCol(_('Custom intervals')))->setAttribute('style', 'vertical-align: top;'),
-		new CCol($custom_intervals)
-	]))
-);
+$update_interval = (new CTable())
+	->setId('opperiod')
+	->addRow([_('Delay'),
+		(new CDiv((new CTextBox('opperiod[delay]', $field_values['opperiod']['delay'], $options['templated']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		))
+	])
+	->addRow(
+		(new CRow([
+			(new CCol(_('Custom intervals')))->setAttribute('style', 'vertical-align: top;'),
+			new CCol($custom_intervals)
+		]))
+	);
 
 $operations_popup_form_list
 	->addRow(
-		(new CVisibilityBox('visible[opperiod]', 'opperiod_div', _('Original')))
+		(new CVisibilityBox('visible[opperiod]', 'opperiod', _('Original')))
 			->setLabel(_('Update interval'))
 			->setChecked(array_key_exists('opperiod', $options))
 			->setReadonly($options['templated']),
-		(new CDiv($update_interval))->setId('opperiod_div'),
+		$update_interval,
 		'opperiod_row'
 	)
 	->addRow(
