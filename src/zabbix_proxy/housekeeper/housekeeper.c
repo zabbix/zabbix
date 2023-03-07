@@ -33,14 +33,15 @@
 
 static int	hk_period;
 
-/* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
-#define HK_MAX_DELETE_PERIODS	4
-
 /******************************************************************************
  *                                                                            *
  * Purpose: remove outdated information from historical table                 *
  *                                                                            *
- * Parameters: now - current timestamp                                        *
+ * Parameters: table                 - [IN]                                   *
+ *             fieldname             - [IN]                                   *
+ *             now                   - [IN] current timestamp                 *
+ *             config_offline_buffer - [IN] hours to keep data when offline   *
+ *             config_local_buffer   - [IN] hours to keep data                *
  *                                                                            *
  * Return value: number of rows records                                       *
  *                                                                            *
@@ -88,6 +89,9 @@ static int	delete_history(const char *table, const char *fieldname, int now, int
 	ZBX_STR2UINT64(maxid, row[0]);
 	zbx_db_free_result(result);
 
+/* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
+#define HK_MAX_DELETE_PERIODS	4
+
 	records = zbx_db_execute(
 			"delete from %s"
 			" where id<" ZBX_FS_UI64
@@ -100,6 +104,8 @@ static int	delete_history(const char *table, const char *fieldname, int now, int
 					minclock + HK_MAX_DELETE_PERIODS * hk_period));
 
 	zbx_db_commit();
+
+#undef HK_MAX_DELETE_PERIODS
 
 	return records;
 rollback:
@@ -114,7 +120,9 @@ rollback:
  *                                                                            *
  * Purpose: remove outdated information from history                          *
  *                                                                            *
- * Parameters: now - current timestamp                                        *
+ * Parameters: now                   - [IN] current timestamp                 *
+ *             config_offline_buffer - [IN] hours to keep data when offline   *
+ *             config_local_buffer   - [IN] hours to keep data                *
  *                                                                            *
  * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
