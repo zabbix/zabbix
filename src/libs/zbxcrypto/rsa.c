@@ -34,11 +34,6 @@
 #endif
 
 #if defined(HAVE_OPENSSL) || defined(HAVE_GNUTLS)
-
-#define PEM_BEGIN		"-----BEGIN"
-#define PEM_BEGIN_HEADER_END	"-----"
-#define PEM_FOOTER_END		"-----END"
-
 static void	pem_replace_spaces(char *s)
 {
 	while ('\0' != *s && '-' != *s)
@@ -62,7 +57,10 @@ static void	pem_replace_spaces(char *s)
  ******************************************************************************/
 void	zbx_normalize_pem(char **key, size_t *key_len)
 {
-	char	*ptr, *newline_ptr;
+#define PEM_BEGIN		"-----BEGIN"
+#define PEM_BEGIN_HEADER_END	"-----"
+#define PEM_FOOTER_END		"-----END"
+	char	*ptr;
 	size_t	offset;
 
 	if (0 == strncmp(*key, PEM_BEGIN, ZBX_CONST_STRLEN(PEM_BEGIN)))
@@ -70,34 +68,31 @@ void	zbx_normalize_pem(char **key, size_t *key_len)
 		if (NULL == (ptr = strstr(*key + ZBX_CONST_STRLEN(PEM_BEGIN), PEM_BEGIN_HEADER_END)))
 			return;
 
-		if ('\n' != *(newline_ptr = ptr + ZBX_CONST_STRLEN(PEM_BEGIN_HEADER_END)) && ' ' != *newline_ptr)
-		{
-			offset = newline_ptr - *key - 1;
-			zbx_replace_string(key, offset, &offset, "-\n");
-			*key_len = *key_len + 1;
-			ptr = *key + offset;
-		}
-		else
-			ptr = newline_ptr;
+		ptr += ZBX_CONST_STRLEN(PEM_BEGIN_HEADER_END);
 
 		pem_replace_spaces(ptr);
+
+		if ('\n' != *ptr)
+		{
+			offset = ptr - *key - 1;
+			zbx_replace_string(key, offset, &offset, "-\n");
+			*key_len = *key_len + 1;
+		}
 
 		if (NULL == (ptr = strstr(*key, PEM_FOOTER_END)))
 			return;
 
-		if ('\n' != *(newline_ptr = ptr - 1))
+		if ('\n' != *(ptr = ptr - 1))
 		{
-			offset = newline_ptr - *key + 1;
+			offset = ptr - *key + 1;
 			zbx_replace_string(key, offset, &offset, "\n-");
 			*key_len = *key_len + 1;
 		}
 	}
-}
-
 #undef PEM_BEGIN
 #undef PEM_BEGIN_HEADER_END
 #undef PEM_FOOTER_END
-
+}
 #endif
 
 #if defined(HAVE_OPENSSL)
