@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,10 +75,15 @@ int	zbx_redirect_stdio(const char *filename)
 */
 import "C"
 
+import (
+	"zabbix.com/pkg/log"
+)
+
 func SetLogLevel(level int) {
 	C.zbx_log_level = C.int(level)
 }
 
 func init() {
+	log.Tracef("Calling C function \"getpid()\"")
 	C.zbx_agent_pid = C.getpid()
 }

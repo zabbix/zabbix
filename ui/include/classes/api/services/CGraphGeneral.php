@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,22 +50,43 @@ abstract class CGraphGeneral extends CApiService {
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'graphids' => $graphIds,
 			'editable' => true,
-			'preservekeys' => true,
-			'inherited' => false
+			'preservekeys' => true
 		]);
 
 		$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
 			'messageAllowed' => _('Cannot update a discovered graph.')
 		]);
 
-		foreach ($graphs as &$graph) {
+		foreach ($graphs as $key => &$graph) {
 			// check permissions
 			if (!isset($dbGraphs[$graph['graphid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
+			// Cannot update templated graph.
+			if ($dbGraphs[$graph['graphid']]['templateid'] != 0
+					&& $dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update a templated graph "%1$s".',
+					$graph['name']
+				));
+			}
+
 			// cannot update discovered graphs
 			$this->checkPartialValidator($graph, $updateDiscoveredValidator, $dbGraphs[$graph['graphid']]);
+
+			// Allow for template inherited graphs to update discover parameter.
+			if ($dbGraphs[$graph['graphid']]['templateid'] != 0) {
+				if ($dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+						&& array_key_exists('discover', $graph)) {
+					$graph = ['discover' => $graph['discover']] + $dbGraphs[$graph['graphid']];
+					unset($graph['templateid'], $graph['flags'], $graph['uuid']);
+				}
+				else {
+					unset($graphs[$key]);
+				}
+
+				continue;
+			}
 
 			// validate items on set or pass existing items from DB
 			if (isset($graph['gitems'])) {
@@ -95,9 +116,11 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		$this->validateUpdate($graphs, $dbGraphs);
+		if ($graphs) {
+			$this->validateUpdate($graphs, $dbGraphs);
+		}
 
-		foreach ($graphs as $graph) {
+		foreach ($graphs as &$graph) {
 			unset($graph['templateid']);
 
 			$graph['gitems'] = isset($graph['gitems']) ? $graph['gitems'] : $dbGraphs[$graph['graphid']]['gitems'];
@@ -428,7 +451,7 @@ abstract class CGraphGeneral extends CApiService {
 
 	/**
 	 * Validate graph name and graph items including Y axis item ID's and graph item fields on Create method
-	 * and return valid item ID's on success or trow an error on failure.
+	 * and return valid item ID's on success or throw an error on failure.
 	 *
 	 * @param array $graphs
 	 *
@@ -436,7 +459,7 @@ abstract class CGraphGeneral extends CApiService {
 	 */
 	protected function validateItemsCreate(array $graphs) {
 		$itemIds = [];
-		$itemid_rules = ['type' => API_ID, 'flags' => API_NOT_EMPTY];
+		$itemid_rules = ['type' => API_ID];
 
 		foreach ($graphs as $graph) {
 			// validate graph name
@@ -502,13 +525,16 @@ abstract class CGraphGeneral extends CApiService {
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_set = _('Cannot set "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_set = _('Cannot set "%1$s" for graph prototype "%2$s".');
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')],
+					'discover' =>	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
 				]];
 				break;
 
@@ -575,7 +601,7 @@ abstract class CGraphGeneral extends CApiService {
 
 	/**
 	 * Validate graph items including valid Y axis item ID's on Update method
-	 * and return valid item ID's on success or trow an error on failure.
+	 * and return valid item ID's on success or throw an error on failure.
 	 *
 	 * @param array $graphs
 	 * @param array $db_graphs
@@ -584,7 +610,7 @@ abstract class CGraphGeneral extends CApiService {
 	 */
 	protected function validateItemsUpdate(array $graphs, array $db_graphs) {
 		$dbFields = ['itemid' => null];
-		$itemid_rules = ['type' => API_ID, 'flags' => API_NOT_EMPTY];
+		$itemid_rules = ['type' => API_ID];
 
 		foreach ($graphs as $graph) {
 			// graph items are optional
@@ -635,7 +661,7 @@ abstract class CGraphGeneral extends CApiService {
 
 	/**
 	 * Validate graph general data on Update method.
-	 * When updating graph check to what host graph belongs to and trow an error if new items added from other hosts.
+	 * When updating graph check to what host graph belongs to and throw an error if new items added from other hosts.
 	 * Includes Y axis validation and if graph already exists somewhere in DB.
 	 *
 	 * @param array $graphs
@@ -647,13 +673,16 @@ abstract class CGraphGeneral extends CApiService {
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_update = _('Cannot update "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'name' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_update = _('Cannot update "%1$s" for graph prototype "%2$s".');
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')],
+					'discover' => 	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
 				]];
 				break;
 

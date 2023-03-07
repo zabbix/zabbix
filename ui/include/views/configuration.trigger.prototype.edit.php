@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,9 @@ $triggersWidget = (new CWidget())
 
 // create form
 $triggersForm = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('triggersForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addItem((new CVar('parent_discoveryid', $data['parent_discoveryid']))->removeId())
 	->addVar('expression_constructor', $data['expression_constructor'])
@@ -507,7 +508,7 @@ $triggersFormList
 	);
 
 // append status to form list
-if (empty($data['triggerid']) && empty($data['form_refresh'])) {
+if (empty($data['triggerid']) && $data['form_refresh'] == 0) {
 	$status = true;
 }
 else {
@@ -530,7 +531,7 @@ $triggersFormList
 
 // append tabs to form
 $triggersTab = new CTabView();
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$triggersTab->setSelected(0);
 }
 $triggersTab->addTab('triggersTab',	_('Trigger prototype'), $triggersFormList);

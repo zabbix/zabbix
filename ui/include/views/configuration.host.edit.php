@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,14 +32,15 @@ $widget = (new CWidget())
 
 $divTabs = new CTabView();
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$divTabs->setSelected(0);
 }
 
 $frmHost = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setId('hostsForm')
 	->setName('hostsForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->disablePasswordAutofill()
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])
@@ -58,15 +59,24 @@ $hostList = new CFormList('hostlist');
 
 // LLD rule link
 if ($data['readonly']) {
-	$hostList->addRow(_('Discovered by'), $data['discoveryRule']
-		? new CLink($data['discoveryRule']['name'],
-			(new CUrl('host_prototypes.php'))
-				->setArgument('form', 'update')
-				->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
-				->setArgument('hostid', $data['hostDiscovery']['parent_hostid'])
-		)
-		: (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY)
-	);
+	if ($data['discoveryRule']) {
+		if ($data['is_discovery_rule_editable']) {
+			$discovery_rule = new CLink($data['discoveryRule']['name'],
+				(new CUrl('host_prototypes.php'))
+					->setArgument('form', 'update')
+					->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+					->setArgument('hostid', $data['hostDiscovery']['parent_hostid'])
+			);
+		}
+		else {
+			$discovery_rule = new CSpan($data['discoveryRule']['name']);
+		}
+	}
+	else {
+		$discovery_rule = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
+	}
+
+	$hostList->addRow(_('Discovered by'), $discovery_rule);
 }
 
 $hostList

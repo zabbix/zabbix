@@ -2850,6 +2850,11 @@ msgstr "Nu se poate actualiza un grafic bazat pe detecție."
 msgid "Cannot update a discovered host group."
 msgstr "Nu se poate actualiza un grup de servere bazat pe detecție."
 
+#: include/classes/api/services/CGraphGeneral.php:69
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:455
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -6441,6 +6446,11 @@ msgstr ""
 #: include/validate.inc.php:229
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
+msgstr ""
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
 msgstr ""
 
 #: include/validate.inc.php:167
@@ -13015,6 +13025,10 @@ msgstr "Numai ultimii 20%% din indicatori sunt afișați."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Numai triggerii atribuiți să activeze servere și care depind de itemi activați sunt contorizați"
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Opera"
@@ -17049,6 +17063,16 @@ msgstr "Această coloană a ecranului nu este goală. O ștergeți?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "Aceast rând al ecranului nu este gol. Îl ștergeți?"
 
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
 msgstr "Această săptămână"
@@ -20221,6 +20245,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:279
 msgid "invalid byte sequence in UTF-8"
+msgstr ""
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
 msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035

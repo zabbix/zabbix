@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-21T18:00:04Z</date>
+   <date>2022-10-18T20:49:06Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -83,7 +83,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.num_mon</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Number of Monitors configured in Ceph cluster</description>
+               <description>The number of Monitors configured in a Ceph cluster.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -109,7 +109,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.num_osd</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Number of known storage daemons in Ceph cluster</description>
+               <description>The number of the known storage daemons in a Ceph cluster.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -135,7 +135,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.num_osd_in</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of participating storage daemons in Ceph cluster</description>
+               <description>The total number of the participating storage daemons in a Ceph cluster.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -161,7 +161,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.num_osd_up</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of online storage daemons in Ceph cluster</description>
+               <description>The total number of the online storage daemons in a Ceph cluster.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -187,7 +187,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.num_pg</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in Ceph cluster</description>
+               <description>The total number of Placement Groups in a Ceph cluster.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -213,7 +213,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.num_pg_temp</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in pg_temp state</description>
+               <description>The total number of Placement Groups in a *pg_temp* state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -235,7 +235,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.num_pools</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of pools in Ceph cluster</description>
+               <description>The total number of pools in a Ceph cluster.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -258,7 +258,7 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Backfill full ratio setting of Ceph cluster as configured on OSDMap</description>
+               <description>The backfill full ratio setting of the Ceph cluster as configured on OSDMap.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -286,7 +286,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Average fill of OSDs</description>
+               <description>The average fill of OSDs.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -310,7 +310,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Percentage fill of maximum filled OSD</description>
+               <description>The percentage of the most filled OSD.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -334,7 +334,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Percentage fill of minimum filled OSD</description>
+               <description>The percentage fill of the minimum filled OSD.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -357,7 +357,7 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Full ratio setting of Ceph cluster as configured on OSDMap</description>
+               <description>The full ratio setting of the Ceph cluster as configured on OSDMap.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -385,7 +385,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>ms</units>
-               <description>Average apply latency of OSDs</description>
+               <description>The average apply latency of OSDs.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -409,7 +409,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>ms</units>
-               <description>Maximum apply latency of OSDs</description>
+               <description>The maximum apply latency of OSDs.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -433,7 +433,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>ms</units>
-               <description>Minimum apply latency of OSDs</description>
+               <description>The minimum apply latency of OSDs.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -457,7 +457,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>ms</units>
-               <description>Average commit latency of OSDs</description>
+               <description>The average commit latency of OSDs.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -481,7 +481,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>ms</units>
-               <description>Maximum commit latency of OSDs</description>
+               <description>The maximum commit latency of OSDs.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -505,7 +505,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>ms</units>
-               <description>Minimum commit latency of OSDs</description>
+               <description>The minimum commit latency of OSDs.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -528,7 +528,7 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Near full ratio setting of Ceph cluster as configured on OSDMap</description>
+               <description>The near full ratio setting of the Ceph cluster as configured on OSDMap.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -555,7 +555,7 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Average amount of PGs on OSDs</description>
+               <description>The average amount of Placement Groups on OSDs.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -578,7 +578,7 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Maximum amount of PGs on OSDs</description>
+               <description>The maximum amount of Placement Groups on OSDs.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -601,7 +601,7 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Minimum amount of PGs on OSDs</description>
+               <description>The minimum amount of Placement Groups on OSDs.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -647,7 +647,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.overall_status</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Overall Ceph cluster status, eg 0 - HEALTH_OK, 1 - HEALTH_WARN or 2 - HEALTH_ERR</description>
+               <description>The overall Ceph cluster status, eg 0 - HEALTH_OK, 1 - HEALTH_WARN or 2 - HEALTH_ERR.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -698,7 +698,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.active</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in active state</description>
+               <description>The total number of Placement Groups in an active state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -720,7 +720,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.backfill_toofull</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in backfill_toofull state</description>
+               <description>The total number of Placement Groups in a *backfill_toofull state*.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -742,7 +742,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.backfill_wait</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in backfill_wait state</description>
+               <description>The total number of Placement Groups in a *backfill_wait* state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -764,7 +764,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.backfilling</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in backfilling state</description>
+               <description>The total number of Placement Groups in a backfill state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -786,7 +786,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.clean</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in clean state</description>
+               <description>The total number of Placement Groups in a clean state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -808,7 +808,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.degraded</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in degraded state</description>
+               <description>The total number of Placement Groups in a degraded state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -830,7 +830,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.inconsistent</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in inconsistent state</description>
+               <description>The total number of Placement Groups in an inconsistent state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -852,7 +852,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.peering</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in peering state</description>
+               <description>The total number of Placement Groups in a peering state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -874,7 +874,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.recovering</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in recovering state</description>
+               <description>The total number of Placement Groups in a recovering state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -896,7 +896,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.recovery_wait</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in recovery_wait state</description>
+               <description>The total number of Placement Groups in a *recovery_wait* state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -918,7 +918,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.remapped</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in remapped state</description>
+               <description>The total number of Placement Groups in a remapped state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -940,7 +940,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.scrubbing</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in scrubbing state</description>
+               <description>The total number of Placement Groups in a scrubbing state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -962,7 +962,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.undersized</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in undersized state</description>
+               <description>The total number of Placement Groups in an undersized state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -984,7 +984,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.pg_states.unknown</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of Placement Groups in unknown state</description>
+               <description>The total number of Placement Groups in an unknown state.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -1035,7 +1035,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>Bps</units>
-               <description>Global read Bytes per second</description>
+               <description>The global read bytes per second.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -1063,7 +1063,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>ops</units>
-               <description>Global read operations per second</description>
+               <description>The global read operations per second.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -1073,6 +1073,10 @@ Template tooling version used: 0.39</description>
                   <step>
                      <type>JSONPATH</type>
                      <params>$.rd_ops</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1098,7 +1102,7 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Total bytes available in Ceph cluster</description>
+               <description>The total bytes available in a Ceph cluster.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -1121,7 +1125,7 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Total (RAW) capacity of Ceph cluster in bytes</description>
+               <description>The total (RAW) capacity of a Ceph cluster in bytes.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -1143,7 +1147,7 @@ Template tooling version used: 0.39</description>
                <key>ceph.total_objects</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of objects in Ceph cluster</description>
+               <description>The total number of objects in a Ceph cluster.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -1166,7 +1170,7 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <units>B</units>
-               <description>Total bytes used in Ceph cluster</description>
+               <description>The total bytes used in a Ceph cluster.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -1190,7 +1194,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>Bps</units>
-               <description>Global write Bytes per second</description>
+               <description>The global write bytes per second.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -1218,7 +1222,7 @@ Template tooling version used: 0.39</description>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>ops</units>
-               <description>Global write operations per second</description>
+               <description>The global write operations per second.</description>
                <applications>
                   <application>
                      <name>Ceph</name>
@@ -1320,7 +1324,7 @@ Template tooling version used: 0.39</description>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>ms</units>
-                     <description>Time taken to flush an update to disks.</description>
+                     <description>The time taken to flush an update to disks.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Ceph {#HOST} OSD [{#CLASS}]</name>
@@ -1345,7 +1349,7 @@ Template tooling version used: 0.39</description>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>ms</units>
-                     <description>Time taken to commit an operation to the journal.</description>
+                     <description>The time taken to commit an operation to the journal.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Ceph {#HOST} OSD [{#CLASS}]</name>
@@ -1454,7 +1458,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
-                     <description>Total bytes used in pool.</description>
+                     <description>The total bytes used in a pool.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
@@ -1499,7 +1503,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <key>ceph.pool["{#POOLNAME}",objects]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>Number of objects in the pool.</description>
+                     <description>The number of objects in the pool.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
@@ -1522,7 +1526,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <delay>0</delay>
                      <history>7d</history>
                      <units>%</units>
-                     <description>Percentage of storage used per pool</description>
+                     <description>The percentage of the storage used per pool.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
@@ -1546,7 +1550,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>Bps</units>
-                     <description>Per-pool read Bytes/second</description>
+                     <description>The read rate per pool (bytes per second).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
@@ -1574,7 +1578,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>ops</units>
-                     <description>Per-pool read operations/second</description>
+                     <description>The read rate per pool (operations per second).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
@@ -1601,7 +1605,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
-                     <description>Bytes used in pool including copies made.</description>
+                     <description>Bytes used in pool including the copies made.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
@@ -1625,7 +1629,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>Bps</units>
-                     <description>Per-pool write Bytes/second</description>
+                     <description>The write rate per pool (bytes per second).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
@@ -1653,7 +1657,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>ops</units>
-                     <description>Per-pool write operations/second</description>
+                     <description>The read rate per pool (operations per second).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>

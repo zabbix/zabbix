@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-04-10T22:48:48Z</date>
+   <date>2022-09-12T10:57:39Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1142,7 +1142,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <dependencies>
                         <dependency>
                            <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
-                           <expression>{Template OS Linux by Prom:vm.memory.available[node_exporter].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template OS Linux by Prom:vm.memory.total[node_exporter].last()}&gt;0</expression>
+                           <expression>{Template OS Linux by Prom:vm.memory.available[node_exporter].max(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template OS Linux by Prom:vm.memory.total[node_exporter].last()}&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -2669,7 +2669,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template OS Linux by Prom:system.swap.pfree[node_exporter].min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template OS Linux by Prom:system.swap.total[node_exporter].last()}&gt;0</expression>
+         <expression>{Template OS Linux by Prom:system.swap.pfree[node_exporter].max(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template OS Linux by Prom:system.swap.total[node_exporter].last()}&gt;0</expression>
          <name>High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
@@ -2681,12 +2681,12 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
             </dependency>
             <dependency>
                <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
-               <expression>{Template OS Linux by Prom:vm.memory.available[node_exporter].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template OS Linux by Prom:vm.memory.total[node_exporter].last()}&gt;0</expression>
+               <expression>{Template OS Linux by Prom:vm.memory.available[node_exporter].max(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template OS Linux by Prom:vm.memory.total[node_exporter].last()}&gt;0</expression>
             </dependency>
          </dependencies>
       </trigger>
       <trigger>
-         <expression>{Template OS Linux by Prom:vm.memory.available[node_exporter].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template OS Linux by Prom:vm.memory.total[node_exporter].last()}&gt;0</expression>
+         <expression>{Template OS Linux by Prom:vm.memory.available[node_exporter].max(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template OS Linux by Prom:vm.memory.total[node_exporter].last()}&gt;0</expression>
          <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
          <opdata>Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>

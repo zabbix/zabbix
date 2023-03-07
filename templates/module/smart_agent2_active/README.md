@@ -19,7 +19,13 @@ This template was tested on:
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 Install the Zabbix agent 2 and Smartmontools 7.1.
+Grant Zabbix agent 2 super/admin user privileges for smartctl utility.
 
+### Linux example:
+
+> sudo dnf install smartmontools
+> sudo visudo
+>> zabbix ALL=(ALL) NOPASSWD:/usr/sbin/smartctl
 
 ## Zabbix configuration
 

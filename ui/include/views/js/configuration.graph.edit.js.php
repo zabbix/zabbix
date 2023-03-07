@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 		<?php if ($readonly): ?>
 			<td>
 		<?php else: ?>
-			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+			<td style="top: 8px">
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>

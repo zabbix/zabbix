@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,36 +188,28 @@ class CMenuItem extends CTag {
 	public function setSelectedByAction(string $action_name, array $request_params, bool $expand = true): bool {
 		if (array_key_exists($action_name, $this->aliases)) {
 			foreach ($this->aliases[$action_name] as $alias_params) {
-				$no_unacceptable_params = true;
-				$unacceptable_params = [];
+				$has_unacceptable_params = false;
+				$has_mandatory_params = true;
+
 				foreach ($alias_params as $name => $value) {
 					if ($name[0] === '!') {
-						$unacceptable_params[substr($name, 1)] = $value;
-						unset($alias_params[$name]);
-					}
-				}
-
-				if ($unacceptable_params) {
-					$unacceptable_params_existing = array_intersect_assoc($unacceptable_params, $request_params);
-					foreach ($unacceptable_params as $name => $value) {
-						if ($value === '*' && array_key_exists($name, $request_params)) {
-							$unacceptable_params_existing[$name] = '*';
+						$name = substr($name, 1);
+						if (array_key_exists($name, $request_params)
+								&& ($value === '*' || $value === $request_params[$name])) {
+							$has_unacceptable_params = true;
+							break;
 						}
 					}
-
-					$no_unacceptable_params = array_diff_assoc($unacceptable_params, $unacceptable_params_existing)
-						? true
-						: false;
-				}
-
-				$alias_params_diff = array_diff_assoc($alias_params, $request_params);
-				foreach ($alias_params_diff as $name => $value) {
-					if ($value === '*') {
-						unset($alias_params_diff[$name]);
+					else {
+						if (!array_key_exists($name, $request_params)
+								|| ($value !== '*' && $value !== $request_params[$name])) {
+							$has_mandatory_params = false;
+							break;
+						}
 					}
 				}
 
-				if ($no_unacceptable_params && !$alias_params_diff) {
+				if (!$has_unacceptable_params && $has_mandatory_params) {
 					$this->setSelected();
 
 					return true;

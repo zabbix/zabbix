@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,7 +93,7 @@ func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
 		switch params[0] {
 		case "", "all":
 		case "percpu":
-			split = len(p.cpus) - 1
+			split = numCPUOnline()
 		default:
 			return nil, errors.New("Invalid second parameter.")
 		}

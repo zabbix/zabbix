@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,6 +72,7 @@ import (
 	"unsafe"
 
 	"zabbix.com/pkg/itemutil"
+	"zabbix.com/pkg/log"
 )
 
 func ExecuteCheck(key string, params []string) (result *string, err error) {
@@ -83,17 +84,22 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 
 	var cvalue, cerrmsg *C.char
 	ckey := C.CString(itemutil.MakeKey(key, params))
+	log.Tracef("Calling C function \"execute_check()\"")
 	if C.execute_check(ckey, C.zbx_agent_check_t(cfunc), &cvalue, &cerrmsg) == Succeed {
 		if cvalue != nil {
 			value := C.GoString(cvalue)
 			result = &value
 		}
+		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(cvalue))
 
 	} else {
 		err = errors.New(C.GoString(cerrmsg))
+		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(cerrmsg))
 	}
+	log.Tracef("Calling C function \"free()\"")
 	C.free(unsafe.Pointer(ckey))
+
 	return
 }

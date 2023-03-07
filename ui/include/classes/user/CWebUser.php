@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -261,13 +261,11 @@ class CWebUser {
 	}
 
 	/**
-	 * Get user ip address.
+	 * Get user IP address.
 	 *
 	 * @return string
 	 */
 	public static function getIp(): string {
-		return (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) && $_SERVER['HTTP_X_FORWARDED_FOR'] !== '')
-			? $_SERVER['HTTP_X_FORWARDED_FOR']
-			: $_SERVER['REMOTE_ADDR'];
+		return $_SERVER['REMOTE_ADDR'];
 	}
 }

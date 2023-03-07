@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,6 +92,10 @@ double	ZBX_DOUBLE_EPSILON = 2.22e-16;
 
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+
+#endif
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
 
 int	__zbx_stat(const char *path, zbx_stat_t *buf)
 {
@@ -3809,8 +3813,9 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	return token;
 }
 
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+/* Since 2.26 the GNU C Library will detect when /etc/resolv.conf has been modified and reload the changed */
+/* configuration. For performance reasons manual reloading should be avoided when unnecessary. */
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
 /******************************************************************************
  *                                                                            *
  * Function: update_resolver_conf                                             *
@@ -3861,7 +3866,7 @@ void	zbx_update_env(double time_now)
 	{
 		time_update = time_now;
 		zbx_handle_log();
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
 		update_resolver_conf();
 #endif
 	}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-01-10T14:11:36Z</date>
+   <date>2022-10-24T13:16:44Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -507,7 +507,7 @@ The system up time in 1/100 seconds since boot.</description>
                      <expression>{last()}&lt;10m</expression>
                      <name>F5 BIG-IP: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -1862,6 +1862,30 @@ The number of total file nodes in the specified partition.</description>
                      <params>6h</params>
                   </step>
                </preprocessing>
+               <overrides>
+                  <override>
+                     <name>Skip trigger for defined filesystems</name>
+                     <step>1</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#PART.NAME}</macro>
+                              <value>{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                           <operator>REGEXP</operator>
+                           <value>^F5 BIG-IP: Low free space in file system</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+               </overrides>
             </discovery_rule>
             <discovery_rule>
                <name>Memory discovery</name>
@@ -3531,6 +3555,11 @@ The percentage of time Virtual Server was busy over the last 5 seconds.</descrip
                <macro>{$BIGIP.LLD.FILTER.PART.NAME.NOT_MATCHES}</macro>
                <value>CHANGE_IF_NEEDED</value>
                <description>Filter to exclude discovered by mount point names.</description>
+            </macro>
+            <macro>
+               <macro>{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}</macro>
+               <value>^/usr$</value>
+               <description>Partitions that low free space trigger should ignore.</description>
             </macro>
             <macro>
                <macro>{$BIGIP.MEMORY.UTIL.WARN.MAX}</macro>

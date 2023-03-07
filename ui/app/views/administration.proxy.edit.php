@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,9 +35,10 @@ if ($data['form_refresh'] == 0) {
 
 $proxyForm = (new CForm())
 	->setId('proxyForm')
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->addVar('proxyid', $data['proxyid'])
 	->addVar('tls_accept', $data['tls_accept'])
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interfaceid', $data)) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
