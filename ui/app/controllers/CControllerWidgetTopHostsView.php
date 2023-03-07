@@ -143,7 +143,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			}
 			else {
 				$numeric_only = self::isNumericOnlyColumn($column);
-				$column_items = !$calc_extremes
+				$column_items = !$calc_extremes || ($column['min'] !== '' && $column['max'] !== '')
 					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids))
 					: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
 
