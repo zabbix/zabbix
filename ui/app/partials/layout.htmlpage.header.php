@@ -53,11 +53,13 @@ $show_gui_messaging = (!defined('ZBX_PAGE_NO_MENU') || $data['web_layout_mode'] 
 		? intval(!CWebUser::isGuest())
 		: null;
 
+$tz_offsets = array_column((new DateTime())->getTimezone()->getTransitions(0, ZBX_MAX_DATE), 'offset', 'ts');
+
 $pageHeader
 	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
 	->addJsBeforeScripts(
-		'var PHP_TZ_OFFSET = '.date('Z').','.
-			'PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";'
+		'var PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'",'.
+		'PHP_TZ_OFFSETS = '.json_encode($tz_offsets).';'
 	)
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))

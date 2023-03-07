@@ -151,11 +151,13 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$pageHeader->addCssFile('imgstore.php?css=1&output=css');
 	}
 
+	$tz_offsets = array_column((new DateTime())->getTimezone()->getTransitions(0, ZBX_MAX_DATE), 'offset', 'ts');
+
 	$pageHeader
 		->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 		->addJsBeforeScripts(
-			'var PHP_TZ_OFFSET = '.date('Z').','.
-				'PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";'
+			'var PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'", '.
+			'PHP_TZ_OFFSETS = '.json_encode($tz_offsets).';'
 		);
 
 	// Show GUI messages in pages with menus and in fullscreen mode.

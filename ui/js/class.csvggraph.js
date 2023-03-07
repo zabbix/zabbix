@@ -563,7 +563,7 @@ jQuery(function ($) {
 						.append(
 							$('<div>')
 								.addClass('header')
-								.html(time.format('Y-m-d H:i:s'))
+								.html(time.format(PHP_ZBX_FULL_DATE_TIME))
 						)
 						.append(html)
 						.append(points_total > data.hintMaxRows
