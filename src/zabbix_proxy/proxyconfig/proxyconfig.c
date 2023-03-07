@@ -291,7 +291,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 			{
 				zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-				DCsync_configuration(ZBX_DBSYNC_UPDATE, synced, NULL, proxyconfig_args_in->config_vault);
+				DCsync_configuration(ZBX_DBSYNC_UPDATE, synced, NULL,
+						proxyconfig_args_in->config_vault);
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				DCupdate_interfaces_availability();
 				zbx_rtc_notify_config_sync(proxyconfig_args_in->config_timeout, &rtc);
