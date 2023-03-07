@@ -130,12 +130,29 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		$item_values = [];
 
 		foreach ($configuration as $column_index => &$column) {
-			$is_numeric_only = self::isNumericOnlyColumn($column);
+			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
+				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
 
-			$items = self::getItems($column['item'], $is_numeric_only, $groupids, $hostids);
+			if ($column_index == $fields['column']) {
+				$column_items = $master_items;
+				$column_item_values = $master_item_values;
+			}
+			else {
+				$numeric_only = self::isNumericOnlyColumn($column);
+				$column_items = !$calc_extremes
+					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids))
+					: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
 
-			foreach ($items as $item) {
-				$is_binary = isBinaryUnits($item['units']);
+				$column_item_values = self::getItemValues($column_items, $column, $time_now);
+			}
+
+			$is_binary = false;
+
+			foreach ($column_items as $item) {
+				if (isBinaryUnits($item['units'])) {
+					$is_binary = true;
+					break;
+				}
 			}
 
 			$number_parser = new CNumberParser([
@@ -147,9 +164,6 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			if ($column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
 				continue;
 			}
-
-			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
-				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
 
 			if ($calc_extremes) {
 				if ($column['min'] !== '' && $number_parser->parse($column['min']) == CParser::PARSE_SUCCESS) {
@@ -171,9 +185,6 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			}
 
 			if ($column_index == $fields['column']) {
-				$column_items = $master_items;
-				$column_item_values = $master_item_values;
-
 				if ($calc_extremes) {
 					if ($column['min'] === '') {
 						$column['min'] = $master_items_min;
@@ -185,13 +196,6 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 				}
 			}
 			else {
-				$numeric_only = self::isNumericOnlyColumn($column);
-				$column_items = !$calc_extremes || $column['min'] !== '' && $column['max'] !== ''
-					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids))
-					: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
-
-				$column_item_values = self::getItemValues($column_items, $column, $time_now);
-
 				if ($calc_extremes && $column_item_values) {
 					if ($column['min'] === '') {
 						$column['min'] = min($column_item_values);
