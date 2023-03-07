@@ -114,8 +114,7 @@ const char	*help_message[] = {
 	"                                 history syncer, housekeeper, http poller,",
 	"                                 icmp pinger, ipmi manager, ipmi poller,",
 	"                                 java poller, poller, preprocessing manager,",
-	"                                 preprocessing worker, self-monitoring,",
-	"                                 snmp trapper, task manager, trapper,",
+	"                                 self-monitoring, snmp trapper, task manager, trapper,",
 	"                                 unreachable poller, vmware collector,",
 	"                                 availability manager, odbc poller)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
@@ -127,9 +126,8 @@ const char	*help_message[] = {
 	"                                 history syncer, housekeeper, http poller,",
 	"                                 icmp pinger, ipmi manager, ipmi poller,",
 	"                                 java poller, poller, preprocessing manager,",
-	"                                 preprocessing worker, self-monitoring,",
-	"                                 snmp trapper, task manager, trapper,",
-	"                                 unreachable poller, vmware collector,",
+	"                                 self-monitoring, snmp trapper, task manager, ",
+	"                                 trapper, unreachable poller, vmware collector,",
 	"                                 availability manager, odbc poller)",
 	"        process-type,N           Process type and number (e.g., history syncer,1)",
 	"        pid                      Process identifier",
@@ -397,10 +395,10 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPPOLLER];
 	}
-	else if (local_server_num <= (server_count += 1))
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_DISCOVERER;
-		*local_process_num = local_server_num - server_count + 1;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER];
 	}
 	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTSYNCER]))
 	{
@@ -1276,8 +1274,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, config_timeout};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time};
-	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, config_timeout,
-								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]};
+	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, config_timeout};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
 								&listen_sock, config_startup_time};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {config_timeout};
@@ -1465,13 +1462,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (ZBX_PROCESS_TYPE_PREPROCESSOR == i)
 			continue;
 
-		/* start single discoverer manager process */
-		if (ZBX_PROCESS_TYPE_DISCOVERER == i)
-		{
-			threads_num++;
-			continue;
-		}
-
 		threads_num += CONFIG_FORKS[i];
 	}
 
@@ -1587,6 +1577,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(taskmanager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &preproc_man_args;
 				zbx_thread_start(preprocessing_manager_thread, &thread_args, &threads[i]);
 				break;

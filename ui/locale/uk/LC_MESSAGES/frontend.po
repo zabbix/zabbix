@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-08 08:34+0000\n"
-"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
+"PO-Revision-Date: 2023-02-21 18:29+0000\n"
+"Last-Translator: Dima <dimakusyaka@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -446,6 +446,10 @@ msgstr "Сер"
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
 msgstr "ДОДАТИ ЗАМІЩЕННЯ"
+
+#: tests/selenium/modules/clock32/Widget.php:46
+msgid "ALARM CLOCK"
+msgstr ""
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
@@ -6686,7 +6690,7 @@ msgstr "Відкинути значення"
 #: include/views/configuration.trigger.prototype.edit.php:549
 #: include/views/configuration.trigger.prototype.list.php:68
 msgid "Discover"
-msgstr "Відкрийте для себе"
+msgstr "Виявлення"
 
 #: app/partials/configuration.filter.items.php:207
 #: include/discovery.inc.php:138 include/forms.inc.php:374

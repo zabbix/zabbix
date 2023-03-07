@@ -1039,8 +1039,8 @@ int	zbx_diag_add_connector_info(const struct zbx_json_parse *jp, struct zbx_json
 	double			time1, time2, time_total = 0;
 	zbx_uint64_t		fields;
 	zbx_diag_map_t		field_map[] = {
-					{"", ZBX_DIAG_CONNECTOR_VALUES},
-					{"values", ZBX_DIAG_CONNECTOR_VALUES},
+					{(char *)"", ZBX_DIAG_CONNECTOR_VALUES},
+					{(char *)"values", ZBX_DIAG_CONNECTOR_VALUES},
 					{NULL, 0}
 					};
 
