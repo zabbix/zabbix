@@ -1468,7 +1468,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 							(((zbx_thread_args_t *)args)->args);
 	int				sleeptime = -1, sleeptime_res = -1, rule_count = 0, old_rule_count = 0;
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t				last_stat_time, nextcheck = 0, nextresult = 0;
+	time_t				last_stat_time, nextcheck = 0;
 	zbx_ipc_async_socket_t		rtc;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
@@ -1547,11 +1547,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		discoverer_queue_unlock(&dmanager.queue);
 
-		if ((int)sec >= nextresult)
-		{
-			process_results(&dmanager);
-			nextresult = time(NULL) + DISCOVERER_DELAY;
-		}
+		process_results(&dmanager);
 
 		/* process discovery rules and create net check jobs */
 
@@ -1606,9 +1602,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		/* update sleeptime and process title */
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
-
-		if (sleeptime > (sleeptime_res = zbx_calculate_sleeptime(nextresult, DISCOVERER_DELAY)))
-			sleeptime = sleeptime_res;
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
