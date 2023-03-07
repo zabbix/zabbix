@@ -168,6 +168,8 @@ class CSvgGraphHelper {
 				$options['hostids'] = $dynamic_hostid !== '' ? $dynamic_hostid : $templateid;
 			}
 
+			$items = null;
+
 			if ($options['hostids']) {
 				$items = API::Item()->get($options);
 			}
