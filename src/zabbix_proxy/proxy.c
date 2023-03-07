@@ -267,6 +267,12 @@ static int	get_config_timeout(void)
 	return config_timeout;
 }
 
+int	CONFIG_PROXYDATA_FREQUENCY = 1;
+static int	get_config_proxydata_frequency(void)
+{
+	return config_timeout;
+}
+
 static int	config_startup_time	= 0;
 static int	config_unavailable_delay	=60;
 
@@ -282,7 +288,6 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= -1;
 
 /* how often active Zabbix proxy requests configuration data from server, in seconds */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 0;	/* will be set to default 5 seconds if not configured */
-int	CONFIG_PROXYDATA_FREQUENCY	= 1;
 
 int	CONFIG_HISTSYNCER_FREQUENCY	= 1;
 int	CONFIG_CONFSYNCER_FREQUENCY	= 0;
@@ -1277,7 +1282,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_program_type, config_timeout, &config_server_addrs};
 	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, config_timeout,
-								&config_server_addrs, get_source_ip, get_hostname};
+								&config_server_addrs, get_source_ip, get_hostname,
+								get_config_proxydata_frequency};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, config_timeout};
