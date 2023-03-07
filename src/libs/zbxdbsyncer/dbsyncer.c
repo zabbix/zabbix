@@ -26,6 +26,7 @@
 #include "zbxcachehistory.h"
 #include "zbxexport.h"
 #include "zbxprof.h"
+#include "zbxtimekeeper.h"
 
 static sigset_t			orig_mask;
 
@@ -177,7 +178,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
 			stats_offset = 0;
-			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, "processed %d values", total_values_num);
+			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, "processed %d values",
+					total_values_num);
 
 			if (0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
@@ -188,9 +190,14 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, " in " ZBX_FS_DBL " sec", total_sec);
 
 			if (0 == sleeptime)
+			{
 				zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
+			}
 			else
-				zbx_setproctitle("%s #%d [%s, idle %d sec]", process_name, process_num, stats, sleeptime);
+			{
+				zbx_setproctitle("%s #%d [%s, idle %d sec]", process_name, process_num, stats,
+						sleeptime);
+			}
 
 			total_values_num = 0;
 			total_triggers_num = 0;
