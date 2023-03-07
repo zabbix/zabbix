@@ -77,7 +77,7 @@ typedef struct
 
 	zbx_hashset_t		incomplete_task_count;
 	zbx_hashset_t		results;
-	pthread_rwlock_t	results_rwlock;
+	pthread_mutex_t		results_lock;
 }
 zbx_discoverer_manager_t;
 
@@ -828,7 +828,7 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 
 	zbx_vector_ptr_create(&results);
 
-	pthread_rwlock_wrlock(&manager->results_rwlock);
+	pthread_mutex_lock(&manager->results_lock);
 	zbx_hashset_iter_reset(&manager->results, &iter);
 
 	while (NULL != (result = (zbx_discovery_results_t *)zbx_hashset_iter_next(&iter)))
@@ -852,7 +852,7 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 		zbx_hashset_iter_remove(&iter);
 	}
 
-	pthread_rwlock_unlock(&manager->results_rwlock);
+	pthread_mutex_unlock(&manager->results_lock);
 
 	for (i = 0; i < results.values_num; i++)
 	{
@@ -1151,9 +1151,9 @@ static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_
 	zbx_vector_ptr_create(&results);
 	discover_icmp(druleid, task, dcheck, &results, worker_max);
 
-	pthread_rwlock_wrlock(&dmanager.results_rwlock);
+	pthread_mutex_lock(&dmanager.results_lock);
 	discover_results_merge(&dmanager.results, &results);
-	pthread_rwlock_unlock(&dmanager.results_rwlock);
+	pthread_mutex_unlock(&dmanager.results_lock);
 
 	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)results_free);
 	zbx_vector_ptr_destroy(&results);
@@ -1194,7 +1194,7 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 	result_cmp.druleid = druleid;
 	result_cmp.ip = task->ip;
 
-	pthread_rwlock_wrlock(&dmanager.results_rwlock);
+	pthread_mutex_lock(&dmanager.results_lock);
 
 	if (NULL == (result = zbx_hashset_search(&dmanager.results, &result_cmp)))
 	{
@@ -1212,7 +1212,7 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 
 	zbx_vector_ptr_append_array(&result->services, services.values, services.values_num);
 	discoverer_task_count_decrease(&dmanager.incomplete_task_count, druleid, task->ip, task->dchecks.values_num);
-	pthread_rwlock_unlock(&dmanager.results_rwlock);
+	pthread_mutex_unlock(&dmanager.results_lock);
 
 	zbx_vector_ptr_destroy(&services);
 }
@@ -1360,9 +1360,9 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 
 	zbx_vector_discoverer_queue_drules_create(&manager->queue.drules);
 
-	if (0 != (err = pthread_rwlock_init(&manager->results_rwlock, NULL)))
+	if (0 != (err = pthread_mutex_init(&manager->results_lock, NULL)))
 	{
-		*error = zbx_dsprintf(NULL, "cannot initialize mutex: %s", zbx_strerror(err));
+		*error = zbx_dsprintf(NULL, "cannot initialize results mutex: %s", zbx_strerror(err));
 		return FAIL;
 	}
 
@@ -1427,7 +1427,7 @@ static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 {
 	int			i;
 	zbx_hashset_iter_t	iter;
-	zbx_discovery_results_t *result;
+	zbx_discovery_results_t	*result;
 
 	discoverer_queue_lock(&manager->queue);
 
@@ -1466,7 +1466,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
 	zbx_thread_discoverer_args	*discoverer_args_in = (zbx_thread_discoverer_args *)
 							(((zbx_thread_args_t *)args)->args);
-	int				sleeptime = -1, sleeptime_res = -1, rule_count = 0, old_rule_count = 0;
+	int				sleeptime = -1, rule_count = 0, old_rule_count = 0;
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time, nextcheck = 0;
 	zbx_ipc_async_socket_t		rtc;
@@ -1568,11 +1568,11 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 			if (0 < rule_count)
 			{
-				pthread_rwlock_wrlock(&dmanager.results_rwlock);
+				pthread_mutex_lock(&dmanager.results_lock);
 				zbx_hashset_destroy(&dmanager.incomplete_task_count);
 				zbx_hashset_copy(&dmanager.incomplete_task_count, &task_counts,
 						sizeof(zbx_discoverer_task_count_t));
-				pthread_rwlock_unlock(&dmanager.results_rwlock);
+				pthread_mutex_unlock(&dmanager.results_lock);
 
 				discoverer_queue_lock(&dmanager.queue);
 
