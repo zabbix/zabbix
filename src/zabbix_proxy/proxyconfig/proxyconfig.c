@@ -31,6 +31,8 @@
 #include "proxyconfigwrite/proxyconfig_write.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
+#include "zbxstr.h"
+#include "zbxalgo.h"
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
 		const zbx_thread_info_t *thread_info, zbx_thread_proxyconfig_args *args)

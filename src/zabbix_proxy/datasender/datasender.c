@@ -27,10 +27,11 @@
 #include "zbxself.h"
 #include "zbxtasks.h"
 #include "zbxcompress.h"
-#include "zbxavailability.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "../taskmanager/taskmanager.h"
+#include "zbxjson.h"
+#include "zbxalgo.h"
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002
