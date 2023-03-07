@@ -22,8 +22,39 @@
 
 #include "zbxdiscovery.h"
 
-void	zbx_discoverer_job_net_check_task_free(zbx_discoverer_net_check_task_t *task);
-void	zbx_discoverer_job_net_check_free(zbx_discoverer_drule_job_t *job);
-void	zbx_discoverer_job_net_check_destroy(zbx_discoverer_drule_job_t *job);
+ZBX_PTR_VECTOR_DECL(discoverer_dcheck, DC_DCHECK *)
+
+typedef struct
+{
+	zbx_vector_discoverer_dcheck_t	dchecks;
+	char				*ip;
+	zbx_vector_str_t		*ips;
+	unsigned short			port;
+	zbx_uint64_t			unique_dcheckid;
+	int				resolve_dns;
+}
+zbx_discoverer_task_t;
+
+#define DISCOVERER_JOB_STATUS_QUEUED	0
+#define DISCOVERER_JOB_STATUS_WAITING	1
+#define DISCOVERER_JOB_STATUS_REMOVING	2
+
+typedef struct
+{
+	zbx_uint64_t				druleid;
+	zbx_list_t				tasks;
+	zbx_uint64_t				drule_revision;
+	int					config_timeout;
+	int					workers_used;
+	int					workers_max;
+	unsigned char				status;
+}
+zbx_discoverer_job_t;
+
+zbx_hash_t	zbx_discoverer_task_hash(const void *data);
+int		zbx_discoverer_task_compare(const void *d1, const void *d2);
+void		zbx_discoverer_task_free(zbx_discoverer_task_t *task);
+void		zbx_discoverer_job_tasks_free(zbx_discoverer_job_t *job);
+void		zbx_discoverer_job_free(zbx_discoverer_job_t *job);
 
 #endif

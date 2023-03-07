@@ -91,12 +91,12 @@ void	discoverer_queue_notify_all(zbx_discoverer_queue_t *queue)
  *               processed.                                                   *
  *                                                                            *
  ******************************************************************************/
-zbx_discoverer_drule_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
+zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 {
 	void	*job;
 
 	if (SUCCEED == zbx_list_pop(&queue->jobs, &job))
-		return (zbx_discoverer_drule_job_t*)job;
+		return (zbx_discoverer_job_t*)job;
 
 	return NULL;
 }
@@ -109,9 +109,9 @@ zbx_discoverer_drule_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
  *             net_check - [IN] the net check job                             *
  *                                                                            *
 *******************************************************************************/
-void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_drule_job_t *net_check)
+void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_job_t *job)
 {
-	zbx_list_append(&queue->jobs, net_check, NULL);
+	zbx_list_append(&queue->jobs, job, NULL);
 }
 
 /******************************************************************************
@@ -121,10 +121,10 @@ void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_drule_j
  ******************************************************************************/
 void	discoverer_queue_clear_jobs(zbx_list_t *jobs)
 {
-	zbx_discoverer_drule_job_t	*job = NULL;
+	zbx_discoverer_job_t	*job = NULL;
 
 	while (SUCCEED == zbx_list_pop(jobs, (void **)&job))
-		zbx_discoverer_job_net_check_destroy(job);
+		zbx_discoverer_job_free(job);
 }
 
 /******************************************************************************

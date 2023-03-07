@@ -37,9 +37,6 @@
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
 
-#define DISCOVERER_WORKER_INIT_NONE	0x00
-#define DISCOVERER_WORKER_INIT_THREAD	0x01
-
 typedef struct
 {
 	zbx_vector_ptr_t	services;
@@ -53,6 +50,17 @@ zbx_discovery_results_t;
 
 typedef struct
 {
+	zbx_uint64_t		druleid;
+	char			ip[ZBX_INTERFACE_IP_LEN_MAX];
+	int			count;
+}
+zbx_discoverer_task_count_t;
+
+#define DISCOVERER_WORKER_INIT_NONE	0x00
+#define DISCOVERER_WORKER_INIT_THREAD	0x01
+
+typedef struct
+{
 	zbx_discoverer_queue_t	*queue;
 	pthread_t		thread;
 	int			worker_id;
@@ -63,36 +71,18 @@ zbx_discoverer_worker_t;
 
 typedef struct
 {
-	zbx_uint64_t		druleid;
-	char			ip[ZBX_INTERFACE_IP_LEN_MAX];
-	int			count;
-}
-zbx_discoverer_task_count_t;
+	int			workers_num;
+	zbx_discoverer_worker_t	*workers;
+	zbx_discoverer_queue_t	queue;
 
-typedef struct
-{
-	zbx_uint64_t			druleid;
-	zbx_discoverer_drule_job_t	*job_ref;
-}
-zbx_discoverer_drule_t;
-
-ZBX_PTR_VECTOR_DECL(discoverer_drules, zbx_discoverer_drule_t)
-
-typedef struct
-{
-	int				workers_num;
-	zbx_discoverer_worker_t		*workers;
-	zbx_discoverer_queue_t		queue;
-	zbx_vector_discoverer_drules_t	drules;
-
-	zbx_hashset_t			incomplete_task_count;
-	zbx_hashset_t			results;
-	pthread_rwlock_t		results_rwlock;
+	zbx_hashset_t		incomplete_task_count;
+	zbx_hashset_t		results;
+	pthread_rwlock_t	results_rwlock;
 }
 zbx_discoverer_manager_t;
 
-ZBX_PTR_VECTOR_IMPL(discoverer_net_check, DC_DCHECK *)
-ZBX_PTR_VECTOR_IMPL(discoverer_drules, zbx_discoverer_drule_t)
+ZBX_PTR_VECTOR_IMPL(discoverer_dcheck, DC_DCHECK *)
+ZBX_PTR_VECTOR_IMPL(discoverer_queue_drules, zbx_discoverer_queue_drule_t)
 
 extern unsigned char			program_type;
 
@@ -120,28 +110,6 @@ static int	discoverer_task_count_compare(const void *d1, const void *d2)
 	ZBX_RETURN_IF_NOT_EQUAL(count1->druleid, count2->druleid);
 
 	return strcmp(count1->ip, count2->ip);
-}
-
-static zbx_hash_t	discoverer_net_check_hash(const void *data)
-{
-	const zbx_discoverer_net_check_task_t	*net_check = (const zbx_discoverer_net_check_task_t *)data;
-	zbx_hash_t				hash;
-	zbx_uint64_t				port = net_check->port;
-
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&port);
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO(net_check->ip, strlen(net_check->ip), hash);
-
-	return hash;
-}
-
-static int	discoverer_net_check_compare(const void *d1, const void *d2)
-{
-	const zbx_discoverer_net_check_task_t	*net_check1 = (const zbx_discoverer_net_check_task_t *)d1;
-	const zbx_discoverer_net_check_task_t	*net_check2 = (const zbx_discoverer_net_check_task_t *)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(net_check1->port, net_check2->port);
-
-	return strcmp(net_check1->ip, net_check2->ip);
 }
 
 static zbx_hash_t	discoverer_result_hash(const void *data)
@@ -525,8 +493,8 @@ static int	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *i
 
 		for (port = first; port <= last; port++)
 		{
-			zbx_discoverer_net_check_task_t	task_local, *task;
-			DC_DCHECK			*dcheck_ptr;
+			zbx_discoverer_task_t	task_local, *task;
+			DC_DCHECK		*dcheck_ptr;
 
 			task_local.ip = zbx_strdup(NULL, SVC_ICMPPING == dcheck->type ? "" : ip);
 			task_local.port = (unsigned short)port;
@@ -544,7 +512,7 @@ static int	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *i
 					zbx_discovery_dcheck_free(dcheck_ptr);
 				}
 				else
-					zbx_vector_discoverer_net_check_append(&task->dchecks, dcheck_ptr);
+					zbx_vector_discoverer_dcheck_append(&task->dchecks, dcheck_ptr);
 			}
 			else
 			{
@@ -566,9 +534,9 @@ static int	process_check(const DC_DRULE *drule, const DC_DCHECK *dcheck, char *i
 						*need_resolve = 0;
 				}
 
-				zbx_vector_discoverer_net_check_create(&task_local.dchecks);
-				zbx_vector_discoverer_net_check_append(&task_local.dchecks, dcheck_ptr);
-				zbx_hashset_insert(tasks, &task_local, sizeof(zbx_discoverer_net_check_task_t));
+				zbx_vector_discoverer_dcheck_create(&task_local.dchecks);
+				zbx_vector_discoverer_dcheck_append(&task_local.dchecks, dcheck_ptr);
+				zbx_hashset_insert(tasks, &task_local, sizeof(zbx_discoverer_task_t));
 			}
 
 			checks_num++;
@@ -938,10 +906,11 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_p
 
 	while (ZBX_IS_RUNNING() && NULL != (drule = zbx_dc_drule_next(now, nextcheck)))
 	{
-		zbx_discoverer_drule_t	cmp = {.druleid = drule->druleid};
+		zbx_discoverer_queue_drule_t	cmp = {.druleid = drule->druleid};
 
 		discoverer_queue_lock(&dmanager.queue);
-		i = zbx_vector_discoverer_drules_bsearch(&dmanager.drules, cmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		i = zbx_vector_discoverer_queue_drules_bsearch(&dmanager.queue.drules, cmp,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		discoverer_queue_unlock(&dmanager.queue);
 
 		if (FAIL != i)
@@ -979,16 +948,16 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_p
 		}
 		else
 		{
-			zbx_discoverer_drule_job_t	*job;
-			zbx_discoverer_net_check_task_t	*task, *task_out;
-			zbx_hashset_t			tasks;
-			zbx_hashset_iter_t		iter;
+			zbx_discoverer_job_t	*job;
+			zbx_discoverer_task_t	*task, *task_out;
+			zbx_hashset_t		tasks;
+			zbx_hashset_iter_t	iter;
 
 			drule->delay = delay;
 
-			zbx_hashset_create(&tasks, 1, discoverer_net_check_hash, discoverer_net_check_compare);
+			zbx_hashset_create(&tasks, 1, zbx_discoverer_task_hash, zbx_discoverer_task_compare);
 
-			job = (zbx_discoverer_drule_job_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_drule_job_t));
+			job = (zbx_discoverer_job_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_job_t));
 			job->druleid = drule->druleid;
 			job->workers_max = drule->workers_max;
 			job->workers_used = 0;
@@ -1001,11 +970,11 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_p
 
 			zbx_hashset_iter_reset(&tasks, &iter);
 
-			while (NULL != (task = (zbx_discoverer_net_check_task_t*)zbx_hashset_iter_next(&iter)))
+			while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
 			{
-				task_out = (zbx_discoverer_net_check_task_t*)zbx_malloc(NULL,
-						sizeof(zbx_discoverer_net_check_task_t));
-				memcpy(task_out, task, sizeof(zbx_discoverer_net_check_task_t));
+				task_out = (zbx_discoverer_task_t*)zbx_malloc(NULL,
+						sizeof(zbx_discoverer_task_t));
+				memcpy(task_out, task, sizeof(zbx_discoverer_task_t));
 				zbx_list_append(&job->tasks, task_out, NULL);
 			}
 
@@ -1030,7 +999,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_p
 
 	return rule_count;	/* performance metric */
 }
-static zbx_dservice_t	*result_dservice_create(const zbx_discoverer_net_check_task_t *task, const DC_DCHECK *dcheck)
+static zbx_dservice_t	*result_dservice_create(const zbx_discoverer_task_t *task, const DC_DCHECK *dcheck)
 {
 	zbx_dservice_t	*service;
 
@@ -1043,7 +1012,7 @@ static zbx_dservice_t	*result_dservice_create(const zbx_discoverer_net_check_tas
 }
 
 static zbx_discovery_results_t	*rdiscovery_result_create(zbx_uint64_t druleid,
-		const zbx_discoverer_net_check_task_t *task)
+		const zbx_discoverer_task_t *task)
 {
 	zbx_discovery_results_t	*result;
 
@@ -1062,7 +1031,7 @@ static zbx_discovery_results_t	*rdiscovery_result_create(zbx_uint64_t druleid,
 ZBX_PTR_VECTOR_DECL(fping_host, ZBX_FPING_HOST)
 ZBX_PTR_VECTOR_IMPL(fping_host, ZBX_FPING_HOST)
 
-static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_net_check_task_t *task,
+static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *task,
 		const DC_DCHECK *dcheck, zbx_vector_ptr_t *results, int worker_max)
 {
 	zbx_vector_fping_host_t	hosts;
@@ -1169,7 +1138,7 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_ptr_t *vr_s
 	}
 }
 
-static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_net_check_task_t *task, int worker_max)
+static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max)
 {
 	DC_DCHECK		*dcheck;
 	zbx_vector_ptr_t	results;
@@ -1190,7 +1159,7 @@ static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_net_c
 	zbx_vector_ptr_destroy(&results);
 }
 
-static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_net_check_task_t *task,
+static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		int config_timeout)
 {
 	int			i;
@@ -1248,15 +1217,18 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_net
 	zbx_vector_ptr_destroy(&services);
 }
 
-static void	discoverer_job_remove(zbx_discoverer_drule_job_t *job)
+static void	discoverer_job_remove(zbx_discoverer_job_t *job)
 {
 	int			i;
-	zbx_discoverer_drule_t	cmp = {.druleid = job->druleid};
+	zbx_discoverer_queue_drule_t	cmp = {.druleid = job->druleid};
 
-	if (FAIL != (i = zbx_vector_discoverer_drules_bsearch(&dmanager.drules, cmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		zbx_vector_discoverer_drules_remove(&dmanager.drules, i);
+	if (FAIL != (i = zbx_vector_discoverer_queue_drules_bsearch(&dmanager.queue.drules, cmp,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+	{
+		zbx_vector_discoverer_queue_drules_remove(&dmanager.queue.drules, i);
+	}
 
-	zbx_discoverer_job_net_check_destroy(job);
+	zbx_discoverer_job_free(job);
 }
 
 static void	*discoverer_net_check(void *net_check_worker)
@@ -1276,13 +1248,13 @@ static void	*discoverer_net_check(void *net_check_worker)
 	while (0 == worker->stop)
 	{
 		char				*error;
-		zbx_discoverer_drule_job_t	*job;
+		zbx_discoverer_job_t	*job;
 
 		if (NULL != (job = discoverer_queue_pop(queue)))
 		{
 			int				config_timeout, worker_max;
 			zbx_uint64_t			druleid;
-			zbx_discoverer_net_check_task_t	*task;
+			zbx_discoverer_task_t	*task;
 
 			if (SUCCEED != zbx_list_pop(&job->tasks, (void*)&task))
 			{
@@ -1317,7 +1289,7 @@ static void	*discoverer_net_check(void *net_check_worker)
 			else
 				discoverer_net_check_icmp(druleid, task, worker_max);
 
-			zbx_discoverer_job_net_check_task_free(task);
+			zbx_discoverer_task_free(task);
 
 			/* proceed to the next job */
 
@@ -1386,7 +1358,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 	zbx_hashset_create(&manager->incomplete_task_count, 1, discoverer_task_count_hash,
 			discoverer_task_count_compare);
 
-	zbx_vector_discoverer_drules_create(&manager->drules);
+	zbx_vector_discoverer_queue_drules_create(&manager->queue.drules);
 
 	if (0 != (err = pthread_rwlock_init(&manager->results_rwlock, NULL)))
 	{
@@ -1474,8 +1446,8 @@ static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 
 	zbx_hashset_destroy(&manager->incomplete_task_count);
 
-	zbx_vector_discoverer_drules_clear(&manager->drules);
-	zbx_vector_discoverer_drules_destroy(&manager->drules);
+	zbx_vector_discoverer_queue_drules_clear(&manager->queue.drules);
+	zbx_vector_discoverer_queue_drules_destroy(&manager->queue.drules);
 
 	zbx_hashset_iter_reset(&manager->results, &iter);
 
@@ -1554,11 +1526,12 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		discoverer_queue_lock(&dmanager.queue);
 
-		for (i = 0; i < dmanager.drules.values_num; i++)
+		for (i = 0; i < dmanager.queue.drules.values_num; i++)
 		{
-			int			k;
-			zbx_uint64_pair_t	revision;
-			zbx_discoverer_drule_t	*drule = (zbx_discoverer_drule_t*)&dmanager.drules.values[i];
+			int				k;
+			zbx_uint64_pair_t		revision;
+			zbx_discoverer_queue_drule_t	*drule =
+					(zbx_discoverer_queue_drule_t*)&dmanager.queue.drules.values[i];
 
 			revision.first = drule->druleid;
 
@@ -1568,7 +1541,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 				zbx_uint64_pair_t	*rev = (zbx_uint64_pair_t*)&revisions.values[k];
 
 				if (rev->second != drule->job_ref->drule_revision)
-					zbx_discoverer_job_net_check_free(drule->job_ref);
+					zbx_discoverer_job_tasks_free(drule->job_ref);
 			}
 		}
 
@@ -1609,17 +1582,18 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 				for (i = 0; i < jobs.values_num; i++)
 				{
-					zbx_discoverer_drule_job_t	*job;
-					zbx_discoverer_drule_t		drule;
+					zbx_discoverer_job_t		*job;
+					zbx_discoverer_queue_drule_t	drule;
 
-					job = (zbx_discoverer_drule_job_t*)jobs.values[i];
+					job = (zbx_discoverer_job_t*)jobs.values[i];
 					discoverer_queue_push(&dmanager.queue, job);
 					drule.druleid = job->druleid;
 					drule.job_ref = job;
-					zbx_vector_discoverer_drules_append(&dmanager.drules, drule);
+					zbx_vector_discoverer_queue_drules_append(&dmanager.queue.drules, drule);
 				}
 
-				zbx_vector_discoverer_drules_sort(&dmanager.drules, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+				zbx_vector_discoverer_queue_drules_sort(&dmanager.queue.drules,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 				discoverer_queue_notify_all(&dmanager.queue);
 				discoverer_queue_unlock(&dmanager.queue);
