@@ -1272,7 +1272,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
 								config_startup_time, config_unavailable_delay};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
-								get_program_type, config_timeout, &config_server_addrs};
+								get_program_type, config_timeout, &config_server_addrs,
+								CONFIG_HOSTNAME, CONFIG_SOURCE_IP,
+								CONFIG_PROXYCONFIG_FREQUENCY};
 	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, config_timeout,
 								&config_server_addrs, CONFIG_SOURCE_IP, CONFIG_HOSTNAME,
 								CONFIG_PROXYDATA_FREQUENCY};

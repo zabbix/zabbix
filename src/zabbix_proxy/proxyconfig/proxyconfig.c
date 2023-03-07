@@ -32,14 +32,8 @@
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
 
-#define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
-
-extern char		*CONFIG_HOSTNAME;
-extern char		*CONFIG_SOURCE_IP;
-
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
-		const zbx_config_tls_t *config_tls, const zbx_config_vault_t *config_vault,
-		const zbx_thread_info_t *thread_info, int config_timeout, zbx_vector_ptr_t *config_server_addrs)
+		const zbx_thread_info_t *thread_info, zbx_thread_proxyconfig_args *args)
 {
 	zbx_socket_t		sock;
 	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
@@ -55,7 +49,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 
 	zbx_json_init(&j, 128);
 	zbx_json_addstring(&j, "request", ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, "host", args->config_hostname, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, zbx_dc_get_received_revision());
@@ -71,12 +65,17 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 
 	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_IDLE);
 
-	if (FAIL == zbx_connect_to_server(&sock,CONFIG_SOURCE_IP, config_server_addrs, 600, config_timeout,
-			CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING, config_tls)) /* retry till have a connection */
+#define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
+
+	if (FAIL == zbx_connect_to_server(&sock, args->config_source_ip, args->config_server_addrs, 600,
+			args->config_timeout, CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING,
+			args->config_tls)) /* retry till have a connection */
 	{
 		zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 		goto out;
 	}
+
+#undef CONFIG_PROXYCONFIG_RETRY
 
 	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 
@@ -122,11 +121,11 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 
 	if (SUCCEED == (ret = zbx_proxyconfig_process(sock.peer, &jp, &error)))
 	{
-		DCsync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL, config_vault);
+		DCsync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL, args->config_vault);
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
 		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
-			DCsync_kvs_paths(&jp_kvs_paths, config_vault);
+			DCsync_kvs_paths(&jp_kvs_paths, args->config_vault);
 
 		DCupdate_interfaces_availability();
 	}
@@ -316,15 +315,13 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->config_tls,
-				proxyconfig_args_in->config_vault, info, proxyconfig_args_in->config_timeout,
-				proxyconfig_args_in->config_server_addrs);
+		process_configuration_sync(&data_size, &synced, info, proxyconfig_args_in);
 
 		interval = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), (zbx_fs_size_t)data_size, interval,
-				CONFIG_PROXYCONFIG_FREQUENCY);
+				proxyconfig_args_in->config_proxyconfig_frequency);
 
 		if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
 		{
@@ -332,7 +329,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 			last_template_cleanup_sec = sec;
 		}
 
-		sleeptime = CONFIG_PROXYCONFIG_FREQUENCY;
+		sleeptime = proxyconfig_args_in->config_proxyconfig_frequency;
 	}
 stop:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
