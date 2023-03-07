@@ -27,6 +27,9 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
+#include "zbxipcservice.h"
+#include "zbxdbhigh.h"
+#include "zbxdb.h"
 
 static int	hk_period;
 
