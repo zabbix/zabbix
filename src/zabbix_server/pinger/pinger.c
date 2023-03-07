@@ -181,8 +181,8 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 }
 
 static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr,
-		int *count, int *interval, int *size, int *timeout, icmppingsec_type_t *type, char *error,
-		int max_error_len)
+		int *count, int *interval, int *size, int *timeout, icmppingsec_type_t *type,
+		unsigned char *allow_redirect, char *error, int max_error_len)
 {
 	const char	*tmp;
 	int		ret = NOTSUPPORTED;
@@ -214,7 +214,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 		goto out;
 	}
 
-	if (6 < get_rparams_num(&request) || (ICMPPINGSEC != *icmpping && 5 < get_rparams_num(&request)))
+	if (7 < get_rparams_num(&request) || (ICMPPINGSEC != *icmpping && 6 < get_rparams_num(&request)))
 	{
 		zbx_snprintf(error, max_error_len, "Too many arguments.");
 		goto out;
@@ -262,29 +262,46 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 		goto out;
 	}
 
-	if (NULL == (tmp = get_rparam(&request, 5)) || '\0' == *tmp)
+	if (ICMPPINGSEC == *icmpping)
 	{
-		*type = ICMPPINGSEC_AVG;
-	}
-	else
-	{
-		if (0 == strcmp(tmp, "min"))
-		{
-			*type = ICMPPINGSEC_MIN;
-		}
-		else if (0 == strcmp(tmp, "avg"))
+		if (NULL == (tmp = get_rparam(&request, 5)) || '\0' == *tmp)
 		{
 			*type = ICMPPINGSEC_AVG;
 		}
-		else if (0 == strcmp(tmp, "max"))
-		{
-			*type = ICMPPINGSEC_MAX;
-		}
 		else
 		{
-			zbx_snprintf(error, max_error_len, "Mode \"%s\" is not supported.", tmp);
-			goto out;
+			if (0 == strcmp(tmp, "min"))
+			{
+				*type = ICMPPINGSEC_MIN;
+			}
+			else if (0 == strcmp(tmp, "avg"))
+			{
+				*type = ICMPPINGSEC_AVG;
+			}
+			else if (0 == strcmp(tmp, "max"))
+			{
+				*type = ICMPPINGSEC_MAX;
+			}
+			else
+			{
+				zbx_snprintf(error, max_error_len, "Mode \"%s\" is not supported.", tmp);
+				goto out;
+			}
 		}
+	}
+
+	if (NULL == (tmp = get_rparam(&request, ((ICMPPINGSEC == *icmpping) ? 6 : 5))) || '\0' == *tmp)
+	{
+		*allow_redirect = 0;
+	}
+	else if (0 == strcmp(tmp, "allow_redirect"))
+	{
+		*allow_redirect = 1;
+	}
+	else
+	{
+		zbx_snprintf(error, max_error_len, "Options \"%s\" is not supported.", tmp);
+		goto out;
 	}
 
 	if (NULL == (tmp = get_rparam(&request, 0)) || '\0' == *tmp)
@@ -344,14 +361,15 @@ static int	get_icmpping_nearestindex(icmpitem_t *items, int items_count, int cou
 }
 
 static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_count, int count, int interval,
-		int size, int timeout, zbx_uint64_t itemid, char *addr, icmpping_t icmpping, icmppingsec_type_t type)
+		int size, int timeout, zbx_uint64_t itemid, char *addr, icmpping_t icmpping, icmppingsec_type_t type,
+		unsigned char allow_redirect)
 {
 	int		index;
 	icmpitem_t	*item;
 	size_t		sz;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s' count:%d interval:%d size:%d timeout:%d",
-			__func__, addr, count, interval, size, timeout);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s' count:%d interval:%d size:%d timeout:%d allow_redirect:%u",
+			__func__, addr, count, interval, size, timeout, allow_redirect);
 
 	index = get_icmpping_nearestindex(*items, *items_count, count, interval, size, timeout);
 
@@ -373,6 +391,7 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
 	item->addr	= addr;
 	item->icmpping	= icmpping;
 	item->type	= type;
+	item->allow_redirect = allow_redirect;
 
 	(*items_count)++;
 
@@ -393,6 +412,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	DC_ITEM			item, *items;
 	int			i, num, count, interval, size, timeout, rc, errcode = SUCCEED;
 	char			error[MAX_STRING_LEN], *addr = NULL;
+	unsigned char		allow_redirect;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
 	zbx_dc_um_handle_t	*um_handle;
@@ -413,13 +433,13 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 		if (SUCCEED == rc)
 		{
 			rc = zbx_parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
-					&interval, &size, &timeout, &type, error, sizeof(error));
+					&interval, &size, &timeout, &type, &allow_redirect, error, sizeof(error));
 		}
 
 		if (SUCCEED == rc)
 		{
 			add_icmpping_item(icmp_items, icmp_items_alloc, icmp_items_count, count, interval, size,
-				timeout, items[i].itemid, addr, icmpping, type);
+				timeout, items[i].itemid, addr, icmpping, type, allow_redirect);
 		}
 		else
 		{
@@ -516,7 +536,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 
 			ping_result = zbx_ping(hosts, hosts_count,
 						items[i].count, items[i].interval, items[i].size, items[i].timeout,
-						error, sizeof(error));
+						items[i].allow_redirect, error, sizeof(error));
 
 			if (FAIL != ping_result)
 				process_values(items, first_index, i + 1, hosts, hosts_count, &ts, ping_result, error);
