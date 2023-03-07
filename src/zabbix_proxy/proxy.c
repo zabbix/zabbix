@@ -204,10 +204,6 @@ static const char	*get_fping6_location(void)
 #endif
 
 char	*CONFIG_HOSTNAME = NULL;
-static const char	*get_hostname(void)
-{
-	return CONFIG_HOSTNAME;
-}
 
 static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
 
@@ -268,10 +264,6 @@ static int	get_config_timeout(void)
 }
 
 int	CONFIG_PROXYDATA_FREQUENCY = 1;
-static int	get_config_proxydata_frequency(void)
-{
-	return config_timeout;
-}
 
 static int	config_startup_time	= 0;
 static int	config_unavailable_delay	=60;
@@ -1282,8 +1274,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_program_type, config_timeout, &config_server_addrs};
 	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, config_timeout,
-								&config_server_addrs, get_source_ip, get_hostname,
-								get_config_proxydata_frequency};
+								&config_server_addrs, CONFIG_SOURCE_IP, CONFIG_HOSTNAME,
+								CONFIG_PROXYDATA_FREQUENCY};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, config_timeout};
