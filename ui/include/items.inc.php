@@ -1445,7 +1445,7 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 }
 
 /**
- * Check whether the unit of an item is binary or not
+ * Check whether the unit of an item is binary or not.
  *
  * @param string $units
  *
