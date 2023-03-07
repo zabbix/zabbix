@@ -49,6 +49,7 @@
  * Purpose: Get current history upload state (disabled/enabled)               *
  *                                                                            *
  * Parameters: buffer - [IN] the contents of a packet (JSON)                  *
+ *             state  - [OUT]                                                 *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
