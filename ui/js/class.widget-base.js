@@ -636,6 +636,12 @@ class CWidgetBase {
 	}
 
 	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	hasPadding() {
+	}
+
+	/**
 	 * Update padding of the widget contents' container. Invoked when widget properties have changed.
 	 */
 	_updatePadding() {
@@ -948,6 +954,12 @@ class CWidgetBase {
 
 				this.fire(WIDGET_EVENT_AFTER_UPDATE);
 			});
+	}
+
+	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	promiseUpdate() {
 	}
 
 	// Widget view methods.
@@ -1294,7 +1306,7 @@ class CWidgetBase {
 				this.fire(WIDGET_EVENT_ENTER);
 			},
 
-			focusout: (e) => {
+			focusout: () => {
 				this.fire(WIDGET_EVENT_LEAVE);
 			},
 
@@ -1347,7 +1359,7 @@ class CWidgetBase {
 	 * @param {function}		listener
 	 * @param {Object|false}	options
 	 *
-	 * @returns {CWidget}
+	 * @returns {CWidgetBase}
 	 */
 	on(type, listener, options = false) {
 		this._target.addEventListener(type, listener, options);
@@ -1362,7 +1374,7 @@ class CWidgetBase {
 	 * @param {function}		listener
 	 * @param {Object|false}	options
 	 *
-	 * @returns {CWidget}
+	 * @returns {CWidgetBase}
 	 */
 	off(type, listener, options = false) {
 		this._target.removeEventListener(type, listener, options);

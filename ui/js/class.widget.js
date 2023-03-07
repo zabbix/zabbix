@@ -236,7 +236,7 @@ class CWidget extends CWidgetBase {
 	}
 
 	/**
-	 * Clear widget and display error message if the update cycle has run successfully, but returned a fatal error.
+	 * Display error message if the update cycle has run successfully, but returned a fatal error.
 	 *
 	 * Invoked by the default implementation of the "promiseUpdate" method only.
 	 *
@@ -248,10 +248,6 @@ class CWidget extends CWidgetBase {
 	 */
 	processUpdateErrorResponse(error) {
 		this._updateMessages(error.messages, error.title);
-		this._updateInfo();
-		this._updateDebug();
-
-		this.setErrorContents();
 	}
 
 	/**
@@ -267,16 +263,5 @@ class CWidget extends CWidgetBase {
 	 */
 	setContents(response) {
 		this._body.innerHTML = response.body ?? '';
-	}
-
-	/**
-	 * Clear widget body if the update cycle has run successfully, but returned a fatal error.
-	 *
-	 * Invoked by the default implementation of the "processUpdateErrorResponse" method only.
-	 *
-	 * Possible widget state: WIDGET_STATE_ACTIVE.
-	 */
-	setErrorContents() {
-		this._body.innerHTML = '';
 	}
 }

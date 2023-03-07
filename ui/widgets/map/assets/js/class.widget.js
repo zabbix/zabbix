@@ -153,10 +153,7 @@ class CWidgetMap extends CWidget {
 
 			if (map_options !== null) {
 				this._makeSvgMap(map_options);
-
-				if (this._state === WIDGET_STATE_ACTIVE) {
-					this._activateContentsEvents();
-				}
+				this._activateContentsEvents();
 			}
 
 			if (response.sysmap_data.error_msg !== undefined) {
