@@ -30,13 +30,16 @@ class HostTemplateGroups {
 				'name' => 'Group empty for Delete test'
 			],
 			[
-				'name' => 'One group for Delete'
+				'name' => 'One group belongs to one object for Delete test'
 			],
 			[
 				'name' => 'First group to one object for Delete test'
 			],
 			[
 				'name' => 'Second group to one object for Delete test'
+			],
+			[
+				'name' => 'Group 3 for Delete test'
 			]
 		]);
 		$template_groupids = CDataHelper::getIds('name');
@@ -44,7 +47,7 @@ class HostTemplateGroups {
 			[
 				'host' => 'Template for template group testing',
 				'groups' => [
-					'groupid' => $template_groupids['One group for Delete']
+					'groupid' => $template_groupids['One group belongs to one object for Delete test']
 				]
 			],
 			[
@@ -59,16 +62,19 @@ class HostTemplateGroups {
 		// Prepare data for host groups.
 		CDataHelper::call('hostgroup.create', [
 			[
+				'name' => 'Group empty for Delete test'
+			],
+			[
+				'name' => 'One group belongs to one object for Delete test'
+			],
+			[
 				'name' => 'First group to one object for Delete test'
 			],
 			[
 				'name' => 'Second group to one object for Delete test'
 			],
 			[
-				'name' => 'Group empty for Delete test'
-			],
-			[
-				'name' => 'One group for Delete'
+				'name' => 'Group 3 for Delete test'
 			],
 			[
 				'name' => 'Group for Script'
@@ -94,7 +100,7 @@ class HostTemplateGroups {
 				'host' => 'Host for host group testing',
 				'interfaces' => [],
 				'groups' => [
-					'groupid' => $host_groupids['One group for Delete']
+					'groupid' => $host_groupids['One group belongs to one object for Delete test']
 				]
 			],
 			[

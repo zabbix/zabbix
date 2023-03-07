@@ -24,11 +24,11 @@ require_once dirname(__FILE__).'/../common/testPageGroups.php';
 /**
  * @backup hosts
  *
- * @onBefore prepareGroupPageData, prepareTemplateGroupPageData
+ * @onBefore preparePageTemplateGroupsData
  *
  * @dataSource HostTemplateGroups
  */
-class testPageTemplateGroup extends testPageGroups {
+class testPageTemplateGroups extends testPageGroups {
 
 	public $link = 'zabbix.php?action=templategroup.list';
 	public $object = 'template';
@@ -41,7 +41,7 @@ class testPageTemplateGroup extends testPageGroups {
 	/**
 	 * Prepare data for template groups test.
 	 */
-	public static function prepareTemplateGroupPageData() {
+	public static function preparePageTemplateGroupsData() {
 		// Creata three groups with disabled hosts and two groups with enabled hosts for testing.
 		CDataHelper::call('templategroup.create', [
 			[
@@ -105,7 +105,7 @@ class testPageTemplateGroup extends testPageGroups {
 	/**
 	 * @dataProvider getLayoutData
 	 */
-	public function testPageTemplateGroup_Layout($data) {
+	public function testPageTemplateGroups_Layout($data) {
 		$links = [
 			'name' => self::GROUP1,
 			'count' => '1',
@@ -114,7 +114,7 @@ class testPageTemplateGroup extends testPageGroups {
 		$this->layout($data, $links);
 	}
 
-	public function testPageTemplateGroup_Sort() {
+	public function testPageTemplateGroups_Sort() {
 		$this->coulmnSorting();
 	}
 
@@ -145,44 +145,40 @@ class testPageTemplateGroup extends testPageGroups {
 			// Exact match.
 			[
 				[
-					'Name' => 'Group with one template testPageTemplateGroup',
-					'expected' => ['Group with one template testPageTemplateGroup']
+					'Name' => self::GROUP1,
+					'expected' => [self::GROUP1]
 				]
 			],
 			// Partial match.
 			[
 				[
 					'Name' => 'with one',
-					'expected' => ['Group with one template testPageTemplateGroup']
+					'expected' => [self::GROUP1]
 				]
 			],
 			[
 				[
 					'Name' => ' with ',
-					'expected' => ['Group with one template testPageTemplateGroup',	'Group with two templates testPageTemplateGroup']
+					'expected' => [self::GROUP1, self::GROUP2]
 				]
 			],
 			[
 				[
 					'Name' => 'Group with',
-					'expected' => ['Group with one template testPageTemplateGroup',	'Group with two templates testPageTemplateGroup']
+					'expected' => [self::GROUP1, self::GROUP2]
 				]
 			],
 			// Not case sensitive.
 			[
 				[
 					'Name' => 'page',
-					'expected' => ['Group with one template testPageTemplateGroup',
-						'Group with two templates testPageTemplateGroup', 'Templates/testPageTemplateGroup'
-					]
+					'expected' => [self::GROUP1, self::GROUP2, 'Templates/testPageTemplateGroup']
 				]
 			],
 			[
 				[
 					'Name' => 'PAGE',
-					'expected' => ['Group with one template testPageTemplateGroup',
-						'Group with two templates testPageTemplateGroup', 'Templates/testPageTemplateGroup'
-					]
+					'expected' => [self::GROUP1, self::GROUP2, 'Templates/testPageTemplateGroup']
 				]
 			]
 		];
@@ -191,18 +187,18 @@ class testPageTemplateGroup extends testPageGroups {
 	/**
 	 * @dataProvider getFilterData
 	 */
-	public function testPageTemplateGroup_Filter($data) {
+	public function testPageTemplateGroups_Filter($data) {
 		$this->filter($data);
 	}
 
 	/**
 	 * @dataProvider getCancelData
 	 */
-	public function testPageTemplateGroup_Cancel($data) {
+	public function testPageTemplateGroups_Cancel($data) {
 		$this->cancel($data);
 	}
 
-	public static function getPageTemplateDeleteData() {
+	public static function getTemplateGroupsDeleteData() {
 		return [
 			// Delete all.
 			[
@@ -215,7 +211,7 @@ class testPageTemplateGroup extends testPageGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => ['One group for Delete', 'Group empty for Delete test'],
+					'groups' => [self::DELETE_ONE_GROUP, self::DELETE_GROUP3],
 					'error' => 'Template "Template for template group testing" cannot be without template group.'
 				]
 			],
@@ -223,7 +219,7 @@ class testPageTemplateGroup extends testPageGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => 'One group for Delete',
+					'groups' => self::DELETE_ONE_GROUP,
 					'error' => 'Template "Template for template group testing" cannot be without template group.'
 				]
 			]
@@ -231,10 +227,10 @@ class testPageTemplateGroup extends testPageGroups {
 	}
 
 	/**
-	 * @dataProvider getPageTemplateDeleteData
+	 * @dataProvider getTemplateGroupsDeleteData
 	 * @dataProvider getDeleteData
 	 */
-	public function testPageTemplateGroup_Delete($data) {
+	public function testPageTemplateGroups_Delete($data) {
 		$this->delete($data);
 	}
 }

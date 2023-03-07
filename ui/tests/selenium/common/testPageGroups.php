@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
- * Base class for Host and Template group form.
+ * Base class for Host and Template groups page.
  */
 class testPageGroups extends CWebTest {
 
@@ -48,6 +48,14 @@ class testPageGroups extends CWebTest {
 	const LLD = 'LLD for Discovered host tests';
 
 	/**
+	 * Objects created in dataSource HostTemplateGroups.
+	 */
+	const DELETE_ONE_GROUP = 'One group belongs to one object for Delete test';
+	const DELETE_EMPTY_GROUP = 'Group empty for Delete test';
+	const DELETE_GROUP2 = 'First group to one object for Delete test';
+	const DELETE_GROUP3 = 'Group 3 for Delete test';
+
+	/**
 	 * SQL query to get groups to compare hash values.
 	 */
 	private $groups_sql = 'SELECT * FROM hstgrp g INNER JOIN hosts_groups hg ON g.groupid=hg.groupid'.
@@ -67,26 +75,6 @@ class testPageGroups extends CWebTest {
 	 * Host or template group.
 	 */
 	public $object;
-
-	/**
-	 * Host and template group names for delete test scenario.
-	 */
-	private static $delete_group = 'Group empty for Delete test';
-	private static $delete_group2 = 'First group to one object for Delete test';
-	private static $delete_group3 = 'Group 3 for Delete test';
-
-	/**
-	 * Create template and host groups for delete test.
-	 */
-	public static function prepareGroupPageData() {
-		foreach (['templategroup', 'hostgroup'] as $method) {
-			CDataHelper::call($method.'.create', [
-				[
-					'name' =>  self::$delete_group3
-				]
-			]);
-		}
-	}
 
 	/**
 	 *  Test for checking group page layout.
@@ -316,14 +304,14 @@ class testPageGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'groups' => self::$delete_group
+					'groups' => self::DELETE_EMPTY_GROUP
 				]
 			],
 			// Select several.
 			[
 				[
 					'expected' => TEST_GOOD,
-					'groups' => [self::$delete_group2, self::$delete_group3]
+					'groups' => [self::DELETE_GROUP2, self::DELETE_GROUP3]
 				]
 			]
 		];

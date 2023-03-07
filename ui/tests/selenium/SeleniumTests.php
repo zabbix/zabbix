@@ -81,8 +81,8 @@ require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
 
 // Groups.
-require_once dirname(__FILE__).'/groups/testPageHostGroup.php';
-require_once dirname(__FILE__).'/groups/testPageTemplateGroup.php';
+require_once dirname(__FILE__).'/groups/testPageHostGroups.php';
+require_once dirname(__FILE__).'/groups/testPageTemplateGroups.php';
 
 // Hosts.
 require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
@@ -341,8 +341,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageHostGraph');
 
 		// Groups.
-		$suite->addTestSuite('testPageHostGroup');
-		$suite->addTestSuite('testPageTemplateGroup');
+		$suite->addTestSuite('testPageHostGroups');
+		$suite->addTestSuite('testPageTemplateGroups');
 
 		// Hosts.
 		$suite->addTestSuite('testFormHostFromConfiguration');

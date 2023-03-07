@@ -24,11 +24,11 @@ require_once dirname(__FILE__).'/../common/testPageGroups.php';
 /**
  * @backup hosts
  *
- * @onBefore prepareGroupPageData, prepareHostGroupPageData
+ * @onBefore preparePageHostGroupsData
  *
  * @dataSource DiscoveredHosts, HostTemplateGroups
  */
-class testPageHostGroup extends testPageGroups {
+class testPageHostGroups extends testPageGroups {
 
 	public $link = 'zabbix.php?action=hostgroup.list';
 	public $object = 'host';
@@ -40,7 +40,7 @@ class testPageHostGroup extends testPageGroups {
 	/**
 	 * Prepare data for enable/disable hosts test.
 	 */
-	public static function prepareHostGroupPageData() {
+	public static function preparePageHostGroupsData() {
 		// Creata three groups with disabled hosts and two groups with enabled hosts for testing.
 		CDataHelper::call('hostgroup.create', [
 			[
@@ -129,7 +129,7 @@ class testPageHostGroup extends testPageGroups {
 						'Info' => ''
 					],
 					[
-						'Name' => 'One group for Delete',
+						'Name' => self::DELETE_ONE_GROUP,
 						'Count' => '1',
 						'Hosts' => 'Host for host group testing',
 						'Info' => ''
@@ -154,7 +154,7 @@ class testPageHostGroup extends testPageGroups {
 	/**
 	 * @dataProvider getLayoutData
 	 */
-	public function testPageHostGroup_Layout($data) {
+	public function testPageHostGroups_Layout($data) {
 		$links = [
 			'name' => self::DISCOVERED_GROUP,
 			'lld' => self::LLD,
@@ -164,7 +164,7 @@ class testPageHostGroup extends testPageGroups {
 		$this->layout($data, $links);
 	}
 
-	public function testPageHostGroup_Sort() {
+	public function testPageHostGroups_Sort() {
 		$this->coulmnSorting();
 	}
 
@@ -245,11 +245,11 @@ class testPageHostGroup extends testPageGroups {
 	/**
 	 * @dataProvider getFilterData
 	 */
-	public function testPageHostGroup_Filter($data) {
+	public function testPageHostGroups_Filter($data) {
 		$this->filter($data);
 	}
 
-	public static function getHostCancelData() {
+	public static function getHostGroupsCancelData() {
 		return [
 			[
 				[
@@ -268,16 +268,16 @@ class testPageHostGroup extends testPageGroups {
 
 	/**
 	 * @dataProvider getCancelData
-	 * @dataProvider getHostCancelData
+	 * @dataProvider getHostGroupsCancelData
 	 */
-	public function testPageHostGroup_Cancel($data) {
+	public function testPageHostGroups_Cancel($data) {
 		$this->cancel($data);
 	}
 
 	/**
 	 * Check that status of host is changed in groups table when change host status in overlay dialog on host group page.
 	 */
-	public function testPageHostGroup_SingleEnableDisable() {
+	public function testPageHostGroups_SingleEnableDisable() {
 		$data = [
 			'group' => self::GROUP,
 			// Group linked to two hosts, but only one host's status will change.
@@ -313,7 +313,7 @@ class testPageHostGroup extends testPageGroups {
 		}
 	}
 
-	public static function getEnableHostData() {
+	public static function getEnableHostsData() {
 		return [
 			[
 				[
@@ -335,13 +335,13 @@ class testPageHostGroup extends testPageGroups {
 	}
 
 	/**
-	 * @dataProvider getEnableHostData
+	 * @dataProvider getEnableHostsData
 	 */
-	public function testPageHostGroup_EnableHosts($data) {
+	public function testPageHostGroups_EnableHosts($data) {
 		$this->checkHostStatusChange($data);
 	}
 
-	public static function getDisableHostData() {
+	public static function getDisableHostsData() {
 		return [
 			[
 				[
@@ -364,9 +364,9 @@ class testPageHostGroup extends testPageGroups {
 	}
 
 	/**
-	 * @dataProvider getDisableHostData
+	 * @dataProvider getDisableHostsData
 	 */
-	public function testPageHostGroup_DisableHosts($data) {
+	public function testPageHostGroups_DisableHosts($data) {
 		$this->checkHostStatusChange($data, 'disable');
 	}
 
@@ -411,7 +411,7 @@ class testPageHostGroup extends testPageGroups {
 		$this->assertMessage(TEST_GOOD, $message_title, $details);
 	}
 
-	public static function getHostDeleteData() {
+	public static function getHostGroupsDeleteData() {
 		return [
 			// Delete all.
 			[
@@ -424,7 +424,7 @@ class testPageHostGroup extends testPageGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => ['One group for Delete', self::LLD.': '.self::DISCOVERED_GROUP],
+					'groups' => [self::DELETE_ONE_GROUP, self::LLD.': '.self::DISCOVERED_GROUP],
 					'error' => 'Host "Host for host group testing" cannot be without host group.'
 				]
 			],
@@ -432,7 +432,7 @@ class testPageHostGroup extends testPageGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => 'One group for Delete',
+					'groups' => self::DELETE_ONE_GROUP,
 					'error' => 'Host "Host for host group testing" cannot be without host group.'
 				]
 			],
@@ -477,9 +477,9 @@ class testPageHostGroup extends testPageGroups {
 
 	/**
 	 * @dataProvider getDeleteData
-	 * @dataProvider getHostDeleteData
+	 * @dataProvider getHostGroupsDeleteData
 	 */
-	public function testPageHostGroup_Delete($data) {
+	public function testPageHostGroups_Delete($data) {
 		$this->delete($data);
 	}
 }
