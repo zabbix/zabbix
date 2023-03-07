@@ -26,6 +26,22 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 trait TableTrait {
 
 	/**
+	 * Table column names.
+	 *
+	 * @var array
+	 */
+	protected $column_names = null;
+
+	/**
+	 * Set names of columns.
+	 *
+	 * @param array $names column names
+	 */
+	protected function setColumnNames($names) {
+		$this->column_names = $names;
+	}
+
+	/**
 	 * Perform data array normalization.
 	 *
 	 * @param array $data
@@ -46,14 +62,27 @@ trait TableTrait {
 		return $data;
 	}
 
+	protected function getTable($selector = null) {
+		if ($selector === null) {
+			$selector = 'class:list-table';
+		}
+
+		$table = $this->query($selector)->asTable()->one();
+		if ($this->column_names !== null) {
+			$table->setColumnNames($this->column_names);
+		}
+
+		return $table;
+	}
+
 	/**
 	 * Check if values in table rows match data from data provider.
 	 *
 	 * @param array   $data        data array to be match with result in table
 	 * @param string  $selector    table selector
 	 */
-	public function assertTableData($data = [], $selector = 'class:list-table') {
-		$rows = $this->query($selector)->asTable()->one()->getRows();
+	public function assertTableData($data = [], $selector = null) {
+		$rows = $this->getTable($selector)->getRows();
 		if (!$data) {
 			// Check that table contain one row with text "No data found."
 			$this->assertEquals(['No data found.'], $rows->asText());
@@ -87,12 +116,12 @@ trait TableTrait {
 	 *
 	 * @throws Exception
 	 */
-	public function assertTableHasData($data = [], $selector = 'class:list-table') {
-		$table_rows = $this->query($selector)->asTable()->one()->index();
+	public function assertTableHasData($data = [], $selector = null) {
+		$table_rows = $this->getTable($selector)->index();
 
 		if (!$data) {
 			// Check that table contain one row with text "No data found."
-			$this->assertEquals(['No data found.'], $rows->asText());
+			$this->assertEquals(['No data found.'], $table_rows->asText());
 
 			return;
 		}
@@ -117,7 +146,9 @@ trait TableTrait {
 			}
 
 			if (!$found) {
-				throw new \Exception('Row "'.implode(', ', $data_row).'" was not found in table.');
+				throw new \Exception('Row ('.implode(', ', array_map(function ($value) {
+					return '"'.$value.'"';
+				}, $data_row)).') was not found in table.');
 			}
 		}
 	}
@@ -159,8 +190,8 @@ trait TableTrait {
 	 * @param string $column		column name
 	 * @param string $selector		table selector
 	 */
-	public function selectTableRows($data = [], $column = 'Name', $selector = 'class:list-table') {
-		$table = $this->query($selector)->asTable()->one();
+	public function selectTableRows($data = [], $column = 'Name', $selector = null) {
+		$table = $this->getTable($selector);
 
 		if (!$data) {
 			// Select all rows in table.
@@ -188,13 +219,22 @@ trait TableTrait {
 	}
 
 	/**
+	 * Assert text of selected rows amount.
+	 *
+	 * @param integer $count	selected rows count
+	 */
+	public function assertSelectedCount($count) {
+		$this->assertEquals($count.' selected',	$this->query('id:selected_count')->one()->getText());
+	}
+
+	/**
 	 * Get data from chosen column.
 	 *
 	 * @param string $column		Column name, where value should be checked
 	 * @param string $selector		Table selector
 	 */
-	private function getTableColumnData($column, $selector = 'class:list-table') {
-		$table = $this->query($selector)->asTable()->one();
+	private function getTableColumnData($column, $selector = null) {
+		$table = $this->getTable($selector);
 		$result = [];
 		foreach ($table->getRows() as $row) {
 			$result[] = $row->getColumn($column)->getText();

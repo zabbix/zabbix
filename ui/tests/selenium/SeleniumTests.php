@@ -80,6 +80,10 @@ require_once dirname(__FILE__).'/graphs/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
 
+// Groups.
+require_once dirname(__FILE__).'/groups/testPageHostGroup.php';
+require_once dirname(__FILE__).'/groups/testPageTemplateGroup.php';
+
 // Hosts.
 require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
 require_once dirname(__FILE__).'/hosts/testFormHostFromMonitoring.php';
@@ -335,6 +339,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceGraphPrototype');
 		$suite->addTestSuite('testPageGraphPrototypes');
 		$suite->addTestSuite('testPageHostGraph');
+
+		// Groups.
+		$suite->addTestSuite('testPageHostGroup');
+		$suite->addTestSuite('testPageTemplateGroup');
 
 		// Hosts.
 		$suite->addTestSuite('testFormHostFromConfiguration');
