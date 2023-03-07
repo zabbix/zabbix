@@ -2713,8 +2713,8 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events, const
  *             trigger_diff   -  [IN] trigger changeset                       *
  *                                                                            *
  ******************************************************************************/
-static void	process_internal_events_dependency(const zbx_vector_ptr_t *internal_events, const zbx_vector_ptr_t *trigger_events,
-		const zbx_vector_ptr_t *trigger_diff)
+static void	process_internal_events_dependency(const zbx_vector_ptr_t *internal_events,
+		const zbx_vector_ptr_t *trigger_events, const zbx_vector_ptr_t *trigger_diff)
 {
 	int			i, index;
 	zbx_db_event		*event;

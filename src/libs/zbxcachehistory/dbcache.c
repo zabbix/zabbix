@@ -1731,9 +1731,9 @@ static int	process_trigger(struct _DC_TRIGGER *trigger, zbx_add_event_func_t add
 	if (0 == (flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE) && 0 == (event_flags & ZBX_FLAGS_TRIGGER_CREATE_EVENT))
 		goto out;
 
-	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT))
+	if (NULL != add_event_cb)
 	{
-		if (NULL != add_event_cb)
+		if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT))
 		{
 			add_event_cb(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 					&trigger->timespec, new_value, trigger->description, trigger->expression,
@@ -1741,11 +1741,8 @@ static int	process_trigger(struct _DC_TRIGGER *trigger, zbx_add_event_func_t add
 					trigger->correlation_mode, trigger->correlation_tag, trigger->value,
 					trigger->opdata, trigger->event_name, NULL);
 		}
-	}
 
-	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
-	{
-		if (NULL != add_event_cb)
+		if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
 		{
 			add_event_cb(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 					&trigger->timespec, new_state, NULL, trigger->expression,
@@ -2189,7 +2186,7 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, ZBX_DC_HIS
  * Purpose: calculates what item fields must be updated                       *
  *                                                                            *
  * Parameters: item         - [IN/OUT]                                        *
- *             h            - [IN]                                            *
+ *             h            - [IN] historical data to process                 *
  *             add_event_cb - [IN]                                            *
  *                                                                            *
  * Return value: The update data. This data must be freed by the caller.      *

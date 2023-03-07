@@ -153,33 +153,33 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: check for host name and return hostid                             *
- *                                                                            *
- * Parameters: sock           - [IN] open socket of server-agent connection   *
- *             host           - [IN] host name                                *
- *             ip             - [IN] IP address of the host                   *
- *             port           - [IN] port of the host                         *
- *             host_metadata  - [IN] host metadata                            *
- *             flag           - [IN] flag describing interface type           *
- *             interface      - [IN] interface value if flag is not default   *
- *             events_cbs     - [IN]                                          *
- *             config_timeout - [IN]                                          *
- *             hostid         - [OUT] host ID                                 *
- *             revision       - [OUT] host configuration revision             *
- *             error          - [OUT] error message                           *
- *                                                                            *
- * Return value:  SUCCEED - host is found                                     *
- *                FAIL - an error occurred or host not found                  *
- *                                                                            *
- * Comments: NB! adds host to the database if it does not exist or if it      *
- *           exists but metadata, interface, interface type or port has       *
- *           changed                                                          *
- *                                                                            *
- ******************************************************************************/
-static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
-		const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: check for host name and return hostid                                *
+ *                                                                               *
+ * Parameters: sock           - [IN] open socket of server-agent connection      *
+ *             host           - [IN] host name                                   *
+ *             ip             - [IN] IP address of the host                      *
+ *             port           - [IN] port of the host                            *
+ *             host_metadata  - [IN] host metadata                               *
+ *             flag           - [IN] flag describing interface type              *
+ *             interface      - [IN] interface value if flag is not default      *
+ *             events_cbs     - [IN]                                             *
+ *             config_timeout - [IN]                                             *
+ *             hostid         - [OUT] host ID                                    *
+ *             revision       - [OUT] host configuration revision                *
+ *             error          - [OUT] error message, (buffer provided by caller) *
+ *                                                                               *
+ * Return value:  SUCCEED - host is found                                        *
+ *                FAIL - an error occurred or host not found                     *
+ *                                                                               *
+ * Comments: NB! adds host to the database if it does not exist or if it         *
+ *           exists but metadata, interface, interface type or port has          *
+ *           changed                                                             *
+ *                                                                               *
+ *********************************************************************************/
+static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const char *host, const char *ip,
+		unsigned short port, const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
 		const zbx_events_funcs_t *events_cbs, int config_timeout, zbx_uint64_t *hostid, zbx_uint64_t *revision,
 		char *error)
 {
@@ -286,8 +286,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_even
 	}
 
 	/* no host metadata in older versions of agent */
-	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",  events_cbs,
-			config_timeout, &hostid, &revision, error))
+	if (FAIL == get_hostid_by_host_or_autoregister(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",
+			events_cbs, config_timeout, &hostid, &revision, error))
 	{
 		goto out;
 	}
@@ -530,8 +530,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		goto error;
 	}
 
-	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, events_cbs, config_timeout,
-			&hostid, &revision, error))
+	if (FAIL == get_hostid_by_host_or_autoregister(sock, host, ip, port, host_metadata, flag, interface, events_cbs,
+			config_timeout, &hostid, &revision, error))
 	{
 		goto error;
 	}

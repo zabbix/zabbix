@@ -2229,7 +2229,7 @@ static void	zbx_drule_free(zbx_drule_t *drule)
  *                                                                            *
  ******************************************************************************/
 static int	process_services(const zbx_vector_ptr_t *services, const char *ip,
-		const zbx_events_funcs_t *events_cbs, zbx_uint64_t druleid, zbx_vector_uint64_t *dcheckids,
+		const zbx_add_event_func_t add_event_cb, zbx_uint64_t druleid, zbx_vector_uint64_t *dcheckids,
 		zbx_uint64_t unique_dcheckid, int *processed_num, int ip_idx)
 {
 	zbx_db_dhost		dhost;
@@ -2364,7 +2364,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip,
 		}
 
 		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime, events_cbs->add_event_cb);
+				service->status, service->value, service->itemtime, add_event_cb);
 	}
 
 	for (;*processed_num < services_num; (*processed_num)++)
@@ -2378,11 +2378,11 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip,
 		}
 
 		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime, events_cbs->add_event_cb);
+				service->status, service->value, service->itemtime, add_event_cb);
 	}
 
 	service = (zbx_dservice_t *)services->values[(*processed_num)++];
-	zbx_discovery_update_host(&dhost, service->status, service->itemtime, events_cbs->add_event_cb);
+	zbx_discovery_update_host(&dhost, service->status, service->itemtime, add_event_cb);
 
 	ret = SUCCEED;
 fail:
@@ -2560,8 +2560,9 @@ json_parse_error:
 
 			while (processed_num != drule_ip->services.values_num)
 			{
-				if (FAIL == (ret2 = process_services(&drule_ip->services, drule_ip->ip, events_cbs,
-						drule->druleid, &drule->dcheckids, unique_dcheckid, &processed_num, j)))
+				if (FAIL == (ret2 = process_services(&drule_ip->services, drule_ip->ip,
+						events_cbs->add_event_cb, drule->druleid, &drule->dcheckids,
+						unique_dcheckid, &processed_num, j)))
 				{
 					break;
 				}

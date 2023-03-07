@@ -598,7 +598,8 @@ static void	process_rule(zbx_db_drule *drule, int config_timeout, const zbx_even
 				goto out;
 			}
 
-			if (SUCCEED != process_services(drule, &dhost, ip, dns, now, &services, &dcheckids, events_cbs->add_event_cb))
+			if (SUCCEED != process_services(drule, &dhost, ip, dns, now, &services, &dcheckids,
+					events_cbs->add_event_cb))
 			{
 				zbx_db_rollback();
 

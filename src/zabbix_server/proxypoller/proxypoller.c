@@ -446,7 +446,7 @@ out:
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
- * Parameters: proxy          - [IN] proxy data                               *
+ * Parameters: proxy          - [IN/OUT] proxy data                               *
  *             config_timeout - [IN]                                          *
  *             events_cbs     - [IN]                                          *
  *             more           - [OUT] available data flag                     *
