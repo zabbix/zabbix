@@ -291,10 +291,10 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 
 	return duk_error(ctx, DUK_RET_TYPE_ERROR, "encryption support was not compiled in");
 #else
-	char			*key_unesc = NULL, *text = NULL, *error = NULL, *out = NULL;
+	char			*key_unesc = NULL, *data = NULL, *error = NULL, *out = NULL;
 	unsigned char		*raw_sig = NULL;
 	const char		*algo, *key_ptr;
-	duk_size_t		key_len, text_len;
+	duk_size_t		key_len, data_len;
 	duk_int_t		arg_type;
 	size_t			raw_sig_len, key_unesc_alloc = 0;
 	int			ret, err_index = -1;
@@ -329,9 +329,9 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 		}
 	}
 
-	text = es_get_buffer_dyn(ctx, 2, &text_len);
+	data = es_get_buffer_dyn(ctx, 2, &data_len);
 
-	if (0 == text_len)
+	if (0 == data_len)
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "data cannot be empty");
 		goto out;
@@ -352,7 +352,7 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 		zbx_normalize_pem(&key_unesc, &key_len);
 	}
 
-	if (SUCCEED == (ret = zbx_rs256_sign(key_unesc, key_len, text, text_len, &raw_sig, &raw_sig_len, &error)))
+	if (SUCCEED == (ret = zbx_rs256_sign(key_unesc, key_len, data, data_len, &raw_sig, &raw_sig_len, &error)))
 	{
 		size_t	hex_sig_len;
 
@@ -368,7 +368,7 @@ static duk_ret_t	es_rsa_sign(duk_context *ctx)
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, error);
 out:
 	zbx_free(error);
-	zbx_free(text);
+	zbx_free(data);
 	zbx_free(key_unesc);
 
 	if (-1 != err_index)
