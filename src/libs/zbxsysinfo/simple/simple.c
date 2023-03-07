@@ -58,12 +58,11 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 	LDAPMessage	*msg	= NULL;
 	BerElement	*ber	= NULL;
 
-	char	*attrs[2] = {"namingContexts", NULL };
-	char	*attr	 = NULL;
-	char	**valRes = NULL;
-	int	ldapErr = 0;
-
-	zbx_alarm_on(timeout);
+	char		*attrs[2] = {"namingContexts", NULL };
+	char		*attr	 = NULL;
+	char		**valRes = NULL;
+	int		ldapErr = 0;
+	struct timeval	t = {.tv_sec = (time_t)timeout, .tv_usec = 0};
 
 	*value_int = 0;
 
@@ -85,7 +84,8 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 	}
 #endif
 
-	if (LDAP_SUCCESS != (ldapErr = ldap_search_s(ldap, "", LDAP_SCOPE_BASE, "(objectClass=*)", attrs, 0, &res)))
+	if (LDAP_SUCCESS != (ldapErr = ldap_search_ext_s(ldap, "", LDAP_SCOPE_BASE, "(objectClass=*)", attrs, 0,
+			NULL, NULL, &t, 0, &res)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - searching failed [%s] [%s]", host, ldap_err2string(ldapErr));
 		goto lbl_ret;
@@ -108,7 +108,6 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 
 	*value_int = 1;
 lbl_ret:
-	zbx_alarm_off();
 
 	if (NULL != valRes)
 		ldap_value_free(valRes);
