@@ -103,7 +103,7 @@ void	zbx_normalize_pem(char **key, size_t *key_len)
  * Parameters:                                                                *
  *     key         - [IN] private key in a PEM container (PKCS#1 or PKCS#8)   *
  *     data        - [IN] data to sign                                        *
- *     data        - [IN] length of data to sign                              *
+ *     data_len    - [IN] length of data to sign                              *
  *     output      - [OUT] dynamically allocated memory with signature        *
  *     output_len  - [OUT] length of a signature (bytes)                      *
  *     error       - [OUT] dynamically allocated memory with error message    *
