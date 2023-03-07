@@ -846,6 +846,8 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(6000)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6010)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6030)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(6040)[];
+/*extern zbx_dbpatch_t	DBPATCH_VERSION(6050)[];*/
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -875,6 +877,8 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(6010), "6.2 development"},
 	{DBPATCH_VERSION(6020), "6.2 maintenance"},
 	{DBPATCH_VERSION(6030), "6.4 development"},
+	{DBPATCH_VERSION(6040), "6.4 maintenance"},
+/*	{DBPATCH_VERSION(6050), "7.0 development"},*/
 	{NULL}
 };
 
@@ -1035,8 +1039,8 @@ int	DBcheck_version(void)
 			sigaddset(&mask, SIGINT);
 			sigaddset(&mask, SIGQUIT);
 
-			if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
-				zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the user signal");
+			if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
+				zabbix_log(LOG_LEVEL_WARNING, "cannot set signal mask to block the user signal");
 
 			zbx_db_begin();
 
@@ -1049,8 +1053,8 @@ int	DBcheck_version(void)
 
 			ret = zbx_db_end(ret);
 
-			if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-				zabbix_log(LOG_LEVEL_WARNING,"cannot restore sigprocmask");
+			if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+				zabbix_log(LOG_LEVEL_WARNING,"cannot restore signal mask");
 
 			if (SUCCEED != ret)
 				break;

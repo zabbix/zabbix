@@ -3208,7 +3208,7 @@ static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
 		return ZBX_PROXY_VERSION_UNSUPPORTED;
 #if (ZABBIX_VERSION_MINOR == 0)
 	if (ZABBIX_VERSION_MAJOR == 1 + ZBX_COMPONENT_VERSION_MAJOR(proxy_version))
-		return ZBX_PROXY_VERSION_STATUS_OUTDATED;
+		return ZBX_PROXY_VERSION_OUTDATED;
 #elif (ZABBIX_VERSION_MINOR > 0)
 	if (ZABBIX_VERSION_MAJOR == ZBX_COMPONENT_VERSION_MAJOR(proxy_version))
 		return ZBX_PROXY_VERSION_OUTDATED;
