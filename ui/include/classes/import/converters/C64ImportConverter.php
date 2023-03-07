@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -17,17 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package com.zabbix.gateway;
 
-class GeneralInformation
-{
-	static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	static final String REVISION_DATE = "6 March 2023";
-	static final String REVISION = "{ZABBIX_REVISION}";
-	static final String VERSION = "7.0.0alpha1";
+/**
+ * Converter for converting import data from 6.4 to 7.0.
+ */
+class C64ImportConverter extends CConverter {
 
-	static void printVersion()
-	{
-		System.out.println(String.format("%s v%s (revision %s) (%s)", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE));
+	/**
+	 * Convert import data from 6.4 to 7.0 version.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function convert(array $data): array {
+		$data['zabbix_export']['version'] = '7.0';
+
+		return $data;
 	}
 }
