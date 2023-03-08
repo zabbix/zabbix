@@ -735,7 +735,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 				$action_cell = $table->findRow('Problem • Severity', $problem)->getColumn('Actions');
 
 				foreach ($action as $class => $hint_rows) {
-					$button = $action_cell->query('xpath:.//button[@class='.CXPathHelper::fromClass($class).']')->one();
+					$button = $action_cell->query('xpath:.//*['.CXPathHelper::fromClass($class).']')->one();
 					$this->assertTrue($button->isVisible());
 
 					if ($class !== 'icon-action-ack-green') {
@@ -746,9 +746,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 						foreach ($hint_table->getRows() as $i => $row) {
 							$hint_rows[$i]['Time'] = ($hint_rows[$i]['Time'] === 'acknowledged')
-								? date('Y-m-d H:i:s', self::$acktime)
-								: date('Y-m-d H:i:s', self::$time);
-							var_dump($class);
+								? date('Y-m-d H:i:s', self::$acktime+7200)
+								: date('Y-m-d H:i:s', self::$time+7200);
 							$row->assertValues($hint_rows[$i]);
 						}
 
@@ -783,17 +782,11 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 				'Host', 'Problem • Severity', 'Duration', 'Update', 'Actions']
 		));
 		$this->assertEquals($headers, $table->getHeadersText());
-
-//		// Delete created widget.
-//		DBexecute('DELETE FROM widget'.
-//			' WHERE dashboard_pageid'.
-//			' IN (SELECT dashboard_pageid'.
-//			' FROM dashboard_page'.
-//			' WHERE dashboardid='.self::$dashboardid.
-//			')'
-//		);
 	}
 
+	/**
+	 * Function for deletion widgets from test dashboard after case.
+	 */
 	public static function deleteWidgets() {
 		DBexecute('DELETE FROM widget'.
 			' WHERE dashboard_pageid'.
