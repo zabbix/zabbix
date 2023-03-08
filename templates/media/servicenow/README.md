@@ -40,4 +40,4 @@ Make sure this user has access to all hosts for which you would like problem not
 For more information see [Zabbix](https://www.zabbix.com/documentation/7.0/manual/config/notifications) and [ServiceNow](https://docs.servicenow.com/) documentations.
 
 ## Supported Versions
-Zabbix 6.2
+Zabbix 7.0

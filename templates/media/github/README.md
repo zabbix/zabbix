@@ -22,7 +22,7 @@ Example of permissions for private repository.
 The configuration consists of a _media type_ in Zabbix, which will invoke the webhook to send alerts to Github issues through the Github Rest API.
 
 
-1\. [Import](https://www.zabbix.com/documentation/7.0/manual/web_interface/frontend_sections/administration/mediatypes) the Github media type from file [media_github.yaml](media_github.yaml).
+1\. [Import](https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/alerts/mediatypes) the Github media type from file [media_github.yaml](media_github.yaml).
 
 2\. Change in the imported media the values of the variable github_token.
 
@@ -40,4 +40,4 @@ For more information, please see [Zabbix](https://www.zabbix.com/documentation/7
 <br/><br/>
 ## Supported Versions
 
-Zabbix 6.2, Github RestApi v3
+Zabbix 7.0, Github RestApi v3

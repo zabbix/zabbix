@@ -85,4 +85,4 @@ For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.0/
 
 ## Supported Versions
 
-Zabbix 6.2
+Zabbix 7.0

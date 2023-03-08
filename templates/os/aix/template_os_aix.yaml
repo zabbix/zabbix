@@ -902,7 +902,7 @@ zabbix_export:
               key: 'vfs.fs.dependent[{#FSNAME},readonly]'
               delay: '0'
               history: 7d
-              description: 'The filesystem is mounted as read-only. It is available only for Zabbix agents 7.0 and higher.'
+              description: 'The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -933,7 +933,7 @@ zabbix_export:
                   recovery_expression: 'last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=0'
                   name: '{#FSNAME}: Filesystem became read-only'
                   priority: AVERAGE
-                  description: 'The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 7.0 and higher.'
+                  description: 'The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 6.4 and higher.'
                   manual_close: 'YES'
                   tags:
                     -

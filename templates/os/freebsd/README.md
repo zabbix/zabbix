@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 7.0 and higher.
-It is an official FreeBSD template. It requires Zabbix agent 7.0 or newer.
+It is an official FreeBSD template. It requires Zabbix agent 6.0 or newer.
 
 
 ## Setup
@@ -49,7 +49,7 @@ There are no template links in this template.
 |CPU |CPU nice time |<p>The time the CPU has spent running users' processes that have been niced.</p> |ZABBIX_PASSIVE |system.cpu.util[,nice] |
 |CPU |CPU system time |<p>The time the CPU has spent running the kernel and its processes.</p> |ZABBIX_PASSIVE |system.cpu.util[,system] |
 |CPU |CPU user time |<p>The time the CPU has spent running users' processes that are not niced.</p> |ZABBIX_PASSIVE |system.cpu.util[,user] |
-|Filesystems |{#FSNAME}: Filesystem is read-only |<p>The filesystem is mounted as read-only. It is available only for Zabbix agents 7.0 and higher.</p> |DEPENDENT |vfs.fs.dependent[{#FSNAME},readonly]<p>**Preprocessing**:</p><p>- JSONPATH: `$.options`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- REGEX: `(?:^|,)read-only\b 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|Filesystems |{#FSNAME}: Filesystem is read-only |<p>The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.</p> |DEPENDENT |vfs.fs.dependent[{#FSNAME},readonly]<p>**Preprocessing**:</p><p>- JSONPATH: `$.options`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- REGEX: `(?:^|,)read-only\b 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |Filesystems |{#FSNAME}: Free inodes, % |<p>-</p> |DEPENDENT |vfs.fs.dependent.inode[{#FSNAME},pfree]<p>**Preprocessing**:</p><p>- JSONPATH: `$.inodes.pfree`</p> |
 |Filesystems |{#FSNAME}: Free disk space |<p>-</p> |DEPENDENT |vfs.fs.dependent.size[{#FSNAME},free]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes.free`</p> |
 |Filesystems |{#FSNAME}: Free disk space, % |<p>-</p> |DEPENDENT |vfs.fs.dependent.size[{#FSNAME},pfree]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes.pfree`</p> |
@@ -85,7 +85,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Processor load is too high on {HOST.NAME} |<p>-</p> |`avg(/FreeBSD by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5` |WARNING | |
-|{#FSNAME}: Filesystem became read-only |<p>The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 7.0 and higher.</p> |`last(/FreeBSD by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly],#2)=0 and last(/FreeBSD by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=1`<p>Recovery expression:</p>`last(/FreeBSD by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=0` |AVERAGE |<p>Manual close: YES</p> |
+|{#FSNAME}: Filesystem became read-only |<p>The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 6.4 and higher.</p> |`last(/FreeBSD by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly],#2)=0 and last(/FreeBSD by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=1`<p>Recovery expression:</p>`last(/FreeBSD by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=0` |AVERAGE |<p>Manual close: YES</p> |
 |{#FSNAME}: Free inodes is less than 20% |<p>-</p> |`last(/FreeBSD by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree])<20` |WARNING | |
 |{#FSNAME}: Free disk space is less than 20% |<p>-</p> |`last(/FreeBSD by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pfree])<20` |WARNING | |
 |Hostname was changed on {HOST.NAME} |<p>-</p> |`last(/FreeBSD by Zabbix agent/system.hostname,#1)<>last(/FreeBSD by Zabbix agent/system.hostname,#2)` |INFO | |

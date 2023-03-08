@@ -17,7 +17,7 @@ The configuration consists of a _media type_ in Zabbix, which will invoke the we
 
 [![](images/tn_1.png?raw=true)](images/1.png)
 
-2. Import Opsgenie media type from this file [media_opsgenie.yaml](media_opsgenie.yaml) following instructions in [Zabbix documentation](https://www.zabbix.com/documentation/7.0/manual/web_interface/frontend_sections/administration/mediatypes). 
+2. Import Opsgenie media type from this file [media_opsgenie.yaml](media_opsgenie.yaml) following instructions in [Zabbix documentation](https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/alerts/mediatypes). 
 
 [![](images/tn_2.png?raw=true)](images/2.png)
 
@@ -68,7 +68,7 @@ Update operations for the resolved event will not be executed but the status of 
 
 ## Supported Versions
 
-Zabbix 6.4, Opsgenie Alert API.
+Zabbix 7.0, Opsgenie Alert API.
 
 ## Feedback
 Please report any issues with this media type at https://support.zabbix.com.

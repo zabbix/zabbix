@@ -426,7 +426,7 @@ zabbix_export:
                 macro: '{#FSTYPE}'
                 value: '@File systems for discovery'
                 formulaid: A
-          description: 'Discovery of different types of file systems as defined in the global regular expression "File systems for discovery". Note that the option to exclude dmg software images from discovery is available only with Zabbix agents 7.0 and higher.'
+          description: 'Discovery of different types of file systems as defined in the global regular expression "File systems for discovery". Note that the option to exclude dmg software images from discovery is available only with Zabbix agents 6.4 and higher.'
           item_prototypes:
             -
               uuid: b7560dc2b6f743458128961cc962bcd3

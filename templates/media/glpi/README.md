@@ -64,4 +64,4 @@ GLPI 9.5.7
 <br/><br/>
 ## Supported Versions
 
-Zabbix 6.2
+Zabbix 7.0

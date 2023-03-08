@@ -57,4 +57,4 @@ The "Send to" field must contain Discord webhook URL created before.
 For more information see [Zabbix](https://www.zabbix.com/documentation/7.0/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentations.
 
 ## Supported Versions
-Zabbix 6.2
+Zabbix 7.0

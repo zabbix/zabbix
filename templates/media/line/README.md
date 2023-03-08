@@ -54,7 +54,7 @@ Media testing can be done manually, from `Media types` page. Press `Test` button
 
 ## Supported Versions
 
-Zabbix 6.4, LINE messaging API.
+Zabbix 7.0, LINE messaging API.
 
 ## Feedback
 Please report any issues with this media type at https://support.zabbix.com.
