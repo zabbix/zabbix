@@ -196,7 +196,7 @@ static int	get_interval_option(const char *fping, ZBX_FPING_HOST *hosts, int hos
 				for (p = out; '\0' != *p && isspace(*p); p++)
 					;
 
-				if (strlen(p) >= strlen(dst) && 0 == strncmp(p, dst, strlen(dst)))
+				if (strlen(p) >= strlen(dst) && NULL != strstr(p, dst))
 				{
 					*value = (int)intervals[j];
 					ret = SUCCEED;
@@ -267,7 +267,7 @@ static int	get_ipv6_support(const char *fping, const char *dst)
 #endif	/* HAVE_IPV6 */
 
 static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout,
-		char *error, size_t max_error_len)
+		unsigned char allow_redirect, char *error, size_t max_error_len)
 {
 	const int	response_time_chars_max = 20;
 	FILE		*f;
@@ -589,6 +589,38 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			zbx_rtrim(tmp, "\n");
 			zabbix_log(LOG_LEVEL_DEBUG, "read line [%s]", tmp);
 
+			/* There might be a situation when the target that is being ICMP pinged responds from a       */
+			/* different IP address (redirected response). Fping marks that in the output accordingly.    */
+			/* It would add the response IP address in square brackets with left triangular bracket and   */
+			/* a dash: '[<- AAA.BBB.CCC.DDD]'.                                                            */
+			/* Before fping 3.11, fping appends response source address at the end of the line:           */
+			/* '192.168.1.1 : [0], 84 bytes, 0.61 ms (0.61 avg, 0% loss) [<- 192.168.1.2]'                */
+			/* Since fping 3.11, fping prepends response source address at the beginning of the line:     */
+			/* ' [<- 192.168.1.2]192.168.1.1 : [0], 84 bytes, 0.65 ms (0.65 avg, 0% loss)'                */
+			if (NULL != (c = strstr(tmp, " [<-")))
+			{
+				char	*first = c, *last;
+
+				if (NULL == (last = strchr(first, ']')))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "ignoring a response from fping with unexpected"
+							" syntax: \"%s\"; \"]\" after \" [<-\" was expected", first);
+					continue;
+				}
+
+				if (0 == allow_redirect)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "treating redirected response as target host down:"
+							" \"%s\"", tmp);
+					continue;
+				}
+
+				zabbix_log(LOG_LEVEL_DEBUG, "treating redirected response as target host up: \"%s\"",
+						tmp);
+
+				memmove(first, last + 1, strlen(last + 1) + 1);	/* include zero-termination character */
+			}
+
 			if (NULL != (c = strchr(tmp, ' ')))
 			{
 				*c = '\0';
@@ -629,11 +661,6 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			/* and mark the valid ones.                                                  */
 			if ('[' == *c)
 			{
-				/* Fping appends response source address in format '[<- 10.3.0.10]' */
-				/* if it does not match the target address. Ignore such responses.  */
-				if (NULL != strstr(c + 1, "[<-"))
-					continue;
-
 				/* get the index of individual ping response */
 				index = atoi(c + 1);
 
@@ -742,6 +769,8 @@ void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config)
  *             timeout       - [IN]  individual target initial timeout except *
  *                                   when count > 1, where it's the -p period *
  *                                   (fping option -t)                        *
+ *             allow_redirect- [IN]  treat redirected response as host up:    *
+ *                                   0 - no, 1 - yes                          *
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN]  length of error buffer                   *
  *                                                                            *
@@ -752,13 +781,13 @@ void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config)
  *                                                                            *
  ******************************************************************************/
 int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int period, int size, int timeout,
-		char *error, size_t max_error_len)
+		unsigned char allow_redirect, char *error, size_t max_error_len)
 {
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __func__, hosts_count);
 
-	if (NOTSUPPORTED == (ret = process_ping(hosts, hosts_count, count, period, size, timeout, error,
+	if (NOTSUPPORTED == (ret = process_ping(hosts, hosts_count, count, period, size, timeout, allow_redirect, error,
 			max_error_len)))
 		zabbix_log(LOG_LEVEL_ERR, "%s", error);
 

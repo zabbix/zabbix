@@ -53,6 +53,7 @@ typedef struct
 	unsigned char	snmpv3_securitylevel;
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
+	unsigned char	allow_redirect;
 }
 DB_DCHECK;
 
@@ -328,8 +329,11 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 				memset(&host, 0, sizeof(host));
 				host.addr = strdup(ip);
 
-				if (SUCCEED != zbx_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error)) || 0 == host.rcv)
+				if (SUCCEED != zbx_ping(&host, 1, 3, 0, 0, 0, dcheck->allow_redirect, error,
+						sizeof(error)) || 0 == host.rcv)
+				{
 					ret = FAIL;
+				}
 
 				zbx_free(host.addr);
 				break;
@@ -425,7 +429,7 @@ static void	process_checks(const zbx_db_drule *drule, int *host_status, char *ip
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 			"select dcheckid,type,key_,snmp_community,snmpv3_securityname,snmpv3_securitylevel,"
 				"snmpv3_authpassphrase,snmpv3_privpassphrase,snmpv3_authprotocol,snmpv3_privprotocol,"
-				"ports,snmpv3_contextname"
+				"ports,snmpv3_contextname,allow_redirect"
 			" from dchecks"
 			" where druleid=" ZBX_FS_UI64,
 			drule->druleid);
@@ -456,6 +460,7 @@ static void	process_checks(const zbx_db_drule *drule, int *host_status, char *ip
 		dcheck.snmpv3_privprotocol = (unsigned char)atoi(row[9]);
 		dcheck.ports = row[10];
 		dcheck.snmpv3_contextname = row[11];
+		dcheck.allow_redirect = (unsigned char)atoi(row[12]);
 
 		zbx_vector_uint64_append(dcheckids, dcheck.dcheckid);
 
