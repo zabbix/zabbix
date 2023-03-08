@@ -527,8 +527,10 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 	{
 		add_pinger_host(&hosts, &hosts_alloc, &hosts_count, items[i].addr);
 
-		if (i == items_count - 1 || items[i].count != items[i + 1].count || items[i].interval != items[i + 1].interval ||
-				items[i].size != items[i + 1].size || items[i].timeout != items[i + 1].timeout)
+		if (i == items_count - 1 || items[i].count != items[i + 1].count ||
+				items[i].interval != items[i + 1].interval || items[i].size != items[i + 1].size ||
+				items[i].timeout != items[i + 1].timeout || items[i].type != items[i + 1].type ||
+				items[i].allow_redirect != items[i + 1].allow_redirect)
 		{
 			zbx_setproctitle("%s #%d [pinging hosts]", get_process_type_string(process_type), process_num);
 
