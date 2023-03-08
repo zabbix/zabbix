@@ -54,6 +54,10 @@ char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 			buf = zbx_malloc(NULL, *len);
 			memcpy(buf, ptr, *len);
 			break;
+		case DUK_TYPE_UNDEFINED:
+		case DUK_TYPE_NONE:
+		case DUK_TYPE_NULL:
+			break;
 		default:
 			if (SUCCEED == es_duktape_string_decode(duk_to_string(ctx, index), &buf))
 				*len = strlen(buf);
