@@ -22,7 +22,7 @@ For Zabbix version: 6.0 and higher.
 > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure the macros: `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, and `{$AZURE.SUBSCRIPTION_ID}`.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, and `{$AZURE.SUBSCRIPTION.ID}`.
 
 ## Configuration
 
@@ -32,39 +32,39 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
+|{$AZURE.APP.ID} |<p>The App ID of Microsoft Azure.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`15s` |
 |{$AZURE.MSSQL.DB.LOCATION.MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`.*` |
-|{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.MSSQL.DB.NAME.MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`.*` |
-|{$AZURE.MSSQL.DB.NAME.NOT_MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$AZURE.MSSQL.DB.SIZE.NOT_MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`^System$` |
+|{$AZURE.MSSQL.DB.NAME.NOT.MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`^System$` |
 |{$AZURE.MYSQL.DB.LOCATION.MATCHES} |<p>This macro is used in MySQL servers discovery rule.</p> |`.*` |
-|{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES} |<p>This macro is used in MySQL servers discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES} |<p>This macro is used in MySQL servers discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.MYSQL.DB.NAME.MATCHES} |<p>This macro is used in MySQL servers discovery rule.</p> |`.*` |
-|{$AZURE.MYSQL.DB.NAME.NOT_MATCHES} |<p>This macro is used in MySQL servers discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.MYSQL.DB.NAME.NOT.MATCHES} |<p>This macro is used in MySQL servers discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
 |{$AZURE.PGSQL.DB.LOCATION.MATCHES} |<p>This macro is used in PostgreSQL servers discovery rule.</p> |`.*` |
-|{$AZURE.PGSQL.DB.LOCATION.NOT_MATCHES} |<p>This macro is used in PostgreSQL servers discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES} |<p>This macro is used in PostgreSQL servers discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.PGSQL.DB.NAME.MATCHES} |<p>This macro is used in PostgreSQL servers discovery rule.</p> |`.*` |
-|{$AZURE.PGSQL.DB.NAME.NOT_MATCHES} |<p>This macro is used in PostgreSQL servers discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.PGSQL.DB.NAME.NOT.MATCHES} |<p>This macro is used in PostgreSQL servers discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.RESOURCE_GROUP.MATCHES} |<p>This macro is used in discovery rules.</p> |`.*` |
-|{$AZURE.RESOURCE_GROUP.NOT_MATCHES} |<p>This macro is used in discovery rules.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.RESOURCE_GROUP.NOT.MATCHES} |<p>This macro is used in discovery rules.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.STORAGE.ACC.AVAILABILITY} |<p>The warning threshold of the storage account availability.</p> |`70` |
 |{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY} |<p>The warning threshold of the storage account blob services availability.</p> |`70` |
 |{$AZURE.STORAGE.ACC.FILE.AVAILABILITY} |<p>The warning threshold of the storage account file services availability.</p> |`70` |
 |{$AZURE.STORAGE.ACC.LOCATION.MATCHES} |<p>This macro is used in storage accounts discovery rule.</p> |`.*` |
-|{$AZURE.STORAGE.ACC.LOCATION.NOT_MATCHES} |<p>This macro is used in storage accounts discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES} |<p>This macro is used in storage accounts discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.STORAGE.ACC.NAME.MATCHES} |<p>This macro is used in storage accounts discovery rule.</p> |`.*` |
-|{$AZURE.STORAGE.ACC.NAME.NOT_MATCHES} |<p>This macro is used in storage accounts discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES} |<p>This macro is used in storage accounts discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.STORAGE.ACC.QUEUE.AVAILABILITY} |<p>The warning threshold of the storage account queue services availability.</p> |`70` |
 |{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY} |<p>The warning threshold of the storage account table services availability.</p> |`70` |
-|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
-|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION.ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT.ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 |{$AZURE.VM.LOCATION.MATCHES} |<p>This macro is used in virtual machines discovery rule.</p> |`.*` |
-|{$AZURE.VM.LOCATION.NOT_MATCHES} |<p>This macro is used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.VM.LOCATION.NOT.MATCHES} |<p>This macro is used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.VM.NAME.MATCHES} |<p>This macro is used in virtual machines discovery rule.</p> |`.*` |
-|{$AZURE.VM.NAME.NOT_MATCHES} |<p>This macro is used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.VM.NAME.NOT.MATCHES} |<p>This macro is used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
 
 ### Template links
 
@@ -74,11 +74,11 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Microsoft SQL databases discovery |<p>The list of the Microsoft SQL databases is provided by the subscription.</p> |DEPENDENT |azure.mssql.databases.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Sql/servers/databases`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.MSSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.MSSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.MSSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p><p>- {#SIZE} NOT_MATCHES_REGEX `{$AZURE.MSSQL.DB.SIZE.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Serverless<br> - {#VERSION} MATCHES_REGEX `^.*serverless$`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Server<br> - {#VERSION} MATCHES_REGEX `^((?!serverless).)*$`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
-|MySQL servers discovery |<p>The list of the MySQL servers is provided by the subscription.</p> |DEPENDENT |azure.mysql.servers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DBforMySQL`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Flexible server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforMySQL/flexibleServers`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Single server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforMySQL/servers`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
-|PostgreSQL servers discovery |<p>The list of the PostgreSQL servers is provided by the subscription.</p> |DEPENDENT |azure.pgsql.servers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DBforPostgreSQL`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.PGSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.PGSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.PGSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.PGSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Flexible server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforPostgreSQL/flexibleServers`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Single server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforPostgreSQL/servers`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
-|Storage accounts discovery |<p>The list of all storage accounts available under the subscription.</p> |DEPENDENT |azure.starage.acc.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$AZURE.STORAGE.ACC.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.STORAGE.ACC.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.STORAGE.ACC.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.STORAGE.ACC.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p> |
-|Virtual machines discovery |<p>The list of the virtual machines is provided by the subscription.</p> |DEPENDENT |azure.vm.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Compute/virtualMachines$`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.VM.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.VM.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.VM.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.VM.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p> |
+|Microsoft SQL databases discovery |<p>The list of the Microsoft SQL databases is provided by the subscription.</p> |DEPENDENT |azure.mssql.databases.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Sql/servers/databases`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.MSSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.MSSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT.MATCHES}`</p><p>- {#SIZE} NOT_MATCHES_REGEX `{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}`</p><p>**Overrides:**</p><p>Serverless<br> - {#VERSION} MATCHES_REGEX `^.*serverless$`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Server<br> - {#VERSION} MATCHES_REGEX `^((?!serverless).)*$`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
+|MySQL servers discovery |<p>The list of the MySQL servers is provided by the subscription.</p> |DEPENDENT |azure.mysql.servers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DBforMySQL`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT.MATCHES}`</p><p>**Overrides:**</p><p>Flexible server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforMySQL/flexibleServers`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Single server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforMySQL/servers`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
+|PostgreSQL servers discovery |<p>The list of the PostgreSQL servers is provided by the subscription.</p> |DEPENDENT |azure.pgsql.servers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DBforPostgreSQL`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.PGSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.PGSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT.MATCHES}`</p><p>**Overrides:**</p><p>Flexible server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforPostgreSQL/flexibleServers`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Single server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforPostgreSQL/servers`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
+|Storage accounts discovery |<p>The list of all storage accounts available under the subscription.</p> |DEPENDENT |azure.starage.acc.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$AZURE.STORAGE.ACC.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.STORAGE.ACC.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT.MATCHES}`</p> |
+|Virtual machines discovery |<p>The list of the virtual machines is provided by the subscription.</p> |DEPENDENT |azure.vm.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Compute/virtualMachines$`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.VM.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.VM.NAME.NOT.MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.VM.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.VM.LOCATION.NOT.MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT.MATCHES}`</p> |
 
 ### Items collected
 
@@ -126,7 +126,6 @@ There are no template links in this template.
 |Azure |Azure: Storage account [{#NAME}]: File Egress |<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p> |DEPENDENT |azure.storage.file.engress[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.fileServices.Egress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Azure |Azure: Storage account [{#NAME}]: File Success Server Latency |<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p> |DEPENDENT |azure.storage.file.success.server.latency[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.fileServices.SuccessServerLatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Azure |Azure: Storage account [{#NAME}]: File Success E2E Latency |<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p> |DEPENDENT |azure.storage.file.success.e2e.latency[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.fileServices.file.SuccessE2ELatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage account [{#NAME}]: File Availability |<p>The percentage of availability for the storage service or a specified API operation.</p><p>Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.</p><p>All unexpected errors result in reduced availability for the storage service or the specified API operation.</p> |DEPENDENT |azure.storage.file.availability[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.fileServices.Availability.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Azure |Azure: Storage account [{#NAME}]: Queue Capacity |<p>The amount of Queue storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.</p> |DEPENDENT |azure.storage.queue.capacity[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queueServices.QueueCapacity.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Azure |Azure: Storage account [{#NAME}]: Queue Count |<p>The number of queues in the storage account with the name `[{#NAME}]`.</p> |DEPENDENT |azure.storage.queue.count[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queueServices.QueueCount.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Azure |Azure: Storage account [{#NAME}]: Queue Message Count |<p>The number of unexpired queue messages in the storage account with the name `[{#NAME}]`.</p> |DEPENDENT |azure.storage.queue.message.count[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queueServices.QueueMessageCount.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
@@ -135,7 +134,6 @@ There are no template links in this template.
 |Azure |Azure: Storage account [{#NAME}]: Queue Egress |<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p> |DEPENDENT |azure.storage.queue.engress[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queueServices.Egress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Azure |Azure: Storage account [{#NAME}]: Queue Success Server Latency |<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p> |DEPENDENT |azure.storage.queue.success.server.latency[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queueServices.SuccessServerLatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Azure |Azure: Storage account [{#NAME}]: Queue Success E2E Latency |<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p> |DEPENDENT |azure.storage.queue.success.e2e.latency[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queueServices.queue.SuccessE2ELatency.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Azure |Azure: Storage account [{#NAME}]: Queue Availability |<p>The percentage of availability for the storage service or a specified API operation.</p><p>Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.</p><p>All unexpected errors result in reduced availability for the storage service or the specified API operation.</p> |DEPENDENT |azure.storage.queue.availability[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queueServices.Availability.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 
 ### Triggers
 
@@ -146,8 +144,6 @@ There are no template links in this template.
 |Azure: Storage account [{#NAME}]: Availability is low |<p>-</p> |`(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}` |WARNING | |
 |Azure: Storage account [{#NAME}]: Blob Availability is low |<p>-</p> |`(min(/Azure by HTTP/azure.storage.blob.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY:"{#NAME}"}` |WARNING | |
 |Azure: Storage account [{#NAME}]: Table Availability is low |<p>-</p> |`(min(/Azure by HTTP/azure.storage.table.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY:"{#NAME}"}` |WARNING | |
-|Azure: Storage account [{#NAME}]: File Availability is low |<p>-</p> |`(min(/Azure by HTTP/azure.storage.file.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.FILE.AVAILABILITY:"{#NAME}"}` |WARNING | |
-|Azure: Storage account [{#NAME}]: Queue Availability is low |<p>-</p> |`(min(/Azure by HTTP/azure.storage.queue.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.QUEUE.AVAILABILITY:"{#NAME}"}` |WARNING | |
 
 ## Feedback
 
@@ -177,7 +173,7 @@ For Zabbix version: 6.0 and higher.
 > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure the macros: `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
 
 ## Configuration
 
@@ -187,12 +183,12 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
+|{$AZURE.APP.ID} |<p>The App ID of Microsoft Azure.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
-|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure Virtual Machine ID.</p> |`` |
-|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
-|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+|{$AZURE.RESOURCE.ID} |<p>Microsoft Azure Virtual Machine ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION.ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT.ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 |{$AZURE.VM.CPU.UTIL.CRIT} |<p>The critical threshold of CPU utilization expressed in %.</p> |`90` |
 
 ### Template links
@@ -294,7 +290,7 @@ For Zabbix version: 6.0 and higher.
 > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure the macros: `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
 
 ## Configuration
 
@@ -304,16 +300,16 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
+|{$AZURE.APP.ID} |<p>The App ID of Microsoft Azure.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.ABORTED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for a trigger expression.</p> |`25` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization expressed in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
-|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure MySQL server ID.</p> |`` |
-|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
-|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+|{$AZURE.RESOURCE.ID} |<p>Microsoft Azure MySQL server ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION.ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT.ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 
 ### Template links
 
@@ -385,7 +381,7 @@ For Zabbix version: 6.0 and higher.
 > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure the macros: `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
 
 ## Configuration
 
@@ -395,7 +391,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
+|{$AZURE.APP.ID} |<p>The App ID of Microsoft Azure.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.FAILED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`25` |
@@ -403,13 +399,16 @@ No specific Zabbix configuration is required.
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of storage utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of storage utilization expressed in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
-|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure MySQL server ID.</p> |`` |
-|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
-|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+|{$AZURE.RESOURCE.ID} |<p>Microsoft Azure MySQL server ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION.ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT.ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 
 ### Template links
 
 There are no template links in this template.
+
+### Discovery rules
+
 
 ### Items collected
 
@@ -477,7 +476,7 @@ For Zabbix version: 6.0 and higher.
 > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure the macros: `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
 
 ## Configuration
 
@@ -487,16 +486,16 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
+|{$AZURE.APP.ID} |<p>The App ID of Microsoft Azure.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of memory utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of storage utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of storage utilization expressed in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
-|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure PostgreSQL server ID.</p> |`` |
-|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
-|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+|{$AZURE.RESOURCE.ID} |<p>Microsoft Azure PostgreSQL server ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION.ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT.ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 
 ### Template links
 
@@ -573,7 +572,7 @@ For Zabbix version: 6.0 and higher.
 > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure the macros: `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
 
 ## Configuration
 
@@ -583,16 +582,16 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
+|{$AZURE.APP.ID} |<p>The App ID of Microsoft Azure.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of memory utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of storage utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of storage utilization expressed in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
-|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure PostgreSQL server ID.</p> |`` |
-|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
-|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+|{$AZURE.RESOURCE.ID} |<p>Microsoft Azure PostgreSQL server ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION.ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT.ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 
 ### Template links
 
@@ -664,7 +663,7 @@ For Zabbix version: 6.0 and higher.
 > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure the macros: `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
 
 ## Configuration
 
@@ -674,16 +673,16 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
+|{$AZURE.APP.ID} |<p>The App ID of Microsoft Azure.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of memory utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of storage utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of storage utilization expressed in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
-|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure Microsoft SQL database ID.</p> |`` |
-|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
-|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+|{$AZURE.RESOURCE.ID} |<p>Microsoft Azure Microsoft SQL database ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION.ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT.ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 
 ### Template links
 
@@ -761,7 +760,7 @@ For Zabbix version: 6.0 and higher.
 > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure the macros: `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
 
 ## Configuration
 
@@ -771,16 +770,16 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>The App ID of Microsoft Azure.</p> |`` |
+|{$AZURE.APP.ID} |<p>The App ID of Microsoft Azure.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of memory utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of storage utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of storage utilization expressed in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
-|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure Microsoft SQL database ID.</p> |`` |
-|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
-|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+|{$AZURE.RESOURCE.ID} |<p>Microsoft Azure Microsoft SQL database ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION.ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT.ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 
 ### Template links
 
