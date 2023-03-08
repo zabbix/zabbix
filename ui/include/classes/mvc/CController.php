@@ -406,16 +406,26 @@ abstract class CController {
 	 * @return bool
 	 */
 	private function checkCsrfToken(): bool {
-		if (!is_array($this->raw_input) || !array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $this->raw_input)) {
+		if (!is_array($this->raw_input)) {
 			return false;
 		}
 
-		$skip = ['popup', 'massupdate'];
-		$csrf_token_form = $this->raw_input[CCsrfTokenHelper::CSRF_TOKEN_NAME];
+		if ($this->getPostContentType() === self::POST_CONTENT_TYPE_JSON) {
+			$csrf_token_form = array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $this->raw_input)
+				? $this->raw_input[CCsrfTokenHelper::CSRF_TOKEN_NAME]
+				: '';
+		}
+		else {
+			$csrf_token_form = array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $_POST)
+				? $_POST[CCsrfTokenHelper::CSRF_TOKEN_NAME]
+				: '';
+		}
 
 		if (!is_string($csrf_token_form)) {
 			return false;
 		}
+
+		$skip = ['popup', 'massupdate'];
 
 		foreach (explode('.', $this->action) as $segment) {
 			if (!in_array($segment, $skip, true)) {

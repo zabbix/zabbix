@@ -343,7 +343,9 @@ function check_field(&$fields, &$field, $checks) {
 		elseif ($flags & P_ACT) {
 			$action = APP::Component()->router->getAction();
 
-			$csrf_token_form = getRequest(CCsrfTokenHelper::CSRF_TOKEN_NAME, '');
+			$csrf_token_form = array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $_POST)
+				? $_POST[CCsrfTokenHelper::CSRF_TOKEN_NAME]
+				: '';
 
 			if (!is_string($csrf_token_form) || !CCsrfTokenHelper::check($csrf_token_form, $action)) {
 				info(_('Operation cannot be performed due to unauthorized request.'));
