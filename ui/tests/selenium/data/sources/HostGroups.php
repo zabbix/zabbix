@@ -50,13 +50,13 @@ class HostGroups {
 				'name' => 'Group for Maintenance'
 			],
 			[
-				'name' => 'Group for Host prtotype'
+				'name' => 'Group for Host prototype'
 			],
 			[
 				'name' => 'Group for Correlation'
 			]
 		]);
-		$host_groupids = CDataHelper::getIds('name');
+		$groupids = CDataHelper::getIds('name');
 
 		// Create elements with host groups.
 		$host = CDataHelper::createHosts([
@@ -64,15 +64,15 @@ class HostGroups {
 				'host' => 'Host for host group testing',
 				'interfaces' => [],
 				'groups' => [
-					'groupid' => $host_groupids['One group belongs to one object for Delete test']
+					'groupid' => $groupids['One group belongs to one object for Delete test']
 				]
 			],
 			[
 				'host' => 'Host with two groups',
 				'interfaces' => [],
 				'groups' => [
-					['groupid' => $host_groupids['First group to one object for Delete test']],
-					['groupid' => $host_groupids['Second group to one object for Delete test']]
+					['groupid' => $groupids['First group to one object for Delete test']],
+					['groupid' => $groupids['Second group to one object for Delete test']]
 				]
 			]
 		]);
@@ -91,7 +91,7 @@ class HostGroups {
 			'ruleid' => $lldid,
 			'groupLinks' => [
 				[
-					'groupid' => $host_groupids['Group for Host prtotype']
+					'groupid' => $groupids['Group for Host prototype']
 				]
 			]
 		]);
@@ -102,7 +102,7 @@ class HostGroups {
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
 				'command' => 'return 1',
-				'groupid' => $host_groupids['Group for Script']
+				'groupid' => $groupids['Group for Script']
 			]
 		]);
 
@@ -116,7 +116,7 @@ class HostGroups {
 						'operationtype' => OPERATION_TYPE_GROUP_ADD,
 						'opgroup' => [
 							[
-								'groupid' => $host_groupids['Group for Action']
+								'groupid' => $groupids['Group for Action']
 							]
 						]
 					]
@@ -131,7 +131,7 @@ class HostGroups {
 				'active_till' => 1390466940,
 				'groups' => [
 					[
-						'groupid' => $host_groupids['Group for Maintenance']
+						'groupid' => $groupids['Group for Maintenance']
 					]
 				],
 				'timeperiods' => [[]]
@@ -146,7 +146,7 @@ class HostGroups {
 					'conditions' => [
 						[
 							'type' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,
-							'groupid' => $host_groupids['Group for Correlation']
+							'groupid' => $groupids['Group for Correlation']
 						]
 					]
 				],
@@ -158,6 +158,6 @@ class HostGroups {
 			]
 		]);
 
-		return $host_groupids;
+		return $groupids;
 	}
 }

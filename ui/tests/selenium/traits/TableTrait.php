@@ -117,15 +117,16 @@ trait TableTrait {
 	 * @throws Exception
 	 */
 	public function assertTableHasData($data = [], $selector = null) {
-		$table_rows = $this->getTable($selector)->index();
+		$table = $this->getTable($selector);
 
 		if (!$data) {
 			// Check that table contain one row with text "No data found."
-			$this->assertEquals(['No data found.'], $table_rows->asText());
+			$this->assertEquals(['No data found.'], $table->getRows()->asText());
 
 			return;
 		}
 
+		$table_rows = $table->index();
 		foreach ($data as $data_row) {
 			$found = false;
 
