@@ -329,7 +329,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 			request->headers_sz = 0;
 		}
 
-		if (NULL != contents)
+		if (NULL != contents && '\0' == contents[contents_len - 1])
 		{
 			if (SUCCEED == zbx_json_open(contents, &jp))
 				request->headers = curl_slist_append(NULL, "Content-Type: application/json");
