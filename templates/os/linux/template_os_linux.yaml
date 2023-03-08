@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.4'
+  version: '7.0'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -21,7 +21,7 @@ zabbix_export:
         Template tooling version used: 0.43
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: 'Templates/Operating systems'
@@ -1697,7 +1697,7 @@ zabbix_export:
               key: 'vfs.fs.dependent[{#FSNAME},readonly]'
               delay: '0'
               history: 7d
-              description: 'The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.'
+              description: 'The filesystem is mounted as read-only. It is available only for Zabbix agents 7.0 and higher.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1728,7 +1728,7 @@ zabbix_export:
                   recovery_expression: 'last(/Linux by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=0'
                   name: '{#FSNAME}: Filesystem became read-only'
                   priority: AVERAGE
-                  description: 'The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 6.4 and higher.'
+                  description: 'The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 7.0 and higher.'
                   manual_close: 'YES'
                   tags:
                     -

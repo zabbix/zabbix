@@ -3,13 +3,13 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 It is an official AIX template. It requires Zabbix agent 4.0 or newer.
 
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 Install Zabbix agent on the AIX OS according to Zabbix documentation.
 
@@ -80,7 +80,7 @@ There are no template links in this template.
 |AIX |Total memory |<p>-</p> |ZABBIX_PASSIVE |vm.memory.size[total] |
 |AIX |Interface {#IFNAME}: Incoming network traffic |<p>-</p> |ZABBIX_PASSIVE |net.if.in[{#IFNAME}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND: ``</p><p>- MULTIPLIER: `8`</p> |
 |AIX |Interface {#IFNAME}: Outgoing network traffic |<p>-</p> |ZABBIX_PASSIVE |net.if.out[{#IFNAME}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND: ``</p><p>- MULTIPLIER: `8`</p> |
-|AIX |{#FSNAME}: Filesystem is read-only |<p>The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.</p> |DEPENDENT |vfs.fs.dependent[{#FSNAME},readonly]<p>**Preprocessing**:</p><p>- JSONPATH: `$.options`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- REGEX: `(?:^|,)ro\b 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|AIX |{#FSNAME}: Filesystem is read-only |<p>The filesystem is mounted as read-only. It is available only for Zabbix agents 7.0 and higher.</p> |DEPENDENT |vfs.fs.dependent[{#FSNAME},readonly]<p>**Preprocessing**:</p><p>- JSONPATH: `$.options`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- REGEX: `(?:^|,)ro\b 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |AIX |{#FSNAME}: Free inodes, % |<p>-</p> |DEPENDENT |vfs.fs.dependent.inode[{#FSNAME},pfree]<p>**Preprocessing**:</p><p>- JSONPATH: `$.inodes.pfree`</p> |
 |AIX |{#FSNAME}: Free disk space |<p>-</p> |DEPENDENT |vfs.fs.dependent.size[{#FSNAME},free]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes.free`</p> |
 |AIX |{#FSNAME}: Free disk space, % |<p>-</p> |DEPENDENT |vfs.fs.dependent.size[{#FSNAME},pfree]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes.pfree`</p> |
@@ -106,7 +106,7 @@ There are no template links in this template.
 |Server has just been restarted |<p>-</p> |`change(/AIX by Zabbix agent/system.uptime)<0` |INFO | |
 |/etc/passwd has been changed |<p>-</p> |`last(/AIX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/AIX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)` |WARNING | |
 |Lack of available memory on server |<p>-</p> |`last(/AIX by Zabbix agent/vm.memory.size[available])<20M` |AVERAGE | |
-|{#FSNAME}: Filesystem became read-only |<p>The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 6.4 and higher.</p> |`last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly],#2)=0 and last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=1`<p>Recovery expression:</p>`last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=0` |AVERAGE |<p>Manual close: YES</p> |
+|{#FSNAME}: Filesystem became read-only |<p>The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 7.0 and higher.</p> |`last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly],#2)=0 and last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=1`<p>Recovery expression:</p>`last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=0` |AVERAGE |<p>Manual close: YES</p> |
 |{#FSNAME}: Free inodes is less than 20% |<p>-</p> |`last(/AIX by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree])<20` |WARNING | |
 |{#FSNAME}: Free disk space is less than 20% |<p>-</p> |`last(/AIX by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pfree])<20` |WARNING | |
 |Zabbix agent is not available |<p>For passive checks only the availability of the agent(s) and a host is used with {$AGENT.TIMEOUT} as the time threshold.</p> |`max(/AIX by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
