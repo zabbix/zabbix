@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,14 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormFilter.php';
 
 /**
  * @backup profiles
  *
  * @onBefore prepareUserData, pepareFilterTabsData
- *
- * @onAfter clearData
  */
 class testFormFilterLatestData extends testFormFilter {
 
@@ -222,6 +221,37 @@ class testFormFilterLatestData extends testFormFilter {
 		$this->checkFilters($data, $this->getTableSelector());
 	}
 
+	public static function getCheckRememberedFilterData() {
+		return [
+			[
+				[
+					'Host groups' => ['Zabbix servers'],
+					'Hosts' => ['ЗАББИКС Сервер'],
+					'Name' => 'Free',
+					'Show tags' => '1'
+				]
+			],
+			[
+				[
+					'Name' => 'Total',
+					'Tag display priority' => 'Alfa, Beta',
+					'id:tag_name_format_0' => 'Shortened',
+					'Show details' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * Create and remember new filters.
+	 *
+	 * @dataProvider getCheckRememberedFilterData
+	 */
+	public function testFormFilterLatestData_CheckRememberedFilter($data) {
+		$this->checkRememberedFilters($data, $this->getTableSelector());
+	}
+
+
 	/**
 	 * Delete created filter.
 	 */
@@ -241,16 +271,5 @@ class testFormFilterLatestData extends testFormFilter {
 	 */
 	public function testFormFilterLatestData_UpdateProperties() {
 		$this->updateFilterProperties('latest-filter-update', 'Update_filter_passw0rd');
-	}
-
-	/**
-	 * Delete created user data after test.
-	 */
-	public static function clearUsersData() {
-		// Delete Hosts.
-		CDataHelper::call('user.delete', [
-				self::$data['user-delete'],
-				self::$data['user-update']
-		]);
 	}
 }

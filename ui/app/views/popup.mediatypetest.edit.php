@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,79 +21,129 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-$form_list = (new CFormList());
-
-if ($data['type'] == MEDIA_TYPE_WEBHOOK) {
-	$i = 0;
-
-	foreach ($data['parameters'] as $parameter) {
-		$fieldid = 'parameters['.$i.']';
-		$form_list
-			->addRow(new CLabel($parameter['name'], $fieldid.'[value]'), [
-				new CVar($fieldid.'[name]', $parameter['name']),
-				(new CTextBox($fieldid.'[value]', $parameter['value']))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			]);
-		$i++;
-	}
-
-	if (!$i) {
-		$form_list->addRow(_('Webhook does not have parameters.'));
-	}
-
-	$form_list
-		->addRow(new CLabel(_('Response')), [
-			(new CTextArea(''))
-				->setId('webhook_response_value')
-				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->setEnabled(false),
-			(new CDiv(''))->setId('webhook_response_type'),
-			(new CDiv((new CLinkAction('Open log'))
-				->setId('mediatypetest_log')
-				->addClass(ZBX_STYLE_DISABLED)
-				->onClick('openLogPopup(this)')))
-		]);
-}
-else {
-	$form_list
-		->addRow(
-			(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
-			(new CTextBox('sendto', $data['sendto'], false, 1024))
-				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
-				->setAriaRequired()
-				->setEnabled($data['enabled'])
-		)
-		->addRow(
-			new CLabel(_('Subject'), 'subject'),
-			(new CTextBox('subject', $data['subject'], false, 1024))
-				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->setEnabled($data['enabled'])
-		)
-		->addRow(
-			(new CLabel(_('Message'), 'message'))->setAsteriskMark($data['type'] != MEDIA_TYPE_EXEC),
-			(new CTextArea('message', $data['message'], ['rows' => 10]))
-				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->setAriaRequired($data['type'] != MEDIA_TYPE_EXEC)
-				->setEnabled($data['enabled'])
-		);
-}
-
 $form = (new CForm())
-	->cleanItems()
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('mediatypetest')))->removeId())
 	->setName('mediatypetest_form')
 	->addVar('action', 'popup.mediatypetest.send')
 	->addVar('mediatypeid', $data['mediatypeid'])
-	->addItem([
-		$form_list,
-		(new CInput('submit', 'submit'))->addStyle('display: none;')
-	]);
+	->addItem(getMessages());
+
+// Enable form submitting on Enter.
+$form->addItem((new CInput('submit', null))->addStyle('display: none;'));
+
+$form_grid = (new CFormGrid());
+
+switch ($data['type']) {
+	case MEDIA_TYPE_EXEC:
+		if ($data['parameters']) {
+			foreach ($data['parameters'] as $parameter) {
+				$form_grid->addItem([
+					$parameter['sortorder'] == 0
+						? new CLabel([
+							_('Script parameters'),
+							makeHelpIcon(_('These parameters will be passed to the script as command-line arguments in the specified order.'))
+						])
+						: null,
+					new CFormField(
+						(new CTextBox('parameters['.$parameter['sortorder'].'][value]', $parameter['value']))
+							->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					)
+				]);
+			}
+		}
+		else {
+			$form_grid->addItem([
+				new CLabel(_('Script parameters')),
+				new CFormField((new CDiv(_('Script does not have parameters.')))->addClass(ZBX_STYLE_GREY))
+			]);
+		}
+
+		break;
+
+	case MEDIA_TYPE_WEBHOOK:
+		$i = 0;
+
+		foreach ($data['parameters'] as $parameter) {
+			$form_grid
+				->addItem([
+					new CLabel($parameter['name'], 'parameters['.$i.'][value]'),
+					new CFormField([
+						new CVar('parameters['.$i.'][name]', $parameter['name']),
+						(new CTextBox('parameters['.$i.'][value]', $parameter['value']))
+							->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					])
+				]);
+			$i++;
+		}
+
+		if (!$i) {
+			$form_grid->addItem([
+				new CLabel(_('Parameters')),
+				new CFormField(
+					(new CDiv(_('Webhook does not have parameters.')))->addClass(ZBX_STYLE_GREY)
+				)
+			]);
+		}
+
+		$form_grid
+			->addItem([
+				new CLabel(_('Response')),
+				new CFormField([
+					(new CTextArea(''))
+						->setId('webhook_response_value')
+						->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+						->setEnabled(false),
+					(new CDiv(''))->setId('webhook_response_type'),
+					(new CDiv(
+						(new CLinkAction(_('Open log')))
+							->setId('mediatypetest_log')
+							->addClass(ZBX_STYLE_DISABLED)
+							->onClick('openLogPopup(this)')
+					))
+				])
+			]);
+		break;
+
+	default:
+		$form_grid
+			->addItem([
+				(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
+				new CFormField(
+					(new CTextBox('sendto', $data['sendto'], false, 1024))
+						->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+						->setAttribute('autofocus', 'autofocus')
+						->setAriaRequired()
+						->setEnabled($data['enabled'])
+				)
+			])
+			->addItem([
+				new CLabel(_('Subject'), 'subject'),
+				new CFormField(
+					(new CTextBox('subject', $data['subject'], false, 1024))
+						->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+						->setEnabled($data['enabled'])
+				)
+			])
+			->addItem([
+				(new CLabel(_('Message'), 'message'))->setAsteriskMark(),
+				new CFormField(
+					(new CTextArea('message', $data['message'], ['rows' => 10]))
+						->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+						->setAriaRequired()
+						->setEnabled($data['enabled'])
+				)
+			]);
+}
+
+$form->addItem($form_grid);
 
 $output = [
 	'header' => $data['title'],
 	'script_inline' => $this->readJsFile('popup.mediatypetest.edit.js.php'),
-	'body' => (new CDiv([$data['errors'], $form]))->toString(),
+	'body' => $form->toString(),
 	'buttons' => [
 		[
 			'title' => _('Test'),

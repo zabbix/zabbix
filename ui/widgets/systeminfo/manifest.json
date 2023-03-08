@@ -1,0 +1,17 @@
+{
+	"manifest_version": 2.0,
+	"id": "systeminfo",
+	"type": "widget",
+	"name": "System information",
+	"namespace": "SystemInfo",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"refresh_rate": 900
+	},
+	"actions": {
+		"widget.systeminfo.view": {
+			"class": "WidgetView"
+		}
+	}
+}

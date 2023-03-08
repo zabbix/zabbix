@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ $filter = (new CFilter())
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_serviceid',
-						'object_name' => 'service',
+						'object_name' => 'services',
 						'data' => $data['service'] !== null
 							? [CArrayHelper::renameKeys($data['service'], ['serviceid' => 'id'])]
 							: [],
@@ -88,9 +88,9 @@ $filter = (new CFilter())
 			])
 	]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('SLA report'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::SLAREPORT_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SLAREPORT_LIST))
 	->addItem($filter);
 
 $report = new CTableInfo();
@@ -196,7 +196,7 @@ else {
 	$form->addItem($report);
 }
 
-$widget
+$html_page
 	->addItem($form)
 	->show();
 

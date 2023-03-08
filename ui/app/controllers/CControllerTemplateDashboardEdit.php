@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,13 +21,13 @@
 
 class CControllerTemplateDashboardEdit extends CController {
 
-	private $dashboard;
+	private array $dashboard;
 
-	protected function init() {
-		$this->disableSIDValidation();
+	protected function init(): void {
+		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'templateid' => 'db dashboard.templateid',
 			'dashboardid' => 'db dashboard.dashboardid'
@@ -44,7 +44,7 @@ class CControllerTemplateDashboardEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if ($this->getUserType() < USER_TYPE_ZABBIX_ADMIN) {
 			return false;
 		}
@@ -61,12 +61,11 @@ class CControllerTemplateDashboardEdit extends CController {
 
 			return (bool) $this->dashboard;
 		}
-		else {
-			return isWritableHostTemplates((array) $this->getInput('templateid'));
-		}
+
+		return isWritableHostTemplates((array) $this->getInput('templateid'));
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		if ($this->hasInput('dashboardid')) {
 			$dashboard = $this->dashboard;
 			$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], $dashboard['templateid'],
@@ -93,7 +92,8 @@ class CControllerTemplateDashboardEdit extends CController {
 
 		$data = [
 			'dashboard' => $dashboard,
-			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD),
+			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(true),
+			'widget_last_type' => CDashboardHelper::getWidgetLastType(true),
 			'time_period' => getTimeSelectorPeriod([]),
 			'page' => CPagerHelper::loadPage('template.dashboard.list', null)
 		];

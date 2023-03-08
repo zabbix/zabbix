@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,20 +35,53 @@ class CConfiguration extends CApiService {
 	 *
 	 * @return string
 	 */
+	private function exportCompare(array $params) {
+		$this->validateExport($params, true);
+
+		return $this->exportForce($params);
+	}
+
+	/**
+	 * @param array $params
+	 *
+	 * @return string
+	 */
 	public function export(array $params) {
+		$this->validateExport($params);
+
+		return $this->exportForce($params);
+	}
+
+	/**
+	 * Validate input parameters for export() and exportCompare() methods.
+	 *
+	 * @param array $params
+	 * @param bool  $with_unlinked_parent_templates
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateExport(array &$params, bool $with_unlinked_parent_templates = false): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
-			'prettyprint' =>		['type' => API_BOOLEAN, 'default' => false],
-			'options' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-				'host_groups' =>		['type' => API_IDS],
+			'format' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
+			'prettyprint' =>	['type' => API_BOOLEAN, 'default' => false],
+			'options' =>		['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 				'hosts' =>				['type' => API_IDS],
 				'images' =>				['type' => API_IDS],
 				'maps' =>				['type' => API_IDS],
 				'mediaTypes' =>			['type' => API_IDS],
 				'template_groups' =>	['type' => API_IDS],
+				'host_groups' => 		['type' => API_IDS],
 				'templates' =>			['type' => API_IDS]
 			]]
 		]];
+
+		if ($with_unlinked_parent_templates) {
+			$api_input_rules['fields'] += ['unlink_parent_templates' => ['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL, 'default' => [], 'fields' => [
+				'templateid' => ['type' => API_ID],
+				'unlink_templateids' => ['type' => API_IDS]
+			]]];
+		}
+
 		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -66,8 +99,19 @@ class CConfiguration extends CApiService {
 				self::exception(ZBX_API_ERROR_INTERNAL, $xml_writer['error']);
 			}
 		}
+	}
 
-		$export = new CConfigurationExport($params['options']);
+	/**
+	 * @param array $params
+	 *
+	 * @return string
+	 */
+	private function exportForce(array $params) {
+		$params['unlink_parent_templates'] = array_key_exists('unlink_parent_templates', $params)
+			? $params['unlink_parent_templates']
+			: [];
+
+		$export = new CConfigurationExport($params['options'], $params['unlink_parent_templates']);
 		$export->setBuilder(new CConfigurationExportBuilder());
 		$writer = CExportWriterFactory::getWriter($params['format']);
 		$writer->formatOutput($params['prettyprint']);
@@ -209,7 +253,7 @@ class CConfiguration extends CApiService {
 			->setStrict(true)
 			->validate($data, '/');
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4', '6.0'] as $version) {
+		foreach ($import_converter_factory::getSequentialVersions() as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
 				continue;
 			}
@@ -237,9 +281,6 @@ class CConfiguration extends CApiService {
 
 		// Normalize array keys and strings.
 		$data = (new CImportDataNormalizer($schema))->normalize($data);
-
-		// Transform converter.
-		$data = (new CTransformImportConverter($schema))->convert($data);
 
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);
@@ -279,7 +320,7 @@ class CConfiguration extends CApiService {
 			->setPreview(true)
 			->validate($data, '/');
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4', '6.0'] as $version) {
+		foreach ($import_converter_factory::getSequentialVersions() as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
 				continue;
 			}
@@ -303,67 +344,76 @@ class CConfiguration extends CApiService {
 		// Normalize array keys and strings.
 		$data = (new CImportDataNormalizer($schema))->normalize($data);
 
-		// Transform converter.
-		$data = (new CTransformImportConverter($schema))->convert($data);
-
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);
 
 		$import = $adapter->getData();
-		$imported_uuids = [];
-		foreach (['groups', 'template_groups', 'templates'] as $first_level) {
-			if (array_key_exists($first_level, $import)) {
-				$imported_uuids[$first_level] = array_column($import[$first_level], 'uuid');
+
+		$imported_entities = [];
+
+		$entities = [
+			'host_groups' => 'name',
+			'template_groups' => 'name',
+			'templates' => 'template'
+		];
+
+		foreach ($entities as $entity => $name_field) {
+			if (array_key_exists($entity, $import)) {
+				$imported_entities[$entity]['uuid'] = array_column($import[$entity], 'uuid');
+				$imported_entities[$entity][$name_field] = array_column($import[$entity], $name_field);
 			}
 		}
 
 		$imported_ids = [];
-		foreach ($imported_uuids as $entity => $uuids) {
-			switch ($entity) {
-				case 'groups':
-					if (array_key_exists('templates', $imported_uuids)) {
-						$imported_ids['groups'] = API::TemplateGroup()->get([
-							'filter' => [
-								'uuid' => $uuids
-							],
-							'preservekeys' => true
-						]);
-						$imported_ids['template_groups'] = array_keys($imported_ids['groups']);
-						unset($imported_ids['groups']);
-					}
-					else {
-						$imported_ids['groups'] = API::HostGroup()->get([
-							'filter' => [
-								'uuid' => $uuids
-							],
-							'preservekeys' => true
-						]);
-						$imported_ids['host_groups'] = array_keys($imported_ids['groups']);
-						unset($imported_ids['groups']);
-					}
 
+		foreach ($imported_entities as $entity => $data) {
+			switch ($entity) {
+				case 'host_groups':
+					$imported_ids['host_groups'] = API::HostGroup()->get([
+						'output' => [],
+						'filter' => [
+							'uuid' => $data['uuid'],
+							'name' => $data['name']
+						],
+						'preservekeys' => true,
+						'searchByAny' => true
+					]);
+
+					$imported_ids['host_groups'] = array_keys($imported_ids['host_groups']);
 					break;
 
 				case 'template_groups':
 					$imported_ids['template_groups'] = API::TemplateGroup()->get([
+						'output' => [],
 						'filter' => [
-							'uuid' => $uuids
+							'uuid' => $data['uuid'],
+							'name' => $data['name']
 						],
-						'preservekeys' => true
+						'preservekeys' => true,
+						'searchByAny' => true
 					]);
-					$imported_ids['template_groups'] = array_keys($imported_ids['template_groups']);
 
+					$imported_ids['template_groups'] = array_keys($imported_ids['template_groups']);
 					break;
 
 				case 'templates':
-					$imported_ids['templates'] = API::Template()->get([
+					$options = [
+						'output' => ['templateid', 'uuid', 'name'],
 						'filter' => [
-							'uuid' => $uuids
+							'uuid' => $data['uuid'],
+							'host' => $data['template']
 						],
-						'preservekeys' => true
-					]);
-					$imported_ids['templates'] = array_keys($imported_ids['templates']);
+						'preservekeys' => true,
+						'searchByAny' => true
+					];
 
+					if ($params['rules']['templateLinkage']['deleteMissing']) {
+						$options['selectParentTemplates'] = ['templateid', 'name'];
+					}
+
+					$db_templates = API::Template()->get($options);
+
+					$imported_ids['templates'] = array_keys($db_templates);
 					break;
 
 				default:
@@ -371,17 +421,56 @@ class CConfiguration extends CApiService {
 			}
 		}
 
+		$unlink_templates_data = [];
+
+		if ($params['rules']['templateLinkage']['deleteMissing']) {
+			$import_tmp_parent_tmp_names = [];
+
+			foreach ($import['templates'] as $template) {
+				if (array_key_exists('templates', $template)) {
+					$parent_tmp = array_column($template['templates'], 'name');
+
+					$import_tmp_parent_tmp_names[$template['name']] = $parent_tmp;
+					$import_tmp_parent_tmp_names[$template['uuid']] = $parent_tmp;
+				}
+				else {
+					$import_tmp_parent_tmp_names[$template['name']] = [];
+					$import_tmp_parent_tmp_names[$template['uuid']] = [];
+				}
+			}
+
+			foreach ($db_templates as $db_template) {
+				$db_parent_tmp_names = array_column($db_template['parentTemplates'], 'name', 'templateid');
+
+				if ($db_parent_tmp_names) {
+					$unlink_templateids = array_key_exists($db_template['uuid'], $import_tmp_parent_tmp_names)
+						? array_diff($db_parent_tmp_names, $import_tmp_parent_tmp_names[$db_template['uuid']])
+						: array_diff($db_parent_tmp_names, $import_tmp_parent_tmp_names[$db_template['name']]);
+
+					if ($unlink_templateids) {
+						$unlink_templates_data[$db_template['templateid']] = [
+							'templateid' => $db_template['templateid'],
+							'unlink_templateids' => array_keys($unlink_templateids)
+						];
+					}
+				}
+			}
+		}
+
 		// Get current state of templates in same format, as import to compare this data.
-		$export = API::Configuration()->export([
+		$export = API::Configuration()->exportCompare([
 			'format' => CExportWriterFactory::RAW,
 			'prettyprint' => false,
-			'options' => $imported_ids
+			'options' => $imported_ids,
+			'unlink_parent_templates' => $unlink_templates_data
 		]);
+
 		// Normalize array keys and strings.
 		$export = (new CImportDataNormalizer($schema))->normalize($export);
 		$export = $export['zabbix_export'];
 
 		$importcompare = new CConfigurationImportcompare($params['rules']);
+
 		return $importcompare->importcompare($export, $import);
 	}
 }

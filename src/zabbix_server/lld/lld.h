@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -259,5 +259,7 @@ typedef void	(*get_object_info_f)(const void *object, zbx_uint64_t *id, int *dis
 		int *ts_delete, const char **name);
 void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_vector_ptr_t *objects,
 		int lifetime, int lastcheck, delete_ids_f cb, get_object_info_f cb_info);
+
+int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error);
 
 #endif

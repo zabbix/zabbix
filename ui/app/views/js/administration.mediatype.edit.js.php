@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,10 +27,10 @@
 <script type="text/x-jquery-tmpl" id="exec_params_row">
 	<tr class="form_row">
 		<td>
-			<input type="text" id="exec_params_#{rowNum}_exec_param" name="exec_params[#{rowNum}][exec_param]" maxlength="255" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
+			<input type="text" id="parameters_exec_#{rowNum}_value" name="parameters_exec[#{rowNum}][value]" maxlength="255" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
 		</td>
 		<td>
-			<button type="button" id="exec_params_#{rowNum}_remove" name="exec_params[#{rowNum}][remove]" class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove"><?= _('Remove') ?></button>
+			<button type="button" id="parameters_exec_#{rowNum}_remove" name="parameters_exec[#{rowNum}][remove]" class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove"><?= _('Remove') ?></button>
 		</td>
 	</tr>
 </script>
@@ -147,7 +147,9 @@
 	}
 
 	jQuery(function($) {
-		populateMessageTemplates(<?= json_encode(array_values($this->data['message_templates'])) ?>);
+		populateMessageTemplates(<?= json_encode(array_values($data['message_templates'])) ?>);
+
+		const providers = <?= json_encode($data['providers']) ?>;
 
 		$('#message-templates').on('click', '[data-action]', function() {
 			var $btn = $(this),
@@ -198,7 +200,7 @@
 
 			$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #gsm_modem, #passwd, #smtp_verify_peer, ' +
 					'#smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #exec_path, ' +
-					'#exec_params_table, #content_type')
+					'#exec_params_table, #content_type, #provider')
 				.closest('li')
 				.hide();
 
@@ -206,12 +208,9 @@
 
 			switch (media_type) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
-					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #smtp_security, #smtp_authentication, #content_type' )
-						.closest('li')
-						.show();
-					// radio button actions
-					toggleSecurityOptions();
-					toggleAuthenticationOptions();
+					const provider = $('#provider').val();
+
+					showFormByProvider(provider);
 					setMaxSessionsType(media_type);
 					break;
 
@@ -229,6 +228,20 @@
 					$('li[id^="row_webhook_"]').show();
 					setMaxSessionsType(media_type);
 					break;
+			}
+		});
+
+		$('#provider').change(function() {
+			const provider = $('#provider').val();
+
+			adjustDataByProvider(provider);
+			showFormByProvider(provider);
+		});
+
+		$('#smtp_email').change(function() {
+			if ($('#type').val() == <?= json_encode(MEDIA_TYPE_EMAIL) ?>
+					&& $('#provider').val() == '<?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>') {
+				generateOffice365RelaySmtpServer();
 			}
 		});
 
@@ -305,7 +318,16 @@
 		 */
 		function toggleAuthenticationOptions() {
 			if ($('input[name=smtp_authentication]:checked').val() == <?= SMTP_AUTHENTICATION_NORMAL ?>) {
-				$('#smtp_username, #passwd').closest('li').show();
+				if ($('#provider').val() == <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>) {
+					$('input[name=passwd]').attr('aria-required', 'false');
+					$('label[for=passwd]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+					$('#smtp_username, #passwd').closest('li').show();
+				}
+				else {
+					$('input[name=passwd]').attr('aria-required', 'true');
+					$('label[for=passwd]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+					$('#passwd').closest('li').show();
+				}
 			}
 			else {
 				$('#smtp_username, #passwd').val('').closest('li').hide();
@@ -347,6 +369,55 @@
 				old_media_type = media_type;
 				maxsessions_type.filter('[value=one]').click();
 			}
+		}
+
+		function showFormByProvider(provider) {
+			$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #passwd, #smtp_verify_peer, #smtp_verify_host,' +
+					'#smtp_username, #smtp_security, #smtp_authentication, #content_type, #provider')
+				.closest('li')
+				.hide();
+
+			if (provider ==	'<?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>' ) {
+				$('input[name=passwd]').attr('aria-required', 'false');
+				$('label[for=passwd]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+				$('label[for=smtp_authentication_1]').text(<?= json_encode(_('Username and password')) ?>);
+
+				$('#smtp_server, #smtp_port, #smtp_helo, #smtp_security, #smtp_authentication, #provider,' +
+					' #smtp_email, #content_type')
+					.closest('li')
+					.show();
+
+				// radio button actions
+				toggleSecurityOptions();
+				toggleAuthenticationOptions();
+			}
+			else if (provider == '<?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>'
+						|| provider == '<?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>') {
+				$('#provider, #smtp_email, #smtp_authentication, #content_type').closest('li').show();
+				$('label[for=smtp_authentication_1]').text(<?= json_encode(_('Email and password')) ?>);
+
+				toggleAuthenticationOptions();
+			}
+			else {
+				$('#provider, #smtp_email, #content_type').closest('li').show();
+
+				toggleAuthenticationOptions();
+			}
+		}
+
+		function adjustDataByProvider(provider) {
+			$('input[name=smtp_port]').val(providers[provider]['smtp_port']);
+			$('input[name=smtp_email]').val(providers[provider]['smtp_email']);
+			$('input[name=smtp_server]').val(providers[provider]['smtp_server']);
+			$('input[name=smtp_security]:checked').prop("checked", false);
+			$('input[name=smtp_security][value=' + providers[provider]['smtp_security'] + ']').prop("checked", true);
+			$('input[name=smtp_verify_host]').val(providers[provider]['smtp_verify_host']);
+			$('input[name=smtp_verify_peer]').val(providers[provider]['smtp_verify_peer']);
+			$('input[name=smtp_authentication]:checked').prop("checked", false);
+			$('input[name=smtp_authentication][value=' + providers[provider]['smtp_authentication'] + ']')
+				.prop("checked", true);
+			$('input[name=content_type]:checked').prop("checked", false);
+			$('input[name=content_type][value=' + providers[provider]['content_type'] + ']').prop("checked", true);
 		}
 
 		$('#exec_params_table').dynamicRows({ template: '#exec_params_row' });

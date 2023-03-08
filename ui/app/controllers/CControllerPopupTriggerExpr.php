@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $period_seasons = [];
 
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 
 		$this->metrics = [
 			PARAM_TYPE_TIME => _('Time'),
@@ -1237,8 +1237,6 @@ class CControllerPopupTriggerExpr extends CController {
 
 		// Opening the popup when editing an expression in the trigger constructor.
 		if (($dstfld1 === 'expr_temp' || $dstfld1 === 'recovery_expr_temp') && $expression !== '') {
-			$expression = utf8RawUrlDecode($expression);
-
 			if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
 				$math_function_token = null;
 				$hist_function_token = null;
@@ -1498,7 +1496,7 @@ class CControllerPopupTriggerExpr extends CController {
 					$quote_params = array_filter($quote_params, 'strlen');
 
 					foreach ($quote_params as $param_key => $param) {
-						$data['params'][$param_key] = quoteFunctionParam($param, true);
+						$data['params'][$param_key] = CExpressionParser::quoteString($param);
 					}
 
 					// Combine sec|#num and <time_shift|period_shift> parameters into one.

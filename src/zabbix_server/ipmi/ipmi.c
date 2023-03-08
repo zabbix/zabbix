@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			&tmp, MACRO_TYPE_COMMON, NULL, 0);
 
-	if (FAIL == is_ushort(tmp, port) || 0 == *port)
+	if (FAIL == zbx_is_ushort(tmp, port) || 0 == *port)
 	{
 		*error = zbx_dsprintf(*error, "Invalid port value \"%s\"", port_orig);
 		ret = FAIL;

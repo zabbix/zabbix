@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 class CControllerHousekeepingEdit extends CController {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -114,19 +114,22 @@ class CControllerHousekeepingEdit extends CController {
 		];
 
 		if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
-			$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
+			$dbversion_status = CSettingsHelper::getDbVersionStatus();
 
-			if ($dbversion_status !== '') {
-				foreach (json_decode($dbversion_status, true) as $dbversion) {
-					if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB
-							&& array_key_exists('compression_availability', $dbversion)) {
-						$data['timescaledb_min_version'] = $dbversion['min_version'];
-						$data['timescaledb_max_version'] = $dbversion['max_version'];
-						$data['timescaledb_min_supported_version'] = $dbversion['min_supported_version'];
-						$data['extension_err_code'] = $dbversion['extension_err_code'];
-						$data['compression_availability'] = $dbversion['compression_availability'];
-						break;
+			foreach ($dbversion_status as $dbversion) {
+				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+					$data['timescaledb_min_version'] = $dbversion['min_version'];
+					$data['timescaledb_max_version'] = $dbversion['max_version'];
+					$data['timescaledb_min_supported_version'] = $dbversion['min_supported_version'];
+					$data['extension_err_code'] = $dbversion['extension_err_code'];
+					$data['compression_availability'] = array_key_exists('compression_availability', $dbversion)
+						&& $dbversion['compression_availability'];
+
+					if ($data['compression_availability']) {
+						$data += CHousekeepingHelper::getWarnings($dbversion_status);
 					}
+
+					break;
 				}
 			}
 		}

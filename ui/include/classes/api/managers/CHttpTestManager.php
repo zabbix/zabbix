@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,6 +44,13 @@ class CHttpTestManager {
 	 * @var array
 	 */
 	protected $httpTestParents = [];
+
+	/**
+	 * Array of parent item IDs indexed by parent httptest ID and item key.
+	 *
+	 * @var array
+	 */
+	private static $parent_itemids = [];
 
 	/**
 	 * Save http test to db.
@@ -96,32 +103,26 @@ class CHttpTestManager {
 	}
 
 	/**
-	 * Create new http tests.
+	 * Create new HTTP tests.
 	 *
-	 * @param array $httpTests
+	 * @param array $httptests
 	 *
 	 * @return array
 	 */
-	public function create(array $httpTests) {
-		$httpTestIds = DB::insert('httptest', $httpTests);
+	public function create(array $httptests) {
+		$httptestids = DB::insert('httptest', $httptests);
 
-		foreach ($httpTests as $hnum => &$httpTest) {
-			$httpTest['httptestid'] = $httpTestIds[$hnum];
-			$itemids = [];
-
-			$this->createHttpTestItems($httpTest, $itemids);
-			$this->createStepsReal($httpTest, $httpTest['steps'], $itemids);
-
-			if (array_key_exists('tags', $httpTest) && $httpTest['tags']) {
-				self::createItemsTags($httpTest['tags'], $itemids);
-			}
+		foreach ($httptests as &$httptest) {
+			$httptest['httptestid'] = array_shift($httptestids);
 		}
-		unset($httpTest);
+		unset($httptest);
 
-		$this->updateHttpTestFields($httpTests, 'create');
-		self::createHttpTestTags($httpTests);
+		self::createItems($httptests);
+		self::updateFields($httptests);
+		self::updateSteps($httptests);
+		self::updateTags($httptests);
 
-		return $httpTests;
+		return $httptests;
 	}
 
 	/**
@@ -132,136 +133,1179 @@ class CHttpTestManager {
 	 * @return array
 	 */
 	public function update(array $httptests) {
-		$db_httptests = API::HttpTest()->get([
-			'output' => ['httptestid', 'name', 'delay', 'status', 'agent', 'authentication',
-				'http_user', 'http_password', 'hostid', 'templateid', 'http_proxy', 'retries', 'ssl_cert_file',
-				'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host'
-			],
-			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
-				'follow_redirects', 'retrieve_mode'
-			],
-			'httptestids' => array_column($httptests, 'httptestid'),
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
+		$db_httptests = DBfetchArrayAssoc(DBselect(
+			'SELECT ht.httptestid,ht.name,ht.delay,ht.retries,ht.agent,ht.http_proxy,ht.status,ht.authentication,'.
+				'ht.http_user,ht.http_password,ht.verify_peer,ht.verify_host,ht.ssl_cert_file,ht.ssl_key_file,'.
+				'ht.ssl_key_password,ht.hostid,ht.templateid,h.status AS host_status'.
+			' FROM httptest ht,hosts h'.
+			' WHERE ht.hostid=h.hostid'.
+				' AND '.dbConditionId('ht.httptestid', array_column($httptests, 'httptestid'))
+		), 'httptestid');
 
-		$deleteStepItemIds = [];
-		$steps_create = [];
-		$steps_update = [];
-		$itemids = [];
+		self::addAffectedObjects($httptests, $db_httptests);
 
-		foreach ($httptests as $key => $httptest) {
+		$upd_httptests = [];
+
+		foreach ($httptests as $httptest) {
+			$upd_httptest = DB::getUpdatedValues('httptest', $httptest, $db_httptests[$httptest['httptestid']]);
+
+			if ($upd_httptest) {
+				$upd_httptests[] = [
+					'values' => $upd_httptest,
+					'where' => ['httptestid' => $httptest['httptestid']]
+				];
+			}
+		}
+
+		if ($upd_httptests) {
+			DB::update('httptest', $upd_httptests);
+		}
+
+		self::updateItems($httptests, $db_httptests);
+		self::updateFields($httptests, $db_httptests);
+		self::updateSteps($httptests, $db_httptests);
+		self::updateTags($httptests, $db_httptests);
+
+		return $httptests;
+	}
+
+	/**
+	 * @param array $httptests
+	 * @param array $db_httptests
+	 */
+	private static function addAffectedObjects(array $httptests, array &$db_httptests): void {
+		self::addAffectedItems($httptests, $db_httptests);
+		self::addAffectedFields($httptests, $db_httptests);
+		self::addAffectedSteps($httptests, $db_httptests);
+		self::addAffectedTags($httptests, $db_httptests);
+	}
+
+	/**
+	 * @param array $httptests
+	 * @param array $db_httptests
+	 */
+	private static function addAffectedItems(array $httptests, array &$db_httptests): void {
+		$httptestids = [];
+
+		foreach ($httptests as $httptest) {
 			$db_httptest = $db_httptests[$httptest['httptestid']];
 
-			if (array_key_exists('delay', $httptest) && $db_httptest['delay'] != $httptest['delay']) {
-				$httptest['nextcheck'] = 0;
+			$name_updated = $httptest['name'] != $db_httptest['name'];
+			$status_updated = array_key_exists('status', $httptest) && $httptest['status'] != $db_httptest['status'];
+			$delay_updated = array_key_exists('delay', $httptest) && $httptest['delay'] !== $db_httptest['delay'];
+			$templateid_updated = array_key_exists('templateid', $httptest)
+				&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0;
+
+			if ($name_updated || $status_updated || $delay_updated || $templateid_updated
+					|| array_key_exists('tags', $httptest)) {
+				$httptestids[] = $httptest['httptestid'];
+			}
+		}
+
+		if (!$httptestids) {
+			return;
+		}
+
+		$result = DBselect(
+			'SELECT hi.httptestid,hi.itemid,hi.type AS test_type,i.name,i.key_,i.status,i.delay,i.templateid'.
+			' FROM httptestitem hi,items i'.
+			' WHERE hi.itemid=i.itemid'.
+				' AND '.dbConditionId('hi.httptestid', $httptestids)
+		);
+
+		while ($row = DBfetch($result)) {
+			$db_httptests[$row['httptestid']]['items'][$row['itemid']] =
+				array_diff_key($row, array_flip(['httptestid']));
+		}
+
+		self::addAffectedItemTags($httptests, $db_httptests);
+	}
+
+	/**
+	 * @param array $httptests
+	 * @param array $db_httptests
+	 */
+	private static function addAffectedItemTags(array $httptests, array &$db_httptests): void {
+		$httptestids = [];
+
+		foreach ($httptests as $httptest) {
+			if (!array_key_exists('tags', $httptest)) {
+				continue;
 			}
 
-			DB::update('httptest', [
-				'values' => $httptest,
-				'where' => ['httptestid' => $httptest['httptestid']]
-			]);
+			$httptestids[] = $httptest['httptestid'];
 
-			if (!array_key_exists($httptest['httptestid'], $itemids)) {
-				$itemids[$httptest['httptestid']] = [];
+			foreach ($db_httptests[$httptest['httptestid']]['items'] as &$db_item) {
+				$db_item['tags'] = [];
+			}
+			unset($db_item);
+		}
+
+		if (!$httptestids) {
+			return;
+		}
+
+		$result = DBselect(
+			'SELECT hti.httptestid,hti.itemid,it.itemtagid,it.tag,it.value'.
+			' FROM httptestitem hti,item_tag it'.
+			' WHERE hti.itemid=it.itemid'.
+				' AND '.dbConditionId('hti.httptestid', $httptestids)
+		);
+
+		while ($row = DBfetch($result)) {
+			$db_httptests[$row['httptestid']]['items'][$row['itemid']]['tags'][$row['itemtagid']] =
+				array_diff_key($row, array_flip(['httptestid', 'itemid']));
+		}
+	}
+
+	/**
+	 * @param array $httptests
+	 * @param array $db_httptests
+	 */
+	private static function addAffectedFields(array $httptests, array &$db_httptests): void {
+		$httptestids = [];
+		$types = [];
+
+		foreach ($httptests as $httptest) {
+			if (array_key_exists('headers', $httptest)) {
+				$httptestids[$httptest['httptestid']] = true;
+				$types[] = ZBX_HTTPFIELD_HEADER;
+				$db_httptests[$httptest['httptestid']]['headers'] = [];
 			}
 
-			$checkItemsUpdate = [];
-			$dbCheckItems = DBselect(
-				'SELECT i.itemid,i.name,i.key_,hi.type'.
-				' FROM items i,httptestitem hi'.
-				' WHERE hi.httptestid='.zbx_dbstr($httptest['httptestid']).
-					' AND hi.itemid=i.itemid'
-			);
-			while ($checkitem = DBfetch($dbCheckItems)) {
-				$itemids[$httptest['httptestid']][] = $checkitem['itemid'];
-				$update_fields = [];
+			if (array_key_exists('variables', $httptest)) {
+				$httptestids[$httptest['httptestid']] = true;
+				$types[] = ZBX_HTTPFIELD_VARIABLE;
+				$db_httptests[$httptest['httptestid']]['variables'] = [];
+			}
+		}
 
-				$update_fields['name'] = $this->getTestName($checkitem['type'], $httptest['name']);
-				if ($update_fields['name'] === $checkitem['name']) {
-					unset($update_fields['name']);
+		if (!$httptestids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['httptest_fieldid', 'httptestid', 'type', 'name', 'value'],
+			'filter' => [
+				'httptestid' => array_keys($httptestids),
+				'type' => $types
+			]
+		];
+		$result = DBselect(DB::makeSql('httptest_field', $options));
+
+		while ($row = DBfetch($result)) {
+			$field_name = ($row['type'] == ZBX_HTTPFIELD_HEADER) ? 'headers' : 'variables';
+
+			if (array_key_exists($field_name, $db_httptests[$row['httptestid']])) {
+				$db_httptests[$row['httptestid']][$field_name][$row['httptest_fieldid']] =
+					array_diff_key($row, array_flip(['httptestid']));
+			}
+		}
+	}
+
+	/**
+	 * @param array $httptests
+	 * @param array $db_httptests
+	 */
+	private static function addAffectedSteps(array $httptests, array &$db_httptests): void {
+		$httptestids = [];
+
+		foreach ($httptests as $httptest) {
+			$name_updated = $httptest['name'] != $db_httptests[$httptest['httptestid']]['name'];
+
+			if (array_key_exists('steps', $httptest) || $name_updated) {
+				$httptestids[] = $httptest['httptestid'];
+				$db_httptests[$httptest['httptestid']]['steps'] = [];
+			}
+		}
+
+		if ($httptestids) {
+			$options = [
+				'output' => ['httpstepid', 'httptestid', 'name', 'no', 'url', 'timeout', 'posts', 'required',
+					'status_codes','follow_redirects', 'retrieve_mode', 'post_type'
+				],
+				'filter' => ['httptestid' => $httptestids]
+			];
+			$result = DBselect(DB::makeSql('httpstep', $options));
+
+			while ($row = DBfetch($result)) {
+				$db_httptests[$row['httptestid']]['steps'][$row['httpstepid']] =
+					array_diff_key($row, array_flip(['httptestid']));
+			}
+		}
+
+		self::addAffectedStepItems($httptests, $db_httptests);
+		self::addAffectedStepFields($httptests, $db_httptests);
+	}
+
+	/**
+	 * @param array $httptests
+	 * @param array $db_httptests
+	 */
+	private static function addAffectedStepItems(array $httptests, array &$db_httptests): void {
+		$httptestids = [];
+
+		foreach ($httptests as $httptest) {
+			$db_httptest = $db_httptests[$httptest['httptestid']];
+
+			$name_updated = $httptest['name'] != $db_httptest['name'];
+			$status_updated = array_key_exists('status', $httptest) && $httptest['status'] != $db_httptest['status'];
+			$delay_updated = array_key_exists('delay', $httptest) && $httptest['delay'] != $db_httptest['delay'];
+			$templateid_updated = array_key_exists('templateid', $httptest)
+				&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0;
+
+			if (array_key_exists('steps', $httptest) || $name_updated || $status_updated || $delay_updated
+					|| $templateid_updated || array_key_exists('tags', $httptest)) {
+				$httptestids[] = $httptest['httptestid'];
+			}
+		}
+
+		if (!$httptestids) {
+			return;
+		}
+
+		$result = DBselect(
+			'SELECT hs.httptestid,hs.httpstepid,hsi.type AS test_type,hsi.itemid,i.name,i.key_,i.status,i.delay,'.
+				'i.templateid'.
+			' FROM httpstep hs,httpstepitem hsi,items i'.
+			' WHERE hs.httpstepid=hsi.httpstepid'.
+				' AND hsi.itemid=i.itemid'.
+				' AND '.dbConditionId('hs.httptestid', $httptestids)
+		);
+
+		while ($row = DBfetch($result)) {
+			$db_httptests[$row['httptestid']]['steps'][$row['httpstepid']]['items'][$row['itemid']] =
+				array_diff_key($row, array_flip(['httptestid', 'httpstepid']));
+		}
+
+		self::addAffectedStepItemTags($httptests, $db_httptests);
+	}
+
+	/**
+	 * @param array $httptests
+	 * @param array $db_httptests
+	 */
+	private static function addAffectedStepItemTags(array $httptests, array &$db_httptests): void {
+		$httptestids = [];
+
+		foreach ($httptests as $httptest) {
+			if (!array_key_exists('tags', $httptest)) {
+				continue;
+			}
+
+			$httptestids[] = $httptest['httptestid'];
+
+			foreach ($db_httptests[$httptest['httptestid']]['steps'] as &$db_step) {
+				if (!array_key_exists('items', $db_step)) {
+					continue;
 				}
 
-				$update_fields['key_'] = $this->getTestKey($checkitem['type'], $httptest['name']);
-				if ($update_fields['key_'] === $checkitem['key_']) {
-					unset($update_fields['key_']);
+				foreach ($db_step['items'] as &$db_item) {
+					$db_item['tags'] = [];
+				}
+				unset($db_item);
+			}
+			unset($db_step);
+		}
+
+		if (!$httptestids) {
+			return;
+		}
+
+		$result = DBselect(
+			'SELECT hs.httptestid,hs.httpstepid,hsi.itemid,it.itemtagid,it.tag,it.value'.
+			' FROM httpstep hs,httpstepitem hsi,item_tag it'.
+			' WHERE hs.httpstepid=hsi.httpstepid'.
+				' AND hsi.itemid=it.itemid'.
+				' AND '.dbConditionId('hs.httptestid', $httptestids)
+		);
+
+		while ($row = DBfetch($result)) {
+			$db_httptests[$row['httptestid']]['steps'][$row['httpstepid']]['items'][$row['itemid']]['tags'][$row['itemtagid']] =
+				array_diff_key($row, array_flip(['httptestid', 'httpstepid', 'itemid']));
+		}
+	}
+
+	/**
+	 * @param array $httptests
+	 * @param array $db_httptests
+	 */
+	private static function addAffectedStepFields(array $httptests, array &$db_httptests): void {
+		$httpstepids = [];
+		$types = [];
+
+		$field_names = [
+			ZBX_HTTPFIELD_HEADER => 'headers',
+			ZBX_HTTPFIELD_VARIABLE => 'variables',
+			ZBX_HTTPFIELD_POST_FIELD => 'posts',
+			ZBX_HTTPFIELD_QUERY_FIELD => 'query_fields'
+		];
+
+		foreach ($httptests as $httptest) {
+			if (!array_key_exists('steps', $httptest)) {
+				continue;
+			}
+
+			foreach ($httptest['steps'] as $step) {
+				if (!array_key_exists('httpstepid', $step)
+						|| !array_key_exists($step['httpstepid'], $db_httptests[$httptest['httptestid']]['steps'])) {
+					continue;
 				}
 
-				if (isset($httptest['status'])) {
-					$update_fields['status'] = (HTTPTEST_STATUS_ACTIVE == $httptest['status'])
+				$db_step = &$db_httptests[$httptest['httptestid']]['steps'][$step['httpstepid']];
+
+				if (array_key_exists('headers', $step)) {
+					$httpstepids[$step['httpstepid']] = true;
+					$types[ZBX_HTTPFIELD_HEADER] = true;
+					$db_step['headers'] = [];
+				}
+
+				if (array_key_exists('variables', $step)) {
+					$httpstepids[$step['httpstepid']] = true;
+					$types[ZBX_HTTPFIELD_VARIABLE] = true;
+
+					$db_step['variables'] = [];
+				}
+
+				if (array_key_exists('posts', $step) && $db_step['post_type'] == ZBX_POSTTYPE_FORM) {
+					$httpstepids[$step['httpstepid']] = true;
+					$types[ZBX_HTTPFIELD_POST_FIELD] = true;
+
+					$db_step['posts'] = [];
+				}
+
+				if (array_key_exists('query_fields', $step)) {
+					$httpstepids[$step['httpstepid']] = true;
+					$types[ZBX_HTTPFIELD_QUERY_FIELD] = true;
+
+					$db_step['query_fields'] = [];
+				}
+			}
+		}
+
+		unset($db_step);
+
+		if (!$httpstepids) {
+			return;
+		}
+
+		$result = DBselect(
+			'SELECT hs.httptestid,hs.httpstepid,hsf.httpstep_fieldid,hsf.type,hsf.name,hsf.value'.
+			' FROM httpstep hs,httpstep_field hsf'.
+			' WHERE hs.httpstepid=hsf.httpstepid'.
+				' AND '.dbConditionId('hs.httpstepid', array_keys($httpstepids)).
+				' AND '.dbConditionInt('hsf.type', array_keys($types))
+		);
+
+		while ($row = DBfetch($result)) {
+			$field_name	= $field_names[$row['type']];
+
+			$db_step = &$db_httptests[$row['httptestid']]['steps'][$row['httpstepid']];
+
+			if (array_key_exists($field_name, $db_step)) {
+				$db_step[$field_name][$row['httpstep_fieldid']] = [
+					'httpstep_fieldid' => $row['httpstep_fieldid'],
+					'name' => $row['name'],
+					'value' => $row['value']
+				];
+			}
+		}
+
+		unset($db_step);
+	}
+
+	/**
+	 * @param array $httptests
+	 * @param array $db_httptests
+	 */
+	private static function addAffectedTags(array $httptests, array &$db_httptests): void {
+		$httptestids = [];
+
+		foreach ($httptests as $httptest) {
+			$steps_to_create_exists = array_key_exists('steps', $httptest)
+				&& count($httptest['steps']) > count(array_column($httptest['steps'], 'httpstepid'));
+
+			if (array_key_exists('tags', $httptest) || $steps_to_create_exists) {
+				$httptestids[] = $httptest['httptestid'];
+				$db_httptests[$httptest['httptestid']]['tags'] = [];
+			}
+		}
+
+		if (!$httptestids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['httptesttagid', 'httptestid', 'tag', 'value'],
+			'filter' => ['httptestid' => $httptestids]
+		];
+		$result = DBselect(DB::makeSql('httptest_tag', $options));
+
+		while ($row = DBfetch($result)) {
+			$db_httptests[$row['httptestid']]['tags'][$row['httptesttagid']] =
+				array_diff_key($row, array_flip(['httptestid']));
+		}
+	}
+
+	/**
+	 * @param array  $httptests
+	 */
+	private static function createItems(array $httptests): void {
+		$items = [];
+
+		$type_items = [
+			HTTPSTEP_ITEM_TYPE_IN => [
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'units' => 'Bps'
+			],
+			HTTPSTEP_ITEM_TYPE_LASTSTEP => [
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'units' => ''
+			],
+			HTTPSTEP_ITEM_TYPE_LASTERROR => [
+				'value_type' => ITEM_VALUE_TYPE_STR,
+				'units' => ''
+			]
+		];
+
+		foreach ($httptests as $httptest) {
+			if (!array_key_exists('status', $httptest)) {
+				$httptest['status'] = DB::getDefault('httptest', 'status');
+			}
+
+			$item_status = $httptest['status'] == HTTPTEST_STATUS_ACTIVE ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+			$item_tags = array_key_exists('tags', $httptest) ? $httptest['tags'] : [];
+
+			if (!array_key_exists('delay', $httptest)) {
+				$httptest['delay'] = DB::getDefault('httptest', 'delay');
+			}
+
+			foreach ($type_items as $type => $type_item) {
+				$item_key = self::getTestKey($type, $httptest['name']);
+
+				$items[] = [
+					'host_status' => $httptest['host_status'],
+					'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+					'hostid' => $httptest['hostid'],
+					'name' => self::getTestName($type, $httptest['name']),
+					'type' => ITEM_TYPE_HTTPTEST,
+					'key_' => $item_key,
+					'history' => self::ITEM_HISTORY,
+					'trends' => self::ITEM_TRENDS,
+					'status' => $item_status,
+					'tags' => $item_tags,
+					'delay' => $httptest['delay'],
+					'templateid' => array_key_exists('templateid', $httptest)
+						? self::$parent_itemids[$httptest['templateid']][$item_key]
+						: 0
+				] + $type_item;
+			}
+		}
+
+		CItem::createForce($items);
+
+		$itemids = array_column($items, 'itemid');
+
+		$ins_httptestitems = [];
+
+		foreach ($httptests as $httptest) {
+			foreach ($type_items as $type => $foo) {
+				$ins_httptestitems[] = [
+					'httptestid' => $httptest['httptestid'],
+					'itemid' => array_shift($itemids),
+					'type' => $type
+				];
+			}
+		}
+
+		DB::insertBatch('httptestitem', $ins_httptestitems);
+	}
+
+	/**
+	 * @param array  $httptests
+	 * @param array  $db_httptests
+	 */
+	private static function updateItems(array $httptests, array $db_httptests): void {
+		$items = [];
+		$db_items = [];
+
+		foreach ($httptests as $httptest) {
+			if (!array_key_exists('items', $db_httptests[$httptest['httptestid']])) {
+				continue;
+			}
+
+			$db_httptest = $db_httptests[$httptest['httptestid']];
+
+			$db_items += $db_httptest['items'];
+
+			foreach ($db_httptest['items'] as $db_item) {
+				$item = [];
+
+				if ($httptest['name'] != $db_httptest['name']) {
+					$item += [
+						'name' => self::getTestName($db_item['test_type'], $httptest['name']),
+						'key_' => self::getTestKey($db_item['test_type'], $httptest['name'])
+					];
+				}
+
+				if (array_key_exists('status', $httptest) && $httptest['status'] != $db_httptest['status']) {
+					$item['status'] = $httptest['status'] == HTTPTEST_STATUS_ACTIVE
 						? ITEM_STATUS_ACTIVE
 						: ITEM_STATUS_DISABLED;
 				}
-				if (isset($httptest['delay'])) {
-					$update_fields['delay'] = $httptest['delay'];
+
+				if (array_key_exists('delay', $httptest) && $httptest['delay'] !== $db_httptest['delay']) {
+					$item['delay'] = $httptest['delay'];
 				}
-				if (!empty($update_fields)) {
-					$checkItemsUpdate[] = [
-						'values' => $update_fields,
-						'where' => ['itemid' => $checkitem['itemid']]
+
+				if (array_key_exists('templateid', $httptest)
+						&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0) {
+					$item_key = array_key_exists('key_', $item) ? $item['key_'] : $db_item['key_'];
+
+					$item['templateid'] = $httptest['templateid'] == 0
+						? 0
+						: self::$parent_itemids[$httptest['templateid']][$item_key];
+				}
+
+				if (array_key_exists('tags', $httptest)) {
+					$item['tags'] = $httptest['tags'];
+				}
+
+				$items[] = ['itemid' => $db_item['itemid']] + $item;
+			}
+
+			if (array_key_exists('steps', $httptest)) {
+				continue;
+			}
+
+			foreach ($db_httptest['steps'] as $db_step) {
+				$db_items += $db_step['items'];
+
+				foreach ($db_step['items'] as $db_item) {
+					$item = [];
+
+					if ($httptest['name'] != $db_httptest['name']) {
+						$item += [
+							'name' => self::getStepName($db_item['test_type'], $httptest['name'], $db_step['name']),
+							'key_' => self::getStepKey($db_item['test_type'], $httptest['name'], $db_step['name'])
+						];
+					}
+
+					if (array_key_exists('status', $httptest) && $httptest['status'] != $db_httptest['status']) {
+						$item['status'] = $httptest['status'] == HTTPTEST_STATUS_ACTIVE
+							? ITEM_STATUS_ACTIVE
+							: ITEM_STATUS_DISABLED;
+					}
+
+					if (array_key_exists('delay', $httptest) && $httptest['delay'] !== $db_httptest['delay']) {
+						$item['delay'] = $httptest['delay'];
+					}
+
+					if (array_key_exists('templateid', $httptest)
+							&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0) {
+						$item_key = array_key_exists('key_', $item) ? $item['key_'] : $db_item['key_'];
+
+						$item['templateid'] = $httptest['templateid'] == 0
+							? 0
+							: self::$parent_itemids[$httptest['templateid']][$item_key];
+					}
+
+					if (array_key_exists('tags', $httptest)) {
+						$item['tags'] = $httptest['tags'];
+					}
+
+					$items[] = ['itemid' => $db_item['itemid']] + $item;
+				}
+			}
+		}
+
+		if ($items) {
+			CItem::updateForce($items, $db_items);
+		}
+	}
+
+	/**
+	 * @param array      $httptests
+	 * @param array|null $db_httptests
+	 */
+	private static function updateFields(array &$httptests, array $db_httptests = null): void {
+		$ins_fields = [];
+		$upd_fields = [];
+		$del_fieldids = [];
+
+		foreach ($httptests as &$httptest) {
+			if (array_key_exists('headers', $httptest)) {
+				$db_headers = $db_httptests !== null ? $db_httptests[$httptest['httptestid']]['headers'] : [];
+
+				foreach ($httptest['headers'] as &$header) {
+					$db_fieldid = key(array_filter($db_headers,
+						static function (array $db_header) use ($header): bool {
+							return $header['name'] == $db_header['name'] && $header['value'] == $db_header['value'];
+						}
+					));
+
+					if ($db_fieldid !== null) {
+						$header['httptest_fieldid'] = $db_fieldid;
+						unset($db_headers[$db_fieldid]);
+					}
+					else {
+						$ins_fields[] = [
+							'httptestid' => $httptest['httptestid'],
+							'type' => ZBX_HTTPFIELD_HEADER
+						] + $header;
+					}
+				}
+				unset($header);
+
+				$del_fieldids = array_merge($del_fieldids, array_keys($db_headers));
+			}
+
+			if (array_key_exists('variables', $httptest)) {
+				$db_variables = $db_httptests !== null
+					? array_column($db_httptests[$httptest['httptestid']]['variables'], null, 'name')
+					: [];
+
+				foreach ($httptest['variables'] as &$variable) {
+					if (array_key_exists($variable['name'], $db_variables)) {
+						$db_variable = $db_variables[$variable['name']];
+
+						$upd_variable = DB::getUpdatedValues('httptest_field', $variable, $db_variable);
+
+						if ($upd_variable) {
+							$upd_fields[] = [
+								'values' => $upd_variable,
+								'where' => ['httptest_fieldid' => $db_variable['httptest_fieldid']]
+							];
+						}
+
+						$variable['httptest_fieldid'] = $db_variable['httptest_fieldid'];
+						unset($db_variables[$variable['name']]);
+					}
+					else {
+						$ins_fields[] = [
+							'httptestid' => $httptest['httptestid'],
+							'type' => ZBX_HTTPFIELD_VARIABLE
+						] + $variable;
+					}
+				}
+				unset($variable);
+
+				$del_fieldids = array_merge($del_fieldids, array_column($db_variables, 'httptest_fieldid'));
+			}
+		}
+		unset($httptest);
+
+		if ($del_fieldids) {
+			DB::delete('httptest_field', ['httptest_fieldid' => $del_fieldids]);
+		}
+
+		if ($upd_fields) {
+			DB::update('httptest_field', $upd_fields);
+		}
+
+		if ($ins_fields) {
+			DB::insertBatch('httptest_field', $ins_fields);
+		}
+	}
+
+	/**
+	 * @param array      $httptests
+	 * @param array|null $db_httptests
+	 */
+	private static function updateSteps(array &$httptests, array $db_httptests = null): void {
+		$ins_steps = [];
+		$upd_steps = [];
+		$update_step_items = false;
+		$del_stepids = [];
+		$del_db_items = [];
+
+		foreach ($httptests as $httptest) {
+			if (!array_key_exists('steps', $httptest)) {
+				continue;
+			}
+
+			$db_steps = $db_httptests !== null ? $db_httptests[$httptest['httptestid']]['steps'] : [];
+
+			foreach ($httptest['steps'] as $step) {
+				if (array_key_exists('httpstepid', $step)) {
+					if (array_key_exists('posts', $step)) {
+						if (is_array($step['posts'])) {
+							if ($db_steps[$step['httpstepid']]['post_type'] == ZBX_POSTTYPE_RAW) {
+								if ($step['posts']) {
+									$step['post_type'] = ZBX_POSTTYPE_FORM;
+								}
+
+								$step['posts'] = '';
+							}
+							else {
+								if (!$step['posts']) {
+									$step['post_type'] = ZBX_POSTTYPE_RAW;
+								}
+
+								unset($step['posts']);
+							}
+						}
+						else {
+							if ($db_steps[$step['httpstepid']]['post_type'] == ZBX_POSTTYPE_FORM) {
+								$step['post_type'] = ZBX_POSTTYPE_RAW;
+								$db_steps[$step['httpstepid']]['posts'] = '';
+							}
+						}
+					}
+
+					$upd_step = DB::getUpdatedValues('httpstep', $step, $db_steps[$step['httpstepid']]);
+
+					if ($upd_step) {
+						$upd_steps[] = [
+							'values' => $upd_step,
+							'where' => ['httpstepid' => $step['httpstepid']]
+						];
+					}
+
+					if (array_key_exists('items', $db_steps[$step['httpstepid']])) {
+						$update_step_items = true;
+					}
+
+					unset($db_steps[$step['httpstepid']]);
+				}
+				else {
+					if (array_key_exists('posts', $step) && is_array($step['posts'])) {
+						$step['post_type'] = ZBX_POSTTYPE_FORM;
+						unset($step['posts']);
+					}
+
+					$ins_steps[] = ['httptestid' => $httptest['httptestid']] + $step;
+				}
+			}
+
+			$del_stepids = array_merge($del_stepids, array_keys($db_steps));
+
+			foreach ($db_steps as $db_step) {
+				if (!array_key_exists('items', $db_step)) {
+					continue;
+				}
+
+				foreach ($db_step['items'] as $db_item) {
+					$del_db_items[$db_item['itemid']] = $db_item;
+				}
+			}
+		}
+
+		if ($del_stepids) {
+			if ($del_db_items) {
+				CItem::addInheritedItems($del_db_items);
+				DB::delete('httpstepitem', ['itemid' => array_keys($del_db_items)]);
+				CItem::deleteForce($del_db_items);
+			}
+
+			DB::delete('httpstep_field', ['httpstepid' => $del_stepids]);
+			DB::delete('httpstep', ['httpstepid' => $del_stepids]);
+		}
+
+		if ($upd_steps) {
+			DB::update('httpstep', $upd_steps);
+		}
+
+		if ($update_step_items) {
+			self::updateStepItems($httptests, $db_httptests);
+		}
+
+		if ($ins_steps) {
+			$stepids = DB::insert('httpstep', $ins_steps);
+
+			foreach ($httptests as &$httptest) {
+				if (!array_key_exists('steps', $httptest)) {
+					continue;
+				}
+
+				foreach ($httptest['steps'] as &$step) {
+					if (!array_key_exists('httpstepid', $step)) {
+						$step['httpstepid'] = current($stepids);
+						next($stepids);
+					}
+				}
+				unset($step);
+			}
+			unset($httptest);
+
+			self::createStepItems($httptests, $stepids, $db_httptests);
+		}
+
+		self::updateStepFields($httptests, $db_httptests);
+	}
+
+	/**
+	 * @param array $httptests
+	 * @param array $db_httptests
+	 */
+	private static function updateStepItems(array $httptests, array $db_httptests): void {
+		$items = [];
+		$db_items = [];
+
+		foreach ($httptests as $httptest) {
+			if (!array_key_exists('steps', $httptest)) {
+				continue;
+			}
+
+			$db_httptest = $db_httptests[$httptest['httptestid']];
+
+			foreach ($httptest['steps'] as $step) {
+				if (!array_key_exists('httpstepid', $step)
+						|| !array_key_exists('items', $db_httptest['steps'][$step['httpstepid']])) {
+					continue;
+				}
+
+				$db_step = $db_httptest['steps'][$step['httpstepid']];
+
+				if (!array_key_exists('name', $step)) {
+					$step['name'] = $db_step['name'];
+				}
+
+				$db_items += $db_step['items'];
+
+				foreach ($db_step['items'] as $db_item) {
+					$item = [];
+
+					if ($httptest['name'] != $db_httptest['name'] || $step['name'] !== $db_step['name']) {
+						$item += [
+							'name' => self::getStepName($db_item['test_type'], $httptest['name'], $step['name']),
+							'key_' => self::getStepKey($db_item['test_type'], $httptest['name'], $step['name'])
+						];
+					}
+
+					if (array_key_exists('status', $httptest) && $httptest['status'] != $db_httptest['status']) {
+						$item['status'] = $httptest['status'] == HTTPTEST_STATUS_ACTIVE
+							? ITEM_STATUS_ACTIVE
+							: ITEM_STATUS_DISABLED;
+					}
+
+					if (array_key_exists('delay', $httptest) && $httptest['delay'] !== $db_httptest['delay']) {
+						$item['delay'] = $httptest['delay'];
+					}
+
+					if (array_key_exists('tags', $httptest)) {
+						$item['tags'] = $httptest['tags'];
+					}
+
+					$items[] = ['itemid' => $db_item['itemid']] + $item;
+				}
+			}
+		}
+
+		if ($items) {
+			CItem::updateForce($items, $db_items);
+		}
+	}
+
+	/**
+	 * @param array      $httptests
+	 * @param array      $stepids
+	 * @param array|null $db_httptests
+	 */
+	private static function createStepItems(array $httptests, array $stepids, ?array $db_httptests): void {
+		$items = [];
+
+		$type_items = [
+			HTTPSTEP_ITEM_TYPE_RSPCODE => [
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'units' => ''
+			],
+			HTTPSTEP_ITEM_TYPE_TIME => [
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'units' => 's'
+			],
+			HTTPSTEP_ITEM_TYPE_IN => [
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'units' => 'Bps'
+			]
+		];
+
+		foreach ($httptests as $httptest) {
+			if (!array_key_exists('steps', $httptest)) {
+				continue;
+			}
+
+			if ($db_httptests !== null) {
+				$httptest['host_status'] = $db_httptests[$httptest['httptestid']]['host_status'];
+			}
+
+			if (!array_key_exists('status', $httptest)) {
+				$httptest['status'] = ($db_httptests !== null)
+					? $db_httptests[$httptest['httptestid']]['status']
+					: DB::getDefault('httptest', 'status');
+			}
+
+			$item_status = $httptest['status'] == HTTPTEST_STATUS_ACTIVE ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+
+			$item_tags = [];
+
+			if (array_key_exists('tags', $httptest)) {
+				$item_tags = $httptest['tags'];
+			}
+			elseif ($db_httptests !== null) {
+				foreach ($db_httptests[$httptest['httptestid']]['tags'] as $tag) {
+					$item_tags[] = array_intersect_key($tag, array_flip(['tag', 'value']));
+				}
+			}
+
+			if (!array_key_exists('delay', $httptest)) {
+				$httptest['delay'] = ($db_httptests !== null)
+					? $db_httptests[$httptest['httptestid']]['delay']
+					: DB::getDefault('httptest', 'delay');
+			}
+
+			foreach ($httptest['steps'] as $step) {
+				if (!in_array($step['httpstepid'], $stepids)) {
+					continue;
+				}
+
+				foreach ($type_items as $type => $type_item) {
+					$item_key = self::getStepKey($type, $httptest['name'], $step['name']);
+
+					$items[] = [
+						'host_status' => $httptest['host_status'],
+						'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+						'hostid' => $httptest['hostid'],
+						'name' => self::getStepName($type, $httptest['name'], $step['name']),
+						'type' => ITEM_TYPE_HTTPTEST,
+						'key_' => $item_key,
+						'history' => self::ITEM_HISTORY,
+						'trends' => self::ITEM_TRENDS,
+						'status' => $item_status,
+						'tags' => $item_tags,
+						'delay' => $httptest['delay'],
+						'templateid' => array_key_exists('templateid', $httptest)
+							? self::$parent_itemids[$httptest['templateid']][$item_key]
+							: 0
+					] + $type_item;
+				}
+			}
+		}
+
+		CItem::createForce($items);
+
+		$itemids = array_column($items, 'itemid');
+
+		$ins_httpstepitems = [];
+
+		foreach ($httptests as $httptest) {
+			if (!array_key_exists('steps', $httptest)) {
+				continue;
+			}
+
+			foreach ($httptest['steps'] as $step) {
+				if (!in_array($step['httpstepid'], $stepids)) {
+					continue;
+				}
+
+				foreach ($type_items as $type => $foo) {
+					$ins_httpstepitems[] = [
+						'httpstepid' => $step['httpstepid'],
+						'itemid' => array_shift($itemids),
+						'type' => $type
 					];
 				}
 			}
-			DB::update('items', $checkItemsUpdate);
+		}
 
-			if (array_key_exists('steps', $httptest)) {
-				$dbSteps = zbx_toHash($db_httptest['steps'], 'httpstepid');
+		DB::insertBatch('httpstepitem', $ins_httpstepitems);
+	}
 
-				foreach ($httptest['steps'] as $webstep) {
-					if (isset($webstep['httpstepid']) && isset($dbSteps[$webstep['httpstepid']])) {
-						$steps_update[$key][] = $webstep;
-						unset($dbSteps[$webstep['httpstepid']]);
+	/**
+	 * @param array      $httptests
+	 * @param array|null $db_httptests
+	 */
+	private static function updateStepFields(array &$httptests, ?array $db_httptests): void {
+		$ins_fields = [];
+		$upd_fields = [];
+		$del_fieldids = [];
+
+		foreach ($httptests as &$httptest) {
+			if (!array_key_exists('steps', $httptest)) {
+				continue;
+			}
+
+			$db_httptest = $db_httptests !== null ? $db_httptests[$httptest['httptestid']] : null;
+
+			foreach ($httptest['steps'] as &$step) {
+				$db_step = ($db_httptest !== null && array_key_exists($step['httpstepid'], $db_httptest['steps']))
+					? $db_httptest['steps'][$step['httpstepid']]
+					: null;
+
+				if (array_key_exists('headers', $step)) {
+					$db_headers = $db_step !== null ? $db_step['headers'] : [];
+
+					foreach ($step['headers'] as &$header) {
+						$db_fieldid = key(array_filter($db_headers,
+							static function (array $db_header) use ($header): bool {
+								return $header['name'] == $db_header['name'] && $header['value'] == $db_header['value'];
+							}
+						));
+
+						if ($db_fieldid !== null) {
+							$header['httpstep_fieldid'] = $db_fieldid;
+							unset($db_headers[$db_fieldid]);
+						}
+						else {
+							$ins_fields[] = [
+								'httpstepid' => $step['httpstepid'],
+								'type' => ZBX_HTTPFIELD_HEADER
+							] + $header;
+						}
 					}
-					elseif (!isset($webstep['httpstepid'])) {
-						$steps_create[$key][] = $webstep;
+					unset($header);
+
+					$del_fieldids = array_merge($del_fieldids, array_keys($db_headers));
+				}
+
+				if (array_key_exists('variables', $step)) {
+					$db_variables = $db_step !== null ? array_column($db_step['variables'], null, 'name') : [];
+
+					foreach ($step['variables'] as &$variable) {
+						if (array_key_exists($variable['name'], $db_variables)) {
+							$db_variable = $db_variables[$variable['name']];
+
+							$upd_variable = DB::getUpdatedValues('httpstep_field', $variable, $db_variable);
+
+							if ($upd_variable) {
+								$upd_fields[] = [
+									'values' => $upd_variable,
+									'where' => ['httpstep_fieldid' => $db_variable['httpstep_fieldid']]
+								];
+							}
+
+							$variable['httpstep_fieldid'] = $db_variable['httpstep_fieldid'];
+							unset($db_variables[$variable['name']]);
+						}
+						else {
+							$ins_fields[] = [
+								'httpstepid' => $step['httpstepid'],
+								'type' => ZBX_HTTPFIELD_VARIABLE
+							] + $variable;
+						}
+					}
+					unset($variable);
+
+					$del_fieldids = array_merge($del_fieldids, array_column($db_variables, 'httpstep_fieldid'));
+				}
+
+				if (array_key_exists('posts', $step)) {
+					if (is_array($step['posts'])) {
+						$db_posts = $db_step !== null && is_array($db_step['posts']) ? $db_step['posts'] : [];
+
+						foreach ($step['posts'] as &$post) {
+							$db_fieldid = key(array_filter($db_posts,
+								static function (array $db_post) use ($post): bool {
+									return $post['name'] == $db_post['name'] && $post['value'] == $db_post['value'];
+								}
+							));
+
+							if ($db_fieldid !== null) {
+								$post['httpstep_fieldid'] = $db_fieldid;
+								unset($db_posts[$db_fieldid]);
+							}
+							else {
+								$ins_fields[] = [
+									'httpstepid' => $step['httpstepid'],
+									'type' => ZBX_HTTPFIELD_POST_FIELD
+								] + $post;
+							}
+						}
+						unset($post);
+
+						$del_fieldids = array_merge($del_fieldids, array_keys($db_posts));
+					}
+					elseif ($db_step !== null && is_array($db_step['posts'])) {
+						$del_fieldids = array_merge($del_fieldids, array_keys($db_step['posts']));
 					}
 				}
 
-				$stepidsDelete = array_keys($dbSteps);
+				if (array_key_exists('query_fields', $step)) {
+					$db_query_fields = $db_step !== null ? $db_step['query_fields'] : [];
 
-				if (!empty($stepidsDelete)) {
-					$result = DBselect(
-						'SELECT hi.itemid FROM httpstepitem hi WHERE '.dbConditionInt('hi.httpstepid', $stepidsDelete)
-					);
+					foreach ($step['query_fields'] as &$query_field) {
+						$db_fieldid = key(array_filter($db_query_fields,
+							static function (array $db_query_field) use ($query_field): bool {
+								return $query_field['name'] == $db_query_field['name']
+									&& $query_field['value'] == $db_query_field['value'];
+							}
+						));
 
-					foreach (DBfetchColumn($result, 'itemid') as $itemId) {
-						$deleteStepItemIds[] = $itemId;
+						if ($db_fieldid !== null) {
+							$query_field['httpstep_fieldid'] = $db_fieldid;
+							unset($db_query_fields[$db_fieldid]);
+						}
+						else {
+							$ins_fields[] = [
+								'httpstepid' => $step['httpstepid'],
+								'type' => ZBX_HTTPFIELD_QUERY_FIELD
+							] + $query_field;
+						}
 					}
+					unset($query_field);
 
-					DB::delete('httpstep', ['httpstepid' => $stepidsDelete]);
+					$del_fieldids = array_merge($del_fieldids, array_keys($db_query_fields));
 				}
 			}
+			unset($step);
+		}
+		unset($httptest);
+
+		if ($del_fieldids) {
+			DB::delete('httpstep_field', ['httpstep_fieldid' => $del_fieldids]);
 		}
 
-		// Old items must be deleted prior to createStepsReal() since identical items cannot be created in DB.
-		if ($deleteStepItemIds) {
-			CItemManager::delete($deleteStepItemIds);
+		if ($upd_fields) {
+			DB::update('httpstep_field', $upd_fields);
 		}
 
-		foreach ($httptests as $key => $httptest) {
-			if (array_key_exists('steps', $httptest)) {
-				if (array_key_exists($key, $steps_update)) {
-					$this->updateStepsReal($httptest, $steps_update[$key], $itemids[$httptest['httptestid']]);
+		if ($ins_fields) {
+			DB::insertBatch('httpstep_field', $ins_fields);
+		}
+	}
+
+	/**
+	 * @param array      $httptests
+	 * @param array|null $db_httptests
+	 */
+	private static function updateTags(array &$httptests, array $db_httptests = null): void {
+		$ins_tags = [];
+		$del_tagids = [];
+
+		foreach ($httptests as &$httptest) {
+			if (!array_key_exists('tags', $httptest)) {
+				continue;
+			}
+
+			$db_tags = $db_httptests !== null ? $db_httptests[$httptest['httptestid']]['tags'] : [];
+
+			foreach ($httptest['tags'] as &$tag) {
+				$db_tagid = key(array_filter($db_tags, static function (array $db_tag) use ($tag): bool {
+					return $tag['tag'] == $db_tag['tag']
+						&& (!array_key_exists('value', $tag) || $tag['value'] == $db_tag['value']);
+				}));
+
+				if ($db_tagid !== null) {
+					$tag['httptesttagid'] = $db_tagid;
+					unset($db_tags[$db_tagid]);
 				}
-
-				if (array_key_exists($key, $steps_create)) {
-					$this->createStepsReal($httptest, $steps_create[$key], $itemids[$httptest['httptestid']]);
+				else {
+					$ins_tags[] = ['httptestid' => $httptest['httptestid']] + $tag;
 				}
 			}
-			else {
-				$this->updateStepItems($httptest, $db_httptests[$httptest['httptestid']]);
-			}
+			unset($tag);
+
+			$del_tagids = array_merge($del_tagids, array_keys($db_tags));
+		}
+		unset($httptest);
+
+		if ($del_tagids) {
+			DB::delete('httptest_tag', ['httptesttagid' => $del_tagids]);
 		}
 
-		$this->updateHttpTestFields($httptests, 'update');
-		self::updateHttpTestTags($httptests);
-
-		foreach ($httptests as $httptest) {
-			$tags = array_key_exists('tags', $httptest) ? $httptest['tags'] : [];
-			self::updateItemsTags($tags, $itemids[$httptest['httptestid']]);
+		if ($ins_tags) {
+			DB::insert('httptest_tag', $ins_tags);
 		}
-
-		return $httptests;
 	}
 
 	/**
@@ -292,21 +1336,29 @@ class CHttpTestManager {
 
 	/**
 	 * Inherit passed http tests to hosts.
-	 * If $hostIds is empty that means that we need to inherit all $httpTests to hosts which are linked to templates
-	 * where $httpTests belong.
-	 *	 *
-	 * @param array $httpTests
+	 * If $hostids is empty that means that we need to inherit all $httptests to hosts which are linked to templates
+	 * where $httptests belong.
+	 *
+	 * @param array $httptests
 	 * @param array $hostIds
 	 *
 	 * @return bool
 	 */
-	public function inherit(array $httpTests, array $hostIds = []) {
-		$hostsTemplatesMap = $this->getChildHostsFromHttpTests($httpTests, $hostIds);
-		if (empty($hostsTemplatesMap)) {
+	public function inherit(array $httptests, array $hostids = []) {
+		$template_hosts = $this->getTemplateHosts($httptests, $hostids);
+
+		if (!$template_hosts) {
 			return true;
 		}
 
-		$preparedHttpTests = $this->prepareInheritedHttpTests($httpTests, $hostsTemplatesMap);
+		foreach ($httptests as $i => $httptest) {
+			if (!array_key_exists($httptest['hostid'], $template_hosts)) {
+				unset($httptests[$i]);
+			}
+		}
+
+		self::$parent_itemids = self::getItemIds($httptests);
+		$preparedHttpTests = $this->prepareInheritedHttpTests($httptests, $template_hosts);
 		$inheritedHttpTests = $this->save($preparedHttpTests);
 		$this->inherit($inheritedHttpTests);
 
@@ -314,30 +1366,69 @@ class CHttpTestManager {
 	}
 
 	/**
-	 * Get array with hosts that are linked with templates which passed http tests belong to as key and templateid that host
-	 * is linked to as value.
-	 * If second parameter $hostIds is not empty, result should contain only passed host ids.
+	 * Get hosts to which is necessary to inherit the given web scenarios indexed by template ID.
 	 *
-	 * @param array $httpTests
-	 * @param array $hostIds
+	 * @param array $httptests
+	 * @param array $hostids
 	 *
 	 * @return array
 	 */
-	protected function getChildHostsFromHttpTests(array $httpTests, array $hostIds = []) {
-		$hostsTemplatesMap = [];
+	private static function getTemplateHosts(array $httptests, array $hostids): array {
+		$template_hosts = [];
 
-		$sqlWhere = $hostIds ? ' AND '.dbConditionInt('ht.hostid', $hostIds) : '';
-		$dbCursor = DBselect(
-			'SELECT ht.templateid,ht.hostid'.
-			' FROM hosts_templates ht'.
-			' WHERE '.dbConditionInt('ht.templateid', zbx_objectValues($httpTests, 'hostid')).
-				$sqlWhere
+		$hostids_condition = $hostids ? ' AND '.dbConditionId('ht.hostid', $hostids) : '';
+
+		$result = DBselect(
+			'SELECT ht.templateid,ht.hostid,h.status'.
+			' FROM hosts_templates ht,hosts h'.
+			' WHERE ht.hostid=h.hostid'.
+				' AND '.dbConditionId('ht.templateid', array_column($httptests, 'hostid')).
+				$hostids_condition
 		);
-		while ($dbHost = DBfetch($dbCursor)) {
-			$hostsTemplatesMap[$dbHost['hostid']] = $dbHost['templateid'];
+
+		while ($row = DBfetch($result)) {
+			$template_hosts[$row['templateid']][$row['hostid']] = array_diff_key($row, array_flip(['templateid']));
 		}
 
-		return $hostsTemplatesMap;
+		return $template_hosts;
+	}
+
+	/**
+	 * Get item IDs array of the given web scenarios and their steps indexed by httptest ID and item key.
+	 *
+	 * @param array $httptests
+	 *
+	 * @return array
+	 */
+	private static function getItemIds(array $httptests): array {
+		$httptest_itemids = [];
+
+		$httptestids = array_column($httptests, 'httptestid');
+
+		$result = DBselect(
+			'SELECT hti.httptestid,hti.itemid,i.key_'.
+			' FROM httptestitem hti,items i'.
+			' WHERE hti.itemid=i.itemid'.
+				' AND '.dbConditionId('hti.httptestid', $httptestids)
+		);
+
+		while ($row = DBfetch($result)) {
+			$httptest_itemids[$row['httptestid']][$row['key_']] = $row['itemid'];
+		}
+
+		$result = DBselect(
+			'SELECT hs.httptestid,hsi.itemid,i.key_'.
+			' FROM httpstep hs,httpstepitem hsi,items i'.
+			' WHERE hs.httpstepid=hsi.httpstepid'.
+				' AND hsi.itemid=i.itemid'.
+				' AND '.dbConditionId('hs.httptestid', $httptestids)
+		);
+
+		while ($row = DBfetch($result)) {
+			$httptest_itemids[$row['httptestid']][$row['key_']] = $row['itemid'];
+		}
+
+		return $httptest_itemids;
 	}
 
 	/**
@@ -345,20 +1436,20 @@ class CHttpTestManager {
 	 * Using passed parameters decide if new http tests must be created on host or existing ones must be updated.
 	 *
 	 * @param array $httpTests which we need to inherit
-	 * @param array $hostsTemplatesMap
+	 * @param array $template_hosts
 	 *
 	 * @throws Exception
 	 * @return array with http tests, existing apps have 'httptestid' key.
 	 */
-	protected function prepareInheritedHttpTests(array $httpTests, array $hostsTemplatesMap) {
-		$hostHttpTests = $this->getHttpTestsMapsByHostIds(array_keys($hostsTemplatesMap));
+	protected function prepareInheritedHttpTests(array $httpTests, array $template_hosts) {
+		$hostHttpTests = $this->getHostHttpTests($template_hosts);
 
 		$result = [];
 		foreach ($httpTests as $httpTest) {
 			$httpTestId = $httpTest['httptestid'];
 			foreach ($hostHttpTests as $hostId => $hostHttpTest) {
 				// if http test template is not linked to host we skip it
-				if ($hostsTemplatesMap[$hostId] != $httpTest['hostid']) {
+				if (!array_key_exists($hostId, $template_hosts[$httpTest['hostid']])) {
 					continue;
 				}
 
@@ -391,10 +1482,6 @@ class CHttpTestManager {
 							_s('Web scenario "%1$s" already exists on host "%2$s".', $exHttpTest['name'], $host['name'])
 						);
 					}
-					elseif ($this->compareHttpProperties($httpTest, $exHttpTest)) {
-						$this->createLinkageBetweenHttpTests($httpTestId, $exHttpTest['httptestid']);
-						continue;
-					}
 				}
 
 				$newHttpTest = $httpTest;
@@ -404,14 +1491,34 @@ class CHttpTestManager {
 				if ($exHttpTest) {
 					$newHttpTest['httptestid'] = $exHttpTest['httptestid'];
 
-					$this->setHttpTestParent($exHttpTest['httptestid'], $httpTestId);
+					if (array_key_exists('variables', $newHttpTest)) {
+						foreach ($newHttpTest['variables'] as &$variable) {
+							unset($variable['httptest_fieldid']);
+						}
+						unset($variable);
+					}
 
-					if (isset($newHttpTest['steps'])) {
-						$newHttpTest['steps'] = $this->prepareHttpSteps($httpTest['steps'], $exHttpTest['httptestid']);
+					if (isset($hostHttpTest['byTemplateId'][$httpTestId])) {
+						$this->setHttpTestParent($exHttpTest['httptestid'], $httpTestId);
+
+						if (isset($newHttpTest['steps'])) {
+							$newHttpTest['steps'] = $this->prepareHttpSteps($httpTest['steps'],
+								$exHttpTest['httptestid']
+							);
+						}
+					}
+					elseif (isset($hostHttpTest['byName'][$httpTest['name']])) {
+						unset($newHttpTest['steps']);
 					}
 				}
 				else {
 					unset($newHttpTest['httptestid']);
+					$newHttpTest['host_status'] = $template_hosts[$httpTest['hostid']][$hostId]['status'];
+
+					foreach ($newHttpTest['steps'] as &$step) {
+						unset($step['httpstepid']);
+					}
+					unset($step);
 				}
 
 				$result[] = $newHttpTest;
@@ -419,72 +1526,6 @@ class CHttpTestManager {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Compare properties for http tests.
-	 *
-	 * @param array $http_test			Current http test properties.
-	 * @param array $ex_http_test		Existing http test properties to compare with.
-	 *
-	 * @return bool
-	 */
-	protected function compareHttpProperties(array $http_test, array $ex_http_test) {
-		return ($http_test['http_proxy'] === $ex_http_test['http_proxy']
-				&& $http_test['agent'] === $ex_http_test['agent']
-				&& $http_test['retries'] == $ex_http_test['retries']
-				&& $http_test['delay'] === $ex_http_test['delay']);
-	}
-
-	/**
-	 * Create linkage between two http tests.
-	 * If we found existing http test by name and steps, we only add linkage, i.e. change templateid
-	 *
-	 * @param $parentId
-	 * @param $childId
-	 */
-	protected function createLinkageBetweenHttpTests($parentId, $childId) {
-		DB::update('httptest', [
-			'values' => [
-				'templateid' => $parentId,
-				'uuid' => ''
-			],
-			'where' => ['httptestid' => $childId]
-		]);
-
-		$dbCursor = DBselect(
-			'SELECT i1.itemid AS parentid,i2.itemid AS childid'.
-			' FROM httptestitem hti1,httptestitem hti2,items i1,items i2'.
-			' WHERE hti1.httptestid='.zbx_dbstr($parentId).
-				' AND hti2.httptestid='.zbx_dbstr($childId).
-				' AND hti1.itemid=i1.itemid'.
-				' AND hti2.itemid=i2.itemid'.
-				' AND i1.key_=i2.key_'
-		);
-		while ($dbItems = DBfetch($dbCursor)) {
-			DB::update('items', [
-				'values' => ['templateid' => $dbItems['parentid']],
-				'where' => ['itemid' => $dbItems['childid']]
-			]);
-		}
-
-		$dbCursor = DBselect(
-			'SELECT i1.itemid AS parentid,i2.itemid AS childid'.
-			' FROM httpstepitem hsi1,httpstepitem hsi2,httpstep hs1,httpstep hs2,items i1,items i2'.
-			' WHERE hs1.httptestid='.zbx_dbstr($parentId).
-				' AND hs2.httptestid='.zbx_dbstr($childId).
-				' AND hsi1.itemid=i1.itemid'.
-				' AND hsi2.itemid=i2.itemid'.
-				' AND hs1.httpstepid=hsi1.httpstepid'.
-				' AND hs2.httpstepid=hsi2.httpstepid'.
-				' AND i1.key_=i2.key_'
-		);
-		while ($dbItems = DBfetch($dbCursor)) {
-			DB::update('items', [
-				'values' => ['templateid' => $dbItems['parentid']],
-				'where' => ['itemid' => $dbItems['childid']]
-			]);
-		}
 	}
 
 	/**
@@ -512,20 +1553,23 @@ class CHttpTestManager {
 	 *     ), ...
 	 * );
 	 *
-	 * @param array $hostIds
+	 * @param array $template_hosts
 	 *
 	 * @return array
 	 */
-	protected function getHttpTestsMapsByHostIds(array $hostIds) {
+	protected function getHostHttpTests(array $template_hosts) {
 		$hostHttpTests = [];
-		foreach ($hostIds as $hostid) {
-			$hostHttpTests[$hostid] = ['byName' => [], 'byTemplateId' => []];
+
+		foreach ($template_hosts as $hosts) {
+			foreach ($hosts as $hostid => $foo) {
+				$hostHttpTests[$hostid] = ['byName' => [], 'byTemplateId' => []];
+			}
 		}
 
 		$dbCursor = DBselect(
 			'SELECT ht.httptestid,ht.name,ht.delay,ht.agent,ht.hostid,ht.templateid,ht.http_proxy,ht.retries'.
 			' FROM httptest ht'.
-			' WHERE '.dbConditionInt('ht.hostid', $hostIds)
+			' WHERE '.dbConditionId('ht.hostid', array_keys($hostHttpTests))
 		);
 		while ($dbHttpTest = DBfetch($dbCursor)) {
 			$hostHttpTests[$dbHttpTest['hostid']]['byName'][$dbHttpTest['name']] = $dbHttpTest;
@@ -643,638 +1687,22 @@ class CHttpTestManager {
 
 			if (isset($exSteps[$stepName])) {
 				$step['httpstepid'] = $exSteps[$stepName];
-				$step['httptestid'] = $exHttpTestId;
+			}
+			else {
+				unset($step['httpstepid']);
+			}
+
+			if (array_key_exists('variables', $step)) {
+				foreach ($step['variables'] as &$variable) {
+					unset($variable['httpstep_fieldid']);
+				}
+				unset($variable);
 			}
 
 			$result[] = $step;
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Create items required for web scenario.
-	 *
-	 * @param array $http_test
-	 * @param array  $_itemids
-	 *
-	 * @throws Exception
-	 */
-	protected function createHttpTestItems(array $http_test, array &$_itemids): void {
-		$checkitems = [
-			[
-				'name'				=> $this->getTestName(HTTPSTEP_ITEM_TYPE_IN, $http_test['name']),
-				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_IN, $http_test['name']),
-				'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
-				'units'				=> 'Bps',
-				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_IN
-			],
-			[
-				'name'				=> $this->getTestName(HTTPSTEP_ITEM_TYPE_LASTSTEP, $http_test['name']),
-				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_LASTSTEP, $http_test['name']),
-				'value_type'		=> ITEM_VALUE_TYPE_UINT64,
-				'units'				=> '',
-				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTSTEP
-			],
-			[
-				'name'				=> $this->getTestName(HTTPSTEP_ITEM_TYPE_LASTERROR, $http_test['name']),
-				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_LASTERROR, $http_test['name']),
-				'value_type'		=> ITEM_VALUE_TYPE_STR,
-				'units'				=> '',
-				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTERROR
-			]
-		];
-
-		// if this is a template scenario, fetch the parent http items to link inherited items to them
-		$parent_items = [];
-		if (isset($http_test['templateid']) && $http_test['templateid']) {
-			$parent_items = DBfetchArrayAssoc(DBselect(
-				'SELECT i.itemid,i.key_'.
-					' FROM items i,httptestitem hti'.
-					' WHERE i.itemid=hti.itemid'.
-					' AND hti.httptestid='.zbx_dbstr($http_test['templateid'])
-			), 'key_');
-		}
-
-		$delay = array_key_exists('delay', $http_test) ? $http_test['delay'] : DB::getDefault('httptest', 'delay');
-		$status = array_key_exists('status', $http_test) ? $http_test['status'] : DB::getDefault('httptest', 'status');
-
-		$ins_items = [];
-		foreach ($checkitems as $item) {
-			$item['hostid'] = $http_test['hostid'];
-			$item['delay'] = $delay;
-			$item['type'] = ITEM_TYPE_HTTPTEST;
-			$item['history'] = self::ITEM_HISTORY;
-			$item['trends'] = self::ITEM_TRENDS;
-			$item['status'] = ($status == HTTPTEST_STATUS_ACTIVE)
-				? ITEM_STATUS_ACTIVE
-				: ITEM_STATUS_DISABLED;
-
-			if (isset($parent_items[$item['key_']])) {
-				$item['templateid'] = $parent_items[$item['key_']]['itemid'];
-			}
-
-			$ins_items[] = $item;
-		}
-		$itemids = DB::insert('items', $ins_items);
-
-		$ins_item_rtdata = [];
-		foreach ($itemids as $itemid) {
-			$_itemids[] = $itemid;
-			$ins_item_rtdata[] = ['itemid' => $itemid];
-		}
-		DB::insertBatch('item_rtdata', $ins_item_rtdata, false);
-
-		$ins_httptestitem = [];
-		foreach ($checkitems as $inum => $item) {
-			$ins_httptestitem[] = [
-				'httptestid' => $http_test['httptestid'],
-				'itemid' => $itemids[$inum],
-				'type' => $item['httptestitemtype']
-			];
-		}
-		DB::insertBatch('httptestitem', $ins_httptestitem);
-	}
-
-	/**
-	 * Create web scenario fields.
-	 *
-	 * @param array  $httptests
-	 * @param string $httptests['httptestid']
-	 * @param array  $httptests['variables']           (optional)
-	 * @param string $httptests['variables']['name']
-	 * @param string $httptests['variables']['value']
-	 * @param array  $httptests['headers']             (optional)
-	 * @param string $httptests['headers']['name']
-	 * @param string $httptests['headers']['value']
-	 * @param string $method
-	 */
-	private function updateHttpTestFields(array $httptests, $method) {
-		$fields = [
-			ZBX_HTTPFIELD_VARIABLE => 'variables',
-			ZBX_HTTPFIELD_HEADER => 'headers'
-		];
-		$httptest_fields = [];
-
-		foreach ($httptests as $httptest) {
-			foreach ($fields as $type => $field) {
-				if (array_key_exists($field, $httptest)) {
-					$httptest_fields[$httptest['httptestid']][$type] = $httptest[$field];
-				}
-			}
-		}
-
-		if (!$httptest_fields) {
-			return;
-		}
-
-		$db_httptest_fields = ($method === 'update')
-			? DB::select('httptest_field', [
-				'output' => ['httptest_fieldid', 'httptestid', 'type', 'name', 'value'],
-				'filter' => ['httptestid' => array_keys($httptest_fields)],
-				'sortfield' => ['httptest_fieldid']
-			])
-			: [];
-
-		$ins_httptest_fields = [];
-		$upd_httptest_fields = [];
-		$del_httptest_fieldids = [];
-
-		foreach ($db_httptest_fields as $index =>  $db_httptest_field) {
-			if (array_key_exists($db_httptest_field['type'], $httptest_fields[$db_httptest_field['httptestid']])) {
-				$httptest_field =
-					array_shift($httptest_fields[$db_httptest_field['httptestid']][$db_httptest_field['type']]);
-
-				if ($httptest_field !== null) {
-					$upd_httptest_field = [];
-
-					foreach (['name', 'value'] as $field_name) {
-						if ($httptest_field[$field_name] !== $db_httptest_field[$field_name]) {
-							$upd_httptest_field[$field_name] = $httptest_field[$field_name];
-						}
-					}
-
-					if ($upd_httptest_field) {
-						$upd_httptest_fields[] = [
-							'values' => $upd_httptest_field,
-							'where' => ['httptest_fieldid' => $db_httptest_field['httptest_fieldid']]
-						];
-					}
-				}
-				else {
-					$del_httptest_fieldids[] = $db_httptest_field['httptest_fieldid'];
-				}
-			}
-		}
-
-		foreach ($httptest_fields as $httptestid => $httptest_fields_by_httptest) {
-			foreach ($httptest_fields_by_httptest as $type => $httptest_fields_by_type) {
-				foreach ($httptest_fields_by_type as $httptest_field) {
-					$ins_httptest_fields[] = [
-						'httptestid' => $httptestid,
-						'type' => $type
-					] + $httptest_field;
-				}
-			}
-		}
-
-		if ($ins_httptest_fields) {
-			DB::insertBatch('httptest_field', $ins_httptest_fields);
-		}
-
-		if ($upd_httptest_fields) {
-			DB::update('httptest_field', $upd_httptest_fields);
-		}
-
-		if ($del_httptest_fieldids) {
-			DB::delete('httptest_field', ['httptest_fieldid' => $del_httptest_fieldids]);
-		}
-	}
-
-	/**
-	 * Create web scenario step fields.
-	 *
-	 * @param array  $httpsteps
-	 * @param string $httpsteps['httpstepid']
-	 * @param array  $httpsteps['variables']           (optional)
-	 * @param string $httpsteps['variables']['name']
-	 * @param string $httpsteps['variables']['value']
-	 * @param array  $httpsteps['headers']             (optional)
-	 * @param string $httpsteps['headers']['name']
-	 * @param string $httpsteps['headers']['value']
-	 * @param string $method
-	 */
-	private function updateHttpStepFields(array $httpsteps, $method) {
-		$fields = [
-			ZBX_HTTPFIELD_VARIABLE => 'variables',
-			ZBX_HTTPFIELD_HEADER => 'headers',
-			ZBX_HTTPFIELD_POST_FIELD => 'post_fields',
-			ZBX_HTTPFIELD_QUERY_FIELD => 'query_fields'
-		];
-		$httpstep_fields = [];
-
-		foreach ($httpsteps as $httpstep) {
-			foreach ($fields as $type => $field) {
-				if (array_key_exists($field, $httpstep)) {
-					$httpstep_fields[$httpstep['httpstepid']][$type] = $httpstep[$field];
-				}
-			}
-		}
-
-		if (!$httpstep_fields) {
-			return;
-		}
-
-		$db_httpstep_fields = ($method === 'update')
-			? DB::select('httpstep_field', [
-				'output' => ['httpstep_fieldid', 'httpstepid', 'type', 'name', 'value'],
-				'filter' => ['httpstepid' => array_keys($httpstep_fields)],
-				'sortfield' => ['httpstep_fieldid']
-			])
-			: [];
-
-		$ins_httpstep_fields = [];
-		$upd_httpstep_fields = [];
-		$del_httpstep_fieldids = [];
-
-		foreach ($db_httpstep_fields as $index =>  $db_httpstep_field) {
-			if (array_key_exists($db_httpstep_field['type'], $httpstep_fields[$db_httpstep_field['httpstepid']])) {
-				$httpstep_field =
-					array_shift($httpstep_fields[$db_httpstep_field['httpstepid']][$db_httpstep_field['type']]);
-
-				if ($httpstep_field !== null) {
-					$upd_httpstep_field = [];
-
-					foreach (['name', 'value'] as $field_name) {
-						if ($httpstep_field[$field_name] !== $db_httpstep_field[$field_name]) {
-							$upd_httpstep_field[$field_name] = $httpstep_field[$field_name];
-						}
-					}
-
-					if ($upd_httpstep_field) {
-						$upd_httpstep_fields[] = [
-							'values' => $upd_httpstep_field,
-							'where' => ['httpstep_fieldid' => $db_httpstep_field['httpstep_fieldid']]
-						];
-					}
-				}
-				else {
-					$del_httpstep_fieldids[] = $db_httpstep_field['httpstep_fieldid'];
-				}
-			}
-		}
-
-		foreach ($httpstep_fields as $httpstepid => $httpstep_fields_by_httpstep) {
-			foreach ($httpstep_fields_by_httpstep as $type => $httpstep_fields_by_type) {
-				foreach ($httpstep_fields_by_type as $httpstep_field) {
-					$ins_httpstep_fields[] = [
-						'httpstepid' => $httpstepid,
-						'type' => $type
-					] + $httpstep_field;
-				}
-			}
-		}
-
-		if ($ins_httpstep_fields) {
-			DB::insertBatch('httpstep_field', $ins_httpstep_fields);
-		}
-
-		if ($upd_httpstep_fields) {
-			DB::update('httpstep_field', $upd_httpstep_fields);
-		}
-
-		if ($del_httpstep_fieldids) {
-			DB::delete('httpstep_field', ['httpstep_fieldid' => $del_httpstep_fieldids]);
-		}
-	}
-
-	/**
-	 * Create web scenario steps with items.
-	 *
-	 * @param array  $http_test
-	 * @param array  $websteps
-	 * @param array  $_itemids
-	 *
-	 * @throws Exception
-	 */
-	protected function createStepsReal(array $http_test, array $websteps, array &$_itemids): void {
-		foreach ($websteps as &$webstep) {
-			$webstep['httptestid'] = $http_test['httptestid'];
-
-			if (array_key_exists('posts', $webstep)) {
-				if (is_array($webstep['posts'])) {
-					$webstep['post_fields'] = $webstep['posts'];
-					$webstep['posts'] = '';
-					$webstep['post_type'] = ZBX_POSTTYPE_FORM;
-				}
-				else {
-					$webstep['post_fields'] = [];
-					$webstep['post_type'] = ZBX_POSTTYPE_RAW;
-				}
-			}
-		}
-		unset($webstep);
-
-		$webstepids = DB::insert('httpstep', $websteps);
-
-		// if this is a template scenario, fetch the parent http items to link inherited items to them
-		$parent_step_items = [];
-		if (isset($http_test['templateid']) && $http_test['templateid']) {
-			$parent_step_items = DBfetchArrayAssoc(DBselect(
-				'SELECT i.itemid,i.key_,hsi.httpstepid'.
-				' FROM items i,httpstepitem hsi,httpstep hs'.
-				' WHERE i.itemid=hsi.itemid'.
-					' AND hsi.httpstepid=hs.httpstepid'.
-					' AND hs.httptestid='.zbx_dbstr($http_test['templateid'])
-			), 'key_');
-		}
-
-		$ins_httpstepitem = [];
-		$ins_item_rtdata = [];
-
-		foreach ($websteps as $snum => &$webstep) {
-			$webstep['httpstepid'] = $webstepids[$snum];
-
-			$stepitems = [
-				[
-					'name' => $this->getStepName(HTTPSTEP_ITEM_TYPE_IN, $http_test['name'], $webstep['name']),
-					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_IN, $http_test['name'], $webstep['name']),
-					'value_type' => ITEM_VALUE_TYPE_FLOAT,
-					'units' => 'Bps',
-					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_IN
-				],
-				[
-					'name' => $this->getStepName(HTTPSTEP_ITEM_TYPE_TIME, $http_test['name'], $webstep['name']),
-					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_TIME, $http_test['name'], $webstep['name']),
-					'value_type' => ITEM_VALUE_TYPE_FLOAT,
-					'units' => 's',
-					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_TIME
-				],
-				[
-					'name' => $this->getStepName(HTTPSTEP_ITEM_TYPE_RSPCODE, $http_test['name'], $webstep['name']),
-					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_RSPCODE, $http_test['name'], $webstep['name']),
-					'value_type' => ITEM_VALUE_TYPE_UINT64,
-					'units' => '',
-					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_RSPCODE
-				]
-			];
-
-			if (!isset($http_test['delay']) || !isset($http_test['status'])) {
-				$db_httptest = DBfetch(DBselect(
-					'SELECT ht.delay,ht.status'.
-					' FROM httptest ht'.
-					' WHERE ht.httptestid='.zbx_dbstr($http_test['httptestid'])
-				));
-				$delay = $db_httptest['delay'];
-				$status = $db_httptest['status'];
-			}
-			else {
-				$delay = $http_test['delay'];
-				$status = $http_test['status'];
-			}
-
-			$ins_items = [];
-			foreach ($stepitems as $item) {
-				$item['hostid'] = $http_test['hostid'];
-				$item['delay'] = $delay;
-				$item['type'] = ITEM_TYPE_HTTPTEST;
-				$item['history'] = self::ITEM_HISTORY;
-				$item['trends'] = self::ITEM_TRENDS;
-				$item['status'] = (HTTPTEST_STATUS_ACTIVE == $status) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
-
-				if (isset($parent_step_items[$item['key_']])) {
-					$item['templateid'] = $parent_step_items[$item['key_']]['itemid'];
-				}
-
-				$ins_items[] = $item;
-			}
-			$itemids = DB::insert('items', $ins_items);
-
-			foreach ($stepitems as $inum => $item) {
-				$_itemids[] = $itemids[$inum];
-				$ins_httpstepitem[] = [
-					'httpstepid' => $webstep['httpstepid'],
-					'itemid' => $itemids[$inum],
-					'type' => $item['httpstepitemtype']
-				];
-			}
-
-			foreach ($itemids as $itemid) {
-				$ins_item_rtdata[] = ['itemid' => $itemid];
-			}
-		}
-		unset($webstep);
-
-		DB::insertBatch('httpstepitem', $ins_httpstepitem);
-		DB::insertBatch('item_rtdata', $ins_item_rtdata, false);
-
-		$this->updateHttpStepFields($websteps, 'create');
-	}
-
-	/**
-	 * Update web scenario steps.
-	 *
-	 * @param array  $httpTest
-	 * @param array  $websteps
-	 * @param array  $itemids_per_http_tests
-	 *
-	 * @throws Exception
-	 */
-	protected function updateStepsReal(array $httpTest, array $websteps, array &$_itemids): void {
-		$item_key_parser = new CItemKey();
-
-		foreach ($websteps as &$webstep) {
-			if (array_key_exists('posts', $webstep)) {
-				if (is_array($webstep['posts'])) {
-					$webstep['post_fields'] = $webstep['posts'];
-					$webstep['posts'] = '';
-					$webstep['post_type'] = ZBX_POSTTYPE_FORM;
-				}
-				else {
-					$webstep['post_fields'] = [];
-					$webstep['post_type'] = ZBX_POSTTYPE_RAW;
-				}
-			}
-		}
-		unset($webstep);
-
-		foreach ($websteps as $webstep) {
-			DB::update('httpstep', [
-				'values' => $webstep,
-				'where' => ['httpstepid' => $webstep['httpstepid']]
-			]);
-
-			// update item keys
-			$stepitems_update = [];
-			$dbStepItems = DBselect(
-				'SELECT i.itemid,i.name,i.key_,hi.type'.
-				' FROM items i,httpstepitem hi'.
-				' WHERE hi.httpstepid='.zbx_dbstr($webstep['httpstepid']).
-					' AND hi.itemid=i.itemid'
-			);
-			while ($stepitem = DBfetch($dbStepItems)) {
-				$_itemids[] = $stepitem['itemid'];
-				$update_fields = [];
-
-				if (isset($httpTest['name']) || isset($webstep['name'])) {
-					if (!isset($httpTest['name']) || !isset($webstep['name'])) {
-						$item_key_parser->parse($stepitem['key_']);
-						if (!isset($httpTest['name'])) {
-							$httpTest['name'] = $item_key_parser->getParam(0);
-						}
-						if (!isset($webstep['name'])) {
-							$webstep['name'] = $item_key_parser->getParam(1);
-						}
-					}
-
-					$update_fields['name'] = $this->getStepName($stepitem['type'], $httpTest['name'], $webstep['name']);
-					if ($update_fields['name'] === $stepitem['name']) {
-						unset($update_fields['name']);
-					}
-
-					$update_fields['key_'] = $this->getStepKey($stepitem['type'], $httpTest['name'], $webstep['name']);
-					if ($update_fields['key_'] === $stepitem['key_']) {
-						unset($update_fields['key_']);
-					}
-				}
-				if (isset($httpTest['status'])) {
-					$update_fields['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status'])
-						? ITEM_STATUS_ACTIVE
-						: ITEM_STATUS_DISABLED;
-				}
-				if (isset($httpTest['delay'])) {
-					$update_fields['delay'] = $httpTest['delay'];
-				}
-				if (!empty($update_fields)) {
-					$stepitems_update[] = [
-						'values' => $update_fields,
-						'where' => ['itemid' => $stepitem['itemid']]
-					];
-				}
-			}
-
-			if ($stepitems_update) {
-				DB::update('items', $stepitems_update);
-			}
-		}
-
-		$this->updateHttpStepFields($websteps, 'update');
-	}
-
-	/**
-	 * Update web items after changes in web scenario.
-	 * This should be used, when individual steps are not being updated.
-	 *
-	 * @param array $httptest
-	 * @param array $db_httptest
-	 */
-	protected function updateStepItems(array $httptest, array $db_httptest): void {
-		$has_status = array_key_exists('status', $httptest);
-		$has_name_changed = ($httptest['name'] !== $db_httptest['name']);
-
-		$stepids = array_column($db_httptest['steps'], 'httpstepid');
-
-		$stepitems = DBfetchArrayAssoc(DBselect(
-			'SELECT i.itemid, hsi.httpstepid, hsi.type'.
-				' FROM items i,httpstepitem hsi'.
-				' WHERE i.itemid=hsi.itemid'.
-					' AND '.dbConditionInt('hsi.httpstepid', $stepids)
-		), 'itemid');
-
-		$stepitemids = array_keys($stepitems);
-
-		if ($has_status) {
-			$status = ($httptest['status'] == HTTPTEST_STATUS_ACTIVE)
-				? ITEM_STATUS_ACTIVE
-				: ITEM_STATUS_DISABLED;
-
-			DB::update('items', [
-				'values' => ['status' => $status],
-				'where' => ['itemid' => $stepitemids]
-			]);
-		}
-
-		if ($has_name_changed) {
-			$db_websteps = zbx_toHash($db_httptest['steps'], 'httpstepid');
-			$stepitems_update = [];
-
-			foreach ($stepitems as $stepitem) {
-				$db_webstep = $db_websteps[$stepitem['httpstepid']];
-
-				$stepitems_update[] = [
-					'values' => [
-						'name' => $this->getStepName($stepitem['type'], $httptest['name'], $db_webstep['name']),
-						'key_' => $this->getStepKey($stepitem['type'], $httptest['name'], $db_webstep['name'])
-					],
-					'where' => ['itemid' => $stepitem['itemid']]
-				];
-			}
-
-			if ($stepitems_update) {
-				DB::update('items', $stepitems_update);
-			}
-		}
-	}
-
-	/**
-	 * Create tags for http test and http test step items.
-	 * All items should belong to the same http test and should have same set of tags.
-	 *
-	 * @static
-	 *
-	 * @param array $tags     New tags to save.
-	 * @param array $itemids  List of itemids.
-	 */
-	protected static function createItemsTags(array $tags, array $itemids): void {
-		$new_tags = [];
-		foreach ($tags as $tag) {
-			foreach ($itemids as $itemid) {
-				$new_tags[] = $tag + ['itemid' => $itemid];
-			}
-		}
-
-		DB::insert('item_tag', $new_tags);
-	}
-
-	/**
-	 * Update step item tags.
-	 * Function assumes that all step items has same set of tags. Not suitable for steps from different web scenarios.
-	 *
-	 * @static
-	 *
-	 * @param array $tags         New tags to save.
-	 * @param array $stepitemids  List of step itemids to update.
-	 */
-	protected static function updateItemsTags(array $tags, array $stepitemids): void {
-		// Select tags from database.
-		$db_tags_raw = DB::select('item_tag', [
-			'output' => ['itemtagid', 'tag', 'value', 'itemid'],
-			'filter' => ['itemid' => $stepitemids]
-		]);
-		$db_tags = [];
-		foreach ($db_tags_raw as $tag) {
-			$db_tags[$tag['itemid']][$tag['tag']][$tag['value']] = $tag['itemtagid'];
-		}
-
-		// Make array with new tags.
-		$item_tags_add = array_fill_keys($stepitemids, $tags);
-
-		// Unset tags which don't need to add/delete.
-		foreach ($db_tags as $stepitemid => $item_tags_del) {
-			foreach ($item_tags_add[$stepitemid] as $new_tag_key => $tag_add) {
-				if (array_key_exists($tag_add['tag'], $item_tags_del)
-						&& array_key_exists($tag_add['value'], $item_tags_del[$tag_add['tag']])) {
-					unset($item_tags_add[$stepitemid][$new_tag_key],
-						$db_tags[$stepitemid][$tag_add['tag']][$tag_add['value']]
-					);
-				}
-			}
-		}
-
-		// Delete tags.
-		$del_tagids = [];
-		foreach ($db_tags as $db_tag) {
-			foreach ($db_tag as $db_tagids) {
-				if ($db_tagids) {
-					$del_tagids = array_merge($del_tagids, array_values($db_tagids));
-				}
-			}
-		}
-		if ($del_tagids) {
-			DB::delete('item_tag', ['itemtagid' => $del_tagids]);
-		}
-
-		// Add new tags.
-		$new_tags = [];
-		foreach ($item_tags_add as $stepitemid => $tags) {
-			foreach ($tags as $tag) {
-				$tag['itemid'] = $stepitemid;
-				$new_tags[] = $tag;
-			}
-		}
-		if ($new_tags) {
-			DB::insert('item_tag', $new_tags);
-		}
 	}
 
 	/**
@@ -1285,7 +1713,7 @@ class CHttpTestManager {
 	 *
 	 * @return string
 	 */
-	protected function getTestKey(int $type, string $test_name): string {
+	protected static function getTestKey(int $type, string $test_name): string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
 				return 'web.test.in['.quoteItemKeyParam($test_name).',,bps]';
@@ -1306,7 +1734,7 @@ class CHttpTestManager {
 	 *
 	 * @return string
 	 */
-	protected function getTestName(int $type, string $test_name): string {
+	private static function getTestName(int $type, string $test_name): string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
 				return 'Download speed for scenario "'.$test_name.'".';
@@ -1328,7 +1756,7 @@ class CHttpTestManager {
 	 *
 	 * @return string
 	 */
-	protected function getStepKey(int $type, string $test_name, string $step_name): string {
+	private static function getStepKey(int $type, string $test_name, string $step_name): string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
 				return 'web.test.in['.quoteItemKeyParam($test_name).','.quoteItemKeyParam($step_name).',bps]';
@@ -1350,7 +1778,7 @@ class CHttpTestManager {
 	 *
 	 * @return string
 	 */
-	protected function getStepName(int $type, string $test_name, string $step_name): string {
+	private static function getStepName(int $type, string $test_name, string $step_name): string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
 				return 'Download speed for step "'.$step_name.'" of scenario "'.$test_name.'".';
@@ -1415,99 +1843,5 @@ class CHttpTestManager {
 		}
 
 		return $data;
-	}
-
-	/**
-	 * Record web scenario tags into database.
-	 *
-	 * @static
-	 *
-	 * @param array  $http_tests
-	 * @param array  $http_tests[]['tags']
-	 * @param string $http_tests[]['tags'][]['tag']
-	 * @param string $http_tests[]['tags'][]['value']
-	 * @param string $http_tests[]['httptestid']
-	 */
-	protected static function createHttpTestTags(array $http_tests): void {
-		$new_tags = [];
-		foreach ($http_tests as $http_test) {
-			if (!array_key_exists('tags', $http_test)) {
-				continue;
-			}
-
-			foreach ($http_test['tags'] as $tag) {
-				$new_tags[] = $tag + ['httptestid' => $http_test['httptestid']];
-			}
-		}
-
-		if ($new_tags) {
-			DB::insert('httptest_tag', $new_tags);
-		}
-	}
-
-	/**
-	 * Update web scenario tags.
-	 *
-	 * @static
-	 *
-	 * @param array  $http_tests
-	 * @param string $http_tests[]['httptestid']
-	 * @param array  $http_tests[]['tags']
-	 * @param string $http_tests[]['tags'][]['tag']
-	 * @param string $http_tests[]['tags'][]['value']
-	 */
-	protected static function updateHttpTestTags(array $http_tests): void {
-		$http_tests = zbx_toHash($http_tests, 'httptestid');
-
-		// Select tags from database.
-		$db_httptest_tags_raw = DB::select('httptest_tag', [
-			'output' => ['httptesttagid', 'httptestid', 'tag', 'value'],
-			'filter' => ['httptestid' => array_column($http_tests, 'httptestid')]
-		]);
-
-		$db_httptest_tags = [];
-		foreach ($db_httptest_tags_raw as $tag) {
-			$db_httptest_tags[$tag['httptestid']][] = $tag;
-		}
-
-		// Find which tags must be added/deleted.
-		$del_tagids = [];
-		foreach ($db_httptest_tags as $httptestid => $db_tags) {
-			if (!array_key_exists('tags', $http_tests[$httptestid])) {
-				continue;
-			}
-
-			foreach ($db_tags as $del_tag_key => $tag_delete) {
-				foreach ($http_tests[$httptestid]['tags'] as $new_tag_key => $tag_add) {
-					if ($tag_delete['tag'] === $tag_add['tag'] && $tag_delete['value'] === $tag_add['value']) {
-						unset($db_tags[$del_tag_key], $http_tests[$httptestid]['tags'][$new_tag_key]);
-						continue 2;
-					}
-				}
-			}
-
-			if ($db_tags) {
-				$del_tagids = array_merge($del_tagids, array_column($db_tags, 'httptesttagid'));
-			}
-		}
-
-		$new_tags = [];
-		foreach ($http_tests as $httptestid => $http_test) {
-			if (!array_key_exists('tags', $http_test)) {
-				continue;
-			}
-
-			foreach ($http_test['tags'] as $tag) {
-				$tag['httptestid'] = $httptestid;
-				$new_tags[] = $tag;
-			}
-		}
-
-		if ($del_tagids) {
-			DB::delete('httptest_tag', ['httptesttagid' => $del_tagids]);
-		}
-		if ($new_tags) {
-			DB::insert('httptest_tag', $new_tags);
-		}
 	}
 }

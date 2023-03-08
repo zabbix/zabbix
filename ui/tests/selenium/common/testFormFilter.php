@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -91,6 +90,45 @@ class testFormFilter extends CWebTest {
 	}
 
 	/**
+	 * Create, remember and check filter.
+	 *
+	 * @param array  $data				given data provider
+	 * @param string $table_selector	selector of a table with filtered data
+	 */
+	public function checkRememberedFilters($data, $table_selector = 'class:list-table') {
+		$this->page->login()->open($this->url.'&filter_reset=1')->waitUntilReady();
+
+		// Checking if home tab is selected.
+		$xpath = 'xpath://li[@data-target="tabfilter_0"]';
+		if ($this->query($xpath)->one()->getAttribute('class') === 'tabfilter-item-label') {
+			$this->query($xpath.'/a')->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
+		}
+
+		$home_form = $this->query('xpath://div[@id="tabfilter_0"]/form')->asForm()->one();
+		$home_form->fill($data);
+
+		$result_table = $this->query($table_selector)->asTable()->waitUntilPresent()->one();
+		$this->query('name:filter_apply')->waitUntilClickable()->one()->click();
+		$result_table->waitUntilReloaded();
+		$filter_result = $result_table->getRows()->asText();
+
+		// Go to another page, to check saved filter after.
+		$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
+
+		// Open filter page again.
+		$this->page->open($this->url)->waitUntilReady();
+
+		// Check that filter form fields and table result match.
+		$home_form->invalidate()->checkValue($data);
+		$this->assertEquals($filter_result, $result_table->getRows()->asText());
+
+		// Reset filter not to interfere next tests.
+		$this->query('name:filter_reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+	}
+
+	/**
 	 * Change data in filter form.
 	 *
 	 * @param string $user              test user with saved filters
@@ -100,6 +138,7 @@ class testFormFilter extends CWebTest {
 	public function updateFilterForm($user, $password, $table_selector) {
 		$this->page->userLogin($user, $password);
 		$this->page->open($this->url)->waitUntilReady();
+		$table = $this->query($table_selector)->asTable()->waitUntilPresent()->one();
 
 		// Changing filter data.
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
@@ -115,32 +154,32 @@ class testFormFilter extends CWebTest {
 				$this->assertFalse($result_before === $this->getTableResults($table_selector));
 			}
 
-			$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
-			$this->page->waitUntilReady();
+			$this->query('xpath://a[@aria-label="Home"]')->one()->click();
+			$table->waitUntilReloaded();
 			$this->assertFalse($this->query('xpath://li[@data-target="tabfilter_1"]//span')->one()->hasClass('display-none'));
 
 			$filter_container->selectTab('update_tab');
+			$table->waitUntilReloaded();
 
 			if ($i === 0) {
 				$this->query('button:Reset')->one()->click();
+				$this->page->waitUntilReady();
+				$table->waitUntilReloaded();
 			}
 			else {
 				$this->assertTrue($result_before === $this->getTableResults($table_selector));
 				$this->query('button:Update')->one()->click();
+				$table->waitUntilReloaded();
 			}
 		}
 
-		// This time needed for filter to update table with results.
-		sleep(1);
-
 		// Getting changed host/problem result and then comparing it with displayed result from dropdown.
 		$result = $this->getTableResults($table_selector);
-		$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
+		$this->query('xpath://a[@aria-label="Home"]')->waitUntilClickable()->one()->click();
+		$table->waitUntilReloaded();
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
-		$this->page->waitUntilReady();
-		$this->assertEquals($result, $this->query('xpath://a[@aria-label="update_tab"]')
-				->one()->getAttribute('data-counter')
-		);
+		$popup_item = CPopupMenuElement::find()->waitUntilVisible()->one()->getItem('update_tab');
+		$this->assertEquals($result, $popup_item->getAttribute('data-counter'));
 
 		// Checking that hosts/problems amount in filter displayed near name at the tab changed.
 		$this->assertEquals($result, $this->query('xpath://li[@data-target="tabfilter_1"]/a')
@@ -228,6 +267,7 @@ class testFormFilter extends CWebTest {
 
 		// Checking if home tab is selected.
 		$xpath = 'xpath://li[@data-target="tabfilter_0"]';
+
 		if ($this->query($xpath)->one()->getAttribute('class') === 'tabfilter-item-label') {
 			$this->query($xpath.'/a')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
@@ -237,12 +277,13 @@ class testFormFilter extends CWebTest {
 			$home_form = $this->query('xpath://div[@id="tabfilter_0"]/form')->asForm()->one();
 			$home_form->fill($data['filter_form']);
 		}
-		$result_table = $this->query($table_selector)->one();
 
+		$result_table = $this->query($table_selector)->one();
 		$this->query('button:Save as')->one()->click();
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->fill($data['filter']);
 		$dialog->submit();
+
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			COverlayDialogElement::ensureNotPresent();
 			$result_table->waitUntilReloaded();

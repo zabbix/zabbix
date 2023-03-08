@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,6 +149,7 @@ function itemGetValueTest(overlay) {
 		url = new Curl('zabbix.php');
 
 	url.setArgument('action', 'popup.itemtest.getvalue');
+	url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', <?= json_encode(CCsrfTokenHelper::get('itemtest')) ?>);
 
 	post_data = jQuery.extend(post_data, {
 		interface: {
@@ -233,6 +234,7 @@ function itemCompleteTest(overlay) {
 		url = new Curl('zabbix.php');
 
 	url.setArgument('action', 'popup.itemtest.send');
+	url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', <?= json_encode(CCsrfTokenHelper::get('itemtest')) ?>);
 
 	post_data = jQuery.extend(post_data, {
 		get_value: form_data['get_value'] || 0,
@@ -510,10 +512,11 @@ jQuery(document).ready(function($) {
 
 				<?php if ($data['show_snmp_form']): ?>
 					$('#interface_details_version').on('change', function (e) {
-						$(`.js-popup-row-snmp-community, .js-popup-row-snmpv3-contextname,
-							.js-popup-row-snmpv3-securityname, .js-popup-row-snmpv3-securitylevel,
-							.js-popup-row-snmpv3-authprotocol, .js-popup-row-snmpv3-authpassphrase,
-							.js-popup-row-snmpv3-privprotocol, .js-popup-row-snmpv3-privpassphrase`).hide();
+						$(`.js-popup-row-snmp-community, .js-popup-row-snmp-max-repetition,
+							.js-popup-row-snmpv3-contextname, .js-popup-row-snmpv3-securityname,
+							.js-popup-row-snmpv3-securitylevel, .js-popup-row-snmpv3-authprotocol,
+							.js-popup-row-snmpv3-authpassphrase, .js-popup-row-snmpv3-privprotocol,
+							.js-popup-row-snmpv3-privpassphrase`).hide();
 
 						switch (e.target.value) {
 							case '<?= SNMP_V1 ?>':
@@ -523,10 +526,11 @@ jQuery(document).ready(function($) {
 							case '<?= SNMP_V2C ?>':
 								$('#interface_details_securitylevel').off('change');
 								$('.js-popup-row-snmp-community').show();
+								$('.js-popup-row-snmp-max-repetition').show();
 								break;
 							case '<?= SNMP_V3 ?>':
 								$(`.js-popup-row-snmpv3-contextname, .js-popup-row-snmpv3-securityname,
-									.js-popup-row-snmpv3-securitylevel`).show();
+									.js-popup-row-snmpv3-securitylevel, .js-popup-row-snmp-max-repetition`).show();
 
 								$('#interface_details_securitylevel').on('change', function (e) {
 									$(`.js-popup-row-snmpv3-authprotocol, .js-popup-row-snmpv3-authpassphrase,

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,6 +117,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			$result = DBend(true);
 		}
 		catch (Exception $e) {
+			$result = false;
 			DBend(false);
 		}
 
@@ -205,7 +206,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			return false;
 		}
 
-		if (!copyItems($src_hostid, $hostid, true)) {
+		if (!copyItemsToHosts('hostids', [$src_hostid], false, [$hostid])) {
 			return false;
 		}
 

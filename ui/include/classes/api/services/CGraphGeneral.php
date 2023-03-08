@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -511,7 +511,7 @@ abstract class CGraphGeneral extends CApiService {
 	 */
 	protected function validateItemsCreate(array $graphs) {
 		$itemIds = [];
-		$itemid_rules = ['type' => API_ID, 'flags' => API_NOT_EMPTY];
+		$itemid_rules = ['type' => API_ID];
 
 		foreach ($graphs as $graph) {
 			// validate graph name
@@ -576,20 +576,19 @@ abstract class CGraphGeneral extends CApiService {
 	protected function validateCreate(array &$graphs) {
 		$colorValidator = new CColorValidator();
 
+		$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
+			'uuid' => ['type' => API_UUID],
+			'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+		]];
+
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_set = _('Cannot set "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
-					'uuid' =>		['type' => API_UUID]
-				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_set = _('Cannot set "%1$s" for graph prototype "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
-					'uuid' =>		['type' => API_UUID],
-					'discover' => 	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
-				]];
+				$api_input_rules['fields'] += ['discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]];
 				break;
 
 			default:
@@ -705,7 +704,7 @@ abstract class CGraphGeneral extends CApiService {
 	 */
 	protected function validateItemsUpdate(array $graphs, array $db_graphs) {
 		$dbFields = ['itemid' => null];
-		$itemid_rules = ['type' => API_ID, 'flags' => API_NOT_EMPTY];
+		$itemid_rules = ['type' => API_ID];
 
 		foreach ($graphs as $graph) {
 			// graph items are optional
@@ -765,17 +764,19 @@ abstract class CGraphGeneral extends CApiService {
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$colorValidator = new CColorValidator();
 
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'uuid' => ['type' => API_UUID],
+			'name' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+		]];
+
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_update = _('Cannot update "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_update = _('Cannot update "%1$s" for graph prototype "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
-				]];
+				$api_input_rules['fields'] += ['discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]];
 				break;
 
 			default:
@@ -791,12 +792,6 @@ abstract class CGraphGeneral extends CApiService {
 
 			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($key + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-
-			if (array_key_exists('uuid', $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/' . ($key + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
 			}
 
 			$templatedGraph = false;

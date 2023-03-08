@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,14 +65,15 @@ $form->addItem([
 	new CActionButtonList('action', 'dashboardids', [
 		'template.dashboard.delete' => [
 			'name' => _('Delete'),
-			'confirm' => _('Delete selected dashboards?')
+			'confirm' => _('Delete selected dashboards?'),
+			'csrf_token' => CCsrfTokenHelper::get('template')
 		]
 	], $checkbox_hash)
 ]);
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Dashboards'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DASHBOARD_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DASHBOARDS_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())

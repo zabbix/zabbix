@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,11 +69,11 @@ class testPageEventCorrelation extends CLegacyWebTest {
 		);
 
 		// Check the correlation names in frontend
-		$corelations = $this->getDbColumn('SELECT name FROM correlation');
-		$this->zbxTestTextPresent($corelations);
+		$correlations = $this->getDbColumn('SELECT name FROM correlation');
+		$this->zbxTestTextPresent($correlations);
 
 		// Check table footer to make sure that results are found
-		$i = count($corelations);
+		$i = count($correlations);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$i.' of '.$i.' found');
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestAssertElementText("//span[@id='selected_count']", '0 selected');

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,11 +106,11 @@ class CXmlConstantValue {
 	const PASSWORD = ITEM_AUTHTYPE_PASSWORD;
 	const PUBLIC_KEY = ITEM_AUTHTYPE_PUBLICKEY;
 
-	// const NONE = HTTPTEST_AUTH_NONE; // Duplicate.
-	const BASIC = HTTPTEST_AUTH_BASIC;
-	const NTLM = HTTPTEST_AUTH_NTLM;
-	const KERBEROS = HTTPTEST_AUTH_KERBEROS;
-	const DIGEST = HTTPTEST_AUTH_DIGEST;
+	// const NONE = ZBX_HTTP_AUTH_NONE; // Duplicate.
+	const BASIC = ZBX_HTTP_AUTH_BASIC;
+	const NTLM = ZBX_HTTP_AUTH_NTLM;
+	const KERBEROS = ZBX_HTTP_AUTH_KERBEROS;
+	const DIGEST = ZBX_HTTP_AUTH_DIGEST;
 
 	const ALIAS = 4;
 	const ASSET_TAG = 11;
@@ -278,6 +278,8 @@ class CXmlConstantValue {
 	const CSV_TO_JSON = ZBX_PREPROC_CSV_TO_JSON;
 	const STR_REPLACE = ZBX_PREPROC_STR_REPLACE;
 	const XML_TO_JSON = ZBX_PREPROC_XML_TO_JSON;
+	const SNMP_WALK_VALUE = ZBX_PREPROC_SNMP_WALK_VALUE;
+	const SNMP_WALK_TO_JSON = ZBX_PREPROC_SNMP_WALK_TO_JSON;
 
 	const AND_OR = CONDITION_EVAL_TYPE_AND_OR;
 	const XML_AND = CONDITION_EVAL_TYPE_AND;
@@ -296,6 +298,12 @@ class CXmlConstantValue {
 	const MEDIA_TYPE_SCRIPT = MEDIA_TYPE_EXEC;
 	const MEDIA_TYPE_SMS = MEDIA_TYPE_SMS;
 	const MEDIA_TYPE_WEBHOOK = MEDIA_TYPE_WEBHOOK;
+
+	const GENERIC_SMTP = CMediatypeHelper::EMAIL_PROVIDER_SMTP;
+	const GMAIL = CMediatypeHelper::EMAIL_PROVIDER_GMAIL;
+	const GMAIL_RELAY = CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY;
+	const OFFICE365 = CMediatypeHelper::EMAIL_PROVIDER_OFFICE365;
+	const OFFICE365_RELAY = CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY;
 
 	const STARTTLS = SMTP_CONNECTION_SECURITY_STARTTLS;
 	const SSL_OR_TLS = SMTP_CONNECTION_SECURITY_SSL_TLS;

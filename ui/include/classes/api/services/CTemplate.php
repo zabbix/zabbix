@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,6 +254,13 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+
+		$upcased_index = array_search($this->tableAlias().'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
+
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($template = DBfetch($res)) {
@@ -281,6 +288,7 @@ class CTemplate extends CHostGeneral {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['name_upper']);
 		}
 
 		// removing keys (hash -> array)
@@ -359,6 +367,8 @@ class CTemplate extends CHostGeneral {
 			'host' =>			['type' => API_H_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name'), 'default_source' => 'host'],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'description')],
+			'vendor_name' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'vendor_name')],
+			'vendor_version' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'vendor_version')],
 			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -384,10 +394,10 @@ class CTemplate extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkGroups($templates);
-		$this->checkDuplicates($templates);
+		self::checkVendorFields($templates);
 		self::checkAndAddUuid($templates);
-
+		$this->checkDuplicates($templates);
+		$this->checkGroups($templates);
 		$this->checkTemplates($templates);
 	}
 
@@ -462,10 +472,13 @@ class CTemplate extends CHostGeneral {
 	 */
 	protected function validateUpdate(array &$templates, array &$db_templates = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid'], ['host'], ['name']], 'fields' => [
+			'uuid' => 				['type' => API_UUID],
 			'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'description')],
+			'vendor_name' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'vendor_name')],
+			'vendor_version' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'vendor_version')],
 			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -493,7 +506,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$db_templates = $this->get([
-			'output' => ['templateid', 'host', 'name', 'description'],
+			'output' => ['templateid', 'host', 'name', 'description', 'vendor_name', 'vendor_version'],
 			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -505,11 +518,45 @@ class CTemplate extends CHostGeneral {
 
 		$this->addAffectedObjects($templates, $db_templates);
 
+		self::checkVendorFields($templates, $db_templates);
 		$this->checkDuplicates($templates, $db_templates);
 		$this->checkGroups($templates, $db_templates);
 		$this->checkTemplates($templates, $db_templates);
 		$this->checkTemplatesLinks($templates, $db_templates);
 		$templates = $this->validateHostMacros($templates, $db_templates);
+	}
+
+	/**
+	 * Check vendor fields for update or create operation.
+	 *
+	 * @param array      $templates
+	 * @param array|null $db_templates
+	 *
+	 * @throws Exception
+	 */
+	private static function checkVendorFields(array $templates, array $db_templates = null): void {
+		$vendor_fields = array_fill_keys(['vendor_name', 'vendor_version'], '');
+
+		foreach ($templates as $i => $template) {
+			if (!array_key_exists('vendor_name', $template) && !array_key_exists('vendor_version', $template)) {
+				continue;
+			}
+
+			$_template = array_intersect_key($template, $vendor_fields);
+
+			if ($db_templates === null) {
+				$_template += $vendor_fields;
+			}
+			else {
+				$_template += array_intersect_key($db_templates[$template['templateid']], $vendor_fields);
+			}
+
+			if (($_template['vendor_name'] === '') !== ($_template['vendor_version'] === '')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+					_('both vendor_name and vendor_version should be either present or empty')
+				));
+			}
+		}
 	}
 
 	/**
@@ -532,19 +579,24 @@ class CTemplate extends CHostGeneral {
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
+
 		if ($del_rules) {
 			CDiscoveryRuleManager::delete(array_keys($del_rules));
 		}
 
 		// delete the items
-		$del_items = API::Item()->get([
-			'output' => [],
-			'templateids' => $templateids,
-			'nopermissions' => true,
+		$db_items = DB::select('items', [
+			'output' => ['itemid', 'name'],
+			'filter' => [
+				'hostid' => $templateids,
+				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+				'type' => CItem::SUPPORTED_ITEM_TYPES
+			],
 			'preservekeys' => true
 		]);
-		if ($del_items) {
-			CItemManager::delete(array_keys($del_items));
+
+		if ($db_items) {
+			CItem::deleteForce($db_items);
 		}
 
 		// delete host from maps
@@ -616,15 +668,15 @@ class CTemplate extends CHostGeneral {
 			'operationid'=>$delOperationids
 		]);
 
-		// http tests
-		$delHttpTests = API::HttpTest()->get([
-			'templateids' => $templateids,
-			'output' => ['httptestid'],
-			'nopermissions' => 1,
+		// delete web scenarios
+		$db_httptests = DB::select('httptest', [
+			'output' => ['httptestid', 'name'],
+			'filter' => ['hostid' => $templateids],
 			'preservekeys' => true
 		]);
-		if (!empty($delHttpTests)) {
-			API::HttpTest()->delete(array_keys($delHttpTests), true);
+
+		if ($db_httptests) {
+			CHttpTest::deleteForce($db_httptests);
 		}
 
 		// Get host prototype operations from LLD overrides where this template is linked.
@@ -826,7 +878,7 @@ class CTemplate extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateMassAdd(array &$data, ?array &$db_templates): void {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'templates' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -938,7 +990,7 @@ class CTemplate extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateMassUpdate(array &$data, ?array &$db_templates): void {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'templates' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -1097,7 +1149,7 @@ class CTemplate extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateMassRemove(array &$data, ?array &$db_templates): void {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'templateids' =>		['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true],
 			'groupids' =>			['type' => API_IDS, 'flags' => API_NORMALIZE, 'uniq' => true],
 			'macros' =>				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE, 'uniq' => true, 'length' => DB::getFieldLength('hostmacro', 'macro')],

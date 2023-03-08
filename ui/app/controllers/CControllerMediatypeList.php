@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 class CControllerMediatypeList extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -83,7 +83,7 @@ class CControllerMediatypeList extends CController {
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['mediatypes'] = API::Mediatype()->get([
 			'output' => ['mediatypeid', 'name', 'type', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
-				'gsm_modem', 'username', 'status'
+				'gsm_modem', 'username', 'status', 'provider'
 			],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
@@ -106,7 +106,7 @@ class CControllerMediatypeList extends CController {
 
 			foreach ($data['mediatypes'] as &$mediaType) {
 				$mediaType['typeid'] = $mediaType['type'];
-				$mediaType['type'] = media_type2str($mediaType['type']);
+				$mediaType['type'] = CMediatypeHelper::getMediaTypes($mediaType['type']);
 				$mediaType['listOfActions'] = [];
 
 				foreach ($actions as $action) {

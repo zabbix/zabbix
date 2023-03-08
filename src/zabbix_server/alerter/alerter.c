@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,29 +19,35 @@
 
 #include "alerter.h"
 
-#include "log.h"
-#include "zbxnix.h"
-#include "zbxmedia.h"
-#include "zbxself.h"
-#include "zbxexec.h"
-#include "zbxipcservice.h"
-#include "dbcache.h"
 #include "alerter_protocol.h"
+#include "log.h"
+#include "zbxcacheconfig.h"
 #include "zbxembed.h"
+#include "zbxexec.h"
 #include "zbxhash.h"
+#include "zbxipcservice.h"
+#include "zbxmedia.h"
+#include "zbxnix.h"
+#include "zbxself.h"
+#include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxtypes.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
-
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
  * Purpose: execute script alert type                                         *
+ *                                                                            *
+ * Parameters: command       - [IN] command for execution                     *
+ *             error         - [OUT] error string if function fails           *
+ *             max_error_len - [IN] length of error buffer                    *
+ *                                                                            *
+ * Return value: SUCCEED if processed successfully, TIMEOUT_ERROR if          *
+ *               timeout occurred, SIG_ERROR if interrupted by signal or FAIL *
+ *               otherwise                                                    *
  *                                                                            *
  ******************************************************************************/
 static int	execute_script_alert(const char *command, char *error, size_t max_error_len)
@@ -63,7 +69,7 @@ static int	execute_script_alert(const char *command, char *error, size_t max_err
  *                                                                            *
  * Purpose: registers alerter with alert manager                              *
  *                                                                            *
- * Parameters: socket - [IN] the connections socket                           *
+ * Parameters: socket - [IN] connection socket                                *
  *                                                                            *
  ******************************************************************************/
 static void	alerter_register(zbx_ipc_socket_t *socket)
@@ -79,9 +85,10 @@ static void	alerter_register(zbx_ipc_socket_t *socket)
  *                                                                            *
  * Purpose: sends alert sending result to alert manager                       *
  *                                                                            *
- * Parameters: socket  - [IN] the connections socket                          *
- *             errcode - [IN] the error code                                  *
- *             value   - [IN] the value or error message                      *
+ * Parameters: socket  - [IN] connection socket                               *
+ *             value   - [IN] value or error message                          *
+ *             errcode - [IN]                                                 *
+ *             error   - [IN] error message                                   *
  *             debug   - [IN] debug message                                   *
  *                                                                            *
  ******************************************************************************/
@@ -101,6 +108,12 @@ static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int
  *                                                                            *
  * Purpose: create email In-Reply_To field value to group related messages    *
  *                                                                            *
+ * Parameters: mediatypeid - [IN]                                             *
+ *             sendto      - [IN] message's Send-To field                     *
+ *             eventid     - [IN]                                             *
+ *                                                                            *
+ * Return value: In-Reply_To field value                                      *
+ *                                                                            *
  ******************************************************************************/
 static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto, zbx_uint64_t eventid)
 {
@@ -115,7 +128,7 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 	zbx_md5_append(&state, (const md5_byte_t *)sendto, strlen(sendto));
 	zbx_md5_finish(&state, hash);
 
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ZBX_FS_UI64 ".", eventid);
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "<" ZBX_FS_UI64 ".", eventid);
 
 	for (i = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
 	{
@@ -123,7 +136,7 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, hex[hash[i] & 15]);
 	}
 
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "." ZBX_FS_UI64 ".%s@zabbix.com", mediatypeid,
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "." ZBX_FS_UI64 ".%s@zabbix.com>", mediatypeid,
 			zbx_dc_get_instanceid());
 
 	return str;
@@ -133,9 +146,8 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
  *                                                                            *
  * Purpose: processes email alert                                             *
  *                                                                            *
- * Parameters: socket      - [IN] the connections socket                      *
- *             ipc_message - [IN] the ipc message with media type and alert   *
- *                                data                                        *
+ * Parameters: socket      - [IN] connection socket                           *
+ *             ipc_message - [IN] ipc message with media type and alert data  *
  *                                                                            *
  ******************************************************************************/
 static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
@@ -174,9 +186,8 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
  *                                                                            *
  * Purpose: processes SMS alert                                               *
  *                                                                            *
- * Parameters: socket      - [IN] the connections socket                      *
- *             ipc_message - [IN] the ipc message with media type and alert   *
- *                                data                                        *
+ * Parameters: socket      - [IN] connection socket                           *
+ *             ipc_message - [IN] ipc message with media type and alert data  *
  *                                                                            *
  ******************************************************************************/
 static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
@@ -201,9 +212,8 @@ static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc
  *                                                                            *
  * Purpose: processes script alert                                            *
  *                                                                            *
- * Parameters: socket      - [IN] the connections socket                      *
- *             ipc_message - [IN] the ipc message with media type and alert   *
- *                                data                                        *
+ * Parameters: socket      - [IN] connection socket                           *
+ *             ipc_message - [IN] ipc message with media type and alert data  *
  *                                                                            *
  ******************************************************************************/
 static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
@@ -225,9 +235,8 @@ static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
  *                                                                            *
  * Purpose: processes webhook alert                                           *
  *                                                                            *
- * Parameters: socket      - [IN] the connections socket                      *
- *             ipc_message - [IN] the ipc message with media type and alert   *
- *                                data                                        *
+ * Parameters: socket      - [IN] connection socket                           *
+ *             ipc_message - [IN] ipc message with media type and alert data  *
  *                                                                            *
  ******************************************************************************/
 static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
@@ -281,25 +290,22 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
  * Purpose: periodically check table alerts and send notifications if needed  *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(alerter_thread, args)
+ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 {
-#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
-				/* once in STAT_INTERVAL seconds */
-
 	char			*error = NULL;
 	int			success_num = 0, fail_num = 0;
 	zbx_ipc_socket_t	alerter_socket;
 	zbx_ipc_message_t	message;
 	double			time_stat, time_idle = 0, time_now, time_read;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -320,11 +326,14 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
+
+#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
@@ -338,7 +347,9 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			fail_num = 0;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+#undef STAT_INTERVAL
+
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&alerter_socket, &message))
 		{
@@ -346,11 +357,11 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			exit(EXIT_FAILURE);
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
-		zbx_update_env(time_read);
+		zbx_update_env(get_process_type_string(process_type), time_read);
 
 		switch (message.code)
 		{

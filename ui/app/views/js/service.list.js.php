@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,10 +93,15 @@
 					this._delete(e.target, [e.target.dataset.serviceid]);
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
-					openMassupdatePopup('popup.massupdate.service', {location_url: this.back_url}, {
-						dialogue_class: 'modal-popup-static',
-						trigger_element: e.target
-					});
+					openMassupdatePopup('popup.massupdate.service', {
+							location_url: this.back_url,
+							<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?> :
+								<?= json_encode(CCsrfTokenHelper::get('service')) ?>
+						}, {
+							dialogue_class: 'modal-popup-static',
+							trigger_element: e.target
+						}
+					);
 				}
 				else if (e.target.classList.contains('js-massdelete-service')) {
 					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
@@ -131,7 +136,7 @@
 			});
 
 			dialogue.addEventListener('dialogue.delete', (e) => {
-				this._uncheckTableRows();
+				uncheckTableRows(chkbxRange.prefix);
 
 				postMessageOk(e.detail.title);
 
@@ -158,6 +163,9 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'service.delete');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('service')) ?>
+			);
 
 			return fetch(curl.getUrl(), {
 				method: 'POST',
@@ -173,7 +181,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						this._uncheckTableRows(response.keepids ?? []);
+						uncheckTableRows(chkbxRange.prefix, response.keepids);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -182,7 +190,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						this._uncheckTableRows();
+						uncheckTableRows(chkbxRange.prefix);
 					}
 
 					location.href = location.href;
@@ -197,14 +205,6 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-		}
-
-		_uncheckTableRows(keepids) {
-			const page = this.is_filtered
-				? 'service'
-				: 'service_' + this.path.concat(this.serviceid !== null ? [this.serviceid] : []).join('_');
-
-			uncheckTableRows(page, keepids);
 		}
 
 		_pauseRefresh() {

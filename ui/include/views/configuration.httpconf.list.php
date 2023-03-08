@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,9 +52,10 @@ $filter_column_left = (new CFormList())
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 			'data' => $data['filter']['hosts'],
 			'popup' => [
-				'filter_preselect_fields' => $data['context'] === 'host'
-					? ['hostgroups' => 'filter_groupids_']
-					: ['templategroups' => 'filter_groupids_'],
+				'filter_preselect' => [
+					'id' => 'filter_groupids_',
+					'submit_as' => 'groupid'
+				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
@@ -87,11 +88,11 @@ $filter = (new CFilter())
 	->addvar('context', $data['context'])
 	->addFilterTab(_('Filter'), [$filter_column_left, $filter_column_right]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Web monitoring'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_HTTPCONF_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATES_HTTPCONF_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_HTTPCONF_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_HTTPCONF_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,
@@ -114,10 +115,10 @@ $widget = (new CWidget())
 	);
 
 if (!empty($this->data['hostid'])) {
-	$widget->setNavigation(getHostNavigation('web', $this->data['hostid']));
+	$html_page->setNavigation(getHostNavigation('web', $this->data['hostid']));
 }
 
-$widget->addItem($filter);
+$html_page->addItem($filter);
 
 $url = (new CUrl('httpconf.php'))
 	->setArgument('context', $data['context'])
@@ -151,6 +152,8 @@ $httpTable = (new CTableInfo())
 
 $httpTestsLastData = $this->data['httpTestsLastData'];
 $http_tests = $data['http_tests'];
+
+$csrf_token = CCsrfTokenHelper::get('httpconf.php');
 
 foreach ($http_tests as $httpTestId => $httpTest) {
 	$name = [];
@@ -205,30 +208,37 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(httptest_status2style($httpTest['status']))
-			->addSID(),
+			->addClass(httptest_status2style($httpTest['status'])),
 		$data['tags'][$httpTest['httptestid']],
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }
 
 $button_list = [
-	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')],
-	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')]
+	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?'),
+		'csrf_token' => $csrf_token
+	],
+	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 if ($data['context'] === 'host') {
 	$button_list += [
 		'httptest.massclearhistory' => [
 			'name' => _('Clear history'),
-			'confirm' => _('Delete history of selected web scenarios?')
+			'confirm' => _('Delete history of selected web scenarios?'),
+			'csrf_token' => $csrf_token
 		]
 	];
 }
 
 $button_list += [
-	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?')]
+	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?'),
+			'csrf_token' => $csrf_token
+	]
 ];
 
 // Append table to form.
@@ -236,10 +246,9 @@ $httpForm->addItem([$httpTable, $data['paging'], new CActionButtonList('action',
 	$data['hostid']
 )]);
 
-// Append form to widget.
-$widget->addItem($httpForm);
-
-$widget->show();
+$html_page
+	->addItem($httpForm)
+	->show();
 
 (new CScriptTag('view.init();'))
 	->setOnDocumentReady()

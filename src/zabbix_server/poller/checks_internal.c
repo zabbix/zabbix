@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 **/
 
 #include "checks_internal.h"
-#include "zbxserver.h"
+#include "zbxstats.h"
 
 #include "checks_java.h"
 #include "zbxself.h"
@@ -28,12 +28,15 @@
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 #include "zbxavailability.h"
 #include "zbxnum.h"
+#include "zbxsysinfo.h"
+#include "zbx_host_constants.h"
 
 extern unsigned char	program_type;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {
-	const DC_INTERFACE2	*i1 = (DC_INTERFACE2 *)p1, *i2 = (DC_INTERFACE2 *)p2;
+	const DC_INTERFACE2	*i1 = (const DC_INTERFACE2 *)p1, *i2 = (const DC_INTERFACE2 *)p2;
 
 	if (i1->type > i2->type)		/* 1st criterion: 'type' in ascending order */
 		return 1;
@@ -168,25 +171,92 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
 	return SUCCEED;
 }
 
+static double	get_selfmon_stat(double busy, unsigned char state)
+{
+	return (ZBX_PROCESS_STATE_BUSY == state ? busy : 100.0 - busy);
+}
+
+static int	get_preprocessor_selfmon_stats(unsigned char aggr_func, int proc_num, unsigned char state,
+		double *value, char **error)
+{
+	zbx_vector_dbl_t	usage;
+	int			ret, count;
+
+	zbx_vector_dbl_create(&usage);
+
+	if (SUCCEED != (ret = zbx_preprocessor_get_usage_stats(&usage, &count, error)))
+		goto out;
+
+	if (0 == usage.values_num)
+	{
+		*value = 0;
+		goto out;
+	}
+
+	if (ZBX_SELFMON_AGGR_FUNC_ONE == aggr_func)
+	{
+		*value = get_selfmon_stat(usage.values[proc_num - 1], state);
+	}
+	else
+	{
+		double	min, max, total;
+
+		min = max = total = usage.values[0];
+
+		for (int i = 1; i < usage.values_num; i++)
+		{
+			if (usage.values[i] < min)
+				min = usage.values[i];
+
+			if (usage.values[i] > max)
+				max = usage.values[i];
+
+			total += usage.values[i];
+		}
+
+		switch (aggr_func)
+		{
+			case ZBX_SELFMON_AGGR_FUNC_AVG:
+				*value = get_selfmon_stat(total / usage.values_num, state);
+				break;
+			case ZBX_SELFMON_AGGR_FUNC_MIN:
+				*value = get_selfmon_stat(min, state);
+				break;
+			case ZBX_SELFMON_AGGR_FUNC_MAX:
+				*value = get_selfmon_stat(max, state);
+				break;
+		}
+	}
+out:
+	zbx_vector_dbl_destroy(&usage);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve data from Zabbix server (internally supported items)     *
  *                                                                            *
- * Parameters: item - item we are interested in                               *
+ * Parameters: item                - [IN] item we are interested in           *
+ *             result              - [OUT] value of the requested item        *
+ *             config_comms        - [IN] Zabbix server/proxy configuration   *
+ *                        for communication                                   *
+ *             config_startup_time - [IN] program startup time                *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
+		int config_startup_time)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
 	const char	*tmp, *tmp1;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
@@ -261,14 +331,14 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		}
 
 		if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp &&
-				FAIL == is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
+				FAIL == zbx_is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			goto out;
 		}
 
 		if (NULL != (tmp = get_rparam(&request, 2)) && '\0' != *tmp &&
-				FAIL == is_time_suffix(tmp, &to, ZBX_LENGTH_UNLIMITED))
+				FAIL == zbx_is_time_suffix(tmp, &to, ZBX_LENGTH_UNLIMITED))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
@@ -300,7 +370,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, time(NULL) - CONFIG_SERVER_STARTUP_TIME);
+		SET_UI64_RESULT(result, time(NULL) - config_startup_time);
 	}
 	else if (0 == strcmp(tmp, "boottime"))			/* zabbix["boottime"] */
 	{
@@ -310,7 +380,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, CONFIG_SERVER_STARTUP_TIME);
+		SET_UI64_RESULT(result, config_startup_time);
 	}
 	else if (0 == strcmp(tmp, "host"))			/* zabbix["host",*] */
 	{
@@ -424,8 +494,9 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 	{
 		int	res;
 
-		zbx_alarm_on(CONFIG_TIMEOUT);
-		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result);
+		zbx_alarm_on((unsigned int)config_comms->config_timeout);
+		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result,
+				config_comms->config_timeout);
 		zbx_alarm_off();
 
 		if (SUCCEED != res)
@@ -449,7 +520,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		process_type = get_process_type_by_name(get_rparam(&request, 1));
+		process_type = (unsigned char)get_process_type_by_name(get_rparam(&request, 1));
 
 		switch (process_type)
 		{
@@ -462,7 +533,6 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
-			case ZBX_PROCESS_TYPE_HEARTBEAT:
 				if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
@@ -474,7 +544,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		process_forks = get_process_type_forks(process_type);
+		process_forks = ZBX_PROCESS_TYPE_COUNT > process_type ? CONFIG_FORKS[process_type] : 0;
 
 		if (NULL == (tmp = get_rparam(&request, 2)))
 			tmp = "";
@@ -495,13 +565,13 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 			unsigned short	process_num = 0;
 
 			if ('\0' == *tmp || 0 == strcmp(tmp, "avg"))
-				aggr_func = ZBX_AGGR_FUNC_AVG;
+				aggr_func = ZBX_SELFMON_AGGR_FUNC_AVG;
 			else if (0 == strcmp(tmp, "max"))
-				aggr_func = ZBX_AGGR_FUNC_MAX;
+				aggr_func = ZBX_SELFMON_AGGR_FUNC_MAX;
 			else if (0 == strcmp(tmp, "min"))
-				aggr_func = ZBX_AGGR_FUNC_MIN;
-			else if (SUCCEED == is_ushort(tmp, &process_num) && 0 < process_num)
-				aggr_func = ZBX_AGGR_FUNC_ONE;
+				aggr_func = ZBX_SELFMON_AGGR_FUNC_MIN;
+			else if (SUCCEED == zbx_is_ushort(tmp, &process_num) && 0 < process_num)
+				aggr_func = ZBX_SELFMON_AGGR_FUNC_ONE;
 			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
@@ -531,7 +601,21 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 				goto out;
 			}
 
-			get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
+			if (ZBX_PROCESS_TYPE_PREPROCESSOR != process_type)
+			{
+				zbx_get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
+			}
+			else
+			{
+				char	*error = NULL;
+
+				if (SUCCEED != get_preprocessor_selfmon_stats(aggr_func, process_num, state, &value,
+						&error))
+				{
+					SET_MSG_RESULT(result, error);
+					goto out;
+				}
+			}
 
 			SET_DBL_RESULT(result, value);
 		}
@@ -700,7 +784,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 			else if (0 == strcmp(tmp1, "pfree"))
 			{
 				SET_DBL_RESULT(result, (double)(stats.memory_total - stats.memory_used) /
-						stats.memory_total * 100);
+						(double)stats.memory_total * 100);
 			}
 			else if (0 == strcmp(tmp1, "total"))
 			{
@@ -712,7 +796,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 			}
 			else if (0 == strcmp(tmp1, "pused"))
 			{
-				SET_DBL_RESULT(result, (double)stats.memory_used / stats.memory_total * 100);
+				SET_DBL_RESULT(result, (double)stats.memory_used / (double)stats.memory_total * 100);
 			}
 			else
 			{
@@ -747,7 +831,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		{
 			port_number = ZBX_DEFAULT_SERVER_PORT;
 		}
-		else if (SUCCEED != is_ushort(port_str, &port_number))
+		else if (SUCCEED != zbx_is_ushort(port_str, &port_number))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
@@ -763,11 +847,11 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 				/* work for both data received from internal and external source. */
 				zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 
-				zbx_get_zabbix_stats(&json);
+				zbx_zabbix_stats_get(&json, config_startup_time);
 
 				zbx_json_close(&json);
 
-				set_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+				zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
 
 				zbx_json_free(&json);
 			}
@@ -788,14 +872,14 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 					int	from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
 
 					if (NULL != tmp && '\0' != *tmp &&
-							FAIL == is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
+							FAIL == zbx_is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
 					{
 						SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 						goto out;
 					}
 
 					if (NULL != tmp1 && '\0' != *tmp1 &&
-							FAIL == is_time_suffix(tmp1, &to, ZBX_LENGTH_UNLIMITED))
+							FAIL == zbx_is_time_suffix(tmp1, &to, ZBX_LENGTH_UNLIMITED))
 					{
 						SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
 						goto out;
@@ -810,10 +894,10 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 
 					zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-					zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
+					zbx_json_addint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
 							DCget_item_queue(NULL, from, to));
 
-					set_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+					zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
 
 					zbx_json_free(&json);
 				}
@@ -897,19 +981,19 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		{
 			zbx_uint64_t	total = stats.hits + stats.misses;
 
-			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.misses / total * 100));
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.misses / (double)total * 100));
 		}
 		else if (0 == strcmp(tmp, "phits"))
 		{
 			zbx_uint64_t	total = stats.hits + stats.misses;
 
-			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.hits / total * 100));
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.hits / (double)total * 100));
 		}
 		else if (0 == strcmp(tmp, "pitems"))
 		{
 			zbx_uint64_t	total = stats.items_num + stats.requests_num;
 
-			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.items_num / total * 100));
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.items_num / (double)total * 100));
 		}
 		else
 		{
@@ -925,10 +1009,10 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 
 	ret = SUCCEED;
 out:
-	if (NOTSUPPORTED == ret && !ISSET_MSG(result))
+	if (NOTSUPPORTED == ret && !ZBX_ISSET_MSG(result))
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Internal check is not supported."));
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

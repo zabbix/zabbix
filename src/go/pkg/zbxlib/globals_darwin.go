@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,6 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxthreads/libzbxthreads.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxmutexs/libzbxmutexs.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxnix/libzbxnix.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxconf/libzbxconf.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxhttp/libzbxhttp.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcompress/libzbxcompress.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxregexp/libzbxregexp.a
@@ -48,8 +47,7 @@ package zbxlib
 #cgo pcre2 LDFLAGS: -lz -lpcre2-8 -lresolv
 #cgo LDFLAGS: -lz -lresolv
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "log.h"
 #include "../src/zabbix_agent/metrics.h"
@@ -57,6 +55,7 @@ package zbxlib
 
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
+typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 
 int CONFIG_MAX_LINES_PER_SECOND = 20;
 char ZBX_THREAD_LOCAL  *CONFIG_HOSTNAME = NULL;
@@ -65,8 +64,6 @@ int	CONFIG_ENABLE_REMOTE_COMMANDS= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS= 0;
 char	*CONFIG_SOURCE_IP= NULL;
 
-int	CONFIG_PASSIVE_FORKS = 0;
-int	CONFIG_ACTIVE_FORKS = 0;
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 const char	*progname = NULL;

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,6 +107,7 @@ $form_grid = (new CFormGrid())
 	]);
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('geomaps')))->removeId())
 	->setId('geomaps-form')
 	->setName('geomaps-form')
 	->setAction(
@@ -114,7 +115,7 @@ $form = (new CForm())
 			->setArgument('action', 'geomaps.update')
 			->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem(
 		(new CTabView())
 			->addTab('geomaps_tab', _('Geographical maps'), $form_grid)
@@ -123,7 +124,7 @@ $form = (new CForm())
 			))
 	);
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Geographical maps'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_GEOMAPS_EDIT))
@@ -131,7 +132,7 @@ $form = (new CForm())
 	->show();
 
 (new CScriptTag(
-	'view.init('. json_encode([
+	'view.init('.json_encode([
 		'tile_providers' => $data['tile_providers']
 	]).');'
 ))

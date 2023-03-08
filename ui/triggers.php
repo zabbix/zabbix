@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,13 +34,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'hostid' =>									[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'triggerid' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'(isset({form}) && ({form} == "update"))'],
-	'copy_type' =>								[T_ZBX_INT, O_OPT, P_SYS,
-													IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP,
-														COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE
-													]),
-													'isset({copy})'
-												],
-	'copy_mode' =>								[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),		null],
 	'type' =>									[T_ZBX_INT, O_OPT, null,	IN('0,1'),		null],
 	'description' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'event_name' =>								[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
@@ -50,6 +43,7 @@ $fields = [
 	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(ZBX_RECOVERY_MODE_EXPRESSION.','.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.','.ZBX_RECOVERY_MODE_NONE),	null],
 	'priority' =>								[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
 	'comments' =>								[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
+	'url_name' =>								[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'url' =>									[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'correlation_mode' =>						[T_ZBX_STR, O_OPT, null,	IN(ZBX_TRIGGER_CORRELATION_NONE.','.ZBX_TRIGGER_CORRELATION_TAG),	null],
 	'correlation_tag' =>						[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
@@ -60,12 +54,11 @@ $fields = [
 	'expr_target_single' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Target')],
 	'recovery_expr_temp' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add_recovery_expression}) || isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Recovery expression')],
 	'recovery_expr_target_single' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Target')],
-	'dependencies' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0',	'isset({add_dependency})'],
-	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'copy_targetids' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,			null],
-	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,			null],
+	'dependencies' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
+	'new_dependency' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID.'{}>0',	'isset({add_dependency})'],
+	'g_triggerid' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
+	'visible' =>								[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,			null],
+	'tags' =>									[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),		null],
 	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
 													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -77,7 +70,7 @@ $fields = [
 	// Filter related fields.
 	'filter_set' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
-	'filter_priority' =>						[T_ZBX_INT, O_OPT, null,
+	'filter_priority' =>						[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,
 													IN([
 														TRIGGER_SEVERITY_NOT_CLASSIFIED,
 														TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
@@ -85,8 +78,8 @@ $fields = [
 														TRIGGER_SEVERITY_DISASTER
 													]), null
 												],
-	'filter_groupids' =>						[T_ZBX_INT, O_OPT, null, DB_ID, null],
-	'filter_hostids' =>							[T_ZBX_INT, O_OPT, null, DB_ID, null],
+	'filter_groupids' =>						[T_ZBX_INT, O_OPT, P_ONLY_ARRAY, DB_ID, null],
+	'filter_hostids' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY, DB_ID, null],
 	'filter_inherited' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
 	'filter_discovered' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
 	'filter_dependent' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
@@ -103,10 +96,10 @@ $fields = [
 	'filter_evaltype' =>						[T_ZBX_INT, O_OPT, null,
 													IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), null
 												],
-	'filter_tags' =>							[T_ZBX_STR, O_OPT, null,	null,			null],
+	'filter_tags' =>							[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	// Action related fields.
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-													IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
+													IN('"trigger.massdelete","trigger.massdisable",'.
 														'"trigger.massenable"'
 													),
 													null
@@ -128,14 +121,13 @@ $fields = [
 	'group_enable' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'group_disable' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'group_delete' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'copy' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'clone' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>							[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>							[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'checkbox_hash' =>							[T_ZBX_STR, O_OPT, null,	null,		null],
 	'backurl' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
 	// Sort and sortorder.
@@ -258,6 +250,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$recovery_mode = getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION);
 	$recovery_expression = getRequest('recovery_expression', '');
 	$type = getRequest('type', 0);
+	$url_name = getRequest('url_name', '');
 	$url = getRequest('url', '');
 	$priority = getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED);
 	$comments = getRequest('comments', '');
@@ -274,6 +267,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'expression' => $expression,
 			'recovery_mode' => $recovery_mode,
 			'type' => $type,
+			'url_name' => $url_name,
 			'url' => $url,
 			'priority' => $priority,
 			'comments' => $comments,
@@ -308,9 +302,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 	else {
 		$db_triggers = API::Trigger()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
-				'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close',
-				'opdata', 'event_name'
+			'output' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments', 'templateid',
+				'type', 'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
+				'manual_close', 'opdata', 'event_name'
 			],
 			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
@@ -364,6 +358,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($db_trigger['type'] != $type) {
 				$trigger['type'] = $type;
+			}
+			if ($db_trigger['url_name'] !== $url_name) {
+				$trigger['url_name'] = $url_name;
 			}
 			if ($db_trigger['url'] !== $url) {
 				$trigger['url'] = $url;
@@ -496,50 +493,6 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('copy')
-		&& hasRequest('g_triggerid')) {
-	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hostids = getRequest('copy_targetids');
-		}
-		elseif (getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE_GROUP) {
-			$hostids = array_keys(API::Template()->get([
-				'output' => [],
-				'groupids' => getRequest('copy_targetids'),
-				'editable' => true,
-				'preservekeys' => true
-			]));
-		}
-		else {
-			$hostids = array_keys(API::Host()->get([
-				'output' => [],
-				'groupids' => getRequest('copy_targetids'),
-				'editable' => true,
-				'preservekeys' => true
-			]));
-		}
-
-		DBstart();
-
-		$result = copyTriggersToHosts($hostids, getRequest('hostid'), getRequest('g_triggerid'));
-		$result = DBend($result);
-
-		$triggers_count = count(getRequest('g_triggerid'));
-
-		if ($result) {
-			uncheckTableRows(getRequest('checkbox_hash'));
-			unset($_REQUEST['g_triggerid']);
-		}
-
-		show_messages($result,
-			_n('Trigger copied', 'Triggers copied', $triggers_count),
-			_n('Cannot copy trigger', 'Cannot copy triggers', $triggers_count)
-		);
-	}
-	else {
-		show_error_message(_('No target selected'));
-	}
-}
 elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' && hasRequest('g_triggerid')) {
 	$result = API::Trigger()->delete(getRequest('g_triggerid'));
 
@@ -556,7 +509,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' &&
 if (isset($_REQUEST['form'])) {
 	$data = [
 		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'parent_discoveryid' => null,
 		'dependencies' => getRequest('dependencies', []),
 		'db_dependencies' => [],
@@ -573,6 +526,7 @@ if (isset($_REQUEST['form'])) {
 		'priority' => getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		'status' => getRequest('status', TRIGGER_STATUS_ENABLED),
 		'comments' => getRequest('comments', ''),
+		'url_name' => getRequest('url_name', ''),
 		'url' => getRequest('url', ''),
 		'expression_constructor' => getRequest('expression_constructor', IM_ESTABLISHED),
 		'recovery_expression_constructor' => getRequest('recovery_expression_constructor', IM_ESTABLISHED),
@@ -593,13 +547,6 @@ if (isset($_REQUEST['form'])) {
 
 	// render view
 	echo (new CView('configuration.triggers.edit', getTriggerFormData($data)))->getOutput();
-}
-elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('g_triggerid')) {
-	$data = getCopyElementsFormData('g_triggerid', _('Triggers'));
-	$data['action'] = 'trigger.masscopyto';
-
-	// render view
-	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 else {
 	$data = [

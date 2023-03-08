@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	private $role;
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -90,6 +90,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'actions_manage_scheduled_reports' => 			'in 0,1',
 			'actions_manage_sla' => 						'in 0,1',
 			'actions_invoke_execute_now' =>					'in 0,1',
+			'actions_change_problem_ranking' =>				'in 0,1',
 			'ui_default_access' => 							'in 0,1',
 			'modules_default_access' => 					'in 0,1',
 			'actions_default_access' => 					'in 0,1',
@@ -180,7 +181,19 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			];
 		}
 
-		$data['labels'] = $this->getLabels();
+		$db_modules = API::Module()->get([
+			'output' => ['moduleid', 'relative_path', 'status']
+		]);
+
+		$disabled_modules = array_filter($db_modules,
+			static function(array $db_module): bool {
+				return $db_module['status'] == MODULE_STATUS_DISABLED;
+			}
+		);
+
+		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
+
+		$data['labels'] = $this->getLabels($db_modules);
 
 		$data['rules']['service_read_list'] = API::Service()->get([
 			'output' => ['serviceid', 'name'],
@@ -191,6 +204,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'output' => ['serviceid', 'name'],
 			'serviceids' => array_column($data['rules']['service_write_list'], 'serviceid')
 		]);
+
+		$data['form_refresh'] = $this->getInput('form_refresh', 0);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user roles'));
@@ -291,10 +306,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		return $data;
 	}
 
-	/**
-	 * @throws APIException
-	 */
-	private function getLabels(): array {
+	private function getLabels(array $db_modules): array {
 		$labels = [
 			'sections' => CRoleHelper::getUiSectionsLabels(USER_TYPE_SUPER_ADMIN),
 			'actions' => CRoleHelper::getActionsLabels(USER_TYPE_SUPER_ADMIN)
@@ -304,23 +316,21 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			$labels['rules'][$section] = CRoleHelper::getUiSectionRulesLabels($section, USER_TYPE_SUPER_ADMIN);
 		}
 
-		$db_modules = API::Module()->get([
-			'output' => ['moduleid', 'relative_path'],
-			'filter' => [
-				'status' => MODULE_STATUS_ENABLED
-			]
-		]);
+		$labels['modules'] = [];
 
 		if ($db_modules) {
-			$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
-			foreach ($db_modules as $module) {
-				$manifest = $module_manager->addModule($module['relative_path']);
-				$labels['modules'][$module['moduleid']] = $manifest['name'];
+			$module_manager = new CModuleManager(APP::getRootDir());
+
+			foreach ($db_modules as $db_module) {
+				$manifest = $module_manager->addModule($db_module['relative_path']);
+
+				if ($manifest !== null) {
+					$labels['modules'][$db_module['moduleid']] = $manifest['name'];
+				}
 			}
 		}
-		else {
-			$labels['modules'] = [];
-		}
+
+		natcasesort($labels['modules']);
 
 		return $labels;
 	}

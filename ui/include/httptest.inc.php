@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,11 +24,11 @@ require_once dirname(__FILE__).'/items.inc.php';
 
 function httptest_authentications($type = null) {
 	$authentication_types = [
-		HTTPTEST_AUTH_NONE => _('None'),
-		HTTPTEST_AUTH_BASIC => _('Basic'),
-		HTTPTEST_AUTH_NTLM => _('NTLM'),
-		HTTPTEST_AUTH_KERBEROS => _('Kerberos'),
-		HTTPTEST_AUTH_DIGEST => _('Digest')
+		ZBX_HTTP_AUTH_NONE => _('None'),
+		ZBX_HTTP_AUTH_BASIC => _('Basic'),
+		ZBX_HTTP_AUTH_NTLM => _('NTLM'),
+		ZBX_HTTP_AUTH_KERBEROS => _('Kerberos'),
+		ZBX_HTTP_AUTH_DIGEST => _('Digest')
 	];
 
 	if (is_null($type)) {
@@ -106,14 +106,7 @@ function deleteHistoryByHttpTestIds(array $httptestids): bool {
 		$result = (bool) API::History()->clear($itemids);
 	}
 
-	$result = ($result && DB::update('httptest', [
-		'values' => ['nextcheck' => 0],
-		'where' => ['httptestid' => $httptestids]
-	]));
-
-	$result = DBend($result);
-
-	return $result;
+	return DBend($result);
 }
 
 function get_httptest_by_httptestid($httptestid) {

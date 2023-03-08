@@ -930,8 +930,70 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC16
-# Test that adding values causes old data (outside active request range) to be dropped.
-test case: Add values after time causing old data to be dropped
+# Test that adding values to item not accessed for a day does not cause item to be dropped
+test case: Add values after item was not accessed for a day
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row42
+      value: value 4.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row45
+      value: value 4.5
+      ts: 2017-01-10 10:00:04.500000000 +00:00
+    - &row47
+      value: value 4.7
+      ts: 2017-01-10 10:00:04.700000000 +00:00
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:05.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:05.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:05.700000000 +00:00
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 5
+    count: 0
+    end: 2017-01-10 10:00:05.000000000 +00:00
+  test:
+    time: 2017-01-11 10:20:00.000000000 +00:00
+    values:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &new1
+        value: value 10.5.9
+        ts: 2017-01-11 10:10:05.900000000 +00:00
+out:
+  return: SUCCEED
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *row42
+      - *row45
+      - *row47
+      - *row52
+      - *row55
+      - *row57
+      - *new1
+      status:
+      active_range: 601
+      values_total: 7
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+---
+# TC17
+# Test that adding single value after long period does not cause old data to be dropped as request range should be 
+# calculated from last received value with which active range was calculated
+test case: Test that adding single value does not cause old data to be dropped (previous value is used for active range).
 in:
   history:
   - itemid: 1
@@ -977,16 +1039,22 @@ out:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data:
+      - *row42
+      - *row45
+      - *row47
+      - *row52
+      - *row55
+      - *row57
       - *new1
       status:
       active_range: 601
-      values_total: 1
-      db_cached_from: 2017-01-10 10:00:06.000000000 +00:00
+      values_total: 7
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
 ---
-# TC17
-# Test that adding values to item not accessed for a day causes item to be dropped
-test case: Add values after item was not accessed for a day
+# TC18
+# Test that adding values causes old data (outside active request range) to be dropped.
+test case: Add values after time causing old data to be dropped
 in:
   history:
   - itemid: 1
@@ -1018,17 +1086,36 @@ in:
     count: 0
     end: 2017-01-10 10:00:05.000000000 +00:00
   test:
-    time: 2017-01-11 10:20:00.000000000 +00:00
+    time: 2017-01-10 10:21:00.000000000 +00:00
     values:
     - itemid: 1
       value type: ITEM_VALUE_TYPE_STR
       data: &new1
-        value: value 10.5.9
-        ts: 2017-01-11 10:10:05.900000000 +00:00
+        value: value 10.5.1
+        ts: 2017-01-10 10:20:01.900000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &new2
+        value: value 10.5.2
+        ts: 2017-01-10 10:20:02.900000000 +00:00
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data: &new3
+        value: value 10.5.3
+        ts: 2017-01-10 10:20:03.900000000 +00:00
 out:
   return: SUCCEED
   cache:
     items:
     - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *new1
+      - *new2
+      - *new3
+      status:
+      active_range: 601
+      values_total: 3
+      db_cached_from: 2017-01-10 10:00:06.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
 ...

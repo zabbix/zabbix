@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -490,8 +490,6 @@
 			$('#itemButtonsRow').before($row);
 			$row.find('.<?= ZBX_STYLE_COLOR_PICKER ?> input').colorpicker();
 
-			colorPalette.incrementNextColor();
-
 			!this.graphs.readonly && this.rewriteNameLinks();
 		},
 
@@ -503,9 +501,18 @@
 				return false;
 			}
 
+			const form = document.getElementsByName(this.form_name)[0];
 			const itemTpl = new Template($('#tmpl-item-row-' + this.graphs.graphtype).html());
 
 			for (let i = 0; i < list.values.length; i++) {
+				const used_colors = [];
+
+				for (const color of form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+					if (color.value !== '') {
+						used_colors.push(color.value);
+					}
+				}
+
 				const number = $('#itemsTable tr.sortable').length;
 				const item = {
 					number: number,
@@ -517,7 +524,7 @@
 					yaxisside: 0,
 					sortorder: number,
 					flags: (typeof list.values[i].flags === 'undefined') ? 0 : list.values[i].flags,
-					color: colorPalette.getNextColor(),
+					color: colorPalette.getNextColor(used_colors),
 					name: list.values[i].name
 				};
 				const $row = $(itemTpl.evaluate(item));
@@ -711,7 +718,7 @@
 		},
 
 		refresh() {
-			const url = new Curl('', false);
+			const url = new Curl('');
 			const form = document.getElementsByName(this.form_name)[0];
 			const fields = getFormFields(form);
 
@@ -744,7 +751,7 @@
 					}
 				}
 
-				const curl = new Curl('zabbix.php', false);
+				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'host.list');
 
 				location.href = curl.getUrl();

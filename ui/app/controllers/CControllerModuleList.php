@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,11 +24,11 @@
  */
 class CControllerModuleList extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
+	protected function init(): void {
+		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'sort' =>			'in name',
 			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
@@ -48,11 +48,11 @@ class CControllerModuleList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		// sort fields
 		$sort_field = $this->getInput('sort', CProfile::get('web.modules.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.modules.sortorder', ZBX_SORT_UP));
@@ -87,13 +87,14 @@ class CControllerModuleList extends CController {
 			'preservekeys' => true
 		]);
 
-		$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
+		$module_manager = new CModuleManager(APP::getRootDir());
 		$modules = [];
 
 		foreach ($db_modules as $moduleid => $db_module) {
 			$manifest = $module_manager->addModule($db_module['relative_path']);
 
-			if ($manifest && ($filter['name'] === '' || mb_stripos($manifest['name'], $filter['name']) !== false)) {
+			if ($manifest !== null
+					&& ($filter['name'] === '' || mb_stripos($manifest['name'], $filter['name']) !== false)) {
 				$modules[$moduleid] = $db_module + $manifest;
 			}
 		}

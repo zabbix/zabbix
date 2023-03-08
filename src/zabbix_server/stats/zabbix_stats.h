@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,8 @@
 #define ZABBIX_ZABBIX_STATS_H_
 
 #include "zbxjson.h"
+#include "zbxstats.h"
 
-void	zbx_get_zabbix_stats_ext(struct zbx_json *json);
+void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg);
 
 #endif /* ZABBIX_ZABBIX_STATS_H_ */

@@ -88,6 +88,19 @@
 		<chmod file="${SIMPLESAMLPHP_CFG_FILE}" perm="go+r"/>
 	</target>
 
+	<target name="create-ldap-configs">
+		<property name="phpunit_ldap_host" value="${PHPUNIT_LDAP_HOST}"/>
+		<property name="phpunit_ldap_bind_password" value="${PHPUNIT_LDAP_BIND_PASSWORD}"/>
+		<property name="phpunit_ldap_username" value="${PHPUNIT_LDAP_USERNAME}"/>
+		<property name="phpunit_ldap_user_password" value="${PHPUNIT_LDAP_USER_PASSWORD}"/>
+
+		<!-- LDAP settings -->
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_LDAP_HOST}" value="${phpunit_ldap_host}"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_LDAP_BIND_PASSWORD}" value="${phpunit_ldap_bind_password}"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_LDAP_USERNAME}" value="${phpunit_ldap_username}"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_LDAP_USER_PASSWORD}" value="${phpunit_ldap_user_password}"/>
+	</target>
+
 	<target name="init-integration">
 		<!-- Copy agent2 configuration file -->
 		<copy overwrite="true" file="src/go/conf/zabbix_agent2.conf" tofile="conf/zabbix_agent2.conf"/>
@@ -133,6 +146,7 @@
 			<arg line="--enable-agent2"/>
 			<arg line="--with-postgresql"/>
 			<arg line="--prefix=${basedir}"/>
+			<arg line="--with-libcurl"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>
@@ -201,6 +215,29 @@
 		</exec>
 	</target>
 
+	<target name="create-db-tsdb" depends="create-db-postgresql">
+		<!-- Create PostgreSQL database with TimescaleDB extension-->
+		<exec executable="psql" failonerror="on">
+			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
+			<arg line="-d '${dbname}'"/>
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-p '${dbport}'"/>
+			<arg line="-U '${dbuser}'"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="-c 'create extension if not exists timescaledb cascade;'"/>
+		</exec>
+		<exec executable="psql" input="database/postgresql/timescaledb.sql" failonerror="on">
+			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-p '${dbport}'"/>
+			<arg line="-U '${dbuser}'"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="${dbname}"/>
+		</exec>
+	</target>
+
 	<target name="init-proxy-postgresql" depends="">
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
@@ -233,7 +270,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-postgresql" depends="create-configs,create-saml-configs,make-dbschema,make-gettext,create-db-postgresql,init-frontend-modules">
+	<target name="init-frontend-postgresql" depends="create-configs,create-saml-configs,create-ldap-configs,make-dbschema,make-gettext,create-db-postgresql,init-frontend-modules">
 		<exec executable="psql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -272,6 +309,9 @@
 		</exec>
 	</target>
 
+	<target name="init-integration-tsdb" depends="create-configs,init-integration,make-binaries-postgresql,create-db-tsdb,init-proxy-postgresql">
+	</target>
+
 	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
 
 	<target name="make-binaries-mysql">
@@ -285,6 +325,7 @@
 			<arg line="--enable-agent2"/>
 			<arg line="--with-mysql"/>
 			<arg line="--prefix=${basedir}"/>
+			<arg line="--with-libcurl"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>
@@ -366,7 +407,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-mysql" depends="create-configs,create-saml-configs,make-dbschema,make-gettext,create-db-mysql,init-frontend-modules">
+	<target name="init-frontend-mysql" depends="create-configs,create-saml-configs,create-ldap-configs,make-dbschema,make-gettext,create-db-mysql,init-frontend-modules">
 		<exec executable="mysql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
@@ -446,9 +487,10 @@
 	<target name="build-api-postgresql" depends="init-api-postgresql,test-api"/>
 	<target name="build-integration-mysql" depends="init-integration-mysql,test-integration"/>
 	<target name="build-integration-postgresql" depends="init-integration-postgresql,test-integration"/>
+	<target name="build-integration-tsdb" depends="init-integration-tsdb,test-integration"/>
 	<target name="build-dast-mysql" depends="init-dast-mysql"/>
 	<target name="build-dast-postgresql" depends="init-dast-postgresql"/>
 
 	<!-- Default target -->
-	<target name="build" depends="build-phpunit,build-mysql,build-postgresql,build-integration-mysql,build-integration-postgresql"/>
+	<target name="build" depends="build-phpunit,build-mysql,build-postgresql,build-integration-mysql,build-integration-postgresql,build-integration-tsdb"/>
 </project>

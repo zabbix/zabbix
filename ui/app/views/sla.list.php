@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -181,9 +181,9 @@ if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 	);
 }
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('SLA'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::SLA_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SLA_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,7 +51,9 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
 		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
 		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
-		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON
+		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON,
+		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON
 	];
 
 	private $PREPROCESSING_STEP_TYPE_DRULE = [
@@ -66,7 +68,9 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
 		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
 		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
-		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON
+		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON,
+		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON
 	];
 
 	private $GRAPH_GRAPH_ITEM_CALC_FNC = [
@@ -283,6 +287,14 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK
 	];
 
+	private $MEDIA_PROVIDER = [
+		CXmlConstantValue::GENERIC_SMTP => CXmlConstantName::GENERIC_SMTP,
+		CXmlConstantValue::GMAIL => CXmlConstantName::GMAIL,
+		CXmlConstantValue::GMAIL_RELAY => CXmlConstantName::GMAIL_RELAY,
+		CXmlConstantValue::OFFICE365 => CXmlConstantName::OFFICE365,
+		CXmlConstantValue::OFFICE365_RELAY => CXmlConstantName::OFFICE365_RELAY
+	];
+
 	private $SMTP_AUTHENTICATION = [
 		CXmlConstantValue::SMTP_AUTHENTICATION_NONE => CXmlConstantName::SMTP_AUTHENTICATION_NONE,
 		CXmlConstantValue::SMTP_AUTHENTICATION_PASSWORD => CXmlConstantName::SMTP_AUTHENTICATION_PASSWORD
@@ -325,7 +337,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::LLD_OVERRIDE_STOP_YES => CXmlConstantName::LLD_OVERRIDE_STOP_YES
 	];
 
-	private $EVALTPYE = [
+	private $EVALTYPE = [
 		CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR,
 		CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND,
 		CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR,
@@ -366,15 +378,6 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::CUSTOM_INTERFACES_YES => CXmlConstantName::YES
 	];
 
-	private $DASHBOARD_WIDGET_TYPE = [
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_CLOCK => CXmlConstantName::DASHBOARD_WIDGET_TYPE_CLOCK,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC => CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_ITEM => CXmlConstantName::DASHBOARD_WIDGET_TYPE_ITEM,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_PLAIN_TEXT => CXmlConstantName::DASHBOARD_WIDGET_TYPE_PLAIN_TEXT,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_URL => CXmlConstantName::DASHBOARD_WIDGET_TYPE_URL
-	];
-
 	private $DASHBOARD_WIDGET_FIELD_TYPE = [
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_STRING => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
@@ -409,7 +412,6 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 	public function getSchema() {
 		return ['type' => XML_ARRAY, 'rules' => [
 			'version' =>				['type' => XML_STRING | XML_REQUIRED],
-			'date' =>					['type' => XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
 			'host_groups' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_group', 'rules' => [
 				'host_group' =>				['type' => XML_ARRAY, 'rules' => [
 					'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
@@ -450,6 +452,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 							'details' =>				['type' => XML_ARRAY, 'rules' => [
 								'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
 								'community' =>				['type' => XML_STRING, 'default' => ''],
+								'max_repetitions' =>		['type' => XML_STRING, 'default' => '10'],
 								'contextname' =>			['type' => XML_STRING, 'default' => ''],
 								'securityname' =>			['type' => XML_STRING, 'default' => ''],
 								'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
@@ -553,6 +556,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'event_name' =>				['type' => XML_STRING, 'default' => ''],
 									'opdata' =>					['type' => XML_STRING, 'default' => ''],
+									'url_name' =>				['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
@@ -593,7 +597,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
-								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
+								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
 								'formula' =>				['type' => XML_STRING, 'default' => ''],
 								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
 									'condition' =>				['type' => XML_ARRAY, 'rules' => [
@@ -629,7 +633,6 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
-									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 										'name' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],
@@ -699,6 +702,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'event_name' =>				['type' => XML_STRING, 'default' => ''],
 											'opdata' =>					['type' => XML_STRING, 'default' => ''],
+											'url_name' =>				['type' => XML_STRING, 'default' => ''],
 											'url' =>					['type' => XML_STRING, 'default' => ''],
 											'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 											'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
@@ -733,6 +737,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'event_name' =>				['type' => XML_STRING, 'default' => ''],
 									'opdata' =>					['type' => XML_STRING, 'default' => ''],
+									'url_name' =>				['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
@@ -842,6 +847,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 											'details' =>				['type' => XML_ARRAY, 'rules' => [
 												'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
 												'community' =>				['type' => XML_STRING, 'default' => ''],
+												'max_repetitions' =>		['type' => XML_STRING, 'default' => '10'],
 												'contextname' =>			['type' => XML_STRING, 'default' => ''],
 												'securityname' =>			['type' => XML_STRING, 'default' => ''],
 												'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
@@ -914,7 +920,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'step' =>					['type' => XML_STRING | XML_REQUIRED],
 									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
 									'filter' =>					['type' => XML_ARRAY, 'rules' => [
-										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
+										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
 										'formula' =>				['type' => XML_STRING, 'default' => ''],
 										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
 											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -1129,10 +1135,14 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 			]],
 			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 				'template' =>				['type' => XML_ARRAY, 'rules' => [
-					'uuid' =>				['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
+					'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 					'template' =>				['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING, 'default' => ''],
 					'description' =>			['type' => XML_STRING, 'default' => ''],
+					'vendor' =>					['type' => XML_ARRAY, 'rules' => [
+						'name' =>					['type' => XML_STRING | XML_REQUIRED],
+						'version' =>				['type' => XML_STRING | XML_REQUIRED]
+					]],
 					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 						'template' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -1235,6 +1245,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'event_name' =>				['type' => XML_STRING, 'default' => ''],
 									'opdata' =>					['type' => XML_STRING, 'default' => ''],
+									'url_name' =>				['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
@@ -1276,7 +1287,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
-								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
+								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
 								'formula' =>				['type' => XML_STRING, 'default' => ''],
 								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
 									'condition' =>				['type' => XML_ARRAY, 'rules' => [
@@ -1312,7 +1323,6 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
-									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 										'name' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],
@@ -1382,6 +1392,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'event_name' =>				['type' => XML_STRING, 'default' => ''],
 											'opdata' =>					['type' => XML_STRING, 'default' => ''],
+											'url_name' =>				['type' => XML_STRING, 'default' => ''],
 											'url' =>					['type' => XML_STRING, 'default' => ''],
 											'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 											'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
@@ -1417,6 +1428,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'event_name' =>				['type' => XML_STRING, 'default' => ''],
 									'opdata' =>					['type' => XML_STRING, 'default' => ''],
+									'url_name' =>				['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
@@ -1600,7 +1612,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'step' =>					['type' => XML_STRING | XML_REQUIRED],
 									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
 									'filter' =>					['type' => XML_ARRAY, 'rules' => [
-										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
+										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
 										'formula' =>				['type' => XML_STRING, 'default' => ''],
 										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
 											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -1733,7 +1745,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'display_period' =>				['type' => XML_STRING, 'default' => '0'],
 									'widgets' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'widget', 'rules' => [
 										'widget' =>						['type' => XML_ARRAY, 'rules' => [
-											'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_TYPE],
+											'type' =>						['type' => XML_STRING | XML_REQUIRED],
 											'name' =>						['type' => XML_STRING, 'default' => ''],
 											'x' =>							['type' => XML_STRING, 'default' => '0'],
 											'y' =>							['type' => XML_STRING, 'default' => '0'],
@@ -1779,6 +1791,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
 					'event_name' =>				['type' => XML_STRING, 'default' => ''],
 					'opdata' =>					['type' => XML_STRING, 'default' => ''],
+					'url_name' =>				['type' => XML_STRING, 'default' => ''],
 					'url' =>					['type' => XML_STRING, 'default' => ''],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 					'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
@@ -1987,6 +2000,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 				'media_type' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
 					'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->MEDIA_TYPE],
+					'provider' =>				['type' => XML_STRING, 'in' => $this->MEDIA_PROVIDER, 'default' => '0'],
 					'smtp_server' =>			['type' => XML_STRING, 'default' => ''],
 					'smtp_port' =>				['type' => XML_STRING, 'default' => '25'],
 					'smtp_helo' =>				['type' => XML_STRING, 'default' => ''],
@@ -2036,25 +2050,6 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 	 */
 	public function validate(array $data, $path) {
 		return $this->doValidate($this->getSchema(), $data, $path);
-	}
-
-	/**
-	 * Validate date and time format.
-	 *
-	 * @param string      $data         Import data.
-	 * @param array|null  $parent_data  Data's parent array.
-	 * @param string      $path         XML path (for error reporting).
-	 *
-	 * @throws Exception if the date or time is invalid.
-	 *
-	 * @return string
-	 */
-	public function validateDateTime($data, ?array $parent_data, $path) {
-		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $data)) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
-		}
-
-		return $data;
 	}
 
 	/**
@@ -2392,7 +2387,10 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 			case CXmlConstantName::SCRIPT:
 			case CXmlConstantValue::MEDIA_TYPE_SCRIPT:
 				return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-					'parameter' => ['type' => XML_STRING]
+					'parameter' => ['type' => XML_ARRAY, 'rules' => [
+						'sortorder' => ['type' => XML_STRING | XML_REQUIRED],
+						'value' => ['type' => XML_STRING, 'default' => '']
+					]]
 				]];
 
 			case CXmlConstantName::WEBHOOK:

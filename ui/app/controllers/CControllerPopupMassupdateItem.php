@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,86 +23,61 @@ require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
 class CControllerPopupMassupdateItem extends CController {
 
-	private $opt_interfaceid_expected = false;
-
 	protected function checkInput() {
 		$fields = [
-			'allow_traps' => 'in '.implode(',', [HTTPCHECK_ALLOW_TRAPS_ON, HTTPCHECK_ALLOW_TRAPS_OFF]),
-			'authtype' => 'string',
 			'context' => 'required|string|in host,template',
-			'delay' => 'string',
-			'delay_flex' => 'array',
-			'description' => 'string',
-			'discover' => 'in '.ZBX_PROTOTYPE_DISCOVER.','.ZBX_PROTOTYPE_NO_DISCOVER,
-			'headers' => 'array',
-			'history' => 'string',
-			'history_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
 			'ids' => 'required|array_id',
-			'interfaceid' => 'id',
-			'jmx_endpoint' => 'string',
-			'logtimefmt' => 'string',
-			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
-			'master_itemid' => 'id',
+			'prototype' => 'required|in 0,1',
+			'update' => 'in 1',
+			'visible' => 'array',
 			'parent_discoveryid' => 'id',
+			'history_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
+			'trends_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
+			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
+			'delay_flex' => 'array',
+
+			// The fields used for all item types.
+			'type' => 'int32',
+			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
+			'units' => 'string',
+			'history' => 'string',
+			'trends' => 'string',
+			'valuemapid' => 'id',
+			'logtimefmt' => 'string',
+			'description' => 'string',
+			'status' => 'in '.implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
+			'discover' => 'in '.ZBX_PROTOTYPE_DISCOVER.','.ZBX_PROTOTYPE_NO_DISCOVER,
+			'tags' => 'array',
+			'preprocessing' => 'array',
+
+			// The fields used for multiple item types.
+			'interfaceid' => 'id',
+			'authtype' => 'string',
+			'username' => 'string',
 			'password' => 'string',
+			'timeout' => 'string',
+			'delay' => 'string',
+			'trapper_hosts' => 'string',
+
+			// Dependent item type specific fields.
+			'master_itemid' => 'id',
+
+			// HTTP Agent item type specific fields.
+			'url' => 'string',
 			'post_type' => 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts' => 'string',
-			'preprocessing' => 'array',
-			'privatekey' => 'string',
-			'prototype' => 'required|in 0,1',
+			'headers' => 'array',
+			'allow_traps' => 'in '.implode(',', [HTTPCHECK_ALLOW_TRAPS_ON, HTTPCHECK_ALLOW_TRAPS_OFF]),
+
+			// JMX item type specific fields.
+			'jmx_endpoint' => 'string',
+
+			// SSH item type specific fields.
 			'publickey' => 'string',
-			'status' => 'in '.implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
-			'tags' => 'array',
-			'trapper_hosts' => 'string',
-			'trends' => 'string',
-			'trends_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
-			'timeout' => 'string',
-			'type' => 'int32',
-			'units' => 'string',
-			'update' => 'in 1',
-			'url' => 'string',
-			'username' => 'string',
-			'value_type' => 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
-			'valuemapid' => 'id',
-			'visible' => 'array'
+			'privatekey' => 'string'
 		];
 
-		$this->opt_interfaceid_expected = (getRequest('interfaceid') == INTERFACE_TYPE_OPT);
-
-		if ($this->opt_interfaceid_expected) {
-			unset($fields['interfaceid']);
-			unset($_REQUEST['interfaceid']);
-		}
-
 		$ret = $this->validateInput($fields);
-
-		if ($ret && $this->opt_interfaceid_expected) {
-			if ($this->hasInput('type')) {
-				$item_types = [$this->getInput('type')];
-			}
-			else {
-				$options = [
-					'output' => ['type'],
-					'itemids' => $this->getInput('ids')
-				];
-				$item_types = (bool) $this->getInput('prototype')
-					? API::ItemPrototype()->get($options)
-					: API::Item()->get($options);
-
-				$item_types = array_column($item_types, 'type', 'type');
-			}
-
-			foreach ($item_types as $item_type) {
-				if (itemTypeInterface($item_type) != INTERFACE_TYPE_OPT) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Host interface'),
-						interfaceType2str(INTERFACE_TYPE_OPT)
-					));
-					$ret = false;
-
-					break;
-				}
-			}
-		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -118,52 +93,26 @@ class CControllerPopupMassupdateItem extends CController {
 	}
 
 	protected function checkPermissions() {
-		$entity = ($this->getInput('prototype') == 1) ? API::ItemPrototype() : API::Item();
+		if ($this->getInput('prototype') == 1) {
+			$count = API::ItemPrototype()->get([
+				'countOutput' => true,
+				'itemids' => $this->getInput('ids'),
+				'editable' => true
+			]);
+		}
+		else {
+			$count = API::Item()->get([
+				'countOutput' => true,
+				'itemids' => $this->getInput('ids'),
+				'editable' => true
+			]);
+		}
 
-		return (bool) $entity->get([
-			'output' => [],
-			'itemids' => $this->getInput('ids'),
-			'editable' => true,
-			'limit' => 1
-		]);
+		return $count != 0;
 	}
 
 	protected function doAction() {
 		$this->setResponse($this->hasInput('update') ? $this->update() : $this->form());
-	}
-
-	/**
-	 * Get array of updated items or item prototypes.
-	 *
-	 * @return array
-	 */
-	protected function getItemsOrPrototypes(): array {
-		$options = [
-			'output' => ['itemid', 'type'],
-			'selectTags' => ['tag', 'value'],
-			'itemids' => $this->getInput('ids'),
-			'preservekeys' => true
-		];
-
-		if ($this->getInput('prototype')) {
-			$result = API::ItemPrototype()->get($options);
-		}
-		else {
-			$options['output'][] = 'flags';
-			$result = API::Item()->get($options);
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Update item or item prototype, return update action status.
-	 *
-	 * @param array $data  Array of item or item prototypes data to update.
-	 * @return bool
-	 */
-	protected function updateItemOrPrototype(array $data): bool {
-		return (bool) ($this->getInput('prototype') ? API::ItemPrototype()->update($data) : API::Item()->update($data));
 	}
 
 	/**
@@ -172,189 +121,159 @@ class CControllerPopupMassupdateItem extends CController {
 	 * @return CControllerResponse
 	 */
 	protected function update(): CControllerResponse {
-		$result = true;
-		$ids = $this->getInput('ids');
-		$prototype = (bool) $this->getInput('prototype');
-		$input = [
-			'allow_traps' => HTTPCHECK_ALLOW_TRAPS_OFF,
-			'authtype' => '',
-			'delay' => DB::getDefault('items', 'delay'),
-			'description' => '',
-			'discover' => ZBX_PROTOTYPE_DISCOVER,
-			'headers' => [],
-			'history' => ITEM_NO_STORAGE_VALUE,
-			'jmx_endpoint' => '',
-			'logtimefmt' => '',
-			'master_itemid' => 0,
-			'password' => '',
-			'post_type' => ZBX_POSTTYPE_RAW,
-			'posts' => '',
-			'preprocessing' => [],
-			'privatekey' => '',
-			'publickey' => '',
-			'status' => ITEM_STATUS_ACTIVE,
-			'tags' => [],
-			'timeout' => '',
-			'trapper_hosts' => '',
-			'trends' => ITEM_NO_STORAGE_VALUE,
-			'type' => 0,
-			'units' => '',
-			'url' => '',
-			'username' => '',
-			'value_type' => ITEM_VALUE_TYPE_UINT64,
-			'valuemapid' => 0,
-			'interfaceid' => $this->opt_interfaceid_expected ? 0 : ''
-		];
-		$this->getInputs($input, array_keys($input));
-
-		if ($this->getInput('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
-			$input['trends'] = ITEM_NO_STORAGE_VALUE;
-		}
-
-		if ($this->getInput('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
-			$input['history'] = ITEM_NO_STORAGE_VALUE;
-		}
-
-		$input = array_intersect_key($input, $this->getInput('visible', []));
-
-		if (array_key_exists('tags', $input)) {
-			$input['tags'] = array_filter($input['tags'], function ($tag) {
-				return ($tag['tag'] !== '' || $tag['value'] !== '');
-			});
-		}
+		$item_prototypes = (bool) $this->getInput('prototype', false);
 
 		try {
-			DBstart();
-			$delay_flex = $this->getInput('delay_flex', []);
+			$input = [
+				'type' => DB::getDefault('items', 'type'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'units' => DB::getDefault('items', 'units'),
+				'history' => ITEM_NO_STORAGE_VALUE,
+				'trends' => ITEM_NO_STORAGE_VALUE,
+				'valuemapid' => 0,
+				'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
+				'description' => DB::getDefault('items', 'description'),
+				'status' => DB::getDefault('items', 'status'),
+				'discover' => DB::getDefault('items', 'discover'),
+				'tags' => [],
+				'preprocessing' => [],
 
-			if (array_key_exists('delay', $input) && $delay_flex) {
-				$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
-				$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
-				$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
+				// The fields used for multiple item types.
+				'interfaceid' => 0,
+				'authtype' => DB::getDefault('items', 'authtype'),
+				'username' => DB::getDefault('items', 'username'),
+				'password' => DB::getDefault('items', 'password'),
+				'timeout' => '',
+				'delay' => DB::getDefault('items', 'delay'),
+				'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
 
-				foreach ($delay_flex as $interval) {
-					if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
-						if ($interval['delay'] === '' && $interval['period'] === '') {
-							continue;
-						}
+				// Dependent item type specific fields.
+				'master_itemid' => 0,
 
-						if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
-							info(_s('Invalid interval "%1$s".', $interval['delay']));
-							throw new Exception();
-						}
-						elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
-							info(_s('Invalid interval "%1$s".', $interval['period']));
-							throw new Exception();
-						}
+				// HTTP Agent item type specific fields.
+				'url' => DB::getDefault('items', 'url'),
+				'post_type' => DB::getDefault('items', 'post_type'),
+				'posts' => DB::getDefault('items', 'posts'),
+				'headers' => [],
+				'allow_traps' => DB::getDefault('items', 'allow_traps'),
 
-						$input['delay'] .= ';'.$interval['delay'].'/'.$interval['period'];
-					}
-					else {
-						if ($interval['schedule'] === '') {
-							continue;
-						}
+				// JMX item type specific fields.
+				'jmx_endpoint' => DB::getDefault('items', 'jmx_endpoint'),
 
-						if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
-							info(_s('Invalid interval "%1$s".', $interval['schedule']));
-							throw new Exception();
-						}
+				// SSH item type specific fields.
+				'publickey' => DB::getDefault('items', 'publickey'),
+				'privatekey' => DB::getDefault('items', 'privatekey')
+			];
 
-						$input['delay'] .= ';'.$interval['schedule'];
-					}
+			$input = array_intersect_key($input, $this->getInput('visible', []));
+			$this->getInputs($input, array_keys($input));
+
+			$options = [];
+
+			if (array_key_exists('tags', $input)) {
+				$input['tags'] = prepareItemTags($input['tags']);
+
+				$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+					'tag' =>	['type' => API_STRING_UTF8],
+					'value' =>	['type' => API_STRING_UTF8]
+				]];
+
+				if (!CApiInputValidator::validateUniqueness($api_input_rules, $input['tags'], '/tags', $error)) {
+					error($error);
+					throw new Exception();
 				}
+
+				$tag_values = [];
+
+				foreach ($input['tags'] as $tag) {
+					$tag_values[$tag['tag']][] = $tag['value'];
+				}
+
+				$options['selectTags'] = ['tag', 'value'];
 			}
 
-			if (array_key_exists('headers', $input) && $input['headers']) {
-				$input['headers']['value'] += array_fill_keys(array_keys($input['headers']['name']), '');
-
-				$headers = [];
-				foreach ($input['headers']['name'] as $i => $header_name) {
-					if ($header_name !== '' || $input['headers']['value'][$i] !== '') {
-						$headers[$header_name] = $input['headers']['value'][$i];
-					}
-				}
-				$input['headers'] = $headers;
-			}
-
-			if (array_key_exists('preprocessing', $input) && $input['preprocessing']) {
+			if (array_key_exists('preprocessing', $input)) {
 				$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
 			}
 
-			$items_to_update = [];
-			$items = $this->getItemsOrPrototypes();
+			if (array_key_exists('delay', $input)) {
+				$delay_flex = $this->getInput('delay_flex', []);
 
-			foreach ($ids as $id) {
-				$update_item = [];
+				if (!isValidCustomIntervals($delay_flex)) {
+					throw new Exception();
+				}
+
+				$input['delay'] = getDelayWithCustomIntervals($input['delay'], $delay_flex);
+			}
+
+			if (array_key_exists('headers', $input)) {
+				$input['headers'] = prepareItemHeaders($input['headers']);
+			}
+
+			$itemids = $this->getInput('ids');
+
+			if ($item_prototypes) {
+				$db_items = API::ItemPrototype()->get([
+					'output' => ['type', 'key_', 'value_type', 'templateid', 'authtype', 'allow_traps'],
+					'selectHosts' => ['status'],
+					'itemids' => $itemids,
+					'preservekeys' => true
+				] + $options);
+			}
+			else {
+				$db_items = API::Item()->get([
+					'output' => ['type', 'key_', 'value_type', 'templateid', 'flags', 'authtype', 'allow_traps'],
+					'selectHosts' => ['status'],
+					'itemids' => $itemids,
+					'preservekeys' => true
+				] + $options);
+			}
+
+			$items = [];
+
+			foreach ($itemids as $itemid) {
+				$db_item = $db_items[$itemid];
+
+				if ($item_prototypes) {
+					$db_item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+				}
+
+				$item = array_intersect_key($input, getSanitizedItemFields($input + $db_item));
 
 				if (array_key_exists('tags', $input)) {
-					switch ($this->getInput('mass_update_tags', ZBX_ACTION_ADD)) {
-						case ZBX_ACTION_ADD:
-							$unique_tags = [];
-							foreach (array_merge($items[$id]['tags'], $input['tags']) as $tag) {
-								$unique_tags[$tag['tag']][$tag['value']] = $tag;
-							}
-
-							foreach ($unique_tags as $tags_by_name) {
-								foreach ($tags_by_name as $tag) {
-									$update_item['tags'][] = $tag;
-								}
-							}
-							break;
-
-						case ZBX_ACTION_REPLACE:
-							$update_item['tags'] = $input['tags'];
-							break;
-
-						case ZBX_ACTION_REMOVE:
-							$diff_tags = [];
-							foreach ($items[$id]['tags'] as $a) {
-								foreach ($input['tags'] as $b) {
-									if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
-										continue 2;
-									}
-								}
-
-								$diff_tags[] = $a;
-							}
-							$update_item['tags'] = $diff_tags;
-							break;
-					}
+					$item['tags'] = $this->getTagsToUpdate($db_item, $tag_values);
 				}
 
-				if ($prototype || $items[$id]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-					$update_item += $input;
-
-					$type = array_key_exists('type', $input) ? $input['type'] : $items[$id]['type'];
-
-					if ($type != ITEM_TYPE_JMX) {
-						unset($update_item['jmx_endpoint']);
-					}
-
-					if ($type != ITEM_TYPE_HTTPAGENT && $type != ITEM_TYPE_SCRIPT) {
-						unset($update_item['timeout']);
-					}
-				}
-				else if (array_key_exists('status', $input)) {
-					$items_to_update[] = ['itemid' => $id, 'status' => $input['status']];
-				}
-
-				if ($update_item) {
-					$items_to_update[] = ['itemid' => $id] + $update_item;
+				if ($item) {
+					$items[] = ['itemid' => $itemid] + $item;
 				}
 			}
 
-			if ($items_to_update && !$this->updateItemOrPrototype($items_to_update)) {
-				throw new Exception();
+			$result = true;
+
+			if ($items) {
+				if ($item_prototypes) {
+					$response = API::ItemPrototype()->update($items);
+				}
+				else {
+					$response = API::Item()->update($items);
+				}
+
+				if ($response === false) {
+					throw new Exception();
+				}
 			}
 		}
 		catch (Exception $e) {
 			$result = false;
-			CMessageHelper::setErrorTitle($prototype ? _('Cannot update item prototypes') : _('Cannot update items'));
+			CMessageHelper::setErrorTitle(
+				$item_prototypes ? _('Cannot update item prototypes') : _('Cannot update items')
+			);
 		}
 
-		if (DBend($result)) {
+		if ($result) {
 			$messages = CMessageHelper::getMessages();
-			$output = ['title' => $prototype ? _('Item prototypes updated') : _('Items updated')];
+			$output = ['title' => $item_prototypes ? _('Item prototypes updated') : _('Items updated')];
 
 			if (count($messages)) {
 				$output['messages'] = array_column($messages, 'message');
@@ -368,6 +287,59 @@ class CControllerPopupMassupdateItem extends CController {
 		}
 
 		return (new CControllerResponseData(['main_block' => json_encode($output)]))->disableView();
+	}
+
+	/**
+	 * Get item tags to update or null if no tags to update found.
+	 *
+	 * @param array $db_item
+	 * @param array $tag_values
+	 *
+	 * @return array
+	 */
+	private function getTagsToUpdate(array $db_item, array $tag_values): ?array {
+		$tags = [];
+
+		switch ($this->getInput('mass_update_tags', ZBX_ACTION_ADD)) {
+			case ZBX_ACTION_ADD:
+				foreach ($db_item['tags'] as $db_tag) {
+					if (array_key_exists($db_tag['tag'], $tag_values)
+							&& in_array($db_tag['value'], $tag_values[$db_tag['tag']])) {
+						unset($tag_values[$db_tag['tag']][$db_tag['value']]);
+					}
+				}
+
+				foreach ($tag_values as $tag => $values) {
+					foreach ($values as $value) {
+						$tags[] = ['tag' => (string) $tag, 'value' => $value];
+					}
+				}
+
+				$tags = array_merge($db_item['tags'], $tags);
+				break;
+
+			case ZBX_ACTION_REPLACE:
+				foreach ($tag_values as $tag => $values) {
+					foreach ($values as $value) {
+						$tags[] = ['tag' => (string) $tag, 'value' => $value];
+					}
+				}
+
+				CArrayHelper::sort($tags, ['tag', 'value']);
+				CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
+				break;
+
+			case ZBX_ACTION_REMOVE:
+				foreach ($db_item['tags'] as $db_tag) {
+					if (!array_key_exists($db_tag['tag'], $tag_values)
+							|| !in_array($db_tag['value'], $tag_values[$db_tag['tag']])) {
+						$tags[] = ['tag' => $db_tag['tag'], 'value' => $db_tag['value']];
+					}
+				}
+				break;
+		}
+
+		return $tags;
 	}
 
 	/**

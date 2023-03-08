@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 Official JMX Template for GridGain In-Memory Computing Platform.
 This template is based on the original template developed by Igor Akkuratov, Senior Engineer at GridGain Systems and GridGain In-Memory Computing Platform Contributor.
 
@@ -99,7 +99,7 @@ There are no template links in this template.
 |GridGain |GridGain [{#JMXIGNITEINSTANCENAME}]: Communication outbound messages queue |<p>Outbound messages queue size.</p> |JMX |jmx["{#JMXOBJ}",OutboundMessagesQueueSize] |
 |GridGain |GridGain [{#JMXIGNITEINSTANCENAME}]: Communication messages received, rate |<p>The number of  messages received per second.</p> |JMX |jmx["{#JMXOBJ}",ReceivedMessagesCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |GridGain |GridGain [{#JMXIGNITEINSTANCENAME}]: Communication messages sent, rate |<p>The number of  messages sent per second.</p> |JMX |jmx["{#JMXOBJ}",SentMessagesCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|GridGain |GridGain [{#JMXIGNITEINSTANCENAME}]: Communication reconnect rate |<p>Gets maximum number of reconnect attempts used when establishing connection with remote nodes per second.</p> |JMX |jmx["{#JMXOBJ}",ReconnectCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|GridGain |GridGain [{#JMXIGNITEINSTANCENAME}]: Communication reconnect rate |<p>Gets maximum number of reconnect attempts used when establishing connection with remote nodes per second.</p> |JMX |jmx["{#JMXOBJ}",ReconnectCount, "maxNumbers"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |GridGain |GridGain [{#JMXIGNITEINSTANCENAME}]: Locked keys |<p>The number of keys locked on the node.</p> |JMX |jmx["{#JMXOBJ}",LockedKeysNumber] |
 |GridGain |GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions owner, current |<p>The number of active transactions for which this node is the initiator.</p> |JMX |jmx["{#JMXOBJ}",OwnerTransactionsNumber] |
 |GridGain |GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions holding lock, current |<p>The number of active transactions holding at least one key lock.</p> |JMX |jmx["{#JMXOBJ}",TransactionsHoldingLockNumber] |
@@ -143,9 +143,9 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime])<10m` |INFO |<p>Manual close: YES</p> |
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime])<10m` |INFO |<p>Manual close: YES</p> |
 |GridGain [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data |<p>Zabbix has not received data for items for the last 10 minutes.</p> |`nodata(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime],10m)=1` |WARNING |<p>Manual close: YES</p> |
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed |<p>GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.</p> |`last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion]))>0` |INFO |<p>Manual close: YES</p> |
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed |<p>The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Perform Ack to close.</p> |`last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion]))>0` |INFO |<p>Manual close: YES</p> |
 |GridGain [{#JMXIGNITEINSTANCENAME}]: Server node left the topology |<p>One or more server node left the topology. Ack to close.</p> |`change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0` |WARNING |<p>Manual close: YES</p> |
 |GridGain [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology |<p>One or more server node added to the topology. Ack to close.</p> |`change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>0` |INFO |<p>Manual close: YES</p> |
 |GridGain [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology |<p>One or more server node left the topology. Ack to close.</p> |`last(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>last(/GridGain by JMX/jmx["{#JMXOBJ}",TotalBaselineNodes])` |INFO |<p>Manual close: YES</p> |
@@ -153,7 +153,7 @@ There are no template links in this template.
 |GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long |<p>PME duration is over {$GRIDGAIN.PME.DURATION.MAX.WARN}ms.</p> |`min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long</p> |
 |GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long |<p>PME duration is over {$GRIDGAIN.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.</p> |`min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.HIGH}` |HIGH | |
 |GridGain [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high |<p>Number of running threads is over {$GRIDGAIN.THREADS.COUNT.MAX.WARN}.</p> |`min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentThreadCount],15m) > {$GRIDGAIN.THREADS.COUNT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long</p> |
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed |<p>GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.</p> |`last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator]))>0` |WARNING |<p>Manual close: YES</p> |
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed |<p>The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Perform Ack to close.</p> |`last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator]))>0` |WARNING |<p>Manual close: YES</p> |
 |Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m |<p>-</p> |`min(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m)>0 and max(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)=0` |AVERAGE | |
 |Cache group [{#JMXGROUP}]: Success transactions less than rollbacks for 5m |<p>-</p> |`min(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m) > max(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)` |WARNING |<p>**Depends on**:</p><p>- Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m</p> |
 |Cache group [{#JMXGROUP}]: All entries are in heap |<p>All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Ack to close.</p> |`last(/GridGain by JMX/jmx["{#JMXOBJ}",CacheSize])=last(/GridGain by JMX/jmx["{#JMXOBJ}",HeapEntriesCount])` |INFO |<p>Manual close: YES</p> |
@@ -171,7 +171,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 

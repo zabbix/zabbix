@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm('post'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sla')))->removeId())
 	->setId('sla-form')
 	->setName('sla_form')
 	->addItem(getMessages());
@@ -136,7 +137,7 @@ $sla_tab = (new CFormGrid())
 								->addClass('element-table-add')
 						))
 					),
-				(new CScriptTemplate('service-tag-row-tmpl'))
+				(new CTemplateTag('service-tag-row-tmpl'))
 					->addItem(
 						(new CRow([
 							(new CTextBox('service_tags[#{rowNum}][tag]', '#{tag}', false,

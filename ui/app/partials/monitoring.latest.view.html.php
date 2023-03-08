@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
  */
 
 $form = (new CForm('GET', 'history.php'))
-	->cleanItems()
 	->setName('items')
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
 
@@ -121,7 +120,16 @@ foreach ($data['items'] as $itemid => $item) {
 
 	$item_name = (new CDiv([
 		(new CLinkAction($item['name']))
-			->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $itemid])),
+			->setMenuPopup(
+				CMenuPopupHelper::getItem([
+					'itemid' => $itemid,
+					'context' => 'host',
+					'backurl' => (new CUrl('zabbix.php'))
+						->setArgument('action', 'latest.view')
+						->setArgument('context','host')
+						->getUrl()
+				])
+			),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
 	]))->addClass(ZBX_STYLE_ACTION_CONTAINER);
 

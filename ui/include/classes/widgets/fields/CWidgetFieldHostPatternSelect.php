@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,36 +19,23 @@
 **/
 
 
+namespace Zabbix\Widgets\Fields;
+
+use Zabbix\Widgets\CWidgetField;
+
 class CWidgetFieldHostPatternSelect extends CWidgetField {
 
-	private $placeholder;
+	public const DEFAULT_VALUE = [];
 
-	/**
-	 * Textarea widget field.
-	 *
-	 * @param string $name  field name in form
-	 * @param string $label  label for the field in form
-	 */
-	public function __construct($name, $label) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->setDefault([]);
-
-		/*
-		 * Set validation rules bypassing a parent::setSaveType to skip validation of length.
-		 * Save type is set in self::toApi method for each string field separately.
-		 */
-		$this->setValidationRules(['type' => API_STRINGS_UTF8]);
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setValidationRules(['type' => API_STRINGS_UTF8]);
 	}
 
-	/**
-	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
-	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
-	 * fields it causes significant performance decrease.
-	 *
-	 * @param array $widget_fields   reference to array of widget fields.
-	 */
-	public function toApi(array &$widget_fields = []) {
+	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
 		if ($value !== $this->default) {
@@ -60,21 +47,5 @@ class CWidgetFieldHostPatternSelect extends CWidgetField {
 				];
 			}
 		}
-	}
-
-	public function setPlaceholder($placeholder) {
-		$this->placeholder = $placeholder;
-
-		return $this;
-	}
-
-	public function getPlaceholder() {
-		return $this->placeholder;
-	}
-
-	public function getJavascript() {
-		$fieldid = zbx_formatDomId($this->getName().'[]');
-
-		return 'jQuery("#'.$fieldid.'").multiSelect(jQuery("#'.$fieldid.'").data("params"));';
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -361,7 +361,16 @@ function PopUp(action, parameters, {
 		.then(function(resp) {
 			if ('error' in resp) {
 				overlay.setProperties({
-					content: makeMessageBox('bad', resp.error.messages, resp.error.title, false)
+					title: resp.header !== undefined ? resp.header : '',
+					content: makeMessageBox('bad', resp.error.messages, resp.error.title, false),
+					buttons: [
+						{
+							'title': t('Cancel'),
+							'class': 'btn-alt js-cancel',
+							'cancel': true,
+							'action': function() {}
+						}
+					]
 				});
 			}
 			else {
@@ -401,6 +410,26 @@ function PopUp(action, parameters, {
 
 			overlay.recoverFocus();
 			overlay.containFocus();
+		})
+		.fail((resp) => {
+			const error = resp.responseJSON !== undefined && resp.responseJSON.error !== undefined
+				? resp.responseJSON.error
+				: {title: t('Unexpected server error.')};
+
+			overlay.setProperties({
+				content: makeMessageBox('bad', error.messages, error.title, false),
+				buttons: [
+					{
+						'title': t('Cancel'),
+						'class': 'btn-alt js-cancel',
+						'cancel': true,
+						'action': function() {}
+					}
+				]
+			});
+
+			overlay.recoverFocus();
+			overlay.containFocus();
 		});
 
 	addToOverlaysStack(overlay);
@@ -424,7 +453,7 @@ function acknowledgePopUp(parameters, trigger_element) {
 	overlay.trigger_parents = $(trigger_element).parents();
 
 	overlay.xhr.then(function() {
-		var url = new Curl('zabbix.php', false);
+		var url = new Curl('zabbix.php');
 		url.setArgument('action', 'popup');
 		url.setArgument('popup_action', 'acknowledge.edit');
 		url.setArgument('eventids', parameters.eventids);
@@ -522,15 +551,18 @@ function closeDialogHandler(event) {
  * @return {object|undefined|null}  Overlay object, if found.
  */
 function removeFromOverlaysStack(dialogueid, return_focus) {
-	var overlay = null;
-
 	if (return_focus !== false) {
 		return_focus = true;
 	}
 
-	overlay = overlays_stack.removeById(dialogueid);
+	const overlay = overlays_stack.removeById(dialogueid);
+
 	if (overlay && return_focus) {
-		jQuery(overlay.element).focus();
+		if (overlay.element !== undefined) {
+			const element = overlay.element instanceof jQuery ? overlay.element[0] : overlay.element;
+
+			element.focus({preventScroll: true});
+		}
 	}
 
 	// Remove event listener.
@@ -724,11 +756,10 @@ function validate_trigger_expression(overlay) {
 	});
 }
 
-function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
+function redirect(uri, method, needle, invert_needle, allow_empty) {
 	method = (method || 'get').toLowerCase();
-	add_sid = (method !== 'get' && (typeof add_sid === 'undefined' || add_sid));
 
-	var url = new Curl(uri, add_sid);
+	var url = new Curl(uri);
 
 	if (method == 'get') {
 		window.location = url.getUrl();

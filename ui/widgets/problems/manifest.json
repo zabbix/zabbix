@@ -1,0 +1,20 @@
+{
+	"manifest_version": 2.0,
+	"id": "problems",
+	"type": "widget",
+	"name": "Problems",
+	"namespace": "Problems",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"js_class": "CWidgetProblems"
+	},
+	"actions": {
+		"widget.problems.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

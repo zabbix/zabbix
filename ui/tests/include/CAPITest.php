@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,14 +64,15 @@ class CAPITest extends CTest {
 	/**
 	 * Make API call.
 	 *
-	 * @param mixed $data     string containing request data as json.
+	 * @param mixed  $data       String containing request data as json.
+	 * @param string $sessionid  Authorization token.
 	 *
 	 * @return array
 	 *
 	 * @throws Exception      if API call fails.
 	 */
-	public function callRaw($data) {
-		return CAPIHelper::callRaw($data);
+	public function callRaw($data, string $sessionid = null) {
+		return CAPIHelper::callRaw($data, $sessionid);
 	}
 
 	/**
@@ -97,14 +98,14 @@ class CAPITest extends CTest {
 	/**
 	 * Enable authorization/session for the following API calls.
 	 */
-	public function enableAuthorization() {
+	public static function enableAuthorization() {
 		CAPIHelper::setSessionId(null);
 	}
 
 	/**
 	 * Disable authorization/session for the following API calls.
 	 */
-	public function disableAuthorization() {
+	public static function disableAuthorization() {
 		CAPIHelper::setSessionId(false);
 	}
 

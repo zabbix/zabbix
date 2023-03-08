@@ -325,7 +325,7 @@
                             <type>2</type>
                             <snmp_community/>
                             <snmp_oid/>
-                            <key>12348</key>
+                            <key>12348[{#LLD_MACRO}]</key>
                             <delay>0</delay>
                             <history>90d</history>
                             <trends>365d</trends>
@@ -385,7 +385,7 @@
                             <type>2</type>
                             <snmp_community/>
                             <snmp_oid/>
-                            <key>12349</key>
+                            <key>12349[{#LLD_MACRO}]</key>
                             <delay>0</delay>
                             <history>90d</history>
                             <trends>365d</trends>
@@ -443,7 +443,7 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{12345:12348.last()}</expression>
+                            <expression>{12345:12348[{#LLD_MACRO}].last()}</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>12348</name>
@@ -459,7 +459,7 @@
                             <tags/>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{12345:12348.last()} or {12345:12349.last()}</expression>
+                            <expression>{12345:12348[{#LLD_MACRO}].last()} or {12345:12349[{#LLD_MACRO}].last()}</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>12348</name>
@@ -475,7 +475,7 @@
                             <tags/>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{12345:12349.last()}</expression>
+                            <expression>{12345:12349[{#LLD_MACRO}].last()}</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>12349</name>
@@ -519,7 +519,7 @@
                                     <type>0</type>
                                     <item>
                                         <host>12345</host>
-                                        <key>12348</key>
+                                        <key>12348[{#LLD_MACRO}]</key>
                                     </item>
                                 </graph_item>
                                 <graph_item>
@@ -531,7 +531,7 @@
                                     <type>0</type>
                                     <item>
                                         <host>12345</host>
-                                        <key>12349</key>
+                                        <key>12349[{#LLD_MACRO}]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>

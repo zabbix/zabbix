@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@
 
 require_once dirname(__FILE__).'/js/configuration.trigger.prototype.list.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Trigger prototypes'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_TRIGGER_PROTOTYPE_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATES_TRIGGER_PROTOTYPE_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_TRIGGER_PROTOTYPE_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_TRIGGER_PROTOTYPE_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,
@@ -77,6 +77,8 @@ $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['trig
 	'sources' => ['expression', 'recovery_expression'],
 	'context' => $data['context']
 ]);
+
+$csrf_token = CCsrfTokenHelper::get('trigger_prototypes.php');
 
 foreach ($data['triggers'] as $trigger) {
 	$triggerid = $trigger['triggerid'];
@@ -139,18 +141,18 @@ foreach ($data['triggers'] as $trigger) {
 	$status = (new CLink(
 		($trigger['status'] == TRIGGER_STATUS_DISABLED) ? _('No') : _('Yes'),
 		(new CUrl('trigger_prototypes.php'))
-			->setArgument('g_triggerid', $triggerid)
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
 				? 'triggerprototype.massenable'
 				: 'triggerprototype.massdisable'
 			)
+			->setArgument('g_triggerid[]', $triggerid)
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))
+		->addCsrfToken($csrf_token)
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(triggerIndicatorStyle($trigger['status']))
-		->addSID();
+		->addClass(triggerIndicatorStyle($trigger['status']));
 
 
 	$nodiscover = ($trigger['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
@@ -158,15 +160,14 @@ foreach ($data['triggers'] as $trigger) {
 			(new CUrl('trigger_prototypes.php'))
 				->setArgument('g_triggerid[]', $triggerid)
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('action', $nodiscover
+				->setArgument('action',  $nodiscover
 					? 'triggerprototype.discover.enable'
 					: 'triggerprototype.discover.disable'
 				)
 				->setArgument('context', $data['context'])
-				->setArgumentSID()
 				->getUrl()
 		))
-			->addSID()
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -202,15 +203,17 @@ $triggersForm->addItem([
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'triggerprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create triggers from selected prototypes as enabled?')
+				'confirm' => _('Create triggers from selected prototypes as enabled?'), 'csrf_token' => $csrf_token
 			],
 			'triggerprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create triggers from selected prototypes as disabled?')
+				'confirm' => _('Create triggers from selected prototypes as disabled?'), 'csrf_token' => $csrf_token
 			],
 			'popup.massupdate.triggerprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"openMassupdatePopup('popup.massupdate.triggerprototype', {}, {
+						"openMassupdatePopup('popup.massupdate.triggerprototype', {".
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('triggerprototype').
+						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
 						});"
@@ -219,14 +222,13 @@ $triggersForm->addItem([
 					->removeAttribute('id')
 			],
 			'triggerprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected trigger prototypes?')
+				'confirm' => _('Delete selected trigger prototypes?'), 'csrf_token' => $csrf_token
 			]
 		],
 		$this->data['parent_discoveryid']
 	)
 ]);
 
-// append form to widget
-$widget->addItem($triggersForm);
-
-$widget->show();
+$html_page
+	->addItem($triggersForm)
+	->show();

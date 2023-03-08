@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,11 +23,10 @@
  * @var CView $this
  */
 
-$discovery_ckeck_types = discovery_check_type2str();
-order_result($discovery_ckeck_types);
+$discovery_check_types = discovery_check_type2str();
+order_result($discovery_check_types);
 
 $form = (new CForm())
-	->cleanItems()
 	->setName('dcheck_form')
 	->addVar('action', 'popup.discovery.check')
 	->addVar('validate', 1);
@@ -40,7 +39,7 @@ $select_type = (new CSelect('type'))
 	->setId('type-select')
 	->setValue($data['params']['type'])
 	->setFocusableElementId('type')
-	->addOptions(CSelect::createOptionsFromArray($discovery_ckeck_types));
+	->addOptions(CSelect::createOptionsFromArray($discovery_check_types));
 
 $select_snmpv3_securitylevel = (new CSelect('snmpv3_securitylevel'))
 	->setId('snmpv3-securitylevel')

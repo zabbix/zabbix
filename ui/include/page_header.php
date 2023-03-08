@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,28 +114,27 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	global $ZBX_SERVER_NAME;
 
 	// page title
-	$pageTitle = '';
+	$page_title = '';
 	if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
-		$pageTitle = $ZBX_SERVER_NAME.NAME_DELIMITER;
+		$page_title = $ZBX_SERVER_NAME.NAME_DELIMITER;
 	}
-	$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
+	$page_title .= isset($page['title']) ? $page['title'] : _('Zabbix');
 
 	if (defined('ZBX_PAGE_DO_JS_REFRESH') && CWebUser::getRefresh() != 0) {
-		$pageTitle .= ' ['._s('refreshed every %1$s sec.', CWebUser::getRefresh()).']';
+		$page_title .= ' ['._s('refreshed every %1$s sec.', CWebUser::getRefresh()).']';
 	}
 
-	$pageHeader = new CPageHeader($pageTitle, CWebUser::getLang());
+	$page_header = new CHtmlPageHeader($page_title, CWebUser::getLang());
 	$is_standard_page = (!defined('ZBX_PAGE_NO_MENU') || $page['web_layout_mode'] == ZBX_LAYOUT_KIOSKMODE);
 
-	$theme = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {
 		global $DB;
 
 		if (!empty($DB['DB'])) {
-			$theme = getUserTheme(CWebUser::$data);
-
-			$pageHeader->addStyle(getTriggerSeverityCss());
-			$pageHeader->addStyle(getTriggerStatusCss());
+			$page_header
+				->setTheme(getUserTheme(CWebUser::$data))
+				->addStyle(getTriggerSeverityCss())
+				->addStyle(getTriggerStatusCss());
 
 			// perform Zabbix server check only for standard pages
 			if ($is_standard_page && CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL)) {
@@ -143,39 +142,65 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			}
 		}
 	}
-	$pageHeader->addCssFile('assets/styles/'.CHtml::encode($theme).'.css');
 
-	if ($page['file'] == 'sysmap.php') {
-		$pageHeader->addCssFile('imgstore.php?css=1&output=css');
-	}
+	$page_header->addCssFile('assets/styles/'.$page_header->getTheme().'.css');
 
-	$pageHeader
-		->addJsFile((new CUrl('js/browsers.js'))->getUrl())
-		->addJsBeforeScripts(
-			'var PHP_TZ_OFFSET = '.date('Z').','.
-				'PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";'
-		);
+	foreach (APP::ModuleManager()->getAssets() as $module_id => $assets) {
+		$module = APP::ModuleManager()->getModule($module_id);
+		$relative_path = $module->getRelativePath().'/assets/css';
 
-	// Show GUI messages in pages with menus and in fullscreen mode.
-	if (!defined('ZBX_PAGE_NO_JSLOADER')) {
-		$pageHeader->addJsFile((new CUrl('jsLoader.php'))
-			->setArgument('ver', ZABBIX_VERSION)
-			->setArgument('lang', CWebUser::$data['lang'])
-			->setArgument('showGuiMessaging', ($is_standard_page && !CWebUser::isGuest()) ? 1 : null)
-			->getUrl()
-		);
-
-		if (array_key_exists('scripts', $page) && $page['scripts']) {
-			$pageHeader->addJsFile((new CUrl('jsLoader.php'))
-				->setArgument('ver', ZABBIX_VERSION)
-				->setArgument('lang', CWebUser::$data['lang'])
-				->setArgument('files', $page['scripts'])
-				->getUrl()
-			);
+		foreach ($assets['css'] as $css_file) {
+			$page_header->addCssFile((new CUrl($relative_path.'/'.$css_file))->getUrl());
 		}
 	}
 
-	$pageHeader->display();
+	if ($page['file'] == 'sysmap.php') {
+		$page_header->addCssFile('imgstore.php?css=1&output=css');
+	}
+
+	$page_header
+		->addJavaScript('
+			const PHP_TZ_OFFSET = '.date('Z').';
+			const PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";
+		')
+		->addJsFile((new CUrl('js/browsers.js'))->getUrl());
+
+	// Show GUI messages in pages with menus and in fullscreen mode.
+	if (!defined('ZBX_PAGE_NO_JSLOADER')) {
+		$page_header->addJsFile(
+			(new CUrl('jsLoader.php'))
+				->setArgument('ver', ZABBIX_VERSION)
+				->setArgument('lang', CWebUser::$data['lang'])
+				->setArgument('showGuiMessaging', ($is_standard_page && !CWebUser::isGuest()) ? 1 : null)
+				->getUrl()
+		);
+
+		if (array_key_exists('scripts', $page) && $page['scripts']) {
+			$page_header->addJsFile(
+				(new CUrl('jsLoader.php'))
+					->setArgument('ver', ZABBIX_VERSION)
+					->setArgument('lang', CWebUser::$data['lang'])
+					->setArgument('files', $page['scripts'])
+					->getUrl()
+			);
+		}
+
+		foreach (APP::ModuleManager()->getAssets() as $module_id => $assets) {
+			$module = APP::ModuleManager()->getModule($module_id);
+			$relative_path = $module->getRelativePath().'/assets/js';
+			$translation_strings = $module->getTranslationStrings();
+
+			foreach ($assets['js'] as $js_file) {
+				$page_header->addJsFile((new CUrl($relative_path.'/'.$js_file))->getUrl());
+
+				if (array_key_exists($js_file, $translation_strings)) {
+					$page_header->addJsTranslationStrings($translation_strings[$js_file]);
+				}
+			}
+		}
+	}
+
+	$page_header->show();
 
 	echo '<body>';
 }
@@ -186,7 +211,7 @@ if ($page['type'] != PAGE_TYPE_HTML || defined('ZBX_PAGE_NO_HEADER')) {
 	return null;
 }
 
-if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] == ZBX_LAYOUT_NORMAL) {
+if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] == ZBX_LAYOUT_NORMAL && CWebUser::isLoggedIn()) {
 	echo (new CPartial('layout.htmlpage.aside', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : ''
 	]))->getOutput();

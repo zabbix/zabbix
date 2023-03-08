@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,17 +44,28 @@ class CSystemInfoHelper {
 		$db_backend = DB::getDbBackend();
 		$data['encoding_warning'] = $db_backend->checkEncoding() ? '' : $db_backend->getWarning();
 
-		$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
+		$dbversion_status = CSettingsHelper::getDbVersionStatus();
 
-		if ($dbversion_status !== null && $dbversion_status !== '') {
-			$dbversion_status = json_decode($dbversion_status, true);
+		foreach ($dbversion_status as $dbversion) {
+			if (array_key_exists('history_pk', $dbversion)) {
+				$data['history_pk'] = ($dbversion['history_pk'] == 1);
 
-			if (array_key_exists('history_pk', $dbversion_status)) {
-				$data['history_pk'] = ($dbversion_status['history_pk'] == 1);
+				break;
 			}
 		}
-		else {
-			$dbversion_status = [];
+
+		$housekeeper_warnings = CHousekeepingHelper::getWarnings($dbversion_status);
+
+		if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $housekeeper_warnings)
+				&& CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) == 1
+				&& CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 0) {
+			$data[CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY] = true;
+		}
+
+		if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS, $housekeeper_warnings)
+				&& CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE) == 1
+				&& CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL) == 0) {
+			$data[CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS] = true;
 		}
 
 		$ha_cluster_enabled = false;

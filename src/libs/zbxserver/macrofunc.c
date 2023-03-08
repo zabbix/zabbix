@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -197,7 +197,7 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
 	if (1 != nparam)
 		return FAIL;
 
-	if (SUCCEED == is_uint32(*out, &value))
+	if (SUCCEED == zbx_is_uint32(*out, &value))
 		return SUCCEED;
 
 	if (FAIL == zbx_is_double(*out, &value))
@@ -206,7 +206,7 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
 		return FAIL;
 	}
 
-	if (FAIL == is_uint32(params[0], &precision))
+	if (FAIL == zbx_is_uint32(params[0], &precision))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "invalid parameter \"%s\"", params[0]);
 		return FAIL;

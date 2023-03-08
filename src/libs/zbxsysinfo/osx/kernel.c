@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "log.h"
 
-int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	kernel_maxfiles(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	mib[] = {CTL_KERN, KERN_MAXFILES}, maxfiles;
 	size_t	len = sizeof(maxfiles);
@@ -37,7 +38,7 @@ int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	kernel_maxproc(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	mib[] = {CTL_KERN, KERN_MAXPROC}, maxproc;
 	size_t	len = sizeof(maxproc);

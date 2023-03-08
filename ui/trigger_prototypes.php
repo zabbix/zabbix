@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ $fields = [
 	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(ZBX_RECOVERY_MODE_EXPRESSION.','.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.','.ZBX_RECOVERY_MODE_NONE),	null],
 	'priority' =>								[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
 	'comments' =>								[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'url_name' =>								[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'url' =>									[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'correlation_mode' =>						[T_ZBX_STR, O_OPT, null,	IN(ZBX_TRIGGER_CORRELATION_NONE.','.ZBX_TRIGGER_CORRELATION_TAG),	null],
 	'correlation_tag' =>						[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
@@ -53,10 +54,10 @@ $fields = [
 	'expr_target_single' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Target')],
 	'recovery_expr_temp' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add_recovery_expression}) || isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Recovery expression')],
 	'recovery_expr_target_single' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Target')],
-	'dependencies' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
-	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
+	'dependencies' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'new_dependency' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
+	'g_triggerid' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'tags' =>									[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
 	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
 													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -73,7 +74,7 @@ $fields = [
 													),
 													null
 												],
-	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
+	'visible' =>								[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
 	'toggle_expression_constructor' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'toggle_recovery_expression_constructor' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_expression' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -98,7 +99,7 @@ $fields = [
 	'delete' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>							[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>							[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'backurl' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>									[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status","discover"'),		null],
@@ -209,6 +210,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$recovery_mode = getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION);
 	$recovery_expression = getRequest('recovery_expression', '');
 	$type = getRequest('type', 0);
+	$url_name = getRequest('url_name', '');
 	$url = getRequest('url', '');
 	$priority = getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED);
 	$comments = getRequest('comments', '');
@@ -226,6 +228,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'expression' => $expression,
 			'recovery_mode' => $recovery_mode,
 			'type' => $type,
+			'url_name' => $url_name,
 			'url' => $url,
 			'priority' => $priority,
 			'comments' => $comments,
@@ -259,9 +262,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 	else {
 		$db_trigger_prototypes = API::TriggerPrototype()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'discover', 'event_name'
+			'output' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments', 'templateid',
+				'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close',
+				'opdata', 'discover', 'event_name'
 			],
 			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
@@ -313,6 +316,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if ($db_trigger_prototype['type'] != $type) {
 			$trigger_prototype['type'] = $type;
+		}
+		if ($db_trigger_prototype['url_name'] !== $url_name) {
+			$trigger_prototype['url_name'] = $url_name;
 		}
 		if ($db_trigger_prototype['url'] !== $url) {
 			$trigger_prototype['url'] = $url;
@@ -496,7 +502,7 @@ elseif (getRequest('action') && hasRequest('g_triggerid')
 if (isset($_REQUEST['form'])) {
 	$data = getTriggerFormData([
 		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'dependencies' => getRequest('dependencies', []),
 		'db_dependencies' => [],
@@ -514,6 +520,7 @@ if (isset($_REQUEST['form'])) {
 		'status' => getRequest('status', TRIGGER_STATUS_ENABLED),
 		'discover' => getRequest('discover', DB::getDefault('triggers', 'discover')),
 		'comments' => getRequest('comments', ''),
+		'url_name' => getRequest('url_name', ''),
 		'url' => getRequest('url', ''),
 		'expression_constructor' => getRequest('expression_constructor', IM_ESTABLISHED),
 		'recovery_expression_constructor' => getRequest('recovery_expression_constructor', IM_ESTABLISHED),

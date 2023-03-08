@@ -13,18 +13,15 @@
 
 AC_DEFUN([LIBPCRE2_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
-],
-[
+]], [[
 	int error = 0;
 	PCRE2_SIZE error_offset = 0;
 	pcre2_code *regexp = pcre2_compile("test", PCRE2_ZERO_TERMINATED, PCRE2_UTF, &error, &error_offset, NULL);
 	pcre2_code_free(regexp);
-],
-found_libpcre2="yes")
+]])],[found_libpcre2="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBPCRE2_CHECK_CONFIG],
@@ -41,7 +38,7 @@ AC_DEFUN([LIBPCRE2_CHECK_CONFIG],
 
 	AC_ARG_WITH([libpcre2],[
 If you want to specify libpcre2 installation directories:
-AC_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base install directory (DIR), default is to search through a number of common places for the libpcre2 files.])],
+AS_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base install directory (DIR), default is to search through a number of common places for the libpcre2 files.])],
 	[
 		if test "$withval" != "no"; then
 			want_libpcre2=yes
@@ -51,7 +48,7 @@ AC_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base inst
 		fi
 	])
 
-	AC_ARG_WITH([libpcre2-include], AC_HELP_STRING([--with-libpcre2-include@<:@=DIR@:>@], [use libpcre2 include headers from given path.]), [
+	AC_ARG_WITH([libpcre2-include], AS_HELP_STRING([--with-libpcre2-include@<:@=DIR@:>@], [use libpcre2 include headers from given path.]), [
 		want_libpcre2="yes"
 		libpcre2_include_dir="$withval"
 		if ! test -d "$libpcre2_include_dir"; then
@@ -62,7 +59,7 @@ AC_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base inst
 		fi
 	])
 
-	AC_ARG_WITH([libpcre2-lib], AC_HELP_STRING([--with-libpcre2-lib@<:@=DIR@:>@], [use libpcre2 libraries from given path.]), [
+	AC_ARG_WITH([libpcre2-lib], AS_HELP_STRING([--with-libpcre2-lib@<:@=DIR@:>@], [use libpcre2 libraries from given path.]), [
 		want_libpcre2="yes"
 		libpcre2_lib_dir="$withval"
 		if ! test -d "$libpcre2_lib_dir"; then

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,14 +50,16 @@ class CLocalApiClient extends CApiClient {
 	/**
 	 * Call the given API service method and return the response.
 	 *
-	 * @param string 	$requestApi			API name
-	 * @param string 	$requestMethod		API method
-	 * @param array 	$params				API parameters
-	 * @param string	$auth				Authentication token
+	 * @param string $requestApi     API name.
+	 * @param string $requestMethod  API method.
+	 * @param array  $params         API parameters.
+	 * @param array  $auth
+	 * @param int    $auth['type']   CJsonRpc::AUTH_TYPE_PARAM, CJsonRpc::AUTH_TYPE_HEADER, CJsonRpc::AUTH_TYPE_COOKIE
+	 * @param string $auth['auth']   Authentication token.
 	 *
 	 * @return CApiClientResponse
 	 */
-	public function callMethod($requestApi, $requestMethod, array $params, $auth) {
+	public function callMethod(string $requestApi, string $requestMethod, array $params, array $auth) {
 		global $DB;
 
 		$api = strtolower($requestApi);
@@ -84,20 +86,28 @@ class CLocalApiClient extends CApiClient {
 		$requiresAuthentication = $this->requiresAuthentication($api, $method);
 
 		// check that no authentication token is passed to methods that don't require it
-		if (!$requiresAuthentication && $auth !== null) {
-			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
-			$response->errorMessage = _s('The "%1$s.%2$s" method must be called without the "auth" parameter.',
-				$requestApi, $requestMethod
-			);
+		if (!$requiresAuthentication) {
+			if ($auth['type'] == CJsonRpc::AUTH_TYPE_COOKIE) {
+				$auth['auth'] = null;
+			}
 
-			return $response;
+			if ($auth['auth'] !== null) {
+				$error = $auth['type'] == CJsonRpc::AUTH_TYPE_HEADER
+					? _('The "%1$s.%2$s" method must be called without authorization header.')
+					: _('The "%1$s.%2$s" method must be called without the "auth" parameter.');
+
+				$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+				$response->errorMessage = _params($error, [$requestApi, $requestMethod]);
+
+				return $response;
+			}
 		}
 
 		$newTransaction = false;
 		try {
 			// authenticate
 			if ($requiresAuthentication) {
-				$this->authenticate($auth);
+				$this->authenticate($auth['auth']);
 
 				// check permissions
 				if (APP::getMode() === APP::EXEC_MODE_API && !$this->isAllowedMethod($api, $method)) {
@@ -199,10 +209,15 @@ class CLocalApiClient extends CApiClient {
 			throw new APIException(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
 		}
 
-		[['roleid' => $roleid, 'username' => $username]] = DB::select('users', [
-			'output' => ['roleid', 'username'],
+		[['roleid' => $roleid, 'username' => $username, 'name' => $name, 'surname' => $surname]] = DB::select('users', [
+			'output' => ['roleid', 'username', 'name', 'surname'],
 			'userids' => $userid
 		]);
+
+		if (!$roleid) {
+			usleep(10000);
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
 
 		[$type] = DBfetchColumn(DBselect('SELECT type FROM role WHERE roleid='.zbx_dbstr($roleid)), 'type');
 
@@ -228,6 +243,8 @@ class CLocalApiClient extends CApiClient {
 		CApiService::$userData = [
 			'userid' => $userid,
 			'username' => $username,
+			'name' => $name,
+			'surname' => $surname,
 			'type' => $type,
 			'roleid' => $roleid,
 			'userip' => CWebUser::getIp(),

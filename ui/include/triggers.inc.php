@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,38 +103,6 @@ function get_triggers_by_hostid($hostid) {
 	);
 }
 
-// unescape Raw URL
-function utf8RawUrlDecode($source) {
-	$decodedStr = '';
-	$pos = 0;
-	$len = strlen($source);
-	while ($pos < $len) {
-		$charAt = substr($source, $pos, 1);
-		if ($charAt == '%') {
-			$pos++;
-			$charAt = substr($source, $pos, 1);
-			if ($charAt == 'u') {
-				// we got a unicode character
-				$pos++;
-				$unicodeHexVal = substr($source, $pos, 4);
-				$unicode = hexdec($unicodeHexVal);
-				$entity = "&#".$unicode.';';
-				$decodedStr .= html_entity_decode(utf8_encode($entity), ENT_COMPAT, 'UTF-8');
-				$pos += 4;
-			}
-			else {
-				$decodedStr .= substr($source, $pos-1, 1);
-			}
-		}
-		else {
-			$decodedStr .= $charAt;
-			$pos++;
-		}
-	}
-
-	return $decodedStr;
-}
-
 /**
  * Copy the given triggers to the target hosts or templates, taking care of copied trigger dependencies.
  *
@@ -199,7 +167,7 @@ function copyTriggersToHosts(array $dst_hostids, ?string $src_hostid, array $src
 	}
 
 	$options = [
-		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
+		'output' => ['triggerid', 'expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments', 'type',
 			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
 			'event_name'
 		],
@@ -258,8 +226,8 @@ function copyTriggersToHosts(array $dst_hostids, ?string $src_hostid, array $src
 
 	foreach ($dst_hosts as $dst_hostid => $dst_host) {
 		foreach ($src_triggers as $src_triggerid => $src_trigger) {
-			$dst_trigger = array_intersect_key($src_trigger, array_flip(['expression', 'description', 'url', 'status',
-				'priority', 'comments', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode',
+			$dst_trigger = array_intersect_key($src_trigger, array_flip(['expression', 'description', 'url_name', 'url',
+				'status', 'priority', 'comments', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode',
 				'correlation_tag', 'manual_close', 'opdata', 'event_name', 'tags'
 			]));
 
@@ -676,6 +644,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity', 'r_eventid'],
 			'objectids' => array_keys($triggers),
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
+			'symptom' => false,
 			'recent' => $problem_options['show_recent'],
 			'acknowledged' => $problem_options['acknowledged'],
 			'time_from' => $problem_options['time_from'],
@@ -733,7 +702,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 
 			if (!array_key_exists('only_true', $trigger_options)
 					|| ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null)) {
-				// Overview type = 'Data', Maps, Dasboard or Overview 'show any' mode.
+				// Overview type = 'Data', Maps, Dashboard or Overview 'show any' mode.
 				$trigger['value'] = TRIGGER_VALUE_FALSE;
 			}
 			else {
@@ -776,13 +745,15 @@ function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
 
 	if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 		$eventid = $trigger['problem']['eventid'];
-		$acknowledge = true;
+		$update_problem = true;
 	}
 	else {
-		$acknowledge = false;
+		$update_problem = false;
 	}
 
-	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
+	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid,
+		['update_problem' => $update_problem]
+	));
 
 	return $column;
 }
@@ -960,8 +931,8 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 /**
  * Make trigger info block.
  *
- * @param array $trigger  Trigger described in info block.
- * @param array $eventid  Associated eventid.
+ * @param array  $trigger  Trigger described in info block.
+ * @param string $eventid  Associated event ID.
  *
  * @return object
  */
@@ -994,7 +965,9 @@ function make_trigger_details($trigger, $eventid) {
 			new CCol(_('Trigger')),
 			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
 				->addClass(ZBX_STYLE_WORDWRAP)
-				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid))
+				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid,
+					['show_rank_change_cause' => true]
+				))
 			)
 		])
 		->addRow([
@@ -1872,24 +1845,6 @@ function get_item_function_info(string $expr) {
 	}
 
 	return $result;
-}
-
-/**
- * Quoting $param if it contains special characters.
- *
- * @param string $param
- * @param bool   $forced
- *
- * @return string
- */
-function quoteFunctionParam($param, $forced = false) {
-	if (!$forced) {
-		if (!isset($param[0]) || ($param[0] != '"' && false === strpbrk($param, ',)'))) {
-			return $param;
-		}
-	}
-
-	return '"'.str_replace('"', '\\"', $param).'"';
 }
 
 /**

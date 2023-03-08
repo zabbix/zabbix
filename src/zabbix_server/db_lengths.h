@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,8 @@
 #define ZABBIX_DB_LENGTHS_H
 
 #define TRIGGER_OPDATA_LEN		255
-#define TRIGGER_URL_LEN			255
+#define TRIGGER_URL_LEN			2048
+#define TRIGGER_URL_NAME_LEN		64
 #define TRIGGER_DESCRIPTION_LEN		255
 #if defined(HAVE_ORACLE)
 #	define TRIGGER_COMMENTS_LEN	2048
@@ -37,8 +38,6 @@
 
 #define ALERT_ERROR_LEN			2048
 #define ALERT_ERROR_LEN_MAX		(ALERT_ERROR_LEN + 1)
-
-#define ITEM_PREPROC_PARAMS_LEN		65535
 
 #define EVENT_NAME_LEN			2048
 

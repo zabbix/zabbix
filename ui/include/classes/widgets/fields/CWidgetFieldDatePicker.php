@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,43 +19,42 @@
 **/
 
 
+namespace Zabbix\Widgets\Fields;
+
+use CAbsoluteTimeParser,
+	CParser,
+	CRelativeTimeParser,
+	DB;
+
+use Zabbix\Widgets\CWidgetField;
+
 class CWidgetFieldDatePicker extends CWidgetField {
 
-	/**
-	 * @var bool
-	 */
-	private $is_date_only;
+	public const DEFAULT_VALUE = '';
 
-	/**
-	 * @param string $name
-	 * @param string $label
-	 * @param bool   $is_date_only
-	 */
-	public function __construct(string $name, string $label, bool $is_date_only) {
+	private bool $is_date_only;
+
+	public function __construct(string $name, string $label = null, bool $is_date_only = false) {
 		parent::__construct($name, $label);
 
 		$this->is_date_only = $is_date_only;
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules([
-			'type' => API_STRING_UTF8,
-			'length' => DB::getFieldLength('widget_field', 'value_str')
-		]);
-		$this->setDefault('');
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
+			->setValidationRules([
+				'type' => API_STRING_UTF8,
+				'length' => DB::getFieldLength('widget_field', 'value_str')
+			]);
 	}
 
-	/**
-	 * @param $flags
-	 *
-	 * @return CWidgetFieldDatePicker
-	 */
-	public function setFlags($flags): self {
+	public function setFlags(int $flags): self {
 		parent::setFlags($flags);
 
 		$validation_rules = $this->getValidationRules();
 		$validation_rules['flags'] = $validation_rules['flags'] ?? 0x00;
 
-		if (($flags & self::FLAG_NOT_EMPTY) != 0) {
+		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
 			$validation_rules['flags'] |= API_NOT_EMPTY;
 		}
 		else {
@@ -67,11 +66,6 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		return $this;
 	}
 
-	/**
-	 * @param bool $strict
-	 *
-	 * @return array
-	 */
 	public function validate(bool $strict = false): array {
 		if ($errors = parent::validate($strict)) {
 			return $errors;
@@ -80,7 +74,7 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		$label = $this->full_name ?? $this->label ?? $this->name;
 		$value = $this->value ?? $this->default;
 
-		if ($value === '' && ($this->getFlags() & self::FLAG_NOT_EMPTY) == 0) {
+		if ($value === '' && ($this->getFlags() & self::FLAG_NOT_EMPTY) === 0) {
 			$this->setValue('');
 
 			return [];

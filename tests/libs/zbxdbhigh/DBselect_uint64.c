@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot get expected results from test case data: %s", zbx_mock_error_string(error));
 
 	zbx_vector_uint64_create(&actual_results);
-	DBselect_uint64(sql, &actual_results);
+	zbx_db_select_uint64(sql, &actual_results);
 
 	for (i = 0; ZBX_MOCK_SUCCESS == (error = zbx_mock_vector_element(expected_results, &expected_result)); i++)
 	{
@@ -57,7 +57,7 @@ void	zbx_mock_test_entry(void **state)
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_string(expected_result, &expected_result_string)))
 			break;
 
-		if (SUCCEED != is_uint64(expected_result_string, &expected_result_uint64))
+		if (SUCCEED != zbx_is_uint64(expected_result_string, &expected_result_uint64))
 			fail_msg("Cannot convert expected result #%d to unsigned 64 bit integer.", i + 1);
 
 		if (i >= actual_results.values_num)

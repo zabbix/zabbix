@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "checks_agent.h"
 
 #include "log.h"
+#include "zbxsysinfo.h"
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 extern unsigned char	program_type;
@@ -126,7 +127,7 @@ int	get_value_agent(const DC_ITEM *item, AGENT_RESULT *result)
 			ret = NETWORK_ERROR;
 		}
 		else
-			set_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
+			zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
 	}
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));

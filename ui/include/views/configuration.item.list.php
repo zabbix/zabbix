@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,15 +21,16 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Items'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_ITEM_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATE_ITEM_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_ITEM_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATE_ITEM_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,
@@ -52,10 +53,10 @@ $widget = (new CWidget())
 	);
 
 if ($data['hostid'] != 0) {
-	$widget->setNavigation(getHostNavigation('items', $data['hostid']));
+	$html_page->setNavigation(getHostNavigation('items', $data['hostid']));
 }
 
-$widget->addItem(new CPartial('configuration.filter.items', [
+$html_page->addItem(new CPartial('configuration.filter.items', [
 	'filter_data' => $data['filter_data'],
 	'subfilter' => $data['subfilter'],
 	'context' => $data['context']
@@ -108,6 +109,7 @@ $data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['
 ]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+$csrf_token = CCsrfTokenHelper::get('items.php');
 
 foreach ($data['items'] as $item) {
 	// description
@@ -166,9 +168,9 @@ foreach ($data['items'] as $item) {
 				)
 				->setArgument('context', $data['context'])
 				->setArgument('checkbox_hash', $data['checkbox_hash'])
-				->setArgumentSID()
 				->getUrl()
 		))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(itemIndicatorStyle($item['status'], $item['state']))
 	);
@@ -237,7 +239,7 @@ foreach ($data['items'] as $item) {
 
 	$wizard = (new CButton(null))
 		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getItemConfiguration([
+		->setMenuPopup(CMenuPopupHelper::getItem([
 			'itemid' => $item['itemid'],
 			'context' => $data['context'],
 			'backurl' => $backurl
@@ -296,14 +298,17 @@ foreach ($data['items'] as $item) {
 }
 
 $button_list = [
-	'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
-	'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?')]
+	'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?'), 'csrf_token' => $csrf_token],
+	'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 if ($data['context'] === 'host') {
 	$massclearhistory = [
 		'name' => _('Clear history'),
-		'confirm' => _('Delete history of selected items?')
+		'confirm' => _('Delete history of selected items?'),
+		'csrf_token' => $csrf_token
 	];
 
 	if ($data['config']['compression_status']) {
@@ -313,9 +318,8 @@ if ($data['context'] === 'host') {
 	$button_list += [
 		'item.masscheck_now' => [
 			'content' => (new CSimpleButton(_('Execute now')))
-				->onClick('view.massCheckNow(this);')
+				->addClass('js-execute-now')
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('no-chkbxrange')
 				->setAttribute('data-required', 'execute')
 		],
 		'item.massclearhistory' => $massclearhistory
@@ -323,11 +327,18 @@ if ($data['context'] === 'host') {
 }
 
 $button_list += [
-	'item.masscopyto' => ['name' => _('Copy')],
+	'item.masscopyto' => [
+		'content' => (new CSimpleButton(_('Copy')))
+			->addClass('js-copy')
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->removeId()
+	],
 	'popup.massupdate.item' => [
 		'content' => (new CButton('', _('Mass update')))
 			->onClick(
-				"openMassupdatePopup('popup.massupdate.item', {}, {
+				"openMassupdatePopup('popup.massupdate.item', {".
+					CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('item').
+				"'}, {
 					dialogue_class: 'modal-popup-preprocessing',
 					trigger_element: this
 				});"
@@ -335,18 +346,18 @@ $button_list += [
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->removeAttribute('id')
 	],
-	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
+	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?'), 'csrf_token' => $csrf_token]
 ];
 
 // Append table to form.
-$itemForm->addItem([$itemTable, $data['paging'], new CActionButtonList('action', 'group_itemid', $button_list,
-	$data['checkbox_hash']
-)]);
+$itemForm->addItem([
+	$itemTable, $data['paging'],
+	new CActionButtonList('action', 'group_itemid', $button_list, $data['checkbox_hash'])
+]);
 
-// Append form to widget.
-$widget->addItem($itemForm);
-
-$widget->show();
+$html_page
+	->addItem($itemForm)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

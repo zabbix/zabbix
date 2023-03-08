@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		let $menu_path = $('#menu-path'),
+		let $type = $('#type'),
+			$menu_path = $('#menu-path'),
 			$user_group = $('#user-group'),
 			$host_access = $('#host-access'),
 			$enable_confirmation = $('#enable-confirmation'),
@@ -49,6 +50,18 @@
 						.add($confirmation)
 						.closest('li')
 						.hide();
+
+					if ($('input[name=type]:checked').val() == <?= ZBX_SCRIPT_TYPE_URL ?>) {
+						$type
+							.find('[value=' + <?= ZBX_SCRIPT_TYPE_WEBHOOK ?> + ']')
+							.prop('checked', true)
+							.change();
+					}
+
+					$type
+						.find('[value=' + <?= ZBX_SCRIPT_TYPE_URL ?> + ']')
+						.closest('li')
+						.hide();
 				}
 				else {
 					$menu_path
@@ -56,6 +69,11 @@
 						.add($host_access)
 						.add($enable_confirmation)
 						.add($confirmation)
+						.closest('li')
+						.show();
+
+					$type
+						.find('[value=' + <?= ZBX_SCRIPT_TYPE_URL ?> + ']')
 						.closest('li')
 						.show();
 				}
@@ -74,7 +92,9 @@
 					$command = $('#command'),
 					$parameters = $('#row-webhook-parameters'),
 					$script = $('#script'),
-					$timeout = $('#timeout');
+					$timeout = $('#timeout'),
+					$url = $('#url'),
+					$new_window = $('#new_window');
 
 				switch (type) {
 					case '<?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>':
@@ -94,6 +114,8 @@
 							.add($privatekey)
 							.add($passphrase)
 							.add($port)
+							.add($url)
+							.add($new_window)
 							.closest('li')
 							.hide();
 
@@ -121,6 +143,8 @@
 							.add($privatekey)
 							.add($passphrase)
 							.add($port)
+							.add($url)
+							.add($new_window)
 							.closest('li')
 							.hide();
 
@@ -140,6 +164,8 @@
 							.add($parameters)
 							.add($script)
 							.add($timeout)
+							.add($url)
+							.add($new_window)
 							.closest('li')
 							.hide();
 
@@ -190,6 +216,8 @@
 							.add($publickey)
 							.add($privatekey)
 							.add($passphrase)
+							.add($url)
+							.add($new_window)
 							.closest('li')
 							.hide();
 
@@ -212,12 +240,37 @@
 							.add($privatekey)
 							.add($passphrase)
 							.add($port)
+							.add($url)
+							.add($new_window)
 							.closest('li')
 							.hide();
 
 						$parameters
 							.add($script)
 							.add($timeout)
+							.closest('li')
+							.show();
+						break;
+
+					case '<?= ZBX_SCRIPT_TYPE_URL ?>':
+						$execute_on
+							.add($command)
+							.add($command_ipmi)
+							.add($authtype)
+							.add($username)
+							.add($password)
+							.add($publickey)
+							.add($privatekey)
+							.add($passphrase)
+							.add($port)
+							.add($parameters)
+							.add($script)
+							.add($timeout)
+							.closest('li')
+							.hide();
+
+						$url
+							.add($new_window)
 							.closest('li')
 							.show();
 						break;
@@ -309,7 +362,7 @@
 		// Trim spaces on sumbit.
 		$('#script-form').submit(function() {
 			$(this).trimValues(['#name', '#command', '#commandipmi', '#description', 'input[name^="parameters"]',
-				'input[name="script"]', '#username', '#publickey', '#privatekey', '#menu-path', '#port'
+				'input[name="script"]', '#username', '#publickey', '#privatekey', '#menu-path', '#port', '#url'
 			]);
 		});
 

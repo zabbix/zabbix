@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include "dbupgrade.h"
 
 #include "zbxdbhigh.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "log.h"
 
 /*
@@ -46,10 +46,10 @@ static int	DBpatch_2050001(void)
 
 	/* flags - ZBX_FLAG_DISCOVERY_RULE                               */
 	/* type  - ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3 */
-	if (NULL == (result = DBselect("select itemid,snmp_oid from items where flags=1 and type in (1,4,6)")))
+	if (NULL == (result = zbx_db_select("select itemid,snmp_oid from items where flags=1 and type in (1,4,6)")))
 		return FAIL;
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		char	*param, *oid_esc;
 		size_t	oid_offset = 0;
@@ -57,7 +57,7 @@ static int	DBpatch_2050001(void)
 		param = zbx_strdup(NULL, row[1]);
 		zbx_snprintf_alloc(&oid, &oid_alloc, &oid_offset, "discovery[{#SNMPVALUE},%s]", param);
 
-		if (FAIL == quote_key_param(&param, 0))
+		if (FAIL == zbx_quote_key_param(&param, 0))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert SNMP discovery OID \"%s\":"
 					" OID contains invalid character(s)", row[1]);
@@ -71,9 +71,9 @@ static int	DBpatch_2050001(void)
 		}
 		else
 		{
-			oid_esc = DBdyn_escape_string(oid);
+			oid_esc = zbx_db_dyn_escape_string(oid);
 
-			rc = DBexecute("update items set snmp_oid='%s' where itemid=%s", oid_esc, row[0]);
+			rc = zbx_db_execute("update items set snmp_oid='%s' where itemid=%s", oid_esc, row[0]);
 
 			zbx_free(oid_esc);
 		}
@@ -86,7 +86,7 @@ static int	DBpatch_2050001(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(oid);
 
 	return ret;
@@ -154,7 +154,7 @@ static int	DBpatch_2050010(void)
 static int	DBpatch_2050011(void)
 {
 	/* 1 - ITEM_VALUE_TYPE_STR, 2 - ITEM_VALUE_TYPE_LOG, 4 - ITEM_VALUE_TYPE_TEXT */
-	if (ZBX_DB_OK <= DBexecute("update items set trends=0 where value_type in (1,2,4)"))
+	if (ZBX_DB_OK <= zbx_db_execute("update items set trends=0 where value_type in (1,2,4)"))
 		return SUCCEED;
 
 	return FAIL;
@@ -170,17 +170,17 @@ static int	DBpatch_2050012(void)
 	AGENT_REQUEST	request;
 
 	/* type - ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE */
-	result = DBselect(
+	result = zbx_db_select(
 			"select hostid,itemid,key_"
 			" from items"
 			" where type in (0,3,7)"
 				" and key_ like 'net.tcp.service%%[%%ntp%%'");
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
-		init_request(&request);
+		zbx_init_agent_request(&request);
 
-		if (SUCCEED != parse_item_key(row[2], &request))
+		if (SUCCEED != zbx_parse_item_key(row[2], &request))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse item key \"%s\"", row[2]);
 			continue;
@@ -191,7 +191,7 @@ static int	DBpatch_2050012(void)
 		/* NULL check to silence static analyzer warning */
 		if (NULL == param || (0 != strcmp("service.ntp", param) && 0 != strcmp("ntp", param)))
 		{
-			free_request(&request);
+			zbx_free_agent_request(&request);
 			continue;
 		}
 
@@ -212,7 +212,7 @@ static int	DBpatch_2050012(void)
 			while ('\0' != *(p++));
 		}
 
-		free_request(&request);
+		zbx_free_agent_request(&request);
 
 		/* replace "net.tcp.service" with "net.udp.service" */
 
@@ -220,13 +220,13 @@ static int	DBpatch_2050012(void)
 		key[5] = 'd';
 		key[6] = 'p';
 
-		key_esc = DBdyn_escape_string(key);
+		key_esc = zbx_db_dyn_escape_string(key);
 
-		result2 = DBselect("select null from items where hostid=%s and key_='%s'", row[0], key_esc);
+		result2 = zbx_db_select("select null from items where hostid=%s and key_='%s'", row[0], key_esc);
 
-		if (NULL == DBfetch(result2))
+		if (NULL == zbx_db_fetch(result2))
 		{
-			if (ZBX_DB_OK > DBexecute("update items set key_='%s' where itemid=%s", key_esc, row[1]))
+			if (ZBX_DB_OK > zbx_db_execute("update items set key_='%s' where itemid=%s", key_esc, row[1]))
 				ret = FAIL;
 		}
 		else
@@ -235,11 +235,11 @@ static int	DBpatch_2050012(void)
 					" item with converted key \"%s\" already exists on host ID [%s]",
 					row[2], key, row[0]);
 		}
-		DBfree_result(result2);
+		zbx_db_free_result(result2);
 
 		zbx_free(key_esc);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(key);
 
@@ -253,7 +253,7 @@ static int	DBpatch_2050013(void)
 
 static int	DBpatch_2050014(void)
 {
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 		"update config"
 		" set default_theme="
 			"case when default_theme in ('classic', 'originalblue')"
@@ -268,7 +268,7 @@ static int	DBpatch_2050014(void)
 
 static int	DBpatch_2050015(void)
 {
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 		"update users"
 		" set theme=case when theme in ('classic', 'originalblue') then 'blue-theme' else 'dark-theme' end"
 		" where theme<>'default'"))
@@ -500,7 +500,7 @@ static int	DBpatch_2050055(void)
 	DB_ROW		row;
 	int		ret = FAIL;
 
-	if (NULL == (result = DBselect(
+	if (NULL == (result = zbx_db_select(
 			"select severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,"
 				"severity_color_5"
 			" from config")))
@@ -508,12 +508,12 @@ static int	DBpatch_2050055(void)
 		return FAIL;
 	}
 
-	if (NULL != (row = DBfetch(result)) &&
+	if (NULL != (row = zbx_db_fetch(result)) &&
 			0 == strcmp(row[0], "DBDBDB") && 0 == strcmp(row[1], "D6F6FF") &&
 			0 == strcmp(row[2], "FFF6A5") && 0 == strcmp(row[3], "FFB689") &&
 			0 == strcmp(row[4], "FF9999") && 0 == strcmp(row[5], "FF3838"))
 	{
-		if (ZBX_DB_OK > DBexecute(
+		if (ZBX_DB_OK > zbx_db_execute(
 				"update config set severity_color_0='97AAB3',severity_color_1='7499FF',"
 					"severity_color_2='FFC859',severity_color_3='FFA059',"
 					"severity_color_4='E97659',severity_color_5='E45959'"))
@@ -524,7 +524,7 @@ static int	DBpatch_2050055(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -581,7 +581,7 @@ static int	DBpatch_2050062(void)
 static int	DBpatch_2050063(void)
 {
 	/* type=1 -> type=MEDIA_TYPE_EXEC */
-	if (ZBX_DB_OK > DBexecute("update media_type"
+	if (ZBX_DB_OK > zbx_db_execute("update media_type"
 			" set exec_params='{ALERT.SENDTO}\n{ALERT.SUBJECT}\n{ALERT.MESSAGE}\n'"
 			" where type=1"))
 	{
@@ -657,7 +657,7 @@ static int	DBpatch_2050077(void)
 static int	DBpatch_2050078(void)
 {
 	/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
-	if (ZBX_DB_OK > DBexecute("update sysmaps set userid=(select min(userid) from users where type=3)"))
+	if (ZBX_DB_OK > zbx_db_execute("update sysmaps set userid=(select min(userid) from users where type=3)"))
 		return FAIL;
 
 	return SUCCEED;
@@ -758,7 +758,7 @@ static int	DBpatch_2050089(void)
 
 static int	DBpatch_2050090(void)
 {
-	if (ZBX_DB_OK > DBexecute("update profiles"
+	if (ZBX_DB_OK > zbx_db_execute("update profiles"
 			" set idx='web.triggers.filter_status',value_int=case when value_int=0 then 0 else -1 end"
 			" where idx='web.triggers.showdisabled'"))
 	{
@@ -770,7 +770,7 @@ static int	DBpatch_2050090(void)
 
 static int	DBpatch_2050091(void)
 {
-	if (ZBX_DB_OK > DBexecute("update profiles"
+	if (ZBX_DB_OK > zbx_db_execute("update profiles"
 			" set idx='web.httpconf.filter_status',value_int=case when value_int=0 then 0 else -1 end"
 			" where idx='web.httpconf.showdisabled'"))
 	{
@@ -800,10 +800,10 @@ static int	DBpatch_2050092(void)
 				"report1.php", "report.status"
 			};
 
-	if (NULL == (result = DBselect("select userid,url from users where url<>''")))
+	if (NULL == (result = zbx_db_select("select userid,url from users where url<>''")))
 		return FAIL;
 
-	while (NULL != (row = (DBfetch(result))))
+	while (NULL != (row = (zbx_db_fetch(result))))
 	{
 		if (NULL == (end = strchr(row[1], '?')))
 			end = row[1] + strlen(row[1]);
@@ -841,8 +841,8 @@ static int	DBpatch_2050092(void)
 					" value is too long. The URL field was reset.", row[0]);
 		}
 
-		url_esc = DBdyn_escape_string(url);
-		rc = DBexecute("update users set url='%s' where userid=%s", url_esc, row[0]);
+		url_esc = zbx_db_dyn_escape_string(url);
+		rc = zbx_db_execute("update users set url='%s' where userid=%s", url_esc, row[0]);
 		zbx_free(url_esc);
 
 		if (ZBX_DB_OK > rc)
@@ -852,7 +852,7 @@ static int	DBpatch_2050092(void)
 	ret = SUCCEED;
 out:
 	zbx_free(url);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -866,7 +866,7 @@ static int	DBpatch_2050093(void)
 static int	DBpatch_2050094(void)
 {
 	/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
-	if (ZBX_DB_OK > DBexecute("update screens"
+	if (ZBX_DB_OK > zbx_db_execute("update screens"
 			" set userid=(select min(userid) from users where type=3)"
 			" where templateid is null"))
 	{
@@ -972,7 +972,7 @@ static int	DBpatch_2050105(void)
 static int	DBpatch_2050106(void)
 {
 	/* convert meta value (1) to PROXY_HISTORY_FLAG_META | PROXY_HISTORY_FLAG_NOVALUE (0x03) flags */
-	if (ZBX_DB_OK > DBexecute("update proxy_history set flags=3 where flags=1"))
+	if (ZBX_DB_OK > zbx_db_execute("update proxy_history set flags=3 where flags=1"))
 	{
 		return FAIL;
 	}
@@ -990,7 +990,7 @@ static int	DBpatch_2050107(void)
 static int	DBpatch_2050108(void)
 {
 	/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
-	if (ZBX_DB_OK > DBexecute("update slideshows set userid=(select min(userid) from users where type=3)"))
+	if (ZBX_DB_OK > zbx_db_execute("update slideshows set userid=(select min(userid) from users where type=3)"))
 		return FAIL;
 
 	return SUCCEED;
@@ -1092,7 +1092,7 @@ static int	DBpatch_2050119(void)
 static int	DBpatch_2050120(void)
 {
 	/* private=0 -> PUBLIC_SHARING */
-	if (ZBX_DB_OK <= DBexecute("update sysmaps set private=0"))
+	if (ZBX_DB_OK <= zbx_db_execute("update sysmaps set private=0"))
 		return SUCCEED;
 
 	return FAIL;
@@ -1101,7 +1101,7 @@ static int	DBpatch_2050120(void)
 static int	DBpatch_2050121(void)
 {
 	/* private=0 -> PUBLIC_SHARING */
-	if (ZBX_DB_OK <= DBexecute("update screens set private=0"))
+	if (ZBX_DB_OK <= zbx_db_execute("update screens set private=0"))
 		return SUCCEED;
 
 	return FAIL;
@@ -1110,7 +1110,7 @@ static int	DBpatch_2050121(void)
 static int	DBpatch_2050122(void)
 {
 	/* private=0 -> PUBLIC_SHARING */
-	if (ZBX_DB_OK <= DBexecute("update slideshows set private=0"))
+	if (ZBX_DB_OK <= zbx_db_execute("update slideshows set private=0"))
 		return SUCCEED;
 
 	return FAIL;

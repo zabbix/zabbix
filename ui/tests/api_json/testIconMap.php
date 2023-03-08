@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -466,21 +466,7 @@ class testIconMap extends CAPITest {
 			]],
 			[[
 				'iconmap' => [
-					'name' => 'invalid regular expression',
-					'default_iconid' => '2',
-					'mappings' =>[
-						[
-							'inventory_link' => '2',
-							'expression' => '\//',
-							'iconid' => '1'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-			]],
-			[[
-				'iconmap' => [
-					'name' => 'invalid regular expression',
+					'name' => 'invalid regular expression 1',
 					'default_iconid' => '2',
 					'mappings' =>[
 						[
@@ -494,7 +480,7 @@ class testIconMap extends CAPITest {
 			]],
 			[[
 				'iconmap' => [
-					'name' => 'invalid regular expression',
+					'name' => 'invalid regular expression 2',
 					'default_iconid' => '2',
 					'mappings' =>[
 						[
@@ -508,7 +494,7 @@ class testIconMap extends CAPITest {
 			]],
 			[[
 				'iconmap' => [
-					'name' => 'invalid regular expression',
+					'name' => 'invalid regular expression 3',
 					'default_iconid' => '2',
 					'mappings' =>[
 						[

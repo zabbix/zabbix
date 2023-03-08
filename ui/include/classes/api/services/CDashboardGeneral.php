@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,10 @@ abstract class CDashboardGeneral extends CApiService {
 		ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => 'value_graphid',
 		ZBX_WIDGET_FIELD_TYPE_MAP => 'value_sysmapid',
 		ZBX_WIDGET_FIELD_TYPE_SERVICE => 'value_serviceid',
-		ZBX_WIDGET_FIELD_TYPE_SLA => 'value_slaid'
+		ZBX_WIDGET_FIELD_TYPE_SLA => 'value_slaid',
+		ZBX_WIDGET_FIELD_TYPE_USER => 'value_userid',
+		ZBX_WIDGET_FIELD_TYPE_ACTION => 'value_actionid',
+		ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE => 'value_mediatypeid'
 	];
 
 	protected const WIDGET_FIELD_TYPE_COLUMNS = [
@@ -225,7 +228,7 @@ abstract class CDashboardGeneral extends CApiService {
 					$options = [
 						'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
 							'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_serviceid',
-							'value_slaid', 'value_sysmapid'
+							'value_slaid', 'value_userid', 'value_actionid', 'value_mediatypeid', 'value_sysmapid'
 						],
 						'filter' => ['widgetid' => $widgetids]
 					];
@@ -376,7 +379,10 @@ abstract class CDashboardGeneral extends CApiService {
 			ZBX_WIDGET_FIELD_TYPE_HOST => [],
 			ZBX_WIDGET_FIELD_TYPE_MAP => [],
 			ZBX_WIDGET_FIELD_TYPE_SERVICE => [],
-			ZBX_WIDGET_FIELD_TYPE_SLA => []
+			ZBX_WIDGET_FIELD_TYPE_SLA => [],
+			ZBX_WIDGET_FIELD_TYPE_USER => [],
+			ZBX_WIDGET_FIELD_TYPE_ACTION => [],
+			ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE => []
 		];
 
 		foreach ($dashboards as $dashboard) {
@@ -628,6 +634,60 @@ abstract class CDashboardGeneral extends CApiService {
 				if (!array_key_exists($slaid, $db_slas)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('SLA with ID "%1$s" is not available.', $slaid)
+					);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_USER]) {
+			$userids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_USER]);
+
+			$db_users = API::User()->get([
+				'output' => [],
+				'userids' => $userids,
+				'preservekeys' => true
+			]);
+
+			foreach ($userids as $userid) {
+				if (!array_key_exists($userid, $db_users)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('User with ID "%1$s" is not available.', $userid)
+					);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_ACTION]) {
+			$actionids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ACTION]);
+
+			$db_actions = API::Action()->get([
+				'output' => [],
+				'actionids' => $actionids,
+				'preservekeys' => true
+			]);
+
+			foreach ($actionids as $actionid) {
+				if (!array_key_exists($actionid, $db_actions)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Action with ID "%1$s" is not available.', $actionid)
+					);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE]) {
+			$mediatypeids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE]);
+
+			$db_media_types = API::MediaType()->get([
+				'output' => [],
+				'mediatypeids' => $mediatypeids,
+				'preservekeys' => true
+			]);
+
+			foreach ($mediatypeids as $mediatypeid) {
+				if (!array_key_exists($mediatypeid, $db_media_types)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Media type with ID "%1$s" is not available.', $mediatypeid)
 					);
 				}
 			}
@@ -1013,7 +1073,7 @@ abstract class CDashboardGeneral extends CApiService {
 						$db_widget_fields = DB::select('widget_field', [
 							'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
 								'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_serviceid',
-								'value_slaid', 'value_sysmapid'
+								'value_slaid', 'value_userid', 'value_actionid', 'value_mediatypeid', 'value_sysmapid'
 							],
 							'filter' => [
 								'widgetid' => array_keys($db_widgets),

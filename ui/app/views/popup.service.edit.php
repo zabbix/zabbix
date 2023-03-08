@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm('post'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('service')))->removeId())
 	->setId('service-form')
 	->setName('service_form')
 	->addItem(getMessages());
@@ -73,7 +74,7 @@ $service_tab = (new CFormGrid())
 								->addClass('element-table-add')
 						))
 					),
-				(new CScriptTemplate('problem-tag-row-tmpl'))
+				(new CTemplateTag('problem-tag-row-tmpl'))
 					->addItem(
 						(new CRow([
 							(new CTextBox('problem_tags[#{rowNum}][tag]', '#{tag}', false,
@@ -250,9 +251,9 @@ $tags_tab = (new CFormGrid())
 				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 				->addItem([
 					renderTagTable($data['form']['tags'])
-						->setId('tags-table')
+						->addClass('tags-table')
 						->setHeader((new CRowHeader([_('Name'), _('Value'), _('Action')]))->addClass(ZBX_STYLE_GREY)),
-					(new CScriptTemplate('tag-row-tmpl'))
+					(new CTemplateTag('tag-row-tmpl'))
 						->addItem(renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, ['add_post_js' => false]))
 				])
 		)

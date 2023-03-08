@@ -1,71 +1,73 @@
 // Widget configuration.
 
 form.dashboard-widget-item {
-	.fields-group-description,
-	.fields-group-value,
-	.fields-group-time,
-	.fields-group-change-indicator {
-		display: grid;
-		grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
-		align-items: center;
-		column-gap: 10px;
-		row-gap: 5px;
+	.fields-group {
+		&.fields-group-description,
+		&.fields-group-value,
+		&.fields-group-time,
+		&.fields-group-change-indicator {
+			display: grid;
+			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+			align-items: center;
+			column-gap: 10px;
+			row-gap: 5px;
 
-		label {
-			text-align: right;
-		}
-
-		hr {
-			grid-column: 1 / -1;
-			margin: 0;
-			width: 100%;
-			border: solid $table-border-color;
-			border-width: 1px 0 0 0;
-		}
-
-		.field-fluid {
-			grid-column: 2 / -1;
-		}
-
-		.offset-3 {
-			grid-column-start: 3;
-		}
-
-		.field-size {
-			input {
-				margin-right: 5px;
+			label {
+				text-align: right;
 			}
-		}
 
-		.form-field {
-			line-height: 24px;
-		}
-	}
-
-	.fields-group-description {
-		.form-field:nth-child(1) {
-			grid-column: 1 / -1;
-		}
-	}
-
-	.fields-group-value {
-		grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
-
-		.units-show {
-			display: flex;
-
-			label[for='units'] {
+			hr {
+				grid-column: 1 / -1;
+				margin: 0;
 				width: 100%;
+				border: solid $table-border-color;
+				border-width: 1px 0 0 0;
+			}
+
+			.field-fluid {
+				grid-column: 2 / -1;
+			}
+
+			.offset-3 {
+				grid-column-start: 3;
+			}
+
+			.field-size {
+				input {
+					margin-right: 5px;
+				}
+			}
+
+			.form-field {
+				line-height: 24px;
 			}
 		}
-	}
 
-	.fields-group-change-indicator {
-		grid-template-columns: repeat(3, max-content 96px);
-	}
+		&.fields-group-description {
+			.form-field:nth-child(1) {
+				grid-column: 1 / -1;
+			}
+		}
 
-	.fields-group-change-indicator .input-color-picker {
-		display: block;
+		&.fields-group-value {
+			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+
+			.units-show {
+				display: flex;
+
+				label[for='units'] {
+					width: 100%;
+				}
+			}
+		}
+
+		&.fields-group-change-indicator {
+			grid-template-columns: repeat(3, max-content 96px);
+
+			.input-color-picker {
+				display: block;
+			}
+		}
 	}
 }
 
@@ -74,12 +76,14 @@ form.dashboard-widget-item {
 div.dashboard-widget-item {
 	$line-height: 1.14;
 
-	box-sizing: border-box;
-	height: 100%;
-	padding: 10px;
-	overflow-x: hidden;
+	> div {
+		box-sizing: border-box;
+		height: 100%;
+		padding: 10px;
+		overflow-x: hidden;
 
-	@extend %webkit-scrollbar;
+		@extend %webkit-scrollbar;
+	}
 
 	a {
 		box-sizing: border-box;

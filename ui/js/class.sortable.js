@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ class CSortable extends CBaseComponent {
 		drag_scroll_delay_short = 150,
 		drag_scroll_delay_long = 400,
 		wheel_step = 100,
+		show_grabbing_cursor = true,
 		do_activate = true
 	}) {
 		super(target);
@@ -51,6 +52,7 @@ class CSortable extends CBaseComponent {
 		this._drag_scroll_delay_short = drag_scroll_delay_short;
 		this._drag_scroll_delay_long = drag_scroll_delay_long;
 		this._wheel_step = wheel_step;
+		this._show_grabbing_cursor = show_grabbing_cursor;
 
 		this._init();
 		this._registerEvents();
@@ -258,6 +260,8 @@ class CSortable extends CBaseComponent {
 
 			item.style.left = `${item_rect.x - list_rect.x}px`;
 			item.style.top = `${item_rect.y - list_rect.y}px`;
+			item.style.width = `${item_rect.width}px`;
+			item.style.height = `${item_rect.height}px`;
 		}
 
 		this._target.classList.add(ZBX_STYLE_SORTABLE_DRAGGING);
@@ -268,10 +272,20 @@ class CSortable extends CBaseComponent {
 		this._drag_item = drag_item;
 		this._drag_item.style.left = `${drag_item_rect.x - target_rect.x}px`;
 		this._drag_item.style.top = `${drag_item_rect.y - target_rect.y}px`;
+		this._drag_item.style.width = `${drag_item_rect.width}px`;
+		this._drag_item.style.height = `${drag_item_rect.height}px`;
+
 		this._target.appendChild(this._drag_item);
 
 		// Hide the actual dragging item.
 		drag_item.classList.add(ZBX_STYLE_SORTABLE_DRAGGING);
+
+		// Set mouse cursor to "grabbing".
+		if (this._show_grabbing_cursor) {
+			this._dragging_style = document.createElement('style');
+			document.head.appendChild(this._dragging_style);
+			this._dragging_style.sheet.insertRule('* { cursor: grabbing !important; }');
+		}
 
 		this.fire(SORTABLE_EVENT_DRAG_START, {item: drag_item});
 	}
@@ -355,6 +369,8 @@ class CSortable extends CBaseComponent {
 		drag_item.classList.remove(ZBX_STYLE_SORTABLE_DRAGGING);
 		drag_item.style.left = '';
 		drag_item.style.top = '';
+		drag_item.style.width = '';
+		drag_item.style.height = '';
 
 		this._target.classList.remove(ZBX_STYLE_SORTABLE_DRAGGING);
 		this._list.style.width = '';
@@ -363,12 +379,19 @@ class CSortable extends CBaseComponent {
 		for (const item of items) {
 			item.style.left = '';
 			item.style.top = '';
+			item.style.width = '';
+			item.style.height = '';
 		}
 
 		// Re-focus the dragged item.
 		drag_item.focus();
 
 		this._drag_item = null;
+
+		// Reset mouse cursor.
+		if (this._show_grabbing_cursor) {
+			this._dragging_style.remove();
+		}
 
 		this.fire(SORTABLE_EVENT_DRAG_END, {item: drag_item});
 	}

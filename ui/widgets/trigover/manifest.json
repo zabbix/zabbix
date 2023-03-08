@@ -1,0 +1,20 @@
+{
+	"manifest_version": 2.0,
+	"id": "trigover",
+	"type": "widget",
+	"name": "Trigger overview",
+	"namespace": "TrigOver",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"js_class": "CWidgetTrigerOver"
+	},
+	"actions": {
+		"widget.trigover.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

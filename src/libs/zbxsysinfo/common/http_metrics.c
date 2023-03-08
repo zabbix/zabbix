@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@
 ZBX_METRIC	parameters_common_http[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
-	{"web.page.get",	CF_HAVEPARAMS,	WEB_PAGE_GET,		"localhost,,80"},
-	{"web.page.perf",	CF_HAVEPARAMS,	WEB_PAGE_PERF,		"localhost,,80"},
-	{"web.page.regexp",	CF_HAVEPARAMS,	WEB_PAGE_REGEXP,	"localhost,,80,OK"},
+	{"web.page.get",	CF_HAVEPARAMS,	web_page_get,		"localhost,,80"},
+	{"web.page.perf",	CF_HAVEPARAMS,	web_page_perf,		"localhost,,80"},
+	{"web.page.regexp",	CF_HAVEPARAMS,	web_page_regexp,	"localhost,,80,OK"},
 
 	{NULL}
 };

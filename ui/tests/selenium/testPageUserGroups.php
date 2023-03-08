@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
  */
 class testPageUserGroups extends CLegacyWebTest {
 	public static function allGroups() {
-		return CDBHelper::getDataProvider("select * from usrgrp where name<>'Disabled' order by usrgrpid");
+		return CDBHelper::getDataProvider("select * from usrgrp where name<>'Disabled' and name<>'Internal' order by usrgrpid");
 	}
 
 	public function testPageUserGroups_CheckLayout() {

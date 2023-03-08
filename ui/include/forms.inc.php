@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -401,7 +401,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 
 			if ($simple_interval_parser->parse($trends) == CParser::PARSE_SUCCESS) {
 				$value = timeUnitToSeconds($trends);
-				$trends = convertUnitsS($value);
+				$trends = convertSecondsToTimeUnits($value);
 			}
 
 			if (!array_key_exists($trends, $item_params['trends'])) {
@@ -436,7 +436,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 
 			if ($simple_interval_parser->parse($history) == CParser::PARSE_SUCCESS) {
 				$value = timeUnitToSeconds($history);
-				$history = convertUnitsS($value);
+				$history = convertSecondsToTimeUnits($value);
 			}
 
 			if (!array_key_exists($history, $item_params['history'])) {
@@ -479,7 +479,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 				// "value" is delay represented in seconds and it is used for sorting the subfilter.
 				if ($delay[0] !== '{') {
 					$value = timeUnitToSeconds($delay);
-					$delay = convertUnitsS($value);
+					$delay = convertSecondsToTimeUnits($value);
 				}
 				else {
 					$value = $delay;
@@ -726,7 +726,7 @@ function prepareScriptItemFormData(array $item): array {
 function getItemFormData(array $item = [], array $options = []) {
 	$data = [
 		'form' => $options['form'],
-		'form_refresh' => getRequest('form_refresh'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
 		'itemid' => getRequest('itemid'),
@@ -782,14 +782,15 @@ function getItemFormData(array $item = [], array $options = []) {
 		'ssl_key_password' => getRequest('ssl_key_password'),
 		'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
 		'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
-		'http_authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
+		'http_authtype' => getRequest('http_authtype', ZBX_HTTP_AUTH_NONE),
 		'http_username' => getRequest('http_username', ''),
 		'http_password' => getRequest('http_password', ''),
 		'preprocessing' => getRequest('preprocessing', []),
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
 		'context' => getRequest('context'),
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
-		'tags' => getRequest('tags', [])
+		'tags' => getRequest('tags', []),
+		'backurl' => getRequest('backurl')
 	];
 
 	// Unset empty and inherited tags.
@@ -1236,7 +1237,6 @@ function getItemFormData(array $item = [], array $options = []) {
 /**
  * Get list of item pre-processing data and return a prepared HTML object.
  *
- * @param CForm  $form                                     Form object to where add pre-processing list.
  * @param array  $preprocessing                            Array of item pre-processing steps.
  * @param string $preprocessing[]['type']                  Pre-processing step type.
  * @param array  $preprocessing[]['params']                Additional parameters used by pre-processing.
@@ -1247,7 +1247,7 @@ function getItemFormData(array $item = [], array $options = []) {
  *
  * @return CList
  */
-function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, array $types) {
+function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$script_maxlength = DB::getFieldLength('item_preproc', 'params');
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
@@ -1292,19 +1292,19 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		// Depending on preprocessing type, display corresponding params field and placeholders.
 		$params = '';
 
-		// Create a primary param text box, so it can be hidden if necessary.
-		$step_param_0_value = array_key_exists('params', $step) ? $step['params'][0] : '';
-		$step_param_0 = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0_value))
-			->setTitle($step_param_0_value)
-			->setReadonly($readonly);
+		if ($step['type'] != ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+			// Create a primary param text box, so it can be hidden if necessary.
+			$step_param_0_value = array_key_exists('params', $step) ? $step['params'][0] : '';
+			$step_param_0 = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0_value))
+				->setReadonly($readonly);
 
-		// Create a secondary param text box, so it can be hidden if necessary.
-		$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
-			? $step['params'][1]
-			: '';
-		$step_param_1 = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1_value))
-			->setTitle($step_param_1_value)
-			->setReadonly($readonly);
+			// Create a secondary param text box, so it can be hidden if necessary.
+			$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
+				? $step['params'][1]
+				: '';
+			$step_param_1 = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1_value))
+				->setReadonly($readonly);
+		}
 
 		// Add corresponding placeholders and show or hide text boxes.
 		switch ($step['type']) {
@@ -1439,6 +1439,90 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					$step_param_0->setAttribute('placeholder', _('search string')),
 					$step_param_1->setAttribute('placeholder', _('replacement'))
 				];
+				break;
+
+			case ZBX_PREPROC_SNMP_WALK_VALUE:
+				$params = [
+					$step_param_0->setAttribute('placeholder', _('OID')),
+					(new CSelect('preprocessing['.$i.'][params][1]'))
+						->setValue($step_param_1_value)
+						->setAdaptiveWidth(202)
+						->addOptions([
+							new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
+							new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+							new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+							new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
+						])
+						->setReadonly($readonly)
+				];
+				break;
+
+			case ZBX_PREPROC_SNMP_WALK_TO_JSON:
+				$mapping_rows = [];
+				$count = count($step['params']);
+
+				for ($j = 0; $j < $count; $j += 3) {
+					$mapping_rows[] = [
+						(new CRow([
+							new CCol(
+								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j]))
+									->setReadonly($readonly)
+									->removeId()
+									->setAttribute('placeholder', _('Field name'))
+							),
+							new CCol(
+								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j + 1]))
+									->setReadonly($readonly)
+									->removeId()
+									->setAttribute('placeholder', _('OID prefix'))
+							),
+							new CCol(
+								(new CSelect('preprocessing['.$i.'][params][]'))
+									->setValue($step['params'][$j + 2])
+									->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
+									->addOptions([
+										new CSelectOption(ZBX_PREPROC_SNMP_UNCHANGED, _('Unchanged')),
+										new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+										new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+										new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
+									])
+									->setReadonly($readonly)
+							),
+							(new CCol(
+								(new CSimpleButton(_('Remove')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass('js-group-json-action-delete')
+									->setEnabled($count > 3)
+							))->addClass(ZBX_STYLE_NOWRAP)
+						]))->addClass('group-json-row')
+					];
+				}
+
+				$params = (new CDiv())
+					->addItem([
+						(new CTable())
+							->addClass('group-json-mapping')
+							->setHeader(
+								(new CRowHeader([
+									new CColHeader(_('Field name')),
+									new CColHeader(_('OID prefix')),
+									new CColHeader(_('Format')),
+									(new CColHeader(_('Action')))->addClass(ZBX_STYLE_NOWRAP)
+								]))->addClass(ZBX_STYLE_GREY)
+							)
+							->addItem($mapping_rows)
+							->addItem(
+								(new CTag('tfoot', true))
+									->addItem(
+										(new CCol(
+											(new CSimpleButton(_('Add')))
+												->addClass(ZBX_STYLE_BTN_LINK)
+												->addClass('js-group-json-action-add')
+										))->setColSpan(4)
+									)
+							)
+							->setAttribute('data-index', $i)
+					])->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
 				break;
 		}
 
@@ -1825,7 +1909,8 @@ function getTriggerFormData(array $data) {
 			$db_hosts = API::Host()->get([
 				'output' => [],
 				'selectTags' => ['tag', 'value'],
-				'hostids' => $data['hostid']
+				'hostids' => $data['hostid'],
+				'templated_hosts' => true
 			]);
 
 			if ($db_hosts) {
@@ -1888,6 +1973,7 @@ function getTriggerFormData(array $data) {
 			$data['priority'] = $trigger['priority'];
 			$data['status'] = $trigger['status'];
 			$data['comments'] = $trigger['comments'];
+			$data['url_name'] = $trigger['url_name'];
 			$data['url'] = $trigger['url'];
 
 			if ($data['parent_discoveryid'] !== null) {

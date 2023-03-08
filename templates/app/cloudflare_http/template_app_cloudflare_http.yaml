@@ -1,6 +1,5 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-07-01T06:44:50Z'
+  version: '6.4'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -14,6 +13,9 @@ zabbix_export:
         The template to monitor Cloudflare to see your web traffic and DNS metrics. It works without any external scripts and uses Script item.
         
         Template tooling version used: 0.41
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications
@@ -824,7 +826,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -839,7 +841,7 @@ zabbix_export:
                         name: 'Cloudflare: Bandwidth'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -855,7 +857,7 @@ zabbix_export:
                         name: 'Cloudflare: Web requests'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -871,7 +873,7 @@ zabbix_export:
                         name: 'Cloudflare: DNS requests'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -888,7 +890,7 @@ zabbix_export:
                         name: 'Cloudflare: Caching'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -904,7 +906,7 @@ zabbix_export:
                         name: 'Cloudflare: HTTP responses ratio over time'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '10'
                   width: '12'
@@ -921,7 +923,7 @@ zabbix_export:
                         name: 'Cloudflare: IPs and threats'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '15'
                   width: '12'
                   height: '5'

@@ -1,0 +1,222 @@
+---
+test case: Invalid value ''
+in:
+  param: 
+out:
+  return: FAIL
+---
+test case: Invalid value 'xxx'
+in:
+  param: xxx
+out:
+  return: FAIL
+---
+test case: Invalid value '123'
+in:
+  param: 123
+out:
+  return: FAIL
+---
+test case: Invalid value '2022x09-12T14:46:15'
+in:
+  param: 2022x09-12T14:46:15
+out:
+  return: FAIL
+---
+test case: Invalid value '2022-09x12T14:46:15'
+in:
+  param: 2022-09x12T14:46:15
+out:
+  return: FAIL
+---
+test case: Invalid value '2022-09-12x14:46:15'
+in:
+  param: 2022-09-12x14:46:15
+out:
+  return: FAIL
+---
+test case: Invalid value '2022-09-12T14x46:15'
+in:
+  param: 2022-09-12T14x46:15
+out:
+  return: FAIL
+---
+test case: Invalid value '2022-09-12T14:46x15'
+in:
+  param: 2022-09-12T14:46x15
+out:
+  return: FAIL
+
+
+---
+test case: Valid yyyy-mm-ddThh:mm:ss
+in:
+  param: 2022-09-12T14:46:15
+out:
+  datetime: 2022-09-12 14:46:15
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-ddThh:mm:ssZ
+in:
+  param: 2022-09-12T14:46:15Z
+out:
+  datetime: 2022-09-12 14:46:15Z
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-ddThh:mm:ss+hh:mm
+in:
+  param: 2022-09-12T14:46:15+04:00
+out:
+  datetime: 2022-09-12 14:46:15 +04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-ddThh:mm:ss-hh:mm
+in:
+  param: 2022-09-12T14:46:15-04:00
+out:
+  datetime: 2022-09-12 14:46:15 -04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-ddThh:mm:ss +hh:mm
+in:
+  param: 2022-09-12T14:46:15 +04:00
+out:
+  datetime: 2022-09-12 14:46:15 +04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-ddThh:mm:ss -hh:mm
+in:
+  param: 2022-09-12T14:46:15 -04:00
+out:
+  datetime: 2022-09-12 14:46:15 -04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-ddThh:mm:ss.ccc
+in:
+  param: 2022-09-12T14:46:15.123
+out:
+  datetime: 2022-09-12 14:46:15.123
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-ddThh:mm:ss.cccZ
+in:
+  param: 2022-09-12T14:46:15.123Z
+out:
+  datetime: 2022-09-12 14:46:15.123Z
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-ddThh:mm:ss.ccc+hh:mm
+in:
+  param: 2022-09-12T14:46:15.123+04:00
+out:
+  datetime: 2022-09-12 14:46:15.123 +04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-ddThh:mm:ss.ccc-hh:mm
+in:
+  param: 2022-09-12T14:46:15.123-04:00
+out:
+  datetime: 2022-09-12 14:46:15.123 -04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-ddThh:mm:ss.ccc +hh:mm
+in:
+  param: 2022-09-12T14:46:15.123 +04:00
+out:
+  datetime: 2022-09-12 14:46:15.123 +04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-ddThh:mm:ss.ccc -hh:mm
+in:
+  param: 2022-09-12T14:46:15.123 -04:00
+out:
+  datetime: 2022-09-12 14:46:15.123 -04:00
+  return: SUCCEED
+
+
+
+---
+test case: Valid yyyy-mm-dd hh:mm:ss
+in:
+  param: 2022-09-12 14:46:15
+out:
+  datetime: 2022-09-12 14:46:15
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-dd hh:mm:ssZ
+in:
+  param: 2022-09-12 14:46:15Z
+out:
+  datetime: 2022-09-12 14:46:15Z
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-dd hh:mm:ss+hh:mm
+in:
+  param: 2022-09-12 14:46:15+04:00
+out:
+  datetime: 2022-09-12 14:46:15 +04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-dd hh:mm:ss-hh:mm
+in:
+  param: 2022-09-12 14:46:15-04:00
+out:
+  datetime: 2022-09-12 14:46:15 -04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-dd hh:mm:ss +hh:mm
+in:
+  param: 2022-09-12 14:46:15 +04:00
+out:
+  datetime: 2022-09-12 14:46:15 +04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-dd hh:mm:ss -hh:mm
+in:
+  param: 2022-09-12 14:46:15 -04:00
+out:
+  datetime: 2022-09-12 14:46:15 -04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-dd hh:mm:ss.ccc
+in:
+  param: 2022-09-12 14:46:15.123
+out:
+  datetime: 2022-09-12 14:46:15.123
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-dd hh:mm:ss.cccZ
+in:
+  param: 2022-09-12 14:46:15.123Z
+out:
+  datetime: 2022-09-12 14:46:15.123Z
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-dd hh:mm:ss.ccc+hh:mm
+in:
+  param: 2022-09-12 14:46:15.123+04:00
+out:
+  datetime: 2022-09-12 14:46:15.123 +04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-dd hh:mm:ss.ccc-hh:mm
+in:
+  param: 2022-09-12 14:46:15.123-04:00
+out:
+  datetime: 2022-09-12 14:46:15.123 -04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-dd hh:mm:ss.ccc +hh:mm
+in:
+  param: 2022-09-12 14:46:15.123 +04:00
+out:
+  datetime: 2022-09-12 14:46:15.123 +04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-dd hh:mm:ss.ccc -hh:mm
+in:
+  param: 2022-09-12 14:46:15.123 -04:00
+out:
+  datetime: 2022-09-12 14:46:15.123 -04:00
+  return: SUCCEED
+

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,60 +24,9 @@
  * @var array $data
  */
 
-$options = [
-	'resourcetype' => SCREEN_RESOURCE_PROBLEM,
-	'mode' => SCREEN_MODE_JS,
-	'dataId' => 'problem',
-	'page' => $data['page'],
-	'data' => [
-		'action' => $data['action'],
-		'sort' => $data['sort'],
-		'sortorder' => $data['sortorder'],
-		'filter' => [
-			'show' => $data['filter']['show'],
-			'groupids' => $data['filter']['groupids'],
-			'hostids' => $data['filter']['hostids'],
-			'triggerids' => $data['filter']['triggerids'],
-			'name' => $data['filter']['name'],
-			'severities' => $data['filter']['severities'],
-			'inventory' => $data['filter']['inventory'],
-			'evaltype' => $data['filter']['evaltype'],
-			'tags' => $data['filter']['tags'],
-			'show_tags' => $data['filter']['show_tags'],
-			'tag_name_format' => $data['filter']['tag_name_format'],
-			'tag_priority' => $data['filter']['tag_priority'],
-			'show_suppressed' => $data['filter']['show_suppressed'],
-			'unacknowledged' => $data['filter']['unacknowledged'],
-			'compact_view' => $data['filter']['compact_view'],
-			'show_timeline' => $data['filter']['show_timeline'],
-			'details' => $data['filter']['details'],
-			'highlight_row' => $data['filter']['highlight_row'],
-			'show_opdata' => $data['filter']['show_opdata']
-		]
-	]
-];
-
-switch ($data['filter']['show']) {
-	case TRIGGERS_OPTION_RECENT_PROBLEM:
-	case TRIGGERS_OPTION_IN_PROBLEM:
-		$options['data']['filter']['age_state'] = $data['filter']['age_state'];
-		$options['data']['filter']['age'] = $data['filter']['age'];
-		break;
-
-	case TRIGGERS_OPTION_ALL:
-		$options['profileIdx'] = $data['tabfilter_idx'];
-		$options['profileIdx2'] = 0;
-		$options['from'] = $data['filter']['from'];
-		$options['to'] = $data['filter']['to'];
-		break;
-}
-
-$screen = CScreenBuilder::getScreen($options);
-
 if ($data['action'] === 'problem.view') {
 	$this->addJsFile('class.calendar.js');
 	$this->addJsFile('gtlc.js');
-	$this->addJsFile('flickerfreescreen.js');
 	$this->addJsFile('layout.mode.js');
 	$this->addJsFile('class.tabfilter.js');
 	$this->addJsFile('class.tabfilteritem.js');
@@ -90,10 +39,10 @@ if ($data['action'] === 'problem.view') {
 		uncheckTableRows('problem');
 	}
 
-	$widget = (new CWidget())
+	$html_page = (new CHtmlPage())
 		->setTitle(_('Problems'))
 		->setWebLayoutMode($web_layout_mode)
-		->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_PROBLEM_VIEW))
+		->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_PROBLEMS_VIEW))
 		->setControls(
 			(new CTag('nav', true,
 				(new CList())
@@ -117,20 +66,23 @@ if ($data['action'] === 'problem.view') {
 
 		// Set javascript options for tab filter initialization in monitoring.problem.view.js.php file.
 		$data['filter_options'] = $filter->options;
-		$widget->addItem($filter);
+		$html_page->addItem($filter);
 	}
 	else {
 		$data['filter_options'] = null;
 	}
 
 	$this->includeJsFile('monitoring.problem.view.js.php', $data);
-	$widget
-		->addItem($screen->get())
+	$html_page
+		->addItem(new CPartial('monitoring.problem.view.html', array_intersect_key($data,
+			array_flip(['page', 'action', 'sort', 'sortorder', 'filter', 'tabfilter_idx'])
+		)))
 		->show();
 
 	(new CScriptTag('
 		view.init('.json_encode([
 			'filter_options' => $data['filter_options'],
+			'refresh_url' => $data['refresh_url'],
 			'refresh_interval' => $data['refresh_interval'],
 			'filter_defaults' => $data['filter_defaults']
 		]).');
@@ -139,5 +91,7 @@ if ($data['action'] === 'problem.view') {
 		->show();
 }
 else {
-	echo $screen->get();
+	echo (new CPartial('monitoring.problem.view.html', array_intersect_key($data,
+		array_flip(['page', 'action', 'sort', 'sortorder', 'filter', 'tabfilter_idx'])
+	)))->getOutput();
 }

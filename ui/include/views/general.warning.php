@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,15 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-$pageHeader = (new CPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']', CWebUser::getLang()))
-	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
-	->display();
+$page_header = (new CHtmlPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']', CWebUser::getLang()));
+
+$page_header
+	->setTheme($data['theme'])
+	->addCssFile('assets/styles/'.$page_header->getTheme().'.css')
+	->show();
 
 $buttons = array_key_exists('buttons', $data)
 	? $data['buttons']

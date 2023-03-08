@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@ if ($data['uncheck']) {
 	uncheckTableRows('correlation');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Event correlation'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_CORRELATION_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
@@ -79,6 +79,8 @@ $table = (new CTableInfo())
 		)
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('correlation');
+
 if ($data['correlations']) {
 	foreach ($data['correlations'] as $correlation) {
 		$conditions = [];
@@ -106,23 +108,21 @@ if ($data['correlations']) {
 			$status = (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
 				->setArgument('correlationids', (array) $correlation['correlationid'])
 				->setArgument('action', 'correlation.enable')
-				->setArgumentSID()
 				->getUrl()
 			))
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_RED)
-				->addSID();
+				->addClass(ZBX_STYLE_RED);
 		}
 		else {
 			$status = (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
 				->setArgument('correlationids', (array) $correlation['correlationid'])
 				->setArgument('action', 'correlation.disable')
-				->setArgumentSID()
 				->getUrl()
 			))
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_GREEN)
-				->addSID();
+				->addClass(ZBX_STYLE_GREEN);
 		}
 
 		$table->addRow([
@@ -142,12 +142,18 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'correlationids', [
-		'correlation.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected correlations?')],
-		'correlation.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected correlations?')],
-		'correlation.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected correlations?')]
+		'correlation.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected correlations?'),
+			'csrf_token' => $csrf_token
+		],
+		'correlation.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected correlations?'),
+			'csrf_token' => $csrf_token
+		],
+		'correlation.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected correlations?'),
+			'csrf_token' => $csrf_token
+		]
 	], 'correlation')
 ]);
 
-$widget->addItem($form);
-
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

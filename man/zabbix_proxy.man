@@ -90,6 +90,16 @@ By default diagnostic information of all sections is logged.
 .RE
 .RS 4
 .TP 4
+\fBprof_enable\fR[=\fItarget\fR]
+Enable profiling, affects all processes if target is not specified
+.RE
+.RS 4
+.TP 4
+\fBprof_disable\fR[=\fItarget\fR]
+Disable profiling, affects all processes if target is not specified
+.RE
+.RS 4
+.TP 4
 \fBlog_level_increase\fR[=\fItarget\fR]
 Increase log level, affects all processes if target is not specified.
 .RE
@@ -105,7 +115,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (configuration\ syncer, data\ sender, discoverer, heartbeat\ sender, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, odbc\ poller)
+All processes of specified type (configuration\ syncer, data\ sender, discoverer, history\ syncer, housekeeper, http\ poller, preprocessing\ manager, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, odbc\ poller)
 .RE
 .RS 4
 .TP 4
@@ -116,6 +126,30 @@ Process type and number (e.g., poller,3)
 .TP 4
 .I pid
 Process identifier
+.RE
+.RE
+.SS
+.RS 4
+Profiling control targets
+.RS 4
+.TP 4
+.I process\-type
+All processes of specified type (configuration\ syncer, data\ sender, discoverer, history\ syncer, housekeeper, http\ poller, preprocessing\ manager, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, odbc\ poller)
+.RE
+.RS 4
+.TP 4
+.I process\-type,N
+Process type and number (e.g., history syncer,1)
+.RE
+.RS 4
+.TP 4
+.I pid
+Process identifier
+.RE
+.RS 4
+.TP 4
+.I scope
+(rwlock, mutex, processing) can be used with process-type (e.g., history syncer,1,processing)
 .RE
 .RE
 .IP "\fB\-h\fR, \fB\-\-help\fR"

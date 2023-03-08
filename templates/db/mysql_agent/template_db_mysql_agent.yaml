@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-08-01T14:00:25Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -27,6 +26,9 @@ zabbix_export:
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Databases
@@ -1722,7 +1724,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -1737,7 +1739,7 @@ zabbix_export:
                         host: 'MySQL by Zabbix agent'
                         name: 'MySQL: Operations'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -1753,7 +1755,7 @@ zabbix_export:
                         host: 'MySQL by Zabbix agent'
                         name: 'MySQL: Queries'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1769,7 +1771,7 @@ zabbix_export:
                         host: 'MySQL by Zabbix agent'
                         name: 'MySQL: Connections'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -1786,7 +1788,7 @@ zabbix_export:
                         host: 'MySQL by Zabbix agent'
                         name: 'MySQL: Bandwidth'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -1802,7 +1804,7 @@ zabbix_export:
                         host: 'MySQL by Zabbix agent'
                         name: 'MySQL: InnoDB buffer pool'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '10'
                   width: '12'

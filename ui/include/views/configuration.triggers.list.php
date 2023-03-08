@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,9 +54,10 @@ $filter_column1 = (new CFormList())
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 			'data' => $data['filter_hostids_ms'],
 			'popup' => [
-				'filter_preselect_fields' => $data['context'] === 'host'
-					? ['hostgroups' => 'filter_groupids_']
-					: ['templategroups' => 'filter_groupids_'],
+				'filter_preselect' => [
+					'id' => 'filter_groupids_',
+					'submit_as' => 'groupid'
+				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
@@ -70,7 +71,13 @@ $filter_column1 = (new CFormList())
 	->addRow(_('Name'),
 		(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Severity'),	(new CSeverityCheckBoxList('filter_priority'))->setChecked($data['filter_priority']));
+	->addRow(_('Severity'),
+		(new CCheckBoxList('filter_priority'))
+			->setOptions(CSeverityHelper::getSeverities())
+			->setChecked($data['filter_priority'])
+			->setColumns(3)
+			->setVertical(true)
+	);
 
 if ($data['context'] === 'host') {
 	$filter_column1->addRow(_('State'),
@@ -145,11 +152,11 @@ $filter = (new CFilter())
 	->addvar('context', $data['context'], 'filter_context')
 	->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Triggers'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_TRIGGERS_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATE_TRIGGERS_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_TRIGGERS_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATE_TRIGGERS_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,
@@ -172,10 +179,10 @@ $widget = (new CWidget())
 	);
 
 if ($data['single_selected_hostid'] != 0) {
-	$widget->setNavigation(getHostNavigation('triggers', $data['single_selected_hostid']));
+	$html_page->setNavigation(getHostNavigation('triggers', $data['single_selected_hostid']));
 }
 
-$widget->addItem($filter);
+$html_page->addItem($filter);
 
 $url = (new CUrl('triggers.php'))
 	->setArgument('context', $data['context'])
@@ -213,6 +220,8 @@ $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['trig
 	'sources' => ['expression', 'recovery_expression'],
 	'context' => $data['context']
 ]);
+
+$csrf_token = CCsrfTokenHelper::get('triggers.php');
 
 foreach ($data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
@@ -289,17 +298,17 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	$status = (new CLink(
 		triggerIndicator($trigger['status'], $trigger['state']),
 		(new CUrl('triggers.php'))
-			->setArgument('g_triggerid', $triggerid)
 			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
 				? 'trigger.massenable'
 				: 'trigger.massdisable'
 			)
+			->setArgument('g_triggerid[]', $triggerid)
 			->setArgument('context', $data['context'])
 			->getUrl()
 		))
+		->addCsrfToken($csrf_token)
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
-		->addSID();
+		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']));
 
 	// hosts
 	$hosts = null;
@@ -349,13 +358,24 @@ $triggers_form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
-			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?')],
-			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?')],
-			'trigger.masscopyto' => ['name' => _('Copy')],
+			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?'),
+				'csrf_token' => $csrf_token
+			],
+			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?'),
+				'csrf_token' => $csrf_token
+			],
+			'trigger.masscopyto' => [
+				'content' => (new CSimpleButton(_('Copy')))
+					->addClass('js-copy')
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeId()
+			],
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"openMassupdatePopup('popup.massupdate.trigger', {}, {
+						"openMassupdatePopup('popup.massupdate.trigger', {".
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('trigger').
+						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
 						});"
@@ -363,17 +383,23 @@ $triggers_form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?')]
+			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?'),
+				'csrf_token' => $csrf_token
+			]
 		],
 		$data['checkbox_hash']
 	)
 ]);
 
-// append form to widget
-$widget->addItem($triggers_form);
+$html_page
+	->addItem($triggers_form)
+	->show();
 
-$widget->show();
-
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['checkbox_hash'],
+		'checkbox_object' => 'g_triggerid'
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

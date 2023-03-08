@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,16 +23,7 @@
 #include "log.h"
 #include "zbxip.h"
 
-extern unsigned char	program_type;
-
-char	*CONFIG_FILE		= NULL;
-
-char	*CONFIG_LOG_TYPE_STR	= NULL;
-int	CONFIG_LOG_TYPE		= LOG_TYPE_UNDEFINED;
-char	*CONFIG_LOG_FILE	= NULL;
-int	CONFIG_LOG_FILE_SIZE	= 1;
-int	CONFIG_ALLOW_ROOT	= 0;
-int	CONFIG_TIMEOUT		= 3;
+static const char	*program_type_str = NULL;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
 		int noexit);
@@ -453,7 +444,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 				switch (cfg[i].type)
 				{
 					case TYPE_INT:
-						if (FAIL == str2uint64(value, "KMGT", &var))
+						if (FAIL == zbx_str2uint64(value, "KMGT", &var))
 							goto incorrect_config;
 
 						if (cfg[i].min > var || (0 != cfg[i].max && var > cfg[i].max))
@@ -472,7 +463,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 						zbx_strarr_add((char ***)cfg[i].variable, value);
 						break;
 					case TYPE_UINT64:
-						if (FAIL == str2uint64(value, "KMGT", &var))
+						if (FAIL == zbx_str2uint64(value, "KMGT", &var))
 							goto incorrect_config;
 
 						if (cfg[i].min > var || (0 != cfg[i].max && var > cfg[i].max))
@@ -566,6 +557,11 @@ error:
 	return FAIL;
 }
 
+void	zbx_init_library_cfg(unsigned char program_type)
+{
+	program_type_str = get_program_type_string(program_type);
+}
+
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit)
 {
 	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict, noexit);
@@ -576,7 +572,7 @@ int	check_cfg_feature_int(const char *parameter, int value, const char *feature)
 	if (0 != value)
 	{
 		zbx_error("\"%s\" configuration parameter cannot be used: Zabbix %s was compiled without %s",
-				parameter, get_program_type_string(program_type), feature);
+				parameter, program_type_str, feature);
 		return FAIL;
 	}
 
@@ -588,7 +584,7 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
 	if (NULL != value)
 	{
 		zbx_error("\"%s\" configuration parameter cannot be used: Zabbix %s was compiled without %s",
-				parameter, get_program_type_string(program_type), feature);
+				parameter, program_type_str, feature);
 		return FAIL;
 	}
 
@@ -660,13 +656,13 @@ int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *n
 			addr = zbx_malloc(NULL, sizeof(zbx_addr_t));
 			addr->ip = NULL;
 
-			if (SUCCEED != parse_serveractive_element(str, &addr->ip, &addr->port, port))
+			if (SUCCEED != zbx_parse_serveractive_element(str, &addr->ip, &addr->port, port))
 			{
 				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\" is "
 						"invalid", name, str);
 				ret = FAIL;
 			}
-			else if (FAIL == is_supported_ip(addr->ip) && FAIL == zbx_validate_hostname(addr->ip))
+			else if (FAIL == zbx_is_supported_ip(addr->ip) && FAIL == zbx_validate_hostname(addr->ip))
 			{
 				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\""
 						" is invalid", name, str);

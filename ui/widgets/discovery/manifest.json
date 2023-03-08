@@ -1,0 +1,20 @@
+{
+	"manifest_version": 2.0,
+	"id": "discovery",
+	"type": "widget",
+	"name": "Discovery status",
+	"namespace": "Discovery",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"size": {
+			"width": 6,
+			"height": 3
+		}
+	},
+	"actions": {
+		"widget.discovery.view": {
+			"class": "WidgetView"
+		}
+	}
+}

@@ -1,6 +1,6 @@
 #
 # Zabbix
-# Copyright (C) 2001-2022 Zabbix SIA
+# Copyright (C) 2001-2023 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,9 @@ AC_DEFUN([CONF_TESTS],
 		tests/libs/zbxserver/Makefile
 		tests/libs/zbxsysinfo/Makefile
 		tests/libs/zbxsysinfo/common/Makefile
+		tests/libs/zbxtagfilter/Makefile
 		tests/libs/zbxtrends/Makefile
+		tests/libs/zbxtime/Makefile
 		tests/zabbix_server/Makefile
 		tests/zabbix_server/pinger/Makefile
 		tests/zabbix_server/poller/Makefile
@@ -86,13 +88,10 @@ AC_DEFUN([CONF_TESTS],
 	esac
 
 
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <stdlib.h>
-],
-[
+]], [[
 	__fxstat(0, 0, NULL);
-],
-AC_DEFINE([HAVE_FXSTAT], [1], [Define to 1 if fxstat function is available]))
+]])],[AC_DEFINE(HAVE_FXSTAT, 1, Define to 1 if fxstat function is available)],[])
 
 ])

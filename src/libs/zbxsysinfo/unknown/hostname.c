@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,14 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-	{"system.hostname",     0,              SYSTEM_HOSTNAME,        NULL};
+	{"system.hostname",     0,              system_hostname,        NULL};
 
-int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported because the system is unknown."));
+
 	return SYSINFO_RET_FAIL;
 }

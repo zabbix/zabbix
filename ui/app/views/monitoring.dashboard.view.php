@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,19 +39,9 @@ $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
 $this->addJsFile('class.geomaps.js');
 $this->addJsFile('class.widget.js');
+$this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
-$this->addJsFile('class.widget.clock.js');
-$this->addJsFile('class.widget.geomap.js');
-$this->addJsFile('class.widget.graph.js');
-$this->addJsFile('class.widget.graph-prototype.js');
-$this->addJsFile('class.widget.item.js');
-$this->addJsFile('class.widget.map.js');
-$this->addJsFile('class.widget.navtree.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
-$this->addJsFile('class.widget.problems.js');
-$this->addJsFile('class.widget.problemsbysv.js');
-$this->addJsFile('class.widget.svggraph.js');
-$this->addJsFile('class.widget.trigerover.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.coverride.js');
@@ -75,7 +65,6 @@ $main_filter_form = null;
 
 if ($data['dynamic']['has_dynamic_widgets']) {
 	$main_filter_form = (new CForm('get'))
-		->cleanItems()
 		->setAttribute('name', 'dashboard_filter')
 		->setAttribute('aria-label', _('Main filter'))
 		->addVar('action', 'dashboard.view')
@@ -100,10 +89,10 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 		]);
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle($data['dashboard']['name'])
 	->setWebLayoutMode($web_layout_mode)
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_DASHBOARD_VIEW))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DASHBOARDS_VIEW))
 	->setControls(
 		(new CList())
 			->setId('dashboard-control')
@@ -137,9 +126,11 @@ $widget = (new CWidget())
 					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
-						->addItem((new CButton('dashboard-add-widget',
-							[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
-						))->addClass(ZBX_STYLE_BTN_ALT))
+						->addItem(
+							(new CButton('dashboard-add-widget',
+								[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
+							))->addClass(ZBX_STYLE_BTN_ALT)
+						)
 						->addItem(
 							(new CButton('dashboard-add', '&#8203;'))
 								->addClass(ZBX_STYLE_BTN_ALT)
@@ -197,7 +188,7 @@ $widget = (new CWidget())
 	])));
 
 if ($data['has_time_selector']) {
-	$widget->addItem(
+	$html_page->addItem(
 		(new CFilter())
 			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
@@ -252,7 +243,7 @@ if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 
 $dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
 
-$widget
+$html_page
 	->addItem($dashboard)
 	->show();
 
@@ -260,10 +251,13 @@ $widget
 	view.init('.json_encode([
 		'dashboard' => $data['dashboard'],
 		'widget_defaults' => $data['widget_defaults'],
+		'widget_last_type' => $data['widget_last_type'],
+		'configuration_hash' => $data['configuration_hash'],
 		'has_time_selector' => $data['has_time_selector'],
 		'time_period' => $data['time_period'],
 		'dynamic' => $data['dynamic'],
-		'web_layout_mode' => $web_layout_mode
+		'web_layout_mode' => $web_layout_mode,
+		'clone' => $data['clone']
 	]).');
 '))
 	->setOnDocumentReady()

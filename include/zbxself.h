@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,39 +24,27 @@
 #define ZBX_PROCESS_STATE_BUSY		1
 #define ZBX_PROCESS_STATE_COUNT		2	/* number of process states */
 
-#define ZBX_AGGR_FUNC_ONE		0
-#define ZBX_AGGR_FUNC_AVG		1
-#define ZBX_AGGR_FUNC_MAX		2
-#define ZBX_AGGR_FUNC_MIN		3
+#define ZBX_SELFMON_AGGR_FUNC_ONE	0
+#define ZBX_SELFMON_AGGR_FUNC_AVG	1
+#define ZBX_SELFMON_AGGR_FUNC_MAX	2
+#define ZBX_SELFMON_AGGR_FUNC_MIN	3
 
 #define ZBX_SELFMON_DELAY		1
 
-/* the process statistics */
-typedef struct
-{
-	double	busy_max;
-	double	busy_min;
-	double	busy_avg;
-	double	idle_max;
-	double	idle_min;
-	double	idle_avg;
-	int	count;
-}
-zbx_process_info_t;
-
-int	get_process_type_forks(unsigned char proc_type);
-
 #ifndef _WINDOWS
-int	init_selfmon_collector(char **error);
-void	free_selfmon_collector(void);
-void	update_selfmon_counter(unsigned char state);
-void	collect_selfmon_stats(void);
-void	get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num, unsigned char state,
+#include "zbxcommon.h"
+#include "zbxthreads.h"
+#include "zbxstats.h"
+
+ZBX_THREAD_ENTRY(zbx_selfmon_thread, args);
+
+int	zbx_init_selfmon_collector(zbx_get_config_forks_f get_config_forks, char **error);
+void	zbx_free_selfmon_collector(void);
+void	zbx_update_selfmon_counter(const zbx_thread_info_t *info, unsigned char state);
+void	zbx_get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num, unsigned char state,
 		double *value);
 int	zbx_get_all_process_stats(zbx_process_info_t *stats);
-void	zbx_sleep_loop(int sleeptime);
-void	zbx_wakeup(void);
-int	zbx_sleep_get_remainder(void);
+void	zbx_sleep_loop(const zbx_thread_info_t *info, int sleeptime);
 #endif
 
 #endif	/* ZABBIX_ZBXSELF_H */

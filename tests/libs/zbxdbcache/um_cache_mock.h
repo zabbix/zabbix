@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #ifndef ZABBIX_UM_CACHE_MOCK_H
 #define ZABBIX_UM_CACHE_MOCK_H
 
-#include "zbxdbcache/dbconfig.h"
-#include "zbxdbcache/dbsync.h"
+#include "zbxcacheconfig/dbconfig.h"
+#include "zbxcacheconfig/dbsync.h"
 
 typedef struct
 {

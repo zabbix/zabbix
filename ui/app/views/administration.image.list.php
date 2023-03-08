@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,13 +26,12 @@
 $this->includeJsFile('administration.image.list.js.php');
 
 $page_url = (new CUrl('zabbix.php'))->setArgument('action', 'image.list');
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Images'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_IMAGE_LIST))
 	->setControls((new CTag('nav', true,
 		(new CForm())
-			->cleanItems()
 			->setAction($page_url->getUrl())
 			->addItem((new CList())
 				->addItem([
@@ -72,7 +71,7 @@ $widget = (new CWidget())
 	);
 
 if (!$data['images']) {
-	$widget->addItem(new CTableInfo());
+	$html_page->addItem(new CTableInfo());
 }
 else {
 	$image_table = (new CDiv())
@@ -113,14 +112,15 @@ else {
 		$image_table->addItem($image_row);
 	}
 
-	$widget->addItem(
-		(new CForm())->addItem(
-			(new CTabView())->addTab('image', null, $image_table)
-		)
+	$html_page->addItem(
+		(new CForm())
+			->addItem(
+				(new CTabView())->addTab('image', null, $image_table)
+			)
 	);
 }
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

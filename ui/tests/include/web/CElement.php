@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -488,6 +488,17 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getClassesPresentCondition($classes) {
+		$target = $this;
+
+		return function () use ($target, $classes) {
+			return $target->hasClass($classes);
+		};
+	}
+
+	/**
 	 * Check if element is ready.
 	 *
 	 * @return boolean
@@ -717,7 +728,7 @@ class CElement extends CBaseElement implements IWaitable {
 				$expected = json_encode($expected);
 			}
 
-			throw new Exception('Element value '.$value.' doesn\'t match expected '.$expected.'.');
+			throw new Exception('Element value "'.$value.'" doesn\'t match expected "'.$expected.'".');
 		}
 
 		return ($expected == $value);

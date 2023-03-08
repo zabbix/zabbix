@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,8 @@
 **/
 
 #include "file.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxstr.h"
 #include "zbxnum.h"
@@ -26,7 +27,6 @@
 #include "zbxparam.h"
 #include "zbxhash.h"
 #include "zbxregexp.h"
-#include "log.h"
 #include "dir.h"
 #include "zbxalgo.h"
 
@@ -37,9 +37,7 @@
 
 #define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
 
-extern int	CONFIG_TIMEOUT;
-
-int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	char		*filename, *mode;
@@ -81,7 +79,7 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 			char	*p1, *p2;
 			size_t	sz = (size_t)nbytes, dif;
 
-			if (CONFIG_TIMEOUT < zbx_time() - ts)
+			if (sysinfo_get_config_timeout() < zbx_time() - ts)
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 				close(f);
@@ -132,7 +130,7 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_time(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_file_time_t	file_time;
 	char		*filename, *type;
@@ -177,7 +175,7 @@ err:
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_file_exists_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*filename;
 	int		ret = SYSINFO_RET_FAIL, file_exists = 0, types, types_incl, types_excl;
@@ -269,7 +267,7 @@ err:
 	return ret;
 }
 #else /* not _WINDOWS or __MINGW32__ */
-static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_file_exists_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	const char	*filename;
@@ -348,12 +346,12 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 }
 #endif
 
-int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return vfs_file_exists(request, result);
+	return vfs_file_exists_local(request, result);
 }
 
-int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *tmp, encoding[32];
 	char		read_buf[MAX_BUFFER_LEN], *utf8, *contents = NULL;
@@ -376,7 +374,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp)
 		*encoding = '\0';
 	else
-		strscpy(encoding, tmp);
+		zbx_strscpy(encoding, tmp);
 
 	if (NULL == filename || '\0' == *filename)
 	{
@@ -390,7 +388,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (CONFIG_TIMEOUT < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -408,7 +406,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (CONFIG_TIMEOUT < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -418,7 +416,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
 	{
-		if (CONFIG_TIMEOUT < zbx_time() - ts)
+		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 			zbx_free(contents);
@@ -432,7 +430,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err;
 		}
 
-		utf8 = convert_to_utf8(read_buf, nbytes, encoding);
+		utf8 = zbx_convert_to_utf8(read_buf, nbytes, encoding);
 		zbx_strcpy_alloc(&contents, &contents_alloc, &contents_offset, utf8);
 		zbx_free(utf8);
 	}
@@ -463,7 +461,7 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
 	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr = NULL;
@@ -501,11 +499,11 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp)
 		*encoding = '\0';
 	else
-		strscpy(encoding, tmp);
+		zbx_strscpy(encoding, tmp);
 
 	if (NULL == start_line_str || '\0' == *start_line_str)
 		start_line = 0;
-	else if (FAIL == is_uint32(start_line_str, &start_line))
+	else if (FAIL == zbx_is_uint32(start_line_str, &start_line))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		goto err;
@@ -513,7 +511,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == end_line_str || '\0' == *end_line_str)
 		end_line = 0xffffffff;
-	else if (FAIL == is_uint32(end_line_str, &end_line))
+	else if (FAIL == zbx_is_uint32(end_line_str, &end_line))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		goto err;
@@ -531,7 +529,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (CONFIG_TIMEOUT < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -539,7 +537,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-		if (CONFIG_TIMEOUT < zbx_time() - ts)
+		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 			goto err;
@@ -548,7 +546,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		utf8 = convert_to_utf8(buf, nbytes, encoding);
+		utf8 = zbx_convert_to_utf8(buf, nbytes, encoding);
 		zbx_rtrim(utf8, "\r\n");
 		zbx_regexp_sub(utf8, regexp, output, &ptr);
 		zbx_free(utf8);
@@ -584,7 +582,7 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *regexp, *tmp, encoding[32];
 	char		buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
@@ -621,11 +619,11 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp)
 		*encoding = '\0';
 	else
-		strscpy(encoding, tmp);
+		zbx_strscpy(encoding, tmp);
 
 	if (NULL == start_line_str || '\0' == *start_line_str)
 		start_line = 0;
-	else if (FAIL == is_uint32(start_line_str, &start_line))
+	else if (FAIL == zbx_is_uint32(start_line_str, &start_line))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		goto err;
@@ -633,7 +631,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == end_line_str || '\0' == *end_line_str)
 		end_line = 0xffffffff;
-	else if (FAIL == is_uint32(end_line_str, &end_line))
+	else if (FAIL == zbx_is_uint32(end_line_str, &end_line))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		goto err;
@@ -651,7 +649,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (CONFIG_TIMEOUT < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -661,7 +659,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 == res && 0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-		if (CONFIG_TIMEOUT < zbx_time() - ts)
+		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 			goto err;
@@ -670,7 +668,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		utf8 = convert_to_utf8(buf, nbytes, encoding);
+		utf8 = zbx_convert_to_utf8(buf, nbytes, encoding);
 		zbx_rtrim(utf8, "\r\n");
 		if (NULL != zbx_regexp_match(utf8, regexp, NULL))
 			res = 1;
@@ -714,7 +712,7 @@ static int	vfs_file_cksum_md5(char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (CONFIG_TIMEOUT < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -724,7 +722,7 @@ static int	vfs_file_cksum_md5(char *filename, AGENT_RESULT *result)
 
 	while (0 < (nbytes = (int)read(f, buf, sizeof(buf))))
 	{
-		if (CONFIG_TIMEOUT < zbx_time() - ts)
+		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 			goto err;
@@ -759,7 +757,7 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_md5sum(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename;
 
@@ -852,7 +850,7 @@ static int	vfs_file_cksum_crc32(char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (CONFIG_TIMEOUT < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -862,7 +860,7 @@ static int	vfs_file_cksum_crc32(char *filename, AGENT_RESULT *result)
 
 	while (0 < (nr = (int)read(f, buf, sizeof(buf))))
 	{
-		if (CONFIG_TIMEOUT < zbx_time() - ts)
+		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 			goto err;
@@ -913,7 +911,7 @@ static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (CONFIG_TIMEOUT < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -923,7 +921,7 @@ static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 
 	while (0 < (nr = read(f, buf, sizeof(buf))))
 	{
-		if (CONFIG_TIMEOUT < zbx_time() - ts)
+		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 			goto err;
@@ -966,7 +964,7 @@ err:
  * Comments: computes POSIX 1003.2 checksum                                   *
  *                                                                            *
  ******************************************************************************/
-int	VFS_FILE_CKSUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_cksum(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*filename, *method;
 	int	ret = SYSINFO_RET_FAIL;
@@ -999,7 +997,7 @@ err:
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_owner(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*filename, *ownertype, *resulttype;
 	int			ret = SYSINFO_RET_FAIL;
@@ -1099,7 +1097,7 @@ err:
 	return ret;
 }
 #else
-int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_owner(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *ownertype, *resulttype;
 	int		ret = SYSINFO_RET_FAIL, type;
@@ -1182,7 +1180,7 @@ err:
 #endif
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-int	VFS_FILE_PERMISSIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_permissions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Item is not supported on Windows."));
@@ -1196,7 +1194,7 @@ static char	*get_file_permissions(zbx_stat_t *st)
 				(S_IRWXU & st->st_mode) >> 6, (S_IRWXG & st->st_mode) >> 3, S_IRWXO & st->st_mode);
 }
 
-int	VFS_FILE_PERMISSIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_permissions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename;
 	int		ret = SYSINFO_RET_FAIL;
@@ -1692,7 +1690,7 @@ err:
 }
 #endif
 
-static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
+static int	vfs_file_get_local(const char *filename, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	char		*error = NULL;
@@ -1719,7 +1717,7 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 #undef VFS_FILE_ADD_TIME
 #undef VFS_FILE_ADD_TS
 
-int	VFS_FILE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*filename;
 
@@ -1737,5 +1735,5 @@ int	VFS_FILE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	return vfs_file_get(filename, result);
+	return vfs_file_get_local(filename, result);
 }

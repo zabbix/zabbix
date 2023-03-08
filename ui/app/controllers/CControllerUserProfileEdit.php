@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		$fields = [
 			'change_password' =>	'in 1',
+			'current_password' =>	'string',
 			'password1' =>			'string',
 			'password2' =>			'string',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
@@ -71,7 +72,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		$users = API::User()->get([
 			'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-				'rows_per_page', 'url', 'timezone'
+				'rows_per_page', 'url', 'timezone', 'userdirectoryid'
 			],
 			'selectMedias' => (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER)
 				? ['mediatypeid', 'period', 'sendto', 'severity', 'active']
@@ -100,6 +101,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'name' => $this->user['name'],
 			'surname' => $this->user['surname'],
 			'change_password' => $this->hasInput('change_password') || $this->hasInput('password1'),
+			'current_password' => '',
 			'password1' => '',
 			'password2' => '',
 			'lang' => $this->user['lang'],
@@ -121,8 +123,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 		}
 
 		// Overwrite with input variables.
-		$this->getInputs($data, ['password1', 'password2', 'lang', 'timezone', 'theme', 'autologin', 'autologout',
-			'refresh', 'rows_per_page', 'url', 'form_refresh'
+		$this->getInputs($data, ['current_password', 'password1', 'password2', 'lang', 'timezone', 'theme', 'autologin',
+			'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh'
 		]);
 
 		$data['password_requirements'] = $this->getPasswordRequirements();
@@ -134,6 +136,20 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 			$data = $this->setUserMedias($data);
 		}
+
+		$data['readonly'] = false;
+		$data['userdirectoryid'] = $this->user['userdirectoryid'];
+
+		if ($this->user['userdirectoryid'] != 0) {
+			$data['readonly'] = true;
+		}
+
+		$data['mediatypes'] = API::MediaType()->get([
+			'output' => ['status'],
+			'preservekeys' => true
+		]);
+
+		$data['internal_authentication'] = CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('User profile'));

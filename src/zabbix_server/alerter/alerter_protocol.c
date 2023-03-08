@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,10 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "alerter_protocol.h"
+#include "alerter.h"
 
+#include "alerter_protocol.h"
 #include "log.h"
+#include "zbxipcservice.h"
 #include "zbxserialize.h"
+#include "zbxstr.h"
 
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 {
@@ -28,7 +31,6 @@ void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 	zbx_free(mediatype->smtp_helo);
 	zbx_free(mediatype->smtp_email);
 	zbx_free(mediatype->exec_path);
-	zbx_free(mediatype->exec_params);
 	zbx_free(mediatype->gsm_modem);
 	zbx_free(mediatype->username);
 	zbx_free(mediatype->passwd);
@@ -41,7 +43,7 @@ void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
  *                                                                            *
  * Purpose: frees the alert object                                            *
  *                                                                            *
- * Parameters: alert - [IN] the alert object                                  *
+ * Parameters: alert - [IN]                                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_am_db_alert_free(zbx_am_db_alert_t *alert)
@@ -276,11 +278,11 @@ static void	alerter_serialize_mediatype(unsigned char **data, zbx_uint32_t *data
 		const char *smtp_email, const char *exec_path, const char *gsm_modem, const char *username,
 		const char *passwd, unsigned short smtp_port, unsigned char smtp_security,
 		unsigned char smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
-		const char *exec_params, int maxsessions, int maxattempts, const char *attempt_interval,
-		unsigned char content_type, const char *script, const char *timeout)
+		int maxsessions, int maxattempts, const char *attempt_interval, unsigned char content_type,
+		const char *script, const char *timeout)
 {
 	zbx_uint32_t	data_len = 0, smtp_server_len, smtp_helo_len, smtp_email_len, exec_path_len, gsm_modem_len,
-			username_len, passwd_len, exec_params_len, script_len, attempt_interval_len, timeout_len;
+			username_len, passwd_len, script_len, attempt_interval_len, timeout_len;
 	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, mediatypeid);
@@ -297,7 +299,6 @@ static void	alerter_serialize_mediatype(unsigned char **data, zbx_uint32_t *data
 	zbx_serialize_prepare_value(data_len, smtp_verify_peer);
 	zbx_serialize_prepare_value(data_len, smtp_verify_host);
 	zbx_serialize_prepare_value(data_len, smtp_authentication);
-	zbx_serialize_prepare_str_len(data_len, exec_params, exec_params_len);
 	zbx_serialize_prepare_value(data_len, maxsessions);
 	zbx_serialize_prepare_value(data_len, maxattempts);
 	zbx_serialize_prepare_str_len(data_len, attempt_interval, attempt_interval_len);
@@ -326,7 +327,6 @@ static void	alerter_serialize_mediatype(unsigned char **data, zbx_uint32_t *data
 	ptr += zbx_serialize_value(ptr, smtp_verify_peer);
 	ptr += zbx_serialize_value(ptr, smtp_verify_host);
 	ptr += zbx_serialize_value(ptr, smtp_authentication);
-	ptr += zbx_serialize_str(ptr, exec_params, exec_params_len);
 	ptr += zbx_serialize_value(ptr, maxsessions);
 	ptr += zbx_serialize_value(ptr, maxattempts);
 	ptr += zbx_serialize_str(ptr, attempt_interval, attempt_interval_len);
@@ -341,8 +341,8 @@ static zbx_uint32_t	alerter_deserialize_mediatype(const unsigned char *data, zbx
 		unsigned char *type, char **smtp_server, char **smtp_helo, char **smtp_email, char **exec_path,
 		char **gsm_modem, char **username, char **passwd, unsigned short *smtp_port,
 		unsigned char *smtp_security, unsigned char *smtp_verify_peer, unsigned char *smtp_verify_host,
-		unsigned char *smtp_authentication, char **exec_params, int *maxsessions, int *maxattempts,
-		char **attempt_interval, unsigned char *content_type, char **script, char **timeout)
+		unsigned char *smtp_authentication, int *maxsessions, int *maxattempts, char **attempt_interval,
+		unsigned char *content_type, char **script, char **timeout)
 {
 	zbx_uint32_t		len;
 	const unsigned char	*start = data;
@@ -361,7 +361,6 @@ static zbx_uint32_t	alerter_deserialize_mediatype(const unsigned char *data, zbx
 	data += zbx_deserialize_value(data, smtp_verify_peer);
 	data += zbx_deserialize_value(data, smtp_verify_host);
 	data += zbx_deserialize_value(data, smtp_authentication);
-	data += zbx_deserialize_str(data, exec_params, len);
 	data += zbx_deserialize_value(data, maxsessions);
 	data += zbx_deserialize_value(data, maxattempts);
 	data += zbx_deserialize_str(data, attempt_interval, len);
@@ -376,9 +375,9 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 		const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *exec_path,
 		const char *gsm_modem, const char *username, const char *passwd, unsigned short smtp_port,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
-		unsigned char smtp_authentication, const char *exec_params, int maxsessions, int maxattempts,
-		const char *attempt_interval, unsigned char content_type, const char *script, const char *timeout,
-		const char *sendto, const char *subject, const char *message, const char *params)
+		unsigned char smtp_authentication, int maxsessions, int maxattempts, const char *attempt_interval,
+		unsigned char content_type, const char *script, const char *timeout, const char *sendto,
+		const char *subject, const char *message, const char *params)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0, data_alloc = 1024, data_offset = 0, sendto_len, subject_len, message_len,
@@ -387,8 +386,8 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 	*data = zbx_malloc(0, data_alloc);
 	alerter_serialize_mediatype(data, &data_alloc, &data_offset, mediatypeid, type, smtp_server, smtp_helo,
 			smtp_email, exec_path, gsm_modem, username, passwd, smtp_port, smtp_security, smtp_verify_peer,
-			smtp_verify_host, smtp_authentication, exec_params, maxsessions, maxattempts, attempt_interval,
-			content_type, script, timeout);
+			smtp_verify_host, smtp_authentication, maxsessions, maxattempts, attempt_interval, content_type,
+			script, timeout);
 
 	zbx_serialize_prepare_str(data_len, sendto);
 	zbx_serialize_prepare_str(data_len, subject);
@@ -414,16 +413,15 @@ void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t 
 		unsigned char *type, char **smtp_server, char **smtp_helo, char **smtp_email, char **exec_path,
 		char **gsm_modem, char **username, char **passwd, unsigned short *smtp_port,
 		unsigned char *smtp_security, unsigned char *smtp_verify_peer, unsigned char *smtp_verify_host,
-		unsigned char *smtp_authentication, char **exec_params, int *maxsessions, int *maxattempts,
-		char **attempt_interval, unsigned char *content_type, char **script, char **timeout,
-		char **sendto, char **subject, char **message, char **params)
+		unsigned char *smtp_authentication, int *maxsessions, int *maxattempts, char **attempt_interval,
+		unsigned char *content_type, char **script, char **timeout, char **sendto, char **subject,
+		char **message, char **params)
 {
 	zbx_uint32_t	len;
 
-	data += alerter_deserialize_mediatype(data, mediatypeid, type, smtp_server, smtp_helo,
-			smtp_email, exec_path, gsm_modem, username, passwd, smtp_port, smtp_security, smtp_verify_peer,
-			smtp_verify_host, smtp_authentication, exec_params, maxsessions, maxattempts, attempt_interval,
-			content_type, script, timeout);
+	data += alerter_deserialize_mediatype(data, mediatypeid, type, smtp_server, smtp_helo, smtp_email, exec_path,
+			gsm_modem, username, passwd, smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
+			smtp_authentication, maxsessions, maxattempts, attempt_interval, content_type, script, timeout);
 
 	data += zbx_deserialize_str(data, sendto, len);
 	data += zbx_deserialize_str(data, subject, len);
@@ -485,8 +483,8 @@ zbx_uint32_t	zbx_alerter_serialize_mediatypes(unsigned char **data, zbx_am_db_me
 		alerter_serialize_mediatype(data, &data_alloc, &data_offset, mt->mediatypeid, mt->type, mt->smtp_server,
 				mt->smtp_helo, mt->smtp_email, mt->exec_path, mt->gsm_modem, mt->username, mt->passwd,
 				mt->smtp_port, mt->smtp_security, mt->smtp_verify_peer, mt->smtp_verify_host,
-				mt->smtp_authentication, mt->exec_params, mt->maxsessions, mt->maxattempts,
-				mt->attempt_interval, mt->content_type, mt->script, mt->timeout);
+				mt->smtp_authentication, mt->maxsessions, mt->maxattempts, mt->attempt_interval,
+				mt->content_type, mt->script, mt->timeout);
 	}
 
 	return data_offset;
@@ -507,8 +505,8 @@ void	zbx_alerter_deserialize_mediatypes(const unsigned char *data, zbx_am_db_med
 		data += alerter_deserialize_mediatype(data, &mt->mediatypeid, &mt->type, &mt->smtp_server,
 				&mt->smtp_helo, &mt->smtp_email, &mt->exec_path, &mt->gsm_modem, &mt->username,
 				&mt->passwd, &mt->smtp_port, &mt->smtp_security, &mt->smtp_verify_peer,
-				&mt->smtp_verify_host, &mt->smtp_authentication, &mt->exec_params, &mt->maxsessions,
-				&mt->maxattempts, &mt->attempt_interval, &mt->content_type, &mt->script, &mt->timeout);
+				&mt->smtp_verify_host, &mt->smtp_authentication, &mt->maxsessions, &mt->maxattempts,
+				&mt->attempt_interval, &mt->content_type, &mt->script, &mt->timeout);
 
 		(*mediatypes)[i] = mt;
 	}
@@ -908,6 +906,12 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
  *                                                                            *
  * Purpose: get alerter manager diagnostic statistics                         *
  *                                                                            *
+ * Parameters: alerts_num - [IN] alert count                                  *
+ *             error      - [OUT]                                             *
+ *                                                                            *
+ * Return value: SUCCEED - the statistics were returned successfully          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
 {
@@ -929,12 +933,12 @@ int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
  *                                                                            *
  * Purpose: get the top N mediatypes by the number of queued alerts           *
  *                                                                            *
- * Parameters limit      - [IN] the number of top records to retrieve         *
+ * Parameters limit      - [IN] number of top records to retrieve             *
  *            mediatypes - [OUT] a vector of top mediatypeid,alerts_num pairs *
- *            error      - [OUT] the error message                            *
+ *            error      - [OUT]                                              *
  *                                                                            *
  * Return value: SUCCEED - the top n mediatypes were returned successfully    *
- *               FAIL - otherwise                                             *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_alerter_get_top_mediatypes(int limit, zbx_vector_uint64_pair_t *mediatypes, char **error)
@@ -963,13 +967,13 @@ out:
  *                                                                            *
  * Purpose: get the top N sources by the number of queued alerts              *
  *                                                                            *
- * Parameters limit   - [IN] the number of top records to retrieve            *
+ * Parameters limit   - [IN] number of top records to retrieve                *
  *            sources - [OUT] a vector of top zbx_alerter_source_stats_t      *
  *                             structure                                      *
- *            error   - [OUT] the error message                               *
+ *            error   - [OUT]                                                *
  *                                                                            *
  * Return value: SUCCEED - the top n sources were returned successfully       *
- *               FAIL - otherwise                                             *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_alerter_get_top_sources(int limit, zbx_vector_ptr_t *sources, char **error)
@@ -1060,7 +1064,7 @@ void	zbx_alerter_deserialize_begin_dispatch(const unsigned char *data, char **su
  *                                                                            *
  ******************************************************************************/
 
-zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const ZBX_DB_MEDIATYPE *mt,
+zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const zbx_db_mediatype *mt,
 		const zbx_vector_str_t *recipients)
 {
 	unsigned char	*ptr;
@@ -1097,7 +1101,7 @@ zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const ZBX
 	return data_len + data_offset;
 }
 
-void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, ZBX_DB_MEDIATYPE *mt,
+void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, zbx_db_mediatype *mt,
 		zbx_vector_str_t *recipients)
 {
 	zbx_uint32_t	len;
@@ -1116,20 +1120,18 @@ void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, ZBX_DB_MED
 	}
 }
 
-#define ZBX_ALERTER_REPORT_TIMEOUT	SEC_PER_MIN * 10
-
 /******************************************************************************
  *                                                                            *
  * Purpose: begin data dispatch                                               *
  *                                                                            *
- * Parameters: dispatch     - [IN] the dispatcher                             *
- *             subject      - [IN] the subject                                *
- *             message      - [IN] the message                                *
- *             content_name - [IN] the content name                           *
- *             content_type - [IN] the content type                           *
- *             content      - [IN] the additional content to dispatch         *
- *             content_size - [IN] the content size                           *
- *             error          [OUT] the error message                         *
+ * Parameters: dispatch     - [IN]                                            *
+ *             subject      - [IN]                                            *
+ *             message      - [IN]                                            *
+ *             content_name - [IN]                                            *
+ *             content_type - [IN]                                            *
+ *             content      - [IN] additional content to dispatch             *
+ *             content_size - [IN] additional content size                    *
+ *             error          [OUT]                                           *
  *                                                                            *
  * Return value: SUCCEED - the dispatch was started successfully              *
  *               FAIL    - otherwise                                          *
@@ -1167,7 +1169,7 @@ int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *sub
 		goto out;
 	}
 
-	zbx_vector_ptr_create(&dispatch->results);
+	zbx_vector_alerter_dispatch_result_create(&dispatch->results);
 	dispatch->total_num = 0;
 	ret = SUCCEED;
 
@@ -1183,16 +1185,16 @@ out:
  *                                                                            *
  * Purpose: dispatch data                                                     *
  *                                                                            *
- * Parameters: dispatch   - [IN] the dispatcher                               *
- *             mediatype  - [IN] the media type to use for sending            *
- *             recipients - [IN] the dispatch recipients                      *
- *             error      - [OUT] the error message                           *
+ * Parameters: dispatch   - [IN] dispatcher                                   *
+ *             mediatype  - [IN] media type to use for sending                *
+ *             recipients - [IN] dispatch recipients                          *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - the dispatch sent successfully                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const ZBX_DB_MEDIATYPE *mediatype,
+int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const zbx_db_mediatype *mediatype,
 		const zbx_vector_str_t *recipients, char **error)
 {
 	unsigned char	*data;
@@ -1225,10 +1227,8 @@ out:
  *                                                                            *
  * Purpose: finish data dispatch                                              *
  *                                                                            *
- * Parameters: dispatch  - [IN] the dispatcher                                *
- *             sent_num  - [OUT] the number of successfully dispatched        *
- *                              messages                                      *
- *             error     - [OUT] the error message                            *
+ * Parameters: dispatch  - [IN] dispatcher                                    *
+ *             error     - [OUT]                                              *
  *                                                                            *
  * Return value: SUCCEED - the dispatch was finished successfully             *
  *               FAIL    - otherwise                                          *
@@ -1254,9 +1254,13 @@ int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error)
 		goto out;
 	}
 
+#define ZBX_ALERTER_REPORT_TIMEOUT	SEC_PER_MIN * 10
+
 	/* wait for the send alert responses for all recipients */
 
 	time_stop = time(NULL) + ZBX_ALERTER_REPORT_TIMEOUT;
+
+#undef ZBX_ALERTER_REPORT_TIMEOUT
 
 	for (i = 0; i < dispatch->total_num; i++)
 	{
@@ -1306,7 +1310,7 @@ int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error)
 					value = NULL;
 				}
 
-				zbx_vector_ptr_append(&dispatch->results, result);
+				zbx_vector_alerter_dispatch_result_append(&dispatch->results, result);
 
 				zbx_free(value);
 				zbx_free(errmsg);
@@ -1330,18 +1334,11 @@ out:
 	return ret;
 }
 
-void	zbx_alerter_dispatch_result_free(zbx_alerter_dispatch_result_t *result)
-{
-	zbx_free(result->recipient);
-	zbx_free(result->info);
-	zbx_free(result);
-}
-
 void	zbx_alerter_clear_dispatch(zbx_alerter_dispatch_t *dispatch)
 {
 	if (SUCCEED == zbx_ipc_async_socket_connected(&dispatch->alerter))
 		zbx_ipc_async_socket_close(&dispatch->alerter);
 
-	zbx_vector_ptr_clear_ext(&dispatch->results, (zbx_clean_func_t)zbx_alerter_dispatch_result_free);
-	zbx_vector_ptr_destroy(&dispatch->results);
+	zbx_vector_alerter_dispatch_result_clear_ext(&dispatch->results, zbx_alerter_dispatch_result_free);
+	zbx_vector_alerter_dispatch_result_destroy(&dispatch->results);
 }

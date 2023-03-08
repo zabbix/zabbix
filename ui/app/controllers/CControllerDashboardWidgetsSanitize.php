@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,19 +19,21 @@
 **/
 
 
+use Zabbix\Core\CModule;
+
 /**
  * Controller for sanitizing fields of widgets before pasting previously copied widget.
  */
 class CControllerDashboardWidgetsSanitize extends CController {
 
-	private $context;
-	private $widgets = [];
+	private array $widgets_data = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'templateid' =>	'db dashboard.templateid',
 			'widgets' =>	'array'
@@ -40,14 +42,10 @@ class CControllerDashboardWidgetsSanitize extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$this->context = $this->hasInput('templateid')
-				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-				: CWidgetConfig::CONTEXT_DASHBOARD;
-
 			foreach ($this->getInput('widgets', []) as $widget) {
 				$validator = new CNewValidator($widget, [
 					'type' =>	'required|string',
-					'fields' =>	'required|json'
+					'fields' =>	'required|array'
 				]);
 
 				foreach ($validator->getAllErrors() as $error) {
@@ -60,9 +58,17 @@ class CControllerDashboardWidgetsSanitize extends CController {
 					break;
 				}
 
-				$widget = $validator->getValidInput();
+				$widget_input = $validator->getValidInput();
 
-				if (!CWidgetConfig::isWidgetTypeSupportedInContext($widget['type'], $this->context)) {
+				$widget = APP::ModuleManager()->getModule($widget_input['type']);
+
+				if ($widget === null || $widget->getType() !== CModule::TYPE_WIDGET) {
+					$this->widgets_data[] = null;
+
+					continue;
+				}
+
+				if ($this->hasInput('templateid') && !$widget->hasTemplateSupport()) {
 					error(_('Widget type is not supported in this context.'));
 
 					$ret = false;
@@ -70,7 +76,12 @@ class CControllerDashboardWidgetsSanitize extends CController {
 					break;
 				}
 
-				$this->widgets[] = $widget;
+				$this->widgets_data[] = [
+					'type' => $widget_input['type'],
+					'form' => $widget->getForm($widget_input['fields'],
+						$this->hasInput('templateid') ? $this->getInput('templateid') : null
+					)
+				];
 			}
 		}
 
@@ -80,29 +91,27 @@ class CControllerDashboardWidgetsSanitize extends CController {
 					'error' => [
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				], JSON_THROW_ON_ERROR)])
 			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$widgets = [];
 
-		foreach ($this->widgets as $widget) {
-			$form = CWidgetConfig::getForm($widget['type'], $widget['fields'],
-				($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) ? $this->getInput('templateid') : null
-			);
-
-			$widgets[] = ['fields' => $form->fieldsToApi()];
+		foreach ($this->widgets_data as $index => $widget_data) {
+			if ($widget_data !== null) {
+				$widgets[$index] = ['fields' => $widget_data['form']->fieldsToApi()];
+			}
 		}
 
-		if ($this->context === CWidgetConfig::CONTEXT_DASHBOARD) {
+		if (!$this->hasInput('templateid')) {
 			$widgets = CDashboardHelper::unsetInaccessibleFields([['widgets' => $widgets]]);
 			$widgets = $widgets[0]['widgets'];
 		}
@@ -111,11 +120,16 @@ class CControllerDashboardWidgetsSanitize extends CController {
 			'widgets' => []
 		];
 
-		foreach ($widgets as $widget_index => $widget) {
+		foreach ($this->widgets_data as $index => $widget_data) {
+			if ($widget_data === null) {
+				$output['widgets'][$index] = null;
+
+				continue;
+			}
+
 			$output_fields = [];
 
-			foreach ($widget['fields'] as $field) {
-
+			foreach ($widgets[$index]['fields'] as $field) {
 				if (array_key_exists($field['name'], $output_fields)) {
 					if (!is_array($output_fields[$field['name']])) {
 						$output_fields[$field['name']] = [$output_fields[$field['name']]];
@@ -128,9 +142,9 @@ class CControllerDashboardWidgetsSanitize extends CController {
 				}
 			}
 
-			$output['widgets'][$widget_index]['fields'] = $output_fields;
+			$output['widgets'][$index]['fields'] = $output_fields;
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));
 	}
 }

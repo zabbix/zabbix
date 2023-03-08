@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 class CControllerHostGroupEdit extends CController{
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -59,7 +59,6 @@ class CControllerHostGroupEdit extends CController{
 
 	protected function doAction(): void {
 		$data = [
-			'sid' => $this->getUserSID(),
 			'groupid' => null,
 			'name' => '',
 			'subgroups' => 0
@@ -71,11 +70,21 @@ class CControllerHostGroupEdit extends CController{
 			$groups = API::HostGroup()->get([
 				'output' => ['name', 'flags'],
 				'selectHosts' => ['hostid'],
+				'selectDiscoveryRule' => ['itemid', 'name'],
+				'selectHostPrototype' => ['hostid'],
 				'groupids' => $data['groupid']
 			]);
-			$group = $groups[0];
-			$data['name'] = $group['name'];
-			$data['flags'] = $group['flags'];
+
+			$data = array_merge($data, $groups[0]);
+
+			$data['is_discovery_rule_editable'] = $data['discoveryRule']
+				&& API::DiscoveryRule()->get([
+					'output' => [],
+					'itemids' => $data['discoveryRule']['itemid'],
+					'editable' => true
+				]);
+
+			$data['allowed_ui_conf_hosts'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 		}
 
 		// For clone action.

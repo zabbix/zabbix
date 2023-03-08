@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,16 +69,18 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'testInheritanceItemPrototype6',
-					'key' => 'item-prototype-test6'
+					'key' => 'item-prototype-test6[{#KEY}]'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'testInheritanceItemPrototype5',
-					'key' => 'item-prototype-test5',
+					'key' => 'item-prototype-test5[{#KEY}]',
 					'errors' => [
-						'Item prototype "item-prototype-test5" already exists on "Template inheritance test host", inherited from another template'
+						'Cannot inherit item prototype with key "item-prototype-test5[{#KEY}]" of template '.
+							'"Inheritance test template" to host "Template inheritance test host", because an item '.
+							'with the same key is already inherited from template "Inheritance test template 2".'
 					]
 				]
 			]

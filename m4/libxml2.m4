@@ -1,6 +1,6 @@
 #
 # Zabbix
-# Copyright (C) 2001-2022 Zabbix SIA
+# Copyright (C) 2001-2023 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ AC_DEFUN([LIBXML2_CHECK_CONFIG],
     AC_ARG_WITH(libxml2,
         [
 If you want to use XML library:
-AC_HELP_STRING([--with-libxml2@<:@=ARG@:>@],
+AS_HELP_STRING([--with-libxml2@<:@=ARG@:>@],
     [use libxml2 client library @<:@default=no@:>@, see PKG_CONFIG_PATH environment variable to specify .pc file location]
         )],
         [

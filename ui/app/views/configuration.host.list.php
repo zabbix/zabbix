@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,9 +31,9 @@ if ($data['uncheck']) {
 	uncheckTableRows('hosts');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Hosts'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_LIST))
 	->setControls((new CTag('nav', true, (new CList())
 			->addItem(
 				(new CSimpleButton(_('Create host')))
@@ -42,7 +42,13 @@ $widget = (new CWidget())
 			->addItem(
 				(new CButton('form', _('Import')))
 					->onClick(
-						'return PopUp("popup.import", {rules_preset: "host"}, {dialogue_class: "modal-popup-generic"});'
+						'return PopUp("popup.import", {
+							rules_preset: "host", '.
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.': "'. CCsrfTokenHelper::get('import').
+						'"}, {
+							dialogueid: "popup_import",
+							dialogue_class: "modal-popup-generic"
+						});'
 					)
 					->removeId()
 			)
@@ -126,6 +132,16 @@ $filter = (new CFilter())
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
+				new CLabel(_('Status'), 'filter_status'),
+				new CFormField(
+					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+						->addValue(_('Any'), -1)
+						->addValue(_('Enabled'), HOST_STATUS_MONITORED)
+						->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED)
+						->setModern(true)
+				)
+			])
+			->addItem([
 				new CLabel(_('Monitored by'), 'filter_monitored_by'),
 				new CFormField(
 					(new CRadioButtonList('filter_monitored_by', (int) $data['filter']['monitored_by']))
@@ -166,7 +182,7 @@ $filter = (new CFilter())
 			])
 	]);
 
-$widget->addItem($filter);
+$html_page->addItem($filter);
 
 // table hosts
 $form = (new CForm())->setName('hosts');
@@ -200,6 +216,7 @@ $table = (new CTableInfo())
 	]);
 
 $current_time = time();
+$csrf_token_massupdate = CCsrfTokenHelper::get('host');
 
 foreach ($data['hosts'] as $host) {
 	// Select an interface from the list with highest priority.
@@ -221,19 +238,27 @@ foreach ($data['hosts'] as $host) {
 
 	$description = [];
 
-	if ($host['discoveryRule']) {
-		$description[] = (new CLink(CHtml::encode($host['discoveryRule']['name']),
-			(new CUrl('host_prototypes.php'))
-				->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
-				->setArgument('context', 'host')
-		))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_ORANGE);
-		$description[] = NAME_DELIMITER;
-	}
-	elseif ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-		// Discovered host which does not contain info about parent discovery rule is inaccessible for current user.
-		$description[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		if ($host['discoveryRule']) {
+			if ($host['is_discovery_rule_editable']) {
+				$description[] = (new CLink($host['discoveryRule']['name'],
+					(new CUrl('host_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
+						->setArgument('hostid', $host['hostDiscovery']['parent_hostid'])
+						->setArgument('context', 'host')
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_ORANGE);
+			}
+			else {
+				$description[] = (new CSpan($host['discoveryRule']['name']))->addClass(ZBX_STYLE_ORANGE);
+			}
+		}
+		else {
+			$description[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
+		}
+
 		$description[] = NAME_DELIMITER;
 	}
 
@@ -251,8 +276,9 @@ foreach ($data['hosts'] as $host) {
 		->setArgument('hostids', [$host['hostid']])
 		->setArgument('visible[status]', 1)
 		->setArgument('update', 1)
+		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token_massupdate)
 		->setArgument('backurl',
-			(new CUrl('zabbix.php', false))
+			(new CUrl('zabbix.php'))
 				->setArgument('action', 'host.list')
 				->setArgument('page', CPagerHelper::loadPage('host.list', null))
 				->getUrl()
@@ -275,16 +301,14 @@ foreach ($data['hosts'] as $host) {
 		$toggle_status_link = (new CLink(_('Enabled'), $status_toggle_url->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
-			->addConfirmation(_('Disable host?'))
-			->addSID();
+			->addConfirmation(_('Disable host?'));
 	}
 	else {
 		$status_toggle_url->setArgument('status', HOST_STATUS_MONITORED);
 		$toggle_status_link = (new CLink(_('Disabled'), $status_toggle_url->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
-			->addConfirmation(_('Enable host?'))
-			->addSID();
+			->addConfirmation(_('Enable host?'));
 	}
 
 	if ($maintenance_icon) {
@@ -482,6 +506,7 @@ foreach ($data['hosts'] as $host) {
 
 $status_toggle_url =  (new CUrl('zabbix.php'))
 	->setArgument('action', 'popup.massupdate.host')
+	->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token_massupdate)
 	->setArgument('visible[status]', 1)
 	->setArgument('update', 1)
 	->setArgument('backurl',
@@ -518,7 +543,9 @@ $form->addItem([
 		'popup.massupdate.host' => [
 			'content' => (new CButton('', _('Mass update')))
 				->onClick(
-					"openMassupdatePopup('popup.massupdate.host', {}, {
+					"openMassupdatePopup('popup.massupdate.host', {".
+						CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".$csrf_token_massupdate.
+					"'}, {
 						dialogue_class: 'modal-popup-static',
 						trigger_element: this
 					});"
@@ -537,7 +564,7 @@ $form->addItem([
 	], 'hosts')
 ]);
 
-$widget
+$html_page
 	->addItem($form)
 	->show();
 

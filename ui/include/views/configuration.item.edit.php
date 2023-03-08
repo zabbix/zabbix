@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,14 +24,14 @@
  * @var array $data
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Items'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ITEM_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_EDIT));
 
 $host = $data['host'];
 
 if (!empty($data['hostid'])) {
-	$widget->setNavigation(getHostNavigation('items', $data['hostid']));
+	$html_page->setNavigation(getHostNavigation('items', $data['hostid']));
 }
 
 $url = (new CUrl('items.php'))
@@ -40,9 +40,11 @@ $url = (new CUrl('items.php'))
 
 // Create form.
 $form = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('items.php')))->removeId())
 	->setId('item-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
 
@@ -516,17 +518,17 @@ $item_tab
 	// Append ITEM_TYPE_HTTPAGENT SSL verify peer to form list.
 	->addItem([
 		(new CLabel(_('SSL verify peer'), 'verify_peer'))->setId('js-item-verify-peer-label'),
-		(new CFormField((new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_ON))
+		(new CFormField((new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
 			->setEnabled(!$readonly)
-			->setChecked($data['verify_peer'] == HTTPTEST_VERIFY_PEER_ON)
+			->setChecked($data['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
 		))->setId('js-item-verify-peer-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT SSL verify host to form list.
 	->addItem([
 		(new CLabel(_('SSL verify host'), 'verify_host'))->setId('js-item-verify-host-label'),
-		(new CFormField((new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_ON))
+		(new CFormField((new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
 			->setEnabled(!$readonly)
-			->setChecked($data['verify_host'] == HTTPTEST_VERIFY_HOST_ON)
+			->setChecked($data['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
 		))->setId('js-item-verify-host-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT SSL certificate file to form list.
@@ -612,7 +614,7 @@ if ($data['display_interfaces']) {
 			$item_tab->addItem([
 				(new CLabel(_('Host interface'), 'interface'))->setId('js-item-interface-label'),
 				(new CFormField(
-					(new CTextBox('interface', interfaceType2str(INTERFACE_TYPE_OPT), true))
+					(new CTextBox('interface', _('None'), true))
 						->setAttribute('disabled', 'disabled')
 				))->setId('js-item-interface-field')
 			]);
@@ -625,10 +627,6 @@ if ($data['display_interfaces']) {
 			->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
 			->setFocusableElementId('interfaceid')
 			->setAriaRequired();
-
-		if ($readonly) {
-			$select_interface->setAttribute('readonly', 'readonly');
-		}
 
 		$item_tab->addItem([
 			(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
@@ -746,7 +744,7 @@ $item_tab
 		(new CLabel(_('Formula'), 'params_f'))
 			->setAsteriskMark()
 			->setId('js-item-formula-label'),
-		(new CFormField((new CTextArea('params_f', $data['params'], $discovered_item))
+		(new CFormField((new CTextArea('params_f', $data['params']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
@@ -762,7 +760,7 @@ $item_tab
 		(new CLabel(_('Update interval'), 'delay'))
 			->setAsteriskMark()
 			->setId('js-item-delay-label'),
-		(new CFormField((new CTextBox('delay', $data['delay']))
+		(new CFormField((new CTextBox('delay', $data['delay'], $discovered_item))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 		))->setId('js-item-delay-field')
@@ -781,7 +779,7 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 			->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
 			->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
 			->setModern(true)
-			->setEnabled(!$discovered_item);
+			->setEnabled(false);
 	}
 	else {
 		$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
@@ -920,15 +918,16 @@ $item_tab
 if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$item_tab->addItem([
 		(new CLabel(_('Value mapping'), 'valuemapid_ms'))->setId('js-item-value-map-label'),
-		(new CFormField((new CMultiSelect([
+		(new CFormField(
+			(new CMultiSelect([
 				'name' => 'valuemapid',
-				'object_name' => 'valuemaps',
+				'object_name' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 				'disabled' => $readonly,
 				'multiple' => false,
 				'data' => $data['valuemap'],
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'valuemaps',
+						'srctbl' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 						'srcfld1' => 'valuemapid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'valuemapid',
@@ -937,8 +936,7 @@ if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 						'editable' => true
 					]
 				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-value-map-field')
 	]);
 }
@@ -1033,7 +1031,8 @@ $item_tabs = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'readonly' => $discovered_item,
-			'tabs_id' => 'tabs'
+			'tabs_id' => 'tabs',
+			'tags_tab_id' => 'tags-tab'
 		]),
 		TAB_INDICATOR_TAGS
 	)
@@ -1043,7 +1042,7 @@ $item_tabs = (new CTabView())
 			->addItem([
 				new CLabel(_('Preprocessing steps')),
 				new CFormField(
-					getItemPreprocessing($form, $data['preprocessing'], $readonly, $data['preprocessing_types'])
+					getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'])
 				)
 			])
 			->addItem([
@@ -1059,9 +1058,13 @@ $item_tabs = (new CTabView())
 		TAB_INDICATOR_PREPROCESSING
 	);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$item_tabs->setSelected(0);
 }
+
+$cancel_button = $data['backurl'] !== null
+	? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
+	: new CButtonCancel(url_params(['hostid', 'context']));
 
 // Append buttons to form.
 if ($data['itemid'] != 0) {
@@ -1088,25 +1091,26 @@ if ($data['itemid'] != 0) {
 			);
 	}
 
-	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'itemid', 'hostid', 'context']), 'context'))
-		->setEnabled(!$data['limited']);
-	$buttons[] = new CButtonCancel(url_params(['hostid', 'context']));
+	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'itemid', 'hostid', 'context']).'&'.
+		CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('items.php'), 'context'
+	))->setEnabled(!$data['limited']);
+	$buttons[] = $cancel_button;
 
 	$item_tabs->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$item_tabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_params(['hostid', 'context']))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), $cancel_button]
 	));
 }
 
 $form->addItem($item_tabs);
-$widget->addItem($form);
+$html_page->addItem($form);
 
 require_once __DIR__.'/js/configuration.item.edit.js.php';
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	item_form.init('.json_encode([

@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,15 +24,15 @@
  */
 class CControllerModuleScan extends CController {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		return true;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		get_and_clear_messages();
 
 		$db_modules_create = [];
@@ -53,36 +53,38 @@ class CControllerModuleScan extends CController {
 			$db_moduleids[$db_module['relative_path']] = $moduleid;
 		}
 
-		$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
+		$module_manager = new CModuleManager(APP::getRootDir());
 
-		foreach (new DirectoryIterator($module_manager->getModulesDir()) as $item) {
-			if (!$item->isDir() || $item->isDot()) {
-				continue;
-			}
+		foreach (['widgets', 'modules'] as $modules_dir) {
+			foreach (new DirectoryIterator(APP::getRootDir().'/'.$modules_dir) as $item) {
+				if (!$item->isDir() || $item->isDot()) {
+					continue;
+				}
 
-			$relative_path = $item->getFilename();
+				$relative_path = $modules_dir.'/'.$item->getFilename();
 
-			$manifest = $module_manager->addModule($relative_path);
+				$manifest = $module_manager->addModule($relative_path);
 
-			if (!$manifest) {
-				continue;
-			}
+				if (!$manifest) {
+					continue;
+				}
 
-			$is_stored = array_key_exists($relative_path, $db_moduleids);
-			$is_healthy = !$is_stored || $db_modules[$db_moduleids[$relative_path]]['id'] === $manifest['id'];
+				$is_stored = array_key_exists($relative_path, $db_moduleids);
+				$is_healthy = !$is_stored || $db_modules[$db_moduleids[$relative_path]]['id'] === $manifest['id'];
 
-			if ($is_healthy) {
-				$healthy_modules[] = $relative_path;
-			}
+				if ($is_healthy) {
+					$healthy_modules[] = $relative_path;
+				}
 
-			if (!$is_stored || !$is_healthy) {
-				$db_modules_create[] = [
-					'id' => $manifest['id'],
-					'relative_path' => $relative_path,
-					'status' => MODULE_STATUS_DISABLED,
-					'config' => $manifest['config']
-				];
-				$db_modules_create_names[] = $manifest['name'];
+				if (!$is_stored || !$is_healthy) {
+					$db_modules_create[] = [
+						'id' => $manifest['id'],
+						'relative_path' => $relative_path,
+						'status' => MODULE_STATUS_DISABLED,
+						'config' => $manifest['config']
+					];
+					$db_modules_create_names[] = $manifest['name'];
+				}
 			}
 		}
 

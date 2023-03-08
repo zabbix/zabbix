@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ class CControllerHostDashboardView extends CController {
 	private $host;
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -45,7 +45,7 @@ class CControllerHostDashboardView extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS)) {
 			return false;
 		}
 
@@ -60,6 +60,9 @@ class CControllerHostDashboardView extends CController {
 		return (bool) $this->host;
 	}
 
+	/**
+	 * @throws APIException|JsonException
+	 */
 	protected function doAction() {
 		$host_dashboards = $this->getSortedHostDashboards();
 
@@ -101,11 +104,14 @@ class CControllerHostDashboardView extends CController {
 
 				updateTimeSelectorPeriod($time_selector_options);
 
+				$widget_defaults = APP::ModuleManager()->getWidgetsDefaults(true);
+
 				$data = [
 					'host' => $this->host,
 					'host_dashboards' => $host_dashboards,
 					'dashboard' => $dashboard,
-					'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD),
+					'widget_defaults' => $widget_defaults,
+					'configuration_hash' => CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults),
 					'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
 					'time_period' => getTimeSelectorPeriod($time_selector_options),
 					'active_tab' => CProfile::get('web.dashboard.filter.active', 1)

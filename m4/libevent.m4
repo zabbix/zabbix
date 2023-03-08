@@ -15,22 +15,21 @@
 
 AC_DEFUN([LIBEVENT_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <stdlib.h>
 #include <event.h>
-],
-[
+#include <event2/thread.h>
+]], [[
+	evthread_use_pthreads();
 	event_init();
-],
-found_libevent="yes")
+]])],[found_libevent="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBEVENT_CHECK_CONFIG],
 [
 	AC_ARG_WITH([libevent],[
 If you want to specify libevent installation directories:
-AC_HELP_STRING([--with-libevent@<:@=DIR@:>@], [use libevent from given base install directory (DIR), default is to search through a number of common places for the libevent files.])],
+AS_HELP_STRING([--with-libevent@<:@=DIR@:>@], [use libevent from given base install directory (DIR), default is to search through a number of common places for the libevent files.])],
 		[
 			if test "x$withval" = "xyes"; then
 				if test -f /usr/local/include/event.h; then withval=/usr/local; else withval=/usr; fi
@@ -43,7 +42,7 @@ AC_HELP_STRING([--with-libevent@<:@=DIR@:>@], [use libevent from given base inst
 	)
 
 	AC_ARG_WITH([libevent-include],
-		AC_HELP_STRING([--with-libevent-include@<:@=DIR@:>@],
+		AS_HELP_STRING([--with-libevent-include@<:@=DIR@:>@],
 			[use libevent include headers from given path.]
 		),
 		[
@@ -53,7 +52,7 @@ AC_HELP_STRING([--with-libevent@<:@=DIR@:>@], [use libevent from given base inst
 	)
 
 	AC_ARG_WITH([libevent-lib],
-		AC_HELP_STRING([--with-libevent-lib@<:@=DIR@:>@],
+		AS_HELP_STRING([--with-libevent-lib@<:@=DIR@:>@],
 			[use libevent libraries from given path.]
 		),
 		[
@@ -64,7 +63,7 @@ AC_HELP_STRING([--with-libevent@<:@=DIR@:>@], [use libevent from given base inst
 
 	AC_MSG_CHECKING(for libevent support)
 
-	LIBEVENT_LIBS="-levent"
+	LIBEVENT_LIBS="-levent -levent_pthreads"
 
 	if test -n "$_libevent_dir_set" -o -f /usr/include/event.h; then
 		found_libevent="yes"

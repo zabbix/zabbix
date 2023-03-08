@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@
 
 // create form
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host')))->removeId())
 	->setId('massupdate-form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'popup.massupdate.host')
 	->addVar('hostids', $data['hostids'], 'ids')
 	->addVar('tls_accept', HOST_ENCRYPTION_NONE)
@@ -117,8 +117,8 @@ $proxy_select = (new CSelect('proxy_hostid'))
 	->setValue(0)
 	->addOption(new CSelectOption(0, _('(no proxy)')));
 
-foreach ($data['proxies'] as $proxie) {
-	$proxy_select->addOption(new CSelectOption($proxie['proxyid'], $proxie['host']));
+foreach ($data['proxies'] as $proxy) {
+	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['host']));
 }
 
 $host_tab->addRow(
@@ -197,7 +197,7 @@ $tags_tab->addRow(
 			->addStyle('margin-bottom: 10px;'),
 		renderTagTable([['tag' => '', 'value' => '']])
 			->setHeader([_('Name'), _('Value'), _('Action')])
-			->setId('tags-table')
+			->addClass('tags-table')
 	]))->setId('tags-div')
 );
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ $options = $data['options'];
 $field_values = $data['field_values'];
 
 $operations_popup_form = (new CForm())
-	->cleanItems()
 	->setId('lldoperation_form')
 	->addVar('no', $options['no'])
 	->addItem((new CVar('templated', $options['templated']))->removeId())
@@ -264,7 +263,7 @@ $operations_popup_form_list
 					['field_name' => 'optag', 'add_post_js' => false])
 				->setHeader([_('Name'), _('Value'), _('Action')])
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setId('tags-table')
+				->addClass('tags-table')
 		))->setId('optag_div'),
 		'optag_row'
 	)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ CArrayHelper::sort($db_media_types, ['name']);
 
 $media_types = array_column($db_media_types, 'name', 'mediatypeid');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Notifications'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORT4));
 
@@ -121,8 +121,7 @@ if ($media_types) {
 		]);
 	}
 
-	$widget->setControls((new CForm('get'))
-		->cleanItems()
+	$html_page->setControls((new CForm('get'))
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem($controls)
 		->setName('report4')
@@ -258,7 +257,7 @@ else {
 	$table = new CTableInfo();
 }
 
-$widget
+$html_page
 	->addItem($table)
 	->show();
 

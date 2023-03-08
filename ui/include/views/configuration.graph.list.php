@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,16 +21,17 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('configuration.graph.list.js.php');
 
 if (!empty($this->data['parent_discoveryid'])) {
-	$widget = (new CWidget())
+	$html_page = (new CHtmlPage())
 		->setTitle(_('Graph prototypes'))
 		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-			? CDocHelper::CONFIGURATION_HOST_GRAPH_PROTOTYPE_LIST
-			: CDocHelper::CONFIGURATION_TEMPLATES_GRAPH_PROTOTYPE_LIST
+			? CDocHelper::DATA_COLLECTION_HOST_GRAPH_PROTOTYPE_LIST
+			: CDocHelper::DATA_COLLECTION_TEMPLATES_GRAPH_PROTOTYPE_LIST
 		))
 		->setControls(
 			(new CTag('nav', true,
@@ -48,11 +49,11 @@ if (!empty($this->data['parent_discoveryid'])) {
 		->setNavigation(getHostNavigation('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 else {
-	$widget = (new CWidget())
+	$html_page = (new CHtmlPage())
 		->setTitle(_('Graphs'))
 		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-			? CDocHelper::CONFIGURATION_HOST_GRAPH_LIST
-			: CDocHelper::CONFIGURATION_TEMPLATE_GRAPH_LIST
+			? CDocHelper::DATA_COLLECTION_HOST_GRAPH_LIST
+			: CDocHelper::DATA_COLLECTION_TEMPLATE_GRAPH_LIST
 		))
 		->setControls(
 			(new CTag('nav', true,
@@ -75,13 +76,13 @@ else {
 		);
 
 	if (!empty($this->data['hostid'])) {
-		$widget->setNavigation(getHostNavigation('graphs', $this->data['hostid']));
+		$html_page->setNavigation(getHostNavigation('graphs', $this->data['hostid']));
 	}
 
 	// Add filter tab.
 	$hg_ms_params = $data['context'] === 'host' ? ['with_hosts' => true] : ['with_templates' => true];
 
-	$widget->addItem(
+	$html_page->addItem(
 		(new CFilter())
 			->setResetUrl((new CUrl('graphs.php'))->setArgument('context', $data['context']))
 			->setProfile($data['profileIdx'])
@@ -116,9 +117,10 @@ else {
 							'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 							'data' => $data['filter']['hosts'],
 							'popup' => [
-								'filter_preselect_fields' => $data['context'] === 'host'
-									? ['hostgroups' => 'filter_groupids_']
-									: ['templategroups' => 'filter_groupids_'],
+								'filter_preselect' => [
+									'id' => 'filter_groupids_',
+									'submit_as' => 'groupid'
+								],
 								'parameters' => [
 									'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 									'srcfld1' => 'hostid',
@@ -140,7 +142,8 @@ $url = (new CUrl('graphs.php'))
 // create form
 $graphForm = (new CForm('post', $url))
 	->setName('graphForm')
-	->addVar('hostid', $data['hostid']);
+	->addVar('hostid', $data['hostid'])
+	->addVar('context', $data['context'], 'form_context');
 
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
@@ -170,6 +173,8 @@ $graphTable = (new CTableInfo())
 		$discover,
 		$info_column
 	]);
+
+$csrf_token = CCsrfTokenHelper::get('graphs.php');
 
 foreach ($data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
@@ -228,7 +233,7 @@ foreach ($data['graphs'] as $graph) {
 					->setArgument('context', $data['context'])
 					->getUrl()
 			))
-				->addSID()
+				->addCsrfToken($csrf_token)
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 	}
@@ -249,27 +254,39 @@ foreach ($data['graphs'] as $graph) {
 }
 
 // buttons
-$buttonsArray = [];
+$buttons = [];
 if (!$this->data['parent_discoveryid']) {
-	$buttonsArray['graph.masscopyto'] = ['name' => _('Copy')];
+	$buttons['graph.masscopyto'] = [
+		'content' => (new CSimpleButton(_('Copy')))
+			->addClass('js-copy')
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->removeId()
+	];
 }
-$buttonsArray['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
+$buttons['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
 	? _('Delete selected graph prototypes?')
-	: _('Delete selected graphs?')
+	: _('Delete selected graphs?'),
+	'csrf_token' => $csrf_token
 ];
 
 // append table to form
 $graphForm->addItem([
 	$graphTable,
 	$data['paging'],
-	new CActionButtonList('action', 'group_graphid', $buttonsArray,
-		$data['parent_discoveryid']
-			? $data['parent_discoveryid']
-			: $data['hostid']
+	new CActionButtonList('action', 'group_graphid', $buttons,
+		$data['parent_discoveryid'] ?: $data['hostid']
 	)
 ]);
 
-// append form to widget
-$widget->addItem($graphForm);
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['hostid'],
+		'checkbox_object' => 'group_graphid'
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();
 
-$widget->show();
+$html_page
+	->addItem($graphForm)
+	->show();

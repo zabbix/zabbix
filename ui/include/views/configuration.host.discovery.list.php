@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.list.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Discovery rules'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_DISCOVERY_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATES_DISCOVERY_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_DISCOVERY_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_DISCOVERY_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,
@@ -52,7 +52,7 @@ $widget = (new CWidget())
 	);
 
 if ($data['hostid'] != 0) {
-	$widget->setNavigation(getHostNavigation('discoveries', $data['hostid']));
+	$html_page->setNavigation(getHostNavigation('discoveries', $data['hostid']));
 }
 
 // Add filter tab.
@@ -90,9 +90,10 @@ $filter_column1 = (new CFormList())
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 			'data' => $data['filter']['hosts'],
 			'popup' => [
-				'filter_preselect_fields' => $data['context'] === 'host'
-					? ['hostgroups' => 'filter_groupids_']
-					: ['templategroups' => 'filter_groupids_'],
+				'filter_preselect' => [
+					'id' => 'filter_groupids_',
+					'submit_as' => 'groupid'
+				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
@@ -176,7 +177,7 @@ $filter_column3->addRow(_('Status'),
 
 $filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2, $filter_column3]);
 
-$widget->addItem($filter);
+$html_page->addItem($filter);
 
 $url = (new CUrl('host_discovery.php'))
 	->setArgument('context', $data['context'])
@@ -209,6 +210,7 @@ $discoveryTable = (new CTableInfo())
 	]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
+$csrf_token = CCsrfTokenHelper::get('host_discovery.php');
 
 foreach ($data['discoveries'] as $discovery) {
 	// description
@@ -257,9 +259,9 @@ foreach ($data['discoveries'] as $discovery) {
 			->setArgument('context', $data['context'])
 			->getUrl()
 		))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']))
-			->addSID();
+			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
@@ -335,8 +337,12 @@ foreach ($data['discoveries'] as $discovery) {
 }
 
 $button_list = [
-	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?')],
-	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?')]
+	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?'),
+		'csrf_token' => $csrf_token
+	],
+	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 if ($data['context'] === 'host') {
@@ -352,7 +358,9 @@ if ($data['context'] === 'host') {
 }
 
 $button_list += [
-	'discoveryrule.massdelete' => ['name' => _('Delete'), 'confirm' =>_('Delete selected discovery rules?')]
+	'discoveryrule.massdelete' => ['name' => _('Delete'), 'confirm' =>_('Delete selected discovery rules?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 // Append table to form.
@@ -360,10 +368,9 @@ $discoveryForm->addItem([$discoveryTable, $data['paging'], new CActionButtonList
 	$button_list, $data['checkbox_hash']
 )]);
 
-// Append form to widget.
-$widget->addItem($discoveryForm);
-
-$widget->show();
+$html_page
+	->addItem($discoveryForm)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

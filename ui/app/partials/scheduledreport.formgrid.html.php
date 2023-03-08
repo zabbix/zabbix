@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -121,10 +121,10 @@ $form_grid
 $show_weekdays = ($data['cycle'] == ZBX_REPORT_CYCLE_WEEKLY);
 
 $weekdays = [];
-foreach ([1, 4, 6, 2, 5, 7, 3] as $day) {
+foreach (range(1, 7) as $day) {
 	$value = 1 << ($day - 1);
 	$weekdays[] = [
-		'name' => getDayOfWeekCaption($day),
+		'label' => getDayOfWeekCaption($day),
 		'value' => $value,
 		'checked' => (bool) ($value & $data['weekdays'])
 	];
@@ -139,8 +139,8 @@ $form_grid
 		(new CFormField(
 			(new CCheckBoxList('weekdays'))
 				->setOptions($weekdays)
-				->addClass(ZBX_STYLE_COLUMNS)
-				->addClass(ZBX_STYLE_COLUMNS_3)
+				->setVertical(true)
+				->setColumns(3)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setEnabled($data['allowed_edit'])
 		))
@@ -230,7 +230,7 @@ if ($data['source'] === 'reports') {
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'scheduledreport.delete')
 					->setArgument('reportids', [$data['reportid']])
-					->setArgumentSID(),
+					->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('scheduledreport')),
 				_('Delete selected scheduled report?')
 			))
 				->setId('delete')

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,19 @@
 #ifndef ZABBIX_SERVER_TASKMANAGER_H
 #define ZABBIX_SERVER_TASKMANAGER_H
 
+#include "zbxtasks.h"
 #include "zbxthreads.h"
+#include "zbxversion.h"
+
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
+		zbx_proxy_compatibility_t compatibility);
+
+typedef struct
+{
+	int			config_timeout;
+	int			config_startup_time;
+}
+zbx_thread_taskmanager_args;
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args);
 

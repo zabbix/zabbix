@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@
 #include "audit/zbxaudit.h"
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
+#include "zbxdbwrap.h"
+#include "zbx_trigger_constants.h"
 
 /******************************************************************************
  *                                                                            *
@@ -52,7 +54,7 @@ static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host
 
 	for (time_start = time(NULL); SEC_PER_MIN > time(NULL) - time_start; sleep(1))
 	{
-		result = DBselect(
+		result = zbx_db_select(
 				"select tr.status,tr.info"
 				" from task t"
 				" left join task_remote_command_result tr"
@@ -60,7 +62,7 @@ static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host
 				" where tr.parent_taskid=" ZBX_FS_UI64,
 				taskid);
 
-		if (NULL != (row = DBfetch(result)))
+		if (NULL != (row = zbx_db_fetch(result)))
 		{
 			int	ret;
 
@@ -69,11 +71,11 @@ static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host
 			else
 				zbx_strlcpy(error, row[1], max_error_len);
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			return ret;
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_snprintf(error, max_error_len, "Timeout while waiting for remote command result.");
@@ -89,7 +91,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 	DB_ROW		row;
 	zbx_uint64_t	usrgrpid_l, groupid_l;
 
-	db_result = DBselect("select command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
+	db_result = zbx_db_select("select command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
 			",username,password,publickey,privatekey"
 			" from scripts"
 			" where scriptid=" ZBX_FS_UI64, scriptid);
@@ -100,7 +102,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 		return FAIL;
 	}
 
-	if (NULL == (row = DBfetch(db_result)))
+	if (NULL == (row = zbx_db_fetch(db_result)))
 	{
 		zbx_strlcpy(error, "Script not found.", error_len);
 		goto fail;
@@ -138,7 +140,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 
 	ZBX_STR2UCHAR(script->host_access, row[1]);
 
-	if (SUCCEED != is_time_suffix(row[6], &script->timeout, ZBX_LENGTH_UNLIMITED))
+	if (SUCCEED != zbx_is_time_suffix(row[6], &script->timeout, ZBX_LENGTH_UNLIMITED))
 	{
 		zbx_strlcpy(error, "Invalid timeout value in script configuration.", error_len);
 		goto fail;
@@ -148,7 +150,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 
 	ret = SUCCEED;
 fail:
-	DBfree_result(db_result);
+	zbx_db_free_result(db_result);
 
 	return ret;
 }
@@ -158,7 +160,7 @@ static int	is_user_in_allowed_group(zbx_uint64_t userid, zbx_uint64_t usrgrpid, 
 	DB_RESULT	result;
 	int		ret = FAIL;
 
-	result = DBselect("select null"
+	result = zbx_db_select("select null"
 			" from users_groups"
 			" where usrgrpid=" ZBX_FS_UI64
 			" and userid=" ZBX_FS_UI64,
@@ -170,12 +172,12 @@ static int	is_user_in_allowed_group(zbx_uint64_t userid, zbx_uint64_t usrgrpid, 
 		goto fail;
 	}
 
-	if (NULL == DBfetch(result))
+	if (NULL == zbx_db_fetch(result))
 		zbx_strlcpy(error, "User has no rights to execute this script.", error_len);
 	else
 		ret = SUCCEED;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 fail:
 	return ret;
 }
@@ -200,18 +202,18 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 	DB_RESULT	db_result;
 	DB_ROW		row;
 
-	if (NULL == (db_result = DBselect("select r_eventid from event_recovery where eventid="ZBX_FS_UI64, eventid)))
+	if (NULL == (db_result = zbx_db_select("select r_eventid from event_recovery where eventid="ZBX_FS_UI64, eventid)))
 	{
 		zbx_strlcpy(error, "Database error, cannot read from 'events' and 'event_recovery' tables.", error_len);
 		return FAIL;
 	}
 
-	if (NULL == (row = DBfetch(db_result)))
+	if (NULL == (row = zbx_db_fetch(db_result)))
 		*r_eventid = 0;
 	else
 		ZBX_DBROW2UINT64(*r_eventid, row[0]);
 
-	DBfree_result(db_result);
+	zbx_db_free_result(db_result);
 
 	return SUCCEED;
 }
@@ -220,13 +222,14 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  *                                                                            *
  * Purpose: executing command                                                 *
  *                                                                            *
- * Parameters:  scriptid - [IN] the id of a script to be executed             *
- *              hostid   - [IN] the host the script will be executed on       *
- *              eventid  - [IN] the id of an event                            *
- *              user     - [IN] the user who executes the command             *
- *              clientip - [IN] the IP of client                              *
- *              result   - [OUT] the result of a script execution             *
- *              debug    - [OUT] the debug data (optional)                    *
+ * Parameters:  scriptid       - [IN] the id of a script to be executed       *
+ *              hostid         - [IN] the host the script will be executed on *
+ *              eventid        - [IN] the id of an event                      *
+ *              user           - [IN] the user who executes the command       *
+ *              clientip       - [IN] the IP of client                        *
+ *              config_timeout - [IN]                                         *
+ *              result         - [OUT] the result of a script execution       *
+ *              debug          - [OUT] the debug data (optional)              *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
@@ -235,7 +238,7 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  *                                                                            *
  ******************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
-		const char *clientip, char **result, char **debug)
+		const char *clientip, int config_timeout, char **result, char **debug)
 {
 	int			ret = FAIL, scope = 0, i, macro_type;
 	DC_HOST			host;
@@ -245,7 +248,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_vector_ptr_t	events;
 	zbx_vector_ptr_pair_t	webhook_params;
 	char			*user_timezone = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
-	ZBX_DB_EVENT		*problem_event = NULL, *recovery_event = NULL;
+	zbx_db_event		*problem_event = NULL, *recovery_event = NULL;
 	zbx_dc_um_handle_t	*um_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
@@ -323,7 +326,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		switch (events.values_num)
 		{
 			case 1:
-				if (eventid == ((ZBX_DB_EVENT *)(events.values[0]))->eventid)
+				if (eventid == ((zbx_db_event *)(events.values[0]))->eventid)
 				{
 					problem_event = events.values[0];
 				}
@@ -334,7 +337,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				}
 				break;
 			case 2:
-				if (r_eventid == ((ZBX_DB_EVENT *)(events.values[0]))->eventid)
+				if (r_eventid == ((zbx_db_event *)(events.values[0]))->eventid)
 				{
 					problem_event = events.values[1];
 					recovery_event = events.values[0];
@@ -439,8 +442,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
-			ret = zbx_script_execute(&script, &host, webhook_params_json, result, error, sizeof(error),
-					debug);
+			ret = zbx_script_execute(&script, &host, webhook_params_json, config_timeout, result, error,
+					sizeof(error), debug);
 		}
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
@@ -494,7 +497,7 @@ fail:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp)
+int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp, int config_timeout)
 {
 	char			*result = NULL, *send = NULL, *debug = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
 				clientip[MAX_STRING_LEN];
@@ -518,7 +521,8 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		result = zbx_strdup(result, "Permission denied. User is a member of group with disabled access.");
 		goto finish;
 	}
-
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
 	if (SUCCEED != zbx_check_user_administration_actions_permissions(&user,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS))
@@ -526,11 +530,12 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		result = zbx_strdup(result, "Permission denied. No role access.");
 		goto finish;
 	}
-
+#undef ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS
+#undef ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS
 	/* extract and validate other JSON elements */
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SCRIPTID, tmp, sizeof(tmp), NULL) ||
-			FAIL == is_uint64(tmp, &scriptid))
+			FAIL == zbx_is_uint64(tmp, &scriptid))
 	{
 		result = zbx_dsprintf(result, "Failed to parse command request tag: %s.", ZBX_PROTO_TAG_SCRIPTID);
 		goto finish;
@@ -558,7 +563,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 
 	if (1 == got_hostid)
 	{
-		if (SUCCEED != is_uint64(tmp_hostid, &hostid))
+		if (SUCCEED != zbx_is_uint64(tmp_hostid, &hostid))
 		{
 			result = zbx_dsprintf(result, "Failed to parse value of command request tag %s.",
 					ZBX_PROTO_TAG_HOSTID);
@@ -573,7 +578,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	}
 	else
 	{
-		if (SUCCEED != is_uint64(tmp_eventid, &eventid))
+		if (SUCCEED != zbx_is_uint64(tmp_eventid, &eventid))
 		{
 			result = zbx_dsprintf(result, "Failed to parse value of command request tag %s.",
 					ZBX_PROTO_TAG_EVENTID);
@@ -590,7 +595,8 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
 
-	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, &result, &debug)))
+	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, config_timeout, &result,
+			&debug)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
@@ -609,7 +615,7 @@ finish:
 		send = j.buffer;
 	}
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
+	zbx_alarm_on(config_timeout);
 	if (SUCCEED != zbx_tcp_send(sock, send))
 		zabbix_log(LOG_LEVEL_WARNING, "Error sending result of command");
 	else

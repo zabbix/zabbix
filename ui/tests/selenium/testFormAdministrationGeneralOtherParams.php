@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -412,7 +412,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Ivalid empty values.
+			// Invalid empty values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -495,7 +495,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Ivalid zero values.
+			// Invalid zero values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -521,7 +521,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Ivalid zero values in seconds with "s".
+			// Invalid zero values in seconds with "s".
 			[
 				[
 					'expected' => TEST_BAD,

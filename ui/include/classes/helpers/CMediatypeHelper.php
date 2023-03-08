@@ -1,7 +1,7 @@
 <?php
 /*
  ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,6 +34,117 @@ class CMediatypeHelper {
 	public const MSG_TYPE_AUTOREG = 7;
 	public const MSG_TYPE_INTERNAL = 8;
 	public const MSG_TYPE_INTERNAL_RECOVERY = 9;
+
+	/**
+	 * Email type providers.
+	 */
+	public const EMAIL_PROVIDER_SMTP = 0;
+	public const EMAIL_PROVIDER_GMAIL = 1;
+	public const EMAIL_PROVIDER_GMAIL_RELAY = 2;
+	public const EMAIL_PROVIDER_OFFICE365 = 3;
+	public const EMAIL_PROVIDER_OFFICE365_RELAY = 4;
+
+	/**
+	 * Returns an array of Email providers default settings.
+	 *
+	 * @return array
+	 */
+	public static function getEmailProviders($provider = null) {
+		$providers = [
+			self::EMAIL_PROVIDER_SMTP => [
+				'name' => 'Generic SMTP',
+				'smtp_server' => 'mail.example.com',
+				'smtp_email' => 'zabbix@example.com',
+				'smtp_port' => 25,
+				'smtp_security' => SMTP_CONNECTION_SECURITY_NONE,
+				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
+				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
+				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+			],
+			self::EMAIL_PROVIDER_GMAIL => [
+				'name' => 'Gmail',
+				'smtp_server' => 'smtp.gmail.com',
+				'smtp_email' => 'zabbix@example.com',
+				'smtp_port' => 587,
+				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
+				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
+				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
+				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+			],
+			self::EMAIL_PROVIDER_GMAIL_RELAY => [
+				'name' => 'Gmail relay',
+				'smtp_server' => 'smtp-relay.gmail.com',
+				'smtp_email' => 'zabbix@example.com',
+				'smtp_port' => 587,
+				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
+				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
+				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
+				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+			],
+			self::EMAIL_PROVIDER_OFFICE365 => [
+				'name' => 'Office365',
+				'smtp_server' => 'smtp.office365.com',
+				'smtp_email' => 'zabbix@example.com',
+				'smtp_port' => 587,
+				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
+				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
+				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
+				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+			],
+			self::EMAIL_PROVIDER_OFFICE365_RELAY => [
+				'name' => 'Office365 relay',
+				'smtp_server' => '.mail.protection.outlook.com',
+				'smtp_email' => 'zabbix@example.com',
+				'smtp_port' => 25,
+				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
+				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
+				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
+				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+			]
+		];
+
+		if ($provider === null) {
+			return $providers;
+		}
+
+		return $providers[$provider];
+	}
+
+	/**
+	 * Returns all providers names.
+	 *
+	 * @return array
+	 */
+	public static function getAllEmailProvidersNames() {
+		return array_column(self::getEmailProviders(), 'name');
+	}
+
+	/**
+	 * Returns media types names.
+	 *
+	 * @return array
+	 */
+	public static function getMediaTypes($type = null) {
+		$types = [
+			MEDIA_TYPE_EMAIL => _('Email'),
+			MEDIA_TYPE_EXEC => _('Script'),
+			MEDIA_TYPE_SMS => _('SMS'),
+			MEDIA_TYPE_WEBHOOK => _('Webhook')
+		];
+
+		if ($type === null) {
+			natsort($types);
+
+			return $types;
+		}
+
+		return $types[$type];
+	}
 
 	/**
 	 * Returns an array of message templates.

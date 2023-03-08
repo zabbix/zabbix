@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,14 +45,6 @@
 #define ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
 #define ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY	5
 
-extern char	*CONFIG_FILE;
-extern char	*CONFIG_LOG_TYPE_STR;
-extern int	CONFIG_LOG_TYPE;
-extern char	*CONFIG_LOG_FILE;
-extern int	CONFIG_LOG_FILE_SIZE;
-extern int	CONFIG_ALLOW_ROOT;
-extern int	CONFIG_TIMEOUT;
-
 struct cfg_line
 {
 	const char	*parameter;
@@ -77,6 +69,8 @@ typedef struct
 
 void	zbx_addr_copy(zbx_vector_ptr_t *addr_to, const zbx_vector_ptr_t *addr_from);
 void	zbx_addr_free(zbx_addr_t *addr);
+
+void	zbx_init_library_cfg(unsigned char program_type);
 
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit);
 

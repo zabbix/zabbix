@@ -1,7 +1,7 @@
 // JavaScript Document
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -303,7 +303,7 @@ calendar.prototype = {
 		else if (section_to_focus === '.calendar-date') {
 			/**
 			 * Switching between months and years, date picker will highlight previously selected date. If
-			 * selected date is in different year or month, the first date of displayed year is highleghted.
+			 * selected date is in different year or month, the first date of displayed year is highlighted.
 			 * Same happens also if the number of dates in selected month is smaller than selected date in different
 			 * month.
 			 */

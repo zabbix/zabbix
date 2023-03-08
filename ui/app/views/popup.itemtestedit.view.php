@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setId('preprocessing-test-form');
 
 if ($data['show_prev']) {
@@ -151,6 +150,19 @@ if ($data['is_item_testable']) {
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 				->addClass('js-popup-row-snmp-community'),
 
+			(new CLabel(_('Max repetition count'), 'interface[details][max_repetitions]'))
+				->addClass('js-popup-row-snmp-max-repetition'),
+			(new CFormField(
+					(new CTextBox('interface[details][max_repetitions]',
+						$data['inputs']['interface']['details']['max_repetitions'], false,
+						CControllerPopupItemTest::INPUT_MAX_LENGTH
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAriaRequired()
+				))
+					->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+					->addClass('js-popup-row-snmp-max-repetition'),
+
 			(new CLabel(_('Context name'), 'interface[details][contextname]'))
 				->addClass('js-popup-row-snmpv3-contextname'),
 			(new CFormField(
@@ -274,7 +286,7 @@ $form_grid->addItem([
 			->setId('time')
 	),
 
-	($data['preproc_item'] instanceof CDiscoveryRule)
+	($data['test_type'] == CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD)
 		? null
 		: (new CFormField((new CCheckBox('not_supported'))->setLabel(_('Not supported'))))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),

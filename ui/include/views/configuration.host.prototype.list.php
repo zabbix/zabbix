@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.prototype.list.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Host prototypes'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_PROTOTYPE_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATES_PROTOTYPE_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_PROTOTYPE_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_PROTOTYPE_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,
@@ -70,6 +70,8 @@ $hostTable = (new CTableInfo())
 		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url),
 		_('Tags')
 	]);
+
+$csrf_token = CCsrfTokenHelper::get('host_prototypes.php');
 
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	// name
@@ -149,7 +151,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$status = (new CLink(
 		($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
 		(new CUrl('host_prototypes.php'))
-			->setArgument('group_hostid', $hostPrototype['hostid'])
+			->setArgument('group_hostid[]', $hostPrototype['hostid'])
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 			->setArgument('action', ($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
 				? 'hostprototype.massenable'
@@ -158,9 +160,9 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))
+		->addCsrfToken($csrf_token)
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(itemIndicatorStyle($hostPrototype['status']))
-		->addSID();
+		->addClass(itemIndicatorStyle($hostPrototype['status']));
 
 	$nodiscover = ($hostPrototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
@@ -172,7 +174,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addSID()
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -193,20 +195,19 @@ $itemForm->addItem([
 	new CActionButtonList('action', 'group_hostid',
 		[
 			'hostprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create hosts from selected prototypes as enabled?')
+				'confirm' => _('Create hosts from selected prototypes as enabled?'), 'csrf_token' => $csrf_token
 			],
 			'hostprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create hosts from selected prototypes as disabled?')
+				'confirm' => _('Create hosts from selected prototypes as disabled?'), 'csrf_token' => $csrf_token
 			],
 			'hostprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected host prototypes?')
+				'confirm' => _('Delete selected host prototypes?'), 'csrf_token' => $csrf_token
 			]
 		],
 		$data['discovery_rule']['itemid']
 	)
 ]);
 
-// append form to widget
-$widget->addItem($itemForm);
-
-$widget->show();
+$html_page
+	->addItem($itemForm)
+	->show();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ class testSystemInformation extends CWebTest {
 	public static $standby_lastaccess;
 	public static $stopped_lastaccess;
 	public static $unavailable_lastaccess;
-	public static $standalone_lastaccess;
 
 	public static $skip_fields;
 
@@ -43,7 +42,6 @@ class testSystemInformation extends CWebTest {
 		self::$standby_lastaccess = self::$active_lastaccess - 1;
 		self::$stopped_lastaccess = self::$active_lastaccess - 240;
 		self::$unavailable_lastaccess = self::$active_lastaccess - 180105;
-		self::$standalone_lastaccess = self::$active_lastaccess - 20;
 
 		$nodes = [
 			[
@@ -81,15 +79,6 @@ class testSystemInformation extends CWebTest {
 				'lastaccess' => self::$active_lastaccess,
 				'status' => 3,
 				'ha_sessionid' => 'ckvaw9wjo0000td7p8j66e74x'
-			],
-			[
-				'ha_nodeid' => 'ckvawe0t00001h57pcotna8nz',
-				'name' => '',
-				'address' => '192.168.133.100',
-				'port' => 10051,
-				'lastaccess' => self::$standalone_lastaccess,
-				'status' => 0,
-				'ha_sessionid' => 'ckvawe0rx0000gv7pi74mzlqp'
 			]
 		];
 
@@ -126,11 +115,10 @@ class testSystemInformation extends CWebTest {
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
-		$this->page->login()->open($url);
+		$this->page->login()->open($url)->waitUntilReady();
 
 		// Not waiting for page to load to minimise the possibility of difference between the time in report and in constant.
 		$current_time = time();
-		$this->page->waitUntilReady();
 
 		if (!$dashboardid) {
 			$nodes_table = $this->query('xpath://table[@class="list-table sticky-header sticky-footer"]')->asTable()->one();
@@ -147,8 +135,7 @@ class testSystemInformation extends CWebTest {
 			'Active node' => self::$active_lastaccess,
 			'Unavailable node' => self::$unavailable_lastaccess,
 			'Stopped node' => self::$stopped_lastaccess,
-			'Standby node' => self::$standby_lastaccess,
-			'<standalone server>' => self::$standalone_lastaccess
+			'Standby node' => self::$standby_lastaccess
 		];
 
 		/**
@@ -158,18 +145,21 @@ class testSystemInformation extends CWebTest {
 		foreach ($nodes as $name => $lastaccess_db) {
 			$row = $nodes_table->findRow('Name', $name);
 			$last_seen = $row->getColumn('Last access');
-			// Converting unix timestamp difference into difference in time units and comparing with lastaccess from report.
-			$lastaccess_expected = convertUnitsS($current_time - $lastaccess_db);
-			$lastaccess_actual = $last_seen->getText();
+			self::$skip_fields[] = $last_seen;
+
 			/**
-			 *  In case if the actual last access doesn't coincide with expected check that the difference is only 1s.
-			 *  This is required because a second might have passed from defining $current_time and loading the page.
+			 * Converting unix timestamp difference into difference in time units and creating an array of such reference
+			 * values. This is required because several seconds might have passed from defining $current_time and
+			 * loading the page. Afterwards, the presence of the actual last access value in this array is determined.
 			 */
-			if ($lastaccess_expected !== $lastaccess_actual) {
-				$this->assertEquals(convertUnitsS($current_time - $lastaccess_db - 1), $lastaccess_actual);
+			$last_expected = [];
+
+			for ($i = 0; $i <= 10; $i++) {
+				$last_expected[] = convertUnitsS($current_time - $lastaccess_db - $i);
 			}
 
-			self::$skip_fields[] = $last_seen;
+			$last_actual = $last_seen->getText();
+			$this->assertContains($last_actual, $last_expected, $last_actual.' not in ['.implode(', ', $last_expected).']');
 
 			// Check Zabbix server address and port for each record in the HA cluster nodes table.
 			if ($name === 'Active node') {
@@ -191,8 +181,8 @@ class testSystemInformation extends CWebTest {
 		}
 
 		// Check and hide the text of messages, because they contain ip addresses of the current host.
-		$error_text = "Connection to Zabbix server \"".$DB['SERVER']."\" failed. Possible reasons:\n".
-				"1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n".
+		$error_text = "Connection to Zabbix server \"".$DB['SERVER'].":0\" failed. Possible reasons:\n".
+				"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
 				"2. Incorrect DNS server configuration.\n".
 				"Failed to parse address \"".$DB['SERVER']."\"";
 		$messages = CMessageElement::find()->all();
@@ -213,13 +203,13 @@ class testSystemInformation extends CWebTest {
 		$table = $this->query('xpath://table[@class="list-table sticky-header"]')->asTable()->waitUntilVisible()->one();
 
 		// Check that before failover delay passes frontend thinks that Zabbix server is running.
-		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn(0)->getText());
+		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
 
 		// Wait for failover delay to pass.
 		sleep(self::$update_timestamp + self::FAILOVER_DELAY - time());
 
 		// Check that after failover delay passes frontend re-validates Zabbix server status.
 		$this->page->refresh();
-		$this->assertEquals('No', $table->findRow('Parameter', 'Zabbix server is running')->getColumn(0)->getText());
+		$this->assertEquals('No', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
 	}
 }

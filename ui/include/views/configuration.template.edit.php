@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,24 +25,26 @@
 
 require_once __DIR__.'/js/common.template.edit.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Templates'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_TEMPLATES_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATES_EDIT));
 
 if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
-	$widget->setNavigation(getHostNavigation('', $data['templateid']));
+	$html_page->setNavigation(getHostNavigation('', $data['templateid']));
 }
 
 $tabs = new CTabView();
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('templates.php')))->removeId())
 	->setId('templates-form')
 	->setName('templatesForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form']);
 
 if ($data['templateid'] != 0) {
@@ -171,6 +173,13 @@ $template_tab
 			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	);
 
+if ($data['vendor']) {
+	$template_tab->addRow(_('Vendor and version'), implode(', ', [
+		$data['vendor']['name'],
+		$data['vendor']['version']
+	]));
+}
+
 $tabs->addTab('tmplTab', _('Templates'), $template_tab, false);
 
 // tags
@@ -178,7 +187,8 @@ $tabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 		'source' => 'template',
 		'tags' => $data['tags'],
 		'readonly' => $data['readonly'],
-		'tabs_id' => 'tabs'
+		'tabs_id' => 'tabs',
+		'tags_tab_id' => 'tags-tab'
 	]), TAB_INDICATOR_TAGS
 );
 
@@ -216,12 +226,15 @@ if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
 		[
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
-			new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid')),
+			new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid').'&'.
+				CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('templates.php')
+			),
 			new CButtonQMessage(
 				'delete_and_clear',
 				_('Delete and clear'),
 				_('Delete and clear template? (Warning: all linked hosts will be cleared!)'),
-				url_param('form').url_param('templateid')
+				url_param('form').url_param('templateid').'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.
+				CCsrfTokenHelper::get('templates.php')
 			),
 			new CButtonCancel()
 		]
@@ -235,6 +248,7 @@ else {
 }
 
 $form->addItem($tabs);
-$widget->addItem($form);
 
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

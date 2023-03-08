@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,13 +54,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 	protected function checkInput() {
 		$fields = [
-			'authtype'				=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'authtype'				=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'get_value'				=> 'in 0,1',
 			'eol'					=> 'in '.implode(',', [ZBX_EOL_LF, ZBX_EOL_CRLF]),
 			'headers'				=> 'array',
 			'proxy_hostid'			=> 'id',
 			'hostid'				=> 'db hosts.hostid',
-			'http_authtype'			=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'http_authtype'			=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'http_password'			=> 'string',
 			'http_proxy'			=> 'string',
 			'http_username'			=> 'string',
@@ -114,7 +114,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', '0'));
 			$this->get_value_from_host = (bool) $this->getInput('get_value');
 			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
-			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
+			$this->test_type = $this->getInput('test_type');
 			$this->is_item_testable = in_array($this->item_type, $testable_item_types);
 
 			$interface = $this->getInput('interface', []);
@@ -158,9 +158,32 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 
 			// Check preprocessing steps.
-			if ($steps && ($error = $this->preproc_item->validateItemPreprocessingSteps($steps)) !== true) {
-				error($error);
-				$ret = false;
+			if ($steps) {
+				if ($this->test_type == self::ZBX_TEST_TYPE_LLD) {
+					$lld_instance = new CDiscoveryRule();
+					$steps_validation_response = $lld_instance->validateItemPreprocessingSteps($steps);
+
+					if ($steps_validation_response !== true) {
+						error($steps_validation_response);
+						$ret = false;
+					}
+				}
+				else {
+					switch ($this->test_type) {
+						case self::ZBX_TEST_TYPE_ITEM:
+							$api_input_rules = CItem::getPreprocessingValidationRules();
+							break;
+
+						case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
+							$api_input_rules = CItemPrototype::getPreprocessingValidationRules();
+							break;
+					}
+
+					if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
+						error($error);
+						$ret = false;
+					}
+				}
 			}
 
 			// Check previous time.
@@ -380,7 +403,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 				foreach ($preproc_test_data['steps'] as $i => &$step) {
 					if ($test_failed) {
-						// If test is failed, proceesing steps are skipped from results.
+						// If test is failed, processing steps are skipped from results.
 						unset($preproc_test_data['steps'][$i]);
 						continue;
 					}

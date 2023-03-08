@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,14 +19,13 @@
 
 #include "http.h"
 
+#include "../sysinfo.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
 #include "zbxcomms.h"
-
-extern int	CONFIG_TIMEOUT;
 
 #define HTTP_SCHEME_STR		"http://"
 
@@ -171,12 +170,22 @@ static int	curl_page_get(char *url, char **buffer, char **error)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADER, 1L)) ||
 			(NULL != CONFIG_SOURCE_IP &&
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP))) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, (long)CONFIG_TIMEOUT)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT,
+					(long)sysinfo_get_config_timeout())) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option: %s.", curl_easy_strerror(err));
 		goto out;
 	}
+
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set allowed protocols: %s", curl_easy_strerror(err));
+		goto out;
+	}
+#endif
 
 	if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 	{
@@ -219,7 +228,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 
 		if (NULL != port && '\0' != *port)
 		{
-			if (SUCCEED != is_ushort(port, &port_n))
+			if (SUCCEED != zbx_is_ushort(port, &port_n))
 			{
 				*error = zbx_strdup(*error, "Invalid third parameter.");
 				return SYSINFO_RET_FAIL;
@@ -316,7 +325,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 			{
 				port_str = zbx_dsprintf(NULL, "%.*s", port_len, p + 1);
 
-				if (SUCCEED != is_ushort(port_str, &port_num))
+				if (SUCCEED != zbx_is_ushort(port_str, &port_num))
 					ret = SYSINFO_RET_FAIL;
 				else
 					hostname = zbx_dsprintf(hostname, "%.*s", (int)(p - p_host), p_host);
@@ -362,7 +371,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		{
 			port_num = ZBX_DEFAULT_HTTP_PORT;
 		}
-		else if (FAIL == is_ushort(port, &port_num))
+		else if (FAIL == zbx_is_ushort(port, &port_num))
 		{
 			*error = zbx_strdup(*error, "Invalid third parameter.");
 			ret = SYSINFO_RET_FAIL;
@@ -383,7 +392,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		goto out;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, hostname, port_num, CONFIG_TIMEOUT,
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, hostname, port_num, sysinfo_get_config_timeout(),
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		char	*request = NULL;
@@ -429,7 +438,7 @@ out:
 }
 #endif
 
-int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	web_page_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*hostname, *path_str, *port_str, *buffer = NULL, *error = NULL;
 	int	ret;
@@ -455,7 +464,7 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	web_page_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*hostname, *path_str, *port_str, *error = NULL;
 	double	start_time;
@@ -481,7 +490,7 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	web_page_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*hostname, *path_str, *port_str, *buffer = NULL, *error = NULL, *regexp, *length_str;
 	const char	*output;
@@ -508,7 +517,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == length_str || '\0' == *length_str)
 		length = ZBX_MAX_UINT31_1;
-	else if (FAIL == is_uint31_1(length_str, &length))
+	else if (FAIL == zbx_is_uint31_1(length_str, &length))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		return SYSINFO_RET_FAIL;

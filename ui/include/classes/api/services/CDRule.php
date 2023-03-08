@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -764,10 +764,6 @@ class CDRule extends CApiService {
 
 			// Update drule if it's modified.
 			if (DB::recordModified('drules', $db_drule, $drule)) {
-				if (array_key_exists('delay', $drule) && $db_drule['delay'] != $drule['delay']) {
-					$drule['nextcheck'] = 0;
-				}
-
 				DB::updateByPk('drules', $drule['druleid'], $drule);
 			}
 
@@ -866,6 +862,7 @@ class CDRule extends CApiService {
 			));
 		}
 
+		DB::delete('dchecks', ['druleid' => $druleids]);
 		DB::delete('drules', ['druleid' => $druleids]);
 
 		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_DISCOVERY_RULE, $db_drules);

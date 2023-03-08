@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,6 +34,11 @@ class CConfigurationImportcompare {
 	protected $uuid_structure;
 
 	/**
+	 * @var array  contains unique fields path for import entities
+	 */
+	protected $unique_fields_keys_by_type;
+
+	/**
 	 * CConfigurationImportcompare constructor.
 	 *
 	 * @param array $options  import options "createMissing", "updateExisting" and "deleteMissing"
@@ -43,7 +48,6 @@ class CConfigurationImportcompare {
 			'template_groups' => [],
 			'host_groups' => [],
 			'templates' => [
-				'groups' => [],
 				'items' => [
 					'triggers' => []
 				],
@@ -53,9 +57,7 @@ class CConfigurationImportcompare {
 					],
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
-					'host_prototypes' => [
-						'group_links' => []
-					]
+					'host_prototypes' => []
 				],
 				'dashboards' => [],
 				'httptests' => [],
@@ -63,6 +65,23 @@ class CConfigurationImportcompare {
 			],
 			'triggers' => [],
 			'graphs' => []
+		];
+
+		$this->unique_fields_keys_by_type = [
+			'template_groups' => ['name'],
+			'host_groups' => ['name'],
+			'templates' => ['template'],
+			'items' => ['name', 'key'],
+			'triggers' => ['name', 'expression', 'recovery_expression'],
+			'dashboards' => ['name'],
+			'httptests' => ['name'],
+			'valuemaps' => ['name'],
+			'discovery_rules' => ['name', 'key'],
+			'item_prototypes' => ['name', 'key'],
+			'trigger_prototypes' => ['name', 'expression', 'recovery_expression'],
+			'graph_prototypes' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
+			'host_prototypes' => ['host'],
+			'graphs' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]]
 		];
 
 		$this->options = $options;
@@ -108,7 +127,8 @@ class CConfigurationImportcompare {
 			$before += [$key => []];
 			$after += [$key => []];
 
-			$diff = $this->compareArrayByUuid($before[$key], $after[$key]);
+			$diff = $this->compareArrayByUniqueness($before[$key], $after[$key], $key);
+
 
 			if (array_key_exists('added', $diff)) {
 				foreach ($diff['added'] as &$entity) {
@@ -150,7 +170,7 @@ class CConfigurationImportcompare {
 			$object['after'] = $after;
 		}
 
-		if($object) {
+		if ($object) {
 			// Insert 'before' and/or 'after' at the beginning of array.
 			$result = array_merge($object, $result);
 		}
@@ -160,42 +180,72 @@ class CConfigurationImportcompare {
 
 	/**
 	 * Compare two entities and separate all their keys into added/removed/updated.
+	 * First entities gets compared by uuid then by its unique field values.
 	 *
-	 * @param array $before
-	 * @param array $after
+	 * @param array  $before
+	 * @param array  $after
+	 * @param string $type
 	 *
 	 * @return array
 	 */
-	protected function compareArrayByUuid(array $before, array $after): array {
+	protected function compareArrayByUniqueness(array $before, array $after, string $type): array {
+		if (!$before && !$after) {
+			return [];
+		}
+
 		$diff = [
 			'added' => [],
 			'removed' => [],
 			'updated' => []
 		];
 
-		$before = zbx_toHash($before, 'uuid');
-		$after = zbx_toHash($after, 'uuid');
+		$before = $this->addUniquenessParameterByEntityType($before, $type);
+		$after = $this->addUniquenessParameterByEntityType($after, $type);
 
-		$before_keys = array_keys($before);
-		$after_keys = array_keys($after);
+		$same_entities = [];
+		foreach ($after as $a_key => $after_entity) {
+			if (!array_key_exists('uuid', $after_entity)) {
+				unset($after[$a_key]);
+				continue;
+			}
 
-		$same_keys = array_intersect($before_keys, $after_keys);
-		$added_keys = array_diff($after_keys, $before_keys);
-		$removed_keys = array_diff($before_keys, $after_keys);
+			foreach ($before as $b_key => $before_entity) {
+				if ($before_entity['uuid'] == $after_entity['uuid']
+						|| $before_entity['uniqueness'] == $after_entity['uniqueness']) {
+					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
+					$before_entity['uuid'] = $after_entity['uuid'];
 
-		foreach ($added_keys as $key) {
-			$diff['added'][] = $after[$key];
+					$same_entities[$b_key]['before'] = $before_entity;
+					$same_entities[$b_key]['after'] = $after_entity;
+
+					unset($before[$b_key], $after[$a_key]);
+					break;
+				}
+			}
 		}
 
-		foreach ($removed_keys as $key) {
-			$diff['removed'][] = $before[$key];
+		$removed_entities = $before;
+		$added_entities = $after;
+
+		foreach ($added_entities as $entity) {
+			unset($entity['uniqueness']);
+
+			$diff['added'][] = $entity;
 		}
 
-		foreach ($same_keys as $key) {
-			if ($before[$key] != $after[$key]) {
+		foreach ($removed_entities as $entity) {
+			unset($entity['uniqueness']);
+
+			$diff['removed'][] = $entity;
+		}
+
+		foreach ($same_entities as $entity) {
+			$uuid = ['uuid' => null];
+
+			if (array_diff_key($entity['before'], $uuid) != array_diff_key($entity['after'], $uuid)) {
 				$diff['updated'][] = [
-					'before' => $before[$key],
-					'after' => $after[$key]
+					'before' => $entity['before'],
+					'after' => $entity['after']
 				];
 			}
 		}
@@ -207,6 +257,89 @@ class CConfigurationImportcompare {
 		}
 
 		return $diff;
+	}
+
+	private function addUniquenessParameterByEntityType(array $entities, string $type): array {
+		foreach ($entities as &$entity) {
+			foreach ($this->unique_fields_keys_by_type[$type] as $unique_field_key) {
+
+				$unique_values = $this->getUniqueValuesByFieldPath($entity, $unique_field_key);
+
+				$entity['uniqueness'][] = $unique_values;
+			}
+			// To make unique entity string, get result values, get rid of value duplicates and sort them.
+			$entity['uniqueness'] = array_unique($this->flatten($entity['uniqueness']));
+			sort($entity['uniqueness']);
+
+			$entity['uniqueness'] = implode('/', $entity['uniqueness']);
+		}
+		unset($entity);
+
+		return $entities;
+	}
+
+	/**
+	 * Get entity field values by giving field key path constructed.
+	 *
+	 * @param array        $entity    Entity.
+	 * @param string|array $field_key Field key or field key path given.
+	 */
+	private function getUniqueValuesByFieldPath(array $entity, $field_key_path) {
+		if (is_array($field_key_path)) {
+			foreach ($field_key_path as $sub_key => $sub_field) {
+				if ($sub_key != 'numeric_keys') {
+					$sub_entities = $entity[$sub_key];
+				}
+				else {
+					if (is_array($sub_field)) {
+						foreach ($sub_field as $key => $field) {
+							foreach ($entity as $sub_entity) {
+								$sub_entities[] = $sub_entity[$key];
+							}
+
+							$sub_field = $field;
+							}
+					}
+					else {
+						$sub_entities = $entity;
+					}
+				}
+
+				$result = $this->getUniqueValuesByFieldPath($sub_entities, $sub_field);
+			}
+		}
+		else {
+			if (array_key_exists($field_key_path, $entity)){
+				$result = $entity[$field_key_path];
+			}
+			else {
+				$result = array_column($entity, $field_key_path);
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Return multidimensional array as one dimensional array.
+	 *
+	 * @param array $array
+	 *
+	 * @return array
+	 */
+	private function flatten(array $array): array {
+		$result = [];
+
+		foreach ($array as $value) {
+			if (is_array($value)) {
+				$result = array_merge($result, self::flatten($value));
+			}
+			else {
+				$result[] = $value;
+			}
+		}
+
+		return $result;
 	}
 
 	/**
@@ -254,7 +387,7 @@ class CConfigurationImportcompare {
 				elseif ($has_before_templates && !$has_after_templates) {
 					$entity['after']['templates'] = [];
 
-					// Make sure, precessed entry is last in both arrays. Otherwise it will break the comparison.
+					// Make sure, processed entry is last in both arrays. Otherwise it will break the comparison.
 					$before_templates = $entity['before']['templates'];
 					unset($entity['before']['templates']);
 					$entity['before']['templates'] = $before_templates;

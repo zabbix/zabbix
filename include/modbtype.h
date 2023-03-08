@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,9 +20,7 @@
 #ifndef ZABBIX_SYSINFO_COMMON_MODBTYPE_H
 #define ZABBIX_SYSINFO_COMMON_MODBTYPE_H
 
-#include "sysinfo.h"
-
-extern int	CONFIG_TIMEOUT;
+#include "zbxsysinfo.h"
 
 #define ZBX_MODBUS_TCP_PORT_DEFAULT		502
 
@@ -123,7 +121,7 @@ typedef enum
 	ZBX_MODBUS_ENDIANNESS_MLE
 } modbus_endianness_t;
 
-int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	modbus_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	zbx_init_modbus(char **error);
 void	zbx_deinit_modbus(void);
 

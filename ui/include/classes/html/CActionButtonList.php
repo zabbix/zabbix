@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,12 +56,13 @@ class CActionButtonList extends CObject {
 
 	/**
 	 * @param string       $action_name                   Name of submit buttons.
-	 * @param string       $checkboxes_name               Name of paramerer into which checked checkboxes will be put
+	 * @param string       $checkboxes_name               Name of parameter into which checked checkboxes will be put
 	 *                                                    in.
 	 * @param array        $buttons_data                  Buttons data array.
 	 * @param string       $buttons_data[]['name']        Button caption.
 	 * @param string       $buttons_data[]['confirm']     Confirmation text (optional).
 	 * @param string       $buttons_data[]['redirect']    Redirect URL (optional).
+	 * @param string       $buttons_data[]['csrf_token']  CSRF token (optional).
 	 * @param bool         $buttons_data[]['disabled']    Set button state disabled (optional).
 	 * @param array        $buttons_data[]['attributes']  Set additional HTML attributes where array key is attribute
 	 *                                                    name array value is the attribute value.
@@ -90,29 +91,36 @@ class CActionButtonList extends CObject {
 				}
 
 				if (array_key_exists('redirect', $button_data)) {
+					$on_click_action = 'const form = this.closest("form");' .
+						// Save the original form action
+						'if (!form.dataset.action) {
+							form.dataset.action = form.action;
+						}
+						form.action = this.dataset.redirect;';
+
 					$button
 						// Removing parameters not to conflict with the redirecting URL.
 						->removeAttribute('name')
 						->removeAttribute('value')
-						->setAttribute('data-redirect', $button_data['redirect'])
-						->onClick('var $_form = jQuery(this).closest("form");'.
-							// Save the original form action.
-							'if (!$_form.data("action")) {'.
-								'$_form.data("action", $_form.attr("action"));'.
-							'}'.
-							'$_form.attr("action", this.dataset.redirect);'
-						);
+						->setAttribute('data-redirect', $button_data['redirect']);
 				}
 				else {
+					$on_click_action = 'const form = this.closest("form");'.
+						// Restore the original form action, if previously saved.
+						'if (form.dataset.action) {
+							form.action = form.dataset.action;
+						}';
+
 					$button
-						->setAttribute('value', $action)
-						->onClick('var $_form = jQuery(this).closest("form");'.
-							// Restore the original form action, if previously saved.
-							'if ($_form.data("action")) {'.
-								'$_form.attr("action", $_form.data("action"));'.
-							'}'
-						);
+						->setAttribute('value', $action);
 				}
+
+				if (array_key_exists('csrf_token', $button_data)) {
+					$on_click_action .= 'create_var(form,"'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'", "'.
+						$button_data['csrf_token'].'", false);';
+				}
+
+				$button->onClick($on_click_action);
 
 				if (array_key_exists('disabled', $button_data)) {
 					$button

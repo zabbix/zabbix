@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -387,7 +387,7 @@ ZBX_Notifications.prototype.handlePushedActiveTabid = function(tabid) {
  * Here `tab` is referred as ZBX_Notifications instance and `focus` - whether instance is `active` (not focused).
  *
  * @param {ZBX_BrowseTab} removed_tab  Current tab instance.
- * @param {array} other_tabids  List of alive tab ids (wuthout current tabid).
+ * @param {array} other_tabids  List of alive tab ids (without current tabid).
  */
 ZBX_Notifications.prototype.handleTabBeforeUnload = function(removed_tab, other_tabids) {
 	if (this.active && other_tabids.length) {
@@ -993,7 +993,9 @@ $(function() {
 		pos_side = 10,
 		side = 'right';
 
-	main.appendChild(ntf_node);
+	if (main !== null) {
+		main.appendChild(ntf_node);
+	}
 
 	if (ntf_pos !== null && 'top' in ntf_pos) {
 		side = ('right' in ntf_pos ? 'right' : ('left' in ntf_pos ? 'left' : null));

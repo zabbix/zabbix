@@ -5,6 +5,7 @@ noinst_LIBRARIES = libzbxcommon.a
 libzbxcommon_a_SOURCES = \
 	comms.c \
 	file.c \
+	libc_wrappers.c \
 	misc.c \
 	setproctitle.c \
 	common_str.c \

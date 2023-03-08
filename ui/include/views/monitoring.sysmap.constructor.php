@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,10 +84,11 @@ zbx_add_post_js('ZABBIX.apps.map.run("'.ZBX_STYLE_MAP_AREA.'", '.json_encode([
 	'iconList' => $data['iconList'],
 	'defaultAutoIconId' => $data['defaultAutoIconId'],
 	'defaultIconId' => $data['defaultIconId'],
-	'defaultIconName' => $data['defaultIconName']
+	'defaultIconName' => $data['defaultIconName'],
+	'csrf_token' => CCsrfTokenHelper::get('sysmap.php')
 ], JSON_FORCE_OBJECT).');');
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Network maps'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_SYSMAP_CONSTRUCTOR))
 	->setNavigation($menu)

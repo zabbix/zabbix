@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
 	$.fn.multiSelectHelper = function(options) {
 		options = $.extend({objectOptions: {}}, options);
 
-		var curl = new Curl('jsrpc.php', false);
+		var curl = new Curl('jsrpc.php');
 		curl.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 		curl.setArgument('method', 'multiselect.get');
 		curl.setArgument('object_name', options.object_name);
@@ -278,7 +278,7 @@
 					return;
 				}
 
-				const link = new Curl(ms_parameters.options.url, false);
+				const link = new Curl(ms_parameters.options.url);
 				link.setArgument('disabledids', entries);
 
 				ms_parameters.options.url = link.getUrl();
@@ -310,12 +310,19 @@
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
 	 * @param object options['popup']				popup data {parameters, width, height} (optional)
 	 * @param string options['popup']['parameters']
-	 * @param string options['popup']['filter_preselect_fields']
+	 * @param string options['popup']['filter_preselect']
+	 * @param string options['popup']['filter_preselect']['id']
+	 * @param string options['popup']['filter_preselect']['submit_as']
+	 * @param object options['popup']['filter_preselect']['submit_parameters']
+	 * @param bool   options['popup']['filter_preselect']['multiple']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
 	 * @param object options['autosuggest']         autosuggest options (optional)
-	 * @param object options['autosuggest']['filter_preselect_fields'] autosuggest preselect fields (optional)
-	 * @param string options['autosuggest']['filter_preselect_fields']['hosts'] autosuggest host preselect field (optional)
+	 * @param object options['autosuggest']['filter_preselect']
+	 * @param string options['autosuggest']['filter_preselect']['id']
+	 * @param string options['autosuggest']['filter_preselect']['submit_as']
+	 * @param object options['autosuggest']['filter_preselect']['submit_parameters']
+	 * @param bool   options['autosuggest']['filter_preselect']['multiple']
 	 * @param string options['styles']				additional style for multiselect wrapper HTML element (optional)
 	 * @param string options['styles']['property']
 	 * @param string options['styles']['value']
@@ -455,8 +462,8 @@
 					ms.select_button.on('click', function(event) {
 						var parameters = ms.options.popup.parameters;
 
-						if (ms.options.popup.filter_preselect_fields) {
-							parameters = jQuery.extend(parameters, getFilterPreselectField($obj, MS_ACTION_POPUP));
+						if (ms.options.popup.filter_preselect) {
+							parameters = jQuery.extend(parameters, getFilterPreselect($obj, MS_ACTION_POPUP));
 						}
 
 						if (typeof parameters['disable_selected'] !== 'undefined' && parameters['disable_selected']) {
@@ -486,38 +493,36 @@
 	 *
 	 * @return {object}
 	 */
-	function getFilterPreselectField($obj, action) {
+	function getFilterPreselect($obj, action) {
 		const ms = $obj.data('multiSelect');
-		const preselect_options = ms.options[(action == MS_ACTION_AUTOSUGGEST) ? 'autosuggest' : 'popup'] || null;
-		const ret = {};
+		const options_key = action == MS_ACTION_AUTOSUGGEST ? 'autosuggest' : 'popup';
 
-		if (!preselect_options) {
-			return ret;
+		if (!(options_key in ms.options) || !('filter_preselect' in ms.options[options_key])) {
+			return {};
 		}
 
-		if (typeof preselect_options.filter_preselect_fields.hosts !== 'undefined') {
-			const hosts = $('#' + preselect_options.filter_preselect_fields.hosts).multiSelect('getData');
+		const filter_preselect = ms.options[options_key].filter_preselect;
+		const data = $('#' + filter_preselect.id).multiSelect('getData');
 
-			if (hosts.length != 0) {
-				ret.hostid = hosts[0].id;
-			}
+		if (data.length === 0) {
+			return {};
 		}
 
-		if (typeof preselect_options.filter_preselect_fields.hostgroups !== 'undefined') {
-			const host_groups = $('#' + preselect_options.filter_preselect_fields.hostgroups).multiSelect('getData');
+		let ret = {};
 
-			if (host_groups.length != 0) {
-				ret.groupid = host_groups[0].id;
+		if ('multiple' in filter_preselect && filter_preselect.multiple) {
+			ret[filter_preselect.submit_as] = [];
+
+			for (const item of data) {
+				ret[filter_preselect.submit_as].push(item.id);
 			}
 		}
+		else {
+			ret[filter_preselect.submit_as] = data[0].id;
+		}
 
-		if (typeof preselect_options.filter_preselect_fields.templategroups !== 'undefined') {
-			const template_groups = $('#' + preselect_options.filter_preselect_fields.templategroups)
-				.multiSelect('getData');
-
-			if (template_groups.length != 0) {
-				ret.templategroupid = template_groups[0].id;
-			}
+		if ('submit_parameters' in filter_preselect) {
+			ret = {...ret, ...filter_preselect.submit_parameters};
 		}
 
 		return ret;
@@ -562,7 +567,7 @@
 					}
 
 					if (search !== '') {
-						var preselect_values = getFilterPreselectField($obj, MS_ACTION_AUTOSUGGEST),
+						var preselect_values = getFilterPreselect($obj, MS_ACTION_AUTOSUGGEST),
 							cache_key = search + JSON.stringify(preselect_values);
 
 						/*

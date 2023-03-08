@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,39 +19,33 @@
 **/
 
 
+namespace Zabbix\Widgets\Fields;
+
+use Zabbix\Widgets\CWidgetField;
+
 class CWidgetFieldUrl extends CWidgetField {
 
-	/**
-	 * URL widget field.
-	 *
-	 * @param string $name  field name in form
-	 * @param string $label  label for the field in form
-	 */
-	public function __construct($name, $label) {
+	public const DEFAULT_VALUE = '';
+
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules(['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO]);
-		$this->setDefault('');
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
+			->setValidationRules(['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO]);
 	}
 
-	/**
-	 * Set additional flags, which can be used in configuration form.
-	 *
-	 * @param int $flags
-	 *
-	 * @return $this
-	 */
-	public function setFlags($flags) {
+	public function setFlags(int $flags): self {
 		parent::setFlags($flags);
 
-		if ($flags & self::FLAG_NOT_EMPTY) {
+		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
 			$strict_validation_rules = $this->getValidationRules();
 			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
 			$this->setStrictValidationRules($strict_validation_rules);
 		}
 		else {
-			$this->setStrictValidationRules(null);
+			$this->setStrictValidationRules();
 		}
 
 		return $this;

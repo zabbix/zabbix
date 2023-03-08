@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,34 +19,47 @@
 **/
 
 
+use Zabbix\Core\{
+	CModule,
+	CWidget
+};
+
 class CControllerDashboardWidgetCheck extends CController {
 
-	private $context;
+	private ?CWidget $widget = null;
 
 	protected function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
 		$fields = [
-			'templateid' =>	'db dashboard.templateid',
 			'type' =>		'required|string',
-			'name' =>		'required|string',
-			'fields' =>		'json'
+			'fields' =>		'array',
+			'templateid' =>	'db dashboard.templateid',
+			'name' =>		'required|string'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$this->context = $this->hasInput('templateid')
-				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-				: CWidgetConfig::CONTEXT_DASHBOARD;
+			$widget = APP::ModuleManager()->getModule($this->getInput('type'));
 
-			if (!CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context)) {
-				error(_('Widget type is not supported in this context.'));
+			if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET) {
+				$this->widget = $widget;
+			}
+			else {
+				error(_('Inaccessible widget type.'));
 
 				$ret = false;
 			}
+		}
+
+		if ($ret && $this->hasInput('templateid') && !$this->widget->hasTemplateSupport()) {
+			error(_('Widget type is not supported in this context.'));
+
+			$ret = false;
 		}
 
 		if (!$ret) {
@@ -67,8 +80,8 @@ class CControllerDashboardWidgetCheck extends CController {
 	}
 
 	protected function doAction() {
-		$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', '{}'),
-			($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) ? $this->getInput('templateid') : null
+		$form = $this->widget->getForm($this->getInput('fields', []),
+			$this->hasInput('templateid') ? $this->getInput('templateid') : null
 		);
 
 		$output = [];

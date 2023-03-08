@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,18 +23,18 @@
  * @var CView $this
  */
 
-$widget = new CWidget();
+$html_page = new CHtmlPage();
 
 if ($data['parent_discoveryid'] === null) {
-	$widget
+	$html_page
 		->setTitle(_('Graphs'))
-		->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_GRAPH_EDIT))
+		->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_GRAPH_EDIT))
 		->setNavigation(getHostNavigation('graphs', $data['hostid']));
 }
 else {
-	$widget
+	$html_page
 		->setTitle(_('Graph prototypes'))
-		->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_PROTOTYPE_GRAPH_EDIT))
+		->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_PROTOTYPE_GRAPH_EDIT))
 		->setNavigation(getHostNavigation('graphs', $data['hostid'], $data['parent_discoveryid']));
 }
 
@@ -45,8 +45,10 @@ $url = (new CUrl('graphs.php'))
 
 // Create form.
 $graphForm = (new CForm('post', $url))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('graphs.php')))->removeId())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setName('graphForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
 
@@ -90,7 +92,7 @@ if ($discovered_graph) {
 $graphFormList
 	->addRow(
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['name'], $readonly))
+		(new CTextBox('name', $data['name'], $readonly, DB::getFieldLength('graphs', 'name')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
@@ -476,7 +478,7 @@ if ($data['parent_discoveryid']) {
 $graphTab = (new CTabView())
 	->addTab('graphTab', ($data['parent_discoveryid'] === null) ? _('Graph') : _('Graph prototype'), $graphFormList);
 
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$graphTab->setSelected(0);
 }
 
@@ -497,7 +499,8 @@ if ($data['graphid'] != 0) {
 	$updateButton = new CSubmit('update', _('Update'));
 	$deleteButton = new CButtonDelete(
 		($data['parent_discoveryid'] === null) ? _('Delete graph?') : _('Delete graph prototype?'),
-		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']), 'context'
+		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']).'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.
+		CCsrfTokenHelper::get('graphs.php'), 'context'
 	);
 
 	if ($readonly) {
@@ -533,10 +536,9 @@ require_once dirname(__FILE__).'/js/configuration.graph.edit.js.php';
 
 $graphForm->addItem($graphTab);
 
-// Append form to widget.
-$widget->addItem($graphForm);
-
-$widget->show();
+$html_page
+	->addItem($graphForm)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

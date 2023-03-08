@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 $this->includeJsFile('search.js.php');
 
-$widgets = [];
+$sections = [];
 
 $table = (new CTableInfo())
 	->setHeader((new CRowHeader())
@@ -179,13 +179,12 @@ foreach ($data['hosts'] as $hostid => $host) {
 	]);
 }
 
-$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTS, $table))
-	->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FLUID)
-	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state', true))
-	->setHeader(_('Hosts'), [], 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state')
-	->setFooter(new CList([
-		_s('Displaying %1$s of %2$s found', count($data['hosts']), $data['total_hosts_cnt'])
-	]));
+$sections[] = (new CSectionCollapsible($table))
+	->setId(SECTION_SEARCH_HOSTS)
+	->setHeader(new CTag('h4', true, _('Hosts')))
+	->setFooter(_s('Displaying %1$s of %2$s found', count($data['hosts']), $data['total_hosts_cnt']))
+	->setProfileIdx('web.search.hats.'.SECTION_SEARCH_HOSTS.'.state')
+	->setExpanded((bool) CProfile::get('web.search.hats.'.SECTION_SEARCH_HOSTS.'.state', true));
 
 $table = (new CTableInfo())
 	->setHeader((new CRowHeader())
@@ -260,13 +259,12 @@ foreach ($data['host_groups'] as $groupid => $group) {
 	]);
 }
 
-$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
-	->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FLUID)
-	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state', true))
-	->setHeader(_('Host groups'), [], 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state')
-	->setFooter(new CList([
-		_s('Displaying %1$s of %2$s found', count($data['host_groups']), $data['total_host_groups_cnt'])
-	]));
+$sections[] = (new CSectionCollapsible($table))
+	->setId(SECTION_SEARCH_HOSTGROUP)
+	->setHeader(new CTag('h4', true, _('Host groups')))
+	->setFooter(_s('Displaying %1$s of %2$s found', count($data['host_groups']), $data['total_host_groups_cnt']))
+	->setProfileIdx('web.search.hats.'.SECTION_SEARCH_HOSTGROUP.'.state')
+	->setExpanded((bool) CProfile::get('web.search.hats.'.SECTION_SEARCH_HOSTGROUP.'.state', true));
 
 if ($data['admin']) {
 	$table = (new CTableInfo())
@@ -359,13 +357,12 @@ if ($data['admin']) {
 		]);
 	}
 
-	$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_TEMPLATES, $table))
-		->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FLUID)
-		->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state', true))
-		->setHeader(_('Templates'), [], 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state')
-		->setFooter(new CList([
-			_s('Displaying %1$s of %2$s found', count($data['templates']), $data['total_templates_cnt'])
-		]));
+	$sections[] = (new CSectionCollapsible($table))
+		->setId(SECTION_SEARCH_TEMPLATES)
+		->setHeader(new CTag('h4', true, _('Templates')))
+		->setFooter(_s('Displaying %1$s of %2$s found', count($data['templates']), $data['total_templates_cnt']))
+		->setProfileIdx('web.search.hats.'.SECTION_SEARCH_TEMPLATES.'.state')
+		->setExpanded((bool) CProfile::get('web.search.hats.'.SECTION_SEARCH_TEMPLATES.'.state', true));
 }
 
 $table = (new CTableInfo())
@@ -404,18 +401,19 @@ foreach ($data['template_groups'] as $groupid => $group) {
 	$table->addRow([$name_link, $templates_link]);
 }
 
-$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_TEMPLATEGROUP, $table))
-	->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FLUID)
-	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_TEMPLATEGROUP.'.state', true))
-	->setHeader(_('Template groups'), [], 'web.search.hats.'.WIDGET_SEARCH_TEMPLATEGROUP.'.state')
-	->setFooter(new CList([
+$sections[] = (new CSectionCollapsible($table))
+	->setId(SECTION_SEARCH_TEMPLATEGROUP)
+	->setHeader(new CTag('h4', true, _('Template groups')))
+	->setFooter(
 		_s('Displaying %1$s of %2$s found', count($data['template_groups']), $data['total_template_groups_cnt'])
-	]));
+	)
+	->setProfileIdx('web.search.hats.'.SECTION_SEARCH_TEMPLATEGROUP.'.state')
+	->setExpanded((bool) CProfile::get('web.search.hats.'.SECTION_SEARCH_TEMPLATEGROUP.'.state', true));
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Search').': '.$data['search'])
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::SEARCH))
-	->addItem(new CDiv($widgets))
+	->addItem(new CDiv($sections))
 	->show();
 
 (new CScriptTag('view.init();'))

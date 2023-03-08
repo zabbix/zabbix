@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,6 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Create CMacrosResolver object and store in static variable.
-	 *
-	 * @static
 	 */
 	private static function init() {
 		if (self::$macrosResolver === null) {
@@ -42,8 +40,6 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve macros.
-	 *
-	 * @static
 	 *
 	 * @param array $options
 	 *
@@ -57,8 +53,6 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve macros in http test name.
-	 *
-	 * @static
 	 *
 	 * @param int    $hostId
 	 * @param string $name
@@ -78,8 +72,6 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve macros in host interfaces.
-	 *
-	 * @static
 	 *
 	 * @param array  $interfaces
 	 * @param string $interfaces[n]['hostid']
@@ -273,8 +265,6 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve macros in trigger name.
 	 *
-	 * @static
-	 *
 	 * @param array $trigger
 	 *
 	 * @return string
@@ -287,8 +277,6 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve macros in trigger names.
-	 *
-	 * @static
 	 *
 	 * @param array $triggers
 	 * @param bool  $references_only
@@ -305,8 +293,6 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve macros in trigger operational data.
-	 *
-	 * @static
 	 *
 	 * @param array  $trigger
 	 * @param string $trigger['expression']
@@ -331,8 +317,6 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve macros in trigger description.
 	 *
-	 * @static
-	 *
 	 * @param array  $trigger
 	 * @param string $trigger['expression']
 	 * @param string $trigger['comments']
@@ -355,8 +339,6 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve macros in trigger descriptions and operational data.
-	 *
-	 * @static
 	 *
 	 * @param array  $triggers
 	 * @param string $triggers[$triggerid]['expression']
@@ -385,8 +367,6 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve macros in trigger url.
 	 *
-	 * @static
-	 *
 	 * @param array  $trigger
 	 * @param string $trigger['triggerid']
 	 * @param string $trigger['expression']
@@ -403,9 +383,25 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve macros in trigger expression.
+	 * Resolve macros in trigger url name.
 	 *
-	 * @static
+	 * @param array  $trigger
+	 * @param string $trigger['triggerid']
+	 * @param string $trigger['expression']
+	 * @param string $trigger['url_name']
+	 * @param string $trigger['eventid']
+	 * @param string $url
+	 *
+	 * @return bool
+	 */
+	public static function resolveTriggerUrlName(array $trigger, &$url_name) {
+		self::init();
+
+		return self::$macrosResolver->resolveTriggerUrlName($trigger, $url_name);
+	}
+
+	/**
+	 * Resolve macros in trigger expression.
 	 *
 	 * @param string $expression
 	 * @param array  $options     See CMacrosResolver::resolveTriggerExpressions() for more details.
@@ -424,8 +420,6 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve macros in trigger expressions.
 	 *
-	 * @static
-	 *
 	 * @param array $triggers
 	 * @param array $options   See CMacrosResolver::resolveTriggerExpressions() for more details.
 	 *
@@ -439,8 +433,6 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve expression macros. For example, {?func(/host/key, param)} or {?func(/{HOST.HOST1}/key, param)}.
-	 *
-	 * @static
 	 *
 	 * @param string $name
 	 * @param array  $items
@@ -457,8 +449,6 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve expression macros. For example, {?func(/host/key, param)} or {?func(/{HOST.HOST1}/key, param)}.
-	 *
-	 * @static
 	 *
 	 * @param array  $graphs
 	 * @param string $graphs[]['graphid']
@@ -514,8 +504,6 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve item key macros to "key_expanded" field.
 	 *
-	 * @static
-	 *
 	 * @param array  $items
 	 * @param string $items[n]['itemid']
 	 * @param string $items[n]['hostid']
@@ -531,8 +519,6 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve item description macros to "description_expanded" field.
-	 *
-	 * @static
 	 *
 	 * @param array	 $items
 	 * @param string $items[n]['hostid']
@@ -611,8 +597,6 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve macros in dashboard widget URL.
 	 *
-	 * @static
-	 *
 	 * @param array $widget
 	 *
 	 * @return string
@@ -636,8 +620,6 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve time unit macros.
 	 *
-	 * @static
-	 *
 	 * @param array $data
 	 * @param array $field_names
 	 *
@@ -651,8 +633,6 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Resolve supported macros used in map element label as well as in URL names and values.
-	 *
-	 * @static
 	 *
 	 * @param array        $selements[]
 	 * @param int          $selements[]['elementtype']          Map element type.
@@ -676,8 +656,6 @@ class CMacrosResolverHelper {
 
 	/**
 	 * Set every trigger items array elements order by item usage order in trigger expression and recovery expression.
-	 *
-	 * @static
 	 *
 	 * @param array  $triggers                            Array of triggers.
 	 * @param string $triggers[]['expression']            Trigger expression used to define order of trigger items.
@@ -734,5 +712,42 @@ class CMacrosResolverHelper {
 		self::init();
 
 		return self::$macrosResolver->resolveMediaTypeUrls($events, $urls);
+	}
+
+	/**
+	 * Resolve macros for manual host action scripts. Resolves host macros, interface macros, inventory, user macros
+	 * and user data macros.
+	 *
+	 * @param array $data                        Array of unersolved macros.
+	 * @param array $data[<hostid>]              Array of scripts. Contains script ID as keys.
+	 * @param array $data[<hostid>][<scriptid>]  Script fields to resolve macros for.
+	 *
+	 * @return array
+	 */
+	public static function resolveManualHostActionScripts(array $data): array {
+		self::init();
+
+		return self::$macrosResolver->resolveManualHostActionScripts($data);
+	}
+
+	/**
+	 * Resolve macros for manual event action scripts. Resolves host<1-9> macros, interface<1-9> macros,
+	 * inventory<1-9> macros, user macros, event macros and user data macros.
+	 *
+	 * @param array $data                                  Array of unersolved macros.
+	 * @param array $data[<eventid>]                       Array of scripts. Contains script ID as keys.
+	 * @param array $data[<eventid>][<scriptid>]           Script fields to resolve macros for.
+	 * @param array $events                                Array of events.
+	 * @param array $events[<eventid>]                     Event fields.
+	 * @param array $events[<eventid>][hosts]              Array of hosts that created the event.
+	 * @param array $events[<eventid>][hosts][][<hostid>]  Host ID.
+	 * @param array $events[<eventid>][objectid]           Trigger ID.
+	 *
+	 * @return array
+	 */
+	public static function resolveManualEventActionScripts(array $data, array $events): array {
+		self::init();
+
+		return self::$macrosResolver->resolveManualEventActionScripts($data, $events);
 	}
 }

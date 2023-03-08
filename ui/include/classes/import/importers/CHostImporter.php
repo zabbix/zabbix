@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class CHostImporter extends CImporter {
 		$hosts_to_update = [];
 		$valuemaps = [];
 		$template_linkage = [];
-		$templates_to_clear = [];
+		$templates_to_unlink = [];
 
 		foreach ($hosts as $host) {
 			/*
@@ -85,7 +85,7 @@ class CHostImporter extends CImporter {
 				// Get already linked templates.
 				$db_template_links = API::Host()->get([
 					'output' => ['hostids'],
-					'selectParentTemplates' => ['hostid'],
+					'selectParentTemplates' => ['templateid'],
 					'hostids' => array_column($hosts_to_update, 'hostid'),
 					'preservekeys' => true
 				]);
@@ -97,13 +97,13 @@ class CHostImporter extends CImporter {
 
 				foreach ($hosts_to_update as $host) {
 					if (array_key_exists($host['host'], $template_linkage)) {
-						$templates_to_clear[$host['hostid']] = array_diff(
+						$templates_to_unlink[$host['hostid']] = array_diff(
 							$db_template_links[$host['hostid']],
 							array_column($template_linkage[$host['host']], 'templateid')
 						);
 					}
 					else {
-						$templates_to_clear[$host['hostid']] = $db_template_links[$host['hostid']];
+						$templates_to_unlink[$host['hostid']] = $db_template_links[$host['hostid']];
 					}
 				}
 			}
@@ -118,11 +118,10 @@ class CHostImporter extends CImporter {
 				$this->processedHostIds[$host['host']] = $host['hostid'];
 
 				// Drop existing template linkages if 'delete missing' selected.
-				if (array_key_exists($host['hostid'], $templates_to_clear) && $templates_to_clear[$host['hostid']]) {
-					API::Host()->massRemove([
-						'hostids' => [$host['hostid']],
-						'templateids_clear' => $templates_to_clear[$host['hostid']]
-					]);
+				if (array_key_exists($host['hostid'], $templates_to_unlink) && $templates_to_unlink[$host['hostid']]) {
+					$host['templates'] = [];
+
+					API::Host()->update($host);
 				}
 
 				// Make new template linkages.

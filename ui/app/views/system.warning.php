@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,17 +21,30 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-$pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team'), CWebUser::getLang()))
-	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
-	->display();
+$page_header = (new CHtmlPageHeader(_('Fatal error, please report to the Zabbix team'), CWebUser::getLang()));
 
-$buttons = [
-	(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
-		->setAttribute('data-url', CMenuHelper::getFirstUrl())
-		->onClick('document.location = this.dataset.url;')
-];
+$page_header
+	->setTheme($data['theme'])
+	->addCssFile('assets/styles/'.$page_header->getTheme().'.css')
+	->show();
+
+if (CWebUser::isLoggedIn()) {
+	$buttons = [
+		(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
+			->setAttribute('data-url', CMenuHelper::getFirstUrl())
+			->onClick('document.location = this.dataset.url;')
+	];
+}
+else {
+	$buttons = [
+		(new CButton('login', _s('Go to "%1$s"', _('Login'))))
+			->setAttribute('data-url', 'index.php')
+			->onClick('document.location = this.dataset.url;')
+	];
+}
 
 echo '<body';
 

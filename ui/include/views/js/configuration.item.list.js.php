@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,6 +55,37 @@
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
 				new CTagFilterItem(row);
 			});
+			this._initActions();
+		},
+
+		_initActions() {
+			document.querySelector('.js-copy').addEventListener('click', () => {
+				const overlay = this.openCopyPopup();
+				const dialogue = overlay.$dialogue[0];
+
+				dialogue.addEventListener('dialogue.submit', (e) => {
+					postMessageOk(e.detail.title);
+
+					const uncheckids = Object.keys(chkbxRange.getSelectedIds());
+					uncheckTableRows('items_' + this.checkbox_hash, [], false);
+					chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
+					chkbxRange.update(this.checkbox_object);
+
+					if ('messages' in e.detail) {
+						postMessageDetails('success', e.detail.messages);
+					}
+
+					location.href = location.href;
+				});
+			});
+
+			const execute_now = document.querySelector('.js-execute-now');
+
+			if (execute_now !== null) {
+				execute_now.addEventListener('click', () => {
+					this.massCheckNow();
+				});
+			}
 		},
 
 		editHost(e, hostid) {
@@ -80,11 +111,26 @@
 			}, {once: true});
 		},
 
-		massCheckNow(button) {
-			button.classList.add('is-loading');
+		openCopyPopup() {
+			const parameters = {
+				itemids: Object.keys(chkbxRange.getSelectedIds()),
+				source: 'items'
+			};
+
+			return PopUp('copy.edit', parameters, {
+				dialogueid: 'copy',
+				dialogue_class: 'modal-popup-static'
+			});
+		},
+
+		massCheckNow() {
+			document.activeElement.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.masscheck_now');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
+			);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -115,10 +161,48 @@
 					addMessage(message_box);
 				})
 				.finally(() => {
-					button.classList.remove('is-loading');
-
 					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
-					button.blur();
+					document.activeElement.blur();
+				});
+
+			document.activeElement.classList.remove('is-loading');
+		},
+
+		checkNow(itemid) {
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'item.masscheck_now');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
+			);
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({itemids: [itemid]})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					clearMessages();
+
+					/*
+					 * Using postMessageError or postMessageOk would mean that those messages are stored in session
+					 * messages and that would mean to reload the page and show them. Also postMessageError would be
+					 * displayed right after header is loaded. Meaning message is not inside the page form like that is
+					 * in postMessageOk case. Instead show message directly that comes from controller.
+					 */
+					if ('error' in response) {
+						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
+					}
+					else if('success' in response) {
+						addMessage(makeMessageBox('good', [], response.success.title, true, false));
+					}
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title)[0];
+
+					clearMessages();
+					addMessage(message_box);
 				});
 		},
 
@@ -148,7 +232,7 @@
 					}
 				}
 
-				const curl = new Curl('zabbix.php', false);
+				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'host.list');
 
 				location.href = curl.getUrl();

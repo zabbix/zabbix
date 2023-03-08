@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,18 +22,19 @@
 class CControllerProxyList extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'sort' =>			'in host',
-			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>		'in 1',
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
-			'filter_status' =>	'in -1,'.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE
+			'sort' =>			'in '.implode(',', ['host', 'status', 'tls_accept', 'version', 'lastaccess']),
+			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'filter_status' =>	'in '.implode(',', ['-1', HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]),
+			'filter_version' =>	'in '.implode(',', ['-1', ZBX_PROXY_VERSION_CURRENT, ZBX_PROXY_VERSION_ALL_OUTDATED])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -60,15 +61,18 @@ class CControllerProxyList extends CController {
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.proxies.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.proxies.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.proxies.filter_version', $this->getInput('filter_version', -1), PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.proxies.filter_name');
 			CProfile::delete('web.proxies.filter_status');
+			CProfile::delete('web.proxies.filter_version');
 		}
 
 		$filter = [
 			'name' => CProfile::get('web.proxies.filter_name', ''),
-			'status' => CProfile::get('web.proxies.filter_status', -1)
+			'status' => CProfile::get('web.proxies.filter_status', -1),
+			'version' => CProfile::get('web.proxies.filter_version', -1)
 		];
 
 		$data = [
@@ -80,6 +84,10 @@ class CControllerProxyList extends CController {
 			'allowed_ui_conf_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 		];
 
+		if ($filter['version'] == ZBX_PROXY_VERSION_ALL_OUTDATED) {
+			$filter['version'] = [ZBX_PROXY_VERSION_OUTDATED, ZBX_PROXY_VERSION_UNSUPPORTED];
+		}
+
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['proxies'] = API::Proxy()->get([
 			'output' => ['proxyid', $sortField],
@@ -87,15 +95,23 @@ class CControllerProxyList extends CController {
 				'host' => ($filter['name'] === '') ? null : $filter['name']
 			],
 			'filter' => [
-				'status' => ($filter['status'] == -1) ? null : $filter['status']
+				'status' => ($filter['status'] == -1) ? null : $filter['status'],
+				'compatibility' => ($filter['version'] == -1) ? null : $filter['version']
 			],
-			'sortfield' => $sortField,
 			'limit' => $limit,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		// data sort and pager
+		$data['proxies'] = API::Proxy()->get([
+			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'version',
+				'compatibility'
+			],
+			'selectHosts' => ['hostid', 'name', 'status'],
+			'proxyids' => array_keys($data['proxies']),
+			'editable' => true,
+			'preservekeys' => true
+		]);
 		order_result($data['proxies'], $sortField, $sortOrder);
 
 		$page_num = getRequest('page', 1);
@@ -104,17 +120,14 @@ class CControllerProxyList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		$data['proxies'] = API::Proxy()->get([
-			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'auto_compress'],
-			'selectHosts' => ['hostid', 'name', 'status'],
-			'proxyids' => array_keys($data['proxies']),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-		order_result($data['proxies'], $sortField, $sortOrder);
-
 		foreach ($data['proxies'] as &$proxy) {
-			order_result($proxy['hosts'], 'name');
+			// Convert proxy version to readable format.
+			$proxy['version'] = $proxy['version'] != 0
+				? (intdiv($proxy['version'], 10000) % 100).'.'.(intdiv($proxy['version'], 100) % 100).'.'.
+					($proxy['version'] % 100)
+				: '';
+
+			CArrayHelper::sort($proxy['hosts'], ['name']);
 			$proxy['hosts'] = array_slice($proxy['hosts'], 0, CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1);
 		}
 		unset($proxy);
@@ -169,8 +182,12 @@ class CControllerProxyList extends CController {
 				}
 			}
 		}
-
 		$data['config'] = ['max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)];
+
+		$server_version = CSettingsHelper::getGlobal(CSettingsHelper::SERVER_STATUS);
+		if ($server_version !== '') {
+			$data['server_version'] = preg_split('/[a-z]/i', json_decode($server_version, true)['version'], 2)[0];
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of proxies'));

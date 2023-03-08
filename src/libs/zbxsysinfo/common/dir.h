@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,9 +57,9 @@ typedef struct
 	zbx_uint64_t st_ino;			/* file serial number */
 } zbx_file_descriptor_t;
 
-int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 int	zbx_etypes_to_mask(const char *etypes, AGENT_RESULT *result);
 int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char **error);

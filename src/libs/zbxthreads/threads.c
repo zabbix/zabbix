@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,20 +22,11 @@
 #include "log.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-int	zbx_win_exception_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep);
-
 static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
 {
-	__try
-	{
-		zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
+	zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
 
-		return thread_args->entry(thread_args);
-	}
-	__except(zbx_win_exception_filter(GetExceptionCode(), GetExceptionInformation()))
-	{
-		zbx_thread_exit(EXIT_SUCCESS);
-	}
+	return thread_args->entry(thread_args);
 }
 
 void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
@@ -79,12 +70,12 @@ void	zbx_child_fork(pid_t *pid)
 	sigaddset(&mask, SIGQUIT);
 	sigaddset(&mask, SIGCHLD);
 
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
 	/* set process id instead of returning, this is to avoid race condition when signal arrives before return */
 	*pid = zbx_fork();
 
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 
 	/* ignore SIGCHLD to avoid problems with exiting scripts in zbx_execute() and other cases */
 	if (0 == *pid)
@@ -246,7 +237,7 @@ void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 	sigemptyset(&set);
 	sigaddset(&set, SIGCHLD);
-	sigprocmask(SIG_BLOCK, &set, NULL);
+	zbx_sigmask(SIG_BLOCK, &set, NULL);
 
 	/* signal all threads to go into idle state and wait for threads with higher priority to exit */
 	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ret);

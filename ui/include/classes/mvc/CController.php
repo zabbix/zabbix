@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ abstract class CController {
 	 *
 	 * @var array|null
 	 */
-	private static $raw_input;
+	private $raw_input;
 
 	/**
 	 * Validated input parameters.
@@ -71,14 +71,15 @@ abstract class CController {
 	protected $input = [];
 
 	/**
-	 * SID validation flag, if true SID must be validated.
+	 * Validate CSRF token flag, if true CSRF token must be validated.
 	 *
 	 * @var bool
 	 */
-	private $validate_sid = true;
+	private bool $validate_csrf_token = true;
 
 	public function __construct() {
 		$this->init();
+		$this->populateRawInput();
 	}
 
 	/**
@@ -171,46 +172,44 @@ abstract class CController {
 	}
 
 	/**
-	 * Return user SID, first 16 bytes of session ID.
+	 * Disables CSRF token validation.
 	 *
-	 * @return string
+	 * @return void
 	 */
-	protected function getUserSID() {
-		$sessionid = CSessionHelper::getId();
-
-		if ($sessionid === null || strlen($sessionid) < 16) {
-			return null;
-		}
-
-		return substr($sessionid, 16, 16);
+	protected function disableCsrfValidation(): void {
+		$this->validate_csrf_token = false;
 	}
 
 	/**
 	 * @return array
 	 */
-	private function getFormInput(): array {
-		$input = $_REQUEST;
+	private static function getFormInput(): array {
+		static $input;
 
-		if (hasRequest('formdata')) {
-			$data = base64_decode(getRequest('data'));
-			$sign = base64_decode(getRequest('sign'));
-			$request_sign = CEncryptHelper::sign($data);
+		if ($input === null) {
+			$input = $_REQUEST;
 
-			if (CEncryptHelper::checkSign($sign, $request_sign)) {
-				$data = json_decode($data, true);
+			if (hasRequest('formdata')) {
+				$data = base64_decode(getRequest('data'));
+				$sign = base64_decode(getRequest('sign'));
+				$request_sign = CEncryptHelper::sign($data);
 
-				if ($data['messages']) {
-					CMessageHelper::setScheduleMessages($data['messages']);
+				if (CEncryptHelper::checkSign($sign, $request_sign)) {
+					$data = json_decode($data, true);
+
+					if ($data['messages']) {
+						CMessageHelper::setScheduleMessages($data['messages']);
+					}
+
+					$input = array_replace($input, $data['form']);
+				}
+				else {
+					info(_('Operation cannot be performed due to unauthorized request.'));
 				}
 
-				$input = array_replace($input, $data['form']);
+				// Replace window.history to avoid resubmission warning dialog.
+				zbx_add_post_js("history.replaceState({}, '');");
 			}
-			else {
-				info(_('Operation cannot be performed due to unauthorized request.'));
-			}
-
-			// Replace window.history to avoid resubmission warning dialog.
-			zbx_add_post_js("history.replaceState({}, '');");
 		}
 
 		return $input;
@@ -219,16 +218,20 @@ abstract class CController {
 	/**
 	 * @return array
 	 */
-	private function getJsonInput(): array {
-		$input = $_REQUEST;
+	private static function getJsonInput(): array {
+		static $input;
 
-		$json_input = json_decode(file_get_contents('php://input'), true);
+		if ($input === null) {
+			$input = $_REQUEST;
 
-		if (is_array($json_input)) {
-			$input += $json_input;
-		}
-		else {
-			info(_('JSON array input is expected.'));
+			$json_input = json_decode(file_get_contents('php://input'), true);
+
+			if (is_array($json_input)) {
+				$input += $json_input;
+			}
+			else {
+				info(_('JSON array input is expected.'));
+			}
 		}
 
 		return $input;
@@ -242,13 +245,13 @@ abstract class CController {
 	 * @return bool
 	 */
 	protected function validateInput(array $validation_rules): bool {
-		if (self::$raw_input === null) {
+		if ($this->raw_input === null) {
 			$this->validation_result = self::VALIDATION_FATAL_ERROR;
 
 			return false;
 		}
 
-		$validator = new CNewValidator(self::$raw_input, $validation_rules);
+		$validator = new CNewValidator($this->raw_input, $validation_rules);
 
 		foreach ($validator->getAllErrors() as $error) {
 			info($error);
@@ -262,7 +265,7 @@ abstract class CController {
 			$this->validation_result = $validator->isError() ? self::VALIDATION_ERROR : self::VALIDATION_OK;
 		}
 
-		return ($this->validation_result == self::VALIDATION_OK);
+		return $this->validation_result == self::VALIDATION_OK;
 	}
 
 	/**
@@ -398,29 +401,29 @@ abstract class CController {
 	abstract protected function checkInput();
 
 	/**
-	 * Validate session ID (SID).
-	 */
-	protected function disableSIDvalidation() {
-		$this->validate_sid = false;
-	}
-
-	/**
-	 * Validate session ID (SID).
+	 * Checks if CSRF token in the request is valid.
 	 *
 	 * @return bool
 	 */
-	private function checkSID(): bool {
-		$sessionid = $this->getUserSID();
-
-		if ($sessionid === null) {
+	private function checkCsrfToken(): bool {
+		if (!is_array($this->raw_input) || !array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $this->raw_input)) {
 			return false;
 		}
 
-		if (!is_array(self::$raw_input) || !array_key_exists('sid', self::$raw_input)) {
+		$skip = ['popup', 'massupdate'];
+		$csrf_token_form = $this->raw_input[CCsrfTokenHelper::CSRF_TOKEN_NAME];
+
+		if (!is_string($csrf_token_form)) {
 			return false;
 		}
 
-		return (self::$raw_input['sid'] === $sessionid);
+		foreach (explode('.', $this->action) as $segment) {
+			if (!in_array($segment, $skip, true)) {
+				return CCsrfTokenHelper::check($csrf_token_form, $segment);
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -433,15 +436,15 @@ abstract class CController {
 	private function populateRawInput(): void {
 		switch ($this->getPostContentType()) {
 			case self::POST_CONTENT_TYPE_FORM:
-				self::$raw_input = $this->getFormInput();
+				$this->raw_input = self::getFormInput();
 				break;
 
 			case self::POST_CONTENT_TYPE_JSON:
-				self::$raw_input = $this->getJsonInput();
+				$this->raw_input = self::getJsonInput();
 				break;
 
 			default:
-				self::$raw_input = null;
+				$this->raw_input = null;
 		}
 	}
 
@@ -453,9 +456,7 @@ abstract class CController {
 	 * @return CControllerResponse|null
 	 */
 	final public function run(): ?CControllerResponse {
-		$this->populateRawInput();
-
-		if ($this->validate_sid && !$this->checkSID()) {
+		if ($this->validate_csrf_token && (!CWebUser::isLoggedIn() || !$this->checkCsrfToken())) {
 			throw new CAccessDeniedException();
 		}
 

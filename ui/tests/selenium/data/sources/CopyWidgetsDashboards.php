@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -170,7 +170,7 @@ class CopyWidgetsDashboards {
 								]
 							],
 							[
-								'name' => 'Test copy Favourite graphs',
+								'name' => 'Test copy Favorite graphs',
 								'type' => 'favgraphs',
 								'x' => 20,
 								'y' => 7,
@@ -186,7 +186,7 @@ class CopyWidgetsDashboards {
 								]
 							],
 							[
-								'name' => 'Test copy Favourite maps',
+								'name' => 'Test copy Favorite maps',
 								'type' => 'favmaps',
 								'x' => 14,
 								'y' => 10,

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ class testPageTriggerDescription extends CWebTest {
 			$this->assertTrue($row->query('class:icon-description')->count() === 0);
 		}
 
-		// Check trigger description in event details of the correspondign problem.
+		// Check trigger description in event details of the corresponding problem.
 		$row->getColumn('Time')->query('xpath:./a')->one()->click();
 		$this->page->waitUntilReady();
 
@@ -130,7 +130,7 @@ class testPageTriggerDescription extends CWebTest {
 	}
 
 	private function checkDescriptionUrls($data, $element) {
-		// Take the urls out of description text to process them separatelly.
+		// Take the urls out of description text to process them separately.
 		$urls = [];
 		preg_match_all('/https?:\/\/\S+/', $data['description'], $urls);
 

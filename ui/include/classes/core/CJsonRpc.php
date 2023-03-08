@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,11 @@
 class CJsonRpc {
 
 	const VERSION = '2.0';
+
+	public const AUTH_TYPE_FRONTEND = 0;
+	public const AUTH_TYPE_PARAM = 1;
+	public const AUTH_TYPE_HEADER = 2;
+	public const AUTH_TYPE_COOKIE = 3;
 
 	/**
 	 * API client to use for making requests.
@@ -71,8 +76,30 @@ class CJsonRpc {
 				continue;
 			}
 
+			$auth = [
+				'type' => self::AUTH_TYPE_PARAM,
+				'auth' => $call['auth']
+			];
+
 			list($api, $method) = explode('.', $call['method']) + [1 => ''];
-			$result = $this->apiClient->callMethod($api, $method, $call['params'], $call['auth']);
+
+			$header = $this->getAuthorizationHeader();
+			if ($header !== null && strpos($header, ZBX_API_HEADER_AUTHENTICATE_PREFIX) === 0) {
+				$auth = [
+					'type' => self::AUTH_TYPE_HEADER,
+					'auth' => substr($header, strlen(ZBX_API_HEADER_AUTHENTICATE_PREFIX))
+				];
+			}
+			elseif ($call['auth'] === null) {
+				$session = new CEncryptedCookieSession();
+
+				$auth = [
+					'type' => self::AUTH_TYPE_COOKIE,
+					'auth' => $session->extractSessionId()
+				];
+			}
+
+			$result = $this->apiClient->callMethod($api, $method, $call['params'], $auth);
 
 			$this->processResult($call, $result);
 		}
@@ -95,7 +122,7 @@ class CJsonRpc {
 			'jsonrpc' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => self::VERSION],
 			'method' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'params' =>		['type' => API_JSONRPC_PARAMS, 'flags' => API_REQUIRED],
-			'auth' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_ALLOW_NULL, 'default' => null],
+			'auth' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_ALLOW_NULL | API_DEPRECATED, 'default' => null],
 			'id' =>			['type' => API_JSONRPC_ID]
 		]];
 
@@ -215,5 +242,23 @@ class CJsonRpc {
 			ZBX_API_ERROR_PERMISSIONS => '-32500',
 			ZBX_API_ERROR_INTERNAL => '-32500'
 		];
+	}
+
+	private function getAuthorizationHeader(): ?string {
+		if (array_key_exists('Authorization', $_SERVER)) {
+			return $_SERVER['Authorization'];
+		}
+		elseif (array_key_exists('HTTP_AUTHORIZATION', $_SERVER)) {
+			return $_SERVER['HTTP_AUTHORIZATION'];
+		}
+		elseif (function_exists('getallheaders')) {
+			$headers = getallheaders();
+
+			if (array_key_exists('Authorization', $headers)) {
+				return $headers['Authorization'];
+			}
+		}
+
+		return null;
 	}
 }

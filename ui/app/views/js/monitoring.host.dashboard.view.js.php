@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 <script>
 	const view = {
-		init({host, dashboard, widget_defaults, time_period, web_layout_mode}) {
+		init({host, dashboard, widget_defaults, configuration_hash, time_period, web_layout_mode}) {
 			timeControl.refreshPage = false;
 
 			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
@@ -61,25 +61,28 @@
 				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
 				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
 				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-				widget_defaults: widget_defaults,
+				widget_defaults,
+				configuration_hash,
 				is_editable: false,
 				is_edit_mode: false,
 				can_edit_dashboards: false,
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period: time_period,
 				dynamic_hostid: host.hostid,
+				csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 			});
 
 			for (const page of dashboard.pages) {
 				for (const widget of page.widgets) {
 					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
-					widget.configuration = (typeof widget.configuration === 'object') ? widget.configuration : {};
 				}
 
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
 
 			ZABBIX.Dashboard.activate();
+
+			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
 
 			if (web_layout_mode == <?= ZBX_LAYOUT_NORMAL ?>) {
 				document.getElementById('dashboardid').addEventListener('change', this.events.dashboardChange);
@@ -89,6 +92,10 @@
 		},
 
 		events: {
+			configurationOutdated() {
+				location.href = location.href;
+			},
+
 			dashboardChange(e) {
 				e.target.closest('form').submit();
 			}

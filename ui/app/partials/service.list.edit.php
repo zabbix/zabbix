@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,7 +149,7 @@ $action_buttons = new CActionButtonList('action', 'serviceids', [
 			->addClass('js-massdelete-service')
 			->addClass('no-chkbxrange')
 	]
-], ($path !== null && $path) ? 'service_'.implode('_', $path) : 'service');
+], $path !== null ? 'service_'.implode('_', $path) : 'service');
 
 $form
 	->addItem([$table, $data['paging'], $action_buttons])
