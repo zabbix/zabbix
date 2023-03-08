@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-01-07 12:23+0000\n"
-"Last-Translator: spbima <spbima@mail.ru>\n"
+"PO-Revision-Date: 2023-03-06 05:23+0000\n"
+"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -3214,7 +3214,7 @@ msgstr "Не удалось обновить обнаруженную групп
 #: include/classes/api/services/CGraphGeneral.php:82
 #, c-format
 msgid "Cannot update a templated graph \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"%1$s\" график из шаблона."
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -8598,7 +8598,7 @@ msgstr "Идентификация системы. Возвращает стро
 
 #: app/views/administration.authentication.edit.php:113
 msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
-msgstr ""
+msgstr "Если активирована HTTP аутентификация, все пользователи  (даже с доступом к веб-интерфейсу LDAP / внутренний) будут аутентифицироваться веб-сервером, не Zabbix."
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -16362,7 +16362,7 @@ msgstr "Услуги обновлены"
 
 #: include/classes/api/services/CUser.php:1693
 msgid "Session ID or token is expected."
-msgstr ""
+msgstr "Ожидается ID сессии или токен."
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
