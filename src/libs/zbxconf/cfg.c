@@ -326,6 +326,8 @@ static char	*expand_include_path(char *raw_path)
 
 		dir_utf8 = zbx_unicode_to_utf8(dir_buf);
 		result = zbx_dsprintf(result, "%s%s", dir_utf8, raw_path);
+
+		zbx_free(raw_path);
 		zbx_free(dir_utf8);
 
 		return result;
@@ -341,12 +343,13 @@ static char	*expand_include_path(char *raw_path)
 		basedir = dirname(cfg_file);
 		result = zbx_dsprintf(result, "%s/%s", basedir, raw_path);
 
+		zbx_free(raw_path);
 		zbx_free(cfg_file);
 
 		return result;
 	}
 #endif
-	return NULL;
+	return raw_path;
 }
 
 /******************************************************************************
@@ -366,19 +369,13 @@ static char	*expand_include_path(char *raw_path)
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict, int noexit)
 {
 	int		ret = FAIL;
-	char		*path = NULL, *raw_path = NULL, *pattern = NULL;
+	char		*path = NULL, *pattern = NULL;
 	zbx_stat_t	sb;
 
-	if (SUCCEED != parse_glob(cfg_file, &raw_path, &pattern))
+	if (SUCCEED != parse_glob(cfg_file, &path, &pattern))
 		goto clean;
 
-	if (NULL == (path = expand_include_path(raw_path)))
-	{
-		path = raw_path;
-		raw_path = NULL;
-	}
-	else
-		zbx_free(raw_path);
+	path = expand_include_path(path);
 
 	if (0 != zbx_stat(path, &sb))
 	{
@@ -401,7 +398,6 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	ret = parse_cfg_dir(path, pattern, cfg, level, strict, noexit);
 clean:
 	zbx_free(pattern);
-	zbx_free(raw_path);
 	zbx_free(path);
 
 	return ret;
