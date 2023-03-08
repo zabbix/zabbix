@@ -329,7 +329,9 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 			request->headers_sz = 0;
 		}
 
-		if (NULL != contents && '\0' == contents[contents_len - 1])
+		/* the post parameter will be converted to string and have terminating zero */
+		/* unless it had buffer or object type                                      */
+		if (NULL != contents && DUK_TYPE_STRING == duk_get_type(ctx, 1))
 		{
 			if (SUCCEED == zbx_json_open(contents, &jp))
 				request->headers = curl_slist_append(NULL, "Content-Type: application/json");
@@ -342,7 +344,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_CUSTOMREQUEST, http_request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT_MS, timeout_ms - elapsed_ms, err);
 
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, contents, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, (long)contents_len, err);
 
 	ZBX_CURL_SETOPT(ctx, request->handle, ZBX_CURLOPT_ACCEPT_ENCODING, "", err);
