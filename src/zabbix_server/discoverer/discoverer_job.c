@@ -19,7 +19,7 @@
 
 #include "discoverer_job.h"
 
-zbx_hash_t	zbx_discoverer_task_hash(const void *data)
+zbx_hash_t	discoverer_task_hash(const void *data)
 {
 	const zbx_discoverer_task_t	*task = (const zbx_discoverer_task_t *)data;
 	zbx_hash_t			hash;
@@ -31,7 +31,7 @@ zbx_hash_t	zbx_discoverer_task_hash(const void *data)
 	return hash;
 }
 
-int	zbx_discoverer_task_compare(const void *d1, const void *d2)
+int	discoverer_task_compare(const void *d1, const void *d2)
 {
 	const zbx_discoverer_task_t	*task1 = (const zbx_discoverer_task_t *)d1;
 	const zbx_discoverer_task_t	*task2 = (const zbx_discoverer_task_t *)d2;
@@ -41,7 +41,7 @@ int	zbx_discoverer_task_compare(const void *d1, const void *d2)
 	return strcmp(task1->ip, task2->ip);
 }
 
-void	zbx_discoverer_task_free(zbx_discoverer_task_t *task)
+void	discoverer_task_free(zbx_discoverer_task_t *task)
 {
 	if (NULL != task->ips)
 	{
@@ -50,24 +50,40 @@ void	zbx_discoverer_task_free(zbx_discoverer_task_t *task)
 		zbx_free(task->ips);
 	}
 
-	zbx_vector_discoverer_dcheck_clear_ext(&task->dchecks, zbx_discovery_dcheck_free);
-	zbx_vector_discoverer_dcheck_destroy(&task->dchecks);
+	zbx_vector_dc_dcheck_ptr_clear_ext(&task->dchecks, zbx_discovery_dcheck_free);
+	zbx_vector_dc_dcheck_ptr_destroy(&task->dchecks);
 
 	zbx_free(task->ip);
 	zbx_free(task);
 }
 
-void	zbx_discoverer_job_tasks_free(zbx_discoverer_job_t *job)
+void	discoverer_job_tasks_free(zbx_discoverer_job_t *job)
 {
 	zbx_discoverer_task_t	*task;
 
 	while (SUCCEED == zbx_list_pop(&job->tasks, (void*)&task))
-		zbx_discoverer_task_free(task);
+		discoverer_task_free(task);
 }
 
-void	zbx_discoverer_job_free(zbx_discoverer_job_t *job)
+void	discoverer_job_free(zbx_discoverer_job_t *job)
 {
-	zbx_discoverer_job_tasks_free(job);
+	discoverer_job_tasks_free(job);
 
 	zbx_free(job);
+}
+
+zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, int cfg_timeout)
+{
+	zbx_discoverer_job_t	*job;
+
+	job = (zbx_discoverer_job_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_job_t));
+	job->druleid = drule->druleid;
+	job->workers_max = drule->workers_max;
+	job->workers_used = 0;
+	job->config_timeout = cfg_timeout;
+	job->drule_revision = drule->revision;
+	job->status = DISCOVERER_JOB_STATUS_QUEUED;
+	zbx_list_create(&job->tasks);
+
+	return job;
 }

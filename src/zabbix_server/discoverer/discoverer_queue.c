@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "log.h"
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
+#include "log.h"
 
 #define DISCOVERER_QUEUE_INIT_NONE	0x00
 #define DISCOVERER_QUEUE_INIT_LOCK	0x01
@@ -49,7 +49,7 @@ void	discoverer_queue_unlock(zbx_discoverer_queue_t *queue)
  *                                                                            *
  * Purpose: notify one worker                                                 *
  *                                                                            *
- * Parameters: queue - [IN] the job queue                                     *
+ * Parameters: queue - [IN]                                                   *
  *                                                                            *
  * Comments: This function is used by manager to notify worker when single    *
  *           job have been pushed                                             *
@@ -67,7 +67,7 @@ void	discoverer_queue_notify(zbx_discoverer_queue_t *queue)
  *                                                                            *
  * Purpose: notify all workers                                                *
  *                                                                            *
- * Parameters: queue - [IN] the job queue                                     *
+ * Parameters: queue - [IN]                                                   *
  *                                                                            *
  * Comments: This function is used by manager to notify workers when either   *
  *           multiple jobs have been pushed or when stopping workers.         *
@@ -85,7 +85,7 @@ void	discoverer_queue_notify_all(zbx_discoverer_queue_t *queue)
  *                                                                            *
  * Purpose: pop job from job queue                                            *
  *                                                                            *
- * Parameters: queue - [IN] the job queue                                     *
+ * Parameters: queue - [IN]                                                   *
  *                                                                            *
  * Return value: The popped job or NULL if there are no jobs to be            *
  *               processed.                                                   *
@@ -103,10 +103,10 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: queue the net check job to be processed                           *
+ * Purpose: queue the job to be processed                                     *
  *                                                                            *
- * Parameters: queue     - [IN] the job queue                                 *
- *             net_check - [IN] the net check job                             *
+ * Parameters: queue     - [IN]                                               *
+ *             net_check - [IN]                                               *
  *                                                                            *
 *******************************************************************************/
 void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_job_t *job)
@@ -124,7 +124,7 @@ void	discoverer_queue_clear_jobs(zbx_list_t *jobs)
 	zbx_discoverer_job_t	*job = NULL;
 
 	while (SUCCEED == zbx_list_pop(jobs, (void **)&job))
-		zbx_discoverer_job_free(job);
+		discoverer_job_free(job);
 }
 
 /******************************************************************************
@@ -170,8 +170,8 @@ void	discoverer_queue_deregister_worker(zbx_discoverer_queue_t *queue)
  *                                                                            *
  * Purpose: wait for queue notifications                                      *
  *                                                                            *
- * Parameters: queue - [IN] the job queue                                     *
- *             error - [IN] the error message                                 *
+ * Parameters: queue - [IN]                                                   *
+ *             error - [OUT]                                                  *
  *                                                                            *
  * Return value: SUCCEED - the wait succeeded                                 *
  *               FAIL    - an error has occurred                              *
@@ -196,8 +196,8 @@ int	discoverer_queue_wait(zbx_discoverer_queue_t *queue, char **error)
  *                                                                            *
  * Purpose: initialize job queue                                              *
  *                                                                            *
- * Parameters: queue      - [IN] the job queue                                *
- *             error      - [OUT] the error message                           *
+ * Parameters: queue - [IN]                                                   *
+ *             error - [OUT]                                                  *
  *                                                                            *
  * Return value: SUCCEED - the job queue was initialized successfully         *
  *               FAIL    - otherwise                                          *

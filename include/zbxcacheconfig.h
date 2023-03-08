@@ -656,25 +656,27 @@ typedef struct
 	unsigned char	snmpv3_privprotocol;
 	char		*snmpv3_contextname;
 }
-DC_DCHECK;
+zbx_dc_dcheck_t;
+
+ZBX_PTR_VECTOR_DECL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
 
 typedef struct
 {
-	zbx_uint64_t		druleid;
-	zbx_uint64_t		proxy_hostid;
-	time_t			nextcheck;
-	int			delay;
-	char			*delay_str;
-	char			*iprange;
-	unsigned char		status;
-	unsigned char		location;
-	zbx_uint64_t		revision;
-	char			*name;
-	zbx_uint64_t		unique_dcheckid;
-	zbx_vector_ptr_t	dchecks;
-	int			workers_max;
+	zbx_uint64_t			druleid;
+	zbx_uint64_t			proxy_hostid;
+	time_t				nextcheck;
+	int				delay;
+	char				*delay_str;
+	char				*iprange;
+	unsigned char			status;
+	unsigned char			location;
+	zbx_uint64_t			revision;
+	char				*name;
+	zbx_uint64_t			unique_dcheckid;
+	zbx_vector_dc_dcheck_ptr_t	dchecks;
+	int				workers_max;
 }
-DC_DRULE;
+zbx_dc_drule_t;
 
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	zbx_is_counted_in_item_queue(unsigned char type, const char *key);
@@ -1162,7 +1164,7 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 /* special item key used for ICMP ping loss packages */
 #define ZBX_SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 
-DC_DRULE	*zbx_dc_drule_next(time_t now, time_t *nextcheck);
+zbx_dc_drule_t	*zbx_dc_drule_next(time_t now, time_t *nextcheck);
 void		zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
 void		zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions);
 

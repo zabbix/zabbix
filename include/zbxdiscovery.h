@@ -37,6 +37,6 @@ zbx_dservice_t;
 void	zbx_discovery_update_host(zbx_db_dhost *dhost, int status, int now);
 void	zbx_discovery_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, zbx_uint64_t unique_dcheckid,
 		zbx_db_dhost *dhost, const char *ip, const char *dns, int port, int status, const char *value, int now);
-void	zbx_discovery_dcheck_free(DC_DCHECK *dcheck);
-void	zbx_discovery_drule_free(DC_DRULE *drule);
+void	zbx_discovery_dcheck_free(zbx_dc_dcheck_t *dcheck);
+void	zbx_discovery_drule_free(zbx_dc_drule_t *drule);
 #endif

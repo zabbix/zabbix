@@ -84,6 +84,7 @@ ZBX_PTR_VECTOR_IMPL(dc_host_ptr, ZBX_DC_HOST *)
 ZBX_PTR_VECTOR_IMPL(dc_item_ptr, ZBX_DC_ITEM *)
 ZBX_VECTOR_IMPL(host_rev, zbx_host_rev_t)
 ZBX_PTR_VECTOR_IMPL(dc_connector_tag, zbx_dc_connector_tag_t *)
+ZBX_PTR_VECTOR_IMPL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
 
 /******************************************************************************
  *                                                                            *
@@ -5587,7 +5588,7 @@ static time_t	dc_calculate_nextcheck(zbx_uint64_t seed, int delay, time_t now)
 	return nextcheck;
 }
 
-static void	dc_drule_queue(DC_DRULE *drule)
+static void	dc_drule_queue(zbx_dc_drule_t *drule)
 {
 	zbx_binary_heap_elem_t	elem;
 
@@ -5603,7 +5604,7 @@ static void	dc_drule_queue(DC_DRULE *drule)
 		zbx_binary_heap_update_direct(&config->drule_queue, &elem);
 }
 
-static void	dc_drule_dequeue(DC_DRULE *drule)
+static void	dc_drule_dequeue(zbx_dc_drule_t *drule)
 {
 	if (ZBX_LOC_QUEUE == drule->location)
 	{
@@ -5614,13 +5615,13 @@ static void	dc_drule_dequeue(DC_DRULE *drule)
 
 static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
-	char			**row, *delay_str;
-	zbx_uint64_t		rowid, druleid, proxy_hostid;
-	unsigned char		tag;
-	int 			found, ret, delay = 0;
-	ZBX_DC_PROXY		*proxy;
-	DC_DRULE		*drule;
-	time_t			now;
+	char		**row, *delay_str;
+	zbx_uint64_t	rowid, druleid, proxy_hostid;
+	unsigned char	tag;
+	int 		found, ret, delay = 0;
+	ZBX_DC_PROXY	*proxy;
+	zbx_dc_drule_t	*drule;
+	time_t		now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5635,7 +5636,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		ZBX_STR2UINT64(druleid, row[0]);
 		ZBX_DBROW2UINT64(proxy_hostid, row[1]);
 
-		drule = (DC_DRULE *)DCfind_id(&config->drules, druleid, sizeof(DC_DRULE), &found);
+		drule = (zbx_dc_drule_t *)DCfind_id(&config->drules, druleid, sizeof(zbx_dc_drule_t), &found);
 
 		ZBX_STR2UCHAR(drule->status, row[5]);
 		drule->workers_max = atoi(row[6]);
@@ -5697,7 +5698,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	/* remove deleted discovery rules from cache and update proxy revision */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		if (NULL == (drule = (DC_DRULE *)zbx_hashset_search(&config->drules, &rowid)))
+		if (NULL == (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &rowid)))
 			continue;
 
 		if (0 != drule->proxy_hostid)
@@ -5723,8 +5724,8 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	unsigned char	tag;
 	int 		found, ret;
 	ZBX_DC_PROXY	*proxy;
-	DC_DRULE	*drule;
-	DC_DCHECK	*dcheck;
+	zbx_dc_drule_t	*drule;
+	zbx_dc_dcheck_t	*dcheck;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5737,10 +5738,10 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		ZBX_STR2UINT64(dcheckid, row[0]);
 		ZBX_STR2UINT64(druleid, row[1]);
 
-		if (NULL == (drule = (DC_DRULE *)zbx_hashset_search(&config->drules, &druleid)))
+		if (NULL == (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &druleid)))
 			continue;
 
-		dcheck = (DC_DCHECK *)DCfind_id(&config->dchecks, dcheckid, sizeof(DC_DCHECK), &found);
+		dcheck = (zbx_dc_dcheck_t *)DCfind_id(&config->dchecks, dcheckid, sizeof(zbx_dc_dcheck_t), &found);
 
 		dcheck->druleid = druleid;
 		ZBX_STR2UCHAR(dcheck->type, row[2]);
@@ -5768,10 +5769,10 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	/* remove deleted discovery checks from cache and update proxy revision */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		if (NULL == (dcheck = (DC_DCHECK *)zbx_hashset_search(&config->dchecks, &rowid)))
+		if (NULL == (dcheck = (zbx_dc_dcheck_t *)zbx_hashset_search(&config->dchecks, &rowid)))
 			continue;
 
-		if (NULL != (drule = (DC_DRULE *)zbx_hashset_search(&config->drules, &dcheck->druleid)) &&
+		if (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &dcheck->druleid)) &&
 				0 != drule->proxy_hostid && drule->revision != revision)
 		{
 			if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &drule->proxy_hostid)))
@@ -7953,8 +7954,8 @@ static int	__config_drule_compare(const void *d1, const void *d2)
 	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
 	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
 
-	const DC_DRULE	*r1 = (const DC_DRULE *)e1->data;
-	const DC_DRULE	*r2 = (const DC_DRULE *)e2->data;
+	const zbx_dc_drule_t	*r1 = (const zbx_dc_drule_t *)e1->data;
+	const zbx_dc_drule_t	*r2 = (const zbx_dc_drule_t *)e2->data;
 
 	return (int)(r1->nextcheck - r2->nextcheck);
 }
@@ -15422,10 +15423,10 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
  *               NULL    - no drules are scheduled at current time            *
  *                                                                            *
  ******************************************************************************/
-DC_DRULE	*zbx_dc_drule_next(time_t now, time_t *nextcheck)
+zbx_dc_drule_t	*zbx_dc_drule_next(time_t now, time_t *nextcheck)
 {
 	zbx_binary_heap_elem_t	*elem;
-	DC_DRULE		*drule, *drule_out = NULL;
+	zbx_dc_drule_t		*drule, *drule_out = NULL;
 
 	*nextcheck = 0;
 
@@ -15434,17 +15435,17 @@ DC_DRULE	*zbx_dc_drule_next(time_t now, time_t *nextcheck)
 	if (FAIL == zbx_binary_heap_empty(&config->drule_queue))
 	{
 		elem = zbx_binary_heap_find_min(&config->drule_queue);
-		drule = (DC_DRULE *)elem->data;
+		drule = (zbx_dc_drule_t *)elem->data;
 
 		if (drule->nextcheck <= now)
 		{
 			zbx_hashset_iter_t	iter;
-			DC_DCHECK		*dcheck, *dheck_out;
+			zbx_dc_dcheck_t		*dcheck, *dheck_out;
 
 			zbx_binary_heap_remove_min(&config->drule_queue);
 			drule->location = ZBX_LOC_POLLER;
 
-			drule_out = zbx_malloc(NULL, sizeof(DC_DRULE));
+			drule_out = zbx_malloc(NULL, sizeof(zbx_dc_drule_t));
 			drule_out->druleid = drule->druleid;
 			drule_out->proxy_hostid = drule->proxy_hostid;
 			drule_out->nextcheck = drule->nextcheck;
@@ -15458,34 +15459,41 @@ DC_DRULE	*zbx_dc_drule_next(time_t now, time_t *nextcheck)
 			drule_out->unique_dcheckid = 0;
 			drule_out->workers_max = drule->workers_max;
 
-			zbx_vector_ptr_create(&drule_out->dchecks);
+			zbx_vector_dc_dcheck_ptr_create(&drule_out->dchecks);
 			zbx_hashset_iter_reset(&config->dchecks, &iter);
 
-			while (NULL != (dcheck = (DC_DCHECK *)zbx_hashset_iter_next(&iter)))
+			while (NULL != (dcheck = (zbx_dc_dcheck_t *)zbx_hashset_iter_next(&iter)))
 			{
 				if (dcheck->druleid != drule->druleid)
 					continue;
 
-				dheck_out = zbx_malloc(NULL, sizeof(DC_DCHECK));
-				dheck_out->dcheckid = dcheck->dcheckid;
+				dheck_out = zbx_malloc(NULL, sizeof(zbx_dc_dcheck_t));
 				dheck_out->druleid = dcheck->druleid;
-				dheck_out->type = dcheck->type;
+				dheck_out->dcheckid = dcheck->dcheckid;
 				dheck_out->key_ = zbx_strdup(NULL, dcheck->key_);
-				dheck_out->snmp_community = zbx_strdup(NULL, dcheck->snmp_community);
 				dheck_out->ports = zbx_strdup(NULL, dcheck->ports);
-				dheck_out->snmpv3_securityname = zbx_strdup(NULL, dcheck->snmpv3_securityname);
-				dheck_out->snmpv3_securitylevel = dcheck->snmpv3_securitylevel;
-				dheck_out->snmpv3_authpassphrase = zbx_strdup(NULL, dcheck->snmpv3_authpassphrase);
-				dheck_out->snmpv3_privpassphrase = zbx_strdup(NULL, dcheck->snmpv3_privpassphrase);
 				dheck_out->uniq = dcheck->uniq;
-				dheck_out->snmpv3_authprotocol = dcheck->snmpv3_authprotocol;
-				dheck_out->snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
-				dheck_out->snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
+				dheck_out->type = dcheck->type;
 
-				zbx_vector_ptr_append(&drule_out->dchecks, dheck_out);
+				if (SVC_SNMPv1 == dheck_out->type || SVC_SNMPv2c == dheck_out->type ||
+						SVC_SNMPv3 == dheck_out->type)
+				{
+					dheck_out->snmp_community = zbx_strdup(NULL, dcheck->snmp_community);
+					dheck_out->snmpv3_securityname = zbx_strdup(NULL, dcheck->snmpv3_securityname);
+					dheck_out->snmpv3_securitylevel = dcheck->snmpv3_securitylevel;
+					dheck_out->snmpv3_authpassphrase = zbx_strdup(NULL,
+							dcheck->snmpv3_authpassphrase);
+					dheck_out->snmpv3_privpassphrase = zbx_strdup(NULL,
+							dcheck->snmpv3_privpassphrase);
+					dheck_out->snmpv3_authprotocol = dcheck->snmpv3_authprotocol;
+					dheck_out->snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
+					dheck_out->snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
+				}
+
+				zbx_vector_dc_dcheck_ptr_append(&drule_out->dchecks, dheck_out);
 			}
 
-			zbx_vector_ptr_sort(&drule_out->dchecks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+			zbx_vector_dc_dcheck_ptr_sort(&drule_out->dchecks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		}
 		else
 			*nextcheck = drule->nextcheck;
@@ -15507,11 +15515,11 @@ DC_DRULE	*zbx_dc_drule_next(time_t now, time_t *nextcheck)
  ******************************************************************************/
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay)
 {
-	DC_DRULE	*drule;
+	zbx_dc_drule_t	*drule;
 
 	WRLOCK_CACHE;
 
-	if (NULL != (drule = (DC_DRULE *)zbx_hashset_search(&config->drules, &druleid)))
+	if (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_search(&config->drules, &druleid)))
 	{
 		drule->delay = delay;
 		drule->nextcheck = dc_calculate_nextcheck(drule->druleid, drule->delay, now);
@@ -15532,13 +15540,13 @@ void	zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_pair_t	revision;
-	DC_DRULE		*drule;
+	zbx_dc_drule_t		*drule;
 
 	WRLOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->drules, &iter);
 
-	while (NULL != (drule = (DC_DRULE *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (drule = (zbx_dc_drule_t *)zbx_hashset_iter_next(&iter)))
 	{
 		revision.first = drule->druleid;
 		revision.second = drule->revision;

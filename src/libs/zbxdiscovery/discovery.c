@@ -19,6 +19,7 @@
 
 #include "zbxdiscovery.h"
 
+#include "zbxserver.h"
 #include "log.h"
 #include "../../zabbix_server/events.h"
 #include "zbxtime.h"
@@ -497,15 +498,20 @@ void	zbx_discovery_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, z
  * Purpose: free discovery check                                              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_dcheck_free(DC_DCHECK *dcheck)
+void	zbx_discovery_dcheck_free(zbx_dc_dcheck_t *dcheck)
 {
 	zbx_free(dcheck->key_);
-	zbx_free(dcheck->snmp_community);
-	zbx_free(dcheck->snmpv3_securityname);
 	zbx_free(dcheck->ports);
-	zbx_free(dcheck->snmpv3_authpassphrase);
-	zbx_free(dcheck->snmpv3_privpassphrase);
-	zbx_free(dcheck->snmpv3_contextname);
+
+	if (SVC_SNMPv1 == dcheck->type || SVC_SNMPv2c == dcheck->type || SVC_SNMPv3 == dcheck->type)
+	{
+		zbx_free(dcheck->snmp_community);
+		zbx_free(dcheck->snmpv3_securityname);
+		zbx_free(dcheck->snmpv3_authpassphrase);
+		zbx_free(dcheck->snmpv3_privpassphrase);
+		zbx_free(dcheck->snmpv3_contextname);
+	}
+
 	zbx_free(dcheck);
 }
 
@@ -514,11 +520,14 @@ void	zbx_discovery_dcheck_free(DC_DCHECK *dcheck)
  * Purpose: free discovery rule                                               *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_drule_free(DC_DRULE *drule)
+void	zbx_discovery_drule_free(zbx_dc_drule_t *drule)
 {
 	zbx_free(drule->delay_str);
 	zbx_free(drule->iprange);
 	zbx_free(drule->name);
+
+	zbx_vector_dc_dcheck_ptr_clear_ext(&drule->dchecks, zbx_discovery_dcheck_free);
+	zbx_vector_dc_dcheck_ptr_destroy(&drule->dchecks);
 
 	zbx_free(drule);
 }
