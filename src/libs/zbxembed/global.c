@@ -30,6 +30,8 @@
  *                                                                            *
  * Purpose: export duktape data at the index into buffer                      *
  *                                                                            *
+ * Return value: allocated buffer with exported data or NULL on error         *
+ *                                                                            *
  * Comments: Throws an error:                                                 *
  *               - if the top value at ctx value stack is non buffer object   *
  *               - if the value stack is empty                                *
@@ -52,10 +54,14 @@ char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 			buf = zbx_malloc(NULL, *len);
 			memcpy(buf, ptr, *len);
 			break;
-		default:
+		case DUK_TYPE_STRING:
 			ptr = duk_require_lstring(ctx, index, len);
 			buf = zbx_malloc(NULL, *len);
 			memcpy(buf, ptr, *len);
+			break;
+		default:
+			if (SUCCEED == es_duktape_string_decode(duk_to_string(ctx, index), &buf))
+				*len = strlen(buf);
 			break;
 	}
 
@@ -78,7 +84,8 @@ static duk_ret_t	es_btoa(duk_context *ctx)
 	char		*str, *b64str = NULL;
 	duk_size_t	len;
 
-	str = es_get_buffer_dyn(ctx, 0, &len);
+	if (NULL == (str = es_get_buffer_dyn(ctx, 0, &len)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
 	str_base64_encode_dyn(str, &b64str, (int)len);
 	duk_push_string(ctx, b64str);
@@ -158,7 +165,8 @@ static duk_ret_t	es_md5(duk_context *ctx)
 	char		*md5sum;
 	duk_size_t	len;
 
-	str = es_get_buffer_dyn(ctx, 0, &len);
+	if (NULL == (str = es_get_buffer_dyn(ctx, 0, &len)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
 	md5sum = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
 
@@ -192,7 +200,8 @@ static duk_ret_t	es_sha256(duk_context *ctx)
 	char		hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
 	duk_size_t	len;
 
-	str = es_get_buffer_dyn(ctx, 0, &len);
+	if (NULL == (str = es_get_buffer_dyn(ctx, 0, &len)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
 	zbx_sha256_hash_len(str, len, hash_res);
 	es_bin_to_hex((const unsigned char *)hash_res, ZBX_SHA256_DIGEST_SIZE, hash_res_stringhexes);
@@ -231,8 +240,14 @@ static duk_ret_t	es_hmac(duk_context *ctx)
 	else
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "unsupported hash function");
 
-	key = es_get_buffer_dyn(ctx, 1, &key_len);
-	text = es_get_buffer_dyn(ctx, 2, &text_len);
+	if (NULL == (key = es_get_buffer_dyn(ctx, 1, &key_len)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain second parameter");
+
+	if (NULL == (text = es_get_buffer_dyn(ctx, 2, &text_len)))
+	{
+		zbx_free(key);
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain third parameter");
+	}
 
 	ret = zbx_hmac(hash_type, key, key_len, text, text_len, &out);
 

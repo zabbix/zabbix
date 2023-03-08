@@ -302,7 +302,13 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	}
 
 	if (0 == duk_is_null_or_undefined(ctx, 1))
-		contents = es_get_buffer_dyn(ctx, 1, &contents_len);
+	{
+		if (NULL == (contents = es_get_buffer_dyn(ctx, 1, &contents_len)))
+		{
+			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot obtain second parameter");
+			goto out;
+		}
+	}
 
 	if (NULL == (request = es_httprequest(ctx)))
 	{
