@@ -32,11 +32,13 @@ CDate.prototype = {
 	serverDate:	null,	// servers(PHP, Unix) date object
 
 	calcTZdiff: function(time) {
-		if (time === undefined){
+		if (time === undefined) {
 			time = new Date().getTime();
 		}
-		const php_tz_offset = Object.keys(PHP_TZ_OFFSETS).reverse().find((ts) => ts * 1000 <= time)
-		this.tzDiff = this.clientDate.getTimezoneOffset() * -60 - PHP_TZ_OFFSETS[php_tz_offset];
+
+		const timestamp = Object.keys(PHP_TZ_OFFSETS).reverse().find((ts) => ts * 1000 <= time);
+
+		this.tzDiff = this.clientDate.getTimezoneOffset() * -60 - PHP_TZ_OFFSETS[timestamp];
 	},
 
 	/**
@@ -158,6 +160,7 @@ CDate.prototype = {
 		this.server = 1;
 		this.serverDate.setTime(Date.parse(arg));
 		this.calcTZdiff();
+
 		return this.getTime();
 	},
 
