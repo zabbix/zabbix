@@ -261,15 +261,20 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					],
 					'actions' => [
 						'Trigger for widget 2 unsigned' => [
-							'class:icon-action-ack-green' => true,
-							'xpath:.//button[contains(@class, "icon-action-msgs")]' => [
+							// Green tick.
+							'icon-action-ack-green' => true,
+
+							// Message bubble.
+							'icon-action-msgs' => [
 								[
 									'Time' => 'acknowledged',
 									'User' => 'Admin (Zabbix Administrator)',
 									'Message' => 'Acknowledged event'
 								]
 							],
-							'xpath:.//button[contains(@class, "icon-actions-number-gray")]' => [
+
+							// Actions arrow icon.
+							'icon-actions-number-gray' => [
 								[
 									'Time' => 'acknowledged',
 									'User/Recipient' => 'Admin (Zabbix Administrator)',
@@ -727,13 +732,14 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			foreach ($data['actions'] as $problem => $action) {
 				$action_cell = $table->findRow('Problem • Severity', $problem)->getColumn('Actions');
 
-				foreach ($action as $selector => $hint_rows) {
-					$button = $action_cell->query($selector)->one();
+				foreach ($action as $class => $hint_rows) {
+					$button = $action_cell->query('xpath:.//button[@class='.CXPathHelper::fromClass($class).']')->one();
 					$this->assertTrue($button->isVisible());
 
-					if ($selector !== 'class:icon-action-ack-green') {
+					if ($class !== 'icon-action-ack-green') {
 						$button->click();
-						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible();
+						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->one()
+							->waitUntilVisible();
 						$hint_table = $hint->query('class:list-table')->asTable()->one();
 
 						foreach ($hint_table->getRows() as $i => $row) {
@@ -743,9 +749,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							$row->assertValues($hint_rows[$i]);
 						}
 
-//						$hint->query('class:overlay-close-btn')->one()->click()->waitUntilNotPresent();
-						$this->query('xpath://div[@class="overlay-dialogue"]/button[@title="Close"]')
-								->one()->click()->waitUntilNotPresent();
+						$hint->close();
+
 					}
 				}
 			}
