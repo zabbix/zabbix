@@ -86,7 +86,7 @@ class HostTemplateGroups {
 				'name' => 'Group for Maintenance'
 			],
 			[
-				'name' => 'Group for Host prtotype'
+				'name' => 'Group for Host prototype'
 			],
 			[
 				'name' => 'Group for Correlation'
@@ -127,7 +127,7 @@ class HostTemplateGroups {
 			'ruleid' => $lldid,
 			'groupLinks' => [
 				[
-					'groupid' => $host_groupids['Group for Host prtotype']
+					'groupid' => $host_groupids['Group for Host prototype']
 				]
 			]
 		]);
