@@ -26,7 +26,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure the macros: `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, and `{$AZURE.SUBSCRIPTION_ID}`.
+          3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, and `{$AZURE.SUBSCRIPTION.ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -244,16 +244,16 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
           tags:
             -
               tag: component
@@ -383,16 +383,16 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
           tags:
             -
               tag: component
@@ -459,7 +459,7 @@ zabbix_export:
                 formulaid: E
               -
                 macro: '{#NAME}'
-                value: '{$AZURE.MSSQL.DB.NAME.NOT_MATCHES}'
+                value: '{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
               -
@@ -468,7 +468,7 @@ zabbix_export:
                 formulaid: C
               -
                 macro: '{#LOCATION}'
-                value: '{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES}'
+                value: '{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               -
@@ -477,12 +477,12 @@ zabbix_export:
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
               -
                 macro: '{#SIZE}'
-                value: '{$AZURE.MSSQL.DB.SIZE.NOT_MATCHES}'
+                value: '{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: G
           description: 'The list of the Microsoft SQL databases is provided by the subscription.'
@@ -497,7 +497,7 @@ zabbix_export:
                     name: Databases
               macros:
                 -
-                  macro: '{$AZURE.RESOURCE_ID}'
+                  macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
               tags:
                 -
@@ -597,7 +597,7 @@ zabbix_export:
                 formulaid: E
               -
                 macro: '{#NAME}'
-                value: '{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}'
+                value: '{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
               -
@@ -606,7 +606,7 @@ zabbix_export:
                 formulaid: C
               -
                 macro: '{#LOCATION}'
-                value: '{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}'
+                value: '{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               -
@@ -615,7 +615,7 @@ zabbix_export:
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The list of the MySQL servers is provided by the subscription.'
@@ -630,7 +630,7 @@ zabbix_export:
                     name: Databases
               macros:
                 -
-                  macro: '{$AZURE.RESOURCE_ID}'
+                  macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
               tags:
                 -
@@ -730,7 +730,7 @@ zabbix_export:
                 formulaid: E
               -
                 macro: '{#NAME}'
-                value: '{$AZURE.PGSQL.DB.NAME.NOT_MATCHES}'
+                value: '{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
               -
@@ -739,7 +739,7 @@ zabbix_export:
                 formulaid: C
               -
                 macro: '{#LOCATION}'
-                value: '{$AZURE.PGSQL.DB.LOCATION.NOT_MATCHES}'
+                value: '{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               -
@@ -748,7 +748,7 @@ zabbix_export:
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The list of the PostgreSQL servers is provided by the subscription.'
@@ -763,7 +763,7 @@ zabbix_export:
                     name: Databases
               macros:
                 -
-                  macro: '{$AZURE.RESOURCE_ID}'
+                  macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
               tags:
                 -
@@ -859,7 +859,7 @@ zabbix_export:
                 formulaid: E
               -
                 macro: '{#NAME}'
-                value: '{$AZURE.STORAGE.ACC.NAME.NOT_MATCHES}'
+                value: '{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
               -
@@ -868,7 +868,7 @@ zabbix_export:
                 formulaid: C
               -
                 macro: '{#LOCATION}'
-                value: '{$AZURE.STORAGE.ACC.LOCATION.NOT_MATCHES}'
+                value: '{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               -
@@ -877,7 +877,7 @@ zabbix_export:
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The list of all storage accounts available under the subscription.'
@@ -978,6 +978,7 @@ zabbix_export:
                     return JSON.stringify({ 'error': error });
                 }
               description: 'The HTTP API endpoint that returns storage metrics with the name `[{#NAME}]`.'
+              timeout: '{$AZURE.DATA.TIMEOUT}'
               parameters:
                 -
                   name: id
@@ -1025,6 +1026,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: common
+                -
                   tag: storage
                   value: '{#NAME}'
               trigger_prototypes:
@@ -1032,6 +1036,7 @@ zabbix_export:
                   uuid: 6a0b3edebded4d848ad76f86f8152377
                   expression: '(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}'
                   name: 'Azure: Storage account [{#NAME}]: Availability is low'
+                  event_name: 'Azure: Storage account [{#NAME} availability are too low (less than {$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}%)'
                   opdata: '{ITEM.LASTVALUE1}'
                   priority: WARNING
                   tags:
@@ -1068,6 +1073,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: blob
+                -
                   tag: storage
                   value: '{#NAME}'
               trigger_prototypes:
@@ -1075,6 +1083,7 @@ zabbix_export:
                   uuid: 4cd8ac56b50c4120bf9de56bb1f06245
                   expression: '(min(/Azure by HTTP/azure.storage.blob.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY:"{#NAME}"}'
                   name: 'Azure: Storage account [{#NAME}]: Blob Availability is low'
+                  event_name: 'Azure: Storage account [{#NAME} blob availability are too low (less than {$AZURE.STORAGE.ACC.BLOB.AVAILABILITY:"{#NAME}"}%)'
                   opdata: '{ITEM.LASTVALUE1}'
                   priority: WARNING
                   tags:
@@ -1108,6 +1117,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: blob
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1135,6 +1147,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: blob
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1161,6 +1176,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: blob
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -1193,6 +1211,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: blob
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1222,6 +1243,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: blob
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1250,6 +1274,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: blob
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -1286,6 +1313,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: blob
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1321,6 +1351,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: blob
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1350,6 +1383,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: blob
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -1382,51 +1418,11 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
-                  tag: storage
-                  value: '{#NAME}'
-            -
-              uuid: 8adc470c703e44dc96b42ac32b98252e
-              name: 'Azure: Storage account [{#NAME}]: File Availability'
-              type: DEPENDENT
-              key: 'azure.storage.file.availability[{#NAME}]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                The percentage of availability for the storage service or a specified API operation.
-                Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.
-                All unexpected errors result in reduced availability for the storage service or the specified API operation.
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - $.fileServices.Availability.average
-                  error_handler: DISCARD_VALUE
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 3h
-              master_item:
-                key: 'azure.get.storage.acc[{#NAME}]'
-              tags:
-                -
-                  tag: component
-                  value: storages
+                  tag: metrics
+                  value: common
                 -
                   tag: storage
                   value: '{#NAME}'
-              trigger_prototypes:
-                -
-                  uuid: 729885e79d1b4c11923606b6d559e0cc
-                  expression: '(min(/Azure by HTTP/azure.storage.file.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.FILE.AVAILABILITY:"{#NAME}"}'
-                  name: 'Azure: Storage account [{#NAME}]: File Availability is low'
-                  opdata: '{ITEM.LASTVALUE1}'
-                  priority: WARNING
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
             -
               uuid: 43069f165849449d8403d1a8c82fe634
               name: 'Azure: Storage account [{#NAME}]: File Capacity'
@@ -1454,6 +1450,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: file
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1480,6 +1479,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: file
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -1512,6 +1514,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: file
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1541,6 +1546,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: file
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1569,6 +1577,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: file
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1595,6 +1606,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: file
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -1624,6 +1638,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: file
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1650,6 +1667,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: file
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -1686,6 +1706,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: file
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1721,6 +1744,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: file
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1751,6 +1777,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: file
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1780,51 +1809,11 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
-                  tag: storage
-                  value: '{#NAME}'
-            -
-              uuid: 74af681b7eb54de2978229354ffe3542
-              name: 'Azure: Storage account [{#NAME}]: Queue Availability'
-              type: DEPENDENT
-              key: 'azure.storage.queue.availability[{#NAME}]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                The percentage of availability for the storage service or a specified API operation.
-                Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.
-                All unexpected errors result in reduced availability for the storage service or the specified API operation.
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - $.queueServices.Availability.average
-                  error_handler: DISCARD_VALUE
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 3h
-              master_item:
-                key: 'azure.get.storage.acc[{#NAME}]'
-              tags:
-                -
-                  tag: component
-                  value: storages
+                  tag: metrics
+                  value: common
                 -
                   tag: storage
                   value: '{#NAME}'
-              trigger_prototypes:
-                -
-                  uuid: 6ea928c21ea7487098d1aee8ce3ff3f6
-                  expression: '(min(/Azure by HTTP/azure.storage.queue.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.QUEUE.AVAILABILITY:"{#NAME}"}'
-                  name: 'Azure: Storage account [{#NAME}]: Queue Availability is low'
-                  opdata: '{ITEM.LASTVALUE1}'
-                  priority: WARNING
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
             -
               uuid: be8b82396ff243e8a52864069b192dea
               name: 'Azure: Storage account [{#NAME}]: Queue Capacity'
@@ -1852,6 +1841,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: queue
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1878,6 +1870,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: queue
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -1910,6 +1905,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: queue
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1939,6 +1937,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: queue
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -1965,6 +1966,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: queue
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -2001,6 +2005,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: queue
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -2036,6 +2043,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: queue
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -2065,6 +2075,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: queue
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -2101,6 +2114,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: common
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -2136,6 +2152,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: common
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -2168,6 +2187,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: table
+                -
                   tag: storage
                   value: '{#NAME}'
               trigger_prototypes:
@@ -2175,6 +2197,7 @@ zabbix_export:
                   uuid: bfb1e82685224048ba8082447cad57ca
                   expression: '(min(/Azure by HTTP/azure.storage.table.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY:"{#NAME}"}'
                   name: 'Azure: Storage account [{#NAME}]: Table Availability is low'
+                  event_name: 'Azure: Storage account [{#NAME} table availability are too low (less than {$AZURE.STORAGE.ACC.TABLE.AVAILABILITY:"{#NAME}"}%)'
                   opdata: '{ITEM.LASTVALUE1}'
                   priority: WARNING
                   tags:
@@ -2208,6 +2231,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: table
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -2234,6 +2260,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: table
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -2266,6 +2295,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: table
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -2292,6 +2324,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: table
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -2321,6 +2356,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: table
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -2357,6 +2395,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: table
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -2392,6 +2433,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: table
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -2422,6 +2466,9 @@ zabbix_export:
                   tag: component
                   value: storages
                 -
+                  tag: metrics
+                  value: table
+                -
                   tag: storage
                   value: '{#NAME}'
             -
@@ -2451,6 +2498,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: common
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -2483,6 +2533,9 @@ zabbix_export:
                 -
                   tag: component
                   value: storages
+                -
+                  tag: metrics
+                  value: common
                 -
                   tag: storage
                   value: '{#NAME}'
@@ -2595,7 +2648,7 @@ zabbix_export:
                 formulaid: E
               -
                 macro: '{#NAME}'
-                value: '{$AZURE.VM.NAME.NOT_MATCHES}'
+                value: '{$AZURE.VM.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
               -
@@ -2604,7 +2657,7 @@ zabbix_export:
                 formulaid: C
               -
                 macro: '{#LOCATION}'
-                value: '{$AZURE.VM.LOCATION.NOT_MATCHES}'
+                value: '{$AZURE.VM.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               -
@@ -2613,7 +2666,7 @@ zabbix_export:
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The list of the virtual machines is provided by the subscription.'
@@ -2631,7 +2684,7 @@ zabbix_export:
                   name: 'Azure Virtual Machine by HTTP'
               macros:
                 -
-                  macro: '{$AZURE.RESOURCE_ID}'
+                  macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
               tags:
                 -
@@ -2688,7 +2741,7 @@ zabbix_export:
           value: azure
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
+          macro: '{$AZURE.APP.ID}'
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
@@ -2699,7 +2752,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in Microsoft SQL databases discovery rule.'
         -
-          macro: '{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES}'
+          macro: '{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in Microsoft SQL databases discovery rule.'
         -
@@ -2707,11 +2760,11 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in Microsoft SQL databases discovery rule.'
         -
-          macro: '{$AZURE.MSSQL.DB.NAME.NOT_MATCHES}'
+          macro: '{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in Microsoft SQL databases discovery rule.'
         -
-          macro: '{$AZURE.MSSQL.DB.SIZE.NOT_MATCHES}'
+          macro: '{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}'
           value: ^System$
           description: 'This macro is used in Microsoft SQL databases discovery rule.'
         -
@@ -2719,7 +2772,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in MySQL servers discovery rule.'
         -
-          macro: '{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}'
+          macro: '{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in MySQL servers discovery rule.'
         -
@@ -2727,7 +2780,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in MySQL servers discovery rule.'
         -
-          macro: '{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}'
+          macro: '{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in MySQL servers discovery rule.'
         -
@@ -2739,7 +2792,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
-          macro: '{$AZURE.PGSQL.DB.LOCATION.NOT_MATCHES}'
+          macro: '{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
@@ -2747,7 +2800,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
-          macro: '{$AZURE.PGSQL.DB.NAME.NOT_MATCHES}'
+          macro: '{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
@@ -2755,7 +2808,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in discovery rules.'
         -
-          macro: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+          macro: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in discovery rules.'
         -
@@ -2775,7 +2828,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in storage accounts discovery rule.'
         -
-          macro: '{$AZURE.STORAGE.ACC.LOCATION.NOT_MATCHES}'
+          macro: '{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in storage accounts discovery rule.'
         -
@@ -2783,7 +2836,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in storage accounts discovery rule.'
         -
-          macro: '{$AZURE.STORAGE.ACC.NAME.NOT_MATCHES}'
+          macro: '{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in storage accounts discovery rule.'
         -
@@ -2795,17 +2848,17 @@ zabbix_export:
           value: '70'
           description: 'The warning threshold of the storage account table services availability.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
         -
           macro: '{$AZURE.VM.LOCATION.MATCHES}'
           value: '.*'
           description: 'This macro is used in virtual machines discovery rule.'
         -
-          macro: '{$AZURE.VM.LOCATION.NOT_MATCHES}'
+          macro: '{$AZURE.VM.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in virtual machines discovery rule.'
         -
@@ -2813,7 +2866,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in virtual machines discovery rule.'
         -
-          macro: '{$AZURE.VM.NAME.NOT_MATCHES}'
+          macro: '{$AZURE.VM.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in virtual machines discovery rule.'
     -
@@ -2829,7 +2882,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure the macros: {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -3292,19 +3345,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -3774,7 +3827,7 @@ zabbix_export:
           value: mssql
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
+          macro: '{$AZURE.APP.ID}'
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
@@ -3801,13 +3854,13 @@ zabbix_export:
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure Microsoft SQL database ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
@@ -3839,7 +3892,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure the macros: {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -4353,19 +4406,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -4740,7 +4793,7 @@ zabbix_export:
           value: mssql
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
+          macro: '{$AZURE.APP.ID}'
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
@@ -4767,13 +4820,13 @@ zabbix_export:
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure Microsoft SQL database ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
@@ -4805,7 +4858,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure the macros: {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -5279,19 +5332,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -5549,7 +5602,7 @@ zabbix_export:
           value: mysql
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
+          macro: '{$AZURE.APP.ID}'
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
@@ -5576,13 +5629,13 @@ zabbix_export:
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure MySQL server ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
@@ -5614,7 +5667,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure the macros: {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -6026,19 +6079,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -6353,7 +6406,7 @@ zabbix_export:
           value: mysql
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
+          macro: '{$AZURE.APP.ID}'
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
@@ -6384,13 +6437,13 @@ zabbix_export:
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure MySQL server ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
@@ -6422,7 +6475,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure the macros: {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -6898,19 +6951,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -7289,7 +7342,7 @@ zabbix_export:
           value: postgresql
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
+          macro: '{$AZURE.APP.ID}'
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
@@ -7316,13 +7369,13 @@ zabbix_export:
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure PostgreSQL server ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
@@ -7354,7 +7407,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure the macros: {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -7755,19 +7808,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -8104,7 +8157,7 @@ zabbix_export:
           value: postgresql
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
+          macro: '{$AZURE.APP.ID}'
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
@@ -8131,13 +8184,13 @@ zabbix_export:
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure PostgreSQL server ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
@@ -8169,7 +8222,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure the macros: {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -8930,19 +8983,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -9613,7 +9666,7 @@ zabbix_export:
           value: azure
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
+          macro: '{$AZURE.APP.ID}'
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
@@ -9624,13 +9677,13 @@ zabbix_export:
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure Virtual Machine ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
         -
           macro: '{$AZURE.VM.CPU.UTIL.CRIT}'
