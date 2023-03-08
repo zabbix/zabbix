@@ -49,7 +49,8 @@ class CControllerPopupDiscoveryCheck extends CController {
 			'snmpv3_authprotocol' =>	'db dchecks.snmpv3_authprotocol|in '.implode(',', array_keys(getSnmpV3AuthProtocols())),
 			'snmpv3_authpassphrase' =>	'string|db dchecks.snmpv3_authpassphrase',
 			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.implode(',', array_keys(getSnmpV3PrivProtocols())),
-			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase'
+			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase',
+			'allow_redirect' => 		'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -87,7 +88,8 @@ class CControllerPopupDiscoveryCheck extends CController {
 	protected function doAction() {
 		$data = array_merge([
 			'type' => self::DEFAULT_TYPE,
-			'ports' => svc_default_port(self::DEFAULT_TYPE)
+			'ports' => svc_default_port(self::DEFAULT_TYPE),
+			'allow_redirect' => 0
 		], $this->getInputAll());
 
 		$params = array_intersect_key($data, DB::getSchema('dchecks')['fields']);

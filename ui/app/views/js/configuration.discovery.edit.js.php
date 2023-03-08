@@ -87,6 +87,10 @@
 		var addNewValue = function(value) {
 			ZBX_CHECKLIST[value.dcheckid] = value;
 
+			if (value.allow_redirect == 1) {
+				value.name += ' "allow redirect"';
+			}
+
 			jQuery('#dcheckListFooter').before(new Template(jQuery('#dcheck-row-tmpl').html()).evaluate(value));
 
 			for (var field_name in value) {
@@ -104,6 +108,10 @@
 
 		var updateNewValue = function(value) {
 			ZBX_CHECKLIST[value.dcheckid] = value;
+
+			if (value.allow_redirect == 1) {
+				value.name += ' "allow redirect"';
+			}
 
 			var ignore_names = ['druleid', 'dcheckid', 'name', 'ports', 'type', 'uniq'];
 
@@ -343,7 +351,8 @@
 		]);
 
 		var data = $form
-				.find('#type, #ports, input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible')
+				.find('#type, #ports, input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible,'
+					+ ' input[type=checkbox]:checked:visible')
 				.serialize(),
 			dialogueid = $form
 				.closest("[data-dialogueid]")

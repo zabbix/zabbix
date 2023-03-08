@@ -227,9 +227,9 @@ final class CItemData {
 			'zabbix.stats[<ip>,<port>]'
 		],
 		ITEM_TYPE_SIMPLE => [
-			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>]',
-			'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>]',
-			'icmppingsec[<target>,<packets>,<interval>,<size>,<timeout>,<mode>]',
+			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>,<options>]',
+			'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>,<options>]',
+			'icmppingsec[<target>,<packets>,<interval>,<size>,<timeout>,<mode>,<options>]',
 			'net.tcp.service.perf[service,<ip>,<port>]',
 			'net.tcp.service[service,<ip>,<port>]',
 			'net.udp.service.perf[service,<ip>,<port>]',
@@ -898,15 +898,15 @@ final class CItemData {
 				'description' => _('Event log monitoring. Returns log'),
 				'value_type' => ITEM_VALUE_TYPE_LOG
 			],
-			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>]' => [
+			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>,<options>]' => [
 				'description' => _('Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
-			'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>]' => [
+			'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>,<options>]' => [
 				'description' => _('Returns percentage of lost ICMP ping packets.'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			'icmppingsec[<target>,<packets>,<interval>,<size>,<timeout>,<mode>]' => [
+			'icmppingsec[<target>,<packets>,<interval>,<size>,<timeout>,<mode>,<options>]' => [
 				'description' => _('Returns ICMP ping response time in seconds. Example: 0.02'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
