@@ -693,6 +693,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 	/**
 	 * @dataProvider getCheckWidgetTable
+	 *
+	 * @onAfter deleteWidgets
 	 */
 	public function testDashboardProblemsWidgetDisplay_CheckTable($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
@@ -746,6 +748,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							$hint_rows[$i]['Time'] = ($hint_rows[$i]['Time'] === 'acknowledged')
 								? date('Y-m-d H:i:s', self::$acktime)
 								: date('Y-m-d H:i:s', self::$time);
+							var_dump($class);
 							$row->assertValues($hint_rows[$i]);
 						}
 
@@ -781,7 +784,17 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		));
 		$this->assertEquals($headers, $table->getHeadersText());
 
-		// Delete created widget.
+//		// Delete created widget.
+//		DBexecute('DELETE FROM widget'.
+//			' WHERE dashboard_pageid'.
+//			' IN (SELECT dashboard_pageid'.
+//			' FROM dashboard_page'.
+//			' WHERE dashboardid='.self::$dashboardid.
+//			')'
+//		);
+	}
+
+	public static function deleteWidgets() {
 		DBexecute('DELETE FROM widget'.
 			' WHERE dashboard_pageid'.
 			' IN (SELECT dashboard_pageid'.
