@@ -18,11 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/items.inc.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
+require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @dataSource WebScenarios
@@ -31,7 +29,7 @@ use Facebook\WebDriver\WebDriverBy;
  *
  * @backup httptest
  */
-class testFormWeb extends CWebTest {
+class testFormWebScenario extends CWebTest {
 
 	private static $hostid;
 	private static $templateid;
@@ -110,7 +108,7 @@ class testFormWeb extends CWebTest {
 	}
 
 	// Returns layout data
-	public static function layout() {
+	public static function getLayoutData() {
 		return [
 			[
 				[
@@ -132,9 +130,9 @@ class testFormWeb extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider layout
+	 * @dataProvider getLayoutData
 	 */
-	public function testFormWeb_CheckLayout($data) {
+	public function testFormWebScenario_CheckLayout($data) {
 		$context_id = ($data['context'] === 'host') ? self::$hostid : self::$templateid;
 		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.$context_id)->waitUntilReady();
 
@@ -160,17 +158,17 @@ class testFormWeb extends CWebTest {
 			'Agent' => ['value' => 'Zabbix'],
 			'id:agent_other' => ['visible' => false, 'enabled' => false, 'maxlength' => 255],
 			'HTTP proxy' => ['placeholder' => '[protocol://][user[:password]@]proxy.example.com[:port]', 'maxlength' => 255],
-			'xpath:(//table[@data-type="variables"]//input)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
-			'xpath:(//table[@data-type="variables"]//input)[2]' => ['placeholder' => 'value', 'maxlength' => 2000],
-			'xpath:(//table[@data-type="headers"]//input)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
-			'xpath:(//table[@data-type="headers"]//input)[2]' => ['placeholder' => 'value', 'maxlength' => 2000],
+			"xpath:(//table[@data-type='variables']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
+			"xpath:(//table[@data-type='variables']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
+			"xpath:(//table[@data-type='headers']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
+			"xpath:(//table[@data-type='headers']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
 			'Enabled' => ['value' => true]
 		];
 
 		// Substitute inherited web scenario speciffic fields and check Parent web scenario field.
 		if (array_key_exists('scenario_name', $data)) {
 			$scenario_fields['Name'] = ['value' => $data['scenario_name'], 'enabled' => false, 'maxlength' => 64];
-			$scenario_fields['Agent'] = ['value' => 'Internet Explorer 10'];
+			$scenario_fields['Agent']['value'] = 'Internet Explorer 10';
 
 			$parent_field = $form->getField('Parent web scenarios');
 			$this->assertTrue($parent_field->isCLickable());
@@ -756,34 +754,34 @@ class testFormWeb extends CWebTest {
 	/**
 	 * @dataProvider getWebScenarioData
 	 */
-	public function testFormWeb_Create($data) {
+	public function testFormWebScenario_Create($data) {
 		$this->checkAction($data);
 	}
 
 	/**
 	 * @dataProvider getWebScenarioData
 	 */
-	public function testFormWeb_Update($data) {
+	public function testFormWebScenario_Update($data) {
 		$this->checkAction($data, 'update');
 	}
 
-	public function testFormWeb_SimpleUpdate() {
+	public function testFormWebScenario_SimpleUpdate() {
 		$this->checkImpactlessAction('simple_update');
 	}
 
-	public function testFormWeb_CancelCreate() {
+	public function testFormWebScenario_CancelCreate() {
 		$this->checkImpactlessAction('cancel_create');
 	}
 
-	public function testFormWeb_CancelUpdate() {
+	public function testFormWebScenario_CancelUpdate() {
 		$this->checkImpactlessAction('cancel_update');
 	}
 
-	public function testFormWeb_CancelDelete() {
+	public function testFormWebScenario_CancelDelete() {
 		$this->checkImpactlessAction('cancel_delete');
 	}
 
-	public function testFormWeb_Delete() {
+	public function testFormWebScenario_Delete() {
 		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
 		$this->query('link', self::DELETE_SCENARIO)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
@@ -800,7 +798,7 @@ class testFormWeb extends CWebTest {
 		}
 	}
 
-	public function testFormWeb_Clone() {
+	public function testFormWebScenario_Clone() {
 		$clone_name = 'Clone of '.self::CLONE_SCENARIO;
 		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
 		$this->query('link', self::CLONE_SCENARIO)->waitUntilClickable()->one()->click();
@@ -1037,6 +1035,4 @@ class testFormWeb extends CWebTest {
 			$form->fill($data['auth_fields']);
 		}
 	}
-
-	// Check items can be used in Triggers.
 }
