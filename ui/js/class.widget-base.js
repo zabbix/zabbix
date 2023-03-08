@@ -128,7 +128,7 @@ class CWidgetBase {
 	 * @param {string|null}	dynamic_hostid      ID of the dynamically selected host on a dashboard (if any of the
 	 *                                          widgets has the "dynamic" checkbox field configured and checked in the
 	 *                                          widget configuration), or null.
-	 * @param {string}      csrf_token          CSRF token for AJAX requests.
+	 * @param {string|null} csrf_token          CSRF token for AJAX requests.
 	 * @param {string}      unique_id           Run-time, unique ID of the widget.
 	 */
 	constructor({
