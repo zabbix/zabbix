@@ -161,6 +161,7 @@ class testSlaReport extends CWebTest {
 					'fields' => [
 						'SLA' => 'SLA Daily'
 					],
+					'check_sorting' => true,
 					'reporting_period' => 'Daily',
 					'expected' => [
 						'SLO' => '11.111',
@@ -370,10 +371,8 @@ class testSlaReport extends CWebTest {
 				'Error budget', 'Excluded downtimes'], $table->getHeadersText()
 		);
 
-		if (CTestArrayHelper::get($data, 'check_sorting')) {
-			foreach ($table->getHeaders() as $header) {
-				$this->assertFalse($header->query('tag:a')->one(false)->isValid());
-			}
+		if (CTestArrayHelper::get($data, 'check_sorting') && !$widget) {
+			$this->assertEquals([], $table->getSortableHeaders());
 		}
 
 		// This test is written taking into account that only SLA with daily reporting period has ongoing downtimes.
@@ -547,12 +546,8 @@ class testSlaReport extends CWebTest {
 		$this->assertEquals($headers, $table->getHeadersText());
 
 		if (CTestArrayHelper::get($data, 'check_sorting')) {
-			foreach ($table->getHeaders() as $header) {
-				// Only "Service" column is sortable.
-				if ($header->getText() !== 'Service' || $widget) {
-					$this->assertFalse($header->query('tag:a')->one(false)->isValid());
-				}
-			}
+			// Only "Service" column is sortable.
+			$this->assertEquals(['Service'], $table->getSortableHeaders());
 		}
 
 		foreach ($data['expected']['services'] as $service) {
