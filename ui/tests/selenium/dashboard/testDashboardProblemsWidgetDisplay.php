@@ -740,8 +740,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 					if ($class !== 'icon-action-ack-green') {
 						$button->click();
-						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->one()
-							->waitUntilVisible();
+						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()
+								->waitUntilVisible()->one();
 						$hint_table = $hint->query('class:list-table')->asTable()->one();
 
 						foreach ($hint_table->getRows() as $i => $row) {
