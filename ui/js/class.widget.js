@@ -127,7 +127,7 @@ class CWidget extends CWidgetBase {
 	 *
 	 * Possible widget state: WIDGET_STATE_INITIAL, WIDGET_STATE_ACTIVE, WIDGET_STATE_INACTIVE.
 	 *
-	 * @param {CWidget[]}	widgets
+	 * @param {CWidget[]} widgets
 	 */
 	announceWidgets(widgets) {
 	}
@@ -214,16 +214,16 @@ class CWidget extends CWidgetBase {
 	 *
 	 * Possible widget state: WIDGET_STATE_ACTIVE.
 	 *
-	 * @param {Object}				response
-	 * @param {string}				response.name			Widget name to display in the header.
-	 * @param {string|undefined}	response.body			Widget body (HTML contents).
-	 * @param {string[]|undefined}	response.messages		Error messages.
+	 * @param {Object}             response
+	 *        {string}             response.name         Widget name to display in the header.
+	 *        {string|undefined}   response.body         Widget body (HTML contents).
+	 *        {string[]|undefined} response.messages     Error messages.
 	 *
-	 * @param {Object[]|undefined}	response.info			Info buttons to display in the widget header.
-	 * @param {string}				response.info[].icon
-	 * @param {string}				response.info[].hint
+	 *        {Object[]|undefined} response.info         Info buttons to display in the widget header.
+	 *        {string}             response.info[].icon
+	 *        {string}             response.info[].hint
 	 *
-	 * @param {string|undefined}	response.debug			Debug information.
+	 *        {string|undefined}   response.debug        Debug information.
 	 */
 	processUpdateResponse(response) {
 		this._setHeaderName(response.name);
@@ -242,9 +242,9 @@ class CWidget extends CWidgetBase {
 	 *
 	 * Possible widget state: WIDGET_STATE_ACTIVE.
 	 *
-	 * @param {Object}				error
-	 * @param {string|undefined}	error.title
-	 * @param {string[]|undefined}	error.messages
+	 * @param {Object}             error
+	 *        {string|undefined}   error.title
+	 *        {string[]|undefined} error.messages
 	 */
 	processUpdateErrorResponse(error) {
 		this._updateMessages(error.messages, error.title);
@@ -259,7 +259,7 @@ class CWidget extends CWidgetBase {
 	 *
 	 * Possible widget state: WIDGET_STATE_ACTIVE.
 	 *
-	 * @param {Object}	response
+	 * @param {Object} response
 	 */
 	setContents(response) {
 		this._body.innerHTML = response.body ?? '';

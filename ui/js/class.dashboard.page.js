@@ -1323,7 +1323,7 @@ class CDashboardPage {
 				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
 			},
 
-			mouseUp: (e) => {
+			mouseUp: () => {
 				if (move_animation_frame !== null) {
 					cancelAnimationFrame(move_animation_frame);
 				}
@@ -1861,7 +1861,7 @@ class CDashboardPage {
 				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
 			},
 
-			mouseUp: (e) => {
+			mouseUp: () => {
 				if (move_animation_frame !== null) {
 					cancelAnimationFrame(move_animation_frame);
 				}
@@ -2069,9 +2069,9 @@ class CDashboardPage {
 	/**
 	 * Attach event listener to dashboard page events.
 	 *
-	 * @param {string}			type
-	 * @param {function}		listener
-	 * @param {Object|false}	options
+	 * @param {string}       type
+	 * @param {function}     listener
+	 * @param {Object|false} options
 	 *
 	 * @returns {CDashboardPage}
 	 */
@@ -2084,9 +2084,9 @@ class CDashboardPage {
 	/**
 	 * Detach event listener from dashboard page events.
 	 *
-	 * @param {string}			type
-	 * @param {function}		listener
-	 * @param {Object|false}	options
+	 * @param {string}       type
+	 * @param {function}     listener
+	 * @param {Object|false} options
 	 *
 	 * @returns {CDashboardPage}
 	 */
@@ -2099,9 +2099,9 @@ class CDashboardPage {
 	/**
 	 * Dispatch dashboard page event.
 	 *
-	 * @param {string}	type
-	 * @param {Object}	detail
-	 * @param {Object}	options
+	 * @param {string} type
+	 * @param {Object} detail
+	 * @param {Object} options
 	 *
 	 * @returns {boolean}
 	 */

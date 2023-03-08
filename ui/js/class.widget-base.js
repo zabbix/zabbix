@@ -81,54 +81,54 @@ class CWidgetBase {
 	/**
 	 * Widget constructor. Invoked by a dashboard page.
 	 *
-	 * @param {string}		type				Widget type ("id" field of the manifest.json).
-	 * @param {string}		name				Widget name to display in the header.
-	 * @param {number}		view_mode			One of ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
-	 * @param {Object}		fields				Widget field values (widget configuration data).
+	 * @param {string}      type                Widget type ("id" field of the manifest.json).
+	 * @param {string}      name                Widget name to display in the header.
+	 * @param {number}      view_mode           One of ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
+	 * @param {Object}      fields              Widget field values (widget configuration data).
 	 *
-	 * @param {Object}		defaults			Widget type defaults.
-	 * @param {string}		defaults.name			Default name to display in the header, if no custom name given.
-	 * @param {Object}		defaults.size			Default size to use when creating new widgets.
-	 * @param {number}		defaults.size.width		Default width.
-	 * @param {number}		defaults.size.height	Default height
-	 * @param {string}		defaults.js_class		JavaScript class name.
+	 * @param {Object}      defaults            Widget type defaults.
+	 *        {string}      defaults.name           Default name to display in the header, if no custom name given.
+	 *        {Object}      defaults.size           Default size to use when creating new widgets.
+	 *        {number}      defaults.size.width     Default width.
+	 *        {number}      defaults.size.height    Default height
+	 *        {string}      defaults.js_class       JavaScript class name.
 	 *
-	 * @param {string|null}	widgetid			Widget ID stored in the database, or null for new widgets.
+	 * @param {string|null} widgetid            Widget ID stored in the database, or null for new widgets.
 	 *
-	 * @param {Object|null}	pos					Position and size of the widget (in dashboard coordinates).
-	 * @param {number}		pos.x				Horizontal position.
-	 * @param {number}		pos.y				Vertical position.
-	 * @param {number}		pos.width			Widget width.
-	 * @param {number}		pos.height			Widget height.
+	 * @param {Object|null} pos                 Position and size of the widget (in dashboard coordinates).
+	 *        {number}      pos.x               Horizontal position.
+	 *        {number}      pos.y               Vertical position.
+	 *        {number}      pos.width           Widget width.
+	 *        {number}      pos.height          Widget height.
 	 *
-	 * @param {boolean}		is_new				Create a visual zoom effect when adding new widgets.
-	 * @param {number}		rf_rate				Update cycle rate (refresh rate) in seconds. Supported values: 0 (no
-	 * 											refresh), 10, 30, 60, 120, 600 or 900 seconds.
-	 * @param {Object}		dashboard			Essential data of the dashboard object.
-	 * @param {string|null}	dashboard.dashboardid	Dashboard ID.
-	 * @param {string|null}	dashboard.templateid	Template ID (used for template and host dashboards).
+	 * @param {boolean}     is_new              Create a visual zoom effect when adding new widgets.
+	 * @param {number}      rf_rate             Update cycle rate (refresh rate) in seconds. Supported values: 0 (no
+	 *                                          refresh), 10, 30, 60, 120, 600 or 900 seconds.
+	 * @param {Object}      dashboard           Essential data of the dashboard object.
+	 *        {string|null} dashboard.dashboardid   Dashboard ID.
+	 *        {string|null} dashboard.templateid    Template ID (used for template and host dashboards).
 	 *
-	 * @param {Object}		dashboard_page		Essential data of the dashboard page object.
-	 * @param {string}		dashboard_page.unique_id	Run-time, unique ID of the dashboard page.
+	 * @param {Object}      dashboard_page      Essential data of the dashboard page object.
+	 *        {string}      dashboard_page.unique_id  Run-time, unique ID of the dashboard page.
 	 *
-	 * @param {number}		cell_width			Dashboard page cell width in percentage.
-	 * @param {number}		cell_height			Dashboard page cell height in pixels.
-	 * @param {number}		min_rows			Minimum number of dashboard cell rows per single widget.
-	 * @param {boolean}		is_editable			Whether to display the "Edit" button.
-	 * @param {boolean}		is_edit_mode		Whether the widget is being created in the editing mode.
-	 * @param {boolean}		can_edit_dashboards	Whether the user has access to creating and editing dashboards.
+	 * @param {number}      cell_width          Dashboard page cell width in percentage.
+	 * @param {number}      cell_height         Dashboard page cell height in pixels.
+	 * @param {number}      min_rows            Minimum number of dashboard cell rows per single widget.
+	 * @param {boolean}     is_editable         Whether to display the "Edit" button.
+	 * @param {boolean}     is_edit_mode        Whether the widget is being created in the editing mode.
+	 * @param {boolean}     can_edit_dashboards Whether the user has access to creating and editing dashboards.
 	 *
-	 * @param {Object|null}	time_period			Selected time period (if widget.use_time_selector in manifest.json is
-	 * 											set to true in any of the loaded widgets), or null.
-	 * @param {string}		time_period.from	Relative time of period start (like "now-1h").
-	 * @param {number}		time_period.from_ts	Timestamp of period start.
-	 * @param {string}		time_period.to		Relative time of period end (like "now").
-	 * @param {number}		time_period.to_ts	Timestamp of period end.
+	 * @param {Object|null} time_period         Selected time period (if widget.use_time_selector in manifest.json is
+	 *                                          set to true in any of the loaded widgets), or null.
+	 *        {string}      time_period.from    Relative time of period start (like "now-1h").
+	 *        {number}      time_period.from_ts Timestamp of period start.
+	 *        {string}      time_period.to      Relative time of period end (like "now").
+	 *        {number}      time_period.to_ts   Timestamp of period end.
 	 *
 	 * @param {string|null}	dynamic_hostid      ID of the dynamically selected host on a dashboard (if any of the
-	 * 											widgets has the "dynamic" checkbox field configured and checked in the
-	 * 											widget configuration), or null.
-	 * @param {string}		unique_id			Run-time, unique ID of the widget.
+	 *                                          widgets has the "dynamic" checkbox field configured and checked in the
+	 *                                          widget configuration), or null.
+	 * @param {string}      unique_id           Run-time, unique ID of the widget.
 	 */
 	constructor({
 		type,
@@ -231,7 +231,7 @@ class CWidgetBase {
 	/**
 	 * Get current state.
 	 *
-	 * @returns {string}	WIDGET_STATE_INITIAL | WIDGET_STATE_INACTIVE | WIDGET_STATE_ACTIVE | WIDGET_STATE_DESTROYED.
+	 * @returns {string}  WIDGET_STATE_INITIAL | WIDGET_STATE_INACTIVE | WIDGET_STATE_ACTIVE | WIDGET_STATE_DESTROYED.
 	 */
 	getState() {
 		return this._state;
@@ -395,7 +395,7 @@ class CWidgetBase {
 	/**
 	 * Set the dynamic host. Invoked if the widget supports dynamic hosts.
 	 *
-	 * @param {string|null}	dynamic_hostid
+	 * @param {string|null} dynamic_hostid
 	 */
 	setDynamicHost(dynamic_hostid) {
 		this._dynamic_hostid = dynamic_hostid;
@@ -408,12 +408,12 @@ class CWidgetBase {
 	/**
 	 * Set the time period selected in the time selector of the dashboard.
 	 *
-	 * @param {Object|null}	time_period	Selected time period (if widget.use_time_selector in manifest.json is set to
-	 * 									true in any of the loaded widgets), or null.
-	 * @param {string}		time_period.from	Relative time of period start (like "now-1h").
-	 * @param {number}		time_period.from_ts	Timestamp of period start.
-	 * @param {string}		time_period.to		Relative time of period end (like "now").
-	 * @param {number}		time_period.to_ts	Timestamp of period end.
+	 * @param {Object|null} time_period  Selected time period (if widget.use_time_selector in manifest.json is set to
+	 *                                   true in any of the loaded widgets), or null.
+	 *        {string}      time_period.from     Relative time of period start (like "now-1h").
+	 *        {number}      time_period.from_ts  Timestamp of period start.
+	 *        {string}      time_period.to       Relative time of period end (like "now").
+	 *        {number}      time_period.to_ts    Timestamp of period end.
 	 */
 	setTimePeriod(time_period) {
 		this._time_period = time_period;
@@ -477,7 +477,7 @@ class CWidgetBase {
 	/**
 	 * Set widget resizing state.
 	 *
-	 * @param {boolean}	is_resizing
+	 * @param {boolean} is_resizing
 	 */
 	setResizing(is_resizing) {
 		this._target.classList.toggle('ui-resizable-resizing', is_resizing);
@@ -495,7 +495,7 @@ class CWidgetBase {
 	/**
 	 * Set widget dragging state.
 	 *
-	 * @param {boolean}	is_dragging
+	 * @param {boolean} is_dragging
 	 */
 	setDragging(is_dragging) {
 		this._target.classList.toggle('ui-draggable-dragging', is_dragging);
@@ -556,7 +556,7 @@ class CWidgetBase {
 	/**
 	 * Set custom widget name and, if not empty, display it in the header. Otherwise, display the default name.
 	 *
-	 * @param {string}	name
+	 * @param {string} name
 	 */
 	_setName(name) {
 		this._name = name;
@@ -575,7 +575,7 @@ class CWidgetBase {
 	/**
 	 * Display the specified widget name in the header.
 	 *
-	 * @param {string}	name
+	 * @param {string} name
 	 */
 	_setHeaderName(name) {
 		if (this._state !== WIDGET_STATE_INITIAL) {
@@ -588,7 +588,7 @@ class CWidgetBase {
 	/**
 	 * Check if widget header is set to be always displayed or displayed only when the widget is entered (focused).
 	 *
-	 * @returns {number}	One of ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER, ZBX_WIDGET_VIEW_MODE_NORMAL.
+	 * @returns {number}  One of ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER, ZBX_WIDGET_VIEW_MODE_NORMAL.
 	 */
 	getViewMode() {
 		return this._view_mode;
@@ -597,7 +597,7 @@ class CWidgetBase {
 	/**
 	 * Set widget header to be either always displayed or displayed only when the widget is entered (focused).
 	 *
-	 * @param {number}	view_mode	One of ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER, ZBX_WIDGET_VIEW_MODE_NORMAL.
+	 * @param {number} view_mode  One of ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER, ZBX_WIDGET_VIEW_MODE_NORMAL.
 	 */
 	_setViewMode(view_mode) {
 		if (this._view_mode !== view_mode) {
@@ -620,7 +620,7 @@ class CWidgetBase {
 	/**
 	 * Set widget field values (widget configuration data).
 	 *
-	 * @param {Object}	fields
+	 * @param {Object} fields
 	 */
 	_setFields(fields) {
 		this._fields = fields;
@@ -629,7 +629,7 @@ class CWidgetBase {
 	/**
 	 * Get widget ID.
 	 *
-	 * @returns {string|null}	Widget ID stored in the database, or null for new widgets.
+	 * @returns {string|null}  Widget ID stored in the database, or null for new widgets.
 	 */
 	getWidgetId() {
 		return this._widgetid;
@@ -653,9 +653,9 @@ class CWidgetBase {
 	/**
 	 * Update widget properties and start updating immediately.
 	 *
-	 * @param {string|undefined}	name		Widget name to display in the header.
-	 * @param {number|undefined}	view_mode	One of ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
-	 * @param {Object|undefined}	fields		Widget field values (widget configuration data).
+	 * @param {string|undefined} name       Widget name to display in the header.
+	 * @param {number|undefined} view_mode  One of ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
+	 * @param {Object|undefined} fields     Widget field values (widget configuration data).
 	 */
 	updateProperties({name, view_mode, fields}) {
 		if (name !== undefined) {
@@ -682,7 +682,7 @@ class CWidgetBase {
 	/**
 	 * Get update cycle rate (refresh rate) in seconds.
 	 *
-	 * @returns {number}	Supported values: 0 (no refresh), 10, 30, 60, 120, 600 or 900 seconds.
+	 * @returns {number}  Supported values: 0 (no refresh), 10, 30, 60, 120, 600 or 900 seconds.
 	 */
 	getRfRate() {
 		return this._rf_rate;
@@ -691,7 +691,7 @@ class CWidgetBase {
 	/**
 	 * Set update cycle rate (refresh rate) in seconds.
 	 *
-	 * @param {number}	rf_rate	Supported values: 0 (no refresh), 10, 30, 60, 120, 600 or 900 seconds.
+	 * @param {number} rf_rate  Supported values: 0 (no refresh), 10, 30, 60, 120, 600 or 900 seconds.
 	 */
 	_setRfRate(rf_rate) {
 		this._rf_rate = rf_rate;
@@ -721,7 +721,7 @@ class CWidgetBase {
 	/**
 	 * Get widget data for purpose of copying the widget.
 	 *
-	 * @param {boolean} is_single_copy	Whether copying a single widget or copying a whole dashboard page.
+	 * @param {boolean} is_single_copy  Whether copying a single widget or copying a whole dashboard page.
 	 *
 	 * @returns {Object}
 	 */
@@ -768,7 +768,7 @@ class CWidgetBase {
 	/**
 	 * Get context menu to display when actions button is clicked.
 	 *
-	 * @param {boolean}	can_paste_widget	Whether a copied widget is ready to be pasted over the current one.
+	 * @param {boolean} can_paste_widget  Whether a copied widget is ready to be pasted over the current one.
 	 *
 	 * @returns {Object[]}
 	 */
@@ -849,8 +849,8 @@ class CWidgetBase {
 	/**
 	 * Start updating the widget. Invoked on activation of the widget or when the update is required immediately.
 	 *
-	 * @param {number}			delay_sec		Delay seconds before the update.
-	 * @param {boolean|null}	do_update_once	Whether the widget is required to update once.
+	 * @param {number}       delay_sec       Delay seconds before the update.
+	 * @param {boolean|null} do_update_once  Whether the widget is required to update once.
 	 */
 	_startUpdating(delay_sec = 0, {do_update_once = null} = {}) {
 		if (do_update_once === null) {
@@ -879,7 +879,7 @@ class CWidgetBase {
 	/**
 	 * Stop updating the widget. Invoked on deactivation of the widget or when the update is required to restart.
 	 *
-	 * @param {boolean}	do_abort	Whether to abort the active update request.
+	 * @param {boolean} do_abort  Whether to abort the active update request.
 	 */
 	_stopUpdating({do_abort = true} = {}) {
 		if (this._update_timeout_id !== null) {
@@ -914,7 +914,7 @@ class CWidgetBase {
 	/**
 	 * Organize the update cycle of the widget.
 	 *
-	 * @param {boolean}	do_update_once	Whether the widget is required to update once.
+	 * @param {boolean} do_update_once  Whether the widget is required to update once.
 	 */
 	_update(do_update_once) {
 		if (this._update_abort_controller !== null || this._is_updating_paused || this.isUserInteracting()) {
@@ -976,7 +976,7 @@ class CWidgetBase {
 	/**
 	 * Get CSS class name for the specified container or state.
 	 *
-	 * @param {string}	name	Container or state name.
+	 * @param {string} name  Container or state name.
 	 *
 	 * @returns {string}
 	 */
@@ -996,13 +996,13 @@ class CWidgetBase {
 	/**
 	 * Set size and position the widget on the dashboard page.
 	 *
-	 * @param {Object}	pos			Position and size of the widget (in dashboard coordinates).
-	 * @param {number}	pos.x		Horizontal position.
-	 * @param {number}	pos.y		Vertical position.
-	 * @param {number}	pos.width	Widget width.
-	 * @param {number}	pos.height	Widget height.
+	 * @param {Object} pos         Position and size of the widget (in dashboard coordinates).
+	 *        {number} pos.x       Horizontal position.
+	 *        {number} pos.y       Vertical position.
+	 *        {number} pos.width   Widget width.
+	 *        {number} pos.height  Widget height.
 	 *
-	 * @param {boolean}	is_managed	Whether physically setting the position and size is managed from the outside.
+	 * @param {boolean} is_managed  Whether physically setting the position and size is managed from the outside.
 	 */
 	setPos(pos, {is_managed = false} = {}) {
 		this._pos = pos;
@@ -1018,7 +1018,7 @@ class CWidgetBase {
 	/**
 	 * Calculate which of the four sides are affected by the resize handle.
 	 *
-	 * @param {HTMLElement}	resize_handle	One of eight dots by which the widget can be resized in editing mode.
+	 * @param {HTMLElement} resize_handle  One of eight dots by which the widget can be resized in editing mode.
 	 *
 	 * @returns {{top: boolean, left: boolean, bottom: boolean, right: boolean}}
 	 */
@@ -1040,8 +1040,8 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Add eight resize handles to the widget by which the widget can be resized in editing mode. Invoked when the widget
-	 * is entered (focused).
+	 * Add eight resize handles to the widget by which the widget can be resized in editing mode. Invoked when the
+	 * widget is entered (focused).
 	 */
 	_addResizeHandles() {
 		this._resizable_handles = {};
@@ -1106,8 +1106,8 @@ class CWidgetBase {
 	/**
 	 * Update error messages.
 	 *
-	 * @param {string[]}	messages
-	 * @param {string|null}	title
+	 * @param {string[]}    messages
+	 * @param {string|null} title
 	 */
 	_updateMessages(messages = [], title = null) {
 		this._messages.innerHTML = '';
@@ -1122,9 +1122,9 @@ class CWidgetBase {
 	/**
 	 * Update info buttons in the widget header.
 	 *
-	 * @param {Object[]}	info
-	 * @param {string}		info[].icon
-	 * @param {string}		info[].hint
+	 * @param {Object[]} info
+	 *        {string}   info[].icon
+	 *        {string}   info[].hint
 	 */
 	_updateInfo(info = []) {
 		for (const li of this._actions.querySelectorAll('.widget-info-button')) {
@@ -1158,7 +1158,7 @@ class CWidgetBase {
 	/**
 	 * Update debug information.
 	 *
-	 * @param {string}	debug
+	 * @param {string} debug
 	 */
 	_updateDebug(debug = '') {
 		this._debug.innerHTML = debug;
@@ -1355,9 +1355,9 @@ class CWidgetBase {
 	/**
 	 * Attach event listener to widget events.
 	 *
-	 * @param {string}			type
-	 * @param {function}		listener
-	 * @param {Object|false}	options
+	 * @param {string}       type
+	 * @param {function}     listener
+	 * @param {Object|false} options
 	 *
 	 * @returns {CWidgetBase}
 	 */
@@ -1370,9 +1370,9 @@ class CWidgetBase {
 	/**
 	 * Detach event listener from widget events.
 	 *
-	 * @param {string}			type
-	 * @param {function}		listener
-	 * @param {Object|false}	options
+	 * @param {string}       type
+	 * @param {function}     listener
+	 * @param {Object|false} options
 	 *
 	 * @returns {CWidgetBase}
 	 */
@@ -1385,9 +1385,9 @@ class CWidgetBase {
 	/**
 	 * Dispatch widget event.
 	 *
-	 * @param {string}	type
-	 * @param {Object}	detail
-	 * @param {Object}	options
+	 * @param {string} type
+	 * @param {Object} detail
+	 * @param {Object} options
 	 *
 	 * @returns {boolean}
 	 */
