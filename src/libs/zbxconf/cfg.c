@@ -305,18 +305,19 @@ out:
 }
 #endif
 
-static void	prepare_include_path(char **raw_path, char **path)
+static char	*expand_include_path(char *raw_path)
 {
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	wchar_t	*wraw_path;
 
-	wraw_path = zbx_utf8_to_unicode(*raw_path);
+	wraw_path = zbx_utf8_to_unicode(raw_path);
 
 	if (TRUE == PathIsRelativeW(wraw_path))
 	{
-		wchar_t	*wconfig_path;
-		wchar_t	dir_buf[_MAX_DIR];
-		char	*dir_utf8;
+		wchar_t	*wconfig_path, dir_buf[_MAX_DIR];
+		char	*dir_utf8, *result = NULL;
+
+		zbx_free(wraw_path);
 
 		wconfig_path = zbx_utf8_to_unicode(CONFIG_FILE);
 		_wsplitpath(wconfig_path, NULL, dir_buf, NULL, NULL);
@@ -324,25 +325,28 @@ static void	prepare_include_path(char **raw_path, char **path)
 		zbx_free(wconfig_path);
 
 		dir_utf8 = zbx_unicode_to_utf8(dir_buf);
-		*path = zbx_dsprintf(*path, "%s%s", dir_utf8, *raw_path);
+		result = zbx_dsprintf(result, "%s%s", dir_utf8, raw_path);
 		zbx_free(dir_utf8);
-		zbx_free(*raw_path);
-	}
-	else
-		*path = *raw_path;
-#else
-	if ('.' == (*raw_path)[0])
-	{
-		char	*basedir;
 
-		basedir = dirname(CONFIG_FILE);
-		*path = zbx_dsprintf(*path, "%s/%s", basedir, *raw_path);
-		zbx_free(*raw_path);
+		return result;
 	}
-	else
-		*path = *raw_path;
+
+	zbx_free(wraw_path);
+#else
+	if ('.' == *raw_path)
+	{
+		char	*basedir, *cfg_file, *result = NULL;
+
+		cfg_file = zbx_strdup(NULL, CONFIG_FILE);
+		basedir = dirname(cfg_file);
+		result = zbx_dsprintf(result, "%s/%s", basedir, raw_path);
+
+		zbx_free(cfg_file);
+
+		return result;
+	}
 #endif
-	*raw_path = NULL;
+	return NULL;
 }
 
 /******************************************************************************
@@ -368,7 +372,13 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	if (SUCCEED != parse_glob(cfg_file, &raw_path, &pattern))
 		goto clean;
 
-	prepare_include_path(&raw_path, &path);
+	if (NULL == (path = expand_include_path(raw_path)))
+	{
+		path = raw_path;
+		raw_path = NULL;
+	}
+	else
+		zbx_free(raw_path);
 
 	if (0 != zbx_stat(path, &sb))
 	{
