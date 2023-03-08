@@ -746,8 +746,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 						foreach ($hint_table->getRows() as $i => $row) {
 							$hint_rows[$i]['Time'] = ($hint_rows[$i]['Time'] === 'acknowledged')
-								? date('Y-m-d H:i:s', self::$acktime+7200)
-								: date('Y-m-d H:i:s', self::$time+7200);
+								? date('Y-m-d H:i:s', self::$acktime)
+								: date('Y-m-d H:i:s', self::$time);
 							$row->assertValues($hint_rows[$i]);
 						}
 
@@ -791,8 +791,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		DBexecute('DELETE FROM widget'.
 			' WHERE dashboard_pageid'.
 			' IN (SELECT dashboard_pageid'.
-			' FROM dashboard_page'.
-			' WHERE dashboardid='.self::$dashboardid.
+				' FROM dashboard_page'.
+				' WHERE dashboardid='.self::$dashboardid.
 			')'
 		);
 	}
