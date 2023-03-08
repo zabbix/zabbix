@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -306,7 +306,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 			case 'Script':
 				$script_params = $form->getField('Script parameters')->asTable();
-				$this->assertEquals(['Parameter', 'Action'], $script_params->getHeadersText());
+				$this->assertEquals(['Value','Action'], $script_params->getHeadersText());
 				$this->assertEquals(['Add'], $script_params->getRows()->asText());
 
 				// Click on the add button and check the added row for script parameter.
@@ -895,13 +895,13 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					],
 					'script_parameters' => [
 						[
-							'exec_param' => 'first parameter'
+							'Value' => 'first parameter'
 						],
 						[
-							'exec_param' => '良い一日を過ごしてください'
+							'Value' => '良い一日を過ごしてください'
 						],
 						[
-							'exec_param' => '!@#$%^&*()_+='
+							'Value' => '!@#$%^&*()_+='
 						]
 					],
 					'options_tab' => [
@@ -1056,7 +1056,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	 */
 	public function testFormAdministrationMediaTypes_Clone($data) {
 		$clone_sql = 'SELECT type, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem, username, passwd, '.
-				'status, smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, exec_params, '.
+				'status, smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, '.
 				'maxsessions, maxattempts, attempt_interval, content_type, script, timeout, process_tags, show_event_menu, '.
 				'event_menu_url, event_menu_name, description FROM media_type WHERE name=';
 		$old_hash = CDBHelper::getHash($clone_sql.zbx_dbstr($data['media_type']));
@@ -1271,6 +1271,10 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			$form->checkValue($data['mediatype_tab']);
 
 			if (array_key_exists('script_parameters', $data)) {
+				// Add an existing script parameter to the result array for update test.
+				if (!$create) {
+					$data['script_parameters'] = array_merge([['Value' => '{ALERT.SUBJECT}']], $data['script_parameters']);
+				}
 				$form->getField('Script parameters')->asMultifieldTable()->checkValue($data['script_parameters']);
 			}
 

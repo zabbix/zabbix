@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,6 +128,7 @@ class CWidgetBase {
 	 * @param {string|null}	dynamic_hostid      ID of the dynamically selected host on a dashboard (if any of the
 	 *                                          widgets has the "dynamic" checkbox field configured and checked in the
 	 *                                          widget configuration), or null.
+	 * @param {string}      csrf_token          CSRF token for AJAX requests.
 	 * @param {string}      unique_id           Run-time, unique ID of the widget.
 	 */
 	constructor({
@@ -150,6 +151,7 @@ class CWidgetBase {
 		can_edit_dashboards,
 		time_period,
 		dynamic_hostid,
+		csrf_token = null,
 		unique_id
 	}) {
 		this._target = document.createElement('div');
@@ -181,6 +183,7 @@ class CWidgetBase {
 		this._can_edit_dashboards = can_edit_dashboards;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
+		this._csrf_token = csrf_token;
 		this._unique_id = unique_id;
 
 		this._init();
@@ -700,6 +703,7 @@ class CWidgetBase {
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.widget.rfrate');
+			curl.setArgument('_csrf_token', this._csrf_token);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

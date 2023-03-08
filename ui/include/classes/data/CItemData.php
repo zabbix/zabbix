@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -360,6 +360,7 @@ final class CItemData {
 		],
 		ITEM_TYPE_INTERNAL => [
 			'zabbix[boottime]',
+			'zabbix[connector_queue]',
 			'zabbix[host,,items]',
 			'zabbix[host,,items_unsupported]',
 			'zabbix[host,,maintenance]',
@@ -776,25 +777,25 @@ final class CItemData {
 				]
 			],
 			'for_http_auth_type' => [
-				HTTPTEST_AUTH_BASIC => [
+				ZBX_HTTP_AUTH_BASIC => [
 					'js-item-http-username-label',
 					'js-item-http-username-field',
 					'js-item-http-password-label',
 					'js-item-http-password-field'
 				],
-				HTTPTEST_AUTH_NTLM => [
+				ZBX_HTTP_AUTH_NTLM => [
 					'js-item-http-username-label',
 					'js-item-http-username-field',
 					'js-item-http-password-label',
 					'js-item-http-password-field'
 				],
-				HTTPTEST_AUTH_KERBEROS => [
+				ZBX_HTTP_AUTH_KERBEROS => [
 					'js-item-http-username-label',
 					'js-item-http-username-field',
 					'js-item-http-password-label',
 					'js-item-http-password-field'
 				],
-				HTTPTEST_AUTH_DIGEST => [
+				ZBX_HTTP_AUTH_DIGEST => [
 					'js-item-http-username-label',
 					'js-item-http-username-field',
 					'js-item-http-password-label',
@@ -1795,6 +1796,10 @@ final class CItemData {
 			],
 			'zabbix[boottime]' => [
 				'description' => _('Startup time of Zabbix server, Unix timestamp.'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'zabbix[connector_queue]' => [
+				'description' => _('Count of values enqueued in the connector queue.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'zabbix[host,,items]' => [

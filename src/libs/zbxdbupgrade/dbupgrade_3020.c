@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ int	DBpatch_3020001(void)
 
 	for (i = 0; i < (int)ARRSIZE(sources); i++)
 	{
-		result = DBselect(
+		result = zbx_db_select(
 				"select p.eventid"
 				" from problem p"
 				" where p.source=%d and p.object=%d and not exists ("
@@ -58,17 +58,17 @@ int	DBpatch_3020001(void)
 				")",
 				sources[i], EVENT_OBJECT_TRIGGER);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			ZBX_STR2UINT64(eventid, row[0]);
 			zbx_vector_uint64_append(&eventids, eventid);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	for (i = 0; i < (int)ARRSIZE(objects); i++)
 	{
-		result = DBselect(
+		result = zbx_db_select(
 				"select p.eventid"
 				" from problem p"
 				" where p.source=%d and p.object=%d and not exists ("
@@ -78,18 +78,18 @@ int	DBpatch_3020001(void)
 				")",
 				EVENT_SOURCE_INTERNAL, objects[i]);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			ZBX_STR2UINT64(eventid, row[0]);
 			zbx_vector_uint64_append(&eventids, eventid);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (0 != eventids.values_num)
-		DBexecute_multiple_query("delete from problem where", "eventid", &eventids);
+		zbx_db_execute_multiple_query("delete from problem where", "eventid", &eventids);
 
 	zbx_vector_uint64_destroy(&eventids);
 

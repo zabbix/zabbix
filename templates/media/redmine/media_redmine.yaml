@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-03T16:00:17Z'
   media_types:
     -
       name: Redmine

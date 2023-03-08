@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-09-29T15:51:36Z'
   media_types:
     -
       name: Github

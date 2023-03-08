@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -132,5 +132,6 @@ DWORD	zbx_get_builtin_object_index(zbx_builtin_counter_ref_t object_ref)
 {
 	return 0;
 }
+
 */
 import "C"

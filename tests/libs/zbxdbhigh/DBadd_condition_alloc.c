@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ void	zbx_mock_test_entry(void **state)
 	while (repeat--);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, sql_where);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name, in_ids.values, in_ids.values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name, in_ids.values, in_ids.values_num);
 	zbx_vector_uint64_destroy(&in_ids);
 
 	if (NULL == zbx_regexp_match(sql, sql_rgx, NULL))

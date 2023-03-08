@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2457,8 +2457,8 @@ class testDashboardGraphWidget extends CWebTest {
 				'Data set #3'
 			],
 			'Legend labels' => [
-				'avg(祝你今天過得愉快)', 'max(ЗАББИКС Сервер: CPU guest nice time)', 'max(ЗАББИКС Сервер: CPU guest time)',
-				'count(Data set #3)'
+				'祝你今天過得愉快', 'max(ЗАББИКС Сервер: CPU guest nice time)', 'max(ЗАББИКС Сервер: CPU guest time)',
+				'Data set #3'
 			]
 		];
 
