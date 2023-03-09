@@ -20,8 +20,10 @@
 package uname
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"os/exec"
 	"strings"
 	"syscall"
 
@@ -66,13 +68,26 @@ func getHostname(params []string) (hostname string, err error) {
 	}
 
 	switch mode {
-	case "host", "fqdn", "":
+	case "host", "":
 		hostname = util.UnameArrayToString(&utsname.Nodename)
 	case "shorthost":
 		hostname = util.UnameArrayToString(&utsname.Nodename)
 		if idx := strings.Index(hostname, "."); idx > 0 {
 			hostname = hostname[:idx]
 		}
+	case "fqdn":
+		var out bytes.Buffer
+
+		cmd := exec.Command("hostname", "-f")
+		cmd.Stdout = &out
+
+		err = cmd.Run()
+
+		if err != nil {
+			return "", errors.New("Cannot get FQDN.")
+		}
+
+		hostname = strings.Trim(out.String(), " \r\n")
 	case "netbios":
 		return "", errors.New("NetBIOS is not supported on the current platform.")
 	default:

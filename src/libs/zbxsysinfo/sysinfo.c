@@ -2036,14 +2036,14 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 }
 
 #ifndef _WINDOWS
-int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname, const char *fqdn_command)
 {
 	char	*type, *transform;
 
 	type = get_rparam(request, 0);
 	transform = get_rparam(request, 1);
 
-	if (NULL != type && '\0' != *type && 0 != strcmp(type, "host") && 0 != strcmp(type, "fdqn"))
+	if (NULL != type && '\0' != *type && 0 != strcmp(type, "host"))
 	{
 		if (0 == strcmp(type, "shorthost"))
 		{
@@ -2051,6 +2051,26 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 
 			if (NULL != (dot = strchr(hostname, '.')))
 				*dot = '\0';
+		}
+		else if (0 == strcmp(type, "fqdn"))
+		{
+			FILE	*f;
+			char	tmp[MAX_STRING_LEN];
+
+			if (NULL == (f = popen("hostname -f", "r")))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot get the FQDN."));
+				return FAIL;
+			}
+
+			if (0 != zbx_fgets(tmp, sizeof(tmp), f))
+			{
+				zbx_rtrim(tmp, " \r\n");
+				hostname = zbx_strdup(hostname, tmp);
+			}
+
+			if (0 != f)
+				pclose(f);
 		}
 		else if (0 == strcmp(type, "netbios"))
 		{

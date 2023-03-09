@@ -41,6 +41,7 @@ var (
 	getDiskFreeSpaceW                uintptr
 	getVolumePathNameW               uintptr
 	getNativeSystemInfo              uintptr
+	getComputerNameExA               uintptr
 )
 
 const (
@@ -78,6 +79,7 @@ func init() {
 	getDiskFreeSpaceW = hKernel32.mustGetProcAddress("GetDiskFreeSpaceW")
 	getVolumePathNameW = hKernel32.mustGetProcAddress("GetVolumePathNameW")
 	getProcessHandleCount = hKernel32.mustGetProcAddress("GetProcessHandleCount")
+	getComputerNameExA = hKernel32.mustGetProcAddress("GetComputerNameExA")
 
 	getNativeSystemInfo, err = hKernel32.getProcAddress("GetNativeSystemInfo")
 	if err != nil {
@@ -205,4 +207,14 @@ func GetNativeSystemInfo() (sysInfo SystemInfo) {
 	syscall.Syscall(getNativeSystemInfo, 1, uintptr(unsafe.Pointer(&sysInfo)), 0, 0)
 
 	return sysInfo
+}
+
+func GetComputerNameExA(name_type int) (name string) {
+	size := uint32(0)
+	syscall.Syscall(getComputerNameExA, 3, 0, 0, uintptr(unsafe.Pointer(&size)))
+
+	buffer := make([]byte, size)
+	syscall.Syscall(getComputerNameExA, 3, 0, uintptr(unsafe.Pointer(&buffer[0])), uintptr(unsafe.Pointer(&size)))
+
+	return string(buffer[:size])
 }

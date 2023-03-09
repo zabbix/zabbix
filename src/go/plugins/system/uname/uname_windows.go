@@ -28,6 +28,7 @@ import (
 
 	"golang.org/x/sys/windows"
 	"zabbix.com/pkg/wmi"
+	"zabbix.com/pkg/win32"
 )
 
 func getHostname(params []string) (uname string, err error) {
@@ -52,10 +53,12 @@ func getHostname(params []string) (uname string, err error) {
 			return "", err
 		}
 		uname = windows.UTF16ToString(w)
-	case "host", "fqdn":
+	case "host":
 		if uname, err = os.Hostname(); err != nil {
 			return "", err
 		}
+	case "fqdn":
+		uname = win32.GetComputerNameExA(3)
 	case "shorthost":
 		if uname, err = os.Hostname(); err != nil {
 			return "", err

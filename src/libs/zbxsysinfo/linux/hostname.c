@@ -48,8 +48,10 @@ int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	hostname = zbx_strdup(NULL, name.nodename);
 
-	if (FAIL == (rc = hostname_handle_params(request, result, hostname)))
+#define FQDN_COMMAND "hostname -f"
+	if (FAIL == (rc = hostname_handle_params(request, result, hostname, FQDN_COMMAND)))
 		zbx_free(hostname);
+#undef FQDN_COMMAND
 
 	return rc;
 }

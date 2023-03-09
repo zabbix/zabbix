@@ -51,8 +51,10 @@ int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (FAIL == (rc = hostname_handle_params(request, result, hostname)))
+#define FQDN_COMMAND "hostname"
+	if (FAIL == (rc = hostname_handle_params(request, result, hostname, FQDN_COMMAND)))
 		zbx_free(hostname);
+#undef FQDN_COMMAND
 
 	return rc;
 }
