@@ -37,14 +37,16 @@
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
 
+ZBX_PTR_VECTOR_DECL(discoverer_services_ptr, zbx_dservice_t*)
+
 typedef struct
 {
-	zbx_vector_ptr_t	services;
-	zbx_uint64_t		druleid;
-	char			*ip;
-	char			*dnsname;
-	int			now;
-	zbx_uint64_t		unique_dcheckid;
+	zbx_vector_discoverer_services_ptr_t	services;
+	zbx_uint64_t				druleid;
+	char					*ip;
+	char					*dnsname;
+	int					now;
+	zbx_uint64_t				unique_dcheckid;
 }
 zbx_discovery_results_t;
 
@@ -63,7 +65,7 @@ typedef struct
 }
 zbx_discoverer_job_ref_t;
 
-ZBX_PTR_VECTOR_DECL(discoverer_job_refs, zbx_discoverer_job_ref_t)
+ZBX_VECTOR_DECL(discoverer_job_refs, zbx_discoverer_job_ref_t)
 
 #define DISCOVERER_WORKER_INIT_NONE	0x00
 #define DISCOVERER_WORKER_INIT_THREAD	0x01
@@ -91,7 +93,8 @@ typedef struct
 }
 zbx_discoverer_manager_t;
 
-ZBX_PTR_VECTOR_IMPL(discoverer_job_refs, zbx_discoverer_job_ref_t)
+ZBX_PTR_VECTOR_IMPL(discoverer_services_ptr, zbx_dservice_t*)
+ZBX_VECTOR_IMPL(discoverer_job_refs, zbx_discoverer_job_ref_t)
 
 extern unsigned char			program_type;
 
@@ -365,41 +368,18 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 				else
 #ifdef HAVE_NETSNMP
 				{
-					item.snmp_community = strdup(dcheck->snmp_community);
-					item.snmp_oid = strdup(dcheck->key_);
-
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-							NULL, NULL, NULL, NULL, NULL, &item.snmp_community,
-							MACRO_TYPE_COMMON, NULL, 0);
-					zbx_substitute_key_macros(&item.snmp_oid, NULL, NULL, NULL, NULL,
-							MACRO_TYPE_SNMP_OID, NULL, 0);
+					item.snmp_community = dcheck->snmp_community;
+					item.snmp_oid = dcheck->key_;
 
 					if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
 					{
-						item.snmpv3_securityname =
-								zbx_strdup(NULL, dcheck->snmpv3_securityname);
+						item.snmpv3_securityname = dcheck->snmpv3_securityname;
 						item.snmpv3_securitylevel = dcheck->snmpv3_securitylevel;
-						item.snmpv3_authpassphrase =
-								zbx_strdup(NULL, dcheck->snmpv3_authpassphrase);
-						item.snmpv3_privpassphrase =
-								zbx_strdup(NULL, dcheck->snmpv3_privpassphrase);
+						item.snmpv3_authpassphrase = dcheck->snmpv3_authpassphrase;
+						item.snmpv3_privpassphrase = dcheck->snmpv3_privpassphrase;
 						item.snmpv3_authprotocol = dcheck->snmpv3_authprotocol;
 						item.snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
-						item.snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
-
-						zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-								NULL, NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
-						zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-								NULL, NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL,
-								0);
-						zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-								NULL, NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
-						zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-								NULL, NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
+						item.snmpv3_contextname = dcheck->snmpv3_contextname;
 					}
 
 					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER, config_timeout) &&
@@ -409,17 +389,6 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 					}
 					else
 						ret = FAIL;
-
-					zbx_free(item.snmp_community);
-					zbx_free(item.snmp_oid);
-
-					if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
-					{
-						zbx_free(item.snmpv3_securityname);
-						zbx_free(item.snmpv3_authpassphrase);
-						zbx_free(item.snmpv3_privpassphrase);
-						zbx_free(item.snmpv3_contextname);
-					}
 				}
 #else
 					ret = FAIL;
@@ -465,12 +434,17 @@ static void	dcheck_copy(const zbx_dc_dcheck_t *src, zbx_dc_dcheck_t *dst)
 	}
 }
 
+static void	service_free(zbx_dservice_t *service)
+{
+	zbx_free(service);
+}
+
 static void	results_clear(zbx_discovery_results_t *result)
 {
 	zbx_free(result->ip);
 	zbx_free(result->dnsname);
-	zbx_vector_ptr_clear_ext(&result->services, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&result->services);
+	zbx_vector_discoverer_services_ptr_clear_ext(&result->services, service_free);
+	zbx_vector_discoverer_services_ptr_destroy(&result->services);
 }
 
 static void	results_free(zbx_discovery_results_t *result)
@@ -515,6 +489,33 @@ static int	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dcheck_t *dch
 
 			dcheck_ptr = (zbx_dc_dcheck_t*)zbx_malloc(NULL, sizeof(zbx_dc_dcheck_t));
 			dcheck_copy(dcheck, dcheck_ptr);
+
+			if (SVC_SNMPv1 == dcheck_ptr->type || SVC_SNMPv2c == dcheck_ptr->type ||
+					SVC_SNMPv3 == dcheck_ptr->type)
+			{
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+						NULL, NULL, NULL, NULL, &dcheck_ptr->snmp_community, MACRO_TYPE_COMMON,
+						NULL, 0);
+				zbx_substitute_key_macros(&dcheck_ptr->key_, NULL, NULL, NULL, NULL,
+						MACRO_TYPE_SNMP_OID, NULL, 0);
+
+				if (SVC_SNMPv3 == dcheck_ptr->type)
+				{
+					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, NULL, NULL, NULL, NULL,
+							&dcheck_ptr->snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
+					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, NULL, NULL, NULL, NULL,
+							&dcheck_ptr->snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL,
+							0);
+					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, NULL, NULL, NULL, NULL,
+							&dcheck_ptr->snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, NULL, NULL, NULL, NULL,
+							&dcheck_ptr->snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
+				}
+			}
 
 			if (NULL != (task = zbx_hashset_search(tasks, &task_local)))
 			{
@@ -593,7 +594,7 @@ static int	process_checks(const zbx_dc_drule_t *drule, char *ip, int unique, int
 }
 
 static int	process_services(zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip, const char *dns,
-		int now, zbx_uint64_t unique_dcheckid, const zbx_vector_ptr_t *services)
+		int now, zbx_uint64_t unique_dcheckid, const zbx_vector_discoverer_services_ptr_t *services)
 {
 	int	host_status = -1, i;
 
@@ -856,7 +857,9 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 		if (NULL != (task_count = zbx_hashset_search(&manager->incomplete_task_count, &cmp)))
 		{
 			if (0 == task_count->count)
+			{
 				zbx_hashset_remove_direct(&manager->incomplete_task_count, task_count);
+			}
 			else
 				continue;
 		}
@@ -1036,7 +1039,7 @@ static zbx_discovery_results_t	*rdiscovery_result_create(zbx_uint64_t druleid,
 
 	result = (zbx_discovery_results_t *)zbx_malloc(NULL, sizeof(zbx_discovery_results_t));
 
-	zbx_vector_ptr_create(&result->services);
+	zbx_vector_discoverer_services_ptr_create(&result->services);
 
 	result->druleid = druleid;
 	result->unique_dcheckid = task->unique_dcheckid;
@@ -1073,7 +1076,7 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 		*service->value = '\0';
 		result = rdiscovery_result_create(druleid, task);
 		result->ip = zbx_strdup(result->ip, task->ips->values[i]);
-		zbx_vector_ptr_append(&result->services, service);
+		zbx_vector_discoverer_services_ptr_append(&result->services, service);
 		zbx_vector_ptr_append(results, result);
 	}
 
@@ -1140,7 +1143,7 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_ptr_t *vr_s
 		if (NULL == (dst = zbx_hashset_search(hr_dst, src)))
 		{
 			dst = zbx_hashset_insert(hr_dst, src, sizeof(zbx_discovery_results_t));
-			zbx_vector_ptr_create(&dst->services);
+			zbx_vector_discoverer_services_ptr_create(&dst->services);
 
 			src->dnsname = NULL;
 			src->ip = NULL;
@@ -1151,8 +1154,9 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_ptr_t *vr_s
 			src->dnsname = NULL;
 		}
 
-		zbx_vector_ptr_append_array(&dst->services, src->services.values, src->services.values_num);
-		zbx_vector_ptr_clear(&src->services);
+		zbx_vector_discoverer_services_ptr_append_array(&dst->services, src->services.values,
+				src->services.values_num);
+		zbx_vector_discoverer_services_ptr_clear(&src->services);
 	}
 }
 
@@ -1180,17 +1184,17 @@ static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_
 static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		int config_timeout)
 {
-	int			i;
-	char			dns[ZBX_INTERFACE_DNS_LEN_MAX];
-	zbx_vector_ptr_t	services;
-	zbx_discovery_results_t	*result = NULL, result_cmp;
-	char			*value = NULL;
-	size_t			value_alloc = 128;
+	int					i;
+	char					dns[ZBX_INTERFACE_DNS_LEN_MAX];
+	zbx_vector_discoverer_services_ptr_t	services;
+	zbx_discovery_results_t			*result = NULL, result_cmp;
+	char					*value = NULL;
+	size_t					value_alloc = 128;
 
 	if (1 == task->resolve_dns)
 		zbx_gethost_by_ip(task->ip, dns, sizeof(dns));
 
-	zbx_vector_ptr_create(&services);
+	zbx_vector_discoverer_services_ptr_create(&services);
 
 	value = (char *)zbx_malloc(value, value_alloc);
 
@@ -1204,7 +1208,7 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 				&value_alloc)) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
 		zbx_strlcpy_utf8(service->value, value, ZBX_MAX_DISCOVERED_VALUE_SIZE);
 
-		zbx_vector_ptr_append(&services, service);
+		zbx_vector_discoverer_services_ptr_append(&services, service);
 	}
 
 	zbx_free(value);
@@ -1228,11 +1232,11 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 	if (1 == task->resolve_dns)
 		result->dnsname = zbx_strdup(result->dnsname, dns);
 
-	zbx_vector_ptr_append_array(&result->services, services.values, services.values_num);
+	zbx_vector_discoverer_services_ptr_append_array(&result->services, services.values, services.values_num);
 	discoverer_task_count_decrease(&dmanager.incomplete_task_count, druleid, task->ip, task->dchecks.values_num);
 	pthread_mutex_unlock(&dmanager.results_lock);
 
-	zbx_vector_ptr_destroy(&services);
+	zbx_vector_discoverer_services_ptr_destroy(&services);
 }
 
 static void	*discoverer_worker_entry(void *net_check_worker)
@@ -1571,12 +1575,19 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 			if (0 < rule_count)
 			{
-				pthread_mutex_lock(&dmanager.results_lock);
-				zbx_hashset_destroy(&dmanager.incomplete_task_count);
-				zbx_hashset_copy(&dmanager.incomplete_task_count, &task_counts,
-						sizeof(zbx_discoverer_task_count_t));
-				pthread_mutex_unlock(&dmanager.results_lock);
+				zbx_hashset_iter_t		iter;
+				zbx_discoverer_task_count_t	*tcount;
 
+				zbx_hashset_iter_reset(&task_counts, &iter);
+				pthread_mutex_lock(&dmanager.results_lock);
+
+				while (NULL != (tcount = (zbx_discoverer_task_count_t *)zbx_hashset_iter_next(&iter)))
+				{
+					zbx_hashset_insert(&dmanager.incomplete_task_count, tcount,
+							sizeof(zbx_discoverer_task_count_t));
+				}
+
+				pthread_mutex_unlock(&dmanager.results_lock);
 				discoverer_queue_lock(&dmanager.queue);
 
 				for (i = 0; i < jobs.values_num; i++)
