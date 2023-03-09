@@ -9,7 +9,7 @@ zabbix_export:
       uuid: d670c32f007d438c9dcd32db57d2b691
       template: 'Oracle by Zabbix agent 2'
       name: 'Oracle by Zabbix agent 2'
-      description: 'Template tooling version used: 0.42'
+      description: 'Template tooling version used: 0.43'
       vendor:
         name: Zabbix
         version: 7.0-0
@@ -2180,21 +2180,30 @@ zabbix_export:
             evaltype: AND
             conditions:
               -
+                macro: '{#CON_NAME}'
+                value: '{$ORACLE.TABLESPACE.CONTAINER.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#CON_NAME}'
+                value: '{$ORACLE.TABLESPACE.CONTAINER.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
                 macro: '{#TABLESPACE}'
                 value: '{$ORACLE.TABLESPACE.NAME.MATCHES}'
-                formulaid: A
+                formulaid: C
               -
                 macro: '{#TABLESPACE}'
                 value: '{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
+                formulaid: D
           description: 'Scanning tablespaces in DBMS.'
           item_prototypes:
             -
               uuid: 14a26a84cfe947089843ed93cd7707c8
-              name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace allocated, bytes'
+              name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace allocated, bytes'
               type: DEPENDENT
-              key: 'oracle.tbs_alloc_bytes["{#TABLESPACE}"]'
+              key: 'oracle.tbs_alloc_bytes["{#CON_NAME}","{#TABLESPACE}"]'
               delay: '0'
               history: 7d
               units: B
@@ -2205,7 +2214,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].file_bytes.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2214,13 +2223,16 @@ zabbix_export:
                   tag: contents
                   value: '{#CONTENTS}'
                 -
+                  tag: database
+                  value: '{#CON_NAME}'
+                -
                   tag: tablespace
                   value: '{#TABLESPACE}'
             -
               uuid: d7263b6da6c04c7798909a8448f526ab
-              name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace free, bytes'
+              name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace free, bytes'
               type: DEPENDENT
-              key: 'oracle.tbs_free_bytes["{#TABLESPACE}"]'
+              key: 'oracle.tbs_free_bytes["{#CON_NAME}","{#TABLESPACE}"]'
               delay: '0'
               history: 7d
               units: B
@@ -2231,7 +2243,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].free_bytes.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2240,13 +2252,16 @@ zabbix_export:
                   tag: contents
                   value: '{#CONTENTS}'
                 -
+                  tag: database
+                  value: '{#CON_NAME}'
+                -
                   tag: tablespace
                   value: '{#TABLESPACE}'
             -
               uuid: d2d919d303b244829c797245e08c2fe5
-              name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace MAX size, bytes'
+              name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace MAX size, bytes'
               type: DEPENDENT
-              key: 'oracle.tbs_max_bytes["{#TABLESPACE}"]'
+              key: 'oracle.tbs_max_bytes["{#CON_NAME}","{#TABLESPACE}"]'
               delay: '0'
               history: 7d
               units: B
@@ -2257,7 +2272,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].max_bytes.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2266,13 +2281,16 @@ zabbix_export:
                   tag: contents
                   value: '{#CONTENTS}'
                 -
+                  tag: database
+                  value: '{#CON_NAME}'
+                -
                   tag: tablespace
                   value: '{#TABLESPACE}'
             -
               uuid: de6892ac5ca4499db01dd02c0444aafc
-              name: 'Oracle TBS ''{#TABLESPACE}'': Open status'
+              name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Open status'
               type: DEPENDENT
-              key: 'oracle.tbs_status["{#TABLESPACE}"]'
+              key: 'oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"]'
               delay: '0'
               history: 7d
               description: |
@@ -2288,7 +2306,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].status.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2297,13 +2315,16 @@ zabbix_export:
                   tag: contents
                   value: '{#CONTENTS}'
                 -
+                  tag: database
+                  value: '{#CON_NAME}'
+                -
                   tag: tablespace
                   value: '{#TABLESPACE}'
               trigger_prototypes:
                 -
                   uuid: 832f908ca3b84a3c9a030b5d33b96016
-                  expression: 'last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"])=2'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace is OFFLINE'
+                  expression: 'last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"])=2'
+                  name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace is OFFLINE'
                   priority: WARNING
                   description: 'The tablespace is in the offline state.'
                   tags:
@@ -2312,25 +2333,25 @@ zabbix_export:
                       value: availability
                 -
                   uuid: 2e84836974b340b5b916eed08e1fcdf4
-                  expression: 'last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#2)'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace status has changed'
-                  event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace status has changed (new value received: {ITEM.VALUE})'
+                  expression: 'last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#2)'
+                  name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace status has changed'
+                  event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
                   description: 'Oracle tablespace status has changed. Ack to close.'
                   manual_close: 'YES'
                   dependencies:
                     -
-                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace is OFFLINE'
-                      expression: 'last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"])=2'
+                      name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace is OFFLINE'
+                      expression: 'last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"])=2'
                   tags:
                     -
                       tag: scope
                       value: notice
             -
               uuid: ab56fee407e143db912dffcf24fb0106
-              name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace used, bytes'
+              name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace used, bytes'
               type: DEPENDENT
-              key: 'oracle.tbs_used_bytes["{#TABLESPACE}"]'
+              key: 'oracle.tbs_used_bytes["{#CON_NAME}","{#TABLESPACE}"]'
               delay: '0'
               history: 7d
               units: B
@@ -2341,7 +2362,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].used_bytes.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2350,13 +2371,16 @@ zabbix_export:
                   tag: contents
                   value: '{#CONTENTS}'
                 -
+                  tag: database
+                  value: '{#CON_NAME}'
+                -
                   tag: tablespace
                   value: '{#TABLESPACE}'
             -
               uuid: 358615a3e372462e9cec05df1df22743
-              name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage, percent'
+              name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage, percent'
               type: DEPENDENT
-              key: 'oracle.tbs_used_file_pct["{#TABLESPACE}"]'
+              key: 'oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2368,7 +2392,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].used_file_pct.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2377,14 +2401,17 @@ zabbix_export:
                   tag: contents
                   value: '{#CONTENTS}'
                 -
+                  tag: database
+                  value: '{#CON_NAME}'
+                -
                   tag: tablespace
                   value: '{#TABLESPACE}'
               trigger_prototypes:
                 -
                   uuid: bbc86236064348ee9150dfdd07623061
-                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high'
-                  event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
+                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
+                  name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high'
+                  event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
                   priority: HIGH
                   tags:
                     -
@@ -2392,23 +2419,23 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: ba298d35aaaa4386b4f03914dcf1cb27
-                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high'
-                  event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
+                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
+                  name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high'
+                  event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high'
-                      expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
+                      name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high'
+                      expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
                   tags:
                     -
                       tag: scope
                       value: capacity
             -
               uuid: 5d6293b33a46488c88a75dc898bf7059
-              name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace allocated, percent'
+              name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace allocated, percent'
               type: DEPENDENT
-              key: 'oracle.tbs_used_pct["{#TABLESPACE}"]'
+              key: 'oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2420,7 +2447,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].used_pct_max.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2429,28 +2456,31 @@ zabbix_export:
                   tag: contents
                   value: '{#CONTENTS}'
                 -
+                  tag: database
+                  value: '{#CON_NAME}'
+                -
                   tag: tablespace
                   value: '{#TABLESPACE}'
               trigger_prototypes:
                 -
                   uuid: 2530cb03fb4e4e728396834f0db89466
-                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
-                  event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
+                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
+                  name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
+                  event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
-                      expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
+                      name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
+                      expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
                   tags:
                     -
                       tag: scope
                       value: capacity
                 -
                   uuid: 451108a2251848ea8719378d5c0abb42
-                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
-                  event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
+                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
+                  name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
+                  event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
                   priority: HIGH
                   tags:
                     -
@@ -2458,8 +2488,8 @@ zabbix_export:
                       value: capacity
             -
               uuid: 97ac4acedcde465b8d004a8ac476dd99
-              name: 'Oracle TBS ''{#TABLESPACE}'': Get tablespaces stats'
-              key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
+              name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Get tablespaces stats'
+              key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
               history: '0'
               trends: '0'
               value_type: TEXT
@@ -2474,25 +2504,25 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 4b20cce21abb453f9aab0dbce75ff060
-              name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace ''{#TABLESPACE}'''
+              name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': ''{#CON_NAME}'' Tablespace ''{#TABLESPACE}'''
               graph_items:
                 -
                   color: 1A7C11
                   item:
                     host: 'Oracle by Zabbix agent 2'
-                    key: 'oracle.tbs_alloc_bytes["{#TABLESPACE}"]'
+                    key: 'oracle.tbs_alloc_bytes["{#CON_NAME}","{#TABLESPACE}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Oracle by Zabbix agent 2'
-                    key: 'oracle.tbs_max_bytes["{#TABLESPACE}"]'
+                    key: 'oracle.tbs_max_bytes["{#CON_NAME}","{#TABLESPACE}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'Oracle by Zabbix agent 2'
-                    key: 'oracle.tbs_used_bytes["{#TABLESPACE}"]'
+                    key: 'oracle.tbs_used_bytes["{#CON_NAME}","{#TABLESPACE}"]'
       tags:
         -
           tag: class
@@ -2572,6 +2602,14 @@ zabbix_export:
           macro: '{$ORACLE.SHARED.FREE.MIN.WARN}'
           value: '5'
           description: 'Alert threshold for the minimum percentage of free shared pool for a trigger expression.'
+        -
+          macro: '{$ORACLE.TABLESPACE.CONTAINER.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.'
+        -
+          macro: '{$ORACLE.TABLESPACE.CONTAINER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.'
         -
           macro: '{$ORACLE.TABLESPACE.NAME.MATCHES}'
           value: '.*'
