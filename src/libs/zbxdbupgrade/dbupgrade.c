@@ -935,28 +935,26 @@ static int	DBcheck_nodes(void)
 
 	zbx_db_free_result(result);
 
-	result = zbx_db_select("select status,lastaccess,name"
+	/* check if there are recently accessed ZBX_NODE_STATUS_STANDBY or ZBX_NODE_STATUS_ACTIVE nodes */
+	result = zbx_db_select("select lastaccess,name"
 			" from ha_node"
-			" where status!=%d"
+			" where status not in (%d,%d)"
 			" order by ha_nodeid" ZBX_FOR_UPDATE,
-			ZBX_NODE_STATUS_STOPPED);
+			ZBX_NODE_STATUS_STOPPED, ZBX_NODE_STATUS_UNAVAILABLE);
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		int	status, lastaccess, age;
+		int	lastaccess, age;
 
-		status = atoi(row[0]);
-		lastaccess = atoi(row[1]);
+		lastaccess = atoi(row[0]);
 
 		if ((age = lastaccess + failover_delay - db_time) <= 0)
 			continue;
 
-		if (ZBX_NODE_STATUS_STOPPED != status)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade: node \"%s\" is still running,"
-					" if node is unreachable it will be skipped in %s",
-					'\0' != *row[2] ? row[2] : "<standalone server>", zbx_age2str(age));
-			ret = FAIL;
-		}
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade: node \"%s\" is still running, if node"
+				" is unreachable it will be skipped in %s",
+				'\0' != *row[1] ? row[1] : "<standalone server>", zbx_age2str(age));
+
+		ret = FAIL;
 	}
 	zbx_db_free_result(result);
 
