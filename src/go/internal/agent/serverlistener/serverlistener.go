@@ -22,6 +22,7 @@ package serverlistener
 import (
 	"fmt"
 	"net"
+	"os"
 	"strings"
 	"time"
 
@@ -42,6 +43,7 @@ type ServerListener struct {
 	tlsConfig    *tls.Config
 	allowedPeers *zbxnet.AllowedPeers
 	bindIP       string
+	last_err     string
 }
 
 func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err error) {
@@ -66,6 +68,7 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 
 func (sl *ServerListener) run() {
 	defer log.PanicHook()
+
 	log.Debugf("[%d] starting listener for '%s:%d'", sl.listenerID, sl.bindIP, sl.options.ListenPort)
 
 	for {
@@ -81,10 +84,25 @@ func (sl *ServerListener) run() {
 				log.Warningf("failed to process an incoming connection from %s: %s", conn.RemoteIP(), err.Error())
 			}
 		} else {
-			log.Errf("failed to accept an incoming connection: %s", err.Error())
+			if nerr, ok := err.(net.Error); ok {
+				if nerr.Timeout() {
+					log.Errf("failed to accept an incoming connection: %s", err.Error())
+					continue
+				}
 
-			if nerr, ok := err.(net.Error); ok && nerr.Temporary() {
-				continue
+				/* sleep to avoid high CPU usage on surprising temporary errors */
+				if nerr.Temporary() {
+					if opError, ok := err.(*net.OpError); ok {
+						if se, ok := opError.Err.(*os.SyscallError); ok {
+							if sl.last_err == se.Err.Error() {
+								time.Sleep(time.Second)
+							}
+							sl.last_err = se.Err.Error()
+						}
+					}
+					log.Errf("failed to accept an incoming connection: %s", err.Error())
+					continue
+				}
 			}
 			break
 		}

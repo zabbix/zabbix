@@ -22,6 +22,8 @@ package remotecontrol
 import (
 	"bufio"
 	"net"
+	"os"
+	"time"
 
 	"git.zabbix.com/ap/plugin-support/log"
 )
@@ -29,6 +31,7 @@ import (
 type Conn struct {
 	listener net.Listener
 	sink     chan *Client
+	last_err string
 }
 
 type Client struct {
@@ -67,10 +70,25 @@ func (c *Conn) run() {
 		conn, err := c.listener.Accept()
 
 		if err != nil {
-			log.Errf("failed to accept an incoming connection for remote command: %s", err.Error())
+			if nerr, ok := err.(net.Error); ok {
+				if nerr.Timeout() {
+					log.Errf("failed to accept an incoming connection for remote command: %s", err.Error())
+					continue
+				}
 
-			if nerr, ok := err.(net.Error); ok && nerr.Temporary() {
-				continue
+				/* sleep to avoid high CPU usage on surprising temporary errors */
+				if nerr.Temporary() {
+					if opError, ok := err.(*net.OpError); ok {
+						if se, ok := opError.Err.(*os.SyscallError); ok {
+							if c.last_err == se.Err.Error() {
+								time.Sleep(time.Second)
+							}
+							c.last_err = se.Err.Error()
+						}
+					}
+					log.Errf("failed to accept an incoming connection for remote command: %s", err.Error())
+					continue
+				}
 			}
 
 			break
