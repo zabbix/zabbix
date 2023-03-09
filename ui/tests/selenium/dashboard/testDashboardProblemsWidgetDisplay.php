@@ -320,7 +320,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'fields' => [
 						'Name' => 'Group, Problem filter',
 						'Hosts' => 'Host for Problems Widgets',
-						'Problem' => 'Trigger for widget 2'
+						'Problem' => 'Trigger for widget 2',
+						'Show timeline' => true
 					],
 					'result' => [
 						['Problem • Severity' => 'Trigger for widget 2 unsigned'],
@@ -645,7 +646,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		// Assert Problems widget's table.
 		$dashboard->getWidget($data['fields']['Name']);
-		$table = $this->query('class:list-table')->asTable()->one()->waitUntilVisible();
+		$table = $this->query('class:list-table')->waitUntilVisible()->asTable()->one();
 
 		// Change time for actual value, because it cannot be used in data provider.
 		foreach ($data['result'] as &$row) {
@@ -688,7 +689,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			}
 		}
 
-		// When there are shown less lines than filered, table appears unusual and doesn't fit for framework functions.
+		// When there are shown less lines than filtered, table appears unusual and doesn't fit for framework functions.
 		if (CTestArrayHelper::get($data['fields'], 'Show lines')) {
 			$this->assertEquals(count($data['result']) + 1, $table->getRows()->count());
 
