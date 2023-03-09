@@ -417,7 +417,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'Media type mapping' => [
 						[
 							'Name' => 'mail',
-							'Media type' => 'Email',
+							'Media type' => 'SMS',
 							'Attribute' => 'mobile'
 						]
 					],
