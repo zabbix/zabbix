@@ -2,7 +2,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 
 This template is designed to get metrics from the Control-M server using the Control-M Automation API with HTTP agent.
 
@@ -10,7 +10,7 @@ This template monitors server statistics, discovers jobs and agents using Low Le
 
 To use this template, macros `{$API.TOKEN}`, `{$API.URI.ENDPOINT}`, and `{$SERVER.NAME}` need to be set.
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 ## Tested versions
 
@@ -127,7 +127,7 @@ You can also provide feedback, discuss the template, or ask for help at [ZABBIX 
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 
 This template is designed to get metrics from the Control-M Enterprise Manager using the Control-M Automation API with HTTP agent.
 
@@ -135,7 +135,7 @@ This template monitors active Service Level Agreement (SLA) services, discovers 
 
 To use this template, macros `{$API.TOKEN}` and `{$API.URI.ENDPOINT}` need to be set.
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 ## Tested versions
 
