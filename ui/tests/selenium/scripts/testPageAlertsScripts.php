@@ -515,7 +515,6 @@ class testPageAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'delete_all' => true,
 					'error' => 'Cannot delete scripts. Script "Reboot" is used in action operation "Trigger action 4".'
 				]
 			],
@@ -564,7 +563,9 @@ class testPageAlertsScripts extends CWebTest {
 	 * @dataProvider getDeleteData
 	 */
 	public function testPageAlertsScripts_Delete($data) {
-		$old_hash = CDBHelper::getHash(self::$script_sql);
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::$script_sql);
+		}
 
 		$this->page->login()->open('zabbix.php?action=script.list');
 
@@ -572,22 +573,14 @@ class testPageAlertsScripts extends CWebTest {
 		$scripts_count = (array_key_exists('name', $data))
 				? count($data['name'])
 				: CDBHelper::getCount(self::$script_sql);
-
-
-		if (array_key_exists('delete_all', $data)) {
-			$this->selectTableRows();
-		}
-		else {
-			$this->selectTableRows($data['name']);
-		}
-
+		$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
 		// Verify that there is no possibility to delete selected script(s) if at least one of them contains linked action.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, ($scripts_count > 1) ? 'Cannot delete scripts' : 'Cannot delete script', $data['error']);
+			$this->assertMessage(TEST_BAD, 'Cannot delete script'.(($scripts_count > 1) ? 's' : ''), $data['error']);
 			$this->assertSelectedCount($scripts_count);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::$script_sql));
 
@@ -602,34 +595,29 @@ class testPageAlertsScripts extends CWebTest {
 	}
 
 	public function testPageAlertsScripts_CancelDelete() {
-		$this->cancelDelete();
+		$this->cancelDelete([self::$custom_script]);
 	}
 
 	public function testPageAlertsScripts_CancelMassDelete() {
-		$this->cancelDelete(true);
+		$this->cancelDelete();
 	}
 
 	/**
 	 * Function for checking cancelling of Delete action.
 	 *
-	 * @param boolean   $all  if true delete will perform for all scripts
+	 * @param array $scripts      script names, if empty delete will perform for all scripts
 	 */
-	private function cancelDelete($all = false) {
+	private function cancelDelete($scripts = []) {
 		$old_hash = CDBHelper::getHash(self::$script_sql);
 
 		$this->page->login()->open('zabbix.php?action=script.list');
-
-		if ($all) {
-			$this->selectTableRows();
-		}
-		else {
-			$this->selectTableRows(self::$custom_script);
-		}
+		$this->selectTableRows($scripts);
 
 		// Scripts count that will be selected before delete action.
-		$scripts_count = ($all) ? CDBHelper::getCount(self::$script_sql) : 1;
+		$scripts_count = ($scripts === []) ? CDBHelper::getCount(self::$script_sql) : count($scripts);
 
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
+		$this->assertEquals('Delete selected scripts?', $this->page->getAlertText());
 		$this->page->dismissAlert();
 		$this->page->waitUntilReady();
 
