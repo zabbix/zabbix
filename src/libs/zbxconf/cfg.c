@@ -335,7 +335,7 @@ static char	*expand_include_path(char *raw_path)
 
 	zbx_free(wraw_path);
 #else
-	if ('.' == *raw_path)
+	if ('/' != *raw_path)
 	{
 		char	*basedir, *cfg_file, *result = NULL;
 
