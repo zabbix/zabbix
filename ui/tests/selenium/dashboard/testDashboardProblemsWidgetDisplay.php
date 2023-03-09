@@ -650,7 +650,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Change time for actual value, because it cannot be used in data provider.
 		foreach ($data['result'] as &$row) {
 			if (CTestArrayHelper::get($row, 'Time')) {
-				$row['Time'] = date('H:i:s', self::$time + 7200);
+				$row['Time'] = date('H:i:s', self::$time);
 			}
 			unset($row);
 		}
@@ -676,8 +676,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							// Check rows in hint's table.
 							foreach ($hint_table->getRows() as $i => $row) {
 								$icon['actions'][$i]['Time'] = ($icon['actions'][$i]['Time'] === 'acknowledged')
-									? date('Y-m-d H:i:s', self::$acktime + 7200)
-									: date('Y-m-d H:i:s', self::$time + 7200);
+									? date('Y-m-d H:i:s', self::$acktime)
+									: date('Y-m-d H:i:s', self::$time);
 								$row->assertValues($icon['actions'][$i]);
 							}
 
