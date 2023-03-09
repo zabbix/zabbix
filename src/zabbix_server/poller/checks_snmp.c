@@ -880,7 +880,20 @@ static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *obj
 
 	if (NULL == strchr(printed_oid, '"') && NULL == strchr(printed_oid, '\''))
 	{
-		zbx_strlcpy(buffer, printed_oid + root_string_len + 1, buffer_len);
+		size_t	offset = 0;
+
+		if (0 != strncmp(buffer, printed_oid, buffer_len))
+		{
+			char	*sep;
+
+			if (NULL != (sep = strstr(printed_oid, "::")))
+				offset = sep - printed_oid + 2;
+		}
+		else
+			offset = root_string_len + 1;
+
+		zbx_strlcpy(buffer, printed_oid + offset, buffer_len);
+
 		return SUCCEED;
 	}
 
