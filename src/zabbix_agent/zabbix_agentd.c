@@ -91,7 +91,7 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #else
 #	include "zbxnix.h"
 #endif
-#include "active.h"
+#include "active_checks/active.h"
 #include "listener.h"
 
 #include "zbxsymbols.h"

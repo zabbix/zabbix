@@ -19,14 +19,17 @@
 
 #include "active.h"
 
-#include "zbxconf.h"
+#include "../zbxconf.h"
+#include "../logfiles/logfiles.h"
+#include "../logfiles/persistent_state.h"
+
 #include "log.h"
 #include "zbxsysinfo.h"
-#include "logfiles/logfiles.h"
 #include "zbxcommshigh.h"
 #include "zbxthreads.h"
 #include "zbxjson.h"
 #include "zbxregexp.h"
+#include "zbxnix.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
@@ -467,14 +470,15 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 
 	if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_REGEXP, &jp_data))
 	{
-	 	p = NULL;
+		p = NULL;
 		while (NULL != (p = zbx_json_next(&jp_data, p)))
 		{
 /* {"regexp":[{"name":"regexp1",...,...},{...},...]}
  *            ^------------------------^
  */			if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
+				zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s",
+						zbx_json_strerror());
 				goto out;
 			}
 
