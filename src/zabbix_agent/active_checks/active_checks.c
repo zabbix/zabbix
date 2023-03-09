@@ -32,7 +32,6 @@
 #include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxregexp.h"
-#include "zbxnix.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
