@@ -20,26 +20,10 @@
 #ifndef ZABBIX_ACTIVE_H
 #define ZABBIX_ACTIVE_H
 
-#include "zbxtime.h"
 #include "zbxthreads.h"
 #include "zbxalgo.h"
 #include "zbxcomms.h"
 
-extern char	*CONFIG_SOURCE_IP;
-extern char	*CONFIG_HOST_METADATA;
-extern char	*CONFIG_HOST_METADATA_ITEM;
-extern char	*CONFIG_HOST_INTERFACE;
-extern char	*CONFIG_HOST_INTERFACE_ITEM;
-extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
-extern int	CONFIG_BUFFER_SEND;
-extern int	CONFIG_BUFFER_SIZE;
-extern int	CONFIG_MAX_LINES_PER_SECOND;
-extern char	*CONFIG_LISTEN_IP;
-extern int	CONFIG_LISTEN_PORT;
-
-extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
-
-#define HOST_METADATA_LEN	65535	/* UTF-8 characters, not bytes */
 #define HOST_INTERFACE_LEN	255	/* UTF-8 characters, not bytes */
 
 typedef struct

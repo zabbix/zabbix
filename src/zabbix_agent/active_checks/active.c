@@ -27,6 +27,7 @@
 #include "zbxsysinfo.h"
 #include "zbxcommshigh.h"
 #include "zbxthreads.h"
+#include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxregexp.h"
 #include "zbxnix.h"
@@ -35,16 +36,19 @@
 #include "zbx_rtc_constants.h"
 #include "zbx_item_constants.h"
 
-extern ZBX_THREAD_LOCAL char		*CONFIG_HOSTNAME;
-extern int				CONFIG_HEARTBEAT_FREQUENCY;
-
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
 #elif defined(ZABBIX_DAEMON)
 #	include "zbxnix.h"
 #endif
 
-#include "zbxcrypto.h"
+extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
+extern int			CONFIG_HEARTBEAT_FREQUENCY;
+extern char			*CONFIG_SOURCE_IP;
+extern char			*CONFIG_HOST_INTERFACE;
+extern char			*CONFIG_HOST_INTERFACE_ITEM;
+extern int			CONFIG_BUFFER_SEND;
+extern int			CONFIG_BUFFER_SIZE;
 
 typedef struct
 {
@@ -655,7 +659,9 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t
 	}
 	else if (NULL != CONFIG_HOST_METADATA_ITEM)
 	{
+#define HOST_METADATA_LEN	65535	/* UTF-8 characters, not bytes */
 		process_config_item(&json, CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN, ZBX_PROTO_TAG_HOST_METADATA);
+#undef HOST_METADATA_LEN
 	}
 
 	if (NULL != CONFIG_HOST_INTERFACE)
