@@ -337,16 +337,15 @@ static char	*expand_include_path(char *raw_path)
 #else
 	if ('/' != *raw_path)
 	{
-		char	*basedir, *cfg_file, *result = NULL;
+		char	*cfg_file, *path;
 
 		cfg_file = zbx_strdup(NULL, CONFIG_FILE);
-		basedir = dirname(cfg_file);
-		result = zbx_dsprintf(result, "%s/%s", basedir, raw_path);
-
-		zbx_free(raw_path);
+		path = zbx_dsprintf(NULL, "%s/%s", dirname(cfg_file), raw_path);
 		zbx_free(cfg_file);
 
-		return result;
+		zbx_free(raw_path);
+
+		return path;
 	}
 #endif
 	return raw_path;
