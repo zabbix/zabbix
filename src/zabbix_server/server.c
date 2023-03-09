@@ -1314,7 +1314,7 @@ static void	zbx_check_db(void)
 #ifdef HAVE_POSTGRESQL
 			SUCCEED != zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
 #endif
-			SUCCEED != DBcheck_version()))
+			SUCCEED != zbx_db_check_version()))
 	{
 		result = FAIL;
 	}
@@ -2012,7 +2012,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_check_db();
 	zbx_db_save_server_status();
 
-	if (SUCCEED != DBcheck_double_type(zbx_config_dbhigh))
+	if (SUCCEED != zbx_db_check_double_type(zbx_config_dbhigh))
 	{
 		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_DISABLED;
 		zbx_update_epsilon_to_float_precision();

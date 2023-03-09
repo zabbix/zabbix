@@ -87,6 +87,10 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname);
+
+int	delete_problems_with_nonexistent_object(void);
+int	create_problem3_index(void);
+int	drop_c_problem_2_index(void);
 #endif /* !HAVE_SQLITE3 */
 
 unsigned char	DBget_program_type(void);

@@ -376,11 +376,9 @@ static int	DBpatch_3050028(void)
 	return DBmodify_field_type("alerts", &field, NULL);
 }
 
-extern int	DBpatch_3040006(void);
-
 static int	DBpatch_3050029(void)
 {
-	return DBpatch_3040006();
+	return create_problem3_index();
 }
 
 static int	DBpatch_3050030(void)
@@ -457,11 +455,9 @@ static int	DBpatch_3050036(void)
 	return SUCCEED;
 }
 
-extern int	DBpatch_3040007(void);
-
 static int	DBpatch_3050037(void)
 {
-	return DBpatch_3040007();
+	return drop_c_problem_2_index();
 }
 
 static int	DBpatch_3050038(void)
