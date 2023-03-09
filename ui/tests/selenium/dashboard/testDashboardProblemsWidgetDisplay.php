@@ -187,10 +187,10 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		$i = 0;
 		foreach ($problem_triggerids as $name => $id) {
 			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.
-				(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
+					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
 			);
 			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.
-				(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
+					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
 			);
 			$i++;
 		}
@@ -198,36 +198,36 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		$j = 0;
 		foreach ($symptoms_triggerids as $name => $id) {
 			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.
-				(1009850 + $j).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
+					(1009850 + $j).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
 			);
 			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.
-				(1009850 + $j).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
+					(1009850 + $j).', 0, 0, '.zbx_dbstr($id).', '.self::$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
 			);
 			$j++;
 		}
 
 		// Change triggers' state to Problem.
 		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for widget 1 float').', '.
-			zbx_dbstr('Trigger for widget 2 log').', '.zbx_dbstr('Trigger for widget 2 unsigned').', '.
-			zbx_dbstr('Trigger for widget text').', '.zbx_dbstr('Cause problem 1').', '.
-			zbx_dbstr('Symptom problem 2').', '.zbx_dbstr('Symptom problem 3').')'
+				zbx_dbstr('Trigger for widget 2 log').', '.zbx_dbstr('Trigger for widget 2 unsigned').', '.
+				zbx_dbstr('Trigger for widget text').', '.zbx_dbstr('Cause problem 1').', '.
+				zbx_dbstr('Symptom problem 2').', '.zbx_dbstr('Symptom problem 3').')'
 		);
 
 		// Manual close is true for the problem: Trigger for widget 1 char.
 		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.
-			zbx_dbstr('Trigger for widget 1 char')
+				zbx_dbstr('Trigger for widget 1 char')
 		);
 
 		// Set cause and symptoms.
 		DBexecute('UPDATE problem SET cause_eventid = 1009850 WHERE name IN ('.zbx_dbstr('Symptom problem 2').', '.
-			zbx_dbstr('Symptom problem 3').')'
+				zbx_dbstr('Symptom problem 3').')'
 		);
 		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES (1009851, 1009850)');
 		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES (1009852, 1009850)');
 
 		// Suppress the problem: 'Trigger for widget text'.
 		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES '.
-			'(100990, 1009954, NULL, 0)'
+				'(100990, 1009954, NULL, 0)'
 		);
 
 		// Acknowledge the problem: 'Trigger for widget 2 unsigned' and get acknowledge time.
@@ -347,7 +347,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						['Problem • Severity' => 'Trigger for widget 2 unsigned']
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-						'Update', 'Actions'
+							'Update', 'Actions'
 					]
 				]
 			],
@@ -366,7 +366,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						['Problem • Severity' => 'Trigger for widget 2 unsigned']
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-						'Update', 'Actions'
+							'Update', 'Actions'
 					]
 				]
 			],
@@ -467,7 +467,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-						'Duration', 'Update', 'Actions', 'Tags'
+							'Duration', 'Update', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -505,7 +505,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Second test trigger with tag priority' => 'Beta: bEpsilon: eEta: eZeta: z'
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-						'Duration', 'Update', 'Actions', 'Tags'
+							'Duration', 'Update', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -550,7 +550,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-						'Update', 'Actions', 'Tags'
+							'Update', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -588,7 +588,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-						'Update', 'Actions', 'Tags'
+							'Update', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -624,7 +624,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-						'Operational data', 'Duration', 'Update', 'Actions'
+							'Operational data', 'Duration', 'Update', 'Actions'
 					]
 				]
 			],
@@ -673,7 +673,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						['Problem • Severity' => 'Symptom problem 2']
 					],
 					'headers' => ['', '', 'Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-						'Duration', 'Update', 'Actions'
+							'Duration', 'Update', 'Actions'
 					]
 				]
 			],
@@ -693,7 +693,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						['Problem • Severity' => 'Symptom problem 2']
 					],
 					'headers' => ['', '', 'Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-						'Duration', 'Update', 'Actions'
+							'Duration', 'Update', 'Actions'
 					]
 				]
 			],
@@ -762,7 +762,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						// Click on icon and open hint.
 						$icon->click();
 						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()
-							->waitUntilVisible()->one();
+								->waitUntilVisible()->one();
 						$hint_table = $hint->query('class:list-table')->asTable()->one();
 
 						// Check rows in hint's table.
@@ -814,7 +814,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		if (CTestArrayHelper::get($data, 'check_tag_ellipsis')) {
 			foreach ($data['check_tag_ellipsis'] as $problem => $ellipsis_text) {
 				$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:icon-wizard-action')
-					->waitUntilClickable()->one()->click();
+						->waitUntilClickable()->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilVisible()->one();
 				$this->assertEquals($ellipsis_text, $hint->getText());
 				$hint->close();
@@ -824,7 +824,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Check eye icon for suppressed problem.
 		if (CTestArrayHelper::get($data, 'check_suppressed_icon')) {
 			$table->findRow('Problem • Severity', $data['check_suppressed_icon']['problem'])->getColumn('Info')
-				->query('class:icon-action-suppress')->waitUntilClickable()->one()->click();
+					->query('class:icon-action-suppress')->waitUntilClickable()->one()->click();
 			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilVisible()->one();
 			$this->assertEquals($data['check_suppressed_icon']['text'], $hint->getText());
 			$hint->close();
@@ -836,11 +836,11 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 	 */
 	public static function deleteWidgets() {
 		DBexecute('DELETE FROM widget'.
-			' WHERE dashboard_pageid'.
-			' IN (SELECT dashboard_pageid'.
-			' FROM dashboard_page'.
-			' WHERE dashboardid='.self::$dashboardid.
-			')'
+				' WHERE dashboard_pageid'.
+				' IN (SELECT dashboard_pageid'.
+					' FROM dashboard_page'.
+					' WHERE dashboardid='.self::$dashboardid.
+				')'
 		);
 	}
 }
