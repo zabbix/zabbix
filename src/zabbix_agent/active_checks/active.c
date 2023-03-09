@@ -70,11 +70,11 @@ active_buffer_element;
 
 typedef struct
 {
-	active_buffer_element		*data;
-	int				count;
-	int				pcount;
-	int				lastsent;
-	int				first_error;
+	active_buffer_element	*data;
+	int			count;
+	int			pcount;
+	int			lastsent;
+	int			first_error;
 }
 active_buffer;
 
@@ -988,7 +988,7 @@ ret:
  *   timestamp      - timestamp of read value                                 *
  *   source         - name of logged data source                              *
  *   severity       - severity of logged data sources                         *
- *   logeventid     - the application-specific identifier for                 *
+ *   logeventid     - application-specific identifier for                     *
  *                           the event; used for monitoring of Windows        *
  *                           event logs                                       *
  *   flags          - metric flags                                            *
@@ -1399,7 +1399,7 @@ static void	process_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_
  * Purpose: update active check and send buffer schedule by the specified     *
  *          time delta                                                        *
  *                                                                            *
- * Parameters: delta - [IN] the time delta in seconds                         *
+ * Parameters: delta - [IN] time delta in seconds                             *
  *                                                                            *
  * Comments: This function is used to update checking and sending schedules   *
  *           if the system time was rolled back.                              *
