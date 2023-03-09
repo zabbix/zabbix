@@ -8,11 +8,11 @@ It works without any external scripts and uses the script item.
 
 ## Requirements
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Create a user to monitor the service or use an existing read-only account.
 > See [Veeam Help Center](https://helpcenter.veeam.com/docs/backup/vbr_rest/reference/vbr-rest-v1-rev2.html?ver=110#tag/Login/operation/CreateToken!path=grant_type&t=request) for more details. 

@@ -7,7 +7,7 @@ This template is designed to monitor internal Zabbix metrics on the remote Zabbi
 
 ## Requirements
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 
 ## Setup
 

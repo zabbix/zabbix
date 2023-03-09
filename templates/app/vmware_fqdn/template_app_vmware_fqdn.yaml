@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.4'
+  version: '7.0'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -19,7 +19,7 @@ zabbix_export:
         Template tooling version used: 0.41
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Applications
@@ -34,7 +34,7 @@ zabbix_export:
           value_type: LOG
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/6.2/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
+          description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/7.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
           tags:
             -
               tag: component
@@ -312,7 +312,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Applications
@@ -1117,7 +1117,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Applications
