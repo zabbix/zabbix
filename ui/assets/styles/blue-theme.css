@@ -4211,6 +4211,7 @@ textarea {
   margin: 0;
   padding: 4px 5px;
   overflow: auto;
+  resize: vertical;
   font-family: Arial, Tahoma, Verdana, sans-serif;
   font-size: 1em;
   line-height: normal;
