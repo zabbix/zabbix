@@ -40,7 +40,7 @@
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
-#elif defined(ZABBIX_DAEMON)
+#elif !defined(_WINDOWS)
 #	include "zbxnix.h"
 #endif
 
