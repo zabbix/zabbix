@@ -33,6 +33,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 	use TableTrait;
 
 	private static $dashboardid;
+	private static $time;
+	protected static $acktime;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -125,7 +127,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		$this->assertArrayHasKey('triggerids', $triggers);
 		$triggerids = CDataHelper::getIds('description');
 
-		$time = time();
+		// Create events and problems.
+		self::$time = time();
 
 		foreach (array_values($itemids) as $itemid) {
 			CDataHelper::addItemData($itemid, 0);
@@ -135,21 +138,23 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		foreach ($triggerids as $name => $id) {
 			// Create events.
 			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.
-					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
+					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.zbx_dbstr(self::$time).', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
 			);
 
 			// Create problems.
 			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.
-					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
+					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.zbx_dbstr(self::$time).', 0, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
 			);
 			$i++;
 		}
 
-		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for widget 1 char.
+		// Change triggers' state to Problem.
 		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for widget 1 float').', '.
 				zbx_dbstr('Trigger for widget 2 log').', '.zbx_dbstr('Trigger for widget 2 unsigned').', '.
 				zbx_dbstr('Trigger for widget text').')'
 		);
+
+		// Manual close is true for the problem: Trigger for widget 1 char.
 		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.
 				zbx_dbstr('Trigger for widget 1 char')
 		);
@@ -170,6 +175,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			'eventids' => 1009953,
 			'select_acknowledges' => ['clock']
 		]);
+		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
 
 	public static function getCheckWidgetTable() {
@@ -182,10 +188,55 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Host groups' => 'Group for Problems Widgets'
 					],
 					'result' => [
-						'Trigger for widget 2 unsigned',
-						'Trigger for widget 2 log',
-						'Trigger for widget 1 char',
-						'Trigger for widget 1 float'
+						['Problem • Severity' => 'Trigger for widget 2 unsigned', 'Actions' => "1 message\n1 action"],
+						['Problem • Severity' => 'Trigger for widget 2 log'],
+						['Problem • Severity' => 'Trigger for widget 1 char'],
+						['Problem • Severity' => 'Trigger for widget 1 float']
+					],
+					'actions' => [
+						'Trigger for widget 2 unsigned' => [
+							// Green link Yes.
+							'Ack' => [
+								[
+									'selector' => 'green link-alt'
+								]
+							],
+							'Actions' => [
+								// Message bubble.
+								[
+									'selector' => 'icon-action-msgs',
+									'actions' => [
+										[
+											'Time' => 'acknowledged',
+											'User' => 'Admin (Zabbix Administrator)',
+											'Message' => 'Acknowledged event'
+										]
+									]
+								],
+								// Actions arrow icon.
+								[
+									'selector' => 'icon-actions-number-gray',
+									'actions' => [
+										[
+											'Time' => 'acknowledged',
+											'User/Recipient' => 'Admin (Zabbix Administrator)',
+											'Action' => '',
+											'Message/Command' => 'Acknowledged event',
+											'Status' => '',
+											'Info' => ''
+										],
+										[
+											'Time' => 'created',
+											'User/Recipient' => '',
+											'Action' => '',
+											'Message/Command' => '',
+											'Status' => '',
+											'Info' => ''
+										]
+									]
+								]
+							]
+						]
 					]
 				]
 			],
@@ -198,11 +249,15 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Show suppressed problems' => true
 					],
 					'result' => [
-						'Trigger for widget text',
-						'Trigger for widget 2 unsigned',
-						'Trigger for widget 2 log',
-						'Trigger for widget 1 char',
-						'Trigger for widget 1 float'
+						['Problem • Severity' => 'Trigger for widget text'],
+						['Problem • Severity' => 'Trigger for widget 2 unsigned'],
+						['Problem • Severity' => 'Trigger for widget 2 log'],
+						['Problem • Severity' => 'Trigger for widget 1 char'],
+						['Problem • Severity' => 'Trigger for widget 1 float']
+					],
+					'check_suppressed_icon' => [
+						'problem' => 'Trigger for widget text',
+						'text' => "Suppressed till: Never\nMaintenance: Inaccessible maintenance"
 					]
 				]
 			],
@@ -215,9 +270,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Show unacknowledged only' => true
 					],
 					'result' => [
-						'Trigger for widget 2 log',
-						'Trigger for widget 1 char',
-						'Trigger for widget 1 float'
+						['Problem • Severity' => 'Trigger for widget 2 log'],
+						['Problem • Severity' => 'Trigger for widget 1 char'],
+						['Problem • Severity' => 'Trigger for widget 1 float']
 					]
 				]
 			],
@@ -230,10 +285,10 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Sort entries by' => 'Problem (ascending)'
 					],
 					'result' => [
-						'Trigger for widget 1 char',
-						'Trigger for widget 1 float',
-						'Trigger for widget 2 log',
-						'Trigger for widget 2 unsigned'
+						['Problem • Severity' => 'Trigger for widget 1 char'],
+						['Problem • Severity' => 'Trigger for widget 1 float'],
+						['Problem • Severity' => 'Trigger for widget 2 log'],
+						['Problem • Severity' => 'Trigger for widget 2 unsigned']
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
 							'Ack', 'Actions'
@@ -249,10 +304,10 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Sort entries by' => 'Severity (ascending)'
 					],
 					'result' => [
-						'Trigger for widget 1 float',
-						'Trigger for widget 1 char',
-						'Trigger for widget 2 log',
-						'Trigger for widget 2 unsigned'
+						['Problem • Severity' => 'Trigger for widget 1 float'],
+						['Problem • Severity' => 'Trigger for widget 1 char'],
+						['Problem • Severity' => 'Trigger for widget 2 log'],
+						['Problem • Severity' => 'Trigger for widget 2 unsigned']
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
 							'Ack', 'Actions'
@@ -268,8 +323,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Problem' => 'Trigger for widget 2'
 					],
 					'result' => [
-						'Trigger for widget 2 unsigned',
-						'Trigger for widget 2 log'
+						['Problem • Severity' => 'Trigger for widget 2 unsigned'],
+						['Problem • Severity' => 'Trigger for widget 2 log']
 					]
 				]
 			],
@@ -287,8 +342,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'result' => [
-						'Trigger for tag permissions Oracle',
-						'Trigger for tag permissions MySQL'
+						['Problem • Severity' => 'Trigger for tag permissions Oracle'],
+						['Problem • Severity' => 'Trigger for tag permissions MySQL']
 					]
 				]
 			],
@@ -303,8 +358,26 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'id:severities_4' => true
 					],
 					'result' => [
-						'Trigger for widget 2 log',
-						'Trigger for widget 1 float'
+						[
+							'Time' => true,
+							'Recovery time' => '',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'Host for Problems Widgets',
+							'Problem • Severity' => 'Trigger for widget 2 log',
+							'Ack' => 'No',
+							'Actions' => ''
+						],
+						[
+							'Time' => true,
+							'Recovery time' => '',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'Host for Problems Widgets',
+							'Problem • Severity' => 'Trigger for widget 1 float',
+							'Ack' => 'No',
+							'Actions' => ''
+						]
 					]
 				]
 			],
@@ -327,12 +400,15 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'result' => [
-						'Fourth test trigger with tag priority',
-						'First test trigger with tag priority'
-					],
-					'tags_display' => [
-						'Delta: t',
-						'Alpha: a'
+						[
+							'Problem • Severity' => 'Fourth test trigger with tag priority',
+							'Tags' => 'Delta: t'
+
+						],
+						[
+							'Problem • Severity' => 'First test trigger with tag priority',
+							'Tags' => 'Alpha: a'
+						]
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
 							'Duration', 'Ack', 'Actions', 'Tags'
@@ -359,12 +435,18 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'result' => [
-						'Fourth test trigger with tag priority',
-						'Second test trigger with tag priority'
+						[
+							'Problem • Severity' => 'Fourth test trigger with tag priority',
+							'Tags' => 'Eta: eDelta: t'
+						],
+						[
+							'Problem • Severity' => 'Second test trigger with tag priority',
+							'Tags' => 'Eta: eBeta: b'
+						]
 					],
-					'tags_display' => [
-						'Eta: eDelta: t',
-						'Eta: eBeta: b'
+					'check_tag_ellipsis' => [
+						'Fourth test trigger with tag priority' => 'Delta: tEta: eGamma: gTheta: t',
+						'Second test trigger with tag priority' => 'Beta: bEpsilon: eEta: eZeta: z'
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
 							'Duration', 'Ack', 'Actions', 'Tags'
@@ -398,14 +480,18 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'result' => [
-						'Test trigger to check tag filter on problem page',
-						'Fourth test trigger with tag priority',
-						'Third test trigger with tag priority'
-					],
-					'tags_display' => [
-						'DatSer: abcser: abcdef',
-						'The: tDel: tEta: e',
-						'The: tAlp: aIot: i'
+						[
+							'Problem • Severity' => 'Test trigger to check tag filter on problem page',
+							'Tags' => 'DatSer: abcser: abcdef'
+						],
+						[
+							'Problem • Severity' => 'Fourth test trigger with tag priority',
+							'Tags' => 'The: tDel: tEta: e'
+						],
+						[
+							'Problem • Severity' => 'Third test trigger with tag priority',
+							'Tags' => 'The: tAlp: aIot: i'
+						]
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
 							'Ack', 'Actions', 'Tags'
@@ -440,9 +526,11 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'result' => [
-						'Fourth test trigger with tag priority'
+						[
+							'Problem • Severity' => 'Fourth test trigger with tag priority',
+							'Tags' => 'get'
+						]
 					],
-					'tags_display' => ['get'],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
 							'Ack', 'Actions', 'Tags'
 					]
@@ -458,18 +546,26 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Show suppressed problems' => true
 					],
 					'result' => [
-						'Trigger for widget text',
-						'Trigger for widget 2 unsigned',
-						'Trigger for widget 2 log',
-						'Trigger for widget 1 char',
-						'Trigger for widget 1 float'
-					],
-					'operational_data' => [
-						'0',
-						"Item value: \n0",
-						'0',
-						'0',
-						"Item value: \n0"
+						[
+							'Problem • Severity' => 'Trigger for widget text',
+							'Operational data' => '0'
+						],
+						[
+							'Problem • Severity' => 'Trigger for widget 2 unsigned',
+							'Operational data' => "Item value: \n0"
+						],
+						[
+							'Problem • Severity' => 'Trigger for widget 2 log',
+							'Operational data' => '0'
+						],
+						[
+							'Problem • Severity' => 'Trigger for widget 1 char',
+							'Operational data' => '0',
+						],
+						[
+							'Problem • Severity' => 'Trigger for widget 1 float',
+							'Operational data' => "Item value: \n0"
+						]
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
 							'Operational data', 'Duration', 'Ack', 'Actions'
@@ -486,9 +582,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Show unacknowledged only' => true
 					],
 					'result' => [
-						'Trigger for widget 2 log',
-						'Trigger for widget 1 char',
-						"Trigger for widget 1 float (Item value: \n0)"
+						['Problem • Severity' => 'Trigger for widget 2 log'],
+						['Problem • Severity' => 'Trigger for widget 1 char'],
+						['Problem • Severity' => "Trigger for widget 1 float (Item value: \n0)"]
 					]
 				]
 			],
@@ -506,12 +602,24 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					],
 					'stats' => '2 of 4 problems are shown'
 				]
+			],
+			// #15 Filtered so there is no data in result.
+			[
+				[
+					'fields' => [
+						'Name' => 'No data',
+						'Host groups' => 'Inheritance test'
+					],
+					'result' => []
+				]
 			]
 		];
 	}
 
 	/**
 	 * @dataProvider getCheckWidgetTable
+	 *
+	 * @onAfter deleteWidgets
 	 */
 	public function testDashboardProblemsWidgetDisplay_CheckTable($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
@@ -539,11 +647,46 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		$dashboard->getWidget($data['fields']['Name']);
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilVisible();
 
-		// Assert table headers depending on widget settings.
-		$headers = (CTestArrayHelper::get($data, 'headers', ['Time', '', '', 'Recovery time', 'Status', 'Info',
-				'Host', 'Problem • Severity', 'Duration', 'Ack', 'Actions']
-		));
-		$this->assertEquals($headers, $table->getHeadersText());
+		// Change time for actual value, because it cannot be used in data provider.
+		foreach ($data['result'] as &$row) {
+			if (CTestArrayHelper::get($row, 'Time')) {
+				$row['Time'] = date('H:i:s', self::$time + 7200);
+			}
+			unset($row);
+		}
+
+		// Check clicks on Acknowledge and Actions icons and hints' contents.
+		if (CTestArrayHelper::get($data, 'actions')) {
+			foreach ($data['actions'] as $problem => $columns) {
+				foreach ($columns as $column => $actions) {
+					$action_cell = $table->findRow('Problem • Severity', $problem)->getColumn($column);
+
+					foreach ($actions as $icon) {
+						$button = $action_cell->query('xpath:.//*['.CXPathHelper::fromClass($icon['selector']).']')
+								->waitUntilVisible()->one();
+						$this->assertTrue($button->isClickable());
+
+						if ($icon['selector'] !== 'green link-alt') {
+							// Click on icon and open hint.
+							$button->click();
+							$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()
+									->waitUntilVisible()->one();
+							$hint_table = $hint->query('class:list-table')->asTable()->one();
+
+							// Check rows in hint's table.
+							foreach ($hint_table->getRows() as $i => $row) {
+								$icon['actions'][$i]['Time'] = ($icon['actions'][$i]['Time'] === 'acknowledged')
+									? date('Y-m-d H:i:s', self::$acktime + 7200)
+									: date('Y-m-d H:i:s', self::$time + 7200);
+								$row->assertValues($icon['actions'][$i]);
+							}
+
+							$hint->close();
+						}
+					}
+				}
+			}
+		}
 
 		// When there are shown less lines than filered, table appears unusual and doesn't fit for framework functions.
 		if (CTestArrayHelper::get($data['fields'], 'Show lines')) {
@@ -560,20 +703,47 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			// Assert table stats.
 			$this->assertEquals($data['stats'], $table->getRow(count($data['result']))->getText());
 		}
+		elseif (empty($data['result'])) {
+			$this->assertTableData();
+		}
 		else {
-			$this->assertTableDataColumn($data['result'], 'Problem • Severity');
+			$this->assertTableHasData($data['result']);
 		}
 
-		if (CTestArrayHelper::get($data, 'operational_data')) {
-			$this->assertTableDataColumn($data['operational_data'], 'Operational data');
+		// Assert table headers depending on widget settings.
+		$headers = (CTestArrayHelper::get($data, 'headers', ['Time', '', '', 'Recovery time', 'Status', 'Info',
+				'Host', 'Problem • Severity', 'Duration', 'Ack', 'Actions']
+		));
+		$this->assertEquals($headers, $table->getHeadersText());
+
+		if (CTestArrayHelper::get($data['fields'], 'Show timeline')) {
+			$this->assertTrue($table->query('class:timeline-td')->exists());
 		}
 
-		// Assert Problems widget's tags column.
-		if (array_key_exists('Tags', $data)) {
-			$this->assertTableDataColumn($data['tags_display'], 'Tags');
+		if (CTestArrayHelper::get($data, 'check_tag_ellipsis')) {
+			foreach ($data['check_tag_ellipsis'] as $problem => $ellipsis_text) {
+				$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:icon-wizard-action')
+						->waitUntilClickable()->one()->click();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilVisible()->one();
+				$this->assertEquals($ellipsis_text, $hint->getText());
+				$hint->close();
+			}
 		}
 
-		// Delete created widget.
+		// Check eye icon for suppressed problem.
+		if (CTestArrayHelper::get($data, 'check_suppressed_icon')) {
+			$table->findRow('Problem • Severity', $data['check_suppressed_icon']['problem'])->getColumn('Info')
+					->query('class:icon-invisible')->waitUntilClickable()->one()->click();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilVisible()->one();
+			$this->assertEquals($data['check_suppressed_icon']['text'], $hint->getText());
+			$hint->close();
+		}
+	}
+
+	/**
+	 * Function for deletion widgets from test dashboard after case.
+	 */
+	public static function deleteWidgets() {
 		DBexecute('DELETE FROM widget'.
 				' WHERE dashboard_pageid'.
 				' IN (SELECT dashboard_pageid'.
