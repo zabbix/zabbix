@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup items
  *
- * @dataSource ExecuteNowAction, DiscoveredHosts
+ * @dataSource ExecuteNowAction, DiscoveredHosts, HostTemplateGroups
  */
 class testPageLowLevelDiscovery extends CWebTest {
 
@@ -424,6 +424,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Last error message of scenario "Web scenario for execute now".: DR5-web-dep',
 						'Zabbix server health: Zabbix stats cluster: High availability cluster node discovery',
 						'LLD for Discovered host tests',
+						'LLD for host group test',
 						'Linux by Zabbix agent: Get filesystems: Mounted filesystem discovery',
 						'Linux by Zabbix agent: Network interface discovery',
 						'Test of discovered host 1 template for unlink: Template1 discovery rule',

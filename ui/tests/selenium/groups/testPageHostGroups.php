@@ -345,7 +345,7 @@ class testPageHostGroups extends testPageGroups {
 		return [
 			[
 				[
-					'Group for Host prtotype' => ''
+					'Group for Host prototype' => ''
 				]
 			],
 			[
@@ -461,8 +461,8 @@ class testPageHostGroups extends testPageGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => 'Group for Host prtotype',
-					'error' => 'Group "Group for Host prtotype" cannot be deleted, because it is used by a host prototype.'
+					'groups' => 'Group for Host prototype',
+					'error' => 'Group "Group for Host prototype" cannot be deleted, because it is used by a host prototype.'
 				]
 			],
 			[
