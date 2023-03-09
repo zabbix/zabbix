@@ -23,7 +23,9 @@
 #include "../logfiles/logfiles.h"
 #include "../logfiles/persistent_state.h"
 
+#include "cfg.h"
 #include "log.h"
+#include "module.h"
 #include "zbxsysinfo.h"
 #include "zbxcommshigh.h"
 #include "zbxthreads.h"
@@ -32,6 +34,7 @@
 #include "zbxregexp.h"
 #include "zbxnix.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_item_constants.h"
