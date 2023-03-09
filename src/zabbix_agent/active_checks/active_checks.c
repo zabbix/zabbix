@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "active.h"
+#include "active_checks.h"
 
 #include "../zbxconf.h"
 #include "../logfiles/logfiles.h"
@@ -349,8 +349,7 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 	char			*name = NULL, *key_orig = NULL, expression[MAX_STRING_LEN],
 				tmp[MAX_STRING_LEN], exp_delimiter;
 	zbx_uint64_t		lastlogsize;
-	struct zbx_json_parse	jp;
-	struct zbx_json_parse	jp_data, jp_row;
+	struct zbx_json_parse	jp, jp_data, jp_row;
 	ZBX_ACTIVE_METRIC	*metric;
 	zbx_vector_str_t	received_metrics;
 	int			delay, mtime, expression_type, case_sensitive, i, j, ret = FAIL;
@@ -408,7 +407,7 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 	{
 /* {"data":[{"key":"system.cpu.num",...,...},{...},...]}
  *          ^------------------------------^
- */ 		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
+ */		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
 			goto out;
@@ -584,8 +583,7 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
 {
 	char		**value;
 	AGENT_RESULT	result;
-	const char	*config_name;
-	const char	*config_type;
+	const char	*config_name, *config_type;
 
 	if (CONFIG_HOST_METADATA_ITEM == config)
 	{
@@ -765,8 +763,7 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t
 static int	check_response(char *response)
 {
 	struct zbx_json_parse	jp;
-	char			value[MAX_STRING_LEN];
-	char			info[MAX_STRING_LEN];
+	char			value[MAX_STRING_LEN], info[MAX_STRING_LEN];
 	int			ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() response:'%s'", __func__, response);
@@ -810,10 +807,10 @@ static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *pre
 		const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	active_buffer_element	*el;
-	int				ret = SUCCEED, i, now, level;
-	zbx_timespec_t			ts;
-	zbx_socket_t			s;
-	struct zbx_json 		json;
+	int			ret = SUCCEED, i, now, level;
+	zbx_timespec_t		ts;
+	zbx_socket_t		s;
+	struct zbx_json		json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d entries:%d/%d",
 			__func__, ((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
@@ -1017,8 +1014,8 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 		const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	active_buffer_element	*el = NULL;
-	int				i, ret = FAIL;
-	size_t				sz;
+	int			i, ret = FAIL;
+	size_t			sz;
 
 	ZBX_UNUSED(agent2_result);
 
@@ -1485,8 +1482,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_uint32_t			config_revision_local = 0;
 	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num,
+					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	activechks_args_in = (zbx_thread_activechk_args *)((((zbx_thread_args_t *)args))->args);
 
@@ -1567,7 +1564,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			process_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
 					activechks_args_in->config_timeout);
 
-			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)	/* failed to complete processing active checks */
+			/* failed to complete processing active checks */
+			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
 				continue;
 
 			nextcheck = get_min_nextcheck();

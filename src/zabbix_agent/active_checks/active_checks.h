@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ACTIVE_H
-#define ZABBIX_ACTIVE_H
+#ifndef ZABBIX_ACTIVE_CHECKS_H
+#define ZABBIX_ACTIVE_CHECKS_H
 
 #include "zbxthreads.h"
 #include "zbxalgo.h"
@@ -39,4 +39,4 @@ zbx_thread_activechk_args;
 
 ZBX_THREAD_ENTRY(active_checks_thread, args);
 
-#endif	/* ZABBIX_ACTIVE_H */
+#endif	/* ZABBIX_ACTIVE_CHECKS_H */
