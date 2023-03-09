@@ -40,7 +40,6 @@ class CLegacyAction extends CAction {
 
 		if (in_array($this->getAction(), $json_actions) && array_key_exists('formdata_json', $_REQUEST)) {
 			$_REQUEST = json_decode($_REQUEST['formdata_json'], true);
-			$_POST = json_decode($_POST['formdata_json'], true);
 		}
 
 		return true;
