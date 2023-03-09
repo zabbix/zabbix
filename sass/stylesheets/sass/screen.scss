@@ -1753,6 +1753,7 @@ textarea {
 	margin: 0;
 	padding: 4px 5px;
 	overflow: auto;
+	resize: vertical;
 	font: {
 		family: $font-stack;
 		size: $font-form-size;
