@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-24T06:16:38Z'
+  date: '2023-03-09T15:16:21Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,6 +13,7 @@ zabbix_export:
       description: |
         This template is designed to monitor Veeam Backup Enterprise Manager.
         The Veeam Backup Enterprise Manager REST API enables the communication with Zabbix to query the information about Veeam Backup Enterprise Manager objects.
+        The RESTful API is available in Veeam Universal License (excluding Community), Enterprise Socket, and Enterprise Plus Socket.
         It works without any external scripts and uses the script item. 
         
         Setup:
