@@ -3591,7 +3591,8 @@ textarea {
   font-size: 1em;
   padding: 4px 5px;
   margin: 0;
-  overflow: auto; }
+  overflow: auto;
+  resize: vertical; }
   textarea[readonly] {
     color: #ffffff !important; }
     textarea[readonly]:focus {

@@ -1620,6 +1620,7 @@ textarea {
 	padding: 4px 5px;
 	margin: 0;
 	overflow: auto;
+	resize: vertical;
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
 
