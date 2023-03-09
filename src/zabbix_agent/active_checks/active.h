@@ -53,34 +53,6 @@ typedef struct
 }
 zbx_thread_activechk_args;
 
-typedef struct
-{
-	char		*host;
-	char		*key;
-	char		*value;
-	unsigned char	state;
-	zbx_uint64_t	lastlogsize;
-	int		timestamp;
-	char		*source;
-	int		severity;
-	zbx_timespec_t	ts;
-	int		logeventid;
-	int		mtime;
-	unsigned char	flags;
-	zbx_uint64_t	id;
-}
-ZBX_ACTIVE_BUFFER_ELEMENT;
-
-typedef struct
-{
-	ZBX_ACTIVE_BUFFER_ELEMENT	*data;
-	int				count;
-	int				pcount;
-	int				lastsent;
-	int				first_error;
-}
-ZBX_ACTIVE_BUFFER;
-
 ZBX_THREAD_ENTRY(active_checks_thread, args);
 
 #endif	/* ZABBIX_ACTIVE_H */

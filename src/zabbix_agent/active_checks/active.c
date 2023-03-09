@@ -46,11 +46,39 @@ extern int				CONFIG_HEARTBEAT_FREQUENCY;
 
 #include "zbxcrypto.h"
 
-static ZBX_THREAD_LOCAL ZBX_ACTIVE_BUFFER	buffer;
-static ZBX_THREAD_LOCAL zbx_vector_ptr_t	active_metrics;
-static ZBX_THREAD_LOCAL zbx_vector_expression_t	regexps;
-static ZBX_THREAD_LOCAL char			*session_token;
-static ZBX_THREAD_LOCAL zbx_uint64_t		last_valueid = 0;
+typedef struct
+{
+	char		*host;
+	char		*key;
+	char		*value;
+	unsigned char	state;
+	zbx_uint64_t	lastlogsize;
+	int		timestamp;
+	char		*source;
+	int		severity;
+	zbx_timespec_t	ts;
+	int		logeventid;
+	int		mtime;
+	unsigned char	flags;
+	zbx_uint64_t	id;
+}
+active_buffer_element;
+
+typedef struct
+{
+	active_buffer_element		*data;
+	int				count;
+	int				pcount;
+	int				lastsent;
+	int				first_error;
+}
+active_buffer;
+
+static ZBX_THREAD_LOCAL active_buffer			buffer;
+static ZBX_THREAD_LOCAL zbx_vector_ptr_t		active_metrics;
+static ZBX_THREAD_LOCAL zbx_vector_expression_t		regexps;
+static ZBX_THREAD_LOCAL char				*session_token;
+static ZBX_THREAD_LOCAL zbx_uint64_t			last_valueid = 0;
 static ZBX_THREAD_LOCAL zbx_vector_pre_persistent_t	pre_persistent_vec;	/* used for staging of data going */
 										/* into persistent files */
 /* used for deleting inactive persistent files */
@@ -69,8 +97,8 @@ static void	init_active_metrics(void)
 	if (NULL == buffer.data)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer: first allocation for %d elements", CONFIG_BUFFER_SIZE);
-		sz = (size_t)CONFIG_BUFFER_SIZE * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
-		buffer.data = (ZBX_ACTIVE_BUFFER_ELEMENT *)zbx_malloc(buffer.data, sz);
+		sz = (size_t)CONFIG_BUFFER_SIZE * sizeof(active_buffer_element);
+		buffer.data = (active_buffer_element *)zbx_malloc(buffer.data, sz);
 		memset(buffer.data, 0, sz);
 		buffer.count = 0;
 		buffer.pcount = 0;
@@ -772,7 +800,7 @@ static int	check_response(char *response)
 static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *config_tls, int config_timeout)
 {
-	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
+	active_buffer_element	*el;
 	int				ret = SUCCEED, i, now, level;
 	zbx_timespec_t			ts;
 	zbx_socket_t			s;
@@ -979,7 +1007,7 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 		const unsigned short *severity, const unsigned long *logeventid, unsigned char flags,
 		const zbx_config_tls_t *config_tls, int config_timeout)
 {
-	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
+	active_buffer_element	*el = NULL;
 	int				i, ret = FAIL;
 	size_t				sz;
 
@@ -1057,7 +1085,7 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 			zbx_free(el->source);
 		}
 
-		sz = (size_t)(CONFIG_BUFFER_SIZE - i - 1) * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
+		sz = (size_t)(CONFIG_BUFFER_SIZE - i - 1) * sizeof(active_buffer_element);
 		memmove(&buffer.data[i], &buffer.data[i + 1], sz);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer full: new element %d", buffer.count - 1);
@@ -1065,7 +1093,7 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 		el = &buffer.data[CONFIG_BUFFER_SIZE - 1];
 	}
 
-	memset(el, 0, sizeof(ZBX_ACTIVE_BUFFER_ELEMENT));
+	memset(el, 0, sizeof(active_buffer_element));
 	el->host = zbx_strdup(NULL, host);
 	el->key = zbx_strdup(NULL, key);
 	if (NULL != value)
