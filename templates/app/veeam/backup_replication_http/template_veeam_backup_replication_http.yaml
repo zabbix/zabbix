@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-03-09T15:16:28Z'
+  date: '2023-03-10T07:20:11Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -12,7 +12,7 @@ zabbix_export:
       name: 'Veeam Backup and Replication by HTTP'
       description: |
         This template is designed to monitor Veeam Backup and Replication version 11.0.
-        The RESTful API is available in Veeam Universal License (excluding Community), Enterprise Socket, and Enterprise Plus Socket.
+        The RESTful API is available in Veeam Universal License (excluding Community) and Veeam Socket License only Enterprise Plus Socket.
         It works without any external scripts and uses the script item.
         
         Setup:

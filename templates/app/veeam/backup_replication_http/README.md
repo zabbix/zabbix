@@ -4,7 +4,7 @@
 ## Overview
 
 This template is designed to monitor Veeam Backup and Replication version 11.0.
-The RESTful API is available in Veeam Universal License (excluding Community), Enterprise Socket, and Enterprise Plus Socket.
+The RESTful API is available in Veeam Universal License (excluding Community) and Veeam Socket License only Enterprise Plus Socket.
 It works without any external scripts and uses the script item.
 
 ## Requirements
