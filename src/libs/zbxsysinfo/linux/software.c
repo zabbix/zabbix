@@ -548,14 +548,14 @@ static void	portage_details(const char *manager, const char *line, const char *r
 {
 	int		rv;
 	static char	pkginfo_fmt[128] = "";
-	char		sizeinfo_fmt[128] = "",	*pkginfo, *sizeinfo, *saveptr, *_line;
+	char		sizeinfo_fmt[128] = "", *pkginfo, *sizeinfo, *saveptr, *l;
 	char		category[DETAIL_BUF] = "", name[DETAIL_BUF] = "", version[DETAIL_BUF] = "",
 			revision[DETAIL_BUF] = "", repo[DETAIL_BUF] = "";
 	size_t		files, nonfiles, size;
 
-	_line = zbx_strdup(NULL, line);
+	l = zbx_strdup(NULL, line);
 
-	pkginfo = strtok_r(_line, ":", &saveptr);
+	pkginfo = strtok_r(l, ":", &saveptr);
 	sizeinfo = strtok_r(NULL, ":", &saveptr);
 
 	/*
@@ -565,11 +565,11 @@ static void	portage_details(const char *manager, const char *line, const char *r
 	if ('\0' == *pkginfo_fmt)
 	{
 		zbx_snprintf(pkginfo_fmt, sizeof(pkginfo_fmt),
-				"%%" ZBX_FS_SIZE_T "[^,]," 	/* category */
-				"%%" ZBX_FS_SIZE_T "[^,]," 	/* name */
-				"%%" ZBX_FS_SIZE_T "[^,]," 	/* version */
-				"%%" ZBX_FS_SIZE_T "[^,]," 	/* revision */
-				"%%" ZBX_FS_SIZE_T "[^ ]" 	/* repo */
+				"%%" ZBX_FS_SIZE_T "[^,],"	/* category */
+				"%%" ZBX_FS_SIZE_T "[^,],"	/* name */
+				"%%" ZBX_FS_SIZE_T "[^,],"	/* version */
+				"%%" ZBX_FS_SIZE_T "[^,],"	/* revision */
+				"%%" ZBX_FS_SIZE_T "[^ ]"	/* repo */
 				,
 				(zbx_fs_size_t)(sizeof(category) - 1),
 				(zbx_fs_size_t)(sizeof(name) - 1),
@@ -614,7 +614,7 @@ static void	portage_details(const char *manager, const char *line, const char *r
 
 	add_package_to_json(json, name, manager, version, size, NULL, 0, NULL, 0, NULL);
 out:
-	zbx_free(_line);
+	zbx_free(l);
 }
 
 static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packages, const char *manager)
