@@ -1121,18 +1121,20 @@ class CImportReferencer {
 			}
 		}
 
-		$db_triggers = API::Trigger()->get([
-			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
-			'filter' => [
-				'uuid' => array_keys($uuids),
-				'flags' => [
-					ZBX_FLAG_DISCOVERY_NORMAL,
-					ZBX_FLAG_DISCOVERY_PROTOTYPE,
-					ZBX_FLAG_DISCOVERY_CREATED
-				]
-			],
-			'preservekeys' => true
-		]);
+		$db_triggers = $uuids
+			? API::Trigger()->get([
+				'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
+				'filter' => [
+					'uuid' => array_keys($uuids),
+					'flags' => [
+						ZBX_FLAG_DISCOVERY_NORMAL,
+						ZBX_FLAG_DISCOVERY_PROTOTYPE,
+						ZBX_FLAG_DISCOVERY_CREATED
+					]
+				],
+				'preservekeys' => true
+			])
+			: [];
 
 		$db_triggers += API::Trigger()->get([
 			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
