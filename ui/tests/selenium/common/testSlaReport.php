@@ -371,7 +371,7 @@ class testSlaReport extends CWebTest {
 				'Error budget', 'Excluded downtimes'], $table->getHeadersText()
 		);
 
-		if (CTestArrayHelper::get($data, 'check_sorting') && !$widget) {
+		if (CTestArrayHelper::get($data, 'check_sorting')) {
 			$this->assertEquals([], $table->getSortableHeaders());
 		}
 
@@ -547,7 +547,7 @@ class testSlaReport extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'check_sorting')) {
 			// Only "Service" column is sortable.
-			$this->assertEquals(['Service'], $table->getSortableHeaders());
+			$this->assertEquals($widget ? [] : ['Service'], $table->getSortableHeaders());
 		}
 
 		foreach ($data['expected']['services'] as $service) {

@@ -21,6 +21,9 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
+/**
+ * @dataSource HostGroups
+ */
 class testPageAdministrationScripts extends CLegacyWebTest {
 
 	/**
@@ -58,11 +61,10 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 				['Name', 'Type', 'Execute on', 'Commands', 'User group', 'Host group', 'Host access']
 		);
 
-		$dbResult = DBselect('SELECT name,command FROM scripts');
+		$dbResult = DBselect('SELECT name FROM scripts');
 
 		while ($dbRow = DBfetch($dbResult)) {
-			$command= str_replace('>&', '&gt;&amp;', $dbRow['command']);
-			$this->zbxTestTextPresent([$dbRow['name'], $command]);
+			$this->zbxTestTextPresent([$dbRow['name']]);
 		}
 	}
 

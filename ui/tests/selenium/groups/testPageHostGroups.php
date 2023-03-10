@@ -634,7 +634,7 @@ class testPageHostGroups extends CWebTest {
 		return [
 			[
 				[
-					'Group for Host prtotype' => ''
+					'Group for Host prototype' => ''
 				]
 			],
 			[
@@ -765,8 +765,8 @@ class testPageHostGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => 'Group for Host prtotype',
-					'error' => 'Group "Group for Host prtotype" cannot be deleted, because it is used by a host prototype.'
+					'groups' => 'Group for Host prototype',
+					'error' => 'Group "Group for Host prototype" cannot be deleted, because it is used by a host prototype.'
 				]
 			],
 			[
@@ -806,6 +806,8 @@ class testPageHostGroups extends CWebTest {
 		}
 
 		$all = $this->getGroupNames();
+		$count = count(CTestArrayHelper::get($data, 'groups', $all));
+
 		$this->page->login()->open($this->link)->waitUntilReady();
 		$table = $this->getTable();
 		$this->selectTableRows(CTestArrayHelper::get($data, 'groups', []));
@@ -815,17 +817,15 @@ class testPageHostGroups extends CWebTest {
 
 		if ($data['expected'] === TEST_GOOD) {
 			$this->assertSelectedCount(0);
-			$this->assertTableStats(count($all) - count($data['groups']));
-			$title = ((count($data['groups']) === 1) ? 'Group' : 'Groups').' deleted';
-			$this->assertMessage(TEST_GOOD, $title);
+			$this->assertTableStats(count($all) - $count);
+			$this->assertMessage(TEST_GOOD, (($count === 1) ? 'Group' : 'Groups').' deleted');
 			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM hstgrp WHERE name IN ('.
 					CDBHelper::escape($data['groups']).')')
 			);
 		}
 		else {
-			$this->assertSelectedCount(count(CTestArrayHelper::get($data, 'groups', $all)));
-			$plural = (count(CTestArrayHelper::get($data, 'groups', [])) !== 1) ? 's' : '';
-			$this->assertMessage(TEST_BAD, 'Cannot delete group'.$plural, $data['error']);
+			$this->assertSelectedCount($count);
+			$this->assertMessage(TEST_BAD, 'Cannot delete group'.(($count > 1) ? 's' : ''), $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($this->groups_sql));
 
 			// Reset selected groups.
