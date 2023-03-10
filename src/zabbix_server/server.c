@@ -1301,28 +1301,29 @@ static void	zbx_check_db(void)
 {
 	struct zbx_json	db_version_json;
 	int		result = SUCCEED;
-	zbx_ha_mode_t	ha_mode;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
 	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, program_type);
 
 	if (SUCCEED == result)
-	{
 		zbx_db_extract_dbextension_info(&db_version_info);
-	}
 
-	if (NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
-		ha_mode = ZBX_HA_MODE_CLUSTER;
-	else
-		ha_mode = ZBX_HA_MODE_STANDALONE;
-
-	if (SUCCEED == result && (
 #ifdef HAVE_POSTGRESQL
-			SUCCEED != zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
+	if (SUCCEED == result)
+		result = zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
 #endif
-			SUCCEED != DBcheck_version(ha_mode)))
+
+	if (SUCCEED == result)
 	{
-		result = FAIL;
+		zbx_ha_mode_t	ha_mode;
+
+		if (NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
+			ha_mode = ZBX_HA_MODE_CLUSTER;
+		else
+			ha_mode = ZBX_HA_MODE_STANDALONE;
+
+		if (SUCCEED != (result = DBcheck_version(ha_mode)))
+			goto out;
 	}
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
@@ -1343,9 +1344,7 @@ static void	zbx_check_db(void)
 
 #if defined(HAVE_POSTGRESQL)
 		if (0 == zbx_strcmp_null(db_version_info.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
-		{
 			zbx_tsdb_extract_compressed_chunk_flags(&db_version_info);
-		}
 #endif
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
@@ -1357,7 +1356,7 @@ static void	zbx_check_db(void)
 	}
 
 	zbx_db_close();
-
+out:
 	if (SUCCEED != result)
 	{
 		zbx_db_version_info_clear(&db_version_info);
