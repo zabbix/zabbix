@@ -208,8 +208,6 @@ void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
 
 /******************************************************************************
  *                                                                            *
- * WARNING! Replace this with str_base64_decode_size_t (below) !              *
- *                                                                            *
  * Purpose: decode a base64 string into a string                              *
  *                                                                            *
  * Parameters: p_b64str   - [IN] the base64 string to decode                  *
@@ -218,98 +216,7 @@ void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
  *             p_out_size - [OUT] the size (length) of the str decoded        *
  *                                                                            *
  ******************************************************************************/
-void	str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_out_size)
-{
-	const char	*p;
-	char		from[4];
-	unsigned char	to[4];
-	int		i = 0, j = 0;
-	int		lasti = -1;	/* index of the last filled-in element of from[] */
-	int		finished = 0;
-
-	assert(p_b64str);
-	assert(p_str);
-	assert(p_out_size);
-	assert(maxsize > 0);
-
-	*p_out_size = 0;
-	p = p_b64str;
-
-	while (1)
-	{
-		if ('\0' != *p)
-		{
-			/* skip non-base64 characters */
-			if (FAIL == is_base64(*p))
-			{
-				p++;
-				continue;
-			}
-
-			/* collect up to 4 characters */
-			from[i] = *p++;
-			lasti = i;
-			if (i < 3)
-			{
-				i++;
-				continue;
-			}
-			else
-				i = 0;
-		}
-		else	/* no more data to read */
-		{
-			finished = 1;
-			for (j = lasti + 1; j < 4; j++)
-				from[j] = 'A';
-		}
-
-		if (-1 != lasti)
-		{
-			/* decode a 4-character block */
-			for (j = 0; j < 4; j++)
-				to[j] = char_base64_decode(from[j]);
-
-			if (1 <= lasti)	/* from[0], from[1] available */
-			{
-				*p_str++ = ((to[0] << 2) | (to[1] >> 4));
-				if (++(*p_out_size) == maxsize)
-					break;
-			}
-
-			if (2 <= lasti && '=' != from[2])	/* from[2] available */
-			{
-				*p_str++ = (((to[1] & 0xf) << 4) | (to[2] >> 2));
-				if (++(*p_out_size) == maxsize)
-					break;
-			}
-
-			if (3 == lasti && '=' != from[3])	/* from[3] available */
-			{
-				*p_str++ = (((to[2] & 0x3) << 6) | to[3]);
-				if (++(*p_out_size) == maxsize)
-					break;
-			}
-			lasti = -1;
-		}
-
-		if (1 == finished)
-			break;
-	}
-}
-
-
-/******************************************************************************
- *                                                                            *
- * Purpose: decode a base64 string into a string                              *
- *                                                                            *
- * Parameters: p_b64str   - [IN] the base64 string to decode                  *
- *             p_str      - [OUT] the decoded str to return                   *
- *             maxsize    - [IN] the size of p_str buffer                     *
- *             p_out_size - [OUT] the size (length) of the str decoded        *
- *                                                                            *
- ******************************************************************************/
-void	str_base64_decode_size_t(const char *p_b64str, char *p_str, size_t maxsize, size_t *p_out_size)
+void	str_base64_decode(const char *p_b64str, char *p_str, size_t maxsize, size_t *p_out_size)
 {
 	const char	*p;
 	char		from[4];

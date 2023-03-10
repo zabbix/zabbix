@@ -136,9 +136,9 @@ void		zbx_db_clean_bind_context(zbx_db_bind_context_t *context);
 int		zbx_db_statement_execute(int iters);
 #endif
 
-#ifdef HAVE_MYSQL
+#if defined (HAVE_MYSQL)
 void	zbx_mysql_escape_bin(char* dst, char chunk[], size_t size);
-#else
+#elif defined(HAVE_POSTGRESQL)
 void	zbx_postgresql_escape_bin(char* dst, char **chunk, size_t size);
 #endif
 

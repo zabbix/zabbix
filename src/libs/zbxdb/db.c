@@ -1493,14 +1493,12 @@ out:
 }
 #endif
 
-#ifdef HAVE_MYSQL
+#if defined(HAVE_MYSQL)
 void	zbx_mysql_escape_bin(char* dst, char chunk[], size_t size)
 {
 	mysql_real_escape_string(conn, chunk, dst, size);
 }
-#endif
-
-#ifdef HAVE_POSTGRESQL
+#elif defined(HAVE_POSTGRESQL)
 void	zbx_postgresql_escape_bin(char* dst, char **chunk, size_t size)
 {
 	size_t	l;
