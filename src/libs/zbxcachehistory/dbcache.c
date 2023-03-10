@@ -4042,14 +4042,14 @@ static void	dc_local_add_history_text_bin_helper(int value_type, zbx_uint64_t it
 static void	dc_local_add_history_text(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
 		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
-	return dc_local_add_history_text_bin_helper(ITEM_VALUE_TYPE_TEXT, itemid, item_value_type, ts, value_orig,
+	dc_local_add_history_text_bin_helper(ITEM_VALUE_TYPE_TEXT, itemid, item_value_type, ts, value_orig,
 			lastlogsize, mtime, flags);
 }
 
 static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
 		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
-	return dc_local_add_history_text_bin_helper(ITEM_VALUE_TYPE_BIN, itemid, item_value_type, ts, value_orig,
+	dc_local_add_history_text_bin_helper(ITEM_VALUE_TYPE_BIN, itemid, item_value_type, ts, value_orig,
 			lastlogsize, mtime, flags);
 }
 

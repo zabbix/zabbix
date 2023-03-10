@@ -64,7 +64,7 @@ static duk_ret_t	es_btoa(duk_context *ctx)
 static duk_ret_t	es_atob(duk_context *ctx)
 {
 	char	*buffer = NULL, *str = NULL;
-	int	out_size, buffer_size;
+	size_t	out_size, buffer_size;
 
 	if (SUCCEED != es_duktape_string_decode(duk_require_string(ctx, 0), &str))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
@@ -75,6 +75,7 @@ static duk_ret_t	es_atob(duk_context *ctx)
 	duk_push_lstring(ctx, buffer, (duk_size_t)out_size);
 	zbx_free(str);
 	zbx_free(buffer);
+
 	return 1;
 }
 
