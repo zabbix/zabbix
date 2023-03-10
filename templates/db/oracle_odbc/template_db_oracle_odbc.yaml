@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-03-01T13:57:11Z'
+  date: '2023-03-10T07:52:26Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -2349,8 +2349,7 @@ zabbix_export:
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
           filter:
-            evaltype: FORMULA
-            formula: '(A or B) and (C or D)'
+            evaltype: AND
             conditions:
               -
                 macro: '{#CON_NAME}'
@@ -3100,7 +3099,7 @@ zabbix_export:
       name: 'Oracle: Total PGA inuse is too high'
       event_name: 'Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)'
       priority: WARNING
-      description: 'The total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.'
+      description: 'The total PGA currently consumed by work areas is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.'
       tags:
         -
           tag: scope
