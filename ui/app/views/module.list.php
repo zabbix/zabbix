@@ -91,8 +91,8 @@ $table = (new CTableInfo())
 
 foreach ($data['modules'] as $moduleid => $module) {
 	$name = (new CLink($module['name']))
-			->addClass('js-edit-module')
-			->setAttribute('data-moduleid', $moduleid);
+		->addClass('js-edit-module')
+		->setAttribute('data-moduleid', $moduleid);
 
 	if ($module['status'] == MODULE_STATUS_ENABLED) {
 		$status = (new CLink(_('Enabled')))

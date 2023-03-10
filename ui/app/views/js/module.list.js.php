@@ -26,6 +26,7 @@
 
 <script>
 	const view = new class {
+
 		init() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit-module')) {
@@ -62,9 +63,6 @@
 
 				location.href = location.href;
 			});
-
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-			}, {once: true});
 		}
 
 		_enable(target, moduleids, mass_update = true) {

@@ -31,7 +31,8 @@ $form = (new CForm())
 	->setName('module.edit')
 	->setId('module-form')
 	->addVar('moduleids', [$data['moduleid']] ?: 0)
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addItem((new CInput('submit', null))->addStyle('display: none;'))
+	->setAttribute('autofocus', 'autofocus');
 
 // Create module tab.
 $module_tab = (new CFormGrid())
@@ -50,7 +51,6 @@ $module_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Description'), 'description'),
 		(new CFormField($data['description'] === '' ? '-' : $data['description']))
-			->addClass(ZBX_STYLE_WORDWRAP)
 			->addClass(ZBX_STYLE_WORDBREAK)
 	])
 	->addItem([
@@ -68,7 +68,6 @@ $module_tab = (new CFormGrid())
 			: (new CLink($data['url'], $data['url']))->setTarget('_blank'))
 		)
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-			->setAttribute('autofocus', 'autofocus')
 	])
 	->addItem([
 		new CLabel(_('Enabled'), 'status'),
@@ -87,7 +86,8 @@ if ($data['form_refresh'] == 0) {
 }
 
 // Append tabs to form.
-$form->addItem($tabs)
+$form
+	->addItem($tabs)
 	->addItem(
 		(new CScriptTag('module_edit.init('.json_encode([
 			'moduleids' => [$data['moduleid']]
@@ -107,7 +107,7 @@ $output = [
 			'action' => 'module_edit.submit();'
 		]
 	],
-	'script_inline' => getPagePostJs() . $this->readJsFile('module.edit.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('module.edit.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
