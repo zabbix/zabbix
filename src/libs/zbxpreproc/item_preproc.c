@@ -366,18 +366,24 @@ static void	unescape_param(int op_type, const char *in, size_t len, char *out)
  ******************************************************************************/
 int	item_preproc_trim(zbx_variant_t *value, int op_type, const char *params, char **errmsg)
 {
-	char	params_raw[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char	*params_raw;
+	size_t	params_len;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
-	unescape_param(op_type, params, strlen(params), params_raw);
+	params_len = strlen(params);
+	params_raw = (char *)zbx_malloc(NULL, params_len + 1);
+
+	unescape_param(op_type, params, params_len, params_raw);
 
 	if (ZBX_PREPROC_LTRIM == op_type || ZBX_PREPROC_TRIM == op_type)
 		zbx_ltrim(value->data.str, params_raw);
 
 	if (ZBX_PREPROC_RTRIM == op_type || ZBX_PREPROC_TRIM == op_type)
 		zbx_rtrim(value->data.str, params_raw);
+
+	zbx_free(params_raw);
 
 	return SUCCEED;
 }
@@ -572,20 +578,20 @@ int	item_preproc_2dec(zbx_variant_t *value, int op_type, char **errmsg)
  ******************************************************************************/
 int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char		pattern[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
-	char		*output, *new_value = NULL;
+	char		*pattern, *output, *new_value = NULL;
 	const char	*regex_error;
 	zbx_regexp_t	*regex = NULL;
+	int		ret = FAIL;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
-	zbx_strlcpy(pattern, params, sizeof(pattern));
+	pattern = zbx_strdup(NULL, params);
 
 	if (NULL == (output = strchr(pattern, '\n')))
 	{
 		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
-		return FAIL;
+		goto out;
 	}
 
 	*output++ = '\0';
@@ -594,22 +600,26 @@ int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char **errm
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression: %s", regex_error);
 		zbx_regexp_err_msg_free(regex_error);
-		return FAIL;
+		goto out;
 	}
 
 	if (FAIL == zbx_mregexp_sub_precompiled(value->data.str, regex, output, ZBX_MAX_RECV_DATA_SIZE, &new_value))
 	{
 		*errmsg = zbx_strdup(*errmsg, "pattern does not match");
-		zbx_regexp_free(regex);
-		return FAIL;
+		goto out;
 	}
 
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, new_value);
 
-	zbx_regexp_free(regex);
+	ret = SUCCEED;
+out:
+	if (NULL != regex)
+		zbx_regexp_free(regex);
 
-	return SUCCEED;
+	zbx_free(pattern);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -628,17 +638,18 @@ int	item_preproc_validate_range(unsigned char value_type, const zbx_variant_t *v
 		char **errmsg)
 {
 	zbx_variant_t	value_num;
-	char		min[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *max;
+	char		*min, *max;
 	zbx_variant_t	range_min, range_max;
 	int		ret = FAIL;
 
 	if (FAIL == zbx_item_preproc_convert_value_to_numeric(&value_num, value, value_type, errmsg))
 		return FAIL;
 
+	min = zbx_strdup(NULL, params);
+
 	zbx_variant_set_none(&range_min);
 	zbx_variant_set_none(&range_max);
 
-	zbx_strlcpy(min, params, sizeof(min));
 	if (NULL == (max = strchr(min, '\n')))
 	{
 		*errmsg = zbx_strdup(*errmsg, "validation range is not specified");
@@ -684,6 +695,8 @@ out:
 	zbx_variant_clear(&value_num);
 	zbx_variant_clear(&range_min);
 	zbx_variant_clear(&range_max);
+
+	zbx_free(min);
 
 	return ret;
 }
@@ -975,7 +988,7 @@ int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const char *pa
 {
 	zbx_variant_t	value_str;
 	int		ret;
-	char		pattern[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
+	char		*pattern = NULL, *output;
 
 	zbx_variant_copy(&value_str, value);
 
@@ -985,7 +998,8 @@ int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const char *pa
 		goto out;
 	}
 
-	zbx_strlcpy(pattern, params, sizeof(pattern));
+	pattern = zbx_strdup(NULL, params);
+
 	if (NULL == (output = strchr(pattern, '\n')))
 	{
 		*error = zbx_strdup(*error, "cannot find second parameter");
@@ -1009,6 +1023,7 @@ int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const char *pa
 			zbx_free(*error);
 	}
 out:
+	zbx_free(pattern);
 	zbx_variant_clear(&value_str);
 
 	return ret;
@@ -1558,8 +1573,8 @@ int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **er
 {
 	size_t		len_search, len_replace;
 	const char	*ptr;
-	char		*new_string, search_str[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
-			replace_str[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char		*new_string, *search_str, *replace_str;
+	int		ret = FAIL;
 
 	if (NULL == (ptr = strchr(params, '\n')))
 	{
@@ -1574,20 +1589,26 @@ int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **er
 		return FAIL;
 	}
 
-	unescape_param(ZBX_PREPROC_STR_REPLACE, params, MIN(len_search, sizeof(search_str) - 1), search_str);
+	search_str = (char *)zbx_malloc(NULL, len_search + 1);
+	unescape_param(ZBX_PREPROC_STR_REPLACE, params, len_search, search_str);
 
 	len_replace = strlen(ptr + 1);
-	unescape_param(ZBX_PREPROC_STR_REPLACE, ptr + 1, MIN(len_replace, sizeof(replace_str) - 1), replace_str);
+	replace_str = (char *)zbx_malloc(NULL, len_replace + 1);
+	unescape_param(ZBX_PREPROC_STR_REPLACE, ptr + 1, len_replace, replace_str);
 
-	if (SUCCEED != item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+	if (SUCCEED == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
+		new_string = zbx_string_replace(value->data.str, search_str, replace_str);
+		zbx_variant_clear(value);
+		zbx_variant_set_str(value, new_string);
+
+		ret = SUCCEED;
 	}
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
 
-	new_string = zbx_string_replace(value->data.str, search_str, replace_str);
-	zbx_variant_clear(value);
-	zbx_variant_set_str(value, new_string);
+	zbx_free(replace_str);
+	zbx_free(search_str);
 
-	return SUCCEED;
+	return ret;
 }
