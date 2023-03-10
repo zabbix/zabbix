@@ -82,7 +82,6 @@ static zbx_int64_t	json_parse_string(const char *start, char **str, char **error
 		if ('\\' == *ptr)
 		{
 			const char	*escape_start = ptr;
-			int		i;
 			unsigned char	uc[4];	/* decoded Unicode character takes 1-4 bytes in UTF-8 */
 
 			/* unexpected end of string data, failing */
