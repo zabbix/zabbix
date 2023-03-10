@@ -122,6 +122,14 @@ func getManagers() []manager {
 			parseRegex,
 			pkgtoolsDetails,
 		},
+		{
+			"portage",
+			"qsize --version 2> /dev/null",
+			"qlist -C -I -F '%{PN},%{PV},%{PR}'",
+			"qsize -C --bytes -F '%{CATEGORY},%{PN},%{PV},%{PR},%{REPO}'",
+			parseRegex,
+			portageDetails,
+		},
 	}
 }
 
@@ -493,6 +501,69 @@ func pkgtoolsDetails(manager string, in []string, regex string) (out string, err
 
 		// pkgtools has no build/install time information
 		pd = append(pd, appendPackage(split[0], manager, split[1], size, split[2], 0, "", 0, ""))
+	}
+
+	var b []byte
+
+	b, err = json.Marshal(pd)
+	if err != nil {
+		return
+	}
+
+	out = string(b)
+
+	return
+}
+
+func portageDetails(manager string, in []string, regex string) (out string, err error) {
+	const num_fields, pkginfo_num_fields, sizeinfo_num_fields = 2, 5, 3
+
+	rgx, err := regexp.Compile(regex);
+	if err != nil {
+		log.Debugf("internal error: cannot compile regex \"%s\"", regex)
+
+		return
+	}
+
+	pd := []PackageDetails{};
+
+	for _, s := range in {
+		var files, nonfiles, size uint64
+
+		// category,name,version,revision,repo: file count, nonfile count, size
+		split := strings.Split(s, ":")
+
+		if len(split) != num_fields {
+			log.Debugf("invalid input format: separator \":\" not found in \"%s\"", s)
+
+			continue
+		}
+
+		// category,name,version,revision,repo
+		pkginfo := strings.Split(split[0], ",")
+
+		if "" != regex && !rgx.MatchString(pkginfo[1]) {
+			continue
+		}
+
+		sizeinfo_fmt := " "
+		sizeinfo_fmt += "%d files"
+		if -1 != strings.Index(split[1], "(") {
+			sizeinfo_fmt += " (%*d unique)"
+		}
+		sizeinfo_fmt += ", "
+		sizeinfo_fmt += "%d non-files"
+		sizeinfo_fmt += ", "
+		sizeinfo_fmt += "%d bytes"
+
+		n, _ := fmt.Sscanf(split[1], sizeinfo_fmt, &files, &nonfiles, &size)
+		if sizeinfo_num_fields != n {
+			log.Debugf("unexpected number of fields read while expected %d in \"%s\", ignoring",
+				sizeinfo_num_fields, split[1])
+			continue
+		}
+
+		pd = append(pd, appendPackage(pkginfo[1], manager, pkginfo[2], size, "", 0, "", 0, ""))
 	}
 
 	var b []byte

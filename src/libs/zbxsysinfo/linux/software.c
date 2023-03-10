@@ -544,6 +544,79 @@ out:
 	zbx_free(out);
 }
 
+static void	portage_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
+{
+	int		rv;
+	static char	pkginfo_fmt[128] = "";
+	char		sizeinfo_fmt[128] = "",	*pkginfo, *sizeinfo, *saveptr, *_line;
+	char		category[DETAIL_BUF] = "", name[DETAIL_BUF] = "", version[DETAIL_BUF] = "",
+			revision[DETAIL_BUF] = "", repo[DETAIL_BUF] = "";
+	size_t		files, nonfiles, size;
+
+	_line = zbx_strdup(NULL, line);
+
+	pkginfo = strtok_r(_line, ":", &saveptr);
+	sizeinfo = strtok_r(NULL, ":", &saveptr);
+
+	/*
+	 * e.g. "dev-lang,tcl,8.6.12,r1,gentoo: 1104 files, 25 non-files, 10871914 bytes"
+	 *  or  "dev-lang,perl,5.36.0,r1,gentoo: 1920 files (1919 unique), 326 non-files, 58056025 bytes"
+	 */
+	if ('\0' == *pkginfo_fmt)
+	{
+		zbx_snprintf(pkginfo_fmt, sizeof(pkginfo_fmt),
+				"%%" ZBX_FS_SIZE_T "[^,]," 	/* category */
+				"%%" ZBX_FS_SIZE_T "[^,]," 	/* name */
+				"%%" ZBX_FS_SIZE_T "[^,]," 	/* version */
+				"%%" ZBX_FS_SIZE_T "[^,]," 	/* revision */
+				"%%" ZBX_FS_SIZE_T "[^ ]" 	/* repo */
+				,
+				(zbx_fs_size_t)(sizeof(category) - 1),
+				(zbx_fs_size_t)(sizeof(name) - 1),
+				(zbx_fs_size_t)(sizeof(version) - 1),
+				(zbx_fs_size_t)(sizeof(revision) - 1),
+				(zbx_fs_size_t)(sizeof(repo) - 1));
+	}
+
+	/* NOTE: as sizeinfo may differ in format, we can't make sizeinfo_fmt static */
+	zbx_snprintf(sizeinfo_fmt, sizeof(sizeinfo_fmt),
+			"%" ZBX_FS_UI64 " files%s, "
+			"%" ZBX_FS_UI64 " non-files, "
+			"%" ZBX_FS_SIZE_T " bytes"
+			,
+			(NULL != strchr(sizeinfo, '('))
+				? " (%*lu unique)"
+				: "");
+
+#define PKGINFO_NUM_FIELDS 5
+	if (PKGINFO_NUM_FIELDS != (rv = sscanf(pkginfo, pkginfo_fmt, category, name, version, revision, repo)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				pkginfo, rv, PKGINFO_NUM_FIELDS);
+		goto out;
+	}
+#undef PKGINFO_NUM_FIELDS
+#define SIZEINFO_NUM_FIELDS 3
+	if (SIZEINFO_NUM_FIELDS != (rv = sscanf(sizeinfo, sizeinfo_fmt, &files, &nonfiles, &size)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				sizeinfo, rv, SIZEINFO_NUM_FIELDS);
+		goto out;
+	}
+#undef SIZEINFO_NUM_FIELDS
+	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
+		goto out;
+
+	/*
+	 * XXX: due to the rigidity of the add_package_to_json() interface, we can't report file counts.
+	 * We should make it easier to add arbitrary data items to the package object.
+	 */
+
+	add_package_to_json(json, name, manager, version, size, NULL, 0, NULL, 0, NULL);
+out:
+	zbx_free(_line);
+}
+
 static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packages, const char *manager)
 {
 	size_t	offset = 0;
@@ -611,6 +684,14 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 		"LC_ALL=C pacman -Qi 2>/dev/null | grep -E '^(Name|Installed Size|Version|Architecture|(Install|Build) Date)' | cut -f2- -d: | paste -d, - - - - - -",
 		NULL,
 		pacman_details
+	},
+	{
+		"portage",
+		"qsize --version 2> /dev/null",
+		"qlist -C -I -F '%{PN},%{PV},%{PR}'",
+		"qsize -C --bytes -F '%{CATEGORY},%{PN},%{PV},%{PR},%{REPO}'",
+		NULL,
+		portage_details
 	},
 	{NULL}
 };
