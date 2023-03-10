@@ -137,7 +137,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
 						'value_type' => ITEM_VALUE_TYPE_BINARY,
 						'delay' => '0s',
-						'preprocessing' => [['type' => 12, 'params' => '$.screenshot',
+						'preprocessing' => [['type' => 12, 'params' => '$.screenshot_image',
 						'error_handler' => 0,
 						'error_handler_params' => ''
 							]]
