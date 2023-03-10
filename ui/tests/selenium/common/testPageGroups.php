@@ -273,6 +273,9 @@ class testPageGroups extends CWebTest {
 			[
 				'index' => 1,
 				'count' => 2
+			],
+			[
+				'all' => true
 			]
 		];
 		$old_grpups_hash = CDBHelper::getHash($this->groups_sql);
@@ -281,12 +284,19 @@ class testPageGroups extends CWebTest {
 		$table = $this->getTable();
 
 		foreach ($rows as $row) {
+			if (array_key_exists('all', $row)) {
+				$row['count'] = count($this->getGroupNames());
+				$this->selectTableRows();
+			}
+			else {
+				$table->getRow($row['index'])->select();
+			}
+
 			// The word "group" in message text depends on the number of selected lines.
 			if ($data['action'] === 'Delete') {
 				$data['message'] = 'Delete selected '.$this->object.' group'.(($row['count'] === 1) ? '?' : 's?');
 			}
 
-			$table->getRow($row['index'])->select();
 			$this->assertSelectedCount($row['count']);
 			$this->query('button', $data['action'])->one()->click();
 			$this->assertEquals($data['message'], $this->page->getAlertText());
@@ -327,6 +337,8 @@ class testPageGroups extends CWebTest {
 		}
 
 		$all = $this->getGroupNames();
+		$count = count(CTestArrayHelper::get($data, 'groups', $all));
+
 		$this->page->login()->open($this->link)->waitUntilReady();
 		$table = $this->getTable();
 		$this->selectTableRows(CTestArrayHelper::get($data, 'groups', []));
@@ -336,8 +348,8 @@ class testPageGroups extends CWebTest {
 
 		if ($data['expected'] === TEST_GOOD) {
 			$this->assertSelectedCount(0);
-			$this->assertTableStats(count($all) - count($data['groups']));
-			$title = ucfirst($this->object).((count($data['groups']) === 1) ? ' group deleted' : ' groups deleted');
+			$this->assertTableStats(count($all) - $count);
+			$title = ucfirst($this->object).(($count === 1) ? ' group deleted' : ' groups deleted');
 			$this->assertMessage(TEST_GOOD, $title);
 			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM hstgrp WHERE type='.
 					constant('HOST_GROUP_TYPE_'.strtoupper($this->object).'_GROUP').
@@ -345,9 +357,8 @@ class testPageGroups extends CWebTest {
 			);
 		}
 		else {
-			$this->assertSelectedCount(count(CTestArrayHelper::get($data, 'groups', $all)));
-			$plural = (count(CTestArrayHelper::get($data, 'groups', [])) !== 1) ? 's' : '';
-			$this->assertMessage(TEST_BAD, 'Cannot delete '.$this->object.' group'.$plural, $data['error']);
+			$this->assertSelectedCount($count);
+			$this->assertMessage(TEST_BAD, 'Cannot delete '.$this->object.' group'.(($count > 1) ? 's' : ''), $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($this->groups_sql));
 
 			// Reset selected groups.
