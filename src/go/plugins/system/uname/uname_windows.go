@@ -59,7 +59,11 @@ func getHostname(params []string) (uname string, err error) {
 			return "", err
 		}
 	case "fqdn":
-		uname = win32.GetComputerNameExA(ComputerNameDnsFullyQualified)
+		uname, err = win32.GetComputerNameExA(ComputerNameDnsFullyQualified)
+		if err != nil {
+			return "", err
+		}
+
 		uname = strings.Trim(uname, " \r\n.")
 	case "shorthost":
 		if uname, err = os.Hostname(); err != nil {

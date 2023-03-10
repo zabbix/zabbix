@@ -209,12 +209,18 @@ func GetNativeSystemInfo() (sysInfo SystemInfo) {
 	return sysInfo
 }
 
-func GetComputerNameExA(name_type int) (name string) {
+func GetComputerNameExA(name_type int) (name string, err error) {
 	size := uint32(0)
-	syscall.Syscall(getComputerNameExA, 3, 0, 0, uintptr(unsafe.Pointer(&size)))
+	_, _, err = syscall.Syscall(getComputerNameExA, 3, 0, 0, uintptr(unsafe.Pointer(&size)))
+	if err != nil {
+		return "", err 
+	}
 
 	buffer := make([]byte, size)
-	syscall.Syscall(getComputerNameExA, 3, 0, uintptr(unsafe.Pointer(&buffer[0])), uintptr(unsafe.Pointer(&size)))
+	_, _, err = syscall.Syscall(getComputerNameExA, 3, 0, uintptr(unsafe.Pointer(&buffer[0])), uintptr(unsafe.Pointer(&size)))
+	if err != nil {
+		return "", err 
+	}
 
-	return string(buffer[:size])
+	return string(buffer[:size]), nil
 }

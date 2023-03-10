@@ -87,7 +87,7 @@ func getHostname(params []string) (hostname string, err error) {
 			return "", errors.New("Cannot get FQDN.")
 		}
 
-		hostname = strings.Trim(out.String(), " \r\n")
+		hostname = strings.Trim(out.String(), " \r\n.")
 	case "netbios":
 		return "", errors.New("NetBIOS is not supported on the current platform.")
 	default:
