@@ -3,15 +3,19 @@
 
 ## Overview
 
-For Zabbix version: 7.0 and higher  
 The template to monitor ClickHouse by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
 
+## Tested versions
 
-This template was tested on:
+This template has been tested on:
 
-- ClickHouse, version 19.14+, 20.3+
+- ClickHouse, version 20.3+, 21.3+, 22.12+
+
+## Requirements
+
+For Zabbix version: 7.0 and higher.
 
 ## Setup
 
@@ -44,7 +48,7 @@ Login and password are also set in macros:
 If you don't need authentication - remove headers from HTTP-Agent type items
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -58,6 +62,8 @@ No specific Zabbix configuration is required.
 |{$CLICKHOUSE.LLD.FILTER.DB.NOT_MATCHES} |<p>Filter to exclude discovered databases</p> |`CHANGE_IF_NEEDED` |
 |{$CLICKHOUSE.LLD.FILTER.DICT.MATCHES} |<p>Filter of discoverable dictionaries</p> |`.*` |
 |{$CLICKHOUSE.LLD.FILTER.DICT.NOT_MATCHES} |<p>Filter to exclude discovered dictionaries</p> |`CHANGE_IF_NEEDED` |
+|{$CLICKHOUSE.LLD.FILTER.TABLE.MATCHES} |<p>Filter of discoverable tables</p> |`.*` |
+|{$CLICKHOUSE.LLD.FILTER.TABLE.NOT_MATCHES} |<p>Filter to exclude discovered tables</p> |`CHANGE_IF_NEEDED` |
 |{$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN} |<p>Maximum diff between log_pointer and log_max_index.</p> |`30` |
 |{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN} |<p>Maximum number of smth for trigger expression</p> |`5` |
 |{$CLICKHOUSE.PARTS.PER.PARTITION.WARN} |<p>Maximum number of parts per partition for trigger expression.</p> |`300` |
@@ -69,19 +75,20 @@ No specific Zabbix configuration is required.
 |{$CLICKHOUSE.SCHEME} |<p>Request scheme which may be http or https</p> |`http` |
 |{$CLICKHOUSE.USER} |<p>-</p> |`zabbix` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
+|Databases |<p>Info about databases</p> |DEPENDENT |clickhouse.db.discovery<p>**Filter**:</p>AND <p>- {#DB} MATCHES_REGEX `{$CLICKHOUSE.LLD.FILTER.DB.MATCHES}`</p><p>- {#DB} NOT_MATCHES_REGEX `{$CLICKHOUSE.LLD.FILTER.DB.NOT_MATCHES}`</p> |
 |Dictionaries |<p>Info about dictionaries</p> |DEPENDENT |clickhouse.dictionaries.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$CLICKHOUSE.LLD.FILTER.DICT.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$CLICKHOUSE.LLD.FILTER.DICT.NOT_MATCHES}`</p> |
 |Replicas |<p>Info about replicas</p> |DEPENDENT |clickhouse.replicas.discovery<p>**Filter**:</p>AND <p>- {#DB} MATCHES_REGEX `{$CLICKHOUSE.LLD.FILTER.DB.MATCHES}`</p><p>- {#DB} NOT_MATCHES_REGEX `{$CLICKHOUSE.LLD.FILTER.DB.NOT_MATCHES}`</p> |
-|Tables |<p>Info about tables</p> |DEPENDENT |clickhouse.tables.discovery<p>**Filter**:</p>AND <p>- {#DB} MATCHES_REGEX `{$CLICKHOUSE.LLD.FILTER.DB.MATCHES}`</p><p>- {#DB} NOT_MATCHES_REGEX `{$CLICKHOUSE.LLD.FILTER.DB.NOT_MATCHES}`</p> |
+|Tables |<p>Info about tables</p> |DEPENDENT |clickhouse.tables.discovery<p>**Filter**:</p>AND <p>- {#DB} MATCHES_REGEX `{$CLICKHOUSE.LLD.FILTER.DB.MATCHES}`</p><p>- {#DB} NOT_MATCHES_REGEX `{$CLICKHOUSE.LLD.FILTER.DB.NOT_MATCHES}`</p><p>- {#TABLE} MATCHES_REGEX `{$CLICKHOUSE.LLD.FILTER.TABLE.MATCHES}`</p><p>- {#TABLE} NOT_MATCHES_REGEX `{$CLICKHOUSE.LLD.FILTER.TABLE.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -115,39 +122,44 @@ There are no template links in this template.
 |ClickHouse |ClickHouse: Resident memory |<p>Maximum number of bytes in physically resident data pages mapped by the allocator,</p><p>comprising all pages dedicated to allocator metadata, pages backing active allocations,</p><p>and unused dirty pages.</p> |DEPENDENT |clickhouse.jemalloc.resident<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "jemalloc.resident")].value.first()`</p> |
 |ClickHouse |ClickHouse: Mapped memory |<p>"Total number of bytes in active extents mapped by the allocator."</p> |DEPENDENT |clickhouse.jemalloc.mapped<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "jemalloc.mapped")].value.first()`</p> |
 |ClickHouse |ClickHouse: Memory used for queries |<p>"Total amount of memory (bytes) allocated in currently executing queries."</p> |DEPENDENT |clickhouse.memory.tracking<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "MemoryTracking")].value.first()`</p> |
-|ClickHouse |ClickHouse: Memory used for background merges |<p>"Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background merges, mutations and fetches).</p><p> Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa. This happens naturally due to caches for tables indexes and doesn't indicate memory leaks."</p> |DEPENDENT |clickhouse.memory.tracking.background<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "MemoryTrackingInBackgroundProcessingPool")].value.first()`</p> |
+|ClickHouse |ClickHouse: Memory used for background merges |<p>"Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background merges, mutations and fetches).</p><p> Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa. This happens naturally due to caches for tables indexes and doesn't indicate memory leaks."</p> |DEPENDENT |clickhouse.memory.tracking.background<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "MemoryTrackingInBackgroundProcessingPool")].value.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |ClickHouse |ClickHouse: Memory used for background moves |<p>"Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background moves). Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa.</p><p> This happens naturally due to caches for tables indexes and doesn't indicate memory leaks."</p> |DEPENDENT |clickhouse.memory.tracking.background.moves<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "MemoryTrackingInBackgroundMoveProcessingPool")].value.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
-|ClickHouse |ClickHouse: Memory used for background schedule pool |<p>"Total amount of memory (bytes) allocated in background schedule pool (that is dedicated for bookkeeping tasks of Replicated tables)."</p> |DEPENDENT |clickhouse.memory.tracking.schedule.pool<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "MemoryTrackingInBackgroundSchedulePool")].value.first()`</p> |
-|ClickHouse |ClickHouse: Memory used for merges |<p>Total amount of memory (bytes) allocated for background merges. Included in MemoryTrackingInBackgroundProcessingPool. Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa.</p><p>This happens naturally due to caches for tables indexes and doesn't indicate memory leaks.</p> |DEPENDENT |clickhouse.memory.tracking.merges<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "MemoryTrackingForMerges")].value.first()`</p> |
+|ClickHouse |ClickHouse: Memory used for background schedule pool |<p>"Total amount of memory (bytes) allocated in background schedule pool (that is dedicated for bookkeeping tasks of Replicated tables)."</p> |DEPENDENT |clickhouse.memory.tracking.schedule.pool<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "MemoryTrackingInBackgroundSchedulePool")].value.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|ClickHouse |ClickHouse: Memory used for merges |<p>Total amount of memory (bytes) allocated for background merges. Included in MemoryTrackingInBackgroundProcessingPool. Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa.</p><p>This happens naturally due to caches for tables indexes and doesn't indicate memory leaks.</p> |DEPENDENT |clickhouse.memory.tracking.merges<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "MemoryTrackingForMerges")].value.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |ClickHouse |ClickHouse: Current distributed files to insert |<p>Number of pending files to process for asynchronous insertion into Distributed tables. Number of files for every shard is summed.</p> |DEPENDENT |clickhouse.distributed.files<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "DistributedFilesToInsert")].value.first()`</p> |
 |ClickHouse |ClickHouse: Distributed connection fail with retry per second |<p>Connection retries in replicated DB connection pool</p> |DEPENDENT |clickhouse.distributed.files.retry.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "DistributedConnectionFailTry")].value.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |ClickHouse |ClickHouse: Distributed connection fail with retry per second |<p>"Connection failures after all retries in replicated DB connection pool"</p> |DEPENDENT |clickhouse.distributed.files.fail.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "DistributedConnectionFailAtAll")].value.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |ClickHouse |ClickHouse: Replication lag across all tables |<p>Maximum replica queue delay relative to current time</p> |DEPENDENT |clickhouse.replicas.max.absolute.delay<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "ReplicasMaxAbsoluteDelay")].value.first()`</p> |
 |ClickHouse |ClickHouse: Total replication tasks in queue | |DEPENDENT |clickhouse.replicas.sum.queue.size<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "ReplicasSumQueueSize")].value.first()`</p> |
 |ClickHouse |ClickHouse: Total number read-only Replicas |<p>Number of Replicated tables that are currently in readonly state</p><p>due to re-initialization after ZooKeeper session loss</p><p>or due to startup without ZooKeeper configured.</p> |DEPENDENT |clickhouse.replicas.readonly.total<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "ReadonlyReplica")].value.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Bytes |<p>Table size in bytes. Database: {#DB}, table: {#TABLE}</p> |DEPENDENT |clickhouse.table.bytes["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].bytes.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Parts |<p>Number of parts of the table. Database: {#DB}, table: {#TABLE}</p> |DEPENDENT |clickhouse.table.parts["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].parts.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Rows |<p>Number of rows in the table. Database: {#DB}, table: {#TABLE}</p> |DEPENDENT |clickhouse.table.rows["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].rows.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}: Bytes |<p>Database size in bytes.</p> |DEPENDENT |clickhouse.db.bytes["{#DB}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}")].bytes.sum()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica readonly |<p>Whether the replica is in read-only mode.</p><p>This mode is turned on if the config doesn't have sections with ZooKeeper, if an unknown error occurred when re-initializing sessions in ZooKeeper, and during session re-initialization in ZooKeeper.</p> |DEPENDENT |clickhouse.replica.is_readonly["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].is_readonly.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica session expired |<p>True if the ZooKeeper session expired</p> |DEPENDENT |clickhouse.replica.is_session_expired["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].is_session_expired.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica future parts |<p>Number of data parts that will appear as the result of INSERTs or merges that haven't been done yet.</p> |DEPENDENT |clickhouse.replica.future_parts["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].future_parts.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica parts to check |<p>Number of data parts in the queue for verification. A part is put in the verification queue if there is suspicion that it might be damaged.</p> |DEPENDENT |clickhouse.replica.parts_to_check["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].parts_to_check.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica queue size |<p>Size of the queue for operations waiting to be performed.</p> |DEPENDENT |clickhouse.replica.queue_size["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].queue_size.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica queue inserts size |<p>Number of inserts of blocks of data that need to be made.</p> |DEPENDENT |clickhouse.replica.inserts_in_queue["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].inserts_in_queue.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica queue merges size |<p>Number of merges waiting to be made. </p> |DEPENDENT |clickhouse.replica.merges_in_queue["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].merges_in_queue.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica log max index |<p>Maximum entry number in the log of general activity. (Have a non-zero value only where there is an active session with ZooKeeper).</p> |DEPENDENT |clickhouse.replica.log_max_index["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].log_max_index.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica log pointer |<p> Maximum entry number in the log of general activity that the replica copied to its execution queue, plus one. (Have a non-zero value only where there is an active session with ZooKeeper).</p> |DEPENDENT |clickhouse.replica.log_pointer["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].log_pointer.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Total replicas |<p>Total number of known replicas of this table. (Have a non-zero value only where there is an active session with ZooKeeper).</p> |DEPENDENT |clickhouse.replica.total_replicas["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].total_replicas.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Active replicas |<p>Number of replicas of this table that have a session in ZooKeeper (i.e., the number of functioning replicas). (Have a non-zero value only where there is an active session with ZooKeeper).</p> |DEPENDENT |clickhouse.replica.active_replicas["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].active_replicas.first()`</p> |
-|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica lag |<p>Difference between log_max_index and log_pointer</p> |DEPENDENT |clickhouse.replica.lag["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].replica_lag.first()`</p> |
-|ClickHouse |ClickHouse: Dictionary {#NAME}: Bytes allocated |<p>The amount of RAM the dictionary uses.</p> |DEPENDENT |clickhouse.dictionary.bytes_allocated["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#NAME}")].bytes_allocated.first()`</p> |
-|ClickHouse |ClickHouse: Dictionary {#NAME}: Element count |<p>Number of items stored in the dictionary.</p> |DEPENDENT |clickhouse.dictionary.element_count["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#NAME}")].element_count.first()`</p> |
-|ClickHouse |ClickHouse: Dictionary {#NAME}: Load factor |<p>The percentage filled in the dictionary (for a hashed dictionary, the percentage filled in the hash table).</p> |DEPENDENT |clickhouse.dictionary.load_factor["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#NAME}")].bytes_allocated.first()`</p><p>- MULTIPLIER: `100`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Get table info |<p>The item gets information about {#TABLE} table of {#DB} database.</p> |DEPENDENT |clickhouse.table.info_raw["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Bytes |<p>Table size in bytes. Database: {#DB}, table: {#TABLE}</p> |DEPENDENT |clickhouse.table.bytes["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Parts |<p>Number of parts of the table. Database: {#DB}, table: {#TABLE}</p> |DEPENDENT |clickhouse.table.parts["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.parts`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Rows |<p>Number of rows in the table. Database: {#DB}, table: {#TABLE}</p> |DEPENDENT |clickhouse.table.rows["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.rows`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Get replicas info |<p>The item gets information about replicas of {#TABLE} table of {#DB} database.</p> |DEPENDENT |clickhouse.replica.info_raw["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}" && @.table == "{#TABLE}")].first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica readonly |<p>Whether the replica is in read-only mode.</p><p>This mode is turned on if the config doesn't have sections with ZooKeeper, if an unknown error occurred when re-initializing sessions in ZooKeeper, and during session re-initialization in ZooKeeper.</p> |DEPENDENT |clickhouse.replica.is_readonly["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.is_readonly`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica session expired |<p>True if the ZooKeeper session expired</p> |DEPENDENT |clickhouse.replica.is_session_expired["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.is_session_expired`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica future parts |<p>Number of data parts that will appear as the result of INSERTs or merges that haven't been done yet.</p> |DEPENDENT |clickhouse.replica.future_parts["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.future_parts`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica parts to check |<p>Number of data parts in the queue for verification. A part is put in the verification queue if there is suspicion that it might be damaged.</p> |DEPENDENT |clickhouse.replica.parts_to_check["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.parts_to_check`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica queue size |<p>Size of the queue for operations waiting to be performed.</p> |DEPENDENT |clickhouse.replica.queue_size["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue_size`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica queue inserts size |<p>Number of inserts of blocks of data that need to be made.</p> |DEPENDENT |clickhouse.replica.inserts_in_queue["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.inserts_in_queue`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica queue merges size |<p>Number of merges waiting to be made. </p> |DEPENDENT |clickhouse.replica.merges_in_queue["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.merges_in_queue`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica log max index |<p>Maximum entry number in the log of general activity. (Have a non-zero value only where there is an active session with ZooKeeper).</p> |DEPENDENT |clickhouse.replica.log_max_index["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.log_max_index`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica log pointer |<p> Maximum entry number in the log of general activity that the replica copied to its execution queue, plus one. (Have a non-zero value only where there is an active session with ZooKeeper).</p> |DEPENDENT |clickhouse.replica.log_pointer["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.log_pointer`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Total replicas |<p>Total number of known replicas of this table. (Have a non-zero value only where there is an active session with ZooKeeper).</p> |DEPENDENT |clickhouse.replica.total_replicas["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.total_replicas`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Active replicas |<p>Number of replicas of this table that have a session in ZooKeeper (i.e., the number of functioning replicas). (Have a non-zero value only where there is an active session with ZooKeeper).</p> |DEPENDENT |clickhouse.replica.active_replicas["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.active_replicas`</p> |
+|ClickHouse |ClickHouse: {#DB}.{#TABLE}: Replica lag |<p>Difference between log_max_index and log_pointer</p> |DEPENDENT |clickhouse.replica.lag["{#DB}.{#TABLE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.replica_lag`</p> |
+|ClickHouse |ClickHouse: Dictionary {#NAME}: Get dictionary info |<p>The item gets information about {#NAME} dictionary.</p> |DEPENDENT |clickhouse.dictionary.info_raw["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#NAME}")].first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|ClickHouse |ClickHouse: Dictionary {#NAME}: Bytes allocated |<p>The amount of RAM the dictionary uses.</p> |DEPENDENT |clickhouse.dictionary.bytes_allocated["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes_allocated`</p> |
+|ClickHouse |ClickHouse: Dictionary {#NAME}: Element count |<p>Number of items stored in the dictionary.</p> |DEPENDENT |clickhouse.dictionary.element_count["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.element_count`</p> |
+|ClickHouse |ClickHouse: Dictionary {#NAME}: Load factor |<p>The percentage filled in the dictionary (for a hashed dictionary, the percentage filled in the hash table).</p> |DEPENDENT |clickhouse.dictionary.load_factor["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes_allocated`</p><p>- MULTIPLIER: `100`</p> |
+|ClickHouse |ClickHouse: {#DB}: Get DB info |<p>The item gets information about {#DB} database.</p> |DEPENDENT |clickhouse.db.info_raw["{#DB}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.database == "{#DB}")].first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|ClickHouse |ClickHouse: {#DB}: Bytes |<p>Database size in bytes.</p> |DEPENDENT |clickhouse.db.bytes["{#DB}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes`</p> |
+|ClickHouse |ClickHouse: {#DB}: Tables |<p>Number of tables in {#DB} database.</p> |DEPENDENT |clickhouse.db.tables["{#DB}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.tables`</p> |
 |ClickHouse ZooKeeper |ClickHouse: ZooKeeper sessions |<p>Number of sessions (connections) to ZooKeeper. Should be no more than one.</p> |DEPENDENT |clickhouse.zookeeper.session<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "ZooKeeperSession")].value.first()`</p> |
 |ClickHouse ZooKeeper |ClickHouse: ZooKeeper watches |<p>Number of watches (e.g., event subscriptions) in ZooKeeper.</p> |DEPENDENT |clickhouse.zookeeper.watch<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "ZooKeeperWatch")].value.first()`</p> |
 |ClickHouse ZooKeeper |ClickHouse: ZooKeeper requests |<p>Number of requests to ZooKeeper in progress.</p> |DEPENDENT |clickhouse.zookeeper.request<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "ZooKeeperRequest")].value.first()`</p> |
-|ClickHouse ZooKeeper |ClickHouse: ZooKeeper wait time |<p>Time spent in waiting for ZooKeeper operations.</p> |DEPENDENT |clickhouse.zookeeper.wait.time<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.event == "ZooKeeperWaitMicroseconds")].value.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.000001`</p><p>- CHANGE_PER_SECOND</p> |
+|ClickHouse ZooKeeper |ClickHouse: ZooKeeper wait time |<p>Time spent in waiting for ZooKeeper operations.</p> |DEPENDENT |clickhouse.zookeeper.wait.time<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.event == "ZooKeeperWaitMicroseconds")].value.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `1.0E-6`</p><p>- CHANGE_PER_SECOND</p> |
 |ClickHouse ZooKeeper |ClickHouse: ZooKeeper exceptions per second |<p>Count of ZooKeeper exceptions that does not belong to user/hardware exceptions.</p> |DEPENDENT |clickhouse.zookeeper.exceptions.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.event == "ZooKeeperOtherExceptions")].value.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |ClickHouse ZooKeeper |ClickHouse: ZooKeeper hardware exceptions per second |<p>Count of ZooKeeper exceptions caused by session moved/expired, connection loss, marshalling error, operation timed out and invalid zhandle state.</p> |DEPENDENT |clickhouse.zookeeper.hw_exceptions.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.event == "ZooKeeperHardwareExceptions")].value.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |ClickHouse ZooKeeper |ClickHouse: ZooKeeper user exceptions per second |<p>Count of ZooKeeper exceptions caused by no znodes, bad version, node exists, node empty and no children for ephemeral.</p> |DEPENDENT |clickhouse.zookeeper.user_exceptions.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.event == "ZooKeeperUserExceptions")].value.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
@@ -156,18 +168,19 @@ There are no template links in this template.
 |Zabbix raw items |ClickHouse: Get system.asynchronous_metrics |<p>Get metrics that are calculated periodically in the background</p> |HTTP_AGENT |clickhouse.system.asynchronous_metrics<p>**Preprocessing**:</p><p>- JSONPATH: `$.data`</p> |
 |Zabbix raw items |ClickHouse: Get system.settings |<p>Get information about settings that are currently in use.</p> |HTTP_AGENT |clickhouse.system.settings<p>**Preprocessing**:</p><p>- JSONPATH: `$.data`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Zabbix raw items |ClickHouse: Get replicas info |<p>-</p> |HTTP_AGENT |clickhouse.replicas<p>**Preprocessing**:</p><p>- JSONPATH: `$.data`</p> |
+|Zabbix raw items |ClickHouse: Get databases info |<p>-</p> |HTTP_AGENT |clickhouse.databases<p>**Preprocessing**:</p><p>- JSONPATH: `$.data`</p> |
 |Zabbix raw items |ClickHouse: Get tables info |<p>-</p> |HTTP_AGENT |clickhouse.tables<p>**Preprocessing**:</p><p>- JSONPATH: `$.data`</p> |
 |Zabbix raw items |ClickHouse: Get dictionaries info |<p>-</p> |HTTP_AGENT |clickhouse.dictionaries<p>**Preprocessing**:</p><p>- JSONPATH: `$.data`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |ClickHouse: There are queries running is long |<p>-</p> |`last(/ClickHouse by HTTP/clickhouse.process.elapsed)>{$CLICKHOUSE.QUERY_TIME.MAX.WARN}` |AVERAGE |<p>Manual close: YES</p> |
 |ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable |<p>-</p> |`last(/ClickHouse by HTTP/net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"])=0` |AVERAGE |<p>Manual close: YES</p> |
 |ClickHouse: Service is down |<p>-</p> |`last(/ClickHouse by HTTP/clickhouse.ping)=0 or last(/ClickHouse by HTTP/net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"]) = 0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable</p> |
-|ClickHouse: Version has changed |<p>ClickHouse version has changed. Ack to close.</p> |`last(/ClickHouse by HTTP/clickhouse.version,#1)<>last(/ClickHouse by HTTP/clickhouse.version,#2) and length(last(/ClickHouse by HTTP/clickhouse.version))>0` |INFO |<p>Manual close: YES</p> |
-|ClickHouse: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/ClickHouse by HTTP/clickhouse.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|ClickHouse: Version has changed |<p>The ClickHouse version has changed. Acknowledge to close manually.</p> |`last(/ClickHouse by HTTP/clickhouse.version,#1)<>last(/ClickHouse by HTTP/clickhouse.version,#2) and length(last(/ClickHouse by HTTP/clickhouse.version))>0` |INFO |<p>Manual close: YES</p> |
+|ClickHouse: Host has been restarted |<p>The host uptime is less than 10 minutes.</p> |`last(/ClickHouse by HTTP/clickhouse.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |ClickHouse: Failed to fetch info data |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/ClickHouse by HTTP/clickhouse.uptime,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- ClickHouse: Service is down</p> |
 |ClickHouse: Too many throttled insert queries |<p>Clickhouse have INSERT queries that are throttled due to high number of active data parts for partition in a MergeTree, please decrease INSERT frequency</p> |`min(/ClickHouse by HTTP/clickhouse.insert.delay,5m)>{$CLICKHOUSE.DELAYED.INSERTS.MAX.WARN}` |WARNING |<p>Manual close: YES</p> |
 |ClickHouse: Too many MergeTree parts |<p>Descease INSERT queries frequency.</p><p>Clickhouse MergeTree table engine split each INSERT query to partitions (PARTITION BY expression)</p><p>and add one or more PARTS per INSERT inside each partition,</p><p>after that background merge process run, and when you have too much unmerged parts inside partition,</p><p>SELECT queries performance can significate degrade, so clickhouse try delay insert, or abort it.</p> |`min(/ClickHouse by HTTP/clickhouse.max.part.count.for.partition,5m)>{$CLICKHOUSE.PARTS.PER.PARTITION.WARN} * 0.9` |WARNING |<p>Manual close: YES</p> |
@@ -184,5 +197,5 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
