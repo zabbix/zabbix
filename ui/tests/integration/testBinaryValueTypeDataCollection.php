@@ -129,7 +129,8 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 
 		$dep_items_create_result = CDataHelper::createItems('item',
 			['agent' =>
-					[[
+				[
+				[
 						'name' => 'BINARY_IMAGE',
 						'key_' => 'BINARY_IMAGE',
 						'type' => ITEM_TYPE_DEPENDENT,
@@ -140,7 +141,37 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 						'error_handler' => 0,
 						'error_handler_params' => ''
 							]]
-					]]
+				],
+				[
+					'name' => 'BINARY_IMAGE_EMPTY',
+					'key_' => 'BINARY_IMAGE_EMPTY',
+					'type' => ITEM_TYPE_DEPENDENT,
+					'master_itemid' => self::$itemids['proxy_agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
+					'value_type' => ITEM_VALUE_TYPE_BINARY,
+					'delay' => '0s',
+					'preprocessing' =>
+						[[
+							'type' => 12,
+							'params' => '$.screenshot_empty',
+							'error_handler' => 0,
+							'error_handler_params' => ''
+						]]
+				],
+				[
+					'name' => 'BINARY_IMAGE_SINGLE_CHAR',
+					'key_' => 'BINARY_IMAGE_SINGLE_CHAR',
+					'type' => ITEM_TYPE_DEPENDENT,
+					'master_itemid' => self::$itemids['proxy_agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
+					'value_type' => ITEM_VALUE_TYPE_BINARY,
+					'delay' => '0s',
+					'preprocessing' =>
+						[[
+							'type' => 12,
+							'params' => '$.screenshot_single_char',
+							'error_handler' => 0,
+							'error_handler_params' => ''
+						]]
+				]]
 			]
 		, $result['hostids']);
 
@@ -162,39 +193,8 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 							'error_handler' => 0,
 							'error_handler_params' => ''
 						]]
-				],
-
-				[
-					'name' => 'BINARY_IMAGE_EMPTY',
-					'key_' => 'BINARY_IMAGE_EMPTY',
-					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => self::$itemids['proxy_agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
-					'value_type' => ITEM_VALUE_TYPE_BINARY,
-					'delay' => '0s',
-					'preprocessing' =>
-						[[
-							'type' => 12,
-							'params' => '$.screenshot_empty',
-							'error_handler' => 0,
-							'error_handler_params' => ''
-						]]
-				],
-
-				[
-					'name' => 'BINARY_IMAGE_SINGLE_CHAR',
-					'key_' => 'BINARY_IMAGE_SINGLE_CHAR',
-					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => self::$itemids['proxy_agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
-					'value_type' => ITEM_VALUE_TYPE_BINARY,
-					'delay' => '0s',
-					'preprocessing' =>
-						[[
-							'type' => 12,
-							'params' => '$.screenshot_single_char',
-							'error_handler' => 0,
-							'error_handler_params' => ''
-						]]
-				]]]
+				]]
+			]
 		, $result['hostids']);
 
 		self::$itemids = array_merge(self::$itemids, $dep_items_create_result);
