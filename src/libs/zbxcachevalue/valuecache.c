@@ -632,7 +632,6 @@ static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, 
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_NONE:
-		case ITEM_VALUE_TYPE_MAX:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -1148,7 +1147,6 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_NONE:
-		case ITEM_VALUE_TYPE_MAX:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);

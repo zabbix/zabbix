@@ -157,7 +157,6 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 				value->dbl = atof(data);
 				break;
 			case ITEM_VALUE_TYPE_NONE:
-			case ITEM_VALUE_TYPE_MAX:
 			default:
 				fail_msg("Unexpected value type: %c", value_type);
 		}
@@ -267,7 +266,6 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 				zbx_mock_assert_double_eq(prefix, expected->value.dbl, returned->value.dbl);
 				break;
 			case ITEM_VALUE_TYPE_NONE:
-			case ITEM_VALUE_TYPE_MAX:
 			default:
 				fail_msg("Unexpected value type: %c", value_type);
 		}

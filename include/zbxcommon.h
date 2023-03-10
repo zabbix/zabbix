@@ -230,10 +230,9 @@ typedef enum
 	ITEM_VALUE_TYPE_LOG,
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT,
-	ITEM_VALUE_TYPE_BIN,
-	/* the number of defined value types */
-	ITEM_VALUE_TYPE_MAX,
-	ITEM_VALUE_TYPE_NONE,
+	ITEM_VALUE_TYPE_BIN,	/* Last real value. In some places it is also used in size of array or */
+				/* upper bound for iteration. Do not forget to update when adding new types. */
+	ITEM_VALUE_TYPE_NONE	/* Artificial value, not written into DB, used internally in server. */
 }
 zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);

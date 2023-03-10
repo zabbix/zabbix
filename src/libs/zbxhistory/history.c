@@ -29,7 +29,7 @@ ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 extern char	*CONFIG_HISTORY_STORAGE_URL;
 extern char	*CONFIG_HISTORY_STORAGE_OPTS;
 
-zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_MAX];
+zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_BIN + 1];
 
 /************************************************************************************
  *                                                                                  *
@@ -48,7 +48,7 @@ int	zbx_history_init(char **error)
 
 	const char	*opts[] = {"dbl", "str", "log", "uint", "text"};
 
-	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
+	for (i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
 	{
 		if (NULL == CONFIG_HISTORY_STORAGE_URL || NULL == strstr(CONFIG_HISTORY_STORAGE_OPTS, opts[i]))
 			ret = zbx_history_sql_init(&history_ifaces[i], i, error);
@@ -74,7 +74,7 @@ void	zbx_history_destroy(void)
 {
 	int	i;
 
-	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
+	for (i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
@@ -101,7 +101,7 @@ int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
+	for (i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
@@ -109,7 +109,7 @@ int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush)
 			flags |= (1 << i);
 	}
 
-	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
+	for (i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
@@ -254,7 +254,6 @@ void	zbx_history_record_clear(zbx_history_record_t *value, int value_type)
 		case ITEM_VALUE_TYPE_BIN:
 			break;
 		case ITEM_VALUE_TYPE_NONE:
-		case ITEM_VALUE_TYPE_MAX:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -290,7 +289,6 @@ void	zbx_history_value2str(char *buffer, size_t size, const zbx_history_value_t 
 			zbx_strlcpy_utf8(buffer, value->log->value, size);
 			break;
 		case ITEM_VALUE_TYPE_NONE:
-		case ITEM_VALUE_TYPE_MAX:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
@@ -328,7 +326,6 @@ char	*zbx_history_value2str_dyn(const zbx_history_value_t *value, int value_type
 			str = zbx_strdup(NULL, value->log->value);
 			break;
 		case ITEM_VALUE_TYPE_NONE:
-		case ITEM_VALUE_TYPE_MAX:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
@@ -384,7 +381,6 @@ void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int va
 		case ITEM_VALUE_TYPE_UINT64:
 			break;
 		case ITEM_VALUE_TYPE_NONE:
-		case ITEM_VALUE_TYPE_MAX:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -467,7 +463,6 @@ void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char v
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_NONE:
-		case ITEM_VALUE_TYPE_MAX:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
