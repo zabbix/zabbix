@@ -1,1 +1,1 @@
-...G...... [ZBX-22452] fixed Windows Zabbix agent web.page.* unsupported item keys (akozlovs)
+...G...... [ZBX-22452] fixed item keys web.page.* in Zabbix agent for Microsoft Windows (akozlovs)
