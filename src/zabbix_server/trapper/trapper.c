@@ -983,7 +983,8 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
 		char *severity, size_t severity_len)
 {
-	int	i, ret = SUCCEED;
+	int	ret = SUCCEED;
+	size_t	i;
 	char	*data_b64 = NULL;
 
 	assert(NULL != host && 0 != host_len);
