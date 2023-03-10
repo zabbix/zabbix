@@ -4,8 +4,24 @@
 ## Overview
 
 This template is designed to monitor Veeam Backup Enterprise Manager.
-Veeam Backup Enterprise Manager REST API is available in Veeam Universal License (excluding Community) and Veeam Socket License (excluding Standart Socket).
 It works without any external scripts and uses the script item. 
+
+This template has been tested on:
+
+- Veeam Backup and Replication, version 11.0
+
+***NOTE:*** Veeam Backup Enterprise Manager REST API may not be available for some editions, template will only work in the following editions of Veeam Backup and Replication:
+
+1. Veeam Universal License (VUL) editions:
+* Foundation
+* Advanced
+* Premium
+
+2. Veeam Socket License editions:
+* Enterprise Socket
+* Enterprise Plus Socket 
+
+> See [Veeam Data Platform Feature Comparison](https://www.veeam.com/licensing-pricing.html) for more details.
 
 ## Requirements
 
