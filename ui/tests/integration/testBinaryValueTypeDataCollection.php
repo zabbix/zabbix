@@ -194,7 +194,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 							'error_handler' => 0,
 							'error_handler_params' => ''
 						]]
-				],]]
+				]]]
 		, $result['hostids']);
 
 		self::$itemids = array_merge(self::$itemids, $dep_items_create_result);

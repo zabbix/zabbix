@@ -3045,25 +3045,31 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 }
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-static void	format_binary_value_for_sql(char **in)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decodes base64 encoded binary data and escapes it allow it to     *
+ *          to be used inside sql statement                                   *
+ *                                                                            *
+ * Parameters: sql_insert_data     - [IN/OUT] base64 encoded unescaped data   *
+ *                                                                            *
+ ******************************************************************************/
+static void	format_binary_value_for_sql(char **sql_insert_data)
 {
-	char	*chunk, *dst = NULL;
-	size_t	data_len, src_len;
+	char	*escaped_binary, *binary_data = NULL;
+	size_t	binary_data_len, binary_data_max_len;
 
-	src_len = strlen(*in) * 3 / 4 + 1;
-	dst = (char*)zbx_malloc(NULL, src_len);
-	str_base64_decode(*in, (char *)dst, src_len, &data_len);
+	binary_data_max_len = strlen(*sql_insert_data) * 3 / 4 + 1;
+	binary_data = (char*)zbx_malloc(NULL, binary_data_max_len);
+	str_base64_decode(*sql_insert_data, (char *)binary_data, binary_data_max_len, &binary_data_len);
 #if defined (HAVE_MYSQL)
-	chunk = (char*)zbx_malloc(NULL, 2 * data_len);
-	zbx_mysql_escape_bin((char*)dst, chunk, data_len);
+	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
+	zbx_mysql_escape_bin((char*)binary_data, escaped_binary, binary_data_len);
 #elif defined (HAVE_POSTGRESQL)
-	zbx_postgresql_escape_bin((char*)dst, &chunk, data_len);
-#else
-#error "Unsupported db during blob insert"
+	zbx_postgresql_escape_bin((char*)binary_data, &escaped_binary, binary_data_len);
 #endif
-	zbx_free(dst);
-	zbx_free(*in);
-	*in = chunk;
+	zbx_free(binary_data);
+	zbx_free(*sql_insert_data);
+	*sql_insert_data = escaped_binary;
 }
 #endif
 

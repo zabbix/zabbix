@@ -1494,16 +1494,16 @@ out:
 #endif
 
 #if defined(HAVE_MYSQL)
-void	zbx_mysql_escape_bin(char* dst, char chunk[], size_t size)
+void	zbx_mysql_escape_bin(char* src, char dst[], size_t size)
 {
-	mysql_real_escape_string(conn, chunk, dst, size);
+	mysql_real_escape_string(conn, dst, src, size);
 }
 #elif defined(HAVE_POSTGRESQL)
-void	zbx_postgresql_escape_bin(char* dst, char **chunk, size_t size)
+void	zbx_postgresql_escape_bin(char* src, char **dst, size_t size)
 {
 	size_t	l;
 
-	*chunk = (char*)PQescapeByteaConn(conn, (unsigned char*)dst, size, &l);
+	*dst = (char*)PQescapeByteaConn(conn, (unsigned char*)src, size, &l);
 }
 #endif
 
