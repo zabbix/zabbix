@@ -525,7 +525,7 @@ class testPageReportsAudit extends CWebTest {
 				}
 
 				// Get all results from column and remove existing values.
-				$table_value = $this->getTableResult($column);
+				$table_value = $this->getTableColumnData($column);
 
 				foreach ($values as $value) {
 					$this->assertTrue(in_array($value, $table_value));

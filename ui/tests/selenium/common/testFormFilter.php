@@ -105,14 +105,14 @@ class testFormFilter extends CWebTest {
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
 		$filter_container->selectTab('update_tab');
 		$form = $this->query('id:tabfilter_1')->asForm()->waitUntilReady()->one();
-		$result_before = $this->getTableResults($table_selector);
+		$result_before = $this->getTableColumnDatas($table_selector);
 
 		for ($i = 0; $i < 2; ++$i) {
 			$form->fill(['Host groups' => ['Group to check Overview', 'Another group to check Overview']]);
 
 			if ($i === 0) {
 				$this->query('name:filter_apply')->one()->click();
-				$this->assertFalse($result_before === $this->getTableResults($table_selector));
+				$this->assertFalse($result_before === $this->getTableColumnDatas($table_selector));
 			}
 
 			$this->query('xpath://a[@aria-label="Home"]')->one()->click();
@@ -128,14 +128,14 @@ class testFormFilter extends CWebTest {
 				$table->waitUntilReloaded();
 			}
 			else {
-				$this->assertTrue($result_before === $this->getTableResults($table_selector));
+				$this->assertTrue($result_before === $this->getTableColumnDatas($table_selector));
 				$this->query('button:Update')->one()->click();
 				$table->waitUntilReloaded();
 			}
 		}
 
 		// Getting changed host/problem result and then comparing it with displayed result from dropdown.
-		$result = $this->getTableResults($table_selector);
+		$result = $this->getTableColumnDatas($table_selector);
 		$this->query('xpath://a[@aria-label="Home"]')->waitUntilClickable()->one()->click();
 		$table->waitUntilReloaded();
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
@@ -257,7 +257,7 @@ class testFormFilter extends CWebTest {
 	 *
 	 * @return int
 	 */
-	public function getTableResults($table_selector) {
+	public function getTableColumnDatas($table_selector) {
 		$table = $this->query($table_selector)->asTable()->waitUntilReady()->one();
 		$text = $table->query('xpath:.//tbody/tr/td')->one()->getText();
 		$result = ($text === 'No data found.') ? 0 : $table->getRows()->count();

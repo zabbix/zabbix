@@ -110,7 +110,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		foreach (['Name', 'Type'] as $column) {
-			$values = $this->getTableResult($column);
+			$values = $this->getTableColumnData($column);
 
 			$values_asc = $values;
 			$values_desc = $values;
