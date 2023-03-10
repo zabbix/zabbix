@@ -1402,7 +1402,7 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 				char	*dst = NULL;
 				size_t	data_len, src_len;
 
-				src_len = strlen(rows[i][position].str) * 3 / 4 ;
+				src_len = strlen(rows[i][position].str) * 3 / 4 + 1;
 				dst = (char*)zbx_malloc(NULL, src_len);
 				str_base64_decode(rows[i][position].str, (char *)dst, src_len, &data_len);
 				sizes[i] = data_len;

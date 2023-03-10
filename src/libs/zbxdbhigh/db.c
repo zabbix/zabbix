@@ -3050,7 +3050,7 @@ static void	format_binary_value_for_sql(char **in)
 	char	*chunk, *dst = NULL;
 	size_t	data_len, src_len;
 
-	src_len = strlen(*in) * 3 / 4 ;
+	src_len = strlen(*in) * 3 / 4 + 1;
 	dst = (char*)zbx_malloc(NULL, src_len);
 	str_base64_decode(*in, (char *)dst, src_len, &data_len);
 #if defined (HAVE_MYSQL)
