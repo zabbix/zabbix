@@ -112,6 +112,8 @@ int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain FQDN: %s", strerror_from_system(WSAGetLastError())));
 				return SYSINFO_RET_FAIL;
 			}
+
+			zbx_rtrim(name, " \r\n.");
 		}
 		else
 		{

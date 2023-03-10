@@ -37,6 +37,7 @@ func getHostname(params []string) (uname string, err error) {
 	}
 
 	var mode, transform string
+	const ComputerNameDnsFullyQualified = 3
 
 	if len(params) > 0 {
 		mode = params[0]
@@ -58,7 +59,8 @@ func getHostname(params []string) (uname string, err error) {
 			return "", err
 		}
 	case "fqdn":
-		uname = win32.GetComputerNameExA(3)
+		uname = win32.GetComputerNameExA(ComputerNameDnsFullyQualified)
+		uname = strings.Trim(uname, " \r\n.")
 	case "shorthost":
 		if uname, err = os.Hostname(); err != nil {
 			return "", err

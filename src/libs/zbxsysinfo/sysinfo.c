@@ -32,6 +32,7 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxexpr.h"
+#include "zbxcommon.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
@@ -2035,7 +2036,7 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 	zbx_free(mpoint);
 }
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname, const char *fqdn_command)
 {
 	char	*type, *transform;
@@ -2057,15 +2058,15 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 			FILE	*f;
 			char	tmp[MAX_STRING_LEN];
 
-			if (NULL == (f = popen("hostname -f", "r")))
+			if (NULL == (f = popen(fqdn_command, "r")))
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot get the FQDN."));
 				return FAIL;
 			}
 
-			if (0 != zbx_fgets(tmp, sizeof(tmp), f))
+			if (NULL != zbx_fgets(tmp, sizeof(tmp), f))
 			{
-				zbx_rtrim(tmp, " \r\n");
+				zbx_rtrim(tmp, " \r\n.");
 				hostname = zbx_strdup(hostname, tmp);
 			}
 
