@@ -430,6 +430,10 @@ msgstr ""
 msgid "ADD OVERRIDE"
 msgstr "AGGIUNGI OVERRIDE"
 
+#: tests/selenium/modules/clock32/Widget.php:46
+msgid "ALARM CLOCK"
+msgstr ""
+
 #: app/views/administration.user.list.php:115
 msgid "API access"
 msgstr ""

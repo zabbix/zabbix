@@ -1795,22 +1795,6 @@ static int	DBpatch_6030193(void)
 	return DBcreate_index("scripts", "scripts_3", "name,menu_path", 1);
 }
 
-static int	DBpatch_6030194(void)
-{
-	const ZBX_TABLE	table =
-		{"history_bin", "itemid,clock,ns", 0,
-			{
-				{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"value", "", NULL, NULL, 0, ZBX_TYPE_BLOB, ZBX_NOTNULL, 0},
-				{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{NULL}
-			},
-			NULL
-		};
-
-	return DBcreate_table(&table);
-}
 #endif
 
 DBPATCH_START(6030)
@@ -1997,6 +1981,5 @@ DBPATCH_ADD(6030190, 0, 1)
 DBPATCH_ADD(6030191, 0, 1)
 DBPATCH_ADD(6030192, 0, 1)
 DBPATCH_ADD(6030193, 0, 1)
-DBPATCH_ADD(6030194, 0, 1)
 
 DBPATCH_END()

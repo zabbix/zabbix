@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.4'
+  version: '7.0'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -30,7 +30,7 @@ zabbix_export:
         Template tooling version used: 0.42
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: 'Templates/Network devices'
