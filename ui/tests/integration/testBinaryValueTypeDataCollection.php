@@ -146,7 +146,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 					'name' => 'BINARY_IMAGE_EMPTY',
 					'key_' => 'BINARY_IMAGE_EMPTY',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => self::$itemids['proxy_agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
+					'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
 					'value_type' => ITEM_VALUE_TYPE_BINARY,
 					'delay' => '0s',
 					'preprocessing' =>
@@ -161,7 +161,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 					'name' => 'BINARY_IMAGE_SINGLE_CHAR',
 					'key_' => 'BINARY_IMAGE_SINGLE_CHAR',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => self::$itemids['proxy_agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
+					'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::TEST_FILE_NAME_JSON_WITH_IMAGE.',]'],
 					'value_type' => ITEM_VALUE_TYPE_BINARY,
 					'delay' => '0s',
 					'preprocessing' =>
