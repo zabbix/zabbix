@@ -251,7 +251,7 @@ static const char	*get_progname(void)
 }
 #endif
 
-static int	config_timeout = 3;
+static ZBX_THREAD_LOCAL int	config_timeout = 3;
 static int	get_config_timeout(void)
 {
 	return config_timeout;

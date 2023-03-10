@@ -255,7 +255,7 @@ static int	get_config_forks(unsigned char process_type)
 	return 0;
 }
 
-static int	config_timeout = 3;
+static ZBX_THREAD_LOCAL int	config_timeout = 3;
 static int	get_config_timeout(void)
 {
 	return config_timeout;
