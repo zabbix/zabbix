@@ -88,7 +88,10 @@ class CControllerModuleEdit extends CController {
 				'url' => array_key_exists('url', $manifest) ? $manifest['url'] : null,
 				'status' => $this->hasInput('form_refresh')
 					? ($this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED)
-					: $this->module['status']
+					: $this->module['status'],
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				]
 			];
 
 			$response = new CControllerResponseData($data);
