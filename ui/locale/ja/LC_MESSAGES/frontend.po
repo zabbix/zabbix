@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-07 04:10+0000\n"
-"Last-Translator: Kodai <kodai.terashima@zabbix.com>\n"
+"PO-Revision-Date: 2023-03-08 03:34+0000\n"
+"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -3992,7 +3992,7 @@ msgstr "1秒あたりの差分"
 
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
-msgstr "障害の順位の変更"
+msgstr "障害の種別の変更"
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
