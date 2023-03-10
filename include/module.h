@@ -141,13 +141,6 @@ ZBX_METRIC;
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
-#define SET_BIN_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_BIN,			\
-	(res)->bin = (char *)(val)		\
-)
-
-/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_LOG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_LOG,			\
