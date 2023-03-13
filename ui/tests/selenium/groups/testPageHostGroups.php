@@ -417,7 +417,7 @@ class testPageHostGroups extends CWebTest {
 			[
 				[
 					'Name' => 'Group with template testPageHostGroups',
-					'expected' => [self::TEMPLATE]
+					'expected' => 'Group with template testPageHostGroups'
 				]
 			],
 			// Partial match.
@@ -810,7 +810,7 @@ class testPageHostGroups extends CWebTest {
 
 		$this->page->login()->open($this->link)->waitUntilReady();
 		$table = $this->getTable();
-		$this->selectTableRows(CTestArrayHelper::get($data, 'groups', []));
+		$this->selectTableRows(CTestArrayHelper::get($data, 'groups'));
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$table->waitUntilReloaded();

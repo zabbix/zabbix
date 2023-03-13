@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
+ * @dataSource DiscoveredHosts, HostGroups
+ *
  * @backup items
  */
 class testPageLowLevelDiscovery extends CWebTest {
@@ -414,6 +416,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'expected' => [
 						'Linux by Zabbix agent: Block devices discovery',
 						'Zabbix server health: Zabbix stats cluster: High availability cluster node discovery',
+						'LLD for Discovered host tests',
+						'LLD for host group test',
 						'Linux by Zabbix agent: Mounted filesystem discovery',
 						'Linux by Zabbix agent: Network interface discovery'
 					]
