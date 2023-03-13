@@ -41,7 +41,7 @@ svg *:focus {
 
 @font-face {
   font-family: "zabbix-icons";
-  src: url("../fonts/zabbix-icons.woff2?t=1677498778051") format("woff2"), url("../fonts/zabbix-icons.woff?t=1677498778051") format("woff"), url("../fonts/zabbix-icons.ttf?t=1677498778051") format("truetype"), url("../fonts/zabbix-icons.svg?t=1677498778051#zabbix-icons") format("svg"); }
+  src: url("../fonts/zabbix-icons.woff2?t=1678702425533") format("woff2"), url("../fonts/zabbix-icons.woff?t=1678702425533") format("woff"), url("../fonts/zabbix-icons.ttf?t=1678702425533") format("truetype"), url("../fonts/zabbix-icons.svg?t=1678702425533#zabbix-icons") format("svg"); }
 [class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, z-select button.focusable::after, z-select a.focusable.btn-icon::after,
 .z-select button.focusable::after,
 .z-select a.focusable.btn-icon::after, .ui-tabs-nav .ui-tabs-tab .btn-info::after, .ui-tabs-nav .ui-tabs-tab .filter-trigger::after, .ui-tabs-nav .ui-tabs-tab .btn-time::after, .btn-dropdown-container .btn-dropdown-toggle::after {
