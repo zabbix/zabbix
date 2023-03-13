@@ -27,6 +27,9 @@
 #include "zbxconnector.h"
 #include "zbxtime.h"
 #include "zbxhttp.h"
+#include "zbxcacheconfig.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
 
 static int	connector_object_compare_func(const void *d1, const void *d2)
 {
@@ -52,15 +55,17 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, '\n');
 	}
 
-	*processed_num += connector_data_points->values_num;
+	*processed_num += (zbx_uint64_t)connector_data_points->values_num;
 
 	zbx_vector_connector_data_point_clear_ext(connector_data_points, zbx_connector_data_point_free);
 #ifdef HAVE_LIBCURL
-	if (SUCCEED != zbx_http_request(HTTP_REQUEST_POST, connector.url, "", "",
+	char	headers[] = "", posts[] = "", status_codes[] = "200";
+
+	if (SUCCEED != zbx_http_request(HTTP_REQUEST_POST, connector.url, headers, posts,
 			str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0,
 			connector.timeout, connector.max_attempts, connector.ssl_cert_file, connector.ssl_key_file,
 			connector.ssl_key_password, connector.verify_peer, connector.verify_host, connector.authtype,
-			connector.username, connector.password, connector.token, ZBX_POSTTYPE_NDJSON, "200",
+			connector.username, connector.password, connector.token, ZBX_POSTTYPE_NDJSON, status_codes,
 			HTTP_STORE_RAW, &out, &error))
 	{
 		char	*info = NULL;

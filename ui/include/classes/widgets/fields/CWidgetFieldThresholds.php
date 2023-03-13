@@ -77,7 +77,9 @@ class CWidgetFieldThresholds extends CWidgetField {
 			}
 		}
 
-		CArrayHelper::sort($thresholds, ['threshold_value']);
+		uasort($thresholds, static function (array $threshold_1, array $threshold_2): int {
+			return $threshold_1['threshold_value'] <=> $threshold_2['threshold_value'];
+		});
 
 		$thresholds = array_values($thresholds);
 

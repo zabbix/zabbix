@@ -31,6 +31,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxconnector.h"
+#include "zbxtagfilter.h"
 
 /* event recovery data */
 typedef struct

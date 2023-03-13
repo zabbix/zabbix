@@ -37,6 +37,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
+#include "zbxtagfilter.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;
@@ -3369,7 +3370,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_uint64_t		itemids;
 	zbx_hashset_t			trigger_info;
 	unsigned char			*data = NULL;
-	size_t				data_alloc = 0, data_offset = 0;
+	size_t				data_alloc = 0, data_offset;
 	zbx_vector_connector_filter_t	connector_filters_history, connector_filters_events;
 
 	if (NULL == history_float && NULL != history_float_cbs)

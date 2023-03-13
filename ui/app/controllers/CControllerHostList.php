@@ -272,26 +272,35 @@ class CControllerHostList extends CController {
 			$item_active_by_hostid[$value['hostid']] = $value['rowscount'];
 		}
 
-		// Get the writable templates among the templates linked to the hosts.
-		$editable_templates = [];
+		// Selecting linked templates to templates linked to hosts.
+		$templateids = [];
 
-		if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
-			$templateids = [];
+		foreach ($hosts as $host) {
+			$templateids = array_merge($templateids, array_column($host['parentTemplates'], 'templateid'));
+		}
 
-			foreach ($hosts as $host) {
-				foreach ($host['parentTemplates'] as $template) {
-					$templateids[$template['templateid']] = true;
-				}
+		$templateids = array_keys(array_flip($templateids));
+
+		$templates = API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'selectParentTemplates' => ['templateid', 'name'],
+			'templateids' => $templateids,
+			'preservekeys' => true
+		]);
+
+		$writable_templates = [];
+
+		if ($templateids) {
+			foreach ($templates as $template) {
+				$templateids = array_merge($templateids, array_column($template['parentTemplates'], 'templateid'));
 			}
 
-			if ($templateids) {
-				$editable_templates = API::Template()->get([
-					'output' => [],
-					'templateids' => array_keys($templateids),
-					'editable' => true,
-					'preservekeys' => true
-				]);
-			}
+			$writable_templates = API::Template()->get([
+				'output' => ['templateid'],
+				'templateids' => array_keys(array_flip($templateids)),
+				'editable' => true,
+				'preservekeys' => true
+			]);
 		}
 
 		// Get proxy host IDs that are not 0 and maintenance IDs.
@@ -370,8 +379,9 @@ class CControllerHostList extends CController {
 			'filter' => $filter,
 			'sortField' => $sort_field,
 			'sortOrder' => $sort_order,
+			'templates' => $templates,
 			'maintenances' => $db_maintenances,
-			'editable_templates' => $editable_templates,
+			'writable_templates' => $writable_templates,
 			'proxies' => $proxies,
 			'proxies_ms' => $proxies_ms,
 			'profileIdx' => 'web.hosts.filter',
@@ -380,6 +390,7 @@ class CControllerHostList extends CController {
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],
+			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'uncheck' => ($this->getInput('uncheck', 0) == 1)
 		];
 

@@ -59,7 +59,6 @@
 #include "housekeeper/trigger_housekeeper.h"
 #include "lld/lld_manager.h"
 #include "lld/lld_worker.h"
-#include "connector/connector_manager.h"
 #include "reporter/report_manager.h"
 #include "reporter/report_writer.h"
 #include "events.h"
@@ -145,9 +144,8 @@ const char	*help_message[] = {
 	"                                  housekeeper, http poller, icmp pinger,",
 	"                                  ipmi manager, ipmi poller, java poller,",
 	"                                  poller, preprocessing manager,",
-	"                                  preprocessing worker, proxy poller,",
-	"                                  self-monitoring, snmp trapper, task manager,",
-	"                                  timer, trapper, unreachable poller,",
+	"                                  proxy poller, self-monitoring, snmp trapper,",
+	"                                  task manager, timer, trapper, unreachable poller,",
 	"                                  vmware collector, history poller,",
 	"                                  availability manager, service manager, odbc poller,",
 	"                                  connector manager, connector worker)",
@@ -161,9 +159,8 @@ const char	*help_message[] = {
 	"                                  housekeeper, http poller, icmp pinger,",
 	"                                  ipmi manager, ipmi poller, java poller,",
 	"                                  poller, preprocessing manager,",
-	"                                  preprocessing worker, proxy poller,",
-	"                                  self-monitoring, snmp trapper, task manager,",
-	"                                  timer, trapper, unreachable poller,",
+	"                                  proxy poller, self-monitoring, snmp trapper, ",
+	"                                  task manager, timer, trapper, unreachable poller,",
 	"                                  vmware collector, history poller,",
 	"                                  availability manager, service manager, odbc poller,",
 	"                                  connector manager, connector worker)",
@@ -483,10 +480,10 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPPOLLER];
 	}
-	else if (local_server_num <= (server_count += 1))
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_DISCOVERER;
-		*local_process_num = local_server_num - server_count + 1;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER];
 	}
 	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTSYNCER]))
 	{
@@ -1407,8 +1404,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, config_timeout};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
 							config_timeout};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, config_timeout,
-							CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]};
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, config_timeout};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP};
 	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, config_timeout};
@@ -1487,13 +1483,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		/* skip threaded components */
 		if (ZBX_PROCESS_TYPE_PREPROCESSOR == i)
 			continue;
-
-		/* start single discoverer manager process */
-		if (ZBX_PROCESS_TYPE_DISCOVERER == i)
-		{
-			threads_num++;
-			continue;
-		}
 
 		threads_num += CONFIG_FORKS[i];
 	}
@@ -1628,6 +1617,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(taskmanager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &preproc_man_args;
 				zbx_thread_start(preprocessing_manager_thread, &thread_args, &threads[i]);
 				break;

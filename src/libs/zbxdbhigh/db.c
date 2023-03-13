@@ -1297,23 +1297,23 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 #endif
 }
 
-/*******************************************************************************
- *                                                                             *
- * Purpose: This function is similar to zbx_db_add_condition_alloc(), except   *
- *          it is designed for generating WHERE conditions for strings. Hence, *
- *          this function is simpler, because only IN condition is possible.   *
- *                                                                             *
- * Parameters: sql        - [IN/OUT] buffer for SQL query construction         *
- *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                  *
- *             sql_offset - [IN/OUT] current position in the 'sql' buffer      *
- *             fieldname  - [IN] field name to be used in SQL WHERE condition  *
- *             values     - [IN] array of string values                        *
- *             num        - [IN] number of elements in 'values' array          *
- *                                                                             *
- * Comments: To support Oracle empty values are checked separately (is null    *
- *           for Oracle and ='' for the other databases).                      *
- *                                                                             *
- *******************************************************************************/
+/******************************************************************************
+ *                                                                            *
+ * Purpose: This function is similar to DBadd_condition_alloc(), except it is *
+ *          designed for generating WHERE conditions for strings. Hence, this *
+ *          function is simpler, because only IN condition is possible.       *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] buffer for SQL query construction        *
+ *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                 *
+ *             sql_offset - [IN/OUT] current position in the 'sql' buffer     *
+ *             fieldname  - [IN] field name to be used in SQL WHERE condition *
+ *             values     - [IN] array of string values                       *
+ *             num        - [IN] number of elements in 'values' array         *
+ *                                                                            *
+ * Comments: To support Oracle empty values are checked separately (is null   *
+ *           for Oracle and ='' for the other databases).                     *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char **values, const int num)
 {

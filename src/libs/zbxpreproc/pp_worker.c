@@ -31,8 +31,6 @@
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
 
-ZBX_THREAD_LOCAL int	__zbxthread__;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: process preprocessing testing task                                *
@@ -108,9 +106,10 @@ static void	*pp_worker_entry(void *arg)
 	zbx_pp_worker_t	*worker = (zbx_pp_worker_t *)arg;
 	zbx_pp_queue_t	*queue = worker->queue;
 	zbx_pp_task_t	*in;
-	char		*error = NULL;
+	char		*error = NULL, component[MAX_ID_LEN + 1];
 
-	__zbxthread__ = worker->id;
+	zbx_snprintf(component, sizeof(component), "%d", worker->id);
+	zbx_set_log_component(component);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
@@ -129,8 +128,8 @@ static void	*pp_worker_entry(void *arg)
 
 			zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_BUSY);
 
-			zabbix_log(LOG_LEVEL_TRACE, "[%d] %s() process task type:%u itemid:" ZBX_FS_UI64, __zbxthread__,
-					__func__, in->type, in->itemid);
+			zabbix_log(LOG_LEVEL_TRACE, "%s() process task type:%u itemid:" ZBX_FS_UI64, __func__,
+					in->type, in->itemid);
 
 			switch (in->type)
 			{
@@ -154,6 +153,9 @@ static void	*pp_worker_entry(void *arg)
 			pp_task_queue_lock(queue);
 			pp_task_queue_push_finished(queue, in);
 
+			if (NULL != worker->finished_cb)
+				worker->finished_cb(worker->finished_data);
+
 			continue;
 		}
 
@@ -163,6 +165,9 @@ static void	*pp_worker_entry(void *arg)
 			zbx_free(error);
 			worker->stop = 1;
 		}
+
+		if (1 < queue->pending_num)
+			pp_task_queue_notify(queue);
 	}
 
 	pp_task_queue_deregister_worker(queue);
@@ -181,8 +186,8 @@ static void	*pp_worker_entry(void *arg)
  * Parameters: worker     - [IN] the preprocessing worker                     *
  *             id         - [IN] the worker id (index)                        *
  *             queue      - [IN] the task queue                               *
- *             timekeeper - [IN] the timekeeper object for busy/idle worker   *
- *                               state reporting                              *
+ *             timekeeper - [IN] the timekeeper object for busy/idle          *
+ *                               worker state reporting                       *
  *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - the worker was initialized and started             *
@@ -241,4 +246,20 @@ void	pp_worker_destroy(zbx_pp_worker_t *worker)
 	pp_context_destroy(&worker->execute_ctx);
 
 	worker->init_flags = PP_WORKER_INIT_NONE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set callback to call after task is processed                      *
+ *                                                                            *
+ * Parameters: worker         - [IN] the preprocessing worker                 *
+ *             finished_cb   - [IN] a callback to call after finishing        *
+ *                                     task                                   *
+ *             finished_data - [IN] the callback data                         *
+ *                                                                            *
+ ******************************************************************************/
+void	pp_worker_set_finished_cb(zbx_pp_worker_t *worker, zbx_pp_notify_cb_t finished_cb, void *finished_data)
+{
+	worker->finished_cb = finished_cb;
+	worker->finished_data = finished_data;
 }

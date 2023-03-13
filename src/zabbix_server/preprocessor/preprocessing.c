@@ -19,6 +19,7 @@
 
 #include "preprocessing.h"
 #include "zbxpreproc.h"
+#include "preproc.h"
 
 #include "log.h"
 #include "zbxserialize.h"
@@ -28,7 +29,6 @@
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
-#define MAX_VALUES_LOCAL	256
 
 #define PACKED_FIELD(value, size)	\
 		(zbx_packed_field_t){(value), (size), (0 == (size) ? PACKED_FIELD_STRING : PACKED_FIELD_RAW)};
@@ -516,12 +516,12 @@ zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t
  *             usage   - [IN] the worker usage statistics                     *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage)
+zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len;
 
-	data_len = (zbx_uint32_t)((unsigned int)usage->values_num * sizeof(double) + sizeof(int));
+	data_len = (zbx_uint32_t)((unsigned int)usage->values_num * sizeof(double) + sizeof(int) + sizeof(int));
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
 
@@ -529,6 +529,8 @@ zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_v
 
 	for (int i = 0; i < usage->values_num; i++)
 		ptr += zbx_serialize_value(ptr, usage->values[i]);
+
+	(void)zbx_serialize_value(ptr, count);
 
 	return data_len;
 }
@@ -725,7 +727,7 @@ void	zbx_preprocessor_unpack_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t 
  *             data  - [IN] the input data                                    *
  *                                                                            *
  ******************************************************************************/
-static void	preprocessor_unpack_usage_stats(zbx_vector_dbl_t *usage, const unsigned char *data)
+static void	preprocessor_unpack_usage_stats(zbx_vector_dbl_t *usage, int *count, const unsigned char *data)
 {
 	const unsigned char	*offset = data;
 	int			usage_num;
@@ -740,6 +742,8 @@ static void	preprocessor_unpack_usage_stats(zbx_vector_dbl_t *usage, const unsig
 		offset += zbx_deserialize_value(offset, &busy);
 		zbx_vector_dbl_append(usage, busy);
 	}
+
+	(void)zbx_deserialize_value(offset, count);
 }
 
 /******************************************************************************
@@ -880,7 +884,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 		preprocessor_pack_value(&cached_message, &value);
 	}
 
-	if (MAX_VALUES_LOCAL < ++cached_values)
+	if (ZBX_PREPROCESSING_BATCH_SIZE < ++cached_values)
 		zbx_preprocessor_flush();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1109,7 +1113,7 @@ int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_sequence_stats_p
  * Purpose: get preprocessing manager diagnostic statistics                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_preprocessor_get_usage_stats(zbx_vector_dbl_t *usage, char **error)
+int	zbx_preprocessor_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **error)
 {
 	unsigned char	*result;
 
@@ -1119,7 +1123,7 @@ int	zbx_preprocessor_get_usage_stats(zbx_vector_dbl_t *usage, char **error)
 		return FAIL;
 	}
 
-	preprocessor_unpack_usage_stats(usage, result);
+	preprocessor_unpack_usage_stats(usage, count, result);
 	zbx_free(result);
 
 	return SUCCEED;
@@ -1137,7 +1141,9 @@ void	zbx_preprocessor_get_worker_info(zbx_process_info_t *info)
 
 	zbx_vector_dbl_create(&usage);
 
-	if (SUCCEED != zbx_preprocessor_get_usage_stats(&usage, &error))
+	memset(info, 0, sizeof(zbx_process_info_t));
+
+	if (SUCCEED != zbx_preprocessor_get_usage_stats(&usage, &info->count, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get preprocessor usage statistics: %s", error);
 		zbx_free(error);
