@@ -546,7 +546,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' &&
 	$result = API::Trigger()->delete(getRequest('g_triggerid'));
 
 	if ($result) {
-		uncheckTableRows(getRequest('checkbox_hash'));
+		uncheckTableRows();
 	}
 
 	show_messages($result, _('Triggers deleted'), _('Cannot delete triggers'));
