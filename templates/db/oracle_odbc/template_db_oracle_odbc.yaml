@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-03-10T07:52:26Z'
+  date: '2023-03-13T10:45:02Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -2894,6 +2894,176 @@ zabbix_export:
           macro: '{$ORACLE.USER}'
           value: '<Put your username here>'
           description: 'Oracle username.'
+      dashboards:
+        -
+          uuid: 8bb7593dc22d43d5ba7a16cb7b94d8a3
+          name: 'Oracle performance'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by ODBC'
+                        name: 'Oracle: Cache Hit Ratios'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by ODBC'
+                        name: 'Oracle: Sort Operations'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by ODBC'
+                        name: 'Oracle: Physical Read\Write Rate'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by ODBC'
+                        name: 'Oracle: Physical Read\Write Rate, Bytes'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by ODBC'
+                        name: 'Oracle: Datafiles'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by ODBC'
+                        name: 'Oracle: PGA'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by ODBC'
+                        name: 'Oracle: Processes'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by ODBC'
+                        name: 'Oracle: Sessions'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '20'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by ODBC'
+                        name: 'Oracle: SGA Memory Usage'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '20'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by ODBC'
+                        name: 'Oracle: Sort Operations'
       valuemaps:
         -
           uuid: 79af6c068ba141ba9806f4341edd9266
@@ -3106,6 +3276,21 @@ zabbix_export:
           value: capacity
   graphs:
     -
+      uuid: cf491b94c7674160ba36e2105026c834
+      name: 'Oracle: Cache Hit Ratios'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Oracle by ODBC'
+            key: oracle.buffer_cache_hit_ratio
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Oracle by ODBC'
+            key: oracle.library_cache_hit_ratio
+    -
       uuid: 72ad9e81bb5147e6827499143d256068
       name: 'Oracle: Datafiles'
       graph_items:
@@ -3259,3 +3444,18 @@ zabbix_export:
           item:
             host: 'Oracle by ODBC'
             key: oracle.sga_buffer_cache
+    -
+      uuid: 48e400ae300642d2ac1b3f3e9d47acc0
+      name: 'Oracle: Sort Operations'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Oracle by ODBC'
+            key: oracle.memory_sorts_ratio
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Oracle by ODBC'
+            key: oracle.disk_sorts
