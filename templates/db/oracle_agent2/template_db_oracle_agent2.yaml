@@ -2638,6 +2638,176 @@ zabbix_export:
           macro: '{$ORACLE.USER}'
           value: zabbix
           description: 'Oracle username.'
+      dashboards:
+        -
+          uuid: 2048704bb05644b7ad4b858090fceeb0
+          name: 'Oracle performance'
+          pages:
+            -
+              widgets:
+                -
+                  type: graph
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: Cache Hit Ratios'
+                -
+                  type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: Sort Operations'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: Physical Read\Write Rate'
+                -
+                  type: graph
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: Physical Read\Write Rate, Bytes'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: Datafiles'
+                -
+                  type: graph
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: PGA'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: Processes'
+                -
+                  type: graph
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: Sessions'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '20'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: SGA Memory Usage'
+                -
+                  type: graph
+                  'y': '20'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Oracle by Zabbix agent 2'
+                        name: 'Oracle: Sort Operations'
       valuemaps:
         -
           uuid: 5a90da8dd6124159a7f82a7a996f0a53
@@ -2840,6 +3010,21 @@ zabbix_export:
           value: capacity
   graphs:
     -
+      uuid: 8b4e1ce9e8b44190a33f241997afbcd8
+      name: 'Oracle: Cache Hit Ratios'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Oracle by Zabbix agent 2'
+            key: oracle.buffer_cache_hit_ratio
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Oracle by Zabbix agent 2'
+            key: oracle.library_cache_hit_ratio
+    -
       uuid: 292f08d249d344db882a3447cc268ca6
       name: 'Oracle: Datafiles'
       graph_items:
@@ -2993,3 +3178,18 @@ zabbix_export:
           item:
             host: 'Oracle by Zabbix agent 2'
             key: oracle.sga_buffer_cache
+    -
+      uuid: c4833df08e784dd6b08bb86cce3ee30a
+      name: 'Oracle: Sort Operations'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Oracle by Zabbix agent 2'
+            key: oracle.memory_sorts_ratio
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Oracle by Zabbix agent 2'
+            key: oracle.disk_sorts
