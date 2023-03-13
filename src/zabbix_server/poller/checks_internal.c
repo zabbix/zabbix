@@ -23,6 +23,7 @@
 #include "checks_java.h"
 #include "zbxself.h"
 #include "preproc.h"
+#include "zbxdiscovery.h"
 #include "zbxtrends.h"
 #include "../vmware/vmware.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
@@ -176,15 +177,17 @@ static double	get_selfmon_stat(double busy, unsigned char state)
 	return (ZBX_PROCESS_STATE_BUSY == state ? busy : 100.0 - busy);
 }
 
-static int	get_preprocessor_selfmon_stats(unsigned char aggr_func, int proc_num, unsigned char state,
-		double *value, char **error)
+typedef int (*zbx_selfmon_stats_threads_cb_t)(zbx_vector_dbl_t*, int*, char**);
+
+static int	get_selfmon_stats_threads(unsigned char aggr_func, zbx_selfmon_stats_threads_cb_t stats_func,
+		int proc_num, unsigned char state, double *value, char **error)
 {
 	zbx_vector_dbl_t	usage;
 	int			ret, count;
 
 	zbx_vector_dbl_create(&usage);
 
-	if (SUCCEED != (ret = zbx_preprocessor_get_usage_stats(&usage, &count, error)))
+	if (SUCCEED != (ret = stats_func(&usage, &count, error)))
 		goto out;
 
 	if (0 == usage.values_num)
@@ -563,6 +566,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 		{
 			unsigned char	aggr_func, state;
 			unsigned short	process_num = 0;
+			char		*error = NULL;
 
 			if ('\0' == *tmp || 0 == strcmp(tmp, "avg"))
 				aggr_func = ZBX_SELFMON_AGGR_FUNC_AVG;
@@ -601,21 +605,22 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				goto out;
 			}
 
-			if (ZBX_PROCESS_TYPE_PREPROCESSOR != process_type)
+			if (ZBX_PROCESS_TYPE_PREPROCESSOR == process_type || ZBX_PROCESS_TYPE_DISCOVERER)
 			{
-				zbx_get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
-			}
-			else
-			{
-				char	*error = NULL;
+				zbx_selfmon_stats_threads_cb_t	stats_func;
 
-				if (SUCCEED != get_preprocessor_selfmon_stats(aggr_func, process_num, state, &value,
-						&error))
+				stats_func = ZBX_PROCESS_TYPE_PREPROCESSOR == process_type ?
+						zbx_preprocessor_get_usage_stats : zbx_discovery_get_usage_stats;
+
+				if (SUCCEED != get_selfmon_stats_threads(aggr_func, stats_func, process_num, state,
+						&value, &error))
 				{
 					SET_MSG_RESULT(result, error);
 					goto out;
 				}
 			}
+			else
+				zbx_get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
 
 			SET_DBL_RESULT(result, value);
 		}
@@ -923,6 +928,16 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 		}
 
 		SET_UI64_RESULT(result, zbx_preprocessor_get_queue_size());
+	}
+	else if (0 == strcmp(tmp, "discoverer_queue"))			/* zabbix[discoverer_queue] */
+	{
+		if (1 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		SET_UI64_RESULT(result, zbx_discovery_get_queue_size());
 	}
 	else if (0 == strcmp(tmp, "tcache"))			/* zabbix[tcache,cache,<parameter>] */
 	{

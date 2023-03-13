@@ -39,13 +39,13 @@ zbx_discoverer_task_t;
 
 typedef struct
 {
-	zbx_uint64_t				druleid;
-	zbx_list_t				tasks;
-	zbx_uint64_t				drule_revision;
-	int					config_timeout;
-	int					workers_used;
-	int					workers_max;
-	unsigned char				status;
+	zbx_uint64_t			druleid;
+	zbx_list_t			tasks;
+	zbx_uint64_t			drule_revision;
+	int				config_timeout;
+	int				workers_used;
+	int				workers_max;
+	unsigned char			status;
 }
 zbx_discoverer_job_t;
 

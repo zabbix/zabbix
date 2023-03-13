@@ -208,6 +208,7 @@ int	discoverer_queue_init(zbx_discoverer_queue_t *queue, char **error)
 	int	err, ret = FAIL;
 
 	queue->workers_num = 0;
+	queue->pending_checks_count = 0;
 	queue->flags = DISCOVERER_QUEUE_INIT_NONE;
 
 	zbx_list_create(&queue->jobs);

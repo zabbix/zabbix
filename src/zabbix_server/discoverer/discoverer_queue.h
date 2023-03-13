@@ -24,11 +24,12 @@
 
 typedef struct
 {
-	int					workers_num;
-	zbx_list_t				jobs;
-	pthread_mutex_t				lock;
-	pthread_cond_t				event;
-	int					flags;
+	int		workers_num;
+	zbx_list_t	jobs;
+	zbx_uint64_t	pending_checks_count;
+	pthread_mutex_t	lock;
+	pthread_cond_t	event;
+	int		flags;
 }
 zbx_discoverer_queue_t;
 

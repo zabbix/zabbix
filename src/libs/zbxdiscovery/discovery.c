@@ -24,6 +24,7 @@
 #include "../../zabbix_server/events.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
+#include "zbxserialize.h"
 
 typedef struct
 {
@@ -530,4 +531,137 @@ void	zbx_discovery_drule_free(zbx_dc_drule_t *drule)
 	zbx_vector_dc_dcheck_ptr_destroy(&drule->dchecks);
 
 	zbx_free(drule);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sends command to discovery manager                                *
+ *                                                                            *
+ * Parameters: code     - [IN] message code                                   *
+ *             data     - [IN] message data                                   *
+ *             size     - [IN] message data size                              *
+ *             response - [OUT] response message (can be NULL if response is  *
+ *                              not requested)                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	discovery_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size,
+		zbx_ipc_message_t *response)
+{
+	char			*error = NULL;
+	static zbx_ipc_socket_t	socket = {0};
+
+	/* each process has a permanent connection to discovery manager */
+	if (0 == socket.fd && FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_DISCOVERER, SEC_PER_MIN,
+			&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to discoverer service: %s", error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to discoverer service");
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL != response && FAIL == zbx_ipc_socket_read(&socket, response))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot receive data from discoverer service");
+		exit(EXIT_FAILURE);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get queue size (enqueued checks count) of discovery manager       *
+ *                                                                            *
+ * Return value: enqueued item count                                          *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_discovery_get_queue_size(void)
+{
+	zbx_uint64_t		size;
+	zbx_ipc_message_t	message;
+
+	zbx_ipc_message_init(&message);
+	discovery_send(ZBX_IPC_DISCOVERER_QUEUE, NULL, 0, &message);
+	memcpy(&size, message.data, sizeof(zbx_uint64_t));
+	zbx_ipc_message_clean(&message);
+
+	return size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unpack worker usage statistics                                    *
+ *                                                                            *
+ * Parameters: usage - [OUT] the worker usage statistics                      *
+ *             data  - [IN] the input data                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	discovery_unpack_usage_stats(zbx_vector_dbl_t *usage, int *count, const unsigned char *data)
+{
+	const unsigned char	*offset = data;
+	int			usage_num;
+
+	offset += zbx_deserialize_value(offset, &usage_num);
+	zbx_vector_dbl_reserve(usage, (size_t)usage_num);
+
+	for (int i = 0; i < usage_num; i++)
+	{
+		double	busy;
+
+		offset += zbx_deserialize_value(offset, &busy);
+		zbx_vector_dbl_append(usage, busy);
+	}
+
+	(void)zbx_deserialize_value(offset, count);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get discovery manager diagnostic statistics                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_discovery_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **error)
+{
+	unsigned char	*result;
+
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_DISCOVERER, ZBX_IPC_DISCOVERER_USAGE_STATS,
+			SEC_PER_MIN, NULL, 0, &result, error))
+	{
+		return FAIL;
+	}
+
+	discovery_unpack_usage_stats(usage, count, result);
+	zbx_free(result);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: pack diagnostic statistics data into a single buffer that can be  *
+ *          used in IPC                                                       *
+ * Parameters: data    - [OUT] memory buffer for packed data                  *
+ *             usage   - [IN] the worker usage statistics                     *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_discovery_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count)
+{
+	unsigned char	*ptr;
+	zbx_uint32_t	data_len;
+
+	data_len = (zbx_uint32_t)((unsigned int)usage->values_num * sizeof(double) + sizeof(int) + sizeof(int));
+
+	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr += zbx_serialize_value(ptr, usage->values_num);
+
+	for (int i = 0; i < usage->values_num; i++)
+		ptr += zbx_serialize_value(ptr, usage->values[i]);
+
+	(void)zbx_serialize_value(ptr, count);
+
+	return data_len;
 }

@@ -34,6 +34,7 @@
 #include "zbxip.h"
 #include "zbxsysinfo.h"
 #include "zbx_rtc_constants.h"
+#include "zbxtimekeeper.h"
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
 
@@ -52,11 +53,11 @@ zbx_discovery_results_t;
 
 typedef struct
 {
-	zbx_uint64_t		druleid;
-	char			ip[ZBX_INTERFACE_IP_LEN_MAX];
-	int			count;
+	zbx_uint64_t	druleid;
+	char		ip[ZBX_INTERFACE_IP_LEN_MAX];
+	zbx_uint64_t	count;
 }
-zbx_discoverer_task_count_t;
+zbx_discoverer_check_count_t;
 
 typedef struct
 {
@@ -77,6 +78,7 @@ typedef struct
 	int			worker_id;
 	int			stop;
 	int			flags;
+	zbx_timekeeper_t	*timekeeper;
 }
 zbx_discoverer_worker_t;
 
@@ -87,9 +89,11 @@ typedef struct
 	zbx_vector_discoverer_job_refs_t	job_refs;
 	zbx_discoverer_queue_t			queue;
 
-	zbx_hashset_t				incomplete_task_count;
+	zbx_hashset_t				incomplete_checks_count;
 	zbx_hashset_t				results;
 	pthread_mutex_t				results_lock;
+
+	zbx_timekeeper_t			*timekeeper;
 }
 zbx_discoverer_manager_t;
 
@@ -103,9 +107,9 @@ extern unsigned char			program_type;
 
 static zbx_discoverer_manager_t 	dmanager;
 
-static zbx_hash_t	discoverer_task_count_hash(const void *data)
+static zbx_hash_t	discoverer_check_count_hash(const void *data)
 {
-	const zbx_discoverer_task_count_t	*count = (const zbx_discoverer_task_count_t *)data;
+	const zbx_discoverer_check_count_t	*count = (const zbx_discoverer_check_count_t *)data;
 	zbx_hash_t				hash;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&count->druleid);
@@ -114,10 +118,10 @@ static zbx_hash_t	discoverer_task_count_hash(const void *data)
 	return hash;
 }
 
-static int	discoverer_task_count_compare(const void *d1, const void *d2)
+static int	discoverer_check_count_compare(const void *d1, const void *d2)
 {
-	const zbx_discoverer_task_count_t	*count1 = (const zbx_discoverer_task_count_t *)d1;
-	const zbx_discoverer_task_count_t	*count2 = (const zbx_discoverer_task_count_t *)d2;
+	const zbx_discoverer_check_count_t	*count1 = (const zbx_discoverer_check_count_t *)d1;
+	const zbx_discoverer_check_count_t	*count2 = (const zbx_discoverer_check_count_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(count1->druleid, count2->druleid);
 
@@ -155,16 +159,16 @@ static int	discoverer_results_compare(const void *d1, const void *d2)
 	return strcmp(r1->ip, r2->ip);
 }
 
-static void	discoverer_task_count_decrease(zbx_hashset_t *task_counts, zbx_uint64_t druleid, const char *ip,
-		int count)
+static void	discoverer_check_count_decrease(zbx_hashset_t *check_counts, zbx_uint64_t druleid, const char *ip,
+		zbx_uint64_t count)
 {
-	zbx_discoverer_task_count_t	*task_count, cmp;
+	zbx_discoverer_check_count_t	*check_count, cmp;
 
 	cmp.druleid = druleid;
 	zbx_strlcpy(cmp.ip, ip, sizeof(cmp.ip));
 
-	if (NULL != (task_count = zbx_hashset_search(task_counts, &cmp)))
-		task_count->count -= count;
+	if (NULL != (check_count = zbx_hashset_search(check_counts, &cmp)))
+		check_count->count -= count;
 }
 
 /******************************************************************************
@@ -453,11 +457,11 @@ static void	results_free(zbx_discovery_results_t *result)
 	zbx_free(result);
 }
 
-static int	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dcheck_t *dcheck, char *ip, int *need_resolve,
-		zbx_hashset_t *tasks)
+static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dcheck_t *dcheck, char *ip,
+		int *need_resolve, zbx_hashset_t *tasks)
 {
 	const char	*start;
-	int		checks_num = 0;
+	zbx_uint64_t	checks_count = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -554,7 +558,7 @@ static int	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dcheck_t *dch
 				zbx_hashset_insert(tasks, &task_local, sizeof(zbx_discoverer_task_t));
 			}
 
-			checks_num++;
+			checks_count++;
 		}
 
 		if (NULL != comma)
@@ -568,13 +572,14 @@ static int	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dcheck_t *dch
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-	return checks_num;
+	return checks_count;
 }
 
-static int	process_checks(const zbx_dc_drule_t *drule, char *ip, int unique, int *need_resolve,
+static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int unique, int *need_resolve,
 		zbx_hashset_t *tasks)
 {
-	int	i, jobs_num = 0;
+	int		i;
+	zbx_uint64_t	checks_count = 0;
 
 	for (i = 0; i < drule->dchecks.values_num; i++)
 	{
@@ -587,10 +592,10 @@ static int	process_checks(const zbx_dc_drule_t *drule, char *ip, int unique, int
 			continue;
 		}
 
-		jobs_num += process_check(drule, dcheck, ip, need_resolve, tasks);
+		checks_count += process_check(drule, dcheck, ip, need_resolve, tasks);
 	}
 
-	return jobs_num;
+	return checks_count;
 }
 
 static int	process_services(zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip, const char *dns,
@@ -629,11 +634,11 @@ static int	process_services(zbx_uint64_t druleid, zbx_db_dhost *dhost, const cha
  * Purpose: process single discovery rule                                     *
  *                                                                            *
  ******************************************************************************/
-static void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *task_counts)
+static void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *check_counts)
 {
-	char			ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma;
-	int			ipaddress[8];
-	zbx_iprange_t		iprange;
+	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma;
+	int		ipaddress[8];
+	zbx_iprange_t	iprange;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __func__, drule->name, drule->iprange);
 
@@ -669,7 +674,8 @@ static void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashse
 
 		do
 		{
-			int	need_resolve = 1, checks_num = 0;
+			int		need_resolve = 1;
+			zbx_uint64_t	checks_count = 0;
 #ifdef HAVE_IPV6
 			if (ZBX_IPRANGE_V6 == iprange.type)
 			{
@@ -691,20 +697,21 @@ static void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashse
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() ip:'%s'", __func__, ip);
 
 			if (0 != drule->unique_dcheckid)
-				checks_num = process_checks(drule, ip, 1, &need_resolve, tasks);
+				checks_count = process_checks(drule, ip, 1, &need_resolve, tasks);
 
-			checks_num += process_checks(drule, ip, 0, &need_resolve, tasks);
+			checks_count += process_checks(drule, ip, 0, &need_resolve, tasks);
 
-			if (0 < checks_num)
+			if (0 < checks_count)
 			{
-				zbx_discoverer_task_count_t	*task_count, cmp;
+				zbx_discoverer_check_count_t	*check_count, cmp;
 
 				cmp.druleid = drule->druleid;
 				zbx_strlcpy(cmp.ip, ip, sizeof(cmp.ip));
 				cmp.count = 0;
 
-				task_count = zbx_hashset_insert(task_counts, &cmp, sizeof(zbx_discoverer_task_count_t));
-				task_count->count += checks_num;
+				check_count = zbx_hashset_insert(check_counts, &cmp,
+						sizeof(zbx_discoverer_check_count_t));
+				check_count->count += checks_count;
 			}
 		}
 		while (SUCCEED == zbx_iprange_next(&iprange, ipaddress));
@@ -835,9 +842,9 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_results(zbx_discoverer_manager_t *manager)
+static int	process_results(zbx_discoverer_manager_t *manager)
 {
-	int			i;
+	int			i, result_count = 0;
 	zbx_vector_ptr_t	results;
 	zbx_discovery_results_t	*result, *result_tmp;
 	zbx_hashset_iter_t	iter;
@@ -849,16 +856,16 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 
 	while (NULL != (result = (zbx_discovery_results_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_discoverer_task_count_t	*task_count, cmp;
+		zbx_discoverer_check_count_t	*check_count, cmp;
 
 		cmp.druleid = result->druleid;
 		zbx_strlcpy(cmp.ip, result->ip, sizeof(cmp.ip));
 
-		if (NULL != (task_count = zbx_hashset_search(&manager->incomplete_task_count, &cmp)))
+		if (NULL != (check_count = zbx_hashset_search(&manager->incomplete_checks_count, &cmp)))
 		{
-			if (0 == task_count->count)
+			if (0 == check_count->count)
 			{
-				zbx_hashset_remove_direct(&manager->incomplete_task_count, task_count);
+				zbx_hashset_remove_direct(&manager->incomplete_checks_count, check_count);
 			}
 			else
 				continue;
@@ -903,14 +910,18 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 			proxy_update_host(result->druleid, result->ip, result->dnsname, host_status,
 					result->now);
 		}
+
+		result_count += result->services.values_num;
 	}
 
 	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)results_free);
 	zbx_vector_ptr_destroy(&results);
+
+	return result_count;
 }
 
 static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_ptr_t *jobs,
-		zbx_hashset_t *task_counts)
+		zbx_hashset_t *check_counts)
 {
 	int			rule_count = 0, delay, i;
 	char			*delay_str = NULL;
@@ -972,7 +983,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_p
 
 			zbx_hashset_create(&tasks, 1, discoverer_task_hash, discoverer_task_compare);
 
-			process_rule(drule, &tasks, task_counts);
+			process_rule(drule, &tasks, check_counts);
 
 			job = discoverer_job_create(drule, config_timeout);
 
@@ -1134,7 +1145,7 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_ptr_t *vr_s
 	{
 		zbx_discovery_results_t	*dst, *src = vr_src->values[i];
 
-		discoverer_task_count_decrease(&dmanager.incomplete_task_count, src->druleid, src->ip, 1);
+		discoverer_check_count_decrease(&dmanager.incomplete_checks_count, src->druleid, src->ip, 1);
 
 		/* result is incomplete without dnsname so skip it */
 		if (NULL == src->dnsname)
@@ -1233,7 +1244,8 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 		result->dnsname = zbx_strdup(result->dnsname, dns);
 
 	zbx_vector_discoverer_services_ptr_append_array(&result->services, services.values, services.values_num);
-	discoverer_task_count_decrease(&dmanager.incomplete_task_count, druleid, task->ip, task->dchecks.values_num);
+	discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, task->ip,
+			(zbx_uint64_t)task->dchecks.values_num);
 	pthread_mutex_unlock(&dmanager.results_lock);
 
 	zbx_vector_discoverer_services_ptr_destroy(&services);
@@ -1275,6 +1287,8 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			}
 
 			job->workers_used++;
+			queue->pending_checks_count -= (zbx_uint64_t)
+					(NULL != task->ips ? task->ips->values_num : task->dchecks.values_num);
 
 			if (0 == job->workers_max || job->workers_used != job->workers_max)
 			{
@@ -1292,12 +1306,15 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 			/* process checks */
 
+			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_BUSY);
+
 			if (NULL == task->ips)
 				discoverer_net_check_common(druleid, task, config_timeout);
 			else
 				discoverer_net_check_icmp(druleid, task, worker_max);
 
 			discoverer_task_free(task);
+			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_IDLE);
 
 			/* proceed to the next job */
 
@@ -1335,12 +1352,13 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 }
 
 static int	discoverer_worker_init(zbx_discoverer_worker_t *worker, zbx_discoverer_queue_t *queue,
-		void *func(void *), char **error)
+		zbx_timekeeper_t *timekeeper, void *func(void *), char **error)
 {
 	int	err;
 
 	worker->flags = DISCOVERER_WORKER_INIT_NONE;
 	worker->queue = queue;
+	worker->timekeeper = timekeeper;
 	worker->stop = 1;
 
 	if (0 != (err = pthread_create(&worker->thread, NULL, func, (void *)worker)))
@@ -1350,65 +1368,6 @@ static int	discoverer_worker_init(zbx_discoverer_worker_t *worker, zbx_discovere
 	}
 
 	worker->flags |= DISCOVERER_WORKER_INIT_THREAD;
-
-	return SUCCEED;
-}
-
-static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int workers_num, char **error)
-{
-	int		i, started_num = 0, err;
-	time_t		time_start;
-	struct timespec	poll_delay = {0, 1e8};
-
-	memset(manager, 0, sizeof(zbx_discoverer_manager_t));
-
-	zbx_hashset_create(&manager->results, 1, discoverer_result_hash, discoverer_result_compare);
-	zbx_hashset_create(&manager->incomplete_task_count, 1, discoverer_task_count_hash,
-			discoverer_task_count_compare);
-
-	zbx_vector_discoverer_job_refs_create(&manager->job_refs);
-
-	if (0 != (err = pthread_mutex_init(&manager->results_lock, NULL)))
-	{
-		*error = zbx_dsprintf(NULL, "cannot initialize results mutex: %s", zbx_strerror(err));
-		return FAIL;
-	}
-
-	if (SUCCEED != discoverer_queue_init(&manager->queue, error))
-		return FAIL;
-
-	manager->workers_num = workers_num;
-	manager->workers = (zbx_discoverer_worker_t*)zbx_calloc(NULL, (size_t)workers_num,
-			sizeof(zbx_discoverer_worker_t));
-
-	for (i = 0; i < workers_num; i++)
-	{
-		if (SUCCEED != discoverer_worker_init(&manager->workers[i], &manager->queue, discoverer_worker_entry,
-				error))
-		{
-			return FAIL;
-		}
-
-		manager->workers[i].worker_id = i;
-	}
-
-	/* wait for threads to start */
-	time_start = time(NULL);
-
-	while (started_num != workers_num)
-	{
-		if (time_start + ZBX_DISCOVERER_STARTUP_TIMEOUT < time(NULL))
-		{
-			*error = zbx_strdup(NULL, "timeout occurred while waiting for workers to start");
-			return FAIL;
-		}
-
-		discoverer_queue_lock(&manager->queue);
-		started_num = manager->queue.workers_num;
-		discoverer_queue_unlock(&manager->queue);
-
-		nanosleep(&poll_delay, NULL);
-	}
 
 	return SUCCEED;
 }
@@ -1429,6 +1388,87 @@ static void	discoverer_worker_stop(zbx_discoverer_worker_t *worker)
 {
 	if (0 != (worker->flags & DISCOVERER_WORKER_INIT_THREAD))
 		worker->stop = 1;
+}
+
+static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int workers_num, char **error)
+{
+	int		i, err, ret = FAIL, started_num = 0;
+	time_t		time_start;
+	struct timespec	poll_delay = {0, 1e8};
+
+	memset(manager, 0, sizeof(zbx_discoverer_manager_t));
+
+	if (0 != (err = pthread_mutex_init(&manager->results_lock, NULL)))
+	{
+		*error = zbx_dsprintf(NULL, "cannot initialize results mutex: %s", zbx_strerror(err));
+		return FAIL;
+	}
+
+	if (SUCCEED != discoverer_queue_init(&manager->queue, error))
+	{
+		pthread_mutex_destroy(&manager->results_lock);
+		return FAIL;
+	}
+
+	zbx_hashset_create(&manager->results, 1, discoverer_result_hash, discoverer_result_compare);
+	zbx_hashset_create(&manager->incomplete_checks_count, 1, discoverer_check_count_hash,
+			discoverer_check_count_compare);
+
+	zbx_vector_discoverer_job_refs_create(&manager->job_refs);
+
+	manager->timekeeper = zbx_timekeeper_create(workers_num, NULL);
+
+	manager->workers_num = workers_num;
+	manager->workers = (zbx_discoverer_worker_t*)zbx_calloc(NULL, (size_t)workers_num,
+			sizeof(zbx_discoverer_worker_t));
+
+	for (i = 0; i < workers_num; i++)
+	{
+		if (SUCCEED != discoverer_worker_init(&manager->workers[i], &manager->queue, manager->timekeeper,
+				discoverer_worker_entry, error))
+		{
+			goto out;
+		}
+
+		manager->workers[i].worker_id = i;
+	}
+
+	/* wait for threads to start */
+	time_start = time(NULL);
+
+	while (started_num != workers_num)
+	{
+		if (time_start + ZBX_DISCOVERER_STARTUP_TIMEOUT < time(NULL))
+		{
+			*error = zbx_strdup(NULL, "timeout occurred while waiting for workers to start");
+			goto out;
+		}
+
+		discoverer_queue_lock(&manager->queue);
+		started_num = manager->queue.workers_num;
+		discoverer_queue_unlock(&manager->queue);
+
+		nanosleep(&poll_delay, NULL);
+	}
+
+	ret = SUCCEED;
+out:
+	if (FAIL == ret)
+	{
+		for (i = 0; i < manager->workers_num; i++)
+			discoverer_worker_stop(&manager->workers[i]);
+
+		discoverer_queue_destroy(&manager->queue);
+
+		zbx_hashset_destroy(&manager->results);
+		zbx_hashset_destroy(&manager->incomplete_checks_count);
+		zbx_vector_discoverer_job_refs_destroy(&manager->job_refs);
+
+		manager->timekeeper = zbx_timekeeper_create(workers_num, NULL);
+		zbx_timekeeper_free(manager->timekeeper);
+	}
+
+	return ret;
 }
 
 static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
@@ -1452,7 +1492,9 @@ static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 
 	discoverer_queue_destroy(&manager->queue);
 
-	zbx_hashset_destroy(&manager->incomplete_task_count);
+	zbx_timekeeper_free(manager->timekeeper);
+
+	zbx_hashset_destroy(&manager->incomplete_checks_count);
 
 	zbx_vector_discoverer_job_refs_clear(&manager->job_refs);
 	zbx_vector_discoverer_job_refs_destroy(&manager->job_refs);
@@ -1463,7 +1505,35 @@ static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 		results_clear(result);
 
 	zbx_hashset_destroy(&manager->results);
+
+	pthread_mutex_destroy(&manager->results_lock);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: respond to worker usage statistics request                        *
+ *                                                                            *
+ * Parameters: manager     - [IN] discovery manager                           *
+ *             client      - [IN] the request source                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	discoverer_reply_usage_stats(zbx_discoverer_manager_t *manager, zbx_ipc_client_t *client)
+{
+	zbx_vector_dbl_t	usage;
+	unsigned char		*data;
+	zbx_uint32_t		data_len;
+
+	zbx_vector_dbl_create(&usage);
+	(void)zbx_timekeeper_get_usage(manager->timekeeper, &usage);
+
+	data_len = zbx_discovery_pack_usage_stats(&data, &usage,  manager->workers_num);
+
+	zbx_ipc_client_send(client, ZBX_IPC_DISCOVERER_USAGE_STATS_RESULT, data, data_len);
+
+	zbx_free(data);
+	zbx_vector_dbl_destroy(&usage);
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -1474,16 +1544,23 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
 	zbx_thread_discoverer_args	*discoverer_args_in = (zbx_thread_discoverer_args *)
 							(((zbx_thread_args_t *)args)->args);
-	int				sleeptime = -1, rule_count = 0, old_rule_count = 0;
+	int				rule_count = 0, old_rule_count = 0, result_count = 0, old_result_count = 0;
+	zbx_uint64_t			check_count = 0, old_check_count = 0;
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time, nextcheck = 0;
-	zbx_ipc_async_socket_t		rtc;
+	zbx_ipc_service_t		ipc_service;
+	zbx_ipc_client_t		*client;
+	zbx_ipc_message_t		*message;
+	zbx_timespec_t			sleeptime = { .sec = -1, .ns = 0 };
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	char				*error;
 	zbx_vector_uint64_pair_t	revisions;
+#ifdef ZBX22336
+	zbx_uint32_t			rtc_msgs[] = { ZBX_RTC_SNMP_CACHE_RELOAD };
+#endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -1501,7 +1578,12 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_rtc_subscribe(process_type, process_num, discoverer_args_in->config_timeout, &rtc);
+	if (FAIL == zbx_ipc_service_start(&ipc_service, ZBX_IPC_SERVICE_DISCOVERER, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start discoverer service: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 	if (FAIL == discoverer_manager_init(&dmanager, discoverer_args_in->workers_num, &error))
 	{
@@ -1509,23 +1591,29 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		goto out;
 	}
 
+#ifdef ZBX22336
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_DISCOVERER, 0, rtc_msgs, ARRSIZE(rtc_msgs),
+			discoverer_args_in->config_timeout, ZBX_IPC_SERVICE_DISCOVERER);
+#endif
+
+#ifdef HAVE_NETSNMP
 	zbx_mt_init_snmp();
+#endif
 	zbx_vector_uint64_pair_create(&revisions);
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_uint32_t	rtc_cmd;
-		unsigned char	*rtc_data;
 		int		i;
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
 
-		if (0 != sleeptime)
+		if (0 != sleeptime.sec)
 		{
-			zbx_setproctitle("%s #%d [processed %d rules in " ZBX_FS_DBL " sec, performing discovery]",
+			zbx_setproctitle("%s #%d [processed %d rules, queued " ZBX_FS_UI64 " network checks, processed "
+					"%d check results in " ZBX_FS_DBL " sec,performing discovery]",
 					get_process_type_string(process_type), process_num, old_rule_count,
-					old_total_sec);
+					old_check_count, old_result_count, old_total_sec);
 		}
 
 		/* update local drules revisions */
@@ -1554,41 +1642,47 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		discoverer_queue_unlock(&dmanager.queue);
 
-		process_results(&dmanager);
+		result_count += process_results(&dmanager);
 
 		/* process discovery rules and create net check jobs */
 
 		if ((int)sec >= nextcheck)
 		{
 			zbx_vector_ptr_t	jobs;
-			zbx_hashset_t		task_counts;
+			zbx_hashset_t		check_counts;
+			int			rule_count_current;
 
 			zbx_vector_ptr_create(&jobs);
-			zbx_hashset_create(&task_counts, 1, discoverer_task_count_hash, discoverer_task_count_compare);
+			zbx_hashset_create(&check_counts, 1, discoverer_check_count_hash,
+					discoverer_check_count_compare);
 
-			rule_count += process_discovery(&nextcheck, discoverer_args_in->config_timeout, &jobs,
-					&task_counts);
+			rule_count_current = process_discovery(&nextcheck, discoverer_args_in->config_timeout, &jobs,
+					&check_counts);
+			rule_count += rule_count_current;
 			total_sec += zbx_time() - sec;
 
 			if (0 == nextcheck)
 				nextcheck = time(NULL) + DISCOVERER_DELAY;
 
-			if (0 < rule_count)
+			if (0 < rule_count_current)
 			{
 				zbx_hashset_iter_t		iter;
-				zbx_discoverer_task_count_t	*tcount;
+				zbx_discoverer_check_count_t	*count;
+				zbx_uint64_t			queued = 0;
 
-				zbx_hashset_iter_reset(&task_counts, &iter);
+				zbx_hashset_iter_reset(&check_counts, &iter);
 				pthread_mutex_lock(&dmanager.results_lock);
 
-				while (NULL != (tcount = (zbx_discoverer_task_count_t *)zbx_hashset_iter_next(&iter)))
+				while (NULL != (count = (zbx_discoverer_check_count_t *)zbx_hashset_iter_next(&iter)))
 				{
-					zbx_hashset_insert(&dmanager.incomplete_task_count, tcount,
-							sizeof(zbx_discoverer_task_count_t));
+					queued += count->count;
+					zbx_hashset_insert(&dmanager.incomplete_checks_count, count,
+							sizeof(zbx_discoverer_check_count_t));
 				}
 
 				pthread_mutex_unlock(&dmanager.results_lock);
 				discoverer_queue_lock(&dmanager.queue);
+				dmanager.queue.pending_checks_count += queued;
 
 				for (i = 0; i < jobs.values_num; i++)
 				{
@@ -1607,52 +1701,88 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 				discoverer_queue_notify_all(&dmanager.queue);
 				discoverer_queue_unlock(&dmanager.queue);
+
+				check_count += queued;
 			}
 
 			zbx_vector_ptr_destroy(&jobs);
-			zbx_hashset_destroy(&task_counts);
+			zbx_hashset_destroy(&check_counts);
 		}
 
 		/* update sleeptime and process title */
 
-		sleeptime = zbx_calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
+		sleeptime.sec = zbx_calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
-		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		if (0 != sleeptime.sec || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
-			if (0 == sleeptime)
+			if (0 == sleeptime.sec)
 			{
-				zbx_setproctitle("%s #%d [processed %d rules in " ZBX_FS_DBL " sec, performing "
+				zbx_setproctitle("%s #%d [processed %d rules, queued " ZBX_FS_UI64 " network checks, "
+						"processed %d check results in " ZBX_FS_DBL " sec, performing "
 						"discovery]", get_process_type_string(process_type), process_num,
-						rule_count, total_sec);
+						rule_count, check_count, result_count, total_sec);
 			}
 			else
 			{
-				zbx_setproctitle("%s #%d [processed %d rules in " ZBX_FS_DBL " sec, idle %d sec]",
-						get_process_type_string(process_type), process_num, rule_count,
-						total_sec, sleeptime);
+				zbx_setproctitle("%s #%d [processed %d rules, queued " ZBX_FS_UI64 " network checks, "
+						"processed %d check results in " ZBX_FS_DBL " sec, idle %d sec]",
+						get_process_type_string(process_type), process_num,
+						rule_count, check_count, result_count, total_sec, sleeptime.sec);
 				old_rule_count = rule_count;
+				old_result_count = result_count;
+				old_check_count = check_count;
 				old_total_sec = total_sec;
 			}
 			rule_count = 0;
+			check_count = 0;
+			result_count = 0;
 			total_sec = 0.0;
 			last_stat_time = time(NULL);
 		}
 
-		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
+		(void)zbx_ipc_service_recv(&ipc_service, &sleeptime, &client, &message);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+
+		if (NULL != message)
 		{
+			switch (message->code)
+			{
+				case ZBX_IPC_DISCOVERER_QUEUE:
+					discoverer_queue_lock(&dmanager.queue);
+					zbx_uint64_t	count = dmanager.queue.pending_checks_count;
+					discoverer_queue_unlock(&dmanager.queue);
+
+					zbx_ipc_client_send(client, ZBX_IPC_DISCOVERER_QUEUE, (unsigned char *)&count,
+							sizeof(count));
+					break;
+				case ZBX_IPC_DISCOVERER_USAGE_STATS:
+					discoverer_reply_usage_stats(&dmanager, client);
+					break;
+#ifdef ZBX22336
 #ifdef HAVE_NETSNMP
-			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
-				zbx_clear_cache_snmp(process_type, process_num);
+				case ZBX_RTC_SNMP_CACHE_RELOAD:
+					zbx_clear_cache_snmp(process_type, process_num);
+					break;
 #endif
-			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-				break;
+				case ZBX_RTC_SHUTDOWN:
+					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
+					goto out;
+#endif
+			}
+
+			zbx_ipc_message_free(message);
 		}
 
+		if (NULL != client)
+			zbx_ipc_client_release(client);
+
+		zbx_timekeeper_collect(dmanager.timekeeper);
 	}
 out:
-	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
-	discoverer_manager_free(&dmanager);
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	discoverer_manager_free(&dmanager);
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
