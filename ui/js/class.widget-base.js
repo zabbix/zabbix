@@ -1110,13 +1110,13 @@ class CWidgetBase {
 	/**
 	 * Update error messages.
 	 *
-	 * @param {string[]}    messages
-	 * @param {string|null} title
+	 * @param {string[]} messages
+	 * @param {string}   title
 	 */
-	_updateMessages(messages = [], title = null) {
+	_updateMessages(messages = [], title = '') {
 		this._messages.innerHTML = '';
 
-		if (messages.length > 0) {
+		if (messages.length > 0 || title !== '') {
 			const message_box = makeMessageBox('bad', messages, title)[0];
 
 			this._messages.appendChild(message_box);
