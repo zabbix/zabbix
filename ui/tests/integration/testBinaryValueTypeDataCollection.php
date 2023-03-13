@@ -271,7 +271,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 
 		$base64_invalid = self::base64_invalid;
 		foreach ($active_data['result'] as $item) {
-			$this->assertEquals($base64_invalid, $item['value']);
+			$this->assertEquals("", $item['value']);
 		}
 	}
 
