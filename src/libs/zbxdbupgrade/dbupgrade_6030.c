@@ -1797,14 +1797,14 @@ static int	DBpatch_6030193(void)
 
 static int	DBpatch_6030194(void)
 {
-	const ZBX_FIELD	field = {"workers_max", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"concurrency_max", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("drules", &field);
 }
 
 static int	DBpatch_6030195(void)
 {
-	if (ZBX_DB_OK > zbx_db_execute("update drules set workers_max=1"))
+	if (ZBX_DB_OK > zbx_db_execute("update drules set concurrency_max=1"))
 		return FAIL;
 
 	return SUCCEED;

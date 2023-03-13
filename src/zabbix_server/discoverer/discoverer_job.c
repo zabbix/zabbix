@@ -78,7 +78,7 @@ zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, int cfg_timeo
 
 	job = (zbx_discoverer_job_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_job_t));
 	job->druleid = drule->druleid;
-	job->workers_max = drule->workers_max;
+	job->workers_max = drule->concurrency_max;
 	job->workers_used = 0;
 	job->config_timeout = cfg_timeout;
 	job->drule_revision = drule->revision;

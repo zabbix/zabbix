@@ -526,7 +526,7 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'workers_max' => [
+			'concurrency_max' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

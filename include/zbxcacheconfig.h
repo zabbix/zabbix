@@ -674,7 +674,7 @@ typedef struct
 	char				*name;
 	zbx_uint64_t			unique_dcheckid;
 	zbx_vector_dc_dcheck_ptr_t	dchecks;
-	int				workers_max;
+	int				concurrency_max;
 }
 zbx_dc_drule_t;
 

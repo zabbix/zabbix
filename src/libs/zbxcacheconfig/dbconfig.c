@@ -5639,7 +5639,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		drule = (zbx_dc_drule_t *)DCfind_id(&config->drules, druleid, sizeof(zbx_dc_drule_t), &found);
 
 		ZBX_STR2UCHAR(drule->status, row[5]);
-		drule->workers_max = atoi(row[6]);
+		drule->concurrency_max = atoi(row[6]);
 
 		if (0 == found)
 		{
@@ -15457,7 +15457,7 @@ zbx_dc_drule_t	*zbx_dc_drule_next(time_t now, time_t *nextcheck)
 			drule_out->location = drule->location;
 			drule_out->revision = drule->revision;
 			drule_out->unique_dcheckid = 0;
-			drule_out->workers_max = drule->workers_max;
+			drule_out->concurrency_max = drule->concurrency_max;
 
 			zbx_vector_dc_dcheck_ptr_create(&drule_out->dchecks);
 			zbx_hashset_iter_reset(&config->dchecks, &iter);
