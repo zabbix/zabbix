@@ -35,8 +35,8 @@ class CControllerModuleUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'moduleid' =>  'required|db module.moduleid',
-			'status' =>	    'in 1',
+			'moduleid' =>   'required|db module.moduleid',
+			'status' =>     'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -79,8 +79,6 @@ class CControllerModuleUpdate extends CController {
 	protected function doAction(): void {
 		$set_status = ($this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED);
 
-		$db_modules_update_names = [];
-
 		$db_modules = API::Module()->get([
 			'output' => ['relative_path', 'status'],
 			'sortfield' => 'relative_path',
@@ -94,14 +92,10 @@ class CControllerModuleUpdate extends CController {
 			$new_status = array_key_exists($moduleid, $this->module) ? $set_status : $db_module['status'];
 
 			if ($new_status == MODULE_STATUS_ENABLED) {
-				$manifest = $module_manager_enabled->addModule($db_module['relative_path']);
+				$module_manager_enabled->addModule($db_module['relative_path']);
 			}
 			else {
-				$manifest = $module_manager->addModule($db_module['relative_path']);
-			}
-
-			if (array_key_exists($moduleid, $this->module) && $manifest) {
-				$db_modules_update_names[] = $manifest['name'];
+				$module_manager->addModule($db_module['relative_path']);
 			}
 		}
 
@@ -125,7 +119,7 @@ class CControllerModuleUpdate extends CController {
 		}
 
 		if ($result) {
-			$output['success']['title'] = (_s('Module updated: %1$s.', $db_modules_update_names[0]));
+			$output['success']['title'] = _s('Module updated');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -133,7 +127,7 @@ class CControllerModuleUpdate extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => (_s('Cannot update module: %1$s.', $db_modules_update_names[0])),
+				'title' => _s('Cannot update module'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}

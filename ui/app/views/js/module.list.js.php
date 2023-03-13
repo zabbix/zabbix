@@ -119,8 +119,6 @@
 						}
 
 						postMessageDetails('error', response.error.messages);
-
-						uncheckTableRows('modules', response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);

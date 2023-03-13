@@ -35,7 +35,7 @@ class CControllerModuleDisable extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'moduleids' =>  'required|array_db module.moduleid',
+			'moduleids' => 'required|array_db module.moduleid',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -70,24 +70,6 @@ class CControllerModuleDisable extends CController {
 	}
 
 	protected function doAction(): void {
-		$db_modules_update_names = [];
-
-		$db_modules = API::Module()->get([
-			'output' => ['relative_path', 'status'],
-			'sortfield' => 'relative_path',
-			'preservekeys' => true
-		]);
-
-		$module_manager = new CModuleManager(APP::getRootDir());
-
-		foreach ($db_modules as $moduleid => $db_module) {
-			$manifest = $module_manager->addModule($db_module['relative_path']);
-
-			if (array_key_exists($moduleid, $this->modules) && $manifest) {
-				$db_modules_update_names[] = $manifest['name'];
-			}
-		}
-
 		$update = [];
 
 		foreach (array_keys($this->modules) as $moduleid) {
@@ -100,9 +82,7 @@ class CControllerModuleDisable extends CController {
 		$result = API::Module()->update($update);
 
 		if ($result) {
-			$output['success']['title'] = _n('Module disabled: %1$s.', 'Modules disabled: %1$s.',
-				implode(', ', $db_modules_update_names), count($this->modules)
-			);
+			$output['success']['title'] = _n('Module disabled', 'Modules disabled', count($this->modules));
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -110,9 +90,7 @@ class CControllerModuleDisable extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot disable module: %1$s.', 'Cannot disable modules: %1$s.',
-					implode(', ', $db_modules_update_names), count($this->modules)
-				),
+				'title' => _n('Cannot disable module', 'Cannot disable modules', count($this->modules)),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
