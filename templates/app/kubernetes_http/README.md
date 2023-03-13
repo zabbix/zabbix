@@ -30,7 +30,7 @@ Templates are of two types:
 
 ## Zabbix set up
 
-* Install Zabbix Helm chart according to the [instructions](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F6.0).
+* Install Zabbix Helm chart according to the [instructions](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Fmaster).
 * Import all templates into Zabbix.
 * Get the token automatically created when you install Zabbix Helm Chart.
 
