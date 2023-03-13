@@ -64,7 +64,8 @@ window.service_edit_popup = new class {
 
 		$problem_tags.dynamicRows({
 			template: '#problem-tag-row-tmpl',
-			rows: problem_tags
+			allow_empty: true,
+			rows: problem_tags,
 		});
 
 		$problem_tags.on('tableupdate.dynamicRows', () => this._update());
@@ -98,7 +99,7 @@ window.service_edit_popup = new class {
 				const $tags = $panel.find('.tags-table');
 
 				$tags
-					.dynamicRows({template: '#tag-row-tmpl'})
+					.dynamicRows({template: '#tag-row-tmpl', allow_empty: true})
 					.on('afteradd.dynamicRows', () => {
 						$tags
 							.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')

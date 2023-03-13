@@ -26,7 +26,8 @@
 
 jQuery(document).ready(function($) {
 	$('#email_send_to').dynamicRows({
-		template: '#email_send_to_table_row'
+		template: '#email_send_to_table_row',
+		allow_empty: true
 	});
 
 	// Show/hide multiple "Send to" inputs and single "Send to" input and populate hidden "type" field.

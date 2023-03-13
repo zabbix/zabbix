@@ -299,7 +299,7 @@
 			$('#event_menu_url, #event_menu_name').prop('disabled', !$(this).is(':checked'));
 		});
 
-		$('#parameters_table').dynamicRows({ template: '#parameters_row' });
+		$('#parameters_table').dynamicRows({ template: '#parameters_row', allow_empty: true });
 
 		/**
 		 * Show or hide "SSL verify peer" and "SSL verify host" fields.
@@ -420,7 +420,7 @@
 			$('input[name=content_type][value=' + providers[provider]['content_type'] + ']').prop("checked", true);
 		}
 
-		$('#exec_params_table').dynamicRows({ template: '#exec_params_row' });
+		$('#exec_params_table').dynamicRows({ template: '#exec_params_row', allow_empty: true });
 
 		$('#chPass_btn').on('click', function() {
 			$(this).hide();

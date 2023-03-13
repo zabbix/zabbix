@@ -232,7 +232,8 @@
 
 		$('#tbl_expr')
 			.dynamicRows({
-				template: '#row-expression-tmpl'
+				template: '#row-expression-tmpl',
+				allow_empty: true
 			})
 			.on('change', '.js-expression-type-select', (e) => {
 				$(e.target)

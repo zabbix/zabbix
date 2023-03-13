@@ -60,7 +60,7 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 			var $thresholds_table = jQuery("#'.$this->field->getName().'-table");
 
 			$thresholds_table
-				.dynamicRows({template: "#'.$this->field->getName().'-row-tmpl"})
+				.dynamicRows({template: "#'.$this->field->getName().'-row-tmpl", allow_empty: true})
 				.on("afteradd.dynamicRows", function(opt) {
 					const rows = this.querySelectorAll(".form_row");
 					const colors = jQuery("#widget-dialogue-form")[0]

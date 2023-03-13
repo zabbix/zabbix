@@ -56,7 +56,8 @@ window.sla_edit_popup = new class {
 
 		$service_tags.dynamicRows({
 			template: '#service-tag-row-tmpl',
-			rows: service_tags
+			rows: service_tags,
+			allow_empty: true
 		});
 
 		// Setup Excluded downtimes.

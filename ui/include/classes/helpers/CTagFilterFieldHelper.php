@@ -83,6 +83,7 @@ class CTagFilterFieldHelper {
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-remove')
 						->removeId()
+						->setEnabled(false)
 				))->addClass(ZBX_STYLE_NOWRAP)
 			], 'form_row');
 		}

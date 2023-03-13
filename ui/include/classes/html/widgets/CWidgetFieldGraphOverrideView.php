@@ -76,6 +76,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 			jQuery("#overrides")
 				.dynamicRows({
 					template: "#overrides-row",
+					allow_empty: true,
 					beforeRow: ".overrides-foot",
 					remove: ".'.ZBX_STYLE_BTN_REMOVE.'",
 					add: "#override-add",

@@ -148,6 +148,11 @@ $left_column
 $filter_inventory_table = new CTable();
 $filter_inventory_table->setId('filter-inventory_#{uniqid}');
 $inventories = array_column(getHostInventories(), 'title', 'db_field');
+
+if(!$data['inventory']){
+	$data['inventory'] = [['field' => '', 'value' => '']];
+}
+
 $i = 0;
 foreach ($data['inventory'] as $field) {
 	$filter_inventory_table->addRow([
@@ -159,6 +164,7 @@ foreach ($data['inventory'] as $field) {
 			(new CButton('inventory['.$i.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
+				->setEnabled(false)
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
 
@@ -185,6 +191,10 @@ $filter_tags_table->addRow(
 			->setId('evaltype_#{uniqid}')
 	))->setColSpan(4)
 );
+
+if(!$data['tags']){
+	$data['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+}
 
 $i = 0;
 foreach ($data['tags'] as $tag) {
@@ -213,6 +223,7 @@ foreach ($data['tags'] as $tag) {
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 				->removeId()
+				->setEnabled(false)
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
 
@@ -467,9 +478,10 @@ if (array_key_exists('render_html', $data)) {
 		}
 
 		// Inventory table.
-		if (data.inventory.length == 0) {
-			data.inventory.push({'field': '', 'value': ''});
+		if (data.inventory.length !== 0) {
+			$('#filter-inventory_' + data.uniqid, container).find('.form_row')[0].remove();
 		}
+
 		$('#filter-inventory_' + data.uniqid, container).dynamicRows({
 			template: '#filter-inventory-row',
 			rows: data.inventory,
@@ -477,8 +489,8 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Tags table.
-		if (data.tags.length == 0) {
-			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>});
+		if (data.tags.length !== 0) {
+			$('#filter-tags_' + data.uniqid, container).find('.form_row')[0].remove();
 		}
 
 		$('#filter-tags_' + data.uniqid, container)

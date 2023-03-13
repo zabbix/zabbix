@@ -870,7 +870,7 @@ ZABBIX.apps.map = (function($) {
 
 				// Init tag fields.
 				$('#selement-tags')
-					.dynamicRows({template: '#tag-row-tmpl', counter: 0})
+					.dynamicRows({template: '#tag-row-tmpl', counter: 0, allow_empty: true})
 					.on('beforeadd.dynamicRows', function() {
 						var options = $('#selement-tags').data('dynamicRows');
 						options.counter = ++options.counter;

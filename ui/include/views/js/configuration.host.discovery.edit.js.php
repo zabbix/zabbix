@@ -105,6 +105,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				.dynamicRows({
 					template: '#condition-row',
 					counter: counter,
+					allow_empty: true
 					dataCallback: (data) => {
 						data.formulaId = num2letter(data.rowNum);
 
@@ -166,7 +167,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			}).trigger('change');
 
 			$('#lld_macro_paths')
-				.dynamicRows({template: '#lld_macro_path-row'})
+				.dynamicRows({template: '#lld_macro_path-row', allow_empty: true})
 				.on('click', 'button.element-table-add', () => {
 					$('#lld_macro_paths .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 				});

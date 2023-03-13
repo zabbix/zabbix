@@ -366,6 +366,6 @@
 			]);
 		});
 
-		$('#parameters-table').dynamicRows({ template: '#parameters-row' });
+		$('#parameters-table').dynamicRows({ template: '#parameters-row', allow_empty: true });
 	});
 </script>

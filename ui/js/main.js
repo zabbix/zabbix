@@ -860,8 +860,10 @@ function getConditionFormula(conditions, evalType) {
 			remove_next_sibling: false,
 			disable: '.element-table-disable',
 			counter: null,
+			allow_empty: false,
 			beforeRow: null,
 			rows: [],
+			last_row_has_input: false,
 			dataCallback: function(data) {
 				return {};
 			}
@@ -878,13 +880,11 @@ function getConditionFormula(conditions, evalType) {
 			// add buttons
 			table.on('click', options.add, function() {
 				table.trigger('beforeadd.dynamicRows', options);
-
 				// add the new row before the row with the "Add" button
 				var beforeRow = (options['beforeRow'] !== null)
 					? $(options['beforeRow'], table)
 					:  $(this).closest('tr');
 				addRow(table, beforeRow, options);
-
 				table.trigger('afteradd.dynamicRows', options);
 			});
 
@@ -892,6 +892,9 @@ function getConditionFormula(conditions, evalType) {
 			table.on('click', options.remove, function() {
 				// remove the parent row
 				removeRow(table, $(this).closest(options.row), options);
+				if (!options.allow_empty && table.find(options.row).length === 0) {
+					addRow(table, $(options.add, table).closest('tr'), options);
+				}
 			});
 
 			// disable buttons
@@ -900,11 +903,14 @@ function getConditionFormula(conditions, evalType) {
 				disableRow($(this).closest(options.row));
 			});
 
+			table.on('tableupdate.dynamicRows', options, function() {
+				toggleRemoveButton(table, options);
+			});
+
 			if (typeof options.rows === 'object') {
 				var before_row = (options['beforeRow'] !== null)
 					? $(options['beforeRow'], table)
 					: $(options.add, table).closest('tr');
-
 				initRows(table, before_row, options);
 			}
 		});
@@ -942,6 +948,8 @@ function getConditionFormula(conditions, evalType) {
 			++counter;
 		});
 
+		toggleRemoveButton(table, options);
+
 		table.data('dynamicRows').counter = counter;
 	}
 
@@ -977,7 +985,6 @@ function getConditionFormula(conditions, evalType) {
 			row.next().remove();
 		}
 		row.remove();
-
 		table.trigger('tableupdate.dynamicRows', options);
 		table.trigger('afterremove.dynamicRows', options);
 	}
@@ -992,6 +999,58 @@ function getConditionFormula(conditions, evalType) {
 		row.find('input').prop('readonly', true);
 		row.find('button').prop('disabled', true);
 	}
+
+	/**
+	 * Disables remove button
+	 *
+	 * @param table
+	 * @param options
+	 */
+	function toggleRemoveButton(table, options) {
+		if (!options.allow_empty){
+			if (table.find(options.row).length <= 1) {
+				addInputListeners(table, options);
+				checkInputChanged(table, options);
+			}
+			else {
+				table.find(options.remove).attr('disabled', false);
+			}
+		}
+	}
+
+	/**
+	 * Checks if an text input has a value
+	 *
+	 * @param table
+	 * @param options
+	 */
+	function checkInputChanged(table, options) {
+		let counter = 0;
+
+		$(table.find(options.row)[0]).find('input[type="text"]').each(function () {
+			if(this.value !== ''){
+				counter++;
+			}
+		});
+
+		options.last_row_has_changes = counter > 0;
+		table.find(options.remove).attr('disabled', !options.last_row_has_changes);
+	}
+
+	/**
+	 * Adds an listener to the last input
+	 *
+	 * @param table
+	 * @param options
+	 */
+	function addInputListeners(table, options) {
+		$(table.find(options.row)[0]).find('input[type="text"]').each(function () {
+			this.addEventListener('input', function () {
+				checkInputChanged(table, options);
+			});
+		});
+	}
+
 }(jQuery));
 
 jQuery(function ($) {

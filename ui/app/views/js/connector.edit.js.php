@@ -36,7 +36,8 @@ window.connector_edit_popup = new class {
 
 		jQuery('#tags').dynamicRows({
 			template: '#tag-row-tmpl',
-			rows: tags
+			rows: tags,
+			allow_empty: true
 		});
 
 		for (const id of ['tags', 'authtype', 'advanced_configuration', 'max_records_mode']) {

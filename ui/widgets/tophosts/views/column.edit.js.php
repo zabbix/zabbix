@@ -38,6 +38,7 @@ window.tophosts_column_edit_form = new class {
 		this._$thresholds_table.dynamicRows({
 			rows: thresholds,
 			template: '#thresholds-row-tmpl',
+			allow_empty: true,
 			dataCallback: (row_data) => {
 				if (!('color' in row_data)) {
 					const colors = this._$widget_form[0].querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');

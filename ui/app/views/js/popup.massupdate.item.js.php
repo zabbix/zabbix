@@ -142,7 +142,8 @@
 		});
 
 	$(obj.querySelector('#custom_intervals')).dynamicRows({
-		template: '#custom-intervals-tmpl'
+		template: '#custom-intervals-tmpl',
+		allow_empty: true
 	});
 })();
 </script>
