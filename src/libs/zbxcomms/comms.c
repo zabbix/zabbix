@@ -1043,19 +1043,260 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: initialize hints for getaddrinfo() call                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	tcp_init_hints(struct addrinfo *hints, int socktype, int flags)
+{
+	memset(hints, 0, sizeof(struct addrinfo));
+
+#if defined(HAVE_IPV6)
+	hints->ai_family = PF_UNSPEC;
+#else
+	hints->ai_family =  PF_INET;
+#endif
+	hints->ai_socktype = socktype;
+	hints->ai_flags = flags;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set non-blocking socket operation                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	tcp_set_nonblocking(ZBX_SOCKET s)
+{
+#if defined(_WINDOWS)
+	u_long	value = 1;
+
+	if (0 != ioctlsocket(s, FIONBIO, (unsigned long*)&value))
+		return FAIL;
+#else
+	if (-1 == fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK))
+		return FAIL;
+#endif
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the last socket error was because of non-blocking socket *
+ *                                                                            *
+ ******************************************************************************/
+static int	tcp_is_nonblocking_error()
+{
+#ifndef _WINDOWS
+	switch (errno)
+	{
+		case EINTR:
+		case EAGAIN:
+		case EINPROGRESS:
+			return SUCCEED;
+		default:
+			return FAIL;
+	}
+#else
+	switch (WSAGetLastError())
+	{
+		case 0:
+		case WSAEINPROGRESS:
+		case WSAEWOULDBLOCK:
+			return SUCCEED;
+		default:
+			return FAIL;
+	}
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get deadline for socket operation                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	tcp_get_deadline(zbx_timespec_t *ts, int sec)
+{
+	zbx_timespec(ts);
+	ts->sec += sec;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if socket operation has reached deadline                    *
+ *                                                                            *
+ ******************************************************************************/
+int	tcp_check_deadline(const zbx_timespec_t *deadline)
+{
+	zbx_timespec_t	ts;
+
+	zbx_timespec(&ts);
+
+	if (0 < zbx_timespec_compare(&ts, deadline))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+#if defined(_WINDOWS)
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: poll() function emulation for windows                             *
+ *                                                                            *
+ * Comments: WSAPoll() does not fully behave like poll() and also is not      *
+ *           supported on older (xp64/server2003) systems                     *
+ *                                                                            *
+ ******************************************************************************/
+int	tcp_poll(zbx_pollfd_t* fds, int fds_num, int timeout)
+{
+	fd_set		fds_read;
+	fd_set		fds_write;
+	fd_set		fds_err;
+	int		i, ret;
+	struct timeval	tv;
+
+	FD_ZERO(&fds_read);
+	FD_ZERO(&fds_write);
+	FD_ZERO(&fds_err);
+
+	for (i = 0; i < fds_num; i++)
+	{
+		fds[i].revents = 0;
+
+		if (fds[i].events & (POLLRDNORM | POLLIN))
+			FD_SET(fds[i].fd, &fds_read);
+
+		if (fds[i].events & (POLLWRNORM | POLLOUT))
+			FD_SET(fds[i].fd, &fds_write);
+
+		FD_SET(fds[i].fd, &fds_err);
+	}
+
+	tv.tv_sec = timeout / 1000;
+	tv.tv_usec = (timeout % 1000) * 1000;
+
+	if (0 >= (ret = select(0, &fds_read, &fds_write, &fds_err, &tv)))
+		return ret;
+
+	ret = 0;
+
+	for (i = 0; i < fds_num; i++)
+	{
+		if (FD_ISSET(fds[i].fd, &fds_read))
+		{
+			fds[i].revents |= (fds[i].events & (POLLRDNORM | POLLIN));
+			printf("select(): read\n");
+
+		}
+
+		if (FD_ISSET(fds[i].fd, &fds_write))
+		{
+			fds[i].revents |= (fds[i].events & (POLLWRNORM | POLLOUT));
+			printf("select(): write\n");
+		}
+
+		if (FD_ISSET(fds[i].fd, &fds_err))
+		{
+			fds[i].revents = POLLERR;
+			printf("select(): error\n");
+		}
+
+		if (0 != fds[i].revents)
+			ret++;
+	}
+
+	return ret;
+}
+
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: inspect data in socket buffer without reading it                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	tcp_peek(ZBX_SOCKET s, char *buffer, size_t size, int timeout)
+{
+	ssize_t		n;
+	zbx_pollfd_t	pd;
+	zbx_timespec_t	deadline;
+	int		poll_timeout;
+
+	if (0 <= (n = recv(s, buffer, size, MSG_PEEK)))
+		return n;
+
+	if (SUCCEED != tcp_is_nonblocking_error())
+		return FAIL;
+
+	if (0 < timeout)
+	{
+		tcp_get_deadline(&deadline, timeout);
+		poll_timeout = 1000;
+	}
+	else if (0 == timeout)
+		return TIMEOUT_ERROR;
+	else
+		poll_timeout = -1;
+
+	pd.fd = s;
+	pd.events = POLLIN;
+
+	while (1)
+	{
+		int	rc;
+
+		while (-1 == (rc = tcp_poll(&pd, 1, poll_timeout)))
+		{
+			if (SUCCEED == tcp_is_nonblocking_error())
+				continue;
+
+			return FAIL;
+		}
+
+		if (0 == rc)
+		{
+			if (0 < timeout && SUCCEED != tcp_check_deadline(&deadline))
+				return TIMEOUT_ERROR;
+
+			continue;
+		}
+
+		if (0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+			return FAIL;
+
+		if (0 <= (n = recv(s, buffer, size, MSG_PEEK)))
+			break;
+
+		if (SUCCEED != tcp_is_nonblocking_error())
+			return FAIL;
+	}
+
+	return n;
+}
+
+static int	tcp_err_in_use()
+{
+#if defined(_WINDOWS)
+	return WSAEADDRINUSE == zbx_socket_last_error() ? SUCCEED : FAIL;
+#else
+	return EADDRINUSE == zbx_socket_last_error() ? SUCCEED : FAIL;
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: create socket for listening                                       *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-#ifdef HAVE_IPV6
 int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port)
 {
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 	char		port[8], *ip, *ips, *delim;
-	int		i, err, on, ret = FAIL;
-#ifdef _WINDOWS
+	int		i, err, on = 1, ret = FAIL;
+
+#if defined(_WINDOWS)
 	/* WSASocket() option to prevent inheritance is available on */
 	/* Windows Server 2008 R2 SP1 or newer and on Windows 7 SP1 or newer */
 	static int	no_inherit_wsapi = -1;
@@ -1070,10 +1311,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 
 	zbx_socket_clean(s);
 
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = PF_UNSPEC;
-	hints.ai_flags = AI_NUMERICHOST | AI_PASSIVE;
-	hints.ai_socktype = SOCK_STREAM;
+	tcp_init_hints(&hints, SOCK_STREAM, AI_NUMERICHOST | AI_PASSIVE);
 	zbx_snprintf(port, sizeof(port), "%hu", listen_port);
 
 	ip = ips = (NULL == listen_ip ? NULL : strdup(listen_ip));
@@ -1103,7 +1341,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 			if (PF_INET != current_ai->ai_family && PF_INET6 != current_ai->ai_family)
 				continue;
 
-#ifdef _WINDOWS
+#if defined(_WINDOWS)
 			/* WSA_FLAG_NO_HANDLE_INHERIT prevents socket inheritance if we call CreateProcess() */
 			/* later on. If it's not available we still try to avoid inheritance by calling  */
 			/* SetHandleInformation() below. WSA_FLAG_OVERLAPPED is not mandatory but strongly */
@@ -1117,32 +1355,13 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 				zbx_set_socket_strerror("WSASocket() for [[%s]:%s] failed: %s",
 						NULL != ip ? ip : "-", port,
 						strerror_from_system(zbx_socket_last_error()));
+
 				if (WSAEAFNOSUPPORT == zbx_socket_last_error())
-#else
-			if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] =
-					socket(current_ai->ai_family, current_ai->ai_socktype | SOCK_CLOEXEC,
-					current_ai->ai_protocol)))
-			{
-				zbx_set_socket_strerror("socket() for [[%s]:%s] failed: %s",
-						NULL != ip ? ip : "-", port,
-						strerror_from_system(zbx_socket_last_error()));
-				if (EAFNOSUPPORT == zbx_socket_last_error())
-#endif
 					continue;
-				else
-					goto out;
+
+				goto out;
 			}
 
-#if !defined(_WINDOWS) && !SOCK_CLOEXEC
-			if (-1 == fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC))
-			{
-				zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on "
-						"socket [[%s]:%s]: %s", NULL != ip ? ip : "-", port,
-						strerror_from_system(zbx_socket_last_error()));
-			}
-#endif
-			on = 1;
-#ifdef _WINDOWS
 			/* If WSA_FLAG_NO_HANDLE_INHERIT not available, prevent listening socket from */
 			/* inheritance with the old API. Disabling handle inheritance in WSASocket() instead of */
 			/* SetHandleInformation() is preferred because it provides atomicity and gets the job done */
@@ -1166,7 +1385,31 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 						"SO_EXCLUSIVEADDRUSE", NULL != ip ? ip : "-", port,
 						strerror_from_system(zbx_socket_last_error()));
 			}
+
 #else
+			if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] =
+					socket(current_ai->ai_family, current_ai->ai_socktype | SOCK_CLOEXEC,
+					current_ai->ai_protocol)))
+			{
+				zbx_set_socket_strerror("socket() for [[%s]:%s] failed: %s",
+						NULL != ip ? ip : "-", port,
+						strerror_from_system(zbx_socket_last_error()));
+
+				if (EAFNOSUPPORT == zbx_socket_last_error())
+					continue;
+
+				goto out;
+			}
+
+#	if !SOCK_CLOEXEC
+			if (-1 == fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC))
+			{
+				zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on "
+						"socket [[%s]:%s]: %s", NULL != ip ? ip : "-", port,
+						strerror_from_system(zbx_socket_last_error()));
+			}
+#	endif
+
 			/* enable address reuse */
 			/* this is to immediately use the address even if it is in TIME_WAIT state */
 			/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
@@ -1190,17 +1433,14 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 			}
 #endif
 			if (ZBX_PROTO_ERROR == zbx_bind(s->sockets[s->num_socks], current_ai->ai_addr,
-					current_ai->ai_addrlen))
+								current_ai->ai_addrlen))
 			{
 				zbx_set_socket_strerror("bind() for [[%s]:%s] failed: %s",
 						NULL != ip ? ip : "-", port,
 						strerror_from_system(zbx_socket_last_error()));
 				zbx_socket_close(s->sockets[s->num_socks]);
-#ifdef _WINDOWS
-				if (WSAEADDRINUSE == zbx_socket_last_error())
-#else
-				if (EADDRINUSE == zbx_socket_last_error())
-#endif
+
+				if (SUCCEED == tcp_err_in_use())
 					continue;
 				else
 					goto out;
@@ -1209,6 +1449,15 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 			if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], CONFIG_TCP_MAX_BACKLOG_SIZE))
 			{
 				zbx_set_socket_strerror("listen() for [[%s]:%s] failed: %s",
+						NULL != ip ? ip : "-", port,
+						strerror_from_system(zbx_socket_last_error()));
+				zbx_socket_close(s->sockets[s->num_socks]);
+				goto out;
+			}
+
+			if (SUCCEED != tcp_set_nonblocking(s->sockets[s->num_socks]))
+			{
+				zbx_set_socket_strerror("setting non-blocking mode for [[%s]:%s] failed: %s",
 						NULL != ip ? ip : "-", port,
 						strerror_from_system(zbx_socket_last_error()));
 				zbx_socket_close(s->sockets[s->num_socks]);
@@ -1254,169 +1503,6 @@ out:
 
 	return ret;
 }
-#else
-int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port)
-{
-	ZBX_SOCKADDR	serv_addr;
-	char		*ip, *ips, *delim;
-	int		i, on, ret = FAIL;
-#ifdef _WINDOWS
-	/* WSASocket() option to prevent inheritance is available on */
-	/* Windows Server 2008 R2 or newer and on Windows 7 SP1 or newer */
-	static int	no_inherit_wsapi = -1;
-
-	if (-1 == no_inherit_wsapi)
-	{
-		/* Both Windows 7 and Windows 2008 R2 are 0x0601 */
-		no_inherit_wsapi = zbx_is_win_ver_or_greater((_WIN32_WINNT_WIN7 >> 8) & 0xff,
-				_WIN32_WINNT_WIN7 & 0xff, 1) == SUCCEED;
-	}
-#endif
-
-	zbx_socket_clean(s);
-
-	ip = ips = (NULL == listen_ip ? NULL : strdup(listen_ip));
-
-	while (1)
-	{
-		delim = (NULL == ip ? NULL : strchr(ip, ','));
-		if (NULL != delim)
-			*delim = '\0';
-
-		if (NULL != ip && FAIL == zbx_is_ip4(ip))
-		{
-			zbx_set_socket_strerror("incorrect IPv4 address [%s]", ip);
-			goto out;
-		}
-
-		if (ZBX_SOCKET_COUNT == s->num_socks)
-		{
-			zbx_set_socket_strerror("not enough space for socket [[%s]:%hu]",
-					NULL != ip ? ip : "-", listen_port);
-			goto out;
-		}
-
-#ifdef _WINDOWS
-		/* WSA_FLAG_NO_HANDLE_INHERIT prevents socket inheritance if we call CreateProcess() */
-		/* later on. If it's not available we still try to avoid inheritance by calling  */
-		/* SetHandleInformation() below. WSA_FLAG_OVERLAPPED is not mandatory but strongly */
-		/* recommended for every socket */
-		s->sockets[s->num_socks] = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0,
-				(0 != no_inherit_wsapi ? WSA_FLAG_NO_HANDLE_INHERIT : 0) | WSA_FLAG_OVERLAPPED);
-		if (ZBX_SOCKET_ERROR == s->sockets[s->num_socks])
-		{
-			zbx_set_socket_strerror("WSASocket() for [[%s]:%hu] failed: %s",
-					NULL != ip ? ip : "-", listen_port,
-					strerror_from_system(zbx_socket_last_error()));
-#else
-		if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
-		{
-			zbx_set_socket_strerror("socket() for [[%s]:%hu] failed: %s",
-					NULL != ip ? ip : "-", listen_port,
-					strerror_from_system(zbx_socket_last_error()));
-#endif
-			goto out;
-		}
-
-#if !defined(_WINDOWS) && !SOCK_CLOEXEC
-		if (-1 == fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC))
-		{
-			zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on "
-					"socket [[%s]:%hu]: %s", NULL != ip ? ip : "-", listen_port,
-					strerror_from_system(zbx_socket_last_error()));
-		}
-#endif
-		on = 1;
-#ifdef _WINDOWS
-		/* If WSA_FLAG_NO_HANDLE_INHERIT not available, prevent listening socket from */
-		/* inheritance with the old API. Disabling handle inheritance in WSASocket() instead of */
-		/* SetHandleInformation() is preferred because it provides atomicity and gets the job done */
-		/* on systems with non-IFS LSPs installed. So there is a chance that the socket will be still */
-		/* inherited on Windows XP with 3rd party firewall/antivirus installed */
-		if (0 == no_inherit_wsapi && 0 == SetHandleInformation((HANDLE)s->sockets[s->num_socks],
-				HANDLE_FLAG_INHERIT, 0))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "SetHandleInformation() failed: %s",
-					strerror_from_system(GetLastError()));
-		}
-
-		/* prevent other processes from binding to the same port */
-		/* SO_EXCLUSIVEADDRUSE is mutually exclusive with SO_REUSEADDR */
-		/* on Windows SO_REUSEADDR has different semantics than on Unix */
-		/* https://msdn.microsoft.com/en-us/library/windows/desktop/ms740621(v=vs.85).aspx */
-		if (ZBX_PROTO_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
-				(void *)&on, sizeof(on)))
-		{
-			zbx_set_socket_strerror("setsockopt() with %s for [[%s]:%hu] failed: %s", "SO_EXCLUSIVEADDRUSE",
-					NULL != ip ? ip : "-", listen_port,
-					strerror_from_system(zbx_socket_last_error()));
-
-		}
-#else
-		/* enable address reuse */
-		/* this is to immediately use the address even if it is in TIME_WAIT state */
-		/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
-		if (ZBX_PROTO_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR,
-				(void *)&on, sizeof(on)))
-		{
-			zbx_set_socket_strerror("setsockopt() with %s for [[%s]:%hu] failed: %s", "SO_REUSEADDR",
-					NULL != ip ? ip : "-", listen_port,
-					strerror_from_system(zbx_socket_last_error()));
-		}
-#endif
-		memset(&serv_addr, 0, sizeof(serv_addr));
-
-		serv_addr.sin_family = AF_INET;
-		serv_addr.sin_addr.s_addr = (NULL != ip ? inet_addr(ip) : htonl(INADDR_ANY));
-		serv_addr.sin_port = htons((unsigned short)listen_port);
-
-		if (ZBX_PROTO_ERROR == bind(s->sockets[s->num_socks], (struct sockaddr *)&serv_addr, sizeof(serv_addr)))
-		{
-			zbx_set_socket_strerror("bind() for [[%s]:%hu] failed: %s",
-					NULL != ip ? ip : "-", listen_port,
-					strerror_from_system(zbx_socket_last_error()));
-			zbx_socket_close(s->sockets[s->num_socks]);
-			goto out;
-		}
-
-		if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], CONFIG_TCP_MAX_BACKLOG_SIZE))
-		{
-			zbx_set_socket_strerror("listen() for [[%s]:%hu] failed: %s",
-					NULL != ip ? ip : "-", listen_port,
-					strerror_from_system(zbx_socket_last_error()));
-			zbx_socket_close(s->sockets[s->num_socks]);
-			goto out;
-		}
-
-		s->num_socks++;
-
-		if (NULL == ip || NULL == delim)
-			break;
-		*delim = ',';
-		ip = delim + 1;
-	}
-
-	if (0 == s->num_socks)
-	{
-		zbx_set_socket_strerror("zbx_tcp_listen() fatal error: unable to serve on any address [[%s]:%hu]",
-				NULL != listen_ip ? listen_ip : "-", listen_port);
-		goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	if (NULL != ips)
-		zbx_free(ips);
-
-	if (SUCCEED != ret)
-	{
-		for (i = 0; i < s->num_socks; i++)
-			zbx_socket_close(s->sockets[i]);
-	}
-
-	return ret;
-}
-#endif	/* HAVE_IPV6 */
 
 void	zbx_tcp_unlisten(zbx_socket_t *s)
 {
@@ -1430,52 +1516,67 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
  *                                                                            *
  * Purpose: permits an incoming connection attempt on a socket                *
  *                                                                            *
- * Return value: SUCCEED - success                                            *
- *               FAIL - an error occurred                                     *
+ * Parameters: s              - [IN/OUT] socket to listen                     *
+ *             tls_accept     - [IN] TLS configuration                        *
+ *             poll_timeout     - [IN] milliseconds to wait for connection      *
+ *                                  (0 - don't wait, -1 - wait forever        *
+ *             config_timeout - [IN] timeout for connection to be established *
+ *                                   after detecting incoming connection      *
+ *                                                                            *
+ * Return value: SUCCEED       - success                                      *
+ *               FAIL          - an error occurred                            *
+ *               TIMEOUT_ERROR - no connections for the timeout period        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int config_timeout)
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, int config_timeout)
 {
 	ZBX_SOCKADDR	serv_addr;
-	fd_set		sock_set;
 	ZBX_SOCKET	accepted_socket;
 	ZBX_SOCKLEN_T	nlen;
-	int		i, n = 0, ret = FAIL;
+	int		i, ret = FAIL;
 	ssize_t		res;
-	unsigned char	buf;	/* 1 byte buffer */
+	char		buf;	/* 1 byte buffer */
+	zbx_pollfd_t	*pds;
 
 	zbx_tcp_unaccept(s);
 
-	FD_ZERO(&sock_set);
+	pds = (zbx_pollfd_t *)zbx_malloc(NULL, sizeof(zbx_pollfd_t) * s->num_socks);
 
 	for (i = 0; i < s->num_socks; i++)
 	{
-		FD_SET(s->sockets[i], &sock_set);
-#ifndef _WINDOWS
-		if (s->sockets[i] > n)
-			n = s->sockets[i];
-#endif
+		pds[i].fd = s->sockets[i];
+		pds[i].events = POLLIN;
 	}
 
-	if (ZBX_PROTO_ERROR == select(n + 1, &sock_set, NULL, NULL, NULL))
+	if (ZBX_PROTO_ERROR == (ret = tcp_poll(pds, s->num_socks, poll_timeout * 1000)))
 	{
-		zbx_set_socket_strerror("select() failed: %s", strerror_from_system(zbx_socket_last_error()));
+		zbx_set_socket_strerror("poll() failed: %s", strerror_from_system(zbx_socket_last_error()));
 		return ret;
 	}
 
+	if (0 == ret)
+		return TIMEOUT_ERROR;
+
 	for (i = 0; i < s->num_socks; i++)
 	{
-		if (FD_ISSET(s->sockets[i], &sock_set))
+		if (0 != (pds[i].revents & POLLIN))
 			break;
 	}
 
-	/* Since this socket was returned by select(), we know we have */
+	/* Since this socket was returned by poll, we know we have */
 	/* a connection waiting and that this accept() will not block. */
 	nlen = sizeof(serv_addr);
 	if (ZBX_SOCKET_ERROR == (accepted_socket = (ZBX_SOCKET)accept(s->sockets[i], (struct sockaddr *)&serv_addr,
 			&nlen)))
 	{
 		zbx_set_socket_strerror("accept() failed: %s", strerror_from_system(zbx_socket_last_error()));
+		return ret;
+	}
+
+	if (SUCCEED != tcp_set_nonblocking(accepted_socket))
+	{
+		zbx_set_socket_strerror("failed to set socket non-blocking mode: %s",
+				strerror_from_system(zbx_socket_last_error()));
 		return ret;
 	}
 
@@ -1490,9 +1591,8 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int config_timeout)
 		goto out;
 	}
 
-	zbx_socket_timeout_set(s, config_timeout);
-
-	if (ZBX_SOCKET_ERROR == (res = recv(s->socket, &buf, 1, MSG_PEEK)))
+	if (FAIL == (res = tcp_peek(s->socket, &buf, 1, config_timeout)) ||
+			TIMEOUT_ERROR == res)
 	{
 		zbx_set_socket_strerror("from %s: reading first byte from connection failed: %s", s->peer,
 				strerror_from_system(zbx_socket_last_error()));
@@ -1508,7 +1608,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int config_timeout)
 		{
 			char	*error = NULL;
 
-			if (SUCCEED != zbx_tls_accept(s, tls_accept, &error))
+			if (SUCCEED != zbx_tls_accept(s, tls_accept, config_timeout, &error))
 			{
 				zbx_set_socket_strerror("from %s: %s", s->peer, error);
 				zbx_tcp_unaccept(s);
@@ -1542,8 +1642,6 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int config_timeout)
 
 	ret = SUCCEED;
 out:
-	zbx_socket_timeout_cleanup(s);
-
 	return ret;
 }
 

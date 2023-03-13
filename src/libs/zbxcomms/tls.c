@@ -18,6 +18,8 @@
 **/
 
 #include "zbxcomms.h"
+
+#include "comms.h"
 #include "tls.h"
 
 #include "zbxsysinc.h"
@@ -266,6 +268,66 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
 		zbx_snprintf(info_buf, sizeof(info_buf), ": TLS%s%s%s %s alert \"%s\"", handshake, direction, rw,
 				SSL_alert_type_string_long(ret), SSL_alert_desc_string_long(ret));
 	}
+}
+#endif
+
+#if defined(HAVE_GNUTLS)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: wait for socket to be available for read or write depending on    *
+ *          unfinished operation                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	tls_socket_wait(ZBX_SOCKET s, gnutls_session_t session)
+{
+	zbx_pollfd_t	pd;
+	int		ret;
+
+	pd.fd = s;
+	pd.events = (0 == gnutls_record_get_direction(session) ? POLLIN : POLLOUT);
+
+	if (0 > (ret = tcp_poll(&pd, 1, 1000)))
+		return FAIL;
+
+	if (1 == ret && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+		return FAIL;
+
+	return SUCCEED;
+}
+#endif
+
+#if defined(HAVE_OPENSSL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: wait for socket to be available for read or write depending on    *
+ *          unfinished operation                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	tls_socket_wait(ZBX_SOCKET s, int ssl_err)
+{
+	zbx_pollfd_t	pd;
+	int		ret;
+
+	pd.fd = s;
+	switch (ssl_err)
+	{
+		case SSL_ERROR_WANT_READ:
+			pd.events = POLLIN;
+			break;
+		case SSL_ERROR_WANT_WRITE:
+			pd.events = POLLOUT;
+			break;
+		default:
+			return FAIL;
+	}
+
+	if (0 > (ret = tcp_poll(&pd, 1, 1000)))
+		return FAIL;
+
+	if (1 == ret && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+		return FAIL;
+
+	return SUCCEED;
 }
 #endif
 
@@ -3098,14 +3160,16 @@ out1:
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_GNUTLS)
-int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
+int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, char **error)
 {
 	int				ret = FAIL, res;
 	gnutls_credentials_type_t	creds;
-#if defined(_WINDOWS)
-	double				sec;
-#endif
+	zbx_timespec_t			deadline;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (0 != timeout)
+		tcp_get_deadline(&deadline, timeout);
 
 	/* set up TLS context */
 
@@ -3238,25 +3302,23 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 
 	/* TLS handshake */
 
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 	while (GNUTLS_E_SUCCESS != (res = gnutls_handshake(s->tls_ctx->ctx)))
 	{
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
-		if (SUCCEED == zbx_alarm_timed_out())
-		{
-			*error = zbx_strdup(*error, "gnutls_handshake() timed out");
-			goto out;
-		}
-
 		if (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res)
 		{
-			continue;
+			if (FAIL == (res = tls_socket_wait(s->socket, s->tls_ctx->ctx)))
+			{
+				*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
+						strerror_from_system(zbx_socket_last_error()));
+				goto out;
+			}
+
+			if (0 == res && SUCCEED != tcp_check_deadline(&deadline))
+			{
+				*error = zbx_strdup(*error, "gnutls_handshake() timed out");
+				goto out;
+			}
+
 		}
 		else if (GNUTLS_E_WARNING_ALERT_RECEIVED == res || GNUTLS_E_FATAL_ALERT_RECEIVED == res ||
 				GNUTLS_E_GOT_APPLICATION_DATA == res)
@@ -3369,12 +3431,13 @@ out1:
 	return ret;
 }
 #elif defined(HAVE_OPENSSL)
-int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
+int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, char **error)
 {
 	const char	*cipher_name;
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
 	long		verify_result;
+	zbx_timespec_t	deadline;
 #if defined(_WINDOWS)
 	double		sec;
 #endif
@@ -3382,6 +3445,9 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	const unsigned char	session_id_context[] = {'Z', 'b', 'x'};
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (0 != timeout)
+		tcp_get_deadline(&deadline, timeout);
 
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 	s->tls_ctx->ctx = NULL;
@@ -3516,7 +3582,31 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	zbx_alarm_flag_clear();
 	sec = zbx_time();
 #endif
-	if (1 != (res = SSL_accept(s->tls_ctx->ctx)))
+
+	while (-1 == (res = SSL_accept(s->tls_ctx->ctx)))
+	{
+		int	ssl_err;
+
+		ssl_err = SSL_get_error(s->tls_ctx->ctx, res);
+
+		if (SSL_ERROR_WANT_READ  != ssl_err && SSL_ERROR_WANT_WRITE != ssl_err)
+			break;
+
+		if (FAIL == (res = tls_socket_wait(s->socket, ssl_err)))
+		{
+			*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
+					strerror_from_system(zbx_socket_last_error()));
+			goto out;
+		}
+
+		if (0 == res && SUCCEED != tcp_check_deadline(&deadline))
+		{
+			*error = zbx_strdup(*error, "SSL_accept() timed out");
+			goto out;
+		}
+	}
+
+	if (1 != res)
 	{
 		int	result_code;
 

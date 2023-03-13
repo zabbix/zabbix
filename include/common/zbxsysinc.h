@@ -446,4 +446,8 @@
 #	include <sys/utsname.h>
 #endif
 
+#ifdef HAVE_POLL_H
+#	include <poll.h>
+#endif
+
 #endif

@@ -1270,6 +1270,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
 {
+#define POLL_TIMEOUT	1
 	zbx_thread_trapper_args	*trapper_args_in = (zbx_thread_trapper_args *)
 					(((zbx_thread_args_t *)args)->args);
 	double			sec = 0.0;
@@ -1322,8 +1323,11 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		/* Only after receiving data it is known who has sent them and one can decide to accept or discard */
 		/* the data. */
 		ret = zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED,
-				trapper_args_in->config_comms->config_timeout);
+				POLL_TIMEOUT, trapper_args_in->config_comms->config_timeout);
 		zbx_update_env(get_process_type_string(process_type), zbx_time());
+
+		if (TIMEOUT_ERROR == ret)
+			continue;
 
 		if (SUCCEED == ret)
 		{
@@ -1373,4 +1377,6 @@ out:
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
+
+#undef POLL_TIMEOUT
 }
