@@ -52,12 +52,10 @@ No specific Zabbix configuration is required.
 |{$AZURE.RESOURCE_GROUP.NOT.MATCHES} |<p>This macro is used in discovery rules.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.STORAGE.ACC.AVAILABILITY} |<p>The warning threshold of the storage account availability.</p> |`70` |
 |{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY} |<p>The warning threshold of the storage account blob services availability.</p> |`70` |
-|{$AZURE.STORAGE.ACC.FILE.AVAILABILITY} |<p>The warning threshold of the storage account file services availability.</p> |`70` |
 |{$AZURE.STORAGE.ACC.LOCATION.MATCHES} |<p>This macro is used in storage accounts discovery rule.</p> |`.*` |
 |{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES} |<p>This macro is used in storage accounts discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.STORAGE.ACC.NAME.MATCHES} |<p>This macro is used in storage accounts discovery rule.</p> |`.*` |
 |{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES} |<p>This macro is used in storage accounts discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$AZURE.STORAGE.ACC.QUEUE.AVAILABILITY} |<p>The warning threshold of the storage account queue services availability.</p> |`70` |
 |{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY} |<p>The warning threshold of the storage account table services availability.</p> |`70` |
 |{$AZURE.SUBSCRIPTION.ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT.ID} |<p>Microsoft Azure tenant ID.</p> |`` |
