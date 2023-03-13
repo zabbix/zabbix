@@ -300,7 +300,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else
 	{
-		zbx_snprintf(error, max_error_len, "Parameter options \"%s\" is not supported.", tmp);
+		zbx_snprintf(error, max_error_len, "\"%s\" is not supported as the \"options\" parameter value.", tmp);
 		goto out;
 	}
 
