@@ -244,6 +244,7 @@ void	zbx_history_record_clear(zbx_history_record_t *value, int value_type)
 	{
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_BIN:
 			zbx_free(value->value.str);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
@@ -251,7 +252,6 @@ void	zbx_history_record_clear(zbx_history_record_t *value, int value_type)
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 		case ITEM_VALUE_TYPE_FLOAT:
-		case ITEM_VALUE_TYPE_BIN:
 			break;
 		case ITEM_VALUE_TYPE_NONE:
 		default:
@@ -292,45 +292,6 @@ void	zbx_history_value2str(char *buffer, size_t size, const zbx_history_value_t 
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: converts history value to string format (with dynamic buffer)     *
- *                                                                            *
- * Parameters: value      - [IN] the value to convert                         *
- *             value_type - [IN] the history value type                       *
- *                                                                            *
- * Return value: The value in text format.                                    *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_history_value2str_dyn(const zbx_history_value_t *value, int value_type)
-{
-	char	*str = NULL;
-	size_t	str_alloc = 0, str_offset = 0;
-
-	switch (value_type)
-	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ZBX_FS_DBL, value->dbl);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ZBX_FS_UI64, value->ui64);
-			break;
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-		case ITEM_VALUE_TYPE_BIN:
-			str = zbx_strdup(NULL, value->str);
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			str = zbx_strdup(NULL, value->log->value);
-			break;
-		case ITEM_VALUE_TYPE_NONE:
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-	}
-
-	return str;
 }
 
 /******************************************************************************

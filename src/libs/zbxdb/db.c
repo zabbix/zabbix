@@ -1400,12 +1400,12 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 			for (i = 0; i < rows_num; i++)
 			{
 				char	*dst = NULL;
-				size_t	data_len, src_len;
+				size_t	dst_len, src_len;
 
 				src_len = strlen(rows[i][position].str) * 3 / 4 + 1;
 				dst = (char*)zbx_malloc(NULL, src_len);
-				str_base64_decode(rows[i][position].str, (char *)dst, src_len, &data_len);
-				sizes[i] = data_len;
+				str_base64_decode(rows[i][position].str, (char *)dst, src_len, &dst_len);
+				sizes[i] = dst_len;
 				zbx_free(rows[i][position].str);
 				rows[i][position].str = dst;
 

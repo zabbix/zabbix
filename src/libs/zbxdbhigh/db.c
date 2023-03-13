@@ -3262,8 +3262,9 @@ retry_oracle:
 				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-					/* Oracle converts base64 to binary when it formats prepared statement */
 					format_binary_value_for_sql(&(value->str));
+#elif defined(HAVE_ORACLE)
+					/* Oracle converts base64 to binary when it formats prepared statement */
 #endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');

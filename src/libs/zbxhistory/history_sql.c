@@ -195,13 +195,11 @@ static int	sql_writer_flush(void)
 
 static void	add_history_dbl(const zbx_vector_ptr_t *history)
 {
-	int		i;
-	zbx_db_insert_t	*db_insert;
+	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
-	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 	zbx_db_insert_prepare(db_insert, "history", "itemid", "clock", "ns", "value", NULL);
 
-	for (i = 0; i < history->values_num; i++)
+	for (int i = 0; i < history->values_num; i++)
 	{
 		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
@@ -216,13 +214,11 @@ static void	add_history_dbl(const zbx_vector_ptr_t *history)
 
 static void	add_history_uint(const zbx_vector_ptr_t *history)
 {
-	int		i;
-	zbx_db_insert_t	*db_insert;
+	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
-	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 	zbx_db_insert_prepare(db_insert, "history_uint", "itemid", "clock", "ns", "value", NULL);
 
-	for (i = 0; i < history->values_num; i++)
+	for (int i = 0; i < history->values_num; i++)
 	{
 		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
@@ -237,13 +233,11 @@ static void	add_history_uint(const zbx_vector_ptr_t *history)
 
 static void	add_history_str(const zbx_vector_ptr_t *history)
 {
-	int		i;
-	zbx_db_insert_t	*db_insert;
+	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
-	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 	zbx_db_insert_prepare(db_insert, "history_str", "itemid", "clock", "ns", "value", NULL);
 
-	for (i = 0; i < history->values_num; i++)
+	for (int i = 0; i < history->values_num; i++)
 	{
 		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
@@ -258,13 +252,11 @@ static void	add_history_str(const zbx_vector_ptr_t *history)
 
 static void	add_history_text(const zbx_vector_ptr_t *history)
 {
-	int		i;
-	zbx_db_insert_t	*db_insert;
+	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
-	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 	zbx_db_insert_prepare(db_insert, "history_text", "itemid", "clock", "ns", "value", NULL);
 
-	for (i = 0; i < history->values_num; i++)
+	for (int i = 0; i < history->values_num; i++)
 	{
 		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
@@ -279,14 +271,12 @@ static void	add_history_text(const zbx_vector_ptr_t *history)
 
 static void	add_history_log(const zbx_vector_ptr_t *history)
 {
-	int			i;
-	zbx_db_insert_t	*db_insert;
+	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
-	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 	zbx_db_insert_prepare(db_insert, "history_log", "itemid", "clock", "ns", "timestamp", "source", "severity",
 			"value", "logeventid", NULL);
 
-	for (i = 0; i < history->values_num; i++)
+	for (int i = 0; i < history->values_num; i++)
 	{
 		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 		const zbx_log_value_t	*log;
@@ -305,13 +295,11 @@ static void	add_history_log(const zbx_vector_ptr_t *history)
 
 static void	add_history_bin(const zbx_vector_ptr_t *history)
 {
-	int		i;
-	zbx_db_insert_t	*db_insert;
+	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
-	db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 	zbx_db_insert_prepare(db_insert, "history_bin", "itemid", "clock", "ns", "value", NULL);
 
-	for (i = 0; i < history->values_num; i++)
+	for (int i = 0; i < history->values_num; i++)
 	{
 		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
 
