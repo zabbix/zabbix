@@ -612,7 +612,7 @@ static void	portage_details(const char *manager, const char *line, const char *r
 	 * We should make it easier to add arbitrary data items to the package object.
 	 */
 
-	add_package_to_json(json, name, manager, version, size, NULL, 0, NULL, 0, NULL);
+	add_package_to_json(json, name, manager, version, size, NULL, 0, "", 0, "");
 out:
 	zbx_free(l);
 }
