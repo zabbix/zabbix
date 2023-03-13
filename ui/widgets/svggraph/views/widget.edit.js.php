@@ -190,7 +190,10 @@ window.widget_svggraph_form = new class {
 		document
 			.getElementById('dataset-add')
 			.addEventListener('click', () => {
-				this._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
+				this._addDataset(this.templateid === null
+					? <?= CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM ?>
+					: <?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>
+				);
 			});
 
 		document
@@ -284,35 +287,59 @@ window.widget_svggraph_form = new class {
 	}
 
 	_addDatasetMenu(e) {
-		const menu = [
-			{
-				items: [
-					{
-						label: <?= json_encode(_('Item pattern')) ?>,
-						clickCallback: () => {
-							this._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
+		const menu = this.templateid === null
+			? [
+				{
+					items: [
+						{
+							label: <?= json_encode(_('Item pattern')) ?>,
+							clickCallback: () => {
+								this._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
+							}
+						},
+						{
+							label: <?= json_encode(_('Item list')) ?>,
+							clickCallback: () => {
+								this._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>);
+							}
 						}
-					},
-					{
-						label: <?= json_encode(_('Item list')) ?>,
-						clickCallback: () => {
-							this._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>);
+					]
+				},
+				{
+					items: [
+						{
+							label: <?= json_encode(_('Clone')) ?>,
+							disabled: this._getOpenedDataset() === null,
+							clickCallback: () => {
+								this._cloneDataset();
+							}
 						}
-					}
-				]
-			},
-			{
-				items: [
-					{
-						label: <?= json_encode(_('Clone')) ?>,
-						disabled: this._getOpenedDataset() === null,
-						clickCallback: () => {
-							this._cloneDataset();
+					]
+				}
+			]
+			: [
+				{
+					items: [
+						{
+							label: <?= json_encode(_('Item list')) ?>,
+							clickCallback: () => {
+								this._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM ?>);
+							}
 						}
-					}
-				]
-			}
-		];
+					]
+				},
+				{
+					items: [
+						{
+							label: <?= json_encode(_('Clone')) ?>,
+							disabled: this._getOpenedDataset() === null,
+							clickCallback: () => {
+								this._cloneDataset();
+							}
+						}
+					]
+				}
+			];
 
 		jQuery(e.target).menuPopup(menu, new jQuery.Event(e), {
 			position: {
@@ -598,39 +625,20 @@ window.widget_svggraph_form = new class {
 						ids.push(jQuery(`#items_${dataset_index}_${i}_input`).val());
 					}
 
-					if (this.templateid === null) {
-						PopUp('popup.generic', {
-							srctbl: 'items',
-							srcfld1: 'itemid',
-							srcfld2: 'name',
-							dstfrm: widget_svggraph_form._form.id,
-							dstfld1: `items_${dataset_index}_${i}_input`,
-							dstfld2: `items_${dataset_index}_${i}_name`,
-							numeric: 1,
-							writeonly: 1,
-							with_webitems: 1,
-							real_hosts: 1,
-							dialogue_class: 'modal-popup-generic',
-							excludeids: ids
-						});
-					}
-					else {
-						PopUp('popup.generic', {
-							srctbl: 'items',
-							srcfld1: 'itemid',
-							srcfld2: 'name',
-							dstfrm: widget_svggraph_form._form.id,
-							dstfld1: `items_${dataset_index}_${i}_input`,
-							dstfld2: `items_${dataset_index}_${i}_name`,
-							numeric: 1,
-							writeonly: 1,
-							with_webitems: 1,
-							hostid: this.templateid,
-							template_dashboard_widget: 1,
-							dialogue_class: 'modal-popup-generic',
-							excludeids: ids
-						});
-					}
+					PopUp('popup.generic', {
+						srctbl: 'items',
+						srcfld1: 'itemid',
+						srcfld2: 'name',
+						dstfrm: widget_svggraph_form._form.id,
+						dstfld1: `items_${dataset_index}_${i}_input`,
+						dstfld2: `items_${dataset_index}_${i}_name`,
+						numeric: 1,
+						writeonly: 1,
+						with_webitems: 1,
+						real_hosts: 1,
+						dialogue_class: 'modal-popup-generic',
+						excludeids: ids
+					});
 				});
 			}
 		}

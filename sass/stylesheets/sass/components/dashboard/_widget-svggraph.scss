@@ -163,12 +163,6 @@ form.dashboard-widget-svggraph {
 				padding-left: 0;
 			}
 		}
-
-		&.with-hosts-multiselect {
-			.multiselect-control {
-				grid-column: span 2;
-			}
-		}
 	}
 
 	.single-item-table {
@@ -221,12 +215,6 @@ form.dashboard-widget-svggraph {
 			right: 0;
 			top: 0;
 			vertical-align: baseline;
-		}
-
-		&.with-hosts-multiselect {
-			.multiselect-control {
-				grid-column: span 2;
-			}
 		}
 	}
 

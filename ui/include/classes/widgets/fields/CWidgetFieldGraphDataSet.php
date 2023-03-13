@@ -97,11 +97,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		if ($flags & self::FLAG_NOT_EMPTY) {
 			$strict_validation_rules = $this->getValidationRules();
 			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
-
-			if ($this->templateid === null) {
-				self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
-			}
-
+			self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
 			self::setValidationRuleFlag($strict_validation_rules['fields']['items'], API_NOT_EMPTY);
 			self::setValidationRuleFlag($strict_validation_rules['fields']['itemids'], API_NOT_EMPTY);
 			$this->setStrictValidationRules($strict_validation_rules);
@@ -113,9 +109,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		return $this;
 	}
 
-	public static function getDefaults(): array {
+	public static function getDefaults(string $templateid = null): array {
 		return [
-			'dataset_type' => self::DATASET_TYPE_PATTERN_ITEM,
+			'dataset_type' => $templateid === null ? self::DATASET_TYPE_PATTERN_ITEM :self::DATASET_TYPE_SINGLE_ITEM,
 			'hosts' => [],
 			'items' => [],
 			'itemids' => [],
