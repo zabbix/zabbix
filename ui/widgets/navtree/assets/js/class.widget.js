@@ -42,9 +42,7 @@ class CWidgetNavTree extends CWidget {
 		this._last_id = null;
 
 		this._has_contents = false;
-	}
 
-	onStart() {
 		this._registerContentsEvents();
 	}
 

@@ -44,9 +44,7 @@ class CWidgetMap extends CWidget {
 		this._initial_load = true;
 
 		this._has_contents = false;
-	}
 
-	onStart() {
 		this._registerContentsEvents();
 	}
 

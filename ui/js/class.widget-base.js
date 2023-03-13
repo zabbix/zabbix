@@ -187,7 +187,6 @@ class CWidgetBase {
 		this._unique_id = unique_id;
 
 		this._init();
-		this._registerEvents();
 	}
 
 	/**
@@ -221,6 +220,8 @@ class CWidgetBase {
 		this._resizable_handles = [];
 
 		this._hide_preloader_animation_frame = null;
+
+		this._events = {};
 
 		this.onInitialize();
 	}
@@ -1320,7 +1321,9 @@ class CWidgetBase {
 
 			leave: () => {
 				this.fire(WIDGET_EVENT_LEAVE);
-			}
+			},
+
+			...this._events
 		};
 	}
 
