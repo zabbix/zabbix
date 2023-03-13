@@ -1556,4 +1556,4 @@ INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node-active','
 -- binary value type
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58739, 99013, 50022, 0, 0, 'master.for.binary', 'master.for.binary', '1d', '90d', 0, '', '', '', '');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58740, 99013, NULL, 18, 5, 'dependent.valuetype.binary', 'dependent.valuetype.binary', 0, 0, 0, '', '', '', '');
-INSERT INTO `history_bin` (`itemid`, `clock`, `value`, `ns`) VALUES (58740, 1549350962, 'This should be binary', 594538048);
+INSERT INTO history_bin (itemid, clock, value, ns) VALUES (58740, 1549350962, 'This should be binary', 594538048);
