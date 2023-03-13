@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-01-08 02:31+0000\n"
+"PO-Revision-Date: 2023-03-02 15:03+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -3064,6 +3064,11 @@ msgstr "ディスカバリされたグラフを更新できません。"
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "ディスカバリされたホストグループ\"%1$s\"を更新できません。"
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr "テンプレートのグラフ\"%1$s\"を更新できません。"
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -16106,6 +16111,10 @@ msgstr "サービスの依存関係が循環設定されています。"
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
 msgstr "サービスを更新しました"
+
+#: include/classes/api/services/CUser.php:1693
+msgid "Session ID or token is expected."
+msgstr "セッションIDかトークンを指定してください。"
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249

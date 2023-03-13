@@ -557,10 +557,6 @@ void	zbx_db_flush_version_requirements(const char *version);
 #ifdef HAVE_POSTGRESQL
 int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver);
 char	*zbx_db_get_schema_esc(void);
-
-#define ZBX_TSDB_RECALC_TIME_PERIOD_HISTORY	1
-#define ZBX_TSDB_RECALC_TIME_PERIOD_TRENDS	2
-void	zbx_tsdb_recalc_time_period(int *ts_from, int table_group);
 #endif
 
 /******************************************************************************
@@ -988,5 +984,9 @@ void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
+
+#define ZBX_RECALC_TIME_PERIOD_HISTORY	1
+#define ZBX_RECALC_TIME_PERIOD_TRENDS	2
+void	zbx_recalc_time_period(int *ts_from, int table_group);
 
 #endif

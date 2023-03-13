@@ -115,11 +115,10 @@ class testSystemInformation extends CWebTest {
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
-		$this->page->login()->open($url);
+		$this->page->login()->open($url)->waitUntilReady();
 
 		// Not waiting for page to load to minimise the possibility of difference between the time in report and in constant.
 		$current_time = time();
-		$this->page->waitUntilReady();
 
 		if (!$dashboardid) {
 			$nodes_table = $this->query('xpath://table[@class="list-table sticky-header sticky-footer"]')->asTable()->one();
@@ -146,18 +145,21 @@ class testSystemInformation extends CWebTest {
 		foreach ($nodes as $name => $lastaccess_db) {
 			$row = $nodes_table->findRow('Name', $name);
 			$last_seen = $row->getColumn('Last access');
-			// Converting unix timestamp difference into difference in time units and comparing with lastaccess from report.
-			$lastaccess_expected = convertUnitsS($current_time - $lastaccess_db);
-			$lastaccess_actual = $last_seen->getText();
+			self::$skip_fields[] = $last_seen;
+
 			/**
-			 *  In case if the actual last access doesn't coincide with expected check that the difference is only 1s.
-			 *  This is required because a second might have passed from defining $current_time and loading the page.
+			 * Converting unix timestamp difference into difference in time units and creating an array of such reference
+			 * values. This is required because several seconds might have passed from defining $current_time and
+			 * loading the page. Afterwards, the presence of the actual last access value in this array is determined.
 			 */
-			if ($lastaccess_expected !== $lastaccess_actual) {
-				$this->assertEquals(convertUnitsS($current_time - $lastaccess_db - 1), $lastaccess_actual);
+			$last_expected = [];
+
+			for ($i = 0; $i <= 10; $i++) {
+				$last_expected[] = convertUnitsS($current_time - $lastaccess_db - $i);
 			}
 
-			self::$skip_fields[] = $last_seen;
+			$last_actual = $last_seen->getText();
+			$this->assertContains($last_actual, $last_expected, $last_actual.' not in ['.implode(', ', $last_expected).']');
 
 			// Check Zabbix server address and port for each record in the HA cluster nodes table.
 			if ($name === 'Active node') {
