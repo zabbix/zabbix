@@ -21,7 +21,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -3094,6 +3094,283 @@ zabbix_export:
               parameters:
                 - 3h
         -
+          uuid: 657edb22832e43f5a084cf872c6bc6e4
+          name: 'PV discovery'
+          type: DEPENDENT
+          key: kube.pv.discovery
+          delay: '0'
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: f93e620a32114a239bc622246ff57eb0
+              name: 'Kubernetes: PV [{#NAME}] Capacity bytes'
+              type: DEPENDENT
+              key: 'kube.pv.capacity.bytes[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'A capacity of the persistent volume in bytes.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolume_capacity_bytes{persistentvolume="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pv
+                -
+                  tag: pv
+                  value: '{#NAME}'
+            -
+              uuid: f1f7c15a30e04203b63b3f828f1e49c6
+              name: 'Kubernetes: PV status phase: Available, sum'
+              type: DEPENDENT
+              key: 'kube.pv.status_phase.available.sum[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'The total amount of persistent volumes in the Available phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolume_status_phase{persistentvolume=~"{$KUBE.LLD.FILTER.PV.MATCHES}", persistentvolume!~"{$KUBE.LLD.FILTER.PV.NOT_MATCHES}", phase="Available"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: phase
+                -
+                  tag: component
+                  value: pv
+                -
+                  tag: phase
+                  value: available
+            -
+              uuid: 236db4d5cb4149f691003c0b50bf2b55
+              name: 'Kubernetes: PV status phase: Bound, sum'
+              type: DEPENDENT
+              key: 'kube.pv.status_phase.bound.sum[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'The total amount of persistent volumes in the Bound phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolume_status_phase{persistentvolume=~"{$KUBE.LLD.FILTER.PV.MATCHES}", persistentvolume!~"{$KUBE.LLD.FILTER.PV.NOT_MATCHES}", phase="Bound"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: phase
+                -
+                  tag: component
+                  value: pv
+                -
+                  tag: phase
+                  value: bound
+            -
+              uuid: bc5e42637e454baeb38eef946093f38a
+              name: 'Kubernetes: PV status phase: Failed, sum'
+              type: DEPENDENT
+              key: 'kube.pv.status_phase.failed.sum[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'The total amount of persistent volumes in the Failed phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolume_status_phase{persistentvolume=~"{$KUBE.LLD.FILTER.PV.MATCHES}", persistentvolume!~"{$KUBE.LLD.FILTER.PV.NOT_MATCHES}", phase="Failed"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: phase
+                -
+                  tag: component
+                  value: pv
+                -
+                  tag: phase
+                  value: failed
+            -
+              uuid: e69e327a90094195997a28e36fe47441
+              name: 'Kubernetes: PV status phase: Pending, sum'
+              type: DEPENDENT
+              key: 'kube.pv.status_phase.pending.sum[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'The total amount of persistent volumes in the Pending phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolume_status_phase{persistentvolume=~"{$KUBE.LLD.FILTER.PV.MATCHES}", persistentvolume!~"{$KUBE.LLD.FILTER.PV.NOT_MATCHES}", phase="Pending"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: phase
+                -
+                  tag: component
+                  value: pv
+                -
+                  tag: phase
+                  value: pending
+            -
+              uuid: 121d33d774534d38809b014f0af20d72
+              name: 'Kubernetes: PV status phase: Released, sum'
+              type: DEPENDENT
+              key: 'kube.pv.status_phase.released.sum[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'The total amount of persistent volumes in the Released phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolume_status_phase{persistentvolume=~"{$KUBE.LLD.FILTER.PV.MATCHES}", persistentvolume!~"{$KUBE.LLD.FILTER.PV.NOT_MATCHES}", phase="Released"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: phase
+                -
+                  tag: component
+                  value: pv
+                -
+                  tag: phase
+                  value: released
+            -
+              uuid: f2982e1a1c4a46f08b855d6f35e60c85
+              name: 'Kubernetes: PV [{#NAME}] Status phase'
+              type: DEPENDENT
+              key: 'kube.pv.status_phase[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The current status phase of the persistent volume.'
+              valuemap:
+                name: 'PV and PVC status phases'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolume_status_phase{persistentvolume="{#NAME}"} == 1'
+                    - label
+                    - phase
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return [''Available'', ''Bound'', ''Failed'', ''Lost'', ''Pending'', ''Released''].indexOf(value) + 1 || ''Problem with status processing in JS, no such PV status: '' + value;'
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: phase
+                -
+                  tag: component
+                  value: pv
+                -
+                  tag: pv
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: ccc486f937bd454e9e7193181a998bdb
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.pv.status_phase[{#NAME}],2m,,3)>=2'
+                  name: 'Kubernetes: PV [{#NAME}]: PV has failed'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+          master_item:
+            key: kube.state.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'kube_persistentvolume_info{persistentvolume=~"{$KUBE.LLD.FILTER.PV.MATCHES}", persistentvolume!~"{$KUBE.LLD.FILTER.PV.NOT_MATCHES}"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (metric) {
+                      output.push({ '{#NAME}': metric.labels.persistentvolume });
+                  });
+                  
+                  if (output.length > 0) {
+                      output.push({ '{#SINGLETON}': '' });
+                  }
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          overrides:
+            -
+              name: 'sum items'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#SINGLETON}'
+                    operator: EXISTS
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: 'status phase.*sum'
+                  discover: DISCOVER
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: NOT_REGEXP
+                  value: 'status phase.*sum'
+                  discover: NO_DISCOVER
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  discover: NO_DISCOVER
+        -
           uuid: 4143b2f294ac45a5ab570a94a626fca6
           name: 'PVC discovery'
           type: DEPENDENT
@@ -3127,7 +3404,7 @@ zabbix_export:
                 -
                   type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace="{#NAMESPACE}", name="{#NAME}"}'
+                    - 'kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}"}'
                     - value
                     - ''
                   error_handler: DISCARD_VALUE
@@ -3140,96 +3417,32 @@ zabbix_export:
                 -
                   tag: namespace
                   value: '{#NAMESPACE}'
-                -
-                  tag: phase
-                  value: requested
-                -
-                  tag: phase
-                  value: '{#NAME}'
-            -
-              uuid: 6bbe0a1846834467b6147ecfe0c53035
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Active, sum'
-              type: DEPENDENT
-              key: 'kube.pvc.status_phase.active.sum[{#NAMESPACE}/{#NAME}]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              description: 'Persistent volume claim is currently in Active phase.'
-              preprocessing:
-                -
-                  type: PROMETHEUS_PATTERN
-                  parameters:
-                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}", phase="Active"}'
-                    - function
-                    - sum
-                  error_handler: DISCARD_VALUE
-              master_item:
-                key: kube.state.metrics
-              tags:
-                -
-                  tag: component
-                  value: pvc
-                -
-                  tag: namespace
-                  value: '{#NAMESPACE}'
-                -
-                  tag: phase
-                  value: active
-                -
-                  tag: phase
-                  value: '{#NAME}'
-            -
-              uuid: 49b5eb7d714c4b019178c96e44af1216
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Available'
-              type: DEPENDENT
-              key: 'kube.pvc.status_phase.active[{#NAMESPACE}/{#NAME}]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              description: 'Persistent volume claim is currently in Active phase.'
-              preprocessing:
-                -
-                  type: PROMETHEUS_PATTERN
-                  parameters:
-                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Available"}'
-                    - value
-                    - ''
-                  error_handler: DISCARD_VALUE
-              master_item:
-                key: kube.state.metrics
-              tags:
-                -
-                  tag: component
-                  value: pvc
-                -
-                  tag: namespace
-                  value: '{#NAMESPACE}'
-                -
-                  tag: phase
-                  value: active
                 -
                   tag: pvc
                   value: '{#NAME}'
             -
-              uuid: c6560c039b894af6a264a0f509491c1f
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Bound, sum'
+              uuid: 41bc1f54992a492da414846b91d48b0e
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC status phase: Bound, sum'
               type: DEPENDENT
-              key: 'kube.pvc.status_phase.bound.sum[{#NAMESPACE}/{#NAME}]'
+              key: 'kube.pvc.status_phase.bound.sum[{#NAMESPACE}]'
               delay: '0'
               history: 7d
-              value_type: FLOAT
-              description: 'Persistent volume claim is currently in Bound phase.'
+              discover: NO_DISCOVER
+              description: 'The total amount of persistent volume claims in the Bound phase.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}", phase="Bound"}'
+                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", phase="Bound"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
               master_item:
                 key: kube.state.metrics
               tags:
+                -
+                  tag: component
+                  value: phase
                 -
                   tag: component
                   value: pvc
@@ -3239,61 +3452,29 @@ zabbix_export:
                 -
                   tag: phase
                   value: bound
-                -
-                  tag: phase
-                  value: '{#NAME}'
             -
-              uuid: 8a979a9baf4e42aeb708be9af81c14c4
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Bound'
+              uuid: f3b3979c04424b908b514589c2995ff8
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC status phase: Lost, sum'
               type: DEPENDENT
-              key: 'kube.pvc.status_phase.bound[{#NAMESPACE}/{#NAME}]'
+              key: 'kube.pvc.status_phase.lost.sum[{#NAMESPACE}]'
               delay: '0'
               history: 7d
-              value_type: FLOAT
-              description: 'Persistent volume claim is currently in Bound phase.'
+              discover: NO_DISCOVER
+              description: 'The total amount of persistent volume claims in the Lost phase.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Bound"}'
-                    - value
-                    - ''
-                  error_handler: DISCARD_VALUE
-              master_item:
-                key: kube.state.metrics
-              tags:
-                -
-                  tag: component
-                  value: pvc
-                -
-                  tag: namespace
-                  value: '{#NAMESPACE}'
-                -
-                  tag: phase
-                  value: bound
-                -
-                  tag: pvc
-                  value: '{#NAME}'
-            -
-              uuid: 6810603a92d941afa29dc2e9314d92ae
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Lost, sum'
-              type: DEPENDENT
-              key: 'kube.pvc.status_phase.lost.sum[{#NAMESPACE}/{#NAME}]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              description: 'Persistent volume claim is currently in Lost phase.'
-              preprocessing:
-                -
-                  type: PROMETHEUS_PATTERN
-                  parameters:
-                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}",persistentvolumeclaim="{#NAME}", phase="Lost"}'
+                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", phase="Lost"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
               master_item:
                 key: kube.state.metrics
               tags:
+                -
+                  tag: component
+                  value: phase
                 -
                   tag: component
                   value: pvc
@@ -3303,55 +3484,20 @@ zabbix_export:
                 -
                   tag: phase
                   value: lost
-                -
-                  tag: phase
-                  value: '{#NAME}'
             -
-              uuid: 0e08b33ba95f4f8d811ace1fcbe44fc7
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Lost'
+              uuid: 237d8ee073c04c21a14269f15ab679fd
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC status phase: Pending, sum'
               type: DEPENDENT
-              key: 'kube.pvc.status_phase.lost[{#NAMESPACE}/{#NAME}]'
+              key: 'kube.pvc.status_phase.pending.sum[{#NAMESPACE}]'
               delay: '0'
               history: 7d
-              value_type: FLOAT
-              description: 'Persistent volume claim is currently in Lost phase.'
+              discover: NO_DISCOVER
+              description: 'The total amount of persistent volume claims in the Pending phase.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Lost"}'
-                    - value
-                    - ''
-                  error_handler: DISCARD_VALUE
-              master_item:
-                key: kube.state.metrics
-              tags:
-                -
-                  tag: component
-                  value: pvc
-                -
-                  tag: namespace
-                  value: '{#NAMESPACE}'
-                -
-                  tag: phase
-                  value: lost
-                -
-                  tag: pvc
-                  value: '{#NAME}'
-            -
-              uuid: 1227e04d6b374154bbf07f1cf64eebeb
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Pending, sum'
-              type: DEPENDENT
-              key: 'kube.pvc.status_phase.pending.sum[{#NAMESPACE}/{#NAME}]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              description: 'Persistent volume claim is currently in Pending phase.'
-              preprocessing:
-                -
-                  type: PROMETHEUS_PATTERN
-                  parameters:
-                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}", phase="Pending"}'
+                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", phase="Pending"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
@@ -3360,36 +3506,7 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: pvc
-                -
-                  tag: namespace
-                  value: '{#NAMESPACE}'
-                -
-                  tag: phase
-                  value: pending
-                -
-                  tag: pvc
-                  value: '{#NAME}'
-            -
-              uuid: 6ab12b7a2ad345a090c3dc36d604d800
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Pending'
-              type: DEPENDENT
-              key: 'kube.pvc.status_phase.pending[{#NAMESPACE}/{#NAME}]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              description: 'Persistent volume claim is currently in Pending phase.'
-              preprocessing:
-                -
-                  type: PROMETHEUS_PATTERN
-                  parameters:
-                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Pending"}'
-                    - value
-                    - ''
-                  error_handler: DISCARD_VALUE
-              master_item:
-                key: kube.state.metrics
-              tags:
+                  value: phase
                 -
                   tag: component
                   value: pvc
@@ -3399,13 +3516,47 @@ zabbix_export:
                 -
                   tag: phase
                   value: pending
+            -
+              uuid: f036e514626b4610b531f9be09289daa
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase'
+              type: DEPENDENT
+              key: 'kube.pvc.status_phase[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The current status phase of the persistent volume claim.'
+              valuemap:
+                name: 'PV and PVC status phases'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}"} == 1'
+                    - label
+                    - phase
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return [''Available'', ''Bound'', ''Failed'', ''Lost'', ''Pending'', ''Released''].indexOf(value) + 1 || ''Problem with status processing in JS, no such PVC status: '' + value;'
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: phase
+                -
+                  tag: component
+                  value: pvc
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
                 -
                   tag: pvc
                   value: '{#NAME}'
               trigger_prototypes:
                 -
-                  uuid: 75a1b90ae3f14a52a0f5d7d073332042
-                  expression: 'min(/Kubernetes cluster state by HTTP/kube.pvc.status_phase.pending[{#NAMESPACE}/{#NAME}],2m)>0'
+                  uuid: 6cdf93dad1c647239570cbb3789f1a2c
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.pvc.status_phase[{#NAMESPACE}/{#NAME}],2m,,5)>=2'
                   name: 'Kubernetes: NS [{#NAMESPACE}] PVC [{#NAME}]: PVC is pending'
                   priority: WARNING
                   tags:
@@ -3424,13 +3575,21 @@ zabbix_export:
               parameters:
                 - |
                   var input = JSON.parse(value),
+                      lookup = {},
                       output = [];
                   
                   input.forEach(function (metric) {
+                      var namespace = metric.labels.namespace;
+                      if (!(lookup[namespace])) {
+                          lookup[namespace] = 1;
+                          output.push({
+                              '{#IS_SUM}': '',
+                              '{#NAMESPACE}': metric.labels.namespace
+                          });
+                      }
                       output.push({
                           '{#NAME}': metric.labels.persistentvolumeclaim,
                           '{#NAMESPACE}': metric.labels.namespace
-                  
                       });
                   });
                   
@@ -3439,6 +3598,32 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
+          overrides:
+            -
+              name: 'sum items'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#IS_SUM}'
+                    operator: EXISTS
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: REGEXP
+                  value: 'status phase.*sum'
+                  discover: DISCOVER
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: NOT_REGEXP
+                  value: 'status phase.*sum'
+                  discover: NO_DISCOVER
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '.*'
+                  discover: NO_DISCOVER
         -
           uuid: ee274767c42345e3a501f43e81a3364a
           name: 'Readyz discovery'
@@ -3959,7 +4144,7 @@ zabbix_export:
           description: 'Kubernetes API readyz endpoint /readyz'
         -
           macro: '{$KUBE.API.TOKEN}'
-          description: 'Service account bearer token'
+          description: 'Service account bearer token.'
         -
           macro: '{$KUBE.API.URL}'
           value: 'https://localhost:6443'
@@ -3991,27 +4176,35 @@ zabbix_export:
         -
           macro: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable pods by namespace'
+          description: 'Filter of discoverable metrics by namespace.'
         -
           macro: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered pods by namespace'
+          description: 'Filter to exclude discovered metrics by namespace.'
         -
           macro: '{$KUBE.LLD.FILTER.NODE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable nodes by nodename'
+          description: 'Filter of discoverable nodes by nodename.'
         -
           macro: '{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered nodes by nodename'
+          description: 'Filter to exclude discovered nodes by nodename.'
+        -
+          macro: '{$KUBE.LLD.FILTER.PV.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable persistent volumes by name.'
+        -
+          macro: '{$KUBE.LLD.FILTER.PV.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered persistent volumes by name.'
         -
           macro: '{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable worker nodes by nodename'
+          description: 'Filter of discoverable worker nodes by nodename.'
         -
           macro: '{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered worker nodes by nodename'
+          description: 'Filter to exclude discovered worker nodes by nodename.'
         -
           macro: '{$KUBE.SCHEDULER.PORT}'
           value: '10251'
@@ -4023,7 +4216,7 @@ zabbix_export:
         -
           macro: '{$KUBE.STATE.ENDPOINT.NAME}'
           value: zabbix-kube-state-metrics
-          description: 'Kubernetes state endpoint name'
+          description: 'Kubernetes state endpoint name.'
       valuemaps:
         -
           uuid: a435f7e23050406ca40cf6f5f872b5a7
@@ -4035,3 +4228,25 @@ zabbix_export:
             -
               value: '1'
               newvalue: 'True'
+        -
+          uuid: f5aa4a786972420b859029116aac8a2f
+          name: 'PV and PVC status phases'
+          mappings:
+            -
+              value: '1'
+              newvalue: Available
+            -
+              value: '2'
+              newvalue: Bound
+            -
+              value: '3'
+              newvalue: Failed
+            -
+              value: '4'
+              newvalue: Lost
+            -
+              value: '5'
+              newvalue: Pending
+            -
+              value: '6'
+              newvalue: Released

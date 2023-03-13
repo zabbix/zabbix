@@ -3,7 +3,6 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 The template to monitor Kubernetes state that work without any external scripts. 
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
 
@@ -13,16 +12,21 @@ Don't forget change macros {$KUBE.API.URL} and {$KUBE.API.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
 
+## Tested versions
 
-This template was tested on:
+This template has been tested on:
 
 - Kubernetes, version 1.19
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse) in your Kubernetes cluster.
+Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F6.4) in your Kubernetes cluster.
 Internal service metrics are collected from kube-state-metrics endpoint.
 
 Template needs to use Authorization via API token.
@@ -58,7 +62,7 @@ Set up macros to filter node metrics by nodename:
 
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -69,7 +73,7 @@ No specific Zabbix configuration is required.
 |{$KUBE.API.COMPONENTSTATUSES.ENDPOINT} |<p>Kubernetes API componentstatuses endpoint /api/v1/componentstatuses</p> |`/api/v1/componentstatuses` |
 |{$KUBE.API.LIVEZ.ENDPOINT} |<p>Kubernetes API livez endpoint /livez</p> |`/livez` |
 |{$KUBE.API.READYZ.ENDPOINT} |<p>Kubernetes API readyz endpoint /readyz</p> |`/readyz` |
-|{$KUBE.API.TOKEN} |<p>Service account bearer token</p> |`` |
+|{$KUBE.API.TOKEN} |<p>Service account bearer token.</p> |`` |
 |{$KUBE.API.URL} |<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p> |`https://localhost:6443` |
 |{$KUBE.API_SERVER.PORT} |<p>Kubernetes API servers metrics endpoint port. Used in ControlPlane LLD.</p> |`6443` |
 |{$KUBE.API_SERVER.SCHEME} |<p>Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.</p> |`https` |
@@ -77,21 +81,23 @@ No specific Zabbix configuration is required.
 |{$KUBE.CONTROLLER_MANAGER.SCHEME} |<p>Kubernetes Controller manager metrics endpoint scheme. Used in ControlPlane LLD.</p> |`http` |
 |{$KUBE.KUBELET.PORT} |<p>Kubernetes Kubelet manager metrics endpoint port. Used in Kubelet LLD.</p> |`10250` |
 |{$KUBE.KUBELET.SCHEME} |<p>Kubernetes Kubelet manager metrics endpoint scheme. Used in Kubelet LLD.</p> |`https` |
-|{$KUBE.LLD.FILTER.NAMESPACE.MATCHES} |<p>Filter of discoverable pods by namespace</p> |`.*` |
-|{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES} |<p>Filter to exclude discovered pods by namespace</p> |`CHANGE_IF_NEEDED` |
-|{$KUBE.LLD.FILTER.NODE.MATCHES} |<p>Filter of discoverable nodes by nodename</p> |`.*` |
-|{$KUBE.LLD.FILTER.NODE.NOT_MATCHES} |<p>Filter to exclude discovered nodes by nodename</p> |`CHANGE_IF_NEEDED` |
-|{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES} |<p>Filter of discoverable worker nodes by nodename</p> |`.*` |
-|{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES} |<p>Filter to exclude discovered worker nodes by nodename</p> |`CHANGE_IF_NEEDED` |
+|{$KUBE.LLD.FILTER.NAMESPACE.MATCHES} |<p>Filter of discoverable metrics by namespace.</p> |`.*` |
+|{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES} |<p>Filter to exclude discovered metrics by namespace.</p> |`CHANGE_IF_NEEDED` |
+|{$KUBE.LLD.FILTER.NODE.MATCHES} |<p>Filter of discoverable nodes by nodename.</p> |`.*` |
+|{$KUBE.LLD.FILTER.NODE.NOT_MATCHES} |<p>Filter to exclude discovered nodes by nodename.</p> |`CHANGE_IF_NEEDED` |
+|{$KUBE.LLD.FILTER.PV.MATCHES} |<p>Filter of discoverable persistent volumes by name.</p> |`.*` |
+|{$KUBE.LLD.FILTER.PV.NOT_MATCHES} |<p>Filter to exclude discovered persistent volumes by name.</p> |`CHANGE_IF_NEEDED` |
+|{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES} |<p>Filter of discoverable worker nodes by nodename.</p> |`.*` |
+|{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES} |<p>Filter to exclude discovered worker nodes by nodename.</p> |`CHANGE_IF_NEEDED` |
 |{$KUBE.SCHEDULER.PORT} |<p>Kubernetes Scheduler manager metrics endpoint port. Used in ControlPlane LLD.</p> |`10251` |
 |{$KUBE.SCHEDULER.SCHEME} |<p>Kubernetes Scheduler manager metrics endpoint scheme. Used in ControlPlane LLD.</p> |`http` |
-|{$KUBE.STATE.ENDPOINT.NAME} |<p>Kubernetes state endpoint name</p> |`zabbix-kube-state-metrics` |
+|{$KUBE.STATE.ENDPOINT.NAME} |<p>Kubernetes state endpoint name.</p> |`zabbix-kube-state-metrics` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
@@ -108,13 +114,14 @@ There are no template links in this template.
 |Node discovery |<p>-</p> |DEPENDENT |kube.node.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}`</p> |
 |Pod discovery |<p>-</p> |DEPENDENT |kube.pod.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
 |PodDisruptionBudget discovery |<p>-</p> |DEPENDENT |kube.pdb.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
-|PVC discovery |<p>-</p> |DEPENDENT |kube.pvc.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
+|PVC discovery |<p>-</p> |DEPENDENT |kube.pvc.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p><p>**Overrides:**</p><p>sum items<br> - {#IS_SUM} EXISTS <br>  - ITEM_PROTOTYPE REGEXP `status phase.*sum`<br>  - DISCOVER</p><br>  - ITEM_PROTOTYPE NOT_REGEXP `status phase.*sum`<br>  - NO_DISCOVER</p><br>  - TRIGGER_PROTOTYPE REGEXP `.*`<br>  - NO_DISCOVER</p> |
+|PV discovery |<p>-</p> |DEPENDENT |kube.pv.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Overrides:**</p><p>sum items<br> - {#SINGLETON} EXISTS <br>  - ITEM_PROTOTYPE REGEXP `status phase.*sum`<br>  - DISCOVER</p><br>  - ITEM_PROTOTYPE NOT_REGEXP `status phase.*sum`<br>  - NO_DISCOVER</p><br>  - TRIGGER_PROTOTYPE REGEXP `.*`<br>  - NO_DISCOVER</p> |
 |Readyz discovery |<p>-</p> |DEPENDENT |kube.readyz.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
 |Replicaset discovery |<p>-</p> |DEPENDENT |kube.replicaset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
 |Scheduler servers nodes discovery |<p>-</p> |DEPENDENT |kube.scheduler.discovery |
 |Statefulset discovery |<p>-</p> |DEPENDENT |kube.statefulset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -137,15 +144,18 @@ There are no template links in this template.
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Desired |<p>The number of nodes that should be running the daemon pod.</p> |DEPENDENT |kube.daemonset.desired[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_daemonset_status_desired_number_scheduled{namespace="{#NAMESPACE}", daemonset="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Misscheduled |<p>The number of nodes running a daemon pod but are not supposed to.</p> |DEPENDENT |kube.daemonset.misscheduled[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_daemonset_status_number_misscheduled{namespace="{#NAMESPACE}", daemonset="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Updated number scheduled |<p>The total number of nodes that are running updated daemon pod.</p> |DEPENDENT |kube.daemonset.updated[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_daemonset_status_updated_number_scheduled{namespace="{#NAMESPACE}", daemonset="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Available |<p>Persistent volume claim is currently in Active phase.</p> |DEPENDENT |kube.pvc.status_phase.active[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Available"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Lost |<p>Persistent volume claim is currently in Lost phase.</p> |DEPENDENT |kube.pvc.status_phase.lost[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Lost"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Bound |<p>Persistent volume claim is currently in Bound phase.</p> |DEPENDENT |kube.pvc.status_phase.bound[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Bound"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Pending |<p>Persistent volume claim is currently in Pending phase.</p> |DEPENDENT |kube.pvc.status_phase.pending[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Pending"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Requested storage |<p>The capacity of storage requested by the persistent volume claim.</p> |DEPENDENT |kube.pvc.requested.storage[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace="{#NAMESPACE}", name="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Status phase: Pending, sum |<p>Persistent volume claim is currently in Pending phase.</p> |DEPENDENT |kube.pvc.status_phase.pending.sum[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}", phase="Pending"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Status phase: Active, sum |<p>Persistent volume claim is currently in Active phase.</p> |DEPENDENT |kube.pvc.status_phase.active.sum[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}", phase="Active"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Status phase: Bound, sum |<p>Persistent volume claim is currently in Bound phase.</p> |DEPENDENT |kube.pvc.status_phase.bound.sum[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}", phase="Bound"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Status phase: Lost, sum |<p>Persistent volume claim is currently in Lost phase.</p> |DEPENDENT |kube.pvc.status_phase.lost.sum[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}",persistentvolumeclaim="{#NAME}", phase="Lost"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase |<p>The current status phase of the persistent volume claim.</p> |DEPENDENT |kube.pvc.status_phase[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}"} == 1`: `label`: `phase`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return ['Available', 'Bound', 'Failed', 'Lost', 'Pending', 'Released'].indexOf(value) + 1 || 'Problem with status processing in JS, no such PVC status: ' + value; `</p> |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Requested storage |<p>The capacity of storage requested by the persistent volume claim.</p> |DEPENDENT |kube.pvc.requested.storage[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC status phase: Bound, sum |<p>The total amount of persistent volume claims in the Bound phase.</p> |DEPENDENT |kube.pvc.status_phase.bound.sum[{#NAMESPACE}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", phase="Bound"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC status phase: Lost, sum |<p>The total amount of persistent volume claims in the Lost phase.</p> |DEPENDENT |kube.pvc.status_phase.lost.sum[{#NAMESPACE}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", phase="Lost"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC status phase: Pending, sum |<p>The total amount of persistent volume claims in the Pending phase.</p> |DEPENDENT |kube.pvc.status_phase.pending.sum[{#NAMESPACE}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", phase="Pending"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: PV [{#NAME}] Status phase |<p>The current status phase of the persistent volume.</p> |DEPENDENT |kube.pv.status_phase[{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolume_status_phase{persistentvolume="{#NAME}"} == 1`: `label`: `phase`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return ['Available', 'Bound', 'Failed', 'Lost', 'Pending', 'Released'].indexOf(value) + 1 || 'Problem with status processing in JS, no such PV status: ' + value; `</p> |
+|Kubernetes |Kubernetes: PV [{#NAME}] Capacity bytes |<p>A capacity of the persistent volume in bytes.</p> |DEPENDENT |kube.pv.capacity.bytes[{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolume_capacity_bytes{persistentvolume="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: PV status phase: Pending, sum |<p>The total amount of persistent volumes in the Pending phase.</p> |DEPENDENT |kube.pv.status_phase.pending.sum[{#SINGLETON}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolume_status_phase{persistentvolume=~"{$KUBE.LLD.FILTER.PV.MATCHES}", persistentvolume!~"{$KUBE.LLD.FILTER.PV.NOT_MATCHES}", phase="Pending"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: PV status phase: Available, sum |<p>The total amount of persistent volumes in the Available phase.</p> |DEPENDENT |kube.pv.status_phase.available.sum[{#SINGLETON}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolume_status_phase{persistentvolume=~"{$KUBE.LLD.FILTER.PV.MATCHES}", persistentvolume!~"{$KUBE.LLD.FILTER.PV.NOT_MATCHES}", phase="Available"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: PV status phase: Bound, sum |<p>The total amount of persistent volumes in the Bound phase.</p> |DEPENDENT |kube.pv.status_phase.bound.sum[{#SINGLETON}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolume_status_phase{persistentvolume=~"{$KUBE.LLD.FILTER.PV.MATCHES}", persistentvolume!~"{$KUBE.LLD.FILTER.PV.NOT_MATCHES}", phase="Bound"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: PV status phase: Released, sum |<p>The total amount of persistent volumes in the Released phase.</p> |DEPENDENT |kube.pv.status_phase.released.sum[{#SINGLETON}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolume_status_phase{persistentvolume=~"{$KUBE.LLD.FILTER.PV.MATCHES}", persistentvolume!~"{$KUBE.LLD.FILTER.PV.NOT_MATCHES}", phase="Released"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Kubernetes |Kubernetes: PV status phase: Failed, sum |<p>The total amount of persistent volumes in the Failed phase.</p> |DEPENDENT |kube.pv.status_phase.failed.sum[{#SINGLETON}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolume_status_phase{persistentvolume=~"{$KUBE.LLD.FILTER.PV.MATCHES}", persistentvolume!~"{$KUBE.LLD.FILTER.PV.NOT_MATCHES}", phase="Failed"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Paused |<p>Whether the deployment is paused and will not be processed by the deployment controller.</p> |DEPENDENT |kube.deployment.spec_paused[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_deployment_spec_paused{namespace="{#NAMESPACE}", deployment="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas desired |<p>Number of desired pods for a deployment.</p> |DEPENDENT |kube.deployment.replicas_desired[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_deployment_spec_replicas{namespace="{#NAMESPACE}", deployment="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Rollingupdate max unavailable |<p>Maximum number of unavailable replicas during a rolling update of a deployment.</p> |DEPENDENT |kube.deployment.rollingupdate.max_unavailable[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_deployment_spec_strategy_rollingupdate_max_unavailable{namespace="{#NAMESPACE}", deployment="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
@@ -210,11 +220,12 @@ There are no template links in this template.
 |Kubernetes |Kubernetes: Readyz [{#NAME}]: Healthcheck |<p>Result of readyz healthcheck for component.</p> |DEPENDENT |kube.readyz.healthcheck[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name == "{#NAME}")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Livez [{#NAME}]: Healthcheck |<p>Result of livez healthcheck for component.</p> |DEPENDENT |kube.livez.healthcheck[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.name == "{#NAME}")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Kubernetes: NS [{#NAMESPACE}] PVC [{#NAME}]: PVC is pending |<p>-</p> |`min(/Kubernetes cluster state by HTTP/kube.pvc.status_phase.pending[{#NAMESPACE}/{#NAME}],2m)>0` |WARNING | |
+|Kubernetes: NS [{#NAMESPACE}] PVC [{#NAME}]: PVC is pending |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.pvc.status_phase[{#NAMESPACE}/{#NAME}],2m,,5)>=2` |WARNING | |
+|Kubernetes: PV [{#NAME}]: PV has failed |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.pv.status_phase[{#NAME}],2m,,3)>=2` |WARNING | |
 |Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Deployment replicas mismatch |<p>-</p> |`(last(/Kubernetes cluster state by HTTP/kube.deployment.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}]))<>0` |WARNING | |
 |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is not healthy |<p>-</p> |`min(/Kubernetes cluster state by HTTP/kube.pod.phase.failed[{#NAMESPACE}/{#NAME}],10m)>0 or min(/Kubernetes cluster state by HTTP/kube.pod.phase.pending[{#NAMESPACE}/{#NAME}],10m)>0 or min(/Kubernetes cluster state by HTTP/kube.pod.phase.unknown[{#NAMESPACE}/{#NAME}],10m)>0` |HIGH | |
 |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is crash looping |<p>-</p> |`(last(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}])-min(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}],#3))>2` |WARNING | |
