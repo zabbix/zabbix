@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 
-extern unsigned char	program_type;
 extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define ZBX_IPMI_POLLER_INIT		0
@@ -665,7 +664,7 @@ static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uin
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_uint64_t itemid, zbx_timespec_t *ts,
-		const char *error)
+		int unavailable_delay, const char *error)
 {
 	DC_ITEM		item;
 	int		errcode;
@@ -674,7 +673,7 @@ static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_u
 
 	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
-	zbx_deactivate_item_interface(ts, &item, &data, &data_alloc, &data_offset, error);
+	zbx_deactivate_item_interface(ts, &item, &data, &data_alloc, &data_offset, unavailable_delay, error);
 	ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
 
 	DCconfig_clean_items(&item, &errcode, 1);
@@ -844,18 +843,19 @@ static void	ipmi_manager_process_client_result(zbx_ipmi_manager_t *manager, zbx_
 	ipmi_manager_process_poller_queue(manager, poller, now);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: processes IPMI check result received from IPMI poller             *
- *                                                                            *
- * Parameters: manager   - [IN] the IPMI manager                              *
- *             client    - [IN] the client (IPMI poller)                      *
- *             message   - [IN] the received ZBX_IPC_IPMI_VALUE_RESULT message*
- *             now       - [IN] the current time                              *
- *                                                                            *
- ******************************************************************************/
+/**************************************************************************************
+ *                                                                                    *
+ * Purpose: processes IPMI check result received from IPMI poller                     *
+ *                                                                                    *
+ * Parameters: manager           - [IN] IPMI manager                                  *
+ *             client            - [IN] client (IPMI poller)                          *
+ *             message           - [IN] received ZBX_IPC_IPMI_VALUE_RESULT message    *
+ *             now               - [IN] current time                                  *
+ *             unavailable_delay - [IN]                                               *
+ *                                                                                    *
+ *************************************************************************************/
 static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_ipc_client_t *client,
-		zbx_ipc_message_t *message, int now)
+		zbx_ipc_message_t *message, int now, int unavailable_delay)
 {
 	char			*value;
 	zbx_timespec_t		ts;
@@ -894,7 +894,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 		case NETWORK_ERROR:
 		case GATEWAY_ERROR:
 		case TIMEOUT_ERROR:
-			ipmi_manager_deactivate_interface(manager, itemid, &ts, value);
+			ipmi_manager_deactivate_interface(manager, itemid, &ts, unavailable_delay, value);
 			break;
 		case CONFIG_ERROR:
 			/* nothing to do */
@@ -961,7 +961,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -975,7 +975,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 
 	ipmi_manager_init(&ipmi_manager);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	nextcleanup = time(NULL) + ZBX_IPMI_MANAGER_CLEANUP_DELAY;
 
@@ -1016,7 +1016,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 		ret = zbx_ipc_service_recv(&ipmi_service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;
@@ -1040,7 +1040,8 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 					break;
 				/* poller -> manager or poller -> manager -> client if value request sent by client */
 				case ZBX_IPC_IPMI_VALUE_RESULT:
-					ipmi_manager_process_value_result(&ipmi_manager, client, message, now);
+					ipmi_manager_process_value_result(&ipmi_manager, client, message, now,
+							ipmi_manager_args_in->config_unavailable_delay);
 					polled_num++;
 					break;
 				/* client -> manager */

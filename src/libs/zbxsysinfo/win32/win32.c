@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,8 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.discovery",0,		system_cpu_discovery,	NULL},
 
 	{"system.sw.arch",	0,		system_sw_arch,		NULL},
+	{"system.sw.os",	CF_HAVEPARAMS,	system_sw_os,		NULL},
+	{"system.sw.os.get",	CF_HAVEPARAMS,	system_sw_os_get,	NULL},
 
 	{"system.swap.size",	CF_HAVEPARAMS,	system_swap_size,	"all,free"},
 	{"vm.vmemory.size",	CF_HAVEPARAMS,	vm_vmemory_size,	"total"},

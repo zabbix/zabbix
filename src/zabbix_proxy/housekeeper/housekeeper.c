@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 
-extern unsigned char			program_type;
-
 static int	hk_period;
 
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
@@ -53,40 +51,40 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' now:%d", __func__, table, now);
 
-	DBbegin();
+	zbx_db_begin();
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select nextid"
 			" from ids"
 			" where table_name='%s'"
 				" and field_name='%s'",
 			table, fieldname);
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = zbx_db_fetch(result)))
 		goto rollback;
 
 	ZBX_STR2UINT64(lastid, row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	result = DBselect("select min(clock) from %s",
+	result = zbx_db_select("select min(clock) from %s",
 			table);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
 		goto rollback;
 
 	minclock = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	result = DBselect("select max(id) from %s",
+	result = zbx_db_select("select max(id) from %s",
 			table);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
 		goto rollback;
 
 	ZBX_STR2UINT64(maxid, row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	records = DBexecute(
+	records = zbx_db_execute(
 			"delete from %s"
 			" where id<" ZBX_FS_UI64
 				" and (clock<%d"
@@ -97,13 +95,13 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 			MIN(now - CONFIG_PROXY_LOCAL_BUFFER * SEC_PER_HOUR,
 					minclock + HK_MAX_DELETE_PERIODS * hk_period));
 
-	DBcommit();
+	zbx_db_commit();
 
 	return records;
 rollback:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	DBrollback();
+	zbx_db_rollback();
 
 	return 0;
 }
@@ -155,7 +153,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	zbx_thread_proxy_housekeeper_args	*housekeeper_args_in = (zbx_thread_proxy_housekeeper_args *)
 			((((zbx_thread_args_t *)args))->args);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -217,7 +215,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		time_now = zbx_time();
 		time_slept = time_now - sec;
-		zbx_update_env(time_now);
+		zbx_update_env(get_process_type_string(process_type), time_now);
 
 		hk_period = get_housekeeper_period(time_slept);
 
@@ -227,7 +225,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
+		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 		zbx_setproctitle("%s [removing old history]", get_process_type_string(process_type));
 
@@ -235,7 +233,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		records = housekeeping_history(start);
 		sec = zbx_time() - sec;
 
-		DBclose();
+		zbx_db_close();
 
 		zbx_dc_cleanup_sessions();
 		zbx_dc_cleanup_autoreg_host();

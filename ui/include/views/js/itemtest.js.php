@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,20 +47,26 @@
 					: ''
 			};
 
-			if (jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).length) {
-				params.push(jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).val());
-			}
-			if (jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).length) {
-				params.push(jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
-			}
-			if (jQuery('[name="preprocessing[' + num + '][params][2]"]:not(:disabled)', $preprocessing).length) {
-				if (type == <?= ZBX_PREPROC_CSV_TO_JSON ?>) {
-					if (jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).is(':checked')) {
+			if (type == <?= ZBX_PREPROC_SNMP_WALK_TO_JSON ?>) {
+				const inputs = document.querySelectorAll(`.group-json-mapping[data-index="${num}"] input`);
+
+				[...inputs].map((input) => params.push(input.value));
+			} else {
+				if (jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).length) {
+					params.push(jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).val());
+				}
+				if (jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).length) {
+					params.push(jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
+				}
+				if (jQuery('[name="preprocessing[' + num + '][params][2]"]:not(:disabled)', $preprocessing).length) {
+					if (type == <?= ZBX_PREPROC_CSV_TO_JSON ?>) {
+						if (jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).is(':checked')) {
+							params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
+						}
+					}
+					else {
 						params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
 					}
-				}
-				else {
-					params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
 				}
 			}
 
@@ -156,7 +162,7 @@
 					verify_peer: form_data['verify_peer'] || 0
 				};
 
-				if (properties.authtype != <?= HTTPTEST_AUTH_NONE ?>) {
+				if (properties.authtype != <?= ZBX_HTTP_AUTH_NONE ?>) {
 					properties = jQuery.extend(properties, {
 						http_username: form_data['http_username'],
 						http_password: form_data['http_password']

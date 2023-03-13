@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@
 #include "zbxtime.h"
 #include "zbxcachehistory.h"
 #include "zbxexport.h"
+#include "zbxprof.h"
 
 extern int				CONFIG_HISTSYNCER_FREQUENCY;
-extern unsigned char			program_type;
 static sigset_t				orig_mask;
 
 static zbx_export_file_t	*problems_export = NULL;
@@ -86,7 +86,7 @@ static void	zbx_db_flush_timer_queue(void)
 
 static void	db_trigger_queue_cleanup(void)
 {
-	DBexecute("delete from trigger_queue");
+	zbx_db_execute("delete from trigger_queue");
 	zbx_db_trigger_queue_unlock();
 }
 
@@ -111,8 +111,8 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type), server_num,
-			(process_name = get_process_type_string(process_type)), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
+			server_num, (process_name = get_process_type_string(process_type)), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -126,7 +126,7 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 	zbx_block_signals(&orig_mask);
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	if (1 == process_num)
 		db_trigger_queue_cleanup();
@@ -146,6 +146,8 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	{
 		sec = zbx_time();
 
+		zbx_prof_update(get_process_type_string(process_type), sec);
+
 		if (0 != sleeptime)
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
 
@@ -155,7 +157,9 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 		zbx_block_signals(&orig_mask);
+		zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
+		zbx_prof_end();
 
 		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())
 			zbx_db_flush_timer_queue();
@@ -173,7 +177,7 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 			stats_offset = 0;
 			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, "processed %d values", total_values_num);
 
-			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			if (0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, ", %d triggers",
 						total_triggers_num);
@@ -206,7 +210,7 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	if (SUCCEED != zbx_db_trigger_queue_locked())
 		zbx_db_flush_timer_queue();
 
-	DBclose();
+	zbx_db_close();
 	zbx_unblock_signals(&orig_mask);
 
 	zbx_log_sync_history_cache_progress();

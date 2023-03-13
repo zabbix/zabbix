@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -195,7 +195,7 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
  *                         default loglevel command handler                   *
  *                                                                            *
  ******************************************************************************/
-static int	rtc_process_loglevel(int direction, const char *data, char **result)
+static int	rtc_process_option(int direction, const char *data, char **result)
 {
 	struct zbx_json_parse	jp;
 	char			buf[MAX_STRING_LEN];
@@ -269,7 +269,8 @@ static int	rtc_process_diaginfo(const char *data, char **result)
 
 	if (0 == strcmp(buf, "all"))
 	{
-		scope = (1 << ZBX_DIAGINFO_VALUECACHE) | (1 << ZBX_DIAGINFO_LLD) | (1 << ZBX_DIAGINFO_ALERTING);
+		scope = (1 << ZBX_DIAGINFO_VALUECACHE) | (1 << ZBX_DIAGINFO_LLD) | (1 << ZBX_DIAGINFO_ALERTING) |
+				(1 << ZBX_DIAGINFO_CONNECTOR);
 	}
 	else if (0 == strcmp(buf, ZBX_DIAG_VALUECACHE))
 	{
@@ -482,15 +483,15 @@ static void	rtc_ha_failover_delay(const char *data, char **out)
  *                         rtc command handler                                *
  *                                                                            *
  ******************************************************************************/
-int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
+int	rtc_process_request_ex_server(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
 {
 	switch (code)
 	{
 #if defined(HAVE_SIGQUEUE)
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
-			return rtc_process_loglevel(1, (const char *)data, result);
+			return rtc_process_option(1, (const char *)data, result);
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
-			return rtc_process_loglevel(-1, (const char *)data, result);
+			return rtc_process_option(-1, (const char *)data, result);
 #endif
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
 			zbx_service_reload_cache();

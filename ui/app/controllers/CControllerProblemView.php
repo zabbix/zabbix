@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 class CControllerProblemView extends CControllerProblem {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -42,6 +42,7 @@ class CControllerProblemView extends CControllerProblem {
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
 			'show_tags' =>				'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
+			'show_symptoms' =>			'in 0,1',
 			'show_suppressed' =>		'in 0,1',
 			'unacknowledged' =>			'in 0,1',
 			'compact_view' =>			'in 0,1',
@@ -125,6 +126,7 @@ class CControllerProblemView extends CControllerProblem {
 				'support_custom_time' => 1,
 				'expanded' => $profile->expanded,
 				'page' => $filter['page'],
+				'csrf_token' => CCsrfTokenHelper::get('tabfilter'),
 				'timeselector' => [
 					'from' => $profile->from,
 					'to' => $profile->to,

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2492,6 +2492,10 @@ class CAction extends CApiService {
 											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])], 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => SEC_PER_MIN.':'.SEC_PER_WEEK, 'length' => DB::getFieldLength('actions', 'esc_period')],
 											['else' => true, 'type' => API_UNEXPECTED]
 			]],
+			'pause_symptoms' => 		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_INT32, 'in' => implode(',', [ACTION_PAUSE_SYMPTOMS_FALSE, ACTION_PAUSE_SYMPTOMS_TRUE])],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'pause_suppressed' =>		['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_INT32, 'in' => implode(',', [ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE])],
 											['else' => true, 'type' => API_UNEXPECTED]
@@ -2566,7 +2570,7 @@ class CAction extends CApiService {
 
 		$db_actions = $this->get([
 			'output' => ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed',
-				'notify_if_canceled'
+				'notify_if_canceled', 'pause_symptoms'
 			],
 			'actionids' => array_column($actions, 'actionid'),
 			'editable' => true,
@@ -2587,6 +2591,10 @@ class CAction extends CApiService {
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])],
 			'esc_period' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])], 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => SEC_PER_MIN.':'.SEC_PER_WEEK, 'length' => DB::getFieldLength('actions', 'esc_period')],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'pause_symptoms' => 		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_INT32, 'in' => implode(',', [ACTION_PAUSE_SYMPTOMS_FALSE, ACTION_PAUSE_SYMPTOMS_TRUE])],
 											['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'pause_suppressed' =>		['type' => API_MULTIPLE, 'rules' => [

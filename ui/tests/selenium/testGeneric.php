@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
@@ -60,14 +61,14 @@ class testGeneric extends CLegacyWebTest {
 			['zabbix.php?action=templategroup.list',	'Configuration of template groups'],
 			['templates.php',					'Configuration of templates'],
 			[self::HOST_LIST_PAGE,				'Configuration of hosts'],
-			['maintenance.php',				'Configuration of maintenance periods'],
+			['zabbix.php?action=maintenance.list',		'Configuration of maintenance periods'],
 			['httpconf.php',					'Configuration of web monitoring'],
 
-			['actionconf.php',					'Configuration of actions'],
-			['actionconf.php?eventsource=0',	'Configuration of actions'],
-			['actionconf.php?eventsource=1',	'Configuration of actions'],
-			['actionconf.php?eventsource=2',	'Configuration of actions'],
-			['actionconf.php?eventsource=3',	'Configuration of actions'],
+			['zabbix.php?action=action.list&eventsource=0',	'Configuration of actions'],
+			['zabbix.php?action=action.list&eventsource=1',	'Configuration of actions'],
+			['zabbix.php?action=action.list&eventsource=2',	'Configuration of actions'],
+			['zabbix.php?action=action.list&eventsource=3',	'Configuration of actions'],
+			['zabbix.php?action=action.list&eventsource=4',	'Configuration of actions'],
 
 			['sysmaps.php',							'Configuration of network maps'],
 			['zabbix.php?action=discovery.list',	'Configuration of discovery rules'],

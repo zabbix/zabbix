@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@
 $this->includeJsFile('administration.authentication.edit.js.php');
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('authentication')))->removeId())
 	->addVar('action', $data['action_submit'])
 	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
 	->setId('authentication-form')
@@ -145,7 +147,11 @@ $auth_tab = (new CFormGrid())
 // HTTP authentication fields.
 $http_tab = (new CFormGrid())
 	->addItem([
-		new CLabel(_('Enable HTTP authentication'), 'http_auth_enabled'),
+		new CLabel([_('Enable HTTP authentication'),
+			makeHelpIcon(
+				_("If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix.")
+			)
+		], 'http_auth_enabled'),
 		new CFormField(
 			(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
 				->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
@@ -505,7 +511,7 @@ $saml_tab = (new CFormGrid())
 		(new CLabel([
 			_('Media type mapping'),
 			makeHelpIcon(
-				_('Map user’s SAML media attributes (e.g. email) to Zabbix user media for sending notifications.')
+				_("Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications.")
 			)
 		]))
 			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
@@ -555,7 +561,7 @@ $saml_tab = (new CFormGrid())
 	]);
 
 	$form->addItem((new CTabView())
-		->setSelected($data['form_refresh'] ? null : 0)
+		->setSelected($data['form_refresh'] != 0 ? null : 0)
 		->addTab('auth', _('Authentication'), $auth_tab)
 		->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
 		->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)

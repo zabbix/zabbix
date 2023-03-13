@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -284,7 +284,7 @@ void	zbx_usage(void)
 }
 
 static const char	copyright_message[] =
-	"Copyright (C) 2022 Zabbix SIA\n"
+	"Copyright (C) 2023 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <https://www.gnu.org/licenses/>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
@@ -525,8 +525,8 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 		case ITEM_TYPE_TELNET:
 			return INTERFACE_TYPE_ANY;
 		case ITEM_TYPE_HTTPAGENT:
-			return INTERFACE_TYPE_OPT;
 		case ITEM_TYPE_SCRIPT:
+			return INTERFACE_TYPE_OPT;
 		default:
 			return INTERFACE_TYPE_UNKNOWN;
 	}
@@ -605,7 +605,7 @@ static void	update_resolver_conf(void)
  * Parameters: time_now - [IN] the time for compare in seconds                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_update_env(double time_now)
+void	__zbx_update_env(double time_now)
 {
 	static double	time_update = 0;
 
@@ -666,11 +666,4 @@ zbx_uint64_t	suffix2factor(char c)
 		default:
 			return 1;
 	}
-}
-
-void	zbx_free_tag(zbx_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
 }

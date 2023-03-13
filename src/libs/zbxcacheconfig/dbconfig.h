@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -539,6 +539,7 @@ typedef struct
 	unsigned char	bulk;
 	unsigned char	max_succeed;
 	unsigned char	min_fail;
+	int		max_repetitions;
 }
 ZBX_DC_SNMPINTERFACE;
 
@@ -857,11 +858,48 @@ zbx_dc_dcheck_t;
 
 typedef struct
 {
+	zbx_uint64_t	connectortagid;
+	zbx_uint64_t	connectorid;
+	unsigned char	op;		/* condition operator */
+	const char	*tag;
+	const char	*value;
+}
+zbx_dc_connector_tag_t;
+
+ZBX_PTR_VECTOR_DECL(dc_connector_tag, zbx_dc_connector_tag_t *)
+
+typedef struct
+{
+	zbx_uint64_t			connectorid;
+	unsigned char			protocol;
+	unsigned char			data_type;
+	const char			*url;
+	int				max_records;
+	int				max_senders;
+	const char			*timeout;
+	unsigned char			max_attempts;
+	const char			*token;
+	const char			*http_proxy;
+	unsigned char			authtype;
+	const char			*username;
+	const char			*password;
+	unsigned char			verify_peer;
+	unsigned char			verify_host;
+	const char			*ssl_cert_file;
+	const char			*ssl_key_file;
+	const char			*ssl_key_password;
+	int				status;
+	int				tags_evaltype;
+	zbx_vector_dc_connector_tag_t	tags;
+}
+zbx_dc_connector_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
-	int			item_sync_ts;
 
 	unsigned int		internal_actions;		/* number of enabled internal actions */
 	unsigned int		auto_registration_actions;	/* number of enabled auto resistration actions */
@@ -948,6 +986,8 @@ typedef struct
 	zbx_hashset_t		httptest_fields;
 	zbx_hashset_t		httpsteps;
 	zbx_hashset_t		httpstep_fields;
+	zbx_hashset_t		connectors;
+	zbx_hashset_t		connector_tags;
 	zbx_hashset_t		sessions[ZBX_SESSION_TYPE_COUNT];
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
@@ -1035,6 +1075,6 @@ int		DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interfac
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
 
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_dbsync_t *gmacros,
-		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls);
+		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault);
 
 #endif

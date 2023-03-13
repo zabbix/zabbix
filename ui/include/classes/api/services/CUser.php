@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -383,6 +383,7 @@ class CUser extends CApiService {
 			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
+			'current_passwd' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
 			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
@@ -462,9 +463,21 @@ class CUser extends CApiService {
 				$usernames[] = $user['username'];
 			}
 
+			if (array_key_exists('current_passwd', $user)) {
+				if (!password_verify($user['current_passwd'], $db_user['passwd'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect current password.'));
+				}
+			}
+
 			if (array_key_exists('passwd', $user) && $this->checkPassword($user + $db_user, '/'.($i + 1).'/passwd')) {
+				if ($user['userid'] == self::$userData['userid'] && !array_key_exists('current_passwd', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Current password is mandatory.'));
+				}
+
 				$user['passwd'] = password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST]);
 			}
+
+			unset($user['current_passwd']);
 
 			if (array_key_exists('roleid', $user) && $user['roleid'] && $user['roleid'] != $db_user['roleid']) {
 				if ($db_user['roleid'] == $readonly_superadmin_role['roleid']) {
@@ -582,6 +595,7 @@ class CUser extends CApiService {
 			DB::update('users', $upd_users);
 		}
 
+		self::terminateActiveSessionsOnPasswordUpdate($users);
 		self::updateUsersGroups($users, $db_users);
 		self::updateMedias($users, $db_users);
 	}
@@ -1015,6 +1029,24 @@ class CUser extends CApiService {
 		}
 
 		return $user;
+	}
+
+	/**
+	 * Terminate all active sessions for user whose password was successfully updated.
+	 *
+	 * @static
+	 *
+	 * @param array      $users
+	 */
+	private static function terminateActiveSessionsOnPasswordUpdate(array $users): void {
+		foreach ($users as $user) {
+			if (array_key_exists('passwd', $user)) {
+				DB::update('sessions', [
+					'values' => ['status' => ZBX_SESSION_PASSIVE],
+					'where' => ['userid' => $user['userid']]
+				]);
+			}
+		}
 	}
 
 	/**
@@ -1670,7 +1702,7 @@ class CUser extends CApiService {
 		$time = time();
 
 		$db_sessions = DB::select('sessions', [
-			'output' => ['userid', 'lastaccess'],
+			'output' => ['userid', 'lastaccess', 'secret'],
 			'sessionids' => $sessionid,
 			'filter' => ['status' => ZBX_SESSION_ACTIVE]
 		]);
@@ -1696,6 +1728,7 @@ class CUser extends CApiService {
 
 		$db_user = $db_users[0];
 		$db_user['sessionid'] = $sessionid;
+		$db_user['secret'] = $db_session['secret'];
 
 		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
 
@@ -2153,12 +2186,14 @@ class CUser extends CApiService {
 	 */
 	private static function createSession(array $db_user): array {
 		$db_user['sessionid'] = CEncryptHelper::generateKey();
+		$db_user['secret'] = CEncryptHelper::generateKey();
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
 			'userid' => $db_user['userid'],
 			'lastaccess' => time(),
-			'status' => ZBX_SESSION_ACTIVE
+			'status' => ZBX_SESSION_ACTIVE,
+			'secret' => $db_user['secret']
 		]], false);
 
 		self::$userData = $db_user;

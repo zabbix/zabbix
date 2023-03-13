@@ -447,6 +447,10 @@ msgstr ""
 msgid "ADD OVERRIDE"
 msgstr ""
 
+#: tests/selenium/modules/clock32/Widget.php:46
+msgid "ALARM CLOCK"
+msgstr ""
+
 #: app/views/administration.user.list.php:115
 msgid "API access"
 msgstr ""
@@ -951,6 +955,14 @@ msgstr ""
 msgid "Add from"
 msgstr ""
 
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
+
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "Adaugă server"
@@ -1084,6 +1096,10 @@ msgstr ""
 #: include/views/monitoring.sysmap.edit.php:160
 msgid "Advanced labels"
 msgstr "Etichete avansate"
+
+#: app/views/popup.import.php:175
+msgid "Advanced options"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -1252,6 +1268,10 @@ msgstr "Servere permise"
 
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
+msgstr ""
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:882
@@ -1806,6 +1826,14 @@ msgstr ""
 msgid "Basic"
 msgstr ""
 
+#: app/views/connector.edit.php:136
+msgid "Bearer"
+msgstr ""
+
+#: app/views/connector.edit.php:156
+msgid "Bearer token"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
 msgstr ""
@@ -2349,6 +2377,11 @@ msgstr "Nu se poate crea o altă conexiune la baza de date."
 msgid "Cannot create circular dependencies."
 msgstr "Nu se pot crea dependințe circulare."
 
+#: app/controllers/CControllerConnectorCreate.php:89
+#: app/controllers/CControllerConnectorCreate.php:164
+msgid "Cannot create connector"
+msgstr ""
+
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
 msgstr "Nu se poate crea dependință cu trigger-ul însuși."
@@ -2365,6 +2398,11 @@ msgstr "Nu se poate crea regula de detecție"
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "Nu se poate crea icon hartă"
+
+#: app/controllers/CControllerMaintenanceCreate.php:72
+#: app/controllers/CControllerMaintenanceCreate.php:150
+msgid "Cannot create maintenance period"
+msgstr ""
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2421,6 +2459,13 @@ msgstr "Nu se poate șterge acțiunea"
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
 msgstr ""
+
+#: app/controllers/CControllerConnectorDelete.php:68
+msgid "Cannot delete connector"
+msgid_plural "Cannot delete connectors"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2552,6 +2597,13 @@ msgstr "Nu se pot șterge elementele"
 #: maintenance.php:224
 msgid "Cannot delete maintenance"
 msgstr "Nu se poate șterge mentenanța"
+
+#: app/controllers/CControllerMaintenanceDelete.php:71
+msgid "Cannot delete maintenance period"
+msgid_plural "Cannot delete maintenance periods"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -2744,6 +2796,13 @@ msgstr[0] "Nu se poate dezactiva acţiunea"
 msgstr[1] "Nu se pot dezactiva acţiunile"
 msgstr[2] "Nu se pot dezactiva acţiunile"
 
+#: app/controllers/CControllerConnectorDisable.php:77
+msgid "Cannot disable connector"
+msgid_plural "Cannot disable connectors"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
@@ -2839,6 +2898,13 @@ msgid_plural "Cannot enable actions"
 msgstr[0] "Nu se poate activa acțiunea"
 msgstr[1] "Nu se pot activa acțiunile"
 msgstr[2] "Nu se pot activa acțiunile"
+
+#: app/controllers/CControllerConnectorEnable.php:77
+msgid "Cannot enable connector"
+msgid_plural "Cannot enable connectors"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
@@ -3750,6 +3816,11 @@ msgstr ""
 msgid "Cannot update configuration"
 msgstr "Nu se poate actualiza configurația"
 
+#: app/controllers/CControllerConnectorUpdate.php:90
+#: app/controllers/CControllerConnectorUpdate.php:173
+msgid "Cannot update connector"
+msgstr ""
+
 #: app/controllers/CControllerCorrelationCreate.php:47
 #: app/controllers/CControllerCorrelationUpdate.php:48
 #: app/controllers/CControllerCorrelationUpdate.php:125
@@ -3773,6 +3844,10 @@ msgid_plural "Cannot update events"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr ""
 
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
@@ -3857,6 +3932,11 @@ msgstr "Nu se pot actualiza macro-urile"
 #: maintenance.php:119
 msgid "Cannot update maintenance"
 msgstr "Nu se poate actualiza mentenanța"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:73
+#: app/controllers/CControllerMaintenanceUpdate.php:152
+msgid "Cannot update maintenance period"
+msgstr ""
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -4018,6 +4098,11 @@ msgstr ""
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr ""
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -4073,6 +4158,10 @@ msgstr "Modifică parola"
 
 #: include/items.inc.php:1844
 msgid "Change per second"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
 msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:71
@@ -4650,6 +4739,10 @@ msgstr ""
 msgid "Configure JIT provisioning"
 msgstr ""
 
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "Text de confirmare"
@@ -4772,6 +4865,51 @@ msgstr ""
 msgid "Connections to proxy"
 msgstr ""
 
+#: app/controllers/CControllerAuditLogList.php:212
+#: app/views/connector.edit.php:283 app/views/connector.edit.php:297
+msgid "Connector"
+msgstr ""
+
+#: include/classes/api/services/CConnector.php:446
+#, c-format
+msgid "Connector \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerConnectorCreate.php:156
+msgid "Connector created"
+msgstr ""
+
+#: app/controllers/CControllerConnectorDelete.php:60
+msgid "Connector deleted"
+msgid_plural "Connectors deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerConnectorDisable.php:69
+msgid "Connector disabled"
+msgid_plural "Connectors disabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerConnectorEnable.php:69
+msgid "Connector enabled"
+msgid_plural "Connectors enabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerConnectorUpdate.php:165
+msgid "Connector updated"
+msgstr ""
+
+#: app/controllers/CControllerConnectorList.php:104
+#: app/views/connector.list.php:132 include/classes/helpers/CMenuHelper.php:360
+#: include/html.inc.php:891
+msgid "Connectors"
+msgstr ""
+
 #: include/views/monitoring.sysmap.list.php:85
 #: include/views/monitoring.sysmap.list.php:86
 msgid "Constructor"
@@ -4875,6 +5013,14 @@ msgstr "Numărul contractului"
 msgid "Convert to JSON"
 msgstr ""
 
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
 msgid "Coordinates"
@@ -4887,6 +5033,30 @@ msgstr "Coordonate"
 #: jsLoader.php:164 jsLoader.php:281
 msgid "Copy"
 msgstr "Copiază"
+
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
@@ -4957,6 +5127,10 @@ msgstr ""
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1802
+msgid "Count of values enqueued in the connector queue."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1638
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr ""
@@ -4992,6 +5166,10 @@ msgstr ""
 
 #: app/views/administration.image.list.php:62
 msgid "Create background"
+msgstr ""
+
+#: app/views/connector.list.php:139
+msgid "Create connector"
 msgstr ""
 
 #: app/views/configuration.correlation.list.php:37
@@ -5235,6 +5413,15 @@ msgstr ""
 msgid "Current host"
 msgstr "Serverul curent"
 
+#: app/controllers/CControllerUserUpdateGeneral.php:85
+#: app/views/administration.user.edit.php:174
+msgid "Current password"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:474
+msgid "Current password is mandatory."
+msgstr ""
+
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
 msgstr ""
@@ -5472,12 +5659,20 @@ msgstr "Verificare date"
 msgid "Data set"
 msgstr ""
 
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
 #: app/views/administration.housekeeping.edit.php:115
 #: app/views/administration.housekeeping.edit.php:132
 #: app/views/administration.housekeeping.edit.php:149
 msgid "Data storage period"
+msgstr ""
+
+#: app/views/connector.edit.php:54 app/views/connector.list.php:73
+msgid "Data type"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:565
@@ -5897,9 +6092,21 @@ msgstr ""
 msgid "Delete selected SLAs?"
 msgstr ""
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "Ștergere acțiuni selectate?"
+
+#: app/views/connector.edit.php:332 app/views/js/connector.list.js.php:129
+msgid "Delete selected connector?"
+msgstr ""
+
+#: app/views/js/connector.list.js.php:128
+msgid "Delete selected connectors?"
+msgstr ""
 
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
@@ -5973,6 +6180,10 @@ msgstr "Ștergere elemente prototip selectațe?"
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
 msgstr "Ștergere elementele selectate?"
+
+#: app/views/js/maintenance.list.js.php:88
+msgid "Delete selected maintenance period?"
+msgstr ""
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -6200,6 +6411,10 @@ msgstr ""
 msgid "Description"
 msgstr "Descriere"
 
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr ""
+
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
 #: app/views/js/reports.auditlog.list.js.php:153
@@ -6320,9 +6535,21 @@ msgstr ""
 msgid "Disable selected SLAs?"
 msgstr ""
 
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
 msgstr "Dezactivare acțiuni selectate?"
+
+#: app/views/js/connector.list.js.php:114
+msgid "Disable selected connector?"
+msgstr ""
+
+#: app/views/js/connector.list.js.php:113
+msgid "Disable selected connectors?"
+msgstr ""
 
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
@@ -7027,6 +7254,10 @@ msgstr "Activare"
 msgid "Enable HTTP authentication"
 msgstr ""
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
 msgid "Enable JIT provisioning"
@@ -7115,9 +7346,21 @@ msgstr ""
 msgid "Enable selected SLAs?"
 msgstr ""
 
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
 msgstr "Activare acțiuni selectate?"
+
+#: app/views/js/connector.list.js.php:99
+msgid "Enable selected connector?"
+msgstr ""
+
+#: app/views/js/connector.list.js.php:98
+msgid "Enable selected connectors?"
+msgstr ""
 
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
@@ -7405,6 +7648,10 @@ msgid_plural "Events updated"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: app/views/connector.edit.php:58 app/views/connector.list.php:99
+msgid "Events"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
@@ -7780,6 +8027,11 @@ msgstr ""
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr ""
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -7794,6 +8046,13 @@ msgstr "Câmpul \"%1$s\" nu este șir."
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Câmpul \"%1$s\" trebuie să lipsească."
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -9356,6 +9615,10 @@ msgstr ""
 msgid "Identification of the system. Returns string"
 msgstr ""
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -9504,6 +9767,11 @@ msgstr "Import cu succes"
 #: hostinventories.php:192
 #, c-format
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
+msgstr ""
+
+#: app/views/js/administration.user.edit.js.php:61
+#: app/views/js/administration.userprofile.edit.js.php:69
+msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
 msgstr ""
 
 #: include/html.inc.php:277 include/maps.inc.php:409
@@ -9876,6 +10144,10 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:1805
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:468
+msgid "Incorrect current password."
 msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
@@ -10569,6 +10841,13 @@ msgstr "Instalare"
 #: include/hosts.inc.php:259
 msgid "Installer name"
 msgstr "Nume de instalare"
+
+#: include/forms.inc.php:1392 include/forms.inc.php:1425
+#: include/views/js/item.preprocessing.js.php:142
+#: include/views/js/item.preprocessing.js.php:180
+#: include/views/js/item.preprocessing.js.php:227
+msgid "Integer from BITS"
+msgstr ""
 
 #: include/classes/helpers/CMenuHelper.php:360
 msgid "Integrations"
@@ -12101,6 +12380,13 @@ msgstr "Adresă MAC A"
 msgid "MAC address B"
 msgstr "Adresă MAC B"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr ""
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -12183,9 +12469,24 @@ msgstr "Mentenanță ștearsă"
 msgid "Maintenance period"
 msgstr "Perioadă de mentenanță"
 
+#: app/controllers/CControllerMaintenanceCreate.php:142
+msgid "Maintenance period created"
+msgstr ""
+
+#: app/controllers/CControllerMaintenanceDelete.php:61
+msgid "Maintenance period deleted"
+msgid_plural "Maintenance periods deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
 msgstr "Lungime perioadă de mentenanță"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:144
+msgid "Maintenance period updated"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -12339,6 +12640,14 @@ msgid "Map update failed."
 msgstr ""
 
 #: app/views/popup.ldap.edit.php:257
+msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:513
+msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:257
 msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
 msgstr ""
 
@@ -12382,6 +12691,10 @@ msgstr "Mar"
 msgid "March"
 msgstr "Martie"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr "Marchează elementele pe schimbarea de status a trigerilor"
@@ -12393,6 +12706,10 @@ msgstr "Marchează pe alții"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "Marchează selecția"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -12465,6 +12782,27 @@ msgstr ""
 
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
+msgstr ""
+
+#: app/views/connector.edit.php:171
+msgid "Max records per message"
+msgstr ""
+
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and walk only."
 msgstr ""
 
 #: app/views/administration.geomaps.edit.php:98
@@ -13309,6 +13647,11 @@ msgstr ""
 msgid "New SLA"
 msgstr ""
 
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
+msgstr ""
+
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
 msgstr ""
@@ -13322,6 +13665,10 @@ msgstr ""
 #: app/controllers/CControllerPopupConditionOperations.php:68
 msgid "New condition"
 msgstr "Condiție nouă"
+
+#: app/views/connector.edit.php:312 app/views/connector.edit.php:341
+msgid "New connector"
+msgstr ""
 
 #: app/controllers/CControllerDashboardView.php:154
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
@@ -13357,6 +13704,11 @@ msgstr ""
 #: app/views/configuration.hostgroup.edit.php:52
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
+msgstr ""
+
+#: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
+#: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
+msgid "New maintenance period"
 msgstr ""
 
 #: app/views/popup.mediatypemapping.edit.php:73
@@ -14240,6 +14592,17 @@ msgstr "Numeric (nesemnat)"
 msgid "OEM"
 msgstr "OEM"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr ""
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr ""
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14446,6 +14809,10 @@ msgstr "Opera"
 
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
 msgstr ""
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
@@ -14992,17 +15359,41 @@ msgstr ""
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr ""
 
+#: include/views/configuration.host.discovery.edit.php:68
+msgid "Parent discovery rule"
+msgstr ""
+
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.prototype.edit.php:64
 msgid "Parent discovery rules"
 msgstr "Reguli de detecție părinte"
 
+#: include/views/configuration.graph.edit.php:88
+msgid "Parent graph"
+msgstr ""
+
+#: include/views/configuration.graph.edit.php:91
+msgid "Parent graph prototype"
+msgstr ""
+
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "Grafice părinte"
 
+#: include/views/configuration.host.prototype.edit.php:81
+msgid "Parent host prototype"
+msgstr ""
+
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
+msgstr ""
+
+#: include/views/configuration.item.edit.php:71
+msgid "Parent item"
+msgstr ""
+
+#: include/views/configuration.item.prototype.edit.php:70
+msgid "Parent item prototype"
 msgstr ""
 
 #: include/views/configuration.item.edit.php:57
@@ -15015,14 +15406,30 @@ msgstr "Itemi părinte"
 msgid "Parent services"
 msgstr ""
 
+#: app/partials/configuration.tags.tab.php:38
+msgid "Parent template"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:42
 msgid "Parent templates"
+msgstr ""
+
+#: include/views/configuration.triggers.edit.php:104
+msgid "Parent trigger"
+msgstr ""
+
+#: include/views/configuration.trigger.prototype.edit.php:95
+msgid "Parent trigger prototype"
 msgstr ""
 
 #: include/views/configuration.trigger.prototype.edit.php:69
 #: include/views/configuration.triggers.edit.php:80
 msgid "Parent triggers"
 msgstr "Triggeri părinte"
+
+#: include/views/configuration.httpconf.edit.php:76
+msgid "Parent web scenario"
+msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:59
 msgid "Parent web scenarios"
@@ -15082,6 +15489,10 @@ msgstr "Parolă"
 msgid "Password (once again)"
 msgstr "Parolă (din nou)"
 
+#: app/views/administration.user.edit.php:199
+msgid "Password can only be changed for users using the internal Zabbix authentication."
+msgstr ""
+
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
 msgstr ""
@@ -15124,6 +15535,10 @@ msgstr ""
 
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
+msgstr ""
+
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
 msgstr ""
 
 #: include/classes/debug/CProfiler.php:163
@@ -15320,6 +15735,10 @@ msgstr ""
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
+#: include/classes/core/ZBase.php:764
+msgid "Possibly the session has expired or the password was changed."
 msgstr ""
 
 #: app/views/popup.httpstep.php:90
@@ -15604,6 +16023,10 @@ msgstr ""
 msgid "Properties"
 msgstr ""
 
+#: app/views/connector.edit.php:47
+msgid "Protocol"
+msgstr ""
+
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
 #, c-format
@@ -15817,6 +16240,10 @@ msgstr ""
 #: include/hosts.inc.php:37
 msgid "RMCP+"
 msgstr "RMCP+"
+
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr ""
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -16899,6 +17326,14 @@ msgstr "Cheie SNMP trap invalidă."
 msgid "SNMP version"
 msgstr ""
 
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
+msgstr ""
+
 #: include/items.inc.php:1299
 #, c-format
 msgid "SNMPv%1$d"
@@ -17171,6 +17606,10 @@ msgid_plural "Scripts deleted"
 msgstr[0] "Script șters"
 msgstr[1] "Scripturile șterse"
 msgstr[2] "Scripturile șterse"
+
+#: app/views/popup.mediatypetest.edit.php:60
+msgid "Script does not have parameters."
+msgstr ""
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
@@ -17812,6 +18251,11 @@ msgstr ""
 msgid "Show suppressed problems"
 msgstr ""
 
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
@@ -18431,6 +18875,10 @@ msgstr ""
 msgid "Support"
 msgstr "Suport"
 
+#: app/partials/administration.system.info.php:124
+msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
+msgstr ""
+
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
 msgstr ""
@@ -18480,6 +18928,11 @@ msgstr "Suedeză (sv_SE)"
 #: app/views/js/administration.authentication.edit.js.php:36
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Schimbarea metodei de autentificare va reseta totul cu excepția acestei sesiuni! Continuați?"
+
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
+msgstr ""
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -19117,6 +19570,11 @@ msgstr ""
 #: app/views/administration.user.edit.php:255
 msgid "Theme"
 msgstr "Temă"
+
+#: app/views/administration.mediatype.edit.php:139
+#: app/views/popup.mediatypetest.edit.php:47
+msgid "These parameters will be passed to the script as command-line arguments in the specified order."
+msgstr ""
 
 #: include/func.inc.php:2468
 msgid "This day last week"
@@ -19942,6 +20400,10 @@ msgstr ""
 msgid "UNKNOWN"
 msgstr "NECUNOSCUT"
 
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr ""
+
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
 #: include/classes/widgets/CWidgetConfig.php:73
@@ -20002,6 +20464,13 @@ msgstr ""
 #: include/views/monitoring.sysmap.edit.php:313 jsLoader.php:385
 msgid "URLs"
 msgstr "URL-uri"
+
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
@@ -20105,6 +20574,13 @@ msgstr ""
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "Deblocare utilizatori selectați?"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20438,6 +20914,10 @@ msgstr ""
 msgid "Updated status of host \"%1$s\"."
 msgstr ""
 
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr ""
+
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
 msgstr "Încarcă"
@@ -20472,6 +20952,10 @@ msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
 msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:36
@@ -21477,6 +21961,10 @@ msgstr ""
 msgid "Vendor"
 msgstr "Vânzător"
 
+#: include/views/configuration.template.edit.php:93
+msgid "Vendor and version"
+msgstr ""
+
 #: include/items.inc.php:43
 msgid "Verbose"
 msgstr "Detaliat"
@@ -22121,6 +22609,10 @@ msgstr "Zabbix"
 msgid "Zabbix Integrations"
 msgstr ""
 
+#: app/views/connector.edit.php:49
+msgid "Zabbix Streaming Protocol v1.0"
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:356
 msgid "Zabbix Technical Support"
 msgstr ""
@@ -22596,6 +23088,10 @@ msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:488
 msgid "both username and password should be either present or empty"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:522
+msgid "both vendor_name and vendor_version should be either present or empty"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:484
@@ -23189,6 +23685,12 @@ msgstr "sintaxă incorectă lângă \"%1$s\""
 msgid "incorrect usage of function \"%1$s\""
 msgstr ""
 
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr ""
@@ -23223,6 +23725,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
+msgstr ""
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
 msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
@@ -23666,6 +24172,14 @@ msgstr ""
 
 #: include/classes/api/services/CEvent.php:757
 msgid "no permissions to close problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
 msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:168

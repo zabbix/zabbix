@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
-
-extern unsigned char			program_type;
 
 extern int		CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY;
 
@@ -57,32 +55,61 @@ static int	housekeep_problems_without_triggers(void)
 
 	zbx_vector_uint64_create(&ids);
 
-	result = DBselect("select eventid"
+	result = zbx_db_select("select eventid"
 			" from problem"
 			" where source=%d"
 				" and object=%d"
 				" and not exists (select NULL from triggers where triggerid=objectid)",
 				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	id;
 
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(&ids, id);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (0 != ids.values_num)
 	{
-		if (SUCCEED == DBexecute_multiple_query("delete from problem where", "eventid", &ids))
+		if (SUCCEED != zbx_db_execute_multiple_query(
+				"update problem"
+				" set cause_eventid=null"
+				" where", "cause_eventid", &ids))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Failed to unlink problem symptoms while housekeeping a cause"
+					" problem without a trigger");
+			goto fail;
+		}
+
+		if (SUCCEED != zbx_db_execute_multiple_query(
+				"delete"
+				" from event_symptom"
+				" where", "cause_eventid", &ids))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Failed to unlink event symptoms while housekeeping a cause"
+					" problem without a trigger");
+			goto fail;
+		}
+
+		if (SUCCEED != zbx_db_execute_multiple_query(
+				"delete"
+				" from problem"
+				" where", "eventid", &ids))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Failed to delete a problem without a trigger");
+		}
+		else
+		{
 			deleted = ids.values_num;
+		}
 
 		housekeep_service_problems(&ids);
 	}
-
+fail:
 	zbx_vector_uint64_destroy(&ids);
 
 	return deleted;
@@ -101,13 +128,13 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	zbx_thread_server_trigger_housekeeper_args	*trigger_housekeeper_args_in =
 			(zbx_thread_server_trigger_housekeeper_args *) ((((zbx_thread_args_t *)args))->args);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s [startup idle for %d second(s)]", get_process_type_string(process_type),
 			CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
@@ -134,7 +161,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 		if (!ZBX_IS_RUNNING())
 			break;
 
-		zbx_update_env(zbx_time());
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		zbx_setproctitle("%s [removing deleted triggers problems]", get_process_type_string(process_type));
 
@@ -146,7 +173,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 				CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
 	}
 
-	DBclose();
+	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

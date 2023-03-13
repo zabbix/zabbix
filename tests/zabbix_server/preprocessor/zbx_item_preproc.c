@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,10 +27,15 @@
 #include "zbxcacheconfig.h"
 #include "zbxembed.h"
 #include "log.h"
+#include "zbxpreproc.h"
+#include "libs/zbxpreproc/pp_execute.h"
+#include "libs/zbxpreproc/preproc_snmp.h"
 
-#include "../../../src/zabbix_server/preprocessor/item_preproc.h"
-
-zbx_es_t	es_engine;
+#ifdef HAVE_NETSNMP
+#define SNMP_NO_DEBUGGING
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>
+#endif
 
 static int	str_to_preproc_type(const char *str)
 {
@@ -82,6 +87,10 @@ static int	str_to_preproc_type(const char *str)
 		return ZBX_PREPROC_CSV_TO_JSON;
 	if (0 == strcmp(str, "ZBX_PREPROC_STR_REPLACE"))
 		return ZBX_PREPROC_STR_REPLACE;
+	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_WALK_TO_JSON"))
+		return ZBX_PREPROC_SNMP_WALK_TO_JSON;
+	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_WALK_TO_VALUE"))
+		return ZBX_PREPROC_SNMP_WALK_TO_VALUE;
 
 	fail_msg("unknow preprocessing step type: %s", str);
 	return FAIL;
@@ -123,27 +132,27 @@ static void	read_history_value(const char *path, zbx_variant_t *value, zbx_times
 	zbx_variant_convert(value, zbx_mock_str_to_variant(zbx_mock_get_object_member_string(handle, "variant")));
 }
 
-static void	read_step(const char *path, zbx_preproc_op_t *op)
+static void	read_step(const char *path, zbx_pp_step_t *step)
 {
 	zbx_mock_handle_t	hop, hop_params, herror, herror_params;
 
 	hop = zbx_mock_get_parameter_handle(path);
-	op->type = str_to_preproc_type(zbx_mock_get_object_member_string(hop, "type"));
+	step->type = str_to_preproc_type(zbx_mock_get_object_member_string(hop, "type"));
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "params", &hop_params))
-		op->params = (char *)zbx_mock_get_object_member_string(hop, "params");
+		step->params = (char *)zbx_mock_get_object_member_string(hop, "params");
 	else
-		op->params = "";
+		step->params = "";
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "error_handler", &herror))
-		op->error_handler = str_to_preproc_error_handler(zbx_mock_get_object_member_string(hop, "error_handler"));
+		step->error_handler = str_to_preproc_error_handler(zbx_mock_get_object_member_string(hop, "error_handler"));
 	else
-		op->error_handler = ZBX_PREPROC_FAIL_DEFAULT;
+		step->error_handler = ZBX_PREPROC_FAIL_DEFAULT;
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "error_handler_params", &herror_params))
-		op->error_handler_params = (char *)zbx_mock_get_object_member_string(hop, "error_handler_params");
+		step->error_handler_params = (char *)zbx_mock_get_object_member_string(hop, "error_handler_params");
 	else
-		op->error_handler_params = "";
+		step->error_handler_params = "";
 }
 
 /******************************************************************************
@@ -174,19 +183,97 @@ static int	is_step_supported(int type)
 	}
 }
 
+#ifdef HAVE_NETSNMP
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if MIB can be translated to OID by the system. Absence of  *
+ *          MIB files in the system will cause failures of MIB translation    *
+ *          tests, and such tests should be skipped if MIB was not found.     *
+ *          configuration or other settings                                   *
+ *                                                                            *
+ * Parameters: op [IN] the preprocessing step operation                       *
+ *                                                                            *
+ * Return value: SUCCEED - MIB can be translated / MIB file exists            *
+ *               FAIL    - MIB cannot be translated / MIB file doesn't exist  *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_mib_existence(zbx_pp_step_t *op)
+{
+	int		ret = FAIL;
+	oid		oid_tmp[MAX_OID_LEN];
+	size_t		oid_len = MAX_OID_LEN;
+	char		*oid_str = NULL, *right = NULL;
+
+	if (ZBX_PREPROC_SNMP_WALK_TO_VALUE == op->type)
+	{
+		zbx_strsplit_first(op->params, '\n', &oid_str, &right);
+	}
+	else if (ZBX_PREPROC_SNMP_WALK_TO_JSON == op->type)
+	{
+		char	*ptr = op->params;
+		int	line_idx = 0;
+
+		while (line_idx != 1 && '\0' != *ptr)
+		{
+			if ('\n' == *ptr)
+				line_idx++;
+
+			ptr++;
+		}
+
+		zbx_strsplit_first(ptr, '\n', &oid_str, &right);
+	}
+	else
+		fail_msg("processing operation type %i is not compatible with SNMP preprocessing", op->type);
+
+	if (0 != get_node(oid_str, oid_tmp, &oid_len))
+		ret = SUCCEED;
+
+	zbx_free(oid_str);
+	zbx_free(right);
+
+	return ret;
+}
+#endif
+
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_variant_t			value, history_value;
-	unsigned char			value_type;
-	zbx_timespec_t			ts, history_ts, expected_history_ts;
-	zbx_preproc_op_t		op;
-	int				returned_ret, expected_ret;
-	char				*error = NULL;
+	zbx_variant_t		value, history_value;
+	unsigned char		value_type;
+	zbx_timespec_t		ts, history_ts, expected_history_ts;
+	zbx_pp_step_t		step;
+	int			returned_ret, expected_ret;
+	zbx_pp_context_t	ctx;
+
+	ZBX_UNUSED(state);
+
+#ifdef HAVE_NETSNMP
+	int				mib_translation_case = 0;
+
+	preproc_init_snmp();
+	pp_context_init(&ctx);
+
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
+		mib_translation_case = 1;
+#else
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
+		skip();
+#endif
 
 	ZBX_UNUSED(state);
 
 	read_value("in.value", &value_type, &value, &ts);
-	read_step("in.step", &op);
+	read_step("in.step", &step);
+
+#ifdef HAVE_NETSNMP
+	/* MIB translation test cases will fail if system lacks MIBs - in this case test case should be skipped */
+	if (1 == mib_translation_case && FAIL == check_mib_existence(&step))
+	{
+		preproc_shutdown_snmp();
+		zbx_variant_clear(&value);
+		skip();
+	}
+#endif
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.history"))
 	{
@@ -199,16 +286,21 @@ void	zbx_mock_test_entry(void **state)
 		history_ts.ns = 0;
 	}
 
-	if (FAIL == (returned_ret = zbx_item_preproc(NULL, value_type, &value, &ts, &op, &history_value, &history_ts,
-			&error)))
+	if (FAIL == (returned_ret = pp_execute_step(&ctx, NULL, value_type, &value, ts, &step, &history_value,
+			&history_ts)))
 	{
-		returned_ret = zbx_item_preproc_handle_error(&value, &op, &error);
+		pp_error_on_fail(&value, &step);
+
+		if (ZBX_VARIANT_ERR != value.type)
+			returned_ret = SUCCEED;
 	}
 
-	if (SUCCEED != returned_ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "Preprocessing error: %s", error);
+	if (SUCCEED != returned_ret && ZBX_VARIANT_ERR == value.type)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Preprocessing error: %s", value.data.err);
+	}
 
-	if (SUCCEED == is_step_supported(op.type))
+	if (SUCCEED == is_step_supported(step.type))
 		expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	else
 		expected_ret = FAIL;
@@ -217,9 +309,9 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == returned_ret)
 	{
-		if (SUCCEED == is_step_supported(op.type) && ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.error"))
+		if (SUCCEED == is_step_supported(step.type) && ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.error"))
 		{
-			zbx_mock_assert_str_eq("error message", zbx_mock_get_parameter_string("out.error"), error);
+			zbx_mock_assert_int_eq("result variant type", ZBX_VARIANT_ERR, value.type);
 		}
 		else
 		{
@@ -266,10 +358,14 @@ void	zbx_mock_test_entry(void **state)
 		}
 	}
 	else
-		zbx_mock_assert_ptr_ne("error message", NULL, error);
+		zbx_mock_assert_int_eq("result variant type", ZBX_VARIANT_ERR, value.type);
 
 	zbx_variant_clear(&value);
 	zbx_variant_clear(&history_value);
-	zbx_free(error);
+
+	pp_context_destroy(&ctx);
+#ifdef HAVE_NETSNMP
+	preproc_shutdown_snmp();
+#endif
 
 }

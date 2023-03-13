@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,22 +21,22 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-$this->addJsFile('popup.condition.common.js');
 $this->includeJsFile('configuration.correlation.edit.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Event correlation rules'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_EDIT));
 
+$csrf_token = CCsrfTokenHelper::get('correlation');
+
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('correlation.edit')
 	->setName('correlation.edit')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'correlation.condition.add')
-		->getUrl()
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['correlationid'] != 0) {
@@ -52,11 +52,145 @@ $form_list = (new CFormList())
 			->setAttribute('autofocus', 'autofocus')
 	);
 
+$remove_button = (new CButton(null, _('Remove')))
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('js-remove');
+
+$condition_tag_template = (new CTemplateTag('condition-tag-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{label}'))
+			->addClass('label')
+			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-formulaid', '#{label}'),
+		(new CCol([
+			'#{condition_name}', ' ', new CTag('em', true, '#{data}')
+		]))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		(new CCol([
+			$remove_button,
+			(new CInput('hidden'))
+				->setAttribute('value', '#{conditiontype}')
+				->setName('conditions[#{row_index}][type]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{operator}')
+				->setName('conditions[#{row_index}][operator]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{tag}')
+				->setName('conditions[#{row_index}][tag]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{label}')
+				->setName('conditions[#{row_index}][formulaid]')
+		]))
+	]))->setId('conditions_#{row_index}')
+);
+
+$condition_hostgroup_template = (new CTemplateTag('condition-hostgr-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{label}'))
+			->addClass('label')
+			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-formulaid', '#{label}'),
+		(new CCol([
+			'#{condition_name}', ' ', new CTag('em', true, '#{data}')
+		]))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		(new CCol([
+			$remove_button,
+			(new CInput('hidden'))
+				->setAttribute('value', '#{conditiontype}')
+				->setName('conditions[#{row_index}][type]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{operator}')
+				->setName('conditions[#{row_index}][operator]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{groupid}')
+				->setName('conditions[#{row_index}][groupid]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{label}')
+				->setName('conditions[#{row_index}][formulaid]')
+		]))
+	]))->setId('conditions_#{row_index}')
+);
+
+$condition_tag_pair_template = (new CTemplateTag('condition-tag-pair-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{label}'))
+			->addClass('label')
+			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-formulaid', '#{label}'),
+		(new CCol([
+			'#{condition_name}', ' ', new CTag('em', true, '#{data_old_tag}'), ' ', '#{condition_operator}', ' ',
+			'#{condition_name2}', ' ', new CTag('em', true, '#{data_new_tag}')
+		]))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		(new CCol([
+			$remove_button,
+			(new CInput('hidden'))
+				->setAttribute('value', '#{conditiontype}')
+				->setName('conditions[#{row_index}][type]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{operator}')
+				->setName('conditions[#{row_index}][operator]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{oldtag}')
+				->setName('conditions[#{row_index}][oldtag]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{newtag}')
+				->setName('conditions[#{row_index}][newtag]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{label}')
+				->setName('conditions[#{row_index}][formulaid]')
+		]))
+	]))->setId('conditions_#{row_index}')
+);
+
+$condition_old_new_tag_template = (new CTemplateTag('condition-old-new-tag-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{label}'))
+			->addClass('label')
+			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-formulaid', '#{label}'),
+		(new CCol([
+			'#{condition_name}', ' ', new CTag('em', true, '#{tag}'), ' ',
+			'#{condition_operator}', ' ', new CTag('em', true, '#{value}')
+		]))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		(new CCol([
+			$remove_button,
+			(new CInput('hidden'))
+				->setAttribute('value', '#{conditiontype}')
+				->setName('conditions[#{row_index}][type]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{operator}')
+				->setName('conditions[#{row_index}][operator]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{tag}')
+				->setName('conditions[#{row_index}][tag]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{value}')
+				->setName('conditions[#{row_index}][value]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{label}')
+				->setName('conditions[#{row_index}][formulaid]')
+		]))
+	]))->setId('conditions_#{row_index}')
+);
+
 // Create condition table.
 $condition_table = (new CTable(_('No conditions defined.')))
 	->setId('condition_table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Label'), _('Name'), _('Action')]);
+	->setHeader([_('Label'), _('Name'), _('Action')])
+	->addItem([
+		$condition_tag_template,
+		$condition_hostgroup_template,
+		$condition_tag_pair_template,
+		$condition_old_new_tag_template
+	]);
 
 $i = 0;
 
@@ -97,31 +231,38 @@ if ($data['conditions']) {
 	}
 }
 
-$condition_table->addRow([
-	(new CSimpleButton(_('Add')))
-		->onClick(
-			'return PopUp("popup.condition.event.corr", '.
-				json_encode(['type' => ZBX_POPUP_CONDITION_TYPE_EVENT_CORR]).',
-				{dialogue_class: "modal-popup-medium"}
-			);'
+$condition_table->addItem(
+	(new CTag('tfoot', true))
+		->addItem(
+			(new CCol(
+				(new CSimpleButton(_('Add')))
+					->onClick(
+						'return PopUp("popup.condition.event.corr", '.
+							json_encode(['type' => ZBX_POPUP_CONDITION_TYPE_EVENT_CORR]).',
+							{dialogue_class: "modal-popup-medium", dialogueid: "event_corr_condition"}
+						);'
+					)
+					->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(4)
 		)
-		->addClass(ZBX_STYLE_BTN_LINK)
-]);
+);
 
 $form_list
-	->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'), [
+	->addRow((new CLabel(_('Type of calculation'), 'evaltype_select'))->setId('label-evaltype'), [
 		(new CSelect('evaltype'))
 			->setId('evaltype')
 			->setValue($data['evaltype'])
-			->setFocusableElementId('label-evaltype')
+			->setFocusableElementId('evaltype_select')
 			->addOptions(CSelect::createOptionsFromArray([
 				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
 				CONDITION_EVAL_TYPE_AND => _('And'),
 				CONDITION_EVAL_TYPE_OR => _('Or'),
 				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
 			])),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan())->setId('condition_label'),
+		(new CDiv())
+			->setId('formula-div')
+			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CSpan())->setId('expression'),
 		(new CTextBox('formula', $data['formula']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setId('formula')
@@ -187,7 +328,7 @@ else {
 	$delete_button = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'correlation.delete')
 			->setArgument('correlationids', (array) $data['correlationid'])
-			->setArgumentSID(),
+			->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 		_('Delete current correlation?')
 	))->setId('delete');
 

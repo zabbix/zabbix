@@ -4,6 +4,7 @@ DIST_SUBDIRS = \
 	zbxalgo \
 	zbxaudit \
 	zbxavailability \
+	zbxconnector \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
@@ -42,6 +43,7 @@ DIST_SUBDIRS = \
 	zbxnix \
 	zbxnum \
 	zbxparam \
+	zbxpreproc \
 	zbxprometheus \
 	zbxregexp \
 	zbxrtc \
@@ -51,20 +53,25 @@ DIST_SUBDIRS = \
 	zbxservice \
 	zbxshmem \
 	zbxsysinfo \
+	zbxstats \
 	zbxstr \
+	zbxtagfilter \
 	zbxtasks \
 	zbxthreads \
 	zbxtime \
+	zbxtimekeeper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxprof \
 	zbxxml
 
 if SERVER
 SERVER_SUBDIRS = \
 	zbxaudit \
 	zbxavailability \
+	zbxconnector \
 	zbxcompress \
 	zbxdb \
 	zbxcacheconfig \
@@ -88,6 +95,7 @@ SERVER_SUBDIRS = \
 	zbxmedia \
 	zbxnum \
 	zbxparam \
+	zbxpreproc \
 	zbxprometheus \
 	zbxrtc \
 	zbxself \
@@ -95,9 +103,12 @@ SERVER_SUBDIRS = \
 	zbxserver \
 	zbxservice \
 	zbxshmem \
+	zbxstats \
 	zbxstr \
+	zbxtagfilter \
 	zbxtasks \
 	zbxtime \
+	zbxtimekeeper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
@@ -108,6 +119,7 @@ if PROXY
 PROXY_SUBDIRS = \
 	zbxaudit \
 	zbxavailability \
+	zbxconnector \
 	zbxcompress \
 	zbxdb \
 	zbxcacheconfig \
@@ -128,15 +140,19 @@ PROXY_SUBDIRS = \
 	zbxkvs \
 	zbxnum \
 	zbxparam \
+	zbxpreproc \
 	zbxprometheus \
 	zbxrtc \
 	zbxself \
 	zbxserialize \
 	zbxserver \
 	zbxshmem \
+	zbxstats \
 	zbxstr \
+	zbxtagfilter \
 	zbxtasks \
 	zbxtime \
+	zbxtimekeeper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
@@ -166,6 +182,7 @@ SUBDIRS = \
 	zbxlog \
 	zbxmodules \
 	zbxmutexs \
+	zbxprof \
 	zbxnix \
 	zbxnum \
 	zbxparam \

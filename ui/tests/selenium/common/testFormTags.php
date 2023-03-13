@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -966,7 +964,7 @@ class testFormTags extends CWebTest {
 				->asTable()->waitUntilReady()->one();
 		$table->findRow('Name', $this->clone_name)->select();
 		$this->query('button:Copy')->one()->click();
-		$copy_form = $this->query('name:elements_form')->asForm()->waitUntilPresent()->one();
+		$copy_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$copy_form->fill(['Target type' => $target_type.'s', 'Target' => $parent]);
 		$copy_form->submit();
 		$this->page->waitUntilReady();

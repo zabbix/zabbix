@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20220722';
-$browser-sprite-path: '../img/browser-sprite.png?20220722';
+$sprite-path: '../img/icon-sprite.svg?20230110';
+$browser-sprite-path: '../img/browser-sprite.png?20221026';
 
 @import "utils/mixins";
 
@@ -342,6 +342,87 @@ form {
 		.icon-ackn {
 			margin: 0 4px -3px 0;
 		}
+
+		// Align tags and checkboxes. Tags are too low.
+		.tag {
+			margin-top: -1px;
+		}
+
+		// Checkboxes are too high up.
+		.checkbox-radio {
+			& + label {
+				span {
+					margin-top: 1px;
+				}
+			}
+		}
+
+		.btn-widget-expand,
+		.btn-widget-collapse {
+			background-color: $ui-bg-color;
+			width: 18px;
+			height: 18px;
+			background-position-x: -9px;
+			margin: 7px 0 0 0;
+			opacity: 1;
+		}
+
+		.btn-widget-expand {
+			background-position-y: -693px;
+		}
+
+		.btn-widget-collapse {
+			background-position-y: -657px;
+		}
+	}
+
+	.second-col {
+		padding-left: 0;
+		padding-right: 0;
+
+		// Default icon marging makes the cell too wide.
+		.icon-action-symptom {
+			margin-right: 0;
+		}
+	}
+
+	.third-col {
+		// Padding top removed because it pushes the collapse and expand icon too far down.
+		padding-top: 0;
+		// Padding bottom removed because Chrome and Safari expands the row.
+		padding-bottom: 0;
+		padding-left: 2px;
+
+		.icon-action-symptom {
+			// Align the symptom icon in the third column, since padding is removed.
+			margin-top: 6px;
+			// Default icon marging makes the cell too wide.
+			margin-right: 0;
+		}
+	}
+
+	// Make the row more narrow.
+	.symptom-limit-td {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+
+	.problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) {
+		background-color: darken($ui-bg-color, 5%);
+
+		td,
+		.timeline-axis,
+		.timeline-td {
+			border-bottom-color: darken($ui-bg-color, 5%) !important;
+		}
+	}
+
+	.problem-nested-small {
+		font-size: calc(#{$font-mono-size} - 1px);
+
+		.tag {
+			font-size: 12px;
+		}
 	}
 
 	&.compact-view {
@@ -447,6 +528,12 @@ form {
 			}
 		}
 
+		.problem-nested:not([class*='flh-']):not(.row-selected) {
+			td, .timeline-axis, .timeline-td {
+				border-bottom: 0 !important;
+			}
+		}
+
 		td {
 			padding-top: 0;
 			padding-bottom: 0;
@@ -463,7 +550,9 @@ form {
 					line-height: 14px;
 					top: 0;
 				}
+			}
 
+			button[class*='icon-'] {
 				&:last-of-type {
 					margin-right: 0;
 				}
@@ -530,6 +619,18 @@ form {
 
 			.icon-description {
 				margin-left: 2px;
+			}
+
+			// Align action icons according to tags and problem description icons in compact view.
+			[class*='icon-action'] {
+				margin-top: -2px;
+			}
+
+			// Align the expand and collapse icons in compact view.
+			.btn-widget-expand,
+			.btn-widget-collapse {
+				vertical-align: top;
+				margin: 0;
 			}
 		}
 	}
@@ -645,32 +746,26 @@ form {
 		&:hover {
 			background-color: $ui-hover-color;
 
-			.timeline-axis {
-				background-color: $ui-bg-color;
+			%timeline-td {
+				border-bottom-color: $ui-hover-color !important;
 			}
 
-			.timeline-date {
-				background-color: $ui-bg-color;
-			}
-
-			.timeline-td {
-				background-color: $ui-bg-color !important;
+			.btn-widget-expand,
+			.btn-widget-collapse {
+				background-color: $ui-hover-color;
 			}
 		}
 
 		&.row-selected {
 			@extend %found-bg;
 
-			.timeline-axis {
-				background-color: $ui-bg-color;
+			%timeline-td {
+				border-bottom-color: $lighter-yellow !important;
 			}
 
-			.timeline-date {
-				background-color: $ui-bg-color;
-			}
-
-			.timeline-td {
-				background-color: $ui-bg-color;
+			.btn-widget-expand,
+			.btn-widget-collapse {
+				background-color: $lighter-yellow;
 			}
 		}
 
@@ -685,6 +780,21 @@ form {
 
 		&.hover-nobg {
 			background-color: $ui-bg-color;
+
+			%timeline-td {
+				border-bottom-color: $ui-bg-color !important;
+			}
+		}
+
+		&.hover-nobg-problem-nested {
+			background-color: darken($ui-bg-color, 5%);
+
+			%timeline-td {
+				border-bottom-color: darken($ui-bg-color, 5%) !important;
+			}
+		}
+		&.hidden {
+			display: none;
 		}
 	}
 
@@ -995,6 +1105,10 @@ form {
 	overflow-x: auto;
 	position: relative;
 	@extend %webkit-hor-scrollbar;
+}
+
+.problem-expand-td {
+	border-bottom-color: $transparent !important;
 }
 
 // Timeline in table view.
@@ -4866,6 +4980,10 @@ svg {
 		padding: 5px 5px 5px 0;
 	}
 
+	.preprocessing-step {
+		align-items: baseline;
+	}
+
 	.step-name {
 		flex: 0 0 $name-width;
 		max-width: $name-width;
@@ -4883,6 +5001,10 @@ svg {
 			&:not(:last-child) {
 				margin-right: 5px;
 			}
+		}
+
+		.table-forms-separator {
+			width: 100%;
 		}
 	}
 
@@ -5218,8 +5340,11 @@ a.icon-count {
 .icon-action-message,
 .icon-action-ack,
 .icon-action-unack,
+.icon-action-ack-green,
 .icon-action-suppress,
 .icon-action-unsuppress,
+.icon-action-cause,
+.icon-action-symptom,
 .icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
@@ -5344,12 +5469,24 @@ button {
 	background-position: -173px -245px;
 }
 
+.icon-action-ack-green::before {
+	background-position: -348px -356px;
+}
+
 .icon-action-suppress::before {
 	background-position: -89px -803px;
 }
 
 .icon-action-unsuppress::before {
 	background-position: -89px -836px;
+}
+
+.icon-action-cause::before {
+	background-position: -123px -693px;
+}
+
+.icon-action-symptom::before {
+	background-position: -122px -656px;
 }
 
 .icon-invisible::before {

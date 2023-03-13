@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 /**
  * @var CView $this
  */
+
+$this->includeJsFile('administration.script.list.js.php');
 
 if ($data['uncheck']) {
 	uncheckTableRows('script');
@@ -125,12 +127,10 @@ foreach ($data['scripts'] as $script) {
 					}
 
 					if ($has_access) {
-						$url = (new CUrl('actionconf.php'))
-							->setArgument('eventsource', $action['eventsource'])
-							->setArgument('form', 'update')
-							->setArgument('actionid', $action['actionid']);
-
-						$actions[] = (new CLink($action['name'], $url))
+						$actions[] = (new CLink($action['name']))
+							->addClass('js-action-edit')
+							->setAttribute('data-actionid', $action['actionid'])
+							->setAttribute('data-eventsource', $action['eventsource'])
 							->addClass(ZBX_STYLE_LINK_ALT)
 							->addClass(ZBX_STYLE_GREY);
 					}
@@ -218,11 +218,16 @@ $scriptsForm->addItem([
 	$scriptsTable,
 	$data['paging'],
 	new CActionButtonList('action', 'scriptids', [
-		'script.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected scripts?')]
+		'script.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected scripts?'),
+			'csrf_token' => CCsrfTokenHelper::get('script')]
 	], 'script')
 ]);
 
 // append form to widget
 $html_page
 	->addItem($scriptsForm)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();

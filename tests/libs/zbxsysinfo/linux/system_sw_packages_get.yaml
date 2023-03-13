@@ -1,0 +1,42 @@
+---
+test case: dpkg package manager details
+in:
+  manager: 'dpkg'
+  input: |
+    install ok installed,docker-ce-cli,5:19.03.15~3-0~debian-stretch,amd64,183329
+    deinstall ok config-files,docutils-common,0.13.1+dfsg-2,all,670
+    install ok installed,dos2unix,7.4.1-1,amd64,1321
+out:
+  result: '[{"name":"docker-ce-cli","manager":"dpkg","version":"5:19.03.15~3-0~debian-stretch","size":187728896,"arch":"amd64","buildtime":{"timestamp":0,"value":""},"installtime":{"timestamp":0,"value":""}},{"name":"dos2unix","manager":"dpkg","version":"7.4.1-1","size":1352704,"arch":"amd64","buildtime":{"timestamp":0,"value":""},"installtime":{"timestamp":0,"value":""}}]'
+---
+test case: RPM package manager details
+in:
+  manager: 'rpm'
+  input: |
+    glibc-gconv-extra,2.34-48.el9,x86_64,8122308,1666100063,1669204555
+    elfutils-default-yama-scope,0.187-5.el9,noarch,1810,1655411412,1659990239
+    perl-Scalar-List-Utils,1.56-461.el9,x86_64,143652,1628565132,1662121942
+out:
+  result: '[{"name":"glibc-gconv-extra","manager":"rpm","version":"2.34-48.el9","size":8122308,"arch":"x86_64","buildtime":{"timestamp":1666100063,"value":"Tue Oct 18 13:34:23 2022"},"installtime":{"timestamp":1669204555,"value":"Wed Nov 23 11:55:55 2022"}},{"name":"elfutils-default-yama-scope","manager":"rpm","version":"0.187-5.el9","size":1810,"arch":"noarch","buildtime":{"timestamp":1655411412,"value":"Thu Jun 16 20:30:12 2022"},"installtime":{"timestamp":1659990239,"value":"Mon Aug  8 20:23:59 2022"}},{"name":"perl-Scalar-List-Utils","manager":"rpm","version":"1.56-461.el9","size":143652,"arch":"x86_64","buildtime":{"timestamp":1628565132,"value":"Tue Aug 10 03:12:12 2021"},"installtime":{"timestamp":1662121942,"value":"Fri Sep  2 12:32:22 2022"}}]'
+---
+test case: pacman package manager details
+in:
+  manager: 'pacman'
+  input: |
+     wget, 1.21.3-1, x86_64, 3.03 MiB, Sun Mar 20 21:36:30 2022, Thu Nov 10 18:33:47 2022
+     systemd-libs, 251.7-4, x86_64, 2006.57 KiB, Thu Nov 3 16:18:07 2022, Sun Nov 6 00:04:08 2022
+     ca-certificates, 20220905-1, any, 0.00 B, Mon Sep 5 21:59:24 2022, Sun Nov 6 00:04:09 2022
+     go, 2:1.19.3-1, x86_64, 435.03 MiB, Tue Nov 1 16:49:49 2022, Thu Nov 10 18:33:47 2022
+out:
+  result: '[{"name":"wget","manager":"pacman","version":"1.21.3-1","size":3177185,"arch":"x86_64","buildtime":{"timestamp":1647812190,"value":"Sun Mar 20 21:36:30 2022"},"installtime":{"timestamp":1668105227,"value":"Thu Nov 10 18:33:47 2022"}},{"name":"systemd-libs","manager":"pacman","version":"251.7-4","size":2054727,"arch":"x86_64","buildtime":{"timestamp":1667492287,"value":"Thu Nov 3 16:18:07 2022"},"installtime":{"timestamp":1667693048,"value":"Sun Nov 6 00:04:08 2022"}},{"name":"ca-certificates","manager":"pacman","version":"20220905-1","size":0,"arch":"any","buildtime":{"timestamp":1662415164,"value":"Mon Sep 5 21:59:24 2022"},"installtime":{"timestamp":1667693049,"value":"Sun Nov 6 00:04:09 2022"}},{"name":"go","manager":"pacman","version":"2:1.19.3-1","size":456162017,"arch":"x86_64","buildtime":{"timestamp":1667321389,"value":"Tue Nov 1 16:49:49 2022"},"installtime":{"timestamp":1668105227,"value":"Thu Nov 10 18:33:47 2022"}}]'
+---
+test case: pkgtools package manager details
+in:
+  manager: 'pkgtools'
+  input: |
+    /var/log/packages/aaa_glibc-solibs-2.33-x86_64-5:UNCOMPRESSED PACKAGE SIZE:     14M
+    /var/log/packages/brotli-1.0.9-x86_64-7:UNCOMPRESSED PACKAGE SIZE:     2.4M
+    /var/log/packages/ca-certificates-20221205-noarch-1_slack15.0:UNCOMPRESSED PACKAGE SIZE:     360K
+out:
+  result: '[{"name":"aaa_glibc-solibs","manager":"pkgtools","version":"2.33-5","size":14680064,"arch":"x86_64","buildtime":{"timestamp":0,"value":""},"installtime":{"timestamp":0,"value":""}},{"name":"brotli","manager":"pkgtools","version":"1.0.9-7","size":2516582,"arch":"x86_64","buildtime":{"timestamp":0,"value":""},"installtime":{"timestamp":0,"value":""}},{"name":"ca-certificates","manager":"pkgtools","version":"20221205-1_slack15.0","size":368640,"arch":"noarch","buildtime":{"timestamp":0,"value":""},"installtime":{"timestamp":0,"value":""}}]'
+...

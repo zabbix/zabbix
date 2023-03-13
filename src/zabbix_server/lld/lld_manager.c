@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +26,6 @@
 #include "lld_protocol.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-
-extern unsigned char	program_type;
-extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /*
  * The LLD queue is organized as a queue (rule_queue binary heap) of LLD rules,
@@ -156,12 +153,12 @@ static void	lld_worker_free(zbx_lld_worker_t *worker)
  * Parameters: manager - [IN] the manager to initialize                       *
  *                                                                            *
  ******************************************************************************/
-static void	lld_manager_init(zbx_lld_manager_t *manager)
+static void	lld_manager_init(zbx_lld_manager_t *manager, zbx_get_config_forks_f get_config_forks_cb)
 {
 	int			i;
 	zbx_lld_worker_t	*worker;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER]);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __func__, get_config_forks_cb(ZBX_PROCESS_TYPE_LLDWORKER));
 
 	zbx_vector_ptr_create(&manager->workers);
 	zbx_queue_ptr_create(&manager->free_workers);
@@ -175,7 +172,7 @@ static void	lld_manager_init(zbx_lld_manager_t *manager)
 
 	manager->next_worker_index = 0;
 
-	for (i = 0; i < CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER]; i++)
+	for (i = 0; i < get_config_forks_cb(ZBX_PROCESS_TYPE_LLDWORKER); i++)
 	{
 		worker = (zbx_lld_worker_t *)zbx_malloc(NULL, sizeof(zbx_lld_worker_t));
 
@@ -569,9 +566,11 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
+	zbx_thread_lld_manager_args	*args_in = (zbx_thread_lld_manager_args *)(((zbx_thread_args_t *)args)->args);
+
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	if (FAIL == zbx_ipc_service_start(&lld_service, ZBX_IPC_SERVICE_LLD, &error))
@@ -581,7 +580,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	lld_manager_init(&manager);
+	lld_manager_init(&manager, args_in->get_process_forks_cb_arg);
 
 	/* initialize statistics */
 	time_stat = zbx_time();
@@ -611,7 +610,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;

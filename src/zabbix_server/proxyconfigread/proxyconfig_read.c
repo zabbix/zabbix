@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@
 #include "zbxcrypto.h"
 #include "zbx_item_constants.h"
 
-extern char	*CONFIG_VAULTDBPATH;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
 typedef struct
@@ -74,7 +73,8 @@ static void	key_path_free(void *data)
 	zbx_free(keys_path);
 }
 
-static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_json *j)
+static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_json *j,
+		const zbx_config_vault_t *config_vault)
 {
 	int		i;
 	zbx_kvs_t	kvs;
@@ -92,7 +92,7 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
 		zbx_hashset_iter_t	iter;
 
 		keys_path = (zbx_keys_path_t *)keys_paths->values[i];
-		if (FAIL == zbx_vault_kvs_get(keys_path->path, &kvs, &error))
+		if (FAIL == zbx_vault_kvs_get(keys_path->path, &kvs, config_vault, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", keys_path->path, error);
 			zbx_free(error);
@@ -157,7 +157,7 @@ static void	proxyconfig_add_row(struct zbx_json *j, const DB_ROW row, const ZBX_
 			case ZBX_TYPE_INT:
 			case ZBX_TYPE_UINT:
 			case ZBX_TYPE_ID:
-				if (SUCCEED != DBis_null(row[fld]))
+				if (SUCCEED != zbx_db_is_null(row[fld]))
 					zbx_json_addstring(j, NULL, row[fld], ZBX_JSON_TYPE_INT);
 				else
 					zbx_json_addstring(j, NULL, NULL, ZBX_JSON_TYPE_NULL);
@@ -209,23 +209,24 @@ static void	proxyconfig_get_fields(char **sql, size_t *sql_alloc, size_t *sql_of
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: get global/host macro data of the specified hosts from database   *
- *                                                                            *
- * Parameters: table_name - [IN] table name - globalmacro/hostmacro           *
- *             hostids    - [IN] the target hostids for hostmacro table and   *
- *                               NULL for globalmacro table                   *
- *             keys_paths - [OUT] the vault macro path/key                    *
- *             j          - [OUT] the output json                             *
- *             error      - [OUT] the error message                           *
- *                                                                            *
- * Return value: SUCCEED - the data was read successfully                     *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
+/**************************************************************************************
+ *                                                                                    *
+ * Purpose: get global/host macro data of the specified hosts from database           *
+ *                                                                                    *
+ * Parameters: table_name           - [IN] table name - globalmacro/hostmacro         *
+ *             hostids              - [IN] the target hostids for hostmacro table and *
+ *                                         NULL for globalmacro table                 *
+ *             config_vault_db_path - [IN]                                            *
+ *             keys_paths           - [OUT] the vault macro path/key                  *
+ *             j                    - [OUT] the output json                           *
+ *             error                - [OUT] the error message                         *
+ *                                                                                    *
+ * Return value: SUCCEED - the data was read successfully                             *
+ *               FAIL    - otherwise                                                  *
+ *                                                                                    *
+ **************************************************************************************/
 static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vector_uint64_t *hostids,
-		zbx_vector_ptr_t *keys_paths, struct zbx_json *j, char **error)
+		const char *config_vault_db_path, zbx_vector_ptr_t *keys_paths, struct zbx_json *j, char **error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -236,7 +237,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	table = DBget_table(table_name);
+	table = zbx_db_get_table(table_name);
 	zbx_json_addobject(j, table->table);
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
@@ -253,7 +254,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 			goto end;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 		offset = 1;
 	}
 	else
@@ -262,7 +263,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by ");
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, table->recid);
 
-	if (NULL == (result = DBselect("%s", sql)))
+	if (NULL == (result = zbx_db_select("%s", sql)))
 	{
 		*error = zbx_dsprintf(*error, "failed to get data from table \"%s\"", table->table);
 		goto out;
@@ -270,7 +271,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s", table->table);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_keys_path_t	*keys_path, keys_path_local;
 		unsigned char	type;
@@ -294,7 +295,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 			goto next;
 		}
 
-		if (NULL != CONFIG_VAULTDBPATH && 0 == strcasecmp(CONFIG_VAULTDBPATH, path) &&
+		if (NULL != config_vault_db_path && 0 == strcasecmp(config_vault_db_path, path) &&
 				(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
 						|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
 		{
@@ -330,7 +331,7 @@ next:
 		zbx_free(key);
 		zbx_free(path);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 end:
 	zbx_json_close(j);
 	zbx_json_close(j);
@@ -376,7 +377,7 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	table = DBget_table(table_name);
+	table = zbx_db_get_table(table_name);
 	zbx_json_addobject(j, table->table);
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
@@ -395,7 +396,7 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 			if (NULL != key_ids)
 			{
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, keyword);
-				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, key_name, key_ids->values,
+				zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, key_name, key_ids->values,
 						key_ids->values_num);
 				keyword = " and";
 			}
@@ -410,7 +411,7 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by ");
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, table->recid);
 
-		if (NULL == (result = DBselect("%s", sql)))
+		if (NULL == (result = zbx_db_select("%s", sql)))
 		{
 			*error = zbx_dsprintf(*error, "failed to get data from table \"%s\"", table->table);
 			goto out;
@@ -418,13 +419,13 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s", table->table);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			zbx_json_addarray(j, NULL);
 			proxyconfig_add_row(j, row, table, recids);
 			zbx_json_close(j);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_json_close(j);
@@ -521,7 +522,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 	zbx_hashset_create(&items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_proxyconfig_dep_item_ptr_create(&dep_items);
 
-	table = DBget_table("items");
+	table = zbx_db_get_table("items");
 
 	/* get type, key_ field indexes used to check if item is processed by server */
 	for (i = 0, fld = 1; 0 != table->fields[i].name; i++)
@@ -554,11 +555,11 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 	if (0 != hostids->values_num)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s where", table->table);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and flags<>%d and type<>%d",
 				ZBX_FLAG_DISCOVERY_PROTOTYPE, ITEM_TYPE_CALCULATED);
 
-		if (NULL == (result = DBselect("%s", sql)))
+		if (NULL == (result = zbx_db_select("%s", sql)))
 		{
 			*error = zbx_dsprintf(*error, "failed to get data from table \"%s\"", table->table);
 			goto out;
@@ -566,7 +567,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s", table->table);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			unsigned char	type;
 
@@ -591,7 +592,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 				zbx_vector_proxyconfig_dep_item_ptr_append(&dep_items, dep_item);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		/* add dependent items processed by proxy */
 		if (0 != dep_items.values_num)
@@ -834,7 +835,7 @@ out:
 
 static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_config_revision,
 		const zbx_dc_revision_t *dc_revision, struct zbx_json *j, zbx_proxyconfig_status_t *status,
-		char **error)
+		const zbx_config_vault_t *config_vault, char **error)
 {
 #define ZBX_PROXYCONFIG_SYNC_HOSTS		0x0001
 #define ZBX_PROXYCONFIG_SYNC_GMACROS		0x0002
@@ -913,7 +914,7 @@ static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_conf
 
 	if (0 != flags)
 	{
-		DBbegin();
+		zbx_db_begin();
 
 		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_HOSTS) &&
 				SUCCEED != proxyconfig_get_host_data(&updated_hostids, j, error))
@@ -921,8 +922,9 @@ static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_conf
 			goto out;
 		}
 
-		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_GMACROS) &&
-				SUCCEED != proxyconfig_get_macro_updates("globalmacro", NULL, &keys_paths, j, error))
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_GMACROS) && SUCCEED !=
+				proxyconfig_get_macro_updates("globalmacro", NULL, config_vault->db_path, &keys_paths,
+				j, error))
 		{
 			goto out;
 		}
@@ -935,8 +937,11 @@ static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_conf
 				goto out;
 			}
 
-			if (SUCCEED != proxyconfig_get_macro_updates("hostmacro", &macro_hostids, &keys_paths, j, error))
+			if (SUCCEED != proxyconfig_get_macro_updates("hostmacro", &macro_hostids, config_vault->db_path,
+					&keys_paths, j, error))
+			{
 				goto out;
+			}
 		}
 
 		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_DRULES) &&
@@ -994,7 +999,7 @@ static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_conf
 	}
 
 	if (0 != keys_paths.values_num)
-		get_macro_secrets(&keys_paths, j);
+		get_macro_secrets(&keys_paths, j, config_vault);
 
 	if (0 == flags && 0 == removed_hostids.values_num && 0 == del_macro_hostids.values_num)
 		*status = ZBX_PROXYCONFIG_STATUS_EMPTY;
@@ -1004,7 +1009,7 @@ static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_conf
 	ret = SUCCEED;
 out:
 	if (0 != flags)
-		DBcommit();
+		zbx_db_commit();
 
 	zbx_vector_ptr_clear_ext(&keys_paths, key_path_free);
 	zbx_vector_ptr_destroy(&keys_paths);
@@ -1033,7 +1038,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
-		zbx_proxyconfig_status_t *status, char **error)
+		zbx_proxyconfig_status_t *status, const zbx_config_vault_t *config_vault, char **error)
 {
 	int			ret = FAIL;
 	char			token[ZBX_SESSION_TOKEN_SIZE + 1], tmp[ZBX_MAX_UINT64_LEN + 1];
@@ -1076,7 +1081,7 @@ int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_re
 	if (proxy_config_revision != dc_revision.config)
 	{
 		if (SUCCEED != (ret = proxyconfig_get_tables(proxy, proxy_config_revision, &dc_revision, j, status,
-				error)))
+				config_vault, error)))
 		{
 			goto out;
 		}
@@ -1102,7 +1107,8 @@ out:
  *          (for active proxies)                                              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
+void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
+		const zbx_config_vault_t *config_vault, int config_timeout)
 {
 	char				*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json			j;
@@ -1113,7 +1119,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp, i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != get_active_proxy_from_request(jp, &proxy, &error))
+	if (SUCCEED != zbx_get_active_proxy_from_request(jp, &proxy, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data request from active proxy at"
 				" \"%s\": %s", sock->peer, error);
@@ -1147,7 +1153,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp, i
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED != zbx_proxyconfig_get_data(&proxy, jp, &j, &status, &error))
+	if (SUCCEED != zbx_proxyconfig_get_data(&proxy, jp, &j, &status, config_vault, &error))
 	{
 		(void)zbx_send_response_ext(sock, FAIL, error, NULL, flags, config_timeout);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",

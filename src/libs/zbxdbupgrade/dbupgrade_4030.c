@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
  */
 
 #ifndef HAVE_SQLITE3
-
-extern unsigned char	program_type;
 
 static int	DBpatch_4030000(void)
 {
@@ -78,7 +76,7 @@ static int	DBpatch_4030004(void)
 
 static int	DBpatch_4030005(void)
 {
-	if (ZBX_DB_OK <= DBexecute("insert into item_rtdata (itemid,lastlogsize,state,mtime,error)"
+	if (ZBX_DB_OK <= zbx_db_execute("insert into item_rtdata (itemid,lastlogsize,state,mtime,error)"
 			" select i.itemid,i.lastlogsize,i.state,i.mtime,i.error"
 			" from items i"
 			" join hosts h on i.hostid=h.hostid"
@@ -113,11 +111,11 @@ static int	DBpatch_4030009(void)
 
 static int	DBpatch_4030010(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	/* 8 - SCREEN_RESOURCE_SCREEN */
-	if (ZBX_DB_OK > DBexecute("delete from screens_items where resourcetype=8"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from screens_items where resourcetype=8"))
 		return FAIL;
 
 	return SUCCEED;
@@ -146,7 +144,7 @@ static int	DBpatch_4030014(void)
 
 static int	DBpatch_4030015(void)
 {
-	if (ZBX_DB_OK > DBexecute("update widget set x=x*2, width=width*2"))
+	if (ZBX_DB_OK > zbx_db_execute("update widget set x=x*2, width=width*2"))
 		return FAIL;
 
 	return SUCCEED;
@@ -165,12 +163,12 @@ static int	DBpatch_4030016(void)
 			"alarm_disaster"
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i++)
 	{
-		if (ZBX_DB_OK > DBexecute(
+		if (ZBX_DB_OK > zbx_db_execute(
 				"update profiles"
 				" set value_str='%s.mp3'"
 				" where value_str='%s.wav'"
@@ -200,12 +198,12 @@ static int	DBpatch_4030018(void)
 			"web.problem.filter.show_latest_values", "web.problem.filter.show_opdata"
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
 	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
 			return FAIL;
 	}
 
@@ -214,10 +212,10 @@ static int	DBpatch_4030018(void)
 
 static int	DBpatch_4030019(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute(
+	if (ZBX_DB_OK > zbx_db_execute(
 			"update widget_field"
 			" set name='show_opdata'"
 			" where name='show_latest_values'"
@@ -246,10 +244,10 @@ static int	DBpatch_4030020(void)
 	zbx_uint32_t	id, next_id = 0;
 	zbx_uint64_t	last_widgetid = 0, widgetid, fieldid;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	result = DBselect("SELECT widgetid,widget_fieldid,name,value_str"
+	result = zbx_db_select("SELECT widgetid,widget_fieldid,name,value_str"
 			" FROM widget_field"
 			" WHERE widgetid IN (SELECT widgetid FROM widget WHERE type='svggraph') AND type=1"
 			" AND (name LIKE 'ds.hosts.%%' OR name LIKE 'ds.items.%%' OR name LIKE 'or.hosts.%%'"
@@ -259,7 +257,7 @@ static int	DBpatch_4030020(void)
 	if (NULL == result)
 		return FAIL;
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_DBROW2UINT64(widgetid, row[0]);
 		ZBX_DBROW2UINT64(fieldid, row[1]);
@@ -297,13 +295,13 @@ static int	DBpatch_4030020(void)
 
 			if (id != next_id || 0 != strcmp(row[3], token))
 			{
-				token_esc = DBdyn_escape_string(token);
+				token_esc = zbx_db_dyn_escape_string(token);
 
-				if (ZBX_DB_OK > DBexecute("insert into widget_field (widgetid,widget_fieldid,type,name,"
+				if (ZBX_DB_OK > zbx_db_execute("insert into widget_field (widgetid,widget_fieldid,type,name,"
 						"value_str) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",1,'%s.%u','%s')",
-						widgetid, DBget_maxid_num("widget_field", 1), field, next_id,
+						widgetid, zbx_db_get_maxid_num("widget_field", 1), field, next_id,
 						token_esc) ||
-						ZBX_DB_OK > DBexecute("delete from widget_field where widget_fieldid="
+						ZBX_DB_OK > zbx_db_execute("delete from widget_field where widget_fieldid="
 								ZBX_FS_UI64, fieldid))
 				{
 					zbx_free(token_esc);
@@ -322,7 +320,7 @@ static int	DBpatch_4030020(void)
 
 	zbx_free(token);
 	zbx_free(value);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 #undef FIELD_LEN
 	return ret;
@@ -372,10 +370,10 @@ static int	DBpatch_4030025(void)
 
 static int	DBpatch_4030026(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK <= DBexecute("insert into config_autoreg_tls (autoreg_tlsid) values (1)"))
+	if (ZBX_DB_OK <= zbx_db_execute("insert into config_autoreg_tls (autoreg_tlsid) values (1)"))
 		return SUCCEED;
 
 	return FAIL;
@@ -389,13 +387,13 @@ static int	DBpatch_4030027(void)
 	char		*exec_params = NULL, *exec_params_esc;
 	size_t		exec_params_alloc = 0;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	/* type : 1 - MEDIA_TYPE_EXEC, 3 - MEDIA_TYPE_JABBER, 100 - MEDIA_TYPE_EZ_TEXTING */
-	result = DBselect("select mediatypeid,type,username,passwd,exec_path from media_type where type in (3,100)");
+	result = zbx_db_select("select mediatypeid,type,username,passwd,exec_path from media_type where type in (3,100)");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		size_t	exec_params_offset = 0;
 
@@ -408,9 +406,9 @@ static int	DBpatch_4030027(void)
 				0 == atoi(row[4]) ? 160 : 136);
 		}
 
-		exec_params_esc = DBdyn_escape_string_len(exec_params, 255);
+		exec_params_esc = zbx_db_dyn_escape_string_len(exec_params, 255);
 
-		if (ZBX_DB_OK > DBexecute("update media_type"
+		if (ZBX_DB_OK > zbx_db_execute("update media_type"
 				" set type=1,"
 					"exec_path='dummy.sh',"
 					"exec_params='%s',"
@@ -427,7 +425,7 @@ static int	DBpatch_4030027(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(exec_params);
 
 	return ret;
@@ -452,10 +450,10 @@ static int	DBpatch_4030030(void)
 
 static int	DBpatch_4030031(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute(
+	if (ZBX_DB_OK > zbx_db_execute(
 			"update profiles"
 			" set value_str='name'"
 			" where value_str='description'"
@@ -624,7 +622,7 @@ static int	DBpatch_4030038(void)
 static int	DBpatch_4030039(void)
 {
 #ifdef HAVE_MYSQL
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK <= zbx_db_execute(
 			"insert into host_inventory (select * from host_inventory_tmp)"))
 	{
 		return SUCCEED;

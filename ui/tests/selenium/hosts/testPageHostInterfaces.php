@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,8 @@ class testPageHostInterfaces extends CWebTest {
 				'details' => [
 					'version' => '3',
 					'bulk' => '1',
-					'securityname' => 'zabbix'
+					'securityname' => 'zabbix',
+					'max_repetitions' => 10
 				],
 				'available' => 1
 			],
@@ -79,7 +80,8 @@ class testPageHostInterfaces extends CWebTest {
 					'bulk' => '1',
 					'securitylevel' => 2,
 					'authprotocol' => 2,
-					'privprotocol' => 4
+					'privprotocol' => 4,
+					'max_repetitions' => 10
 				],
 				'available' => 1
 			],
@@ -93,7 +95,8 @@ class testPageHostInterfaces extends CWebTest {
 				'details' => [
 					'version' => '2',
 					'bulk' => '1',
-					'community' => '{$SNMP_COMMUNITY}'
+					'community' => '{$SNMP_COMMUNITY}',
+					'max_repetitions' => 10
 				],
 				'available' => 2
 			],
@@ -471,11 +474,13 @@ class testPageHostInterfaces extends CWebTest {
 			// Check every interface row.
 			foreach ($interface_table->getRows() as $i => $row) {
 				$interface_details  = $data['interfaces'][$interface_name]['rows'][$i];
-				$this->assertEquals($interface_details['Interface'], $row->getColumn('Interface')->getText());
-				$this->assertEquals($interface_details['Status']['text'], $row->getColumn('Status')->getText());
+				$row->assertValues([
+					'Interface' => $interface_details['Interface'],
+					'Status' => $interface_details['Status']['text'],
+					'Error' => $interface_details['Error']
+				]);
 				$this->assertEquals($interface_details['Status']['color'], $row->getColumn('Status')
 						->query('xpath:.//span[contains(@class, "status")]')->one()->getCSSValue('background-color'));
-				$this->assertEquals($interface_details['Error'], $row->getColumn('Error')->getText());
 			}
 
 			$overlay->close();

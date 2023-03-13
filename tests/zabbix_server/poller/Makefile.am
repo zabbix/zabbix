@@ -21,6 +21,7 @@ POLLER_LIBS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
@@ -51,7 +52,7 @@ zbx_poller_test_SOURCES = \
 	../../zbxmockdir.c
 
 zbx_poller_test_LDADD = $(POLLER_LIBS)
-zbx_poller_test_LDADD += @SERVER_LIBS@ 
+zbx_poller_test_LDADD += @SERVER_LIBS@
 zbx_poller_test_LDFLAGS = @SERVER_LDFLAGS@\
 	-Wl,--wrap=ssh_run \
 	-Wl,--wrap=telnet_run

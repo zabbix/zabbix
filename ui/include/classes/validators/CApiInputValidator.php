@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -3951,6 +3951,8 @@ class CApiInputValidator {
 		$preproc_type = $rule['preproc_type']['value'];
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
+		$params = [];
+
 		if (self::checkStringUtf8(0x00, $data, $path, $error) === false) {
 			return false;
 		}
@@ -3962,8 +3964,6 @@ class CApiInputValidator {
 
 			return false;
 		}
-
-		$params = [];
 
 		if ($preproc_type == ZBX_PREPROC_SCRIPT) {
 			$params[1] = $data;
@@ -4085,6 +4085,17 @@ class CApiInputValidator {
 					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 					'2' =>	['type' => API_STRING_UTF8, 'default' => '']
 				]];
+				break;
+
+			case ZBX_PREPROC_SNMP_WALK_VALUE:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+					'2' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX, ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])]
+				]];
+				break;
+
+			case ZBX_PREPROC_SNMP_WALK_TO_JSON:
+				$api_input_rules = ['type' => API_STRINGS_UTF8, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'length' => 255];
 				break;
 		}
 

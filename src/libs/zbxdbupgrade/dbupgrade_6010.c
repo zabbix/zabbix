@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,8 +25,6 @@
 #include "zbxavailability.h"
 #include "zbx_host_constants.h"
 
-extern unsigned char	program_type;
-
 /*
  * 6.2 development database patches
  */
@@ -36,10 +34,10 @@ extern unsigned char	program_type;
 static int	DBpatch_6010000(void)
 {
 #define ZBX_MD5_SIZE	32
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update users set passwd='' where length(passwd)=%d", ZBX_MD5_SIZE))
+	if (ZBX_DB_OK > zbx_db_execute("update users set passwd='' where length(passwd)=%d", ZBX_MD5_SIZE))
 		return FAIL;
 
 	return SUCCEED;
@@ -61,32 +59,32 @@ static int	DBpatch_6010002(void)
 	char		*sql = NULL, *descripton_esc;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
-	result = DBselect(
+	result = zbx_db_select(
 		"select triggerid,description"
 		" from triggers"
 		" where " ZBX_DB_CHAR_LENGTH(description) ">%d", 255);
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		row[1][zbx_strlen_utf8_nchars(row[1], 255)] = '\0';
 
-		descripton_esc = DBdyn_escape_field("triggers", "description", row[1]);
+		descripton_esc = zbx_db_dyn_escape_field("triggers", "description", row[1]);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"update triggers set description='%s' where triggerid=%s;\n", descripton_esc, row[0]);
 		zbx_free(descripton_esc);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -115,29 +113,29 @@ static int	DBpatch_6010005(void)
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
-	result = DBselect(
+	result = zbx_db_select(
 		"select ht.hosttemplateid"
 		" from hosts_templates ht, hosts h"
 		" where ht.hostid=h.hostid and h.flags=4"); /* ZBX_FLAG_DISCOVERY_CREATED */
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		/* set ZBX_TEMPLATE_LINK_LLD as link_type */
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update hosts_templates set link_type=1 where hosttemplateid=%s;\n", row[0]);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -211,23 +209,23 @@ static int	DBpatch_6010013(void)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	if (NULL == (result = DBselect("select ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,"
+	if (NULL == (result = zbx_db_select("select ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,"
 			"ldap_bind_password,ldap_search_attribute"
 			" from config where ldap_configured=1")))
 	{
 		return FAIL;
 	}
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		char	*base_dn_esc, *bind_dn_esc, *password_esc, *search_esc;
 
-		base_dn_esc = DBdyn_escape_string(row[2]);
-		bind_dn_esc = DBdyn_escape_string(row[3]);
-		password_esc = DBdyn_escape_string(row[4]);
-		search_esc = DBdyn_escape_string(row[5]);
+		base_dn_esc = zbx_db_dyn_escape_string(row[2]);
+		bind_dn_esc = zbx_db_dyn_escape_string(row[3]);
+		password_esc = zbx_db_dyn_escape_string(row[4]);
+		search_esc = zbx_db_dyn_escape_string(row[5]);
 
-		rc = DBexecute("insert into userdirectory (userdirectoryid,name,description,host,port,"
+		rc = zbx_db_execute("insert into userdirectory (userdirectoryid,name,description,host,port,"
 				"base_dn,bind_dn,bind_password,search_attribute,start_tls) values "
 				"(1,'Default LDAP server','','%s',%s,'%s','%s','%s','%s',%d)",
 				row[0], row[1], base_dn_esc, bind_dn_esc, password_esc, search_esc, 0);
@@ -238,7 +236,7 @@ static int	DBpatch_6010013(void)
 		zbx_free(base_dn_esc);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (ZBX_DB_OK > rc)
 		return FAIL;
@@ -248,7 +246,7 @@ static int	DBpatch_6010013(void)
 
 static int	DBpatch_6010014(void)
 {
-	if (ZBX_DB_OK > DBexecute("update config set ldap_userdirectoryid=1 where ldap_configured=1"))
+	if (ZBX_DB_OK > zbx_db_execute("update config set ldap_userdirectoryid=1 where ldap_configured=1"))
 		return FAIL;
 
 	return SUCCEED;
@@ -316,15 +314,15 @@ static int	DBpatch_6010023(void)
 
 	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "active_available", NULL);
 
-	result = DBselect("select hostid from hosts where flags!=%i and status in (%i,%i)",
+	result = zbx_db_select("select hostid from hosts where flags!=%i and status in (%i,%i)",
 			ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
 		zbx_db_insert_add_values(&insert, hostid, INTERFACE_AVAILABLE_UNKNOWN);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != insert.rows.values_num)
 		ret = zbx_db_insert_execute(&insert);
@@ -351,17 +349,17 @@ static int	DBpatch_6010024(void)
 	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
 	char		*out = NULL;
 
-	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER != DBget_program_type())
 		return SUCCEED;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select hi.itemid,hi.type,ht.name"
 			" from httptestitem hi,httptest ht"
 			" where hi.httptestid=ht.httptestid");
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	itemid;
 		char		*esc;
@@ -386,20 +384,20 @@ static int	DBpatch_6010024(void)
 						"Last error message of scenario \"%s\".", row[2]);
 				break;
 		}
-		esc = DBdyn_escape_field("items", "name", out);
+		esc = zbx_db_dyn_escape_field("items", "name", out);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set name='%s' where itemid="
 				ZBX_FS_UI64 ";\n", esc, itemid);
 		zbx_free(esc);
 
-		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
 
@@ -418,18 +416,18 @@ static int	DBpatch_6010025(void)
 	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
 	char		*out = NULL;
 
-	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER != DBget_program_type())
 		return SUCCEED;
 
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select hi.itemid,hi.type,hs.name,ht.name"
 			" from httpstepitem hi,httpstep hs,httptest ht"
 			" where hi.httpstepid=hs.httpstepid"
 				" and hs.httptestid=ht.httptestid");
 
-	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	itemid;
 		char		*esc;
@@ -455,20 +453,20 @@ static int	DBpatch_6010025(void)
 				break;
 		}
 
-		esc = DBdyn_escape_field("items", "name", out);
+		esc = zbx_db_dyn_escape_field("items", "name", out);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set name='%s' where itemid="
 				ZBX_FS_UI64 ";\n", esc, itemid);
 		zbx_free(esc);
 
-		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
 
@@ -486,10 +484,10 @@ static int	DBpatch_6010025(void)
 
 static int	DBpatch_6010026(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.auditlog.filter.action' and value_int=-1"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.auditlog.filter.action' and value_int=-1"))
 		return FAIL;
 
 	return SUCCEED;
@@ -497,10 +495,10 @@ static int	DBpatch_6010026(void)
 
 static int	DBpatch_6010028(void)
 {
-	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type()))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute(
+	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from role_rule where value_str='trigger.adddependencies' or "
 			"value_str='trigger.deletedependencies'"))
 	{
@@ -631,7 +629,7 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "type", "uuid", NULL);
-	groupid = DBget_maxid_num("hstgrp", new_count);
+	groupid = zbx_db_get_maxid_num("hstgrp", new_count);
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
@@ -648,24 +646,24 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "groupid", "permission", "id", NULL);
-	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
 		if (DBPATCH_HOSTGROUP_TYPE_MIXED != hstgrps->values[i]->type)
 			continue;
 
-		result = DBselect("select groupid,permission from rights where id=" ZBX_FS_UI64,
+		result = zbx_db_select("select groupid,permission from rights where id=" ZBX_FS_UI64,
 				hstgrps->values[i]->groupid);
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			ZBX_STR2UINT64(groupid, row[0]);
 			permission = atoi(row[1]);
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), groupid, permission,
 					hstgrps->values[i]->newgroupid);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update hosts_groups"
@@ -677,17 +675,17 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 						" where status=3" /* HOST_STATUS_TEMPLATE */
 					");\n", hstgrps->values[i]->newgroupid, hstgrps->values[i]->groupid);
 
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
 
 	zbx_db_insert_autoincrement(&db_insert, "rightid");
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
 		goto out;
 
-	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_free(sql);
@@ -698,14 +696,14 @@ out:
 
 #define ADD_GROUPIDS_FROM_FIELD(table,field)								\
 													\
-	result = DBselect("select distinct " field " from " table " where " field " is not null");	\
+	result = zbx_db_select("select distinct " field " from " table " where " field " is not null");	\
 													\
-	while (NULL != (row = DBfetch(result)))								\
+	while (NULL != (row = zbx_db_fetch(result)))							\
 	{												\
 		ZBX_STR2UINT64(groupid, row[0]);							\
 		zbx_vector_uint64_append(&host_groupids, groupid);					\
 	}												\
-	DBfree_result(result);
+	zbx_db_free_result(result);
 #define ADD_GROUPIDS_FROM(table) ADD_GROUPIDS_FROM_FIELD(table, "groupid")
 
 static int	DBpatch_6010033_split_groups(void)
@@ -721,9 +719,9 @@ static int	DBpatch_6010033_split_groups(void)
 	zbx_vector_uint64_create(&host_groupids);
 	zbx_vector_uint64_create(&template_groupids);
 
-	result = DBselect("select groupid,name,uuid from hstgrp order by length(name)");
+	result = zbx_db_select("select groupid,name,uuid from hstgrp order by length(name)");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		hstgrp_t	*hstgrp;
 
@@ -736,21 +734,21 @@ static int	DBpatch_6010033_split_groups(void)
 
 		zbx_vector_hstgrp_append(&hstgrps, hstgrp);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select distinct g.groupid"
 			" from hstgrp g,hosts_groups hg,hosts h"
 			" where g.groupid=hg.groupid"
 				" and hg.hostid=h.hostid"
 				" and h.status<>3" /* HOST_STATUS_TEMPLATE */);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
 		zbx_vector_uint64_append(&host_groupids, groupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ADD_GROUPIDS_FROM("group_prototype");
 	ADD_GROUPIDS_FROM_FIELD("config", "discovery_groupid");
@@ -762,38 +760,38 @@ static int	DBpatch_6010033_split_groups(void)
 	ADD_GROUPIDS_FROM("scripts");
 
 	/* 0 - ZBX_CONDITION_TYPE_HOST_GROUP */
-	result = DBselect("select distinct value from conditions where conditiontype=0");
+	result = zbx_db_select("select distinct value from conditions where conditiontype=0");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
 		zbx_vector_uint64_append(&host_groupids, groupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* 3 - SYSMAP_ELEMENT_TYPE_HOST_GROUP */
-	result = DBselect("select distinct elementid from sysmaps_elements where elementtype=3");
+	result = zbx_db_select("select distinct elementid from sysmaps_elements where elementtype=3");
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
 		zbx_vector_uint64_append(&host_groupids, groupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select distinct g.groupid"
 			" from hstgrp g,hosts_groups hg,hosts h"
 			" where g.groupid=hg.groupid"
 				" and hg.hostid=h.hostid"
 				" and h.status=3" /* HOST_STATUS_TEMPLATE */);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
 		zbx_vector_uint64_append(&template_groupids, groupid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(&template_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_sort(&host_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -820,7 +818,7 @@ static int	DBpatch_6010033_split_groups(void)
 			continue;
 
 		/* 1 - HOST_GROUP_TYPE_TEMPLATE_GROUP */
-		if (ZBX_DB_OK > DBexecute("update hstgrp set type=1 where groupid=" ZBX_FS_UI64,
+		if (ZBX_DB_OK > zbx_db_execute("update hstgrp set type=1 where groupid=" ZBX_FS_UI64,
 				hstgrps.values[i]->groupid))
 		{
 			goto out;
@@ -839,7 +837,7 @@ out:
 
 static int	DBpatch_6010033(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return DBpatch_6010033_split_groups();
@@ -856,12 +854,12 @@ static int	DBpatch_6010034(void)
 			"web.groups.filter.active", "web.hostgroups.filter.active",
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
 	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
 			return FAIL;
 	}
 
@@ -870,10 +868,10 @@ static int	DBpatch_6010034(void)
 
 static int	DBpatch_6010035(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute(
+	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from tag_filter"
 			" where groupid in ("
 				"select groupid"
@@ -889,10 +887,10 @@ static int	DBpatch_6010035(void)
 
 static int	DBpatch_6010036(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute(
+	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from widget_field"
 			" where value_groupid in ("
 				"select groupid"
@@ -922,7 +920,7 @@ static int	DBpatch_6010037(void)
 
 static int	DBpatch_6010038(void)
 {
-	if (ZBX_DB_OK > DBexecute(
+	if (ZBX_DB_OK > zbx_db_execute(
 			"update hostmacro"
 			" set automatic=1"	/* ZBX_USERMACRO_AUTOMATIC */
 			" where hostid in ("
@@ -946,7 +944,7 @@ static int	DBpatch_6010039(void)
 
 static int	DBpatch_6010040(void)
 {
-	if (ZBX_DB_OK > DBexecute(
+	if (ZBX_DB_OK > zbx_db_execute(
 			"update host_tag"
 			" set automatic=1"	/* ZBX_TAG_AUTOMATIC */
 			" where hostid in ("
@@ -1290,7 +1288,7 @@ static int	DBpatch_6010095(void)
 static int	DBpatch_6010096(void)
 {
 	/* status 5,6 - HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE */
-	if (ZBX_DB_OK > DBexecute("insert into host_rtdata (hostid,lastaccess)"
+	if (ZBX_DB_OK > zbx_db_execute("insert into host_rtdata (hostid,lastaccess)"
 			" select hostid,lastaccess from hosts where status in (5,6)"))
 	{
 		return FAIL;

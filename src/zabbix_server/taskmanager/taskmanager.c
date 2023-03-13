@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,8 @@
 #include "zbxversion.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
+#include "zbxdbwrap.h"
+#include "zbxserver.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -47,8 +49,6 @@
 #define ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS		32
 #define ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS	64
 #define ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME		0
-
-extern unsigned char			program_type;
 
 zbx_export_file_t		*problems_export = NULL;
 static zbx_export_file_t	*get_problems_export(void)
@@ -73,15 +73,15 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, eventid);
 
-	result = DBselect("select null from problem where eventid=" ZBX_FS_UI64 " and r_eventid is null", eventid);
+	result = zbx_db_select("select null from problem where eventid=" ZBX_FS_UI64 " and r_eventid is null", eventid);
 
 	/* check if the task hasn't been already closed by another process */
-	if (NULL != DBfetch(result))
+	if (NULL != zbx_db_fetch(result))
 		zbx_close_problem(triggerid, eventid, userid);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
+	zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -109,7 +109,7 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_create(&locked_triggerids);
 
-	result = DBselect("select a.userid,a.eventid,e.objectid"
+	result = zbx_db_select("select a.userid,a.eventid,e.objectid"
 				" from task_close_problem tcp"
 				" left join acknowledges a"
 					" on tcp.acknowledgeid=a.acknowledgeid"
@@ -118,13 +118,13 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 				" where tcp.taskid=" ZBX_FS_UI64,
 			taskid);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (SUCCEED == DBis_null(row[0]))
+		if (SUCCEED == zbx_db_is_null(row[0]))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot process close problem task because related event"
 					" was removed");
-			DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
+			zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
 			ret = SUCCEED;
 		}
@@ -148,13 +148,13 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 			}
 			else if (FAIL == DCconfig_trigger_exists(triggerid))
 			{
-				DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE,
+				zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE,
 						taskid);
 				ret = SUCCEED;
 			}
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_destroy(&locked_triggerids);
 	zbx_vector_uint64_destroy(&triggerids);
@@ -178,28 +178,28 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __func__, taskid);
 
-	DBbegin();
+	zbx_db_begin();
 
-	result = DBselect("select alertid from task_remote_command where taskid=" ZBX_FS_UI64, taskid);
+	result = zbx_db_select("select alertid from task_remote_command where taskid=" ZBX_FS_UI64, taskid);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (SUCCEED != DBis_null(row[0]))
+		if (SUCCEED != zbx_db_is_null(row[0]))
 		{
 			ZBX_STR2UINT64(alertid, row[0]);
 
-			error = DBdyn_escape_string_len("Remote command has been expired.", ALERT_ERROR_LEN);
-			DBexecute("update alerts set error='%s',status=%d where alertid=" ZBX_FS_UI64,
+			error = zbx_db_dyn_escape_string_len("Remote command has been expired.", ALERT_ERROR_LEN);
+			zbx_db_execute("update alerts set error='%s',status=%d where alertid=" ZBX_FS_UI64,
 					error, ALERT_STATUS_FAILED, alertid);
 			zbx_free(error);
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_EXPIRED, taskid);
+	zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_EXPIRED, taskid);
 
-	DBcommit();
+	zbx_db_commit();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -223,9 +223,9 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __func__, taskid);
 
-	DBbegin();
+	zbx_db_begin();
 
-	result = DBselect("select r.status,r.info,a.alertid,r.parent_taskid"
+	result = zbx_db_select("select r.status,r.info,a.alertid,r.parent_taskid"
 			" from task_remote_command_result r"
 			" left join task_remote_command c"
 				" on c.taskid=r.parent_taskid"
@@ -233,24 +233,24 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 				" on a.alertid=c.alertid"
 			" where r.taskid=" ZBX_FS_UI64, taskid);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(parent_taskid, row[3]);
 
-		if (SUCCEED != DBis_null(row[2]))
+		if (SUCCEED != zbx_db_is_null(row[2]))
 		{
 			ZBX_STR2UINT64(alertid, row[2]);
 			status = atoi(row[0]);
 
 			if (SUCCEED == status)
 			{
-				DBexecute("update alerts set status=%d where alertid=" ZBX_FS_UI64, ALERT_STATUS_SENT,
+				zbx_db_execute("update alerts set status=%d where alertid=" ZBX_FS_UI64, ALERT_STATUS_SENT,
 						alertid);
 			}
 			else
 			{
-				error = DBdyn_escape_string_len(row[1], ALERT_ERROR_LEN);
-				DBexecute("update alerts set error='%s',status=%d where alertid=" ZBX_FS_UI64,
+				error = zbx_db_dyn_escape_string_len(row[1], ALERT_ERROR_LEN);
+				zbx_db_execute("update alerts set error='%s',status=%d where alertid=" ZBX_FS_UI64,
 						error, ALERT_STATUS_FAILED, alertid);
 				zbx_free(error);
 			}
@@ -259,17 +259,17 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 		ret = SUCCEED;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where taskid=" ZBX_FS_UI64,
 			ZBX_TM_STATUS_DONE, taskid);
 	if (0 != parent_taskid)
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " or taskid=" ZBX_FS_UI64, parent_taskid);
 
-	DBexecute("%s", sql);
+	zbx_db_execute("%s", sql);
 	zbx_free(sql);
 
-	DBcommit();
+	zbx_db_commit();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -291,30 +291,248 @@ static void	tm_process_data_result(zbx_uint64_t taskid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __func__, taskid);
 
-	DBbegin();
+	zbx_db_begin();
 
-	result = DBselect("select parent_taskid"
+	result = zbx_db_select("select parent_taskid"
 			" from task_result"
 			" where taskid=" ZBX_FS_UI64,
 			taskid);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 		ZBX_STR2UINT64(parent_taskid, row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where taskid=" ZBX_FS_UI64,
 			ZBX_TM_STATUS_DONE, taskid);
 	if (0 != parent_taskid)
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " or taskid=" ZBX_FS_UI64, parent_taskid);
 
-	DBexecute("%s", sql);
+	zbx_db_execute("%s", sql);
 	zbx_free(sql);
 
-	DBcommit();
+	zbx_db_commit();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: rank event/problem as cause                                       *
+ *                                                                            *
+ * Parameters: eventid     - [IN] the event/problem, which should be ranked   *
+ *                           as cause                                         *
+ *                                                                            *
+ * Return value: SUCCEED - if there are no database errors                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	tm_rank_event_as_cause(zbx_uint64_t eventid)
+{
+	int	ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid: " ZBX_FS_UI64, __func__, eventid);
+
+	if (ZBX_DB_OK > zbx_db_execute("update problem set cause_eventid=null where eventid=" ZBX_FS_UI64, eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to convert problem (eventid:" ZBX_FS_UI64 ") from symptom to"
+				" cause", eventid);
+		ret = FAIL;
+		goto out;
+	}
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from event_symptom where eventid=" ZBX_FS_UI64, eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to convert event (id:" ZBX_FS_UI64 ") from symptom to cause",
+				eventid);
+		ret = FAIL;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: rank event/problem as symptom                                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     eventid           - [IN] event id of the new symptom                   *
+ *     cause_eventid     - [IN] event id of the new cause                     *
+ *     old_cause_eventid - [IN] event id of the old cause before the ranking  *
+ *                                                                            *
+ * Return value: SUCCEED - if there are no database errors                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ *****************************************************************************/
+static int	tm_rank_event_as_symptom(zbx_uint64_t eventid, zbx_uint64_t cause_eventid,
+		zbx_uint64_t old_cause_eventid)
+{
+	int	ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid: " ZBX_FS_UI64 ", cause_eventid: " ZBX_FS_UI64,  __func__, eventid,
+			cause_eventid);
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update problem"
+			" set cause_eventid=" ZBX_FS_UI64
+			" where eventid=" ZBX_FS_UI64 " or cause_eventid=" ZBX_FS_UI64,
+			cause_eventid, eventid, eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set new cause (eventid:" ZBX_FS_UI64 ") for problem"
+				" (eventid:" ZBX_FS_UI64 ")", cause_eventid, eventid);
+		ret = FAIL;
+		goto out;
+	}
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update event_symptom"
+			" set cause_eventid=" ZBX_FS_UI64
+			" where eventid=" ZBX_FS_UI64 " or cause_eventid=" ZBX_FS_UI64,
+			cause_eventid, eventid, eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set new cause (eventid:" ZBX_FS_UI64 ") for event"
+				" (eventid:" ZBX_FS_UI64 ")", cause_eventid, eventid);
+		ret = FAIL;
+		goto out;
+	}
+
+	if (0 == old_cause_eventid && ZBX_DB_OK > zbx_db_execute(
+			"insert into event_symptom (eventid,cause_eventid)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+			eventid, cause_eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to convert cause event " ZBX_FS_UI64 " to symptom of "
+				ZBX_FS_UI64, eventid, cause_eventid);
+		ret = FAIL;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: rank event task                                                   *
+ *                                                                            *
+ * Parameters: taskid - [IN]                                                  *
+ *             data   - [IN] JSON with with acknowledge id, action, event id  *
+ *                      for all actions and cause_eventid for rank to symptom *
+ *                      action                                                *
+ *                                                                            *
+ * Comments: Logic of this function is described in comments to test cases in *
+ *           the integration test testEventsCauseAndSymptoms                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	tm_process_rank_event(zbx_uint64_t taskid, const char *data)
+{
+	zbx_uint64_t		acknowledgeid, eventid, action;
+	struct zbx_json_parse	jp;
+	char			tmp[MAX_ID_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid: " ZBX_FS_UI64 ", data: '%s'",  __func__, taskid, data);
+
+	if (FAIL == zbx_json_open(data, &jp))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse process rank event task data");
+		goto fail;
+	}
+
+	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ACKNOWLEDGEID, tmp, sizeof(tmp), NULL) ||
+			FAIL == zbx_is_uint64(tmp, &acknowledgeid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse process rank event task data: failed to retrieve"
+				" \"%s\" tag", ZBX_PROTO_TAG_ACKNOWLEDGEID);
+		goto fail;
+	}
+
+	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ACTION, tmp, sizeof(tmp), NULL) ||
+			FAIL == zbx_is_uint64(tmp, &action))
+	{
+
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse process rank event task data: failed to retrieve"
+				" \"%s\" tag", ZBX_PROTO_TAG_ACTION);
+		goto fail;
+	}
+
+	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_EVENTID, tmp, sizeof(tmp), NULL) ||
+			FAIL == zbx_is_uint64(tmp, &eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse process rank event task data: failed to retrieve"
+				" \"%s\" tag", ZBX_PROTO_TAG_EVENTID);
+		goto fail;
+	}
+
+	if (0 != (action & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE))
+	{
+		if (SUCCEED != tm_rank_event_as_cause(eventid))
+			goto fail;
+	}
+	else if (0 != (action & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM))
+	{
+		int		should_swap;
+		zbx_uint64_t	requested_cause_eventid, target_cause_eventid, old_cause_eventid,
+				target_cause_triggerid;
+
+		if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_CAUSE_EVENTID, tmp, sizeof(tmp), NULL) ||
+				FAIL == zbx_is_uint64(tmp, &requested_cause_eventid))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to parse process rank event task data: failed to retrieve"
+					" \"%s\" tag", ZBX_PROTO_TAG_CAUSE_EVENTID);
+			goto fail;
+		}
+
+		/* the event specified in task data by cause_eventid might be a symptom, find the actual target cause */
+		if (0 == (target_cause_eventid = zbx_db_get_cause_eventid(requested_cause_eventid)))
+			target_cause_eventid = requested_cause_eventid;
+
+		if (target_cause_eventid == eventid)
+		{
+			/* cause and its symptom should be swapped */
+			should_swap = 1;
+			target_cause_eventid = requested_cause_eventid;
+			old_cause_eventid = 0;
+		}
+		else
+		{
+			should_swap = 0;
+			old_cause_eventid = zbx_db_get_cause_eventid(eventid);
+		}
+
+		if (0 == (target_cause_triggerid = zbx_get_objectid_by_eventid(target_cause_eventid)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "trigger id should never be '0' for target cause event (eventid: "
+					ZBX_FS_UI64 ")", target_cause_eventid);
+			goto fail;
+		}
+		else if (SUCCEED != zbx_db_lock_triggerid(target_cause_triggerid))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "the trigger (triggerid: " ZBX_FS_UI64 "), which generated the"
+					" target cause event (eventid: " ZBX_FS_UI64 ") was deleted, skip ranking"
+					" events as symptoms", target_cause_triggerid, target_cause_eventid);
+			goto skip;
+		}
+
+		/* start swap by turning the symptom into a cause */
+		if (1 == should_swap && SUCCEED != tm_rank_event_as_cause(requested_cause_eventid))
+			goto fail;
+
+		if (SUCCEED != tm_rank_event_as_symptom(eventid, target_cause_eventid, old_cause_eventid))
+			goto fail;
+	}
+skip:
+	if (ZBX_DB_OK > zbx_db_execute("update acknowledges set taskid=null where acknowledgeid=" ZBX_FS_UI64,
+			acknowledgeid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to change taskid from " ZBX_FS_UI64 " to null in table"
+				" acknowledges where acknowledgeid is " ZBX_FS_UI64, taskid, acknowledgeid);
+	}
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: notify service manager about problem severity changes             *
@@ -380,7 +598,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	zbx_vector_ptr_create(&ack_tasks);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select a.eventid,ta.acknowledgeid,ta.taskid,a.old_severity,a.new_severity"
+			"select a.eventid,ta.acknowledgeid,ta.taskid,a.old_severity,a.new_severity,a.action"
 			" from task_acknowledge ta"
 			" left join acknowledges a"
 				" on ta.acknowledgeid=a.acknowledgeid"
@@ -390,17 +608,21 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 				" on ta.taskid=t.taskid"
 			" where t.status=%d and",
 			ZBX_TM_STATUS_NEW);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.taskid", ack_taskids->values, ack_taskids->values_num);
-	result = DBselect("%s", sql);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.taskid", ack_taskids->values, ack_taskids->values_num);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (SUCCEED == DBis_null(row[0]))
+		if (SUCCEED == zbx_db_is_null(row[0]))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot process acknowledge tasks because related event"
 					" was removed");
 			continue;
 		}
+
+		/* do not notify about rank changes */
+		if (0 != (atoi(row[5]) & (ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM)))
+			continue;
 
 		ack_task = (zbx_ack_task_t *)zbx_malloc(NULL, sizeof(zbx_ack_task_t));
 
@@ -411,7 +633,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 		ack_task->new_severity = atoi(row[4]);
 		zbx_vector_ptr_append(&ack_tasks, ack_task);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < ack_tasks.values_num)
 	{
@@ -423,8 +645,8 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset , "update task set status=%d where", ZBX_TM_STATUS_DONE);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", ack_taskids->values, ack_taskids->values_num);
-	DBexecute("%s", sql);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", ack_taskids->values, ack_taskids->values_num);
+	zbx_db_execute("%s", sql);
 
 	zbx_free(sql);
 
@@ -467,14 +689,14 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 			" left join task_check_now td"
 				" on t.taskid=td.taskid"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.taskid", taskids->values, taskids->values_num);
-	result = DBselect("%s", sql);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.taskid", taskids->values, taskids->values_num);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(taskid, row[0]);
 
-		if (SUCCEED == DBis_null(row[3]))
+		if (SUCCEED == zbx_db_is_null(row[3]))
 		{
 			zbx_vector_uint64_append(&done_taskids, taskid);
 			continue;
@@ -499,7 +721,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		task->data = (void *)zbx_tm_check_now_create(itemid);
 		zbx_vector_ptr_append(&tasks, task);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != tasks.values_num)
 	{
@@ -516,7 +738,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		zbx_dc_reschedule_items(&itemids, time(NULL), proxy_hostids);
 
 		sql_offset = 0;
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < tasks.values_num; i++)
 		{
@@ -547,13 +769,13 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where taskid=" ZBX_FS_UI64 ";\n",
 					task->taskid);
 
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 
 		zbx_vector_uint64_destroy(&itemids);
 		zbx_free(proxy_hostids);
@@ -566,9 +788,9 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where",
 				ZBX_TM_STATUS_DONE);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", done_taskids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", done_taskids.values,
 				done_taskids.values_num);
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 	}
 
 	zbx_free(sql);
@@ -861,13 +1083,13 @@ static void	tm_process_temp_suppression(const char *data)
 
 	}
 
-	if (SUCCEED != DBlock_record("users", userid, NULL, 0))
+	if (SUCCEED != zbx_db_lock_record("users", userid, NULL, 0))
 		return;
 
 	if (ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS == action ||
 			(ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME != ts && time(NULL) >= ts))
 	{
-		DBexecute("delete from event_suppress where eventid=" ZBX_FS_UI64 " and maintenanceid is null",
+		zbx_db_execute("delete from event_suppress where eventid=" ZBX_FS_UI64 " and maintenanceid is null",
 				eventid);
 	}
 	else if (ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS == action)
@@ -875,15 +1097,15 @@ static void	tm_process_temp_suppression(const char *data)
 		DB_ROW		row;
 		DB_RESULT	result;
 
-		if (SUCCEED != DBlock_record("events", eventid, NULL, 0))
+		if (SUCCEED != zbx_db_lock_record("events", eventid, NULL, 0))
 			return;
 
-		result = DBselect("select event_suppressid,suppress_until from event_suppress where eventid="
+		result = zbx_db_select("select event_suppressid,suppress_until from event_suppress where eventid="
 				ZBX_FS_UI64 " and maintenanceid is null" ZBX_FOR_UPDATE, eventid);
 
-		if (NULL != (row = DBfetch(result)))
+		if (NULL != (row = zbx_db_fetch(result)))
 		{
-			DBexecute("update event_suppress set suppress_until=%u,userid=" ZBX_FS_UI64
+			zbx_db_execute("update event_suppress set suppress_until=%u,userid=" ZBX_FS_UI64
 					" where event_suppressid=%s", ts, userid, row[0]);
 		}
 		else
@@ -899,7 +1121,7 @@ static void	tm_process_temp_suppression(const char *data)
 			zbx_db_insert_clean(&db_insert);
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -924,7 +1146,7 @@ static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *tas
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __func__, taskids->values_num);
 
-	DBbegin();
+	zbx_db_begin();
 
 	zbx_vector_uint64_create(&done_taskids);
 
@@ -935,14 +1157,14 @@ static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *tas
 				" on t.taskid=td.taskid"
 			" where t.proxy_hostid is null"
 				" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.taskid", taskids->values, taskids->values_num);
-	result = DBselect("%s", sql);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.taskid", taskids->values, taskids->values_num);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(taskid, row[0]);
 
-		if (SUCCEED == DBis_null(row[1]))
+		if (SUCCEED == zbx_db_is_null(row[1]))
 		{
 			zbx_vector_uint64_append(&done_taskids, taskid);
 			continue;
@@ -968,26 +1190,30 @@ static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *tas
 				tm_process_temp_suppression(row[2]);
 				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
+			case ZBX_TM_DATA_TYPE_RANK_EVENT:
+				tm_process_rank_event(taskid, row[2]);
+				zbx_vector_uint64_append(&done_taskids, taskid);
+				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != (processed_num = done_taskids.values_num))
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where",
 				ZBX_TM_STATUS_DONE);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", done_taskids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", done_taskids.values,
 				done_taskids.values_num);
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 	}
 
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&done_taskids);
 
-	DBcommit();
+	zbx_db_commit();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __func__, processed_num);
 
@@ -1007,8 +1233,8 @@ static int	tm_expire_generic_tasks(zbx_vector_uint64_t *taskids)
 	size_t		sql_alloc = 0, sql_offset = 0;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where", ZBX_TM_STATUS_EXPIRED);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
-	DBexecute("%s", sql);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
+	zbx_db_execute("%s", sql);
 	zbx_free(sql);
 
 	return taskids->values_num;
@@ -1025,18 +1251,18 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxy_h
 
 	if (0 < proxy_hostid)
 	{
-		DB_ROW				row;
-		DB_RESULT			result;
+		DB_ROW		row;
+		DB_RESULT	result;
 
-		result = DBselect(
+		result = zbx_db_select(
 				"select compatibility"
 				" from host_rtdata"
 				" where hostid=" ZBX_FS_UI64, proxy_hostid);
 
-		if (NULL != (row = DBfetch(result)))
+		if (NULL != (row = zbx_db_fetch(result)))
 			compatibility = (zbx_proxy_compatibility_t)atoi(row[0]);
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	return compatibility;
@@ -1062,13 +1288,13 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 	zbx_vector_uint64_create(&expire_taskids);
 	zbx_vector_uint64_create(&data_taskids);
 
-	result = DBselect("select taskid,type,clock,ttl,proxy_hostid"
+	result = zbx_db_select("select taskid,type,clock,ttl,proxy_hostid"
 				" from task"
 				" where status in (%d,%d)"
 				" order by taskid",
 			ZBX_TM_STATUS_NEW, ZBX_TM_STATUS_INPROGRESS);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_proxy_compatibility_t	compatibility;
 
@@ -1131,30 +1357,27 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 					zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
-			case ZBX_TM_PROXYDATA:
-				if (ZBX_TM_TASK_DATA == type)
+				compatibility = tm_get_proxy_compatibility(proxy_hostid);
+
+				if (ZBX_PROXY_VERSION_OUTDATED == compatibility ||
+						ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 				{
-					compatibility = tm_get_proxy_compatibility(proxy_hostid);
+					zbx_tm_task_t	*task;
+					const char	*error = "The requested task is disabled. Proxy major"
+							" version does not match server major version.";
 
-					if (ZBX_PROXY_VERSION_OUTDATED == compatibility ||
-							ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
-					{
-						zbx_tm_task_t	*task;
-						const char	*error = "The requested task is disabled. Proxy major"
-								" version does not match server major version.";
+					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+					task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
+							zbx_time(), 0, 0);
+					task->data = zbx_tm_data_result_create(taskid, FAIL, error);
+					zbx_tm_save_task(task);
+					zbx_tm_task_free(task);
 
-						zabbix_log(LOG_LEVEL_WARNING, "%s", error);
-						task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
-								zbx_time(), 0, 0);
-						task->data = zbx_tm_data_result_create(taskid, FAIL, error);
-						zbx_tm_save_task(task);
-						zbx_tm_task_free(task);
-
-						zbx_vector_uint64_append(&expire_taskids, taskid);
-						break;
-					}
+					zbx_vector_uint64_append(&expire_taskids, taskid);
+					break;
 				}
-
+				ZBX_FALLTHROUGH;
+			case ZBX_TM_PROXYDATA:
 				/* both - 'new' and 'in progress' tasks should expire */
 				if (0 != ttl && clock + ttl < now)
 					zbx_vector_uint64_append(&expire_taskids, taskid);
@@ -1171,7 +1394,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 		}
 
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < ack_taskids.values_num)
 		processed_num += tm_process_acknowledgments(&ack_taskids);
@@ -1200,10 +1423,10 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
  ******************************************************************************/
 static void	tm_remove_old_tasks(int now)
 {
-	DBbegin();
-	DBexecute("delete from task where status in (%d,%d) and clock<=%d",
+	zbx_db_begin();
+	zbx_db_execute("delete from task where status in (%d,%d) and clock<=%d",
 			ZBX_TM_STATUS_DONE, ZBX_TM_STATUS_EXPIRED, now - ZBX_TM_CLEANUP_TASK_AGE);
-	DBcommit();
+	zbx_db_commit();
 }
 
 static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
@@ -1256,9 +1479,9 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 	if (0 < tasks_active.values_num)
 	{
-		DBbegin();
+		zbx_db_begin();
 		zbx_tm_save_tasks(&tasks_active);
-		DBcommit();
+		zbx_db_commit();
 		zbx_vector_tm_task_clear_ext(&tasks_active, zbx_tm_task_free);
 	}
 
@@ -1375,9 +1598,9 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 
 	if (0 < tasks_active.values_num)
 	{
-		DBbegin();
+		zbx_db_begin();
 		zbx_tm_save_tasks(&tasks_active);
-		DBcommit();
+		zbx_db_commit();
 		zbx_vector_tm_task_clear_ext(&tasks_active, zbx_tm_task_free);
 	}
 
@@ -1398,13 +1621,13 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
 			((((zbx_thread_args_t *)args))->args);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		problems_export = zbx_problems_export_init(get_problems_export, "task-manager", process_num);
@@ -1434,7 +1657,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		}
 
 		sec1 = zbx_time();
-		zbx_update_env(sec1);
+		zbx_update_env(get_process_type_string(process_type), sec1);
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 

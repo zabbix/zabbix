@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
 
-#include "zbxdbhigh.h"
 #include "log.h"
 
 typedef struct
@@ -89,8 +88,6 @@ zbx_db_version_t;
 #endif
 
 #define ZBX_FIRST_DB_VERSION		2010000
-
-extern unsigned char	program_type;
 
 #ifndef HAVE_SQLITE3
 static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
@@ -219,7 +216,7 @@ static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql
 				break;
 			default:
 #endif
-				default_value_esc = DBdyn_escape_string(field->default_value);
+				default_value_esc = zbx_db_dyn_escape_string(field->default_value);
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " default '%s'", default_value_esc);
 				zbx_free(default_value_esc);
 #if defined(HAVE_MYSQL)
@@ -446,7 +443,7 @@ int	DBcreate_table(const ZBX_TABLE *table)
 
 	DBcreate_table_sql(&sql, &sql_alloc, &sql_offset, table);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -462,7 +459,7 @@ int	DBrename_table(const char *table_name, const char *new_name)
 
 	DBrename_table_sql(&sql, &sql_alloc, &sql_offset, table_name, new_name);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -478,7 +475,7 @@ int	DBdrop_table(const char *table_name)
 
 	DBdrop_table_sql(&sql, &sql_alloc, &sql_offset, table_name);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -494,7 +491,7 @@ int	DBadd_field(const char *table_name, const ZBX_FIELD *field)
 
 	DBadd_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -510,7 +507,7 @@ int	DBrename_field(const char *table_name, const char *field_name, const ZBX_FIE
 
 	DBrename_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name, field);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -530,7 +527,7 @@ static int	DBmodify_field_type_with_copy(const char *table_name, const ZBX_FIELD
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "alter table %s rename column %s to " ZBX_OLD_FIELD,
 			table_name, field->name);
 
-	if (ZBX_DB_OK > DBexecute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 		goto out;
 
 	if (ZBX_DB_OK > DBadd_field(table_name, field))
@@ -540,7 +537,7 @@ static int	DBmodify_field_type_with_copy(const char *table_name, const ZBX_FIELD
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s=" ZBX_OLD_FIELD, table_name,
 			field->name);
 
-	if (ZBX_DB_OK > DBexecute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 		goto out;
 
 	ret = DBdrop_field(table_name, ZBX_OLD_FIELD);
@@ -557,7 +554,7 @@ out:
 
 int	DBcreate_serial_sequence(const char *table_name)
 {
-	if (ZBX_DB_OK > DBexecute("create sequence " ZBX_FS_DB_SEQUENCE " start with 1 increment by 1 nomaxvalue",
+	if (ZBX_DB_OK > zbx_db_execute("create sequence " ZBX_FS_DB_SEQUENCE " start with 1 increment by 1 nomaxvalue",
 			table_name))
 	{
 		return FAIL;
@@ -568,7 +565,7 @@ int	DBcreate_serial_sequence(const char *table_name)
 
 int	DBcreate_serial_trigger(const char *table_name, const char *field_name)
 {
-	if (ZBX_DB_OK > DBexecute("create trigger " ZBX_FS_DB_TRIGGER " before insert on %s for each row\n"
+	if (ZBX_DB_OK > zbx_db_execute("create trigger " ZBX_FS_DB_TRIGGER " before insert on %s for each row\n"
 					"begin\n"
 						"select " ZBX_FS_DB_SEQUENCE ".nextval into :new.%s from dual;\n"
 					"end;",
@@ -607,7 +604,7 @@ int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field, const ZB
 #endif
 	DBmodify_field_type_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -623,7 +620,7 @@ int	DBset_not_null(const char *table_name, const ZBX_FIELD *field)
 
 	DBset_not_null_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -639,7 +636,7 @@ int	DBset_default(const char *table_name, const ZBX_FIELD *field)
 
 	DBset_default_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -655,7 +652,7 @@ int	DBdrop_default(const char *table_name, const ZBX_FIELD *field)
 
 	DBdrop_default_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -671,7 +668,7 @@ int	DBdrop_not_null(const char *table_name, const ZBX_FIELD *field)
 
 	DBdrop_not_null_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -687,7 +684,7 @@ int	DBdrop_field(const char *table_name, const char *field_name)
 
 	DBdrop_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -703,7 +700,7 @@ int	DBcreate_index(const char *table_name, const char *index_name, const char *f
 
 	DBcreate_index_sql(&sql, &sql_alloc, &sql_offset, table_name, index_name, fields, unique);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -719,7 +716,7 @@ int	DBdrop_index(const char *table_name, const char *index_name)
 
 	DBdrop_index_sql(&sql, &sql_alloc, &sql_offset, table_name, index_name);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -736,7 +733,7 @@ int	DBrename_index(const char *table_name, const char *old_name, const char *new
 
 	DBrename_index_sql(&sql, &sql_alloc, &sql_offset, table_name, old_name, new_name, fields, unique);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -752,7 +749,7 @@ int	DBadd_foreign_key(const char *table_name, int id, const ZBX_FIELD *field)
 
 	DBadd_foreign_key_sql(&sql, &sql_alloc, &sql_offset, table_name, id, field);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -768,7 +765,7 @@ int	DBdrop_foreign_key(const char *table_name, int id)
 
 	DBdrop_foreign_key_sql(&sql, &sql_alloc, &sql_offset, table_name, id);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -789,17 +786,17 @@ static int	DBcreate_dbversion_table(void)
 			};
 	int		ret;
 
-	DBbegin();
+	zbx_db_begin();
 	if (SUCCEED == (ret = DBcreate_table(&table)))
 	{
-		if (ZBX_DB_OK > DBexecute("insert into dbversion (mandatory,optional) values (%d,%d)",
+		if (ZBX_DB_OK > zbx_db_execute("insert into dbversion (mandatory,optional) values (%d,%d)",
 				ZBX_FIRST_DB_VERSION, ZBX_FIRST_DB_VERSION))
 		{
 			ret = FAIL;
 		}
 	}
 
-	return DBend(ret);
+	return zbx_db_end(ret);
 }
 
 static int	DBset_version(int version, unsigned char mandatory)
@@ -812,13 +809,15 @@ static int	DBset_version(int version, unsigned char mandatory)
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "mandatory=%d,", version);
 	zbx_snprintf(sql + offset, sizeof(sql) - offset, "optional=%d", version);
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		return SUCCEED;
 
 	return FAIL;
 }
 
 #endif	/* not HAVE_SQLITE3 */
+
+zbx_get_program_type_f	DBget_program_type_cb;
 
 extern zbx_dbpatch_t	DBPATCH_VERSION(2010)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(2020)[];
@@ -847,6 +846,8 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(6000)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6010)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6030)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(6040)[];
+/*extern zbx_dbpatch_t	DBPATCH_VERSION(6050)[];*/
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -876,6 +877,8 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(6010), "6.2 development"},
 	{DBPATCH_VERSION(6020), "6.2 maintenance"},
 	{DBPATCH_VERSION(6030), "6.4 development"},
+	{DBPATCH_VERSION(6040), "6.4 maintenance"},
+/*	{DBPATCH_VERSION(6050), "7.0 development"},*/
 	{NULL}
 };
 
@@ -887,20 +890,30 @@ static void	DBget_version(int *mandatory, int *optional)
 	*mandatory = -1;
 	*optional = -1;
 
-	result = DBselect("select mandatory,optional from dbversion");
+	result = zbx_db_select("select mandatory,optional from dbversion");
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		*mandatory = atoi(row[0]);
 		*optional = atoi(row[1]);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (-1 == *mandatory)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot get the database version. Exiting ...");
 		exit(EXIT_FAILURE);
 	}
+}
+
+unsigned char	DBget_program_type(void)
+{
+	return DBget_program_type_cb();
+}
+
+void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb)
+{
+	DBget_program_type_cb = get_program_type_cb;
 }
 
 int	DBcheck_version(void)
@@ -930,14 +943,14 @@ int	DBcheck_version(void)
 			required = patches[i].version;
 	}
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	if (SUCCEED != DBtable_exists(dbversion_table_name))
+	if (SUCCEED != zbx_db_table_exists(dbversion_table_name))
 	{
 #ifndef HAVE_SQLITE3
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" does not exist", __func__, dbversion_table_name);
 
-		if (SUCCEED != DBfield_exists("config", "server_check_interval"))
+		if (SUCCEED != zbx_db_field_exists("config", "server_check_interval"))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot upgrade database: the database must"
 					" correspond to version 2.0 or later. Exiting ...");
@@ -950,7 +963,7 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): UNKNOWN."
 				" Required mandatory version: %08d.",
-				get_program_type_string(program_type), required);
+				get_program_type_string(DBget_program_type_cb()), required);
 		zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
 
 		ret = NOTSUPPORTED;
@@ -983,7 +996,8 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): %08d/%08d."
 				" Required mandatory version: %08d.",
-				get_program_type_string(program_type), db_mandatory, db_optional, required);
+				get_program_type_string(DBget_program_type_cb()), db_mandatory, db_optional,
+				required);
 #ifdef HAVE_SQLITE3
 		if (required > db_mandatory)
 			zabbix_log(LOG_LEVEL_WARNING, "Zabbix does not support SQLite3 database upgrade.");
@@ -1025,10 +1039,10 @@ int	DBcheck_version(void)
 			sigaddset(&mask, SIGINT);
 			sigaddset(&mask, SIGQUIT);
 
-			if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
-				zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the user signal");
+			if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
+				zabbix_log(LOG_LEVEL_WARNING, "cannot set signal mask to block the user signal");
 
-			DBbegin();
+			zbx_db_begin();
 
 			/* skipping the duplicated patches */
 			if ((0 != patches[i].duplicates && patches[i].duplicates <= db_optional) ||
@@ -1037,10 +1051,10 @@ int	DBcheck_version(void)
 				ret = DBset_version(patches[i].version, patches[i].mandatory);
 			}
 
-			ret = DBend(ret);
+			ret = zbx_db_end(ret);
 
-			if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-				zabbix_log(LOG_LEVEL_WARNING,"cannot restore sigprocmask");
+			if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+				zabbix_log(LOG_LEVEL_WARNING,"cannot restore signal mask");
 
 			if (SUCCEED != ret)
 				break;
@@ -1062,7 +1076,7 @@ int	DBcheck_version(void)
 	if (SUCCEED == ret)
 	{
 		/* clear changelog after successful upgrade, doesn't matter if it fails */
-		(void)DBexecute("delete from changelog");
+		(void)zbx_db_execute("delete from changelog");
 
 		zabbix_log(LOG_LEVEL_WARNING, "database upgrade fully completed");
 	}
@@ -1071,14 +1085,14 @@ int	DBcheck_version(void)
 #endif	/* not HAVE_SQLITE3 */
 
 out:
-	DBclose();
+	zbx_db_close();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
-int	DBcheck_double_type(void)
+int	DBcheck_double_type(zbx_config_dbhigh_t *config_dbhigh)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1088,26 +1102,29 @@ int	DBcheck_double_type(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 #if defined(HAVE_MYSQL)
-	sql = DBdyn_escape_string(CONFIG_DBNAME);
+	sql = zbx_db_dyn_escape_string(config_dbhigh->config_dbname);
 	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
 			" where table_schema='%s' and column_type='double'", sql);
 #elif defined(HAVE_POSTGRESQL)
-	sql = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ? "public" : CONFIG_DBSCHEMA);
+	sql = zbx_db_dyn_escape_string(NULL == config_dbhigh->config_dbschema ||
+			'\0' == *config_dbhigh->config_dbschema ? "public" : config_dbhigh->config_dbschema);
 	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
 			" where table_schema='%s' and data_type='double precision'", sql);
 #elif defined(HAVE_ORACLE)
+	ZBX_UNUSED(config_dbhigh);
 	sql = zbx_strdup(sql, "select count(*) from user_tab_columns"
 			" where data_type='BINARY_DOUBLE'");
 #elif defined(HAVE_SQLITE3)
+	ZBX_UNUSED(config_dbhigh);
 	/* upgrade patch is not required for sqlite3 */
 	ret = SUCCEED;
 	goto out;
 #endif
 
-	if (NULL == (result = DBselect("%s"
+	if (NULL == (result = zbx_db_select("%s"
 			" and ((lower(table_name)='trends'"
 					" and (lower(column_name) in ('value_min', 'value_avg', 'value_max')))"
 			" or (lower(table_name)='history' and lower(column_name)='value'))", sql)))
@@ -1116,12 +1133,12 @@ int	DBcheck_double_type(void)
 		goto out;
 	}
 
-	if (NULL != (row = DBfetch(result)) && total_dbl_cols == atoi(row[0]))
+	if (NULL != (row = zbx_db_fetch(result)) && total_dbl_cols == atoi(row[0]))
 		ret = SUCCEED;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
-	DBclose();
+	zbx_db_close();
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1192,7 +1209,7 @@ int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_
 				table_name);
 #endif
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -1244,7 +1261,7 @@ int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_
 				table_name);
 #endif
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -1296,7 +1313,7 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 				table_name);
 #endif
 
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -1348,7 +1365,7 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 			original_column_name, idname, idname, table_name, indexed_column_name, table_name,
 			table_name, indexed_column_name, function);
 #endif
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);
@@ -1407,7 +1424,7 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 			original_column_name, idname, idname, table_name, indexed_column_name,
 			original_column_name, table_name, table_name, indexed_column_name, function);
 #endif
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
 		ret = SUCCEED;
 
 	zbx_free(sql);

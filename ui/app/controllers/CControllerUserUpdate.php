@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,28 +31,37 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		$themes[] = THEME_DEFAULT;
 
 		$fields = [
-			'userid' =>			'fatal|required|db users.userid',
-			'username' =>		'required|db users.username|not_empty',
-			'name' =>			'db users.name',
-			'surname' =>		'db users.surname',
-			'user_groups' =>	'array_id',
-			'password1' =>		'string',
-			'password2' =>		'string',
-			'medias' =>			'array',
-			'lang' =>			'db users.lang|in '.implode(',', $locales),
-			'timezone' =>		'db users.timezone|in '.implode(',', $this->timezones),
-			'theme' =>			'db users.theme|in '.implode(',', $themes),
-			'autologin' =>		'db users.autologin|in 0,1',
-			'autologout' =>		'db users.autologout|not_empty',
-			'refresh' =>		'db users.refresh|not_empty',
-			'rows_per_page' =>	'db users.rows_per_page',
-			'url' =>			'db users.url',
-			'roleid' =>			'id',
-			'form_refresh' =>	'int32'
+			'userid' =>				'fatal|required|db users.userid',
+			'username' =>			'required|db users.username|not_empty',
+			'name' =>				'db users.name',
+			'surname' =>			'db users.surname',
+			'user_groups' =>		'array_id',
+			'current_password' =>	'string',
+			'password1' =>			'string',
+			'password2' =>			'string',
+			'medias' =>				'array',
+			'lang' =>				'db users.lang|in '.implode(',', $locales),
+			'timezone' =>			'db users.timezone|in '.implode(',', $this->timezones),
+			'theme' =>				'db users.theme|in '.implode(',', $themes),
+			'autologin' =>			'db users.autologin|in 0,1',
+			'autologout' =>			'db users.autologout|not_empty',
+			'refresh' =>			'db users.refresh|not_empty',
+			'rows_per_page' =>		'db users.rows_per_page',
+			'url' =>				'db users.url',
+			'roleid' =>				'id',
+			'form_refresh' =>		'int32'
 		];
 
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
+
+		if (CWebUser::$data['userid'] == $this->getInput('userid')
+				&& CWebUser::$data['roleid'] == USER_TYPE_SUPER_ADMIN) {
+			if ($ret && !$this->validateCurrentPassword()) {
+				$error = self::VALIDATION_ERROR;
+				$ret = false;
+			}
+		}
 
 		if ($ret && (!$this->validatePassword() || !$this->validateUserRole())) {
 			$error = self::VALIDATION_ERROR;
@@ -96,6 +105,11 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'
 		]);
 
+		if ($this->getInput('current_password', '') !== '' || ($this->hasInput('current_password')
+				&& CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL)) {
+			$user['current_passwd'] = $this->getInput('current_password');
+		}
+
 		if ($this->getInput('password1', '') !== '' || ($this->hasInput('password1') && !$this->allow_empty_password)) {
 			$user['passwd'] = $this->getInput('password1');
 		}
@@ -117,6 +131,10 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		$result = (bool) API::User()->update($user);
 
 		if ($result) {
+			if (array_key_exists('passwd', $user) && CWebUser::$data['userid'] == $user['userid']) {
+				redirect('index.php');
+			}
+
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'user.list')
 				->setArgument('page', CPagerHelper::loadPage('user.list', null))

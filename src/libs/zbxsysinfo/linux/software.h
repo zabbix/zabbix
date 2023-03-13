@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,13 +22,6 @@
 
 #include "zbxtypes.h"
 #include "zbxjson.h"
-
-#define SW_OS_FULL			"/proc/version"
-#define SW_OS_SHORT 			"/proc/version_signature"
-#define SW_OS_NAME			"/etc/issue.net"
-#define SW_OS_NAME_RELEASE		"/etc/os-release"
-
-#define SW_OS_OPTION_PRETTY_NAME	"PRETTY_NAME"
 
 typedef struct
 {

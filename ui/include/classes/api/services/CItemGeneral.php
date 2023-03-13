@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -489,7 +489,8 @@ abstract class CItemGeneral extends CApiService {
 				'SELECT ht.templateid,ht.hostid,h.status'.
 				' FROM hosts_templates ht,hosts h'.
 				' WHERE ht.hostid=h.hostid'.
-					' AND '.dbConditionId('ht.templateid', array_keys($templateids))
+					' AND '.dbConditionId('ht.templateid', array_keys($templateids)).
+					' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])
 			);
 
 			$tpl_links = [];
@@ -1185,7 +1186,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if (array_key_exists('authtype', $item) && $item['authtype'] != $db_item['authtype']
-						&& $item['authtype'] == HTTPTEST_AUTH_NONE) {
+						&& $item['authtype'] == ZBX_HTTP_AUTH_NONE) {
 					$item += array_intersect_key($type_field_defaults, array_flip(['username', 'password']));
 				}
 
@@ -2020,6 +2021,53 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				$master_itemid = $dep_item_links[$master_itemid];
+			}
+		}
+	}
+
+	/**
+	 * Check prerpocessing steps for specifics validation rules.
+	 *
+	 * @param array $items
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkPreprocessingSteps(array $items): void {
+		foreach ($items as $i => $item) {
+			if (!array_key_exists('preprocessing', $item)) {
+				continue;
+			}
+
+			foreach ($item['preprocessing'] as $j => $step) {
+				if ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+					$params = explode("\n", $step['params']);
+
+					if (count($params) % 3 !== 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s.', '/'.($i + 1).'/preprocessing/'.($j + 1).'/params', _('cannot be empty'))
+						);
+					}
+
+					for ($n = 1; $n <= count($params); $n++) {
+						$param = $params[$n - 1];
+
+						if ($param === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', '/'.($i + 1).'/preprocessing/'.($j + 1).'/params', _('cannot be empty'))
+							);
+						}
+
+						// Field "Treat as" every 3rd value. Check that field is correct.
+						if ($n % 3 === 0) {
+							if (!in_array($param, [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX,
+									ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Incorrect value for field "%1$s": %2$s.', '/'.($i + 1).'/preprocessing/'.($j + 1).'/params', _('incorrect value'))
+								);
+							}
+						}
+					}
+				}
 			}
 		}
 	}

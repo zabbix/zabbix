@@ -1,6 +1,5 @@
 zabbix_export:
-  version: '6.4'
-  date: '2022-09-01T13:23:33Z'
+  version: '7.0'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -17,6 +16,9 @@ zabbix_export:
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 7.0-0
       groups:
         -
           name: Templates/Cloud
@@ -381,7 +383,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    if (typeof AwsS3.params.proxy !== 'undefined' && AwsS3.params.proxy !== '') {
+                        request.setProxy(AwsS3.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
@@ -499,6 +504,9 @@ zabbix_export:
             -
               name: bucket_name
               value: '{$AWS.S3.BUCKET.NAME}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -639,7 +647,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri;
-            
+
+                    if (typeof AwsS3.params.proxy !== 'undefined' && AwsS3.params.proxy !== '') {
+                        request.setProxy(AwsS3.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('X-Amz-Target: GraniteServiceVersion20100801.GetMetricData')
                     request.addHeader('Accept: application/json');
@@ -723,6 +734,9 @@ zabbix_export:
             -
               name: bucket_name
               value: '{$AWS.S3.BUCKET.NAME}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -1207,6 +1221,9 @@ zabbix_export:
           tag: target
           value: s3
       macros:
+        -
+          macro: '{$AWS.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         -
           macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
