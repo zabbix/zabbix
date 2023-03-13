@@ -41,7 +41,13 @@ class CControllerModuleEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -90,11 +96,12 @@ class CControllerModuleEdit extends CController {
 			$response = new CControllerResponseData($data);
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'module.list')
-				->setArgument('page', CPagerHelper::loadPage('module.list', null))
-			);
-			CMessageHelper::setErrorTitle(_s('Cannot load module at: %1$s.', $this->module['relative_path']));
+			$response = (new CControllerResponseData(['main_block' => json_encode([
+				'error' => [
+					'title' => _s('Cannot load module at: %1$s.', $this->module['relative_path']),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]
+			])]))->disableView();
 		}
 
 		$this->setResponse($response);
