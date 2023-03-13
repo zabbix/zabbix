@@ -49,9 +49,8 @@ class testPageAdministrationScripts extends CWebTest {
 	private static $script_scope_event = 'Manual event action for filter check';
 	private static $custom_action = 'Trigger action for Scripts page testing';
 
-	public function prepareScriptData()
-	{
-		$response = CDataHelper::call('script.create', [
+	public function prepareScriptData() {
+		CDataHelper::call('script.create', [
 			[
 				'name' => self::$script_scope_event,
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
@@ -104,95 +103,93 @@ class testPageAdministrationScripts extends CWebTest {
 		return [
 			[
 				[
-					'fields' => [
-						[
-							'Name' => self::$custom_script,
-							'Scope' => 'Action operation',
-							'Used in actions' => self::$custom_action,
-							'Type' => 'Script',
-							'Execute on' => 'Server (proxy)',
-							'Commands' => '/sbin/zabbix_server --runtime-control config_cache_reload',
-							'User group' => 'All',
-							'Host group' => 'Zabbix servers',
-							'Host access' => 'Read'
-						],
-						[
-							'Name' => 'Detect operating system',
-							'Scope' => 'Manual host action',
-							'Used in actions' => '',
-							'Type' => 'Script',
-							'Execute on' => 'Server (proxy)',
-							'Commands' => 'sudo /usr/bin/nmap -O {HOST.CONN}',
-							'User group' => 'Zabbix administrators',
-							'Host group' => 'All',
-							'Host access' => 'Read'
-						],
-						[
-							'Name' => self::$script_scope_event,
-							'Scope' => 'Manual event action',
-							'Used in actions' => '',
-							'Type' => 'Script',
-							'Execute on' => 'Server (proxy)',
-							'Commands' => 'test',
-							'User group' => 'All',
-							'Host group' => 'All',
-							'Host access' => 'Read'
-						],
-						[
-							'Name' => 'Ping',
-							'Scope' => 'Manual host action',
-							'Used in actions' => '',
-							'Type' => 'Script',
-							'Execute on' => 'Server (proxy)',
-							'Commands' => 'ping -c 3 {HOST.CONN}; case $? in [01]) true;; *) false;; esac',
-							'User group' => 'All',
-							'Host group' => 'All',
-							'Host access' => 'Read'
-						],
-						[
-							'Name' => 'Reboot',
-							'Scope' => 'Action operation',
-							'Used in actions' => 'Autoregistration action 1, Autoregistration action 2, Trigger action 4',
-							'Type' => 'Script',
-							'Execute on' => 'Server (proxy)',
-							'Commands' => '/sbin/shutdown -r',
-							'User group' => 'Zabbix administrators',
-							'Host group' => 'Zabbix servers',
-							'Host access' => 'Write'
-						],
-						[
-							'Name' => self::$script_for_filter,
-							'Scope' => 'Manual event action',
-							'Used in actions' => '',
-							'Type' => 'Script',
-							'Execute on' => 'Server (proxy)',
-							'Commands' => '/sbin/run',
-							'User group' => 'All',
-							'Host group' => 'All',
-							'Host access' => 'Read'
-						],
-						[
-							'Name' => 'Selenium script',
-							'Scope' => 'Action operation',
-							'Used in actions' => '',
-							'Type' => 'Script',
-							'Execute on' => 'Server (proxy)',
-							'Commands' => 'test',
-							'User group' => 'Selenium user group in scripts',
-							'Host group' => 'All',
-							'Host access' => 'Read'
-						],
-						[
-							'Name' => 'Traceroute',
-							'Scope' => 'Manual host action',
-							'Used in actions' => '',
-							'Type' => 'Script',
-							'Execute on' => 'Server (proxy)',
-							'Commands' => '/usr/bin/traceroute {HOST.CONN}',
-							'User group' => 'All',
-							'Host group' => 'All',
-							'Host access' => 'Read'
-						]
+					[
+						'Name' => self::$custom_script,
+						'Scope' => 'Action operation',
+						'Used in actions' => self::$custom_action,
+						'Type' => 'Script',
+						'Execute on' => 'Server (proxy)',
+						'Commands' => '/sbin/zabbix_server --runtime-control config_cache_reload',
+						'User group' => 'All',
+						'Host group' => 'Zabbix servers',
+						'Host access' => 'Read'
+					],
+					[
+						'Name' => 'Detect operating system',
+						'Scope' => 'Manual host action',
+						'Used in actions' => '',
+						'Type' => 'Script',
+						'Execute on' => 'Server (proxy)',
+						'Commands' => 'sudo /usr/bin/nmap -O {HOST.CONN}',
+						'User group' => 'Zabbix administrators',
+						'Host group' => 'All',
+						'Host access' => 'Read'
+					],
+					[
+						'Name' => self::$script_scope_event,
+						'Scope' => 'Manual event action',
+						'Used in actions' => '',
+						'Type' => 'Script',
+						'Execute on' => 'Server (proxy)',
+						'Commands' => 'test',
+						'User group' => 'All',
+						'Host group' => 'All',
+						'Host access' => 'Read'
+					],
+					[
+						'Name' => 'Ping',
+						'Scope' => 'Manual host action',
+						'Used in actions' => '',
+						'Type' => 'Script',
+						'Execute on' => 'Server (proxy)',
+						'Commands' => 'ping -c 3 {HOST.CONN}; case $? in [01]) true;; *) false;; esac',
+						'User group' => 'All',
+						'Host group' => 'All',
+						'Host access' => 'Read'
+					],
+					[
+						'Name' => 'Reboot',
+						'Scope' => 'Action operation',
+						'Used in actions' => 'Autoregistration action 1, Autoregistration action 2, Trigger action 4',
+						'Type' => 'Script',
+						'Execute on' => 'Server (proxy)',
+						'Commands' => '/sbin/shutdown -r',
+						'User group' => 'Zabbix administrators',
+						'Host group' => 'Zabbix servers',
+						'Host access' => 'Write'
+					],
+					[
+						'Name' => self::$script_for_filter,
+						'Scope' => 'Manual event action',
+						'Used in actions' => '',
+						'Type' => 'Script',
+						'Execute on' => 'Server (proxy)',
+						'Commands' => '/sbin/run',
+						'User group' => 'All',
+						'Host group' => 'All',
+						'Host access' => 'Read'
+					],
+					[
+						'Name' => 'Selenium script',
+						'Scope' => 'Action operation',
+						'Used in actions' => '',
+						'Type' => 'Script',
+						'Execute on' => 'Server (proxy)',
+						'Commands' => 'test',
+						'User group' => 'Selenium user group in scripts',
+						'Host group' => 'All',
+						'Host access' => 'Read'
+					],
+					[
+						'Name' => 'Traceroute',
+						'Scope' => 'Manual host action',
+						'Used in actions' => '',
+						'Type' => 'Script',
+						'Execute on' => 'Server (proxy)',
+						'Commands' => '/usr/bin/traceroute {HOST.CONN}',
+						'User group' => 'All',
+						'Host group' => 'All',
+						'Host access' => 'Read'
 					]
 				]
 			]
@@ -203,26 +200,21 @@ class testPageAdministrationScripts extends CWebTest {
 	 * @dataProvider getScriptsData
 	 */
 	public function testPageAdministrationScripts_Layout($data) {
-		$scripts_count = count($data['fields']);
+		$scripts_count = count($data);
 
 		$this->page->login()->open('zabbix.php?action=script.list');
 		$this->page->assertTitle('Configuration of scripts');
 		$this->page->assertHeader('Scripts');
 
-		// Check status of buttons on the Script page.
-		$form_buttons = [
-			'Create script' => true,
-			'Apply' => true,
-			'Reset' => true,
-			'Delete' => false
-		];
-		foreach ($form_buttons as $button => $enabled) {
-			$this->assertTrue($this->query('button', $button)->one()->isEnabled($enabled));
-		}
+		// Check buttons on the Script page.
+		$this->assertEquals(3, $this->query('button', ['Create script', 'Apply', 'Reset'])
+				->all()->filter(CElementFilter::CLICKABLE)->count()
+		);
+		$this->assertFalse($this->query('button:Delete')->one()->isClickable());
 
 		// Check displaying and hiding the filter.
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
-		$filter_tab = $this->query('xpath://a[contains(text(), "Filter")]')->one();
+		$filter_tab = $this->query('link:Filter')->one();
 		$filter = $filter_form->query('id:tab_0')->one();
 		$this->assertTrue($filter->isDisplayed());
 		$filter_tab->click();
@@ -230,54 +222,35 @@ class testPageAdministrationScripts extends CWebTest {
 		$filter_tab->click();
 		$this->assertTrue($filter->isDisplayed());
 
-		// Check that all filter fields are present.
+		// Check filter labels and default values.
 		$this->assertEquals(['Name', 'Scope'], $filter_form->getLabels()->asText());
+		$filter_form->checkValue(['Name' => '', 'Scope' => 'Any']);
+		$this->assertEquals('255', $filter_form->getField('Name')->getAttribute('maxlength'));
 
 		// Check the count of returned Scripts and the count of selected Scripts.
 		$this->assertTableStats($scripts_count);
-		$selected_count = $this->query('id:selected_count')->one();
-		$this->assertEquals('0 selected', $selected_count->getText());
+		$this->assertSelectedCount(0);
 		$all_scripts = $this->query('id:all_scripts')->asCheckbox()->one();
-		$all_scripts->set(true);
-		$this->assertEquals($scripts_count.' selected', $selected_count->getText());
+		$all_scripts->check();
+		$this->assertSelectedCount($scripts_count);
 
 		// Check that button became enabled.
 		$this->assertTrue($this->query('button:Delete')->one()->isClickable());
 
-		$all_scripts->set(false);
-		$this->assertEquals('0 selected', $selected_count->getText());
+		$all_scripts->uncheck();
+		$this->assertSelectedCount(0);
 
 		// Check table headers.
 		$table = $this->query('class:list-table')->asTable()->one();
-		$headers_text = $table->getHeadersText();
-		array_shift($headers_text);
+		$this->assertEquals(['', 'Name', 'Scope', 'Used in actions', 'Type', 'Execute on', 'Commands', 'User group',
+			'Host group', 'Host access'], $table->getHeadersText()
+		);
 
-		$reference_headers = [
-			'Name' => true,
-			'Scope' => false,
-			'Used in actions' => false,
-			'Type' => false,
-			'Execute on' => false,
-			'Commands' => true,
-			'User group' => false,
-			'Host group' => false,
-			'Host access' => false
-		];
-		$this->assertSame(array_keys($reference_headers), $headers_text);
-
-		// Check which headers are sortable.
-		foreach ($reference_headers as $header => $sortable) {
-			$xpath = 'xpath:.//th/a[text()='.CXPathHelper::escapeQuotes($header).']';
-			if ($sortable) {
-				$this->assertTrue($table->query($xpath)->one()->isClickable());
-			}
-			else {
-				$this->assertFalse($table->query($xpath)->one(false)->isValid());
-			}
-		}
+		// Check sortable headers.
+		$this->assertEquals(['Name', 'Commands'], $table->getHeaders()->query('tag:a')->asText());
 
 		// Check Script table content.
-		$this->assertTableData($data['fields']);
+		$this->assertTableHasData($data);
 	}
 
 	public function getFilterData() {
@@ -473,21 +446,15 @@ class testPageAdministrationScripts extends CWebTest {
 	 */
 	public function testPageAdministrationScripts_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=script.list');
-		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		if (array_key_exists('expected', $data)) {
-			// Using column Name check that only the expected Scripts are returned in the list.
-			$this->assertTableDataColumn($data['expected']);
-		}
-		else {
-			// Check that 'No data found.' string is returned if no results are expected.
-			$this->assertTableData();
-		}
+		// Check that expected Scripts are returned in the list.
+		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected', []));
 
 		// Reset filter due to not influence further tests.
 		$this->query('button:Reset')->one()->click();
@@ -534,7 +501,7 @@ class testPageAdministrationScripts extends CWebTest {
 	public function testPageAdministrationScripts_Sort($data) {
 		$this->page->login()->open('zabbix.php?action=script.list');
 		$table = $this->query('class:list-table')->asTable()->one();
-		$header = $table->query('xpath:.//a[text()="'.$data['sort_field'].'"]')->one();
+		$header = $table->query('link', $data['sort_field'])->one();
 
 		foreach(['desc', 'asc'] as $sorting) {
 			$expected = ($sorting === 'desc') ? $data['expected'] : array_reverse($data['expected']);
@@ -543,37 +510,121 @@ class testPageAdministrationScripts extends CWebTest {
 		}
 	}
 
-	public function testPageAdministrationScripts_Delete() {
+	public function getDeleteData() {
+		return [
+			[
+				[
+					'expected' => TEST_BAD,
+					'error' => 'Cannot delete scripts. Script "Reboot" is used in action operation "Trigger action 4".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => [
+						self::$custom_script
+					],
+					'error' => 'Cannot delete scripts. Script "'.self::$custom_script.
+							'" is used in action operation "'.self::$custom_action.'".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => [
+						self::$custom_script,
+						self::$script_for_filter
+					],
+					'error' => 'Cannot delete scripts. Script "'.self::$custom_script.
+							'" is used in action operation "'.self::$custom_action.'".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => [
+						self::$script_scope_event
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => [
+						self::$script_for_filter,
+						'Ping'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getDeleteData
+	 */
+	public function testPageAdministrationScripts_Delete($data) {
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::$script_sql);
+		}
+
 		$this->page->login()->open('zabbix.php?action=script.list');
 
-		foreach ([self::$script_scope_event, self::$custom_script, self::$script_for_filter] as $scripts) {
-			$this->selectTableRows($scripts);
-			$this->query('button:Delete')->one()->waitUntilClickable()->click();
-			$this->page->acceptAlert();
-			$this->page->waitUntilReady();
+		// Scripts count that will be selected before delete action.
+		$scripts_count = (array_key_exists('name', $data))
+				? count($data['name'])
+				: CDBHelper::getCount(self::$script_sql);
+		$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
+		$this->query('button:Delete')->one()->waitUntilClickable()->click();
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
 
-			if ($scripts === self::$custom_script) {
-				// Verify that selected script which is linked to an action can't be deleted.
-				$count = CDBHelper::getCount('SELECT scriptid FROM scripts');
-				$this->assertMessage(TEST_BAD, 'Cannot delete script', 'Cannot delete scripts. Script "'
-					.$scripts.'" is used in action operation "'.self::$custom_action);
-				$this->assertEquals(1, CDBHelper::getCount('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($scripts)));
+		// Verify that there is no possibility to delete selected script(s) if at least one of them contains linked action.
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, 'Cannot delete script'.(($scripts_count > 1) ? 's' : ''), $data['error']);
+			$this->assertSelectedCount($scripts_count);
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::$script_sql));
 
-				// Verify that there is no possibility to delete all selected scripts if at least one of them contains linked action.
-				$this->query('id:all_scripts')->asCheckbox()->one()->set(true);
-				$this->query('button:Delete')->one()->click();
-				$this->page->acceptAlert();
-				$this->assertMessage(TEST_BAD, 'Cannot delete scripts');
-				$this->assertEquals($count, CDBHelper::getCount('SELECT scriptid FROM scripts'));
-
-				// Uncheck selected scripts due to not influence further tests.
-				$this->query('button:Reset')->one()->click();
-			}
-			else {
-				$this->assertMessage(TEST_GOOD, 'Script deleted');
-				$this->assertEquals(0, CDBHelper::getCount('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($scripts)));
-			}
+			// Uncheck selected scripts due to not influence further tests.
+			$this->query('button:Reset')->one()->click();
 		}
+		else {
+			$this->assertMessage(TEST_GOOD, ($scripts_count > 1) ? 'Scripts deleted' : 'Script deleted');
+			$this->assertSelectedCount(0);
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name IN ('.
+					CDBHelper::escape($data['name']).')')
+			);
+		}
+	}
+
+	public function testPageAdministrationScripts_CancelDelete() {
+		$this->cancelDelete([self::$custom_script]);
+	}
+
+	public function testPageAdministrationScripts_CancelMassDelete() {
+		$this->cancelDelete();
+	}
+
+	/**
+	 * Function for checking cancelling of Delete action.
+	 *
+	 * @param array $scripts      script names, if empty delete will perform for all scripts
+	 */
+	private function cancelDelete($scripts = []) {
+		$old_hash = CDBHelper::getHash(self::$script_sql);
+
+		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->selectTableRows($scripts);
+
+		// Scripts count that will be selected before delete action.
+		$scripts_count = ($scripts === []) ? CDBHelper::getCount(self::$script_sql) : count($scripts);
+
+		$this->query('button:Delete')->one()->waitUntilClickable()->click();
+		$this->assertEquals('Delete selected scripts?', $this->page->getAlertText());
+		$this->page->dismissAlert();
+		$this->page->waitUntilReady();
+
+		$this->assertSelectedCount($scripts_count);
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::$script_sql));
 	}
 
 	/**
