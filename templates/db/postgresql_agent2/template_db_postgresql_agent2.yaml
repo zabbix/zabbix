@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-07-01T10:19:00Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -14,6 +13,9 @@ zabbix_export:
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql
         
         Template tooling version used: 0.42
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Databases

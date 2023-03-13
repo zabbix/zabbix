@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.4.0rc1');
-define('ZABBIX_API_VERSION',	'6.4.0');
+define('ZABBIX_VERSION',		'6.4.1rc1');
+define('ZABBIX_API_VERSION',	'6.4.1');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030186);
+define('ZABBIX_DB_VERSION',		6040000);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -692,9 +692,10 @@ define('ZBX_PREPROC_PROMETHEUS_MAX',   'max');
 define('ZBX_PREPROC_PROMETHEUS_AVG',   'avg');
 define('ZBX_PREPROC_PROMETHEUS_COUNT', 'count');
 
-define('ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED', 0);
-define('ZBX_PREPROC_SNMP_WALK_TREAT_UTF8', 1);
-define('ZBX_PREPROC_SNMP_WALK_TREAT_MAC', 2);
+define('ZBX_PREPROC_SNMP_UNCHANGED', 0);
+define('ZBX_PREPROC_SNMP_UTF8_FROM_HEX', 1);
+define('ZBX_PREPROC_SNMP_MAC_FROM_HEX', 2);
+define('ZBX_PREPROC_SNMP_INT_FROM_BITS', 3);
 
 // LLD rule overrides.
 define('ZBX_LLD_OVERRIDE_STOP_NO',	0);

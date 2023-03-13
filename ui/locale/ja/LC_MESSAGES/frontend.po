@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-08 02:32+0000\n"
+"PO-Revision-Date: 2023-03-08 03:34+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -412,6 +412,10 @@ msgstr "軽"
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
 msgstr "オーバーライドの追加"
+
+#: tests/selenium/modules/clock32/Widget.php:46
+msgid "ALARM CLOCK"
+msgstr ""
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
@@ -1051,7 +1055,7 @@ msgstr "拡張ラベル"
 
 #: app/views/popup.import.php:175
 msgid "Advanced options"
-msgstr ""
+msgstr "高度なオプション"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -1774,6 +1778,14 @@ msgstr "基本色"
 msgid "Basic"
 msgstr "Basic"
 
+#: app/views/connector.edit.php:136
+msgid "Bearer"
+msgstr "Bearer"
+
+#: app/views/connector.edit.php:156
+msgid "Bearer token"
+msgstr "Bearerトークン"
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
 msgstr "値の前"
@@ -2309,6 +2321,11 @@ msgstr "データベースへのコネクションを作成できません。"
 msgid "Cannot create circular dependencies."
 msgstr "循環する依存関係は作成できません。"
 
+#: app/controllers/CControllerConnectorCreate.php:89
+#: app/controllers/CControllerConnectorCreate.php:164
+msgid "Cannot create connector"
+msgstr "コネクタを作成できません"
+
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
 msgstr "自身に対する依存関係は作成できません。"
@@ -2325,6 +2342,11 @@ msgstr "ディスカバリルールを作成できません"
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "アイコンのマッピングを作成できません"
+
+#: app/controllers/CControllerMaintenanceCreate.php:72
+#: app/controllers/CControllerMaintenanceCreate.php:150
+msgid "Cannot create maintenance period"
+msgstr "メンテナンス期間を作成できません"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2377,6 +2399,11 @@ msgstr "アクションを削除できません"
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
 msgstr "割り当てられたユーザーの役割\"%1$s\"が削除できません。"
+
+#: app/controllers/CControllerConnectorDelete.php:68
+msgid "Cannot delete connector"
+msgid_plural "Cannot delete connectors"
+msgstr[0] "コネクタを削除できません"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2494,6 +2521,11 @@ msgstr "アイテムを削除できません"
 #: maintenance.php:224
 msgid "Cannot delete maintenance"
 msgstr "メンテナンスを削除できません"
+
+#: app/controllers/CControllerMaintenanceDelete.php:71
+msgid "Cannot delete maintenance period"
+msgid_plural "Cannot delete maintenance periods"
+msgstr[0] "メンテナンス期間を削除できません"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -2658,6 +2690,11 @@ msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "アクションを無効にできません"
 
+#: app/controllers/CControllerConnectorDisable.php:77
+msgid "Cannot disable connector"
+msgid_plural "Cannot disable connectors"
+msgstr[0] "コネクタを無効にできません"
+
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
@@ -2729,6 +2766,11 @@ msgstr[0] "SLAを有効にできません"
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "アクションを有効にできません"
+
+#: app/controllers/CControllerConnectorEnable.php:77
+msgid "Cannot enable connector"
+msgid_plural "Cannot enable connectors"
+msgstr[0] "コネクタを有効にできません"
 
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
@@ -3614,6 +3656,11 @@ msgstr "認証の設定を更新できません"
 msgid "Cannot update configuration"
 msgstr "設定を更新できません"
 
+#: app/controllers/CControllerConnectorUpdate.php:90
+#: app/controllers/CControllerConnectorUpdate.php:173
+msgid "Cannot update connector"
+msgstr "コネクタを更新できません"
+
 #: app/controllers/CControllerCorrelationCreate.php:47
 #: app/controllers/CControllerCorrelationUpdate.php:48
 #: app/controllers/CControllerCorrelationUpdate.php:125
@@ -3719,6 +3766,11 @@ msgstr "マクロを更新できません"
 #: maintenance.php:119
 msgid "Cannot update maintenance"
 msgstr "メンテナンスを更新できません"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:73
+#: app/controllers/CControllerMaintenanceUpdate.php:152
+msgid "Cannot update maintenance period"
+msgstr "メンテナンス期間を更新できません"
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -3879,7 +3931,7 @@ msgstr "snmptrap[]アイテムでキャッチされていないすべてのSNMP�
 #: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
 #: include/events.inc.php:256
 msgid "Cause"
-msgstr "原因"
+msgstr "主要原因の障害"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
@@ -3940,7 +3992,7 @@ msgstr "1秒あたりの差分"
 
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
-msgstr "障害の順位の変更"
+msgstr "障害の種別の変更"
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4665,6 +4717,45 @@ msgstr "ホストへの接続"
 msgid "Connections to proxy"
 msgstr "プロキシへの接続"
 
+#: app/controllers/CControllerAuditLogList.php:212
+#: app/views/connector.edit.php:283 app/views/connector.edit.php:297
+msgid "Connector"
+msgstr "コネクタ"
+
+#: include/classes/api/services/CConnector.php:446
+#, c-format
+msgid "Connector \"%1$s\" already exists."
+msgstr "コネクタ\"%1$s\"はすでに存在しています。"
+
+#: app/controllers/CControllerConnectorCreate.php:156
+msgid "Connector created"
+msgstr "コネクタを作成しました"
+
+#: app/controllers/CControllerConnectorDelete.php:60
+msgid "Connector deleted"
+msgid_plural "Connectors deleted"
+msgstr[0] "コネクタを削除しました"
+
+#: app/controllers/CControllerConnectorDisable.php:69
+msgid "Connector disabled"
+msgid_plural "Connectors disabled"
+msgstr[0] "コネクタを無効にしました"
+
+#: app/controllers/CControllerConnectorEnable.php:69
+msgid "Connector enabled"
+msgid_plural "Connectors enabled"
+msgstr[0] "コネクタを有効にしました"
+
+#: app/controllers/CControllerConnectorUpdate.php:165
+msgid "Connector updated"
+msgstr "コネクタを更新しました"
+
+#: app/controllers/CControllerConnectorList.php:104
+#: app/views/connector.list.php:132 include/classes/helpers/CMenuHelper.php:360
+#: include/html.inc.php:891
+msgid "Connectors"
+msgstr "コネクタ"
+
 #: include/views/monitoring.sysmap.list.php:85
 #: include/views/monitoring.sysmap.list.php:86
 msgid "Constructor"
@@ -4770,11 +4861,11 @@ msgstr "JSONへの変換"
 
 #: app/views/popup.acknowledge.edit.php:134
 msgid "Convert to cause"
-msgstr "原因に変換"
+msgstr "副次的な障害から削除"
 
 #: app/views/popup.acknowledge.edit.php:135
 msgid "Converts a symptom event back to cause event"
-msgstr "兆候イベントを原因イベントに戻します"
+msgstr "副次的な障害を通常の障害へ戻します"
 
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
@@ -4793,19 +4884,19 @@ msgstr "コピー"
 #, c-format
 msgid "Copy %1$s graph"
 msgid_plural "Copy %1$s graphs"
-msgstr[0] ""
+msgstr[0] "%1$sグラフをコピー"
 
 #: app/views/copy.edit.php:36
 #, c-format
 msgid "Copy %1$s item"
 msgid_plural "Copy %1$s items"
-msgstr[0] ""
+msgstr[0] "%1$sアイテムをコピー"
 
 #: app/views/copy.edit.php:43
 #, c-format
 msgid "Copy %1$s trigger"
 msgid_plural "Copy %1$s triggers"
-msgstr[0] ""
+msgstr[0] "%1$sトリガーをコピー"
 
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
@@ -4870,6 +4961,10 @@ msgstr "ログローテーションに対応したログの一致行数。整数
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "ログの一致行数。整数値を返す。"
 
+#: include/classes/data/CItemData.php:1802
+msgid "Count of values enqueued in the connector queue."
+msgstr "コネクタキュー内にキューイングされた値の数。"
+
 #: include/classes/data/CItemData.php:1638
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr "ローレベルディスカバリ処理キュー内にキューイングされた値の数。"
@@ -4906,6 +5001,10 @@ msgstr "マップの作成と変更"
 #: app/views/administration.image.list.php:62
 msgid "Create background"
 msgstr "背景の作成"
+
+#: app/views/connector.list.php:139
+msgid "Create connector"
+msgstr "コネクタの作成"
 
 #: app/views/configuration.correlation.list.php:37
 msgid "Create correlation"
@@ -5404,6 +5503,10 @@ msgstr "データセットラベル"
 msgid "Data storage period"
 msgstr "データ保存期間"
 
+#: app/views/connector.edit.php:54 app/views/connector.list.php:73
+msgid "Data type"
+msgstr "データのタイプ"
+
 #: include/classes/setup/CSetupWizard.php:565
 #: include/classes/setup/CSetupWizard.php:717
 #: include/classes/setup/CSetupWizard.php:976
@@ -5829,6 +5932,14 @@ msgstr "選択したアクションを削除しますか？"
 msgid "Delete selected actions?"
 msgstr "選択したアクションを削除しますか？"
 
+#: app/views/connector.edit.php:332 app/views/js/connector.list.js.php:129
+msgid "Delete selected connector?"
+msgstr "選択したコネクタを削除しますか？"
+
+#: app/views/js/connector.list.js.php:128
+msgid "Delete selected connectors?"
+msgstr "選択したコネクタを削除しますか？"
+
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
 msgstr "選択した相関関係を削除しますか？"
@@ -5901,6 +6012,10 @@ msgstr "選択したアイテムのプロトタイプを削除しますか？"
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
 msgstr "選択したアイテムを削除しますか？"
+
+#: app/views/js/maintenance.list.js.php:88
+msgid "Delete selected maintenance period?"
+msgstr "選択したメンテナンス期間を削除しますか？"
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -6259,6 +6374,14 @@ msgstr "選択したアクションを無効にしますか？"
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
 msgstr "選択したアクションを無効にしますか？"
+
+#: app/views/js/connector.list.js.php:114
+msgid "Disable selected connector?"
+msgstr "選択したコネクタを無効にしますか？"
+
+#: app/views/js/connector.list.js.php:113
+msgid "Disable selected connectors?"
+msgstr "選択したコネクタを無効にしますか？"
 
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
@@ -7057,6 +7180,14 @@ msgstr "選択したアクションを有効にしますか？"
 msgid "Enable selected actions?"
 msgstr "選択したアクションを有効にしますか？"
 
+#: app/views/js/connector.list.js.php:99
+msgid "Enable selected connector?"
+msgstr "選択したコネクタを有効にしますか？"
+
+#: app/views/js/connector.list.js.php:98
+msgid "Enable selected connectors?"
+msgstr "選択したコネクタを有効にしますか？"
+
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
 msgstr "選択した相関関係を有効にしますか？"
@@ -7341,6 +7472,10 @@ msgstr "イベントタイプ"
 msgid "Event updated"
 msgid_plural "Events updated"
 msgstr[0] "イベントを更新しました"
+
+#: app/views/connector.edit.php:58 app/views/connector.list.php:99
+msgid "Events"
+msgstr "イベント"
 
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
@@ -10513,6 +10648,13 @@ msgstr "インストール"
 msgid "Installer name"
 msgstr "インストーラ名"
 
+#: include/forms.inc.php:1392 include/forms.inc.php:1425
+#: include/views/js/item.preprocessing.js.php:142
+#: include/views/js/item.preprocessing.js.php:180
+#: include/views/js/item.preprocessing.js.php:227
+msgid "Integer from BITS"
+msgstr "BITSから整数値"
+
 #: include/classes/helpers/CMenuHelper.php:360
 msgid "Integrations"
 msgstr "インテグレーション"
@@ -12113,9 +12255,22 @@ msgstr "メンテナンスを削除しました"
 msgid "Maintenance period"
 msgstr "メンテナンス期間"
 
+#: app/controllers/CControllerMaintenanceCreate.php:142
+msgid "Maintenance period created"
+msgstr "メンテナンス期間を作成しました"
+
+#: app/controllers/CControllerMaintenanceDelete.php:61
+msgid "Maintenance period deleted"
+msgid_plural "Maintenance periods deleted"
+msgstr[0] "メンテナンス期間を削除しました"
+
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
 msgstr "メンテナンス期間"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:144
+msgid "Maintenance period updated"
+msgstr "メンテナンス期間を更新しました"
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -12270,11 +12425,11 @@ msgstr "マップの更新に失敗しました。"
 
 #: app/views/popup.ldap.edit.php:257
 msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr ""
+msgstr "通知を送信するために、ユーザーのLDAPのメディア属性(電子メールなど)をZabbixのユーザーメディアにマッピングします。"
 
 #: app/views/administration.authentication.edit.php:513
 msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr ""
+msgstr "通知を送信するために、ユーザーのSAMLのメディア属性(電子メールなど)をZabbixのユーザーメディアにマッピングします。"
 
 #: app/views/popup.ldap.edit.php:257
 msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
@@ -12322,7 +12477,7 @@ msgstr "3月"
 
 #: jsLoader.php:361
 msgid "Mark as cause"
-msgstr "原因としてマーク"
+msgstr "副次的な障害から削除"
 
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
@@ -12338,7 +12493,7 @@ msgstr "選択をマーク"
 
 #: jsLoader.php:362
 msgid "Mark selected as symptoms"
-msgstr "選択したものを兆候としてマーク"
+msgstr "選択したものを副次的な障害として追加"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -12413,6 +12568,10 @@ msgstr "概要テーブル内の列と行の最大数"
 msgid "Max period for time selector"
 msgstr "タイムセレクターの最大期間"
 
+#: app/views/connector.edit.php:171
+msgid "Max records per message"
+msgstr "メッセージあたりの最大レコード数"
+
 #: app/controllers/CControllerPopupItemTest.php:1313
 #: app/controllers/CControllerPopupItemTest.php:1319
 #: app/controllers/CControllerPopupItemTest.php:1325
@@ -12428,7 +12587,7 @@ msgstr "最大繰り返し回数は、検出とsnmp.walkにのみ適用されま
 
 #: app/partials/configuration.host.interface.row.php:106
 msgid "Max repetition count is applicable to discovery and walk only."
-msgstr ""
+msgstr "最大繰り返し回数は、ディスカバリとwalkにのみ適用されます。"
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -13273,6 +13432,10 @@ msgstr "新規列"
 msgid "New condition"
 msgstr "新規条件"
 
+#: app/views/connector.edit.php:312 app/views/connector.edit.php:341
+msgid "New connector"
+msgstr "新規コネクタ"
+
 #: app/controllers/CControllerDashboardView.php:154
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
 msgid "New dashboard"
@@ -13308,6 +13471,11 @@ msgstr "新しいホストの作成"
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
 msgstr "新しいホストグループの作成"
+
+#: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
+#: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
+msgid "New maintenance period"
+msgstr "新しいメンテナンス期間の作成"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
@@ -14955,18 +15123,42 @@ msgstr "パラメータ"
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr "パラメーター\"esc_step_from\"と\"esc_step_to\"は一緒に設定してください。"
 
+#: include/views/configuration.host.discovery.edit.php:68
+msgid "Parent discovery rule"
+msgstr "親ディスカバリルール"
+
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.prototype.edit.php:64
 msgid "Parent discovery rules"
 msgstr "親ディスカバリルール"
 
+#: include/views/configuration.graph.edit.php:88
+msgid "Parent graph"
+msgstr "親グラフ"
+
+#: include/views/configuration.graph.edit.php:91
+msgid "Parent graph prototype"
+msgstr "親のグラフのプロトタイプ"
+
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "親グラフ"
 
+#: include/views/configuration.host.prototype.edit.php:81
+msgid "Parent host prototype"
+msgstr "親のホストのプロトタイプ"
+
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
 msgstr "親ホストの値"
+
+#: include/views/configuration.item.edit.php:71
+msgid "Parent item"
+msgstr "親アイテム"
+
+#: include/views/configuration.item.prototype.edit.php:70
+msgid "Parent item prototype"
+msgstr "親のアイテムのプロトタイプ"
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -14978,14 +15170,30 @@ msgstr "親アイテム"
 msgid "Parent services"
 msgstr "親サービス"
 
+#: app/partials/configuration.tags.tab.php:38
+msgid "Parent template"
+msgstr "親テンプレート"
+
 #: app/partials/configuration.tags.tab.php:42
 msgid "Parent templates"
 msgstr "親テンプレート"
+
+#: include/views/configuration.triggers.edit.php:104
+msgid "Parent trigger"
+msgstr "親トリガー"
+
+#: include/views/configuration.trigger.prototype.edit.php:95
+msgid "Parent trigger prototype"
+msgstr "親のトリガーのプロトタイプ"
 
 #: include/views/configuration.trigger.prototype.edit.php:69
 #: include/views/configuration.triggers.edit.php:80
 msgid "Parent triggers"
 msgstr "親トリガー"
+
+#: include/views/configuration.httpconf.edit.php:76
+msgid "Parent web scenario"
+msgstr "親Webシナリオ"
 
 #: include/views/configuration.httpconf.edit.php:59
 msgid "Parent web scenarios"
@@ -15095,7 +15303,7 @@ msgstr "メンテナンス中の場合に実行を保留"
 
 #: app/views/popup.action.edit.php:227
 msgid "Pause operations for symptom problems"
-msgstr ""
+msgstr "副次的な障害の場合に実行を保留"
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -15295,7 +15503,7 @@ msgstr "位置は、単位がs、uptime、unixtimeの時は無視されます。
 
 #: include/classes/core/ZBase.php:764
 msgid "Possibly the session has expired or the password was changed."
-msgstr ""
+msgstr "セッションの有効期限が切れたか、パスワードが変更された可能性があります。"
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -15579,6 +15787,10 @@ msgstr "PrometheusからJSON"
 msgid "Properties"
 msgstr "プロパティ"
 
+#: app/views/connector.edit.php:47
+msgid "Protocol"
+msgstr "プロトコル"
+
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
 #, c-format
@@ -15793,7 +16005,7 @@ msgstr "RMCP+"
 
 #: include/events.inc.php:256 include/events.inc.php:272
 msgid "Rank"
-msgstr ""
+msgstr "障害の種別"
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -16870,11 +17082,11 @@ msgstr "SNMPバージョン"
 
 #: include/items.inc.php:1802
 msgid "SNMP walk to JSON"
-msgstr ""
+msgstr "SNMP walkからJSON"
 
 #: include/items.inc.php:1798
 msgid "SNMP walk value"
-msgstr ""
+msgstr "SNMP walkの値"
 
 #: include/items.inc.php:1299
 #, c-format
@@ -17140,6 +17352,10 @@ msgstr "スクリプトを追加しました"
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "スクリプトを削除しました"
+
+#: app/views/popup.mediatypetest.edit.php:60
+msgid "Script does not have parameters."
+msgstr "スクリプトにはパラメータがありません。"
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
@@ -17782,7 +17998,7 @@ msgstr "メンテナンス中の障害を表示"
 #: app/partials/monitoring.problem.filter.php:129
 #: widgets/problems/includes/WidgetForm.php:120
 msgid "Show symptoms"
-msgstr ""
+msgstr "副次的な障害をを表示"
 
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
@@ -18403,6 +18619,10 @@ msgstr "特権管理者"
 msgid "Support"
 msgstr "サポート"
 
+#: app/partials/administration.system.info.php:124
+msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
+msgstr "古い数値型のサポートは廃止されました。拡張された数値型にアップグレードしてください。"
+
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
 msgstr "サポートしているフォーマット："
@@ -18456,7 +18676,7 @@ msgstr "認証方式の変更を行うと現在のセッション以外はリセ
 #: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
 #: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
 msgid "Symptom"
-msgstr ""
+msgstr "副次的な障害"
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -18962,7 +19182,7 @@ msgstr "テキスト、マクロの{INVENTORY.*}と{HOST.*}をサポート"
 #: include/classes/api/clients/CLocalApiClient.php:96
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without authorization header."
-msgstr ""
+msgstr "\"%1$s.%2$s\"メソッドは、認証ヘッダーなしで呼び出す必要があります。"
 
 #: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
@@ -19089,6 +19309,11 @@ msgstr "トリガーはディスカバリされなかったので次のディス
 msgid "Theme"
 msgstr "テーマ"
 
+#: app/views/administration.mediatype.edit.php:139
+#: app/views/popup.mediatypetest.edit.php:47
+msgid "These parameters will be passed to the script as command-line arguments in the specified order."
+msgstr "これらのパラメーターは、指定された順序でコマンドライン引数としてスクリプトに渡されます。"
+
 #: include/func.inc.php:2468
 msgid "This day last week"
 msgstr "先週の今日"
@@ -19139,7 +19364,7 @@ msgstr "このデータ型はアイテムキーと合ってません。"
 
 #: app/views/administration.user.edit.php:59
 msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
-msgstr ""
+msgstr "このユーザーはIdPでプロビジョニングされています。プロビジョニングされたフィールドを手動で変更することはできません。"
 
 #: include/func.inc.php:2474
 msgid "This week"
@@ -19907,7 +20132,7 @@ msgstr "不明"
 
 #: include/events.inc.php:336 include/events.inc.php:343
 msgid "UPDATING"
-msgstr ""
+msgstr "更新中"
 
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
@@ -19975,7 +20200,7 @@ msgstr "URL"
 #: include/views/js/item.preprocessing.js.php:177
 #: include/views/js/item.preprocessing.js.php:223
 msgid "UTF-8 from Hex-STRING"
-msgstr ""
+msgstr "16進文字列からUTF-8"
 
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
@@ -20085,7 +20310,7 @@ msgstr "選択したユーザーのブロックを解除しますか？"
 #: include/views/js/item.preprocessing.js.php:176
 #: include/views/js/item.preprocessing.js.php:222
 msgid "Unchanged"
-msgstr ""
+msgstr "変更なし"
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20419,7 +20644,7 @@ msgstr "ホスト\"%1$s\"のステータスを更新しました。"
 
 #: include/events.inc.php:346
 msgid "Updating"
-msgstr ""
+msgstr "更新中"
 
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
@@ -20451,7 +20676,7 @@ msgstr "アップタイム/ダウンタイム"
 
 #: app/views/popup.ldap.edit.php:169
 msgid "Use %{ref} in group filter to reference value of this user attribute."
-msgstr ""
+msgstr "このユーザー属性の値を参照するには、グループフィルターで%{ref}を使用します。"
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
@@ -20587,7 +20812,7 @@ msgstr "ユーザーディレクトリ\"%1$s\"はすでに存在します。"
 #: include/classes/api/services/CUser.php:715
 #, c-format
 msgid "User directory with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID\"%1$s\"のユーザーディレクトリは利用できません。"
 
 #: app/views/administration.user.list.php:211
 msgid "User does not have user groups."
@@ -21454,6 +21679,10 @@ msgstr "Vaultシークレットクエリ文字列"
 msgid "Vendor"
 msgstr "ベンダー"
 
+#: include/views/configuration.template.edit.php:93
+msgid "Vendor and version"
+msgstr "ベンダーとバージョン"
+
 #: include/items.inc.php:43
 msgid "Verbose"
 msgstr "Verbose"
@@ -21803,7 +22032,7 @@ msgstr "表示/設定"
 #: include/classes/core/CModuleManager.php:136
 #, c-format
 msgid "Wrong %1$s.php class name for module located at %2$s."
-msgstr ""
+msgstr "%2$sにあるモジュールの%1$s.phpのクラス名が間違っています。"
 
 #: include/classes/core/CModuleManager.php:203
 #, c-format
@@ -22093,6 +22322,10 @@ msgstr "Zabbix"
 #: include/classes/helpers/CMenuHelper.php:363
 msgid "Zabbix Integrations"
 msgstr "Zabbixインテグレーション"
+
+#: app/views/connector.edit.php:49
+msgid "Zabbix Streaming Protocol v1.0"
+msgstr "Zabbixストリーミングプロトコル v1.0"
 
 #: include/classes/helpers/CMenuHelper.php:356
 msgid "Zabbix Technical Support"
@@ -22576,6 +22809,10 @@ msgstr "点滅"
 #: include/classes/api/services/CItemGeneral.php:488
 msgid "both username and password should be either present or empty"
 msgstr "ユーザー名とパスワードの両方を指定するか空である必要があります"
+
+#: include/classes/api/services/CTemplate.php:522
+msgid "both vendor_name and vendor_version should be either present or empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
@@ -23659,11 +23896,11 @@ msgstr "障害のクローズの権限がありません"
 
 #: include/classes/api/services/CEvent.php:1054
 msgid "no permissions to convert cause problems to symptom problems"
-msgstr ""
+msgstr "副次的な障害に変更する権限がありません"
 
 #: include/classes/api/services/CEvent.php:1053
 msgid "no permissions to convert symptom problems to cause problems"
-msgstr ""
+msgstr "副次的な障害から削除する権限がありません"
 
 #: include/classes/api/services/CConfiguration.php:168
 msgid "no permissions to create and edit maps"

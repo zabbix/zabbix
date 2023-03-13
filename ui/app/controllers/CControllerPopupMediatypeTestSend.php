@@ -111,21 +111,34 @@ class CControllerPopupMediatypeTestSend extends CController {
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		if ($this->mediatype['type'] == MEDIA_TYPE_WEBHOOK ) {
-			$params = [];
+		switch ($this->mediatype['type']) {
+			case MEDIA_TYPE_EXEC:
+				$parameters = [];
 
-			foreach ($this->getInput('parameters', []) as $parameter) {
-				$params[$parameter['name']] = $parameter['value'];
-			}
+				foreach ($this->getInput('parameters', []) as $parameter) {
+					$parameters[] = $parameter['value'];
+				}
 
-			$params = ['parameters' => $params];
-		}
-		else {
-			$params = [
-				'sendto' =>	$this->getInput('sendto'),
-				'subject' => $this->getInput('subject'),
-				'message' => $this->getInput('message')
-			];
+				$params = ['parameters' => $parameters];
+				break;
+
+			case MEDIA_TYPE_WEBHOOK:
+				$parameters = [];
+
+				foreach ($this->getInput('parameters', []) as $parameter) {
+					$parameters[$parameter['name']] = $parameter['value'];
+				}
+
+				$params = ['parameters' => $parameters];
+				break;
+
+			default:
+				$params = [
+					'sendto' =>	$this->getInput('sendto'),
+					'subject' => $this->getInput('subject'),
+					'message' => $this->getInput('message')
+				];
+
 		}
 
 		$params['mediatypeid'] = $this->getInput('mediatypeid');

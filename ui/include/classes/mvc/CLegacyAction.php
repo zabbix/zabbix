@@ -74,7 +74,7 @@ class CLegacyAction extends CAction {
 
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
 			$denied = array_merge($denied, ['actionconf.php', 'disc_prototypes.php', 'graphs.php', 'host_discovery.php',
-				'host_prototypes.php', 'host.list', 'httpconf.php', 'items.php', 'maintenance.php', 'report4.php',
+				'host_prototypes.php', 'host.list', 'httpconf.php', 'items.php', 'report4.php',
 				'templates.php', 'trigger_prototypes.php', 'triggers.php'
 			]);
 		}
@@ -101,7 +101,6 @@ class CLegacyAction extends CAction {
 		if ($user_type == USER_TYPE_ZABBIX_ADMIN || $user_type == USER_TYPE_SUPER_ADMIN) {
 			$rule_actions += [
 				CRoleHelper::UI_CONFIGURATION_HOSTS => ['host.list'],
-				CRoleHelper::UI_CONFIGURATION_MAINTENANCE => ['maintenance.php'],
 				CRoleHelper::UI_CONFIGURATION_TEMPLATES => ['templates.php'],
 				CRoleHelper::UI_REPORTS_NOTIFICATIONS => ['report4.php']
 			];

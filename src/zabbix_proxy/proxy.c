@@ -114,8 +114,7 @@ const char	*help_message[] = {
 	"                                 history syncer, housekeeper, http poller,",
 	"                                 icmp pinger, ipmi manager, ipmi poller,",
 	"                                 java poller, poller, preprocessing manager,",
-	"                                 preprocessing worker, self-monitoring,",
-	"                                 snmp trapper, task manager, trapper,",
+	"                                 self-monitoring, snmp trapper, task manager, trapper,",
 	"                                 unreachable poller, vmware collector,",
 	"                                 availability manager, odbc poller)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
@@ -127,9 +126,8 @@ const char	*help_message[] = {
 	"                                 history syncer, housekeeper, http poller,",
 	"                                 icmp pinger, ipmi manager, ipmi poller,",
 	"                                 java poller, poller, preprocessing manager,",
-	"                                 preprocessing worker, self-monitoring,",
-	"                                 snmp trapper, task manager, trapper,",
-	"                                 unreachable poller, vmware collector,",
+	"                                 self-monitoring, snmp trapper, task manager, ",
+	"                                 trapper, unreachable poller, vmware collector,",
 	"                                 availability manager, odbc poller)",
 	"        process-type,N           Process type and number (e.g., history syncer,1)",
 	"        pid                      Process identifier",
@@ -1579,6 +1577,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(taskmanager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &preproc_man_args;
 				zbx_thread_start(preprocessing_manager_thread, &thread_args, &threads[i]);
 				break;

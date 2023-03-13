@@ -22,6 +22,7 @@
 #include "zbxserver.h"
 #include "actions.h"
 #include "zbx_item_constants.h"
+#include "zbxtagfilter.h"
 
 ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
 

@@ -19,8 +19,9 @@
 
 #include "zbxconnector.h"
 #include "zbxserialize.h"
-#include "log.h"
-#include "zbxjson.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxtime.h"
 
 void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_connector_object_t *connector_object)
@@ -96,7 +97,7 @@ void	zbx_connector_serialize_data_point(unsigned char **data, size_t *data_alloc
 
 	ptr += zbx_serialize_value(ptr, connector_data_point->ts.sec);
 	ptr += zbx_serialize_value(ptr, connector_data_point->ts.ns);
-	ptr += zbx_serialize_str(ptr, connector_data_point->str, str_len);
+	(void)zbx_serialize_str(ptr, connector_data_point->str, str_len);
 }
 
 static void	zbx_connector_deserialize_data_point(const unsigned char *data, zbx_uint32_t size,
