@@ -42,7 +42,6 @@ $data += [
 				->addClass('js-clone-templategroup')
 				->setEnabled(CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
 			(new CSimpleButton(_('Delete')))
-				->setAttribute('confirm', _('Delete selected template group?'))
 				->addClass('js-delete-templategroup'),
 			$cancel_button
 		]

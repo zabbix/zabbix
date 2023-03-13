@@ -80,6 +80,10 @@
 		}
 
 		_delete() {
+			if (!confirm(<?= json_encode(_('Delete selected host group?')) ?>)) {
+				return;
+			}
+
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'hostgroup.delete');
 			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',

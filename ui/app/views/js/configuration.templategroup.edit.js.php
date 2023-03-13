@@ -80,6 +80,10 @@
 		}
 
 		_delete() {
+			if (!confirm(<?= json_encode(_('Delete selected template group?')) ?>)) {
+				return;
+			}
+
 			const curl = new Curl('zabbix.php', false);
 			curl.setArgument('action', 'templategroup.delete');
 			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
