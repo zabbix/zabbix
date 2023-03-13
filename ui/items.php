@@ -682,7 +682,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 	$result = (bool) API::Item()->update($items);
 
 	if ($result) {
-		uncheckTableRows(getRequest('checkbox_hash'));
+		uncheckTableRows();
 	}
 
 	$updated = count($itemids);

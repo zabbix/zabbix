@@ -487,7 +487,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 		: _n('Cannot disable trigger', 'Cannot disable triggers', $updated);
 
 	if ($result) {
-		uncheckTableRows(getRequest('checkbox_hash'));
+		uncheckTableRows();
 		unset($_REQUEST['g_triggerid']);
 	}
 

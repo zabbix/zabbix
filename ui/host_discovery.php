@@ -708,7 +708,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 	$result = (bool) API::DiscoveryRule()->update($lld_rules);
 
 	if ($result) {
-		uncheckTableRows($checkbox_hash);
+		uncheckTableRows();
 	}
 
 	$updated = count($itemids);
