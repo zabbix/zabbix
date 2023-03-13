@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-09-05 15:09+0000\n"
+"PO-Revision-Date: 2023-03-06 05:28+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -2847,6 +2847,11 @@ msgstr "Невозможно обновить обнаруженный граф�
 #: include/classes/api/services/CHostGroup.php:866
 msgid "Cannot update a discovered host group."
 msgstr "Невозможно обновить обнаруженную группу узлов сети."
+
+#: include/classes/api/services/CGraphGeneral.php:69
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr "Не удалось обновить \"%1$s\" график из шаблона."
 
 #: include/classes/api/services/CHttpTest.php:455
 #, c-format
@@ -6451,7 +6456,7 @@ msgstr "Поле \"%1$s\" не корректно: %2$s"
 #: include/validate.inc.php:185 include/validate.inc.php:190
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s."
-msgstr ""
+msgstr "Поле \"%1$s\" задано некорректным значением: %2$s."
 
 #: include/validate.inc.php:167
 #, c-format
@@ -13022,7 +13027,7 @@ msgstr "Подсчитываются только триггеры у актив
 
 #: app/views/popup.mediatypetest.edit.php:52
 msgid "Open log"
-msgstr ""
+msgstr "Открыть журнал"
 
 #: include/httptest.inc.php:430
 msgid "Opera"
@@ -17059,12 +17064,12 @@ msgstr "Строка комплексного экрана не пустая. У
 #: app/views/administration.housekeeping.edit.php:134
 #: include/blocks.inc.php:714
 msgid "This setting should be enabled, because history tables contain compressed chunks."
-msgstr ""
+msgstr "Эта настройка должна быть активирована, поскольку таблицы истории содержат сжатые порции."
 
 #: app/views/administration.housekeeping.edit.php:164
 #: include/blocks.inc.php:730
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
-msgstr ""
+msgstr "Эта настройка должна быть активирована, поскольку таблицы динамики изменений содержат сжатые порции."
 
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
@@ -20243,7 +20248,7 @@ msgstr "ошибочная последовательность байт в UTF-
 
 #: include/validate.inc.php:190
 msgid "invalid data type"
-msgstr ""
+msgstr "ошибочный тип данных"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-01-29 15:57+0000\n"
+"PO-Revision-Date: 2023-02-27 01:02+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -2847,6 +2847,11 @@ msgstr "Nie można zaktualizować wykrytego wykresu."
 #: include/classes/api/services/CHostGroup.php:866
 msgid "Cannot update a discovered host group."
 msgstr "Nie można zaktualizować wykrytej grupy hostów."
+
+#: include/classes/api/services/CGraphGeneral.php:69
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr "Nie można zaktualizować wykresu pochodzącego z szablonu \"%1$s\"."
 
 #: include/classes/api/services/CHttpTest.php:455
 #, c-format
@@ -20243,7 +20248,7 @@ msgstr "nieprawidłowa sekwencja bajtów w UTF-8"
 
 #: include/validate.inc.php:190
 msgid "invalid data type"
-msgstr "niewłaściwy tym danych"
+msgstr "niewłaściwy typ danych"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"
