@@ -536,7 +536,7 @@ class testPageAlertsScripts extends CWebTest {
 						self::$script_for_filter
 					],
 					'error' => 'Cannot delete scripts. Script "'.self::$custom_script.
-						'" is used in action operation "'.self::$custom_action.'".'
+							'" is used in action operation "'.self::$custom_action.'".'
 				]
 			],
 			[
