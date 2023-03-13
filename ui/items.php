@@ -471,7 +471,7 @@ $ms_groups = [];
 $filter_groupids = getSubGroups(getRequest('filter_groupids', []), $ms_groups, ['editable' => true],
 	getRequest('context')
 );
-$filter_hostids = getRequest('filter_hostids', []);
+$filter_hostids = getRequest('filter_hostids');
 if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
 		$host = API::Host()->get([
@@ -949,11 +949,7 @@ else {
 		$options['filter']['value_type'] = $_REQUEST['filter_value_type'];
 	}
 	if (array_key_exists('hostids', $options) && $_REQUEST['filter_valuemapids']) {
-		$hostids = $options['hostids'];
-
-		if ($data['context'] === 'host') {
-			addParentTemplateIds($hostids);
-		}
+		$hostids = CTemplateHelper::getParentTemplatesRecursive($filter_hostids, $data['context']);
 
 		$valuemap_names = array_unique(array_column(API::ValueMap()->get([
 			'output' => ['name'],
@@ -1034,6 +1030,7 @@ else {
 	}
 
 	$data['items'] = API::Item()->get($options);
+	$data['parent_templates'] = [];
 
 	// Unset unexisting subfilter tags (subfilter tags stored in profiles may contain tags already deleted).
 	if ($subfilter_tags) {
@@ -1282,27 +1279,22 @@ else {
 		(new CUrl('items.php'))->setArgument('context', $data['context'])
 	);
 
-	$triggerids = [];
+	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL);
 
+	$itemTriggerIds = [];
 	foreach ($data['items'] as $item) {
-		foreach ($item['triggers'] as $trigger) {
-			$triggerids[$trigger['triggerid']] = true;
-		}
+		$itemTriggerIds = array_merge($itemTriggerIds, zbx_objectValues($item['triggers'], 'triggerid'));
 	}
-
-	$data['triggers'] = API::Trigger()->get([
+	$data['itemTriggers'] = API::Trigger()->get([
+		'triggerids' => $itemTriggerIds,
 		'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'priority',
 			'status', 'state', 'error', 'templateid', 'flags'
 		],
 		'selectHosts' => ['hostid', 'name', 'host'],
-		'triggerids' => array_keys($triggerids),
 		'preservekeys' => true
 	]);
 
-	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-
-	$data['parent_items'] = getParentItems($data['items'], $allowed_ui_conf_templates);
-	$data['parent_triggers'] = getParentTriggers($data['triggers'], $allowed_ui_conf_templates);
+	$data['trigger_parent_templates'] = getTriggerParentTemplates($data['itemTriggers'], ZBX_FLAG_DISCOVERY_NORMAL);
 
 	sort($filter_hostids);
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));
@@ -1310,6 +1302,8 @@ else {
 	$data['config'] = [
 		'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
 	];
+
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter_tags);
 

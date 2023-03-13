@@ -305,6 +305,17 @@ class testTagFiltering extends CAPITest {
 				],
 				'expected' => []
 			],
+			'tests-inheritance-from-2nd-level-template' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'office', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Riga']
+					]
+				],
+				'expected' => [
+					'Host OS - Windows'
+				]
+			],
 
 			// evaltype: OR
 			'tests-equal-one-of-two-tags' => [
