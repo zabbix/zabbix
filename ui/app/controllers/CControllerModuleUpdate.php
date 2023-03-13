@@ -25,9 +25,9 @@
 class CControllerModuleUpdate extends CController {
 
 	/**
-	 * List of modules to update.
+	 * Current module data.
 	 */
-	private array $modules = [];
+	private array $module = [];
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -35,11 +35,8 @@ class CControllerModuleUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'moduleids' =>		'required|array_db module.moduleid',
-
-			// form update fields
-			'status' =>			'in 1',
-			'form_refresh' =>	'int32'
+			'moduleid' =>  'required|db module.moduleid',
+			'status' =>	    'in 1',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -62,15 +59,21 @@ class CControllerModuleUpdate extends CController {
 			return false;
 		}
 
-		$moduleids = $this->getInput('moduleids');
+		$moduleid = $this->getInput('moduleid');
 
-		$this->modules = API::Module()->get([
+		$module = API::Module()->get([
 			'output' => [],
-			'moduleids' => $moduleids,
+			'moduleids' => [$moduleid],
 			'preservekeys' => true
 		]);
 
-		return (count($this->modules) == count($moduleids));
+		if (!$module) {
+			return false;
+		}
+
+		$this->module = [$moduleid => $module];
+
+		return true;
 	}
 
 	protected function doAction(): void {
@@ -88,7 +91,7 @@ class CControllerModuleUpdate extends CController {
 		$module_manager_enabled = new CModuleManager(APP::getRootDir());
 
 		foreach ($db_modules as $moduleid => $db_module) {
-			$new_status = array_key_exists($moduleid, $this->modules) ? $set_status : $db_module['status'];
+			$new_status = array_key_exists($moduleid, $this->module) ? $set_status : $db_module['status'];
 
 			if ($new_status == MODULE_STATUS_ENABLED) {
 				$manifest = $module_manager_enabled->addModule($db_module['relative_path']);
@@ -97,7 +100,7 @@ class CControllerModuleUpdate extends CController {
 				$manifest = $module_manager->addModule($db_module['relative_path']);
 			}
 
-			if (array_key_exists($moduleid, $this->modules) && $manifest) {
+			if (array_key_exists($moduleid, $this->module) && $manifest) {
 				$db_modules_update_names[] = $manifest['name'];
 			}
 		}
@@ -111,7 +114,7 @@ class CControllerModuleUpdate extends CController {
 		if (!$errors) {
 			$update = [];
 
-			foreach (array_keys($this->modules) as $moduleid) {
+			foreach (array_keys($this->module) as $moduleid) {
 				$update[] = [
 					'moduleid' => $moduleid,
 					'status' => $set_status

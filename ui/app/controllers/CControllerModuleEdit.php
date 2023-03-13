@@ -35,11 +35,7 @@ class CControllerModuleEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'moduleid' =>		'required|db module.moduleid',
-
-			// form update fields
-			'status' =>			'in 1',
-			'form_refresh' =>	'int32'
+			'moduleid' =>   'required|db module.moduleid',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -57,7 +53,7 @@ class CControllerModuleEdit extends CController {
 		}
 
 		$modules = API::Module()->get([
-			'output' => ['id', 'relative_path', 'status'],
+			'output' => ['relative_path', 'status'],
 			'moduleids' => [$this->getInput('moduleid')]
 		]);
 
@@ -77,18 +73,15 @@ class CControllerModuleEdit extends CController {
 
 		if ($manifest !== null) {
 			$data = [
-				'form_refresh' => $this->getInput('form_refresh', 0),
 				'moduleid' => $this->getInput('moduleid'),
 				'name' => $manifest['name'],
 				'version' => $manifest['version'],
-				'author' => array_key_exists('author', $manifest) ? $manifest['author'] : null,
-				'description' => array_key_exists('description', $manifest) ? $manifest['description'] : null,
+				'author' => $manifest['author'],
+				'description' => $manifest['description'],
 				'relative_path' => $this->module['relative_path'],
 				'namespace' => $manifest['namespace'],
-				'url' => array_key_exists('url', $manifest) ? $manifest['url'] : null,
-				'status' => $this->hasInput('form_refresh')
-					? ($this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED)
-					: $this->module['status'],
+				'url' => $manifest['url'],
+				'status' => $this->module['status'],
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]

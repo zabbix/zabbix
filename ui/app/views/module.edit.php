@@ -24,18 +24,17 @@
  * @var array $data
  */
 
-// Create form.
+// Create popup form.
 $form = (new CForm())
-	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('module')))->removeId())
 	->setName('module.edit')
 	->setId('module-form')
-	->addVar('moduleids', [$data['moduleid']] ?: 0)
+	->addVar('moduleid', $data['moduleid'] ?: 0, $data['moduleid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'))
 	->setAttribute('autofocus', 'autofocus');
 
-// Create module tab.
-$module_tab = (new CFormGrid())
+// Create module details form.
+$module_form = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Name'), 'name'),
 		new CFormField($data['name'])
@@ -77,22 +76,10 @@ $module_tab = (new CFormGrid())
 		)
 	]);
 
-// Create tabs.
-$tabs = (new CTabView())
-	->addTab('moduleTab', _('Module'), $module_tab);
-
-if ($data['form_refresh'] == 0) {
-	$tabs->setSelected(0);
-}
-
-// Append tabs to form.
+// Append module details to popup form.
 $form
-	->addItem($tabs)
-	->addItem(
-		(new CScriptTag('module_edit.init('.json_encode([
-			'moduleids' => [$data['moduleid']]
-		]).');'))->setOnDocumentReady()
-	);
+	->addItem($module_form)
+	->addItem((new CScriptTag('module_edit.init();'))->setOnDocumentReady());
 
 // Popup output.
 $output = [

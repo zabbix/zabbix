@@ -35,11 +35,7 @@ class CControllerModuleEnable extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'moduleids' =>		'required|array_db module.moduleid',
-
-			// form update fields
-			'status' =>			'in 1',
-			'form_refresh' =>	'int32'
+			'moduleids' =>  'required|array_db module.moduleid',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -74,8 +70,6 @@ class CControllerModuleEnable extends CController {
 	}
 
 	protected function doAction(): void {
-		$set_status = MODULE_STATUS_ENABLED;
-
 		$db_modules_update_names = [];
 
 		$db_modules = API::Module()->get([
@@ -106,7 +100,7 @@ class CControllerModuleEnable extends CController {
 			foreach (array_keys($this->modules) as $moduleid) {
 				$update[] = [
 					'moduleid' => $moduleid,
-					'status' => $set_status
+					'status' => MODULE_STATUS_ENABLED
 				];
 			}
 
