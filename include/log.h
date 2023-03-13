@@ -95,4 +95,7 @@ int		zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_
 
 void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offset, const char *format,
 		...) __zbx_attr_format_printf(5, 6);
+
+void	zbx_set_log_component(const char *component);
+
 #endif

@@ -77,19 +77,17 @@ if (!empty($data['hostid'])) {
 }
 
 // create table
-$object_label = null;
-
-if ($data['hostid'] == 0) {
-	$object_label = $data['context'] === 'host' ? _('Host') : _('Template');
-}
-
 $itemTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		'',
-		$object_label,
+		($data['hostid'] == 0)
+			? ($data['context'] === 'host')
+				? _('Host')
+				: _('Template')
+			: null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Triggers'),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
@@ -104,7 +102,7 @@ $itemTable = (new CTableInfo())
 
 $current_time = time();
 
-$data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
+$data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['itemTriggers'], [
 	'html' => true,
 	'sources' => ['expression', 'recovery_expression'],
 	'context' => $data['context']
@@ -116,24 +114,9 @@ $csrf_token = CCsrfTokenHelper::get('items.php');
 foreach ($data['items'] as $item) {
 	// description
 	$description = [];
-
-	if (array_key_exists($item['templateid'], $data['parent_items'])) {
-		$parent_item = $data['parent_items'][$item['templateid']];
-
-		if ($parent_item['editable']) {
-			$parent_template_name = (new CLink(CHtml::encode($parent_item['template_name']),
-				(new CUrl('items.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$parent_item['templateid']])
-					->setArgument('context', 'template')
-			))->addClass(ZBX_STYLE_LINK_ALT);
-		}
-		else {
-			$parent_template_name = new CSpan(CHtml::encode($parent_item['template_name']));
-		}
-
-		$description[] = [$parent_template_name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
-	}
+	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
+		$data['allowed_ui_conf_templates']
+	);
 
 	if (!empty($item['discoveryRule'])) {
 		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
@@ -200,39 +183,12 @@ foreach ($data['items'] as $item) {
 		->getUrl();
 
 	foreach ($item['triggers'] as $num => &$trigger) {
-		$trigger = $data['triggers'][$trigger['triggerid']];
+		$trigger = $data['itemTriggers'][$trigger['triggerid']];
 
 		$trigger_description = [];
-
-		if (array_key_exists($trigger['templateid'], $data['parent_triggers'])) {
-			$parent_trigger = $data['parent_triggers'][$trigger['templateid']];
-
-			$parent_template_names = [];
-
-			foreach ($parent_trigger['template_names'] as $templateid => $template_name) {
-				if ($parent_template_names) {
-					$parent_template_names[] = ', ';
-				}
-
-				if ($parent_trigger['editable']) {
-					$parent_template_names[] = (new CLink(CHtml::encode($template_name),
-						(new CUrl('triggers.php'))
-							->setArgument('filter_hostids', [$templateid])
-							->setArgument('filter_set', 1)
-							->setArgument('context', 'template')
-					))
-						->addClass(ZBX_STYLE_LINK_ALT)
-						->addClass(ZBX_STYLE_GREY);
-				}
-				else {
-					$parent_template_names[] = (new CSpan(CHtml::encode($template_name)))->addClass(ZBX_STYLE_GREY);
-				}
-			}
-
-			$parent_template_names[] = NAME_DELIMITER;
-
-			$trigger_description[] = $parent_template_names;
-		}
+		$trigger_description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates'],
+			ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
+		);
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 

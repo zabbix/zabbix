@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-05 16:12+0000\n"
+"PO-Revision-Date: 2023-03-07 09:16+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -208,7 +208,7 @@ msgstr[1] "%1$s de %2$s element en estat problemàtic"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr "%1$s preseleccionats, utilitzeu les tecles de fletxa avall, amunt i Intro per seleccionar"
+msgstr "%1$s preseleccionats, empreu les tecles de fletxa avall, amunt i Intro per seleccionar"
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
@@ -428,6 +428,10 @@ msgstr "A"
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
 msgstr "AFEGIR INVALIDACIÓ"
+
+#: tests/selenium/modules/clock32/Widget.php:46
+msgid "ALARM CLOCK"
+msgstr "DESPERTADOR"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
@@ -2369,7 +2373,7 @@ msgstr "No es pot pas crear un mapa d'icones"
 #: app/controllers/CControllerMaintenanceCreate.php:72
 #: app/controllers/CControllerMaintenanceCreate.php:150
 msgid "Cannot create maintenance period"
-msgstr ""
+msgstr "No es pot pas crear el període de manteniment"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2558,8 +2562,8 @@ msgstr "No es pot pas esborrar el manteniment"
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
 msgid_plural "Cannot delete maintenance periods"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es pot pas esborrar el període de manteniment"
+msgstr[1] "No es poden pas esborrar els períodes de manteniment"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -3848,7 +3852,7 @@ msgstr "No es pot pas actualitzar el manteniment"
 #: app/controllers/CControllerMaintenanceUpdate.php:73
 #: app/controllers/CControllerMaintenanceUpdate.php:152
 msgid "Cannot update maintenance period"
-msgstr ""
+msgstr "No es pot pas actualitzar el període de manteniment"
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -4535,7 +4539,7 @@ msgstr "Configuració de la neteja"
 #: app/controllers/CControllerIconMapEdit.php:98
 #: app/controllers/CControllerIconMapList.php:75
 msgid "Configuration of icon mapping"
-msgstr "Configuració del mapeig d'icones"
+msgstr "Configuració del mapatge d'icones"
 
 #: app/controllers/CControllerImageEdit.php:75
 #: app/controllers/CControllerImageList.php:57
@@ -6105,7 +6109,7 @@ msgstr "Vols esborrar els elements triats?"
 
 #: app/views/js/maintenance.list.js.php:88
 msgid "Delete selected maintenance period?"
-msgstr ""
+msgstr "Vols esborrar el període de manteniment?"
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -8545,12 +8549,12 @@ msgstr "Grup"
 #: include/classes/api/services/CHostGroup.php:656
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
-msgstr "El grup \"%1$s\" no es pot pas esborrar perquè l'utilitza un prototip d'equip."
+msgstr "El grup \"%1$s\" no es pot pas esborrar perquè l'empra un prototip d'equip."
 
 #: include/classes/api/services/CHostGroup.php:717
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
-msgstr "El grup \"%1$s\" no es pot pas esborrar perquè s'utilitza en una condició de correlació."
+msgstr "El grup \"%1$s\" no es pot pas esborrar perquè s'empra en una condició de correlació."
 
 #: include/classes/import/importers/CTemplateImporter.php:399
 #, c-format
@@ -9035,7 +9039,7 @@ msgstr "El grup d'equips \"%1$s\" ja existeix."
 #: include/classes/api/services/CHostGroup.php:703
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
-msgstr "El grup \"%1$s\" no es pot pas esborrar perquè s'utilitza en una condició de correlació."
+msgstr "El grup \"%1$s\" no es pot pas esborrar perquè s'empra en una condició de correlació."
 
 #: include/classes/api/services/CHostGroup.php:631
 #, c-format
@@ -9520,7 +9524,7 @@ msgstr "Els mòduls situats a %1$s fan anar accions idèntiques."
 #: include/classes/core/CModuleManager.php:162
 #, c-format
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
-msgstr "Els mòduls situats a %2$s utilitzen un espai de noms idèntic (%1$s)."
+msgstr "Els mòduls situats a %2$s empren un espai de noms idèntic (%1$s)."
 
 #: include/classes/data/CItemData.php:1114
 msgid "Identification of the system. Returns string"
@@ -10048,7 +10052,7 @@ msgstr "Valor massiu incorrecte per a la interfície."
 #: include/classes/api/services/CHost.php:2241
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
-msgstr "S'utilitzen caràcters incorrectes per al nom d'equip \"%1$s\"."
+msgstr "S'empren caràcters incorrectes per al nom d'equip \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1805
 #, c-format
@@ -10136,7 +10140,7 @@ msgstr "Operador de condició de filtre incorrecte per a la regla de descobrimen
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/triggers.inc.php:1144
 msgid "Incorrect function is used"
-msgstr "S'utilitza una funció incorrecta"
+msgstr "S'empra una funció incorrecta"
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -10966,7 +10970,7 @@ msgstr "La clau \"%1$s\" no és vàlida: %2$s."
 #: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
 #: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
 msgid "Invalid media type mapping configuration."
-msgstr "La configuració de mapeig del tipus de suport no és vàlida."
+msgstr "La configuració de mapatge del tipus de suport no és vàlida."
 
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
@@ -11273,7 +11277,7 @@ msgstr "Període de temps no vàlid."
 #: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
 #: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
 msgid "Invalid user group mapping configuration."
-msgstr "La configuració de mapeig del grup d'usuaris no és vàlida."
+msgstr "La configuració de mapatge del grup d'usuaris no és vàlida."
 
 #: include/classes/validators/CApiInputValidator.php:2852
 #, c-format
@@ -11489,7 +11493,7 @@ msgstr "Etiquetes d'elements"
 
 #: jsLoader.php:397
 msgid "Item type does not use interface"
-msgstr "El tipus d'element no utilitza la interfície"
+msgstr "El tipus d'element no empra la interfície"
 
 #: items.php:879
 msgid "Item updated"
@@ -11501,7 +11505,7 @@ msgstr "L'element fa ús d'una interfície d'equip d'un equip no pare."
 
 #: include/classes/api/services/CItemGeneral.php:426
 msgid "Item uses incorrect interface type."
-msgstr "L'element utilitza un tipus d'interfície incorrecta."
+msgstr "L'element empra un tipus d'interfície incorrecta."
 
 #: app/views/popup.tophosts.column.edit.php:63
 #: include/classes/widgets/CWidgetConfig.php:59
@@ -11522,7 +11526,7 @@ msgstr "L'element no s'actualitzarà pas. L'interval d'actualització especifica
 
 #: include/items.inc.php:2094
 msgid "Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used."
-msgstr "L'element no s'actualitzarà pas. L'interval d'actualització ha d'estar entre 1 s i 1 d. També es poden utilitzar intervals programats/flexibles."
+msgstr "L'element no s'actualitzarà pas. L'interval d'actualització ha d'estar entre 1 s i 1 d. També es poden emprar intervals programats/flexibles."
 
 #: include/classes/api/services/CDashboardGeneral.php:447
 #: include/classes/api/services/CDashboardGeneral.php:454
@@ -12370,13 +12374,13 @@ msgstr "Període de manteniment"
 
 #: app/controllers/CControllerMaintenanceCreate.php:142
 msgid "Maintenance period created"
-msgstr ""
+msgstr "Període de manteniment creat"
 
 #: app/controllers/CControllerMaintenanceDelete.php:61
 msgid "Maintenance period deleted"
 msgid_plural "Maintenance periods deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Període de manteniment esborrat"
+msgstr[1] "Períodes de manteniment esborrats"
 
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
@@ -12384,7 +12388,7 @@ msgstr "Durada del període de manteniment"
 
 #: app/controllers/CControllerMaintenanceUpdate.php:144
 msgid "Maintenance period updated"
-msgstr ""
+msgstr "Període de manteniment actualitzat"
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -12800,7 +12804,7 @@ msgstr[1] "Habilitats els tipus de suport"
 #: app/views/popup.ldap.edit.php:255
 #: app/views/popup.mediatypemapping.edit.php:85
 msgid "Media type mapping"
-msgstr "Mapeig del tipus de suport"
+msgstr "Mapatge del tipus de suport"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -12838,7 +12842,7 @@ msgstr "Tipus de suport desactivats per l'Administrador."
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
 msgid "Media types used by action \"%1$s\"."
-msgstr "Tipus de suport utilitzats per l'acció \"%1$s\"."
+msgstr "Tipus de suport emprats per l'acció \"%1$s\"."
 
 #: app/views/administration.usergroup.list.php:76
 #: include/views/configuration.hostgroups.list.php:70
@@ -13598,11 +13602,11 @@ msgstr "Nou grup d'equips"
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
 msgid "New maintenance period"
-msgstr ""
+msgstr "Nou període de manteniment"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
-msgstr "Nou mapeig del tipus de suport"
+msgstr "Nou mapatge del tipus de suport"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -13635,7 +13639,7 @@ msgstr "Nous triggers"
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
-msgstr "Nou mapeig de grups d'usuaris"
+msgstr "Nou mapatge de grups d'usuaris"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -16000,12 +16004,12 @@ msgstr "El servidor intermediari \"%1$s\" per a l'equip \"%2$s\" no existeix."
 #: include/classes/api/services/CProxy.php:471
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
-msgstr "El servidor intermediari \"%1$s\" s'utilitza per l'acció \"%2$s\"."
+msgstr "El servidor intermediari \"%1$s\" s'empra per l'acció \"%2$s\"."
 
 #: include/classes/api/services/CProxy.php:428
 #, c-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
-msgstr "El servidor intermediari \"%1$s\" s'utilitza per la regla de descobriment \"%2$s\"."
+msgstr "El servidor intermediari \"%1$s\" s'empra per la regla de descobriment \"%2$s\"."
 
 #: app/controllers/CControllerProxyCreate.php:115
 msgid "Proxy added"
@@ -16870,11 +16874,11 @@ msgstr "Torna-ho a provar"
 
 #: include/classes/data/CItemData.php:862
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
-msgstr "Retorna una matriu JSON amb macros LLD que descriuen els objectes MBean o els seus atributs. Es pot utilitzar per a LLD."
+msgstr "Retorna una matriu JSON amb macros LLD que descriuen els objectes MBean o els seus atributs. Es pot emprar per a LLD."
 
 #: include/classes/data/CItemData.php:866
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
-msgstr "Retorna una matriu JSON amb objectes MBean o els seus atributs. En comparació amb jmx.discovery, aquest no defineix macros LLD. Es pot utilitzar per a LLD."
+msgstr "Retorna una matriu JSON amb objectes MBean o els seus atributs. En comparació amb jmx.discovery, aquest no defineix macros LLD. Es pot emprar per a LLD."
 
 #: include/classes/data/CItemData.php:838
 msgid "Return first column of the first row of the SQL query result."
@@ -16894,7 +16898,7 @@ msgstr "Retorna el temps de resposta de ping ICMP en segons. Exemple: 0,02"
 
 #: include/classes/data/CItemData.php:1618
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
-msgstr "Retorna una matriu JSON que descriu les interfícies de xarxa de l'equip configurades a Zabbix. Es pot utilitzar per a LLD."
+msgstr "Retorna una matriu JSON que descriu les interfícies de xarxa de l'equip configurades a Zabbix. Es pot emprar per a LLD."
 
 #: include/classes/data/CItemData.php:1594
 #: include/classes/data/CItemData.php:1674
@@ -19326,7 +19330,7 @@ msgstr "El mètode \"%1$s.%2$s\" s'ha de cridar sense el paràmetre \"auth\"."
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
-msgstr "La plantilla d'URL s'utilitza per carregar i mostrar la capa de mosaic als mapes geogràfics."
+msgstr "La plantilla d'URL s'empra per carregar i mostrar la capa de mosaic als mapes geogràfics."
 
 #: include/classes/db/DbBackend.php:130
 #, c-format
@@ -19431,7 +19435,7 @@ msgstr "El procediment remot sol·licitat no existeix / no és pas disponible"
 
 #: app/views/popup.token.view.php:64
 msgid "The token has expired. Please update the expiry date to use the token."
-msgstr "El token ha caducat. Actualitzeu la data de caducitat per utilitzar el token."
+msgstr "El token ha caducat. Actualitzeu la data de caducitat per emprar el token."
 
 #: include/html.inc.php:718
 #, c-format
@@ -20894,7 +20898,7 @@ msgstr "L'usuari \"%1$s\" és el destinatari de l'informe \"%2$s\"."
 #: include/classes/api/services/CUser.php:1302
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
-msgstr "L'usuari \"%1$s\" s'utilitza a l'acció \"%2$s\"."
+msgstr "L'usuari \"%1$s\" s'empra a l'acció \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:1375
 #, c-format
@@ -21018,7 +21022,7 @@ msgstr "Grup d'usuaris per al missatge de baixa de la base de dades"
 #: app/views/popup.ldap.edit.php:226
 #: app/views/popup.usergroupmapping.edit.php:126
 msgid "User group mapping"
-msgstr "Mapeig de grups d'usuaris"
+msgstr "Mapatge de grups d'usuaris"
 
 #: app/views/popup.ldap.edit.php:196
 msgid "User group membership attribute"
@@ -21432,7 +21436,7 @@ msgstr "Temps d'activitat de l'hipervisor de VMware, <url> - URL del servei de V
 
 #: include/classes/data/CItemData.php:1354
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Mida de memòria utilitzada de l'hipervisor VMware, <url> - URL del servei VMware, <uuid> - nom d'equip de l'hipervisor VMware"
+msgstr "Mida de memòria emprada de l'hipervisor VMware, <url> - URL del servei VMware, <uuid> - nom d'equip de l'hipervisor VMware"
 
 #: include/classes/data/CItemData.php:1342
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -21734,7 +21738,7 @@ msgstr "Mapes de valors"
 
 #: include/classes/data/CItemData.php:906
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
-msgstr "Valor del tema MQTT. El format de les dades retornades dependrà del contingut del tema. Si s'utilitzen comodins, retorna els valors del tema en format JSON"
+msgstr "Valor del tema MQTT. El format de les dades retornades dependrà del contingut del tema. Si s'empren comodins, retorna els valors del tema en format JSON"
 
 #: include/classes/data/CItemData.php:982
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"

@@ -32,10 +32,10 @@ typedef struct
 	/* the current usage statistics */
 	zbx_uint64_t	counter[ZBX_PROCESS_STATE_COUNT];
 
-	/* ticks of the last self timekeepering update */
+	/* ticks of the last timekeeper update */
 	clock_t		ticks;
 
-	/* ticks of the last self timekeepering cache flush */
+	/* ticks of the last timekeeper cache flush */
 	clock_t		ticks_flush;
 
 	/* the current process state (see ZBX_PROCESS_STATE_* defines) */
@@ -77,7 +77,7 @@ struct zbx_timekeeper
 	/* number of ticks per second */
 	long int		ticks_per_sec;
 
-	/* ticks of the last self timekeepering sync (data gathering) */
+	/* ticks of the last timekeeper sync (data gathering) */
 	clock_t			ticks_sync;
 
 	zbx_timekeeper_sync_t		*sync;
@@ -298,11 +298,11 @@ void	zbx_timekeeper_update(zbx_timekeeper_t *timekeeper, int index, unsigned cha
 
 		for (int s = 0; s < ZBX_PROCESS_STATE_COUNT; s++)
 		{
-			/* If process did not update selfmon counter during one self timekeepering data   */
+			/* If process did not update statistic counter during one timekeeper data         */
 			/* collection interval, then self timekeeper will collect statistics based on the */
-			/* current process state and the ticks passed since last self timekeepering data  */
-			/* collection. This value is stored in counter_used and the local statistics   */
-			/* must be adjusted by this (already collected) value.                         */
+			/* current process state and the ticks passed since last timekeeper data          */
+			/* collection. This value is stored in counter_used and the local statistics      */
+			/* must be adjusted by this (already collected) value.                            */
 			if (unit->cache.counter[s] > unit->counter_used[s])
 			{
 				unit->cache.counter[s] -= unit->counter_used[s];
@@ -319,7 +319,7 @@ void	zbx_timekeeper_update(zbx_timekeeper_t *timekeeper, int index, unsigned cha
 		timekeeper->sync->unlock(timekeeper->sync->data);
 	}
 
-	/* update local self timekeepering cache */
+	/* update local timekeeper cache */
 	unit->cache.state = state;
 	unit->cache.ticks = ticks;
 }
@@ -376,19 +376,21 @@ void	zbx_timekeeper_collect(zbx_timekeeper_t *timekeeper)
 
 		if (unit->cache.ticks_flush < timekeeper->ticks_sync)
 		{
-			/* If the process local cache was not flushed during the last self timekeepering  */
+			/* If the process local cache was not flushed during the last timekeeper       */
 			/* data collection interval update the process statistics based on the current */
-			/* process state and ticks passed during the collection interval. Store this   */
-			/* value so the process local self timekeepering cache can be adjusted before     */
-			/* flushing.                                                                   */
+			/* process state and ticks passed during the collection interval.              */
+			/* This will serve as good estimate until the timekeeper cache is flushed and  */
+			/* its counters adjusted by those values.                                      */
 			unit->counter[unit->cache.state] += (zbx_uint64_t)ticks_done;
+
+			/* store the estimated ticks to adjust the counters when flushing local cache */
 			unit->counter_used[unit->cache.state] += (zbx_uint64_t)ticks_done;
 		}
 
 		for (int s = 0; s < ZBX_PROCESS_STATE_COUNT; s++)
 		{
 			/* The data is gathered as ticks spent in corresponding states during the */
-			/* self timekeepering data collection interval. But in history the data are  */
+			/* timekeeper data collection interval. But in history the data are       */
 			/* stored as relative values. To achieve it we add the collected data to  */
 			/* the last values.                                                       */
 			unit->h_counter[s][index] = unit->h_counter[s][last] + unit->counter[s];

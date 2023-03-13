@@ -164,6 +164,16 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 		goto out;
 	}
 
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
+				(curl_error = rw_curl_error(err)));
+		goto out;
+	}
+#endif
+
 	if (NULL != config_tls_ca_file && '\0' != *config_tls_ca_file)
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_tls_ca_file)) ||

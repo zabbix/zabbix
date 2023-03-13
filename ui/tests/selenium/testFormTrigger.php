@@ -226,13 +226,13 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Trigger');
 
 		if (isset($data['templatedHost'])) {
-			$this->zbxTestTextPresent('Parent trigger');
+			$this->zbxTestTextPresent('Parent triggers');
 			if (isset($data['hostTemplate'])) {
 				$this->zbxTestAssertElementPresentXpath("//a[text()='".$data['hostTemplate']."']");
 			}
 		}
 		else {
-			$this->zbxTestTextNotPresent('Parent trigger');
+			$this->zbxTestTextNotPresent('Parent triggers');
 		}
 
 		$this->zbxTestTextPresent('Name');

@@ -2366,8 +2366,8 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 			continue;
 		}
 
-		zbx_discovery_update_service(drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
-				service->dns, service->port, service->status, service->value, service->itemtime);
+		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
+				service->status, service->value, service->itemtime);
 	}
 
 	for (;*processed_num < services_num; (*processed_num)++)
@@ -2380,8 +2380,8 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 			continue;
 		}
 
-		zbx_discovery_update_service(drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
-				service->dns, service->port, service->status, service->value, service->itemtime);
+		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
+				service->status, service->value, service->itemtime);
 	}
 
 	service = (zbx_dservice_t *)services->values[(*processed_num)++];
@@ -3198,7 +3198,7 @@ static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
 		return ZBX_PROXY_VERSION_UNSUPPORTED;
 #if (ZABBIX_VERSION_MINOR == 0)
 	if (ZABBIX_VERSION_MAJOR == 1 + ZBX_COMPONENT_VERSION_MAJOR(proxy_version))
-		return ZBX_PROXY_VERSION_STATUS_OUTDATED;
+		return ZBX_PROXY_VERSION_OUTDATED;
 #elif (ZABBIX_VERSION_MINOR > 0)
 	if (ZABBIX_VERSION_MAJOR == ZBX_COMPONENT_VERSION_MAJOR(proxy_version))
 		return ZBX_PROXY_VERSION_OUTDATED;

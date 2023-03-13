@@ -51,21 +51,11 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if (array_key_exists('parent_item', $data)) {
-	if ($data['parent_item']['editable']) {
-		$parent_template_name = new CLink(CHtml::encode($data['parent_item']['template_name']),
-			(new CUrl('host_discovery.php'))
-				->setArgument('form', 'update')
-				->setArgument('itemid', $data['item']['templateid'])
-				->setArgument('context', 'template')
-		);
-	}
-	else {
-		$parent_template_name = (new CSpan(CHtml::encode($data['parent_item']['template_name'])))
-			->addClass(ZBX_STYLE_GREY);
-	}
-
-	$item_tab->addItem([new CLabel(_('Parent discovery rule')), new CFormField($parent_template_name)]);
+if (!empty($data['templates'])) {
+	$item_tab->addItem([
+		new CLabel(_('Parent discovery rules')),
+		new CFormField($data['templates'])
+	]);
 }
 
 $item_tab

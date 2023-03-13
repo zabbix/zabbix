@@ -817,6 +817,7 @@ int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value,
 			if (SUCCEED != zbx_snmp_value_cache_init(snmp_cache, value->data.str, &err))
 			{
 				zbx_free(snmp_cache);
+				cache->type = ZBX_PREPROC_NONE;
 				goto out;
 			}
 
@@ -875,11 +876,17 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 
 		for (i = 0; i < parsed_params.values_num; i++)
 		{
-			zbx_snmp_walk_json_output_obj_t		*oobj_cached, oobj_local;
-			zbx_snmp_value_pair_t			*output_value;
+			zbx_snmp_walk_json_output_obj_t	*oobj_cached, oobj_local;
+			zbx_snmp_value_pair_t		*output_value;
 
 			param_field = parsed_params.values[i];
 			prefix_len = strlen(param_field.oid_prefix);
+
+			if ('.' == param_field.oid_prefix[prefix_len - 1])
+			{
+				param_field.oid_prefix[prefix_len - 1] = '\0';
+				prefix_len--;
+			}
 
 			if ('.' != param_field.oid_prefix[0])
 			{
@@ -889,6 +896,9 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 				prefix_len++;
 			}
 			else if (0 != strncmp(param_field.oid_prefix, p.oid, prefix_len))
+				continue;
+
+			if ('.' != p.oid[prefix_len])
 				continue;
 
 			if (SUCCEED != preproc_snmp_convert_value(&p.value, p.type, param_field.format_flag, errmsg))
@@ -981,13 +991,13 @@ static void	zbx_init_snmp(void)
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
 	init_snmp(progname);
 	netsnmp_init_mib();
 	zbx_snmp_init_done = 1;
 
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
 void	preproc_init_snmp(void)
@@ -995,6 +1005,7 @@ void	preproc_init_snmp(void)
 	zbx_init_snmp();
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, 1);
 	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, NETSNMP_OID_OUTPUT_NUMERIC);
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 }
 
 void	preproc_shutdown_snmp(void)
@@ -1006,11 +1017,11 @@ void	preproc_shutdown_snmp(void)
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
 	snmp_shutdown(progname);
 	zbx_snmp_init_done = 0;
 
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 #endif

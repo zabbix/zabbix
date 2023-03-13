@@ -856,13 +856,27 @@ class CScreenProblem extends CScreenBase {
 
 				if ($problem['cause_eventid'] == 0) {
 					$options = [
-						'countOutput' => true,
+						'output' => ['objectid'],
 						'filter' => ['cause_eventid' => $problem['eventid']]
 					];
 
-					$problem['symptom_count'] = ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL)
+					$symptom_events = $this->data['filter']['show'] == TRIGGERS_OPTION_ALL
 						? API::Event()->get($options)
 						: API::Problem()->get($options + ['recent' => true]);
+
+					if ($symptom_events) {
+						$enabled_triggers = API::Trigger()->get([
+							'output' => [],
+							'triggerids' => array_column($symptom_events, 'objectid'),
+							'filter' => ['status' => TRIGGER_STATUS_ENABLED],
+							'preservekeys' => true
+						]);
+
+						$symptom_events = array_filter($symptom_events,
+							static fn($event) => array_key_exists($event['objectid'], $enabled_triggers)
+						);
+						$problem['symptom_count'] = count($symptom_events);
+					}
 
 					if ($problem['symptom_count'] > 0) {
 						$do_causes_have_symptoms = true;

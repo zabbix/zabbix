@@ -80,23 +80,9 @@ $csrf_token = CCsrfTokenHelper::get('disc_prototypes.php');
 
 foreach ($data['items'] as $item) {
 	$description = [];
-
-	if (array_key_exists($item['templateid'], $data['parent_items'])) {
-		$parent_item = $data['parent_items'][$item['templateid']];
-
-		if ($parent_item['editable']) {
-			$parent_template_name = (new CLink(CHtml::encode($parent_item['template_name']),
-				(new CUrl('disc_prototypes.php'))
-					->setArgument('parent_discoveryid', $parent_item['ruleid'])
-					->setArgument('context', 'template')
-			))->addClass(ZBX_STYLE_LINK_ALT);
-		}
-		else {
-			$parent_template_name = new CSpan(CHtml::encode($parent_item['template_name']));
-		}
-
-		$description[] = [$parent_template_name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
-	}
+	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
+		$data['allowed_ui_conf_templates']
+	);
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
