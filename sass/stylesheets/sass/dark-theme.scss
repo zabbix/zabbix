@@ -41,8 +41,18 @@ $body-bg-color: #0e1012;
 $overlay-bg-color: #000000;
 $overlay-border-color: #383838;
 
+$icon-btn-icon-color: #8c979c;
+$icon-btn-icon-hover-color: #acbbc2;
+$icon-doc-color: #4f4f4f;
+$icon-doc-hover-color: #737373;
+$icon-help-hint-color: #4f4f4f;
+$icon-sidebar-mode-color:#b1b1b1;
+$icon-form-search-color: #b1b1b1;
+
 // Main menu
+$menu-icon-color: #b1b1b1;
 $menu-main-color: #f2f2f2;
+$menu-main-submenu-hover-color: #ffffff;
 $menu-main-hover-bg-color: #0e0e0e;
 $menu-main-selected-bg-color: #202020;
 $menu-main-selected-border-color: #c5c5c5;
@@ -112,7 +122,8 @@ $form-search-icon-bg-position: -570px -616px;
 
 // Error messages
 $msg-bad-color: darken(desaturate($red, 10%), 20%);
-$msg-good-color: darken(desaturate($green, 10%), 20%);
+$msg-good-color: #344e3f;
+$msg-good-border-color: #344e3f;
 $msg-warning-color: #a97d38;
 $msg-warning-border-color: #614f32;
 

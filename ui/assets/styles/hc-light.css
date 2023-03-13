@@ -758,6 +758,10 @@ header {
     padding: 2px; }
     header .header-doc-link + .header-controls {
       margin-left: 0; }
+    header .header-doc-link .zi-help::before {
+      color: #bbc6cc; }
+    header .header-doc-link .zi-help:hover::before, header .header-doc-link .zi-help:focus::before {
+      color: #768d99; }
   header .header-controls {
     flex-shrink: 0;
     margin: 0 -2px 0 auto;
@@ -2979,7 +2983,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
     color: #009900;
     border-color: #28a745; }
   .msg-good::after {
-    background-color: #28a745; }
+    background-color: #009900; }
 
 .msg-warning {
   border-color: #ffb319; }
@@ -4800,6 +4804,8 @@ z-select button.focusable, z-select a.focusable.btn-icon,
 
 .calendar-control .zi-calendar::before {
   font-size: 22px; }
+.calendar-control .zi-calendar:disabled::before {
+  opacity: .3; }
 
 .header-kioskmode-controls {
   position: fixed;

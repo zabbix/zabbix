@@ -27,6 +27,19 @@ header {
 		& + .header-controls {
 			margin-left: 0;
 		}
+
+		.zi-help {
+			&::before {
+				color: $icon-doc-color;
+			}
+
+			&:hover,
+			&:focus {
+				&::before {
+					color: $icon-doc-hover-color;
+				}
+			}
+		}
 	}
 
 	.header-controls {

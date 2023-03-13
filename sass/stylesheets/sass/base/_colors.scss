@@ -37,7 +37,7 @@ $teal: #0f998b;
 // Layout
 $header-bg-color: #ffffff !default;
 $sidebar-bg-color: #0a466a !default;
-$sidebar-mode-icon-color: #8cb2ca !default;
+$icon-sidebar-mode-color: #8cb2ca !default;
 $sidebar-mode-icon-hover-color: #ffffff !default;
 
 $scrollbar-track-color: rgba(#acbbc2, .55) !default;
@@ -59,6 +59,9 @@ $overlay-border-color: #ccd5d9 !default;
 $icon-btn-icon-color: lighten(#768d99, 25%) !default;
 $icon-btn-icon-hover-color: #768d99 !default;
 $icon-btn-icon-disabled-color: lighten(#768d99, 35%) !default;
+$icon-doc-color: #bbc6cc !default;
+$icon-doc-hover-color: #768d99 !default;
+$icon-help-hint-color: #768d99 !default;
 
 $icon-color: #768d99 !default;
 $icon-hint-color: #768d99 !default;
@@ -174,7 +177,7 @@ $form-disabled-border-color: #ccd5d9 !default;
 $input-placeholder-color: #9d9d9d !default;
 
 $form-search-color: #ffffff !default;
-$form-search-icon-color: #8cb2ca !default;
+$icon-form-search-color: #8cb2ca !default;
 $form-search-icon-hover-color: #ffffff !default;
 $form-search-bg-color: #092637 !default;
 $form-search-border-color: #010a0f !default;

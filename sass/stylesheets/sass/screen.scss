@@ -1894,8 +1894,16 @@ select {
 }
 
 .calendar-control {
-	.zi-calendar::before {
-		font-size: 22px;
+	.zi-calendar {
+		&::before {
+			font-size: 22px;
+		}
+
+		&:disabled {
+			&::before {
+				opacity: .3;
+			}
+		}
 	}
 }
 
@@ -4487,8 +4495,8 @@ a.icon-count {
 
 .zi-circle-question-filled {
 	&::before {
-		top: -2px; // TODO acikuns check
-		color: $icon-color;
+		top: -2px;
+		color: $icon-help-hint-color;
 	}
 	&:focus,
 	&:hover,
