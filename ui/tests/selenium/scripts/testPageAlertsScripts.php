@@ -590,7 +590,9 @@ class testPageAlertsScripts extends CWebTest {
 		else {
 			$this->assertMessage(TEST_GOOD, ($scripts_count > 1) ? 'Scripts deleted' : 'Script deleted');
 			$this->assertSelectedCount(0);
-			$this->assertNotEquals($old_hash, CDBHelper::getHash(self::$script_sql));
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name IN ('.
+					CDBHelper::escape($data['name']).')')
+			);
 		}
 	}
 
