@@ -880,11 +880,13 @@ function getConditionFormula(conditions, evalType) {
 			// add buttons
 			table.on('click', options.add, function() {
 				table.trigger('beforeadd.dynamicRows', options);
+
 				// add the new row before the row with the "Add" button
 				var beforeRow = (options['beforeRow'] !== null)
 					? $(options['beforeRow'], table)
 					:  $(this).closest('tr');
 				addRow(table, beforeRow, options);
+
 				table.trigger('afteradd.dynamicRows', options);
 			});
 
@@ -892,9 +894,11 @@ function getConditionFormula(conditions, evalType) {
 			table.on('click', options.remove, function() {
 				// remove the parent row
 				removeRow(table, $(this).closest(options.row), options);
+
 				if (!options.allow_empty && table.find(options.row).length === 0) {
 					addRow(table, $(options.add, table).closest('tr'), options);
 				}
+
 			});
 
 			// disable buttons
@@ -985,6 +989,7 @@ function getConditionFormula(conditions, evalType) {
 			row.next().remove();
 		}
 		row.remove();
+
 		table.trigger('tableupdate.dynamicRows', options);
 		table.trigger('afterremove.dynamicRows', options);
 	}
