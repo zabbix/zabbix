@@ -54,7 +54,7 @@ $form_tabs = (new CTabView())
 		TAB_INDICATOR_GRAPH_PROBLEMS
 	);
 
-if ($data['fields']['ds']->templateid === null) {
+if (array_key_exists('or', $data['fields'])) {
 	$form_tabs
 		->addTab('overrides', _('Overrides'), getOverridesTab($form, $data['fields']),
 		TAB_INDICATOR_GRAPH_OVERRIDES
