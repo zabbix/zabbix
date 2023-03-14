@@ -27,7 +27,6 @@
 #include "cfg.h"
 #include "zbxcrypto.h"
 #include "zbxvault.h"
-#include "base64.h"
 #include "zbxdbhigh.h"
 #include "dbsync.h"
 #include "actions.h"
@@ -2481,7 +2480,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 
 	src_len = strlen(src) * 3 / 4;
 	dst = __config_shmem_malloc_func(NULL, src_len);
-	str_base64_decode(src, (char *)dst, src_len, &data_len);
+	zbx_base64_decode(src, (char *)dst, src_len, &data_len);
 
 	return dst;
 }
@@ -4608,7 +4607,7 @@ static size_t	dc_corr_condition_get_size(unsigned char type)
  *             row       - [IN] the database row containing condition data    *
  *                                                                            *
  ******************************************************************************/
-static void	dc_corr_condition_init_data(zbx_dc_corr_condition_t *condition, int found,  DB_ROW row)
+static void	dc_corr_condition_init_data(zbx_dc_corr_condition_t *condition, int found,  zbx_db_row_t row)
 {
 	if (ZBX_CORR_CONDITION_OLD_EVENT_TAG == condition->type || ZBX_CORR_CONDITION_NEW_EVENT_TAG == condition->type)
 	{
@@ -6427,8 +6426,8 @@ static void	dc_hostgroups_update_cache(void)
  ******************************************************************************/
 static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	result = zbx_db_select("select objectid,type,clock,ns from trigger_queue");
 

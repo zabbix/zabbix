@@ -136,6 +136,8 @@ In order to be able to monitor tablespaces across multiple containers, the Oracl
 
 Common parameters for all the keys are: [ConnString][User][Password][Service] where `ConnString` can be either a URI or a session name.
 `ConnString` will be treated as a URI if no session with the given name is found.
+User can contain sysdba, sysoper, sysasm privileges. It must be used with `as` as a separator
+e.g `user as sysdba`, privilege can be upper or lowercase, and must be at the end of username string.
 If you use `ConnString` as a session name, you can skip the rest of the connection parameters.
  
 #### Using named sessions
@@ -165,15 +167,22 @@ Note: session names are case-sensitive.
 
 ## Supported keys
 
-**oracle.diskgroups.stats[\<commonParams\>]** — returns Automatic Storage Management (ASM) disk groups statistics.
+**oracle.diskgroups.stats[\<commonParams\>,\<diskgroup\>]** — returns Automatic Storage Management (ASM) disk groups statistics.
+
+*Parameters:*  
+`diskgroup` (optional) — the name of the diskgroup.
 
 **oracle.diskgroups.discovery[\<commonParams\>]** — returns the list of ASM disk groups in LLD format.
 
-**oracle.archive.info[\<commonParams\>]** — returns archive logs statistics.
+**oracle.archive.info[\<commonParams\>,\<destination\>]** — returns archive logs statistics.
+*Parameters:*  
+`destination` (optional) — the name of the destination.
 
 **oracle.archive.discovery[\<commonParams\>]** — returns the list of archive logs in LLD format.
 
-**oracle.cdb.info[\<commonParams\>]** — returns the Container Databases (CDBs) info.
+**oracle.cdb.info[\<commonParams\>,\<database\>]** — returns the Container Databases (CDBs) info.
+*Parameters:*  
+`database` (optional) — the name of the database.
 
 **oracle.custom.query[\<commonParams\>,queryName[,args...]]** — returns the result of a custom query.
 
@@ -189,7 +198,9 @@ Note: session names are case-sensitive.
 
 **oracle.instance.info[\<commonParams\>]** — returns instance statistics.
 
-**oracle.pdb.info[\<commonParams\>]** — returns the Pluggable Databases (PDBs) information.
+**oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Plugable Databases (PDBs) information.
+*Parameters:*  
+`database` (optional) — the name of the database.
 
 **oracle.pdb.discovery[\<commonParams\>]** — returns the list of PDBs in LLD format.
 
@@ -223,10 +234,12 @@ Possible values:
 
 **oracle.sys.params[\<commonParams\>]** — returns a set of the system parameter values.
 
-**oracle.ts.stats[\<commonParams\>[,conname]]** — returns the tablespace statistics. 
+**oracle.ts.stats[\<commonParams\>,[conname],[tablespace],[type]]** — returns the tablespace statistics. 
 
 *Parameters:*  
-Conname (optional) — the container name for which the information is required.
+`conname` (optional) — the container name for which the information is required.
+`tablespace` (optional) — the name of the tablespace.
+`type` (optional) — the type of the tablespace.
 
 **oracle.ts.discovery[\<commonParams\>]** — returns the list of tablespaces in Low-level discovery (LLD) format.
 

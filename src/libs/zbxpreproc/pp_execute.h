@@ -22,6 +22,9 @@
 
 #include "pp_cache.h"
 #include "zbxembed.h"
+#include "zbxpreproc.h"
+#include "zbxtime.h"
+#include "zbxvariant.h"
 
 typedef struct
 {
@@ -30,8 +33,8 @@ typedef struct
 }
 zbx_pp_context_t;
 
-void	pp_context_init(zbx_pp_context_t *ctx);
-void	pp_context_destroy(zbx_pp_context_t *ctx);
+void		pp_context_init(zbx_pp_context_t *ctx);
+void		pp_context_destroy(zbx_pp_context_t *ctx);
 zbx_es_t	*pp_context_es_engine(zbx_pp_context_t *ctx);
 
 void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_cache_t *cache,

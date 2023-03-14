@@ -687,6 +687,8 @@ footer {
     line-height: 24px; }
   .form-grid .form-actions button:not(:first-of-type) {
     margin-left: 10px; }
+  .form-grid.form-grid-actions {
+    margin-top: 10px; }
   .form-grid .form-field.offset-1 {
     grid-column-start: 2 !important; }
   .form-grid .form-field.offset-2 {
@@ -2397,7 +2399,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad .overlay-close-btn,
   .msg-good .overlay-close-btn,
   .msg-warning .overlay-close-btn {
-    color: #333333; }
+    color: #333333;
+    background-color: transparent; }
   .msg-bad .link-action,
   .msg-good .link-action,
   .msg-warning .link-action {
@@ -2414,7 +2417,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad button,
   .msg-good button,
   .msg-warning button {
-    background-color: #ffffff; }
+    background-color: transparent; }
   .msg-bad::before,
   .msg-good::before,
   .msg-warning::before {
@@ -3434,7 +3437,6 @@ form.is-loading {
     padding-bottom: 0;
     border-bottom: 0;
     box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
-    color: #000000;
     height: 22px;
     vertical-align: middle;
     white-space: nowrap; }
