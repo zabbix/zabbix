@@ -3687,7 +3687,7 @@ void	zbx_recalc_history_time_period(int *ts_from)
 	if (1 != hk.history_global)
 		return;
 
-	least_ts = (int)time(NULL) - cfg.hk.history;
+	least_ts = (int)time(NULL) - hk.history;
 
 	if (least_ts > *ts_from)
 		*ts_from = least_ts;

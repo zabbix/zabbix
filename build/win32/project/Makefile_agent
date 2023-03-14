@@ -25,6 +25,7 @@ PDBS = $(TARGETDIR)\$(TARGETNAME).pdb $(TARGETNAME).$(TARGETEXT).pdb
 
 ADD_CFLAGS = $(ADD_CFLAGS) /D WITH_AGENT_METRICS /D WITH_COMMON_METRICS \
 	/D WITH_SPECIFIC_METRICS /D WITH_HOSTNAME_METRIC /D WITH_SIMPLE_METRICS \
+	/D WITH_HTTP_METRICS \
 	/Zi /D DEFAULT_CONFIG_FILE="\"C:\\zabbix_agentd.conf\"" \
 	/Fd$(TARGETNAME).$(TARGETEXT).pdb
 
@@ -73,6 +74,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\common\dns.o \
 	..\..\..\src\libs\zbxsysinfo\common\system.o \
 	..\..\..\src\libs\zbxsysinfo\common\zabbix_stats.o \
+	..\..\..\src\libs\zbxsysinfo\common\http_metrics.o \
 	..\..\..\src\libs\zbxsysinfo\simple\ntp.o \
 	..\..\..\src\libs\zbxsysinfo\simple\simple.o \
 	..\..\..\src\libs\zbxsysinfo\win32\cpu.o \
