@@ -50,7 +50,6 @@
 #include "proxypoller/proxypoller.h"
 #include "vmware/vmware.h"
 #include "taskmanager/taskmanager.h"
-#include "preprocessor/preproc_manager.h"
 #include "availability/avail_manager.h"
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"
@@ -64,7 +63,6 @@
 #include "events/events.h"
 #include "zbxcachevalue.h"
 #include "zbxcachehistory.h"
-#include "setproctitle.h"
 #include "zbxhistory.h"
 #include "postinit.h"
 #include "zbxvault.h"
@@ -83,8 +81,7 @@
 #include "zbxthreads.h"
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
-#include "preprocessor/preproc_stats.h"
-#include "preproc.h"
+#include "preproc/preproc_server.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -1153,9 +1150,7 @@ static void	zbx_on_exit(int ret)
 
 	zbx_locks_destroy();
 
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
+	zbx_setproctitle_deinit();
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		zbx_export_deinit(problems_export);
@@ -1200,9 +1195,7 @@ int	main(int argc, char **argv)
 
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
-#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	argv = setproctitle_save_env(argc, argv);
-#endif
+	argv = zbx_setproctitle_init(argc, argv);
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
@@ -1280,6 +1273,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_stats(get_program_type);
 	zbx_init_library_sysinfo(get_config_timeout);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
+	zbx_init_library_preproc(preproc_flush_value_server);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1426,7 +1420,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_taskmanager_args	taskmanager_args = {config_timeout, config_startup_time};
 	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, config_timeout};
 	zbx_thread_pinger_args		pinger_args = {config_timeout};
-	zbx_thread_preprocessing_manager_args	preproc_man_args =
+	zbx_thread_pp_manager_args	preproc_man_args =
 						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
 
 #ifdef HAVE_OPENIPMI
@@ -1636,7 +1630,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &preproc_man_args;
-				zbx_thread_start(preprocessing_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_pp_manager_thread, &thread_args, &threads[i]);
 				break;
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:

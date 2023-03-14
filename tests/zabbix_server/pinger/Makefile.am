@@ -26,7 +26,6 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
-	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \

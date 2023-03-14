@@ -17,9 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "preproc_stats.h"
+#include "zbxpreproc.h"
 
-#include "preproc.h"
 #include "zbxjson.h"
 
 void zbx_preproc_stats_ext_get(struct zbx_json *json, const void *arg)

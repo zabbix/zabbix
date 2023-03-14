@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.4'
+  version: '7.0'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         Template tooling version used: 0.42
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Applications
@@ -831,7 +831,7 @@ zabbix_export:
         -
           macro: '{$IIS.SERVICE}'
           value: http
-          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/6.4/manual/config/items/itemtypes/simple_checks'
+          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/simple_checks'
       valuemaps:
         -
           uuid: 63d1ad6b4cf643da870b14c53da6c52f

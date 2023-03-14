@@ -478,7 +478,7 @@ $item_tab
 		(new CFormField((new CTextBox('http_proxy', $data['http_proxy'], $readonly,
 				DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->setAttribute('placeholder', _('[protocol://][user[:password]@]proxy.example.com[:port]'))
 			->disableAutocomplete()
 		))->setId('js-item-http-proxy-field')
 	])
@@ -1017,7 +1017,7 @@ if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA) && $data['item
 				->setArgument('action', 'latest.view')
 				->setArgument('hostids[]', $data['hostid'])
 				->setArgument('name', $data['name'])
-				->setArgument('filter_name', '')
+				->setArgument('filter_set', '1')
 		))->setTarget('_blank')))
 	);
 }
@@ -1119,7 +1119,8 @@ $html_page->show();
 		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
-		'interface_types' => itemTypeInterface()
+		'interface_types' => itemTypeInterface(),
+		'discovered_item' => $discovered_item
 	]).');
 '))->show();
 

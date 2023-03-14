@@ -667,7 +667,7 @@ static zbx_db_event	*get_event_by_source_object_id(int source, int object, zbx_u
  ******************************************************************************/
 static int	correlation_match_event_hostgroup(const zbx_db_event *event, zbx_uint64_t groupid)
 {
-	DB_RESULT		result;
+	zbx_db_result_t		result;
 	int			ret = FAIL;
 	zbx_vector_uint64_t	groupids;
 	char			*sql = NULL;
@@ -1232,7 +1232,7 @@ static void	correlate_event_by_global_rules(zbx_db_event *event, zbx_problem_sta
 		{
 			if (ZBX_PROBLEM_STATE_UNKNOWN == *problem_state)
 			{
-				DB_RESULT	result;
+				zbx_db_result_t	result;
 
 				result = zbx_db_select_n("select eventid from problem"
 						" where r_eventid is null and source="
@@ -1270,8 +1270,8 @@ static void	correlate_event_by_global_rules(zbx_db_event *event, zbx_problem_sta
 
 	if (0 != corr_old.values_num)
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
 
 		/* Process correlations that matches new event and either uses old events in conditions */
 		/* or has operations involving old events.                                              */
@@ -1546,8 +1546,8 @@ out:
  ******************************************************************************/
 static void	update_trigger_problem_count(zbx_vector_ptr_t *trigger_diff)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_uint64_t	triggerids;
 	zbx_trigger_diff_t	*diff;
 	int			i, index;
@@ -1772,8 +1772,8 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 	struct zbx_json		json;
 	size_t			sql_alloc = 256, sql_offset;
 	char			*sql = NULL;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_hashset_t		hosts;
 	zbx_vector_uint64_t	hostids;
 	zbx_hashset_iter_t	iter;
@@ -2240,8 +2240,8 @@ static void	process_internal_ok_events(const zbx_vector_ptr_t *ok_events)
 	const char		*separator = "";
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	triggerids, itemids, lldruleids;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_db_event		*event;
 
 	zbx_vector_uint64_create(&triggerids);
@@ -2369,8 +2369,8 @@ static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_p
  ******************************************************************************/
 static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *problems)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_event_problem_t	*problem;
