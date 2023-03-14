@@ -66,8 +66,8 @@ static int	DBpatch_5010003(void)
 
 static int	DBpatch_5010004(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	int		ret = SUCCEED;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
@@ -1257,8 +1257,8 @@ static int	DBpatch_delete_screen(uint64_t screenid)
 
 static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templateid)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			i, ret;
 	zbx_db_screen_item_t	*scr_item;
 	zbx_db_dashboard_t	dashboard;
@@ -1456,8 +1456,8 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 
 static int	DBpatch_5010044(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))

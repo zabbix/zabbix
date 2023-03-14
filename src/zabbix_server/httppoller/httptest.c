@@ -20,7 +20,6 @@
 #include "httptest.h"
 
 #include "log.h"
-#include "preproc.h"
 #include "zbxnix.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
@@ -30,6 +29,7 @@
 #include "zbxsysinfo.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxpreproc.h"
 
 /* HTTP item types */
 #define ZBX_HTTPITEM_TYPE_RSPCODE	0
@@ -112,8 +112,8 @@ static void	httptest_remove_macros(zbx_httptest_t *httptest)
 static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, double speed_download,
 		const char *err_str, zbx_timespec_t *ts)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	unsigned char	types[3];
 	DC_ITEM		items[3];
 	zbx_uint64_t	itemids[3];
@@ -257,8 +257,8 @@ static void	httppairs_free(zbx_vector_ptr_pair_t *pairs)
 #ifdef HAVE_LIBCURL
 static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx_timespec_t *ts)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	unsigned char	types[3];
 	DC_ITEM		items[3];
 	zbx_uint64_t	itemids[3];
@@ -354,8 +354,8 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 {
 	int			type, ret = SUCCEED;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	size_t			alloc_len = 0, offset;
 	zbx_ptr_pair_t		pair;
 	zbx_vector_ptr_pair_t	*vector, headers, query_fields, post_fields;
@@ -537,8 +537,8 @@ static void	add_http_headers(char *headers, struct curl_slist **headers_slist, c
 static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 {
 	int			type, ret = SUCCEED;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	size_t			alloc_len = 0, offset;
 	zbx_ptr_pair_t		pair;
 	zbx_vector_ptr_pair_t	*vector, headers;
@@ -618,7 +618,7 @@ out:
  ******************************************************************************/
 static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest, int *delay)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 	zbx_db_httpstep	db_httpstep;
 	char		*err_str = NULL, *buffer = NULL;
 	int		lastfailedstep = 0;
@@ -626,7 +626,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest, int *delay
 	double		speed_download = 0;
 	int		speed_download_num = 0;
 #ifdef HAVE_LIBCURL
-	DB_ROW		row;
+	zbx_db_row_t	row;
 	zbx_httpstat_t	stat;
 	char		errbuf[CURL_ERROR_SIZE];
 	CURL		*easyhandle = NULL;
@@ -1036,8 +1036,8 @@ httptest_error:
  ******************************************************************************/
 int	process_httptests(int now, time_t *nextcheck)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_uint64_t		httptestid;
 	zbx_httptest_t		httptest;
 	DC_HOST			host;

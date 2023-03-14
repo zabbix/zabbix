@@ -110,8 +110,8 @@ static int	DBpatch_4050012(void)
 
 static int	DBpatch_4050014(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	int		ret = SUCCEED;
 	char		*sql = NULL, *name = NULL, *name_esc;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -165,8 +165,8 @@ out:
 
 static int	DBpatch_4050015(void)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_uint64_t		time_period_id, every;
 	int			invalidate = 0;
 	const zbx_db_table_t	*timeperiods;
@@ -245,8 +245,8 @@ static int	DBpatch_4050019(void)
 
 static int	DBpatch_4050020(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_uint64_t	operationid;
 	int		ret = SUCCEED, res, col;
 	char		*subject, *message;
@@ -411,8 +411,8 @@ static int	DBpatch_4050021(void)
 				}
 			};
 	int		ret = SUCCEED, res;
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_uint64_t	mediatypeid, mediatypemessageid = 1;
 	int		content_type, i, k;
 	char		*msg_esc = NULL, *subj_esc = NULL;
@@ -833,8 +833,8 @@ static void	DBpatch_load_data(zbx_vector_dbu_snmp_if_t *snmp_ifs, zbx_vector_dbu
 #define ITEM_TYPE_SNMPv2c	4
 #define ITEM_TYPE_SNMPv3	6
 
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		index;
 
 	result = zbx_db_select(
@@ -946,8 +946,8 @@ static void	DBpatch_load_data(zbx_vector_dbu_snmp_if_t *snmp_ifs, zbx_vector_dbu
 
 static void	DBpatch_load_empty_if(zbx_vector_dbu_snmp_if_t *snmp_def_ifs)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	result = zbx_db_select(
 			"select h.interfaceid,h.bulk"
@@ -1281,8 +1281,8 @@ static void	db_if_link(zbx_uint64_t if_slave, zbx_uint64_t if_master, zbx_vector
 static void	DBpatch_if_load_data(zbx_vector_dbu_interface_t *new_ifs, zbx_vector_dbu_snmp_if_t *snmp_new_ifs,
 		zbx_vector_uint64_pair_t *if_links)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	result = zbx_db_select(
 			"select hreal.hostid,"
@@ -1522,8 +1522,8 @@ static int	DBpatch_4050062(void)
 
 static int	DBpatch_4050063(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_uint64_t	profileid, userid, idx2;
 	int		ret = SUCCEED, value_int, i;
 	const char	*profile = "web.problem.filter.severities";

@@ -38,8 +38,8 @@ static int	DBpatch_2050000(void)
 
 static int	DBpatch_2050001(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*oid = NULL;
 	size_t		oid_alloc = 0;
 	int		ret = FAIL, rc;
@@ -162,9 +162,9 @@ static int	DBpatch_2050011(void)
 
 static int	DBpatch_2050012(void)
 {
-	DB_RESULT	result;
-	DB_RESULT	result2;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_result_t	result2;
+	zbx_db_row_t	row;
 	char		*key = NULL, *key_esc, *param;
 	int		ret = SUCCEED;
 	AGENT_REQUEST	request;
@@ -501,8 +501,8 @@ static int	DBpatch_2050054(void)
 
 static int	DBpatch_2050055(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = FAIL;
 
 	if (NULL == (result = zbx_db_select(
@@ -789,8 +789,8 @@ static int	DBpatch_2050091(void)
 
 static int	DBpatch_2050092(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	const char	*end, *start;
 	int		len, ret = FAIL, rc;
 	char		*url = NULL, *url_esc;

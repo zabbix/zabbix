@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher  
+For Zabbix version: 7.0 and higher  
 The template to monitor AWS S3 bucket by HTTP via Zabbix that works without any external scripts.  
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 *NOTE*
@@ -18,7 +18,7 @@ Additional information about metrics and used API methods:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 The template gets AWS S3 metrics and uses the script item to make HTTP requests to the CloudWatch API.
 

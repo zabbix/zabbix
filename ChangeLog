@@ -1,3 +1,22 @@
+Changes for 7.0.0alpha1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.1rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.0
+
+6.4.0rc4 was released as 6.4.0 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.4.0rc4
 
 Bug fixes:
@@ -7,19 +26,19 @@ Bug fixes:
 Changes for 6.4.0rc3
 
 Bug fixes:
-...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
-.......PS. [ZBX-22408] fixed multiple preprocessing workers trying to index json object at the same time (wiper)
-.......PS. [ZBX-22419] fixed wrongful removal of matching oids (dgoloscapov)
+...G...... [ZBX-22402] fixed data sending to Zabbix server from the Zabbix agent 2 persistent buffer (akozlovs)
+.......PS. [ZBX-22408] fixed multiple preprocessing workers trying to index a JSON object at the same time (wiper)
+.......PS. [ZBX-22419] fixed wrongful removal of matching OIDs (dgoloscapov)
 ...G...PS. [ZBX-22368] replaced sigprocmask with pthread_sigmask when libpthread is available (wiper)
-.......PS. [ZBX-22412] fixed dependent items beging generated from discarded master item value (wiper)
-........S. [ZBX-22396] fixed handling of oids of different lengths before index in snmpwalk2json preprocessing step (dgoloscapov)
+.......PS. [ZBX-22412] fixed dependent items being generated from a discarded master item value (wiper)
+........S. [ZBX-22396] fixed handling of OIDs of different lengths before index in the SNMP walk to JSON preprocessing step (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0rc2
 
 New features:
-A.F.....S. [ZBXNEXT-8087] reverted removing of template nesting (Sasha)
-..F....... [ZBXNEXT-8257] removed aggregate function labels from the graph widget legend (acikuns)
+A.F.....S. [ZBXNEXT-8087] reverted removal of template nesting (Sasha)
+..F....... [ZBXNEXT-8257] removed aggregate function labels from the Graph widget legend (acikuns)
 .......PS. [ZBXNEXT-8262] updated soft minimal threshold for MySQL to version 8.0.30 (mprihodko)
 .......PS. [ZBXNEXT-8105] fixed build when cURL library version is less than 7.61.0 (vso)
 
@@ -64,9 +83,9 @@ Changes for 6.4.0beta6
 
 New features:
 .........T [ZBXNEXT-7923] added templates for BMC Control-M integration (knaglis)
-.........T [ZBXNEXT-7775] added veeam backup and replication templates (egordymov)
-..F....... [ZBXNEXT-7605] replaced column "Ack" with "Update" in problem lists (Ivo)
-....I..... [ZBXNEXT-8213] added database upgrade patch for renamed Actions filters (dpetra)
+.........T [ZBXNEXT-7775] added Veeam Backup and Replication templates (egordymov)
+..F....... [ZBXNEXT-7605] replaced the column "Ack" with "Update" in the problem lists (Ivo)
+....I..... [ZBXNEXT-8213] added a database upgrade patch for renamed Actions filters (dpetra)
 ..F....... [ZBXNEXT-1354] implemented host filtering by status (dpetra)
 .......PS. [ZBXNEXT-8054] updated MariaDB maximum supported version to 10.10 (MVekslers)
 A.F....... [ZBXNEXT-7951] improved import configuration by changing UI, matching logic and unlinking logic (acikuns, rdetlavs)
@@ -74,55 +93,55 @@ A.F....... [ZBXNEXT-7951] improved import configuration by changing UI, matching
 ........S. [ZBXNEXT-8197] added TimescaleDB v2.9.x support (dgoloscapov)
 .........T [ZBXNEXT-7962] fixed interfaces discovery rules in OPNsense, PFSense and TrueNAS templates (drasikhov)
 .........T [ZBXNEXT-8115] updated system.sw.packages key in Linux templates (abakaldin)
-A.F....... [ZBXNEXT-3100] added requirement for users to enter current password when changing their own password (dpetra)
+A.F....... [ZBXNEXT-3100] added the requirement for users to enter current password when changing their own password (dpetra)
 A.F.I...S. [ZBXNEXT-7964] introduced two-level event/problem hierarchy: causes and symptoms (Ivo, mprihodko)
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (egordymov)
 
 Bug fixes:
-...G...... [ZBX-22061] fixed custom query parameter read on empty parameter for oracle plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBX-22061] fixed custom query parameter read on an empty parameter for Oracle plugin in Zabbix agent 2 (esneiders)
 ...G...... [ZBX-21227] improved error logging during Zabbix agent start as Windows service (asestakovs)
-........S. [ZBX-22178] fixed action operations being executed on current host if only host group is selected (vso)
+........S. [ZBX-22178] fixed action operations being executed on the current host if only a host group is selected (vso)
 ........S. [ZBX-22189] fixed LLD Zabbix server crash (arimdjonoks)
 ..F....... [ZBXNEXT-7541] added modal copy form for items, triggers and graphs (esekace)
 A......... [ZBX-21538] fixed history.get API method blocking drop_chunks requests during housekeeping (agriscenko, Sasha)
-..F....... [ZBX-21956] fixed severity sign overlapping trigger name in map element configuration (agriscenko)
+..F....... [ZBX-21956] fixed the severity sign overlapping the trigger name in the map element configuration (agriscenko)
 ........S. [ZBX-22215] fixed incorrectly quoted function parameter parsing (wiper)
 ...G...... [ZBX-22118] fixed remote command execution sequence in Zabbix agent 2 (esneiders)
 .........T [ZBX-21556] updated Etcd by HTTP template to comply with Etcd v3.5 (knaglis)
 ...G...... [ZBX-22133] fixed closed pipe detection for communication with plugins in Windows (MVekslers)
-..F....... [ZBX-21936] fixed actions not being displayed in Action log widget (esekace)
+..F....... [ZBX-21936] fixed actions not being displayed in the Action log widget (esekace)
 ..F....... [ZBX-22164] fixed quote and unquote methods for trigger functions (rdetlavs)
 .........T [ZBX-21254] removed kernel.maxproc from processes graph in Linux by Zabbix agent templates (drasikhov)
 ........S. [ZBX-21754] improved value cache warmup when retrieving two last values with 1 day update interval (vso)
-.......PS. [ZBX-22043] fixed crash when array index in jsonpath is negative or large (vso)
-..F....... [ZBX-22077] fixed Sign out link not working consistently in Mozilla Firefox (jfreibergs)
-...G...... [ZBX-21862] updated tablespaces query for oracle plugin in Zabbix agent 2 (esneiders)
+.......PS. [ZBX-22043] fixed the crash when array index in JSONPath is negative or large (vso)
+..F....... [ZBX-22077] fixed the Sign out link not working consistently in Mozilla Firefox (jfreibergs)
+...G...... [ZBX-21862] updated the tablespaces query for Oracle plugin in Zabbix agent 2 (esneiders)
 ...G...... [ZBX-21665] fixed SMART plugin infinite loop for Zabbix agent 2 (esneiders)
 ...G...... [ZBX-19138] fixed Redis plugin configuration in Zabbix agent 2 configuration files (esneiders)
 .........T [ZBX-21592] moved some static items under LLD rules to optimize Oracle by ODBC template (knaglis)
-.......PS. [ZBX-21069] fixed snmp max_vars not backing off when generr is received (dgoloscapov)
-..F....... [ZBX-21889] fixed warnings being shown even after overrides are enabled for trends or history tables with compressed chunks (jfreibergs)
+.......PS. [ZBX-21069] fixed SNMP max_vars not backing off when generr is received (dgoloscapov)
+..F....... [ZBX-21889] fixed warnings being shown even after overrides have been enabled for trends or history tables with compressed chunks (jfreibergs)
 ..F.....S. [ZBX-21563] changed the order in which escalation steps and recovery operations are executed (asitals, rlataria)
-..F....... [ZBX-22017] fixed map navigation tree widget inability to save the order when the depth levels get changed (acikuns)
-..F....... [ZBX-21961] removed unnecessary "Command:" label for message actions in Event details page (esekace)
+..F....... [ZBX-22017] fixed the Map navigation tree widget inability to save the order when the depth levels get changed (acikuns)
+..F....... [ZBX-21961] removed the unnecessary "Command:" label for message actions on the Event details page (esekace)
 .......... [ZBX-21783] fixed Zabbix JS timeout validation (asestakovs)
 ........S. [ZBX-21720] fixed trends function cache size estimation and overallocation handling (kprutkovs, wiper)
-.......PS. [ZBX-21713] fixed retrieval of numeric column width when Oracle db is used (dgoloscapov)
-........S. [ZBX-22126] fixed trends being deleted from cache and retrieved from database when data older than 1 hour is received (vso)
-.......PS. [ZBX-22075] fixed crash when Elasticsearch is used (dgoloscapov)
-....I..... [ZBX-21826] fixed dummy module Makefile to use cc and compile on FreeBSD (yurii)
+.......PS. [ZBX-21713] fixed retrieval of numeric column width when Oracle DB is used (dgoloscapov)
+........S. [ZBX-22126] fixed trends being deleted from cache and retrieved from the database when the data older than 1 hour is received (vso)
+.......PS. [ZBX-22075] fixed the crash when Elasticsearch is used (dgoloscapov)
+....I..... [ZBX-21826] fixed a dummy module Makefile to use cc and compile on FreeBSD (yurii)
 A......... [ZBX-22015] fixed provisioning of new user when group mapping contains duplicate groups (gcalenko)
-........S. [ZBX-21950] fixed to not require host interface for script item during template linkage (asestakovs)
-........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
-A......... [ZBX-22138] fixed inability to delete group from host prototype (vmaksimovs)
-.........T [ZBX-21540] moved some static items under LLD rules to improve performance in Oracle by Zabbix agent 2 template (knaglis)
+........S. [ZBX-21950] fixed script items to stop requiring host interface during template linkage (asestakovs)
+........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PostgreSQL without TSDB (dgoloscapov)
+A......... [ZBX-22138] fixed the inability to delete a group from a host prototype (vmaksimovs)
+.........T [ZBX-21540] moved some static items under LLD rules to improve performance of Oracle by Zabbix agent 2 template (knaglis)
 .........T [ZBX-21587] added metrics for optimizing dependent items preprocessing in Jenkins template (abiba)
 .......PS. [ZBX-22110] fixed memory leak in Zabbix server in case of monitoring VMware (MVekslers)
-.........T [ZBX-21288] renamed LLD macro 'DG_NAME' to 'DGNAME' and fixed preprocessing JSONPATH in Oracle by Zabbix agent 2 template (knaglis)
+.........T [ZBX-21288] renamed LLD macro 'DG_NAME' to 'DGNAME' and fixed preprocessing JSONPath in Oracle by Zabbix agent 2 template (knaglis)
 .........T [ZBX-22071] extended description for OPSGenie media type (atocko)
 .......PS. [ZBX-20845] fixed SNMP interface availability in case of wrong credentials (akozlovs)
-........S. [ZBX-22224] fixed broken json generation by zabbix internal stats (dgoloscapov)
-.......... [ZBX-20110] added single field search option to oracle archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys for Zabbix agent 2 (esneiders)
+........S. [ZBX-22224] fixed broken JSON generation by Zabbix internal stats (dgoloscapov)
+.......... [ZBX-20110] added single field search option to Oracle archive.info, ts.stats, pdb.info, cdb.info and diskgroups.stats keys for Zabbix agent 2 (esneiders)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta5
@@ -323,6 +342,11 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....... [ZBXNEXT-7832] renamed setting "Dynamic item" to "Enable host selection" for URL, Plain text, Graph prototype, Item value, Graph classic widgets (agavriluks)
 .D.G...PS. [ZBXNEXT-7852] added incremental active check refresh for active agents (vso)
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
+
+--------------------------------------------------------------------------------
+Changes for 6.2.8
+
+6.2.8rc2 was released as 6.2.8 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.2.8rc2
@@ -953,6 +977,11 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.14
+
+6.0.14rc2 was released as 6.0.14 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.14rc2
@@ -3330,6 +3359,11 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.32
+
+5.0.32rc2 was released as 5.0.32 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.32rc2

@@ -502,8 +502,8 @@ static int	DBpatch_2010049(void)
 static int	DBpatch_2010050(void)
 {
 	const char	*fields[] = {"ts_from", "ts_to", NULL};
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		i;
 	time_t		ts;
 	struct tm	*tm;
@@ -769,8 +769,8 @@ static int	DBpatch_2010079(void)
 
 static int	DBpatch_2010080(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	applicationid, templateid, application_templateid = 1;
 	int		ret = FAIL;
 
@@ -912,8 +912,8 @@ static int	DBpatch_2010100(void)
 
 static int	DBpatch_2010101(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 	char		*key = NULL;
 	size_t		key_alloc = 0, key_offset;
@@ -1481,8 +1481,8 @@ static int	DBpatch_2010175(void)
 
 static int	DBpatch_2010176(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*name, *name_esc;
 	int		ret = SUCCEED;
 
@@ -1719,8 +1719,8 @@ static int	DBpatch_2010195_replace_key_param_cb(const char *data, int key_type, 
 
 static int	DBpatch_2010195(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*key = NULL, *key_esc, error[64];
 	int		ret = SUCCEED;
 

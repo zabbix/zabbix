@@ -21,6 +21,8 @@
 #define ZABBIX_PP_HISTORY_H
 
 #include "zbxpreproc.h"
+#include "zbxtime.h"
+#include "zbxvariant.h"
 
 void	pp_history_free(zbx_pp_history_t *history);
 void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts);

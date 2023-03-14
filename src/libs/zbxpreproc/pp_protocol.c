@@ -17,15 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "preprocessing.h"
+#include "pp_protocol.h"
 #include "zbxpreproc.h"
-#include "preproc.h"
 
 #include "log.h"
 #include "zbxserialize.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
-#include "zbxlld.h"
+#include "zbxvariant.h"
+#include "zbxtime.h"
+#include "zbxstats.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
@@ -41,13 +42,13 @@ ZBX_PTR_VECTOR_IMPL(ipcmsg, zbx_ipc_message_t *)
 static zbx_uint32_t	fields_calc_size(zbx_packed_field_t *fields, int fields_num)
 {
 	zbx_uint32_t	data_size = 0, field_size;
-	int		i;
 
-	for (i = 0; i < fields_num; i++)
+	for (int i = 0; i < fields_num; i++)
 	{
 		if (PACKED_FIELD_STRING == fields[i].type)
 		{
-			field_size = (NULL != fields[i].value) ? (zbx_uint32_t)strlen((const char *)fields[i].value) + 1 : 0;
+			field_size = (NULL != fields[i].value) ?
+					(zbx_uint32_t)strlen((const char *)fields[i].value) + 1 : 0;
 			fields[i].size = (zbx_uint32_t)field_size;
 			field_size += (zbx_uint32_t)sizeof(zbx_uint32_t);
 		}
@@ -65,10 +66,9 @@ static zbx_uint32_t	fields_calc_size(zbx_packed_field_t *fields, int fields_num)
 
 static zbx_uint32_t	fields_pack(const zbx_packed_field_t *fields, int fields_num, unsigned char *data)
 {
-	int		i;
 	unsigned char	*offset = data;
 
-	for (i = 0; i < fields_num; i++)
+	for (int i = 0; i < fields_num; i++)
 	{
 		/* data packing */
 		if (PACKED_FIELD_STRING == fields[i].type)
@@ -106,8 +106,8 @@ static int	message_pack_fields(zbx_ipc_message_t *message, const zbx_packed_fiel
  *                                                                            *
  * Parameters: message - [OUT] IPC message, can be NULL for buffer size       *
  *                             calculations                                   *
- *             fields  - [IN]  the definition of data to be packed            *
- *             count   - [IN]  field count                                    *
+ *             fields  - [IN] definition of data to be packed                 *
+ *             count   - [IN] field count                                     *
  *                                                                            *
  * Return value: size of packed data or 0 if the message size would exceed    *
  *               4GB limit                                                    *
@@ -134,7 +134,7 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
  * Purpose: pack item value data into a single buffer that can be used in IPC *
  *                                                                            *
  * Parameters: message - [OUT] IPC message                                    *
- *             value   - [IN]  value to be packed                             *
+ *             value   - [IN] value to be packed                              *
  *                                                                            *
  * Return value: size of packed data                                          *
  *                                                                            *
@@ -194,8 +194,8 @@ static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_prep
  *                                                                            *
  * Purpose: packs variant value for serialization                             *
  *                                                                            *
- * Parameters: fields - [OUT] the packed fields                               *
- *             value  - [IN] the value to pack                                *
+ * Parameters: fields - [OUT] packed fields                                   *
+ *             value  - [IN] value to pack                                    *
  *                                                                            *
  * Return value: The number of fields used.                                   *
  *                                                                            *
@@ -239,8 +239,9 @@ static int	preprocessor_pack_variant(zbx_packed_field_t *fields, const zbx_varia
  *                                                                            *
  * Purpose: packs preprocessing history for serialization                     *
  *                                                                            *
- * Parameters: fields  - [OUT] the packed fields                              *
- *             history - [IN] the history to pack                             *
+ * Parameters: fields  - [OUT] packed fields                                  *
+ *             history - [IN] history to pack                                 *
+ *             history_num - [IN] number of history entries                   *
  *                                                                            *
  * Return value: The number of fields used.                                   *
  *                                                                            *
@@ -250,11 +251,11 @@ static int	preprocessor_pack_variant(zbx_packed_field_t *fields, const zbx_varia
 static int	preprocessor_pack_history(zbx_packed_field_t *fields, const zbx_pp_history_t *history,
 		const int *history_num)
 {
-	int	i, offset = 0;
+	int	offset = 0;
 
 	fields[offset++] = PACKED_FIELD(history_num, sizeof(int));
 
-	for (i = 0; i < *history_num; i++)
+	for (int i = 0; i < *history_num; i++)
 	{
 		zbx_pp_step_history_t	*step_history = &history->step_history.values[i];
 
@@ -271,8 +272,8 @@ static int	preprocessor_pack_history(zbx_packed_field_t *fields, const zbx_pp_hi
  *                                                                            *
  * Purpose: packs preprocessing step for serialization                        *
  *                                                                            *
- * Parameters: fields - [OUT] the packed fields                               *
- *             step   - [IN] the step to pack                                 *
+ * Parameters: fields - [OUT] packed fields                                   *
+ *             step   - [IN] step to pack                                     *
  *                                                                            *
  * Return value: The number of fields used.                                   *
  *                                                                            *
@@ -295,8 +296,8 @@ static int	preprocessor_pack_step(zbx_packed_field_t *fields, const zbx_pp_step_
  *                                                                            *
  * Purpose: unpacks serialized variant value                                  *
  *                                                                            *
- * Parameters: data  - [IN] the serialized data                               *
- *             value - [OUT] the value                                        *
+ * Parameters: data  - [IN] serialized data                                   *
+ *             value - [OUT] value                                            *
  *                                                                            *
  * Return value: The number of bytes parsed.                                  *
  *                                                                            *
@@ -338,8 +339,8 @@ static int	preprocesser_unpack_variant(const unsigned char *data, zbx_variant_t 
  *                                                                            *
  * Purpose: unpacks serialized preprocessing history                          *
  *                                                                            *
- * Parameters: data    - [IN] the serialized data                             *
- *             history - [OUT] the history                                    *
+ * Parameters: data    - [IN] serialized data                                 *
+ *             history - [OUT] history                                        *
  *                                                                            *
  * Return value: The number of bytes parsed.                                  *
  *                                                                            *
@@ -347,7 +348,7 @@ static int	preprocesser_unpack_variant(const unsigned char *data, zbx_variant_t 
 static int	preprocessor_unpack_history(const unsigned char *data, zbx_pp_history_t *history)
 {
 	const unsigned char	*offset = data;
-	int			i, history_num;
+	int			history_num;
 
 	offset += zbx_deserialize_int(offset, &history_num);
 
@@ -355,7 +356,7 @@ static int	preprocessor_unpack_history(const unsigned char *data, zbx_pp_history
 	{
 		zbx_pp_history_reserve(history, history_num);
 
-		for (i = 0; i < history_num; i++)
+		for (int i = 0; i < history_num; i++)
 		{
 			int		index;
 			zbx_variant_t	value;
@@ -377,8 +378,8 @@ static int	preprocessor_unpack_history(const unsigned char *data, zbx_pp_history
  *                                                                            *
  * Purpose: unpacks serialized preprocessing step                             *
  *                                                                            *
- * Parameters: data - [IN] the serialized data                                *
- *             step - [OUT] the preprocessing step                            *
+ * Parameters: data - [IN] serialized data                                    *
+ *             step - [OUT] preprocessing step                                *
  *                                                                            *
  * Return value: The number of bytes parsed.                                  *
  *                                                                            *
@@ -400,8 +401,8 @@ static int	preprocessor_unpack_step(const unsigned char *data, zbx_pp_step_t *st
  *                                                                            *
  * Purpose: unpacks serialized preprocessing steps                            *
  *                                                                            *
- * Parameters: data      - [IN] the serialized data                           *
- *             preproc   - [OUT] the item preprocessing data                  *
+ * Parameters: data    - [IN] serialized data                                 *
+ *             preproc - [OUT] item preprocessing data                        *
  *                                                                            *
  * Return value: The number of bytes parsed.                                  *
  *                                                                            *
@@ -409,14 +410,13 @@ static int	preprocessor_unpack_step(const unsigned char *data, zbx_pp_step_t *st
 static int	preprocessor_unpack_steps(const unsigned char *data, zbx_pp_item_preproc_t *preproc)
 {
 	const unsigned char	*offset = data;
-	int			i;
 
 	offset += zbx_deserialize_int(offset, &preproc->steps_num);
 	if (0 < preproc->steps_num)
 	{
 		preproc->steps = (zbx_pp_step_t *)zbx_malloc(NULL, sizeof(zbx_pp_step_t) * (size_t)preproc->steps_num);
 
-		for (i = 0; i < preproc->steps_num; i++)
+		for (int i = 0; i < preproc->steps_num; i++)
 			offset += preprocessor_unpack_step(offset, preproc->steps + i);
 	}
 
@@ -428,12 +428,10 @@ static int	preprocessor_unpack_steps(const unsigned char *data, zbx_pp_item_prep
  * Purpose: pack preprocessing result data into a single buffer that can be   *
  *          used in IPC                                                       *
  *                                                                            *
- * Parameters: data          - [OUT] memory buffer for packed data            *
- *             ret           - [IN] return code                               *
- *             results       - [IN] the preprocessing step results            *
- *             results_num   - [IN] the number of preprocessing step results  *
- *             history       - [IN] item history data                         *
- *             error         - [IN] preprocessing error                       *
+ * Parameters: data        - [OUT] memory buffer for packed data              *
+ *             results     - [IN] preprocessing step results                  *
+ *             results_num - [IN] number of preprocessing step results        *
+ *             history     - [IN] item history data                           *
  *                                                                            *
  * Return value: size of packed data                                          *
  *                                                                            *
@@ -444,7 +442,7 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
 	zbx_packed_field_t	*offset, *fields;
 	zbx_uint32_t		size;
 	zbx_ipc_message_t	message;
-	int			i, history_num;
+	int			history_num;
 
 	history_num = (NULL != history ? history->step_history.values_num : 0);
 
@@ -454,7 +452,7 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
 
 	*offset++ = PACKED_FIELD(&results_num, sizeof(int));
 
-	for (i = 0; i < results_num; i++)
+	for (int i = 0; i < results_num; i++)
 	{
 		offset += preprocessor_pack_variant(offset, &results[i].value);
 		*offset++ = PACKED_FIELD(&results[i].action, sizeof(unsigned char));
@@ -477,13 +475,13 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
  * Purpose: pack diagnostic statistics data into a single buffer that can be  *
  *          used in IPC                                                       *
  * Parameters: data          - [OUT] memory buffer for packed data            *
- *             preproc_num   - [IN] the number of items with preprocessing    *
+ *             preproc_num   - [IN] number of items with preprocessing        *
  *                                related data (preprocessing, internal/      *
  *                                master/dependent items)                     *
- *             pending_num   - [IN] the number of values waiting to be        *
+ *             pending_num   - [IN] number of values waiting to be            *
  *                               preprocessed                                 *
- *             finished_num  - [IN] the number of values being preprocessed   *
- *             sequences_num - [IN] the number of registered task sequences   *
+ *             finished_num  - [IN] number of values being preprocessed       *
+ *             sequences_num - [IN] number of registered task sequences       *
  *                                                                            *
  ******************************************************************************/
 zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t preproc_num,
@@ -512,8 +510,10 @@ zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t
  *                                                                            *
  * Purpose: pack diagnostic statistics data into a single buffer that can be  *
  *          used in IPC                                                       *
- * Parameters: data    - [OUT] memory buffer for packed data                  *
- *             usage   - [IN] the worker usage statistics                     *
+ *                                                                            *
+ * Parameters: data  - [OUT] memory buffer for packed data                    *
+ *             usage - [IN] worker usage statistics                           *
+ *             count - [IN]                                                   *
  *                                                                            *
  ******************************************************************************/
 zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count)
@@ -540,8 +540,7 @@ zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_v
  * Purpose: pack top request data into a single buffer that can be used in IPC*
  *                                                                            *
  * Parameters: data  - [OUT] memory buffer for packed data                    *
- *             field - [IN] the sort field                                    *
- *             limit - [IN] the number of top values to return                *
+ *             limit - [IN] number of top values to return                    *
  *                                                                            *
  ******************************************************************************/
 zbx_uint32_t	zbx_preprocessor_pack_top_sequences_request(unsigned char **data, int limit)
@@ -559,9 +558,9 @@ zbx_uint32_t	zbx_preprocessor_pack_top_sequences_request(unsigned char **data, i
  *                                                                            *
  * Purpose: pack top result data into a single buffer that can be used in IPC *
  *                                                                            *
- * Parameters: data      - [OUT] memory buffer for packed data                *
- *             sequences - [IN] the list of sequences                         *
- *             items_num - [IN] the number of sequences to pack               *
+ * Parameters: data          - [OUT] memory buffer for packed data            *
+ *             sequences     - [IN] list of sequences                         *
+ *             sequences_num - [IN] number of sequences to pack               *
  *                                                                            *
  ******************************************************************************/
 zbx_uint32_t	zbx_preprocessor_pack_top_sequences_result(unsigned char **data,
@@ -569,7 +568,6 @@ zbx_uint32_t	zbx_preprocessor_pack_top_sequences_result(unsigned char **data,
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0, sequence_len = 0;
-	int		i;
 
 	if (0 != sequences_num)
 	{
@@ -584,7 +582,7 @@ zbx_uint32_t	zbx_preprocessor_pack_top_sequences_result(unsigned char **data,
 	ptr = *data;
 	ptr += zbx_serialize_value(ptr, sequences_num);
 
-	for (i = 0; i < sequences_num; i++)
+	for (int i = 0; i < sequences_num; i++)
 	{
 		ptr += zbx_serialize_value(ptr, sequences->values[i]->itemid);
 		ptr += zbx_serialize_value(ptr, sequences->values[i]->tasks_num);
@@ -597,8 +595,8 @@ zbx_uint32_t	zbx_preprocessor_pack_top_sequences_result(unsigned char **data,
  *                                                                            *
  * Purpose: unpack item value data from IPC data buffer                       *
  *                                                                            *
- * Parameters: value    - [OUT] unpacked item value                           *
- *             data     - [IN]  IPC data buffer                               *
+ * Parameters: value - [OUT] unpacked item value                              *
+ *             data  - [IN]  IPC data buffer                                  *
  *                                                                            *
  * Return value: size of packed data                                          *
  *                                                                            *
@@ -667,23 +665,23 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
  *                                                                            *
  * Purpose: unpack preprocessing test data from IPC data buffer               *
  *                                                                            *
- * Parameters: results       - [OUT] the preprocessing step results           *
- *             history       - [OUT] item history data                        *
- *             data          - [IN] IPC data buffer                           *
+ * Parameters: results - [OUT] preprocessing step results                     *
+ *             history - [OUT] item history data                              *
+ *             data    - [IN] IPC data buffer                                 *
  *                                                                            *
  ******************************************************************************/
 void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
 		const unsigned char *data)
 {
 	const unsigned char	*offset = data;
-	int			i, results_num;
+	int			results_num;
 	zbx_pp_result_t		*result;
 
 	offset += zbx_deserialize_int(offset, &results_num);
 
 	zbx_vector_pp_result_ptr_reserve(results, (size_t)results_num);
 
-	for (i = 0; i < results_num; i++)
+	for (int i = 0; i < results_num; i++)
 	{
 		result = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t));
 		offset += preprocesser_unpack_variant(offset, &result->value);
@@ -699,13 +697,14 @@ void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_ptr_t *results, zb
  *                                                                            *
  * Purpose: unpack preprocessing test data from IPC data buffer               *
  *                                                                            *
- * Parameters: preproc_num   - [OUT] the number of items with preprocessing   *
+ * Parameters: preproc_num   - [OUT] number of items with preprocessing       *
  *                                related data (preprocessing, internal/      *
  *                                master/dependent items)                     *
- *             pending_num   - [OUT] the number of values waiting to be       *
+ *             pending_num   - [OUT] number of values waiting to be           *
  *                               preprocessed                                 *
- *             finished_num  - [OUT] the number of values being preprocessed  *
- *             sequences_num - [OUT] the number of registered task sequences  *
+ *             finished_num  - [OUT] number of values being preprocessed      *
+ *             sequences_num - [OUT] number of registered task sequences      *
+ *             data          - [OUT] data buffer                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_preprocessor_unpack_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
@@ -723,8 +722,9 @@ void	zbx_preprocessor_unpack_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t 
  *                                                                            *
  * Purpose: unpack worker usage statistics                                    *
  *                                                                            *
- * Parameters: usage - [OUT] the worker usage statistics                      *
- *             data  - [IN] the input data                                    *
+ * Parameters: usage - [OUT] worker usage statistics                          *
+ *             count - [OUT]                                                  *
+ *             data  - [IN] input data                                        *
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_unpack_usage_stats(zbx_vector_dbl_t *usage, int *count, const unsigned char *data)
@@ -750,8 +750,8 @@ static void	preprocessor_unpack_usage_stats(zbx_vector_dbl_t *usage, int *count,
  *                                                                            *
  * Purpose: unpack preprocessing test data from IPC data buffer               *
  *                                                                            *
- * Parameters: data  - [OUT] memory buffer for packed data                    *
- *             limit - [IN] the number of top values to return                *
+ * Parameters: limit - [IN] number of top values to return                    *
+ *             data  - [OUT] memory buffer for packed data                    *
  *                                                                            *
  ******************************************************************************/
 void	zbx_preprocessor_unpack_top_request(int *limit, const unsigned char *data)
@@ -763,13 +763,14 @@ void	zbx_preprocessor_unpack_top_request(int *limit, const unsigned char *data)
  *                                                                            *
  * Purpose: unpack preprocessing test data from IPC data buffer               *
  *                                                                            *
- * Parameters: items - [OUT] the item diag data                               *
- *             data  - [IN] memory buffer for packed data                     *
+ * Parameters: sequences - [OUT] item diag data                               *
+ *             data      - [IN] memory buffer for packed data                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_unpack_top_sequences_result(zbx_vector_pp_sequence_stats_ptr_t *sequences, const unsigned char *data)
+void	zbx_preprocessor_unpack_top_sequences_result(zbx_vector_pp_sequence_stats_ptr_t *sequences,
+		const unsigned char *data)
 {
-	int	i, sequences_num;
+	int	sequences_num;
 
 	data += zbx_deserialize_value(data, &sequences_num);
 
@@ -777,7 +778,7 @@ void	zbx_preprocessor_unpack_top_sequences_result(zbx_vector_pp_sequence_stats_p
 	{
 		zbx_vector_pp_sequence_stats_ptr_reserve(sequences, (size_t)sequences_num);
 
-		for (i = 0; i < sequences_num; i++)
+		for (int i = 0; i < sequences_num; i++)
 		{
 			zbx_pp_sequence_stats_t	*stat;
 
@@ -831,15 +832,15 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
  *                                                                            *
  * Purpose: perform item value preprocessing and dependent item processing    *
  *                                                                            *
- * Parameters: itemid          - [IN] the itemid                              *
- *             itemid          - [IN] the hostid                              *
- *             item_value_type - [IN] the item value type                     *
- *             item_flags      - [IN] the item flags (e. g. lld rule)         *
+ * Parameters: itemid          - [IN]                                         *
+ *             hostid          - [IN]                                         *
+ *             item_value_type - [IN] item value type                         *
+ *             item_flags      - [IN] item flags (e. g. lld rule)             *
  *             result          - [IN] agent result containing the value       *
  *                               to add                                       *
- *             ts              - [IN] the value timestamp                     *
- *             state           - [IN] the item state                          *
- *             error           - [IN] the error message in case item state is *
+ *             ts              - [IN] value timestamp                         *
+ *             state           - [IN] item state                              *
+ *             error           - [IN] error message in case item state is     *
  *                               ITEM_STATE_NOTSUPPORTED                      *
  *                                                                            *
  ******************************************************************************/
@@ -940,7 +941,7 @@ static zbx_uint32_t	preprocessor_pack_test_request(unsigned char **data, unsigne
 {
 	zbx_packed_field_t	*offset, *fields;
 	zbx_uint32_t		size;
-	int			i, history_num;
+	int			history_num;
 	zbx_ipc_message_t	message;
 
 	history_num = (NULL != history ? history->step_history.values_num : 0);
@@ -961,7 +962,7 @@ static zbx_uint32_t	preprocessor_pack_test_request(unsigned char **data, unsigne
 
 	*offset++ = PACKED_FIELD(&steps->values_num, sizeof(int));
 
-	for (i = 0; i < steps->values_num; i++)
+	for (int i = 0; i < steps->values_num; i++)
 		offset += preprocessor_pack_step(offset, steps->values[i]);
 
 	zbx_ipc_message_init(&message);
@@ -977,7 +978,7 @@ static zbx_uint32_t	preprocessor_pack_test_request(unsigned char **data, unsigne
  * Purpose: unpack preprocessing test request data from IPC data buffer       *
  *                                                                            *
  * Parameters: preproc - [OUT] item preprocessing data                        *
- *             value   - [OUT] the value                                      *
+ *             value   - [OUT] value                                          *
  *             ts      - [OUT] value timestamp                                *
  *             data    - [IN] IPC data buffer                                 *
  *                                                                            *

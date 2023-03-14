@@ -44,8 +44,8 @@ static int	hk_period;
  ******************************************************************************/
 static int	delete_history(const char *table, const char *fieldname, int now)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		minclock, records = 0;
 	zbx_uint64_t	lastid, maxid;
 

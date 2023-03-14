@@ -117,8 +117,8 @@ static void	DBpatch_trim_tag_value(char *value)
 
 static void	DBpatch_get_problems_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uint64_t *eventids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	result = zbx_db_select("select eventid from problem where source=0 and object=0 and objectid="
 			ZBX_FS_UI64, triggerid);
@@ -136,8 +136,8 @@ static void	DBpatch_get_problems_by_triggerid(zbx_uint64_t triggerid, zbx_vector
 
 static int	DBpatch_5050009(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_db_insert_t	ins_service_problem_tag, ins_trigger_tag, ins_problem_tag;
 	zbx_uint64_t	old_triggerid = 0, triggerid, serviceid;
 	int		ret = SUCCEED;
@@ -454,8 +454,8 @@ static int	DBpatch_5050050(void)
 static int	dbpatch_update_simple_macro(const char *table, const char *field, const char *id, size_t field_len,
 		const char *descr)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	char		*sql;
 	size_t		sql_alloc = 4096, sql_offset = 0;
 	int		ret = SUCCEED;
@@ -654,8 +654,8 @@ static int	DBpatch_5050067(void)
  ******************************************************************************/
 static int	DBpatch_5050068_calc_services_write_value(zbx_uint64_t roleid, int *value)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		default_access = 1, ret = FAIL;
 
 	result = zbx_db_select("select name,value_int from role_rule where roleid=" ZBX_FS_UI64, roleid);
@@ -680,8 +680,8 @@ out:
 
 static int	DBpatch_5050068(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_db_insert_t	db_insert;
 	int		ret = FAIL;
 
@@ -1192,8 +1192,8 @@ static int	DBpatch_5050113(void)
 
 static int	DBpatch_5050114(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*sql = NULL, *params = NULL;
 	const char	*output;
 	size_t		sql_alloc = 0, sql_offset = 0, params_alloc = 0, params_offset = 0;
@@ -1668,8 +1668,8 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 
 static int	DBpatch_5050128(void)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_uint64_t		last_serviceid = 0;
 	zbx_vector_sla_t	slas, uniq_slas;
 	int			i, j, ret;
@@ -1790,8 +1790,8 @@ static int	DBpatch_5050132(void)
 	int		ret = SUCCEED;
 	char		*uuid, *sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 

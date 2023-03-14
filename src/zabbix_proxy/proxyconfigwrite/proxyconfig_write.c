@@ -556,7 +556,7 @@ static void	proxyconfig_dump_data(const zbx_vector_table_data_ptr_t *config_tabl
  *           update flag will be set if at last one match failed.             *
  *                                                                            *
  ******************************************************************************/
-static int	proxyconfig_compare_row(zbx_table_row_t *row, DB_ROW dbrow, char **buf, size_t *buf_alloc)
+static int	proxyconfig_compare_row(zbx_table_row_t *row, zbx_db_row_t dbrow, char **buf, size_t *buf_alloc)
 {
 	int		i, ret = SUCCEED;
 	const char	*pf;
@@ -1079,8 +1079,8 @@ clean:
 static void	proxyconfig_prepare_table(zbx_table_data_t *td, const char *key_field, zbx_vector_uint64_t *key_ids,
 		zbx_vector_uint64_t *recids)
 {
-	DB_RESULT	result;
-	DB_ROW		dbrow;
+	zbx_db_result_t	result;
+	zbx_db_row_t	dbrow;
 	char		*sql = NULL, *buf, *delim = " where";
 	size_t		sql_alloc = 0, sql_offset = 0, buf_alloc = ZBX_KIBIBYTE;
 	zbx_uint64_t	recid;
@@ -1581,8 +1581,8 @@ static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, zbx_tab
 	/* check for existing templates and create empty templates if necessary */
 	if (0 != templateids.values_num)
 	{
-		DB_ROW		dbrow;
-		DB_RESULT	result;
+		zbx_db_row_t	dbrow;
+		zbx_db_result_t	result;
 		char		*sql = NULL;
 		size_t		sql_alloc = 0, sql_offset = 0;
 		zbx_hashset_t	templates;

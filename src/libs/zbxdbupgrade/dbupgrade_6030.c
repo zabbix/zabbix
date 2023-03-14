@@ -30,8 +30,8 @@
 
 static int	DBpatch_6030000(void)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_db_insert_t		db_insert;
 	int			ret = SUCCEED;
 
@@ -476,8 +476,8 @@ static int	DBpatch_6030061(void)
 
 static int	DBpatch_6030062(void)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql;
 	size_t			sql_alloc = 4096, sql_offset = 0;
 	int			ret = SUCCEED;
@@ -1127,13 +1127,13 @@ static int	DBpatch_6030123(void)
 
 static int	migrate_ldap_data(void)
 {
-	DB_RESULT	result = zbx_db_select("select userdirectoryid,host,port,base_dn,bind_dn,bind_password,"
+	zbx_db_result_t	result = zbx_db_select("select userdirectoryid,host,port,base_dn,bind_dn,bind_password,"
 					"search_attribute,start_tls,search_filter"
 					" from userdirectory");
 	if (NULL == result)
 		return FAIL;
 
-	DB_ROW	row;
+	zbx_db_row_t	row;
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1187,7 +1187,7 @@ static int	DBpatch_6030124(void)
 
 static int	migrate_saml_data(void)
 {
-	DB_RESULT	result = zbx_db_select("select saml_idp_entityid,saml_sso_url,saml_slo_url,saml_username_attribute,"
+	zbx_db_result_t	result = zbx_db_select("select saml_idp_entityid,saml_sso_url,saml_slo_url,saml_username_attribute,"
 					"saml_sp_entityid,saml_nameid_format,saml_sign_messages,saml_sign_assertions,"
 					"saml_sign_authn_requests,saml_sign_logout_requests,saml_sign_logout_responses,"
 					"saml_encrypt_nameid,saml_encrypt_assertions"
@@ -1195,7 +1195,7 @@ static int	migrate_saml_data(void)
 	if (NULL == result)
 		return FAIL;
 
-	DB_ROW	row = zbx_db_fetch(result);
+	zbx_db_row_t	row = zbx_db_fetch(result);
 
 	if (NULL == row)
 	{
@@ -1610,8 +1610,8 @@ static int	DBpatch_6030188(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	DB_RESULT	result = zbx_db_select("select mediatypeid,exec_params from media_type where type=1");
-	DB_ROW		row;
+	zbx_db_result_t	result = zbx_db_select("select mediatypeid,exec_params from media_type where type=1");
+	zbx_db_row_t	row;
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, "media_type_param", "mediatype_paramid", "mediatypeid", "name", "value",
@@ -1674,8 +1674,8 @@ static void	substitute_macro(const char *in, const char *macro, const char *macr
 static void	get_mediatype_params(zbx_uint64_t mediatypeid, const char *sendto, const char *subject,
 		const char *message, char **params)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	struct zbx_json		json;
 	char			*value = NULL;
 	size_t			value_alloc = 0;
@@ -1724,7 +1724,7 @@ static int	DBpatch_6030189(void)
 		return SUCCEED;
 
 	/* select alerts of Script Mediatype that aren't sent */
-	DB_RESULT	result = zbx_db_select(
+	zbx_db_result_t	result = zbx_db_select(
 			"select a.alertid,m.mediatypeid,a.sendto,a.subject,a.message"
 			" from alerts a,media_type m"
 			" where a.mediatypeid=m.mediatypeid"
@@ -1732,7 +1732,7 @@ static int	DBpatch_6030189(void)
 				" and m.type=1"
 			" order by a.mediatypeid");
 
-	DB_ROW		row;
+	zbx_db_row_t	row;
 
 	/* set their parameters according to how we now store them */
 	while (NULL != (row = zbx_db_fetch(result)))

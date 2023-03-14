@@ -231,8 +231,8 @@ static int	DBpatch_4010024(void)
 
 static int	DBpatch_4010025(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_uint64_t	nextid;
 
 	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
