@@ -2399,7 +2399,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad .overlay-close-btn,
   .msg-good .overlay-close-btn,
   .msg-warning .overlay-close-btn {
-    color: #333333; }
+    color: #333333;
+    background-color: transparent; }
   .msg-bad .link-action,
   .msg-good .link-action,
   .msg-warning .link-action {
@@ -2416,7 +2417,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad button,
   .msg-good button,
   .msg-warning button {
-    background-color: #ffffff; }
+    background-color: transparent; }
   .msg-bad::before,
   .msg-good::before,
   .msg-warning::before {
