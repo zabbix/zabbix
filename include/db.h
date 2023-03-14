@@ -510,10 +510,6 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 #ifdef HAVE_POSTGRESQL
 void	zbx_db_check_tsdb_capabilities(void);
 char	*zbx_db_get_schema_esc(void);
-
-#define ZBX_TSDB_RECALC_TIME_PERIOD_HISTORY	1
-#define ZBX_TSDB_RECALC_TIME_PERIOD_TRENDS	2
-void	zbx_tsdb_recalc_time_period(int *ts_from, int table_group);
 #endif
 
 /******************************************************************************
@@ -829,4 +825,6 @@ void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int fiel
 int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
 
 int	zbx_db_check_instanceid(void);
+
+void	zbx_recalc_history_time_period(int *ts_from);
 #endif
