@@ -1343,7 +1343,7 @@ class CControllerPopupTriggerExpr extends CController {
 							error(_('Unknown host item, no such item in selected host'));
 						}
 						elseif ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-							error(_s('Binary item "%1$s" cannot be used in trigger.', $item['key_']));
+							error(_s('Binary item "%1$s" cannot be used in trigger', $item['key_']));
 						}
 					}
 
@@ -1399,7 +1399,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 		if ($item) {
 			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-				throw new Exception(_s('Binary item "%1$s" cannot be used in trigger.', $item['key_']));
+				throw new Exception(_s('Binary item "%1$s" cannot be used in trigger', $item['key_']));
 			}
 
 			$itemid = $item['itemid'];

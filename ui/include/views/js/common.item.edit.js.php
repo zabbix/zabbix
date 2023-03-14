@@ -173,10 +173,6 @@
 
 				return false;
 			}
-
-			$('.preprocessing-step-test, #preproc_test_all')
-				.toggle(!binary_selected)
-				.attr('disabled', binary_selected);
 		});
 
 		$('#type')

@@ -602,8 +602,12 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if ($ret && $this->getInput('value_types', [])) {
+			$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+				ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
+			];
+
 			foreach ($this->getInput('value_types') as $value_type) {
-				if (!is_numeric($value_type) || $value_type < 0 || $value_type > 15) {
+				if (!is_numeric($value_type) || !in_array($value_type, $value_types)) {
 					error(_s('Incorrect value "%1$s" for "%2$s" field.', $value_type, 'value_types'));
 					$ret = false;
 				}
