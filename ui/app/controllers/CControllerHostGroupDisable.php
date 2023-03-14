@@ -73,7 +73,7 @@ class CControllerHostGroupDisable extends CController {
 		$updated = count($hosts);
 
 		if ($result) {
-			$output['success']['title'] = _n('Host enabled', 'Hosts enabled', $updated);
+			$output['success']['title'] = _n('Host disabled', 'Hosts disabled', $updated);
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -88,7 +88,7 @@ class CControllerHostGroupDisable extends CController {
 			]);
 
 			$output['error'] = [
-				'title' => _n('Cannot enable host', 'Cannot enable hosts', $updated),
+				'title' => _n('Cannot disable host', 'Cannot disable hosts', $updated),
 				'messages' => array_column(get_and_clear_messages(), 'message'),
 				'keepids' => array_keys($hosts)
 			];

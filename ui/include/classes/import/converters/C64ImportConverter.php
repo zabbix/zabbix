@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -17,11 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_BASE64_H
-#define ZABBIX_BASE64_H
 
-void	str_base64_encode(const char *p_str, char *p_b64str, int in_size);
-void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size);
-void	str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_out_size);
+/**
+ * Converter for converting import data from 6.4 to 7.0.
+ */
+class C64ImportConverter extends CConverter {
 
-#endif /* ZABBIX_BASE64_H */
+	/**
+	 * Convert import data from 6.4 to 7.0 version.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function convert(array $data): array {
+		$data['zabbix_export']['version'] = '7.0';
+
+		return $data;
+	}
+}

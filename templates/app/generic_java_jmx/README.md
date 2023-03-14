@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 7.0 and higher  
 Official JMX Template from Zabbix distribution. Could be useful for many Java Applications (JMX).
 
 

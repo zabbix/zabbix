@@ -700,6 +700,8 @@ footer {
     line-height: 24px; }
   .form-grid .form-actions button:not(:first-of-type) {
     margin-left: 10px; }
+  .form-grid.form-grid-actions {
+    margin-top: 10px; }
   .form-grid .form-field.offset-1 {
     grid-column-start: 2 !important; }
   .form-grid .form-field.offset-2 {

@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 The template to monitor SAN NetApp FAS3220 cluster by Zabbix SNMP agent.
 
 
@@ -14,7 +14,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 1\. Create a host for FAS3220 with cluster management IP as SNMPv2 interface.
 

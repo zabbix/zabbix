@@ -22,7 +22,6 @@
 #include "zbxstr.h"
 #include "embed.h"
 #include "duktape.h"
-#include "base64.h"
 #include "zbxcrypto.h"
 
 /******************************************************************************
@@ -43,7 +42,7 @@ static duk_ret_t	es_btoa(duk_context *ctx)
 	if (SUCCEED != es_duktape_string_decode(duk_require_string(ctx, 0), &str))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
 
-	str_base64_encode_dyn(str, &b64str, (int)strlen(str));
+	zbx_base64_encode_dyn(str, &b64str, (int)strlen(str));
 	duk_push_string(ctx, b64str);
 	zbx_free(str);
 	zbx_free(b64str);
@@ -71,7 +70,7 @@ static duk_ret_t	es_atob(duk_context *ctx)
 
 	buffer_size = (int)strlen(str) * 3 / 4 + 1;
 	buffer = zbx_malloc(buffer, (size_t)buffer_size);
-	str_base64_decode(str, buffer, buffer_size, &out_size);
+	zbx_base64_decode(str, buffer, buffer_size, &out_size);
 	duk_push_lstring(ctx, buffer, (duk_size_t)out_size);
 	zbx_free(str);
 	zbx_free(buffer);

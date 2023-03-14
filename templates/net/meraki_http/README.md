@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 The template to monitor Cisco Meraki dashboard by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.  
 
@@ -15,7 +15,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 You must set {$MERAKI.TOKEN} and {$MERAKI.API.URL} macros. 
 
@@ -35,7 +35,7 @@ No specific Zabbix configuration is required.
 |{$MERAKI.API.URL} |<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p> |`api.meraki.com/api/v1` |
 |{$MERAKI.DEVICE.NAME.MATCHES} |<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p> |`.+` |
 |{$MERAKI.DEVICE.NAME.NOT_MATCHES} |<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
-|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.4/manual/config/items/itemtypes/http</p> |`` |
+|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http</p> |`` |
 |{$MERAKI.ORGANIZATION.NAME.MATCHES} |<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p> |`.+` |
 |{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES} |<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
 |{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
@@ -74,7 +74,7 @@ You can also provide feedback, discuss the template, or ask for help at [ZABBIX 
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 
 ## Setup
 
@@ -90,7 +90,7 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$MERAKI.API.URL} |<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p> |`api.meraki.com/api/v1` |
 |{$MERAKI.CONFIG.CHANGE.TIMESPAN} |<p>Timespan for gathering config change log. Used in the metric config and in the URL query.</p> |`1200` |
-|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.4/manual/config/items/itemtypes/http</p> |`` |
+|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http</p> |`` |
 |{$MERAKI.LICENSE.EXPIRE} |<p>Time in seconds for license to expire.</p> |`86400` |
 |{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
 
@@ -157,7 +157,7 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 
 ## Setup
 
@@ -178,7 +178,7 @@ No specific Zabbix configuration is required.
 |{$MERAKI.DEVICE.LOSS} |<p>Devices uplink loss threshold in percents.</p> |`15` |
 |{$MERAKI.DEVICE.UPLINK.MATCHES} |<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p> |`.+` |
 |{$MERAKI.DEVICE.UPLINK.NOT_MATCHES} |<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p> |`^$` |
-|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.4/manual/config/items/itemtypes/http</p> |`` |
+|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http</p> |`` |
 |{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
 
 ## Template links

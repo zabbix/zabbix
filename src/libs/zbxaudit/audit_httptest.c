@@ -151,8 +151,8 @@ PREPARE_AUDIT_HTTPTEST_UPDATE(verify_host, int, int)
 
 int	zbx_audit_DBselect_delete_for_httptest(const char *sql, zbx_vector_uint64_t *ids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	if (NULL == (result = zbx_db_select("%s", sql)))
 		return FAIL;
