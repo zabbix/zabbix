@@ -510,7 +510,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Updates children of triggers on the given hosts.
+	 * Updates children of triggers on the given hosts and propagates the inheritance to all child hosts.
 	 * All of the child triggers that became obsolete will be deleted if the given triggers were assigned to a different
 	 * template or host.
 	 *
@@ -531,6 +531,10 @@ abstract class CTriggerGeneral extends CApiService {
 
 		if ($upd_triggers) {
 			$this->updateReal($upd_triggers, $db_triggers, true);
+		}
+
+		if ($ins_triggers || $upd_triggers) {
+			$this->inherit(array_merge($ins_triggers + $upd_triggers));
 		}
 	}
 
@@ -2167,13 +2171,17 @@ abstract class CTriggerGeneral extends CApiService {
 		$templates = API::Template()->get([
 			'output' => [],
 			'selectHosts' => ['hostid'],
+			'selectTemplates' => ['templateid'],
 			'templateids' => array_keys($templateids),
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 
 		foreach ($templates as &$template) {
-			$template = array_column($template['hosts'], 'hostid');
+			$template = array_merge(
+				zbx_objectValues($template['hosts'], 'hostid'),
+				zbx_objectValues($template['templates'], 'templateid')
+			);
 		}
 		unset($template);
 

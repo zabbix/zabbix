@@ -32,8 +32,6 @@
 #	endif
 #endif
 
-extern ZBX_THREAD_LOCAL int __zbxthread__;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: execute 'multiply by' step                                        *
@@ -278,6 +276,7 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 			{
 				*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 				zbx_free(obj);
+				cache->type = ZBX_PREPROC_NONE;
 				return FAIL;
 			}
 
@@ -289,6 +288,8 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 			*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 			return FAIL;
 		}
+
+		zbx_jsonobj_disable_indexing(obj);
 	}
 
 	if (NULL == data)
@@ -660,30 +661,29 @@ static int	pp_execute_script(zbx_pp_context_t *ctx, zbx_variant_t *value, const 
 static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params,
 		char **errmsg)
 {
-	char	pattern[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *request, *output,
-			*value_out = NULL, *err = NULL;
+	char	*pattern, *request, *output, *value_out = NULL, *err = NULL;
 	int	ret = FAIL;
 
-	zbx_strlcpy(pattern, params, sizeof(pattern));
+	pattern = zbx_strdup(NULL, params);
 
 	if (NULL == (request = strchr(pattern, '\n')))
 	{
 		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
-		return FAIL;
+		goto out;
 	}
 	*request++ = '\0';
 
 	if (NULL == (output = strchr(request, '\n')))
 	{
 		*errmsg = zbx_strdup(*errmsg, "cannot find third parameter");
-		return FAIL;
+		goto out;
 	}
 	*output++ = '\0';
 
 	if (NULL == cache || ZBX_PREPROC_PROMETHEUS_PATTERN != cache->type)
 	{
 		if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
-			return FAIL;
+			goto out;
 
 		ret = zbx_prometheus_pattern(value->data.str, pattern, request, output, &value_out, &err);
 	}
@@ -693,14 +693,15 @@ static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *val
 
 		if (NULL == (prom_cache = (zbx_prometheus_t *)cache->data))
 		{
-			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
-
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
-				return FAIL;
+				goto out;
+
+			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
 
 			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &err))
 			{
 				zbx_free(prom_cache);
+				cache->type = ZBX_PREPROC_NONE;
 				goto out;
 			}
 
@@ -710,9 +711,13 @@ static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *val
 		ret = zbx_prometheus_pattern_ex(prom_cache, pattern, request, output, &value_out, &err);
 	}
 out:
+	zbx_free(pattern);
+
 	if (FAIL == ret)
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "cannot apply Prometheus pattern: %s", err);
+		if (NULL == *errmsg)
+			*errmsg = zbx_dsprintf(*errmsg, "cannot apply Prometheus pattern: %s", err);
+
 		zbx_free(err);
 		return FAIL;
 	}
@@ -918,7 +923,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char 
 
 	pp_cache_copy_value(cache, step->type, value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() step:%d params:'%s' value:'%s' cache:%p", __zbxthread__, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%s' cache:%p", __func__,
 			step->type, ZBX_NULL2EMPTY_STR(step->params), zbx_variant_value_desc(value), (void *)cache);
 
 	switch (step->type)
@@ -1006,7 +1011,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char 
 			ret = FAIL;
 		}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ret:%s value:%s", __zbxthread__, __func__, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s value:%s", __func__, zbx_result_string(ret),
 			zbx_variant_value_desc(value));
 
 	return ret;
@@ -1035,7 +1040,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	int			quote_error, results_num, action;
 	zbx_variant_t		value_raw;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s(): value:%s type:%s", __zbxthread__, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): value:%s type:%s", __func__,
 			zbx_variant_value_desc(NULL == cache ? value_in : &cache->value),
 			zbx_variant_type_desc(NULL == cache ? value_in : &cache->value));
 
@@ -1134,7 +1139,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	else
 		pp_free_results(results, results_num);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s(): value:'%s' type:%s", __zbxthread__, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): value:'%s' type:%s", __func__,
 			zbx_variant_value_desc(value_out), zbx_variant_type_desc(value_out));
 
 }

@@ -510,11 +510,11 @@ elseif (hasRequest('action') && hasRequest('group_itemid')
  * Display
  */
 if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
-	$item = [];
+	$itemPrototype = [];
 	$has_errors = false;
 
 	if (hasRequest('itemid') && !hasRequest('clone')) {
-		$items = API::ItemPrototype()->get([
+		$itemPrototype = API::ItemPrototype()->get([
 			'itemids' => getRequest('itemid'),
 			'output' => [
 				'itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
@@ -529,12 +529,10 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value']
 		]);
-		$item = reset($items);
-
-		$item['hosts'] = $lld_rules[0]['hosts'];
+		$itemPrototype = reset($itemPrototype);
 
 		$i = 0;
-		foreach ($item['preprocessing'] as &$step) {
+		foreach ($itemPrototype['preprocessing'] as &$step) {
 			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
 				$step['params'] = [$step['params'], ''];
 			}
@@ -545,24 +543,24 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 		}
 		unset($step);
 
-		if ($item['type'] != ITEM_TYPE_JMX) {
-			$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+		if ($itemPrototype['type'] != ITEM_TYPE_JMX) {
+			$itemPrototype['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
-		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT) {
+		if (getRequest('type', $itemPrototype['type']) == ITEM_TYPE_DEPENDENT) {
 			$master_prototypes = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'itemids' => [getRequest('master_itemid', $item['master_itemid'])],
-				'hostids' => [$item['hostid']],
+				'itemids' => [getRequest('master_itemid', $itemPrototype['master_itemid'])],
+				'hostids' => [$itemPrototype['hostid']],
 				'webitems' => true
 			])
 			+ API::ItemPrototype()->get([
 				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'itemids' => getRequest('master_itemid', $item['master_itemid'])
+				'itemids' => getRequest('master_itemid', $itemPrototype['master_itemid'])
 			]);
 
 			if ($master_prototypes) {
-				$item['master_item'] = reset($master_prototypes);
+				$itemPrototype['master_item'] = reset($master_prototypes);
 			}
 		}
 	}
@@ -578,7 +576,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 		]);
 
 		if ($master_prototypes) {
-			$item['master_item'] = reset($master_prototypes);
+			$itemPrototype['master_item'] = reset($master_prototypes);
 		}
 		else {
 			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
@@ -587,7 +585,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 	}
 
 	$form_action = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
-	$data = getItemFormData($item, ['form' => $form_action]);
+	$data = getItemFormData($itemPrototype, ['form' => $form_action]);
 	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
 	$data['preprocessing_types'] = CItemPrototype::SUPPORTED_PREPROCESSING_TYPES;
@@ -693,9 +691,8 @@ else {
 			->setArgument('context', $data['context'])
 	);
 
-	$data['parent_items'] = getParentItemPrototypes($data['items'],
-		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-	);
+	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT);
 

@@ -243,8 +243,8 @@ static int	DBpatch_2030023(void)
 
 static int	DBpatch_2030024(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*value, *macro_esc, *value_esc;
 	int		ret = FAIL, rc;
 
@@ -489,8 +489,8 @@ static int	DBpatch_2030045(void)
 static int	dm_rename_slave_data(const char *table_name, const char *key_name, const char *field_name,
 		int field_length)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		local_nodeid = 0, nodeid, globalmacro;
 	zbx_uint64_t	id, min, max;
 	char		*name = NULL, *name_esc;
@@ -555,8 +555,8 @@ static int	dm_rename_slave_data(const char *table_name, const char *key_name, co
 
 static int	check_data_uniqueness(const char *table_name, const char *field_name)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 
 	if (NULL == (result = zbx_db_select("select %s from %s group by %s having count(*)>1",
@@ -673,8 +673,8 @@ static int	DBpatch_2030064(void)
 
 static int	DBpatch_2030065(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		local_nodeid = 0;
 	zbx_uint64_t	min, max;
 
@@ -895,8 +895,8 @@ static int	DBpatch_2030093(void)
 
 static int	DBpatch_2030094(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 	char		*p, *expr = NULL, *expr_esc;
 	size_t		expr_alloc = 0, expr_offset;
@@ -1106,8 +1106,8 @@ error:
 
 static int	DBpatch_2030095(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 	char		*p, *q, *params = NULL, *params_esc;
 	size_t		params_alloc = 0, params_offset;

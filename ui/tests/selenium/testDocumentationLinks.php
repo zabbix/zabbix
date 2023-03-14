@@ -530,7 +530,7 @@ class testDocumentationLinks extends CWebTest {
 			// #50 Update template view.
 			[
 				[
-					'url' => 'templates.php?form=update&templateid=10050',
+					'url' => 'templates.php?form=update&templateid=10047',
 					'doc_link' => '/en/manual/config/templates/template#creating-a-template'
 				]
 			],
