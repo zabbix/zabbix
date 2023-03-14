@@ -33,6 +33,7 @@ type Conn struct {
 	listener net.Listener
 	sink     chan *Client
 	last_err string
+	stopped  bool
 }
 
 type Client struct {
@@ -60,6 +61,7 @@ func (c *Client) Close() {
 }
 
 func (c *Conn) Stop() {
+	c.stopped = true
 	if c.listener != nil {
 		c.listener.Close()
 	}
@@ -75,12 +77,12 @@ func (c *Conn) handleError(err error) error {
 	}
 
 	if netErr.Timeout() {
-		log.Errf("failed to accept an incoming connection: %s", err.Error())
+		log.Debugf("failed to accept an incoming connection: %s", err.Error())
 
 		return nil
 	}
 
-	if !netErr.Temporary() {
+	if c.stopped {
 		return err
 	}
 

@@ -45,6 +45,7 @@ type ServerListener struct {
 	allowedPeers *zbxnet.AllowedPeers
 	bindIP       string
 	last_err     string
+	stopped      bool
 }
 
 func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err error) {
@@ -67,7 +68,7 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 	return nil
 }
 
-func (sl *ServerListener) handleError(err error) error {
+func (c *ServerListener) handleError(err error) error {
 	var netErr net.Error
 
 	if !errors.As(err, &netErr) {
@@ -77,12 +78,12 @@ func (sl *ServerListener) handleError(err error) error {
 	}
 
 	if netErr.Timeout() {
-		log.Errf("failed to accept an incoming connection: %s", err.Error())
+		log.Debugf("failed to accept an incoming connection: %s", err.Error())
 
 		return nil
 	}
 
-	if !netErr.Temporary() {
+	if c.stopped {
 		return err
 	}
 
@@ -95,10 +96,10 @@ func (sl *ServerListener) handleError(err error) error {
 	}
 
 	/* sleep to avoid high CPU usage on surprising temporary errors */
-	if sl.last_err == se.Err.Error() {
+	if c.last_err == se.Err.Error() {
 		time.Sleep(time.Second)
 	}
-	sl.last_err = se.Err.Error()
+	c.last_err = se.Err.Error()
 
 	return nil
 }
@@ -157,6 +158,7 @@ func (sl *ServerListener) Start() (err error) {
 }
 
 func (sl *ServerListener) Stop() {
+	sl.stopped = true
 	if sl.listener != nil {
 		sl.listener.Close()
 	}
