@@ -1530,6 +1530,97 @@ div.dashboard-grid-widget-item {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    width: 100%; }
+    .list-table .action-container .separator {
+      margin-right: 4px; }
+    .list-table .action-container [class*='icon-'] {
+      flex-shrink: 0; }
+  .list-table td .icon-maintenance {
+    margin: 0 0 -3px 4px; }
+  .list-table td .icon-depend-up,
+  .list-table td .icon-depend-down,
+  .list-table td .icon-ackn {
+    margin: 0 4px -3px 0; }
+  .list-table.compact-view .link-action {
+    color: #ffffff; }
+    .list-table.compact-view .link-action.red {
+      color: #ff5050; }
+    .list-table.compact-view .link-action.orange {
+      color: #ff7800; }
+    .list-table.compact-view .link-action.yellow {
+      color: #ffa20d; }
+    .list-table.compact-view .link-action.green {
+      color: #23d545; }
+    .list-table.compact-view .link-action:hover, .list-table.compact-view .link-action:focus {
+      color: #ffffff; }
+  .list-table.compact-view td {
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+    box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.1);
+    height: 22px;
+    line-height: 1;
+    vertical-align: middle;
+    white-space: nowrap; }
+    .list-table.compact-view td [class*='icon-']::after {
+      margin: 0;
+      line-height: 14px;
+      top: 0; }
+    .list-table.compact-view td [class*='icon-']:last-of-type {
+      margin-right: 0; }
+    .list-table.compact-view td .rel-container span {
+      margin: 0; }
+    .list-table.compact-view td .tag {
+      display: inline-block;
+      line-height: 16px;
+      margin-right: 3px;
+      padding: 0 3px;
+      max-width: 40px; }
+      @media screen and (min-width: 1200px) {
+        .list-table.compact-view td .tag {
+          max-width: 71px; } }
+      @media screen and (min-width: 1400px) {
+        .list-table.compact-view td .tag {
+          max-width: 102px; } }
+      @media screen and (min-width: 1600px) {
+        .list-table.compact-view td .tag {
+          max-width: 133px; } }
+    .list-table.compact-view td .icon-maintenance {
+      height: 12px;
+      width: 12px;
+      margin: 3px 1px 2px 4px; }
+      .list-table.compact-view td .icon-maintenance::before {
+        height: 12px;
+        width: 12px;
+        background-position: -48px -804px; }
+    .list-table.compact-view td .icon-depend-up,
+    .list-table.compact-view td .icon-depend-down {
+      width: 12px; }
+    .list-table.compact-view td .icon-depend-up::before {
+      background-position: -49px -731px; }
+    .list-table.compact-view td .icon-depend-down::before {
+      background-position: -49px -767px; }
+    .list-table.compact-view td .icon-wzrd-action {
+      background: url("../img/icon-sprite.svg?20200407") no-repeat -6px -624px;
+      height: 12px;
+      min-height: 12px;
+      margin: 0;
+      position: relative; }
+    .list-table.compact-view td .icon-description {
+      margin-left: 2px; }
+  .list-table.compact-view .action-container {
+    height: 18px;
+    line-height: 18px; }
+    .list-table.compact-view .action-container .rel-container {
+      display: flex; }
+    .list-table.compact-view .action-container .link-action {
+      height: 16px;
+      min-width: 1em; }
+    .list-table.compact-view .action-container .separator {
+      flex-shrink: 0; }
+  .list-table thead th {
+    color: #cacaca;
+>>>>>>> ba3edd3ad3b... ..F....... [ZBX-22056] fixed "No data found" message style in Monitoring->Problems
     height: 100%;
     color: inherit; }
     div.dashboard-grid-widget-item a:focus, div.dashboard-grid-widget-item a:hover, div.dashboard-grid-widget-item a:visited {
