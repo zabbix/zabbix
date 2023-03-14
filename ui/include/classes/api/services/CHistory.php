@@ -144,7 +144,8 @@ class CHistory extends CApiService {
 
 		switch (CHistoryManager::getDataSourceType($options['history'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
-				return $this->getFromElasticsearch($options);
+				$result = $this->getFromElasticsearch($options);
+				break;
 
 			default:
 				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
@@ -152,8 +153,19 @@ class CHistory extends CApiService {
 					$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
 				}
 
-				return $this->getFromSql($options);
+				$result = $this->getFromSql($options);
+				break;
 		}
+
+		if (!$options['countOutput'] && $options['history'] == ITEM_VALUE_TYPE_BINARY
+				&& $this->outputIsRequested('value', $options['output'])) {
+			foreach ($result as &$row) {
+				$row['value'] = base64_encode($row['value']);
+			}
+			unset($row);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -210,15 +222,6 @@ class CHistory extends CApiService {
 			else {
 				$result[] = $data;
 			}
-		}
-
-		if (!$options['countOutput'] && $this->tableName() === 'history_bin') {
-			foreach ($result as &$row) {
-				if (array_key_exists('value', $row)) {
-					$row['value'] = base64_encode($row['value']);
-				}
-			}
-			unset($row);
 		}
 
 		return $result;
