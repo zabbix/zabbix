@@ -226,7 +226,8 @@ if ($data['plaintext']) {
 		foreach ($screen as $text) {
 			$pre->addItem([$text, BR()]);
 		}
-		$html_page->addItem($pre);
+
+		$html_page->addItem($pre->addStyle('white-space: nowrap;'));
 	}
 }
 else {

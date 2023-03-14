@@ -82,13 +82,6 @@ class CScreenHistory extends CScreenBase {
 	public $page_file;
 
 	/**
-	 * Substitute for binary value output.
-	 *
-	 * @var CTag
-	 */
-	private static $binary_value;
-
-	/**
 	 * Init screen data.
 	 *
 	 * @param array		$options
@@ -121,14 +114,9 @@ class CScreenHistory extends CScreenBase {
 				'output' => ['itemid'],
 				'graphids' => [$options['graphid']]
 			]);
-
-			$this->itemids = array_column($itemids, 'itemid', 'itemid');
+			$this->itemids = zbx_objectValues($itemids, 'itemid');
 			$this->graphid = $options['graphid'];
 		}
-
-		self::$binary_value = $this->plaintext
-			? _('binary data')
-			: (new CTag('em', true, _('binary data')))->addClass(ZBX_STYLE_GREY);
 	}
 
 	/**
@@ -154,7 +142,10 @@ class CScreenHistory extends CScreenBase {
 			return;
 		}
 
-		$searchable_types = array_flip([ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]);
+		$iv_string = [
+			ITEM_VALUE_TYPE_LOG => 1,
+			ITEM_VALUE_TYPE_TEXT => 1
+		];
 
 		if ($this->action == HISTORY_VALUES || $this->action == HISTORY_LATEST) {
 			$options = [
@@ -174,22 +165,22 @@ class CScreenHistory extends CScreenBase {
 				];
 			}
 
-			$is_many_items = count($items) > 1;
-			$searchable_items = false;
+			$is_many_items = (count($items) > 1);
+			$numeric_items = true;
 
 			foreach ($items as $item) {
-				$searchable_items = array_key_exists($item['value_type'], $searchable_types);
-
-				if ($searchable_items) {
+				$numeric_items = ($numeric_items && !array_key_exists($item['value_type'], $iv_string));
+				if (!$numeric_items) {
 					break;
 				}
 			}
 
 			/**
 			 * View type: As plain text.
+			 * Item type: numeric (unsigned, char), float, text, log.
 			 */
 			if ($this->plaintext) {
-				if ($searchable_items && $this->filter !== ''
+				if (!$numeric_items && $this->filter !== ''
 						&& in_array($this->filterTask, [FILTER_TASK_SHOW, FILTER_TASK_HIDE])) {
 					$options['search'] = ['value' => $this->filter];
 
@@ -208,20 +199,10 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items_by_type as $value_type => $itemids) {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
-					$options['output'] = $value_type == ITEM_VALUE_TYPE_BINARY
-						? ['itemid', 'clock', 'ns']
-						: API_OUTPUT_EXTEND;
 
 					$item_data = API::History()->get($options);
 
 					if ($item_data) {
-						if ($value_type == ITEM_VALUE_TYPE_BINARY) {
-							foreach ($item_data as &$row) {
-								$row['value'] = self::$binary_value;
-							}
-							unset($row);
-						}
-
 						$history_data = array_merge($history_data, $item_data);
 					}
 				}
@@ -236,17 +217,12 @@ class CScreenHistory extends CScreenBase {
 				foreach ($history_data as $history_row) {
 					$value = $history_row['value'];
 
-					switch ($items[$history_row['itemid']]['value_type']) {
-						case ITEM_VALUE_TYPE_LOG:
-						case ITEM_VALUE_TYPE_STR:
-						case ITEM_VALUE_TYPE_TEXT:
-						case ITEM_VALUE_TYPE_BINARY:
-							$value = '"'.$value.'"';
-						break;
-
-						case ITEM_VALUE_TYPE_FLOAT:
-							$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
-						break;
+					if (in_array($items[$history_row['itemid']]['value_type'],
+							[ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
+						$value = '"'.$value.'"';
+					}
+					elseif ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
+						$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
 					}
 
 					$row = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock']).' '.$history_row['clock'].
@@ -264,8 +240,9 @@ class CScreenHistory extends CScreenBase {
 			}
 			/**
 			 * View type: Values, 500 latest values
+			 * Item type: text, log
 			 */
-			elseif ($searchable_items) {
+			elseif (!$numeric_items) {
 				$use_log_item = false;
 				$use_eventlog_item = false;
 				$items_by_type = [];
@@ -311,19 +288,12 @@ class CScreenHistory extends CScreenBase {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
 					$options['output'] = $value_type == ITEM_VALUE_TYPE_BINARY
-						? ['itemid', 'clock', 'ns']
+						? ['clock', 'value', 'ns']
 						: API_OUTPUT_EXTEND;
 
 					$item_data = API::History()->get($options);
 
 					if ($item_data) {
-						if ($value_type == ITEM_VALUE_TYPE_BINARY) {
-							foreach ($item_data as &$row) {
-								$row['value'] = self::$binary_value;
-							}
-							unset($row);
-						}
-
 						$history_data = array_merge($history_data, $item_data);
 					}
 				}
@@ -339,34 +309,42 @@ class CScreenHistory extends CScreenBase {
 				);
 
 				foreach ($history_data as $data) {
-					$item = $items[$data['itemid']];
-					$host = reset($item['hosts']);
-					$color = null;
-
-					if ($this->filter !== '' && array_key_exists($item['value_type'], $searchable_types)) {
+					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
+						$data['value'] = $this->plaintext
+							? _('binary data')
+							: (new CTag('em', true, _('binary data')))->addClass(ZBX_STYLE_GREY);
+					}
+					else {
 						$data['value'] = rtrim($data['value'], " \t\r\n");
+						$data['value'] = zbx_nl2br($data['value']);
 
-						$haystack = mb_strtolower($data['value']);
-						$needle = mb_strtolower($this->filter);
-						$pos = mb_strpos($haystack, $needle);
+						$item = $items[$data['itemid']];
+						$host = reset($item['hosts']);
+						$color = null;
 
-						if ($pos !== false && $this->filterTask == FILTER_TASK_MARK) {
-							$color = $this->markColor;
-						}
-						elseif ($pos === false && $this->filterTask == FILTER_TASK_INVERT_MARK) {
-							$color = $this->markColor;
-						}
+						if ($this->filter !== '') {
+							$haystack = mb_strtolower($data['value']);
+							$needle = mb_strtolower($this->filter);
+							$pos = mb_strpos($haystack, $needle);
 
-						switch ($color) {
-							case MARK_COLOR_RED:
-								$color = ZBX_STYLE_RED;
-								break;
-							case MARK_COLOR_GREEN:
-								$color = ZBX_STYLE_GREEN;
-								break;
-							case MARK_COLOR_BLUE:
-								$color = ZBX_STYLE_BLUE;
-								break;
+							if ($pos !== false && $this->filterTask == FILTER_TASK_MARK) {
+								$color = $this->markColor;
+							}
+							elseif ($pos === false && $this->filterTask == FILTER_TASK_INVERT_MARK) {
+								$color = $this->markColor;
+							}
+
+							switch ($color) {
+								case MARK_COLOR_RED:
+									$color = ZBX_STYLE_RED;
+									break;
+								case MARK_COLOR_GREEN:
+									$color = ZBX_STYLE_GREEN;
+									break;
+								case MARK_COLOR_BLUE:
+									$color = ZBX_STYLE_BLUE;
+									break;
+							}
 						}
 					}
 
@@ -408,7 +386,7 @@ class CScreenHistory extends CScreenBase {
 						}
 					}
 
-					$row[] = (new CCol(new CPre(zbx_nl2br($data['value']))))->addClass($color);
+					$row[] = (new CCol(new CPre($data['value'])))->addClass($color);
 
 					$history_table->addRow($row);
 				}
@@ -417,6 +395,7 @@ class CScreenHistory extends CScreenBase {
 			}
 			/**
 			 * View type: 500 latest values.
+			 * Item type: numeric (unsigned, char), float.
 			 */
 			elseif ($this->action === HISTORY_LATEST) {
 				$history_table = (new CTableInfo())
@@ -434,19 +413,12 @@ class CScreenHistory extends CScreenBase {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
 					$options['output'] = $value_type == ITEM_VALUE_TYPE_BINARY
-						? ['itemid', 'clock', 'ns']
+						? ['itemid', 'clock', 'value', 'ns']
 						: API_OUTPUT_EXTEND;
 
 					$item_data = API::History()->get($options);
 
 					if ($item_data) {
-						if ($value_type == ITEM_VALUE_TYPE_BINARY) {
-							foreach ($item_data as &$row) {
-								$row['value'] = self::$binary_value;
-							}
-							unset($row);
-						}
-
 						$history_data = array_merge($history_data, $item_data);
 					}
 				}
@@ -460,21 +432,27 @@ class CScreenHistory extends CScreenBase {
 
 				foreach ($history_data as $history_row) {
 					$item = $items[$history_row['itemid']];
-					$value = $history_row['value'];
 
-					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-						$value = $value === ''
-							? ''
-							: formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
+					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
+						$value = $this->plaintext
+							? _('binary data')
+							: (new CTag('em', true, _('binary data')))->addClass(ZBX_STYLE_GREY);
 					}
-					elseif ($item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+					else {
+						$value = $history_row['value'];
+
+						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
+							$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
+						}
+
 						$value = CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
+						$value = zbx_nl2br($value);
 					}
 
 					$history_table->addRow([
 						(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock'])))
 							->addClass(ZBX_STYLE_NOWRAP),
-						new CPre(zbx_nl2br($value))
+						new CPre($value)
 					]);
 				}
 
@@ -482,6 +460,7 @@ class CScreenHistory extends CScreenBase {
 			}
 			/**
 			 * View type: Values.
+			 * Item type: numeric (unsigned, char), float.
 			 */
 			else {
 				CArrayHelper::sort($items, [
@@ -494,17 +473,10 @@ class CScreenHistory extends CScreenBase {
 					$options['itemids'] = [$item['itemid']];
 					$options['history'] = $item['value_type'];
 					$options['output'] = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
-						? ['itemid', 'clock', 'ns']
+						? ['clock', 'value', 'ns']
 						: API_OUTPUT_EXTEND;
 
 					$item_data = API::History()->get($options);
-
-					if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-						foreach ($item_data as &$row) {
-							$row['value'] = self::$binary_value;
-						}
-						unset($row);
-					}
 
 					CArrayHelper::sort($item_data, [
 						['field' => 'clock', 'order' => ZBX_SORT_DOWN],
@@ -557,14 +529,18 @@ class CScreenHistory extends CScreenBase {
 					$values = $history_data_row['values'];
 
 					foreach ($items as $item) {
-						$value = array_key_exists($item['itemid'], $values) ? $values[$item['itemid']] : '';
-
-						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-							$value = $value === ''
-								? ''
-								: formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
+						if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+							$value = $this->plaintext
+								? _('binary data')
+								: (new CTag('em', true, _('binary data')))->addClass(ZBX_STYLE_GREY);
 						}
-						elseif ($item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+						else {
+							$value = array_key_exists($item['itemid'], $values) ? $values[$item['itemid']] : '';
+
+							if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT && $value !== '') {
+								$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
+							}
+
 							$value = CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
 						}
 
