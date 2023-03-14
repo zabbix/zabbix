@@ -384,6 +384,16 @@ static int	DBpatch_6000018(void)
 
 	return DBmodify_field_type("task_result", &field, &old_field);
 }
+
+static int	DBpatch_6000019(void)
+{
+	return DBdrop_index("scripts", "scripts_3");
+}
+
+static int	DBpatch_6000020(void)
+{
+	return DBcreate_index("scripts", "scripts_3", "name,menu_path", 1);
+}
 #endif
 
 DBPATCH_START(6000)
@@ -409,5 +419,7 @@ DBPATCH_ADD(6000015, 0, 0)
 DBPATCH_ADD(6000016, 0, 0)
 DBPATCH_ADD(6000017, 0, 0)
 DBPATCH_ADD(6000018, 0, 0)
+DBPATCH_ADD(6000019, 0, 0)
+DBPATCH_ADD(6000020, 0, 0)
 
 DBPATCH_END()
