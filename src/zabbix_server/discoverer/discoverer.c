@@ -99,6 +99,21 @@ typedef struct
 }
 zbx_discoverer_manager_t;
 
+typedef struct
+{
+	pthread_mutex_t		lock;
+	pthread_cond_t		event;
+	const zbx_dc_dcheck_t	*dcheck;
+	char			*ip;
+	int			port;
+	int			config_timeout;
+	char			**value;
+	size_t			*value_alloc;
+	int			ret;
+	unsigned char		completed;
+}
+zbx_discoverer_service_args_t;
+
 ZBX_PTR_VECTOR_DECL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
 
 ZBX_PTR_VECTOR_IMPL(discoverer_services_ptr, zbx_dservice_t*)
@@ -417,6 +432,109 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 	zbx_free_agent_result(&result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+static void	*discover_service_child(void *func_arg)
+{
+	zbx_discoverer_service_args_t	*args = (zbx_discoverer_service_args_t*)func_arg;
+	int				err;
+
+	args->ret = discover_service(args->dcheck, args->ip, args->port, args->config_timeout, args->value,
+			args->value_alloc);
+
+	pthread_mutex_lock(&args->lock);
+
+	if (0 != args->completed)
+	{
+		pthread_mutex_unlock(&args->lock);
+		pthread_mutex_destroy(&args->lock);
+		pthread_cond_destroy(&args->event);
+		zbx_free(*args->value);
+		zbx_free(args);
+
+		return NULL;
+	}
+
+	if (0 != (err = pthread_cond_signal(&args->event)))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot signal conditional variable: %s", zbx_strerror(err));
+
+	pthread_mutex_unlock(&args->lock);
+
+	return NULL;
+}
+
+static int	discover_service_timed(const zbx_dc_dcheck_t *dcheck, char *ip, int port, int config_timeout,
+		char **value, size_t *value_alloc)
+{
+	int				err, cond_init = 0, ret = FAIL;
+	size_t				val_alloc = 128, offset = 0;
+	char				*val = NULL;
+	pthread_t			thread;
+	zbx_discoverer_service_args_t	*args;
+	struct timespec			timeout;
+
+	val = (char *)zbx_malloc(val, val_alloc);
+	**value = '\0';
+
+	args = zbx_malloc(NULL, sizeof(zbx_discoverer_service_args_t));
+	args->dcheck = dcheck;
+	args->ip = ip;
+	args->port = port;
+	args->config_timeout = config_timeout;
+	args->value = &val;
+	args->value_alloc = &val_alloc;
+	args->completed = 0;
+
+	if (0 != (err = pthread_mutex_init(&args->lock, NULL)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize mutex: %s", zbx_strerror(err));
+		goto out;
+	}
+
+	if (0 != (err = pthread_cond_init(&args->event, NULL)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize conditional variable: %s", zbx_strerror(err));
+		goto err;
+	}
+
+	cond_init = 1;
+
+	pthread_mutex_lock(&args->lock);
+
+	if (0 != (err = pthread_create(&thread, NULL, discover_service_child, (void *)args)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot create thread: %s", zbx_strerror(err));
+		goto err;
+	}
+
+	clock_gettime(CLOCK_REALTIME, &timeout);
+	timeout.tv_sec += config_timeout;
+
+	do
+	{
+		err = pthread_cond_timedwait(&args->event, &args->lock, &timeout);
+	} while (0 != err && ETIMEDOUT != err);
+
+	if (err == ETIMEDOUT)
+	{
+		args->completed = 1;
+		pthread_mutex_unlock(&args->lock);
+		return FAIL;
+	}
+
+	zbx_strcpy_alloc(value, value_alloc, &offset, *args->value);
+	ret = args->ret;
+	pthread_mutex_unlock(&args->lock);
+err:
+	pthread_mutex_destroy(&args->lock);
+
+	if (0 != cond_init)
+		pthread_cond_destroy(&args->event);
+out:
+	zbx_free(*args->value);
+	zbx_free(args);
 
 	return ret;
 }
@@ -1198,8 +1316,7 @@ static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_
 	zbx_vector_discoverer_results_ptr_destroy(&results);
 }
 
-static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
-		int config_timeout)
+static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int timeout)
 {
 	int					i;
 	char					dns[ZBX_INTERFACE_DNS_LEN_MAX];
@@ -1217,12 +1334,18 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 
 	for (i = 0; i < task->dchecks.values_num; i++)
 	{
+		int			status;
 		zbx_dc_dcheck_t		*dcheck = (zbx_dc_dcheck_t*)task->dchecks.values[i];
 		zbx_dservice_t		*service;
 
 		service = result_dservice_create(task, dcheck);
-		service->status = (SUCCEED == discover_service(dcheck, task->ip, task->port, config_timeout, &value,
-				&value_alloc)) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
+
+		if (SVC_LDAP == dcheck->type)
+			status = discover_service_timed(dcheck, task->ip, task->port, timeout, &value, &value_alloc);
+		else
+			status = discover_service(dcheck, task->ip, task->port, timeout, &value, &value_alloc);
+
+		service->status = SUCCEED == status ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
 		zbx_strlcpy_utf8(service->value, value, ZBX_MAX_DISCOVERED_VALUE_SIZE);
 
 		zbx_vector_discoverer_services_ptr_append(&services, service);
@@ -1562,7 +1685,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
 	zbx_thread_discoverer_args	*discoverer_args_in = (zbx_thread_discoverer_args *)
 							(((zbx_thread_args_t *)args)->args);
-	int				rule_count = 0, old_rule_count = 0, result_count = 0, old_result_count = 0;
+	int				rule_count = 0, old_rule_count = 0, result_count = 0, old_result_count = 0, err;
 	zbx_uint64_t			check_count = 0, old_check_count = 0;
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time, nextcheck = 0;
@@ -1576,6 +1699,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	char				*error;
 	zbx_vector_uint64_pair_t	revisions;
+	sigset_t			mask;
 #ifdef ZBX22336
 	zbx_uint32_t			rtc_msgs[] = { ZBX_RTC_SNMP_CACHE_RELOAD };
 #endif
@@ -1593,6 +1717,12 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGALRM);
+
+	if (0 > (err = zbx_sigmask(SIG_BLOCK, &mask, NULL)))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot block the signals: %s", zbx_strerror(err));
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
