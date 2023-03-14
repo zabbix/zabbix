@@ -9,3 +9,6 @@ libzbxcrypto_a_SOURCES = \
 	aes.h \
 	hmac.c \
 	rsa.c
+
+libzbxcrypto_a_CFLAGS = \
+	$(TLS_CFLAGS)
