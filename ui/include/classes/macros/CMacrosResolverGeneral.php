@@ -1439,7 +1439,7 @@ class CMacrosResolverGeneral {
 					]);
 
 					foreach ($db_items as $db_item) {
-						$value = $db_item['lastclock']
+						$value = $db_item['lastclock'] && $db_item['value_type'] != ITEM_VALUE_TYPE_BINARY
 							? formatHistoryValue($db_item['lastvalue'], $db_item)
 							: UNRESOLVED_MACRO_STRING;
 
