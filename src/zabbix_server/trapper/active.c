@@ -168,7 +168,7 @@ out:
  *             config_timeout - [IN]                                             *
  *             hostid         - [OUT] host ID                                    *
  *             revision       - [OUT] host configuration revision                *
- *             error          - [OUT] error message, (buffer provided by caller) *
+ *             error          - [OUT] error message (buffer provided by caller)  *
  *                                                                               *
  * Return value:  SUCCEED - host is found                                        *
  *                FAIL - an error occurred or host not found                     *
