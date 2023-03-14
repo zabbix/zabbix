@@ -22,8 +22,26 @@
 ** were used in development of this file. Thanks to PostgreSQL developers!
 **/
 
-#include "setproctitle.h"
+#include "log.h"
 #include "zbxcommon.h"
+
+#if defined(__linux__)				/* Linux */
+#	define PS_OVERWRITE_ARGV
+#elif defined(_AIX)				/* AIX */
+#	define PS_OVERWRITE_ARGV
+#	define PS_CONCAT_ARGV
+#elif defined(__sun) && defined(__SVR4)		/* Solaris */
+#	define PS_OVERWRITE_ARGV
+#	define PS_APPEND_ARGV
+#elif defined(HAVE_SYS_PSTAT_H)			/* HP-UX */
+#	define PS_PSTAT_ARGV
+#elif defined(__APPLE__) && defined(__MACH__)	/* OS X */
+#	include <TargetConditionals.h>
+#	if TARGET_OS_MAC == 1 && TARGET_OS_EMBEDDED == 0 && TARGET_OS_IPHONE == 0 && TARGET_IPHONE_SIMULATOR == 0
+#		define PS_OVERWRITE_ARGV
+#		define PS_DARWIN_ARGV
+#	endif
+#endif
 
 #if defined(PS_DARWIN_ARGV)
 #include <crt_externs.h>
@@ -46,6 +64,7 @@ static size_t	ps_buf_size = 0, prev_msg_size = 0;
 #define PS_BUF_SIZE	512
 static char	ps_buf[PS_BUF_SIZE], *p_msg = NULL;
 static size_t	ps_buf_size = PS_BUF_SIZE, ps_buf_size_msg = PS_BUF_SIZE;
+#undef PS_BUF_SIZE
 #endif
 
 /******************************************************************************
@@ -62,7 +81,7 @@ static size_t	ps_buf_size = PS_BUF_SIZE, ps_buf_size_msg = PS_BUF_SIZE;
  *                                                                            *
  ******************************************************************************/
 #if defined(PS_OVERWRITE_ARGV)
-char	**setproctitle_save_env(int argc, char **argv)
+char	**zbx_setproctitle_init(int argc, char **argv)
 {
 	int	i;
 	char	*arg_next = NULL;
@@ -159,7 +178,7 @@ char	**setproctitle_save_env(int argc, char **argv)
 	return argv_int;
 }
 #elif defined(PS_PSTAT_ARGV)
-char	**setproctitle_save_env(int argc, char **argv)
+char	**zbx_setproctitle_init(int argc, char **argv)
 {
 	size_t	len0;
 
@@ -174,7 +193,12 @@ char	**setproctitle_save_env(int argc, char **argv)
 	}
 	return argv;
 }
-#endif	/* defined(PS_PSTAT_ARGV) */
+#else	/* defined(PS_PSTAT_ARGV) */
+char	**zbx_setproctitle_init(int argc, char **argv)
+{
+	return argv;
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -185,7 +209,7 @@ char	**setproctitle_save_env(int argc, char **argv)
  *           and a status message.                                            *
  *                                                                            *
  ******************************************************************************/
-void	setproctitle_set_status(const char *status)
+static void	setproctitle_set_status(const char *status)
 {
 #if defined(PS_OVERWRITE_ARGV)
 	static int	initialized = 0;
@@ -205,7 +229,7 @@ void	setproctitle_set_status(const char *status)
 	{
 		size_t	start_pos;
 
-		/* Initialization has not been moved to setproctitle_save_env() because setproctitle_save_env()	*/
+		/* Initialization has not been moved to zbx_setproctitle_init() because zbx_setproctitle_init()	*/
 		/* is called from the main process and we do not change its command line.			*/
 		/* argv[] changing takes place only in child processes.						*/
 
@@ -240,15 +264,41 @@ void	setproctitle_set_status(const char *status)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: release memory allocated in setproctitle_save_env().              *
+ * Purpose: set process title                                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_setproctitle(const char *fmt, ...)
+{
+#if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
+	char	title[MAX_STRING_LEN];
+	va_list	args;
+
+	va_start(args, fmt);
+	zbx_vsnprintf(title, sizeof(title), fmt, args);
+	va_end(args);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() title:'%s'", __func__, title);
+#endif
+
+#if defined(HAVE_FUNCTION_SETPROCTITLE)
+	setproctitle("%s", title);
+#elif defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
+	setproctitle_set_status(title);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release memory allocated in zbx_setproctitle_init().              *
  *                                                                            *
  * Comments: call this function when process terminates and argv[] and        *
  *           environment variables are not used anymore.                      *
  *                                                                            *
  ******************************************************************************/
-#if defined(PS_OVERWRITE_ARGV)
-void	setproctitle_free_env(void)
+
+void	zbx_setproctitle_deinit(void)
 {
+#if defined(PS_OVERWRITE_ARGV)
 	int	i;
 
 	/* restore the original environment variable to safely free our internally allocated environ array */
@@ -263,5 +313,5 @@ void	setproctitle_free_env(void)
 
 	zbx_free(argv_int);
 	zbx_free(environ_int);
-}
 #endif	/* PS_OVERWRITE_ARGV */
+}

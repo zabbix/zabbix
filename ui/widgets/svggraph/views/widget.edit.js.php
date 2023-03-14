@@ -118,8 +118,8 @@ window.widget_svggraph_form = new class {
 				}
 
 				if (e.target.classList.contains('js-click-expend')
-					|| e.target.classList.contains('color-picker-preview')
-					|| e.target.classList.contains('<?= ZBX_STYLE_BTN_GREY ?>')) {
+						|| e.target.classList.contains('color-picker-preview')
+						|| e.target.classList.contains('<?= ZBX_STYLE_BTN_GREY ?>')) {
 					jQuery('#data_sets').zbx_vertical_accordion('expandNth',
 						jQuery(e.target).closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').index()
 					);
@@ -455,7 +455,10 @@ window.widget_svggraph_form = new class {
 		if (this._sortable_data_set === undefined) {
 			this._sortable_data_set = new CSortable(
 				document.querySelector('#data_set .<?= ZBX_STYLE_LIST_VERTICAL_ACCORDION ?>'),
-				{is_vertical: true}
+				{
+					is_vertical: true,
+					with_opacity: true
+				}
 			);
 
 			this._sortable_data_set.on(SORTABLE_EVENT_DRAG_END, () => {

@@ -233,8 +233,8 @@ PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
  ******************************************************************************/
 void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	result = zbx_db_select("%s", sql);
 
