@@ -1,0 +1,1 @@
+A.F....... [ZBX-22480] fixed template import in case the imported template objects match existing inherited template objects (Ivo, vmurzins)
