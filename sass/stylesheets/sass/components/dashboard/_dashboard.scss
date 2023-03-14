@@ -424,14 +424,6 @@
 	}
 
 	&.no-padding {
-		.dashboard-grid-widget-messages {
-			.msg-bad,
-			.msg-good,
-			.msg-warning {
-				margin: 8px 10px;
-			}
-		}
-
 		.dashboard-grid-widget-debug {
 			.debug-output {
 				margin: 8px 10px;
@@ -462,6 +454,16 @@
 			margin-top: 0;
 			height: 100%;
 			padding-top: 8px;
+
+			&.no-padding {
+				.dashboard-grid-widget-messages {
+					.msg-bad,
+					.msg-good,
+					.msg-warning {
+						margin: 8px 10px;
+					}
+				}
+			}
 
 			.list-table {
 				&.sticky-footer {
