@@ -64,7 +64,7 @@ To utilize the media type, we will create a Zabbix user to represent Event-Drive
 
 3\. Navigate to the **Media** tab and click on the **Add** button inside of the Media box.
 
-4\. Add Media with the **Event-Driven Ansible**. The "Send to" field should be filled as a pair of ip and destination port in the format (ххх.ххх.ххх.ххх:port). Save user setting.
+4\. Add Media with the **Event-Driven Ansible**. The "Send to" field should be filled as a pair of ip and destination port in the format `xxx.xxx.xxx.xxx:port`. Save user setting.
 
 [![](images/thumb.3.png?raw=true)](images/3.png)
 

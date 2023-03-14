@@ -87,7 +87,7 @@ zabbix_export:
             setParams: function (params) {
                 if (typeof params !== 'object') {
                     Zabbix.log(3, '[ Event-Driven Ansible webhook ] Incorrect type of "params" parameter given. Must be object. Given: ' + (typeof params));
-                    throw 'Incorrect type of "params" parameter given. Check server log for more information.';
+                    throw 'Incorrect type of "params" parameter given. Check server log for more information';
                 }
                 Eda.params = params;
             },
@@ -112,14 +112,14 @@ zabbix_export:
                     }
                     else {
                         Zabbix.log(3, '[ Event-Driven Ansible webhook ] notification failed: ' + response.description);
-                        throw 'Unknown error. Check debug log for more information.';
+                        throw 'Unknown error. Check debug log for more information';
                     }
                 }
             }
         };
         
         /**
-        * Function for transorm string date and time to timestamp
+        * Function for transform string date and time to timestamp
         * @param    {String} strDate    Date of events
         * @param    {String} strTime    Time of events
         * @return   {Number}            Timestamp of events
@@ -199,17 +199,17 @@ zabbix_export:
         
             // Possible values: 0 - Trigger
             if (params.event_source != 0) {
-                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0.';
+                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0';
             }
         
             // Check trigger update and trigger resolve events
             if (params.event_source == 0 && params.event_value != 1) {
-                throw 'Incorrect "event_value" parameter given: "' + params.event_value + '".\nMust be 1. Unsupport trigger update and resolve events';
+                throw 'Incorrect "event_value" parameter given: "' + params.event_value + '".\nMust be 1. Trigger events of updating and resolving are unsupported';
             }
         
             // Check destination
             if (!checkDestination(params.send_to)) {
-                throw 'Incorrect media type parameter given: ' + params.send_to + '\nMust be IP:PORT.';
+                throw 'Incorrect media type parameter given: ' + params.send_to + '\nMust be IP:PORT';
             }
         
             // target params
