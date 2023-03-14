@@ -515,6 +515,25 @@ func pkgtoolsDetails(manager string, in []string, regex string) (out string, err
 	return
 }
 
+func portageParseSizeInfo(in string) (out uint64, err error) {
+	const sizeinfo_num_fields = 3
+
+	// "n files, n non-files, n bytes"
+	sizeinfo := strings.Split(in, ", ")
+
+	if len(sizeinfo) != sizeinfo_num_fields {
+		err = errors.New("invalid input format: separator \", \" not found in \"%s\"")
+		return
+	}
+
+	_, err = fmt.Sscanf(sizeinfo[2], "%d bytes", &out)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func portageDetails(manager string, in []string, regex string) (out string, err error) {
 	const num_fields, pkginfo_num_fields, sizeinfo_num_fields = 2, 5, 3
 
@@ -528,7 +547,7 @@ func portageDetails(manager string, in []string, regex string) (out string, err 
 	pd := []PackageDetails{};
 
 	for _, s := range in {
-		var files, nonfiles, size uint64
+		var size uint64
 
 		// category,name,version,revision,repo: file count, nonfile count, size
 		split := strings.Split(s, ":")
@@ -546,20 +565,9 @@ func portageDetails(manager string, in []string, regex string) (out string, err 
 			continue
 		}
 
-		sizeinfo_fmt := " "
-		sizeinfo_fmt += "%d files"
-		if -1 != strings.Index(split[1], "(") {
-			sizeinfo_fmt += " (%*d unique)"
-		}
-		sizeinfo_fmt += ", "
-		sizeinfo_fmt += "%d non-files"
-		sizeinfo_fmt += ", "
-		sizeinfo_fmt += "%d bytes"
-
-		n, _ := fmt.Sscanf(split[1], sizeinfo_fmt, &files, &nonfiles, &size)
-		if sizeinfo_num_fields != n {
-			log.Debugf("unexpected number of fields read while expected %d in \"%s\", ignoring",
-				sizeinfo_num_fields, split[1])
+		size, err = portageParseSizeInfo(split[1])
+		if err != nil {
+			log.Debugf("internal error: failed to parse package size information in \"%s\"", split[1])
 			continue
 		}
 
