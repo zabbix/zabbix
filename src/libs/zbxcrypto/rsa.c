@@ -22,10 +22,10 @@
 
 #if defined(HAVE_OPENSSL)
 #include <openssl/evp.h>
+#include <openssl/rsa.h>
+#include <openssl/err.h>
 #include <openssl/bio.h>
 #include <openssl/pem.h>
-#include <openssl/crypto.h>
-#include <openssl/types.h>
 #elif defined(HAVE_GNUTLS)
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>

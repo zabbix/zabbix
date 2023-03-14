@@ -10,3 +10,6 @@ libzbxcrypto_a_SOURCES = \
 	endian.c \
 	hmac.c \
 	rsa.c
+
+libzbxcrypto_a_CFLAGS = \
+	$(TLS_CFLAGS)

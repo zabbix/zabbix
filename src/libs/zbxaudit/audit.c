@@ -405,9 +405,9 @@ int	zbx_audit_flush_once(void)
 
 static int	audit_field_default(const char *table_name, const char *field_name, const char *value, uint64_t id)
 {
-	static ZBX_THREAD_LOCAL char		cached_table_name[ZBX_TABLENAME_LEN_MAX];
-	static ZBX_THREAD_LOCAL const ZBX_TABLE	*table = NULL;
-	const ZBX_FIELD				*field;
+	static ZBX_THREAD_LOCAL char			cached_table_name[ZBX_TABLENAME_LEN_MAX];
+	static ZBX_THREAD_LOCAL const zbx_db_table_t	*table = NULL;
+	const zbx_db_field_t				*field;
 
 	if (NULL == table_name)
 		return FAIL;
