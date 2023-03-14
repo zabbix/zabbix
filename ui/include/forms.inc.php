@@ -759,6 +759,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'possibleHostInventories' => null,
 		'alreadyPopulated' => null,
 		'initial_item_type' => null,
+		'templates' => [],
 		'jmx_endpoint' => getRequest('jmx_endpoint', ZBX_DEFAULT_JMX_ENDPOINT),
 		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 		'url' => getRequest('url'),
@@ -905,23 +906,22 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['limited'] = ($data['item']['templateid'] != 0);
 		$data['interfaceid'] = $item['interfaceid'];
 
-		if ($item['templateid'] != 0) {
-			if ($data['is_discovery_rule']) {
-				$parent_items = getParentLldRules([$item],
-					CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-				);
-			}
-			elseif ($data['parent_discoveryid'] != 0) {
-				$parent_items = getParentItemPrototypes([$item],
-					CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-				);
-			}
-			else {
-				$parent_items = getParentItems([$item], CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES));
-			}
-
-			$data['parent_item'] = reset($parent_items);
+		// discovery rule
+		if ($data['is_discovery_rule']) {
+			$flag = ZBX_FLAG_DISCOVERY_RULE;
 		}
+		// item prototype
+		elseif ($data['parent_discoveryid'] != 0) {
+			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		}
+		// plain item
+		else {
+			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
+		}
+
+		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
 	}
 
 	// caption
@@ -1142,30 +1142,92 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	if (!$data['is_discovery_rule']) {
-		if ($data['show_inherited_tags']) {
-			$parent_item = [];
+		// Select inherited tags.
+		if ($data['show_inherited_tags'] && array_key_exists('item', $data)) {
+			if ($data['item']['discoveryRule']) {
+				$items = [$data['item']['discoveryRule']];
+				$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_RULE)['templates'];
+			}
+			else {
+				$items = [[
+					'templateid' => $data['item']['templateid'],
+					'itemid' => $data['itemid']
+				]];
+				$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
+			}
+			unset($parent_templates[0]);
 
-			if ($data['context'] === 'host' && array_key_exists('item', $data)) {
-				if ($data['parent_discoveryid'] == 0 && $data['item']['discoveryRule']) {
-					$parent_items = getParentLldRules([$data['item']['discoveryRule']],
-						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-					);
+			$db_templates = $parent_templates
+				? API::Template()->get([
+					'output' => ['templateid'],
+					'selectTags' => ['tag', 'value'],
+					'templateids' => array_keys($parent_templates),
+					'preservekeys' => true
+				])
+				: [];
 
-					$parent_item = reset($parent_items);
-				}
-				elseif (array_key_exists('parent_item', $data)) {
-					$parent_item = $data['parent_item'];
+			$inherited_tags = [];
+
+			// Make list of template tags.
+			foreach ($parent_templates as $templateid => $template) {
+				if (array_key_exists($templateid, $db_templates)) {
+					foreach ($db_templates[$templateid]['tags'] as $tag) {
+						if (array_key_exists($tag['tag'], $inherited_tags)
+								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+							$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+								$templateid => $template
+							];
+						}
+						else {
+							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+								'parent_templates' => [$templateid => $template],
+								'type' => ZBX_PROPERTY_INHERITED
+							];
+						}
+					}
 				}
 			}
 
-			CTagHelper::addInheritedTags($data['tags'], $data['context'], [$data['hostid']], $parent_item);
+			$db_hosts = API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'selectTags' => ['tag', 'value'],
+				'hostids' => $data['hostid'],
+				'templated_hosts' => true
+			]);
+
+			// Overwrite and attach host level tags.
+			if ($db_hosts) {
+				foreach ($db_hosts[0]['tags'] as $tag) {
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
+				}
+			}
+
+			// Overwrite and attach item's own tags.
+			foreach ($data['tags'] as $tag) {
+				if (array_key_exists($tag['tag'], $inherited_tags)
+						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+				}
+				else {
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				}
+			}
+
+			$data['tags'] = [];
+
+			foreach ($inherited_tags as $tag) {
+				foreach ($tag as $value) {
+					$data['tags'][] = $value;
+				}
+			}
 		}
 
-		if ($data['tags']) {
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
+		if (!$data['tags']) {
+			$data['tags'] = [['tag' => '', 'value' => '']];
 		}
 		else {
-			$data['tags'] = [['tag' => '', 'value' => '']];
+			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 		}
 	}
 
@@ -1430,7 +1492,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 								(new CSimpleButton(_('Remove')))
 									->addClass(ZBX_STYLE_BTN_LINK)
 									->addClass('js-group-json-action-delete')
-									->setEnabled($count > 3)
+									->setEnabled(!$readonly && $count > 3)
 							))->addClass(ZBX_STYLE_NOWRAP)
 						]))->addClass('group-json-row')
 					];
@@ -1456,6 +1518,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 											(new CSimpleButton(_('Add')))
 												->addClass(ZBX_STYLE_BTN_LINK)
 												->addClass('js-group-json-action-add')
+												->setEnabled(!$readonly)
 										))->setColSpan(4)
 									)
 							)
@@ -1727,7 +1790,7 @@ function getTriggerMassupdateFormData() {
  * @param string      $data['expression_constructor']           Trigger expression constructor mode.
  * @param string      $data['recovery_expression_constructor']  Trigger recovery expression constructor mode.
  * @param bool        $data['limited']                          Templated trigger.
- * @param array       $data['template']                         Trigger template.
+ * @param array       $data['templates']                        Trigger templates.
  * @param string      $data['hostid']                           Host ID.
  * @param string      $data['expression_action']                Trigger expression action.
  * @param string      $data['recovery_expression_action']       Trigger recovery expression action.
@@ -1760,9 +1823,11 @@ function getTriggerFormData(array $data) {
 			$options['selectDiscoveryRule'] = ['itemid', 'name', 'templateid'];
 			$options['selectTriggerDiscovery'] = ['parent_triggerid'];
 			$triggers = API::Trigger()->get($options);
+			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
 		else {
 			$triggers = API::TriggerPrototype()->get($options);
+			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
@@ -1775,23 +1840,107 @@ function getTriggerFormData(array $data) {
 			$data['tags'] = $trigger['tags'];
 		}
 
-		if ($trigger['templateid'] != 0) {
-			if ($data['parent_discoveryid']) {
-				$parent_triggers = getParentTriggerPrototypes([$trigger],
-					CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-				);
+		// Get templates.
+		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
+			getTriggerParentTemplates([$trigger], $flag), $flag,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
+
+		if ($data['show_inherited_tags']) {
+			if ($data['parent_discoveryid'] === null) {
+				if ($trigger['discoveryRule']) {
+					$item_parent_templates = getItemParentTemplates([$trigger['discoveryRule']],
+						ZBX_FLAG_DISCOVERY_RULE
+					)['templates'];
+				}
+				else {
+					$item_parent_templates = getItemParentTemplates($trigger['items'],
+						ZBX_FLAG_DISCOVERY_NORMAL
+					)['templates'];
+				}
 			}
 			else {
-				$parent_triggers = getParentTriggers([$trigger],
-					CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-				);
+				$items = [];
+				$item_prototypes = [];
+
+				foreach ($trigger['items'] as $item) {
+					if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+						$items[] = $item;
+					}
+					else {
+						$item_prototypes[] = $item;
+					}
+				}
+
+				$item_parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates']
+					+ getItemParentTemplates($item_prototypes, ZBX_FLAG_DISCOVERY_PROTOTYPE)['templates'];
+			}
+			unset($item_parent_templates[0]);
+
+			$db_templates = $item_parent_templates
+				? API::Template()->get([
+					'output' => ['templateid'],
+					'selectTags' => ['tag', 'value'],
+					'templateids' => array_keys($item_parent_templates),
+					'preservekeys' => true
+				])
+				: [];
+
+			$inherited_tags = [];
+
+			foreach ($item_parent_templates as $templateid => $template) {
+				if (array_key_exists($templateid, $db_templates)) {
+					foreach ($db_templates[$templateid]['tags'] as $tag) {
+						if (array_key_exists($tag['tag'], $inherited_tags)
+								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+							$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+								$templateid => $template
+							];
+						}
+						else {
+							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+								'parent_templates' => [$templateid => $template],
+								'type' => ZBX_PROPERTY_INHERITED
+							];
+						}
+					}
+				}
 			}
 
-			$data['parent_trigger'] = reset($parent_triggers);
+			$db_hosts = API::Host()->get([
+				'output' => [],
+				'selectTags' => ['tag', 'value'],
+				'hostids' => $data['hostid'],
+				'templated_hosts' => true
+			]);
+
+			if ($db_hosts) {
+				foreach ($db_hosts[0]['tags'] as $tag) {
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
+				}
+			}
+
+			foreach ($data['tags'] as $tag) {
+				if (array_key_exists($tag['tag'], $inherited_tags)
+						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+				}
+				else {
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				}
+			}
+
+			$data['tags'] = [];
+
+			foreach ($inherited_tags as $tag) {
+				foreach ($tag as $value) {
+					$data['tags'][] = $value;
+				}
+			}
 		}
 
 		$data['limited'] = ($trigger['templateid'] != 0);
-		$data['templateid'] = $trigger['templateid'];
 
 		// Select first host from triggers if no matching value is given.
 		$hosts = $trigger['hosts'];
@@ -1801,83 +1950,12 @@ function getTriggerFormData(array $data) {
 		}
 	}
 
-	if ($data['show_inherited_tags']) {
-		$parent_trigger = [];
-		$hostids = [];
-
-		if ($data['context'] === 'host' && $data['triggerid'] !== null) {
-			if ($data['parent_discoveryid'] === null && $trigger['triggerDiscovery']) {
-				$trigger_prototypes = API::TriggerPrototype()->get([
-					'output' => ['templateid'],
-					'triggerids' => $trigger['triggerDiscovery']['parent_triggerid']
-				]);
-
-				$parent_triggers = getParentTriggerPrototypes($trigger_prototypes,
-					CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-				);
-
-				$parent_trigger = reset($parent_triggers);
-			}
-			else {
-				$parent_trigger = array_key_exists('parent_trigger', $data) ? $data['parent_trigger'] : [];
-			}
-
-			if ($parent_trigger || !hasRequest('form_refresh')) {
-				$hostids = array_column($trigger['hosts'], 'hostid');
-			}
-		}
-
-		if (!$hostids) {
-			$hostids = [$data['hostid']];
-
-			if ($data['expression'] !== '' || $data['recovery_mode'] != ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-					|| $data['recovery_expression'] !== '') {
-				$expression_parser = new CExpressionParser([
-					'usermacros' => true,
-					'lldmacros' => $data['parent_discoveryid'] ? true : false
-				]);
-
-				$hosts = [];
-
-				if ($expression_parser->parse($data['expression']) == CParser::PARSE_SUCCESS) {
-					$hosts = $expression_parser->getResult()->getHosts();
-				}
-
-				if ($data['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-						&& $expression_parser->parse($data['recovery_expression']) == CParser::PARSE_SUCCESS) {
-					$hosts = array_merge($hosts, $expression_parser->getResult()->getHosts());
-				}
-
-				if ($hosts) {
-					if ($data['context'] === 'template') {
-						$db_templates = API::Template()->get([
-							'output' => ['templateid'],
-							'filter' => ['host' => array_unique($hosts)]
-						]);
-
-						$hostids = array_column($db_templates, 'templateid');
-					}
-					else {
-						$db_hosts = API::Host()->get([
-							'output' => ['hostid'],
-							'filter' => ['host' => array_unique($hosts)]
-						]);
-
-						$hostids = array_column($db_hosts, 'hostid');
-					}
-				}
-			}
-		}
-
-		CTagHelper::addInheritedTags($data['tags'], $data['context'], $hostids, $parent_trigger);
-	}
-
 	// tags
-	if ($data['tags']) {
-		CArrayHelper::sort($data['tags'], ['tag', 'value']);
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
 	}
 	else {
-		$data['tags'] = [['tag' => '', 'value' => '']];
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 
 	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {

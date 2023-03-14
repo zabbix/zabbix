@@ -79,8 +79,8 @@ out:
  ******************************************************************************/
 static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			ret = FAIL, errcode;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1], *sendto = NULL, *subject = NULL,
 				*message = NULL, *error = NULL, *params = NULL, *value = NULL, *debug = NULL;

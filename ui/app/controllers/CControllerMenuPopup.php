@@ -784,6 +784,7 @@ class CControllerMenuPopup extends CController {
 						$menu_data['show_rank_change_symptom'] = array_key_exists('show_rank_change_symptom', $data)
 							? $data['show_rank_change_symptom']
 							: false;
+						$menu_data['csrf_tokens']['acknowledge'] = CCsrfTokenHelper::get('acknowledge');
 					}
 				}
 			}
@@ -868,7 +869,7 @@ class CControllerMenuPopup extends CController {
 			}
 
 			if ($scripts) {
-				$menu_data['csrf_token'] = CCsrfTokenHelper::get('scriptexec');
+				$menu_data['csrf_tokens']['scriptexec'] = CCsrfTokenHelper::get('scriptexec');
 			}
 
 			foreach (array_values($urls) as $url) {

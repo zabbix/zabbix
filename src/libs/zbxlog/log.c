@@ -31,12 +31,16 @@
 static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 #endif
 
-static char		log_filename[MAX_STRING_LEN];
-static int		log_type = LOG_TYPE_UNDEFINED;
-static zbx_mutex_t	log_access = ZBX_MUTEX_NULL;
-int			zbx_log_level = LOG_LEVEL_WARNING;
+#define LOG_COMPONENT_LEN	64
 
-static int		config_log_file_size = -1;	/* max log file size in MB */
+static char			log_filename[MAX_STRING_LEN];
+static int			log_type = LOG_TYPE_UNDEFINED;
+static zbx_mutex_t		log_access = ZBX_MUTEX_NULL;
+int				zbx_log_level = LOG_LEVEL_WARNING;
+
+static ZBX_THREAD_LOCAL char	log_component[LOG_COMPONENT_LEN + 1];
+
+static int			config_log_file_size = -1;	/* max log file size in MB */
 
 static int	get_config_log_file_size(void)
 {
@@ -257,8 +261,8 @@ static void	lock_log(void)
 	sigaddset(&mask, SIGQUIT);
 	sigaddset(&mask, SIGHUP);
 
-	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
-		zbx_error("cannot set sigprocmask to block the user signal");
+	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
+		zbx_error("cannot set signal mask to block the user signal");
 
 	zbx_mutex_lock(log_access);
 }
@@ -267,8 +271,8 @@ static void	unlock_log(void)
 {
 	zbx_mutex_unlock(log_access);
 
-	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-		zbx_error("cannot restore sigprocmask");
+	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+		zbx_error("cannot restore signal mask");
 }
 #else
 static void	lock_log(void)
@@ -414,7 +418,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 			zbx_get_time(&tm, &milliseconds, NULL);
 
 			fprintf(log_file,
-					"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld ",
+					"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld %s",
 					zbx_get_thread_id(),
 					tm.tm_year + 1900,
 					tm.tm_mon + 1,
@@ -422,7 +426,8 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 					tm.tm_hour,
 					tm.tm_min,
 					tm.tm_sec,
-					milliseconds
+					milliseconds,
+					log_component
 					);
 
 			va_start(args, fmt);
@@ -459,7 +464,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		zbx_get_time(&tm, &milliseconds, NULL);
 
 		fprintf(stdout,
-				"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld ",
+				"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld %s",
 				zbx_get_thread_id(),
 				tm.tm_year + 1900,
 				tm.tm_mon + 1,
@@ -467,7 +472,8 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 				tm.tm_hour,
 				tm.tm_min,
 				tm.tm_sec,
-				milliseconds
+				milliseconds,
+				log_component
 				);
 
 		va_start(args, fmt);
@@ -527,20 +533,20 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		switch (level)
 		{
 			case LOG_LEVEL_CRIT:
-				syslog(LOG_CRIT, "%s", message);
+				syslog(LOG_CRIT, "%s%s", log_component, message);
 				break;
 			case LOG_LEVEL_ERR:
-				syslog(LOG_ERR, "%s", message);
+				syslog(LOG_ERR, "%s%s", log_component, message);
 				break;
 			case LOG_LEVEL_WARNING:
-				syslog(LOG_WARNING, "%s", message);
+				syslog(LOG_WARNING, "%s%s", log_component, message);
 				break;
 			case LOG_LEVEL_DEBUG:
 			case LOG_LEVEL_TRACE:
-				syslog(LOG_DEBUG, "%s", message);
+				syslog(LOG_DEBUG, "%s%s", log_component, message);
 				break;
 			case LOG_LEVEL_INFORMATION:
-				syslog(LOG_INFO, "%s", message);
+				syslog(LOG_INFO, "%s%s", log_component, message);
 				break;
 			default:
 				/* LOG_LEVEL_EMPTY - print nothing */
@@ -556,22 +562,22 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		switch (level)
 		{
 			case LOG_LEVEL_CRIT:
-				zbx_error("ERROR: %s", message);
+				zbx_error("ERROR: %s%s", log_component, message);
 				break;
 			case LOG_LEVEL_ERR:
-				zbx_error("Error: %s", message);
+				zbx_error("Error: %s%s", log_component, message);
 				break;
 			case LOG_LEVEL_WARNING:
-				zbx_error("Warning: %s", message);
+				zbx_error("Warning: %s%s", log_component, message);
 				break;
 			case LOG_LEVEL_DEBUG:
-				zbx_error("DEBUG: %s", message);
+				zbx_error("DEBUG: %s%s", log_component, message);
 				break;
 			case LOG_LEVEL_TRACE:
-				zbx_error("TRACE: %s", message);
+				zbx_error("TRACE: %s%s", log_component, message);
 				break;
 			default:
-				zbx_error("%s", message);
+				zbx_error("%s%s", log_component, message);
 				break;
 		}
 
@@ -730,4 +736,9 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 	}
 
 	zbx_free(buf);
+}
+
+void	zbx_set_log_component(const char *component)
+{
+	zbx_snprintf(log_component, sizeof(log_component), "[%s] ", component);
 }

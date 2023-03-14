@@ -347,6 +347,9 @@ svg a {
       transition: left .2s, top .2s; }
   .sortable.sortable-dragging .sortable-item {
     position: absolute; }
+  .sortable.sortable-opacity .sortable-item.sortable-dragging {
+    opacity: 0.6;
+    z-index: 1; }
 
 html,
 body {
@@ -687,6 +690,8 @@ footer {
     line-height: 24px; }
   .form-grid .form-actions button:not(:first-of-type) {
     margin-left: 10px; }
+  .form-grid.form-grid-actions {
+    margin-top: 10px; }
   .form-grid .form-field.offset-1 {
     grid-column-start: 2 !important; }
   .form-grid .form-field.offset-2 {
@@ -2399,7 +2404,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad .overlay-close-btn,
   .msg-good .overlay-close-btn,
   .msg-warning .overlay-close-btn {
-    color: #cacaca; }
+    color: #cacaca;
+    background-color: transparent; }
   .msg-bad .link-action,
   .msg-good .link-action,
   .msg-warning .link-action {
@@ -2416,7 +2422,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad button,
   .msg-good button,
   .msg-warning button {
-    background-color: #000000 !important; }
+    background-color: transparent; }
   .msg-bad::before,
   .msg-good::before,
   .msg-warning::before {
@@ -2450,7 +2456,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad ul {
     border-top-color: #ff3a3a; }
   .msg-bad button {
-    color: #ff3a3a;
+    color: #ffffff;
     border-color: #ff3a3a; }
   .msg-bad::before {
     background-color: #ff3a3a; }
@@ -3436,7 +3442,6 @@ form.is-loading {
     padding-bottom: 0;
     border-bottom: 0;
     box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.1);
-    color: #ffffff;
     height: 22px;
     vertical-align: middle;
     white-space: nowrap; }

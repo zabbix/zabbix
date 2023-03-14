@@ -3,14 +3,14 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 The template for monitoring Switch MikroTik CRS354-48G-4S+2Q+RM.
 
 Best price and best performance on the market – this 48 port switch will rock any setup, including 40 Gbps devices!
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 Refer to the vendor documentation.
 

@@ -1073,6 +1073,8 @@ class CItem extends CItemGeneral {
 		if ($ins_items) {
 			self::createForce($ins_items);
 		}
+
+		self::inherit(array_merge($upd_items, $ins_items), $upd_db_items);
 	}
 
 	/**
@@ -1238,7 +1240,9 @@ class CItem extends CItemGeneral {
 		$parent_indexes = [];
 
 		foreach ($items as $i => &$item) {
+			$item['uuid'] = '';
 			$item = self::unsetNestedObjectIds($item);
+
 			$parent_indexes[$item['hostid']][$item['key_']] = $i;
 		}
 		unset($item);
@@ -1315,9 +1319,11 @@ class CItem extends CItemGeneral {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$result = DBselect(
-			'SELECT ii.itemid,ii.name,ii.templateid,ii.valuemapid'.
-			' FROM items i,items ii'.
+			'SELECT ii.itemid,ii.name,ii.type,ii.key_,ii.value_type,ii.templateid,ii.uuid,ii.valuemapid,ii.hostid,'.
+				'h.status AS host_status'.
+			' FROM items i,items ii,hosts h'.
 			' WHERE i.itemid=ii.templateid'.
+				' AND ii.hostid=h.hostid'.
 				' AND '.dbConditionId('i.hostid', $templateids).
 				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL]).
 				' AND '.dbConditionInt('i.type', self::SUPPORTED_ITEM_TYPES).
@@ -1326,23 +1332,44 @@ class CItem extends CItemGeneral {
 
 		$items = [];
 		$db_items = [];
+		$i = 0;
+		$tpl_itemids = [];
 
 		while ($row = DBfetch($result)) {
 			$item = [
 				'itemid' => $row['itemid'],
+				'type' => $row['type'],
 				'templateid' => 0
 			];
 
-			if ($row['valuemapid'] != 0) {
-				$item['valuemapid'] = 0;
+			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+				$item += ['uuid' => generateUuidV4()];
 			}
 
-			$items[] = $item;
+			if ($row['valuemapid'] != 0) {
+				$item += ['valuemapid' => 0];
+
+				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+					$tpl_itemids[$i] = $row['itemid'];
+					$item += array_intersect_key($row,
+						array_flip(['key_', 'hostid', 'host_status', 'value_type'])
+					);
+				}
+			}
+
+			$items[$i++] = $item;
 			$db_items[$row['itemid']] = $row;
 		}
 
 		if ($items) {
 			self::updateForce($items, $db_items);
+
+			if ($tpl_itemids) {
+				$items = array_intersect_key($items, $tpl_itemids);
+				$db_items = array_intersect_key($db_items, array_flip($tpl_itemids));
+
+				self::inherit($items, $db_items);
+			}
 		}
 	}
 

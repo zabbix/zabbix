@@ -72,8 +72,8 @@ static int	DBpatch_3030006(void)
 
 static int	DBpatch_3030007(void)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	zbx_vector_uint64_t	dserviceids;
 	zbx_uint64_t		dserviceid;
 	int			ret = SUCCEED;
@@ -225,8 +225,8 @@ static void	DBpatch_3030018_add_numeric_preproc_steps(zbx_db_insert_t *db_insert
 
 static int	DBpatch_3030018(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	unsigned char	value_type, data_type, delta;
 	zbx_db_insert_t	db_insert;
 	zbx_uint64_t	itemid;
@@ -348,8 +348,8 @@ static int	DBpatch_3030029(void)
 static int	DBpatch_3030030(void)
 {
 	int		ret = SUCCEED, upd_num;
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset;
 	zbx_uint64_t	last_r_eventid = 0, r_eventid;
@@ -573,8 +573,8 @@ static int	DBpatch_3030045(void)
 
 static int	DBpatch_3030046(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	int		ret = FAIL;
 	zbx_uint64_t	shapeid = 0;
 
@@ -647,8 +647,8 @@ static int	DBpatch_3030052(void)
 
 static int	DBpatch_3030053(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_db_insert_t	db_insert;
 	zbx_uint64_t	selementid, triggerid;
 	int		ret = FAIL;
@@ -859,8 +859,8 @@ skip:
 static int	DBpatch_3030060_migrate_pairs(const char *table, const char *field, int type, char separator,
 		int unique, int allow_empty)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_db_insert_t	db_insert;
 	zbx_uint64_t	parentid;
 	char		*target, *target_id, *source_id;
@@ -1055,8 +1055,8 @@ DBpatch_field_conv_t;
 static int	DBpatch_table_convert(const char *table, const char *recid, const DBpatch_field_conv_t *field_convs)
 {
 	const DBpatch_field_conv_t	*fc;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	const char			*suffix;
@@ -1248,8 +1248,8 @@ static int	DBpatch_3030092(void)
 
 static int	DBpatch_3030093(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	const char	*delay_flex, *next, *suffix;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -1370,8 +1370,8 @@ static int	DBpatch_3030101(void)
 
 static int	DBpatch_3030102(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 	const char	*suffix;
@@ -1706,8 +1706,8 @@ static int	DBpatch_3030137(void)
 static int	DBpatch_trailing_semicolon_remove(const char *table, const char *recid, const char *field,
 		const char *condition)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	const char	*semicolon;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -2290,8 +2290,8 @@ static int	DBpatch_3030197(void)
 {
 	if (SUCCEED == zbx_db_table_exists("widget_tmp"))
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
 		int		ret = FAIL;
 
 		result = zbx_db_select("select widgetid,x,y,width,height from widget_tmp");

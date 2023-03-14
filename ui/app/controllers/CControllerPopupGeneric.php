@@ -562,9 +562,10 @@ class CControllerPopupGeneric extends CController {
 			'with_monitored_triggers' =>			'in 1',
 			'with_monitored_items' =>				'in 1',
 			'with_httptests' => 					'in 1',
+			'with_inherited' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
-			'context' =>							'string|in host,template',
+			'context' =>							'string|in host,template,audit',
 			'enabled_only' =>						'in 1',
 			'disable_names' =>						'array',
 			'numeric' =>							'in 1',
@@ -1263,6 +1264,11 @@ class CControllerPopupGeneric extends CController {
 				];
 
 				$records = API::User()->get($options);
+
+				if ($this->hasInput('context')) {
+					$records[0] = ['userid' => 0, 'username' => 'System', 'name' => '', 'surname' => ''];
+				}
+
 				CArrayHelper::sort($records, ['username']);
 				break;
 
@@ -1640,7 +1646,8 @@ class CControllerPopupGeneric extends CController {
 				 * Show list of value maps with unique names for defined hosts or templates.
 				 *
 				 * hostids           (required) Array of host or template ids to get value maps from.
-				 * context           (required) Define context for inherited value maps: host, template.
+				 * context           (required) Define context for inherited value maps: host, template
+				 * with_inherited    Include value maps from inherited templates.
 				 */
 				$records = [];
 				$hostids = $this->getInput('hostids', []);
@@ -1650,8 +1657,8 @@ class CControllerPopupGeneric extends CController {
 					break;
 				}
 
-				if ($context === 'host') {
-					addParentTemplateIds($hostids);
+				if ($this->hasInput('with_inherited')) {
+					$hostids = CTemplateHelper::getParentTemplatesRecursive($hostids, $context);
 				}
 
 				$records = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([

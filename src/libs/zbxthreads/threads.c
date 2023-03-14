@@ -70,12 +70,12 @@ void	zbx_child_fork(pid_t *pid)
 	sigaddset(&mask, SIGQUIT);
 	sigaddset(&mask, SIGCHLD);
 
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
 	/* set process id instead of returning, this is to avoid race condition when signal arrives before return */
 	*pid = zbx_fork();
 
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 
 	/* ignore SIGCHLD to avoid problems with exiting scripts in zbx_execute() and other cases */
 	if (0 == *pid)
@@ -237,7 +237,7 @@ void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 	sigemptyset(&set);
 	sigaddset(&set, SIGCHLD);
-	sigprocmask(SIG_BLOCK, &set, NULL);
+	zbx_sigmask(SIG_BLOCK, &set, NULL);
 
 	/* signal all threads to go into idle state and wait for threads with higher priority to exit */
 	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ret);

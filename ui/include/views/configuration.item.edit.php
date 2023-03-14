@@ -54,21 +54,11 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if (array_key_exists('parent_item', $data)) {
-	if ($data['parent_item']['editable']) {
-		$parent_template_name = new CLink(CHtml::encode($data['parent_item']['template_name']),
-			(new CUrl('items.php'))
-				->setArgument('form', 'update')
-				->setArgument('itemid', $data['item']['templateid'])
-				->setArgument('context', 'template')
-		);
-	}
-	else {
-		$parent_template_name = (new CSpan(CHtml::encode($data['parent_item']['template_name'])))
-			->addClass(ZBX_STYLE_GREY);
-	}
-
-	$item_tab->addItem([new CLabel(_('Parent item')), new CFormField($parent_template_name)]);
+if (!empty($data['templates'])) {
+	$item_tab->addItem([
+		new CLabel(_('Parent items')),
+		new CFormField($data['templates'])
+	]);
 }
 
 $discovered_item = (array_key_exists('item', $data) && $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
@@ -486,7 +476,7 @@ $item_tab
 		(new CFormField((new CTextBox('http_proxy', $data['http_proxy'], $readonly,
 				DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->setAttribute('placeholder', _('[protocol://][user[:password]@]proxy.example.com[:port]'))
 			->disableAutocomplete()
 		))->setId('js-item-http-proxy-field')
 	])
@@ -1015,7 +1005,7 @@ if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA) && $data['item
 				->setArgument('action', 'latest.view')
 				->setArgument('hostids[]', $data['hostid'])
 				->setArgument('name', $data['name'])
-				->setArgument('filter_name', '')
+				->setArgument('filter_set', '1')
 		))->setTarget('_blank')))
 	);
 }
@@ -1028,7 +1018,6 @@ $item_tabs = (new CTabView())
 			'source' => 'item',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
-			'context' => $data['context'],
 			'readonly' => $discovered_item,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab'
@@ -1118,7 +1107,8 @@ $html_page->show();
 		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
-		'interface_types' => itemTypeInterface()
+		'interface_types' => itemTypeInterface(),
+		'discovered_item' => $discovered_item
 	]).');
 '))->show();
 
