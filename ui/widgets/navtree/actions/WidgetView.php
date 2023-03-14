@@ -36,6 +36,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->addValidationRules([
 			'name' => 'string',
+			'widgetid' => 'db widget.widgetid',
 			'fields' => 'array'
 		]);
 	}
