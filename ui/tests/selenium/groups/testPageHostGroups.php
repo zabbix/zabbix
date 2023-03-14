@@ -43,7 +43,7 @@ class testPageHostGroups extends CWebTest {
 		return ['class' => CMessageBehavior::class];
 	}
 
-	public $link = 'hostgroups.php';
+	const LINK = 'hostgroups.php';
 	const GROUP_DISABLED = 'Group with two disabled hosts testPageHostGroups';
 	const HOST1 = 'One disabled host testPageHostGroups';
 	const HOST2 = 'Two disabled host testPageHostGroups';
@@ -68,15 +68,11 @@ class testPageHostGroups extends CWebTest {
 	const DELETE_GROUP3 = 'Group 3 for Delete test';
 
 	/**
-	 * SQL query to get groups to compare hash values.
+	 * SQL query to get groups and hosts to compare hash values.
 	 */
-	private $groups_sql = 'SELECT * FROM hstgrp g INNER JOIN hosts_groups hg ON g.groupid=hg.groupid'.
+	const GROUPS_SQL = 'SELECT * FROM hstgrp g INNER JOIN hosts_groups hg ON g.groupid=hg.groupid'.
 			' ORDER BY g.groupid, hg.hostgroupid';
-
-	/**
-	 * SQL query to get hosts to compare hash values.
-	 */
-	private $hosts_sql = 'SELECT * FROM hosts ORDER BY hostid';
+	const HOSTS_SQL = 'SELECT * FROM hosts ORDER BY hostid';
 
 	/**
 	 * Prepare data for enable/disable hosts test.
@@ -218,7 +214,7 @@ class testPageHostGroups extends CWebTest {
 	 * @dataProvider getLayoutData
 	 */
 	public function testPageHostGroups_Layout($data) {
-		$this->page->login()->open($this->link)->waitUntilReady();
+		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$this->page->assertHeader('Host groups');
 		$this->page->assertTitle('Configuration of host groups');
 
@@ -232,7 +228,7 @@ class testPageHostGroups extends CWebTest {
 		foreach ([false, true] as $state) {
 			$filter->expand($state);
 			$this->page->open('zabbix.php?action=report.status')->waitUntilReady();
-			$this->page->open($this->link)->waitUntilReady();
+			$this->page->open(self::LINK)->waitUntilReady();
 			$filter->checkIfExpanded($state);
 		}
 
@@ -307,7 +303,7 @@ class testPageHostGroups extends CWebTest {
 	 * @dataProvider getLinksData
 	 */
 	public function testPageHostGroups_Links($data) {
-		$this->page->login()->open($this->link)->waitUntilReady();
+		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$table = $this->getTable();
 		$row = $table->findRow('Name', array_key_exists('lld', $data) ? $data['lld'].': '.$data['name'] : $data['name']);
 
@@ -331,7 +327,7 @@ class testPageHostGroups extends CWebTest {
 					->checkValue(['Template name' => $data['template']]);
 			$this->query('button:Cancel')->one()->click();
 			$this->assertStringContainsString('templates.php', $this->page->getCurrentUrl());
-			$this->page->open($this->link)->waitUntilReady();
+			$this->page->open(self::LINK)->waitUntilReady();
 		}
 
 		// Check link to hosts or templates page with selected group in filer.
@@ -348,7 +344,7 @@ class testPageHostGroups extends CWebTest {
 			$filter_form = CFilterContainerElement::find()->one()->getFilterForm();
 			$filter_form->checkValue(['Host groups' => $data['name']]);
 			$this->assertTableStats($count);
-			$this->page->open($this->link)->waitUntilReady();
+			$this->page->open(self::LINK)->waitUntilReady();
 		}
 
 		// Check link to host prototype from host group name.
@@ -360,7 +356,7 @@ class testPageHostGroups extends CWebTest {
 					->checkValue(['Host name' => self::HOST_PROTOTYPE]);
 			$this->query('button:Cancel')->one()->click();
 			$this->assertStringContainsString('host_prototypes.php?cancel=1&parent_discoveryid=', $this->page->getCurrentUrl());
-			$this->page->open($this->link)->waitUntilReady();
+			$this->page->open(self::LINK)->waitUntilReady();
 		}
 	}
 
@@ -388,7 +384,7 @@ class testPageHostGroups extends CWebTest {
 	 * Check ascending and descending groups sorting by column Name.
 	 */
 	public function testPageHostGroups_Sort() {
-		$this->page->login()->open($this->link)->waitUntilReady();
+		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$table = $this->getTable();
 
 		foreach (['desc', 'asc'] as $sorting) {
@@ -417,7 +413,7 @@ class testPageHostGroups extends CWebTest {
 			[
 				[
 					'Name' => 'Group with template testPageHostGroups',
-					'expected' => 'Group with template testPageHostGroups'
+					'expected' => ['Group with template testPageHostGroups']
 				]
 			],
 			// Partial match.
@@ -481,7 +477,7 @@ class testPageHostGroups extends CWebTest {
 			$data['expected'] = $all;
 		}
 
-		$this->page->login()->open($this->link)->waitUntilReady();
+		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$table = $this->getTable();
 		$form = CFilterContainerElement::find()->one()->getFilterForm();
 		$form->fill(['Name' => $data['Name']]);
@@ -536,9 +532,9 @@ class testPageHostGroups extends CWebTest {
 				'all' => true
 			]
 		];
-		$old_grpups_hash = CDBHelper::getHash($this->groups_sql);
-		$old_hosts_hash = CDBHelper::getHash($this->hosts_sql);
-		$this->page->login()->open($this->link)->waitUntilReady();
+		$old_grpups_hash = CDBHelper::getHash(self::GROUPS_SQL);
+		$old_hosts_hash = CDBHelper::getHash(self::HOSTS_SQL);
+		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$table = $this->getTable();
 
 		foreach ($rows as $row) {
@@ -557,8 +553,8 @@ class testPageHostGroups extends CWebTest {
 			$this->assertSelectedCount($row['count']);
 		}
 
-		$this->assertEquals($old_grpups_hash, CDBHelper::getHash($this->groups_sql));
-		$this->assertEquals($old_hosts_hash, CDBHelper::getHash($this->hosts_sql));
+		$this->assertEquals($old_grpups_hash, CDBHelper::getHash(self::GROUPS_SQL));
+		$this->assertEquals($old_hosts_hash, CDBHelper::getHash(self::HOSTS_SQL));
 	}
 
 	/**
@@ -572,7 +568,7 @@ class testPageHostGroups extends CWebTest {
 			'host' => self::HOST2,
 			'template' => self::TEMPLATE
 		];
-		$this->page->login()->open($this->link)->waitUntilReady();
+		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$table = $this->getTable();
 		$hosts = $table->findRow('Name', $data['group'])->getColumn('Members');
 
@@ -665,7 +661,7 @@ class testPageHostGroups extends CWebTest {
 	 * @param string $status	enable or disable hosts
 	 */
 	private function checkHostStatusChange($data, $status = 'enable') {
-		$this->page->login()->open($this->link)->waitUntilReady();
+		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$table = $this->getTable();
 		$this->selectTableRows(array_keys($data));
 		$this->assertSelectedCount(count($data));
@@ -798,7 +794,7 @@ class testPageHostGroups extends CWebTest {
 	 */
 	public function testPageHostGroups_Delete($data) {
 		if ($data['expected'] === TEST_BAD) {
-			$old_hash = CDBHelper::getHash($this->groups_sql);
+			$old_hash = CDBHelper::getHash(self::GROUPS_SQL);
 		}
 
 		if (!is_array(CTestArrayHelper::get($data, 'groups', []))){
@@ -808,7 +804,7 @@ class testPageHostGroups extends CWebTest {
 		$all = $this->getGroupNames();
 		$count = count(CTestArrayHelper::get($data, 'groups', $all));
 
-		$this->page->login()->open($this->link)->waitUntilReady();
+		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$table = $this->getTable();
 		$this->selectTableRows(CTestArrayHelper::get($data, 'groups'));
 		$this->query('button:Delete')->one()->click();
@@ -826,7 +822,7 @@ class testPageHostGroups extends CWebTest {
 		else {
 			$this->assertSelectedCount($count);
 			$this->assertMessage(TEST_BAD, 'Cannot delete group'.(($count > 1) ? 's' : ''), $data['error']);
-			$this->assertEquals($old_hash, CDBHelper::getHash($this->groups_sql));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::GROUPS_SQL));
 
 			// Reset selected groups.
 			$this->query('button:Reset')->one()->click();
