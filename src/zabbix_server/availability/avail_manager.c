@@ -268,8 +268,8 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache, unsigne
 	}
 	else
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
 
 		result = zbx_db_select("select hostid from hosts");
 

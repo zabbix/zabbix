@@ -428,8 +428,8 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 static zbx_trend_state_t	trends_eval(const char *table, zbx_uint64_t itemid, int start, int end,
 		const char *eval_single, const char *eval_multi, double *value)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_trend_state_t	state;
@@ -486,8 +486,8 @@ static zbx_trend_state_t	trends_eval(const char *table, zbx_uint64_t itemid, int
 static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, int end,
 		double *value)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_trend_state_t	state;
@@ -545,8 +545,8 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
 static zbx_trend_state_t	trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int end,
 		double *value)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 	double		sum = 0;
