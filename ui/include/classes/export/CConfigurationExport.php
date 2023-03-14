@@ -598,7 +598,7 @@ class CConfigurationExport {
 
 		$discovery_rules = $this->prepareDiscoveryRules($discovery_rules);
 
-		// Discovery rules may use dependent items as web items.
+		// Discovery rules may use web items as master items.
 		foreach ($discovery_rules as $discovery_rule) {
 			if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
 				$master_itemid = $discovery_rule['master_itemid'];
