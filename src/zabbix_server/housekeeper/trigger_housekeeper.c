@@ -48,8 +48,8 @@ static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 
 static int	housekeep_problems_without_triggers(void)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_uint64_t	ids;
 	int			deleted = 0;
 

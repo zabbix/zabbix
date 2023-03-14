@@ -261,8 +261,8 @@ static void	lock_log(void)
 	sigaddset(&mask, SIGQUIT);
 	sigaddset(&mask, SIGHUP);
 
-	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
-		zbx_error("cannot set sigprocmask to block the user signal");
+	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
+		zbx_error("cannot set signal mask to block the user signal");
 
 	zbx_mutex_lock(log_access);
 }
@@ -271,8 +271,8 @@ static void	unlock_log(void)
 {
 	zbx_mutex_unlock(log_access);
 
-	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-		zbx_error("cannot restore sigprocmask");
+	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+		zbx_error("cannot restore signal mask");
 }
 #else
 static void	lock_log(void)

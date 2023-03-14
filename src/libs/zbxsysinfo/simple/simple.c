@@ -202,6 +202,17 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 		goto clean;
 	}
 
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROTOCOLS,
+			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set cURL option [%d]: %s",
+				__func__, (int)opt, curl_easy_strerror(err));
+		goto clean;
+	}
+#endif
+
 	if (NULL != CONFIG_SOURCE_IP)
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))

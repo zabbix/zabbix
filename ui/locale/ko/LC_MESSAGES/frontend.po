@@ -413,6 +413,10 @@ msgstr ""
 msgid "ADD OVERRIDE"
 msgstr "오버라이드 추가"
 
+#: tests/selenium/modules/clock32/Widget.php:46
+msgid "ALARM CLOCK"
+msgstr ""
+
 #: app/views/administration.user.list.php:115
 msgid "API access"
 msgstr "API 액세스"

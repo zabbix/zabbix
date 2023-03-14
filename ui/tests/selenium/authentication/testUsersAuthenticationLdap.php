@@ -388,15 +388,19 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'expected' => TEST_GOOD,
 					'servers_settings' => [
 						'Host' => PHPUNIT_LDAP_HOST,
-						'Base DN' => 'DC=zbx,DC=local',
-						'Search attribute' => 'sAMAccountName',
-						'Bind DN' => 'CN=Admin,OU=Users,OU=Zabbix,DC=zbx,DC=local',
+						'Base DN' => 'dc=zbx,dc=local',
+						'Search attribute' => 'uid',
+						'Bind DN' => 'cn=admin,dc=zbx,dc=local',
 						'Bind password' => PHPUNIT_LDAP_BIND_PASSWORD,
 						'Configure JIT provisioning' => true,
-						'Group configuration' => 'memberOf',
-						'Group name attribute' => 'CN',
-						'User group membership attribute' => 'memberof',
-						'User name attribute' => 'mail'
+						'Group configuration' => 'groupOfNames',
+						'Group base DN' => 'ou=Groups,ou=Zabbix,dc=zbx,dc=local',
+						'Group name attribute' => 'cn',
+						'Group member attribute' => 'memberUid',
+						'Reference attribute' => '%{ref}',
+						'Group filter' => '(%{groupattr}=%{user})',
+						'User name attribute' => 'uid',
+						'User last name attribute' => 'sn'
 					],
 					'User group mapping' => [
 						[
@@ -412,9 +416,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'Media type mapping' => [
 						[
-							'Name' => 'Email',
-							'Media type' => 'Email',
-							'Attribute' => 'mail'
+							'Name' => 'mail',
+							'Media type' => 'SMS',
+							'Attribute' => 'mobile'
 						]
 					],
 					'test_settings' => [
@@ -424,7 +428,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'check_provisioning' => [
 						'role' => 'Super admin role',
 						'groups' => 'Zabbix administratorsGuests',
-						'medias' => 'Email'
+						'medias' => 'mail'
 					]
 				]
 			]
@@ -459,8 +463,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 		// Fill login and user password in Test authentication form.
 		if (array_key_exists('test_settings', $data)) {
-			$test_form = $test_form_dialog->asForm();
-			$test_form->fill($data['test_settings'])->submit()->waitUntilReady();
+			$test_form_dialog->asForm()->fill($data['test_settings'])->submit();
+			$test_form_dialog->waitUntilReady();
 		}
 
 		// Check error messages testing LDAP settings.
@@ -473,7 +477,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 		if (array_key_exists('check_provisioning', $data)) {
 			foreach ($data['check_provisioning'] as $id => $text) {
-				$this->assertEquals($text, $test_form_dialog->query('id:provisioning_'.$id)->waitUntilVisible()->one()->getText());
+				$this->assertEquals($text, $test_form_dialog->query('id:provisioning_'.$id)->waitUntilVisible()
+						->one()->getText()
+				);
 			}
 		}
 

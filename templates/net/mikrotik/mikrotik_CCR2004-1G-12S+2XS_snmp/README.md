@@ -3,14 +3,14 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 The template for monitoring Ethernet router MikroTik CCR2004-1G-12S+2XS.
 
 The Connectivity Router - your best companion when it comes to SFP, SFP+ and SFP28 management! 1, 10 and 25 Gbps ports in a single device to make your life easier.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 Refer to the vendor documentation.
 
