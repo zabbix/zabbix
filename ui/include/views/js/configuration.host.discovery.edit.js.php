@@ -105,7 +105,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				.dynamicRows({
 					template: '#condition-row',
 					counter: counter,
-					allow_empty: true
+					allow_empty: true,
 					dataCallback: (data) => {
 						data.formulaId = num2letter(data.rowNum);
 
