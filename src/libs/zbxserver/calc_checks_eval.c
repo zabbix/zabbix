@@ -405,8 +405,8 @@ zbx_expression_eval_many_t;
 static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zbx_expression_query_t *query,
 		const zbx_vector_str_t *groups, const char *filter_template, zbx_vector_uint64_pair_t *itemhosts)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*sql = NULL, *esc, *clause = "where";
 	size_t		sql_alloc = 0, sql_offset = 0;
 	AGENT_REQUEST	pattern;

@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 Template for monitoring TrueNAS by SNMP
 
 This template was tested on:
@@ -12,7 +12,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 1. Import template into Zabbix
 2. Enable SNMP daemon at Services in TrueNAS web interface https://www.truenas.com/docs/core/services/snmp
