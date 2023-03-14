@@ -409,19 +409,20 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	}				\
 }
 
-#define SET_FLAG_UINT64(r, i, f)			\
-							\
-{							\
-	if (SUCCEED == zbx_db_is_null(r))		\
-		uint64_orig = 0;			\
-	else						\
-		ZBX_STR2UINT64(uint64_orig, (r));	\
-	if (uint64_orig != (i))				\
-	{						\
-		item->upd_flags |= f;			\
-		i##_orig = uint64_orig;			\
-	}						\
-}
+#define SET_FLAG_UINT64(r, i, f)				\
+	do							\
+	{							\
+		if (SUCCEED == zbx_db_is_null(r))		\
+			uint64_orig = 0;			\
+		else						\
+			ZBX_STR2UINT64(uint64_orig, (r));	\
+		if (uint64_orig != (i))				\
+		{						\
+			item->upd_flags |= f;			\
+			i##_orig = uint64_orig;			\
+		}						\
+	}							\
+	while(0)
 			item->key = NULL;
 			ZBX_STR2UINT64(item->itemid, row[26]);
 
