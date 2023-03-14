@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.4'
+  version: '7.0'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -17,10 +17,10 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Applications
@@ -981,7 +981,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
             -
               name: 'total item'
@@ -997,7 +996,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: NOT_LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
         -
           uuid: 8dcd7c95a9364efdb2fe64c651360ad4
@@ -1453,7 +1451,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
             -
               name: 'total item'
@@ -1469,7 +1466,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: NOT_LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
         -
           uuid: d015cafd6e9f4707bb78125ff17cc679

@@ -19,14 +19,14 @@
 
 #include "pp_worker.h"
 #include "pp_task.h"
-#include "pp_cache.h"
 #include "pp_queue.h"
 #include "pp_execute.h"
-#include "pp_error.h"
 
 #include "zbxcommon.h"
 #include "log.h"
 #include "zbxself.h"
+#include "zbxpreproc.h"
+#include "zbxalgo.h"
 
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
@@ -176,19 +176,19 @@ static void	*pp_worker_entry(void *arg)
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
 
-	return (void *)0;
+	return NULL;
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize and start preprocessing worker                         *
  *                                                                            *
- * Parameters: worker     - [IN] the preprocessing worker                     *
- *             id         - [IN] the worker id (index)                        *
- *             queue      - [IN] the task queue                               *
- *             timekeeper - [IN] the timekeeper object for busy/idle          *
- *                               worker state reporting                       *
- *             error      - [OUT] the error message                           *
+ * Parameters: worker     - [IN] preprocessing worker                         *
+ *             id         - [IN] worker id (index)                            *
+ *             queue      - [IN] task queue                                   *
+ *             timekeeper - [IN] timekeeper object for busy/idle worker       *
+ *                               state reporting                              *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - the worker was initialized and started             *
  *               FAIL    - otherwise                                          *

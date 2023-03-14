@@ -53,8 +53,8 @@ static int	DBpatch_6010001(void)
 
 static int	DBpatch_6010002(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 	char		*sql = NULL, *descripton_esc;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -107,8 +107,8 @@ static int	DBpatch_6010004(void)
 
 static int	DBpatch_6010005(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -206,8 +206,8 @@ static int	DBpatch_6010012(void)
 static int	DBpatch_6010013(void)
 {
 	int		rc = ZBX_DB_OK;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	if (NULL == (result = zbx_db_select("select ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,"
 			"ldap_bind_password,ldap_search_attribute"
@@ -306,8 +306,8 @@ static int	DBpatch_6010022(void)
 
 static int	DBpatch_6010023(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	hostid;
 	zbx_db_insert_t	insert;
 	int		ret;
@@ -342,8 +342,8 @@ static int	DBpatch_6010023(void)
 
 static int	DBpatch_6010024(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	int		ret = SUCCEED;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
@@ -409,8 +409,8 @@ static int	DBpatch_6010024(void)
 
 static int	DBpatch_6010025(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	int		ret = SUCCEED;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
@@ -615,8 +615,8 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 	zbx_uint64_t		groupid;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_db_insert_t		db_insert;
 
 	for (i = 0; i < hstgrps->values_num; i++)
@@ -710,8 +710,8 @@ static int	DBpatch_6010033_split_groups(void)
 {
 	int			i, ret = FAIL;
 	zbx_uint64_t		groupid;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_hstgrp_t	hstgrps;
 	zbx_vector_uint64_t	host_groupids, template_groupids;
 

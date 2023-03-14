@@ -110,7 +110,7 @@ static void	zbx_ha_node_free(zbx_ha_node_t *node)
 }
 
 static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
-static DB_RESULT	ha_db_select(zbx_ha_info_t *info, const char *sql, ...) __zbx_attr_format_printf(2, 3);
+static zbx_db_result_t	ha_db_select(zbx_ha_info_t *info, const char *sql, ...) __zbx_attr_format_printf(2, 3);
 static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...) __zbx_attr_format_printf(2, 3);
 
 /******************************************************************************
@@ -342,10 +342,10 @@ static int	ha_db_commit(zbx_ha_info_t *info)
  *          connection status                                                 *
  *                                                                            *
  ******************************************************************************/
-static DB_RESULT	ha_db_select(zbx_ha_info_t *info, const char *sql, ...)
+static zbx_db_result_t	ha_db_select(zbx_ha_info_t *info, const char *sql, ...)
 {
 	va_list		args;
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 
 	if (ZBX_DB_OK > info->db_status)
 		return NULL;
@@ -394,8 +394,8 @@ static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...)
  ******************************************************************************/
 static int	ha_db_update_config(zbx_ha_info_t *info)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	if (NULL == (result = ha_db_select(info, "select ha_failover_delay,auditlog_enabled from config")))
 		return FAIL;
@@ -425,8 +425,8 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
  ******************************************************************************/
 static int	ha_db_get_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int lock)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	if (NULL == (result = ha_db_select(info, "select ha_nodeid,name,status,lastaccess,address,port,ha_sessionid"
 			" from ha_node order by ha_nodeid%s",
@@ -519,7 +519,7 @@ static void	ha_get_external_address(char **address, unsigned short *port, zbx_ha
  ******************************************************************************/
 static int	ha_db_lock_nodes(zbx_ha_info_t *info)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 
 	if (NULL == (result = ha_db_select(info, "select null from ha_node order by ha_nodeid" ZBX_FOR_UPDATE)))
 		return FAIL;
@@ -635,8 +635,8 @@ static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *no
  ******************************************************************************/
 static int	ha_db_get_time(zbx_ha_info_t *info, int *db_time)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1384,8 +1384,8 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 	const char	*error = NULL;
 	zbx_uint32_t	len = 0, error_len;
 	unsigned char	*data;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
