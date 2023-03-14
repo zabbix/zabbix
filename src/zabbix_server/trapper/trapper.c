@@ -1279,9 +1279,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
-
 #ifdef HAVE_NETSNMP
 	zbx_ipc_async_socket_t	rtc;
+	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 #endif
 
 	zbx_get_program_type_cb = trapper_args_in->zbx_get_program_type_cb_arg;
@@ -1302,7 +1302,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 #ifdef HAVE_NETSNMP
-	zbx_rtc_subscribe(process_type, process_num, trapper_args_in->config_comms->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs),
+			trapper_args_in->config_comms->config_timeout, &rtc);
 #endif
 
 	while (ZBX_IS_RUNNING())
