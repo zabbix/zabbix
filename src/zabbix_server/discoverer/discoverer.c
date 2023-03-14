@@ -49,7 +49,9 @@ typedef struct
 	int					now;
 	zbx_uint64_t				unique_dcheckid;
 }
-zbx_discovery_results_t;
+zbx_discoverer_results_t;
+
+ZBX_PTR_VECTOR_DECL(discoverer_results_ptr, zbx_discoverer_results_t*)
 
 typedef struct
 {
@@ -97,7 +99,11 @@ typedef struct
 }
 zbx_discoverer_manager_t;
 
+ZBX_PTR_VECTOR_DECL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
+
 ZBX_PTR_VECTOR_IMPL(discoverer_services_ptr, zbx_dservice_t*)
+ZBX_PTR_VECTOR_IMPL(discoverer_results_ptr, zbx_discoverer_results_t*)
+ZBX_PTR_VECTOR_IMPL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
 ZBX_VECTOR_IMPL(discoverer_job_refs, zbx_discoverer_job_ref_t)
 
 extern unsigned char			program_type;
@@ -130,7 +136,7 @@ static int	discoverer_check_count_compare(const void *d1, const void *d2)
 
 static zbx_hash_t	discoverer_result_hash(const void *data)
 {
-	const zbx_discovery_results_t	*result = (const zbx_discovery_results_t *)data;
+	const zbx_discoverer_results_t	*result = (const zbx_discoverer_results_t *)data;
 	zbx_hash_t			hash;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&result->druleid);
@@ -141,8 +147,8 @@ static zbx_hash_t	discoverer_result_hash(const void *data)
 
 static int	discoverer_result_compare(const void *d1, const void *d2)
 {
-	const zbx_discovery_results_t	*r1 = (const zbx_discovery_results_t *)d1;
-	const zbx_discovery_results_t	*r2 = (const zbx_discovery_results_t *)d2;
+	const zbx_discoverer_results_t	*r1 = (const zbx_discoverer_results_t *)d1;
+	const zbx_discoverer_results_t	*r2 = (const zbx_discoverer_results_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(r1->druleid, r2->druleid);
 
@@ -151,8 +157,8 @@ static int	discoverer_result_compare(const void *d1, const void *d2)
 
 static int	discoverer_results_compare(const void *d1, const void *d2)
 {
-	const zbx_discovery_results_t	*r1 = *((const zbx_discovery_results_t * const *)d1);
-	const zbx_discovery_results_t	*r2 = *((const zbx_discovery_results_t * const *)d2);
+	const zbx_discoverer_results_t	*r1 = *((const zbx_discoverer_results_t * const *)d1);
+	const zbx_discoverer_results_t	*r2 = *((const zbx_discoverer_results_t * const *)d2);
 
 	ZBX_RETURN_IF_NOT_EQUAL(r1->druleid, r2->druleid);
 
@@ -443,7 +449,7 @@ static void	service_free(zbx_dservice_t *service)
 	zbx_free(service);
 }
 
-static void	results_clear(zbx_discovery_results_t *result)
+static void	results_clear(zbx_discoverer_results_t *result)
 {
 	zbx_free(result->ip);
 	zbx_free(result->dnsname);
@@ -451,7 +457,7 @@ static void	results_clear(zbx_discovery_results_t *result)
 	zbx_vector_discoverer_services_ptr_destroy(&result->services);
 }
 
-static void	results_free(zbx_discovery_results_t *result)
+static void	results_free(zbx_discoverer_results_t *result)
 {
 	results_clear(result);
 	zbx_free(result);
@@ -844,17 +850,17 @@ out:
 
 static int	process_results(zbx_discoverer_manager_t *manager)
 {
-	int			i, result_count = 0;
-	zbx_vector_ptr_t	results;
-	zbx_discovery_results_t	*result, *result_tmp;
-	zbx_hashset_iter_t	iter;
+	int					i, result_count = 0;
+	zbx_vector_discoverer_results_ptr_t	results;
+	zbx_discoverer_results_t		*result, *result_tmp;
+	zbx_hashset_iter_t			iter;
 
-	zbx_vector_ptr_create(&results);
+	zbx_vector_discoverer_results_ptr_create(&results);
 
 	pthread_mutex_lock(&manager->results_lock);
 	zbx_hashset_iter_reset(&manager->results, &iter);
 
-	while (NULL != (result = (zbx_discovery_results_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (result = (zbx_discoverer_results_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_discoverer_check_count_t	*check_count, cmp;
 
@@ -871,9 +877,9 @@ static int	process_results(zbx_discoverer_manager_t *manager)
 				continue;
 		}
 
-		result_tmp = (zbx_discovery_results_t*)zbx_malloc(NULL, sizeof(zbx_discovery_results_t));
-		memcpy(result_tmp, result, sizeof(zbx_discovery_results_t));
-		zbx_vector_ptr_append(&results, result_tmp);
+		result_tmp = (zbx_discoverer_results_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_results_t));
+		memcpy(result_tmp, result, sizeof(zbx_discoverer_results_t));
+		zbx_vector_discoverer_results_ptr_append(&results, result_tmp);
 		zbx_hashset_iter_remove(&iter);
 	}
 
@@ -914,13 +920,13 @@ static int	process_results(zbx_discoverer_manager_t *manager)
 		result_count += result->services.values_num;
 	}
 
-	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)results_free);
-	zbx_vector_ptr_destroy(&results);
+	zbx_vector_discoverer_results_ptr_clear_ext(&results, results_free);
+	zbx_vector_discoverer_results_ptr_destroy(&results);
 
 	return result_count;
 }
 
-static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_ptr_t *jobs,
+static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_discoverer_jobs_ptr_t *jobs,
 		zbx_hashset_t *check_counts)
 {
 	int			rule_count = 0, delay, i;
@@ -998,7 +1004,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_p
 			}
 
 			zbx_hashset_destroy(&tasks);
-			zbx_vector_ptr_append(jobs, job);
+			zbx_vector_discoverer_jobs_ptr_append(jobs, job);
 		}
 
 		zbx_dc_drule_queue(now, drule->druleid, delay);
@@ -1043,12 +1049,12 @@ static zbx_dservice_t	*result_dservice_create(const zbx_discoverer_task_t *task,
 	return service;
 }
 
-static zbx_discovery_results_t	*rdiscovery_result_create(zbx_uint64_t druleid,
+static zbx_discoverer_results_t	*rdiscovery_result_create(zbx_uint64_t druleid,
 		const zbx_discoverer_task_t *task)
 {
-	zbx_discovery_results_t	*result;
+	zbx_discoverer_results_t	*result;
 
-	result = (zbx_discovery_results_t *)zbx_malloc(NULL, sizeof(zbx_discovery_results_t));
+	result = (zbx_discoverer_results_t *)zbx_malloc(NULL, sizeof(zbx_discoverer_results_t));
 
 	zbx_vector_discoverer_services_ptr_create(&result->services);
 
@@ -1064,7 +1070,7 @@ ZBX_PTR_VECTOR_DECL(fping_host, ZBX_FPING_HOST)
 ZBX_PTR_VECTOR_IMPL(fping_host, ZBX_FPING_HOST)
 
 static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *task,
-		const zbx_dc_dcheck_t *dcheck, zbx_vector_ptr_t *results, int worker_max)
+		const zbx_dc_dcheck_t *dcheck, zbx_vector_discoverer_results_ptr_t *results, int worker_max)
 {
 	zbx_vector_fping_host_t	hosts;
 	char			error[ZBX_ITEM_ERROR_LEN_MAX];
@@ -1074,9 +1080,9 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 
 	for (i = 0; i < task->ips->values_num; i++)
 	{
-		ZBX_FPING_HOST		host;
-		zbx_discovery_results_t	*result;
-		zbx_dservice_t		*service;
+		ZBX_FPING_HOST			host;
+		zbx_discoverer_results_t	*result;
+		zbx_dservice_t			*service;
 
 		memset(&host, 0, sizeof(host));
 		host.addr = task->ips->values[i];
@@ -1088,7 +1094,7 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 		result = rdiscovery_result_create(druleid, task);
 		result->ip = zbx_strdup(result->ip, task->ips->values[i]);
 		zbx_vector_discoverer_services_ptr_append(&result->services, service);
-		zbx_vector_ptr_append(results, result);
+		zbx_vector_discoverer_results_ptr_append(results, result);
 	}
 
 	if (0 == worker_max)
@@ -1106,18 +1112,18 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 		}
 	}
 
-	zbx_vector_ptr_sort(results, discoverer_results_compare);
+	zbx_vector_discoverer_results_ptr_sort(results, discoverer_results_compare);
 
 	for (i = 0; i < hosts.values_num; i++)
 	{
-		int			index;
-		zbx_discovery_results_t	result_cmp, *result;
-		ZBX_FPING_HOST		*h = &hosts.values[i];
+		int				index;
+		zbx_discoverer_results_t	result_cmp, *result;
+		ZBX_FPING_HOST			*h = &hosts.values[i];
 
 		result_cmp.ip = h->addr;
 		result_cmp.druleid = druleid;
 
-		if (FAIL == (index = zbx_vector_ptr_bsearch(results, &result_cmp, discoverer_results_compare)))
+		if (FAIL == (index = zbx_vector_discoverer_results_ptr_bsearch(results, &result_cmp, discoverer_results_compare)))
 		{
 			zbx_str_free(h->dnsname);
 			continue;
@@ -1137,13 +1143,13 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 	zbx_vector_fping_host_destroy(&hosts);
 }
 
-static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_ptr_t *vr_src)
+static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_results_ptr_t *vr_src)
 {
 	int	i;
 
 	for (i = 0; i < vr_src->values_num; i++)
 	{
-		zbx_discovery_results_t	*dst, *src = vr_src->values[i];
+		zbx_discoverer_results_t	*dst, *src = vr_src->values[i];
 
 		discoverer_check_count_decrease(&dmanager.incomplete_checks_count, src->druleid, src->ip, 1);
 
@@ -1153,7 +1159,7 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_ptr_t *vr_s
 
 		if (NULL == (dst = zbx_hashset_search(hr_dst, src)))
 		{
-			dst = zbx_hashset_insert(hr_dst, src, sizeof(zbx_discovery_results_t));
+			dst = zbx_hashset_insert(hr_dst, src, sizeof(zbx_discoverer_results_t));
 			zbx_vector_discoverer_services_ptr_create(&dst->services);
 
 			src->dnsname = NULL;
@@ -1173,23 +1179,23 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_ptr_t *vr_s
 
 static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max)
 {
-	zbx_dc_dcheck_t		*dcheck;
-	zbx_vector_ptr_t	results;
+	zbx_dc_dcheck_t				*dcheck;
+	zbx_vector_discoverer_results_ptr_t	results;
 
 	if (0 == task->dchecks.values_num)
 		return;
 
 	dcheck = (zbx_dc_dcheck_t*)task->dchecks.values[0];
 
-	zbx_vector_ptr_create(&results);
+	zbx_vector_discoverer_results_ptr_create(&results);
 	discover_icmp(druleid, task, dcheck, &results, worker_max);
 
 	pthread_mutex_lock(&dmanager.results_lock);
 	discover_results_merge(&dmanager.results, &results);
 	pthread_mutex_unlock(&dmanager.results_lock);
 
-	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)results_free);
-	zbx_vector_ptr_destroy(&results);
+	zbx_vector_discoverer_results_ptr_clear_ext(&results, results_free);
+	zbx_vector_discoverer_results_ptr_destroy(&results);
 }
 
 static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
@@ -1198,7 +1204,7 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 	int					i;
 	char					dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	zbx_vector_discoverer_services_ptr_t	services;
-	zbx_discovery_results_t			*result = NULL, result_cmp;
+	zbx_discoverer_results_t		*result = NULL, result_cmp;
 	char					*value = NULL;
 	size_t					value_alloc = 128;
 
@@ -1231,12 +1237,12 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 
 	if (NULL == (result = zbx_hashset_search(&dmanager.results, &result_cmp)))
 	{
-		zbx_discovery_results_t	*r;
+		zbx_discoverer_results_t	*r;
 
 		r = rdiscovery_result_create(druleid, task);
 		r->ip = zbx_strdup(NULL, task->ip);
 
-		result = zbx_hashset_insert(&dmanager.results, r, sizeof(zbx_discovery_results_t));
+		result = zbx_hashset_insert(&dmanager.results, r, sizeof(zbx_discoverer_results_t));
 		zbx_free(r);
 	}
 
@@ -1487,7 +1493,7 @@ static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 {
 	int			i;
 	zbx_hashset_iter_t	iter;
-	zbx_discovery_results_t	*result;
+	zbx_discoverer_results_t	*result;
 
 	discoverer_queue_lock(&manager->queue);
 
@@ -1513,7 +1519,7 @@ static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 
 	zbx_hashset_iter_reset(&manager->results, &iter);
 
-	while (NULL != (result = (zbx_discovery_results_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (result = (zbx_discoverer_results_t *)zbx_hashset_iter_next(&iter)))
 		results_clear(result);
 
 	zbx_hashset_destroy(&manager->results);
@@ -1660,11 +1666,11 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		if ((int)sec >= nextcheck)
 		{
-			zbx_vector_ptr_t	jobs;
-			zbx_hashset_t		check_counts;
-			int			rule_count_current;
+			int					rule_count_current;
+			zbx_vector_discoverer_jobs_ptr_t	jobs;
+			zbx_hashset_t				check_counts;
 
-			zbx_vector_ptr_create(&jobs);
+			zbx_vector_discoverer_jobs_ptr_create(&jobs);
 			zbx_hashset_create(&check_counts, 1, discoverer_check_count_hash,
 					discoverer_check_count_compare);
 
@@ -1717,7 +1723,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 				check_count += queued;
 			}
 
-			zbx_vector_ptr_destroy(&jobs);
+			zbx_vector_discoverer_jobs_ptr_destroy(&jobs);
 			zbx_hashset_destroy(&check_counts);
 		}
 
