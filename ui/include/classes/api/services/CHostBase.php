@@ -39,12 +39,12 @@ abstract class CHostBase extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function checkTemplates(array $hosts, array $db_hosts = null): void {
+	protected function checkTemplates(array &$hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$edit_templates = [];
 
-		foreach ($hosts as $i1 => $host) {
+		foreach ($hosts as $i1 => &$host) {
 			if (array_key_exists('templates', $host) && array_key_exists('templates_clear', $host)) {
 				$path_clear = '/'.($i1 + 1).'/templates_clear';
 				$path = '/'.($i1 + 1).'/templates';
@@ -83,6 +83,7 @@ abstract class CHostBase extends CApiService {
 				$edit_templates += array_column($host['templates_clear'], null, 'templateid');
 			}
 		}
+		unset($host);
 
 		if (!$edit_templates) {
 			return;
@@ -1023,11 +1024,8 @@ abstract class CHostBase extends CApiService {
 			}
 			elseif (array_key_exists('templates_clear', $host)) {
 				foreach ($host['templates_clear'] as &$template) {
-					if (array_key_exists($template['templateid'], $db_templates)) {
-						$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
-						$del_hosttemplateids[] = $db_templates[$template['templateid']]['hosttemplateid'];
-						$changed = true;
-					}
+					$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
+					$del_hosttemplateids[] = $db_templates[$template['templateid']]['hosttemplateid'];
 				}
 				unset($template);
 			}
@@ -1172,6 +1170,7 @@ abstract class CHostBase extends CApiService {
 							'values' => $upd_hostmacro,
 							'where' => ['hostmacroid' => $macro['hostmacroid']]
 						];
+						$changed = true;
 					}
 
 					unset($db_macros[$macro['hostmacroid']]);
@@ -1364,20 +1363,14 @@ abstract class CHostBase extends CApiService {
 		return $hostsLinkageInserts;
 	}
 
-	/**
-	 * @param array      $templateids
-	 * @param array|null $targetids
-	 */
-	protected function unlink(array $templateids, array $targetids = null): void {
-		$options = ['templateid' => $templateids];
-
-		if ($targetids !== null) {
-			$options['hostid'] = $targetids;
+	protected function unlink($templateids, $targetids = null) {
+		$cond = ['templateid' => $templateids];
+		if (!is_null($targetids)) {
+			$cond['hostid'] = $targetids;
 		}
+		DB::delete('hosts_templates', $cond);
 
-		DB::delete('hosts_templates', $options);
-
-		if ($targetids !== null) {
+		if (!is_null($targetids)) {
 			$hosts = API::Host()->get([
 				'hostids' => $targetids,
 				'output' => ['hostid', 'host'],
@@ -1392,15 +1385,15 @@ abstract class CHostBase extends CApiService {
 			]);
 		}
 
-		if ($hosts) {
+		if (!empty($hosts)) {
 			$templates = API::Template()->get([
 				'templateids' => $templateids,
 				'output' => ['hostid', 'host'],
 				'nopermissions' => true
 			]);
 
-			$hosts = implode(', ', array_column($hosts, 'host'));
-			$templates = implode(', ', array_column($templates, 'host'));
+			$hosts = implode(', ', zbx_objectValues($hosts, 'host'));
+			$templates = implode(', ', zbx_objectValues($templates, 'host'));
 
 			info(_s('Templates "%1$s" unlinked from hosts "%2$s".', $templates, $hosts));
 		}

@@ -721,7 +721,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		// host prototypes
 		if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
-			API::HostPrototype()->unlinkTemplateObjects(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]), $hostids);
+			API::HostPrototype()->unlinkTemplateObjects(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]));
 		}
 
 		// http tests
@@ -1053,7 +1053,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param null|array $targetids		the IDs of the hosts to unlink the templates from
 	 * @param bool       $clear			delete all of the inherited objects from the hosts
 	 */
-	protected function unlink(array $templateids, $targetids = null, $clear = false): void {
+	protected function unlink($templateids, $targetids = null, $clear = false) {
 		$flags = ($clear)
 			? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE]
 			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE];
@@ -1353,9 +1353,7 @@ abstract class CHostGeneral extends CHostBase {
 		// we need only to unlink host prototypes. in case of unlink and clear they will be deleted together with LLD rules.
 		if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
 			if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
-				API::HostPrototype()->unlinkTemplateObjects(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]),
-					$targetids
-				);
+				API::HostPrototype()->unlinkTemplateObjects(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]));
 			}
 		}
 

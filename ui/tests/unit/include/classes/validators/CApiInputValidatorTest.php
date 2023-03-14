@@ -1510,6 +1510,60 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
+					'host' => ['type' => API_ANY],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'host' => 'Zabbix server'
+				],
+				'/',
+				[
+					'host' => 'Zabbix server'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'host' => ['type' => API_ANY],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'uuid' => ['type' => API_STRING_UTF8, 'in' => '', 'unset' => true],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'uuid' => '',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				[
+					'name' => 'Zabbix server'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'uuid' => ['type' => API_STRING_UTF8, 'in' => '', 'unset' => true],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'uuid' => '56079badd056419383cc26e6a4fcc7e0',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				'Invalid parameter "/uuid": value must be empty.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
 					'host' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 					'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 				]],
