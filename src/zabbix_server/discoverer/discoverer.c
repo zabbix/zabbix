@@ -1576,9 +1576,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	char				*error;
 	zbx_vector_uint64_pair_t	revisions;
-#ifdef ZBX22336
-	zbx_uint32_t			rtc_msgs[] = { ZBX_RTC_SNMP_CACHE_RELOAD };
-#endif
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -1609,10 +1607,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		goto out;
 	}
 
-#ifdef ZBX22336
 	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_DISCOVERER, 0, rtc_msgs, ARRSIZE(rtc_msgs),
 			discoverer_args_in->config_timeout, ZBX_IPC_SERVICE_DISCOVERER);
-#endif
 
 #ifdef HAVE_NETSNMP
 	zbx_mt_init_snmp();
@@ -1777,7 +1773,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 				case ZBX_IPC_DISCOVERER_USAGE_STATS:
 					discoverer_reply_usage_stats(&dmanager, client);
 					break;
-#ifdef ZBX22336
 #ifdef HAVE_NETSNMP
 				case ZBX_RTC_SNMP_CACHE_RELOAD:
 					zbx_clear_cache_snmp(process_type, process_num);
@@ -1786,7 +1781,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
 					goto out;
-#endif
 			}
 
 			zbx_ipc_message_free(message);
