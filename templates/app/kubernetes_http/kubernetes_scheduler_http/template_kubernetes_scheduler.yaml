@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:53Z'
+  date: '2023-02-17T11:39:44Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -649,7 +649,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
             -
               name: 'total item'
@@ -665,7 +664,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: NOT_LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
         -
           uuid: 8cfc88eb0f6b4ae09d93bd9fc275659d
@@ -837,7 +835,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
             -
               name: 'total item'
@@ -853,7 +850,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: NOT_LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
         -
           uuid: 5d4a17f09a7e4ad3b4ac72c30bac5e7d
@@ -1025,7 +1021,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
             -
               name: 'total item'
@@ -1041,7 +1036,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: NOT_LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
       tags:
         -
