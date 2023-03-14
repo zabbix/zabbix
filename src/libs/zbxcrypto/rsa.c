@@ -22,10 +22,10 @@
 
 #if defined(HAVE_OPENSSL)
 #include <openssl/evp.h>
-#include <openssl/rsa.h>
-#include <openssl/err.h>
 #include <openssl/bio.h>
 #include <openssl/pem.h>
+#include <openssl/crypto.h>
+#include <openssl/types.h>
 #elif defined(HAVE_GNUTLS)
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
@@ -52,7 +52,8 @@ static void	pem_replace_spaces(char *s)
  *          insert them if they are absent.                                   *
  *                                                                            *
  * Parameters:                                                                *
- *     key     - [OUT/IN] the key in PEM container                            *
+ *     key     - [OUT/IN] key in PEM container                                *
+ *     key_len - [OUT/IN] key length                                          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_normalize_pem(char **key, size_t *key_len)
@@ -140,7 +141,7 @@ int	zbx_rs256_sign(char *key, size_t key_len, char *data, size_t data_len, unsig
 		goto out;
 	}
 
-	if (0 >= EVP_DigestSign(mdctx, NULL, &sign_len, NULL, 0))
+	if (1 !=  EVP_DigestSign(mdctx, NULL, &sign_len, NULL, 0))
 	{
 		*error = zbx_strdup(NULL, "failed to retrieve length of a signature");
 		ret = FAIL;
@@ -149,7 +150,7 @@ int	zbx_rs256_sign(char *key, size_t key_len, char *data, size_t data_len, unsig
 
 	sig = OPENSSL_malloc(sign_len);
 
-	if (0 >= EVP_DigestSign(mdctx, sig, &sign_len, (const unsigned char *)data, data_len))
+	if (1 != EVP_DigestSign(mdctx, sig, &sign_len, (const unsigned char *)data, data_len))
 	{
 		*error = zbx_strdup(NULL, "signing failed");
 		ret = FAIL;

@@ -19,12 +19,10 @@
 
 #include "global.h"
 
-#include "zbxstr.h"
 #include "embed.h"
 #include "duktape.h"
 #include "zbxcrypto.h"
 #include "zbxjson.h"
-#include "log.h"
 
 /******************************************************************************
  *                                                                            *
