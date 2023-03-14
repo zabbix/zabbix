@@ -41,8 +41,8 @@ static int	DBpatch_3050000(void)
 
 static int	DBpatch_3050001(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = FAIL;
 
 	/* type : 'problem' - WIDGET_PROBLEMS */
@@ -953,8 +953,8 @@ static int	DBpatch_3050101(void)
 
 static int	DBpatch_3050102(void)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			ret = SUCCEED;
 	zbx_vector_uint64_t	ids;
 
@@ -1151,8 +1151,8 @@ static int	DBpatch_3050117(void)
 
 static int	DBpatch_3050118(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	int		ret = SUCCEED;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -1193,8 +1193,8 @@ out:
 
 static int	DBpatch_3050119(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	int		ret = SUCCEED;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -1238,8 +1238,8 @@ static int	DBpatch_3050120(void)
 	int		ret = SUCCEED, action;
 	zbx_uint64_t	ackid, eventid;
 	zbx_hashset_t	eventids;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*sql;
 	size_t		sql_alloc = 4096, sql_offset = 0;
 
@@ -1320,8 +1320,8 @@ static void	DBpatch_3050122_add_anchors(const char *src, char *dst, size_t src_l
 
 static int	DBpatch_3050122(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	int		ret = FAIL;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -1615,8 +1615,8 @@ static int	DBpatch_3050143(void)
 
 static int	DBpatch_3050144(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = FAIL;
 	zbx_db_insert_t	db_insert;
 

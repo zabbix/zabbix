@@ -40,8 +40,8 @@ static int	force = 0;
 
 static void	DBget_lastsize(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zbx_db_begin();
 

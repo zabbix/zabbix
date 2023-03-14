@@ -238,13 +238,6 @@
 			showFormByProvider(provider);
 		});
 
-		$('#smtp_email').change(function() {
-			if ($('#type').val() == <?= json_encode(MEDIA_TYPE_EMAIL) ?>
-					&& $('#provider').val() == '<?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>') {
-				generateOffice365RelaySmtpServer();
-			}
-		});
-
 		// clone button
 		$('#clone').click(function() {
 			$('#mediatypeid, #delete, #clone').remove();

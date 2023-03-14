@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 The template is developed to monitor a single DBMS Oracle Database instance with Zabbix agent 2.
 
 This template was tested on:
@@ -12,7 +12,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 1. Setup and configure Zabbix agent 2 compiled with the Oracle monitoring plugin. See the setup instructions for [Oracle Database plugin](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/src/go/plugins/oracle/README.md).
 2. Set the {$ORACLE.CONNSTRING} macro value using either <protocol(host:port)> or named session.

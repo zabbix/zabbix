@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 This template collects Linux metrics from node_exporter 0.18 and above. Support for older node_exporter versions is provided as 'best effort'.
 
 This template was tested on:

@@ -451,8 +451,8 @@ out:
 
 static int	DBget_template_count(zbx_uint64_t *count)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = FAIL;
 
 	if (NULL == (result = zbx_db_select("select count(*) from hosts where status=%d", HOST_STATUS_TEMPLATE)))
@@ -470,8 +470,8 @@ out:
 
 static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offline)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	users_offline, users_online = 0;
 	int		now, ret = FAIL;
 
