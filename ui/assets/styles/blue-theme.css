@@ -1204,10 +1204,6 @@ footer {
       margin-bottom: -8px; }
       .dashboard-grid-widget-contents .list-table.sticky-footer tfoot {
         bottom: -8px; }
-  .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-bad,
-  .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-good,
-  .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-warning {
-    margin: 8px 10px; }
   .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-debug .debug-output {
     margin: 8px 10px; }
 
@@ -1228,6 +1224,10 @@ footer {
     margin-top: 0;
     height: 100%;
     padding-top: 8px; }
+    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-bad,
+    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-good,
+    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-warning {
+      margin: 8px 10px; }
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents .list-table.sticky-footer {
       margin-bottom: 0; }
       .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents .list-table.sticky-footer tfoot {
