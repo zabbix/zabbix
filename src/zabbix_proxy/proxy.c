@@ -47,7 +47,6 @@
 #include "taskmanager/taskmanager.h"
 #include "../zabbix_server/vmware/vmware.h"
 #include "zbxcomms.h"
-#include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "zbxvault.h"
 #include "zbxdiag.h"
 #include "diag/diag_proxy.h"
@@ -61,9 +60,8 @@
 #include "zbx_rtc_constants.h"
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
-#include "../zabbix_server/preprocessor/preproc_stats.h"
 #include "../zabbix_server/ipmi/ipmi_manager.h"
-#include "preproc.h"
+#include "preproc/preproc_proxy.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -1154,6 +1152,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_sysinfo(get_config_timeout);
 	zbx_init_library_stats(get_program_type);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
+	zbx_init_library_preproc(preproc_flush_value_proxy);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1276,7 +1275,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args		ipmimanager_args = {config_timeout, config_unavailable_delay};
 #endif
-	zbx_thread_preprocessing_manager_args	preproc_man_args =
+	zbx_thread_pp_manager_args		preproc_man_args =
 						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
@@ -1573,7 +1572,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &preproc_man_args;
-				zbx_thread_start(preprocessing_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_pp_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;

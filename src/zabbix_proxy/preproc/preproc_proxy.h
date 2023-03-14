@@ -17,26 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PP_CACHE_H
-#define ZABBIX_PP_CACHE_H
+#ifndef ZABBIX_PREPROC_PREPROC_SERVER_H
+#define ZABBIX_PREPROC_PREPROC_SERVER_H
 
 #include "zbxpreproc.h"
-#include "zbxvariant.h"
+#include "zbxtime.h"
+#include "zbxtypes.h"
 
-typedef struct
-{
-	zbx_uint32_t	refcount;
-	zbx_variant_t	value;
-	int		type;
-	void		*data;
-}
-zbx_pp_cache_t;
-
-zbx_pp_cache_t	*pp_cache_create(const zbx_pp_item_preproc_t *preproc, const zbx_variant_t *value);
-void		pp_cache_release(zbx_pp_cache_t *cache);
-zbx_pp_cache_t	*pp_cache_copy(zbx_pp_cache_t *cache);
-
-void	pp_cache_copy_value(zbx_pp_cache_t *cache, int step_type, zbx_variant_t *value);
-int	pp_cache_is_supported(zbx_pp_item_preproc_t *preproc);
+void	preproc_flush_value_proxy(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
+	unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt);
 
 #endif

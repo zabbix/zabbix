@@ -17,12 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PREPROCESSING_H
-#define ZABBIX_PREPROCESSING_H
+#ifndef ZABBIX_PP_PROTOCOL_H
+#define ZABBIX_PP_PROTOCOL_H
 
-#include "preproc.h"
 #include "zbxpreproc.h"
 #include "zbxipcservice.h"
+#include "zbxtime.h"
+#include "zbxalgo.h"
 
 #define ZBX_IPC_SERVICE_PREPROCESSING	"preprocessing"
 
@@ -49,6 +50,17 @@ typedef struct
 	unsigned char		state;		 /* item state */
 }
 zbx_preproc_item_value_t;
+
+ZBX_PTR_VECTOR_DECL(ipcmsg, zbx_ipc_message_t *)
+
+/* packed field data description */
+typedef struct
+{
+	const void	*value;	/* value to be packed */
+	zbx_uint32_t	size;	/* size of a value (can be 0 for strings) */
+	unsigned char	type;	/* field type */
+}
+zbx_packed_field_t;
 
 zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsigned char *data);
 
@@ -79,15 +91,4 @@ void	zbx_preprocessor_unpack_top_sequences_result(zbx_vector_pp_sequence_stats_p
 
 zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count);
 
-ZBX_PTR_VECTOR_DECL(ipcmsg, zbx_ipc_message_t *)
-
-/* packed field data description */
-typedef struct
-{
-	const void	*value;	/* value to be packed */
-	zbx_uint32_t	size;	/* size of a value (can be 0 for strings) */
-	unsigned char	type;	/* field type */
-}
-zbx_packed_field_t;
-
-#endif /* ZABBIX_PREPROCESSING_H */
+#endif
