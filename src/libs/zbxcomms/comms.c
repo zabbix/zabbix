@@ -47,11 +47,18 @@
 #	define SOCK_CLOEXEC 0	/* SOCK_CLOEXEC is Linux-specific, available since 2.6.23 */
 #endif
 
+#define ZBX_TCP_POLL_TIMEOUT	1000
+
 #ifdef HAVE_OPENSSL
 extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
 
 extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
+
+static void	tcp_init_hints(struct addrinfo *hints, int socktype, int flags);
+static int	tcp_set_nonblocking(ZBX_SOCKET s);
+static int	tcp_is_nonblocking_error();
+static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip);
 
 zbx_config_tls_t	*zbx_config_tls_new(void)
 {
@@ -421,88 +428,50 @@ static void	zbx_socket_timeout_cleanup(zbx_socket_t *s)
 static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, socklen_t addrlen, int timeout,
 		char **error)
 {
-#ifdef _WINDOWS
-	u_long		mode = 1;
-	FD_SET		fdw, fde;
-	struct timeval	tv, *ptv;
-#endif
-	if (0 != timeout)
-		zbx_socket_timeout_set(s, timeout);
-
-#ifdef _WINDOWS
-	if (0 != ioctlsocket(s->socket, FIONBIO, &mode))
-	{
-		*error = zbx_strdup(*error, strerror_from_system(zbx_socket_last_error()));
-		return FAIL;
-	}
-
-	FD_ZERO(&fdw);
-	FD_SET(s->socket, &fdw);
-
-	FD_ZERO(&fde);
-	FD_SET(s->socket, &fde);
+	int		rc;
+	zbx_pollfd_t	pd;
+	zbx_timespec_t	deadline;
 
 	if (0 != timeout)
-	{
-		tv.tv_sec = timeout;
-		tv.tv_usec = 0;
-		ptv = &tv;
-	}
-	else
-		ptv = NULL;
+		tcp_get_deadline(&deadline, timeout);
 
-	if (ZBX_PROTO_ERROR == connect(s->socket, addr, addrlen) && WSAEWOULDBLOCK != zbx_socket_last_error())
+	if (ZBX_PROTO_ERROR == connect(s->socket, addr, addrlen) && SUCCEED != tcp_is_nonblocking_error())
 	{
-		*error = zbx_strdup(*error, strerror_from_system(zbx_socket_last_error()));
+		*error = zbx_dsprintf(*error, "cannot connect to address: %s",
+				strerror_from_system(zbx_socket_last_error()));
 		return FAIL;
 	}
 
-	if (-1 == select(0, NULL, &fdw, &fde, ptv))
-	{
-		*error = zbx_strdup(*error, strerror_from_system(zbx_socket_last_error()));
-		return FAIL;
-	}
+	pd.fd = s->socket;
+	pd.events = POLLOUT;
 
-	if (0 == FD_ISSET(s->socket, &fdw))
+	do
 	{
-		if (0 != FD_ISSET(s->socket, &fde))
+		if (-1 == (rc = tcp_poll(&pd, 1, 1000)))
 		{
-			int socket_error = 0;
-			int socket_error_len = sizeof(int);
+			if (SUCCEED != tcp_is_nonblocking_error())
+			{
+				*error = zbx_strdup(NULL, "cannot wait for connection");
+				return FAIL;
+			}
 
-			if (ZBX_PROTO_ERROR != getsockopt(s->socket, SOL_SOCKET,
-				SO_ERROR, (char *)&socket_error, &socket_error_len))
-			{
-				if (socket_error == WSAECONNREFUSED)
-					*error = zbx_strdup(*error, "Connection refused.");
-				else if (socket_error == WSAETIMEDOUT)
-					*error = zbx_strdup(*error, "A connection timeout occurred.");
-				else
-					*error = zbx_strdup(*error, strerror_from_system(socket_error));
-			}
-			else
-			{
-				*error = zbx_dsprintf(*error, "Cannot obtain error code: %s",
-						strerror_from_system(zbx_socket_last_error()));
-			}
+			continue;
 		}
 
+		if (0 == rc && 0 != timeout && SUCCEED != tcp_check_deadline(&deadline))
+		{
+			*error = zbx_strdup(NULL, "connection timed out");
+			return FAIL;
+		}
+	}
+	while (0 >= rc);
+
+	if (0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+	{
+		*error = zbx_strdup(NULL, "connection error");
 		return FAIL;
 	}
 
-	mode = 0;
-	if (0 != ioctlsocket(s->socket, FIONBIO, &mode))
-	{
-		*error = zbx_strdup(*error, strerror_from_system(zbx_socket_last_error()));
-		return FAIL;
-	}
-#else
-	if (ZBX_PROTO_ERROR == connect(s->socket, addr, addrlen))
-	{
-		*error = zbx_strdup(*error, strerror_from_system(zbx_socket_last_error()));
-		return FAIL;
-	}
-#endif
 	s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 
 	return SUCCEED;
@@ -518,7 +487,6 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-#ifdef HAVE_IPV6
 static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
@@ -530,8 +498,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*server_name = NULL;
 #endif
-
-	zbx_socket_clean(s);
 
 	if (SOCK_DGRAM == type && (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect))
 	{
@@ -552,14 +518,14 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 #endif
 
+	zbx_socket_clean(s);
+
 	zbx_snprintf(service, sizeof(service), "%hu", port);
-	memset(&hints, 0x00, sizeof(struct addrinfo));
-	hints.ai_family = PF_UNSPEC;
-	hints.ai_socktype = type;
+	tcp_init_hints(&hints, type, 0);
 
 	if (0 != getaddrinfo(ip, service, &hints, &ai))
 	{
-		zbx_set_socket_strerror("cannot resolve [%s]", ip);
+		tcp_set_socket_strerror_from_getaddrinfo(ip);
 		goto out;
 	}
 
@@ -581,15 +547,11 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 
 	if (NULL != source_ip)
 	{
-		memset(&hints, 0x00, sizeof(struct addrinfo));
-
-		hints.ai_family = PF_UNSPEC;
-		hints.ai_socktype = type;
-		hints.ai_flags = AI_NUMERICHOST;
+		tcp_init_hints(&hints, type, AI_NUMERICHOST);
 
 		if (0 != getaddrinfo(source_ip, NULL, &hints, &ai_bind))
 		{
-			zbx_set_socket_strerror("invalid source IP address [%s]", source_ip);
+			tcp_set_socket_strerror_from_getaddrinfo(source_ip);
 			func_socket_close(s);
 			goto out;
 		}
@@ -600,6 +562,15 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 			func_socket_close(s);
 			goto out;
 		}
+	}
+
+	if (SUCCEED != tcp_set_nonblocking(s->socket))
+	{
+		zbx_set_socket_strerror("setting non-blocking mode for [[%s]:%hu] failed: %s",
+				NULL != ip ? ip : "-", port,
+				strerror_from_system(zbx_socket_last_error()));
+		func_socket_close(s);
+		goto out;
 	}
 
 	if (SUCCEED != zbx_socket_connect(s, ai->ai_addr, (socklen_t)ai->ai_addrlen, timeout, &error))
@@ -617,7 +588,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
-			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, &error))
+			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, timeout, &error))
 	{
 		zbx_tcp_close(s);
 		zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
@@ -640,130 +611,6 @@ out:
 
 	return ret;
 }
-#else
-static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
-{
-	ZBX_SOCKADDR	servaddr_in;
-	struct addrinfo	hints, *ai;
-	char		*error = NULL;
-	void		(*func_socket_close)(zbx_socket_t *s);
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	const char	*server_name = NULL;
-#endif
-
-	if (SOCK_DGRAM == type && (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
-	}
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_PSK == tls_connect && '\0' == *tls_arg1)
-	{
-		zbx_set_socket_strerror("cannot connect with PSK: PSK not available");
-		return FAIL;
-	}
-#else
-	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
-	{
-		zbx_set_socket_strerror("support for TLS was not compiled in");
-		return FAIL;
-	}
-#endif
-	zbx_socket_clean(s);
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = type;
-
-	if (0 != getaddrinfo(ip, NULL, &hints, &ai))
-	{
-#ifdef _WINDOWS
-		zbx_set_socket_strerror("getaddrinfo() failed for '%s': %s",
-				ip, strerror_from_system(WSAGetLastError()));
-#else
-#ifdef HAVE_HSTRERROR
-		zbx_set_socket_strerror("getaddrinfo() failed for '%s': [%d] %s",
-				ip, h_errno, hstrerror(h_errno));
-#else
-		zbx_set_socket_strerror("getaddrinfo() failed for '%s': [%d]",
-				ip, h_errno);
-#endif
-#endif
-		return FAIL;
-	}
-
-	servaddr_in.sin_family = AF_INET;
-	servaddr_in.sin_addr = ((struct sockaddr_in *)ai->ai_addr)->sin_addr;
-	servaddr_in.sin_port = htons(port);
-
-	freeaddrinfo(ai);
-
-	if (ZBX_SOCKET_ERROR == (s->socket = socket(AF_INET, type | SOCK_CLOEXEC, 0)))
-	{
-		zbx_set_socket_strerror("cannot create socket [[%s]:%hu]: %s",
-				ip, port, strerror_from_system(zbx_socket_last_error()));
-		return FAIL;
-	}
-
-#if !defined(_WINDOWS) && !SOCK_CLOEXEC
-	if (-1 == fcntl(s->socket, F_SETFD, FD_CLOEXEC))
-	{
-		zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on socket [[%s]:%hu]: %s",
-				ip, port, strerror_from_system(zbx_socket_last_error()));
-	}
-#endif
-	func_socket_close = (SOCK_STREAM == type ? zbx_tcp_close : zbx_udp_close);
-
-	if (NULL != source_ip)
-	{
-		ZBX_SOCKADDR	source_addr;
-
-		memset(&source_addr, 0, sizeof(source_addr));
-
-		source_addr.sin_family = AF_INET;
-		source_addr.sin_addr.s_addr = inet_addr(source_ip);
-		source_addr.sin_port = 0;
-
-		if (ZBX_PROTO_ERROR == bind(s->socket, (struct sockaddr *)&source_addr, sizeof(source_addr)))
-		{
-			zbx_set_socket_strerror("bind() failed: %s", strerror_from_system(zbx_socket_last_error()));
-			func_socket_close(s);
-			return FAIL;
-		}
-	}
-
-	if (SUCCEED != zbx_socket_connect(s, (struct sockaddr *)&servaddr_in, sizeof(servaddr_in), timeout, &error))
-	{
-		func_socket_close(s);
-		zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", ip, port, error);
-		zbx_free(error);
-		return FAIL;
-	}
-
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL != ip && SUCCEED != zbx_is_ip(ip))
-	{
-		server_name = ip;
-	}
-
-	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
-			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, &error))
-	{
-		zbx_tcp_close(s);
-		zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
-		zbx_free(error);
-		return FAIL;
-	}
-#else
-	ZBX_UNUSED(tls_arg1);
-	ZBX_UNUSED(tls_arg2);
-#endif
-	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
-
-	return SUCCEED;
-}
-#endif	/* HAVE_IPV6 */
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
 		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
@@ -1040,6 +887,22 @@ out:
 	return res;
 }
 #endif	/* HAVE_IPV6 */
+
+static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip)
+{
+#if defined(_WINDOWS)
+		zbx_set_socket_strerror("getaddrinfo() failed for '%s': %s",
+				ip, strerror_from_system(WSAGetLastError()));
+#else
+#if defined(HAVE_HSTRERROR)
+		zbx_set_socket_strerror("getaddrinfo() failed for '%s': [%d] %s",
+				ip, h_errno, hstrerror(h_errno));
+#else
+		zbx_set_socket_strerror("getaddrinfo() failed for '%s': [%d]",
+				ip, h_errno);
+#endif
+#endif
+}
 
 /******************************************************************************
  *                                                                            *

@@ -2195,9 +2195,6 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 
 		SSL_CTX_set_info_callback(ctx_cert, zbx_openssl_info_cb);
 
-		/* we're using blocking sockets, deal with renegotiations automatically */
-		SSL_CTX_set_mode(ctx_cert, SSL_MODE_AUTO_RETRY);
-
 		/* use server ciphersuite preference, do not use RFC 4507 ticket extension */
 		SSL_CTX_set_options(ctx_cert, SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_NO_TICKET);
 
@@ -2288,7 +2285,6 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 			SSL_CTX_set_psk_server_callback(ctx_psk, zbx_psk_server_cb);
 		}
 
-		SSL_CTX_set_mode(ctx_psk, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_options(ctx_psk, SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_NO_TICKET);
 		SSL_CTX_clear_options(ctx_psk, SSL_OP_LEGACY_SERVER_CONNECT);
 		SSL_CTX_set_session_cache_mode(ctx_psk, SSL_SESS_CACHE_OFF);
@@ -2372,7 +2368,6 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 			SSL_CTX_set_psk_server_callback(ctx_all, zbx_psk_server_cb);
 		}
 
-		SSL_CTX_set_mode(ctx_all, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_options(ctx_all, SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_NO_TICKET);
 		SSL_CTX_clear_options(ctx_all, SSL_OP_LEGACY_SERVER_CONNECT);
 		SSL_CTX_set_session_cache_mode(ctx_all, SSL_SESS_CACHE_OFF);
@@ -2609,6 +2604,7 @@ void	zbx_tls_free(void)
  *                        (in hex-string) to connect with depending on value  *
  *                        of 'tls_connect'.                                   *
  *     server_name - [IN] optional server name indication for TLS             *
+ *     timeout     - [IN] the connection timeout                              *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
@@ -2617,12 +2613,13 @@ void	zbx_tls_free(void)
  ******************************************************************************/
 #if defined(HAVE_GNUTLS)
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		const char *server_name, char **error)
+		const char *server_name, int timeout, char **error)
 {
-	int	ret = FAIL, res;
-#if defined(_WINDOWS)
-	double	sec;
-#endif
+	int		ret = FAIL, res;
+	zbx_timespec_t	deadline;
+
+	if (0 != timeout)
+		tcp_get_deadline(&deadline, timeout);
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
@@ -2777,25 +2774,23 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 	/* TLS handshake */
 
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 	while (GNUTLS_E_SUCCESS != (res = gnutls_handshake(s->tls_ctx->ctx)))
 	{
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
-		if (SUCCEED == zbx_alarm_timed_out())
-		{
-			*error = zbx_strdup(*error, "gnutls_handshake() timed out");
-			goto out;
-		}
-
 		if (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res)
 		{
-			continue;
+			if (FAIL == (res = tls_socket_wait(s->socket, s->tls_ctx->ctx)))
+			{
+				*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
+						strerror_from_system(zbx_socket_last_error()));
+				goto out;
+			}
+
+			if (0 == res && SUCCEED != tcp_check_deadline(&deadline))
+			{
+				*error = zbx_strdup(*error, "gnutls_handshake() timed out");
+				goto out;
+			}
+
 		}
 		else if (GNUTLS_E_WARNING_ALERT_RECEIVED == res || GNUTLS_E_FATAL_ALERT_RECEIVED == res)
 		{
@@ -2952,16 +2947,18 @@ static int	zbx_tls_get_error(const SSL *s, int res, const char *func, size_t *er
 }
 
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		const char *server_name, char **error)
+		const char *server_name, int timeout, char **error)
 {
-	int	ret = FAIL, res;
-	size_t	error_alloc = 0, error_offset = 0;
-#if defined(_WINDOWS)
-	double	sec;
-#endif
+	int		ret = FAIL, res;
+	size_t		error_alloc = 0, error_offset = 0;
+	zbx_timespec_t	deadline;
+
 #if defined(HAVE_OPENSSL_WITH_PSK)
 	char	psk_buf[HOST_TLS_PSK_LEN / 2];
 #endif
+
+	if (0 != timeout)
+		tcp_get_deadline(&deadline, timeout);
 
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 	s->tls_ctx->ctx = NULL;
@@ -3067,22 +3064,32 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 	/* TLS handshake */
 
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
-	if (1 != (res = SSL_connect(s->tls_ctx->ctx)))
+
+	while (-1 == (res = SSL_connect(s->tls_ctx->ctx)))
 	{
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
-		if (SUCCEED == zbx_alarm_timed_out())
+		int	ssl_err;
+
+		ssl_err = SSL_get_error(s->tls_ctx->ctx, res);
+
+		if (SSL_ERROR_WANT_READ != ssl_err && SSL_ERROR_WANT_WRITE != ssl_err)
+			break;
+
+		if (FAIL == (res = tls_socket_wait(s->socket, ssl_err)))
+		{
+			*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
+					strerror_from_system(zbx_socket_last_error()));
+			goto out;
+		}
+
+		if (0 == res && SUCCEED != tcp_check_deadline(&deadline))
 		{
 			*error = zbx_strdup(*error, "SSL_connect() timed out");
 			goto out;
 		}
+	}
 
+	if (1 != res)
+	{
 		if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 		{
 			long	verify_result;
@@ -3589,7 +3596,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, char *
 
 		ssl_err = SSL_get_error(s->tls_ctx->ctx, res);
 
-		if (SSL_ERROR_WANT_READ  != ssl_err && SSL_ERROR_WANT_WRITE != ssl_err)
+		if (SSL_ERROR_WANT_READ != ssl_err && SSL_ERROR_WANT_WRITE != ssl_err)
 			break;
 
 		if (FAIL == (res = tls_socket_wait(s->socket, ssl_err)))
