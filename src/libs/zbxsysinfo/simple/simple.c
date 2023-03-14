@@ -51,7 +51,7 @@ ZBX_METRIC	parameters_simple[] =
 };
 
 #ifdef HAVE_LDAP
-static int	check_ldap(const char *host, unsigned short port, int timeout, int *value_int)
+static int	check_ldap(const char *host, unsigned short port, int *value_int)
 {
 	LDAP		*ldap	= NULL;
 	LDAPMessage	*res	= NULL;
@@ -62,8 +62,6 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 	char		*attr	 = NULL;
 	char		**valRes = NULL;
 	int		ldapErr = 0;
-
-	zbx_alarm_on(timeout);
 
 	*value_int = 0;
 
@@ -108,7 +106,6 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 
 	*value_int = 1;
 lbl_ret:
-	zbx_alarm_off();
 
 	if (NULL != valRes)
 		ldap_value_free(valRes);
@@ -373,7 +370,7 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 #ifdef HAVE_LDAP
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_LDAP_PORT;
-			ret = check_ldap(ip, port, sysinfo_get_config_timeout(), &value_int);
+			ret = check_ldap(ip, port, &value_int);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for LDAP check was not compiled in."));
 #endif
