@@ -239,8 +239,8 @@ static int	DBpatch_4030020(void)
 	const char	*tmp_token;
 	char		*pos, *token = NULL, *token_esc = NULL, *value = NULL, field[FIELD_LEN];
 	int		ret = SUCCEED;
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_uint32_t	id, next_id = 0;
 	zbx_uint64_t	last_widgetid = 0, widgetid, fieldid;
 
@@ -381,8 +381,8 @@ static int	DBpatch_4030026(void)
 
 static int	DBpatch_4030027(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = FAIL;
 	char		*exec_params = NULL, *exec_params_esc;
 	size_t		exec_params_alloc = 0;

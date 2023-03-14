@@ -35,7 +35,7 @@ static int	DBpatch_4000000(void)
 
 static int	DBpatch_4000001(void)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 	int		ret;
 	zbx_field_len_t	fields[] = {
 			{"def_shortdata", 0},
@@ -60,7 +60,7 @@ static int	DBpatch_4000001(void)
 
 static int	DBpatch_4000002(void)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 	int		ret;
 	zbx_field_len_t	fields[] = {
 			{"subject", 0},
@@ -84,7 +84,7 @@ static int	DBpatch_4000002(void)
 
 static int	DBpatch_4000003(void)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 	int		ret;
 	zbx_field_len_t	fields[] = {{"command", 0}};
 

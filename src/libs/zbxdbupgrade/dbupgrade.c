@@ -884,8 +884,8 @@ static zbx_db_version_t dbversions[] = {
 
 static void	DBget_version(int *mandatory, int *optional)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	*mandatory = -1;
 	*optional = -1;
@@ -1094,8 +1094,8 @@ out:
 
 int	DBcheck_double_type(zbx_config_dbhigh_t *config_dbhigh)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*sql = NULL;
 	const int	total_dbl_cols = 4;
 	int		ret = FAIL;

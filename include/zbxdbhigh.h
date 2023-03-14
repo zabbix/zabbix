@@ -491,9 +491,9 @@ void	zbx_db_statement_prepare(const char *sql);
 #endif
 int		zbx_db_execute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		zbx_db_execute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-DB_RESULT	zbx_db_select(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-DB_RESULT	zbx_db_select_n(const char *query, int n);
-DB_ROW		zbx_db_fetch(DB_RESULT result);
+zbx_db_result_t	zbx_db_select(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+zbx_db_result_t	zbx_db_select_n(const char *query, int n);
+zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result);
 int		zbx_db_is_null(const char *field);
 void		zbx_db_begin(void);
 int		zbx_db_commit(void);

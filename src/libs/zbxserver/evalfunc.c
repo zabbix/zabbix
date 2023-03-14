@@ -525,8 +525,8 @@ map_value:
 static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid, unsigned char value_type)
 {
 	int				ret = FAIL;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_valuemaps_t			*valuemap;
 	zbx_vector_valuemaps_ptr_t	valuemaps;
 
