@@ -21,6 +21,7 @@ package remotecontrol
 
 import (
 	"bufio"
+	"errors"
 	"net"
 	"os"
 	"time"
@@ -64,31 +65,49 @@ func (c *Conn) Stop() {
 	}
 }
 
+func (c *Conn) handleError(err error) error {
+	var netErr net.Error
+
+	if !errors.As(err, &netErr) {
+		log.Errf("failed to accept an incoming connection: %s", err.Error())
+
+		return nil
+	}
+
+	if netErr.Timeout() {
+		log.Errf("failed to accept an incoming connection: %s", err.Error())
+
+		return nil
+	}
+
+	if !netErr.Temporary() {
+		return err
+	}
+
+	log.Errf("failed to accept an incoming connection: %s", err.Error())
+
+	var se *os.SyscallError
+
+	if !errors.As(err, &se) {
+		return nil
+	}
+
+	/* sleep to avoid high CPU usage on surprising temporary errors */
+	if c.last_err == se.Err.Error() {
+		time.Sleep(time.Second)
+	}
+	c.last_err = se.Err.Error()
+
+	return nil
+}
+
 func (c *Conn) run() {
 	for {
-
 		conn, err := c.listener.Accept()
 
 		if err != nil {
-			if nerr, ok := err.(net.Error); ok {
-				if nerr.Timeout() {
-					log.Errf("failed to accept an incoming connection for remote command: %s", err.Error())
-					continue
-				}
-
-				/* sleep to avoid high CPU usage on surprising temporary errors */
-				if nerr.Temporary() {
-					if opError, ok := err.(*net.OpError); ok {
-						if se, ok := opError.Err.(*os.SyscallError); ok {
-							if c.last_err == se.Err.Error() {
-								time.Sleep(time.Second)
-							}
-							c.last_err = se.Err.Error()
-						}
-					}
-					log.Errf("failed to accept an incoming connection for remote command: %s", err.Error())
-					continue
-				}
+			if c.handleError(err) == nil {
+				continue
 			}
 
 			break

@@ -20,6 +20,7 @@
 package serverlistener
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -66,6 +67,46 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 	return nil
 }
 
+func (sl *ServerListener) handleError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	var netErr net.Error
+
+	if !errors.As(err, &netErr) {
+		log.Errf("failed to accept an incoming connection: %s", err.Error())
+
+		return nil
+	}
+
+	if netErr.Timeout() {
+		log.Errf("failed to accept an incoming connection: %s", err.Error())
+
+		return nil
+	}
+
+	if !netErr.Temporary() {
+		return err
+	}
+
+	log.Errf("failed to accept an incoming connection: %s", err.Error())
+
+	var se *os.SyscallError
+
+	if !errors.As(err, &se) {
+		return nil
+	}
+
+	/* sleep to avoid high CPU usage on surprising temporary errors */
+	if sl.last_err == se.Err.Error() {
+		time.Sleep(time.Second)
+	}
+	sl.last_err = se.Err.Error()
+
+	return nil
+}
+
 func (sl *ServerListener) run() {
 	defer log.PanicHook()
 
@@ -84,27 +125,13 @@ func (sl *ServerListener) run() {
 				log.Warningf("failed to process an incoming connection from %s: %s", conn.RemoteIP(), err.Error())
 			}
 		} else {
-			if nerr, ok := err.(net.Error); ok {
-				if nerr.Timeout() {
-					log.Errf("failed to accept an incoming connection: %s", err.Error())
+			if err != nil {
+				if sl.handleError(err) == nil {
 					continue
 				}
 
-				/* sleep to avoid high CPU usage on surprising temporary errors */
-				if nerr.Temporary() {
-					if opError, ok := err.(*net.OpError); ok {
-						if se, ok := opError.Err.(*os.SyscallError); ok {
-							if sl.last_err == se.Err.Error() {
-								time.Sleep(time.Second)
-							}
-							sl.last_err = se.Err.Error()
-						}
-					}
-					log.Errf("failed to accept an incoming connection: %s", err.Error())
-					continue
-				}
+				break
 			}
-			break
 		}
 	}
 
