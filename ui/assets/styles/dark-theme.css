@@ -1944,6 +1944,9 @@ form.dashboard-widget-svggraph .no-items-message {
   border: none !important;
   top: 0; }
 
+div.dashboard-widget-svggraph {
+  overflow-x: hidden; }
+
 form.dashboard-widget-tophosts #list_columns .text {
   max-width: 250px; }
 form.dashboard-widget-tophosts #column {
