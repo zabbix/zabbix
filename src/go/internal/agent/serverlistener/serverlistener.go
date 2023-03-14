@@ -68,10 +68,6 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 }
 
 func (sl *ServerListener) handleError(err error) error {
-	if err == nil {
-		return nil
-	}
-
 	var netErr net.Error
 
 	if !errors.As(err, &netErr) {
